@@ -65,6 +65,7 @@ def test_neuralforecast_fit_receives_validation_window(monkeypatch):
     spec = types.SimpleNamespace(
         class_name="TiDE",
         model_id="nf-tide",
+        library="neuralforecast",
         default_params={},
     )
 
