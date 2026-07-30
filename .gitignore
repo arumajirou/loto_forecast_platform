@@ -59,3 +59,7 @@ secrets.json
 Thumbs.db
 .vscode/
 .idea/
+
+# Local experiment backups
+*.before-*
+lightning_logs/
