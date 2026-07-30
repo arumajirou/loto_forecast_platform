@@ -1,0 +1,13 @@
+[Unit]
+Description=Loto trusted forecast pipeline
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/env/ts/loto
+EnvironmentFile=%h/.config/loto/runtime.env
+ExecStart=%h/env/ts/loto/.venv/bin/loto experiment run --input %h/env/ts/loto/data/loto7.csv --output %h/env/ts/loto/runs/latest --backtest-draws 50
+Nice=5
+
+[Install]
+WantedBy=default.target

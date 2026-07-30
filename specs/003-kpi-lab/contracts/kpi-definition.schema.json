@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loto.local/schemas/003/kpi-definition.schema.json",
+  "title": "KpiDefinition",
+  "description": "Frozen statement of the coverage target and its mandatory ticket denominator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["game", "objective", "tolerance", "n_tickets", "target_coverage", "alpha", "schema_version"],
+  "properties": {
+    "game": {"type": "string", "enum": ["mini", "loto6", "loto7", "bingo5", "numbers3", "numbers4"]},
+    "objective": {"type": "string", "enum": ["coverage_efficiency", "arm_delta", "raw_coverage"]},
+    "tolerance": {"type": "integer", "minimum": 0},
+    "n_tickets": {"type": "integer", "minimum": 1, "description": "Fixed and mandatory. There is deliberately no unlimited option."},
+    "target_coverage": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+    "min_arm_delta": {"type": "number"},
+    "alpha": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+    "max_false_positive_rate": {"type": "number", "minimum": 0, "exclusiveMaximum": 1},
+    "require_reference_arm": {"type": "boolean"},
+    "reference_construction": {"type": "string"},
+    "notes": {"type": "array", "items": {"type": "string"}},
+    "notes_count": {"type": "integer", "minimum": 0},
+    "kpi_definition_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "is_degenerate": {"type": "boolean"},
+    "schema_version": {"type": "string"}
+  }
+}

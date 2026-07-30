@@ -1,0 +1,11 @@
+{
+  "valid": true,
+  "config_hash": "43b45832755bb443fddb7f93d4d51d278ffc23bccdfdf1e3c7b41306c38b7c33",
+  "models": [
+    "uniform",
+    "frequency",
+    "logistic",
+    "extra-trees",
+    "hist-gradient-boosting"
+  ]
+}

@@ -1,0 +1,5 @@
+api/openapi.yaml: OK (dict)
+events/asyncapi.yaml: OK (dict)
+configs/default.yaml: OK (dict)
+installed_distribution: 0.1.0
+loto_entrypoint: /opt/pyvenv/bin/loto

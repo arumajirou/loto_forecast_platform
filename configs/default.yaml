@@ -1,0 +1,32 @@
+runtime:
+  production_os: linux
+  windows_role: auxiliary
+  wsl_role: compatibility
+  production_slo_minutes: 180
+evaluation:
+  holdout_draws: 50
+  shadow_min_draws: 20
+  shadow_formal_draws: 50
+  provisional_hits_improvement: 0.10
+  formal_hits_improvement: 0.15
+  calibration_relative_margin: 0.02
+  ece_absolute_margin: 0.02
+search:
+  default_backend: optuna
+  ray_cpu_parallel_threshold: 4
+  max_gpu_trial_concurrency: 1
+feature_windows: [10, 30, 100]
+
+platform:
+  registry_url: "sqlite:///runs/platform.sqlite3"
+  artifact_store: "runs/artifacts"
+  production_os: "linux"
+  auth:
+    enabled: true
+    token_env: "LOTO_API_TOKENS"
+    roles: [viewer, researcher, operator, approver, administrator]
+  approval:
+    two_person_required: true
+  shadow:
+    minimum_draws: 20
+    formal_draws: 50

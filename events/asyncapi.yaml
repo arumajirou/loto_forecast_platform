@@ -1,0 +1,42 @@
+asyncapi: 3.0.0
+info:
+  title: Loto Platform Events
+  version: 0.1.0
+channels:
+  runStageChanged:
+    address: run.stage.changed
+    messages:
+      stageChanged:
+        payload:
+          type: object
+          required: [run_id, stage, status]
+          properties:
+            run_id: {type: string}
+            stage: {type: string}
+            status: {type: string}
+  forecastSealed:
+    address: forecast.sealed
+    messages:
+      forecastSealed:
+        payload:
+          type: object
+          required: [forecast_id, verified]
+          properties:
+            forecast_id: {type: string}
+            verified: {type: boolean}
+  releaseBundleCreated:
+    address: release.bundle.created
+    messages:
+      bundleCreated:
+        payload:
+          type: object
+          required: [release_id]
+          properties:
+            release_id: {type: string}
+operations:
+  publishStageChanged:
+    action: send
+    channel: {$ref: '#/channels/runStageChanged'}
+  publishForecastSealed:
+    action: send
+    channel: {$ref: '#/channels/forecastSealed'}

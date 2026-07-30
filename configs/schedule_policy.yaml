@@ -1,0 +1,6 @@
+schedule:
+  timezone: Asia/Tokyo
+  run_hour: 20
+  run_minute: 30
+  delay_days: 0
+  startup_cooldown_seconds: 900

@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loto-forecast-platform"
+version = "3.2.0"
+description = "Extensible, leakage-safe, multi-model Loto forecasting research and operations platform"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "numpy>=2.0",
+  "pandas>=2.2",
+  "pydantic>=2.10",
+  "scikit-learn>=1.5",
+  "scipy>=1.14",
+  "PyYAML>=6.0",
+  "prometheus-client>=0.21",
+  "ray[tune]>=2.56.1",
+  "optuna>=4.9.0",
+  "tensorboard>=2.21.0",
+]
+
+[project.optional-dependencies]
+api = ["fastapi>=0.115,<0.120", "starlette<0.49", "httpx>=0.27,<1", "uvicorn>=0.34"]
+mlflow = ["mlflow>=3.0"]
+dev = [
+  "pytest>=8", "httpx>=0.27,<1", "pytest-cov>=5", "hypothesis>=6", "ruff>=0.9",
+  "mypy>=1.14", "fastapi>=0.115,<0.120", "starlette<0.49", "uvicorn>=0.34",
+  # Constitution principle III (test hermeticity): tests/test_integrated_full_features.py
+  # asserts on the resolved Optuna sampler name. Without optuna installed,
+  # _build_search_algorithm falls back to "library_default" and the suite verdict silently
+  # changes with the environment. optuna is therefore a DEV dependency, not just a `full` one.
+  "optuna>=4.0",
+]
+postgres = ["psycopg[binary]>=3.2", "sqlalchemy>=2.0"]
+full = ["fastapi>=0.115,<0.120", "starlette<0.49", "httpx>=0.27,<1", "uvicorn>=0.34", "mlflow>=3.0", "psycopg[binary]>=3.2", "sqlalchemy>=2.0", "pyarrow>=18", "psutil>=6", "lightgbm>=4.5", "xgboost>=2.1", "catboost>=1.2", "statsforecast>=2.0", "mlforecast>=1.0", "hierarchicalforecast>=1.0", "neuralforecast>=3.0", "optuna>=4.0", "ray[tune]>=2.40", "opentelemetry-sdk>=1.30", "opentelemetry-exporter-otlp>=1.30", "structlog>=25", "plotly>=6"]
+frameworks = ["u8darts>=0.37", "gluonts>=0.16", "sktime>=0.37", "skforecast>=0.17", "reservoirpy>=0.4"]
+tsfm = ["transformers>=4.50", "accelerate>=1.5", "chronos-forecasting>=2.0"]
+
+[project.scripts]
+loto = "loto.cli:main"
+loto3 = "loto.cli_v3:main"
+loto-integrity = "loto.verify.integrity:main"
+loto-lab = "loto.kpi_lab.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+

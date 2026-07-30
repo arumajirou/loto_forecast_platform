@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loto.local/schemas/003/negative-control.schema.json",
+  "title": "ControlSuiteReport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "results",
+    "n_negative",
+    "false_positive_rate",
+    "max_false_positive_rate",
+    "suspend",
+    "schema_version"
+  ],
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "kind",
+          "expectation",
+          "model_coverage",
+          "reference_coverage",
+          "delta",
+          "e_value",
+          "e_threshold",
+          "outcome"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "negative",
+              "positive"
+            ]
+          },
+          "expectation": {
+            "type": "string"
+          },
+          "model_coverage": {
+            "type": "number"
+          },
+          "reference_coverage": {
+            "type": "number"
+          },
+          "delta": {
+            "type": "number"
+          },
+          "threshold": {
+            "type": "number",
+            "description": "Minimum effect size. Insufficient alone: on a ~50-draw window the sampling SD of a coverage estimate is about 0.07, so a fixed delta rule fires on roughly half of null controls. The e_value is what bounds the null firing rate at alpha."
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "INCONCLUSIVE"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          },
+          "n_draws": {
+            "type": "integer"
+          },
+          "n_tickets": {
+            "type": "integer"
+          },
+          "schema_version": {
+            "type": "string"
+          },
+          "e_value": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Paired McNemar-style e-value on the scored window."
+          },
+          "e_threshold": {
+            "type": "number",
+            "exclusiveMinimum": 1,
+            "description": "1/alpha. Detection requires e_value >= this AND delta >= threshold."
+          },
+          "n_discordant": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Discordant pairs the e-value was computed over."
+          }
+        }
+      }
+    },
+    "n_negative": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "n_negative_failed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "false_positive_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "max_false_positive_rate": {
+      "type": "number",
+      "minimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "positive_controls_fired": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "n_positive": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "has_demonstrated_power": {
+      "type": "boolean",
+      "description": "False makes passing negatives uninformative."
+    },
+    "suspend": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    }
+  }
+}

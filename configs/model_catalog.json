@@ -1,0 +1,847 @@
+[
+  {
+    "model_id": "uniform",
+    "family": "theory",
+    "library": "builtin",
+    "task": "candidate",
+    "class_name": "UniformCandidateAdapter",
+    "priority": "p0",
+    "package": null,
+    "capabilities": [
+      "probability",
+      "ranking"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "frequency",
+    "family": "frequency",
+    "library": "builtin",
+    "task": "candidate",
+    "class_name": "FrequencyCandidateAdapter",
+    "priority": "p0",
+    "package": null,
+    "capabilities": [
+      "probability",
+      "ranking"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "logistic",
+    "family": "linear",
+    "library": "sklearn",
+    "task": "candidate",
+    "class_name": "LogisticRegression",
+    "priority": "p0",
+    "package": "sklearn",
+    "capabilities": [
+      "probability",
+      "exogenous"
+    ],
+    "default_params": {
+      "C": 1.0,
+      "max_iter": 1000
+    },
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "ridge-position",
+    "family": "linear",
+    "library": "sklearn",
+    "task": "position",
+    "class_name": "Ridge",
+    "priority": "p0",
+    "package": "sklearn",
+    "capabilities": [
+      "position",
+      "exogenous"
+    ],
+    "default_params": {
+      "alpha": 1.0
+    },
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "elasticnet-position",
+    "family": "linear",
+    "library": "sklearn",
+    "task": "position",
+    "class_name": "ElasticNet",
+    "priority": "p1",
+    "package": "sklearn",
+    "capabilities": [
+      "position",
+      "exogenous"
+    ],
+    "default_params": {
+      "alpha": 0.01,
+      "l1_ratio": 0.5,
+      "max_iter": 5000
+    },
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "random-forest",
+    "family": "tree",
+    "library": "sklearn",
+    "task": "candidate",
+    "class_name": "RandomForestClassifier",
+    "priority": "p1",
+    "package": "sklearn",
+    "capabilities": [
+      "probability",
+      "exogenous"
+    ],
+    "default_params": {
+      "n_estimators": 300,
+      "min_samples_leaf": 3,
+      "n_jobs": -1
+    },
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "extra-trees",
+    "family": "tree",
+    "library": "sklearn",
+    "task": "candidate",
+    "class_name": "ExtraTreesClassifier",
+    "priority": "p0",
+    "package": "sklearn",
+    "capabilities": [
+      "probability",
+      "exogenous"
+    ],
+    "default_params": {
+      "n_estimators": 300,
+      "min_samples_leaf": 2,
+      "n_jobs": -1
+    },
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "hist-gradient-boosting",
+    "family": "tree",
+    "library": "sklearn",
+    "task": "candidate",
+    "class_name": "HistGradientBoostingClassifier",
+    "priority": "p0",
+    "package": "sklearn",
+    "capabilities": [
+      "probability",
+      "exogenous"
+    ],
+    "default_params": {
+      "max_iter": 200,
+      "learning_rate": 0.05
+    },
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "lightgbm-classifier",
+    "family": "tree",
+    "library": "lightgbm",
+    "task": "candidate",
+    "class_name": "LGBMClassifier",
+    "priority": "p0",
+    "package": "lightgbm",
+    "capabilities": [
+      "probability",
+      "ranking",
+      "exogenous",
+      "gpu_optional"
+    ],
+    "default_params": {
+      "n_estimators": 400,
+      "learning_rate": 0.03,
+      "num_leaves": 31
+    },
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "lightgbm-position",
+    "family": "tree",
+    "library": "lightgbm",
+    "task": "position",
+    "class_name": "LGBMRegressor",
+    "priority": "p0",
+    "package": "lightgbm",
+    "capabilities": [
+      "position",
+      "exogenous",
+      "gpu_optional"
+    ],
+    "default_params": {
+      "n_estimators": 400,
+      "learning_rate": 0.03
+    },
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "xgboost-classifier",
+    "family": "tree",
+    "library": "xgboost",
+    "task": "candidate",
+    "class_name": "XGBClassifier",
+    "priority": "p1",
+    "package": "xgboost",
+    "capabilities": [
+      "probability",
+      "exogenous",
+      "gpu_optional"
+    ],
+    "default_params": {
+      "n_estimators": 400,
+      "learning_rate": 0.03,
+      "max_depth": 5
+    },
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "catboost-classifier",
+    "family": "tree",
+    "library": "catboost",
+    "task": "candidate",
+    "class_name": "CatBoostClassifier",
+    "priority": "p1",
+    "package": "catboost",
+    "capabilities": [
+      "probability",
+      "exogenous",
+      "gpu_optional"
+    ],
+    "default_params": {
+      "iterations": 400,
+      "learning_rate": 0.03,
+      "verbose": false
+    },
+    "notes": "",
+    "available": true
+  },
+  {
+    "model_id": "stats-naive",
+    "family": "statistical",
+    "library": "statsforecast",
+    "task": "position_series",
+    "class_name": "Naive",
+    "priority": "p0",
+    "package": "statsforecast",
+    "capabilities": [],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "stats-historic-average",
+    "family": "statistical",
+    "library": "statsforecast",
+    "task": "position_series",
+    "class_name": "HistoricAverage",
+    "priority": "p0",
+    "package": "statsforecast",
+    "capabilities": [],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "stats-autoarima",
+    "family": "statistical",
+    "library": "statsforecast",
+    "task": "position_series",
+    "class_name": "AutoARIMA",
+    "priority": "p0",
+    "package": "statsforecast",
+    "capabilities": [],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "stats-autoets",
+    "family": "statistical",
+    "library": "statsforecast",
+    "task": "position_series",
+    "class_name": "AutoETS",
+    "priority": "p0",
+    "package": "statsforecast",
+    "capabilities": [],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "stats-autotheta",
+    "family": "statistical",
+    "library": "statsforecast",
+    "task": "position_series",
+    "class_name": "AutoTheta",
+    "priority": "p0",
+    "package": "statsforecast",
+    "capabilities": [],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "stats-autoces",
+    "family": "statistical",
+    "library": "statsforecast",
+    "task": "position_series",
+    "class_name": "AutoCES",
+    "priority": "p1",
+    "package": "statsforecast",
+    "capabilities": [],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "stats-croston",
+    "family": "intermittent",
+    "library": "statsforecast",
+    "task": "candidate_series",
+    "class_name": "CrostonClassic",
+    "priority": "p1",
+    "package": "statsforecast",
+    "capabilities": [],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "stats-tsb",
+    "family": "intermittent",
+    "library": "statsforecast",
+    "task": "candidate_series",
+    "class_name": "TSB",
+    "priority": "p1",
+    "package": "statsforecast",
+    "capabilities": [],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "mlforecast-ridge",
+    "family": "lag_ml",
+    "library": "mlforecast",
+    "task": "position_series",
+    "class_name": "Ridge",
+    "priority": "p0",
+    "package": "mlforecast",
+    "capabilities": [
+      "lags",
+      "exogenous"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "mlforecast-lightgbm",
+    "family": "lag_ml",
+    "library": "mlforecast",
+    "task": "position_series",
+    "class_name": "LGBMRegressor",
+    "priority": "p0",
+    "package": "mlforecast",
+    "capabilities": [
+      "lags",
+      "exogenous",
+      "gpu_optional"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-dlinear",
+    "family": "deep",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "DLinear",
+    "priority": "p0",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "checkpoint"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-nlinear",
+    "family": "deep",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "NLinear",
+    "priority": "p0",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "checkpoint"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-nhits",
+    "family": "deep",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "NHITS",
+    "priority": "p0",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "checkpoint",
+      "exogenous"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-nbeats",
+    "family": "deep",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "NBEATS",
+    "priority": "p1",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "checkpoint"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-nbeatsx",
+    "family": "deep",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "NBEATSx",
+    "priority": "p1",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "checkpoint",
+      "exogenous"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-tide",
+    "family": "deep",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "TiDE",
+    "priority": "p0",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "checkpoint",
+      "exogenous"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-tcn",
+    "family": "deep",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "TCN",
+    "priority": "p0",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "checkpoint"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-gru",
+    "family": "deep",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "GRU",
+    "priority": "p0",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "checkpoint"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-lstm",
+    "family": "deep",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "LSTM",
+    "priority": "p1",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "checkpoint"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-deepar",
+    "family": "deep_probabilistic",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "DeepAR",
+    "priority": "p1",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "probabilistic"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-tft",
+    "family": "transformer",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "TFT",
+    "priority": "p1",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "exogenous",
+      "attention"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-patchtst",
+    "family": "transformer",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "PatchTST",
+    "priority": "p1",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-timesnet",
+    "family": "transformer",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "TimesNet",
+    "priority": "p1",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-tsmixer",
+    "family": "mixer",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "TSMixer",
+    "priority": "p1",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "multiseries"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-timemixer",
+    "family": "mixer",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "TimeMixer",
+    "priority": "p2",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-itransformer",
+    "family": "transformer",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "iTransformer",
+    "priority": "p2",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu",
+      "multivariate"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "nf-vanilla-transformer",
+    "family": "transformer",
+    "library": "neuralforecast",
+    "task": "position_series",
+    "class_name": "VanillaTransformer",
+    "priority": "p2",
+    "package": "neuralforecast",
+    "capabilities": [
+      "gpu"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "autogluon-timeseries",
+    "family": "automl",
+    "library": "autogluon",
+    "task": "position_series",
+    "class_name": "TimeSeriesPredictor",
+    "priority": "p1",
+    "package": "autogluon",
+    "capabilities": [
+      "ensemble",
+      "probabilistic",
+      "zero_shot"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "darts-ensemble",
+    "family": "framework",
+    "library": "darts",
+    "task": "position_series",
+    "class_name": "RegressionEnsembleModel",
+    "priority": "p2",
+    "package": "darts",
+    "capabilities": [
+      "ensemble",
+      "probabilistic"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "gluonts-deepar",
+    "family": "deep_probabilistic",
+    "library": "gluonts",
+    "task": "position_series",
+    "class_name": "DeepAREstimator",
+    "priority": "p2",
+    "package": "gluonts",
+    "capabilities": [
+      "probabilistic"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "reservoir-esn",
+    "family": "reservoir",
+    "library": "reservoirpy",
+    "task": "position",
+    "class_name": "ESN",
+    "priority": "p1",
+    "package": "reservoirpy",
+    "capabilities": [
+      "position"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "chronos-bolt-tiny",
+    "family": "tsfm",
+    "library": "chronos",
+    "task": "foundation",
+    "class_name": "ChronosBoltPipeline",
+    "priority": "p1",
+    "package": "chronos",
+    "capabilities": [
+      "zero_shot",
+      "probabilistic",
+      "gpu_optional"
+    ],
+    "default_params": {
+      "model_name": "amazon/chronos-bolt-tiny"
+    },
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "chronos-2-small",
+    "family": "tsfm",
+    "library": "chronos",
+    "task": "foundation",
+    "class_name": "Chronos2Pipeline",
+    "priority": "p1",
+    "package": "chronos",
+    "capabilities": [
+      "zero_shot",
+      "fine_tuning",
+      "exogenous"
+    ],
+    "default_params": {
+      "model_name": "autogluon/chronos-2-small"
+    },
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "timesfm-2.5",
+    "family": "tsfm",
+    "library": "timesfm",
+    "task": "foundation",
+    "class_name": "TimesFM",
+    "priority": "p1",
+    "package": "timesfm",
+    "capabilities": [
+      "zero_shot",
+      "fine_tuning",
+      "exogenous",
+      "gpu"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "granite-ttm",
+    "family": "tsfm",
+    "library": "transformers",
+    "task": "foundation",
+    "class_name": "TinyTimeMixerForPrediction",
+    "priority": "p1",
+    "package": "transformers",
+    "capabilities": [
+      "zero_shot",
+      "fine_tuning",
+      "gpu_optional"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "tirex",
+    "family": "tsfm",
+    "library": "tirex",
+    "task": "foundation",
+    "class_name": "TiRex",
+    "priority": "p1",
+    "package": "tirex",
+    "capabilities": [
+      "zero_shot",
+      "probabilistic",
+      "gpu_optional"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "moirai",
+    "family": "tsfm",
+    "library": "uni2ts",
+    "task": "foundation",
+    "class_name": "MoiraiForecast",
+    "priority": "p2",
+    "package": "uni2ts",
+    "capabilities": [
+      "zero_shot",
+      "probabilistic",
+      "gpu"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "sundial",
+    "family": "tsfm",
+    "library": "transformers",
+    "task": "foundation",
+    "class_name": "Sundial",
+    "priority": "p2",
+    "package": "transformers",
+    "capabilities": [
+      "zero_shot",
+      "generative",
+      "gpu"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  },
+  {
+    "model_id": "tabpfn-ts",
+    "family": "foundation_tabular",
+    "library": "tabpfn_time_series",
+    "task": "candidate",
+    "class_name": "TabPFNTimeSeries",
+    "priority": "p1",
+    "package": "tabpfn_time_series",
+    "capabilities": [
+      "zero_shot",
+      "probability",
+      "gpu_optional"
+    ],
+    "default_params": {},
+    "notes": "",
+    "available": false
+  }
+]

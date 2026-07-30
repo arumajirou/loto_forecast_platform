@@ -1,0 +1,45 @@
+{
+  "schema_version": "2.0.0",
+  "run_id": "research-803d40f393db",
+  "config_hash": "43b45832755bb443fddb7f93d4d51d278ffc23bccdfdf1e3c7b41306c38b7c33",
+  "data_version": "loto7-1-160-792c12de7a3f",
+  "development_draws": 140,
+  "holdout_draws": 20,
+  "outer_folds": [
+    {
+      "fold_id": "fold-01",
+      "train_start": 0,
+      "train_end": 134,
+      "test_start": 134,
+      "test_end": 137
+    },
+    {
+      "fold_id": "fold-02",
+      "train_start": 0,
+      "train_end": 137,
+      "test_start": 137,
+      "test_end": 140
+    }
+  ],
+  "successful_trials": 5,
+  "failed_trials": 0,
+  "champion": {
+    "rank": 1,
+    "model_id": "uniform",
+    "family": "theory",
+    "library": "builtin",
+    "composite_score": 0.7482825489582247,
+    "mean_hits_at_7": 1.8333333333333333,
+    "mean_within_1": 0.2857142857142857,
+    "all_positions_within_1": 0.0,
+    "worst_position_within_1": 0.0,
+    "position_mae": 3.4761904761904763,
+    "position_mse": 22.047619047619047,
+    "brier": 0.15339663988312632,
+    "log_loss": 0.4850451425563365,
+    "ece": 0.0,
+    "elapsed_seconds": 0.6479825120004534
+  },
+  "holdout_evaluated": false,
+  "note": "Holdout remains untouched until an explicit certification command."
+}

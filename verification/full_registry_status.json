@@ -1,0 +1,12 @@
+[
+  {
+    "run_id": "run-7a908ce04a3d",
+    "status": "SUCCEEDED",
+    "current_stage": "REGISTER",
+    "created_at": "2026-07-30T03:41:51.550366+00:00",
+    "updated_at": "2026-07-30T03:41:52.902182+00:00",
+    "config_hash": "",
+    "release_id": "release-run-7a908ce04a3d",
+    "error_json": null
+  }
+]

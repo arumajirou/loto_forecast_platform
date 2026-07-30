@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "dataset_id": "loto7-canonical",
+  "data_version": "loto7-1-160-792c12de7a3f",
+  "lottery": "loto7",
+  "row_count": 160,
+  "first_draw_no": 1,
+  "last_draw_no": 160,
+  "first_draw_date": "2023-01-06T00:00:00Z",
+  "last_draw_date": "2026-01-23T00:00:00Z",
+  "sha256": "792c12de7a3fc25c7126457235a179f33a9b704972303ff7121606826e2942f5",
+  "source": "examples/sample_loto7.csv"
+}

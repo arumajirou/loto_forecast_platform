@@ -1,0 +1,44 @@
+# KPI Lab 設定例（003-kpi-lab）
+#
+# 実行:
+#   uv run loto-lab bounds --game loto7          # まず下限を見る（データ不要・数秒）
+#   uv run loto-lab run --config configs/kpi_lab.example.yaml
+#
+# 未知のトップレベルキーは無視されずエラーになる（loto.kpi_lab.runner.load_lab_config）。
+
+kpi:
+  game: mini                    # mini / loto6 / loto7 / bingo5 / numbers3 / numbers4
+  objective: arm_delta          # arm_delta 推奨。raw_coverage は口数を測るだけになる
+  tolerance: 1
+  n_tickets: 700                # 必須かつ固定。ここを可変にするとKPIが無意味になる
+  target_coverage: 0.90
+  min_arm_delta: 0.0            # Arm A をこの差以上上回らねば勝利宣言しない
+  alpha: 0.01                   # e-value 閾値 = 1/alpha = 100
+  max_false_positive_rate: 0.05 # 超過で LEAK_DETECTED_SUSPENDED。実行中に緩めない
+  reference_construction: offset_lattice   # 実測最良（spec.md §7 参照）
+
+budget:
+  max_experiments: 50
+  max_runtime_seconds: 3600
+  max_consecutive_failures: 10
+  min_confirmation_draws: 30
+  n_monte_carlo: 8000
+
+lab:
+  calibration_fraction: 0.5
+  seed: 42
+  improvement_threshold: 0.02
+  output_dir: artifacts/kpi_lab
+  # ローカルLLM提案器。未設定なら決定的グリッド探索のみを使う。
+  # 不通時は UNAVAILABLE を記録し、明示ログ付きでグリッドへ切替する（silent fallback しない）。
+  # llm_endpoint: http://127.0.0.1:8788/v1/chat/completions
+  # llm_model: qwen3.6-35b-a3b
+
+data:
+  draws_path: data/mini.csv     # 列名は GameGeometry.column_names() に一致すること（mini なら n1..n5）
+
+# cost:
+#   # 当せん金体系を一次情報で確認できた場合のみ設定する。
+#   # 未設定なら expected_return_jpy は None になる（被覆率からは決して導出しない）。
+#   payout_table_jpy:
+#     mini: {top: 10000000}

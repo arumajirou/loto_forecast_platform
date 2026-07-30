@@ -1,0 +1,84 @@
+schema_version: "2.1.0"
+data:
+  game: loto7
+  input: examples/sample_loto7.csv
+  target_mode: both
+  feature_windows: [5, 10, 20, 30, 50, 100]
+  exponential_halflives: [5.0, 10.0, 20.0, 50.0]
+  min_train_draws: 100
+models:
+  - uniform
+  - frequency
+  - logistic
+  - extra-trees
+  - hist-gradient-boosting
+  - lightgbm-classifier
+  - stats-autoarima
+  - stats-autoets
+  - stats-autotheta
+  - mlforecast-ridge
+  - mlforecast-lightgbm
+  - nf-dlinear
+  - nf-nhits
+  - nf-tide
+  - nf-tcn
+  - nf-gru
+  - chronos-bolt-tiny
+model_params:
+  lightgbm-classifier:
+    n_estimators: 300
+    learning_rate: 0.03
+  nf-nhits:
+    max_steps: 300
+    input_size: 64
+cv:
+  outer_folds: 5
+  inner_folds: 3
+  test_size: 10
+  gap: 0
+  expanding: true
+  holdout_size: 50
+  seeds: [42, 1729, 20260730]
+  min_train_size: 100
+objective:
+  primary: mean_within_1
+  weights:
+    mean_hits_at_7: 0.35
+    mean_within_1: 0.35
+    all_positions_within_1: 0.15
+    brier: -0.10
+    ece: -0.05
+  calibration_brier_relative_limit: 1.02
+  max_single_ensemble_weight: 0.60
+search:
+  backend: optuna
+  trials: 30
+  timeout_seconds: 7200
+  parallel_jobs: 2
+  cpus_per_trial: 4
+  gpus_per_trial: 0.25
+  fail_fast: false
+  max_consecutive_failures: 5
+  sampler: tpe
+  pruner: median
+observability:
+  mlflow_uri: http://127.0.0.1:5050
+  experiment_name: loto-v2-research
+  jsonl_log: true
+  log_level: INFO
+  prometheus_port: null
+  otlp_endpoint: http://127.0.0.1:4318
+  trace_sample_ratio: 1.0
+  capture_gpu: true
+  capture_process_tree: true
+  profile: none
+runtime:
+  output: runs/research-v2
+  device: auto
+  precision: "32"
+  deterministic: true
+  cache_dir: .cache/loto
+  worker_isolation: subprocess
+  model_timeout_seconds: 1800
+  max_memory_mb: null
+  resume: true

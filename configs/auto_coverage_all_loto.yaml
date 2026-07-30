@@ -1,0 +1,82 @@
+schema_version: "1.0.0"
+output: runs/auto-coverage-all-loto
+resume: true
+
+budget:
+  max_experiments: 500
+  max_runtime_seconds: 86400
+  max_consecutive_failures: 20
+  max_candidates: 5000
+  target_coverage: 0.90
+  calibration_margin: 0.02
+  tolerance: 1
+  stop_when_target_met: true
+
+games:
+  mini:
+    input: runs/data-acquisition-mini/normalized/mini.csv
+    split: {min_train_size: 250, calibration_size: 80, validation_size: 80, test_size: 50}
+  loto6:
+    input: runs/data-acquisition-loto6/normalized/loto6.csv
+    split: {min_train_size: 300, calibration_size: 80, validation_size: 80, test_size: 50}
+  loto7:
+    input: runs/data-acquisition-loto7/normalized/loto7.csv
+    split: {min_train_size: 300, calibration_size: 80, validation_size: 80, test_size: 50}
+
+search:
+  # "available" evaluates every model whose dependency is present. Optional models without
+  # their provider fail explicitly and are retained as evidence, never silently replaced.
+  models:
+    - uniform
+    - frequency
+    - stats-naive
+    - stats-historic-average
+    - stats-autoarima
+    - stats-autoets
+    - ridge-position
+    - mlforecast-ridge
+  ensembles:
+    - []
+    - [frequency, stats-historic-average]
+    - [frequency, stats-autoarima]
+    - [stats-historic-average, stats-autoarima]
+    - [frequency, stats-historic-average, stats-autoarima]
+  common:
+    pool_size: 20000
+    pool_size_max: 100000
+    per_position_top: 7
+    beam_width: 20000
+    diversity_penalty: 0.05
+    seed: 42
+  parameter_spaces:
+    uniform:
+      window: [50, 100, 200, 99999]
+    frequency:
+      window: [20, 50, 100, 200]
+    stats-naive:
+      window: [20, 50, 100]
+    stats-historic-average:
+      window: [50, 100, 200, 99999]
+    stats-autoarima:
+      window: [50, 100, 200]
+      lags: [[1,2,3,5,10], [1,2,3,5,10,20], [1,4,8,12,24]]
+      alpha: [0.1, 1.0, 10.0]
+    stats-autoets:
+      window: [50, 100, 200, 99999]
+    ridge-position:
+      window: [50, 100, 200]
+      lags: [[1,2,3,5,10], [1,2,3,5,10,20], [1,4,8,12,24]]
+      alpha: [0.01, 0.1, 1.0, 10.0, 100.0]
+    mlforecast-ridge:
+      window: [50, 100, 200]
+      lags: [[1,2,3,5,10], [1,2,3,5,10,20], [1,4,8,12,24]]
+      alpha: [0.01, 0.1, 1.0, 10.0, 100.0]
+
+local_llm:
+  enabled: true
+  base_url: http://127.0.0.1:17200/v1
+  model: ornith9b_mtp_fast
+  timeout_seconds: 300
+  temperature: 0.1
+  max_tokens: 1500
+  every_n_experiments: 10

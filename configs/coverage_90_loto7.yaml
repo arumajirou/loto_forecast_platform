@@ -1,0 +1,23 @@
+schema_version: "1.0.0"
+data:
+  game: loto7
+  input: runs/data-acquisition-loto7/normalized/loto7.csv
+output: runs/coverage-90-loto7
+models:
+  - median
+  - historic-average
+  - recent-median
+split:
+  min_train_size: 300
+  calibration_size: 100
+  validation_size: 100
+  test_size: 50
+coverage:
+  target_coverage: 0.90
+  calibration_margin: 0.02
+  tolerance: 1
+  max_candidates: 5000
+  pool_size: 20000
+  per_position_top: 9
+  beam_width: 30000
+  diversity_penalty: 0.05

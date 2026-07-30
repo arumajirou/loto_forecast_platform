@@ -1,0 +1,8 @@
+{
+  "mini": {"display_name":"ミニロト","url":"https://loto-life.net/csv/mini","kind":"lotto","main_count":5,"bonus_count":1,"number_min":1,"number_max":31,"draw_weekdays":[1]},
+  "loto6": {"display_name":"ロト6","url":"https://loto-life.net/csv/loto6","kind":"lotto","main_count":6,"bonus_count":1,"number_min":1,"number_max":43,"draw_weekdays":[0,3]},
+  "loto7": {"display_name":"ロト7","url":"https://loto-life.net/csv/loto7","kind":"lotto","main_count":7,"bonus_count":2,"number_min":1,"number_max":37,"draw_weekdays":[4]},
+  "bingo5": {"display_name":"ビンゴ5","url":"https://loto-life.net/csv/bingo5","kind":"bingo5","main_count":8,"bonus_count":0,"number_min":1,"number_max":40,"draw_weekdays":[2]},
+  "numbers3": {"display_name":"ナンバーズ3","url":"https://loto-life.net/csv/numbers3","kind":"numbers","digits_count":3,"number_min":0,"number_max":9,"draw_weekdays":[0,1,2,3,4]},
+  "numbers4": {"display_name":"ナンバーズ4","url":"https://loto-life.net/csv/numbers4","kind":"numbers","digits_count":4,"number_min":0,"number_max":9,"draw_weekdays":[0,1,2,3,4]}
+}

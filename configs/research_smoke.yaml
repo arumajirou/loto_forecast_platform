@@ -1,0 +1,61 @@
+schema_version: "2.1.0"
+data:
+  game: loto7
+  input: examples/sample_loto7.csv
+  target_mode: candidate
+  feature_windows: [5, 10, 20]
+  exponential_halflives: [5.0, 10.0]
+  min_train_draws: 80
+models: [uniform, frequency, logistic, extra-trees, hist-gradient-boosting]
+model_params: {}
+cv:
+  outer_folds: 2
+  inner_folds: 2
+  test_size: 3
+  gap: 0
+  expanding: true
+  holdout_size: 20
+  seeds: [42]
+  min_train_size: 80
+objective:
+  primary: mean_within_1
+  weights:
+    mean_hits_at_7: 0.35
+    mean_within_1: 0.40
+    all_positions_within_1: 0.15
+    brier: -0.05
+    ece: -0.05
+  calibration_brier_relative_limit: 1.02
+  max_single_ensemble_weight: 0.60
+search:
+  backend: none
+  trials: 1
+  timeout_seconds: 300
+  parallel_jobs: 1
+  cpus_per_trial: 1
+  gpus_per_trial: 0
+  fail_fast: false
+  max_consecutive_failures: 5
+  sampler: tpe
+  pruner: none
+observability:
+  mlflow_uri: null
+  experiment_name: loto-v2-smoke
+  jsonl_log: true
+  log_level: INFO
+  prometheus_port: null
+  otlp_endpoint: null
+  trace_sample_ratio: 1.0
+  capture_gpu: true
+  capture_process_tree: true
+  profile: none
+runtime:
+  output: runs/research-smoke-v2
+  device: cpu
+  precision: "32"
+  deterministic: true
+  cache_dir: .cache/loto
+  worker_isolation: inprocess
+  model_timeout_seconds: 300
+  max_memory_mb: null
+  resume: false
