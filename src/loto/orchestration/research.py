@@ -93,6 +93,11 @@ def _position_fold(
     test_end: int,
     device: str,
     precision: str,
+    *,
+    run_id: str,
+    trial_id: str,
+    fold_id: str,
+    output_dir: Path,
 ) -> tuple[list[list[int]], list[np.ndarray], list[list[int]], list[dict[str, Any]]]:
     predictions: list[list[int]] = []
     probabilities: list[np.ndarray] = []
@@ -104,7 +109,17 @@ def _position_fold(
         history = master.iloc[:draw_index].copy()
         before = collect_gpu_evidence(gpu_required=False)
         started = time.perf_counter()
-        output = PositionSeriesWorker(spec, params, seed=seed, device=device, precision=precision).forecast(history)
+        output = PositionSeriesWorker(
+            spec,
+            params,
+            seed=seed,
+            device=device,
+            precision=precision,
+            run_id=run_id,
+            trial_id=trial_id,
+            fold_id=fold_id,
+            output_dir=output_dir,
+        ).forecast(history)
         elapsed = time.perf_counter() - started
         after = collect_gpu_evidence(gpu_required=gpu_required)
         values = np.clip(np.rint(output.position_values), 1, 37).astype(int)
@@ -184,6 +199,10 @@ def _tune_candidate_params(
         return float(np.mean(rows))
 
     if config.search.backend == "optuna":
+        optuna_dir = output / "optuna"
+        optuna_dir.mkdir(parents=True, exist_ok=True)
+        storage = config.search.optuna_storage or f"sqlite:///{(optuna_dir / 'studies.sqlite3').resolve()}"
+        study_name = f"{config.search.optuna_study_name_prefix}-{model_id}-s{seed}"
         result = optimize_optuna(
             model_id,
             objective,
@@ -193,6 +212,9 @@ def _tune_candidate_params(
             pruner=config.search.pruner,
             seed=seed,
             jobs=config.search.parallel_jobs,
+            storage=storage,
+            study_name=study_name,
+            load_if_exists=config.search.optuna_load_if_exists,
         )
     else:
         result = optimize_ray(
@@ -202,7 +224,8 @@ def _tune_candidate_params(
             timeout_seconds=config.search.timeout_seconds,
             cpus_per_trial=config.search.cpus_per_trial,
             gpus_per_trial=config.search.gpus_per_trial,
-            output_dir=str(output / "ray" / model_id),
+            output_dir=str(output / "ray"),
+            run_name=f"{model_id}-s{seed}",
         )
     search_dir = output / "search" / f"{model_id}-s{seed}"
     search_dir.mkdir(parents=True, exist_ok=True)
@@ -329,6 +352,10 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
                                     fold.test_end,
                                     config.runtime.device,
                                     config.runtime.precision,
+                                    run_id=run_id,
+                                    trial_id=trial_id,
+                                    fold_id=fold.fold_id,
+                                    output_dir=output,
                                 )
                             else:
                                 job = gateway.build_job(
@@ -463,6 +490,58 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
             "note": "Holdout remains untouched until an explicit certification command.",
         }
         atomic_write_json(output / "research_summary.json", summary)
+
+        lineage = {
+            "schema_version": "1.0.0",
+            "platform_run_id": run_id,
+            "config_hash": config.config_hash,
+            "data_version": manifest.data_version,
+            "output_dir": str(output),
+            "holdout_evaluated": False,
+            "models": list(config.models),
+            "seeds": list(config.cv.seeds),
+            "folds": [
+                {
+                    "fold_id": fold.fold_id,
+                    "train_start": fold.train_start,
+                    "train_end": fold.train_end,
+                    "test_start": fold.test_start,
+                    "test_end": fold.test_end,
+                }
+                for fold in folds
+            ],
+            "trials": [
+                {
+                    "trial_id": row.get("trial_id"),
+                    "model_id": row.get("model_id"),
+                    "seed": row.get("seed"),
+                    "status": row.get("status"),
+                    "params": row.get("params"),
+                }
+                for row in trials
+            ],
+            "artifacts": {
+                "resolved_config": str(output / "resolved_config.yaml"),
+                "research_summary": str(output / "research_summary.json"),
+                "trial_results_csv": str(output / "trial_results.csv"),
+                "trial_results_parquet": str(output / "trial_results.parquet"),
+                "fold_results_csv": str(output / "fold_results.csv"),
+                "fold_results_parquet": str(output / "fold_results.parquet"),
+                "model_leaderboard": str(output / "model_leaderboard.csv"),
+                "events": str(output / "events.jsonl"),
+                "resource_samples": str(output / "resource_samples.jsonl"),
+                "resources_dir": str(output / "resources"),
+                "search_dir": str(output / "search"),
+                "ray_dir": str(output / "ray"),
+                "optuna_dir": str(output / "optuna"),
+            },
+        }
+
+        atomic_write_json(
+            output / "lineage.json",
+            lineage,
+        )
+
         if config.observability.mlflow_uri:
             metrics = {
                 "successful_trials": float(len(trials)),
@@ -476,7 +555,27 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
                 run_id,
                 {"config_hash": config.config_hash, "models": config.models, "data_version": manifest.data_version},
                 metrics,
-                [output / "research_summary.json", output / "model_leaderboard.csv", output / "resolved_config.yaml"],
+                [
+                    output / "research_summary.json",
+                    output / "model_leaderboard.csv",
+                    output / "resolved_config.yaml",
+                    output / "trial_results.csv",
+                    output / "fold_results.csv",
+                    output / "trial_results.parquet",
+                    output / "fold_results.parquet",
+                    output / "failed_trials.csv",
+                    output / "skipped_trials.csv",
+                    output / "artifact_status.json",
+                    output / "events.jsonl",
+                    output / "resource_samples.jsonl",
+                    output / "lineage.json",
+                    output / "resources",
+                    output / "search",
+                    output / "ray",
+                    output / "optuna",
+                    output / "models",
+                    output / "tensorboard",
+                ],
             )
             atomic_write_json(output / "mlflow_status.json", mlflow_status)
             summary["mlflow"] = mlflow_status

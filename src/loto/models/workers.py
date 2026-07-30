@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 import importlib
+import json
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -82,12 +85,24 @@ class PositionSeriesWorker:
         seed: int = 42,
         device: str = "auto",
         precision: str = "32",
+        run_id: str | None = None,
+        trial_id: str | None = None,
+        fold_id: str | None = None,
+        output_dir: str | Path | None = None,
     ):
         self.spec = spec
         self.params = spec.default_params | (params or {})
         self.seed = seed
         self.device = device
         self.precision = precision
+        self.run_id = run_id
+        self.trial_id = trial_id
+        self.fold_id = fold_id
+        self.output_dir = (
+            Path(output_dir)
+            if output_dir is not None
+            else None
+        )
 
     def forecast(self, history: pd.DataFrame) -> WorkerOutput:
         if self.spec.library in {"sklearn", "lightgbm"}:
@@ -175,6 +190,143 @@ class PositionSeriesWorker:
         values = prediction.sort_values("unique_id")[self.spec.model_id].to_numpy(float)
         return WorkerOutput(values, {"library": "mlforecast", "lags": lags})
 
+    def _neuralforecast_artifact_dirs(self) -> dict[str, Path] | None:
+        if self.output_dir is None:
+            return None
+
+        model_root = (
+            self.output_dir
+            / "models"
+            / self.spec.model_id
+            / f"seed-{self.seed}"
+            / str(self.fold_id or "fold-unknown")
+        )
+
+        tensorboard_root = (
+            self.output_dir
+            / "tensorboard"
+            / self.spec.model_id
+            / f"seed-{self.seed}"
+        )
+
+        checkpoint_root = model_root / "checkpoints"
+        saved_model_root = model_root / "neuralforecast"
+
+        for directory in (
+            model_root,
+            tensorboard_root,
+            checkpoint_root,
+            saved_model_root,
+        ):
+            directory.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+
+        return {
+            "model_root": model_root,
+            "tensorboard_root": tensorboard_root,
+            "checkpoint_root": checkpoint_root,
+            "saved_model_root": saved_model_root,
+        }
+
+    @staticmethod
+    def _sha256(path: Path) -> str:
+        digest = hashlib.sha256()
+
+        with path.open("rb") as stream:
+            for block in iter(
+                lambda: stream.read(1024 * 1024),
+                b"",
+            ):
+                digest.update(block)
+
+        return digest.hexdigest()
+
+    def _write_neuralforecast_properties(
+        self,
+        *,
+        params: dict[str, Any],
+        metadata: dict[str, Any],
+        directories: dict[str, Path],
+    ) -> dict[str, Any]:
+        checkpoint_files = sorted(
+            directories["model_root"].rglob("*.ckpt")
+        )
+
+        checkpoints = []
+
+        for checkpoint in checkpoint_files:
+            checkpoints.append({
+                "path": str(checkpoint),
+                "bytes": checkpoint.stat().st_size,
+                "sha256": self._sha256(checkpoint),
+            })
+
+        properties = {
+            "schema_version": "1.0.0",
+            "run_id": self.run_id,
+            "trial_id": self.trial_id,
+            "fold_id": self.fold_id,
+            "model_id": self.spec.model_id,
+            "class_name": self.spec.class_name,
+            "library": self.spec.library,
+            "seed": self.seed,
+            "device": self.device,
+            "precision": self.precision,
+            "resolved_params": {
+                key: str(value)
+                for key, value in params.items()
+            },
+            "metadata": metadata,
+            "checkpoints": checkpoints,
+        }
+
+        properties_path = (
+            directories["model_root"]
+            / "model-properties.json"
+        )
+
+        properties_path.write_text(
+            json.dumps(
+                properties,
+                indent=2,
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+
+        sha_path = (
+            directories["model_root"]
+            / "checkpoint-sha256.txt"
+        )
+
+        sha_path.write_text(
+            "".join(
+                f"{item['sha256']}  {item['path']}\n"
+                for item in checkpoints
+            ),
+            encoding="utf-8",
+        )
+
+        return {
+            "model_root": str(
+                directories["model_root"]
+            ),
+            "tensorboard_root": str(
+                directories["tensorboard_root"]
+            ),
+            "checkpoint_root": str(
+                directories["checkpoint_root"]
+            ),
+            "saved_model_root": str(
+                directories["saved_model_root"]
+            ),
+            "model_properties": str(properties_path),
+            "checkpoint_manifest": str(sha_path),
+            "checkpoint_count": len(checkpoints),
+        }
+
     def _neuralforecast(self, history: pd.DataFrame) -> WorkerOutput:
         import torch
         from neuralforecast import NeuralForecast
@@ -193,6 +345,57 @@ class PositionSeriesWorker:
         accelerator = "gpu" if self.device == "cuda" or (self.device == "auto" and torch.cuda.is_available()) else "cpu"
         params.setdefault("accelerator", accelerator)
         params.setdefault("devices", 1)
+
+        directories = self._neuralforecast_artifact_dirs()
+
+        if directories is not None:
+            from pytorch_lightning.callbacks import (
+                ModelCheckpoint,
+            )
+            from pytorch_lightning.loggers import (
+                TensorBoardLogger,
+            )
+
+            logger = TensorBoardLogger(
+                save_dir=str(
+                    directories["tensorboard_root"]
+                ),
+                name="",
+                version=str(
+                    self.fold_id or "fold-unknown"
+                ),
+                default_hp_metric=True,
+            )
+
+            checkpoint_callback = ModelCheckpoint(
+                dirpath=str(
+                    directories["checkpoint_root"]
+                ),
+                filename=(
+                    "{epoch:03d}-{step:06d}"
+                    "-{ptl_val_loss:.6f}"
+                ),
+                monitor="ptl/val_loss",
+                mode="min",
+                save_top_k=1,
+                save_last=True,
+                auto_insert_metric_name=False,
+            )
+
+            params.setdefault("logger", logger)
+            params.setdefault(
+                "callbacks",
+                [checkpoint_callback],
+            )
+            params.setdefault(
+                "enable_checkpointing",
+                True,
+            )
+            params.setdefault(
+                "default_root_dir",
+                str(directories["model_root"]),
+            )
+
         if self.spec.class_name == "TSMixer":
             params.setdefault("n_series", 7)
         if self.spec.class_name == "TimesNet" and self.precision != "32":
@@ -210,18 +413,49 @@ class PositionSeriesWorker:
             val_size = 0
 
         nf.fit(df=frame, val_size=val_size)
+
+        artifact_metadata: dict[str, Any] = {}
+
+        if directories is not None:
+            nf.save(
+                path=str(
+                    directories["saved_model_root"]
+                ),
+                overwrite=True,
+            )
+
         prediction = nf.predict().reset_index()
         value_col = [c for c in prediction.columns if c not in {"unique_id", "ds", "index"}][0]
-        values = prediction.sort_values("unique_id")[value_col].to_numpy(float)
+        values = prediction.sort_values(
+            "unique_id"
+        )[value_col].to_numpy(float)
+
+        metadata = {
+            "library": "neuralforecast",
+            "accelerator": accelerator,
+            "column": value_col,
+            "val_size": val_size,
+            "early_stop_patience_steps": (
+                early_stop_patience
+            ),
+            "run_id": self.run_id,
+            "trial_id": self.trial_id,
+            "fold_id": self.fold_id,
+        }
+
+        if directories is not None:
+            artifact_metadata = (
+                self._write_neuralforecast_properties(
+                    params=params,
+                    metadata=metadata,
+                    directories=directories,
+                )
+            )
+            metadata["artifacts"] = artifact_metadata
+
         return WorkerOutput(
             values,
-            {
-                "library": "neuralforecast",
-                "accelerator": accelerator,
-                "column": value_col,
-                "val_size": val_size,
-                "early_stop_patience_steps": early_stop_patience,
-            },
+            metadata,
         )
 
     def _neuralforecast_auto(self, history: pd.DataFrame) -> WorkerOutput:
