@@ -72,6 +72,9 @@ class SearchConfig(BaseModel):
     max_consecutive_failures: int = 5
     sampler: Literal["tpe", "random", "cmaes"] = "tpe"
     pruner: Literal["median", "hyperband", "none"] = "median"
+    optuna_storage: str | None = None
+    optuna_study_name_prefix: str = "loto-research"
+    optuna_load_if_exists: bool = True
 
 
 class ObservabilityConfig(BaseModel):

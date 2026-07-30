@@ -70,7 +70,9 @@ def _suggest_optuna(trial, space: dict[str, tuple]) -> dict[str, Any]:
 
 def optimize_optuna(model_id: str, objective: Callable[[dict[str, Any]], float], *, trials: int,
                      timeout_seconds: int | None = None, sampler: str = "tpe",
-                     pruner: str = "median", seed: int = 42, jobs: int = 1) -> SearchResult:
+                     pruner: str = "median", seed: int = 42, jobs: int = 1,
+                     storage: str | None = None, study_name: str | None = None,
+                     load_if_exists: bool = True) -> SearchResult:
     import optuna
 
     if sampler == "random":
@@ -85,7 +87,14 @@ def optimize_optuna(model_id: str, objective: Callable[[dict[str, Any]], float],
         pruner_obj = optuna.pruners.NopPruner()
     else:
         pruner_obj = optuna.pruners.MedianPruner()
-    study = optuna.create_study(direction="maximize", sampler=sampler_obj, pruner=pruner_obj)
+    study = optuna.create_study(
+        direction="maximize",
+        sampler=sampler_obj,
+        pruner=pruner_obj,
+        storage=storage,
+        study_name=study_name,
+        load_if_exists=load_if_exists,
+    )
     space = PARAM_SPACES.get(model_id, {})
 
     def wrapped(trial):
@@ -116,7 +125,8 @@ def _ray_space(space: dict[str, tuple]):
 
 def optimize_ray(model_id: str, objective: Callable[[dict[str, Any]], float], *, trials: int,
                  timeout_seconds: int | None = None, cpus_per_trial: float = 1.0,
-                 gpus_per_trial: float = 0.0, output_dir: str | None = None) -> SearchResult:
+                 gpus_per_trial: float = 0.0, output_dir: str | None = None,
+                 run_name: str | None = None) -> SearchResult:
     from ray import tune
     from ray.air import RunConfig
 
@@ -129,7 +139,11 @@ def optimize_ray(model_id: str, objective: Callable[[dict[str, Any]], float], *,
         tune.with_resources(trainable, {"cpu": cpus_per_trial, "gpu": gpus_per_trial}),
         param_space=space,
         tune_config=tune.TuneConfig(num_samples=trials, metric="score", mode="max"),
-        run_config=RunConfig(storage_path=output_dir, stop={"time_total_s": timeout_seconds} if timeout_seconds else None),
+        run_config=RunConfig(
+            name=run_name or f"{model_id}-ray-search",
+            storage_path=output_dir,
+            stop={"time_total_s": timeout_seconds} if timeout_seconds else None,
+        ),
     )
     results = tuner.fit()
     best = results.get_best_result(metric="score", mode="max")

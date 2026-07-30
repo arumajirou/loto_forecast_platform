@@ -13,28 +13,17 @@ mlruns/
 ray_results/
 
 # Local environments
-.venv/
-.env
 .env.*
 !.env.example
 !.env.full.example
 
 # Python
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
 
 # Runtime outputs
 logs/
 runs/
 outputs/
 artifacts/
-mlruns/
-ray_results/
 *.log
 *.pid
 
@@ -59,3 +48,53 @@ secrets.json
 Thumbs.db
 .vscode/
 .idea/
+
+# --------------------------------------------------
+# Local-first development
+# Generated runtime and experiment data stay local.
+# --------------------------------------------------
+
+# Python environments and caches
+venv/
+env/
+
+# IDE and OS
+
+# Secrets and local configuration
+!.env.*.example
+
+# Runtime databases
+platform.sqlite3
+
+# Experiment outputs
+lightning_logs/
+tensorboard/
+checkpoints/
+
+# ML and data artifacts
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.ubj
+*.joblib
+*.pickle
+*.pkl
+*.parquet
+events.out.tfevents.*
+
+# Temporary backups and generated copies
+*.before-*
+*.bak.*
+*.tmp
+*.temp
+*.zip
+*.zip.sha256
+
+# Local reports
+coverage.xml
+junit.xml
+pytest-report.xml
+/runs/gpu-24h-campaign/
+/runs/stage2-expanded-*/
+/logs/

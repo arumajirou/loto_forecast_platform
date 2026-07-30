@@ -30,6 +30,8 @@ class MlflowBridge:
                     p = Path(artifact)
                     if p.exists() and p.is_file():
                         mlflow.log_artifact(str(p))
+                    elif p.exists() and p.is_dir():
+                        mlflow.log_artifacts(str(p), artifact_path=p.name)
                 return {
                     "enabled": True,
                     "tracking_uri": self.tracking_uri,
