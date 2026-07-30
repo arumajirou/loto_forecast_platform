@@ -193,17 +193,38 @@ class PositionSeriesWorker:
         accelerator = "gpu" if self.device == "cuda" or (self.device == "auto" and torch.cuda.is_available()) else "cpu"
         params.setdefault("accelerator", accelerator)
         params.setdefault("devices", 1)
-        if self.spec.class_name == "TSMixer":
+        if self.spec.class_name in {
+            "TSMixer",
+            "TimeMixer",
+            "iTransformer",
+        }:
             params.setdefault("n_series", 7)
         if self.spec.class_name == "TimesNet" and self.precision != "32":
             params.setdefault("precision", "32-true")
         model = cls(**params)
         nf = NeuralForecast(models=[model], freq="7D")
-        nf.fit(df=canonical_to_long(history))
+        frame = canonical_to_long(history)
+
+        # NeuralForecast requires a validation window whenever early stopping
+        # is enabled. Keep it bounded so short fold histories remain usable.
+        val_size = max(1, min(10, len(history) // 5))
+
+        if len(history) - val_size < 2:
+            raise ValueError(
+                f"insufficient history for NeuralForecast validation: "
+                f"rows={len(history)}, val_size={val_size}"
+            )
+
+        nf.fit(df=frame, val_size=val_size)
         prediction = nf.predict().reset_index()
         value_col = [c for c in prediction.columns if c not in {"unique_id", "ds", "index"}][0]
         values = prediction.sort_values("unique_id")[value_col].to_numpy(float)
-        return WorkerOutput(values, {"library": "neuralforecast", "accelerator": accelerator, "column": value_col})
+        return WorkerOutput(values, {
+            "library": "neuralforecast",
+            "accelerator": accelerator,
+            "column": value_col,
+            "val_size": val_size,
+        })
 
     def _neuralforecast_auto(self, history: pd.DataFrame) -> WorkerOutput:
         import torch

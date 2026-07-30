@@ -45,7 +45,7 @@ FOUNDATION_MODELS = [
 ]
 
 COMMON_GRID = {
-    "input_size": [32, 64, 128, 256],
+    "input_size": [32, 64],
     "max_steps": [300, 600, 1000, 2000],
     "learning_rate": [1e-4, 3e-4, 1e-3],
     "batch_size": [32, 64, 128],
@@ -66,7 +66,7 @@ MODEL_GRID: dict[str, dict[str, list[Any]]] = {
         "dropout_prob_theta": [0.0, 0.1, 0.2],
     },
     "nf-nbeats": {
-        "stack_types": [["identity", "identity"], ["trend", "seasonality"]],
+        "stack_types": [["identity", "identity"]],
         "n_blocks": [[1, 1], [2, 2]],
         "mlp_units": [[[256, 256], [256, 256]], [[512, 512], [512, 512]]],
     },
@@ -93,20 +93,20 @@ MODEL_GRID: dict[str, dict[str, list[Any]]] = {
         "encoder_n_layers": [1, 2, 3],
         "decoder_hidden_size": [128, 256],
         "decoder_layers": [1, 2],
-        "dropout": [0.0, 0.1, 0.2],
+        "encoder_dropout": [0.0, 0.1, 0.2],
     },
     "nf-lstm": {
         "encoder_hidden_size": [128, 256, 512],
         "encoder_n_layers": [1, 2, 3],
         "decoder_hidden_size": [128, 256],
         "decoder_layers": [1, 2],
-        "dropout": [0.0, 0.1, 0.2],
+        "encoder_dropout": [0.0, 0.1, 0.2],
     },
     "nf-deepar": {
         "lstm_hidden_size": [128, 256, 512],
         "lstm_n_layers": [1, 2, 3],
-        "dropout_prob": [0.0, 0.1, 0.2],
-        "num_samples": [100, 300],
+        "lstm_dropout": [0.0, 0.1, 0.2],
+        "trajectory_samples": [100, 300],
     },
     "nf-tft": {
         "hidden_size": [64, 128, 256],
@@ -452,6 +452,57 @@ def collect_artifacts(
     return copied
 
 
+def inspect_research_result(run_dir: Path) -> tuple[str, str]:
+    """Validate the inner research result instead of trusting exit code alone."""
+    summary_path = run_dir / "research_summary.json"
+
+    if not summary_path.is_file():
+        return (
+            "PARTIAL_NO_SUMMARY",
+            "research_summary.json is missing",
+        )
+
+    try:
+        summary = json.loads(
+            summary_path.read_text(encoding="utf-8")
+        )
+    except Exception as exc:
+        return (
+            "PARTIAL_INVALID_SUMMARY",
+            f"{type(exc).__name__}: {exc}",
+        )
+
+    inner_status = str(
+        summary.get("status", "UNKNOWN")
+    ).upper()
+
+    successful_trials = int(
+        summary.get("successful_trials") or 0
+    )
+
+    champion = summary.get("champion")
+
+    if inner_status != "SUCCEEDED":
+        return (
+            "INNER_FAILED",
+            f"inner_status={inner_status}",
+        )
+
+    if successful_trials < 1:
+        return (
+            "INNER_FAILED",
+            "successful_trials=0",
+        )
+
+    if not champion:
+        return (
+            "PARTIAL_NO_CHAMPION",
+            "champion is missing",
+        )
+
+    return "SUCCEEDED", ""
+
+
 def build_config(base: dict[str, Any], trial: Trial, run_dir: Path, args: argparse.Namespace) -> dict[str, Any]:
     cfg = copy.deepcopy(base)
     cfg["models"] = [trial.model_id]
@@ -623,13 +674,21 @@ def main() -> int:
         trial.elapsed_seconds = elapsed
         trial.returncode = rc
         if rc == 0:
-            trial.status = "SUCCEEDED"
-            prune_run_checkpoints(run_dir)
-            trial.artifacts = collect_artifacts(
-                run_dir,
-                artifacts,
-                trial.trial_id,
+            effective_status, detail = inspect_research_result(
+                run_dir
             )
+            trial.status = effective_status
+            trial.error_class = detail
+
+            if effective_status == "SUCCEEDED":
+                prune_run_checkpoints(run_dir)
+                trial.artifacts = collect_artifacts(
+                    run_dir,
+                    artifacts,
+                    trial.trial_id,
+                )
+            else:
+                trial.artifacts = None
         else:
             trial.status = classify(text, rc)
             trial.error_class = trial.status
