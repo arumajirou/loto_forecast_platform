@@ -1,0 +1,1 @@
+/mnt/data/loto_trusted_vertical_slice/examples/sample_loto7.csv

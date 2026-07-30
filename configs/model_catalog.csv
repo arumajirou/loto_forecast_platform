@@ -1,0 +1,52 @@
+﻿model_id,family,library,task,class_name,priority,package,capabilities,default_params,notes,available
+uniform,theory,builtin,candidate,UniformCandidateAdapter,p0,,probability;ranking,{},,True
+frequency,frequency,builtin,candidate,FrequencyCandidateAdapter,p0,,probability;ranking,{},,True
+logistic,linear,sklearn,candidate,LogisticRegression,p0,sklearn,probability;exogenous,"{""C"": 1.0, ""max_iter"": 1000}",,True
+ridge-position,linear,sklearn,position,Ridge,p0,sklearn,position;exogenous,"{""alpha"": 1.0}",,True
+elasticnet-position,linear,sklearn,position,ElasticNet,p1,sklearn,position;exogenous,"{""alpha"": 0.01, ""l1_ratio"": 0.5, ""max_iter"": 5000}",,True
+random-forest,tree,sklearn,candidate,RandomForestClassifier,p1,sklearn,probability;exogenous,"{""n_estimators"": 300, ""min_samples_leaf"": 3, ""n_jobs"": -1}",,True
+extra-trees,tree,sklearn,candidate,ExtraTreesClassifier,p0,sklearn,probability;exogenous,"{""n_estimators"": 300, ""min_samples_leaf"": 2, ""n_jobs"": -1}",,True
+hist-gradient-boosting,tree,sklearn,candidate,HistGradientBoostingClassifier,p0,sklearn,probability;exogenous,"{""max_iter"": 200, ""learning_rate"": 0.05}",,True
+lightgbm-classifier,tree,lightgbm,candidate,LGBMClassifier,p0,lightgbm,probability;ranking;exogenous;gpu_optional,"{""n_estimators"": 400, ""learning_rate"": 0.03, ""num_leaves"": 31}",,True
+lightgbm-position,tree,lightgbm,position,LGBMRegressor,p0,lightgbm,position;exogenous;gpu_optional,"{""n_estimators"": 400, ""learning_rate"": 0.03}",,True
+xgboost-classifier,tree,xgboost,candidate,XGBClassifier,p1,xgboost,probability;exogenous;gpu_optional,"{""n_estimators"": 400, ""learning_rate"": 0.03, ""max_depth"": 5}",,True
+catboost-classifier,tree,catboost,candidate,CatBoostClassifier,p1,catboost,probability;exogenous;gpu_optional,"{""iterations"": 400, ""learning_rate"": 0.03, ""verbose"": false}",,True
+stats-naive,statistical,statsforecast,position_series,Naive,p0,statsforecast,,{},,False
+stats-historic-average,statistical,statsforecast,position_series,HistoricAverage,p0,statsforecast,,{},,False
+stats-autoarima,statistical,statsforecast,position_series,AutoARIMA,p0,statsforecast,,{},,False
+stats-autoets,statistical,statsforecast,position_series,AutoETS,p0,statsforecast,,{},,False
+stats-autotheta,statistical,statsforecast,position_series,AutoTheta,p0,statsforecast,,{},,False
+stats-autoces,statistical,statsforecast,position_series,AutoCES,p1,statsforecast,,{},,False
+stats-croston,intermittent,statsforecast,candidate_series,CrostonClassic,p1,statsforecast,,{},,False
+stats-tsb,intermittent,statsforecast,candidate_series,TSB,p1,statsforecast,,{},,False
+mlforecast-ridge,lag_ml,mlforecast,position_series,Ridge,p0,mlforecast,lags;exogenous,{},,False
+mlforecast-lightgbm,lag_ml,mlforecast,position_series,LGBMRegressor,p0,mlforecast,lags;exogenous;gpu_optional,{},,False
+nf-dlinear,deep,neuralforecast,position_series,DLinear,p0,neuralforecast,gpu;checkpoint,{},,False
+nf-nlinear,deep,neuralforecast,position_series,NLinear,p0,neuralforecast,gpu;checkpoint,{},,False
+nf-nhits,deep,neuralforecast,position_series,NHITS,p0,neuralforecast,gpu;checkpoint;exogenous,{},,False
+nf-nbeats,deep,neuralforecast,position_series,NBEATS,p1,neuralforecast,gpu;checkpoint,{},,False
+nf-nbeatsx,deep,neuralforecast,position_series,NBEATSx,p1,neuralforecast,gpu;checkpoint;exogenous,{},,False
+nf-tide,deep,neuralforecast,position_series,TiDE,p0,neuralforecast,gpu;checkpoint;exogenous,{},,False
+nf-tcn,deep,neuralforecast,position_series,TCN,p0,neuralforecast,gpu;checkpoint,{},,False
+nf-gru,deep,neuralforecast,position_series,GRU,p0,neuralforecast,gpu;checkpoint,{},,False
+nf-lstm,deep,neuralforecast,position_series,LSTM,p1,neuralforecast,gpu;checkpoint,{},,False
+nf-deepar,deep_probabilistic,neuralforecast,position_series,DeepAR,p1,neuralforecast,gpu;probabilistic,{},,False
+nf-tft,transformer,neuralforecast,position_series,TFT,p1,neuralforecast,gpu;exogenous;attention,{},,False
+nf-patchtst,transformer,neuralforecast,position_series,PatchTST,p1,neuralforecast,gpu,{},,False
+nf-timesnet,transformer,neuralforecast,position_series,TimesNet,p1,neuralforecast,gpu,{},,False
+nf-tsmixer,mixer,neuralforecast,position_series,TSMixer,p1,neuralforecast,gpu;multiseries,{},,False
+nf-timemixer,mixer,neuralforecast,position_series,TimeMixer,p2,neuralforecast,gpu,{},,False
+nf-itransformer,transformer,neuralforecast,position_series,iTransformer,p2,neuralforecast,gpu;multivariate,{},,False
+nf-vanilla-transformer,transformer,neuralforecast,position_series,VanillaTransformer,p2,neuralforecast,gpu,{},,False
+autogluon-timeseries,automl,autogluon,position_series,TimeSeriesPredictor,p1,autogluon,ensemble;probabilistic;zero_shot,{},,False
+darts-ensemble,framework,darts,position_series,RegressionEnsembleModel,p2,darts,ensemble;probabilistic,{},,False
+gluonts-deepar,deep_probabilistic,gluonts,position_series,DeepAREstimator,p2,gluonts,probabilistic,{},,False
+reservoir-esn,reservoir,reservoirpy,position,ESN,p1,reservoirpy,position,{},,False
+chronos-bolt-tiny,tsfm,chronos,foundation,ChronosBoltPipeline,p1,chronos,zero_shot;probabilistic;gpu_optional,"{""model_name"": ""amazon/chronos-bolt-tiny""}",,False
+chronos-2-small,tsfm,chronos,foundation,Chronos2Pipeline,p1,chronos,zero_shot;fine_tuning;exogenous,"{""model_name"": ""autogluon/chronos-2-small""}",,False
+timesfm-2.5,tsfm,timesfm,foundation,TimesFM,p1,timesfm,zero_shot;fine_tuning;exogenous;gpu,{},,False
+granite-ttm,tsfm,transformers,foundation,TinyTimeMixerForPrediction,p1,transformers,zero_shot;fine_tuning;gpu_optional,{},,False
+tirex,tsfm,tirex,foundation,TiRex,p1,tirex,zero_shot;probabilistic;gpu_optional,{},,False
+moirai,tsfm,uni2ts,foundation,MoiraiForecast,p2,uni2ts,zero_shot;probabilistic;gpu,{},,False
+sundial,tsfm,transformers,foundation,Sundial,p2,transformers,zero_shot;generative;gpu,{},,False
+tabpfn-ts,foundation_tabular,tabpfn_time_series,candidate,TabPFNTimeSeries,p1,tabpfn_time_series,zero_shot;probability;gpu_optional,{},,False

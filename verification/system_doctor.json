@@ -1,0 +1,6 @@
+{
+  "python": "3.13.5 (main, May  5 2026, 21:05:52) [GCC 14.2.0]",
+  "platform": "Linux-6.12.13-x86_64-with-glibc2.41",
+  "torch_probe_skipped": true,
+  "deep_probe_hint": "Set LOTO_DEEP_DOCTOR=1 for bounded PyTorch/CUDA probing"
+}

@@ -1,0 +1,13 @@
+run_id: run-a3ff69bc5069
+numbers: [1, 5, 13, 15, 25, 27, 37]
+champion: uniform
+seal_verified: true
+release_verified: true
+forecast.json: 5852 bytes
+forecast.sealed.json: 6623 bytes
+evaluation.json: 513 bytes
+release_bundle.json: 1855 bytes
+events.jsonl: 4025 bytes
+resource_evidence.json: 187 bytes
+mlflow_status.json: 153 bytes
+registry.sqlite3: 24576 bytes

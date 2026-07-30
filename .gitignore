@@ -1,0 +1,61 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage.json
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.venv/
+.env
+configs/notify.env
+mlruns/
+ray_results/
+
+# Local environments
+.venv/
+.env
+.env.*
+!.env.example
+!.env.full.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Runtime outputs
+logs/
+runs/
+outputs/
+artifacts/
+mlruns/
+ray_results/
+*.log
+*.pid
+
+# Local databases and generated data
+*.db
+*.sqlite
+*.sqlite3
+
+# Local backups
+*.backup-*
+*.bak
+*~
+
+# Secrets and credentials
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

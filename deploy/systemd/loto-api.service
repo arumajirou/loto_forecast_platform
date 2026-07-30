@@ -1,0 +1,13 @@
+[Unit]
+Description=Loto forecast API
+After=network-online.target
+
+[Service]
+WorkingDirectory=%h/env/ts/loto
+EnvironmentFile=%h/.config/loto/runtime.env
+Environment=LOTO_OUTPUT_DIR=%h/env/ts/loto/runs/latest
+ExecStart=%h/env/ts/loto/.venv/bin/uvicorn loto.api.app:app --host 127.0.0.1 --port 8088
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
