@@ -13,58 +13,46 @@ mlruns/
 ray_results/
 
 # Local environments
-.venv/
-.env
 .env.*
 !.env.example
 !.env.full.example
-
 # Python
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
-
 # Runtime outputs
 logs/
 runs/
 outputs/
 artifacts/
-mlruns/
-ray_results/
 *.log
 *.pid
-
 # Local databases and generated data
 *.db
 *.sqlite
 *.sqlite3
-
 # Local backups
 *.backup-*
 *.bak
 *~
-
 # Secrets and credentials
 *.pem
 *.key
 credentials.json
 secrets.json
-
 # OS and editors
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-
 # Local experiment backups
 *.before-*
 lightning_logs/
-
 # Runtime validation local artifacts
 catboost_info/
 codex-pre-*.diff
 *.bak.*
+# Local agent state
+.kilo/
+# Runtime/model artifacts
+checkpoints/
+environments/granite-ttm/environment_manifest.json
+# Generated packaging metadata
+src/loto_forecast_platform.egg-info/
