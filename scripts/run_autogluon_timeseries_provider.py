@@ -61,7 +61,9 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         if not history:
             return {"status": "ERROR", "message": "fit_predict_save requires non-empty history"}
         frame = _history_to_long(history)
-        ts = TimeSeriesDataFrame.from_data_frame(frame, id_column="item_id", timestamp_column="timestamp")
+        ts = TimeSeriesDataFrame.from_data_frame(
+            frame, id_column="item_id", timestamp_column="timestamp"
+        )
         artifact_dir.mkdir(parents=True, exist_ok=True)
         predictor = TimeSeriesPredictor(
             prediction_length=prediction_length,
@@ -80,12 +82,17 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         pred = predictor.predict(ts)
     elif mode == "load_predict":
         if not artifact_dir.exists() or not any(artifact_dir.iterdir()):
-            return {"status": "ARTIFACT_MISSING", "message": f"artifact_dir not found or empty: {artifact_dir}"}
+            return {
+                "status": "ARTIFACT_MISSING",
+                "message": f"artifact_dir not found or empty: {artifact_dir}",
+            }
         history = request.get("history") or []
         if not history:
             return {"status": "ERROR", "message": "load_predict requires non-empty history"}
         frame = _history_to_long(history)
-        ts = TimeSeriesDataFrame.from_data_frame(frame, id_column="item_id", timestamp_column="timestamp")
+        ts = TimeSeriesDataFrame.from_data_frame(
+            frame, id_column="item_id", timestamp_column="timestamp"
+        )
         try:
             predictor = TimeSeriesPredictor.load(str(artifact_dir))
         except Exception as exc:
@@ -103,7 +110,8 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         }
 
     execution_device = "cuda" if requested_device == "cuda" and cuda_available else "cpu"
-    gpu_used = False  # fast_training / very_light preset trains statistical + tabular-ML models only, never on GPU
+    # fast_training / very_light preset trains statistical + tabular-ML models only, never on GPU
+    gpu_used = False
 
     try:
         library_version = metadata.version("autogluon.timeseries")
@@ -148,7 +156,9 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run AutoGluon-TimeSeries provider in an isolated env")
+    parser = argparse.ArgumentParser(
+        description="Run AutoGluon-TimeSeries provider in an isolated env"
+    )
     parser.add_argument("--request", required=True, type=Path)
     parser.add_argument("--response", required=True, type=Path)
     args = parser.parse_args()

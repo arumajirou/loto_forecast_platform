@@ -72,18 +72,27 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
     tabpfn_model_config = {"model_path": weight_filename}
 
     try:
-        resolved_model_paths, _resolved_model_dirs, _resolved_model_names, _which = resolve_model_path(
+        res = resolve_model_path(
             weight_filename, which="regressor", version="v2"
         )
+        resolved_model_paths, _resolved_model_dirs, _resolved_model_names, _which = res
         resolved_path = resolved_model_paths[0]
     except Exception as exc:
-        return {"status": "MODEL_WEIGHTS_MISSING", "message": f"failed to resolve checkpoint path: {exc}"}
+        return {
+            "status": "MODEL_WEIGHTS_MISSING",
+            "message": f"failed to resolve checkpoint path: {exc}",
+        }
 
     if not resolved_path.exists():
-        return {"status": "MODEL_WEIGHTS_MISSING", "message": f"resolved checkpoint not found: {resolved_path}"}
+        return {
+            "status": "MODEL_WEIGHTS_MISSING",
+            "message": f"resolved checkpoint not found: {resolved_path}",
+        }
 
     try:
-        pipeline = TabPFNTSPipeline(tabpfn_mode=TabPFNMode.LOCAL, tabpfn_model_config=tabpfn_model_config)
+        pipeline = TabPFNTSPipeline(
+            tabpfn_mode=TabPFNMode.LOCAL, tabpfn_model_config=tabpfn_model_config
+        )
     except Exception as exc:
         message = str(exc)
         if "license" in message.lower() or "gated" in message.lower():
@@ -112,7 +121,8 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
 
     gpu_used = execution_device == "cuda"
     weight_sha256 = _sha256(resolved_path)
-    config_sha256 = hashlib.sha256(json.dumps(tabpfn_model_config, sort_keys=True, default=str).encode()).hexdigest()
+    config_bytes = json.dumps(tabpfn_model_config, sort_keys=True, default=str).encode()
+    config_sha256 = hashlib.sha256(config_bytes).hexdigest()
 
     return {
         "status": "OK",
@@ -146,7 +156,11 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
             "gpu_certification": "OBSERVED" if gpu_used else "NOT_CERTIFIED",
             "resource_certification": "GPU_PASS" if gpu_used else "CPU_ONLY_PASS",
             "cpu_fallback": requested_device == "cuda" and not gpu_used,
-            "fallback_reason": None if execution_device == requested_device else "cuda_unavailable_or_not_selected",
+            "fallback_reason": (
+                None
+                if execution_device == requested_device
+                else "cuda_unavailable_or_not_selected"
+            ),
             "peak_vram_bytes": int(torch.cuda.max_memory_allocated()) if gpu_used else 0,
             "gpu_pid": os.getpid() if gpu_used else None,
         },

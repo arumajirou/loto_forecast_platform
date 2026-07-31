@@ -8,8 +8,8 @@ from loto.models.providers.granite_ttm import GraniteTTMProvider
 from loto.models.providers.moirai import MoiraiProvider
 from loto.models.providers.sundial import SundialProvider
 from loto.models.providers.tabpfn_ts import TabPFNTSProvider
-from loto.models.providers.tirex import TiRexProvider
 from loto.models.providers.timesfm import TimesFMProvider
+from loto.models.providers.tirex import TiRexProvider
 
 
 class ProviderNotImplemented(FoundationProvider):

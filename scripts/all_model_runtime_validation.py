@@ -35,7 +35,12 @@ from loto.data.lineage import atomic_write_json
 from loto.models.argument_verifier import verify_arguments
 from loto.models.artifact_store import load_pickle_model, model_manifest, save_pickle_model
 from loto.models.catalog import ModelSpec, list_model_specs
-from loto.models.lifecycle import ModelLifecycleResult, candidate_metrics, run_candidate_lifecycle, validate_prediction
+from loto.models.lifecycle import (
+    ModelLifecycleResult,
+    candidate_metrics,
+    run_candidate_lifecycle,
+    validate_prediction,
+)
 from loto.models.property_inspector import inspect_model_properties
 from loto.models.providers import FoundationProviderError, get_foundation_provider
 from loto.models.workers import PositionSeriesWorker, normalize_worker_predictions

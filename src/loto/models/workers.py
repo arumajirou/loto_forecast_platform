@@ -660,10 +660,11 @@ class PositionSeriesWorker:
         models = []
         values = []
         for position in range(1, 8):
-            series = TimeSeries.from_series(history.set_index("draw_date")[f"n{position}"].astype(float))
+            source_series = history.set_index("draw_date")[f"n{position}"].astype(float)
+            series = TimeSeries.from_series(source_series)
             model = RegressionEnsembleModel(
                 forecasting_models=[NaiveDrift(), ExponentialSmoothing()],
-                regression_train_n_points=min(20, max(5, len(series) // 4)),
+                regression_train_n_points=min(20, max(5, len(source_series) // 4)),
             )
             model.fit(series)
             values.append(float(model.predict(1).values()[0, 0]))
