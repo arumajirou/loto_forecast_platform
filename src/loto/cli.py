@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import platform
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 from loto.data.canonical import canonicalize_loto7
@@ -84,6 +86,7 @@ def build_parser() -> argparse.ArgumentParser:
     models = sub.add_parser("models"); msub = models.add_subparsers(dest="action", required=True)
     mlist = msub.add_parser("list"); mlist.add_argument("--priority"); mlist.add_argument("--available-only", action="store_true"); mlist.add_argument("--format", choices=["json","table"], default="table")
     mshow = msub.add_parser("show"); mshow.add_argument("model_id")
+    mex = msub.add_parser("export-catalog"); mex.add_argument("--output", required=True)
 
     config = sub.add_parser("config"); csub = config.add_subparsers(dest="action", required=True)
     cval = csub.add_parser("validate"); cval.add_argument("--file", required=True); cval.add_argument("--write-resolved")
@@ -165,6 +168,22 @@ def main(argv=None):
     if args.group == "models" and args.action == "show":
         from loto.models.catalog import get_model_spec
         _json(get_model_spec(args.model_id).to_dict()); return 0
+    if args.group == "models" and args.action == "export-catalog":
+        rows = [spec.to_dict() for spec in list_model_specs()]
+        digest = hashlib.sha256(json.dumps(rows, ensure_ascii=False, sort_keys=True, default=str).encode()).hexdigest()
+        payload = {
+            "schema_version": 1,
+            "catalog_source": "dynamic",
+            "catalog_count": len(rows),
+            "catalog_sha256": digest,
+            "generator_version": 1,
+            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "rows": rows,
+        }
+        Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.output).write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
+        _json({key: payload[key] for key in ("catalog_source", "catalog_count", "catalog_sha256", "generated_at")})
+        return 0
     if args.group == "config" and args.action == "validate":
         cfg = ExperimentConfig.from_file(args.file)
         if args.write_resolved: cfg.write_resolved(args.write_resolved)

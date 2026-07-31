@@ -71,6 +71,9 @@ MODEL_GRID: dict[str, dict[str, list[Any]]] = {
         "mlp_units": [[[256, 256], [256, 256]], [[512, 512], [512, 512]]],
     },
     "nf-nbeatsx": {
+        # h=1ではtrend/seasonality stackは使用不可。
+        # identity-onlyに固定して1-step forecastとの互換性を保証する。
+        "stack_types": [["identity", "identity", "identity"]],
         "n_blocks": [[1, 1, 1], [2, 2, 2]],
         "mlp_units": [[[256, 256], [256, 256], [256, 256]],
                       [[512, 512], [512, 512], [512, 512]]],
@@ -122,11 +125,16 @@ MODEL_GRID: dict[str, dict[str, list[Any]]] = {
         "dropout": [0.05, 0.1, 0.2],
     },
     "nf-timesnet": {
-        "hidden_size": [64, 128, 256],
-        "conv_hidden_size": [64, 128, 256],
-        "top_k": [3, 5, 8],
-        "num_kernels": [4, 6, 8],
-        "encoder_layers": [1, 2, 3],
+        # Runtime smoke用の軽量設定。
+        # 本探索では別gridへ分離する。
+        "input_size": [16],
+        "max_steps": [5],
+        "batch_size": [32],
+        "hidden_size": [32],
+        "conv_hidden_size": [32],
+        "top_k": [2],
+        "num_kernels": [2],
+        "encoder_layers": [1],
     },
     "nf-tsmixer": {
         "n_block": [2, 4, 6],

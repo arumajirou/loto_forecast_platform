@@ -319,7 +319,10 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
                                     fold.test_end,
                                     windows,
                                 )
-                            elif spec.task == "position_series":
+                            elif spec.task in {"position_series", "foundation"}:
+                                # Foundation time-series models use the same
+                                # seven-position forecasting contract and are
+                                # dispatched by PositionSeriesWorker.
                                 pred, probs, actual, resources = _position_fold(
                                     development,
                                     model_id,

@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+# ruff: noqa: E501,I001,UP035
+
 from dataclasses import asdict, dataclass, field
 from importlib.util import find_spec
 from typing import Any, Iterable
+
+
+PACKAGE_MODULE_ALIASES = {
+    "chronos": ("chronos",),
+}
 
 
 @dataclass(frozen=True)
@@ -20,7 +27,10 @@ class ModelSpec:
 
     @property
     def available(self) -> bool:
-        return self.package is None or find_spec(self.package) is not None
+        if self.package is None:
+            return True
+        packages = PACKAGE_MODULE_ALIASES.get(self.package, (self.package,))
+        return any(find_spec(package) is not None for package in packages)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self) | {"available": self.available}
@@ -103,15 +113,88 @@ MODEL_SPECS: tuple[ModelSpec, ...] = (
     ModelSpec("nf-auto-rmok", "kan", "neuralforecast_auto", "position_series", "AutoRMoK", "p1", "neuralforecast", ("gpu", "auto_hpo", "optuna", "ray", "checkpoint"), notes="Official NeuralForecast AutoModel; backend/search resolved at runtime"),
     ModelSpec("autogluon-timeseries", "automl", "autogluon", "position_series", "TimeSeriesPredictor", "p1", "autogluon", ("ensemble", "probabilistic", "zero_shot")),
     ModelSpec("darts-ensemble", "framework", "darts", "position_series", "RegressionEnsembleModel", "p2", "darts", ("ensemble", "probabilistic")),
-    ModelSpec("gluonts-deepar", "deep_probabilistic", "gluonts", "position_series", "DeepAREstimator", "p2", "gluonts", ("probabilistic",)),
-    ModelSpec("reservoir-esn", "reservoir", "reservoirpy", "position", "ESN", "p1", "reservoirpy", ("position",)),
-    ModelSpec("chronos-bolt-tiny", "tsfm", "chronos", "foundation", "ChronosBoltPipeline", "p1", "chronos", ("zero_shot", "probabilistic", "gpu_optional"), {"model_name": "amazon/chronos-bolt-tiny"}),
+    ModelSpec(
+        "gluonts-deepar",
+        "deep_probabilistic",
+        "gluonts",
+        "position_series",
+        "DeepAREstimator",
+        "p2",
+        "gluonts",
+        ("probabilistic",),
+        {"epochs": 1, "num_batches_per_epoch": 2, "context_length": 16, "num_samples": 20},
+    ),
+    ModelSpec(
+        "reservoir-esn",
+        "reservoir",
+        "reservoirpy",
+        "position",
+        "ESN",
+        "p1",
+        "reservoirpy",
+        ("position",),
+        {"reservoir_size": 50, "spectral_radius": 0.9, "leak_rate": 0.3, "ridge_alpha": 1e-6},
+    ),
+    ModelSpec(
+        "chronos-bolt-tiny",
+        "tsfm",
+        "chronos",
+        "foundation",
+        "ChronosBoltPipeline",
+        "p1",
+        "chronos",
+        ("zero_shot", "probabilistic", "gpu_optional"),
+        {
+            "model_name": "amazon/chronos-bolt-tiny",
+            "revision": "a0e552de83495b5c28c14c71c374f3e33280b340",
+        },
+    ),
     ModelSpec("chronos-2-small", "tsfm", "chronos", "foundation", "Chronos2Pipeline", "p1", "chronos", ("zero_shot", "fine_tuning", "exogenous"), {"model_name": "autogluon/chronos-2-small"}),
     ModelSpec("timesfm-2.5", "tsfm", "timesfm", "foundation", "TimesFM", "p1", "timesfm", ("zero_shot", "fine_tuning", "exogenous", "gpu")),
     ModelSpec("granite-ttm", "tsfm", "transformers", "foundation", "TinyTimeMixerForPrediction", "p1", "transformers", ("zero_shot", "fine_tuning", "gpu_optional")),
-    ModelSpec("tirex", "tsfm", "tirex", "foundation", "TiRex", "p1", "tirex", ("zero_shot", "probabilistic", "gpu_optional")),
-    ModelSpec("moirai", "tsfm", "uni2ts", "foundation", "MoiraiForecast", "p2", "uni2ts", ("zero_shot", "probabilistic", "gpu")),
-    ModelSpec("sundial", "tsfm", "transformers", "foundation", "Sundial", "p2", "transformers", ("zero_shot", "generative", "gpu")),
+    ModelSpec(
+        "tirex",
+        "tsfm",
+        "tirex",
+        "foundation",
+        "TiRex",
+        "p1",
+        "tirex",
+        ("zero_shot", "probabilistic", "gpu_optional"),
+        {
+            "model_name": "NX-AI/TiRex-2",
+            "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+        },
+    ),
+    ModelSpec(
+        "moirai",
+        "tsfm",
+        "uni2ts",
+        "foundation",
+        "Moirai2Forecast",
+        "p2",
+        "uni2ts",
+        ("zero_shot", "probabilistic", "gpu"),
+        {
+            "model_name": "Salesforce/moirai-2.0-R-small",
+            "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+        },
+    ),
+    ModelSpec(
+        "sundial",
+        "tsfm",
+        "transformers",
+        "foundation",
+        "SundialForPrediction",
+        "p2",
+        "transformers",
+        ("zero_shot", "generative", "gpu"),
+        {
+            "model_name": "thuml/sundial-base-128m",
+            "revision": "3212e42564493f520593e5414af4367fc4b49226",
+            "trust_remote_code": True,
+        },
+    ),
     ModelSpec("tabpfn-ts", "foundation_tabular", "tabpfn_time_series", "candidate", "TabPFNTimeSeries", "p1", "tabpfn_time_series", ("zero_shot", "probability", "gpu_optional")),
 )
 

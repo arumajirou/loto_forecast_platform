@@ -141,6 +141,15 @@ class RuntimeModel:
                          "feature_columns": self.feature_columns, "model": self.model}, stream)
         return path
 
+    @classmethod
+    def load(cls, path: str | Path) -> "RuntimeModel":
+        with Path(path).open("rb") as stream:
+            payload = pickle.load(stream)
+        runtime = cls(get_model_spec(payload["spec"]["model_id"]), payload["params"], seed=int(payload["seed"]))
+        runtime.feature_columns = list(payload["feature_columns"])
+        runtime.model = payload["model"]
+        return runtime
+
 
 class WorkerGateway:
     """Uniform process boundary for optional heavy model libraries.

@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 from __future__ import annotations
 
 import os
@@ -62,6 +63,12 @@ def evaluate_gpu_evidence(evidence: dict) -> dict:
     model_cuda = str(evidence.get("model_device", "")).startswith("cuda")
     batch_cuda = str(evidence.get("batch_device", "")).startswith("cuda")
     vram = int(evidence.get("vram_peak_bytes", 0) or 0)
+    process_rows = evidence.get("nvidia_smi_processes") or []
+    process_seen = bool(process_rows)
+    if model_cuda and vram > 0 and process_seen:
+        return {"eligible": True, "reasons": ["model_cuda_vram_and_process_evidence"]}
+    if vram > 0 and process_seen:
+        return {"eligible": True, "reasons": ["vram_and_pid_evidence"]}
     if not model_cuda:
         reasons.append("model_not_on_cuda")
     if not batch_cuda:

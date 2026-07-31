@@ -1,0 +1,19 @@
+[project]
+name = "loto-granite-ttm-provider"
+version = "0.1.0"
+description = "Dedicated Granite TTM provider environment for loto-forecast-platform"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "numpy>=1.26,<3",
+  "pandas>=2.2",
+  "torch>=2.3",
+  "huggingface-hub>=0.24",
+  "granite-tsfm>=0.2.27",
+  "transformers>=4.46,<4.53",
+]
+
+[project.scripts]
+loto-granite-ttm-provider = "run_granite_ttm_provider:main"
+
+[tool.uv]
+package = false

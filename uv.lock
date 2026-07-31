@@ -1580,6 +1580,26 @@ wheels = [
 ]
 
 [[package]]
+name = "lightning"
+version = "2.6.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fsspec", extra = ["http"] },
+    { name = "lightning-utilities" },
+    { name = "packaging" },
+    { name = "pytorch-lightning" },
+    { name = "pyyaml" },
+    { name = "torch" },
+    { name = "torchmetrics" },
+    { name = "tqdm" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c9/1d/83be8536bec71a0173e762a9a1fd92a24a5ad0d0f74c59550c3c4e6c103b/lightning-2.6.5.tar.gz", hash = "sha256:16a30310ed69afde3748491feb5d13508908effd70390d2bfc203dc0812a4b4a", size = 659201, upload-time = "2026-05-27T14:33:41.806Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e7/c5/fca7144236b6fa3279d0fb3172b32576c5ad8b84a63b9432ad6592d24847/lightning-2.6.5-py3-none-any.whl", hash = "sha256:3702fb7ef4ab51a8c3d4a140f4674514fe72973a9673dfa05e07a078e2767389", size = 848611, upload-time = "2026-05-27T14:33:39.714Z" },
+]
+
+[[package]]
 name = "lightning-utilities"
 version = "0.15.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1648,6 +1668,7 @@ dev = [
 ]
 frameworks = [
     { name = "gluonts" },
+    { name = "lightning" },
     { name = "reservoirpy" },
     { name = "skforecast" },
     { name = "sktime" },
@@ -1706,6 +1727,7 @@ requires-dist = [
     { name = "httpx", marker = "extra == 'full'", specifier = ">=0.27,<1" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6" },
     { name = "lightgbm", marker = "extra == 'full'", specifier = ">=4.5" },
+    { name = "lightning", marker = "extra == 'frameworks'", specifier = ">=2" },
     { name = "mlflow", marker = "extra == 'full'", specifier = ">=3.0" },
     { name = "mlflow", marker = "extra == 'mlflow'", specifier = ">=3.0" },
     { name = "mlforecast", marker = "extra == 'full'", specifier = ">=1.0" },

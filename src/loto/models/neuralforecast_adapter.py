@@ -12,7 +12,7 @@ from typing import Any, Literal
 SUPPORTED_BACKENDS = {"optuna", "ray"}
 MODELS_REQUIRING_N_SERIES = {
     "AutoTSMixer", "AutoTSMixerx", "AutoTimeMixer", "AutoRMoK", "AutoSOFTS",
-    "AutoStemGNN", "AutoMLPMultivariate", "AutoiTransformer",
+    "AutoStemGNN", "AutoMLPMultivariate", "AutoiTransformer", "AutoTimeXer",
 }
 FFT_MODELS = {"AutoTimesNet", "AutoFEDformer"}
 
@@ -122,8 +122,6 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
             adjustments.append(f"removed_unsupported_{key}")
     if request.early_stop_patience_steps is not None:
         config["early_stop_patience_steps"] = int(request.early_stop_patience_steps)
-    if request.n_series is not None:
-        config["n_series"] = int(request.n_series)
     precision = request.precision
     if request.model_name in FFT_MODELS and precision in {"16", "16-mixed", "bf16", "bf16-mixed"}:
         precision = "32-true"
@@ -137,11 +135,17 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
         "backend": backend,
         "num_samples": request.num_samples,
         "refit_with_val": request.refit_with_val,
-        "cpus": request.cpus,
-        "gpus": request.gpus,
+        # neuralforecast >= 3.2.0 removed the legacy cpus/gpus
+        # constructor arguments. Optuna runs in-process, so these values
+        # must not be forwarded to AutoModel constructors.
         "verbose": True,
         "alias": f"{request.model_name}-{backend}",
     }
+    needs_n_series = request.model_name in MODELS_REQUIRING_N_SERIES
+    if needs_n_series and request.n_series is not None:
+        config["n_series"] = int(request.n_series)
+    if needs_n_series and request.n_series is not None:
+        constructor_kwargs["n_series"] = int(request.n_series)
     # Empty config intentionally delegates to the official per-model default search space.
     if config:
         if backend == "optuna":

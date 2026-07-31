@@ -1,0 +1,10 @@
+[project]
+name = "loto-autogluon-timeseries-provider"
+version = "0.1.0"
+description = "Isolated AutoGluon-TimeSeries provider runtime for loto forecast platform validation"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "autogluon.timeseries==1.5.0",
+  "numpy>=1.26",
+  "pandas>=2.2",
+]

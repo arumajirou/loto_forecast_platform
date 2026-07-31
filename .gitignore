@@ -63,3 +63,8 @@ Thumbs.db
 # Local experiment backups
 *.before-*
 lightning_logs/
+
+# Runtime validation local artifacts
+catboost_info/
+codex-pre-*.diff
+*.bak.*
