@@ -57,6 +57,7 @@ Requires-Dist: plotly>=6; extra == "full"
 Provides-Extra: frameworks
 Requires-Dist: u8darts>=0.37; extra == "frameworks"
 Requires-Dist: gluonts>=0.16; extra == "frameworks"
+Requires-Dist: lightning>=2; extra == "frameworks"
 Requires-Dist: sktime>=0.37; extra == "frameworks"
 Requires-Dist: skforecast>=0.17; extra == "frameworks"
 Requires-Dist: reservoirpy>=0.4; extra == "frameworks"

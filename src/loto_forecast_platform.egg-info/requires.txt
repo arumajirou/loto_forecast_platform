@@ -27,6 +27,7 @@ optuna>=4.0
 [frameworks]
 u8darts>=0.37
 gluonts>=0.16
+lightning>=2
 sktime>=0.37
 skforecast>=0.17
 reservoirpy>=0.4
