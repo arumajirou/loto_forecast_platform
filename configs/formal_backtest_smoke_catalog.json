@@ -1,0 +1,1794 @@
+{
+  "schema_version": 1,
+  "stage": "smoke",
+  "generated_at": "2026-07-31T10:42:22.219756+00:00",
+  "code_fingerprint": "38c9ba1ca09e9fee",
+  "model_count": 84,
+  "models": {
+    "uniform": {
+      "library": "builtin",
+      "family": "theory",
+      "class_name": "UniformCandidateAdapter",
+      "priority": "p0",
+      "capabilities": [
+        "probability",
+        "ranking"
+      ],
+      "available": true,
+      "model_config_hash": "cf6fb1704ae9f4a9",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "frequency": {
+      "library": "builtin",
+      "family": "frequency",
+      "class_name": "FrequencyCandidateAdapter",
+      "priority": "p0",
+      "capabilities": [
+        "probability",
+        "ranking"
+      ],
+      "available": true,
+      "model_config_hash": "fb5d92846c525db8",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "logistic": {
+      "library": "sklearn",
+      "family": "linear",
+      "class_name": "LogisticRegression",
+      "priority": "p0",
+      "capabilities": [
+        "probability",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "d055a0feed75cad9",
+      "resolved_smoke_params": {
+        "C": 1.0,
+        "max_iter": 1000
+      },
+      "resolve_error": null
+    },
+    "ridge-position": {
+      "library": "sklearn",
+      "family": "linear",
+      "class_name": "Ridge",
+      "priority": "p0",
+      "capabilities": [
+        "position",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "155c290cd10044ce",
+      "resolved_smoke_params": {
+        "alpha": 1.0
+      },
+      "resolve_error": null
+    },
+    "elasticnet-position": {
+      "library": "sklearn",
+      "family": "linear",
+      "class_name": "ElasticNet",
+      "priority": "p1",
+      "capabilities": [
+        "position",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "c4e953bf87e9e311",
+      "resolved_smoke_params": {
+        "alpha": 0.01,
+        "l1_ratio": 0.5,
+        "max_iter": 5000
+      },
+      "resolve_error": null
+    },
+    "random-forest": {
+      "library": "sklearn",
+      "family": "tree",
+      "class_name": "RandomForestClassifier",
+      "priority": "p1",
+      "capabilities": [
+        "probability",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "3c35e37e8daa2674",
+      "resolved_smoke_params": {
+        "n_estimators": 300,
+        "min_samples_leaf": 3,
+        "n_jobs": -1
+      },
+      "resolve_error": null
+    },
+    "extra-trees": {
+      "library": "sklearn",
+      "family": "tree",
+      "class_name": "ExtraTreesClassifier",
+      "priority": "p0",
+      "capabilities": [
+        "probability",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "d0f0ebe01b5e6215",
+      "resolved_smoke_params": {
+        "n_estimators": 300,
+        "min_samples_leaf": 2,
+        "n_jobs": -1
+      },
+      "resolve_error": null
+    },
+    "hist-gradient-boosting": {
+      "library": "sklearn",
+      "family": "tree",
+      "class_name": "HistGradientBoostingClassifier",
+      "priority": "p0",
+      "capabilities": [
+        "probability",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "59f6feeb5e6b3796",
+      "resolved_smoke_params": {
+        "max_iter": 200,
+        "learning_rate": 0.05
+      },
+      "resolve_error": null
+    },
+    "lightgbm-classifier": {
+      "library": "lightgbm",
+      "family": "tree",
+      "class_name": "LGBMClassifier",
+      "priority": "p0",
+      "capabilities": [
+        "probability",
+        "ranking",
+        "exogenous",
+        "gpu_optional"
+      ],
+      "available": true,
+      "model_config_hash": "9ef384ee638d5093",
+      "resolved_smoke_params": {
+        "n_estimators": 400,
+        "learning_rate": 0.03,
+        "num_leaves": 31
+      },
+      "resolve_error": null
+    },
+    "lightgbm-position": {
+      "library": "lightgbm",
+      "family": "tree",
+      "class_name": "LGBMRegressor",
+      "priority": "p0",
+      "capabilities": [
+        "position",
+        "exogenous",
+        "gpu_optional"
+      ],
+      "available": true,
+      "model_config_hash": "0138c761e8621b75",
+      "resolved_smoke_params": {
+        "n_estimators": 400,
+        "learning_rate": 0.03
+      },
+      "resolve_error": null
+    },
+    "xgboost-classifier": {
+      "library": "xgboost",
+      "family": "tree",
+      "class_name": "XGBClassifier",
+      "priority": "p1",
+      "capabilities": [
+        "probability",
+        "exogenous",
+        "gpu_optional"
+      ],
+      "available": true,
+      "model_config_hash": "810116c09fbc3ee8",
+      "resolved_smoke_params": {
+        "n_estimators": 400,
+        "learning_rate": 0.03,
+        "max_depth": 5
+      },
+      "resolve_error": null
+    },
+    "catboost-classifier": {
+      "library": "catboost",
+      "family": "tree",
+      "class_name": "CatBoostClassifier",
+      "priority": "p1",
+      "capabilities": [
+        "probability",
+        "exogenous",
+        "gpu_optional"
+      ],
+      "available": true,
+      "model_config_hash": "86c300c989ca2e0c",
+      "resolved_smoke_params": {
+        "iterations": 400,
+        "learning_rate": 0.03,
+        "verbose": false
+      },
+      "resolve_error": null
+    },
+    "stats-naive": {
+      "library": "statsforecast",
+      "family": "statistical",
+      "class_name": "Naive",
+      "priority": "p0",
+      "capabilities": [],
+      "available": true,
+      "model_config_hash": "40e9d97b12bdc9d5",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "stats-historic-average": {
+      "library": "statsforecast",
+      "family": "statistical",
+      "class_name": "HistoricAverage",
+      "priority": "p0",
+      "capabilities": [],
+      "available": true,
+      "model_config_hash": "85cf058c4a4cb4d8",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "stats-autoarima": {
+      "library": "statsforecast",
+      "family": "statistical",
+      "class_name": "AutoARIMA",
+      "priority": "p0",
+      "capabilities": [],
+      "available": true,
+      "model_config_hash": "b1fef1fd31e3cbf8",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "stats-autoets": {
+      "library": "statsforecast",
+      "family": "statistical",
+      "class_name": "AutoETS",
+      "priority": "p0",
+      "capabilities": [],
+      "available": true,
+      "model_config_hash": "a1c867e9e0f8cab4",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "stats-autotheta": {
+      "library": "statsforecast",
+      "family": "statistical",
+      "class_name": "AutoTheta",
+      "priority": "p0",
+      "capabilities": [],
+      "available": true,
+      "model_config_hash": "ae570dd11f53b45a",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "stats-autoces": {
+      "library": "statsforecast",
+      "family": "statistical",
+      "class_name": "AutoCES",
+      "priority": "p1",
+      "capabilities": [],
+      "available": true,
+      "model_config_hash": "2af15797571b4e47",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "stats-croston": {
+      "library": "statsforecast",
+      "family": "intermittent",
+      "class_name": "CrostonClassic",
+      "priority": "p1",
+      "capabilities": [],
+      "available": true,
+      "model_config_hash": "49cd442eefac9b84",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "stats-tsb": {
+      "library": "statsforecast",
+      "family": "intermittent",
+      "class_name": "TSB",
+      "priority": "p1",
+      "capabilities": [],
+      "available": true,
+      "model_config_hash": "0022f25d044edea2",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "mlforecast-ridge": {
+      "library": "mlforecast",
+      "family": "lag_ml",
+      "class_name": "Ridge",
+      "priority": "p0",
+      "capabilities": [
+        "lags",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "8588d3afe24a9e9f",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "mlforecast-lightgbm": {
+      "library": "mlforecast",
+      "family": "lag_ml",
+      "class_name": "LGBMRegressor",
+      "priority": "p0",
+      "capabilities": [
+        "lags",
+        "exogenous",
+        "gpu_optional"
+      ],
+      "available": true,
+      "model_config_hash": "6c648fc86ed1bce9",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "nf-dlinear": {
+      "library": "neuralforecast",
+      "family": "deep",
+      "class_name": "DLinear",
+      "priority": "p0",
+      "capabilities": [
+        "gpu",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "09cc12f317ad2692",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-nlinear": {
+      "library": "neuralforecast",
+      "family": "deep",
+      "class_name": "NLinear",
+      "priority": "p0",
+      "capabilities": [
+        "gpu",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "fa2c54c2314044b8",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-nhits": {
+      "library": "neuralforecast",
+      "family": "deep",
+      "class_name": "NHITS",
+      "priority": "p0",
+      "capabilities": [
+        "gpu",
+        "checkpoint",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "cdd3cbe043dcfdf8",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-nbeats": {
+      "library": "neuralforecast",
+      "family": "deep",
+      "class_name": "NBEATS",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "e5cc364713cbed3b",
+      "resolved_smoke_params": {
+        "stack_types": [
+          "identity"
+        ],
+        "n_blocks": [
+          1
+        ],
+        "mlp_units": [
+          [
+            64,
+            64
+          ]
+        ],
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-nbeatsx": {
+      "library": "neuralforecast",
+      "family": "deep",
+      "class_name": "NBEATSx",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "checkpoint",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "36d59e0c817d9759",
+      "resolved_smoke_params": {
+        "stack_types": [
+          "identity"
+        ],
+        "n_blocks": [
+          1
+        ],
+        "mlp_units": [
+          [
+            64,
+            64
+          ]
+        ],
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-tide": {
+      "library": "neuralforecast",
+      "family": "deep",
+      "class_name": "TiDE",
+      "priority": "p0",
+      "capabilities": [
+        "gpu",
+        "checkpoint",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "6b648e6bbd8d2263",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-tcn": {
+      "library": "neuralforecast",
+      "family": "deep",
+      "class_name": "TCN",
+      "priority": "p0",
+      "capabilities": [
+        "gpu",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "f390ff5d6c2eb56d",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-gru": {
+      "library": "neuralforecast",
+      "family": "deep",
+      "class_name": "GRU",
+      "priority": "p0",
+      "capabilities": [
+        "gpu",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "c8e78afecfd9dc39",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-lstm": {
+      "library": "neuralforecast",
+      "family": "deep",
+      "class_name": "LSTM",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "9e6fdde845e45f9e",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-deepar": {
+      "library": "neuralforecast",
+      "family": "deep_probabilistic",
+      "class_name": "DeepAR",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "probabilistic"
+      ],
+      "available": true,
+      "model_config_hash": "cd9b5a41756dc8da",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-tft": {
+      "library": "neuralforecast",
+      "family": "transformer",
+      "class_name": "TFT",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "exogenous",
+        "attention"
+      ],
+      "available": true,
+      "model_config_hash": "fb00eb909a042855",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 32,
+        "hidden_size": 16,
+        "n_head": 2
+      },
+      "resolve_error": null
+    },
+    "nf-patchtst": {
+      "library": "neuralforecast",
+      "family": "transformer",
+      "class_name": "PatchTST",
+      "priority": "p1",
+      "capabilities": [
+        "gpu"
+      ],
+      "available": true,
+      "model_config_hash": "e60eae326ada44fb",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 32,
+        "hidden_size": 16,
+        "n_heads": 2
+      },
+      "resolve_error": null
+    },
+    "nf-timesnet": {
+      "library": "neuralforecast",
+      "family": "transformer",
+      "class_name": "TimesNet",
+      "priority": "p1",
+      "capabilities": [
+        "gpu"
+      ],
+      "available": true,
+      "model_config_hash": "920c13f62a3d1726",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 32,
+        "hidden_size": 16
+      },
+      "resolve_error": null
+    },
+    "nf-tsmixer": {
+      "library": "neuralforecast",
+      "family": "mixer",
+      "class_name": "TSMixer",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "multiseries"
+      ],
+      "available": true,
+      "model_config_hash": "c68f3f1db1d324e8",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 32
+      },
+      "resolve_error": null
+    },
+    "nf-timemixer": {
+      "library": "neuralforecast",
+      "family": "mixer",
+      "class_name": "TimeMixer",
+      "priority": "p2",
+      "capabilities": [
+        "gpu"
+      ],
+      "available": true,
+      "model_config_hash": "be70b11de31ac63e",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 32
+      },
+      "resolve_error": null
+    },
+    "nf-itransformer": {
+      "library": "neuralforecast",
+      "family": "transformer",
+      "class_name": "iTransformer",
+      "priority": "p2",
+      "capabilities": [
+        "gpu",
+        "multivariate"
+      ],
+      "available": true,
+      "model_config_hash": "bf858261d0b52f73",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 32,
+        "hidden_size": 16,
+        "n_heads": 2
+      },
+      "resolve_error": null
+    },
+    "nf-vanilla-transformer": {
+      "library": "neuralforecast",
+      "family": "transformer",
+      "class_name": "VanillaTransformer",
+      "priority": "p2",
+      "capabilities": [
+        "gpu"
+      ],
+      "available": true,
+      "model_config_hash": "4dea26da968d758b",
+      "resolved_smoke_params": {
+        "max_steps": 2,
+        "val_check_steps": 1,
+        "early_stop_patience_steps": -1,
+        "batch_size": 8,
+        "input_size": 32,
+        "hidden_size": 16,
+        "n_head": 2
+      },
+      "resolve_error": null
+    },
+    "nf-auto-rnn": {
+      "library": "neuralforecast_auto",
+      "family": "rnn",
+      "class_name": "AutoRNN",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "44236fea945bd904",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-lstm": {
+      "library": "neuralforecast_auto",
+      "family": "rnn",
+      "class_name": "AutoLSTM",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "18354e146f5dc317",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-gru": {
+      "library": "neuralforecast_auto",
+      "family": "rnn",
+      "class_name": "AutoGRU",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "142d2a671b31ee8f",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-tcn": {
+      "library": "neuralforecast_auto",
+      "family": "cnn",
+      "class_name": "AutoTCN",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "f657a6f00d780cc8",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-deepar": {
+      "library": "neuralforecast_auto",
+      "family": "deep_probabilistic",
+      "class_name": "AutoDeepAR",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "0ceb2d2b6f035c1a",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-dilatedrnn": {
+      "library": "neuralforecast_auto",
+      "family": "rnn",
+      "class_name": "AutoDilatedRNN",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "9b595a3b165c1d99",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-bitcn": {
+      "library": "neuralforecast_auto",
+      "family": "cnn",
+      "class_name": "AutoBiTCN",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "d4b562dcd8b9e88f",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-mlp": {
+      "library": "neuralforecast_auto",
+      "family": "mlp",
+      "class_name": "AutoMLP",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "aa8c1ade4d6a87e1",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-nbeats": {
+      "library": "neuralforecast_auto",
+      "family": "mlp",
+      "class_name": "AutoNBEATS",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "9cfa60acbd5f689b",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8,
+        "stack_types": [
+          "identity"
+        ],
+        "n_blocks": [
+          1
+        ],
+        "mlp_units": [
+          [
+            64,
+            64
+          ]
+        ]
+      },
+      "resolve_error": null
+    },
+    "nf-auto-nbeatsx": {
+      "library": "neuralforecast_auto",
+      "family": "mlp",
+      "class_name": "AutoNBEATSx",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "19cb10e287e57e35",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8,
+        "stack_types": [
+          "identity"
+        ],
+        "n_blocks": [
+          1
+        ],
+        "mlp_units": [
+          [
+            64,
+            64
+          ]
+        ]
+      },
+      "resolve_error": null
+    },
+    "nf-auto-nhits": {
+      "library": "neuralforecast_auto",
+      "family": "mlp",
+      "class_name": "AutoNHITS",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "ed0a295a41324fa0",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-dlinear": {
+      "library": "neuralforecast_auto",
+      "family": "linear",
+      "class_name": "AutoDLinear",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "dc53e95c3ef28a69",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-nlinear": {
+      "library": "neuralforecast_auto",
+      "family": "linear",
+      "class_name": "AutoNLinear",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "e86a7f2ebf2b5002",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-tide": {
+      "library": "neuralforecast_auto",
+      "family": "mlp",
+      "class_name": "AutoTiDE",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "50ea268a6aeb6294",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-deepnpts": {
+      "library": "neuralforecast_auto",
+      "family": "deep_probabilistic",
+      "class_name": "AutoDeepNPTS",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "858da48e86aab695",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-kan": {
+      "library": "neuralforecast_auto",
+      "family": "kan",
+      "class_name": "AutoKAN",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "18d9aeca43c8fdc3",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-tft": {
+      "library": "neuralforecast_auto",
+      "family": "transformer",
+      "class_name": "AutoTFT",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "6fc2556eeada7659",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-vanilla-transformer": {
+      "library": "neuralforecast_auto",
+      "family": "transformer",
+      "class_name": "AutoVanillaTransformer",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "e229e17316d51a7c",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-informer": {
+      "library": "neuralforecast_auto",
+      "family": "transformer",
+      "class_name": "AutoInformer",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "95e82faf8b965b12",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 32,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-autoformer": {
+      "library": "neuralforecast_auto",
+      "family": "transformer",
+      "class_name": "AutoAutoformer",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "3743afe15fa76908",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 32,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-fedformer": {
+      "library": "neuralforecast_auto",
+      "family": "transformer",
+      "class_name": "AutoFEDformer",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "1ee6e0b8b75a0712",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 32,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-patchtst": {
+      "library": "neuralforecast_auto",
+      "family": "transformer",
+      "class_name": "AutoPatchTST",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "7fdf37dbcb802705",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 32,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-itransformer": {
+      "library": "neuralforecast_auto",
+      "family": "transformer",
+      "class_name": "AutoiTransformer",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "adf92febdabc4125",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 32,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-timexer": {
+      "library": "neuralforecast_auto",
+      "family": "transformer",
+      "class_name": "AutoTimeXer",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "ac435dfdff8f1ab2",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 32,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-timesnet": {
+      "library": "neuralforecast_auto",
+      "family": "transformer",
+      "class_name": "AutoTimesNet",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "c432a30569d2825f",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 32,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-stemgnn": {
+      "library": "neuralforecast_auto",
+      "family": "graph",
+      "class_name": "AutoStemGNN",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "4e365f24485424f4",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-hint": {
+      "library": "neuralforecast_auto",
+      "family": "hierarchical",
+      "class_name": "AutoHINT",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "d6fd3e6e5cca7842",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-tsmixer": {
+      "library": "neuralforecast_auto",
+      "family": "mixer",
+      "class_name": "AutoTSMixer",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "a5d7fb2fa307c074",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-tsmixerx": {
+      "library": "neuralforecast_auto",
+      "family": "mixer",
+      "class_name": "AutoTSMixerx",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "63d80af2e4625be4",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-mlp-multivariate": {
+      "library": "neuralforecast_auto",
+      "family": "mlp",
+      "class_name": "AutoMLPMultivariate",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "4eb25f7034c68fe2",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-softs": {
+      "library": "neuralforecast_auto",
+      "family": "mixer",
+      "class_name": "AutoSOFTS",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "962dff43f449cd70",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-timemixer": {
+      "library": "neuralforecast_auto",
+      "family": "mixer",
+      "class_name": "AutoTimeMixer",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "b3493fbc8a27a5e4",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-rmok": {
+      "library": "neuralforecast_auto",
+      "family": "kan",
+      "class_name": "AutoRMoK",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "e8e3a9f7a1576bcd",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "autogluon-timeseries": {
+      "library": "autogluon",
+      "family": "automl",
+      "class_name": "TimeSeriesPredictor",
+      "priority": "p1",
+      "capabilities": [
+        "ensemble",
+        "probabilistic",
+        "zero_shot"
+      ],
+      "available": false,
+      "model_config_hash": "a523a4e17785f578",
+      "resolved_smoke_params": {
+        "presets": "fast_training",
+        "time_limit": 5
+      },
+      "resolve_error": null
+    },
+    "darts-ensemble": {
+      "library": "darts",
+      "family": "framework",
+      "class_name": "RegressionEnsembleModel",
+      "priority": "p2",
+      "capabilities": [
+        "ensemble",
+        "probabilistic"
+      ],
+      "available": true,
+      "model_config_hash": "fbd09c7c150a0288",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "gluonts-deepar": {
+      "library": "gluonts",
+      "family": "deep_probabilistic",
+      "class_name": "DeepAREstimator",
+      "priority": "p2",
+      "capabilities": [
+        "probabilistic"
+      ],
+      "available": true,
+      "model_config_hash": "276295e7c9abbc4c",
+      "resolved_smoke_params": {
+        "epochs": 1,
+        "num_batches_per_epoch": 2,
+        "context_length": 16,
+        "num_samples": 20
+      },
+      "resolve_error": null
+    },
+    "reservoir-esn": {
+      "library": "reservoirpy",
+      "family": "reservoir",
+      "class_name": "ESN",
+      "priority": "p1",
+      "capabilities": [
+        "position"
+      ],
+      "available": true,
+      "model_config_hash": "37d9ddbe8c2a13de",
+      "resolved_smoke_params": {
+        "reservoir_size": 50,
+        "spectral_radius": 0.9,
+        "leak_rate": 0.3,
+        "ridge_alpha": 1e-06,
+        "units": 10
+      },
+      "resolve_error": null
+    },
+    "chronos-bolt-tiny": {
+      "library": "chronos",
+      "family": "tsfm",
+      "class_name": "ChronosBoltPipeline",
+      "priority": "p1",
+      "capabilities": [
+        "zero_shot",
+        "probabilistic",
+        "gpu_optional"
+      ],
+      "available": true,
+      "model_config_hash": "1302e4c882d159c2",
+      "resolved_smoke_params": {
+        "model_name": "amazon/chronos-bolt-tiny",
+        "revision": "a0e552de83495b5c28c14c71c374f3e33280b340"
+      },
+      "resolve_error": null
+    },
+    "chronos-2-small": {
+      "library": "chronos",
+      "family": "tsfm",
+      "class_name": "Chronos2Pipeline",
+      "priority": "p1",
+      "capabilities": [
+        "zero_shot",
+        "fine_tuning",
+        "exogenous"
+      ],
+      "available": true,
+      "model_config_hash": "b35568bb662644ce",
+      "resolved_smoke_params": {
+        "model_name": "autogluon/chronos-2-small"
+      },
+      "resolve_error": null
+    },
+    "timesfm-2.5": {
+      "library": "timesfm",
+      "family": "tsfm",
+      "class_name": "TimesFM",
+      "priority": "p1",
+      "capabilities": [
+        "zero_shot",
+        "fine_tuning",
+        "exogenous",
+        "gpu"
+      ],
+      "available": false,
+      "model_config_hash": "0dddf29698885b98",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "granite-ttm": {
+      "library": "transformers",
+      "family": "tsfm",
+      "class_name": "TinyTimeMixerForPrediction",
+      "priority": "p1",
+      "capabilities": [
+        "zero_shot",
+        "fine_tuning",
+        "gpu_optional"
+      ],
+      "available": true,
+      "model_config_hash": "b82a94e392261d39",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    },
+    "tirex": {
+      "library": "tirex",
+      "family": "tsfm",
+      "class_name": "TiRex",
+      "priority": "p1",
+      "capabilities": [
+        "zero_shot",
+        "probabilistic",
+        "gpu_optional"
+      ],
+      "available": false,
+      "model_config_hash": "8c4b74b1e09241a0",
+      "resolved_smoke_params": {
+        "model_name": "NX-AI/TiRex-2",
+        "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3"
+      },
+      "resolve_error": null
+    },
+    "moirai": {
+      "library": "uni2ts",
+      "family": "tsfm",
+      "class_name": "Moirai2Forecast",
+      "priority": "p2",
+      "capabilities": [
+        "zero_shot",
+        "probabilistic",
+        "gpu"
+      ],
+      "available": false,
+      "model_config_hash": "cc2c93a93f1bcdea",
+      "resolved_smoke_params": {
+        "model_name": "Salesforce/moirai-2.0-R-small",
+        "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389"
+      },
+      "resolve_error": null
+    },
+    "sundial": {
+      "library": "transformers",
+      "family": "tsfm",
+      "class_name": "SundialForPrediction",
+      "priority": "p2",
+      "capabilities": [
+        "zero_shot",
+        "generative",
+        "gpu"
+      ],
+      "available": true,
+      "model_config_hash": "eb17baa1858952be",
+      "resolved_smoke_params": {
+        "model_name": "thuml/sundial-base-128m",
+        "revision": "3212e42564493f520593e5414af4367fc4b49226",
+        "trust_remote_code": true
+      },
+      "resolve_error": null
+    },
+    "tabpfn-ts": {
+      "library": "tabpfn_time_series",
+      "family": "foundation_tabular",
+      "class_name": "TabPFNTimeSeries",
+      "priority": "p1",
+      "capabilities": [
+        "zero_shot",
+        "probability",
+        "gpu_optional"
+      ],
+      "available": false,
+      "model_config_hash": "268afa6628a439f8",
+      "resolved_smoke_params": {},
+      "resolve_error": null
+    }
+  }
+}

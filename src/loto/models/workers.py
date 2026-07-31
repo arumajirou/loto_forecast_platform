@@ -501,6 +501,9 @@ class PositionSeriesWorker:
             "batch_size": int(self.params.get("batch_size", 8)),
             "learning_rate": float(self.params.get("learning_rate", 0.001)),
             "random_seed": self.seed,
+            # AUDIT (Phase 11, 2026-07-31): hardcoded, unlike _neuralforecast/_neuralforecast_auto
+            # which branch on self.device. Not yet reconciled with --device cuda/auto requests --
+            # left as-is pending a deliberate decision (see audit trail), not silently changed here.
             "accelerator": "cpu",
             "devices": 1,
             "enable_progress_bar": False,
@@ -660,7 +663,7 @@ class PositionSeriesWorker:
         models = []
         values = []
         for position in range(1, 8):
-            source_series = history.set_index("draw_date")[f"n{position}"].astype(float)
+            source_series = history.set_index("draw_no")[f"n{position}"].astype(float)
             series = TimeSeries.from_series(source_series)
             model = RegressionEnsembleModel(
                 forecasting_models=[NaiveDrift(), ExponentialSmoothing()],
@@ -720,6 +723,9 @@ class PositionSeriesWorker:
             distr_output=StudentTOutput(),
             trainer_kwargs={
                 "max_epochs": int(self.params.get("epochs", 1)),
+                # AUDIT (Phase 11, 2026-07-31): hardcoded, unlike _neuralforecast/_neuralforecast_auto
+                # which branch on self.device. Not yet reconciled with --device cuda/auto requests --
+                # left as-is pending a deliberate decision (see audit trail), not silently changed here.
                 "accelerator": "cpu",
                 "devices": 1,
                 "logger": False,
