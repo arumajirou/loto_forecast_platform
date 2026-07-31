@@ -39,10 +39,10 @@ def _json(value) -> None:
 
 
 def _probe_torch(timeout_seconds: int = 10) -> dict:
-    code = (
+    script = (
         "import json,torch;"
         "print(json.dumps({"
-        "'torch_version':torch.__version__,"
+        "'torch':torch.__version__,"
         "'cuda_available':torch.cuda.is_available(),"
         "'cuda_device_count':torch.cuda.device_count(),"
         "'cuda_version':torch.version.cuda"
