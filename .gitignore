@@ -71,7 +71,6 @@ optuna.db
 
 # Local model/runtime environments
 .venv*/
-environments/
 
 # Secrets and local configuration
 credentials*.json
