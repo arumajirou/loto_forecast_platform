@@ -1,5 +1,3 @@
-
-
 def test_neuralforecast_fit_receives_validation_window(monkeypatch):
     import sys
     import types
@@ -23,11 +21,13 @@ def test_neuralforecast_fit_receives_validation_window(monkeypatch):
             captured["val_size"] = val_size
 
         def predict(self):
-            return pd.DataFrame({
-                "unique_id": [f"n{i}" for i in range(1, 8)],
-                "ds": pd.date_range("2026-01-01", periods=7),
-                "FakeModel": np.arange(1, 8, dtype=float),
-            })
+            return pd.DataFrame(
+                {
+                    "unique_id": [f"n{i}" for i in range(1, 8)],
+                    "ds": pd.date_range("2026-01-01", periods=7),
+                    "FakeModel": np.arange(1, 8, dtype=float),
+                }
+            )
 
     fake_models = types.SimpleNamespace(TiDE=FakeModel)
     fake_losses = types.SimpleNamespace(MAE=lambda: object())
@@ -50,17 +50,16 @@ def test_neuralforecast_fit_receives_validation_window(monkeypatch):
         fake_losses,
     )
 
-    history = pd.DataFrame({
-        "draw_date": pd.date_range(
-            "2024-01-01",
-            periods=50,
-            freq="7D",
-        ),
-        **{
-            f"n{i}": np.arange(50) + i
-            for i in range(1, 8)
-        },
-    })
+    history = pd.DataFrame(
+        {
+            "draw_date": pd.date_range(
+                "2024-01-01",
+                periods=50,
+                freq="7D",
+            ),
+            **{f"n{i}": np.arange(50) + i for i in range(1, 8)},
+        }
+    )
 
     spec = types.SimpleNamespace(
         class_name="TiDE",

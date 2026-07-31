@@ -32,7 +32,7 @@ def _point_forecast(history: np.ndarray, method: str) -> np.ndarray:
     elif method == "historic-average":
         values = np.mean(history, axis=0)
     elif method == "recent-median":
-        values = np.median(history[-min(100, len(history)):], axis=0)
+        values = np.median(history[-min(100, len(history)) :], axis=0)
     else:
         raise ValueError(f"unknown point method: {method}")
     rounded = np.rint(values).astype(int)
@@ -44,7 +44,9 @@ def _point_forecast(history: np.ndarray, method: str) -> np.ndarray:
     return rounded
 
 
-def _walk_forward(data: np.ndarray, start: int, end: int, methods: list[str]) -> tuple[np.ndarray, np.ndarray]:
+def _walk_forward(
+    data: np.ndarray, start: int, end: int, methods: list[str]
+) -> tuple[np.ndarray, np.ndarray]:
     actual: list[np.ndarray] = []
     predicted: list[np.ndarray] = []
     for index in range(start, end):
@@ -90,7 +92,9 @@ def run_coverage_experiment(config_path: str | Path) -> dict[str, Any]:
     cal_actual, cal_pred = _walk_forward(data, calibration_start, validation_start, methods)
     val_actual, val_pred = _walk_forward(data, validation_start, test_start, methods)
     cfg = CoverageConfig(**raw.get("coverage", {}))
-    conformal_radius = simultaneous_conformal_radius(cal_actual, cal_pred, cfg.target_coverage + cfg.calibration_margin)
+    conformal_radius = simultaneous_conformal_radius(
+        cal_actual, cal_pred, cfg.target_coverage + cfg.calibration_margin
+    )
 
     center = _point_forecast(data[:test_start], "median")
     method_centers = np.vstack([_point_forecast(data[:test_start], method) for method in methods])
@@ -103,7 +107,11 @@ def run_coverage_experiment(config_path: str | Path) -> dict[str, Any]:
         beam_width=cfg.beam_width,
         pool_size=cfg.pool_size,
     )
-    pool.extend(augment_with_residual_offsets(ensemble_center, residuals, radius=max(1, min(conformal_radius, 3)), limit=cfg.pool_size))
+    pool.extend(
+        augment_with_residual_offsets(
+            ensemble_center, residuals, radius=max(1, min(conformal_radius, 3)), limit=cfg.pool_size
+        )
+    )
     pool.extend([tuple(center.tolist()), tuple(ensemble_center.tolist())])
     pool = list(dict.fromkeys(pool))[: cfg.pool_size]
 
@@ -137,7 +145,9 @@ def run_coverage_experiment(config_path: str | Path) -> dict[str, Any]:
     atomic_write_json(output / "selection_trace.json", trace)
     summary = {
         "schema_version": "1.0.0",
-        "status": "TARGET_MET" if validation_eval.row_within_tolerance >= cfg.target_coverage else "TARGET_NOT_MET",
+        "status": "TARGET_MET"
+        if validation_eval.row_within_tolerance >= cfg.target_coverage
+        else "TARGET_NOT_MET",
         "data_version": manifest.data_version,
         "draws": len(data),
         "split": {
@@ -165,7 +175,9 @@ def run_coverage_experiment(config_path: str | Path) -> dict[str, Any]:
     return summary
 
 
-def certify_coverage_experiment(config_path: str | Path, prediction_set_path: str | Path | None = None) -> dict[str, Any]:
+def certify_coverage_experiment(
+    config_path: str | Path, prediction_set_path: str | Path | None = None
+) -> dict[str, Any]:
     raw = _load_config(config_path)
     output = Path(raw.get("output", "runs/coverage-90"))
     summary_path = output / "coverage_summary.json"
@@ -175,15 +187,19 @@ def certify_coverage_experiment(config_path: str | Path, prediction_set_path: st
     set_path = Path(prediction_set_path) if prediction_set_path else output / "prediction_set.json"
     prediction_set = json.loads(set_path.read_text(encoding="utf-8"))
     candidates = prediction_set["candidates"]
-    frame, manifest = canonicalize_loto7(pd.read_csv(raw["data"]["input"]), source=raw["data"]["input"])
+    frame, manifest = canonicalize_loto7(
+        pd.read_csv(raw["data"]["input"]), source=raw["data"]["input"]
+    )
     data = _numbers(frame)
     start, end = prior["split"]["protected_test"]
-    actual = data[int(start):int(end)]
+    actual = data[int(start) : int(end)]
     cfg = CoverageConfig(**raw.get("coverage", {}))
     evaluation = evaluate_candidates(actual, candidates, cfg.tolerance)
     result = {
         "schema_version": "1.0.0",
-        "status": "CERTIFIED_TARGET_MET" if evaluation.row_within_tolerance >= cfg.target_coverage else "CERTIFIED_TARGET_NOT_MET",
+        "status": "CERTIFIED_TARGET_MET"
+        if evaluation.row_within_tolerance >= cfg.target_coverage
+        else "CERTIFIED_TARGET_NOT_MET",
         "data_version": manifest.data_version,
         "target_coverage": cfg.target_coverage,
         "protected_test": evaluation.to_dict(),

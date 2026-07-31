@@ -1,4 +1,5 @@
 """End-to-end research run: every stage wired, every game supported."""
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -18,17 +19,27 @@ def _synthetic(game: str, n: int = 220, seed: int = 7) -> pd.DataFrame:
     rows = []
     for i in range(n):
         if g.family == "select":
-            v = sorted(rng.choice(np.arange(g.value_min, g.value_max + 1),
-                                  size=g.positions, replace=False).tolist())
+            v = sorted(
+                rng.choice(
+                    np.arange(g.value_min, g.value_max + 1), size=g.positions, replace=False
+                ).tolist()
+            )
         else:
             v = rng.integers(g.value_min, g.value_max + 1, size=g.positions).tolist()
-        rows.append({"draw_no": i + 1, **dict(zip(g.column_names(), v))})
+        rows.append({"draw_no": i + 1, **dict(zip(g.column_names(), v, strict=False))})
     return pd.DataFrame(rows)
 
 
 def _cfg(game: str, **kw) -> ResearchConfig:
-    base = dict(game=game, folds=4, test_size=10, min_train_size=80,
-                holdout_size=20, n_boot=200, sentinel_repeats=3)
+    base = dict(
+        game=game,
+        folds=4,
+        test_size=10,
+        min_train_size=80,
+        holdout_size=20,
+        n_boot=200,
+        sentinel_repeats=3,
+    )
     base.update(kw)
     return ResearchConfig(**base)
 
@@ -120,8 +131,7 @@ def test_illegal_predictions_are_projected_onto_the_legal_space():
     def out_of_range(train, geometry, n_test):
         return np.full((n_test, geometry.positions), 999.0)
 
-    out = run_research(_synthetic("loto7"), _cfg("loto7"),
-                       predictors={"bad": out_of_range})
+    out = run_research(_synthetic("loto7"), _cfg("loto7"), predictors={"bad": out_of_range})
     row = next(r for r in out.leaderboard["rows"] if r["model_id"] == "bad")
     assert row["status"] == "SUCCEEDED"  # projected, not crashed
     assert row["point_estimate"] > 0
@@ -130,6 +140,7 @@ def test_illegal_predictions_are_projected_onto_the_legal_space():
 def test_theory_predictors_hit_their_exact_bounds():
     g = geometry_for("loto7")
     from loto.evaluation.theory_general import theoretical_bounds
+
     bounds = theoretical_bounds(g)
     pred = theory_median_predictor(pd.DataFrame(), g, 3)
     assert pred.shape == (3, 7)

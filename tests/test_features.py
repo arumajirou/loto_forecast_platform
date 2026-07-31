@@ -7,8 +7,22 @@ from loto.features.pipeline import build_candidate_features
 def test_features_for_draw_do_not_use_current_draw_target():
     rows = []
     for draw_no in range(1, 8):
-        nums = [draw_no, draw_no + 5, draw_no + 10, draw_no + 15, draw_no + 20, draw_no + 25, draw_no + 30]
-        rows.append({"draw_no": draw_no, "draw_date": f"2026-01-{draw_no:02d}", **{f"n{i+1}": n for i, n in enumerate(nums)}})
+        nums = [
+            draw_no,
+            draw_no + 5,
+            draw_no + 10,
+            draw_no + 15,
+            draw_no + 20,
+            draw_no + 25,
+            draw_no + 30,
+        ]
+        rows.append(
+            {
+                "draw_no": draw_no,
+                "draw_date": f"2026-01-{draw_no:02d}",
+                **{f"n{i + 1}": n for i, n in enumerate(nums)},
+            }
+        )
     master, _ = canonicalize_loto7(pd.DataFrame(rows))
     feats = build_candidate_features(master, windows=(3,))
     draw7 = feats[feats.draw_no == 7].set_index("candidate_number")

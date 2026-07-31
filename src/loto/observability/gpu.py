@@ -6,7 +6,9 @@ import subprocess
 from typing import Any
 
 
-def collect_gpu_evidence(*, gpu_required: bool, model: Any | None = None, batch: Any | None = None) -> dict:
+def collect_gpu_evidence(
+    *, gpu_required: bool, model: Any | None = None, batch: Any | None = None
+) -> dict:
     evidence: dict[str, Any] = {
         "gpu_required": gpu_required,
         "pid": os.getpid(),
@@ -22,12 +24,15 @@ def collect_gpu_evidence(*, gpu_required: bool, model: Any | None = None, batch:
         return evidence
     try:
         import torch
-        evidence.update({
-            "torch_version": torch.__version__,
-            "cuda_available": torch.cuda.is_available(),
-            "cuda_version": torch.version.cuda,
-            "gpu_count": torch.cuda.device_count(),
-        })
+
+        evidence.update(
+            {
+                "torch_version": torch.__version__,
+                "cuda_available": torch.cuda.is_available(),
+                "cuda_version": torch.version.cuda,
+                "gpu_count": torch.cuda.device_count(),
+            }
+        )
         if model is not None:
             try:
                 evidence["model_device"] = str(next(model.parameters()).device)
@@ -43,13 +48,19 @@ def collect_gpu_evidence(*, gpu_required: bool, model: Any | None = None, batch:
         evidence["torch_error"] = str(exc)
     try:
         proc = subprocess.run(
-            ["nvidia-smi", "--query-compute-apps=pid,gpu_uuid,used_memory", "--format=csv,noheader,nounits"],
+            [
+                "nvidia-smi",
+                "--query-compute-apps=pid,gpu_uuid,used_memory",
+                "--format=csv,noheader,nounits",
+            ],
             capture_output=True,
             text=True,
             timeout=5,
             check=False,
         )
-        evidence["nvidia_smi_processes"] = proc.stdout.strip().splitlines() if proc.returncode == 0 else []
+        evidence["nvidia_smi_processes"] = (
+            proc.stdout.strip().splitlines() if proc.returncode == 0 else []
+        )
     except Exception as exc:  # noqa: BLE001
         evidence["nvidia_smi_error"] = str(exc)
     evidence.update(evaluate_gpu_evidence(evidence))

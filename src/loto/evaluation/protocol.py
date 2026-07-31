@@ -10,6 +10,7 @@ of the same protocol agree. Conversely ``horizon`` and ``tau`` are included, bec
 evaluated at ``horizon=1`` is not comparable to one evaluated at ``horizon=4`` no matter how
 similar the numbers look.
 """
+
 from __future__ import annotations
 
 import hashlib

@@ -10,12 +10,11 @@ import os
 import shutil
 import signal
 import subprocess
-import sys
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass, asdict
-from datetime import datetime, timezone
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -43,8 +42,7 @@ MODEL_GRIDS: dict[str, dict[str, list[Any]]] = {
     "nf-nlinear": {},
     "nf-nhits": {
         "n_blocks": [[1, 1, 1], [2, 2, 2]],
-        "mlp_units": [[[64, 64], [64, 64], [64, 64]],
-                      [[128, 128], [128, 128], [128, 128]]],
+        "mlp_units": [[[64, 64], [64, 64], [64, 64]], [[128, 128], [128, 128], [128, 128]]],
     },
     "nf-tide": {
         "hidden_size": [64, 128],
@@ -73,6 +71,7 @@ PROFILE_LIMITS = {
     },
 }
 
+
 @dataclass
 class RunResult:
     run_index: int
@@ -92,7 +91,7 @@ class RunResult:
 
 
 def now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def slug(value: str) -> str:
@@ -134,10 +133,15 @@ def product_dict(grid: dict[str, list[Any]]) -> list[dict[str, Any]]:
     if not grid:
         return [{}]
     keys = list(grid)
-    return [dict(zip(keys, values)) for values in itertools.product(*(grid[k] for k in keys))]
+    return [
+        dict(zip(keys, values, strict=False))
+        for values in itertools.product(*(grid[k] for k in keys))
+    ]
 
 
-def build_matrix(models: list[str], profile: str, max_runs: int) -> list[tuple[str, dict[str, Any]]]:
+def build_matrix(
+    models: list[str], profile: str, max_runs: int
+) -> list[tuple[str, dict[str, Any]]]:
     rules = PROFILE_LIMITS[profile]
     common = {k: COMMON_GRID[k] for k in rules["common_keys"]}
     matrix: list[tuple[str, dict[str, Any]]] = []
@@ -163,8 +167,15 @@ def build_matrix(models: list[str], profile: str, max_runs: int) -> list[tuple[s
     return matrix
 
 
-def write_yaml(base: dict[str, Any], model: str, params: dict[str, Any],
-               cfg_path: Path, output_dir: Path, device: str, seed: int) -> None:
+def write_yaml(
+    base: dict[str, Any],
+    model: str,
+    params: dict[str, Any],
+    cfg_path: Path,
+    output_dir: Path,
+    device: str,
+    seed: int,
+) -> None:
     cfg = json.loads(json.dumps(base))
     cfg["models"] = [model]
     cfg.setdefault("model_params", {})
@@ -188,7 +199,9 @@ def write_yaml(base: dict[str, Any], model: str, params: dict[str, Any],
     cfg_path.write_text(yaml.safe_dump(cfg, sort_keys=False, allow_unicode=True), encoding="utf-8")
 
 
-def run_cmd(cmd: list[str], cwd: Path, log_path: Path, timeout: int) -> tuple[int, float, bool, str | None]:
+def run_cmd(
+    cmd: list[str], cwd: Path, log_path: Path, timeout: int
+) -> tuple[int, float, bool, str | None]:
     started = time.monotonic()
     timed_out = False
     error = None
@@ -226,7 +239,9 @@ def gpu_sampler(stop: threading.Event, output: Path, interval: int = 10) -> None
         return
     output.parent.mkdir(parents=True, exist_ok=True)
     header_written = output.exists() and output.stat().st_size > 0
-    fields = "timestamp,index,name,utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw"
+    fields = (
+        "timestamp,index,name,utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw"
+    )
     while not stop.is_set():
         cmd = [
             "nvidia-smi",
@@ -263,8 +278,14 @@ def classify(log_path: Path, rc: int, timed_out: bool) -> tuple[str, str | None]
     return "FAILED", f"return_code={rc}"
 
 
-def execute_one(index: int, model: str, params: dict[str, Any], args: argparse.Namespace,
-                base: dict[str, Any], campaign: Path) -> RunResult:
+def execute_one(
+    index: int,
+    model: str,
+    params: dict[str, Any],
+    args: argparse.Namespace,
+    base: dict[str, Any],
+    campaign: Path,
+) -> RunResult:
     fingerprint = sha12({"model": model, "params": params, "seed": args.seed})
     run_name = f"{index:05d}-{slug(model)}-{fingerprint}"
     cfg_path = campaign / "configs" / f"{run_name}.yaml"
@@ -278,29 +299,57 @@ def execute_one(index: int, model: str, params: dict[str, Any], args: argparse.N
     validate_log = campaign / "logs" / f"{run_name}.validate.log"
     vrc, velapsed, vto, verr = run_cmd(
         ["uv", "run", "loto", "config", "validate", "--file", str(cfg_path)],
-        PROJECT, validate_log, min(args.timeout, 300),
+        PROJECT,
+        validate_log,
+        min(args.timeout, 300),
     )
     if vrc != 0:
         status, error = classify(validate_log, vrc, vto)
         return RunResult(
-            index, run_name, model, "VALIDATION_" + status, vrc, velapsed,
-            str(cfg_path), str(out_dir), str(validate_log), params,
-            started_at, now_iso(), error or verr, vto
+            index,
+            run_name,
+            model,
+            "VALIDATION_" + status,
+            vrc,
+            velapsed,
+            str(cfg_path),
+            str(out_dir),
+            str(validate_log),
+            params,
+            started_at,
+            now_iso(),
+            error or verr,
+            vto,
         )
 
     rc, elapsed, timed_out, run_error = run_cmd(
         ["uv", "run", "loto", "experiment", "research", "--config", str(cfg_path)],
-        PROJECT, log_path, args.timeout,
+        PROJECT,
+        log_path,
+        args.timeout,
     )
     status, classified_error = classify(log_path, rc, timed_out)
     return RunResult(
-        index, run_name, model, status, rc, elapsed,
-        str(cfg_path), str(out_dir), str(log_path), params,
-        started_at, now_iso(), classified_error or run_error, timed_out
+        index,
+        run_name,
+        model,
+        status,
+        rc,
+        elapsed,
+        str(cfg_path),
+        str(out_dir),
+        str(log_path),
+        params,
+        started_at,
+        now_iso(),
+        classified_error or run_error,
+        timed_out,
     )
 
 
-def write_results(campaign: Path, results: list[RunResult], matrix_count: int, args: argparse.Namespace) -> None:
+def write_results(
+    campaign: Path, results: list[RunResult], matrix_count: int, args: argparse.Namespace
+) -> None:
     ordered = sorted(results, key=lambda r: r.run_index)
     rows = []
     for r in ordered:
@@ -356,7 +405,9 @@ def write_results(campaign: Path, results: list[RunResult], matrix_count: int, a
         md.append("| Run | Model | Status | Error | Log |")
         md.append("|---|---|---|---|---|")
         for r in failures[:500]:
-            md.append(f"| {r.run_name} | {r.model_id} | {r.status} | {r.error or ''} | `{r.log_path}` |")
+            md.append(
+                f"| {r.run_name} | {r.model_id} | {r.status} | {r.error or ''} | `{r.log_path}` |"
+            )
     (campaign / "REPORT.md").write_text("\n".join(md) + "\n", encoding="utf-8")
 
 
@@ -420,7 +471,11 @@ def main() -> int:
     (campaign / "matrix.json").write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8"
     )
-    print(json.dumps({k: v for k, v in manifest.items() if k != "matrix"}, indent=2, ensure_ascii=False))
+    print(
+        json.dumps(
+            {k: v for k, v in manifest.items() if k != "matrix"}, indent=2, ensure_ascii=False
+        )
+    )
     print(f"CAMPAIGN={campaign}")
 
     if args.dry_run:
@@ -446,9 +501,20 @@ def main() -> int:
                     i = futures[future]
                     model, params = matrix[i - 1]
                     result = RunResult(
-                        i, f"{i:05d}-{slug(model)}-internal", model, "HARNESS_ERROR",
-                        None, 0.0, "", "", "", params, now_iso(), now_iso(),
-                        f"{type(exc).__name__}: {exc}", False
+                        i,
+                        f"{i:05d}-{slug(model)}-internal",
+                        model,
+                        "HARNESS_ERROR",
+                        None,
+                        0.0,
+                        "",
+                        "",
+                        "",
+                        params,
+                        now_iso(),
+                        now_iso(),
+                        f"{type(exc).__name__}: {exc}",
+                        False,
                     )
                 results.append(result)
                 print(

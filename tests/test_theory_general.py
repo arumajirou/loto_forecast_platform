@@ -1,4 +1,5 @@
 """Exact theoretical bounds, verified against independently known values."""
+
 import pytest
 
 from loto.evaluation.theory_general import bounds_table, position_pmf, theoretical_bounds

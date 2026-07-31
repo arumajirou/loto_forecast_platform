@@ -72,9 +72,7 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
     tabpfn_model_config = {"model_path": weight_filename}
 
     try:
-        res = resolve_model_path(
-            weight_filename, which="regressor", version="v2"
-        )
+        res = resolve_model_path(weight_filename, which="regressor", version="v2")
         resolved_model_paths, _resolved_model_dirs, _resolved_model_names, _which = res
         resolved_path = resolved_model_paths[0]
     except Exception as exc:
@@ -157,9 +155,7 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
             "resource_certification": "GPU_PASS" if gpu_used else "CPU_ONLY_PASS",
             "cpu_fallback": requested_device == "cuda" and not gpu_used,
             "fallback_reason": (
-                None
-                if execution_device == requested_device
-                else "cuda_unavailable_or_not_selected"
+                None if execution_device == requested_device else "cuda_unavailable_or_not_selected"
             ),
             "peak_vram_bytes": int(torch.cuda.max_memory_allocated()) if gpu_used else 0,
             "gpu_pid": os.getpid() if gpu_used else None,

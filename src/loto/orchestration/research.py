@@ -72,7 +72,9 @@ def _candidate_fold(
         output = runtime.predict_candidate(query)
         elapsed = time.perf_counter() - started
         after = collect_gpu_evidence(gpu_required=False)
-        probability = np.clip(np.asarray(output.candidate_probabilities, dtype=float), 1e-9, 1 - 1e-9)
+        probability = np.clip(
+            np.asarray(output.candidate_probabilities, dtype=float), 1e-9, 1 - 1e-9
+        )
         position = PositionFrequencyAdapter().fit(history).predict_matrix()
         predicted = _rank_to_combo(probability, position)
         row = master.iloc[draw_index]
@@ -80,7 +82,9 @@ def _candidate_fold(
         predictions.append(predicted)
         probabilities.append(probability)
         actuals.append(actual)
-        resources.append({"draw_index": draw_index, "elapsed_seconds": elapsed, "before": before, "after": after})
+        resources.append(
+            {"draw_index": draw_index, "elapsed_seconds": elapsed, "before": before, "after": after}
+        )
     return predictions, probabilities, actuals, resources
 
 
@@ -104,7 +108,9 @@ def _position_fold(
         history = master.iloc[:draw_index].copy()
         before = collect_gpu_evidence(gpu_required=False)
         started = time.perf_counter()
-        output = PositionSeriesWorker(spec, params, seed=seed, device=device, precision=precision).forecast(history)
+        output = PositionSeriesWorker(
+            spec, params, seed=seed, device=device, precision=precision
+        ).forecast(history)
         elapsed = time.perf_counter() - started
         after = collect_gpu_evidence(gpu_required=gpu_required)
         values = np.clip(np.rint(output.position_values), 1, 37).astype(int)
@@ -119,27 +125,37 @@ def _position_fold(
         predictions.append(values.tolist())
         probabilities.append(np.asarray(output.candidate_probabilities, dtype=float))
         actuals.append(actual)
-        resources.append({
-            "draw_index": draw_index,
-            "elapsed_seconds": elapsed,
-            "before": before,
-            "after": after,
-            "worker": output.metadata,
-            "gpu_certification": "VERIFIED" if after.get("eligible") and gpu_required else "NOT_REQUIRED" if not gpu_required else "PARTIAL",
-        })
+        resources.append(
+            {
+                "draw_index": draw_index,
+                "elapsed_seconds": elapsed,
+                "before": before,
+                "after": after,
+                "worker": output.metadata,
+                "gpu_certification": "VERIFIED"
+                if after.get("eligible") and gpu_required
+                else "NOT_REQUIRED"
+                if not gpu_required
+                else "PARTIAL",
+            }
+        )
     return predictions, probabilities, actuals, resources
 
 
-def _metric_bundle(actual: list[list[int]], predicted: list[list[int]], probs: list[np.ndarray]) -> dict[str, Any]:
+def _metric_bundle(
+    actual: list[list[int]], predicted: list[list[int]], probs: list[np.ndarray]
+) -> dict[str, Any]:
     targets = np.asarray([_targets(row) for row in actual])
     matrix = np.asarray(probs, dtype=float)
     result = detailed_draw_metrics(np.asarray(actual), np.asarray(predicted))
-    result.update({
-        "brier": brier_score(targets, matrix),
-        "log_loss": log_loss(targets, matrix),
-        "ece": expected_calibration_error(targets, matrix),
-        **candidate_ranking_metrics(targets, matrix, k=7),
-    })
+    result.update(
+        {
+            "brier": brier_score(targets, matrix),
+            "log_loss": log_loss(targets, matrix),
+            "ece": expected_calibration_error(targets, matrix),
+            **candidate_ranking_metrics(targets, matrix, k=7),
+        }
+    )
     return result
 
 
@@ -206,12 +222,15 @@ def _tune_candidate_params(
         )
     search_dir = output / "search" / f"{model_id}-s{seed}"
     search_dir.mkdir(parents=True, exist_ok=True)
-    atomic_write_json(search_dir / "result.json", {
-        "backend": result.backend,
-        "best_params": result.best_params,
-        "best_value": result.best_value,
-        "trials": result.trials,
-    })
+    atomic_write_json(
+        search_dir / "result.json",
+        {
+            "backend": result.backend,
+            "best_params": result.best_params,
+            "best_value": result.best_value,
+            "trials": result.trials,
+        },
+    )
     return base_params | result.best_params
 
 
@@ -225,7 +244,11 @@ def _resume_keys(output: Path, config_hash: str) -> set[tuple[str, int]]:
         if summary.get("config_hash") != config_hash:
             return set()
         frame = pd.read_csv(trials_path)
-        return {(str(row.model_id), int(row.seed)) for row in frame.itertuples() if row.status == "SUCCEEDED"}
+        return {
+            (str(row.model_id), int(row.seed))
+            for row in frame.itertuples()
+            if row.status == "SUCCEEDED"
+        }
     except Exception:
         return set()
 
@@ -245,7 +268,9 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
     config.write_resolved(output / "resolved_config.yaml")
     events = JsonEventLogger(output / "events.jsonl", run_id, {"config_hash": config.config_hash})
     trace = TraceManager(otlp_endpoint=config.observability.otlp_endpoint)
-    monitor = ResourceMonitor(output / "resource_samples.jsonl", capture_gpu=config.observability.capture_gpu)
+    monitor = ResourceMonitor(
+        output / "resource_samples.jsonl", capture_gpu=config.observability.capture_gpu
+    )
     monitor.start()
     events.emit("research.run", status="STARTED")
     mlflow_status: dict[str, Any] = {"enabled": False, "reason": "not_configured"}
@@ -254,7 +279,9 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
         with trace.span("research.load_data", {"run.id": run_id}):
             raw = pd.read_csv(config.data.input)
             master, manifest = canonicalize_loto7(raw, source=config.data.input)
-            development_slice, holdout_slice = split_development_holdout(len(master), config.cv.holdout_size)
+            development_slice, holdout_slice = split_development_holdout(
+                len(master), config.cv.holdout_size
+            )
             development = master.iloc[development_slice].reset_index(drop=True)
             holdout = master.iloc[holdout_slice].reset_index(drop=True)
             folds = rolling_folds(
@@ -266,7 +293,9 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
                 expanding=config.cv.expanding,
             )
         if not folds:
-            raise ValueError("no outer folds can be constructed; reduce holdout/test size or min_train_size")
+            raise ValueError(
+                "no outer folds can be constructed; reduce holdout/test size or min_train_size"
+            )
 
         existing_keys = _resume_keys(output, config.config_hash) if config.runtime.resume else set()
         trials: list[dict[str, Any]] = []
@@ -281,15 +310,36 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
             spec = get_model_spec(model_id)
             params = config.model_params.get(model_id, {})
             if not spec.available:
-                failed.append({"model_id": model_id, "status": "UNAVAILABLE", "reason": f"optional package missing: {spec.package}"})
-                events.emit("research.model", status="UNAVAILABLE", model_id=model_id, package=spec.package)
+                failed.append(
+                    {
+                        "model_id": model_id,
+                        "status": "UNAVAILABLE",
+                        "reason": f"optional package missing: {spec.package}",
+                    }
+                )
+                events.emit(
+                    "research.model", status="UNAVAILABLE", model_id=model_id, package=spec.package
+                )
                 continue
             for seed in config.cv.seeds:
                 trial_key = (model_id, seed)
                 trial_id = f"{model_id}-s{seed}"
                 if trial_key in existing_keys:
-                    skipped.append({"trial_id": trial_id, "model_id": model_id, "seed": seed, "status": "RESUMED_SKIP"})
-                    events.emit("research.trial", status="RESUMED_SKIP", trial_id=trial_id, model_id=model_id, seed=seed)
+                    skipped.append(
+                        {
+                            "trial_id": trial_id,
+                            "model_id": model_id,
+                            "seed": seed,
+                            "status": "RESUMED_SKIP",
+                        }
+                    )
+                    events.emit(
+                        "research.trial",
+                        status="RESUMED_SKIP",
+                        trial_id=trial_id,
+                        model_id=model_id,
+                        seed=seed,
+                    )
                     continue
                 model_predictions: list[list[int]] = []
                 model_actuals: list[list[int]] = []
@@ -298,15 +348,30 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
                 resource_rows: list[dict[str, Any]] = []
                 resolved_params = dict(params)
                 trial_started = time.perf_counter()
-                events.emit("research.trial", status="STARTED", trial_id=trial_id, model_id=model_id, seed=seed)
+                events.emit(
+                    "research.trial",
+                    status="STARTED",
+                    trial_id=trial_id,
+                    model_id=model_id,
+                    seed=seed,
+                )
                 try:
-                    with trace.span("research.trial", {"trial.id": trial_id, "model.id": model_id, "seed": seed}):
+                    with trace.span(
+                        "research.trial", {"trial.id": trial_id, "model.id": model_id, "seed": seed}
+                    ):
                         for fold in folds:
                             started = time.perf_counter()
                             fold_params = params
                             if spec.task == "candidate":
                                 fold_params = _tune_candidate_params(
-                                    development, model_id, params, seed, fold.train_end, config, windows, output
+                                    development,
+                                    model_id,
+                                    params,
+                                    seed,
+                                    fold.train_end,
+                                    config,
+                                    windows,
+                                    output,
                                 )
                                 resolved_params = fold_params
                                 pred, probs, actual, resources = _candidate_fold(
@@ -344,18 +409,22 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
                                     precision=config.runtime.precision,
                                 )
                                 gateway.write_job(job, output / "worker_jobs" / f"{trial_id}.json")
-                                raise RuntimeError(f"task {spec.task} requires provider plugin/worker")
+                                raise RuntimeError(
+                                    f"task {spec.task} requires provider plugin/worker"
+                                )
                             elapsed = time.perf_counter() - started
                             elapsed_total += elapsed
                             fold_metric = _metric_bundle(actual, pred, probs)
                             fold_metric["elapsed_seconds"] = elapsed
-                            fold_rows.append({
-                                "trial_id": trial_id,
-                                "model_id": model_id,
-                                "seed": seed,
-                                "fold_id": fold.fold_id,
-                                **fold_metric,
-                            })
+                            fold_rows.append(
+                                {
+                                    "trial_id": trial_id,
+                                    "model_id": model_id,
+                                    "seed": seed,
+                                    "fold_id": fold.fold_id,
+                                    **fold_metric,
+                                }
+                            )
                             for resource in resources:
                                 resource_rows.append({"fold_id": fold.fold_id, **resource})
                             model_predictions.extend(pred)
@@ -363,7 +432,9 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
                             model_probs.extend(probs)
                     aggregate = _metric_bundle(model_actuals, model_predictions, model_probs)
                     aggregate["elapsed_seconds"] = elapsed_total
-                    aggregate["composite_score"] = composite_score(aggregate, config.objective.weights)
+                    aggregate["composite_score"] = composite_score(
+                        aggregate, config.objective.weights
+                    )
                     row = {
                         "trial_id": trial_id,
                         "model_id": model_id,
@@ -377,8 +448,17 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
                     }
                     trials.append(row)
                     atomic_write_json(output / "resources" / f"{trial_id}.json", resource_rows)
-                    observe_trial(model_id, "SUCCEEDED", time.perf_counter() - trial_started, aggregate)
-                    events.emit("research.trial", status="SUCCEEDED", trial_id=trial_id, model_id=model_id, seed=seed, metrics=aggregate)
+                    observe_trial(
+                        model_id, "SUCCEEDED", time.perf_counter() - trial_started, aggregate
+                    )
+                    events.emit(
+                        "research.trial",
+                        status="SUCCEEDED",
+                        trial_id=trial_id,
+                        model_id=model_id,
+                        seed=seed,
+                        metrics=aggregate,
+                    )
                     consecutive_failures = 0
                 except Exception as exc:
                     failure = {
@@ -392,12 +472,23 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
                     failed.append(failure)
                     atomic_write_json(output / "failures" / f"{trial_id}.json", failure)
                     observe_trial(model_id, "FAILED", time.perf_counter() - trial_started)
-                    events.emit("research.trial", status="FAILED", trial_id=trial_id, model_id=model_id, seed=seed, error=str(exc))
+                    events.emit(
+                        "research.trial",
+                        status="FAILED",
+                        trial_id=trial_id,
+                        model_id=model_id,
+                        seed=seed,
+                        error=str(exc),
+                    )
                     consecutive_failures += 1
                     if config.search.fail_fast:
                         raise
                     if consecutive_failures >= config.search.max_consecutive_failures:
-                        events.emit("research.run", status="STOPPED_FAILURE_LIMIT", failures=consecutive_failures)
+                        events.emit(
+                            "research.run",
+                            status="STOPPED_FAILURE_LIMIT",
+                            failures=consecutive_failures,
+                        )
                         break
             if consecutive_failures >= config.search.max_consecutive_failures:
                 break
@@ -472,14 +563,32 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
                 "failed_trials": float(len(failed)),
             }
             if summary["champion"]:
-                for key in ("composite_score", "mean_hits_at_7", "mean_within_1", "position_mae", "position_mse", "brier", "ece"):
+                for key in (
+                    "composite_score",
+                    "mean_hits_at_7",
+                    "mean_within_1",
+                    "position_mae",
+                    "position_mse",
+                    "brier",
+                    "ece",
+                ):
                     if key in summary["champion"]:
                         metrics[f"champion_{key}"] = float(summary["champion"][key])
-            mlflow_status = MlflowBridge(config.observability.mlflow_uri, config.observability.experiment_name).record_run(
+            mlflow_status = MlflowBridge(
+                config.observability.mlflow_uri, config.observability.experiment_name
+            ).record_run(
                 run_id,
-                {"config_hash": config.config_hash, "models": config.models, "data_version": manifest.data_version},
+                {
+                    "config_hash": config.config_hash,
+                    "models": config.models,
+                    "data_version": manifest.data_version,
+                },
                 metrics,
-                [output / "research_summary.json", output / "model_leaderboard.csv", output / "resolved_config.yaml"],
+                [
+                    output / "research_summary.json",
+                    output / "model_leaderboard.csv",
+                    output / "resolved_config.yaml",
+                ],
             )
             atomic_write_json(output / "mlflow_status.json", mlflow_status)
             summary["mlflow"] = mlflow_status
@@ -489,7 +598,12 @@ def run_research_experiment(config: ExperimentConfig) -> dict[str, Any]:
         write_notification_report(notify_results, output / "notification_status.json")
         summary["notifications"] = notification_status
         atomic_write_json(output / "research_summary.json", summary)
-        events.emit("research.run", status=summary["status"], successful_trials=len(trials), failed_trials=len(failed))
+        events.emit(
+            "research.run",
+            status=summary["status"],
+            successful_trials=len(trials),
+            failed_trials=len(failed),
+        )
         return summary
     except Exception as exc:
         events.emit("research.run", status="FAILED", error=f"{type(exc).__name__}: {exc}")

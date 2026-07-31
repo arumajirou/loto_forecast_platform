@@ -32,7 +32,9 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _snapshot(repo_id: str, revision: str | None, local_files_only: bool, snapshot: str | None) -> Path:
+def _snapshot(
+    repo_id: str, revision: str | None, local_files_only: bool, snapshot: str | None
+) -> Path:
     if snapshot:
         snapshot_path = Path(snapshot)
         if not snapshot_path.exists():
@@ -45,7 +47,15 @@ def _snapshot(repo_id: str, revision: str | None, local_files_only: bool, snapsh
             repo_id=repo_id,
             revision=revision,
             local_files_only=local_files_only,
-            allow_patterns=["*.json", "*.safetensors", "*.bin", "*.py", "*.txt", "README.md", "LICENSE*"],
+            allow_patterns=[
+                "*.json",
+                "*.safetensors",
+                "*.bin",
+                "*.py",
+                "*.txt",
+                "README.md",
+                "LICENSE*",
+            ],
         )
     )
 
@@ -70,9 +80,15 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
     weights = sorted(snapshot_path.glob("*.safetensors")) + sorted(snapshot_path.glob("*.bin"))
     remote_code = sorted(snapshot_path.glob("*.py"))
     if not config_path.exists() or not remote_code:
-        return {"status": "PARTIAL_SNAPSHOT", "message": f"config or remote code missing in {snapshot_path}"}
+        return {
+            "status": "PARTIAL_SNAPSHOT",
+            "message": f"config or remote code missing in {snapshot_path}",
+        }
     if not weights:
-        return {"status": "MODEL_WEIGHTS_MISSING", "message": f"no model weights found in {snapshot_path}"}
+        return {
+            "status": "MODEL_WEIGHTS_MISSING",
+            "message": f"no model weights found in {snapshot_path}",
+        }
 
     cuda_available = torch.cuda.is_available()
     execution_device = "cuda" if requested_device == "cuda" and cuda_available else "cpu"
@@ -146,7 +162,9 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
             "gpu_certification": "OBSERVED" if gpu_used else "NOT_CERTIFIED",
             "resource_certification": "GPU_PASS" if gpu_used else "CPU_ONLY_PASS",
             "cpu_fallback": requested_device == "cuda" and not gpu_used,
-            "fallback_reason": None if execution_device == requested_device else "cuda_unavailable_or_not_selected",
+            "fallback_reason": None
+            if execution_device == requested_device
+            else "cuda_unavailable_or_not_selected",
             "peak_vram_bytes": int(torch.cuda.max_memory_allocated()) if gpu_used else 0,
             "gpu_pid": os.getpid() if gpu_used else None,
         },

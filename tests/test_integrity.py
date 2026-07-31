@@ -1,4 +1,5 @@
 """One authoritative manifest; staleness must be detectable."""
+
 import json
 
 import pytest

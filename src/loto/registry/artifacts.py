@@ -35,7 +35,9 @@ class ArtifactStore:
     def put_json(self, payload: dict, name: str, *, namespace: str = "default") -> dict:
         tmp = self.root / ".tmp" / name
         tmp.parent.mkdir(parents=True, exist_ok=True)
-        tmp.write_text(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
+        tmp.write_text(
+            json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8"
+        )
         result = self.put_file(tmp, namespace=namespace)
         tmp.unlink(missing_ok=True)
         return result

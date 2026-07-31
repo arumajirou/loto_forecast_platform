@@ -15,6 +15,7 @@ Metric families:
   seasonal-naive reference
 * ranking -- precision/recall/NDCG at k over the marginal inclusion vector
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -105,7 +106,9 @@ def set_overlap_metrics(actual, predicted, geometry: GameGeometry) -> dict[str, 
     if a.shape != p.shape:
         raise ValueError("actual and predicted must have identical shapes")
     k = geometry.positions
-    hits = np.array([len(set(row_a) & set(row_p)) for row_a, row_p in zip(a, p)], dtype=float)
+    hits = np.array(
+        [len(set(row_a) & set(row_p)) for row_a, row_p in zip(a, p, strict=False)], dtype=float
+    )
     out = {
         "set_overlap_supported": 1.0,
         f"mean_hits_at_{k}": float(hits.mean()),
@@ -131,7 +134,7 @@ def expected_calibration_error(y_true, y_prob, *, bins: int = 10) -> float:
         raise ValueError("bins must be >= 1")
     edges = np.linspace(0.0, 1.0, bins + 1)
     total = 0.0
-    for lo, hi in zip(edges[:-1], edges[1:]):
+    for lo, hi in zip(edges[:-1], edges[1:], strict=False):
         mask = (q >= lo) & (q < hi) if hi < 1.0 else (q >= lo) & (q <= hi)
         if mask.any():
             total += mask.mean() * abs(t[mask].mean() - q[mask].mean())
@@ -146,7 +149,7 @@ def reliability_curve(y_true, y_prob, *, bins: int = 10) -> list[dict[str, float
         raise ValueError("y_true and y_prob must align")
     edges = np.linspace(0.0, 1.0, bins + 1)
     rows: list[dict[str, float]] = []
-    for lo, hi in zip(edges[:-1], edges[1:]):
+    for lo, hi in zip(edges[:-1], edges[1:], strict=False):
         mask = (q >= lo) & (q < hi) if hi < 1.0 else (q >= lo) & (q <= hi)
         rows.append(
             {
@@ -191,9 +194,7 @@ def probabilistic_metrics(
     log_loss = float(-np.mean(t * np.log(clipped) + (1.0 - t) * np.log(1.0 - clipped)))
     base = geometry.marginal_base_rate()
     brier_uniform = float(np.mean((base - t) ** 2))
-    ll_uniform = float(
-        -np.mean(t * np.log(base) + (1.0 - t) * np.log(1.0 - base))
-    )
+    ll_uniform = float(-np.mean(t * np.log(base) + (1.0 - t) * np.log(1.0 - base)))
     return {
         "brier": brier,
         "brier_uniform_reference": brier_uniform,
@@ -207,7 +208,9 @@ def probabilistic_metrics(
     }
 
 
-def ranking_metrics(targets, scores, geometry: GameGeometry, *, k: int | None = None) -> dict[str, float]:
+def ranking_metrics(
+    targets, scores, geometry: GameGeometry, *, k: int | None = None
+) -> dict[str, float]:
     """Precision / recall / NDCG at ``k`` over the marginal inclusion vector."""
     t = np.asarray(targets, dtype=float)
     s = np.asarray(scores, dtype=float)
@@ -222,7 +225,7 @@ def ranking_metrics(targets, scores, geometry: GameGeometry, *, k: int | None = 
     kk = min(int(k or geometry.positions), t.shape[1])
     discounts = 1.0 / np.log2(np.arange(2, kk + 2))
     precisions, recalls, ndcgs = [], [], []
-    for truth, score in zip(t, s):
+    for truth, score in zip(t, s, strict=False):
         order = np.argsort(-score, kind="stable")[:kk]
         rel = truth[order]
         hits = float(rel.sum())

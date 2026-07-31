@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -68,9 +69,17 @@ def _suggest_optuna(trial, space: dict[str, tuple]) -> dict[str, Any]:
     return params
 
 
-def optimize_optuna(model_id: str, objective: Callable[[dict[str, Any]], float], *, trials: int,
-                     timeout_seconds: int | None = None, sampler: str = "tpe",
-                     pruner: str = "median", seed: int = 42, jobs: int = 1) -> SearchResult:
+def optimize_optuna(
+    model_id: str,
+    objective: Callable[[dict[str, Any]], float],
+    *,
+    trials: int,
+    timeout_seconds: int | None = None,
+    sampler: str = "tpe",
+    pruner: str = "median",
+    seed: int = 42,
+    jobs: int = 1,
+) -> SearchResult:
     import optuna
 
     if sampler == "random":
@@ -91,15 +100,19 @@ def optimize_optuna(model_id: str, objective: Callable[[dict[str, Any]], float],
     def wrapped(trial):
         return objective(_suggest_optuna(trial, space))
 
-    study.optimize(wrapped, n_trials=trials, timeout=timeout_seconds, n_jobs=jobs,
-                   catch=(Exception,))
-    rows = [{"number": t.number, "value": t.value, "state": t.state.name,
-             "params": t.params} for t in study.trials]
+    study.optimize(
+        wrapped, n_trials=trials, timeout=timeout_seconds, n_jobs=jobs, catch=(Exception,)
+    )
+    rows = [
+        {"number": t.number, "value": t.value, "state": t.state.name, "params": t.params}
+        for t in study.trials
+    ]
     return SearchResult(study.best_params, float(study.best_value), rows, "optuna")
 
 
 def _ray_space(space: dict[str, tuple]):
     from ray import tune
+
     result = {}
     for name, spec in space.items():
         kind = spec[0]
@@ -114,9 +127,16 @@ def _ray_space(space: dict[str, tuple]):
     return result
 
 
-def optimize_ray(model_id: str, objective: Callable[[dict[str, Any]], float], *, trials: int,
-                 timeout_seconds: int | None = None, cpus_per_trial: float = 1.0,
-                 gpus_per_trial: float = 0.0, output_dir: str | None = None) -> SearchResult:
+def optimize_ray(
+    model_id: str,
+    objective: Callable[[dict[str, Any]], float],
+    *,
+    trials: int,
+    timeout_seconds: int | None = None,
+    cpus_per_trial: float = 1.0,
+    gpus_per_trial: float = 0.0,
+    output_dir: str | None = None,
+) -> SearchResult:
     from ray import tune
     from ray.air import RunConfig
 
@@ -129,10 +149,19 @@ def optimize_ray(model_id: str, objective: Callable[[dict[str, Any]], float], *,
         tune.with_resources(trainable, {"cpu": cpus_per_trial, "gpu": gpus_per_trial}),
         param_space=space,
         tune_config=tune.TuneConfig(num_samples=trials, metric="score", mode="max"),
-        run_config=RunConfig(storage_path=output_dir, stop={"time_total_s": timeout_seconds} if timeout_seconds else None),
+        run_config=RunConfig(
+            storage_path=output_dir,
+            stop={"time_total_s": timeout_seconds} if timeout_seconds else None,
+        ),
     )
     results = tuner.fit()
     best = results.get_best_result(metric="score", mode="max")
-    rows = [{"config": result.config, "score": result.metrics.get("score"),
-             "error": str(result.error) if result.error else None} for result in results]
+    rows = [
+        {
+            "config": result.config,
+            "score": result.metrics.get("score"),
+            "error": str(result.error) if result.error else None,
+        }
+        for result in results
+    ]
     return SearchResult(dict(best.config), float(best.metrics["score"]), rows, "ray")

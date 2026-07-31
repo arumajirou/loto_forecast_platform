@@ -1,4 +1,5 @@
 """Leaderboard must refuse to invent a champion, and refuse cross-protocol ranking."""
+
 import numpy as np
 import pytest
 
@@ -11,8 +12,9 @@ H2 = "b" * 64
 
 def _noise_results(n_models=12, n=100, seed=0):
     rng = np.random.default_rng(seed)
-    out = [ModelResult("baseline", H, {"position_mae": 3.8},
-                       rng.normal(3.8, 1.0, n), is_control=True)]
+    out = [
+        ModelResult("baseline", H, {"position_mae": 3.8}, rng.normal(3.8, 1.0, n), is_control=True)
+    ]
     for i in range(n_models):
         out.append(ModelResult(f"m{i}", H, {"position_mae": 3.8}, rng.normal(3.8, 1.0, n)))
     return out

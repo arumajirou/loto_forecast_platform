@@ -14,8 +14,10 @@ from scipy.stats import wilcoxon
 # Try importing matplotlib, fail gracefully if not available (should be available)
 try:
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+
     PLOT_AVAILABLE = True
 except ImportError:
     PLOT_AVAILABLE = False
@@ -57,6 +59,7 @@ def calculate_sign_test(diffs: np.ndarray) -> float:
         return 1.0
     k = len(diffs[diffs > 0])  # wins count
     from scipy.stats import binomtest
+
     res = binomtest(k, n, p=0.5, alternative="two-sided")
     return float(res.pvalue)
 
@@ -164,10 +167,18 @@ def main() -> None:
                     f_baselines = json.loads(baselines_path.read_text(encoding="utf-8"))
                     for base_id, b_metrics in f_baselines.items():
                         if base_id in baseline_metrics_dict:
-                            baseline_metrics_dict[base_id]["mae"].append(b_metrics.get("position_mae", np.nan))
-                            baseline_metrics_dict[base_id]["mse"].append(b_metrics.get("position_mse", np.nan))
-                            baseline_metrics_dict[base_id]["hits7"].append(b_metrics.get("mean_hits_at_7", np.nan))
-                            baseline_metrics_dict[base_id]["brier"].append(b_metrics.get("brier", np.nan))
+                            baseline_metrics_dict[base_id]["mae"].append(
+                                b_metrics.get("position_mae", np.nan)
+                            )
+                            baseline_metrics_dict[base_id]["mse"].append(
+                                b_metrics.get("position_mse", np.nan)
+                            )
+                            baseline_metrics_dict[base_id]["hits7"].append(
+                                b_metrics.get("mean_hits_at_7", np.nan)
+                            )
+                            baseline_metrics_dict[base_id]["brier"].append(
+                                b_metrics.get("brier", np.nan)
+                            )
                 except Exception:
                     pass
 
@@ -192,15 +203,27 @@ def main() -> None:
             # Check: SCREENING_BACKTEST_PASS
             # Screening conditions: not clearly worse than baseline, failure rate 0, within runtime limit
             # Let's check vs uniform baseline MAE. If we are not worse (model MAE <= uniform MAE * 1.05) and latency <= 600s
-            uniform_mae = np.nanmean(baseline_metrics_dict["uniform"]["mae"]) if baseline_metrics_dict["uniform"]["mae"] else np.nan
+            uniform_mae = (
+                np.nanmean(baseline_metrics_dict["uniform"]["mae"])
+                if baseline_metrics_dict["uniform"]["mae"]
+                else np.nan
+            )
             if gate_status == "SMOKE_BACKTEST_PASS" and args.stage in ["screening", "formal"]:
-                if not np.isnan(uniform_mae) and avg_mae <= uniform_mae * 1.05 and avg_latency <= 600.0:
+                if (
+                    not np.isnan(uniform_mae)
+                    and avg_mae <= uniform_mae * 1.05
+                    and avg_latency <= 600.0
+                ):
                     gate_status = "SCREENING_BACKTEST_PASS"
 
                     # Check: FORMAL_BACKTEST_PASS
                     # Formal conditions: improved over baseline, CI positive, stable, license check
                     # We compare vs position_median baseline (which is the strongest classical MAE-baseline).
-                    pos_med_mae = np.nanmean(baseline_metrics_dict["position_median"]["mae"]) if baseline_metrics_dict["position_median"]["mae"] else np.nan
+                    pos_med_mae = (
+                        np.nanmean(baseline_metrics_dict["position_median"]["mae"])
+                        if baseline_metrics_dict["position_median"]["mae"]
+                        else np.nan
+                    )
                     if gate_status == "SCREENING_BACKTEST_PASS" and args.stage == "formal":
                         if not np.isnan(pos_med_mae) and avg_mae < pos_med_mae:
                             # Verify if license is approved
@@ -220,7 +243,9 @@ def main() -> None:
 
         improvement_rate = 0.0
         if len(pos_med_mae_arr) > 0 and np.nanmean(pos_med_mae_arr) > 0:
-            improvement_rate = -delta_mae / np.nanmean(pos_med_mae_arr)  # positive represents reduction in error
+            improvement_rate = -delta_mae / np.nanmean(
+                pos_med_mae_arr
+            )  # positive represents reduction in error
 
         # Sign test and Wilcoxon vs position_median
         pval_wilcoxon = 1.0
@@ -249,45 +274,53 @@ def main() -> None:
         # Multi-baseline summaries for saving
         for base_id, lists in baseline_metrics_dict.items():
             base_mae = np.nanmean(lists["mae"]) if lists["mae"] else np.nan
-            comparisons_row[f"vs_{base_id}_mae_delta"] = avg_mae - base_mae if not np.isnan(base_mae) else np.nan
+            comparisons_row[f"vs_{base_id}_mae_delta"] = (
+                avg_mae - base_mae if not np.isnan(base_mae) else np.nan
+            )
 
         baseline_comparisons.append(comparisons_row)
 
-        model_statuses.append({
-            "model_id": model_id,
-            "stage": args.stage,
-            "fold_count": total_folds,
-            "passed_folds": passed_folds,
-            "failed_folds": failed_folds,
-            "license": license_status,
-            "promotion_status": gate_status,
-        })
+        model_statuses.append(
+            {
+                "model_id": model_id,
+                "stage": args.stage,
+                "fold_count": total_folds,
+                "passed_folds": passed_folds,
+                "failed_folds": failed_folds,
+                "license": license_status,
+                "promotion_status": gate_status,
+            }
+        )
 
-        leaderboard_rows.append({
-            "model_id": model_id,
-            "stage": args.stage,
-            "fold_count": total_folds,
-            "MAE": avg_mae,
-            "MSE": avg_mse,
-            "within1": avg_within1,
-            "Hits@7": avg_hits7,
-            "Brier": avg_brier,
-            "latency": avg_latency,
-            "peak_ram_mb": 0.0,  # placeholder or read from log
-            "peak_vram": peak_vram,
-            "artifact_size_kb": 0.0,
-            "failure_count": failed_folds,
-            "license": license_status,
-            "promotion_status": gate_status,
-        })
+        leaderboard_rows.append(
+            {
+                "model_id": model_id,
+                "stage": args.stage,
+                "fold_count": total_folds,
+                "MAE": avg_mae,
+                "MSE": avg_mse,
+                "within1": avg_within1,
+                "Hits@7": avg_hits7,
+                "Brier": avg_brier,
+                "latency": avg_latency,
+                "peak_ram_mb": 0.0,  # placeholder or read from log
+                "peak_vram": peak_vram,
+                "artifact_size_kb": 0.0,
+                "failure_count": failed_folds,
+                "license": license_status,
+                "promotion_status": gate_status,
+            }
+        )
 
-        plot_data.append({
-            "model_id": model_id,
-            "mae": avg_mae,
-            "hits7": avg_hits7,
-            "latency": avg_latency,
-            "vram": peak_vram,
-        })
+        plot_data.append(
+            {
+                "model_id": model_id,
+                "mae": avg_mae,
+                "hits7": avg_hits7,
+                "latency": avg_latency,
+                "vram": peak_vram,
+            }
+        )
 
     # Sort leaderboard
     leaderboard_df = pd.DataFrame(leaderboard_rows)

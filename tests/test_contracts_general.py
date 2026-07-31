@@ -1,4 +1,5 @@
 """Contracts must be parameterised by geometry, not pinned to Loto7."""
+
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -89,17 +90,21 @@ def _forecast_kwargs(game, **overrides):
     c = contracts_for(game)
     now = datetime.now(UTC)
     candidates = [
-        c.CandidateProbability(candidate_number=v, probability=g.marginal_base_rate(),
-                               rank_score=float(v))
+        c.CandidateProbability(
+            candidate_number=v, probability=g.marginal_base_rate(), rank_score=float(v)
+        )
         for v in g.values
     ] * (g.positions if g.family == "digits" else 1)
-    values = (
-        list(g.values)[: g.positions] if g.family == "select" else [0] * g.positions
-    )
+    values = list(g.values)[: g.positions] if g.family == "select" else [0] * g.positions
     kwargs = dict(
-        forecast_id="f1", draw_id="d1", model_id="uniform", data_version="v1",
-        feature_set_id="fs1", protocol_hash="a" * 64,
-        created_at=now, draw_time=now + timedelta(days=1),
+        forecast_id="f1",
+        draw_id="d1",
+        model_id="uniform",
+        data_version="v1",
+        feature_set_id="fs1",
+        protocol_hash="a" * 64,
+        created_at=now,
+        draw_time=now + timedelta(days=1),
         combination=c.DecodedCombination(values=values, score=0.0),
         candidates=candidates,
     )

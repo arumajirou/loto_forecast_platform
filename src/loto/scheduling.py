@@ -1,4 +1,5 @@
 """Draw-aware scheduling plans and non-destructive run locks."""
+
 from __future__ import annotations
 
 import json
@@ -23,7 +24,7 @@ class SchedulePolicy:
     startup_cooldown_seconds: int = 900
 
     @classmethod
-    def from_file(cls, path: str | Path | None = None) -> "SchedulePolicy":
+    def from_file(cls, path: str | Path | None = None) -> SchedulePolicy:
         if path is None:
             return cls()
         raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
@@ -39,7 +40,9 @@ class ScheduledRun:
     timezone: str
 
 
-def next_scheduled_run(game: str, *, now: datetime | None = None, policy: SchedulePolicy | None = None) -> ScheduledRun:
+def next_scheduled_run(
+    game: str, *, now: datetime | None = None, policy: SchedulePolicy | None = None
+) -> ScheduledRun:
     policy = policy or SchedulePolicy()
     tz = ZoneInfo(policy.timezone)
     current = now.astimezone(tz) if now is not None else datetime.now(tz)
@@ -58,10 +61,20 @@ def next_scheduled_run(game: str, *, now: datetime | None = None, policy: Schedu
     return ScheduledRun(game, weekday, run_at.isoformat(), policy.timezone)
 
 
-def build_schedule_plan(games: str | list[str] | None = "all", *, now: datetime | None = None, policy: SchedulePolicy | None = None) -> dict:
+def build_schedule_plan(
+    games: str | list[str] | None = "all",
+    *,
+    now: datetime | None = None,
+    policy: SchedulePolicy | None = None,
+) -> dict:
     policy = policy or SchedulePolicy()
-    runs = [next_scheduled_run(spec.key, now=now, policy=policy) for spec in select_lottery_specs(games)]
-    return {"policy": asdict(policy), "runs": [asdict(item) for item in sorted(runs, key=lambda item: item.run_at)]}
+    runs = [
+        next_scheduled_run(spec.key, now=now, policy=policy) for spec in select_lottery_specs(games)
+    ]
+    return {
+        "policy": asdict(policy),
+        "runs": [asdict(item) for item in sorted(runs, key=lambda item: item.run_at)],
+    }
 
 
 class RunLock:
@@ -75,7 +88,12 @@ class RunLock:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         try:
             self.fd = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-            os.write(self.fd, json.dumps({"pid": os.getpid(), "created_at": datetime.now().astimezone().isoformat()}).encode())
+            os.write(
+                self.fd,
+                json.dumps(
+                    {"pid": os.getpid(), "created_at": datetime.now().astimezone().isoformat()}
+                ).encode(),
+            )
         except FileExistsError as exc:
             raise RuntimeError(f"another scheduled run appears active: {self.path}") from exc
 
@@ -85,7 +103,7 @@ class RunLock:
             self.fd = None
         self.path.unlink(missing_ok=True)
 
-    def __enter__(self) -> "RunLock":
+    def __enter__(self) -> RunLock:
         self.acquire()
         return self
 

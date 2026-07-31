@@ -76,7 +76,9 @@ def main() -> None:
     out_path = ROOT / "configs" / "formal_backtest_smoke_catalog.json"
     atomic_write_json(out_path, snapshot)
     errors = {k: v["resolve_error"] for k, v in snapshot["models"].items() if v["resolve_error"]}
-    print(f"Wrote {out_path} ({snapshot['model_count']} models, code_fingerprint={snapshot['code_fingerprint']})")
+    print(
+        f"Wrote {out_path} ({snapshot['model_count']} models, code_fingerprint={snapshot['code_fingerprint']})"
+    )
     if errors:
         print(f"WARNING: {len(errors)} models failed to resolve params: {errors}", file=sys.stderr)
 

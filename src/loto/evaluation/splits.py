@@ -12,8 +12,15 @@ class Fold:
     test_end: int
 
 
-def rolling_folds(n_rows: int, *, folds: int, test_size: int, min_train_size: int,
-                  gap: int = 0, expanding: bool = True) -> list[Fold]:
+def rolling_folds(
+    n_rows: int,
+    *,
+    folds: int,
+    test_size: int,
+    min_train_size: int,
+    gap: int = 0,
+    expanding: bool = True,
+) -> list[Fold]:
     required = min_train_size + gap + test_size
     if n_rows < required:
         return []
@@ -26,13 +33,15 @@ def rolling_folds(n_rows: int, *, folds: int, test_size: int, min_train_size: in
         if train_end < min_train_size:
             break
         train_start = 0 if expanding else max(0, train_end - min_train_size)
-        values.append(Fold(
-            fold_id=f"fold-{folds - reverse_index:02d}",
-            train_start=train_start,
-            train_end=train_end,
-            test_start=test_start,
-            test_end=test_end,
-        ))
+        values.append(
+            Fold(
+                fold_id=f"fold-{folds - reverse_index:02d}",
+                train_start=train_start,
+                train_end=train_end,
+                test_start=test_start,
+                test_end=test_end,
+            )
+        )
     return list(reversed(values))
 
 

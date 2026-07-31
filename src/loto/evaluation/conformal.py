@@ -16,6 +16,7 @@ calibration window so a downstream audit can check it, and
 :func:`adaptive_conformal` implements the online (ACI) update that recovers coverage under
 drift by adjusting alpha from realised errors.
 """
+
 from __future__ import annotations
 
 import math
@@ -191,9 +192,7 @@ def adaptive_conformal(
     }
 
 
-def weighted_interval_score(
-    actual, lower, upper, *, alpha: float = 0.1
-) -> dict[str, float]:
+def weighted_interval_score(actual, lower, upper, *, alpha: float = 0.1) -> dict[str, float]:
     """Interval score decomposed into sharpness and the two penalty terms.
 
     Unlike raw coverage, this is a proper score: it cannot be gamed by widening the

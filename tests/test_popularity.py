@@ -1,4 +1,5 @@
 """Conscious-selection avoidance: the only strategy with a measurable edge."""
+
 import numpy as np
 import pytest
 

@@ -11,7 +11,7 @@ def test_decoder_returns_legal_global_optimum():
         position[pos, num - 1] = 2.0
     result = decode_hybrid(candidate, position, top_k=5)
     assert result[0].numbers == [1, 4, 9, 15, 22, 30, 37]
-    assert all(a < b for a, b in zip(result[0].numbers, result[0].numbers[1:]))
+    assert all(a < b for a, b in zip(result[0].numbers, result[0].numbers[1:], strict=False))
 
 
 def test_decoder_never_returns_duplicates_even_when_one_number_dominates():

@@ -20,19 +20,26 @@ def _write_payload(path: Path, payload: dict[str, Any]) -> None:
 
 
 def _history_to_long(history: list[dict[str, Any]]) -> pd.DataFrame:
+    """Convert lottery draws to seven regular position series.
+
+    Actual lottery dates are not perfectly weekly because of schedule changes
+    and holidays. AutoGluon requires a regular time index, so one draw is
+    represented as one synthetic daily step while preserving draw order.
+    """
     rows: list[dict[str, Any]] = []
-    for record in history:
-        draw_date = pd.Timestamp(record["draw_date"])
-        if draw_date.tzinfo is not None:
-            draw_date = draw_date.tz_convert(None)
+    base_timestamp = pd.Timestamp("2000-01-01")
+
+    for step, record in enumerate(history):
+        timestamp = base_timestamp + pd.Timedelta(days=step)
         for position in range(1, 8):
             rows.append(
                 {
                     "item_id": f"position-{position}",
-                    "timestamp": draw_date,
+                    "timestamp": timestamp,
                     "target": float(record[f"n{position}"]),
                 }
             )
+
     return pd.DataFrame(rows).sort_values(["item_id", "timestamp"]).reset_index(drop=True)
 
 
@@ -69,6 +76,7 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
             prediction_length=prediction_length,
             target="target",
             eval_metric=eval_metric,
+            freq="D",
             path=str(artifact_dir),
             verbosity=0,
         )

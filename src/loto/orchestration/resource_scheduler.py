@@ -67,7 +67,9 @@ class ResourceScheduler:
                 free_vram_mib = int(proc.stdout.strip().splitlines()[0])
         except Exception:
             free_vram_mib = None
-        estimated = estimated_vram_mib if estimated_vram_mib is not None else self.policy.max_vram_mib
+        estimated = (
+            estimated_vram_mib if estimated_vram_mib is not None else self.policy.max_vram_mib
+        )
         with self._lock:
             active_gpu_trials = self._active_gpu_trials
         enough_slots = active_gpu_trials < self.policy.max_parallel_gpu_models
@@ -86,14 +88,20 @@ class ResourceScheduler:
             "decision": "AVAILABLE" if enough_slots and enough_vram else "WAITING_FOR_GPU_RESOURCE",
         }
 
-    def acquire(self, *, requires_gpu: bool, lease_id: str, timeout: float | None = None) -> ResourceLease:
+    def acquire(
+        self, *, requires_gpu: bool, lease_id: str, timeout: float | None = None
+    ) -> ResourceLease:
         semaphore = self._gpu if requires_gpu else self._cpu
         if requires_gpu and self.policy.max_parallel_gpu_models == 0:
             raise RuntimeError("GPU trial requested but max_parallel_gpu_models is 0")
-        ok = semaphore.acquire(timeout=timeout if timeout is not None else self.policy.timeout_seconds)
+        ok = semaphore.acquire(
+            timeout=timeout if timeout is not None else self.policy.timeout_seconds
+        )
         if not ok:
             raise TimeoutError(f"resource lease timed out: {lease_id}")
-        lease = ResourceLease(lease_id=lease_id, kind="gpu" if requires_gpu else "cpu", started_at=time.time())
+        lease = ResourceLease(
+            lease_id=lease_id, kind="gpu" if requires_gpu else "cpu", started_at=time.time()
+        )
         with self._lock:
             if requires_gpu:
                 self._active_gpu_trials += 1

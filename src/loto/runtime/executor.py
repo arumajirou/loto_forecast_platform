@@ -7,7 +7,6 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 
 @dataclass(frozen=True)
@@ -25,17 +24,28 @@ class IsolatedExecutor:
         self.timeout_seconds = timeout_seconds
         self.env = env or {}
 
-    def run_python_module(self, module: str, args: list[str], output_dir: str | Path) -> ExecutionResult:
+    def run_python_module(
+        self, module: str, args: list[str], output_dir: str | Path
+    ) -> ExecutionResult:
         root = Path(output_dir)
         root.mkdir(parents=True, exist_ok=True)
         stdout_path = root / "stdout.log"
         stderr_path = root / "stderr.log"
         started = time.perf_counter()
         command = [sys.executable, "-m", module, *args]
-        with stdout_path.open("w", encoding="utf-8") as stdout, stderr_path.open("w", encoding="utf-8") as stderr:
+        with (
+            stdout_path.open("w", encoding="utf-8") as stdout,
+            stderr_path.open("w", encoding="utf-8") as stderr,
+        ):
             try:
-                proc = subprocess.run(command, stdout=stdout, stderr=stderr, timeout=self.timeout_seconds,
-                                      check=False, env=os.environ | self.env)
+                proc = subprocess.run(
+                    command,
+                    stdout=stdout,
+                    stderr=stderr,
+                    timeout=self.timeout_seconds,
+                    check=False,
+                    env=os.environ | self.env,
+                )
                 timed_out = False
                 code = proc.returncode
             except subprocess.TimeoutExpired:
@@ -43,8 +53,13 @@ class IsolatedExecutor:
                 code = None
         result = ExecutionResult(
             status="TIMEOUT" if timed_out else ("SUCCEEDED" if code == 0 else "FAILED"),
-            returncode=code, elapsed_seconds=time.perf_counter() - started,
-            stdout_path=str(stdout_path), stderr_path=str(stderr_path), timed_out=timed_out,
+            returncode=code,
+            elapsed_seconds=time.perf_counter() - started,
+            stdout_path=str(stdout_path),
+            stderr_path=str(stderr_path),
+            timed_out=timed_out,
         )
-        (root / "execution.json").write_text(json.dumps(result.__dict__, indent=2), encoding="utf-8")
+        (root / "execution.json").write_text(
+            json.dumps(result.__dict__, indent=2), encoding="utf-8"
+        )
         return result

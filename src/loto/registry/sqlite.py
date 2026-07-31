@@ -3,9 +3,9 @@ from __future__ import annotations
 import contextlib
 import json
 import sqlite3
+from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Iterator
 
 
 class Registry:
@@ -59,9 +59,7 @@ class Registry:
             ).fetchall()
         return [{**dict(row), "payload": json.loads(row["payload_json"])} for row in rows]
 
-    def record_forecast(
-        self, forecast_id: str, run_id: str, sealed: dict, verified: bool
-    ) -> None:
+    def record_forecast(self, forecast_id: str, run_id: str, sealed: dict, verified: bool) -> None:
         with self._connect() as con:
             con.execute(
                 "INSERT INTO forecasts VALUES(?,?,?,?,?)",

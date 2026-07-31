@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import contextlib
-import json
 import os
 import sqlite3
 import tempfile
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 import pandas as pd
 
@@ -52,7 +51,10 @@ def write_dataset_bundle(
                     "frame_sha256": frame_fingerprint(frame),
                     "sqlite_table": name,
                     "csv": artifact_descriptor(csv_path),
-                    "parquet": {"enabled": parquet, "status": "SKIPPED" if not parquet else "PENDING"},
+                    "parquet": {
+                        "enabled": parquet,
+                        "status": "SKIPPED" if not parquet else "PENDING",
+                    },
                 }
                 if parquet:
                     parquet_path = out / f"{name}.parquet"
@@ -60,7 +62,11 @@ def write_dataset_bundle(
                     try:
                         frame.to_parquet(parquet_tmp, index=False)
                         parquet_tmp.replace(parquet_path)
-                        entry["parquet"] = {"enabled": True, "status": "WRITTEN", **artifact_descriptor(parquet_path)}
+                        entry["parquet"] = {
+                            "enabled": True,
+                            "status": "WRITTEN",
+                            **artifact_descriptor(parquet_path),
+                        }
                     except Exception as exc:  # availability is recorded, never hidden
                         parquet_tmp.unlink(missing_ok=True)
                         detail = f"{name}:{type(exc).__name__}:{exc}"
@@ -81,7 +87,12 @@ def write_dataset_bundle(
         "parquet_errors": parquet_errors,
     }
     manifest_path = atomic_write_json(out / "dataset_bundle_manifest.json", payload)
-    return {"sqlite": str(sqlite_path), "manifest": str(manifest_path), "tables": manifest, "parquet_errors": parquet_errors}
+    return {
+        "sqlite": str(sqlite_path),
+        "manifest": str(manifest_path),
+        "tables": manifest,
+        "parquet_errors": parquet_errors,
+    }
 
 
 def copy_bundle_to_postgres(
@@ -101,7 +112,15 @@ def copy_bundle_to_postgres(
             conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
         written = {}
         for name, frame in tables.items():
-            frame.to_sql(name, engine, schema=schema, if_exists=if_exists, index=False, method="multi", chunksize=5000)
+            frame.to_sql(
+                name,
+                engine,
+                schema=schema,
+                if_exists=if_exists,
+                index=False,
+                method="multi",
+                chunksize=5000,
+            )
             written[f"{schema}.{name}"] = int(len(frame))
         return written
     finally:

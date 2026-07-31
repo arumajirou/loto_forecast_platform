@@ -11,7 +11,7 @@ class NonNegativeEnsemble:
     max_weight: float = 0.60
     weights_: np.ndarray | None = None
 
-    def fit(self, predictions: np.ndarray, targets: np.ndarray) -> "NonNegativeEnsemble":
+    def fit(self, predictions: np.ndarray, targets: np.ndarray) -> NonNegativeEnsemble:
         """Fit OOF weights. predictions=(samples, models, outputs)."""
         values = np.asarray(predictions, dtype=float)
         y = np.asarray(targets, dtype=float)
@@ -26,7 +26,9 @@ class NonNegativeEnsemble:
             return float(np.mean((combined - y) ** 2))
 
         result = minimize(
-            loss, np.full(model_count, 1 / model_count), method="SLSQP",
+            loss,
+            np.full(model_count, 1 / model_count),
+            method="SLSQP",
             bounds=[(0.0, self.max_weight)] * model_count,
             constraints=[{"type": "eq", "fun": lambda w: np.sum(w) - 1.0}],
         )

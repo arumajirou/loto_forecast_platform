@@ -1,4 +1,5 @@
 """Leakage must be falsifiable, not asserted."""
+
 import numpy as np
 import pytest
 
@@ -28,8 +29,9 @@ def test_permutation_control_passes_for_an_honest_model():
     rng = np.random.default_rng(0)
     y = rng.integers(1, 38, size=(120, 7)).astype(float)
     x = np.arange(120, dtype=float).reshape(-1, 1)
-    v = permutation_sentinel(_honest_fit, x, y, _mae, baseline=10.0,
-                             higher_is_better=False, tolerance=1.0, n_repeats=5)
+    v = permutation_sentinel(
+        _honest_fit, x, y, _mae, baseline=10.0, higher_is_better=False, tolerance=1.0, n_repeats=5
+    )
     assert not v.tripped
 
 
@@ -37,8 +39,9 @@ def test_permutation_control_catches_a_leaking_model():
     rng = np.random.default_rng(1)
     y = rng.integers(1, 38, size=(120, 7)).astype(float)
     x = np.arange(120, dtype=float).reshape(-1, 1)
-    v = permutation_sentinel(_leaky_fit, x, y, _mae, baseline=10.0,
-                             higher_is_better=False, tolerance=1.0, n_repeats=3)
+    v = permutation_sentinel(
+        _leaky_fit, x, y, _mae, baseline=10.0, higher_is_better=False, tolerance=1.0, n_repeats=3
+    )
     assert v.tripped and v.observed == pytest.approx(0.0)
 
 
@@ -46,8 +49,9 @@ def test_time_shift_control_runs_and_reports():
     rng = np.random.default_rng(2)
     y = rng.integers(1, 38, size=(80, 7)).astype(float)
     x = np.arange(80, dtype=float).reshape(-1, 1)
-    v = time_shift_sentinel(_leaky_fit, x, y, _mae, baseline=10.0,
-                            higher_is_better=False, tolerance=1.0)
+    v = time_shift_sentinel(
+        _leaky_fit, x, y, _mae, baseline=10.0, higher_is_better=False, tolerance=1.0
+    )
     assert v.control == "time_shift" and v.tripped
 
 
@@ -59,7 +63,14 @@ def test_time_shift_requires_enough_rows():
 def test_causality_audit_is_exact_for_a_causal_builder():
     def causal(values):
         import pandas as pd
-        return pd.Series(list(values), dtype=float).shift(1).rolling(3, min_periods=1).mean().to_numpy()
+
+        return (
+            pd.Series(list(values), dtype=float)
+            .shift(1)
+            .rolling(3, min_periods=1)
+            .mean()
+            .to_numpy()
+        )
 
     v = audit_feature_causality(causal, list(range(50)), index=30)
     assert not v.tripped and v.observed == pytest.approx(0.0)
@@ -68,7 +79,13 @@ def test_causality_audit_is_exact_for_a_causal_builder():
 def test_causality_audit_catches_a_centred_window():
     def leaky(values):
         import pandas as pd
-        return pd.Series(list(values), dtype=float).rolling(5, min_periods=1, center=True).mean().to_numpy()
+
+        return (
+            pd.Series(list(values), dtype=float)
+            .rolling(5, min_periods=1, center=True)
+            .mean()
+            .to_numpy()
+        )
 
     v = audit_feature_causality(leaky, list(range(50)), index=30)
     assert v.tripped and v.observed > 0.0
@@ -83,8 +100,9 @@ def test_suite_blocks_promotion_when_any_control_trips():
     rng = np.random.default_rng(4)
     y = rng.integers(1, 38, size=(60, 7)).astype(float)
     x = np.arange(60, dtype=float).reshape(-1, 1)
-    bad = permutation_sentinel(_leaky_fit, x, y, _mae, baseline=10.0,
-                               higher_is_better=False, tolerance=1.0, n_repeats=2)
+    bad = permutation_sentinel(
+        _leaky_fit, x, y, _mae, baseline=10.0, higher_is_better=False, tolerance=1.0, n_repeats=2
+    )
     out = run_sentinel_suite([bad])
     assert out["status"] == "SENTINEL_TRIPPED"
     assert out["promotion_allowed"] is False

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 import pandas as pd
 
@@ -100,7 +100,9 @@ def _candidate_numeric_columns(df: pd.DataFrame) -> list[str]:
         s = df[c].dropna().astype(str).head(20)
         if len(s) == 0:
             continue
-        numeric_like = s.map(lambda x: bool(re.fullmatch(r"\s*\d+\s*", unicodedata.normalize("NFKC", x)))).mean()
+        numeric_like = s.map(
+            lambda x: bool(re.fullmatch(r"\s*\d+\s*", unicodedata.normalize("NFKC", x)))
+        ).mean()
         if numeric_like >= 0.8:
             candidates.append(str(c))
     return candidates
@@ -112,7 +114,9 @@ def normalize_raw_dataframe(df: pd.DataFrame, spec: LotterySpec, source_url: str
     out["game_display_name"] = spec.display_name
     out["source_url"] = source_url
 
-    draw_col = _find_first_column(df, [r"^(開催)?回(別|号|数)?$", r"draw", r"round", r"^no$", r"^id$"])
+    draw_col = _find_first_column(
+        df, [r"^(開催)?回(別|号|数)?$", r"draw", r"round", r"^no$", r"^id$"]
+    )
     date_col = _find_first_column(df, [r"抽選日", r"開催日", r"日付", r"date"])
 
     if draw_col:
@@ -126,8 +130,12 @@ def normalize_raw_dataframe(df: pd.DataFrame, spec: LotterySpec, source_url: str
         out["draw_date"] = pd.Series([pd.NA] * len(df), dtype="string")
 
     if spec.kind == "numbers":
-        digit_col = _find_first_column(df, [r"抽選数字", r"本数字", r"当選番号", r"当せん番号", r"number", r"digits"])
-        digit_cols = _find_number_columns(df, [r"d", r"digit", r"数字", r"桁"], spec.digits_count or 0)
+        digit_col = _find_first_column(
+            df, [r"抽選数字", r"本数字", r"当選番号", r"当せん番号", r"number", r"digits"]
+        )
+        digit_cols = _find_number_columns(
+            df, [r"d", r"digit", r"数字", r"桁"], spec.digits_count or 0
+        )
         if digit_cols and len(digit_cols) >= (spec.digits_count or 0):
             for i, col in enumerate(digit_cols[: spec.digits_count or 0], start=1):
                 out[f"d{i}"] = df[col].map(_to_int_or_none).astype("Int64")

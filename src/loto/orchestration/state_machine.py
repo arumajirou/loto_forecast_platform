@@ -2,7 +2,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-STAGES = ["INGEST", "VALIDATE", "CANONICALIZE", "BUILD_FEATURES", "TRAIN", "CALIBRATE", "DECODE", "EVALUATE", "SEAL_FORECAST", "REGISTER"]
+STAGES = [
+    "INGEST",
+    "VALIDATE",
+    "CANONICALIZE",
+    "BUILD_FEATURES",
+    "TRAIN",
+    "CALIBRATE",
+    "DECODE",
+    "EVALUATE",
+    "SEAL_FORECAST",
+    "REGISTER",
+]
 TERMINAL = {"SUCCEEDED", "FAILED", "CANCELLED"}
 
 

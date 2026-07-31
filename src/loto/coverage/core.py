@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from itertools import product
-from typing import Iterable, Sequence
 
 import numpy as np
 
@@ -72,7 +72,6 @@ def legal_loto7(row: Sequence[int]) -> tuple[int, ...] | None:
     return values
 
 
-
 def project_to_legal(row: Sequence[int]) -> tuple[int, ...]:
     values = np.clip(np.rint(np.asarray(row, dtype=float)), 1, 37).astype(int)
     values.sort()
@@ -93,7 +92,9 @@ def _coverage_mask(actual: np.ndarray, candidate: Sequence[int], tolerance: int)
     return np.max(np.abs(actual - cand), axis=1) <= tolerance
 
 
-def evaluate_candidates(actual: Sequence[Sequence[int]], candidates: Sequence[Sequence[int]], tolerance: int = 1) -> CoverageEvaluation:
+def evaluate_candidates(
+    actual: Sequence[Sequence[int]], candidates: Sequence[Sequence[int]], tolerance: int = 1
+) -> CoverageEvaluation:
     actual_arr = np.asarray(actual, dtype=int)
     candidate_arr = np.asarray(candidates, dtype=int)
     if actual_arr.ndim != 2 or actual_arr.shape[1] != 7:
@@ -116,7 +117,9 @@ def evaluate_candidates(actual: Sequence[Sequence[int]], candidates: Sequence[Se
     )
 
 
-def simultaneous_conformal_radius(actual: Sequence[Sequence[int]], predicted: Sequence[Sequence[int]], coverage: float = 0.90) -> int:
+def simultaneous_conformal_radius(
+    actual: Sequence[Sequence[int]], predicted: Sequence[Sequence[int]], coverage: float = 0.90
+) -> int:
     a = np.asarray(actual, dtype=int)
     p = np.asarray(predicted, dtype=int)
     if a.shape != p.shape or a.ndim != 2 or a.shape[1] != 7:
@@ -129,14 +132,22 @@ def simultaneous_conformal_radius(actual: Sequence[Sequence[int]], predicted: Se
     return int(np.partition(scores, rank - 1)[rank - 1])
 
 
-def position_probabilities(history: Sequence[Sequence[int]], centers: Sequence[float], scales: Sequence[float] | None = None) -> np.ndarray:
+def position_probabilities(
+    history: Sequence[Sequence[int]],
+    centers: Sequence[float],
+    scales: Sequence[float] | None = None,
+) -> np.ndarray:
     values = np.asarray(history, dtype=float)
     centers_arr = np.asarray(centers, dtype=float)
     if values.ndim != 2 or values.shape[1] != 7:
         raise ValueError("history must have shape (n, 7)")
     if scales is None:
         diffs = np.diff(values, axis=0)
-        mad = np.median(np.abs(diffs - np.median(diffs, axis=0)), axis=0) if len(diffs) else np.ones(7)
+        mad = (
+            np.median(np.abs(diffs - np.median(diffs, axis=0)), axis=0)
+            if len(diffs)
+            else np.ones(7)
+        )
         scales_arr = np.clip(1.4826 * mad, 0.75, 6.0)
     else:
         scales_arr = np.clip(np.asarray(scales, dtype=float), 0.5, 10.0)
@@ -162,7 +173,9 @@ def generate_candidate_pool(
     choices: list[list[tuple[int, float]]] = []
     for position in range(7):
         order = np.argsort(probs[position])[::-1][:per_position_top]
-        choices.append([(int(idx + 1), float(np.log(max(probs[position, idx], 1e-15)))) for idx in order])
+        choices.append(
+            [(int(idx + 1), float(np.log(max(probs[position, idx], 1e-15)))) for idx in order]
+        )
 
     beam: list[tuple[tuple[int, ...], float]] = [(tuple(), 0.0)]
     for pos_choices in choices:
@@ -183,7 +196,11 @@ def generate_candidate_pool(
 
 
 def augment_with_residual_offsets(
-    centers: Sequence[int], residuals: Sequence[Sequence[int]], *, radius: int = 1, limit: int = 20000
+    centers: Sequence[int],
+    residuals: Sequence[Sequence[int]],
+    *,
+    radius: int = 1,
+    limit: int = 20000,
 ) -> list[tuple[int, ...]]:
     center = np.asarray(centers, dtype=int)
     residual_arr = np.asarray(residuals, dtype=int)
@@ -229,18 +246,34 @@ def greedy_coverage_select(
         if selected and diversity_penalty > 0:
             selected_arr = np.asarray(selected, dtype=float)
             pool_arr = np.asarray(legal_pool, dtype=float)
-            distances = np.min(np.mean(np.abs(pool_arr[:, None, :] - selected_arr[None, :, :]), axis=2), axis=1)
+            distances = np.min(
+                np.mean(np.abs(pool_arr[:, None, :] - selected_arr[None, :, :]), axis=2), axis=1
+            )
             gains += diversity_penalty * distances
         index = int(np.argmax(gains))
         raw_gain = int(np.sum(masks[index] & uncovered))
         if raw_gain <= 0:
             if not selected:
                 selected.append(legal_pool[index])
-                trace.append({"step": 1, "candidate": list(legal_pool[index]), "newly_covered": 0, "coverage": 0.0})
+                trace.append(
+                    {
+                        "step": 1,
+                        "candidate": list(legal_pool[index]),
+                        "newly_covered": 0,
+                        "coverage": 0.0,
+                    }
+                )
             break
         remaining[index] = False
         selected.append(legal_pool[index])
         uncovered &= ~masks[index]
         coverage = float(np.mean(~uncovered))
-        trace.append({"step": len(selected), "candidate": list(legal_pool[index]), "newly_covered": raw_gain, "coverage": coverage})
+        trace.append(
+            {
+                "step": len(selected),
+                "candidate": list(legal_pool[index]),
+                "newly_covered": raw_gain,
+                "coverage": coverage,
+            }
+        )
     return selected, trace

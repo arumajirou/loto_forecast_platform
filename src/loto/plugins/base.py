@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 
 
@@ -14,7 +15,7 @@ class LotterySpec:
             raise ValueError(f"expected {self.picks} numbers")
         if any(n < 1 or n > self.max_number for n in numbers):
             raise ValueError("number outside legal range")
-        if any(a >= b for a, b in zip(numbers, numbers[1:])):
+        if any(a >= b for a, b in zip(numbers, numbers[1:], strict=False)):
             raise ValueError("numbers must be strictly ascending")
 
 

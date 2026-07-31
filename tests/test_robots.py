@@ -1,4 +1,5 @@
 """robots.txt must actually be enforced, not merely advertised in a User-Agent."""
+
 import urllib.error
 import urllib.robotparser
 
@@ -35,9 +36,8 @@ class _FakeParser:
 @pytest.fixture()
 def patched(monkeypatch):
     def _install(**kwargs):
-        monkeypatch.setattr(
-            urllib.robotparser, "RobotFileParser", lambda: _FakeParser(**kwargs)
-        )
+        monkeypatch.setattr(urllib.robotparser, "RobotFileParser", lambda: _FakeParser(**kwargs))
+
     return _install
 
 

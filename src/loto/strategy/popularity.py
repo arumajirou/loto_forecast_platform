@@ -35,10 +35,11 @@ Honesty constraints built in:
   labelled ``sales_adjusted=False``, since without sales the estimate confounds popularity
   with market size.
 """
+
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Sequence
 
 import numpy as np
 
@@ -55,16 +56,16 @@ __all__ = [
 ]
 
 FEATURE_NAMES: tuple[str, ...] = (
-    "frac_calendar",       # values <= 31: birthday / date picking
-    "frac_low",            # values in the lower third of the universe
-    "mean_scaled",         # mean value, scaled to [0, 1]
-    "spread_scaled",       # (max - min) / (universe - 1)
-    "consecutive_runs",    # count of adjacent pairs, normalised
-    "arithmetic_score",    # how close to an arithmetic progression
-    "digit_repeat",        # repeated trailing digits, normalised
-    "decade_concentration",# Herfindahl index over decades
-    "sum_deviation",       # |sum - expected sum| / expected sum
-    "parity_imbalance",    # |odd - even| / positions
+    "frac_calendar",  # values <= 31: birthday / date picking
+    "frac_low",  # values in the lower third of the universe
+    "mean_scaled",  # mean value, scaled to [0, 1]
+    "spread_scaled",  # (max - min) / (universe - 1)
+    "consecutive_runs",  # count of adjacent pairs, normalised
+    "arithmetic_score",  # how close to an arithmetic progression
+    "digit_repeat",  # repeated trailing digits, normalised
+    "decade_concentration",  # Herfindahl index over decades
+    "sum_deviation",  # |sum - expected sum| / expected sum
+    "parity_imbalance",  # |odd - even| / positions
 )
 
 
@@ -106,8 +107,18 @@ def combination_features(values: Sequence[int], geometry: GameGeometry) -> np.nd
 
     del n
     return np.array(
-        [frac_calendar, frac_low, mean_scaled, spread_scaled, consecutive, arithmetic,
-         digit_repeat, decade_concentration, sum_deviation, parity_imbalance],
+        [
+            frac_calendar,
+            frac_low,
+            mean_scaled,
+            spread_scaled,
+            consecutive,
+            arithmetic,
+            digit_repeat,
+            decade_concentration,
+            sum_deviation,
+            parity_imbalance,
+        ],
         dtype=float,
     )
 
@@ -147,7 +158,7 @@ class PopularityModel:
         return {
             "game": self.game,
             "intercept": self.intercept,
-            "coefficients": dict(zip(self.feature_names, self.coefficients)),
+            "coefficients": dict(zip(self.feature_names, self.coefficients, strict=False)),
             "n_observations": self.n_observations,
             "r_squared": self.r_squared,
             "permutation_p_value": self.permutation_p_value,
@@ -161,14 +172,12 @@ class PopularityModel:
                 "expected to be shared with fewer co-winners"
                 if self.usable
                 else "no detectable popularity signal at this sample size; do NOT act on "
-                     "these coefficients"
+                "these coefficients"
             ),
         }
 
 
-def _design_matrix(
-    combinations: Sequence[Sequence[int]], geometry: GameGeometry
-) -> np.ndarray:
+def _design_matrix(combinations: Sequence[Sequence[int]], geometry: GameGeometry) -> np.ndarray:
     return np.vstack([combination_features(c, geometry) for c in combinations])
 
 

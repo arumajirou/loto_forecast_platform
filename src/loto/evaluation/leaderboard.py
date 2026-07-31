@@ -14,15 +14,16 @@ This module fixes all three. Ranking requires per-draw losses, not just aggregat
 significance is not recoverable from a mean. A model that cannot supply per-draw losses is
 listed as ``UNRANKED`` rather than being ranked on an aggregate.
 """
+
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Sequence
 
 import numpy as np
 
 from loto.evaluation.multiplicity import Correction, correct, paired_bootstrap_p, romano_wolf
-from loto.evaluation.protocol import ProtocolMismatch, assert_comparable
+from loto.evaluation.protocol import assert_comparable
 
 __all__ = [
     "ModelResult",
@@ -193,8 +194,7 @@ def build_leaderboard(
     by_id = {r.model_id: r for r in results}
     if baseline_model_id not in by_id:
         raise KeyError(
-            f"baseline {baseline_model_id!r} absent from results; "
-            f"available={sorted(by_id)[:10]}"
+            f"baseline {baseline_model_id!r} absent from results; available={sorted(by_id)[:10]}"
         )
     baseline = by_id[baseline_model_id]
     if not baseline.rankable:
@@ -228,8 +228,11 @@ def build_leaderboard(
         else:
             raw = [
                 paired_bootstrap_p(
-                    np.asarray(c.per_draw_loss).ravel(), base_loss,
-                    n_boot=n_boot, seed=seed, alternative="less",
+                    np.asarray(c.per_draw_loss).ravel(),
+                    base_loss,
+                    n_boot=n_boot,
+                    seed=seed,
+                    alternative="less",
                 )["p_value"]
                 for c in candidates
             ]
@@ -262,13 +265,22 @@ def build_leaderboard(
 
     rows.append(
         LeaderboardRow(
-            rank=None, model_id=baseline.model_id, status=baseline.status, is_control=True,
-            point_estimate=float(base_loss.mean()), n=int(base_loss.size),
+            rank=None,
+            model_id=baseline.model_id,
+            status=baseline.status,
+            is_control=True,
+            point_estimate=float(base_loss.mean()),
+            n=int(base_loss.size),
             sd=float(base_loss.std(ddof=1)),
             se=float(base_loss.std(ddof=1) / np.sqrt(base_loss.size)),
-            ci_low=float("nan"), ci_high=float("nan"), delta_vs_baseline=0.0,
-            raw_p=1.0, adjusted_p=1.0, significant=False,
-            metrics=dict(baseline.metrics), elapsed_seconds=baseline.elapsed_seconds,
+            ci_low=float("nan"),
+            ci_high=float("nan"),
+            delta_vs_baseline=0.0,
+            raw_p=1.0,
+            adjusted_p=1.0,
+            significant=False,
+            metrics=dict(baseline.metrics),
+            elapsed_seconds=baseline.elapsed_seconds,
             notes="baseline",
         )
     )

@@ -19,10 +19,11 @@ Three controls are implemented, in increasing strength:
                  statistical test, so it catches leaks that are too small to detect
                  statistically but still invalidate the protocol.
 """
+
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import Callable, Sequence
 
 import numpy as np
 

@@ -1,4 +1,5 @@
 """Deterministic, leakage-safe candidate feature generation."""
+
 from __future__ import annotations
 
 import hashlib
@@ -34,9 +35,7 @@ def _feature_rows_for_index(
         result[f"freq_w{window}"] = (
             selected[start:idx].mean(axis=0) if denom > 0 else np.zeros(37, dtype=float)
         )
-    result["freq_all"] = (
-        selected[:idx].mean(axis=0) if hist_len > 0 else np.zeros(37, dtype=float)
-    )
+    result["freq_all"] = selected[:idx].mean(axis=0) if hist_len > 0 else np.zeros(37, dtype=float)
     result["gap_draws"] = np.where(last_seen >= 0, idx - last_seen, idx + 1).astype(float)
     result["freq_exp"] = exp_num / exp_den if exp_den > 0 else np.zeros(37, dtype=float)
     candidates = np.arange(1, 38, dtype=float)
@@ -44,7 +43,10 @@ def _feature_rows_for_index(
     result["candidate_is_even"] = (candidates % 2 == 0).astype(float)
     result["candidate_mod3"] = candidates % 3
     result["candidate_mod10"] = candidates % 10
-    result["candidate_is_prime"] = np.asarray([int(n >= 2 and all(n % d for d in range(2, int(n ** 0.5) + 1))) for n in range(1, 38)], dtype=float)
+    result["candidate_is_prime"] = np.asarray(
+        [int(n >= 2 and all(n % d for d in range(2, int(n**0.5) + 1))) for n in range(1, 38)],
+        dtype=float,
+    )
     return result
 
 

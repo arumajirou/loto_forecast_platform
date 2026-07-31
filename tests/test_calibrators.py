@@ -3,8 +3,8 @@
 Constitution: every component must justify itself. These tests establish what the two
 calibrators actually guarantee, so a future decision to keep or delete them is informed.
 """
+
 import numpy as np
-import pytest
 
 from loto.calibration.calibrators import PlattCalibrator, TemperatureScaler
 from loto.evaluation.metrics_general import expected_calibration_error

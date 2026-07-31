@@ -35,12 +35,15 @@ def test_generate_pool_is_legal():
 def test_greedy_cover_selects_multiple_regions():
     actual = [[1, 5, 10, 15, 20, 25, 30], [10, 14, 18, 22, 26, 30, 34]]
     pool = [actual[0], actual[1]]
-    selected, trace = greedy_coverage_select(actual, pool, target_coverage=1.0, tolerance=0, max_candidates=2)
+    selected, trace = greedy_coverage_select(
+        actual, pool, target_coverage=1.0, tolerance=0, max_candidates=2
+    )
     assert len(selected) == 2
     assert trace[-1]["coverage"] == 1.0
 
 
 def test_catalog_position_models_are_routable():
     from loto.models.catalog import get_model_spec
+
     assert get_model_spec("ridge-position").task == "position_series"
     assert get_model_spec("mlforecast-ridge").task == "position_series"

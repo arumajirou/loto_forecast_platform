@@ -1,4 +1,5 @@
 """Multiple-comparison control. Without it, a model sweep always finds a winner."""
+
 import numpy as np
 import pytest
 
@@ -23,7 +24,7 @@ def test_holm_is_monotone_and_conservative():
     c = holm(p)
     adj = list(c.adjusted_p)
     assert adj == sorted(adj)
-    assert all(a >= b for a, b in zip(adj, p))
+    assert all(a >= b for a, b in zip(adj, p, strict=False))
 
 
 def test_holm_rejects_nothing_when_all_p_are_marginal():
@@ -69,8 +70,9 @@ def test_romano_wolf_finds_nothing_on_pure_noise():
 def test_romano_wolf_detects_a_genuinely_better_model():
     rng = np.random.default_rng(3)
     base = rng.normal(loc=1.0, scale=0.5, size=200)
-    cand = np.vstack([rng.normal(loc=0.2, scale=0.5, size=200),
-                      rng.normal(loc=1.0, scale=0.5, size=200)])
+    cand = np.vstack(
+        [rng.normal(loc=0.2, scale=0.5, size=200), rng.normal(loc=1.0, scale=0.5, size=200)]
+    )
     c = romano_wolf(cand, base, alpha=0.05, n_boot=600, seed=2)
     assert c.rejected[0] and not c.rejected[1]
 

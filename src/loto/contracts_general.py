@@ -8,6 +8,7 @@ given :class:`~loto.game.geometry.GameGeometry` and cache it.
 The v1 contracts remain importable so existing Loto7 regression tests keep passing; new code
 should use :func:`contracts_for`.
 """
+
 from __future__ import annotations
 
 from datetime import datetime

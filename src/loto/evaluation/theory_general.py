@@ -16,6 +16,7 @@ Three bounds are reported per game because they are *not* simultaneously attaina
 
 Reporting only one of these is how a platform ends up claiming a model "beat the floor".
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -37,8 +38,7 @@ def position_pmf(geometry: GameGeometry) -> dict[int, dict[int, Fraction]]:
     if geometry.family == "digits":
         uniform = Fraction(1, geometry.universe_size)
         return {
-            slot: {v: uniform for v in geometry.values}
-            for slot in range(1, geometry.positions + 1)
+            slot: {v: uniform for v in geometry.values} for slot in range(1, geometry.positions + 1)
         }
 
     n, k = geometry.universe_size, geometry.positions
