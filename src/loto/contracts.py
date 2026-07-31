@@ -1,4 +1,5 @@
 """Versioned logical contracts shared across the platform."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -53,10 +54,10 @@ class DecodedCombination(StrictContract):
     score: float
 
     @model_validator(mode="after")
-    def validate_numbers(self) -> "DecodedCombination":
+    def validate_numbers(self) -> DecodedCombination:
         if any(n < 1 or n > 37 for n in self.numbers):
             raise ValueError("numbers must be in [1, 37]")
-        if any(a >= b for a, b in zip(self.numbers, self.numbers[1:])):
+        if any(a >= b for a, b in zip(self.numbers, self.numbers[1:], strict=False)):
             raise ValueError("numbers must be strictly ascending and unique")
         return self
 
@@ -74,7 +75,7 @@ class ForecastPackage(StrictContract):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
-    def validate_forecast(self) -> "ForecastPackage":
+    def validate_forecast(self) -> ForecastPackage:
         nums = [c.candidate_number for c in self.candidates]
         if sorted(nums) != list(range(1, 38)):
             raise ValueError("candidates must contain every number 1..37 exactly once")

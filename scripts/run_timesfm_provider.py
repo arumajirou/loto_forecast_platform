@@ -71,10 +71,7 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         )
     )
     history = pd.DataFrame(request["history"])
-    inputs = [
-        history[f"n{position}"].to_numpy(dtype=np.float32)
-        for position in range(1, 8)
-    ]
+    inputs = [history[f"n{position}"].to_numpy(dtype=np.float32) for position in range(1, 8)]
     horizon = int(request.get("prediction_length", 1))
     point_forecast, quantile_forecast = model.forecast(horizon=horizon, inputs=inputs)
     predictions = np.asarray(point_forecast, dtype=float)[:, 0]

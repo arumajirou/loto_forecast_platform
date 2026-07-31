@@ -21,11 +21,13 @@ Execution order, and why:
 
 Every stage writes a typed status record. A stage that degrades says so.
 """
+
 from __future__ import annotations
 
 import time
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Callable, Sequence
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -62,20 +64,20 @@ class ResearchConfig:
     """Everything that defines a run. Fields feeding ``protocol_hash`` are marked."""
 
     game: str
-    target_mode: str = "position"          # hashed
-    horizon: int = 1                       # hashed
-    tau: int = 1                           # hashed
-    folds: int = 4                         # hashed
-    test_size: int = 10                    # hashed
-    gap: int = 0                           # hashed
-    expanding: bool = True                 # hashed
-    min_train_size: int = 60               # hashed
-    holdout_size: int = 20                 # hashed
-    seeds: tuple[int, ...] = (42,)         # hashed
+    target_mode: str = "position"  # hashed
+    horizon: int = 1  # hashed
+    tau: int = 1  # hashed
+    folds: int = 4  # hashed
+    test_size: int = 10  # hashed
+    gap: int = 0  # hashed
+    expanding: bool = True  # hashed
+    min_train_size: int = 60  # hashed
+    holdout_size: int = 20  # hashed
+    seeds: tuple[int, ...] = (42,)  # hashed
     objective_primary: str = "position_mae"  # hashed
     objective_weights: dict[str, float] = field(default_factory=dict)  # hashed
-    feature_windows: tuple[int, ...] = (5, 10, 20)                     # hashed
-    exponential_halflives: tuple[float, ...] = (5.0, 10.0)             # hashed
+    feature_windows: tuple[int, ...] = (5, 10, 20)  # hashed
+    exponential_halflives: tuple[float, ...] = (5.0, 10.0)  # hashed
     # not hashed -- operational only
     alpha: float = 0.05
     correction_method: str = "romano_wolf"
@@ -160,6 +162,7 @@ class ResearchOutcome:
 # Built-in predictors used as mandatory controls
 # --------------------------------------------------------------------------------------
 
+
 def theory_median_predictor(train: pd.DataFrame, geometry: GameGeometry, n_test: int) -> np.ndarray:
     """Constant prediction at the exact per-slot median. Attains the MAE floor."""
     del train
@@ -200,6 +203,7 @@ MANDATORY_PREDICTORS: dict[str, PositionPredictor] = {
 # Orchestration
 # --------------------------------------------------------------------------------------
 
+
 def _slot_matrix(frame: pd.DataFrame, geometry: GameGeometry) -> np.ndarray:
     cols = geometry.column_names()
     missing = [c for c in cols if c not in frame.columns]
@@ -215,7 +219,9 @@ def _legalise(prediction: np.ndarray, geometry: GameGeometry) -> np.ndarray:
     de-duplicating upward. A model that emits an illegal combination is not silently accepted;
     the projection is recorded so the cost of illegality is visible in the metrics.
     """
-    out = np.clip(np.rint(np.asarray(prediction, dtype=float)), geometry.value_min, geometry.value_max)
+    out = np.clip(
+        np.rint(np.asarray(prediction, dtype=float)), geometry.value_min, geometry.value_max
+    )
     if not geometry.ascending:
         return out
     fixed = np.empty_like(out)
@@ -355,8 +361,7 @@ def run_research(
     for name in active:
         if name in failures:
             results.append(
-                ModelResult(name, protocol_hash, {}, None,
-                            status="FAILED", notes=failures[name])
+                ModelResult(name, protocol_hash, {}, None, status="FAILED", notes=failures[name])
             )
             continue
         actual = np.vstack(per_model_actual[name])
@@ -402,15 +407,21 @@ def run_research(
 
             def _score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
                 return float(
-                    positional_metrics(y_true, _legalise(y_pred, geometry), geometry,
-                                       tau=config.tau)["position_mae"]
+                    positional_metrics(
+                        y_true, _legalise(y_pred, geometry), geometry, tau=config.tau
+                    )["position_mae"]
                 )
 
             perm = permutation_sentinel(
-                _fit_predict, features, slots, _score,
+                _fit_predict,
+                features,
+                slots,
+                _score,
                 baseline=bounds.mae_floor,
                 higher_is_better=False,
-                tolerance=3.0 * float(np.std(np.abs(slots - np.median(slots, axis=0)))) / np.sqrt(max(len(slots), 1)),
+                tolerance=3.0
+                * float(np.std(np.abs(slots - np.median(slots, axis=0))))
+                / np.sqrt(max(len(slots), 1)),
                 n_repeats=config.sentinel_repeats,
             )
             sentinel = run_sentinel_suite(causality_verdicts + [perm])
@@ -431,7 +442,9 @@ def run_research(
         pred = np.vstack(per_model_pred[reference])
         half = max(len(actual) // 2, 1)
         interval = split_conformal(
-            actual[:half].ravel(), pred[:half].ravel(), pred[half:].ravel(),
+            actual[:half].ravel(),
+            pred[:half].ravel(),
+            pred[half:].ravel(),
             alpha=config.conformal_alpha,
             clip=(float(geometry.value_min), float(geometry.value_max)),
         )
@@ -449,8 +462,11 @@ def run_research(
     try:
         from loto.evaluation.pace_gate import PaceConfig, PaceGate
 
-        gate = PaceGate(PaceConfig(alpha=config.alpha, min_draws=max(len(folds), 2),
-                                   protocol_hash=protocol_hash))
+        gate = PaceGate(
+            PaceConfig(
+                alpha=config.alpha, min_draws=max(len(folds), 2), protocol_hash=protocol_hash
+            )
+        )
         champ = np.vstack(per_model_pred[config.baseline_model_id])
         base_actual = np.vstack(per_model_actual[config.baseline_model_id])
         cand_id = board.champion.model_id if board.champion else config.baseline_model_id
@@ -464,8 +480,11 @@ def run_research(
                 (np.abs(a - cand[start:stop]) <= config.tau).ravel(),
                 (np.abs(a - champ[start:stop]) <= config.tau).ravel(),
             )
-        pace = gate.state() | {"candidate": cand_id, "champion": config.baseline_model_id,
-                               "protocol_hash": protocol_hash}
+        pace = gate.state() | {
+            "candidate": cand_id,
+            "champion": config.baseline_model_id,
+            "protocol_hash": protocol_hash,
+        }
         stage["pace_gate"] = "SUCCEEDED"
     except (ImportError, KeyError, ValueError, AssertionError) as exc:
         pace = {"status": "UNAVAILABLE", "error": f"{type(exc).__name__}: {exc}"}
@@ -488,8 +507,12 @@ def run_research(
         geometry=geometry.to_dict(),
         theory=theoretical_bounds(geometry, tau=config.tau).to_dict(),
         folds=[
-            {"train_start": f.train_start, "train_end": f.train_end,
-             "test_start": f.test_start, "test_end": f.test_end}
+            {
+                "train_start": f.train_start,
+                "train_end": f.train_end,
+                "test_start": f.test_start,
+                "test_end": f.test_end,
+            }
             for f in folds
         ],
         development_rows=len(development),

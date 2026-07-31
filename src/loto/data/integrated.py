@@ -4,9 +4,10 @@ import json
 import shutil
 import time
 import uuid
+from collections.abc import Mapping
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 import pandas as pd
 
@@ -40,7 +41,11 @@ def _quality_report(frame: pd.DataFrame, spec: LotterySpec) -> dict[str, Any]:
     duplicate_draws = int(frame.duplicated(subset=["draw_no"]).sum()) if "draw_no" in frame else 0
     if duplicate_draws:
         issues.append(f"duplicate_draw_no:{duplicate_draws}")
-    date_invalid = int(pd.to_datetime(frame.get("draw_date"), errors="coerce").isna().sum()) if "draw_date" in frame else len(frame)
+    date_invalid = (
+        int(pd.to_datetime(frame.get("draw_date"), errors="coerce").isna().sum())
+        if "draw_date" in frame
+        else len(frame)
+    )
     if date_invalid:
         issues.append(f"invalid_draw_date:{date_invalid}")
     number_columns = [c for c in frame.columns if c.startswith("n") and c[1:].isdigit()]
@@ -49,7 +54,9 @@ def _quality_report(frame: pd.DataFrame, spec: LotterySpec) -> dict[str, Any]:
     for col in number_columns:
         values = pd.to_numeric(frame[col], errors="coerce")
         missing_numbers += int(values.isna().sum())
-        range_violations += int(((values < spec.number_min) | (values > spec.number_max)).fillna(False).sum())
+        range_violations += int(
+            ((values < spec.number_min) | (values > spec.number_max)).fillna(False).sum()
+        )
     if missing_numbers:
         issues.append(f"missing_numbers:{missing_numbers}")
     if range_violations:
@@ -74,7 +81,9 @@ def _quality_report(frame: pd.DataFrame, spec: LotterySpec) -> dict[str, Any]:
     }
 
 
-def _materialize_source_file(source_file: str | Path, raw_dir: Path, game: str) -> tuple[Path, dict[str, Any]]:
+def _materialize_source_file(
+    source_file: str | Path, raw_dir: Path, game: str
+) -> tuple[Path, dict[str, Any]]:
     source = Path(source_file)
     if not source.exists() or not source.is_file():
         raise FileNotFoundError(source)
@@ -84,7 +93,13 @@ def _materialize_source_file(source_file: str | Path, raw_dir: Path, game: str) 
         tmp = target.with_suffix(".csv.tmp")
         shutil.copy2(source, tmp)
         tmp.replace(target)
-    return target, {"game": game, "source": str(source), "raw_path": str(target), "mode": "local-file", **artifact_descriptor(target)}
+    return target, {
+        "game": game,
+        "source": str(source),
+        "raw_path": str(target),
+        "mode": "local-file",
+        **artifact_descriptor(target),
+    }
 
 
 def acquire_and_build(
@@ -114,7 +129,16 @@ def acquire_and_build(
     def run_stage(name: str, operation):
         started_at = utc_now_iso()
         started = time.perf_counter()
-        _append_event(event_path, {"run_id": run_id, "game": game, "stage": name, "status": "STARTED", "timestamp": started_at})
+        _append_event(
+            event_path,
+            {
+                "run_id": run_id,
+                "game": game,
+                "stage": name,
+                "status": "STARTED",
+                "timestamp": started_at,
+            },
+        )
         try:
             value, inputs, outputs, metrics, warnings = operation()
             manifest = StageManifest(
@@ -140,11 +164,31 @@ def acquire_and_build(
             )
             path = atomic_write_json(manifest_dir / f"{name}.json", manifest.to_dict())
             stages.append({**manifest.to_dict(), "manifest_path": str(path)})
-            _append_event(event_path, {"run_id": run_id, "game": game, "stage": name, "status": "FAILED", "timestamp": manifest.finished_at, "error": manifest.error})
+            _append_event(
+                event_path,
+                {
+                    "run_id": run_id,
+                    "game": game,
+                    "stage": name,
+                    "status": "FAILED",
+                    "timestamp": manifest.finished_at,
+                    "error": manifest.error,
+                },
+            )
             raise
         path = atomic_write_json(manifest_dir / f"{name}.json", manifest.to_dict())
         stages.append({**manifest.to_dict(), "manifest_path": str(path)})
-        _append_event(event_path, {"run_id": run_id, "game": game, "stage": name, "status": "SUCCEEDED", "timestamp": manifest.finished_at, **manifest.metrics})
+        _append_event(
+            event_path,
+            {
+                "run_id": run_id,
+                "game": game,
+                "stage": name,
+                "status": "SUCCEEDED",
+                "timestamp": manifest.finished_at,
+                **manifest.metrics,
+            },
+        )
         return value
 
     def fetch_stage():
@@ -154,7 +198,13 @@ def acquire_and_build(
             fetched = PoliteHttpClient().fetch_one(spec, raw_dir, force=force)
             raw_path = Path(fetched.raw_path)
             fetch_meta = asdict(fetched)
-        return (raw_path, fetch_meta), [], [artifact_descriptor(raw_path, role="raw")], {"bytes": raw_path.stat().st_size}, []
+        return (
+            (raw_path, fetch_meta),
+            [],
+            [artifact_descriptor(raw_path, role="raw")],
+            {"bytes": raw_path.stat().st_size},
+            [],
+        )
 
     raw_path, fetch_meta = run_stage("fetch", fetch_stage)
 
@@ -165,38 +215,70 @@ def acquire_and_build(
         atomic_write_json(normalized_dir / f"{game}.quality.json", quality)
         if quality["status"] != "PASS":
             raise ValueError("normalized data quality failed: " + ",".join(quality["issues"]))
-        return (normalized, parse_meta, normalized_path, quality), [artifact_descriptor(raw_path, role="raw")], [artifact_descriptor(normalized_path, role="normalized")], {"rows": len(normalized), "columns": len(normalized.columns)}, []
+        return (
+            (normalized, parse_meta, normalized_path, quality),
+            [artifact_descriptor(raw_path, role="raw")],
+            [artifact_descriptor(normalized_path, role="normalized")],
+            {"rows": len(normalized), "columns": len(normalized.columns)},
+            [],
+        )
 
     normalized, parse_meta, normalized_path, quality = run_stage("parse_validate", parse_stage)
 
     def feature_stage():
         draw_features = make_draw_features(normalized, spec, windows=list(windows))
         occurrence_features = make_occurrence_features(normalized, spec, windows=list(windows))
-        tables: dict[str, pd.DataFrame] = {"normalized_draws": normalized, "draw_features": draw_features}
+        tables: dict[str, pd.DataFrame] = {
+            "normalized_draws": normalized,
+            "draw_features": draw_features,
+        }
         if not occurrence_features.empty:
             tables["occurrence_features"] = occurrence_features
         canonical_manifest = None
         if game == "loto7":
             canonical, canonical_manifest = canonicalize_loto7(normalized, source=str(raw_path))
-            tables.update({
-                "canonical_loto7": canonical,
-                "position_loto7": to_position_table(canonical),
-                "candidate_loto7": to_candidate_table(canonical),
-                "candidate_features_v2": build_candidate_features(canonical, windows=windows),
-            })
+            tables.update(
+                {
+                    "canonical_loto7": canonical,
+                    "position_loto7": to_position_table(canonical),
+                    "candidate_loto7": to_candidate_table(canonical),
+                    "candidate_features_v2": build_candidate_features(canonical, windows=windows),
+                }
+            )
         bundle = write_dataset_bundle(tables, feature_dir, require_parquet=require_parquet)
-        outputs = [artifact_descriptor(bundle["sqlite"], role="sqlite"), artifact_descriptor(bundle["manifest"], role="bundle_manifest")]
-        metrics = {"table_count": len(tables), "total_rows": sum(len(v) for v in tables.values()), "parquet_failures": len(bundle["parquet_errors"])}
+        outputs = [
+            artifact_descriptor(bundle["sqlite"], role="sqlite"),
+            artifact_descriptor(bundle["manifest"], role="bundle_manifest"),
+        ]
+        metrics = {
+            "table_count": len(tables),
+            "total_rows": sum(len(v) for v in tables.values()),
+            "parquet_failures": len(bundle["parquet_errors"]),
+        }
         warnings = list(bundle["parquet_errors"])
-        return (tables, bundle, canonical_manifest), [artifact_descriptor(normalized_path, role="normalized")], outputs, metrics, warnings
+        return (
+            (tables, bundle, canonical_manifest),
+            [artifact_descriptor(normalized_path, role="normalized")],
+            outputs,
+            metrics,
+            warnings,
+        )
 
     tables, bundle, canonical_manifest = run_stage("features_persist", feature_stage)
 
     postgres = None
     if postgres_dsn:
+
         def postgres_stage():
             written = copy_bundle_to_postgres(tables, postgres_dsn)
-            return written, [artifact_descriptor(bundle["manifest"], role="bundle_manifest")], [], {"tables_written": len(written), "rows_written": sum(written.values())}, []
+            return (
+                written,
+                [artifact_descriptor(bundle["manifest"], role="bundle_manifest")],
+                [],
+                {"tables_written": len(written), "rows_written": sum(written.values())},
+                [],
+            )
+
         postgres = run_stage("postgres", postgres_stage)
 
     report = {
@@ -211,7 +293,9 @@ def acquire_and_build(
         "normalized": str(normalized_path),
         "bundle": bundle,
         "postgres": postgres,
-        "canonical_manifest": canonical_manifest.model_dump(mode="json") if canonical_manifest else None,
+        "canonical_manifest": canonical_manifest.model_dump(mode="json")
+        if canonical_manifest
+        else None,
         "stages": stages,
         "events": str(event_path),
     }
@@ -252,7 +336,11 @@ def acquire_and_build_many(
             )
             results.append(result)
         except Exception as exc:
-            failure = {"game": spec.key, "status": "FAILED", "reason": f"{type(exc).__name__}: {exc}"}
+            failure = {
+                "game": spec.key,
+                "status": "FAILED",
+                "reason": f"{type(exc).__name__}: {exc}",
+            }
             failures.append(failure)
             if not continue_on_error:
                 raise

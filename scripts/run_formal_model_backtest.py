@@ -53,7 +53,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--catalog-source", choices=["static", "dynamic", "merged"], default="dynamic"
     )
-    parser.add_argument("--available-only", action="store_true", default=True)
+    parser.add_argument("--available-only", action="store_true", default=False)
     parser.add_argument("--models", default="all", help="'all' or comma separated model IDs")
     parser.add_argument("--stage", choices=["smoke", "screening", "formal"], default="smoke")
     parser.add_argument("--test-draws", type=positive_int, default=None)
@@ -68,7 +68,54 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output", default="runs/formal-backtest")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--precision", default="32")
+    parser.add_argument(
+        "--device-policy",
+        choices=["auto", "gpu-strict", "cpu-only"],
+        default="auto",
+        help=(
+            "auto: current behavior, CPU fallback permitted but recorded as "
+            "CPU_FALLBACK_DEGRADED, never as PASS. gpu-strict: only GPU_REQUIRED/"
+            "GPU_OPTIONAL models (per configs/model_device_policy.json) are execution "
+            "targets, CUDA must be available before start, CPU fallback is forbidden "
+            "entirely (a CUDA failure FAILs the fold, it is never retried on CPU). "
+            "cpu-only: forces --device to cpu."
+        ),
+    )
+    parser.add_argument(
+        "--require-gpu-evidence",
+        action="store_true",
+        default=False,
+        help="Fail a fold if measured GPU evidence (VRAM delta) does not corroborate gpu usage.",
+    )
+    parser.add_argument(
+        "--no-cpu-fallback",
+        action="store_true",
+        default=False,
+        help="Forbid retrying a CUDA execution failure on CPU, independent of --device-policy.",
+    )
+    parser.add_argument(
+        "--gpu-min-memory-delta-mib",
+        type=float,
+        default=0.0,
+        help="Minimum measured VRAM delta (MiB) required to certify gpu_used=true.",
+    )
+    parser.add_argument(
+        "--gpu-evidence-sample-interval-ms",
+        type=positive_int,
+        default=50,
+        help=(
+            "Recorded for forward compatibility with periodic GPU-utilization sampling "
+            "(Phase 4 device_evidence schema); not yet used to drive a sampling loop."
+        ),
+    )
     return parser
+
+
+def load_device_policy() -> dict[str, dict[str, Any]]:
+    policy_path = ROOT / "configs" / "model_device_policy.json"
+    if not policy_path.exists():
+        return {}
+    return json.loads(policy_path.read_text(encoding="utf-8"))
 
 
 def get_data_manifest(data_path: Path) -> dict[str, Any]:
@@ -90,7 +137,7 @@ def get_data_manifest(data_path: Path) -> dict[str, Any]:
         "first_draw_date": str(df["draw_date"].min()),
         "last_draw_date": str(df["draw_date"].max()),
         "validation_status": "PASS",
-        "schema_version": "1.0.0"
+        "schema_version": "1.0.0",
     }
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     atomic_write_json(manifest_path, manifest)
@@ -147,6 +194,7 @@ def generate_fold_signature(
 # 11 Mandatory Baseline Implementations
 # ------------------------------------------------------------------------------
 
+
 def get_baseline_predictions(
     baseline_id: str,
     train_df: pd.DataFrame,
@@ -174,7 +222,9 @@ def get_baseline_predictions(
         all_vals = train_df[[f"n{i}" for i in range(1, 8)]].to_numpy().flatten()
         med = float(np.median(all_vals))
         pos_values = np.full(positions, med)
-        probs = normalize_worker_predictions(task="position_series", history=train_df, values=pos_values)
+        probs = normalize_worker_predictions(
+            task="position_series", history=train_df, values=pos_values
+        )
         probs = project_probabilities(probs)
         return probs, pos_values
 
@@ -182,15 +232,17 @@ def get_baseline_predictions(
         all_vals = train_df[[f"n{i}" for i in range(1, 8)]].to_numpy().flatten()
         mean_val = float(np.mean(all_vals))
         pos_values = np.full(positions, mean_val)
-        probs = normalize_worker_predictions(task="position_series", history=train_df, values=pos_values)
+        probs = normalize_worker_predictions(
+            task="position_series", history=train_df, values=pos_values
+        )
         probs = project_probabilities(probs)
         return probs, pos_values
 
     elif baseline_id == "position_median":
-        pos_values = np.array([
-            float(np.median(train_df[f"n{i}"])) for i in range(1, 8)
-        ])
-        probs = normalize_worker_predictions(task="position_series", history=train_df, values=pos_values)
+        pos_values = np.array([float(np.median(train_df[f"n{i}"])) for i in range(1, 8)])
+        probs = normalize_worker_predictions(
+            task="position_series", history=train_df, values=pos_values
+        )
         probs = project_probabilities(probs)
         return probs, pos_values
 
@@ -200,7 +252,9 @@ def get_baseline_predictions(
             mode_val = train_df[f"n{i}"].mode()
             pos_values.append(float(mode_val.iloc[0]) if not mode_val.empty else 19.0)
         pos_values = np.array(pos_values)
-        probs = normalize_worker_predictions(task="position_series", history=train_df, values=pos_values)
+        probs = normalize_worker_predictions(
+            task="position_series", history=train_df, values=pos_values
+        )
         probs = project_probabilities(probs)
         return probs, pos_values
 
@@ -210,22 +264,26 @@ def get_baseline_predictions(
         else:
             ref_row = train_df.iloc[-1]
         pos_values = ref_row[[f"n{i}" for i in range(1, 8)]].to_numpy(float)
-        probs = normalize_worker_predictions(task="position_series", history=train_df, values=pos_values)
+        probs = normalize_worker_predictions(
+            task="position_series", history=train_df, values=pos_values
+        )
         probs = project_probabilities(probs)
         return probs, pos_values
 
     elif baseline_id == "last_value":
         ref_row = train_df.iloc[-1]
         pos_values = ref_row[[f"n{i}" for i in range(1, 8)]].to_numpy(float)
-        probs = normalize_worker_predictions(task="position_series", history=train_df, values=pos_values)
+        probs = normalize_worker_predictions(
+            task="position_series", history=train_df, values=pos_values
+        )
         probs = project_probabilities(probs)
         return probs, pos_values
 
     elif baseline_id == "fixed_optimized_vector" or baseline_id == "mae_optimal_fixed_vector":
-        pos_values = np.array([
-            float(np.median(train_df[f"n{i}"])) for i in range(1, 8)
-        ])
-        probs = normalize_worker_predictions(task="position_series", history=train_df, values=pos_values)
+        pos_values = np.array([float(np.median(train_df[f"n{i}"])) for i in range(1, 8)])
+        probs = normalize_worker_predictions(
+            task="position_series", history=train_df, values=pos_values
+        )
         probs = project_probabilities(probs)
         return probs, pos_values
 
@@ -242,7 +300,9 @@ def get_baseline_predictions(
                     best_val = float(candidate)
             pos_values.append(best_val)
         pos_values = np.array(pos_values)
-        probs = normalize_worker_predictions(task="position_series", history=train_df, values=pos_values)
+        probs = normalize_worker_predictions(
+            task="position_series", history=train_df, values=pos_values
+        )
         probs = project_probabilities(probs)
         return probs, pos_values
 
@@ -261,8 +321,14 @@ def get_baseline_predictions(
 # LEAKAGE_NOT_VERIFIED status persisted in the evidence trail instead of being
 # silently skipped, so the gap is auditable rather than invisible.
 LEAKAGE_CHECK_UNSUPPORTED_LIBRARIES = {
-    "neuralforecast", "neuralforecast_auto", "gluonts", "autogluon",
-    "timesfm", "chronos", "uni2ts", "tirex",
+    "neuralforecast",
+    "neuralforecast_auto",
+    "gluonts",
+    "autogluon",
+    "timesfm",
+    "chronos",
+    "uni2ts",
+    "tirex",
 }
 
 ABSOLUTE_LEAKAGE_TOLERANCE = 1e-5
@@ -295,13 +361,19 @@ def execute_leakage_checks(
 
     # Hard invariants: unconditional, exact, cheap -- checked regardless of library.
     if test_idx in train_df.index:
-        print("LEAKAGE_DETECTED: Scaler/Boundary Leakage check failed. Test index found in train set.", file=sys.stderr)
+        print(
+            "LEAKAGE_DETECTED: Scaler/Boundary Leakage check failed. Test index found in train set.",
+            file=sys.stderr,
+        )
         sys.exit("LEAKAGE_DETECTED")
 
     max_train_draw = train_df["draw_no"].max()
     test_draw_no = test_row.iloc[0]["draw_no"]
     if max_train_draw >= test_draw_no:
-        print("LEAKAGE_DETECTED: Fold Boundary Invariant violated. Train end >= test draw.", file=sys.stderr)
+        print(
+            "LEAKAGE_DETECTED: Fold Boundary Invariant violated. Train end >= test draw.",
+            file=sys.stderr,
+        )
         sys.exit("LEAKAGE_DETECTED")
 
     if spec.library in LEAKAGE_CHECK_UNSUPPORTED_LIBRARIES:
@@ -322,7 +394,9 @@ def execute_leakage_checks(
     # order) so the future-mutation tolerance below scales to it instead of relying
     # on an arbitrary fixed atol.
     try:
-        r_probs, r_pos, _, _ = run_model_fold_internal(spec, train_df, params, seed, device, precision)
+        r_probs, r_pos, _, _ = run_model_fold_internal(
+            spec, train_df, params, seed, device, precision
+        )
         deterministic_repeat_diff = max(
             float(np.max(np.abs(base_probs - r_probs))),
             float(np.max(np.abs(base_pos - r_pos))),
@@ -342,7 +416,9 @@ def execute_leakage_checks(
     modified_train_df = modified_full_df.iloc[:test_idx]
 
     try:
-        m_probs, m_pos, _, _ = run_model_fold_internal(spec, modified_train_df, params, seed, device, precision)
+        m_probs, m_pos, _, _ = run_model_fold_internal(
+            spec, modified_train_df, params, seed, device, precision
+        )
         future_mutation_diff = max(
             float(np.max(np.abs(base_probs - m_probs))),
             float(np.max(np.abs(base_pos - m_pos))),
@@ -373,7 +449,9 @@ def execute_leakage_checks(
     for col in ["n1", "n2", "n3", "n4", "n5", "n6", "n7"]:
         modified_past_df[col] = ((modified_past_df[col] + 17 - 1) % 37) + 1
     try:
-        p_probs, p_pos, _, _ = run_model_fold_internal(spec, modified_past_df, params, seed, device, precision)
+        p_probs, p_pos, _, _ = run_model_fold_internal(
+            spec, modified_past_df, params, seed, device, precision
+        )
         past_mutation_diff = max(
             float(np.max(np.abs(base_probs - p_probs))),
             float(np.max(np.abs(base_pos - p_pos))),
@@ -391,6 +469,7 @@ def execute_leakage_checks(
 # Model Parameter Resolver & Execution Wrapper
 # ------------------------------------------------------------------------------
 
+
 def resolve_model_params(spec: ModelSpec, stage: str) -> dict[str, Any]:
     params = dict(spec.default_params)
 
@@ -402,22 +481,40 @@ def resolve_model_params(spec: ModelSpec, stage: str) -> dict[str, Any]:
 
     if stage == "smoke":
         if spec.library == "neuralforecast":
-            params.update({
-                "max_steps": 2,
-                "val_check_steps": 1,
-                "early_stop_patience_steps": -1,
-                "batch_size": 8,
-                "input_size": 8,
-            })
-            # Transformer/Mixer models need larger input_size to avoid patch/FFT constraints
-            if spec.class_name in {"TimesNet", "TimeMixer", "TSMixer", "iTransformer", "VanillaTransformer", "PatchTST", "TFT"}:
-                params.update({
+            params.update(
+                {
                     "max_steps": 2,
-                    "input_size": 32,
-                })
+                    "val_check_steps": 1,
+                    "early_stop_patience_steps": -1,
+                    "batch_size": 8,
+                    "input_size": 8,
+                }
+            )
+            # Transformer/Mixer models need larger input_size to avoid patch/FFT constraints
+            if spec.class_name in {
+                "TimesNet",
+                "TimeMixer",
+                "TSMixer",
+                "iTransformer",
+                "VanillaTransformer",
+                "PatchTST",
+                "TFT",
+            }:
+                params.update(
+                    {
+                        "max_steps": 2,
+                        "input_size": 32,
+                    }
+                )
                 # Add hidden_size and attention heads to compatible models to avoid pl.Trainer type errors.
                 # TFT and VanillaTransformer use n_head, while others use n_heads. Ensure hidden_size is divisible by heads.
-                if spec.class_name in {"TimesNet", "iTransformer", "VanillaTransformer", "PatchTST", "TFT"}:
+                if spec.class_name in {
+                    "TimesNet",
+                    "iTransformer",
+                    "VanillaTransformer",
+                    "PatchTST",
+                    "TFT",
+                }:
                     params["hidden_size"] = 16
 
                 if spec.class_name in {"iTransformer", "PatchTST"}:
@@ -435,40 +532,58 @@ def resolve_model_params(spec: ModelSpec, stage: str) -> dict[str, Any]:
                 params.pop("n_heads", None)
 
         elif spec.library == "neuralforecast_auto":
-            params.update({
-                "backend": "optuna",
-                "num_samples": 1,
-                "max_steps": 2,
-                "parallel_trials": 1,
-                "refit_with_val": False,
-                "search_strategy": "random",
-                "input_size": 8,
-                "batch_size": 8,
-            })
+            params.update(
+                {
+                    "backend": "optuna",
+                    "num_samples": 1,
+                    "max_steps": 2,
+                    "parallel_trials": 1,
+                    "refit_with_val": False,
+                    "search_strategy": "random",
+                    "input_size": 8,
+                    "batch_size": 8,
+                }
+            )
             if spec.class_name in {"AutoNBEATS", "AutoNBEATSx"}:
-                params.update({
-                    "stack_types": ["identity"],
-                    "n_blocks": [1],
-                    "mlp_units": [[64, 64]],
-                })
+                params.update(
+                    {
+                        "stack_types": ["identity"],
+                        "n_blocks": [1],
+                        "mlp_units": [[64, 64]],
+                    }
+                )
             # Transformer-based AutoML models need larger input_size.
             # Do NOT specify network structure configurations (hidden_size, n_heads) here
             # to let Optuna initialize them properly according to default spaces without pl.Trainer type errors.
-            if spec.class_name in {"AutoTimesNet", "AutoTimeXer", "AutoInformer", "AutoAutoformer", "AutoFEDformer", "AutoPatchTST", "AutoiTransformer"}:
-                params.update({
-                    "input_size": 32,
-                    "max_steps": 2,
-                    "batch_size": 8,
-                })
+            if spec.class_name in {
+                "AutoTimesNet",
+                "AutoTimeXer",
+                "AutoInformer",
+                "AutoAutoformer",
+                "AutoFEDformer",
+                "AutoPatchTST",
+                "AutoiTransformer",
+            }:
+                params.update(
+                    {
+                        "input_size": 32,
+                        "max_steps": 2,
+                        "batch_size": 8,
+                    }
+                )
         elif spec.library == "autogluon":
-            params.update({
-                "presets": "fast_training",
-                "time_limit": 5,
-            })
+            params.update(
+                {
+                    "presets": "fast_training",
+                    "time_limit": 5,
+                }
+            )
         elif spec.library == "reservoirpy":
-            params.update({
-                "units": 10,
-            })
+            params.update(
+                {
+                    "units": 10,
+                }
+            )
 
     return params
 
@@ -502,11 +617,15 @@ def _run_model_fold_internal_core(
     precision: str,
 ) -> tuple[np.ndarray, np.ndarray]:
     if spec.task == "candidate" and spec.library == "tabpfn_time_series":
-        provider = get_foundation_provider(spec)(spec, params, seed=seed, device=device, precision=precision)
+        provider = get_foundation_provider(spec)(
+            spec, params, seed=seed, device=device, precision=precision
+        )
         provider.load()
         try:
             raw_values = np.asarray(provider.predict(train_df), dtype=float).reshape(37)
-            candidate_probs = normalize_worker_predictions(task="candidate", history=train_df, values=raw_values)
+            candidate_probs = normalize_worker_predictions(
+                task="candidate", history=train_df, values=raw_values
+            )
             candidate_probs = project_probabilities(candidate_probs)
             ranked = np.argsort(-candidate_probs)[:7] + 1
             pos_pred = np.asarray(sorted(ranked.tolist()), dtype=float)
@@ -524,31 +643,42 @@ def _run_model_fold_internal_core(
         pos_pred = np.asarray(sorted(ranked.tolist()), dtype=float)
 
     elif spec.task == "foundation":
-        provider = get_foundation_provider(spec)(spec, params, seed=seed, device=device, precision=precision)
+        provider = get_foundation_provider(spec)(
+            spec, params, seed=seed, device=device, precision=precision
+        )
         provider.load()
         try:
             pos_pred = np.asarray(provider.predict(train_df), dtype=float).reshape(7)
-            candidate_probs = normalize_worker_predictions(task="position_series", history=train_df, values=pos_pred)
+            candidate_probs = normalize_worker_predictions(
+                task="position_series", history=train_df, values=pos_pred
+            )
             candidate_probs = project_probabilities(candidate_probs)
         finally:
             provider.close()
 
     elif spec.task in {"position", "position_series", "candidate_series"}:
-        worker = PositionSeriesWorker(spec=spec, params=params, seed=seed, device=device, precision=precision)
+        worker = PositionSeriesWorker(
+            spec=spec, params=params, seed=seed, device=device, precision=precision
+        )
         output = worker.forecast(train_df)
         prediction_values = (
             output.candidate_probabilities
-            if spec.task in {"candidate", "candidate_series"} and output.candidate_probabilities is not None
+            if spec.task in {"candidate", "candidate_series"}
+            and output.candidate_probabilities is not None
             else output.position_values
         )
         if spec.task in {"candidate", "candidate_series"}:
-            candidate_probs = normalize_worker_predictions(task=spec.task, history=train_df, values=prediction_values)
+            candidate_probs = normalize_worker_predictions(
+                task=spec.task, history=train_df, values=prediction_values
+            )
             candidate_probs = project_probabilities(candidate_probs)
             ranked = np.argsort(-candidate_probs)[:7] + 1
             pos_pred = np.asarray(sorted(ranked.tolist()), dtype=float)
         else:
             pos_pred = prediction_values.flatten()
-            candidate_probs = normalize_worker_predictions(task="position_series", history=train_df, values=pos_pred)
+            candidate_probs = normalize_worker_predictions(
+                task="position_series", history=train_df, values=pos_pred
+            )
             candidate_probs = project_probabilities(candidate_probs)
     else:
         raise NotImplementedError()
@@ -564,7 +694,9 @@ def run_model_fold_internal(
     device: str,
     precision: str,
 ) -> tuple[np.ndarray, np.ndarray, str, str | None]:
-    effective_device = "cuda" if device == "cuda" or (device == "auto" and torch.cuda.is_available()) else "cpu"
+    effective_device = (
+        "cuda" if device == "cuda" or (device == "auto" and torch.cuda.is_available()) else "cpu"
+    )
     fallback_reason: str | None = None
 
     # Force CPU execution for granite-ttm due to local env CUDA compatibility problems
@@ -573,13 +705,20 @@ def run_model_fold_internal(
         fallback_reason = "granite_ttm_forced_cpu_env_compatibility"
 
     try:
-        probs, pos = _run_model_fold_internal_core(spec, train_df, params, seed, effective_device, precision)
+        probs, pos = _run_model_fold_internal_core(
+            spec, train_df, params, seed, effective_device, precision
+        )
         return probs, pos, effective_device, fallback_reason
     except Exception as e:
         # Fall back to CPU if GPU execution fails (SM architecture mismatch, CUDA runtime errors)
         if effective_device == "cuda":
-            print(f"WARNING: Model {spec.model_id} failed on CUDA ({e}). Retrying with CPU fallback...", file=sys.stderr)
-            probs, pos = _run_model_fold_internal_core(spec, train_df, params, seed, "cpu", precision)
+            print(
+                f"WARNING: Model {spec.model_id} failed on CUDA ({e}). Retrying with CPU fallback...",
+                file=sys.stderr,
+            )
+            probs, pos = _run_model_fold_internal_core(
+                spec, train_df, params, seed, "cpu", precision
+            )
             return probs, pos, "cpu", f"cuda_execution_failed: {e}"
         raise
 
@@ -648,7 +787,19 @@ def run_model_fold(
         raise ValueError("Normalized probabilities contain negative values")
 
     # Run Leakage Checks
-    leakage_evidence = execute_leakage_checks(spec, params, train_df, test_row, full_df, test_idx, candidate_probs, pos_pred, seed, device, precision)
+    leakage_evidence = execute_leakage_checks(
+        spec,
+        params,
+        train_df,
+        test_row,
+        full_df,
+        test_idx,
+        candidate_probs,
+        pos_pred,
+        seed,
+        device,
+        precision,
+    )
 
     return candidate_probs, pos_pred, params, duration, peak_vram, leakage_evidence, device_evidence
 
@@ -656,6 +807,7 @@ def run_model_fold(
 # ------------------------------------------------------------------------------
 # Main Runner Loop
 # ------------------------------------------------------------------------------
+
 
 def main() -> None:
     parser = build_parser()
@@ -690,7 +842,9 @@ def main() -> None:
             test_draws = 100
 
     if N - test_draws < args.min_train_draws:
-        sys.exit(f"Insufficient history for min-train-draws={args.min_train_draws} and test-draws={test_draws}. N={N}")
+        sys.exit(
+            f"Insufficient history for min-train-draws={args.min_train_draws} and test-draws={test_draws}. N={N}"
+        )
 
     specs = list_model_specs(available_only=args.available_only)
     if args.models != "all":
@@ -727,7 +881,9 @@ def main() -> None:
         if is_nc or is_prior:
             license_status = "LICENSE_RESTRICTED"
 
-        model_config_hash = hashlib.sha256(json.dumps(spec.to_dict(), sort_keys=True, default=str).encode("utf-8")).hexdigest()[:16]
+        model_config_hash = hashlib.sha256(
+            json.dumps(spec.to_dict(), sort_keys=True, default=str).encode("utf-8")
+        ).hexdigest()[:16]
 
         folds_skipped = 0
         folds_executed = 0
@@ -758,7 +914,9 @@ def main() -> None:
                 precision=args.precision,
             )
 
-            fold_runs.append((fold_id, train_df, test_row, test_idx, train_start, train_end, test_draw_no, sig))
+            fold_runs.append(
+                (fold_id, train_df, test_row, test_idx, train_start, train_end, test_draw_no, sig)
+            )
 
         all_passed = True
         model_run_dir = output_dir / model_id
@@ -778,10 +936,21 @@ def main() -> None:
                 break
 
         if args.resume and all_passed:
-            print(f"Skipping model {model_id} (All folds already completed with matching signature)")
+            print(
+                f"Skipping model {model_id} (All folds already completed with matching signature)"
+            )
             continue
 
-        for fold_id, train_df, test_row, test_idx, train_start, train_end, test_draw_no, sig in fold_runs:
+        for (
+            fold_id,
+            train_df,
+            test_row,
+            test_idx,
+            train_start,
+            train_end,
+            test_draw_no,
+            sig,
+        ) in fold_runs:
             fold_dir = model_run_dir / fold_id
             fold_dir.mkdir(parents=True, exist_ok=True)
 
@@ -818,7 +987,15 @@ def main() -> None:
                 "fallback_reason": "fold_execution_failed_before_device_evidence_collected",
             }
             try:
-                candidate_probs, pos_pred, resolved_params, duration, peak_vram, leakage_evidence, device_evidence = run_model_fold(
+                (
+                    candidate_probs,
+                    pos_pred,
+                    resolved_params,
+                    duration,
+                    peak_vram,
+                    leakage_evidence,
+                    device_evidence,
+                ) = run_model_fold(
                     spec=spec,
                     train_df=train_df,
                     test_row=test_row,
@@ -838,21 +1015,30 @@ def main() -> None:
                     probabilities=candidate_probs.reshape(1, -1),
                 )
 
-                atomic_write_json(fold_dir / "prediction.json", {
-                    "position_predictions": pos_pred.tolist(),
-                    "candidate_probabilities": candidate_probs.tolist(),
-                })
+                atomic_write_json(
+                    fold_dir / "prediction.json",
+                    {
+                        "position_predictions": pos_pred.tolist(),
+                        "candidate_probabilities": candidate_probs.tolist(),
+                    },
+                )
                 atomic_write_json(fold_dir / "metrics.json", metrics)
-                atomic_write_json(fold_dir / "resource_evidence.json", {
-                    "duration_seconds": duration,
-                    "peak_vram_mib": peak_vram,
-                    **device_evidence,
-                })
-                atomic_write_json(fold_dir / "lifecycle.json", {
-                    "fit_status": "PASS",
-                    "predict_status": "PASS",
-                    "resolved_params": resolved_params,
-                })
+                atomic_write_json(
+                    fold_dir / "resource_evidence.json",
+                    {
+                        "duration_seconds": duration,
+                        "peak_vram_mib": peak_vram,
+                        **device_evidence,
+                    },
+                )
+                atomic_write_json(
+                    fold_dir / "lifecycle.json",
+                    {
+                        "fit_status": "PASS",
+                        "predict_status": "PASS",
+                        "resolved_params": resolved_params,
+                    },
+                )
 
             except Exception as e:
                 traceback.print_exc()
@@ -863,10 +1049,13 @@ def main() -> None:
                         sys.exit("LEAKAGE_DETECTED")
                     sys.exit(f"Fail-fast active. Model {model_id} failed on {fold_id}: {err_msg}")
 
-                atomic_write_json(fold_dir / "error.json", {
-                    "error": err_msg,
-                    "traceback": traceback.format_exc(),
-                })
+                atomic_write_json(
+                    fold_dir / "error.json",
+                    {
+                        "error": err_msg,
+                        "traceback": traceback.format_exc(),
+                    },
+                )
                 status = "FAIL"
 
             baseline_metrics = {}
@@ -883,18 +1072,21 @@ def main() -> None:
             atomic_write_json(fold_dir / "baselines.json", baseline_metrics)
             atomic_write_json(fold_dir / "leakage_evidence.json", leakage_evidence)
 
-            atomic_write_json(fold_manifest_path, {
-                "model_id": model_id,
-                "fold_id": fold_id,
-                "status": status,
-                "signature": sig,
-                "train_start": train_start,
-                "train_end": train_end,
-                "test_draw": test_draw_no,
-                "license_status": license_status,
-                "error": err_msg,
-                "leakage_status": leakage_evidence.get("status", "LEAKAGE_NOT_VERIFIED"),
-            })
+            atomic_write_json(
+                fold_manifest_path,
+                {
+                    "model_id": model_id,
+                    "fold_id": fold_id,
+                    "status": status,
+                    "signature": sig,
+                    "train_start": train_start,
+                    "train_end": train_end,
+                    "test_draw": test_draw_no,
+                    "license_status": license_status,
+                    "error": err_msg,
+                    "leakage_status": leakage_evidence.get("status", "LEAKAGE_NOT_VERIFIED"),
+                },
+            )
             folds_executed += 1
 
         print(f"Model {model_id} run complete: {folds_executed} executed, {folds_skipped} skipped.")

@@ -1,9 +1,9 @@
 """Canonical Loto7 data validation and deterministic projections."""
+
 from __future__ import annotations
 
 import hashlib
 import json
-from datetime import UTC
 
 import pandas as pd
 
@@ -26,7 +26,9 @@ def _frame_hash(df: pd.DataFrame) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def canonicalize_loto7(df: pd.DataFrame, source: str = "user-supplied") -> tuple[pd.DataFrame, DatasetManifest]:
+def canonicalize_loto7(
+    df: pd.DataFrame, source: str = "user-supplied"
+) -> tuple[pd.DataFrame, DatasetManifest]:
     missing = [c for c in REQUIRED_COLS if c not in df.columns]
     if missing:
         raise CanonicalDataError(f"missing required columns: {missing}")
@@ -45,7 +47,7 @@ def canonicalize_loto7(df: pd.DataFrame, source: str = "user-supplied") -> tuple
         raise CanonicalDataError("draw_no must be increasing")
     if not out["draw_date"].is_monotonic_increasing:
         raise CanonicalDataError("draw_date must be non-decreasing")
-    for idx, row in out.iterrows():
+    for _idx, row in out.iterrows():
         numbers = [int(row[c]) for c in NUMBER_COLS]
         try:
             LOTO7.validate_numbers(numbers)
@@ -73,10 +75,16 @@ def to_position_table(master: pd.DataFrame) -> pd.DataFrame:
     rows: list[dict] = []
     for rec in master.to_dict("records"):
         for pos, col in enumerate(NUMBER_COLS, start=1):
-            rows.append({
-                "draw_id": rec["draw_id"], "draw_no": rec["draw_no"], "draw_date": rec["draw_date"],
-                "position": pos, "number": int(rec[col]), "available_at": rec["available_at"],
-            })
+            rows.append(
+                {
+                    "draw_id": rec["draw_id"],
+                    "draw_no": rec["draw_no"],
+                    "draw_date": rec["draw_date"],
+                    "position": pos,
+                    "number": int(rec[col]),
+                    "available_at": rec["available_at"],
+                }
+            )
     return pd.DataFrame(rows)
 
 
@@ -85,16 +93,25 @@ def to_candidate_table(master: pd.DataFrame) -> pd.DataFrame:
     for rec in master.to_dict("records"):
         positions = {int(rec[col]): pos for pos, col in enumerate(NUMBER_COLS, start=1)}
         for candidate in range(1, 38):
-            rows.append({
-                "draw_id": rec["draw_id"], "draw_no": rec["draw_no"], "draw_date": rec["draw_date"],
-                "candidate_number": candidate, "selected": int(candidate in positions),
-                "position_if_selected": positions.get(candidate), "available_at": rec["available_at"],
-            })
+            rows.append(
+                {
+                    "draw_id": rec["draw_id"],
+                    "draw_no": rec["draw_no"],
+                    "draw_date": rec["draw_date"],
+                    "candidate_number": candidate,
+                    "selected": int(candidate in positions),
+                    "position_if_selected": positions.get(candidate),
+                    "available_at": rec["available_at"],
+                }
+            )
     return pd.DataFrame(rows)
 
 
 def save_manifest(manifest: DatasetManifest, path) -> None:
     from pathlib import Path
+
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(manifest.model_dump(mode="json"), ensure_ascii=False, indent=2), encoding="utf-8")
+    p.write_text(
+        json.dumps(manifest.model_dump(mode="json"), ensure_ascii=False, indent=2), encoding="utf-8"
+    )

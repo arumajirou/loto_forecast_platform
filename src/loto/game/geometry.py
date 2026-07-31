@@ -16,6 +16,7 @@ Two families of Japanese lottery are modelled:
 The two families need genuinely different metrics and decoders, so the geometry carries a
 ``family`` discriminator rather than pretending ``digits`` is a degenerate ``select``.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -131,7 +132,7 @@ class GameGeometry:
                 )
         if self.distinct and len(set(seq)) != len(seq):
             raise ValueError(f"{self.key}: values must be distinct")
-        if self.ascending and any(a >= b for a, b in zip(seq, seq[1:])):
+        if self.ascending and any(a >= b for a, b in zip(seq, seq[1:], strict=False)):
             raise ValueError(f"{self.key}: values must be strictly ascending")
 
     def is_legal(self, values: list[int] | tuple[int, ...]) -> bool:
@@ -164,28 +165,64 @@ class GameGeometry:
 #: Canonical geometries for the six supported games.
 GEOMETRIES: dict[str, GameGeometry] = {
     "mini": GameGeometry(
-        key="mini", family="select", positions=5, value_min=1, value_max=31,
-        bonus_count=1, display_name="ミニロト", draw_weekdays=(1,),
+        key="mini",
+        family="select",
+        positions=5,
+        value_min=1,
+        value_max=31,
+        bonus_count=1,
+        display_name="ミニロト",
+        draw_weekdays=(1,),
     ),
     "loto6": GameGeometry(
-        key="loto6", family="select", positions=6, value_min=1, value_max=43,
-        bonus_count=1, display_name="ロト6", draw_weekdays=(0, 3),
+        key="loto6",
+        family="select",
+        positions=6,
+        value_min=1,
+        value_max=43,
+        bonus_count=1,
+        display_name="ロト6",
+        draw_weekdays=(0, 3),
     ),
     "loto7": GameGeometry(
-        key="loto7", family="select", positions=7, value_min=1, value_max=37,
-        bonus_count=2, display_name="ロト7", draw_weekdays=(4,),
+        key="loto7",
+        family="select",
+        positions=7,
+        value_min=1,
+        value_max=37,
+        bonus_count=2,
+        display_name="ロト7",
+        draw_weekdays=(4,),
     ),
     "bingo5": GameGeometry(
-        key="bingo5", family="select", positions=8, value_min=1, value_max=40,
-        bonus_count=0, display_name="ビンゴ5", draw_weekdays=(2,),
+        key="bingo5",
+        family="select",
+        positions=8,
+        value_min=1,
+        value_max=40,
+        bonus_count=0,
+        display_name="ビンゴ5",
+        draw_weekdays=(2,),
     ),
     "numbers3": GameGeometry(
-        key="numbers3", family="digits", positions=3, value_min=0, value_max=9,
-        bonus_count=0, display_name="ナンバーズ3", draw_weekdays=(0, 1, 2, 3, 4),
+        key="numbers3",
+        family="digits",
+        positions=3,
+        value_min=0,
+        value_max=9,
+        bonus_count=0,
+        display_name="ナンバーズ3",
+        draw_weekdays=(0, 1, 2, 3, 4),
     ),
     "numbers4": GameGeometry(
-        key="numbers4", family="digits", positions=4, value_min=0, value_max=9,
-        bonus_count=0, display_name="ナンバーズ4", draw_weekdays=(0, 1, 2, 3, 4),
+        key="numbers4",
+        family="digits",
+        positions=4,
+        value_min=0,
+        value_max=9,
+        bonus_count=0,
+        display_name="ナンバーズ4",
+        draw_weekdays=(0, 1, 2, 3, 4),
     ),
 }
 
@@ -216,14 +253,19 @@ def geometry_from_spec(spec: object) -> GameGeometry:
     if family == "digits":
         positions = int(getattr(spec, "digits_count", 0) or 0)
         return GameGeometry(
-            key=key or "custom", family="digits", positions=positions,
-            value_min=0, value_max=9,
+            key=key or "custom",
+            family="digits",
+            positions=positions,
+            value_min=0,
+            value_max=9,
             display_name=str(getattr(spec, "display_name", "")),
             draw_weekdays=tuple(getattr(spec, "draw_weekdays", ()) or ()),
         )
     positions = int(getattr(spec, "main_count", 0) or 0)
     return GameGeometry(
-        key=key or "custom", family="select", positions=positions,
+        key=key or "custom",
+        family="select",
+        positions=positions,
         value_min=int(getattr(spec, "number_min", 1)),
         value_max=int(getattr(spec, "number_max", 1)),
         bonus_count=int(getattr(spec, "bonus_count", 0) or 0),

@@ -56,3 +56,34 @@ checkpoints/
 environments/granite-ttm/environment_manifest.json
 # Generated packaging metadata
 src/loto_forecast_platform.egg-info/
+
+# Local experiment and validation outputs
+models/
+optuna.db
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+*.pkl
+*.pickle
+*.joblib
+*.parquet
+
+# Local model/runtime environments
+.venv*/
+
+# Secrets and local configuration
+credentials*.json
+secrets*.yaml
+secrets*.yml
+
+# OS/editor files
+
+# Python package build metadata
+*.egg-info/
+src/*.egg-info/
+
+# Local audits and generated reports
+.external-model-probe/
+backups/
+reports/

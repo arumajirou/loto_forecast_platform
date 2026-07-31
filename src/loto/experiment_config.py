@@ -49,13 +49,15 @@ class CVConfig(BaseModel):
 class ObjectiveConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     primary: Literal["mean_hits_at_7", "mean_within_1", "all_positions_within_1"] = "mean_hits_at_7"
-    weights: dict[str, float] = Field(default_factory=lambda: {
-        "mean_hits_at_7": 0.45,
-        "mean_within_1": 0.30,
-        "all_positions_within_1": 0.10,
-        "brier": -0.10,
-        "ece": -0.05,
-    })
+    weights: dict[str, float] = Field(
+        default_factory=lambda: {
+            "mean_hits_at_7": 0.45,
+            "mean_within_1": 0.30,
+            "all_positions_within_1": 0.10,
+            "brier": -0.10,
+            "ece": -0.05,
+        }
+    )
     calibration_brier_relative_limit: float = 1.02
     max_single_ensemble_weight: float = 0.60
 
@@ -105,7 +107,9 @@ class ExperimentConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     schema_version: str = "2.1.0"
     data: DataConfig
-    models: list[str] = Field(default_factory=lambda: ["uniform", "frequency", "logistic", "extra-trees"])
+    models: list[str] = Field(
+        default_factory=lambda: ["uniform", "frequency", "logistic", "extra-trees"]
+    )
     model_params: dict[str, dict[str, Any]] = Field(default_factory=dict)
     cv: CVConfig = Field(default_factory=CVConfig)
     objective: ObjectiveConfig = Field(default_factory=ObjectiveConfig)
@@ -126,7 +130,7 @@ class ExperimentConfig(BaseModel):
         return hashlib.sha256(payload.encode()).hexdigest()
 
     @classmethod
-    def from_file(cls, path: str | Path) -> "ExperimentConfig":
+    def from_file(cls, path: str | Path) -> ExperimentConfig:
         path = Path(path)
         raw = yaml.safe_load(path.read_text(encoding="utf-8"))
         return cls.model_validate(raw)
@@ -134,5 +138,8 @@ class ExperimentConfig(BaseModel):
     def write_resolved(self, path: str | Path) -> Path:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(yaml.safe_dump(self.model_dump(mode="json"), sort_keys=False, allow_unicode=True), encoding="utf-8")
+        path.write_text(
+            yaml.safe_dump(self.model_dump(mode="json"), sort_keys=False, allow_unicode=True),
+            encoding="utf-8",
+        )
         return path

@@ -1,4 +1,5 @@
 """protocol_hash must be stable, sensitive, and enforced."""
+
 import pytest
 
 from loto.evaluation.protocol import (
@@ -11,10 +12,19 @@ from loto.evaluation.protocol import (
 
 def _spec(**overrides):
     base = dict(
-        game="loto7", family="select", positions=7, universe_size=37,
-        target_mode="position", horizon=1, data_version="v1",
-        development_rows=140, holdout_rows=20, folds=2, test_size=3,
-        min_train_size=80, objective_primary="position_mae",
+        game="loto7",
+        family="select",
+        positions=7,
+        universe_size=37,
+        target_mode="position",
+        horizon=1,
+        data_version="v1",
+        development_rows=140,
+        holdout_rows=20,
+        folds=2,
+        test_size=3,
+        min_train_size=80,
+        objective_primary="position_mae",
     )
     base.update(overrides)
     return ProtocolSpec(**base)
@@ -32,8 +42,15 @@ def test_hash_is_insensitive_to_dict_ordering():
 
 @pytest.mark.parametrize(
     "override",
-    [{"horizon": 4}, {"tau": 2}, {"game": "loto6"}, {"folds": 5},
-     {"test_size": 10}, {"data_version": "v2"}, {"seeds": (1, 2)}],
+    [
+        {"horizon": 4},
+        {"tau": 2},
+        {"game": "loto6"},
+        {"folds": 5},
+        {"test_size": 10},
+        {"data_version": "v2"},
+        {"seeds": (1, 2)},
+    ],
 )
 def test_hash_changes_when_conditions_change(override):
     assert _spec().hash != _spec(**override).hash

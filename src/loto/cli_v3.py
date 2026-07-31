@@ -4,6 +4,7 @@ Kept separate from ``loto.cli`` so the v2 CLI regression tests stay valid. Every
 prints JSON to stdout and returns a POSIX exit code, so the whole surface is scriptable and
 CI-checkable without parsing prose.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -81,20 +82,31 @@ def _cmd_research(args: argparse.Namespace) -> int:
         for i in range(args.synthetic_rows):
             if geometry.family == "select":
                 values = sorted(
-                    rng.choice(np.arange(geometry.value_min, geometry.value_max + 1),
-                               size=geometry.positions, replace=False).tolist()
+                    rng.choice(
+                        np.arange(geometry.value_min, geometry.value_max + 1),
+                        size=geometry.positions,
+                        replace=False,
+                    ).tolist()
                 )
             else:
-                values = rng.integers(geometry.value_min, geometry.value_max + 1,
-                                      size=geometry.positions).tolist()
-            rows.append({"draw_no": i + 1, **dict(zip(geometry.column_names(), values))})
+                values = rng.integers(
+                    geometry.value_min, geometry.value_max + 1, size=geometry.positions
+                ).tolist()
+            rows.append(
+                {"draw_no": i + 1, **dict(zip(geometry.column_names(), values, strict=False))}
+            )
         frame = pd.DataFrame(rows)
         version = f"{args.game}-synthetic-{args.synthetic_rows}-seed{args.seed}"
 
     config = ResearchConfig(
-        game=args.game, folds=args.folds, test_size=args.test_size,
-        min_train_size=args.min_train_size, holdout_size=args.holdout_size,
-        tau=args.tau, alpha=args.alpha, n_boot=args.n_boot,
+        game=args.game,
+        folds=args.folds,
+        test_size=args.test_size,
+        min_train_size=args.min_train_size,
+        holdout_size=args.holdout_size,
+        tau=args.tau,
+        alpha=args.alpha,
+        n_boot=args.n_boot,
         correction_method=args.correction,
     )
     outcome = run_research(frame, config, data_version=version)
@@ -109,20 +121,24 @@ def _cmd_research(args: argparse.Namespace) -> int:
             out_dir / "model_leaderboard.csv", index=False
         )
         payload["artifacts"] = sorted(p.name for p in out_dir.iterdir())
-    _emit(payload if args.verbose else {
-        "status": payload["status"],
-        "protocol_hash": payload["protocol_hash"],
-        "verdict": payload["leaderboard"]["verdict"],
-        "interpretation": payload["leaderboard"]["interpretation"],
-        "champion": payload["leaderboard"]["champion"],
-        "sentinel": payload["sentinel"]["status"],
-        "statistical_power": payload["statistical_power"],
-        "theory_mae_floor": payload["theory"]["mae_floor"],
-        "holdout_evaluated": payload["holdout_evaluated"],
-        "stage_status": payload["stage_status"],
-        "warnings": payload["warnings"],
-        "artifacts": payload.get("artifacts", []),
-    })
+    _emit(
+        payload
+        if args.verbose
+        else {
+            "status": payload["status"],
+            "protocol_hash": payload["protocol_hash"],
+            "verdict": payload["leaderboard"]["verdict"],
+            "interpretation": payload["leaderboard"]["interpretation"],
+            "champion": payload["leaderboard"]["champion"],
+            "sentinel": payload["sentinel"]["status"],
+            "statistical_power": payload["statistical_power"],
+            "theory_mae_floor": payload["theory"]["mae_floor"],
+            "holdout_evaluated": payload["holdout_evaluated"],
+            "stage_status": payload["stage_status"],
+            "warnings": payload["warnings"],
+            "artifacts": payload.get("artifacts", []),
+        }
+    )
     return 0 if payload["status"] in ("SUCCEEDED", "PARTIALLY_SUCCEEDED") else 1
 
 
@@ -134,16 +150,18 @@ def _cmd_hierarchy(args: argparse.Namespace) -> int:
     rng = np.random.default_rng(args.seed)
     base = rng.uniform(0.0, 1.0, size=(hierarchy.n_total, 1))
     result = reconcile(base, hierarchy, method=args.method)
-    _emit({
-        "game": args.game,
-        "levels": hierarchy.n_total,
-        "bottom_series": hierarchy.n_bottom,
-        "labels_head": list(hierarchy.labels[:8]),
-        "method": result["method"],
-        "downgraded": result["downgraded_from_mint_shrink"],
-        "base_incoherence": result["base_incoherence"],
-        "coherence_error": result["coherence_error"],
-    })
+    _emit(
+        {
+            "game": args.game,
+            "levels": hierarchy.n_total,
+            "bottom_series": hierarchy.n_bottom,
+            "labels_head": list(hierarchy.labels[:8]),
+            "method": result["method"],
+            "downgraded": result["downgraded_from_mint_shrink"],
+            "base_incoherence": result["base_incoherence"],
+            "coherence_error": result["coherence_error"],
+        }
+    )
     return 0
 
 
@@ -185,17 +203,22 @@ def build_parser() -> argparse.ArgumentParser:
     research.add_argument("--tau", type=int, default=1)
     research.add_argument("--alpha", type=float, default=0.05)
     research.add_argument("--n-boot", type=int, default=500)
-    research.add_argument("--correction", default="romano_wolf",
-                          choices=["romano_wolf", "holm", "benjamini_hochberg", "none"])
+    research.add_argument(
+        "--correction",
+        default="romano_wolf",
+        choices=["romano_wolf", "holm", "benjamini_hochberg", "none"],
+    )
     research.add_argument("--seed", type=int, default=42)
     research.add_argument("--output", default=None)
     research.add_argument("--verbose", action="store_true")
     research.set_defaults(func=_cmd_research)
 
     hierarchy = sub.add_parser("hierarchy", help="inspect and test the reconciliation hierarchy")
-    hierarchy.add_argument("--game", choices=[g for g in known_games()
-                                              if geometry_for(g).family == "select"],
-                           default="loto7")
+    hierarchy.add_argument(
+        "--game",
+        choices=[g for g in known_games() if geometry_for(g).family == "select"],
+        default="loto7",
+    )
     hierarchy.add_argument("--method", default="wls_struct")
     hierarchy.add_argument("--seed", type=int, default=42)
     hierarchy.set_defaults(func=_cmd_hierarchy)

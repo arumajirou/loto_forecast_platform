@@ -12,10 +12,9 @@ import random
 import shutil
 import signal
 import subprocess
-import sys
 import time
-from dataclasses import dataclass, asdict
-from datetime import datetime, timezone
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -33,15 +32,32 @@ except ImportError as exc:
 
 
 NIXXTLA_MODELS = [
-    "nf-dlinear", "nf-nlinear", "nf-nhits", "nf-nbeats", "nf-nbeatsx",
-    "nf-tide", "nf-tcn", "nf-gru", "nf-lstm", "nf-deepar", "nf-tft",
-    "nf-patchtst", "nf-timesnet", "nf-tsmixer", "nf-timemixer",
-    "nf-itransformer", "nf-vanilla-transformer",
+    "nf-dlinear",
+    "nf-nlinear",
+    "nf-nhits",
+    "nf-nbeats",
+    "nf-nbeatsx",
+    "nf-tide",
+    "nf-tcn",
+    "nf-gru",
+    "nf-lstm",
+    "nf-deepar",
+    "nf-tft",
+    "nf-patchtst",
+    "nf-timesnet",
+    "nf-tsmixer",
+    "nf-timemixer",
+    "nf-itransformer",
+    "nf-vanilla-transformer",
 ]
 
 FOUNDATION_MODELS = [
-    "chronos-bolt-tiny", "chronos-2-small", "timesfm-2.5",
-    "granite-ttm", "tirex", "moirai",
+    "chronos-bolt-tiny",
+    "chronos-2-small",
+    "timesfm-2.5",
+    "granite-ttm",
+    "tirex",
+    "moirai",
 ]
 
 COMMON_GRID = {
@@ -61,8 +77,7 @@ MODEL_GRID: dict[str, dict[str, list[Any]]] = {
     },
     "nf-nhits": {
         "n_blocks": [[1, 1, 1], [2, 2, 2]],
-        "mlp_units": [[[256, 256], [256, 256], [256, 256]],
-                      [[512, 512], [512, 512], [512, 512]]],
+        "mlp_units": [[[256, 256], [256, 256], [256, 256]], [[512, 512], [512, 512], [512, 512]]],
         "dropout_prob_theta": [0.0, 0.1, 0.2],
     },
     "nf-nbeats": {
@@ -75,8 +90,7 @@ MODEL_GRID: dict[str, dict[str, list[Any]]] = {
         # identity-onlyに固定して1-step forecastとの互換性を保証する。
         "stack_types": [["identity", "identity", "identity"]],
         "n_blocks": [[1, 1, 1], [2, 2, 2]],
-        "mlp_units": [[[256, 256], [256, 256], [256, 256]],
-                      [[512, 512], [512, 512], [512, 512]]],
+        "mlp_units": [[[256, 256], [256, 256], [256, 256]], [[512, 512], [512, 512], [512, 512]]],
     },
     "nf-tide": {
         "hidden_size": [128, 256, 512],
@@ -191,8 +205,16 @@ FOUNDATION_GRID: dict[str, dict[str, list[Any]]] = {
 }
 
 MODEL_ARTIFACT_SUFFIXES = {
-    ".ckpt", ".pt", ".pth", ".pkl", ".pickle", ".joblib", ".ubj", ".onnx",
-    ".safetensors", ".bin"
+    ".ckpt",
+    ".pt",
+    ".pth",
+    ".pkl",
+    ".pickle",
+    ".joblib",
+    ".ubj",
+    ".onnx",
+    ".safetensors",
+    ".bin",
 }
 
 
@@ -213,7 +235,7 @@ class Trial:
 
 
 def utcnow() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def sha12(payload: Any) -> str:
@@ -245,7 +267,10 @@ def choose_models(args: argparse.Namespace, catalog: list[dict[str, Any]]) -> li
 
 def cartesian_sample(grid: dict[str, list[Any]], limit: int, seed: int) -> list[dict[str, Any]]:
     keys = sorted(grid)
-    combos = [dict(zip(keys, values)) for values in itertools.product(*(grid[k] for k in keys))]
+    combos = [
+        dict(zip(keys, values, strict=False))
+        for values in itertools.product(*(grid[k] for k in keys))
+    ]
     rnd = random.Random(seed)
     rnd.shuffle(combos)
     return combos[:limit]
@@ -319,11 +344,7 @@ def prune_run_checkpoints(run_dir: Path) -> None:
         if not directory.is_dir():
             continue
 
-        checkpoints = [
-            path
-            for path in directory.glob("*.ckpt")
-            if path.is_file()
-        ]
+        checkpoints = [path for path in directory.glob("*.ckpt") if path.is_file()]
 
         if len(checkpoints) <= 2:
             continue
@@ -335,13 +356,11 @@ def prune_run_checkpoints(run_dir: Path) -> None:
             keep.add(canonical_last)
 
         numbered = [
-            path
-            for path in checkpoints
-            if pattern.search(path.name)
-            and "-v" not in path.stem
+            path for path in checkpoints if pattern.search(path.name) and "-v" not in path.stem
         ]
 
         if numbered:
+
             def score(path: Path) -> tuple[int, int, float]:
                 match = pattern.search(path.name)
 
@@ -398,10 +417,7 @@ def collect_artifacts(
 
         should_keep = source.name in keep_names
 
-        if (
-            source.suffix.lower() in MODEL_ARTIFACT_SUFFIXES
-            and "neuralforecast" in source.parts
-        ):
+        if source.suffix.lower() in MODEL_ARTIFACT_SUFFIXES and "neuralforecast" in source.parts:
             should_keep = True
 
         if (
@@ -409,10 +425,7 @@ def collect_artifacts(
             and "checkpoints" in source.parts
             and (
                 source.name == "last.ckpt"
-                or (
-                    pattern.search(source.name)
-                    and "-v" not in source.stem
-                )
+                or (pattern.search(source.name) and "-v" not in source.stem)
             )
         ):
             should_keep = True
@@ -443,14 +456,14 @@ def collect_artifacts(
         if artifact.name == "artifact_manifest.json":
             continue
 
-        manifest.append({
-            "path": str(artifact),
-            "sha256": hashlib.sha256(
-                artifact.read_bytes()
-            ).hexdigest(),
-            "size_bytes": artifact.stat().st_size,
-            "inode": artifact.stat().st_ino,
-        })
+        manifest.append(
+            {
+                "path": str(artifact),
+                "sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
+                "size_bytes": artifact.stat().st_size,
+                "inode": artifact.stat().st_ino,
+            }
+        )
 
     atomic_json(
         destination / "artifact_manifest.json",
@@ -471,22 +484,16 @@ def inspect_research_result(run_dir: Path) -> tuple[str, str]:
         )
 
     try:
-        summary = json.loads(
-            summary_path.read_text(encoding="utf-8")
-        )
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
     except Exception as exc:
         return (
             "PARTIAL_INVALID_SUMMARY",
             f"{type(exc).__name__}: {exc}",
         )
 
-    inner_status = str(
-        summary.get("status", "UNKNOWN")
-    ).upper()
+    inner_status = str(summary.get("status", "UNKNOWN")).upper()
 
-    successful_trials = int(
-        summary.get("successful_trials") or 0
-    )
+    successful_trials = int(summary.get("successful_trials") or 0)
 
     champion = summary.get("champion")
 
@@ -511,54 +518,65 @@ def inspect_research_result(run_dir: Path) -> tuple[str, str]:
     return "SUCCEEDED", ""
 
 
-def build_config(base: dict[str, Any], trial: Trial, run_dir: Path, args: argparse.Namespace) -> dict[str, Any]:
+def build_config(
+    base: dict[str, Any], trial: Trial, run_dir: Path, args: argparse.Namespace
+) -> dict[str, Any]:
     cfg = copy.deepcopy(base)
     cfg["models"] = [trial.model_id]
     cfg["model_params"] = {trial.model_id: trial.params}
     cfg.setdefault("cv", {})
-    cfg["cv"].update({
-        "outer_folds": args.outer_folds,
-        "inner_folds": args.inner_folds,
-        "test_size": args.test_size,
-        "seeds": [args.seed],
-    })
+    cfg["cv"].update(
+        {
+            "outer_folds": args.outer_folds,
+            "inner_folds": args.inner_folds,
+            "test_size": args.test_size,
+            "seeds": [args.seed],
+        }
+    )
     cfg.setdefault("search", {})
-    cfg["search"].update({
-        "backend": "none",
-        "trials": 1,
-        "parallel_jobs": 1,
-        "cpus_per_trial": args.cpu_threads,
-        "gpus_per_trial": 1,
-        "fail_fast": False,
-        "max_consecutive_failures": 999999,
-    })
+    cfg["search"].update(
+        {
+            "backend": "none",
+            "trials": 1,
+            "parallel_jobs": 1,
+            "cpus_per_trial": args.cpu_threads,
+            "gpus_per_trial": 1,
+            "fail_fast": False,
+            "max_consecutive_failures": 999999,
+        }
+    )
     cfg.setdefault("observability", {})
-    cfg["observability"].update({
-        "jsonl_log": True,
-        "capture_gpu": True,
-        "capture_process_tree": True,
-        "trace_sample_ratio": 1.0,
-        "experiment_name": args.experiment_name,
-    })
+    cfg["observability"].update(
+        {
+            "jsonl_log": True,
+            "capture_gpu": True,
+            "capture_process_tree": True,
+            "trace_sample_ratio": 1.0,
+            "experiment_name": args.experiment_name,
+        }
+    )
     cfg.setdefault("runtime", {})
-    cfg["runtime"].update({
-        "output": str(run_dir),
-        "device": "cuda",
-        "precision": args.precision,
-        "deterministic": True,
-        "worker_isolation": "subprocess",
-        "model_timeout_seconds": args.trial_timeout,
-        "resume": True,
-    })
+    cfg["runtime"].update(
+        {
+            "output": str(run_dir),
+            "device": "cuda",
+            "precision": args.precision,
+            "deterministic": True,
+            "worker_isolation": "subprocess",
+            "model_timeout_seconds": args.trial_timeout,
+            "resume": True,
+        }
+    )
     return cfg
 
 
-def run_command(cmd: list[str], log_path: Path, timeout: int, env: dict[str, str]) -> tuple[int, float, str]:
+def run_command(
+    cmd: list[str], log_path: Path, timeout: int, env: dict[str, str]
+) -> tuple[int, float, str]:
     started = time.monotonic()
     with log_path.open("w", encoding="utf-8") as log:
         proc = subprocess.Popen(
-            cmd, stdout=log, stderr=subprocess.STDOUT, text=True,
-            start_new_session=True, env=env
+            cmd, stdout=log, stderr=subprocess.STDOUT, text=True, start_new_session=True, env=env
         )
         try:
             rc = proc.wait(timeout=timeout)
@@ -630,15 +648,17 @@ def main() -> int:
 
     deadline = started_epoch + args.hours * 3600
     env = os.environ.copy()
-    env.update({
-        "CUDA_VISIBLE_DEVICES": "0",
-        "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
-        "OMP_NUM_THREADS": str(args.cpu_threads),
-        "MKL_NUM_THREADS": str(args.cpu_threads),
-        "OPENBLAS_NUM_THREADS": str(args.cpu_threads),
-        "NUMEXPR_NUM_THREADS": str(args.cpu_threads),
-        "TOKENIZERS_PARALLELISM": "false",
-    })
+    env.update(
+        {
+            "CUDA_VISIBLE_DEVICES": "0",
+            "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+            "OMP_NUM_THREADS": str(args.cpu_threads),
+            "MKL_NUM_THREADS": str(args.cpu_threads),
+            "OPENBLAS_NUM_THREADS": str(args.cpu_threads),
+            "NUMEXPR_NUM_THREADS": str(args.cpu_threads),
+            "TOKENIZERS_PARALLELISM": "false",
+        }
+    )
 
     for trial in trials:
         if time.time() >= deadline:
@@ -651,20 +671,25 @@ def main() -> int:
         log_path = logs / f"{trial.trial_id}.log"
         validate_log = logs / f"{trial.trial_id}.validate.log"
         cfg = build_config(base, trial, run_dir, args)
-        cfg_path.write_text(yaml.safe_dump(cfg, sort_keys=False, allow_unicode=True), encoding="utf-8")
+        cfg_path.write_text(
+            yaml.safe_dump(cfg, sort_keys=False, allow_unicode=True), encoding="utf-8"
+        )
         trial.config_path = str(cfg_path)
         trial.run_dir = str(run_dir)
         trial.log_path = str(log_path)
         trial.status = "VALIDATING"
 
-        atomic_json(campaign / "state.json", {
-            "schema_version": "2.0.0",
-            "started_at": datetime.fromtimestamp(started_epoch, timezone.utc).isoformat(),
-            "started_epoch": started_epoch,
-            "deadline_at": datetime.fromtimestamp(deadline, timezone.utc).isoformat(),
-            "models": models,
-            "trials": [asdict(t) for t in trials],
-        })
+        atomic_json(
+            campaign / "state.json",
+            {
+                "schema_version": "2.0.0",
+                "started_at": datetime.fromtimestamp(started_epoch, UTC).isoformat(),
+                "started_epoch": started_epoch,
+                "deadline_at": datetime.fromtimestamp(deadline, UTC).isoformat(),
+                "models": models,
+                "trials": [asdict(t) for t in trials],
+            },
+        )
 
         validate_cmd = ["uv", "run", "loto", "config", "validate", "--file", str(cfg_path)]
         rc, elapsed, text = run_command(validate_cmd, validate_log, args.validate_timeout, env)
@@ -682,9 +707,7 @@ def main() -> int:
         trial.elapsed_seconds = elapsed
         trial.returncode = rc
         if rc == 0:
-            effective_status, detail = inspect_research_result(
-                run_dir
-            )
+            effective_status, detail = inspect_research_result(run_dir)
             trial.status = effective_status
             trial.error_class = detail
 
@@ -702,19 +725,25 @@ def main() -> int:
             trial.error_class = trial.status
 
         write_csv(campaign / "results.csv", trials)
-        atomic_json(campaign / "state.json", {
-            "schema_version": "2.0.0",
-            "started_at": datetime.fromtimestamp(started_epoch, timezone.utc).isoformat(),
-            "started_epoch": started_epoch,
-            "deadline_at": datetime.fromtimestamp(deadline, timezone.utc).isoformat(),
-            "updated_at": utcnow(),
-            "models": models,
-            "trials": [asdict(t) for t in trials],
-        })
+        atomic_json(
+            campaign / "state.json",
+            {
+                "schema_version": "2.0.0",
+                "started_at": datetime.fromtimestamp(started_epoch, UTC).isoformat(),
+                "started_epoch": started_epoch,
+                "deadline_at": datetime.fromtimestamp(deadline, UTC).isoformat(),
+                "updated_at": utcnow(),
+                "models": models,
+                "trials": [asdict(t) for t in trials],
+            },
+        )
         counts: dict[str, int] = {}
         for t in trials:
             counts[t.status] = counts.get(t.status, 0) + 1
-        print(f"[{utcnow()}] {trial.trial_id} {trial.status} {elapsed:.1f}s counts={counts}", flush=True)
+        print(
+            f"[{utcnow()}] {trial.trial_id} {trial.status} {elapsed:.1f}s counts={counts}",
+            flush=True,
+        )
 
     counts: dict[str, int] = {}
     for t in trials:
@@ -722,9 +751,9 @@ def main() -> int:
     summary = {
         "schema_version": "2.0.0",
         "campaign": str(campaign),
-        "started_at": datetime.fromtimestamp(started_epoch, timezone.utc).isoformat(),
+        "started_at": datetime.fromtimestamp(started_epoch, UTC).isoformat(),
         "finished_at": utcnow(),
-        "deadline_at": datetime.fromtimestamp(deadline, timezone.utc).isoformat(),
+        "deadline_at": datetime.fromtimestamp(deadline, UTC).isoformat(),
         "hours_budget": args.hours,
         "models": models,
         "status_counts": counts,

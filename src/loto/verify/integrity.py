@@ -16,6 +16,7 @@ that a raw ``sha256sum -c`` conflates:
 A stale manifest is a release-blocking defect, so ``verify`` fails on ``UNTRACKED`` too
 unless the path matches an explicit exclusion rule.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -41,10 +42,25 @@ MANIFEST_SCHEMA = "3.0.0"
 
 #: Glob-ish prefixes and suffixes never tracked. Generated artefacts and caches only.
 DEFAULT_EXCLUDES: tuple[str, ...] = (
-    ".git/", ".venv/", "venv/", "__pycache__/", ".pytest_cache/", ".mypy_cache/",
-    ".ruff_cache/", "htmlcov/", "node_modules/", ".coverage", "coverage.json",
-    "coverage.xml", ".DS_Store", MANIFEST_NAME,
-    "runs/", "evidence/", ".cache/", "dist/", "build/",
+    ".git/",
+    ".venv/",
+    "venv/",
+    "__pycache__/",
+    ".pytest_cache/",
+    ".mypy_cache/",
+    ".ruff_cache/",
+    "htmlcov/",
+    "node_modules/",
+    ".coverage",
+    "coverage.json",
+    "coverage.xml",
+    ".DS_Store",
+    MANIFEST_NAME,
+    "runs/",
+    "evidence/",
+    ".cache/",
+    "dist/",
+    "build/",
 )
 
 _BINARY_EXCLUDE_SUFFIXES: tuple[str, ...] = (".pyc", ".pyo", ".so", ".egg-info")
@@ -146,7 +162,9 @@ class IntegrityReport:
             f"tracked / verified: {self.n_tracked} / {self.n_verified}",
         ]
         for label, items in (
-            ("MODIFIED", self.modified), ("MISSING", self.missing), ("UNTRACKED", self.untracked)
+            ("MODIFIED", self.modified),
+            ("MISSING", self.missing),
+            ("UNTRACKED", self.untracked),
         ):
             if items:
                 lines.append(f"{label:<18}: {len(items)}")
@@ -266,14 +284,18 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "generate":
         payload = generate_manifest(args.root, release=args.release)
-        print(f"wrote {MANIFEST_NAME}: {payload['n_files']} files, "
-              f"{payload['total_bytes']} bytes, self_digest={payload['self_digest'][:16]}…")
+        print(
+            f"wrote {MANIFEST_NAME}: {payload['n_files']} files, "
+            f"{payload['total_bytes']} bytes, self_digest={payload['self_digest'][:16]}…"
+        )
         return 0
 
     report = verify_manifest(
         args.root, manifest=args.manifest, strict_untracked=not args.allow_untracked
     )
-    print(json.dumps(report.to_dict(), indent=2, ensure_ascii=False) if args.json else report.render())
+    print(
+        json.dumps(report.to_dict(), indent=2, ensure_ascii=False) if args.json else report.render()
+    )
     return 0 if report.ok else 1
 
 

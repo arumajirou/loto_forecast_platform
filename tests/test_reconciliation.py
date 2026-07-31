@@ -1,4 +1,5 @@
 """Reconciled forecasts must be exactly coherent."""
+
 import numpy as np
 import pytest
 
@@ -25,9 +26,9 @@ def test_summing_matrix_aggregates_correctly():
     h = build_number_hierarchy(G)
     bottom = np.ones(37)
     full = h.aggregate(bottom)
-    assert full[0] == 37.0                      # total
-    assert full[1] + full[2] == 37.0            # odd + even
-    assert full[-1] == 1.0                      # individual number
+    assert full[0] == 37.0  # total
+    assert full[1] + full[2] == 37.0  # odd + even
+    assert full[-1] == 1.0  # individual number
 
 
 @pytest.mark.parametrize("method", AVAILABLE_METHODS)

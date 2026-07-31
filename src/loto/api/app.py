@@ -10,13 +10,13 @@ from fastapi.responses import HTMLResponse, Response
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, Field
 
+from loto.data.lotteries import load_lottery_specs
 from loto.evaluation.shadow import score_combination
 from loto.models.catalog import get_model_spec, list_model_specs
 from loto.models.neuralforecast_adapter import AutoModelRequest, resolve_auto_model_plan
-from loto.data.lotteries import load_lottery_specs
 from loto.registry.full import PlatformRegistry
-from loto.security import Identity, authenticate, parse_tokens, require_role
 from loto.sealing.manifest import verify_seal
+from loto.security import Identity, authenticate, parse_tokens, require_role
 
 
 class ScoreRequest(BaseModel):
@@ -53,7 +53,9 @@ class ModelPlanRequest(BaseModel):
 
 def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None) -> FastAPI:
     root = Path(output_dir)
-    registry = PlatformRegistry(registry_url or os.environ.get("LOTO_REGISTRY_URL", root / "platform.sqlite3"))
+    registry = PlatformRegistry(
+        registry_url or os.environ.get("LOTO_REGISTRY_URL", root / "platform.sqlite3")
+    )
     token_map = parse_tokens()
     app = FastAPI(title="Loto Forecast Platform API", version="2.1.0")
 
@@ -74,6 +76,7 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
             except PermissionError as exc:
                 raise HTTPException(status_code=403, detail=str(exc)) from exc
             return identity
+
         return dep
 
     @app.get("/", response_class=HTMLResponse)
@@ -85,12 +88,16 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
 <h2>Model Parameter Lab</h2><div class='card'><div class='grid'><label>AutoModel<select id='lab-model'></select></label><label>Backend<select id='lab-backend'><option>optuna</option><option>ray</option></select></label><label>Horizon<input id='lab-h' type='number' min='1' value='1'></label><label>Trials<input id='lab-trials' type='number' min='1' value='10'></label></div><p><button id='lab-plan' type='button'>Resolve plan</button></p><pre id='lab-output' class='muted'>Select a model and resolve a non-executing plan.</pre></div><h2>Latest leaderboard</h2><div class='card'><table><thead><tr><th>Rank</th><th>Model</th><th>Score</th><th>±1</th><th>MAE</th></tr></thead><tbody id='leaderboard'><tr><td colspan='5'>No result</td></tr></tbody></table></div>
 <script>const el=id=>document.getElementById(id);async function j(u,o){const r=await fetch(u,o);if(!r.ok)throw Error(r.status);return r.json()}Promise.allSettled([j('/health'),j('/api/v2/models'),j('/api/v2/runs'),j('/api/v2/data/games'),j('/api/v2/leaderboard')]).then(x=>{if(x[0].status==='fulfilled'){el('health').textContent=x[0].value.status;el('health').style.background='#166534'}el('models').textContent=x[1].status==='fulfilled'?x[1].value.length:'-';el('runs').textContent=x[2].status==='fulfilled'?x[2].value.length:'-';el('games').textContent=x[3].status==='fulfilled'?x[3].value.length:'-';if(x[1].status==='fulfilled'){el('lab-model').innerHTML=x[1].value.filter(m=>m.library==='neuralforecast_auto').map(m=>`<option value='${m.class_name}'>${m.class_name}</option>`).join('')}if(x[4].status==='fulfilled'){el('leaderboard').innerHTML=x[4].value.slice(0,10).map(r=>`<tr><td>${r.rank??''}</td><td>${r.model_id??''}</td><td>${Number(r.composite_score??0).toFixed(4)}</td><td>${Number(r.mean_within_1??0).toFixed(3)}</td><td>${Number(r.position_mae??0).toFixed(3)}</td></tr>`).join('')}});el('lab-plan').addEventListener('click',async()=>{try{const body={model_name:el('lab-model').value,backend:el('lab-backend').value,h:Number(el('lab-h').value),num_samples:Number(el('lab-trials').value)};el('lab-output').textContent=JSON.stringify(await j('/api/v2/model-plan',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}),null,2)}catch(e){el('lab-output').textContent='Plan unavailable: '+e}})</script></body></html>"""
 
-
-
     @app.get("/api/v2/models")
-    def models(priority: str | None = None, available_only: bool = False,
-               _identity: Identity = Depends(need("viewer"))) -> list[dict]:
-        return [item.to_dict() for item in list_model_specs(priority=priority, available_only=available_only)]
+    def models(
+        priority: str | None = None,
+        available_only: bool = False,
+        _identity: Identity = Depends(need("viewer")),
+    ) -> list[dict]:
+        return [
+            item.to_dict()
+            for item in list_model_specs(priority=priority, available_only=available_only)
+        ]
 
     @app.get("/api/v2/models/{model_id}")
     def model_detail(model_id: str, _identity: Identity = Depends(need("viewer"))) -> dict:
@@ -100,14 +107,16 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @app.post("/api/v2/model-plan")
-    def model_plan(request: ModelPlanRequest,
-                   _identity: Identity = Depends(need("viewer"))) -> dict:
+    def model_plan(
+        request: ModelPlanRequest, _identity: Identity = Depends(need("viewer"))
+    ) -> dict:
         try:
             plan = resolve_auto_model_plan(AutoModelRequest(**request.model_dump()))
         except (TypeError, ValueError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
         constructor = {
-            key: value for key, value in plan.constructor_kwargs.items()
+            key: value
+            for key, value in plan.constructor_kwargs.items()
             if key not in {"config", "search_alg"}
         }
         return {
@@ -144,7 +153,10 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
 
     @app.get("/api/v2/data/games")
     def data_games(_identity: Identity = Depends(need("viewer"))) -> list[dict]:
-        return [spec.__dict__ | {"candidate_numbers": list(spec.candidate_numbers)} for spec in load_lottery_specs().values()]
+        return [
+            spec.__dict__ | {"candidate_numbers": list(spec.candidate_numbers)}
+            for spec in load_lottery_specs().values()
+        ]
 
     @app.get("/api/v2/runs")
     def run_index(_identity: Identity = Depends(need("viewer"))) -> list[dict]:
@@ -163,12 +175,16 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
         return json.loads((item / "research_summary.json").read_text(encoding="utf-8"))
 
     @app.get("/api/v2/runs/{run_id}/events")
-    def run_events(run_id: str, limit: int = 500, _identity: Identity = Depends(need("viewer"))) -> list[dict]:
+    def run_events(
+        run_id: str, limit: int = 500, _identity: Identity = Depends(need("viewer"))
+    ) -> list[dict]:
         path = _safe_run(run_id) / "events.jsonl"
         if not path.exists():
             return []
         rows = []
-        for line in path.read_text(encoding="utf-8", errors="replace").splitlines()[-min(max(limit, 1), 5000):]:
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines()[
+            -min(max(limit, 1), 5000) :
+        ]:
             try:
                 rows.append(json.loads(line))
             except json.JSONDecodeError:
@@ -176,12 +192,16 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
         return rows
 
     @app.get("/api/v2/runs/{run_id}/resources")
-    def run_resources(run_id: str, limit: int = 1000, _identity: Identity = Depends(need("viewer"))) -> list[dict]:
+    def run_resources(
+        run_id: str, limit: int = 1000, _identity: Identity = Depends(need("viewer"))
+    ) -> list[dict]:
         path = _safe_run(run_id) / "resource_samples.jsonl"
         if not path.exists():
             return []
         rows = []
-        for line in path.read_text(encoding="utf-8", errors="replace").splitlines()[-min(max(limit, 1), 5000):]:
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines()[
+            -min(max(limit, 1), 5000) :
+        ]:
             try:
                 rows.append(json.loads(line))
             except json.JSONDecodeError:
@@ -200,6 +220,7 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
         if not path.exists():
             raise HTTPException(status_code=404, detail="leaderboard not found")
         import pandas as pd
+
         return pd.read_csv(path).replace({float("nan"): None}).to_dict(orient="records")
 
     @app.get("/metrics", include_in_schema=False)
@@ -225,11 +246,14 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
         secret = os.environ.get("LOTO_SEAL_SECRET")
         if not secret:
             raise HTTPException(status_code=503, detail="seal secret is not configured")
-        return {"verified": verify_seal(json.loads(path.read_text(encoding="utf-8")), secret.encode())}
+        return {
+            "verified": verify_seal(json.loads(path.read_text(encoding="utf-8")), secret.encode())
+        }
 
     @app.post("/forecasts/{forecast_id}/score")
-    def score_forecast(forecast_id: str, request: ScoreRequest,
-                       identity: Identity = Depends(need("operator"))) -> dict:
+    def score_forecast(
+        forecast_id: str, request: ScoreRequest, identity: Identity = Depends(need("operator"))
+    ) -> dict:
         path = root / "forecast.json"
         if not path.exists():
             raise HTTPException(status_code=404, detail="forecast not found")
@@ -238,7 +262,9 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
             raise HTTPException(status_code=404, detail="forecast id not found")
         score = score_combination(forecast["combination"]["numbers"], request.actual)
         registry.score_forecast(forecast_id, score)
-        registry.audit(identity.username, "score", "forecast", forecast_id, "actual draw registered", score)
+        registry.audit(
+            identity.username, "score", "forecast", forecast_id, "actual draw registered", score
+        )
         return score
 
     @app.get("/evaluation/latest")
@@ -249,32 +275,57 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
         return json.loads(path.read_text(encoding="utf-8"))
 
     @app.get("/registry/{table}")
-    def registry_rows(table: str, limit: int = 100,
-                      _identity: Identity = Depends(need("viewer"))) -> list[dict]:
+    def registry_rows(
+        table: str, limit: int = 100, _identity: Identity = Depends(need("viewer"))
+    ) -> list[dict]:
         try:
             return registry.list_rows(table, limit=min(max(limit, 1), 500))
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     @app.post("/approvals/request")
-    def request_approval(request: ApprovalRequest,
-                         identity: Identity = Depends(need("operator"))) -> dict:
-        registry.request_approval(request.object_type, request.object_id, request.action,
-                                  identity.username, request.reason)
-        registry.audit(identity.username, "request_approval", request.object_type,
-                       request.object_id, request.reason, {"action": request.action})
+    def request_approval(
+        request: ApprovalRequest, identity: Identity = Depends(need("operator"))
+    ) -> dict:
+        registry.request_approval(
+            request.object_type,
+            request.object_id,
+            request.action,
+            identity.username,
+            request.reason,
+        )
+        registry.audit(
+            identity.username,
+            "request_approval",
+            request.object_type,
+            request.object_id,
+            request.reason,
+            {"action": request.action},
+        )
         return {"status": "PENDING"}
 
     @app.post("/approvals/decide")
-    def decide_approval(request: ApprovalDecision,
-                        identity: Identity = Depends(need("approver"))) -> dict:
+    def decide_approval(
+        request: ApprovalDecision, identity: Identity = Depends(need("approver"))
+    ) -> dict:
         try:
-            registry.decide_approval(request.object_type, request.object_id, request.action,
-                                     identity.username, request.approved)
+            registry.decide_approval(
+                request.object_type,
+                request.object_id,
+                request.action,
+                identity.username,
+                request.approved,
+            )
         except (KeyError, PermissionError) as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
-        registry.audit(identity.username, "decide_approval", request.object_type,
-                       request.object_id, "approval decision", {"action": request.action, "approved": request.approved})
+        registry.audit(
+            identity.username,
+            "decide_approval",
+            request.object_type,
+            request.object_id,
+            "approval decision",
+            {"action": request.action, "approved": request.approved},
+        )
         return {"status": "APPROVED" if request.approved else "REJECTED"}
 
     return app

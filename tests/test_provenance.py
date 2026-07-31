@@ -1,18 +1,20 @@
 """The v2.1.0 quality gate passed with 100% null provenance. This gate does not."""
+
 import pandas as pd
-import pytest
 
 from loto.data.provenance import REQUIRED_PROVENANCE_COLUMNS, check_provenance
 
 
 def _good(n=3):
-    return pd.DataFrame({
-        "game": ["loto7"] * n,
-        "game_display_name": ["ロト7"] * n,
-        "source_url": ["https://example.invalid/csv/loto7"] * n,
-        "draw_no": list(range(1, n + 1)),
-        "draw_date": pd.to_datetime(["2026-01-02", "2026-01-09", "2026-01-16"][:n]),
-    })
+    return pd.DataFrame(
+        {
+            "game": ["loto7"] * n,
+            "game_display_name": ["ロト7"] * n,
+            "source_url": ["https://example.invalid/csv/loto7"] * n,
+            "draw_no": list(range(1, n + 1)),
+            "draw_date": pd.to_datetime(["2026-01-02", "2026-01-09", "2026-01-16"][:n]),
+        }
+    )
 
 
 def test_complete_provenance_passes():

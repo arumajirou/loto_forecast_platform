@@ -38,10 +38,17 @@ def assess_promotion(i: PromotionInputs) -> PromotionDecision:
         "shadow_minimum": i.shadow_draws >= 20,
         "shadow_formal": i.shadow_draws >= 50,
     }
-    core = all(gates[k] for k in (
-        "no_critical_failures", "majority_fold_wins", "provisional_effect",
-        "brier_noninferior", "logloss_noninferior", "ece_noninferior",
-    ))
+    core = all(
+        gates[k]
+        for k in (
+            "no_critical_failures",
+            "majority_fold_wins",
+            "provisional_effect",
+            "brier_noninferior",
+            "logloss_noninferior",
+            "ece_noninferior",
+        )
+    )
     if core and gates["formal_effect"] and gates["bootstrap_positive"] and gates["shadow_formal"]:
         decision = "PROMOTE_FORMAL"
     elif core and gates["bootstrap_positive"] and gates["shadow_minimum"]:

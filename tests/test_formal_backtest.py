@@ -31,28 +31,48 @@ def dummy_train_df():
     # Create dummy sequential history of 20 draws for Loto7
     # n1..n7 must be sorted and distinct, n1 >= 1, n7 <= 37
     for idx in range(1, 21):
-        data.append({
-            "draw_id": f"loto7-{idx}",
-            "draw_no": idx,
-            "draw_date": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * idx),
-            "n1": 2, "n2": 6, "n3": 11, "n4": 15, "n5": 20, "n6": 28, "n7": 34,
-            "bonus1": 3, "bonus2": 15,
-            "available_at": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * idx),
-        })
+        data.append(
+            {
+                "draw_id": f"loto7-{idx}",
+                "draw_no": idx,
+                "draw_date": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * idx),
+                "n1": 2,
+                "n2": 6,
+                "n3": 11,
+                "n4": 15,
+                "n5": 20,
+                "n6": 28,
+                "n7": 34,
+                "bonus1": 3,
+                "bonus2": 15,
+                "available_at": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * idx),
+            }
+        )
     return pd.DataFrame(data)
 
 
 @pytest.fixture
 def dummy_test_row():
     # draw 21
-    return pd.DataFrame([{
-        "draw_id": "loto7-21",
-        "draw_no": 21,
-        "draw_date": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * 21),
-        "n1": 3, "n2": 7, "n3": 12, "n4": 16, "n5": 21, "n6": 29, "n7": 35,
-        "bonus1": 4, "bonus2": 16,
-        "available_at": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * 21),
-    }])
+    return pd.DataFrame(
+        [
+            {
+                "draw_id": "loto7-21",
+                "draw_no": 21,
+                "draw_date": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * 21),
+                "n1": 3,
+                "n2": 7,
+                "n3": 12,
+                "n4": 16,
+                "n5": 21,
+                "n6": 29,
+                "n7": 35,
+                "bonus1": 4,
+                "bonus2": 16,
+                "available_at": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * 21),
+            }
+        ]
+    )
 
 
 def test_walk_forward_signature():
@@ -166,8 +186,17 @@ def test_leakage_check_pass_for_simple_model(dummy_train_df, dummy_test_row, dum
         stage="smoke",
     )[:2]
     evidence = execute_leakage_checks(
-        spec, params, dummy_train_df, dummy_test_row, full_df, test_idx,
-        base_probs, base_pos, seed=42, device="cpu", precision="fp32",
+        spec,
+        params,
+        dummy_train_df,
+        dummy_test_row,
+        full_df,
+        test_idx,
+        base_probs,
+        base_pos,
+        seed=42,
+        device="cpu",
+        precision="fp32",
     )
     assert evidence["status"] == "PASS"
     assert evidence["deterministic_repeat_diff"] is not None
@@ -187,8 +216,17 @@ def test_leakage_check_not_verified_for_skip_listed_library(
         class_name="Fake",
     )
     evidence = execute_leakage_checks(
-        fake_spec, {}, dummy_train_df, dummy_test_row, full_df, test_idx,
-        np.zeros(37), np.zeros(7), seed=42, device="cpu", precision="fp32",
+        fake_spec,
+        {},
+        dummy_train_df,
+        dummy_test_row,
+        full_df,
+        test_idx,
+        np.zeros(37),
+        np.zeros(7),
+        seed=42,
+        device="cpu",
+        precision="fp32",
     )
     assert evidence["status"] == "LEAKAGE_NOT_VERIFIED"
     assert skip_listed_library in evidence["reason"]
@@ -221,8 +259,17 @@ def test_leakage_check_detects_future_injection(
 
     with pytest.raises(SystemExit, match="LEAKAGE_DETECTED"):
         rfmb.execute_leakage_checks(
-            spec, {}, dummy_train_df, dummy_test_row, full_df, test_idx,
-            base_probs, base_pos, seed=42, device="cpu", precision="fp32",
+            spec,
+            {},
+            dummy_train_df,
+            dummy_test_row,
+            full_df,
+            test_idx,
+            base_probs,
+            base_pos,
+            seed=42,
+            device="cpu",
+            precision="fp32",
         )
 
 

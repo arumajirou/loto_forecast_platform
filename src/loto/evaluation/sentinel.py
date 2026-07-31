@@ -19,10 +19,11 @@ Three controls are implemented, in increasing strength:
                  statistical test, so it catches leaks that are too small to detect
                  statistically but still invalidate the protocol.
 """
+
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import Callable, Sequence
 
 import numpy as np
 
@@ -107,7 +108,9 @@ def permutation_sentinel(
         tolerance=tolerance,
         n_repeats=n_repeats,
         tripped=bool(tripped),
-        detail=f"score sd over repeats={float(np.std(scores, ddof=1)) if len(scores) > 1 else 0.0:.6f}",
+        detail=(
+            f"score sd over repeats={float(np.std(scores, ddof=1)) if len(scores) > 1 else 0.0:.6f}"
+        ),
     )
 
 

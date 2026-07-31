@@ -9,7 +9,13 @@ class MlflowBridge:
         self.tracking_uri = tracking_uri
         self.experiment_name = experiment_name
 
-    def record_run(self, run_name: str, params: dict[str, Any], metrics: dict[str, float], artifacts: list[str | Path]) -> dict:
+    def record_run(
+        self,
+        run_name: str,
+        params: dict[str, Any],
+        metrics: dict[str, float],
+        artifacts: list[str | Path],
+    ) -> dict:
         try:
             import mlflow
         except ImportError:

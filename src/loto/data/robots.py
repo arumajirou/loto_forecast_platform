@@ -9,6 +9,7 @@ Enforcement is fail-closed on an explicit ``Disallow`` and fail-open on a networ
 reaching robots.txt itself, because a transient 500 on ``/robots.txt`` is not consent to be
 blocked forever -- but the decision is always recorded so an audit can see which branch ran.
 """
+
 from __future__ import annotations
 
 import time
@@ -87,7 +88,9 @@ class RobotsPolicy:
         parser, robots_url = self._parser_for(url)
         if parser is None:
             decision = RobotsDecision(
-                url=url, allowed=True, robots_url=robots_url,
+                url=url,
+                allowed=True,
+                robots_url=robots_url,
                 reason="robots.txt unreachable; proceeding with configured rate limit",
             )
         elif parser.can_fetch(self.user_agent, url):
@@ -96,12 +99,17 @@ class RobotsPolicy:
                 raw = parser.crawl_delay(self.user_agent)
                 delay = float(raw) if raw is not None else None
             decision = RobotsDecision(
-                url=url, allowed=True, reason="allowed by robots.txt",
-                crawl_delay=delay, robots_url=robots_url,
+                url=url,
+                allowed=True,
+                reason="allowed by robots.txt",
+                crawl_delay=delay,
+                robots_url=robots_url,
             )
         else:
             decision = RobotsDecision(
-                url=url, allowed=False, robots_url=robots_url,
+                url=url,
+                allowed=False,
+                robots_url=robots_url,
                 reason="disallowed by robots.txt for this user-agent",
             )
         self.decisions.append(decision)

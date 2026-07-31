@@ -1,4 +1,5 @@
 """Best-effort run notifications with secret-free defaults."""
+
 from __future__ import annotations
 
 import json
@@ -49,7 +50,7 @@ class NotificationConfig:
     smtp_starttls: bool = True
 
     @classmethod
-    def from_env(cls) -> "NotificationConfig":
+    def from_env(cls) -> NotificationConfig:
         recipients = tuple(
             value.strip()
             for value in re.split(r"[,;]", os.getenv("LOTO_NOTIFY_EMAIL_TO", ""))
@@ -60,7 +61,9 @@ class NotificationConfig:
             file_enabled=_env_bool("LOTO_NOTIFY_FILE_ENABLED", True),
             file_path=os.getenv("LOTO_NOTIFY_FILE_PATH", "notifications/events.jsonl"),
             webhook_enabled=_env_bool("LOTO_NOTIFY_WEBHOOK_ENABLED", False),
-            webhook_url=os.getenv("LOTO_NOTIFY_WEBHOOK_URL", os.getenv("LOTO_NOTIFY_SLACK_WEBHOOK_URL", "")),
+            webhook_url=os.getenv(
+                "LOTO_NOTIFY_WEBHOOK_URL", os.getenv("LOTO_NOTIFY_SLACK_WEBHOOK_URL", "")
+            ),
             email_enabled=_env_bool("LOTO_NOTIFY_EMAIL_ENABLED", False),
             email_to=recipients,
             smtp_host=os.getenv("LOTO_NOTIFY_SMTP_HOST", ""),
@@ -79,7 +82,9 @@ class NotificationConfig:
         return value
 
 
-def build_run_summary(report: dict[str, Any], *, output_dir: str | Path | None = None) -> dict[str, Any]:
+def build_run_summary(
+    report: dict[str, Any], *, output_dir: str | Path | None = None
+) -> dict[str, Any]:
     failures = report.get("failed_games") or report.get("failed_trials") or []
     status = str(report.get("status") or ("FAILED" if failures else "SUCCEEDED"))
     summary = {
@@ -97,7 +102,13 @@ def build_run_summary(report: dict[str, Any], *, output_dir: str | Path | None =
     }
     root = Path(output_dir) if output_dir else None
     if root and root.exists():
-        for name in ("acquisition_report.json", "multi_game_summary.json", "research_summary.json", "model_leaderboard.csv", "events.jsonl"):
+        for name in (
+            "acquisition_report.json",
+            "multi_game_summary.json",
+            "research_summary.json",
+            "model_leaderboard.csv",
+            "events.jsonl",
+        ):
             path = root / name
             if path.exists():
                 summary["artifacts"].append(str(path))
@@ -125,7 +136,9 @@ def format_summary_text(summary: dict[str, Any]) -> str:
 
 
 class NotificationSender:
-    def __init__(self, config: NotificationConfig | None = None, *, base_dir: str | Path = ".") -> None:
+    def __init__(
+        self, config: NotificationConfig | None = None, *, base_dir: str | Path = "."
+    ) -> None:
         self.config = config or NotificationConfig.from_env()
         self.base_dir = Path(base_dir)
 
@@ -145,11 +158,16 @@ class NotificationSender:
             return NotifyResult("webhook", "SKIPPED", "disabled")
         if not self.config.webhook_url:
             return NotifyResult("webhook", "SKIPPED", "missing_url")
-        payload = json.dumps({"text": format_summary_text(summary), "summary": summary}, ensure_ascii=False).encode()
+        payload = json.dumps(
+            {"text": format_summary_text(summary), "summary": summary}, ensure_ascii=False
+        ).encode()
         request = urllib.request.Request(
             self.config.webhook_url,
             data=payload,
-            headers={"Content-Type": "application/json", "User-Agent": "loto-forecast-platform/2.1"},
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "loto-forecast-platform/2.1",
+            },
             method="POST",
         )
         with urllib.request.urlopen(request, timeout=15) as response:  # noqa: S310 - explicit configured endpoint
@@ -161,11 +179,15 @@ class NotificationSender:
     def send_email(self, summary: dict[str, Any]) -> NotifyResult:
         if not self.config.email_enabled:
             return NotifyResult("email", "SKIPPED", "disabled")
-        missing = [name for name, value in {
-            "email_to": self.config.email_to,
-            "smtp_host": self.config.smtp_host,
-            "smtp_from": self.config.smtp_from,
-        }.items() if not value]
+        missing = [
+            name
+            for name, value in {
+                "email_to": self.config.email_to,
+                "smtp_host": self.config.smtp_host,
+                "smtp_from": self.config.smtp_from,
+            }.items()
+            if not value
+        ]
         if missing:
             return NotifyResult("email", "SKIPPED", "missing:" + ",".join(missing))
         message = EmailMessage()
@@ -181,7 +203,9 @@ class NotificationSender:
             client.send_message(message)
         return NotifyResult("email", "SENT", f"recipients={len(self.config.email_to)}")
 
-    def send_all(self, summary: dict[str, Any], *, fail_on_error: bool = False) -> list[NotifyResult]:
+    def send_all(
+        self, summary: dict[str, Any], *, fail_on_error: bool = False
+    ) -> list[NotifyResult]:
         if not self.config.enabled:
             # File audit remains useful and contains no external side effect.
             return [self.send_file(summary), NotifyResult("external", "SKIPPED", "global_disabled")]
@@ -190,7 +214,9 @@ class NotificationSender:
             try:
                 results.append(send(summary))
             except Exception as exc:  # best effort by default
-                result = NotifyResult(send.__name__.removeprefix("send_"), "FAILED", f"{type(exc).__name__}: {exc}")
+                result = NotifyResult(
+                    send.__name__.removeprefix("send_"), "FAILED", f"{type(exc).__name__}: {exc}"
+                )
                 results.append(result)
                 if fail_on_error:
                     raise
@@ -198,4 +224,6 @@ class NotificationSender:
 
 
 def write_notification_report(results: list[NotifyResult], path: str | Path) -> Path:
-    return atomic_write_json(path, {"timestamp": utc_now_iso(), "results": [item.to_dict() for item in results]})
+    return atomic_write_json(
+        path, {"timestamp": utc_now_iso(), "results": [item.to_dict() for item in results]}
+    )

@@ -1,5 +1,4 @@
 """Catalog counts must be computed from primary-source lists, never hand-typed."""
-import pytest
 
 from loto.models.catalog_full import (
     MLFORECAST_AUTOMODELS,
@@ -24,8 +23,13 @@ def test_primary_source_list_sizes():
 
 
 def test_no_duplicate_names_within_any_primary_list():
-    for names in (NEURALFORECAST_MODELS, NEURALFORECAST_AUTOMODELS,
-                  STATSFORECAST_MODELS, MLFORECAST_AUTOMODELS, RECONCILIATION_METHODS):
+    for names in (
+        NEURALFORECAST_MODELS,
+        NEURALFORECAST_AUTOMODELS,
+        STATSFORECAST_MODELS,
+        MLFORECAST_AUTOMODELS,
+        RECONCILIATION_METHODS,
+    ):
         assert len(set(names)) == len(names)
 
 
@@ -112,8 +116,13 @@ def test_multivariate_models_require_n_series():
 def test_every_entry_records_its_primary_source():
     for entry in build_catalog():
         row = entry.to_row()
-        if entry.library in ("neuralforecast", "neuralforecast_auto", "statsforecast",
-                             "mlforecast_auto", "hierarchicalforecast"):
+        if entry.library in (
+            "neuralforecast",
+            "neuralforecast_auto",
+            "statsforecast",
+            "mlforecast_auto",
+            "hierarchicalforecast",
+        ):
             assert row["primary_source"], f"{entry.model_id} lacks provenance"
 
 

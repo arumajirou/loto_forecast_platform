@@ -1,10 +1,11 @@
 """Geometry is the single source of truth for every game shape."""
+
 import ast
 from pathlib import Path
 
 import pytest
 
-from loto.game.geometry import GEOMETRIES, geometry_for, known_games
+from loto.game.geometry import geometry_for, known_games
 
 
 def test_all_six_games_present():
@@ -13,9 +14,14 @@ def test_all_six_games_present():
 
 @pytest.mark.parametrize(
     ("game", "positions", "lo", "hi", "family"),
-    [("mini", 5, 1, 31, "select"), ("loto6", 6, 1, 43, "select"),
-     ("loto7", 7, 1, 37, "select"), ("bingo5", 8, 1, 40, "select"),
-     ("numbers3", 3, 0, 9, "digits"), ("numbers4", 4, 0, 9, "digits")],
+    [
+        ("mini", 5, 1, 31, "select"),
+        ("loto6", 6, 1, 43, "select"),
+        ("loto7", 7, 1, 37, "select"),
+        ("bingo5", 8, 1, 40, "select"),
+        ("numbers3", 3, 0, 9, "digits"),
+        ("numbers4", 4, 0, 9, "digits"),
+    ],
 )
 def test_geometry_values(game, positions, lo, hi, family):
     g = geometry_for(game)
@@ -61,6 +67,7 @@ def test_marginal_base_rate():
 
 def test_geometry_rejects_impossible_configuration():
     from loto.game.geometry import GameGeometry
+
     with pytest.raises(ValueError, match="cannot draw"):
         GameGeometry(key="bad", family="select", positions=50, value_min=1, value_max=10)
 

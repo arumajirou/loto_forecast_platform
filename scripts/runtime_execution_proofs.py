@@ -20,7 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def atomic_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8"
+    )
 
 
 def pid_alive(pid: int) -> bool:
@@ -89,7 +91,11 @@ time.sleep(120)
 def nvidia_smi_processes() -> list[str]:
     try:
         proc = subprocess.run(
-            ["nvidia-smi", "--query-compute-apps=pid,gpu_uuid,used_memory", "--format=csv,noheader,nounits"],
+            [
+                "nvidia-smi",
+                "--query-compute-apps=pid,gpu_uuid,used_memory",
+                "--format=csv,noheader,nounits",
+            ],
             capture_output=True,
             text=True,
             timeout=5,
@@ -131,17 +137,42 @@ def cpu_parallel_proof(output: Path) -> dict[str, Any]:
             str(trial_out),
         ]
         start = time.time()
-        proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True)
+        proc = subprocess.Popen(
+            cmd,
+            cwd=ROOT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            start_new_session=True,
+        )
         procs.append((model, proc, start))
     for model, proc, start in procs:
         stdout, stderr = proc.communicate(timeout=300)
         end = time.time()
-        rows.append({"model_id": model, "pid": proc.pid, "start": start, "end": end, "returncode": proc.returncode, "stdout_tail": stdout[-1000:], "stderr_tail": stderr[-1000:]})
-    overlap = float(rows[0]["start"]) < float(rows[1]["end"]) and float(rows[1]["start"]) < float(rows[0]["end"])
-    report = {"status": "PASS" if overlap and all(row["returncode"] == 0 for row in rows) else "FAILED", "overlap": overlap, "rows": rows}
+        rows.append(
+            {
+                "model_id": model,
+                "pid": proc.pid,
+                "start": start,
+                "end": end,
+                "returncode": proc.returncode,
+                "stdout_tail": stdout[-1000:],
+                "stderr_tail": stderr[-1000:],
+            }
+        )
+    overlap = float(rows[0]["start"]) < float(rows[1]["end"]) and float(rows[1]["start"]) < float(
+        rows[0]["end"]
+    )
+    report = {
+        "status": "PASS" if overlap and all(row["returncode"] == 0 for row in rows) else "FAILED",
+        "overlap": overlap,
+        "rows": rows,
+    }
     atomic_json(output / "parallel_execution_timeline.json", report)
     atomic_json(output / "resource_allocation.json", {"parallel_cpu_models": 2, "models": models})
-    with (output / "parallel_execution_report.csv").open("w", encoding="utf-8", newline="") as stream:
+    with (output / "parallel_execution_report.csv").open(
+        "w", encoding="utf-8", newline=""
+    ) as stream:
         writer = csv.DictWriter(stream, fieldnames=sorted(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
@@ -179,7 +210,17 @@ def resume_proof(output: Path, run: Path) -> dict[str, Any]:
         else:
             decision = "RERUN_PREVIOUS_FAILURE"
             artifact_hash = None
-        decisions.append({"model_id": row["model_id"], "previous_status": row.get("final_status"), "artifact": str(artifact) if artifact else None, "artifact_exists": bool(artifact and artifact.exists()), "manifest_exists": bool(manifest), "artifact_hash": artifact_hash, "decision": decision})
+        decisions.append(
+            {
+                "model_id": row["model_id"],
+                "previous_status": row.get("final_status"),
+                "artifact": str(artifact) if artifact else None,
+                "artifact_exists": bool(artifact and artifact.exists()),
+                "manifest_exists": bool(manifest),
+                "artifact_hash": artifact_hash,
+                "decision": decision,
+            }
+        )
     report = {"status": "PASS", "source_run": str(run), "decisions": decisions}
     atomic_json(output / "resume_decision.json", report)
     return report
@@ -187,19 +228,50 @@ def resume_proof(output: Path, run: Path) -> dict[str, Any]:
 
 def foundation_audit(output: Path) -> dict[str, Any]:
     models: list[dict[str, Any]] = [
-        {"model_id": "timesfm-2.5", "repo_id": "google/timesfm-2.5-200m-pytorch", "package": "timesfm", "runtime": "dedicated uv environment recommended"},
-        {"model_id": "tirex", "repo_id": "NX-AI/TiRex", "package": "tirex", "runtime": "dedicated subprocess provider recommended"},
-        {"model_id": "moirai", "repo_id": "Salesforce/moirai-2.0-R-small", "package": "uni2ts", "runtime": "dedicated uv environment recommended"},
-        {"model_id": "sundial", "repo_id": "thuml/sundial-base-128m", "package": "transformers", "runtime": "dedicated subprocess provider recommended"},
+        {
+            "model_id": "timesfm-2.5",
+            "repo_id": "google/timesfm-2.5-200m-pytorch",
+            "package": "timesfm",
+            "runtime": "dedicated uv environment recommended",
+        },
+        {
+            "model_id": "tirex",
+            "repo_id": "NX-AI/TiRex",
+            "package": "tirex",
+            "runtime": "dedicated subprocess provider recommended",
+        },
+        {
+            "model_id": "moirai",
+            "repo_id": "Salesforce/moirai-2.0-R-small",
+            "package": "uni2ts",
+            "runtime": "dedicated uv environment recommended",
+        },
+        {
+            "model_id": "sundial",
+            "repo_id": "thuml/sundial-base-128m",
+            "package": "transformers",
+            "runtime": "dedicated subprocess provider recommended",
+        },
     ]
     for item in models:
-        item.update({"local_cache_complete": False, "main_env_install": "not attempted", "cuda_16gb_fit": "requires model-specific validation", "license": "not verified offline"})
+        item.update(
+            {
+                "local_cache_complete": False,
+                "main_env_install": "not attempted",
+                "cuda_16gb_fit": "requires model-specific validation",
+                "license": "not verified offline",
+            }
+        )
     report = {"status": "AUDIT_ONLY", "models": models}
     atomic_json(output / "foundation_environment_audit.json", report)
     lines = ["# Foundation Environment Audit", ""]
     for item in models:
-        lines.append(f"- {item['model_id']}: repo={item['repo_id']}, package={item['package']}, cache_complete=false, runtime={item['runtime']}")
-    (output / "foundation_environment_audit.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+        lines.append(
+            f"- {item['model_id']}: repo={item['repo_id']}, package={item['package']}, cache_complete=false, runtime={item['runtime']}"
+        )
+    (output / "foundation_environment_audit.md").write_text(
+        "\n".join(lines) + "\n", encoding="utf-8"
+    )
     return report
 
 
@@ -242,8 +314,13 @@ def gpu_scheduler_proof(output: Path) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output", default=f"runs/all-model-runtime-validation/execution-proofs-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}")
-    parser.add_argument("--resume-run", default="runs/all-model-runtime-validation/runtime-20260731-114151-ff06b9be")
+    parser.add_argument(
+        "--output",
+        default=f"runs/all-model-runtime-validation/execution-proofs-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}",
+    )
+    parser.add_argument(
+        "--resume-run", default="runs/all-model-runtime-validation/runtime-20260731-114151-ff06b9be"
+    )
     args = parser.parse_args()
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
@@ -255,8 +332,17 @@ def main() -> int:
         "foundation_audit": foundation_audit(output),
     }
     atomic_json(output / "execution_proofs_summary.json", summary)
-    print(json.dumps({"output": str(output), "summary": {k: v.get("status") for k, v in summary.items()}}, ensure_ascii=False))
-    return 0 if summary["timeout"]["status"] == "PASS" and summary["cpu_parallel"]["status"] == "PASS" else 2
+    print(
+        json.dumps(
+            {"output": str(output), "summary": {k: v.get("status") for k, v in summary.items()}},
+            ensure_ascii=False,
+        )
+    )
+    return (
+        0
+        if summary["timeout"]["status"] == "PASS" and summary["cpu_parallel"]["status"] == "PASS"
+        else 2
+    )
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from loto.models.baselines import FrequencyCandidateAdapter, UniformCandidateAdapter
 from loto.models.base import ModelCapabilities
+from loto.models.baselines import FrequencyCandidateAdapter, UniformCandidateAdapter
 
 
 def test_adapters_declare_capabilities_and_emit_37_probabilities():
@@ -17,5 +17,7 @@ def test_frequency_adapter_uses_only_supplied_history():
     model = FrequencyCandidateAdapter(alpha=1.0)
     history = pd.DataFrame({"candidate_number": [1, 1, 2, 3], "selected": [1, 1, 1, 0]})
     model.fit(history)
-    pred = model.predict(pd.DataFrame({"candidate_number": range(1, 38)})).set_index("candidate_number")
+    pred = model.predict(pd.DataFrame({"candidate_number": range(1, 38)})).set_index(
+        "candidate_number"
+    )
     assert pred.loc[1, "probability"] > pred.loc[37, "probability"]

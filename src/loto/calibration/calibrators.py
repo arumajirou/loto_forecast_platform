@@ -9,13 +9,14 @@ class PlattCalibrator:
         self.model = LogisticRegression(C=1e6, max_iter=1000)
         self.fitted = False
 
-    def fit(self, probabilities: np.ndarray, targets: np.ndarray) -> "PlattCalibrator":
+    def fit(self, probabilities: np.ndarray, targets: np.ndarray) -> PlattCalibrator:
         p = np.clip(np.asarray(probabilities, dtype=float).ravel(), 1e-6, 1 - 1e-6)
         y = np.asarray(targets, dtype=int).ravel()
         if np.unique(y).size < 2:
             return self
         logits = np.log(p / (1 - p)).reshape(-1, 1)
-        self.model.fit(logits, y); self.fitted = True
+        self.model.fit(logits, y)
+        self.fitted = True
         return self
 
     def transform(self, probabilities: np.ndarray) -> np.ndarray:
@@ -30,15 +31,18 @@ class TemperatureScaler:
     def __init__(self, temperature: float = 1.0):
         self.temperature = temperature
 
-    def fit(self, logits: np.ndarray, targets: np.ndarray) -> "TemperatureScaler":
-        logits = np.asarray(logits, dtype=float); targets = np.asarray(targets, dtype=int)
+    def fit(self, logits: np.ndarray, targets: np.ndarray) -> TemperatureScaler:
+        logits = np.asarray(logits, dtype=float)
+        targets = np.asarray(targets, dtype=int)
         best = (float("inf"), 1.0)
         for t in np.geomspace(0.25, 4.0, 80):
             shifted = logits / t
             shifted -= shifted.max(axis=1, keepdims=True)
-            probs = np.exp(shifted); probs /= probs.sum(axis=1, keepdims=True)
+            probs = np.exp(shifted)
+            probs /= probs.sum(axis=1, keepdims=True)
             loss = -np.log(np.clip(probs[np.arange(len(targets)), targets], 1e-12, 1)).mean()
-            if loss < best[0]: best = (float(loss), float(t))
+            if loss < best[0]:
+                best = (float(loss), float(t))
         self.temperature = best[1]
         return self
 

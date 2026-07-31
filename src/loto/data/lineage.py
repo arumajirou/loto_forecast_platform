@@ -3,6 +3,7 @@
 The functions in this module avoid in-place replacement of valid artifacts and
 produce small, machine-readable manifests that can be joined to experiment runs.
 """
+
 from __future__ import annotations
 
 import hashlib

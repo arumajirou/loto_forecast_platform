@@ -1,4 +1,5 @@
 """Every v3 subcommand must emit JSON and a meaningful exit code."""
+
 import json
 
 import pytest
@@ -71,10 +72,24 @@ def test_integrity_check_returns_nonzero_on_tampering(capsys, tmp_path):
 
 
 def test_research_synthetic_run_reports_no_champion(capsys):
-    code, payload = _run(capsys, [
-        "research", "--game", "loto7", "--synthetic-rows", "180",
-        "--folds", "3", "--test-size", "10", "--min-train-size", "80", "--n-boot", "150",
-    ])
+    code, payload = _run(
+        capsys,
+        [
+            "research",
+            "--game",
+            "loto7",
+            "--synthetic-rows",
+            "180",
+            "--folds",
+            "3",
+            "--test-size",
+            "10",
+            "--min-train-size",
+            "80",
+            "--n-boot",
+            "150",
+        ],
+    )
     assert code == 0
     assert payload["verdict"] == "NO_MODEL_BEATS_BASELINE"
     assert payload["champion"] is None
@@ -83,11 +98,26 @@ def test_research_synthetic_run_reports_no_champion(capsys):
 
 
 def test_research_writes_artifacts(capsys, tmp_path):
-    code, payload = _run(capsys, [
-        "research", "--game", "loto6", "--synthetic-rows", "180", "--folds", "3",
-        "--test-size", "10", "--min-train-size", "80", "--n-boot", "100",
-        "--output", str(tmp_path / "run"),
-    ])
+    code, payload = _run(
+        capsys,
+        [
+            "research",
+            "--game",
+            "loto6",
+            "--synthetic-rows",
+            "180",
+            "--folds",
+            "3",
+            "--test-size",
+            "10",
+            "--min-train-size",
+            "80",
+            "--n-boot",
+            "100",
+            "--output",
+            str(tmp_path / "run"),
+        ],
+    )
     assert code == 0
     assert "research_summary.json" in payload["artifacts"]
     assert "model_leaderboard.csv" in payload["artifacts"]
@@ -96,10 +126,24 @@ def test_research_writes_artifacts(capsys, tmp_path):
 @pytest.mark.parametrize("game", ["mini", "bingo5", "numbers3", "numbers4"])
 def test_research_runs_for_the_previously_unsupported_games(capsys, game):
     """v2.1.0 could only forecast loto7. These four are the regression that mattered."""
-    code, payload = _run(capsys, [
-        "research", "--game", game, "--synthetic-rows", "170", "--folds", "3",
-        "--test-size", "10", "--min-train-size", "80", "--n-boot", "100",
-    ])
+    code, payload = _run(
+        capsys,
+        [
+            "research",
+            "--game",
+            game,
+            "--synthetic-rows",
+            "170",
+            "--folds",
+            "3",
+            "--test-size",
+            "10",
+            "--min-train-size",
+            "80",
+            "--n-boot",
+            "100",
+        ],
+    )
     assert code == 0 and payload["status"] == "SUCCEEDED"
 
 

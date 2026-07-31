@@ -12,7 +12,9 @@ def detailed_draw_metrics(actual: np.ndarray, predicted: np.ndarray) -> dict[str
         raise ValueError("actual and predicted must have shape (n_draws, 7)")
     errors = np.abs(actual - predicted)
     within = errors <= 1
-    hits = np.array([len(set(map(int, a)) & set(map(int, p))) for a, p in zip(actual, predicted)])
+    hits = np.array(
+        [len(set(map(int, a)) & set(map(int, p))) for a, p in zip(actual, predicted, strict=False)]
+    )
     position_rates = within.mean(axis=0)
     result: dict[str, Any] = {
         "draws": int(len(actual)),
@@ -39,11 +41,15 @@ def detailed_draw_metrics(actual: np.ndarray, predicted: np.ndarray) -> dict[str
     for index, rate in enumerate(position_rates, start=1):
         result[f"position_{index}_within_1"] = float(rate)
         result[f"position_{index}_mae"] = float(errors[:, index - 1].mean())
-        result[f"position_{index}_mse"] = float(np.square(actual[:, index - 1] - predicted[:, index - 1]).mean())
+        result[f"position_{index}_mse"] = float(
+            np.square(actual[:, index - 1] - predicted[:, index - 1]).mean()
+        )
     return result
 
 
-def candidate_ranking_metrics(targets: np.ndarray, probabilities: np.ndarray, k: int = 7) -> dict[str, float]:
+def candidate_ranking_metrics(
+    targets: np.ndarray, probabilities: np.ndarray, k: int = 7
+) -> dict[str, float]:
     targets = np.asarray(targets, dtype=float)
     probabilities = np.asarray(probabilities, dtype=float)
     if targets.shape != probabilities.shape or targets.ndim != 2:
@@ -52,7 +58,7 @@ def candidate_ranking_metrics(targets: np.ndarray, probabilities: np.ndarray, k:
     precisions: list[float] = []
     recalls: list[float] = []
     ndcgs: list[float] = []
-    for truth, score in zip(targets, probabilities):
+    for truth, score in zip(targets, probabilities, strict=False):
         order = np.argsort(-score, kind="stable")[:k]
         rel = truth[order]
         hits = float(rel.sum())
@@ -78,7 +84,7 @@ def expected_calibration_error(y_true: np.ndarray, y_prob: np.ndarray, bins: int
         raise ValueError("shape mismatch")
     boundaries = np.linspace(0.0, 1.0, bins + 1)
     value = 0.0
-    for low, high in zip(boundaries[:-1], boundaries[1:]):
+    for low, high in zip(boundaries[:-1], boundaries[1:], strict=False):
         mask = (y_prob >= low) & (y_prob < high if high < 1.0 else y_prob <= high)
         if mask.any():
             value += mask.mean() * abs(y_true[mask].mean() - y_prob[mask].mean())
@@ -86,4 +92,6 @@ def expected_calibration_error(y_true: np.ndarray, y_prob: np.ndarray, bins: int
 
 
 def composite_score(metrics: dict[str, float], weights: dict[str, float]) -> float:
-    return float(sum(weight * float(metrics[key]) for key, weight in weights.items() if key in metrics))
+    return float(
+        sum(weight * float(metrics[key]) for key, weight in weights.items() if key in metrics)
+    )

@@ -21,6 +21,7 @@ Also provided is :func:`paired_bootstrap_p` -- a paired, two-sided bootstrap p-v
 the difference between a candidate and the baseline on the same draws, which is the correct
 pairing for a rolling-CV sweep.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -96,7 +97,11 @@ def holm(p_values, alpha: float = 0.05) -> Correction:
         running = max(running, min(1.0, (m - rank) * p[idx]))
         adjusted[idx] = running
     return Correction(
-        "holm", alpha, m, tuple(p.tolist()), tuple(adjusted.tolist()),
+        "holm",
+        alpha,
+        m,
+        tuple(p.tolist()),
+        tuple(adjusted.tolist()),
         tuple((adjusted <= alpha).tolist()),
     )
 
@@ -116,7 +121,11 @@ def benjamini_hochberg(p_values, alpha: float = 0.05) -> Correction:
         running = min(running, min(1.0, m / (rank + 1) * p[idx]))
         adjusted[idx] = running
     return Correction(
-        "benjamini_hochberg", alpha, m, tuple(p.tolist()), tuple(adjusted.tolist()),
+        "benjamini_hochberg",
+        alpha,
+        m,
+        tuple(p.tolist()),
+        tuple(adjusted.tolist()),
         tuple((adjusted <= alpha).tolist()),
     )
 
@@ -179,7 +188,11 @@ def romano_wolf(
 
     raw = np.array([float((boot[:, j] >= stat[j]).mean()) for j in range(m)])
     return Correction(
-        "romano_wolf", alpha, m, tuple(raw.tolist()), tuple(adjusted.tolist()),
+        "romano_wolf",
+        alpha,
+        m,
+        tuple(raw.tolist()),
+        tuple(adjusted.tolist()),
         tuple((adjusted <= alpha).tolist()),
     )
 
@@ -240,6 +253,10 @@ def correct(p_values, *, method: str = "holm", alpha: float = 0.05) -> Correctio
         raise ValueError("romano_wolf requires loss matrices; call romano_wolf() directly")
     p = _validate(p_values, alpha)
     return Correction(
-        "none", alpha, p.size, tuple(p.tolist()), tuple(p.tolist()),
+        "none",
+        alpha,
+        p.size,
+        tuple(p.tolist()),
+        tuple(p.tolist()),
         tuple((p <= alpha).tolist()),
     )

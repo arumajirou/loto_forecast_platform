@@ -1,4 +1,5 @@
 """Structured event logging and lightweight process/resource sampling."""
+
 from __future__ import annotations
 
 import json
@@ -6,7 +7,6 @@ import os
 import platform
 import subprocess
 import threading
-import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -53,20 +53,25 @@ def _process_snapshot() -> dict[str, Any]:
 
         proc = psutil.Process()
         memory = proc.memory_info()
-        result.update({
-            "cpu_percent": proc.cpu_percent(interval=None),
-            "rss_bytes": int(memory.rss),
-            "vms_bytes": int(memory.vms),
-            "threads": proc.num_threads(),
-            "children": [child.pid for child in proc.children(recursive=True)],
-        })
+        result.update(
+            {
+                "cpu_percent": proc.cpu_percent(interval=None),
+                "rss_bytes": int(memory.rss),
+                "vms_bytes": int(memory.vms),
+                "threads": proc.num_threads(),
+                "children": [child.pid for child in proc.children(recursive=True)],
+            }
+        )
     except Exception as exc:
         result["psutil_error"] = f"{type(exc).__name__}: {exc}"
     return result
 
 
 def _gpu_snapshot() -> dict[str, Any]:
-    query = "timestamp,index,uuid,name,utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw"
+    query = (
+        "timestamp,index,uuid,name,utilization.gpu,memory.used,"
+        "memory.total,temperature.gpu,power.draw"
+    )
     try:
         proc = subprocess.run(
             ["nvidia-smi", f"--query-gpu={query}", "--format=csv,noheader,nounits"],
@@ -83,11 +88,19 @@ def _gpu_snapshot() -> dict[str, Any]:
     for line in proc.stdout.splitlines():
         parts = [item.strip() for item in line.split(",")]
         if len(parts) >= 9:
-            rows.append({
-                "timestamp": parts[0], "index": parts[1], "uuid": parts[2], "name": parts[3],
-                "utilization_gpu_percent": parts[4], "memory_used_mib": parts[5],
-                "memory_total_mib": parts[6], "temperature_c": parts[7], "power_w": parts[8],
-            })
+            rows.append(
+                {
+                    "timestamp": parts[0],
+                    "index": parts[1],
+                    "uuid": parts[2],
+                    "name": parts[3],
+                    "utilization_gpu_percent": parts[4],
+                    "memory_used_mib": parts[5],
+                    "memory_total_mib": parts[6],
+                    "temperature_c": parts[7],
+                    "power_w": parts[8],
+                }
+            )
     return {"available": bool(rows), "gpus": rows}
 
 
@@ -100,7 +113,7 @@ class ResourceMonitor:
     _thread: threading.Thread | None = field(default=None, init=False, repr=False)
     _samples: int = field(default=0, init=False)
 
-    def start(self) -> "ResourceMonitor":
+    def start(self) -> ResourceMonitor:
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
         self._stop.clear()
         self._thread = threading.Thread(target=self._run, name="loto-resource-monitor", daemon=True)
@@ -129,7 +142,7 @@ class ResourceMonitor:
         atomic_write_json(self.output_path.with_suffix(".summary.json"), summary)
         return summary
 
-    def __enter__(self) -> "ResourceMonitor":
+    def __enter__(self) -> ResourceMonitor:
         return self.start()
 
     def __exit__(self, *_exc) -> None:

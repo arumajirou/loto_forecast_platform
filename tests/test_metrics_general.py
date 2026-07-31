@@ -1,4 +1,5 @@
 """Metrics must work for every game, not just Loto7."""
+
 import numpy as np
 import pytest
 
@@ -49,16 +50,22 @@ def test_single_draw_has_zero_dispersion_not_nan():
 
 
 def test_set_overlap_only_applies_to_select_games():
-    assert set_overlap_metrics(np.ones((2, 3)), np.ones((2, 3)),
-                               geometry_for("numbers3"))["set_overlap_supported"] == 0.0
-    out = set_overlap_metrics([[1, 2, 3, 4, 5, 6, 7]], [[1, 2, 3, 4, 5, 6, 7]],
-                              geometry_for("loto7"))
+    assert (
+        set_overlap_metrics(np.ones((2, 3)), np.ones((2, 3)), geometry_for("numbers3"))[
+            "set_overlap_supported"
+        ]
+        == 0.0
+    )
+    out = set_overlap_metrics(
+        [[1, 2, 3, 4, 5, 6, 7]], [[1, 2, 3, 4, 5, 6, 7]], geometry_for("loto7")
+    )
     assert out["mean_hits_at_7"] == 7.0 and out["jackpot_rate"] == 1.0
 
 
 def test_expected_hits_reference_is_included():
-    out = set_overlap_metrics([[1, 2, 3, 4, 5, 6, 7]], [[8, 9, 10, 11, 12, 13, 14]],
-                              geometry_for("loto7"))
+    out = set_overlap_metrics(
+        [[1, 2, 3, 4, 5, 6, 7]], [[8, 9, 10, 11, 12, 13, 14]], geometry_for("loto7")
+    )
     assert out["mean_hits_at_7"] == 0.0
     assert out["expected_hits_uniform"] == pytest.approx(49 / 37)
 

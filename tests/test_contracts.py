@@ -26,6 +26,9 @@ def test_forecast_package_accepts_legal_loto7_combination():
         created_at=datetime.now(UTC),
         draw_time=datetime.now(UTC) + timedelta(minutes=1),
         combination=DecodedCombination(numbers=[1, 4, 9, 15, 22, 30, 37], score=1.0),
-        candidates=[CandidateProbability(candidate_number=i, probability=7 / 37, rank_score=0.0) for i in range(1, 38)],
+        candidates=[
+            CandidateProbability(candidate_number=i, probability=7 / 37, rank_score=0.0)
+            for i in range(1, 38)
+        ],
     )
     assert package.combination.numbers[-1] == 37

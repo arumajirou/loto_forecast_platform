@@ -32,7 +32,9 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _snapshot(repo_id: str, revision: str | None, local_files_only: bool, snapshot: str | None) -> Path:
+def _snapshot(
+    repo_id: str, revision: str | None, local_files_only: bool, snapshot: str | None
+) -> Path:
     if snapshot:
         snapshot_path = Path(snapshot)
         if not snapshot_path.exists():
@@ -68,11 +70,18 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         request.get("snapshot_path"),
     )
     config_path = snapshot_path / "config.json"
-    weights = sorted(snapshot_path.glob("*.safetensors")) + sorted(snapshot_path.glob("*.bin")) + sorted(snapshot_path.glob("*.ckpt"))
+    weights = (
+        sorted(snapshot_path.glob("*.safetensors"))
+        + sorted(snapshot_path.glob("*.bin"))
+        + sorted(snapshot_path.glob("*.ckpt"))
+    )
     if not config_path.exists():
         return {"status": "PARTIAL_SNAPSHOT", "message": f"config.json missing in {snapshot_path}"}
     if not weights:
-        return {"status": "MODEL_WEIGHTS_MISSING", "message": f"no model weights found in {snapshot_path}"}
+        return {
+            "status": "MODEL_WEIGHTS_MISSING",
+            "message": f"no model weights found in {snapshot_path}",
+        }
 
     cuda_available = torch.cuda.is_available()
     execution_device = "cuda" if requested_device == "cuda" and cuda_available else "cpu"
@@ -102,7 +111,10 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
     forecast = next(iter(model.create_predictor(batch_size=1).predict(dataset)))
     median = np.asarray(forecast.quantile(0.5), dtype=float)
     if median.shape != (horizon, 7):
-        return {"status": "INVALID_PREDICTION", "message": f"unexpected Moirai forecast shape: {median.shape}"}
+        return {
+            "status": "INVALID_PREDICTION",
+            "message": f"unexpected Moirai forecast shape: {median.shape}",
+        }
     predictions = median[0, :]
     gpu_used = execution_device == "cuda"
     return {
@@ -143,7 +155,9 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
             "gpu_certification": "OBSERVED" if gpu_used else "NOT_CERTIFIED",
             "resource_certification": "GPU_PASS" if gpu_used else "CPU_ONLY_PASS",
             "cpu_fallback": requested_device == "cuda" and not gpu_used,
-            "fallback_reason": None if execution_device == requested_device else "cuda_unavailable_or_not_selected",
+            "fallback_reason": None
+            if execution_device == requested_device
+            else "cuda_unavailable_or_not_selected",
             "peak_vram_bytes": int(torch.cuda.max_memory_allocated()) if gpu_used else 0,
             "gpu_pid": os.getpid() if gpu_used else None,
         },

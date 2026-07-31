@@ -15,6 +15,7 @@ Two implementations are provided:
 Both are exact in the sense that the returned forecasts satisfy ``S @ bottom == full`` to
 floating-point tolerance, which :func:`coherence_error` verifies rather than assumes.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -157,7 +158,7 @@ def reconcile(
         "bottom": bottom,
         "reconciled": full,
         "coherence_error": coherence_error(full, bottom, hierarchy),
-        "base_incoherence": coherence_error(base, base[-hierarchy.n_bottom:], hierarchy),
+        "base_incoherence": coherence_error(base, base[-hierarchy.n_bottom :], hierarchy),
     }
 
 

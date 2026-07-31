@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
-from typing import Iterable
+from collections.abc import Iterable
 
 import pandas as pd
 
@@ -68,9 +68,13 @@ def _add_rolling(df: pd.DataFrame, cols: list[str], windows: list[int]) -> pd.Da
     return out
 
 
-def make_draw_features(df: pd.DataFrame, spec: LotterySpec, windows: list[int] | None = None) -> pd.DataFrame:
+def make_draw_features(
+    df: pd.DataFrame, spec: LotterySpec, windows: list[int] | None = None
+) -> pd.DataFrame:
     windows = windows or [5, 10, 20, 50]
-    base = df.sort_values(["draw_date", "draw_no"], na_position="last").reset_index(drop=True).copy()
+    base = (
+        df.sort_values(["draw_date", "draw_no"], na_position="last").reset_index(drop=True).copy()
+    )
     primes = _prime_set(spec.number_max)
 
     if spec.kind == "numbers":
@@ -90,8 +94,12 @@ def make_draw_features(df: pd.DataFrame, spec: LotterySpec, windows: list[int] |
                     "digit_unique_count": len(set(digits)),
                     "digit_duplicate_count": len(digits) - len(set(digits)),
                     "digit_entropy": _shannon_entropy(digits),
-                    "digit_monotonic_inc": int(all(a <= b for a, b in zip(digits, digits[1:]))),
-                    "digit_monotonic_dec": int(all(a >= b for a, b in zip(digits, digits[1:]))),
+                    "digit_monotonic_inc": int(
+                        all(a <= b for a, b in zip(digits, digits[1:], strict=False))
+                    ),
+                    "digit_monotonic_dec": int(
+                        all(a >= b for a, b in zip(digits, digits[1:], strict=False))
+                    ),
                 }
             )
         feat = pd.concat([base.reset_index(drop=True), pd.DataFrame(rows)], axis=1)
@@ -101,7 +109,7 @@ def make_draw_features(df: pd.DataFrame, spec: LotterySpec, windows: list[int] |
     rows = []
     for _, row in base.iterrows():
         nums = sorted(_int_values(row, num_cols))
-        gaps = [b - a for a, b in zip(nums, nums[1:])]
+        gaps = [b - a for a, b in zip(nums, nums[1:], strict=False)]
         low_cut = spec.number_min + (spec.number_max - spec.number_min + 1) / 3
         high_cut = spec.number_min + 2 * (spec.number_max - spec.number_min + 1) / 3
         endings = [n % 10 for n in nums]
@@ -156,7 +164,9 @@ def make_draw_features(df: pd.DataFrame, spec: LotterySpec, windows: list[int] |
     return _add_rolling(feat, summary_cols, windows)
 
 
-def make_occurrence_features(df: pd.DataFrame, spec: LotterySpec, windows: list[int] | None = None) -> pd.DataFrame:
+def make_occurrence_features(
+    df: pd.DataFrame, spec: LotterySpec, windows: list[int] | None = None
+) -> pd.DataFrame:
     """Create long candidate-level features for lotto/bingo games.
 
     Each row is one candidate number at one draw. `target_hit_next` is useful for
@@ -165,7 +175,9 @@ def make_occurrence_features(df: pd.DataFrame, spec: LotterySpec, windows: list[
     if spec.kind == "numbers":
         return pd.DataFrame()
     windows = windows or [5, 10, 20, 50]
-    base = df.sort_values(["draw_date", "draw_no"], na_position="last").reset_index(drop=True).copy()
+    base = (
+        df.sort_values(["draw_date", "draw_no"], na_position="last").reset_index(drop=True).copy()
+    )
     num_cols = [f"n{i}" for i in range(1, (spec.main_count or 0) + 1)]
     records: list[dict[str, object]] = []
     last_seen: dict[int, int | None] = {n: None for n in spec.candidate_numbers}

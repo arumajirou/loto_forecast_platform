@@ -1,4 +1,5 @@
 """Split conformal must deliver its advertised finite-sample coverage."""
+
 import numpy as np
 import pytest
 
@@ -84,6 +85,8 @@ def test_interval_score_penalises_both_directions():
 
 def test_interval_score_cannot_be_gamed_by_widening():
     tight = weighted_interval_score(np.zeros(100), -np.ones(100), np.ones(100), alpha=0.1)
-    wide = weighted_interval_score(np.zeros(100), -100 * np.ones(100), 100 * np.ones(100), alpha=0.1)
+    wide = weighted_interval_score(
+        np.zeros(100), -100 * np.ones(100), 100 * np.ones(100), alpha=0.1
+    )
     assert wide["coverage"] == tight["coverage"] == 1.0
     assert wide["interval_score"] > tight["interval_score"]
