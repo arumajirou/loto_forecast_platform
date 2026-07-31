@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "stage": "smoke",
-  "generated_at": "2026-07-31T10:42:22.219756+00:00",
-  "code_fingerprint": "38c9ba1ca09e9fee",
+  "generated_at": "2026-07-31T23:15:41.975262+00:00",
+  "code_fingerprint": "88716856f61ce744",
   "model_count": 84,
   "models": {
     "uniform": {
@@ -15,7 +15,7 @@
         "ranking"
       ],
       "available": true,
-      "model_config_hash": "cf6fb1704ae9f4a9",
+      "model_config_hash": "29763c5bea2f86a4",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -29,7 +29,7 @@
         "ranking"
       ],
       "available": true,
-      "model_config_hash": "fb5d92846c525db8",
+      "model_config_hash": "f14a464646e4a63e",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -43,7 +43,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "d055a0feed75cad9",
+      "model_config_hash": "3729d677199cc997",
       "resolved_smoke_params": {
         "C": 1.0,
         "max_iter": 1000
@@ -60,7 +60,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "155c290cd10044ce",
+      "model_config_hash": "cb2c479d01bd6f24",
       "resolved_smoke_params": {
         "alpha": 1.0
       },
@@ -76,7 +76,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "c4e953bf87e9e311",
+      "model_config_hash": "9fdbabd2f1d476f4",
       "resolved_smoke_params": {
         "alpha": 0.01,
         "l1_ratio": 0.5,
@@ -94,7 +94,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "3c35e37e8daa2674",
+      "model_config_hash": "71bbe3940c76238e",
       "resolved_smoke_params": {
         "n_estimators": 300,
         "min_samples_leaf": 3,
@@ -112,7 +112,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "d0f0ebe01b5e6215",
+      "model_config_hash": "53e0d1bc7bde3e70",
       "resolved_smoke_params": {
         "n_estimators": 300,
         "min_samples_leaf": 2,
@@ -130,7 +130,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "59f6feeb5e6b3796",
+      "model_config_hash": "98ada71474c2e48c",
       "resolved_smoke_params": {
         "max_iter": 200,
         "learning_rate": 0.05
@@ -149,7 +149,7 @@
         "gpu_optional"
       ],
       "available": true,
-      "model_config_hash": "9ef384ee638d5093",
+      "model_config_hash": "77e7563312f8d931",
       "resolved_smoke_params": {
         "n_estimators": 400,
         "learning_rate": 0.03,
@@ -168,7 +168,7 @@
         "gpu_optional"
       ],
       "available": true,
-      "model_config_hash": "0138c761e8621b75",
+      "model_config_hash": "6d63e9ff9fcfe033",
       "resolved_smoke_params": {
         "n_estimators": 400,
         "learning_rate": 0.03
@@ -186,7 +186,7 @@
         "gpu_optional"
       ],
       "available": true,
-      "model_config_hash": "810116c09fbc3ee8",
+      "model_config_hash": "714260a1eef9c108",
       "resolved_smoke_params": {
         "n_estimators": 400,
         "learning_rate": 0.03,
@@ -205,7 +205,7 @@
         "gpu_optional"
       ],
       "available": true,
-      "model_config_hash": "86c300c989ca2e0c",
+      "model_config_hash": "97e150421746c3c6",
       "resolved_smoke_params": {
         "iterations": 400,
         "learning_rate": 0.03,
@@ -220,7 +220,7 @@
       "priority": "p0",
       "capabilities": [],
       "available": true,
-      "model_config_hash": "40e9d97b12bdc9d5",
+      "model_config_hash": "db24c06c35df6c3c",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -231,7 +231,7 @@
       "priority": "p0",
       "capabilities": [],
       "available": true,
-      "model_config_hash": "85cf058c4a4cb4d8",
+      "model_config_hash": "1b0a6ff1e6a796c1",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -242,7 +242,7 @@
       "priority": "p0",
       "capabilities": [],
       "available": true,
-      "model_config_hash": "b1fef1fd31e3cbf8",
+      "model_config_hash": "fd8b9961fd9885bb",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -253,7 +253,7 @@
       "priority": "p0",
       "capabilities": [],
       "available": true,
-      "model_config_hash": "a1c867e9e0f8cab4",
+      "model_config_hash": "c2f53541d8c3fdda",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -264,7 +264,7 @@
       "priority": "p0",
       "capabilities": [],
       "available": true,
-      "model_config_hash": "ae570dd11f53b45a",
+      "model_config_hash": "e7ff5edbac45a302",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -275,7 +275,7 @@
       "priority": "p1",
       "capabilities": [],
       "available": true,
-      "model_config_hash": "2af15797571b4e47",
+      "model_config_hash": "7abcad2fe750141d",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -286,7 +286,7 @@
       "priority": "p1",
       "capabilities": [],
       "available": true,
-      "model_config_hash": "49cd442eefac9b84",
+      "model_config_hash": "f74fc3284503526a",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -297,7 +297,7 @@
       "priority": "p1",
       "capabilities": [],
       "available": true,
-      "model_config_hash": "0022f25d044edea2",
+      "model_config_hash": "4d4db88c3f8675fd",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -311,7 +311,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "8588d3afe24a9e9f",
+      "model_config_hash": "3b0094d8f1ecd23d",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -326,7 +326,7 @@
         "gpu_optional"
       ],
       "available": true,
-      "model_config_hash": "6c648fc86ed1bce9",
+      "model_config_hash": "405d1892f8e742fd",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -340,7 +340,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "09cc12f317ad2692",
+      "model_config_hash": "41b89e8175bb55db",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -360,7 +360,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "fa2c54c2314044b8",
+      "model_config_hash": "6f1408ea6d1944bf",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -381,7 +381,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "cdd3cbe043dcfdf8",
+      "model_config_hash": "8c6da8157a6dddeb",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -401,7 +401,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "e5cc364713cbed3b",
+      "model_config_hash": "10531f23570455a0",
       "resolved_smoke_params": {
         "stack_types": [
           "identity"
@@ -434,7 +434,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "36d59e0c817d9759",
+      "model_config_hash": "bb8d12e76fdb2cf5",
       "resolved_smoke_params": {
         "stack_types": [
           "identity"
@@ -467,7 +467,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "6b648e6bbd8d2263",
+      "model_config_hash": "e1a3b5cd420623b2",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -487,7 +487,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "f390ff5d6c2eb56d",
+      "model_config_hash": "c938be6782ce5e97",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -507,7 +507,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "c8e78afecfd9dc39",
+      "model_config_hash": "db2f8aaa1b6b1ee2",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -527,7 +527,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "9e6fdde845e45f9e",
+      "model_config_hash": "e8e8610c7fccb756",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -547,7 +547,7 @@
         "probabilistic"
       ],
       "available": true,
-      "model_config_hash": "cd9b5a41756dc8da",
+      "model_config_hash": "57e203794f9233f2",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -568,7 +568,7 @@
         "attention"
       ],
       "available": true,
-      "model_config_hash": "fb00eb909a042855",
+      "model_config_hash": "12302047f4cfad63",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -589,7 +589,7 @@
         "gpu"
       ],
       "available": true,
-      "model_config_hash": "e60eae326ada44fb",
+      "model_config_hash": "750ea5a6a1fcfb91",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -610,7 +610,7 @@
         "gpu"
       ],
       "available": true,
-      "model_config_hash": "920c13f62a3d1726",
+      "model_config_hash": "9f214aa680221b41",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -631,7 +631,7 @@
         "multiseries"
       ],
       "available": true,
-      "model_config_hash": "c68f3f1db1d324e8",
+      "model_config_hash": "d0fac00615219ef6",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -650,7 +650,7 @@
         "gpu"
       ],
       "available": true,
-      "model_config_hash": "be70b11de31ac63e",
+      "model_config_hash": "71f09f4266c4d9c6",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -670,7 +670,7 @@
         "multivariate"
       ],
       "available": true,
-      "model_config_hash": "bf858261d0b52f73",
+      "model_config_hash": "b7bb4af6e394b9b6",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -691,7 +691,7 @@
         "gpu"
       ],
       "available": true,
-      "model_config_hash": "4dea26da968d758b",
+      "model_config_hash": "0877bce3af2f055a",
       "resolved_smoke_params": {
         "max_steps": 2,
         "val_check_steps": 1,
@@ -716,7 +716,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "44236fea945bd904",
+      "model_config_hash": "8addc2b6663d9acc",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -742,7 +742,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "18354e146f5dc317",
+      "model_config_hash": "d877d602e2a78333",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -768,7 +768,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "142d2a671b31ee8f",
+      "model_config_hash": "094eddb4e627d27a",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -794,7 +794,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "f657a6f00d780cc8",
+      "model_config_hash": "e354214610e343bd",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -820,7 +820,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "0ceb2d2b6f035c1a",
+      "model_config_hash": "2d1a51e607d3bac7",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -846,7 +846,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "9b595a3b165c1d99",
+      "model_config_hash": "c3a3d6d6edb03d2a",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -872,7 +872,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "d4b562dcd8b9e88f",
+      "model_config_hash": "3a60f5d00f637719",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -898,7 +898,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "aa8c1ade4d6a87e1",
+      "model_config_hash": "bdf57fdb22b6542b",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -924,7 +924,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "9cfa60acbd5f689b",
+      "model_config_hash": "aa43be0ac1f1bd33",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -962,7 +962,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "19cb10e287e57e35",
+      "model_config_hash": "540c44cec9caa190",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1000,7 +1000,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "ed0a295a41324fa0",
+      "model_config_hash": "d6335251896041eb",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1026,7 +1026,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "dc53e95c3ef28a69",
+      "model_config_hash": "4bc5be4aa420cd2c",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1052,7 +1052,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "e86a7f2ebf2b5002",
+      "model_config_hash": "55c5a78a07f3affd",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1078,7 +1078,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "50ea268a6aeb6294",
+      "model_config_hash": "203eca6c54f353e3",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1104,7 +1104,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "858da48e86aab695",
+      "model_config_hash": "0f777d67221fe556",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1130,7 +1130,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "18d9aeca43c8fdc3",
+      "model_config_hash": "caf66485c9bb4c4e",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1156,7 +1156,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "6fc2556eeada7659",
+      "model_config_hash": "b6f8fdddac5b8f1b",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1182,7 +1182,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "e229e17316d51a7c",
+      "model_config_hash": "e4a9623a0dcb9294",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1208,7 +1208,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "95e82faf8b965b12",
+      "model_config_hash": "5c7fdb5afce0c47e",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1234,7 +1234,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "3743afe15fa76908",
+      "model_config_hash": "31be1a92223f277e",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1260,7 +1260,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "1ee6e0b8b75a0712",
+      "model_config_hash": "cf53de2d4d755372",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1286,7 +1286,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "7fdf37dbcb802705",
+      "model_config_hash": "5ee152c27e83b73a",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1312,7 +1312,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "adf92febdabc4125",
+      "model_config_hash": "cd741726f74a29f5",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1338,7 +1338,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "ac435dfdff8f1ab2",
+      "model_config_hash": "08ff2e8ec00f5644",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1364,7 +1364,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "c432a30569d2825f",
+      "model_config_hash": "ea5308fb31b3e069",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1390,7 +1390,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "4e365f24485424f4",
+      "model_config_hash": "4873e565c2c0a860",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1416,7 +1416,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "d6fd3e6e5cca7842",
+      "model_config_hash": "d66d27e03393b3d2",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1442,7 +1442,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "a5d7fb2fa307c074",
+      "model_config_hash": "5ffd6d8bc5587420",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1468,7 +1468,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "63d80af2e4625be4",
+      "model_config_hash": "da123fcd1cc948c8",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1494,7 +1494,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "4eb25f7034c68fe2",
+      "model_config_hash": "80bccae7f67ae804",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1520,7 +1520,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "962dff43f449cd70",
+      "model_config_hash": "a440d513e7c175f3",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1546,7 +1546,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "b3493fbc8a27a5e4",
+      "model_config_hash": "1fb567b34dc4d3d4",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1572,7 +1572,7 @@
         "checkpoint"
       ],
       "available": true,
-      "model_config_hash": "e8e3a9f7a1576bcd",
+      "model_config_hash": "f85919cdf90e27da",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
@@ -1596,7 +1596,7 @@
         "zero_shot"
       ],
       "available": false,
-      "model_config_hash": "a523a4e17785f578",
+      "model_config_hash": "401343fef4ffc848",
       "resolved_smoke_params": {
         "presets": "fast_training",
         "time_limit": 5
@@ -1613,7 +1613,7 @@
         "probabilistic"
       ],
       "available": true,
-      "model_config_hash": "fbd09c7c150a0288",
+      "model_config_hash": "6d71c5f3ed01867e",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -1626,7 +1626,7 @@
         "probabilistic"
       ],
       "available": true,
-      "model_config_hash": "276295e7c9abbc4c",
+      "model_config_hash": "d277985c0ab16618",
       "resolved_smoke_params": {
         "epochs": 1,
         "num_batches_per_epoch": 2,
@@ -1644,7 +1644,7 @@
         "position"
       ],
       "available": true,
-      "model_config_hash": "37d9ddbe8c2a13de",
+      "model_config_hash": "d3822ab15272f6ba",
       "resolved_smoke_params": {
         "reservoir_size": 50,
         "spectral_radius": 0.9,
@@ -1665,7 +1665,7 @@
         "gpu_optional"
       ],
       "available": true,
-      "model_config_hash": "1302e4c882d159c2",
+      "model_config_hash": "cae533608cbbe459",
       "resolved_smoke_params": {
         "model_name": "amazon/chronos-bolt-tiny",
         "revision": "a0e552de83495b5c28c14c71c374f3e33280b340"
@@ -1683,7 +1683,7 @@
         "exogenous"
       ],
       "available": true,
-      "model_config_hash": "b35568bb662644ce",
+      "model_config_hash": "422e5f9ea3c9fc0c",
       "resolved_smoke_params": {
         "model_name": "autogluon/chronos-2-small"
       },
@@ -1701,7 +1701,7 @@
         "gpu"
       ],
       "available": false,
-      "model_config_hash": "0dddf29698885b98",
+      "model_config_hash": "2e4eea86f43900ab",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -1716,7 +1716,7 @@
         "gpu_optional"
       ],
       "available": true,
-      "model_config_hash": "b82a94e392261d39",
+      "model_config_hash": "ccd04f43dfe62b66",
       "resolved_smoke_params": {},
       "resolve_error": null
     },
@@ -1731,7 +1731,7 @@
         "gpu_optional"
       ],
       "available": false,
-      "model_config_hash": "8c4b74b1e09241a0",
+      "model_config_hash": "740f4d04e84547f9",
       "resolved_smoke_params": {
         "model_name": "NX-AI/TiRex-2",
         "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3"
@@ -1749,7 +1749,7 @@
         "gpu"
       ],
       "available": false,
-      "model_config_hash": "cc2c93a93f1bcdea",
+      "model_config_hash": "a49dcf8f8c3dcfd5",
       "resolved_smoke_params": {
         "model_name": "Salesforce/moirai-2.0-R-small",
         "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389"
@@ -1767,7 +1767,7 @@
         "gpu"
       ],
       "available": true,
-      "model_config_hash": "eb17baa1858952be",
+      "model_config_hash": "291cd910b323890f",
       "resolved_smoke_params": {
         "model_name": "thuml/sundial-base-128m",
         "revision": "3212e42564493f520593e5414af4367fc4b49226",
@@ -1786,7 +1786,7 @@
         "gpu_optional"
       ],
       "available": false,
-      "model_config_hash": "268afa6628a439f8",
+      "model_config_hash": "a1506b13767813c3",
       "resolved_smoke_params": {},
       "resolve_error": null
     }
