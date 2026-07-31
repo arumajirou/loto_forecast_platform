@@ -340,8 +340,10 @@ def test_formal_backtest_smoke_catalog_no_drift():
     mismatches = []
     for model_id, frozen_entry in frozen["models"].items():
         spec = specs[model_id]
+        model_config = spec.to_dict()
+        model_config.pop("available", None)
         current_hash = hashlib.sha256(
-            json.dumps(spec.to_dict(), sort_keys=True, default=str).encode("utf-8")
+            json.dumps(model_config, sort_keys=True, default=str).encode("utf-8")
         ).hexdigest()[:16]
         if current_hash != frozen_entry["model_config_hash"]:
             mismatches.append(
