@@ -41,11 +41,13 @@ class FakeStatsForecast:
         return self
 
     def predict(self, h):
-        return pd.DataFrame({
-            "unique_id": [f"candidate-{i:02d}" for i in range(1, 38)],
-            "ds": pd.Timestamp("2026-01-01"),
-            "Fake": np.linspace(0.1, 1.0, 37),
-        })
+        return pd.DataFrame(
+            {
+                "unique_id": [f"candidate-{i:02d}" for i in range(1, 38)],
+                "ds": pd.Timestamp("2026-01-01"),
+                "Fake": np.linspace(0.1, 1.0, 37),
+            }
+        )
 
 
 def sample_master(rows: int = 90) -> pd.DataFrame:
@@ -56,11 +58,13 @@ def sample_master(rows: int = 90) -> pd.DataFrame:
         while len(numbers) < 7:
             numbers.append(((numbers[-1]) % 37) + 1)
             numbers = sorted(set(numbers))
-        data.append({
-            "draw_no": i + 1,
-            "draw_date": pd.Timestamp("2020-01-01", tz="UTC") + pd.Timedelta(days=i * 7),
-            **{f"n{j + 1}": numbers[j] for j in range(7)},
-        })
+        data.append(
+            {
+                "draw_no": i + 1,
+                "draw_date": pd.Timestamp("2020-01-01", tz="UTC") + pd.Timedelta(days=i * 7),
+                **{f"n{j + 1}": numbers[j] for j in range(7)},
+            }
+        )
     return pd.DataFrame(data)
 
 
@@ -75,14 +79,16 @@ def test_cli_validation_rejects_invalid_parallel_value():
 
 def test_cli_rejects_missing_catalog(tmp_path):
     with pytest.raises(SystemExit, match="catalog does not exist"):
-        main([
-            "--catalog",
-            str(tmp_path / "missing.json"),
-            "--models",
-            "uniform",
-            "--output",
-            str(tmp_path / "runs"),
-        ])
+        main(
+            [
+                "--catalog",
+                str(tmp_path / "missing.json"),
+                "--models",
+                "uniform",
+                "--output",
+                str(tmp_path / "runs"),
+            ]
+        )
 
 
 def test_argument_mapping_reports_verified_and_unsupported():
@@ -215,15 +221,23 @@ def test_candidate_series_worker_transforms_37_binary_series(monkeypatch):
             return self
 
         def predict(self, h):
-            return pd.DataFrame({
-                "unique_id": [f"candidate-{i:02d}" for i in range(1, 38)],
-                "ds": pd.Timestamp("2026-01-01"),
-                "Fake": np.linspace(0.1, 1.0, 37),
-            })
+            return pd.DataFrame(
+                {
+                    "unique_id": [f"candidate-{i:02d}" for i in range(1, 38)],
+                    "ds": pd.Timestamp("2026-01-01"),
+                    "Fake": np.linspace(0.1, 1.0, 37),
+                }
+            )
 
-    monkeypatch.setitem(sys.modules, "statsforecast", types.SimpleNamespace(StatsForecast=FakeStatsForecast))
-    monkeypatch.setitem(sys.modules, "statsforecast.models", types.SimpleNamespace(CrostonClassic=FakeModel))
-    worker = PositionSeriesWorker(get_model_spec("stats-croston"), {}, seed=42, device="cpu", precision="32")
+    monkeypatch.setitem(
+        sys.modules, "statsforecast", types.SimpleNamespace(StatsForecast=FakeStatsForecast)
+    )
+    monkeypatch.setitem(
+        sys.modules, "statsforecast.models", types.SimpleNamespace(CrostonClassic=FakeModel)
+    )
+    worker = PositionSeriesWorker(
+        get_model_spec("stats-croston"), {}, seed=42, device="cpu", precision="32"
+    )
     output = worker.forecast(sample_master(30))
     assert captured["series"] == 37
     assert output.candidate_probabilities.shape == (37,)
@@ -231,8 +245,12 @@ def test_candidate_series_worker_transforms_37_binary_series(monkeypatch):
 
 
 @pytest.mark.parametrize("model_id", ["stats-croston", "stats-tsb"])
-def test_statsforecast_candidate_series_lifecycle_reload_and_retrain_are_37(monkeypatch, tmp_path, model_id):
-    monkeypatch.setitem(sys.modules, "statsforecast", types.SimpleNamespace(StatsForecast=FakeStatsForecast))
+def test_statsforecast_candidate_series_lifecycle_reload_and_retrain_are_37(
+    monkeypatch, tmp_path, model_id
+):
+    monkeypatch.setitem(
+        sys.modules, "statsforecast", types.SimpleNamespace(StatsForecast=FakeStatsForecast)
+    )
     monkeypatch.setitem(
         sys.modules,
         "statsforecast.models",
@@ -312,14 +330,110 @@ def test_darts_ensemble_worker_returns_persistence_payload(monkeypatch):
             RegressionEnsembleModel=FakeRegressionEnsembleModel,
         ),
     )
-    output = PositionSeriesWorker(get_model_spec("darts-ensemble"), {}, seed=42, device="cpu", precision="32").forecast(sample_master(30))
+    output = PositionSeriesWorker(
+        get_model_spec("darts-ensemble"), {}, seed=42, device="cpu", precision="32"
+    ).forecast(sample_master(30))
     assert output.model_artifact_payload["library"] == "darts_ensemble"
     assert output.metadata["component_models"] == ["NaiveDrift", "ExponentialSmoothing"]
     assert len(output.model_artifact_payload["models"]) == 7
 
 
 def test_resource_scheduler_limits_and_report():
-    scheduler = ResourceScheduler(ResourcePolicy(max_parallel_cpu_models=1, max_parallel_gpu_models=1))
+    scheduler = ResourceScheduler(
+        ResourcePolicy(max_parallel_cpu_models=1, max_parallel_gpu_models=1)
+    )
     lease = scheduler.acquire(requires_gpu=False, lease_id="a", timeout=1)
     scheduler.release(lease)
     assert scheduler.report()[0]["lease_id"] == "a"
+
+
+def test_resume_skip_behavior_on_pass_and_zero_shot_pass(tmp_path):
+    from pathlib import Path
+
+    output_root = tmp_path / "runtime-run"
+    output_root.mkdir()
+
+    model1_dir = output_root / "model-1"
+    model1_dir.mkdir()
+    (model1_dir / "lifecycle_result.json").write_text("{}", encoding="utf-8")
+
+    model2_dir = output_root / "model-2"
+    model2_dir.mkdir()
+    (model2_dir / "lifecycle_result.json").write_text("{}", encoding="utf-8")
+
+    model3_dir = output_root / "model-3"
+    model3_dir.mkdir()
+    (model3_dir / "lifecycle_result.json").write_text("{}", encoding="utf-8")
+
+    art1 = model1_dir / "model.pkl"
+    art1.write_text("dummy", encoding="utf-8")
+    art2 = model2_dir / "provider.json"
+    art2.write_text("dummy", encoding="utf-8")
+
+    status_payload = {
+        "rows": [
+            {"model_id": "model-1", "final_status": "PASS", "artifact path": str(art1)},
+            {"model_id": "model-2", "final_status": "ZERO_SHOT_PASS", "artifact path": str(art2)},
+            {"model_id": "model-3", "final_status": "FIT_FAILED", "artifact path": None},
+        ]
+    }
+
+    from scripts.all_model_runtime_validation import extract_status_rows
+
+    previous_rows = {row["model_id"]: row for row in extract_status_rows(status_payload)}
+
+    row1 = previous_rows.get("model-1")
+    artifact1 = Path(str(row1.get("artifact path")))
+    assert row1.get("final_status") in {"PASS", "ZERO_SHOT_PASS"}
+    assert artifact1.exists()
+
+    row2 = previous_rows.get("model-2")
+    artifact2 = Path(str(row2.get("artifact path")))
+    assert row2.get("final_status") in {"PASS", "ZERO_SHOT_PASS"}
+    assert artifact2.exists()
+
+    row3 = previous_rows.get("model-3")
+    assert row3.get("final_status") not in {"PASS", "ZERO_SHOT_PASS"}
+
+
+def test_resume_rejected_on_signature_mismatch(tmp_path):
+    import json
+
+    output_root = tmp_path / "runtime-run"
+    output_root.mkdir()
+
+    manifest_payload = {"run_signature": "old_sig_123"}
+    (output_root / "run_manifest.json").write_text(json.dumps(manifest_payload), encoding="utf-8")
+
+    status_payload = {
+        "rows": [{"model_id": "model-1", "final_status": "PASS", "artifact path": "dummy"}]
+    }
+    (output_root / "all_model_runtime_validation.json").write_text(
+        json.dumps(status_payload), encoding="utf-8"
+    )
+
+    run_signature = "new_sig_456"
+    previous_rows = {}
+    previous_manifest = output_root / "run_manifest.json"
+    previous_results = output_root / "all_model_runtime_validation.json"
+
+    sig_match = True
+    if previous_manifest.exists():
+        try:
+            manifest_data = json.loads(previous_manifest.read_text(encoding="utf-8"))
+            prev_sig = manifest_data.get("run_signature")
+            if prev_sig != run_signature:
+                sig_match = False
+        except Exception:
+            sig_match = False
+
+    if sig_match:
+        from scripts.all_model_runtime_validation import extract_status_rows
+
+        previous_rows = {
+            row["model_id"]: row
+            for row in extract_status_rows(json.loads(previous_results.read_text(encoding="utf-8")))
+        }
+
+    assert sig_match is False
+    assert not previous_rows

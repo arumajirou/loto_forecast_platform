@@ -63,9 +63,13 @@ def non_negative_int(value: str) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run real lifecycle validation for catalog models.")
+    parser = argparse.ArgumentParser(
+        description="Run real lifecycle validation for catalog models."
+    )
     parser.add_argument("--catalog", default="configs/model_catalog.json")
-    parser.add_argument("--catalog-source", choices=["static", "dynamic", "merged"], default="static")
+    parser.add_argument(
+        "--catalog-source", choices=["static", "dynamic", "merged"], default="static"
+    )
     parser.add_argument("--available-only", action="store_true")
     parser.add_argument("--models", default="all", help="'all' or comma separated model IDs")
     parser.add_argument("--data", default="examples/sample_loto7.csv")
@@ -143,7 +147,9 @@ def load_static_specs(catalog_path: Path, *, available_only: bool) -> list[Model
     return specs
 
 
-def resolve_specs(args: argparse.Namespace, catalog_path: Path) -> tuple[list[ModelSpec], dict[str, Any]]:
+def resolve_specs(
+    args: argparse.Namespace, catalog_path: Path
+) -> tuple[list[ModelSpec], dict[str, Any]]:
     static_specs: list[ModelSpec] = []
     static_sha = file_sha256(catalog_path)
     if args.catalog_source in {"static", "merged"}:
@@ -223,7 +229,9 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 def write_prediction_artifact(path: Path, values: np.ndarray) -> None:
-    frame = pd.DataFrame({"index": np.arange(len(values)), "prediction": np.asarray(values, dtype=float)})
+    frame = pd.DataFrame(
+        {"index": np.arange(len(values)), "prediction": np.asarray(values, dtype=float)}
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
         frame.to_parquet(path, index=False)
@@ -262,7 +270,10 @@ def dependency_report() -> dict[str, Any]:
     result: dict[str, Any] = {}
     for package in packages:
         try:
-            result[package] = {"status": "INSTALLED", "version": importlib.metadata.version(package)}
+            result[package] = {
+                "status": "INSTALLED",
+                "version": importlib.metadata.version(package),
+            }
         except importlib.metadata.PackageNotFoundError:
             result[package] = {"status": "MISSING", "version": None}
     return result
@@ -281,7 +292,9 @@ def environment_report() -> dict[str, Any]:
 
 def nvidia_smi_text() -> str:
     try:
-        proc = subprocess.run(["nvidia-smi"], capture_output=True, text=True, timeout=10, check=False)
+        proc = subprocess.run(
+            ["nvidia-smi"], capture_output=True, text=True, timeout=10, check=False
+        )
     except Exception as exc:
         return f"nvidia-smi failed: {type(exc).__name__}: {exc}\n"
     return proc.stdout + proc.stderr
@@ -389,33 +402,39 @@ def write_trial_artifacts(
 def neuralforecast_smoke_params(spec, args: argparse.Namespace) -> dict[str, Any]:
     if spec.library == "neuralforecast_auto":
         params = dict(spec.default_params)
-        params.update({
-            "backend": "optuna",
-            "num_samples": 1,
-            "max_steps": 1,
-            "parallel_trials": 1,
-            "refit_with_val": False,
-            "search_strategy": "random",
-            "input_size": 16,
-            "batch_size": 32,
-        })
-        if spec.class_name in {"AutoNBEATS", "AutoNBEATSx"}:
-            params.update({
-                "stack_types": ["identity"],
-                "n_blocks": [1],
-                "mlp_units": [[64, 64]],
-            })
-        if spec.class_name == "AutoTimesNet":
-            params.update({
+        params.update(
+            {
+                "backend": "optuna",
+                "num_samples": 1,
+                "max_steps": 1,
+                "parallel_trials": 1,
+                "refit_with_val": False,
+                "search_strategy": "random",
                 "input_size": 16,
-                "max_steps": 5,
                 "batch_size": 32,
-                "hidden_size": 32,
-                "conv_hidden_size": 32,
-                "top_k": 2,
-                "num_kernels": 2,
-                "encoder_layers": 1,
-            })
+            }
+        )
+        if spec.class_name in {"AutoNBEATS", "AutoNBEATSx"}:
+            params.update(
+                {
+                    "stack_types": ["identity"],
+                    "n_blocks": [1],
+                    "mlp_units": [[64, 64]],
+                }
+            )
+        if spec.class_name == "AutoTimesNet":
+            params.update(
+                {
+                    "input_size": 16,
+                    "max_steps": 5,
+                    "batch_size": 32,
+                    "hidden_size": 32,
+                    "conv_hidden_size": 32,
+                    "top_k": 2,
+                    "num_kernels": 2,
+                    "encoder_layers": 1,
+                }
+            )
         return params
     if spec.library != "neuralforecast":
         return dict(spec.default_params)
@@ -427,22 +446,26 @@ def neuralforecast_smoke_params(spec, args: argparse.Namespace) -> dict[str, Any
     params.setdefault("val_check_steps", 1)
     params.setdefault("early_stop_patience_steps", -1)
     if spec.class_name in {"NBEATS", "NBEATSx"}:
-        params.update({
-            "stack_types": ["identity"],
-            "n_blocks": [1],
-            "mlp_units": [[64, 64]],
-        })
+        params.update(
+            {
+                "stack_types": ["identity"],
+                "n_blocks": [1],
+                "mlp_units": [[64, 64]],
+            }
+        )
     if spec.class_name == "TimesNet":
-        params.update({
-            "input_size": 16,
-            "max_steps": 5,
-            "batch_size": 32,
-            "hidden_size": 32,
-            "conv_hidden_size": 32,
-            "top_k": 2,
-            "num_kernels": 2,
-            "encoder_layers": 1,
-        })
+        params.update(
+            {
+                "input_size": 16,
+                "max_steps": 5,
+                "batch_size": 32,
+                "hidden_size": 32,
+                "conv_hidden_size": 32,
+                "top_k": 2,
+                "num_kernels": 2,
+                "encoder_layers": 1,
+            }
+        )
     return params
 
 
@@ -815,7 +838,9 @@ def unsupported_result(spec, output_dir: Path, status: str, reason: str) -> Mode
     return result
 
 
-def run_foundation_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> ModelLifecycleResult:
+def run_foundation_lifecycle(
+    spec, master: pd.DataFrame, args, output_dir: Path
+) -> ModelLifecycleResult:
     output_dir.mkdir(parents=True, exist_ok=True)
     effective_device = "cuda" if args.verify_gpu else args.device
     requested = dict(spec.default_params) | {
@@ -824,10 +849,22 @@ def run_foundation_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path)
         "precision": args.precision,
         "local_files_only": True,
     }
-    before = inspect_model_properties(spec, None, params=requested, device=effective_device, precision=args.precision)
-    gpu_required = args.verify_gpu and ("gpu" in spec.capabilities or "gpu_optional" in spec.capabilities or "zero_shot" in spec.capabilities)
+    before = inspect_model_properties(
+        spec, None, params=requested, device=effective_device, precision=args.precision
+    )
+    gpu_required = args.verify_gpu and (
+        "gpu" in spec.capabilities
+        or "gpu_optional" in spec.capabilities
+        or "zero_shot" in spec.capabilities
+    )
     resource_before = collect_gpu_evidence(gpu_required=gpu_required)
-    provider = get_foundation_provider(spec)(spec, dict(spec.default_params), seed=args.seed, device=effective_device, precision=args.precision)
+    provider = get_foundation_provider(spec)(
+        spec,
+        dict(spec.default_params),
+        seed=args.seed,
+        device=effective_device,
+        precision=args.precision,
+    )
     errors: list[dict[str, Any]] = []
     predictions = np.asarray([], dtype=float)
     reloaded_predictions = None
@@ -891,13 +928,22 @@ def run_foundation_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path)
         errors.append({"stage": "foundation", "type": exc.status, "message": str(exc)})
     except Exception as exc:
         final_status = "PREDICT_FAILED"
-        errors.append({"stage": "foundation", "type": type(exc).__name__, "message": str(exc), "traceback": traceback.format_exc()})
+        errors.append(
+            {
+                "stage": "foundation",
+                "type": type(exc).__name__,
+                "message": str(exc),
+                "traceback": traceback.format_exc(),
+            }
+        )
     finally:
         provider.close()
     resource_after = collect_gpu_evidence(gpu_required=gpu_required)
     provider_gpu_evidence = {}
     if hasattr(provider, "last_response"):
-        provider_gpu_evidence = dict(getattr(provider, "last_response", {}).get("gpu_evidence", {}) or {})
+        provider_gpu_evidence = dict(
+            getattr(provider, "last_response", {}).get("gpu_evidence", {}) or {}
+        )
     if (
         final_status == "ZERO_SHOT_PASS"
         and gpu_required
@@ -906,17 +952,29 @@ def run_foundation_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path)
         and int(provider_gpu_evidence.get("peak_vram_bytes") or 0) > 0
     ):
         resource_after = dict(resource_after)
-        resource_after.update({
-            "eligible": True,
-            "reasons": ["subprocess_gpu_evidence"],
-            "model_device": provider_gpu_evidence.get("execution_device", "cuda"),
-            "batch_device": provider_gpu_evidence.get("execution_device", "cuda"),
-            "vram_peak_bytes": int(provider_gpu_evidence.get("peak_vram_bytes") or 0),
-            "subprocess_gpu_evidence": provider_gpu_evidence,
-        })
-    if final_status == "ZERO_SHOT_PASS" and gpu_required and not resource_after.get("eligible", False):
+        resource_after.update(
+            {
+                "eligible": True,
+                "reasons": ["subprocess_gpu_evidence"],
+                "model_device": provider_gpu_evidence.get("execution_device", "cuda"),
+                "batch_device": provider_gpu_evidence.get("execution_device", "cuda"),
+                "vram_peak_bytes": int(provider_gpu_evidence.get("peak_vram_bytes") or 0),
+                "subprocess_gpu_evidence": provider_gpu_evidence,
+            }
+        )
+    if (
+        final_status == "ZERO_SHOT_PASS"
+        and gpu_required
+        and not resource_after.get("eligible", False)
+    ):
         final_status = "GPU_PARTIAL"
-        errors.append({"stage": "gpu_evidence", "type": "GPU_PARTIAL", "message": ";".join(resource_after.get("reasons", []))})
+        errors.append(
+            {
+                "stage": "gpu_evidence",
+                "type": "GPU_PARTIAL",
+                "message": ";".join(resource_after.get("reasons", [])),
+            }
+        )
     result = ModelLifecycleResult(
         model_id=spec.model_id,
         fit_status=fit_status,
@@ -933,7 +991,11 @@ def run_foundation_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path)
         properties_after_load=properties_after_load,
         properties_after_retrain=properties_after_retrain,
         argument_evidence=verify_arguments(requested, requested, properties_after_fit or before),
-        resource_evidence={"before": resource_before, "after": resource_after, "provider": provider_gpu_evidence},
+        resource_evidence={
+            "before": resource_before,
+            "after": resource_after,
+            "provider": provider_gpu_evidence,
+        },
         errors=errors,
         final_status=final_status,
         metrics={"prediction_count": int(predictions.size)},
@@ -942,7 +1004,9 @@ def run_foundation_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path)
     return result
 
 
-def run_foundation_candidate_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> ModelLifecycleResult:
+def run_foundation_candidate_lifecycle(
+    spec, master: pd.DataFrame, args, output_dir: Path
+) -> ModelLifecycleResult:
     output_dir.mkdir(parents=True, exist_ok=True)
     effective_device = "cuda" if args.verify_gpu else args.device
     requested = dict(spec.default_params) | {
@@ -951,10 +1015,22 @@ def run_foundation_candidate_lifecycle(spec, master: pd.DataFrame, args, output_
         "precision": args.precision,
         "local_files_only": True,
     }
-    before = inspect_model_properties(spec, None, params=requested, device=effective_device, precision=args.precision)
-    gpu_required = args.verify_gpu and ("gpu" in spec.capabilities or "gpu_optional" in spec.capabilities or "zero_shot" in spec.capabilities)
+    before = inspect_model_properties(
+        spec, None, params=requested, device=effective_device, precision=args.precision
+    )
+    gpu_required = args.verify_gpu and (
+        "gpu" in spec.capabilities
+        or "gpu_optional" in spec.capabilities
+        or "zero_shot" in spec.capabilities
+    )
     resource_before = collect_gpu_evidence(gpu_required=gpu_required)
-    provider = get_foundation_provider(spec)(spec, dict(spec.default_params), seed=args.seed, device=effective_device, precision=args.precision)
+    provider = get_foundation_provider(spec)(
+        spec,
+        dict(spec.default_params),
+        seed=args.seed,
+        device=effective_device,
+        precision=args.precision,
+    )
     errors: list[dict[str, Any]] = []
     predictions = np.asarray([], dtype=float)
     reloaded_predictions = None
@@ -1025,13 +1101,22 @@ def run_foundation_candidate_lifecycle(spec, master: pd.DataFrame, args, output_
         errors.append({"stage": "foundation", "type": exc.status, "message": str(exc)})
     except Exception as exc:
         final_status = "PREDICT_FAILED"
-        errors.append({"stage": "foundation", "type": type(exc).__name__, "message": str(exc), "traceback": traceback.format_exc()})
+        errors.append(
+            {
+                "stage": "foundation",
+                "type": type(exc).__name__,
+                "message": str(exc),
+                "traceback": traceback.format_exc(),
+            }
+        )
     finally:
         provider.close()
     resource_after = collect_gpu_evidence(gpu_required=gpu_required)
     provider_gpu_evidence = {}
     if hasattr(provider, "last_response"):
-        provider_gpu_evidence = dict(getattr(provider, "last_response", {}).get("gpu_evidence", {}) or {})
+        provider_gpu_evidence = dict(
+            getattr(provider, "last_response", {}).get("gpu_evidence", {}) or {}
+        )
     if (
         final_status == "ZERO_SHOT_PASS"
         and gpu_required
@@ -1040,17 +1125,29 @@ def run_foundation_candidate_lifecycle(spec, master: pd.DataFrame, args, output_
         and int(provider_gpu_evidence.get("peak_vram_bytes") or 0) > 0
     ):
         resource_after = dict(resource_after)
-        resource_after.update({
-            "eligible": True,
-            "reasons": ["subprocess_gpu_evidence"],
-            "model_device": provider_gpu_evidence.get("execution_device", "cuda"),
-            "batch_device": provider_gpu_evidence.get("execution_device", "cuda"),
-            "vram_peak_bytes": int(provider_gpu_evidence.get("peak_vram_bytes") or 0),
-            "subprocess_gpu_evidence": provider_gpu_evidence,
-        })
-    if final_status == "ZERO_SHOT_PASS" and gpu_required and not resource_after.get("eligible", False):
+        resource_after.update(
+            {
+                "eligible": True,
+                "reasons": ["subprocess_gpu_evidence"],
+                "model_device": provider_gpu_evidence.get("execution_device", "cuda"),
+                "batch_device": provider_gpu_evidence.get("execution_device", "cuda"),
+                "vram_peak_bytes": int(provider_gpu_evidence.get("peak_vram_bytes") or 0),
+                "subprocess_gpu_evidence": provider_gpu_evidence,
+            }
+        )
+    if (
+        final_status == "ZERO_SHOT_PASS"
+        and gpu_required
+        and not resource_after.get("eligible", False)
+    ):
         final_status = "GPU_PARTIAL"
-        errors.append({"stage": "gpu_evidence", "type": "GPU_PARTIAL", "message": ";".join(resource_after.get("reasons", []))})
+        errors.append(
+            {
+                "stage": "gpu_evidence",
+                "type": "GPU_PARTIAL",
+                "message": ";".join(resource_after.get("reasons", [])),
+            }
+        )
     result = ModelLifecycleResult(
         model_id=spec.model_id,
         fit_status=fit_status,
@@ -1067,7 +1164,11 @@ def run_foundation_candidate_lifecycle(spec, master: pd.DataFrame, args, output_
         properties_after_load=properties_after_load,
         properties_after_retrain=properties_after_retrain,
         argument_evidence=verify_arguments(requested, requested, properties_after_fit or before),
-        resource_evidence={"before": resource_before, "after": resource_after, "provider": provider_gpu_evidence},
+        resource_evidence={
+            "before": resource_before,
+            "after": resource_after,
+            "provider": provider_gpu_evidence,
+        },
         errors=errors,
         final_status=final_status,
         metrics=metrics or {"prediction_count": int(predictions.size)},
@@ -1076,7 +1177,9 @@ def run_foundation_candidate_lifecycle(spec, master: pd.DataFrame, args, output_
     return result
 
 
-def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> ModelLifecycleResult:
+def run_worker_lifecycle(
+    spec, master: pd.DataFrame, args, output_dir: Path
+) -> ModelLifecycleResult:
     output_dir.mkdir(parents=True, exist_ok=True)
     params = neuralforecast_smoke_params(spec, args)
     effective_device = (
@@ -1091,11 +1194,16 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
     (output_dir / "nvidia_smi_before.txt").write_text(nvidia_smi_text(), encoding="utf-8")
     resource_before = collect_gpu_evidence(gpu_required=gpu_required)
     errors: list[dict[str, Any]] = []
+    metrics: dict[str, Any] = {}
     predictions = np.asarray([], dtype=float)
     reloaded_predictions = None
     retrained_predictions = None
     model_artifact = None
-    fit_status = "OK" if spec.task in {"position", "position_series", "candidate_series", "foundation"} else "NOT_RUN"
+    fit_status = (
+        "OK"
+        if spec.task in {"position", "position_series", "candidate_series", "foundation"}
+        else "NOT_RUN"
+    )
     predict_status = "NOT_RUN"
     save_status = "NOT_AVAILABLE"
     load_status = "NOT_RUN"
@@ -1105,7 +1213,11 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
     properties_after_load: dict[str, Any] = {}
     properties_after_retrain: dict[str, Any] = {}
     resource_after_override: dict[str, Any] | None = None
-    requested = params | {"seed": args.seed, "device": effective_device, "precision": args.precision}
+    requested = params | {
+        "seed": args.seed,
+        "device": effective_device,
+        "precision": args.precision,
+    }
     try:
         started = time.perf_counter()
         output = PositionSeriesWorker(
@@ -1119,7 +1231,8 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
         elapsed = time.perf_counter() - started
         prediction_values = (
             output.candidate_probabilities
-            if spec.task in {"candidate", "candidate_series"} and output.candidate_probabilities is not None
+            if spec.task in {"candidate", "candidate_series"}
+            and output.candidate_probabilities is not None
             else output.position_values
         )
         predictions = normalize_worker_predictions(
@@ -1133,11 +1246,13 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
         write_prediction_artifact(output_dir / "predictions.parquet", predictions)
         if output.model_artifact_payload is None:
             final_status = "SAVE_FAILED"
-            errors.append({
-                "stage": "save",
-                "type": "ARTIFACT_MISSING",
-                "message": "worker forecast returned predictions but no fitted model/save handle",
-            })
+            errors.append(
+                {
+                    "stage": "save",
+                    "type": "ARTIFACT_MISSING",
+                    "message": "worker forecast returned predictions but no fitted model/save handle",
+                }
+            )
         else:
             if output.model_artifact_payload.get("library") == "neuralforecast":
                 loaded = output.model_artifact_payload
@@ -1172,18 +1287,38 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
                 validate_prediction(reloaded_predictions, expected_shape=(37,))
                 load_status = "OK"
                 max_abs_diff = float(np.max(np.abs(predictions - reloaded_predictions)))
-                parity_tolerance = (
-                    1e-4
-                    if "probabilistic" in spec.capabilities or "DeepAR" in spec.class_name
-                    else 1e-5
-                )
+
+                # Model-specific/Library-specific parity tolerance policy mapping
+                parity_policy = {
+                    "default": 1e-5,
+                    "probabilistic": 1e-4,
+                    "DeepAR": 1e-4,
+                    "neuralforecast_auto": 1e-4,
+                }
+
+                policy_key = "default"
+                if "probabilistic" in spec.capabilities:
+                    policy_key = "probabilistic"
+                elif "DeepAR" in spec.class_name:
+                    policy_key = "DeepAR"
+                elif spec.library == "neuralforecast_auto":
+                    policy_key = "neuralforecast_auto"
+
+                parity_tolerance = parity_policy[policy_key]
+
+                metrics["prediction_parity_max_abs_diff"] = max_abs_diff
+                metrics["prediction_parity_tolerance"] = parity_tolerance
+                metrics["prediction_parity_policy"] = policy_key
+
                 if max_abs_diff > parity_tolerance:
                     final_status = "PREDICTION_MISMATCH"
-                    errors.append({
-                        "stage": "prediction_parity",
-                        "type": "PREDICTION_MISMATCH",
-                        "message": f"max_abs_diff={max_abs_diff}; tolerance={parity_tolerance}",
-                    })
+                    errors.append(
+                        {
+                            "stage": "prediction_parity",
+                            "type": "PREDICTION_MISMATCH",
+                            "message": f"max_abs_diff={max_abs_diff}; tolerance={parity_tolerance}; policy={policy_key}",
+                        }
+                    )
                 properties_after_load = inspect_model_properties(
                     spec,
                     nf.models[0] if getattr(nf, "models", None) else nf,
@@ -1217,7 +1352,9 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
                         gpu_required=gpu_required,
                         model=nf.models[0] if getattr(nf, "models", None) else None,
                     )
-                    resource_after_override["trainer_accelerator"] = loaded["params"].get("accelerator")
+                    resource_after_override["trainer_accelerator"] = loaded["params"].get(
+                        "accelerator"
+                    )
                     resource_after_override["trainer_devices"] = loaded["params"].get("devices")
                     if (
                         gpu_required
@@ -1231,10 +1368,14 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
                         ]
                 except Exception:
                     resource_after_override = None
-                properties_after_retrain = before | retrained_output.metadata | {
-                    "retrain_method": "full_refit_on_expanded_data",
-                    "retrain_rows": int(len(master)),
-                }
+                properties_after_retrain = (
+                    before
+                    | retrained_output.metadata
+                    | {
+                        "retrain_method": "full_refit_on_expanded_data",
+                        "retrain_rows": int(len(master)),
+                    }
+                )
                 if final_status != "PREDICTION_MISMATCH":
                     final_status = "PASS"
                 atomic_write_json(
@@ -1258,7 +1399,9 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
                 )
                 save_status = "OK"
             else:
-                model_artifact = save_pickle_model(output.model_artifact_payload, output_dir / "model.pkl")
+                model_artifact = save_pickle_model(
+                    output.model_artifact_payload, output_dir / "model.pkl"
+                )
                 save_status = "OK"
                 loaded = load_pickle_model(model_artifact)
             if loaded.get("library") == "statsforecast":
@@ -1339,10 +1482,14 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
                 )
                 validate_prediction(reloaded_predictions, expected_shape=(37,))
                 load_status = "OK"
-                properties_after_load = before | loaded.get("metadata", {}) | {
-                    "artifact_path": str(model_artifact),
-                    "load_method": "pickle_reservoirpy_esn",
-                }
+                properties_after_load = (
+                    before
+                    | loaded.get("metadata", {})
+                    | {
+                        "artifact_path": str(model_artifact),
+                        "load_method": "pickle_reservoirpy_esn",
+                    }
+                )
             elif loaded.get("library") == "darts_ensemble":
                 values = []
                 for model in loaded["models"]:
@@ -1355,19 +1502,22 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
                 )
                 validate_prediction(reloaded_predictions, expected_shape=(37,))
                 load_status = "OK"
-                properties_after_load = before | loaded.get("metadata", {}) | {
-                    "artifact_path": str(model_artifact),
-                    "load_method": "pickle_darts_ensemble",
-                }
+                properties_after_load = (
+                    before
+                    | loaded.get("metadata", {})
+                    | {
+                        "artifact_path": str(model_artifact),
+                        "load_method": "pickle_darts_ensemble",
+                    }
+                )
             elif loaded.get("library") == "gluonts_deepar":
                 from gluonts.dataset.common import ListDataset
 
                 dataset = ListDataset(loaded["dataset"], freq="D")
                 forecasts = list(loaded["predictor"].predict(dataset))
-                values = np.asarray([
-                    float(np.asarray(forecast.samples).mean(axis=0)[0])
-                    for forecast in forecasts
-                ])
+                values = np.asarray(
+                    [float(np.asarray(forecast.samples).mean(axis=0)[0]) for forecast in forecasts]
+                )
                 history = master.iloc[:-1].copy()
                 reloaded_predictions = normalize_worker_predictions(
                     task=spec.task,
@@ -1376,10 +1526,14 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
                 )
                 validate_prediction(reloaded_predictions, expected_shape=(37,))
                 load_status = "OK"
-                properties_after_load = before | loaded.get("metadata", {}) | {
-                    "artifact_path": str(model_artifact),
-                    "load_method": "pickle_gluonts_deepar",
-                }
+                properties_after_load = (
+                    before
+                    | loaded.get("metadata", {})
+                    | {
+                        "artifact_path": str(model_artifact),
+                        "load_method": "pickle_gluonts_deepar",
+                    }
+                )
             elif loaded.get("library") == "autohint_fixed":
                 write_autohint_hierarchy_artifacts(output_dir, loaded["hierarchy"])
                 frame_path = output_dir / "autohint_frame.csv"
@@ -1406,14 +1560,17 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
                 )
                 validate_prediction(reloaded_predictions, expected_shape=(37,))
                 load_status = "OK"
-                properties_after_load = inspect_model_properties(
-                    spec,
-                    loaded["neuralforecast"].models[0],
-                    params=requested,
-                    artifact_path=model_artifact,
-                    device=args.device,
-                    precision=args.precision,
-                ) | loaded["metadata"]
+                properties_after_load = (
+                    inspect_model_properties(
+                        spec,
+                        loaded["neuralforecast"].models[0],
+                        params=requested,
+                        artifact_path=model_artifact,
+                        device=args.device,
+                        precision=args.precision,
+                    )
+                    | loaded["metadata"]
+                )
                 atomic_write_json(
                     output_dir / "coherence_evidence.json",
                     {
@@ -1460,10 +1617,14 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
                 )
                 validate_prediction(reloaded_predictions, expected_shape=(37,))
                 load_status = "OK"
-                properties_after_load = before | reload_result.get("properties", {}) | {
-                    "artifact_path": str(model_artifact),
-                    "load_method": "autogluon_subprocess_reload",
-                }
+                properties_after_load = (
+                    before
+                    | reload_result.get("properties", {})
+                    | {
+                        "artifact_path": str(model_artifact),
+                        "load_method": "autogluon_subprocess_reload",
+                    }
+                )
             if loaded.get("library") != "neuralforecast":
                 retrained_output = PositionSeriesWorker(
                     spec,
@@ -1487,7 +1648,9 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
                 retrain_status = "OK"
                 properties_after_retrain = before | retrained_output.metadata
                 if loaded.get("library") == "autogluon":
-                    retrain_artifact_dir = retrained_output.model_artifact_payload.get("artifact_dir")
+                    retrain_artifact_dir = retrained_output.model_artifact_payload.get(
+                        "artifact_dir"
+                    )
                     if retrain_artifact_dir:
                         shutil.rmtree(retrain_artifact_dir, ignore_errors=True)
                 if load_status == "OK":
@@ -1509,19 +1672,32 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
         if status:
             final_status = status
         elif "requires provider" in message or "not implemented" in message:
-            final_status = "PROVIDER_NOT_IMPLEMENTED" if spec.task == "foundation" else "WORKER_NOT_IMPLEMENTED"
+            final_status = (
+                "PROVIDER_NOT_IMPLEMENTED"
+                if spec.task == "foundation"
+                else "WORKER_NOT_IMPLEMENTED"
+            )
         else:
             final_status = "PREDICT_FAILED"
-        errors.append({"stage": "fit_predict", "type": type(exc).__name__, "message": message, "traceback": traceback.format_exc()})
+        errors.append(
+            {
+                "stage": "fit_predict",
+                "type": type(exc).__name__,
+                "message": message,
+                "traceback": traceback.format_exc(),
+            }
+        )
     (output_dir / "nvidia_smi_after.txt").write_text(nvidia_smi_text(), encoding="utf-8")
     resource_after = resource_after_override or collect_gpu_evidence(gpu_required=gpu_required)
     if gpu_required and final_status == "PASS" and not resource_after.get("eligible", False):
         final_status = "GPU_PARTIAL"
-        errors.append({
-            "stage": "gpu_evidence",
-            "type": "GPU_PARTIAL",
-            "message": ";".join(resource_after.get("reasons", [])),
-        })
+        errors.append(
+            {
+                "stage": "gpu_evidence",
+                "type": "GPU_PARTIAL",
+                "message": ";".join(resource_after.get("reasons", [])),
+            }
+        )
     result = ModelLifecycleResult(
         model_id=spec.model_id,
         fit_status=fit_status,
@@ -1541,7 +1717,7 @@ def run_worker_lifecycle(spec, master: pd.DataFrame, args, output_dir: Path) -> 
         resource_evidence={"before": resource_before, "after": resource_after},
         errors=errors,
         final_status=final_status,
-        metrics={"prediction_count": int(predictions.size)},
+        metrics={**metrics, "prediction_count": int(predictions.size)},
     )
     atomic_write_json(output_dir / "lifecycle_result.json", result.to_dict())
     return result
@@ -1584,7 +1760,8 @@ def flatten_result(
         "property_inspection": "OK" if result.properties_before else "FAILED",
         "argument_verification": "OK" if result.argument_evidence else "NOT_RUN",
         "GPU利用": result.resource_evidence.get("after", {}).get("eligible", "NOT_REQUIRED"),
-        "parallel対応": any(cap in spec.capabilities for cap in ("auto_hpo", "ray")) or spec.library in {"sklearn", "lightgbm"},
+        "parallel対応": any(cap in spec.capabilities for cap in ("auto_hpo", "ray"))
+        or spec.library in {"sklearn", "lightgbm"},
         "学習時間": result.metrics.get("training_time_seconds"),
         "推論時間": result.metrics.get("prediction_time_seconds"),
         "最大RAM": None,
@@ -1594,7 +1771,9 @@ def flatten_result(
         "failure_reason": "; ".join(error.get("message", "") for error in result.errors),
         "selected_run_id": run_id,
         "selected_signature": selected_signature,
-        "selection_reason": "current_run_success" if result.final_status in {"PASS", "ZERO_SHOT_PASS"} else "current_run_latest_failure",
+        "selection_reason": "current_run_success"
+        if result.final_status in {"PASS", "ZERO_SHOT_PASS"}
+        else "current_run_latest_failure",
         "superseded_runs": [],
         "artifact_validation": {
             "artifact_path": None if result.model_artifact is None else str(result.model_artifact),
@@ -1612,10 +1791,12 @@ def main(argv: list[str] | None = None) -> int:
     specs, catalog_info = resolve_specs(args, catalog_path)
     cli_config = args_snapshot(args)
     data_sha256 = file_sha256(Path(args.data))
-    code_fingerprint = stable_hash({
-        "script": file_sha256(Path(__file__)),
-        "workers": file_sha256(ROOT / "src" / "loto" / "models" / "workers.py"),
-    })
+    code_fingerprint = stable_hash(
+        {
+            "script": file_sha256(Path(__file__)),
+            "workers": file_sha256(ROOT / "src" / "loto" / "models" / "workers.py"),
+        }
+    )
     required_lifecycle_flags = {
         "require_fit": args.require_fit,
         "require_predict": args.require_predict,
@@ -1625,16 +1806,18 @@ def main(argv: list[str] | None = None) -> int:
         "require_property_validation": args.require_property_validation,
         "verify_arguments": args.verify_arguments,
     }
-    run_signature = stable_hash({
-        "cli": cli_config,
-        "models": [spec.model_id for spec in specs],
-        "catalog_sha256": catalog_info["catalog_sha256"],
-        "data_sha256": data_sha256,
-        "code_fingerprint": code_fingerprint,
-        "required_lifecycle_flags": required_lifecycle_flags,
-        "device": args.device,
-        "precision": args.precision,
-    })
+    run_signature = stable_hash(
+        {
+            "cli": cli_config,
+            "models": [spec.model_id for spec in specs],
+            "catalog_sha256": catalog_info["catalog_sha256"],
+            "data_sha256": data_sha256,
+            "code_fingerprint": code_fingerprint,
+            "required_lifecycle_flags": required_lifecycle_flags,
+            "device": args.device,
+            "precision": args.precision,
+        }
+    )
     output_base = Path(args.output)
     if args.resume:
         candidates = sorted(
@@ -1642,7 +1825,11 @@ def main(argv: list[str] | None = None) -> int:
             key=lambda path: path.stat().st_mtime,
             reverse=True,
         )
-        output_root = candidates[0] if candidates else output_base / f"runtime-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"
+        output_root = (
+            candidates[0]
+            if candidates
+            else output_base / f"runtime-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"
+        )
         run_id = output_root.name
     else:
         run_id = f"runtime-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"
@@ -1667,16 +1854,31 @@ def main(argv: list[str] | None = None) -> int:
     events: list[dict[str, Any]] = []
     previous_rows: dict[str, dict[str, Any]] = {}
     previous_results = output_root / "all_model_runtime_validation.json"
+    previous_manifest = output_root / "run_manifest.json"
     if args.resume and previous_results.exists():
-        try:
-            previous_rows = {
-                str(row["model_id"]): row
-                for row in extract_status_rows(
-                    json.loads(previous_results.read_text(encoding="utf-8"))
-                )
-            }
-        except Exception:
-            previous_rows = {}
+        sig_match = True
+        if previous_manifest.exists():
+            try:
+                manifest_data = json.loads(previous_manifest.read_text(encoding="utf-8"))
+                prev_sig = manifest_data.get("run_signature")
+                if prev_sig != run_signature:
+                    print(
+                        f"Resume signature mismatch: current={run_signature}, previous={prev_sig}. Re-running all trials.",
+                        file=sys.stderr,
+                    )
+                    sig_match = False
+            except Exception:
+                sig_match = False
+        if sig_match:
+            try:
+                previous_rows = {
+                    str(row["model_id"]): row
+                    for row in extract_status_rows(
+                        json.loads(previous_results.read_text(encoding="utf-8"))
+                    )
+                }
+            except Exception:
+                previous_rows = {}
     atomic_write_json(
         output_root / "run_manifest.json",
         {
@@ -1700,18 +1902,46 @@ def main(argv: list[str] | None = None) -> int:
         trial_dir = output_root / spec.model_id
         if args.resume and (trial_dir / "lifecycle_result.json").exists():
             row = previous_rows.get(spec.model_id)
-            artifact = Path(str(row.get("artifact path"))) if row and row.get("artifact path") else None
-            if row and row.get("final_status") == "PASS" and artifact is not None and artifact.exists():
+            artifact = (
+                Path(str(row.get("artifact path"))) if row and row.get("artifact path") else None
+            )
+            if (
+                row
+                and row.get("final_status") in {"PASS", "ZERO_SHOT_PASS"}
+                and artifact is not None
+                and artifact.exists()
+            ):
                 rows.append(row)
                 events.append({"event": "trial_resumed_skip", "model_id": spec.model_id})
                 continue
-            if row and row.get("final_status") == "PASS" and artifact is None:
-                events.append({"event": "trial_resume_rejected", "model_id": spec.model_id, "reason": "missing artifact path"})
-            elif row and row.get("final_status") == "PASS":
-                events.append({"event": "trial_resume_rejected", "model_id": spec.model_id, "reason": "artifact missing"})
+            if row and row.get("final_status") in {"PASS", "ZERO_SHOT_PASS"} and artifact is None:
+                events.append(
+                    {
+                        "event": "trial_resume_rejected",
+                        "model_id": spec.model_id,
+                        "reason": "missing artifact path",
+                    }
+                )
+            elif row and row.get("final_status") in {"PASS", "ZERO_SHOT_PASS"}:
+                events.append(
+                    {
+                        "event": "trial_resume_rejected",
+                        "model_id": spec.model_id,
+                        "reason": "artifact missing",
+                    }
+                )
         trial_events: list[dict[str, Any]] = []
-        lease = scheduler.acquire(requires_gpu=args.verify_gpu and "gpu" in spec.capabilities, lease_id=spec.model_id)
-        events.append({"event": "trial_started", "model_id": spec.model_id, "pid": lease.pid, "started_at": lease.started_at})
+        lease = scheduler.acquire(
+            requires_gpu=args.verify_gpu and "gpu" in spec.capabilities, lease_id=spec.model_id
+        )
+        events.append(
+            {
+                "event": "trial_started",
+                "model_id": spec.model_id,
+                "pid": lease.pid,
+                "started_at": lease.started_at,
+            }
+        )
         trial_events.append(events[-1])
         try:
             if (
@@ -1720,7 +1950,12 @@ def main(argv: list[str] | None = None) -> int:
                 and spec.library not in FOUNDATION_CANDIDATE_LIBRARIES
                 and spec.library not in WORKER_SUBPROCESS_LIBRARIES
             ):
-                result = unsupported_result(spec, trial_dir, "DEPENDENCY_MISSING", f"optional package missing: {spec.package}")
+                result = unsupported_result(
+                    spec,
+                    trial_dir,
+                    "DEPENDENCY_MISSING",
+                    f"optional package missing: {spec.package}",
+                )
             elif spec.task == "candidate" and spec.library in FOUNDATION_CANDIDATE_LIBRARIES:
                 result = run_foundation_candidate_lifecycle(spec, master, args, trial_dir)
             elif spec.task == "candidate":
@@ -1738,12 +1973,27 @@ def main(argv: list[str] | None = None) -> int:
             elif spec.task in {"position", "position_series", "candidate_series"}:
                 result = run_worker_lifecycle(spec, master, args, trial_dir)
             else:
-                result = unsupported_result(spec, trial_dir, "WORKER_NOT_IMPLEMENTED", f"task {spec.task} has no runtime validation worker")
+                result = unsupported_result(
+                    spec,
+                    trial_dir,
+                    "WORKER_NOT_IMPLEMENTED",
+                    f"task {spec.task} has no runtime validation worker",
+                )
         finally:
             scheduler.release(lease)
-            events.append({"event": "trial_finished", "model_id": spec.model_id, "released_at": lease.released_at})
+            events.append(
+                {
+                    "event": "trial_finished",
+                    "model_id": spec.model_id,
+                    "released_at": lease.released_at,
+                }
+            )
             trial_events.append(events[-1])
-        requested = spec.default_params | {"seed": args.seed, "device": args.device, "precision": args.precision}
+        requested = spec.default_params | {
+            "seed": args.seed,
+            "device": args.device,
+            "precision": args.precision,
+        }
         effective = result.properties_after_fit or result.properties_before
         write_trial_artifacts(
             trial_dir,
@@ -1756,9 +2006,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         write_prediction_artifact(trial_dir / "predictions.parquet", result.predictions)
         if result.reloaded_predictions is not None:
-            write_prediction_artifact(trial_dir / "reloaded_predictions.parquet", result.reloaded_predictions)
+            write_prediction_artifact(
+                trial_dir / "reloaded_predictions.parquet", result.reloaded_predictions
+            )
         if result.retrained_predictions is not None:
-            write_prediction_artifact(trial_dir / "retrained_predictions.parquet", result.retrained_predictions)
+            write_prediction_artifact(
+                trial_dir / "retrained_predictions.parquet", result.retrained_predictions
+            )
         row = flatten_result(
             spec,
             result,
@@ -1783,7 +2037,10 @@ def main(argv: list[str] | None = None) -> int:
             argument_rows.append({"model_id": spec.model_id, **arg})
         gpu_rows.append({"model_id": spec.model_id, **result.resource_evidence})
     write_jsonl(output_root / "events.jsonl", events)
-    atomic_write_json(output_root / "process_tree.json", {"pid": lease.pid if specs else None})
+    atomic_write_json(
+        output_root / "process_tree.json",
+        {"pid": lease.pid if (specs and "lease" in locals() and lease is not None) else None},
+    )
     write_csv(output_root / "all_model_runtime_validation.csv", rows)
     status_payload = {
         "schema_version": 1,
@@ -1799,7 +2056,9 @@ def main(argv: list[str] | None = None) -> int:
     write_csv(output_root / "argument_verification_matrix.csv", argument_rows)
     write_csv(output_root / "gpu_vram_matrix.csv", gpu_rows)
     write_csv(output_root / "parallel_execution_report.csv", scheduler.report())
-    counts = pd.Series([row["final_status"] for row in rows]).value_counts().to_dict() if rows else {}
+    counts = (
+        pd.Series([row["final_status"] for row in rows]).value_counts().to_dict() if rows else {}
+    )
     status_payload["counts"] = counts
     atomic_write_json(output_root / "all_model_runtime_validation.json", status_payload)
     md_lines = [
@@ -1812,10 +2071,22 @@ def main(argv: list[str] | None = None) -> int:
         "",
         *[f"- {key}: {value}" for key, value in counts.items()],
     ]
-    (output_root / "all_model_runtime_validation.md").write_text("\n".join(md_lines) + "\n", encoding="utf-8")
+    (output_root / "all_model_runtime_validation.md").write_text(
+        "\n".join(md_lines) + "\n", encoding="utf-8"
+    )
     failures = [row for row in rows if row["final_status"] != "PASS"]
     (output_root / "failure_analysis.md").write_text(
-        "\n".join(["# Failure Analysis", "", *[f"- {row['model_id']}: {row['final_status']} {row['failure_reason']}" for row in failures]]) + "\n",
+        "\n".join(
+            [
+                "# Failure Analysis",
+                "",
+                *[
+                    f"- {row['model_id']}: {row['final_status']} {row['failure_reason']}"
+                    for row in failures
+                ],
+            ]
+        )
+        + "\n",
         encoding="utf-8",
     )
     final_status_payload = {
@@ -1825,12 +2096,27 @@ def main(argv: list[str] | None = None) -> int:
         "data_sha256": data_sha256,
         "code_fingerprint": code_fingerprint,
     }
-    atomic_write_json(output_root / "run_summary.json", {"schema_version": 1, "run_id": run_id, "counts": counts, "models": len(rows), **catalog_info})
+    atomic_write_json(
+        output_root / "run_summary.json",
+        {
+            "schema_version": 1,
+            "run_id": run_id,
+            "counts": counts,
+            "models": len(rows),
+            **catalog_info,
+        },
+    )
     atomic_write_json(output_root / "status.json", final_status_payload)
     if args.models == "all":
         atomic_write_json(output_base / "all_model_final_status.json", final_status_payload)
-    print(json.dumps({"run_id": run_id, "output": str(output_root), "counts": counts}, ensure_ascii=False))
-    return 0 if not any(row["final_status"] in {"FIT_FAILED", "PREDICT_FAILED"} for row in rows) else 2
+    print(
+        json.dumps(
+            {"run_id": run_id, "output": str(output_root), "counts": counts}, ensure_ascii=False
+        )
+    )
+    return (
+        0 if not any(row["final_status"] in {"FIT_FAILED", "PREDICT_FAILED"} for row in rows) else 2
+    )
 
 
 if __name__ == "__main__":
