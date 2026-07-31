@@ -21,7 +21,7 @@ from typing import Any
 try:
     import yaml
 except Exception as exc:
-    raise SystemExit(f"PyYAML is required: {exc}")
+    raise SystemExit(f"PyYAML is required: {exc}") from exc
 
 PROJECT = Path.cwd()
 DEFAULT_BASE = PROJECT / "configs" / "research_smoke.yaml"
