@@ -39,8 +39,10 @@ def build_catalog_snapshot() -> dict[str, Any]:
     specs = list_model_specs(available_only=False)
     models: dict[str, Any] = {}
     for spec in specs:
+        model_config = spec.to_dict()
+        model_config.pop("available", None)
         model_config_hash = hashlib.sha256(
-            json.dumps(spec.to_dict(), sort_keys=True, default=str).encode("utf-8")
+            json.dumps(model_config, sort_keys=True, default=str).encode("utf-8")
         ).hexdigest()[:16]
         try:
             resolved_params = resolve_model_params(spec, STAGE)
