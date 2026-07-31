@@ -108,7 +108,9 @@ def permutation_sentinel(
         tolerance=tolerance,
         n_repeats=n_repeats,
         tripped=bool(tripped),
-        detail=f"score sd over repeats={float(np.std(scores, ddof=1)) if len(scores) > 1 else 0.0:.6f}",
+        detail=(
+            f"score sd over repeats={float(np.std(scores, ddof=1)) if len(scores) > 1 else 0.0:.6f}"
+        ),
     )
 
 

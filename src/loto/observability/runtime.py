@@ -68,7 +68,10 @@ def _process_snapshot() -> dict[str, Any]:
 
 
 def _gpu_snapshot() -> dict[str, Any]:
-    query = "timestamp,index,uuid,name,utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw"
+    query = (
+        "timestamp,index,uuid,name,utilization.gpu,memory.used,"
+        "memory.total,temperature.gpu,power.draw"
+    )
     try:
         proc = subprocess.run(
             ["nvidia-smi", f"--query-gpu={query}", "--format=csv,noheader,nounits"],

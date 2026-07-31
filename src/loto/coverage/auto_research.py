@@ -138,10 +138,12 @@ def _point(
                 beta = np.linalg.solve(x.T @ x + alpha * np.eye(x.shape[1]), x.T @ y)
                 center = np.concatenate([sample[-lag] for lag in lags]) @ beta
     else:
-        # Unsupported heavy/optional model gets a deterministic surrogate only when explicitly allowed.
+        # Unsupported heavy/optional models get a deterministic surrogate
+        # only when explicitly allowed.
         if not params.get("allow_surrogate", False):
             raise RuntimeError(
-                f"model {method} requires its provider worker; set allow_surrogate only for orchestration smoke tests"
+                f"model {method} requires its provider worker; "
+                "set allow_surrogate only for orchestration smoke tests"
             )
         center = np.median(sample, axis=0)
     return _legalize(center, count, maximum)
@@ -326,10 +328,12 @@ class LocalLLMClient:
 
     def propose(self, context: dict[str, Any]) -> list[dict[str, Any]]:
         prompt = (
-            "You optimize a leakage-safe lottery coverage experiment. Return JSON only with key proposals. "
-            "Each proposal has model_id, params, ensemble, pool_size, diversity_penalty. Never claim success; "
-            "suggest bounded experiments that may improve validation row_within_tolerance while reducing candidate_count.\n"
-            + json.dumps(context, ensure_ascii=False, default=str)
+            "You optimize a leakage-safe lottery coverage experiment. "
+            "Return JSON only with key proposals. Each proposal has "
+            "model_id, params, ensemble, pool_size, diversity_penalty. "
+            "Never claim success; suggest bounded experiments that may "
+            "improve validation row_within_tolerance while reducing "
+            "candidate_count.\n" + json.dumps(context, ensure_ascii=False, default=str)
         )
         body = json.dumps(
             {
@@ -534,7 +538,11 @@ def run_auto_research(config_path: str | Path) -> dict[str, Any]:
         "budget": asdict(budget),
         "games": all_summaries,
         "elapsed_seconds": time.time() - started,
-        "note": "Search is bounded; 'all settings' means every value explicitly enumerated in parameter_spaces, not an infinite continuum. Protected tests remain unopened.",
+        "note": (
+            "Search is bounded; 'all settings' means every value "
+            "explicitly enumerated in parameter_spaces, not an infinite "
+            "continuum. Protected tests remain unopened."
+        ),
     }
     atomic_write_json(output / "auto_research_summary.json", summary)
     return summary

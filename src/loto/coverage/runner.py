@@ -169,7 +169,10 @@ def run_coverage_experiment(config_path: str | Path) -> dict[str, Any]:
             "prediction_set_json": str(output / "prediction_set.json"),
             "selection_trace": str(output / "selection_trace.json"),
         },
-        "note": "90% is a measured coverage target, not a guaranteed lottery win probability. Protected test remains unopened.",
+        "note": (
+            "90% is a measured coverage target, not a guaranteed lottery "
+            "win probability. Protected test remains unopened."
+        ),
     }
     atomic_write_json(output / "coverage_summary.json", summary)
     return summary
@@ -204,7 +207,11 @@ def certify_coverage_experiment(
         "target_coverage": cfg.target_coverage,
         "protected_test": evaluation.to_dict(),
         "prediction_set_sha256": __import__("hashlib").sha256(set_path.read_bytes()).hexdigest(),
-        "warning": "Certification opens the protected test. Do not tune on this result; create a new future holdout for subsequent changes.",
+        "warning": (
+            "Certification opens the protected test. Do not tune on "
+            "this result; create a new future holdout for subsequent "
+            "changes."
+        ),
     }
     atomic_write_json(output / "coverage_certification.json", result)
     prior["protected_test_evaluated"] = True

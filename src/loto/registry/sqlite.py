@@ -42,7 +42,9 @@ class Registry:
     def record_stage(self, run_id: str, stage: str, status: str, payload: dict) -> None:
         with self._connect() as con:
             con.execute(
-                "INSERT INTO stage_events(run_id,stage,status,created_at,payload_json) VALUES(?,?,?,?,?)",
+                "INSERT INTO stage_events("
+                "run_id,stage,status,created_at,payload_json"
+                ") VALUES(?,?,?,?,?)",
                 (
                     run_id,
                     stage,

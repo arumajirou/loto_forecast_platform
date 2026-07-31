@@ -228,7 +228,8 @@ def main(argv=None):
     if args.group == "experiment" and args.action == "run-all":
         if args.game != "loto7":
             raise SystemExit(
-                "experiment run-all currently supports loto7 prediction; data acquire supports all configured games"
+                "experiment run-all currently supports loto7 prediction; "
+                "data acquire supports all configured games"
             )
         data_dir = Path(args.output) / "data"
         acquired = acquire_and_build(
@@ -282,7 +283,11 @@ def main(argv=None):
             print(f"{'MODEL ID':32} {'LIBRARY':18} {'TASK':18} {'PRI':4} AVAILABLE")
             for row in rows:
                 print(
-                    f"{row['model_id'][:32]:32} {row['library'][:18]:18} {row['task'][:18]:18} {row['priority']:4} {row['available']}"
+                    f"{row['model_id'][:32]:32} "
+                    f"{row['library'][:18]:18} "
+                    f"{row['task'][:18]:18} "
+                    f"{row['priority']:4} "
+                    f"{row['available']}"
                 )
         return 0
     if args.group == "models" and args.action == "show":

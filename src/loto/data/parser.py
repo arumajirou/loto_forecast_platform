@@ -171,7 +171,8 @@ def normalize_raw_dataframe(df: pd.DataFrame, spec: LotterySpec, source_url: str
 
     bonus_cols = _find_number_columns(df, [r"ボーナス数字", r"bonus", r"b"], spec.bonus_count)
     if len(bonus_cols) < spec.bonus_count:
-        # If the CSV places bonus numbers after the main numbers, use remaining valid numeric columns.
+        # If the CSV places bonus numbers after the main numbers,
+        # use remaining valid numeric columns.
         candidates = [c for c in _candidate_numeric_columns(df) if c not in main_cols]
         bonus_cols = (bonus_cols + candidates)[: spec.bonus_count]
     for i in range(spec.bonus_count):
