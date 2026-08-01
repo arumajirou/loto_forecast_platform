@@ -15,8 +15,10 @@ Primary sources (retrieved 2026-07-30):
 
 TSFM entries carry ``repo_id`` but ``revision=None``. A ``None`` revision is deliberately
 *not* filled with a plausible-looking SHA: an unverified commit hash is worse than an
-explicit gap, because it makes ``protocol_hash`` look reproducible when it is not. Run
-``loto models pin`` against a network-enabled environment to resolve them.
+explicit gap, because it makes ``protocol_hash`` look reproducible when it is not.
+Generate and validate an explicit manifest with
+``loto3 revisions template`` and ``loto3 revisions validate``. Resolution itself remains a
+reviewed external step; the platform never guesses a commit.
 """
 
 from __future__ import annotations
