@@ -1,0 +1,17 @@
+{
+  "environment": "granite-ttm",
+  "strategy": "dedicated uv environment plus subprocess provider",
+  "python": ">=3.11,<3.13",
+  "repo_id": "ibm-granite/granite-timeseries-ttm-r2",
+  "reason": "The main environment transformers package does not expose TinyTimeMixerForPrediction.",
+  "dependencies": {
+    "numpy": ">=1.26,<3",
+    "pandas": ">=2.2",
+    "torch": ">=2.3",
+    "huggingface-hub": ">=0.24",
+    "transformers": ">=4.46,<4.53"
+  },
+  "entrypoint": "scripts/run_granite_ttm_provider.py",
+  "contract": "environments/granite-ttm/provider-contract.md",
+  "local_files_only": true
+}
