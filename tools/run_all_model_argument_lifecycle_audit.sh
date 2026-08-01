@@ -27,6 +27,8 @@ uv run --no-sync python scripts/build_all_model_argument_audit.py \
 # The existing lifecycle runner is the execution authority. It performs fit,
 # prediction, save/load, reload prediction, retraining, property inspection,
 # argument verification and resource evidence collection.
+set +e
+
 uv run --no-sync python scripts/all_model_runtime_validation.py \
   --models "$MODELS" \
   "${AVAILABLE_FLAG[@]}" \
@@ -41,6 +43,10 @@ uv run --no-sync python scripts/all_model_runtime_validation.py \
   --device "$DEVICE" \
   --precision "$PRECISION" \
   --output "$OUT/runtime"
+
+RUNTIME_RC=$?
+
+set -e
 
 uv run --no-sync python - "$OUT" <<'PY'
 from __future__ import annotations
@@ -150,3 +156,6 @@ print(json.dumps(result, ensure_ascii=False))
 PY
 
 echo "audit=$OUT"
+echo "runtime_exit_code=$RUNTIME_RC"
+
+exit "$RUNTIME_RC"
