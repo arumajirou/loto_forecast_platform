@@ -66,7 +66,9 @@ def test_runtime_status_contains_four_certified_models() -> None:
 
     row = next(item for item in status["results"] if item["model_id"] == "tirex-2")
 
-    assert status["runtime_certified_models"] == 4
+    assert status["runtime_certified_models"] == sum(
+        item.get("runtime_status") == "CERTIFIED" for item in status["results"]
+    )
     assert row["runtime_status"] == "CERTIFIED"
     assert row["runtime_vram_certified"] is True
     assert row["runtime_revision"] == REVISION

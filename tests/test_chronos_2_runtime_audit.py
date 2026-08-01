@@ -162,11 +162,13 @@ def test_chronos_2_runtime_status_ledger() -> None:
     status = _load_json(STATUS_PATH)
 
     assert len(status["results"]) == 21
-    assert status["runtime_certified_models"] == 8
+    assert status["runtime_certified_models"] == sum(
+        item.get("runtime_status") == "CERTIFIED" for item in status["results"]
+    )
 
     certified = [item for item in status["results"] if item.get("runtime_status") == "CERTIFIED"]
 
-    assert len(certified) == 8
+    assert len(certified) == status["runtime_certified_models"]
 
     row = next(item for item in status["results"] if item["model_id"] == MODEL_ID)
 

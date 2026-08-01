@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "stage": "smoke",
-  "generated_at": "2026-08-01T05:48:38.061235+00:00",
-  "code_fingerprint": "aa119f6f321d6a37",
-  "model_count": 87,
+  "generated_at": "2026-08-01T11:15:09.204558+00:00",
+  "code_fingerprint": "a75c85a5c8b90df4",
+  "model_count": 89,
   "models": {
     "uniform": {
       "library": "builtin",
@@ -148,7 +148,7 @@
         "exogenous",
         "gpu_optional"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "77e7563312f8d931",
       "resolved_smoke_params": {
         "n_estimators": 400,
@@ -167,7 +167,7 @@
         "exogenous",
         "gpu_optional"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "6d63e9ff9fcfe033",
       "resolved_smoke_params": {
         "n_estimators": 400,
@@ -185,7 +185,7 @@
         "exogenous",
         "gpu_optional"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "714260a1eef9c108",
       "resolved_smoke_params": {
         "n_estimators": 400,
@@ -204,7 +204,7 @@
         "exogenous",
         "gpu_optional"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "97e150421746c3c6",
       "resolved_smoke_params": {
         "iterations": 400,
@@ -219,7 +219,7 @@
       "class_name": "Naive",
       "priority": "p0",
       "capabilities": [],
-      "available": true,
+      "available": false,
       "model_config_hash": "db24c06c35df6c3c",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -230,7 +230,7 @@
       "class_name": "HistoricAverage",
       "priority": "p0",
       "capabilities": [],
-      "available": true,
+      "available": false,
       "model_config_hash": "1b0a6ff1e6a796c1",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -241,7 +241,7 @@
       "class_name": "AutoARIMA",
       "priority": "p0",
       "capabilities": [],
-      "available": true,
+      "available": false,
       "model_config_hash": "fd8b9961fd9885bb",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -252,7 +252,7 @@
       "class_name": "AutoETS",
       "priority": "p0",
       "capabilities": [],
-      "available": true,
+      "available": false,
       "model_config_hash": "c2f53541d8c3fdda",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -263,7 +263,7 @@
       "class_name": "AutoTheta",
       "priority": "p0",
       "capabilities": [],
-      "available": true,
+      "available": false,
       "model_config_hash": "e7ff5edbac45a302",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -274,7 +274,7 @@
       "class_name": "AutoCES",
       "priority": "p1",
       "capabilities": [],
-      "available": true,
+      "available": false,
       "model_config_hash": "7abcad2fe750141d",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -285,7 +285,7 @@
       "class_name": "CrostonClassic",
       "priority": "p1",
       "capabilities": [],
-      "available": true,
+      "available": false,
       "model_config_hash": "f74fc3284503526a",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -296,7 +296,7 @@
       "class_name": "TSB",
       "priority": "p1",
       "capabilities": [],
-      "available": true,
+      "available": false,
       "model_config_hash": "4d4db88c3f8675fd",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -310,7 +310,7 @@
         "lags",
         "exogenous"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "3b0094d8f1ecd23d",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -325,7 +325,7 @@
         "exogenous",
         "gpu_optional"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "405d1892f8e742fd",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -1692,7 +1692,7 @@
         "ensemble",
         "probabilistic"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "6d71c5f3ed01867e",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -1705,7 +1705,7 @@
       "capabilities": [
         "probabilistic"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "d277985c0ab16618",
       "resolved_smoke_params": {
         "epochs": 1,
@@ -1723,7 +1723,7 @@
       "capabilities": [
         "position"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "d3822ab15272f6ba",
       "resolved_smoke_params": {
         "reservoir_size": 50,
@@ -1744,11 +1744,53 @@
         "probabilistic",
         "gpu_optional"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "cae533608cbbe459",
       "resolved_smoke_params": {
         "model_name": "amazon/chronos-bolt-tiny",
         "revision": "a0e552de83495b5c28c14c71c374f3e33280b340"
+      },
+      "resolve_error": null
+    },
+    "chronos-t5-small": {
+      "library": "chronos",
+      "family": "tsfm",
+      "class_name": "ChronosPipeline",
+      "priority": "p1",
+      "capabilities": [
+        "zero_shot",
+        "probabilistic",
+        "gpu"
+      ],
+      "available": false,
+      "model_config_hash": "29dda99fff5c15aa",
+      "resolved_smoke_params": {
+        "model_name": "amazon/chronos-t5-small",
+        "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+        "num_samples": 20
+      },
+      "resolve_error": null
+    },
+    "chronos-2": {
+      "library": "chronos",
+      "family": "tsfm",
+      "class_name": "Chronos2Pipeline",
+      "priority": "p0",
+      "capabilities": [
+        "zero_shot",
+        "fine_tuning",
+        "exogenous",
+        "probabilistic",
+        "gpu"
+      ],
+      "available": false,
+      "model_config_hash": "021fca4b7de52fcf",
+      "resolved_smoke_params": {
+        "model_name": "amazon/chronos-2",
+        "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+        "batch_size": 256,
+        "context_length": 512,
+        "cross_learning": false
       },
       "resolve_error": null
     },
@@ -1762,7 +1804,7 @@
         "fine_tuning",
         "exogenous"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "422e5f9ea3c9fc0c",
       "resolved_smoke_params": {
         "model_name": "autogluon/chronos-2-small"
@@ -1795,7 +1837,7 @@
         "fine_tuning",
         "gpu_optional"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "ccd04f43dfe62b66",
       "resolved_smoke_params": {},
       "resolve_error": null
@@ -1846,7 +1888,7 @@
         "generative",
         "gpu"
       ],
-      "available": true,
+      "available": false,
       "model_config_hash": "291cd910b323890f",
       "resolved_smoke_params": {
         "model_name": "thuml/sundial-base-128m",

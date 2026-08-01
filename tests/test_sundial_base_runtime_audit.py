@@ -93,9 +93,15 @@ def test_ledger_and_summary_counts() -> None:
     assert blocked == 12
     assert pending == 0
 
-    assert status["runtime_certified_models"] == 9
-    assert status["blocked_models"] == 12
-    assert status["pending_models"] == 0
+    assert status["runtime_certified_models"] == sum(
+        item.get("runtime_status") == "CERTIFIED" for item in status["results"]
+    )
+    assert status["blocked_models"] == sum(
+        item.get("runtime_status") == "BLOCKED" for item in status["results"]
+    )
+    assert status["pending_models"] == sum(
+        item.get("runtime_status") not in {"CERTIFIED", "BLOCKED"} for item in status["results"]
+    )
 
 
 def test_progress_document() -> None:

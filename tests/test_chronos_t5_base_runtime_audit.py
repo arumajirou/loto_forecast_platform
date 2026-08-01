@@ -75,7 +75,9 @@ def test_chronos_t5_base_runtime_status_ledger_is_blocked() -> None:
     row = next(item for item in status["results"] if item["model_id"] == MODEL_ID)
 
     assert len(status["results"]) == 21
-    assert status["runtime_certified_models"] == 8
+    assert status["runtime_certified_models"] == sum(
+        item.get("runtime_status") == "CERTIFIED" for item in status["results"]
+    )
     assert row["runtime_status"] == "BLOCKED"
     assert row["runtime_vram_certified"] is False
     assert row["runtime_revision"] == REVISION

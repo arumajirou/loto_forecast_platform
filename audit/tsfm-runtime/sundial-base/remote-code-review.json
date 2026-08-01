@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "model_id": "sundial-base",
+  "repo_id": "thuml/sundial-base-128m",
+  "revision": "3212e42564493f520593e5414af4367fc4b49226",
+  "review_scope": "/mnt/e/env/huggingface/modules/transformers_modules/thuml/sundial-base-128m/3212e42564493f520593e5414af4367fc4b49226",
+  "files": [
+    {
+      "name": "__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "dangerous_calls": [],
+      "top_level_calls": []
+    },
+    {
+      "name": "configuration_sundial.py",
+      "sha256": "1a79b4265d7a7feabb1fadc336c2c7580157ededd7cc58655f007213447eb7e4",
+      "size_bytes": 1577,
+      "dangerous_calls": [],
+      "top_level_calls": []
+    },
+    {
+      "name": "flow_loss.py",
+      "sha256": "fb33d3c3988015124c9f4e05728127d85afee8b416930c0e6d5097e4ced2ecf8",
+      "size_bytes": 7829,
+      "dangerous_calls": [],
+      "top_level_calls": []
+    },
+    {
+      "name": "modeling_sundial.py",
+      "sha256": "4a7ce7defa6578d0ae84593587d164afb933cfa6e52aee53f709f236b00b85e4",
+      "size_bytes": 24413,
+      "dangerous_calls": [],
+      "top_level_calls": []
+    },
+    {
+      "name": "ts_generation_mixin.py",
+      "sha256": "789577dafbd9605d4c1b2d8930ff2861277090b004b6e7ddef6011b79444942e",
+      "size_bytes": 13765,
+      "dangerous_calls": [],
+      "top_level_calls": []
+    }
+  ],
+  "dangerous_call_findings": [],
+  "network_calls_detected": false,
+  "subprocess_calls_detected": false,
+  "dynamic_code_execution_detected": false,
+  "destructive_file_operations_detected": false,
+  "top_level_side_effects_detected": false,
+  "review_status": "APPROVED",
+  "limitations": [
+    "Static review only",
+    "Runtime behavior must still be tested offline",
+    "Review applies only to the pinned revision"
+  ]
+}
