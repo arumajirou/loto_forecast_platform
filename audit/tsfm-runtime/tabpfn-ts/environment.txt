@@ -1,0 +1,8 @@
+timestamp=2026-08-01T17:49:11+09:00
+hostname=az
+kernel=7.0.0-28-generic
+branch=feat/tabpfn-ts-runtime-audit-v1
+commit=309ca34af71909297cb2f98700797b3ddbd69652
+model_id=tabpfn-ts
+repo_id=Prior-Labs/TabPFN-v2-reg
+revision=4972a65a1b30806315c6f92499959ffbfc69a673

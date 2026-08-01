@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "model_id": "tabpfn-ts",
+  "repo_id": "Prior-Labs/TabPFN-v2-reg",
+  "revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
+  "license_name": "Prior Labs License 1.1",
+  "license_family": "Apache-2.0-derived",
+  "commercial_use": true,
+  "production_use": true,
+  "attribution_required": true,
+  "additional_attribution_requirement": true,
+  "review_status": "APPROVED_WITH_ATTRIBUTION",
+  "scope": "TabPFN V2 regressor weights only",
+  "excluded_models": [
+    "TabPFN 2.5 default weights",
+    "TabPFN 2.6 default weights",
+    "Prior-Labs/tabpfn_3"
+  ],
+  "notes": [
+    "The V2 model weights use Prior Labs License 1.1.",
+    "The license is derived from Apache 2.0 with an additional attribution requirement.",
+    "Distribution and product attribution obligations must be preserved.",
+    "This record is a technical compliance classification, not legal advice."
+  ]
+}

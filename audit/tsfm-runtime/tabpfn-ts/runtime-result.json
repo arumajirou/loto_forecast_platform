@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "model_id": "tabpfn-ts",
+  "repo_id": "Prior-Labs/TabPFN-v2-reg",
+  "revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
+  "runtime_vram_certified": true,
+  "provider_response": {
+    "status": "OK",
+    "schema_version": 1,
+    "provider_version": 1,
+    "repo_id": "Prior-Labs/TabPFN-v2-reg",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Prior-Labs--TabPFN-v2-reg/snapshots/4972a65a1b30806315c6f92499959ffbfc69a673",
+    "predictions": [
+      0.0006009663920849562,
+      1.4961231499910355e-05,
+      9.309849701821804e-06,
+      0.0007142591057345271,
+      -4.0295650251209736e-05,
+      0.00045197762665338814,
+      2.491625491529703e-05,
+      -9.413342922925949e-07,
+      0.0007032914436422288,
+      7.706519681960344e-05,
+      0.0005455573555082083,
+      0.00010067538823932409,
+      2.3415428586304188e-05,
+      0.0007377021829597652,
+      3.519398160278797e-05,
+      0.00043571394053287804,
+      0.0003714362683240324,
+      1.4110468327999115e-05,
+      0.0007520634680986404,
+      3.725721035152674e-05,
+      0.00047815096331760287,
+      0.0008258486050181091,
+      3.0424445867538452e-05,
+      0.0007686599274165928,
+      1.83529919013381e-05,
+      0.00048106786562129855,
+      0.0005432185134850442,
+      2.4288427084684372e-05,
+      2.411194145679474e-05,
+      0.0007361127645708621,
+      0.0006302352994680405,
+      4.5869965106248856e-05,
+      0.0006573470309376717,
+      1.540081575512886e-05,
+      1.2696837075054646e-05,
+      0.0006000858847983181,
+      2.680043689906597e-05
+    ],
+    "prediction_shape": [
+      37
+    ],
+    "finite": true,
+    "properties": {
+      "library": "tabpfn_time_series",
+      "package": "tabpfn-time-series",
+      "license": "Prior Labs License 1.1",
+      "license_commercial_use": true,
+      "license_attribution_required_on_distribution": true,
+      "backend": "torch",
+      "context_length": 256,
+      "prediction_length": 1,
+      "weight_path": "/mnt/e/env/huggingface/hub/models--Prior-Labs--TabPFN-v2-reg/snapshots/4972a65a1b30806315c6f92499959ffbfc69a673/tabpfn-v2-regressor.ckpt",
+      "weight_sha256": "2ab5a07d5c41dfe6db9aa7ae106fc6de898326c2765be66505a07e2868c10736",
+      "config_sha256": "c40b7869f5343883697af1701e93c489cc586a67ea049f4b90c64cd60c4b1c8e",
+      "tabpfn_model_config": {
+        "model_path": "/mnt/e/env/huggingface/hub/models--Prior-Labs--TabPFN-v2-reg/snapshots/4972a65a1b30806315c6f92499959ffbfc69a673/tabpfn-v2-regressor.ckpt"
+      }
+    },
+    "gpu_evidence": {
+      "requested_device": "cuda",
+      "execution_device": "cuda",
+      "cuda_available": true,
+      "gpu_requested": true,
+      "gpu_used": true,
+      "gpu_certification": "OBSERVED",
+      "resource_certification": "GPU_PASS",
+      "cpu_fallback": false,
+      "fallback_reason": null,
+      "peak_vram_bytes": 114643968,
+      "gpu_pid": 840682
+    },
+    "artifact_reference": {
+      "repo_id": "Prior-Labs/TabPFN-v2-reg",
+      "revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
+      "snapshot_path": "/mnt/e/env/huggingface/hub/models--Prior-Labs--TabPFN-v2-reg/snapshots/4972a65a1b30806315c6f92499959ffbfc69a673"
+    }
+  },
+  "device": "cuda",
+  "peak_vram_bytes": 114643968,
+  "prediction_shape": [
+    37
+  ],
+  "finite": true,
+  "context_length": 256,
+  "prediction_length": 1,
+  "weight_path": "/mnt/e/env/huggingface/hub/models--Prior-Labs--TabPFN-v2-reg/snapshots/4972a65a1b30806315c6f92499959ffbfc69a673/tabpfn-v2-regressor.ckpt",
+  "weight_sha256": "2ab5a07d5c41dfe6db9aa7ae106fc6de898326c2765be66505a07e2868c10736",
+  "config_sha256": "c40b7869f5343883697af1701e93c489cc586a67ea049f4b90c64cd60c4b1c8e",
+  "license": "Prior Labs License 1.1",
+  "license_commercial_use": true,
+  "license_attribution_required": true,
+  "artifact_reference": {
+    "repo_id": "Prior-Labs/TabPFN-v2-reg",
+    "revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Prior-Labs--TabPFN-v2-reg/snapshots/4972a65a1b30806315c6f92499959ffbfc69a673"
+  }
+}

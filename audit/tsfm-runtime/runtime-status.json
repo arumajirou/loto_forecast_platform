@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "total_models": 21,
-  "runtime_certified_models": 4,
+  "runtime_certified_models": 5,
   "results": [
     {
       "model_id": "chronos-2",
@@ -318,19 +318,32 @@
     },
     {
       "model_id": "tabpfn-ts",
-      "repo_id": "Prior-Labs/TabPFN-v2-clf",
-      "revision": "f851f2a3c941544733b712d8c0f96dfae9b28862",
+      "repo_id": "Prior-Labs/TabPFN-v2-reg",
+      "revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
       "category": "E",
       "reasons": [
-        "license requires manual review"
+        "Prior Labs License 1.1 requires attribution review"
       ],
-      "license": "other",
+      "license": "priorlabs-1-1",
       "gated": false,
       "gated_required": false,
       "trust_remote_code_candidate": false,
-      "stored_weight_bytes": 280667328,
-      "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "stored_weight_bytes": 44390977,
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
+      "runtime_revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
+      "runtime_device": "cuda",
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 114643968,
+      "runtime_prediction_shape": [
+        37
+      ],
+      "runtime_context_length": 256,
+      "runtime_prediction_length": 1,
+      "runtime_weight_sha256": "2ab5a07d5c41dfe6db9aa7ae106fc6de898326c2765be66505a07e2868c10736",
+      "runtime_config_sha256": "c40b7869f5343883697af1701e93c489cc586a67ea049f4b90c64cd60c4b1c8e",
+      "runtime_license_review": "APPROVED_WITH_ATTRIBUTION"
     },
     {
       "model_id": "timesfm-2.5-transformers",
