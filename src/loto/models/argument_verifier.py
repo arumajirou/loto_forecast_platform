@@ -33,6 +33,11 @@ def _read_effective(argument: str, properties: dict[str, Any]) -> Any:
         "h": "horizon",
         "seed": "random_seed",
     }
+    effective_parameters = properties.get("effective_parameters", {})
+    if isinstance(effective_parameters, dict):
+        for name in (argument, aliases.get(argument, argument)):
+            if name in effective_parameters:
+                return effective_parameters[name]
     return properties.get(argument, properties.get(aliases.get(argument, argument)))
 
 
@@ -44,7 +49,11 @@ def verify_arguments(
     arguments: tuple[str, ...] = VERIFY_ARGUMENTS,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    for argument in arguments:
+    ordered_arguments = list(arguments)
+    for argument in sorted(set(requested) | set(constructor_values)):
+        if argument not in ordered_arguments:
+            ordered_arguments.append(argument)
+    for argument in ordered_arguments:
         if argument not in requested and argument not in constructor_values:
             rows.append({
                 "argument": argument,

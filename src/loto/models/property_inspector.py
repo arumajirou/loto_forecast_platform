@@ -67,6 +67,39 @@ def _not_exposed(name: str) -> dict[str, str]:
     return {"property": name, "status": "NOT_EXPOSED", "reason": "not exposed by this adapter/model"}
 
 
+
+
+def _serializable_parameter_value(value: Any) -> Any:
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, (list, tuple)):
+        return [_serializable_parameter_value(item) for item in value]
+    if isinstance(value, dict):
+        return {str(key): _serializable_parameter_value(item) for key, item in value.items()}
+    return repr(value)
+
+
+def _effective_parameters(model: Any | None, params: dict[str, Any]) -> dict[str, Any]:
+    result = {str(key): _serializable_parameter_value(value) for key, value in params.items()}
+    if model is None:
+        return result
+    getter = getattr(model, "get_params", None)
+    if callable(getter):
+        try:
+            exposed = getter(deep=False)
+        except Exception:
+            exposed = {}
+        if isinstance(exposed, dict):
+            result.update(
+                {str(key): _serializable_parameter_value(value) for key, value in exposed.items()}
+            )
+    for key, value in vars(model).items():
+        if key.startswith("_") or key in result:
+            continue
+        result[key] = _serializable_parameter_value(value)
+    return result
+
+
 def inspect_model_properties(
     spec: ModelSpec,
     model: Any | None,
@@ -96,6 +129,7 @@ def inspect_model_properties(
         "predict_proba_supported": hasattr(model, "predict_proba") if model is not None else False,
         "gpu_supported": any(cap in spec.capabilities for cap in ("gpu", "gpu_optional")),
         "parallel_supported": any(cap in spec.capabilities for cap in ("auto_hpo", "ray")) or spec.library in {"sklearn", "lightgbm"},
+        "effective_parameters": _effective_parameters(model, params),
     })
     mapping = {
         "input_size": ("input_size",),

@@ -1,0 +1,32 @@
+schema_version: "1.0"
+profiles:
+  quick:
+    description: One bounded maximal-safe lifecycle run per available model.
+    default_timeout_seconds: 300
+    checks:
+      - fit
+      - predict
+      - save
+      - load
+      - reload_predict
+      - property_reflection
+      - argument_verification
+      - retrain
+      - retrain_predict
+      - artifact_hash
+  oat:
+    description: Quick profile plus one-at-a-time mutation for every safely bounded argument.
+    warning: This creates many cases; it is exhaustive over discoverable safe arguments, not Cartesian values.
+coverage_rules:
+  constructor_signature: inspect __init__ when the optional library is importable
+  catalog_defaults: always inventory ModelSpec.default_params
+  runtime_arguments: inventory device, precision, seed, timeout, CPU/GPU and parallel settings
+  unsafe_arguments: report as inventoried/not-auto-mutated with a reason
+acceptance:
+  allowed_final_statuses:
+    - PASS
+    - ZERO_SHOT_PASS
+  prediction_parity_max_abs_diff: 0.0
+  artifact_required_for_trainable_models: true
+  retrain_prediction_required_for_trainable_models: true
+  zero_shot_retrain_policy: not_applicable
