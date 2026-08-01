@@ -1,124 +1,50 @@
 {
   "schema_version": 1,
-  "status": "BLOCKED",
+  "status": "PASS",
   "model_id": "sundial-base",
   "repo_id": "thuml/sundial-base-128m",
   "revision": "3212e42564493f520593e5414af4367fc4b49226",
-  "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T10:07:40.754890+00:00",
-  "blocked_reason": "TRUST_REMOTE_CODE_REVIEW_REQUIRED",
-  "blocked_detail": "Pinned snapshot includes custom remote-code files and requires trust_remote_code review before execution.",
-  "retry_condition": "Complete and approve a security review of the pinned remote-code files before running CUDA runtime certification.",
-  "snapshot_probe": {
-    "schema_version": 1,
-    "model_id": "sundial-base",
-    "repo_id": "thuml/sundial-base-128m",
-    "revision": "3212e42564493f520593e5414af4367fc4b49226",
-    "checked_at": "2026-08-01T10:07:40.754890+00:00",
-    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m",
-    "repo_cache_exists": true,
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226",
-    "snapshot_exists": true,
-    "snapshot_revision_matches": true,
-    "existing_files": [
-      {
-        "name": "README.md",
-        "path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226/README.md",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/59abfff79e9c998040b59cc6e80d7686f0053c7c",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/blobs/59abfff79e9c998040b59cc6e80d7686f0053c7c",
-        "size_bytes": 6555,
-        "sha256": "067cec6d8736b9f36ed85cf861289c97f434d4577d479a4bdc273e7ca710a65d"
-      },
-      {
-        "name": "config.json",
-        "path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226/config.json",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/c6f1e70083152ac6b07c328b6a45f2d9bbede536",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/blobs/c6f1e70083152ac6b07c328b6a45f2d9bbede536",
-        "size_bytes": 739,
-        "sha256": "173dd40c0a7e08a71b660110fd6334ee85eb9f6ce6f30df0a6cbaea3bb1ff3b4"
-      },
-      {
-        "name": "configuration_sundial.py",
-        "path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226/configuration_sundial.py",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/c34c8acc7905b49408054b58f377e171a3ef2bec",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/blobs/c34c8acc7905b49408054b58f377e171a3ef2bec",
-        "size_bytes": 1577,
-        "sha256": "1a79b4265d7a7feabb1fadc336c2c7580157ededd7cc58655f007213447eb7e4"
-      },
-      {
-        "name": "flow_loss.py",
-        "path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226/flow_loss.py",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/ee076799b51862f2e3df77969ef330c470eda73a",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/blobs/ee076799b51862f2e3df77969ef330c470eda73a",
-        "size_bytes": 7829,
-        "sha256": "fb33d3c3988015124c9f4e05728127d85afee8b416930c0e6d5097e4ced2ecf8"
-      },
-      {
-        "name": "generation_config.json",
-        "path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226/generation_config.json",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/b62b5fe29d4c8e667f2ef9a733903e0beba2bc86",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/blobs/b62b5fe29d4c8e667f2ef9a733903e0beba2bc86",
-        "size_bytes": 69,
-        "sha256": "d90f7f1d9ef012f9ec0bd76fdf42e6979d086f157d65910b3b273edfb100e748"
-      },
-      {
-        "name": "model.safetensors",
-        "path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226/model.safetensors",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/414435b508391f92afadd2aaeec418c806776aeccbce12e638d73a139ca5ca78",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/blobs/414435b508391f92afadd2aaeec418c806776aeccbce12e638d73a139ca5ca78",
-        "size_bytes": 513341448,
-        "sha256": "414435b508391f92afadd2aaeec418c806776aeccbce12e638d73a139ca5ca78"
-      },
-      {
-        "name": "modeling_sundial.py",
-        "path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226/modeling_sundial.py",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/ab3efc1f524831ff64413d80d2cdf3c674b98953",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/blobs/ab3efc1f524831ff64413d80d2cdf3c674b98953",
-        "size_bytes": 24413,
-        "sha256": "4a7ce7defa6578d0ae84593587d164afb933cfa6e52aee53f709f236b00b85e4"
-      },
-      {
-        "name": "ts_generation_mixin.py",
-        "path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226/ts_generation_mixin.py",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/89bf56274416bdd410d0aa76bc2b24a1ffa68a03",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/blobs/89bf56274416bdd410d0aa76bc2b24a1ffa68a03",
-        "size_bytes": 13765,
-        "sha256": "789577dafbd9605d4c1b2d8930ff2861277090b004b6e7ddef6011b79444942e"
-      }
-    ],
-    "weight_candidates": [
-      "model.safetensors"
-    ],
-    "missing_files": [],
-    "weight_sha256": "414435b508391f92afadd2aaeec418c806776aeccbce12e638d73a139ca5ca78",
-    "config_sha256": "173dd40c0a7e08a71b660110fd6334ee85eb9f6ce6f30df0a6cbaea3bb1ff3b4",
-    "remote_code_files": [
-      "configuration_sundial.py",
-      "flow_loss.py",
-      "modeling_sundial.py",
-      "ts_generation_mixin.py"
-    ],
-    "trust_remote_code_required": true,
-    "result": "TRUST_REMOTE_CODE_REVIEW_REQUIRED"
-  },
-  "gpu_used": false,
-  "cpu_fallback": false,
-  "cpu_preprocessing": null,
-  "peak_vram_bytes": null,
-  "finite": null,
-  "weight_sha256": "414435b508391f92afadd2aaeec418c806776aeccbce12e638d73a139ca5ca78",
-  "config_sha256": "173dd40c0a7e08a71b660110fd6334ee85eb9f6ce6f30df0a6cbaea3bb1ff3b4",
-  "artifact_reference": {
-    "repo_id": "thuml/sundial-base-128m",
-    "revision": "3212e42564493f520593e5414af4367fc4b49226",
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226"
-  }
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226",
+  "pid": 83745,
+  "input_series_count": 7,
+  "context_length": 64,
+  "prediction_length": 1,
+  "num_samples": 1,
+  "seed": 42,
+  "model_class": "SundialForPrediction",
+  "parameter_device": "cuda:0",
+  "parameter_dtype": "torch.float32",
+  "input_shape": [
+    7,
+    64
+  ],
+  "input_device": "cuda:0",
+  "output_shape": [
+    7,
+    1,
+    1
+  ],
+  "output_device": "cuda:0",
+  "output_dtype": "torch.float32",
+  "output_finite": true,
+  "prediction_values": [
+    7.113725662231445,
+    11.56743335723877,
+    16.136613845825195,
+    20.572887420654297,
+    25.057170867919922,
+    29.598812103271484,
+    34.0323486328125
+  ],
+  "inference_iterations": 8,
+  "allocated_vram_bytes": 608354816,
+  "reserved_vram_bytes": 668991488,
+  "peak_vram_bytes": 611804160,
+  "cuda_device_name": "NVIDIA GeForce RTX 5070 Ti",
+  "compute_capability": [
+    12,
+    0
+  ],
+  "cpu_preprocessing": true,
+  "cpu_fallback": false
 }

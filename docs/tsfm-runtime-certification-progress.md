@@ -5,10 +5,10 @@ Updated: 2026-08-01
 ## Current Status
 
 - Total models: 21
-- Runtime certified: 8
-- Blocked: 13
-- Pending: 0
-- Formal certification progress: 38.1%
+- Runtime certified: 9 / 21
+- Blocked: 12 / 21
+- Pending: 0 / 21
+- Formal certification progress: 42.9%
 - Judged progress: 100.0%
 - Current branch: feat/toto-open-base-runtime-audit-v1
 - Next model: NO_PENDING_MODELS
@@ -191,23 +191,31 @@ No pending models remain.
 
 ### sundial-base
 
-- Branch: feat/sundial-base-runtime-audit-v1
-- Commit: 276b436
-- Push: origin/feat/sundial-base-runtime-audit-v1
+- Branch: feat/sundial-base-runtime-certification-v2
 - repo_id: thuml/sundial-base-128m
 - revision: 3212e42564493f520593e5414af4367fc4b49226
-- status: BLOCKED
-- blocked reason: TRUST_REMOTE_CODE_REVIEW_REQUIRED
-- checked snapshot: /mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226
-- snapshot finding: complete snapshot with custom Python remote-code files
-- weight SHA-256: 414435b508391f92afadd2aaeec418c806776aeccbce12e638d73a139ca5ca78
-- config SHA-256: 173dd40c0a7e08a71b660110fd6334ee85eb9f6ce6f30df0a6cbaea3bb1ff3b4
-- runtime executed: false
+- status: CERTIFIED
+- runtime executed: true
+- model class: SundialForPrediction
+- input series: 7
+- context length: 64
+- prediction length: 1
+- input shape: [7, 64]
+- output shape: [7, 1, 1]
+- output finite: true
+- model device: cuda:0
+- input device: cuda:0
+- output device: cuda:0
+- CPU preprocessing: true
 - CPU fallback: false
+- PyTorch peak VRAM: 611804160 bytes
+- external runtime PID: 83745
+- external PID captures: 38
+- external GPU memory range: 26-916 MiB
+- remote-code review: APPROVED
 - license: Apache-2.0 APPROVED
 - dedicated test: tests/test_sundial_base_runtime_audit.py
 - hash verification: audit/tsfm-runtime/sundial-base/sha256sum.txt OK
-- resume condition: Complete and approve a security review of the pinned remote-code files before running CUDA runtime certification.
 
 ### t0-alpha
 

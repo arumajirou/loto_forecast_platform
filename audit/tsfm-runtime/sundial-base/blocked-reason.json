@@ -7,5 +7,10 @@
   "facts": [
     "Snapshot includes custom Python model files.",
     "README usage requires trust_remote_code=True."
-  ]
+  ],
+  "historical": true,
+  "resolved": true,
+  "resolved_at": "2026-08-01T10:51:37.868218+00:00",
+  "resolution": "Pinned remote code was reviewed and approved; offline CUDA inference and external GPU PID capture completed successfully.",
+  "superseded_by": "runtime-certification.json"
 }

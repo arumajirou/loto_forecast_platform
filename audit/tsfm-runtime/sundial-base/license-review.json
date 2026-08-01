@@ -12,9 +12,11 @@
   "patent_grant": true,
   "notice_required_on_distribution": true,
   "limitations": [
-    "Runtime certification remains blocked pending remote-code security review."
+    "License review applies to the pinned model revision.",
+    "Apache-2.0 attribution and notice obligations apply when redistributing applicable artifacts."
   ],
   "review_notes": [
-    "Ledger records apache-2.0 and pinned README/model metadata is available locally."
+    "Ledger records apache-2.0 and pinned README/model metadata is available locally.",
+    "Pinned remote-code security review completed with APPROVED status."
   ]
 }
