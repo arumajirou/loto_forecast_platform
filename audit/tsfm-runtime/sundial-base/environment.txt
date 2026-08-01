@@ -1,0 +1,8 @@
+PROJECT_ROOT=/mnt/e/env/ts/loto_forecast_platform
+branch=feat/sundial-base-runtime-audit-v1
+model_id=sundial-base
+repo_id=thuml/sundial-base-128m
+revision=3212e42564493f520593e5414af4367fc4b49226
+snapshot_path=/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226
+status=BLOCKED
+blocked_reason=TRUST_REMOTE_CODE_REVIEW_REQUIRED

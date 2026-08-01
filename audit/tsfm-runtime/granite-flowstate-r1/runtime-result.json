@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "status": "BLOCKED",
+  "model_id": "granite-flowstate-r1",
+  "repo_id": "ibm-granite/granite-timeseries-flowstate-r1",
+  "revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+  "runtime_vram_certified": false,
+  "blocked_at": "2026-08-01T09:49:12.358092+00:00",
+  "blocked_reason": {
+    "code": "FIXED_SNAPSHOT_MISSING",
+    "message": "Pinned Hugging Face snapshot directory is missing; available loose model files cannot satisfy revision and snapshot symlink validation requirements.",
+    "missing_snapshot_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1",
+    "candidate_loose_model_path": "/mnt/e/env/ts/loto_platform_unified/runtime/tsfm_lab/models/ibm-granite__granite-timeseries-flowstate-r1",
+    "candidate_loose_model_files_present": true,
+    "resume_conditions": [
+      "Materialize the pinned Hugging Face snapshot for ibm-granite/granite-timeseries-flowstate-r1 at revision 05effc6cb39ee16dce9dd0064ed1a76e4b8ff464.",
+      "Verify required model/config files and SHA-256 values from that snapshot.",
+      "Implement or select the correct FlowState runtime API and run CUDA inference with local_files_only=true.",
+      "Capture the runner GPU PID with external nvidia-smi process sampling."
+    ]
+  },
+  "provider_response": {
+    "schema_version": 1,
+    "provider_version": 1,
+    "status": "FIXED_SNAPSHOT_MISSING",
+    "model_id": "granite-flowstate-r1",
+    "repo_id": "ibm-granite/granite-timeseries-flowstate-r1",
+    "revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+    "message": "Pinned Hugging Face snapshot directory is missing; available loose model files cannot satisfy revision and snapshot symlink validation requirements.",
+    "blocker": {
+      "code": "FIXED_SNAPSHOT_MISSING",
+      "message": "Pinned Hugging Face snapshot directory is missing; available loose model files cannot satisfy revision and snapshot symlink validation requirements.",
+      "missing_snapshot_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+      "repo_cache_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1",
+      "candidate_loose_model_path": "/mnt/e/env/ts/loto_platform_unified/runtime/tsfm_lab/models/ibm-granite__granite-timeseries-flowstate-r1",
+      "candidate_loose_model_files_present": true,
+      "resume_conditions": [
+        "Materialize the pinned Hugging Face snapshot for ibm-granite/granite-timeseries-flowstate-r1 at revision 05effc6cb39ee16dce9dd0064ed1a76e4b8ff464.",
+        "Verify required model/config files and SHA-256 values from that snapshot.",
+        "Implement or select the correct FlowState runtime API and run CUDA inference with local_files_only=true.",
+        "Capture the runner GPU PID with external nvidia-smi process sampling."
+      ]
+    }
+  },
+  "gpu_used": false,
+  "cpu_fallback": false,
+  "cpu_preprocessing": null,
+  "finite": null,
+  "artifact_reference": {
+    "repo_id": "ibm-granite/granite-timeseries-flowstate-r1",
+    "revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464"
+  }
+}

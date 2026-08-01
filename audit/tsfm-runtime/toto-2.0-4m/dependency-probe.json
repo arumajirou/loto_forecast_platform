@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "model_id": "toto-2.0-4m",
+  "runtime_executed": false,
+  "dependency_status": "MISSING",
+  "missing_packages": [
+    "toto2",
+    "toto-models"
+  ],
+  "reason": "Pinned snapshot is complete, but the required Toto runtime package toto2/toto-models is not installed in the certification environment."
+}

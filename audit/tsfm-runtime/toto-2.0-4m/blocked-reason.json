@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "model_id": "toto-2.0-4m",
+  "blocked_reason": "RUNTIME_DEPENDENCY_MISSING",
+  "blocked_detail": "Pinned snapshot is complete, but the required Toto runtime package toto2/toto-models is not installed in the certification environment.",
+  "retry_condition": "Install the Toto runtime package compatible with the pinned checkpoint, then rerun CUDA runtime certification with external PID sampling.",
+  "facts": [
+    "Repo cache exists: True",
+    "Snapshot path exists: True",
+    "Snapshot revision matches ledger revision: True",
+    "Missing files: none"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "model_id": "moment-1-large",
+  "repo_cache_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large",
+  "repo_cache_exists": true,
+  "snapshots": [
+    "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc"
+  ]
+}

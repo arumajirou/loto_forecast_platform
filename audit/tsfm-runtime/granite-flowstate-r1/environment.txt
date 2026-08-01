@@ -1,0 +1,9 @@
+PROJECT_ROOT=/mnt/e/env/ts/loto_forecast_platform
+branch=feat/granite-flowstate-r1-runtime-audit-v1
+model_id=granite-flowstate-r1
+repo_id=ibm-granite/granite-timeseries-flowstate-r1
+revision=05effc6cb39ee16dce9dd0064ed1a76e4b8ff464
+snapshot_path=/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464
+candidate_loose_model_path=/mnt/e/env/ts/loto_platform_unified/runtime/tsfm_lab/models/ibm-granite__granite-timeseries-flowstate-r1
+status=BLOCKED
+blocked_reason=FIXED_SNAPSHOT_MISSING

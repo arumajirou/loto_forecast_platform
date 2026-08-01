@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "model_id": "granite-flowstate-r1",
+  "python": "/mnt/e/env/ts/loto_forecast_platform/environments/granite-ttm/.venv/bin/python",
+  "audit_python": "/mnt/e/env/ts/loto_forecast_platform/.venv-v212-audit/bin/python",
+  "runtime_executed": false,
+  "blocked_reason": "FIXED_SNAPSHOT_MISSING"
+}

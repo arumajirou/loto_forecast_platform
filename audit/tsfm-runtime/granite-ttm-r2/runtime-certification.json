@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "model_id": "granite-ttm-r2",
+  "repo_id": "ibm-granite/granite-timeseries-ttm-r2",
+  "revision": "d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f",
+  "certification_status": "RUNTIME_CERTIFIED",
+  "runtime_vram_certified": true,
+  "environment_reproduced_from_lockfile": true,
+  "torch": "2.12.1+cu130",
+  "torch_cuda": "13.0",
+  "compiled_arch_list": [
+    "sm_75",
+    "sm_80",
+    "sm_86",
+    "sm_90",
+    "sm_100",
+    "sm_120"
+  ],
+  "gpu": "NVIDIA GeForce RTX 5070 Ti",
+  "compute_capability": [
+    12,
+    0
+  ],
+  "device": "cuda:0",
+  "dtype": "torch.float32",
+  "parameter_count": 805280,
+  "context_length": 512,
+  "prediction_length": 96,
+  "num_input_channels": 1,
+  "input_shape": [
+    7,
+    512,
+    1
+  ],
+  "prediction_shape": [
+    7,
+    96,
+    1
+  ],
+  "prediction_finite": true,
+  "load_seconds": 0.013861996998457471,
+  "inference_seconds": 0.13352739100082545,
+  "peak_allocated_bytes": 37356544,
+  "peak_reserved_bytes": 37748736,
+  "limitations": [
+    "Synthetic input only",
+    "Seven independent one-channel series were used",
+    "Forecast accuracy was not evaluated",
+    "Production stability was not certified",
+    "Certification applies to the exact revision and locked environment",
+    "Formal backtest CPU force has not yet been removed"
+  ]
+}

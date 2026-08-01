@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "model_id": "sundial-base",
+  "repo_cache_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m",
+  "repo_cache_exists": true,
+  "snapshots": [
+    "3212e42564493f520593e5414af4367fc4b49226"
+  ]
+}

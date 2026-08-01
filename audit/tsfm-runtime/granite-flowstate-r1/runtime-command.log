@@ -1,0 +1,8 @@
+PROJECT_ROOT=/mnt/e/env/ts/loto_forecast_platform
+cwd=/mnt/e/env/ts/loto_forecast_platform
+runtime_command=not executed
+reason=FIXED_SNAPSHOT_MISSING
+checked_snapshot=/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464
+candidate_loose_model_path=/mnt/e/env/ts/loto_platform_unified/runtime/tsfm_lab/models/ibm-granite__granite-timeseries-flowstate-r1
+local_files_only=true
+implicit_network_fetch=false

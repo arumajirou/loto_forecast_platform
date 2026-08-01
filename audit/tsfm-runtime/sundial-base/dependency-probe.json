@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "model_id": "sundial-base",
+  "runtime_executed": false,
+  "dependency_status": "NOT_EVALUATED",
+  "reason": "Remote-code review is required before dependency/runtime probing."
+}

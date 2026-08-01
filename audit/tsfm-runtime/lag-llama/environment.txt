@@ -1,0 +1,8 @@
+PROJECT_ROOT=/mnt/e/env/ts/loto_forecast_platform
+branch=feat/lag-llama-runtime-audit-v1
+model_id=lag-llama
+repo_id=time-series-foundation-models/Lag-Llama
+revision=72dcfc29da106acfe38250a60f4ae29d1e56a3d9
+snapshot_path=/mnt/e/env/huggingface/hub/models--time-series-foundation-models--Lag-Llama/snapshots/72dcfc29da106acfe38250a60f4ae29d1e56a3d9
+status=BLOCKED
+blocked_reason=PARTIAL_SNAPSHOT

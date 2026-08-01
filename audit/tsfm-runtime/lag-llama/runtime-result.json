@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "status": "BLOCKED",
+  "model_id": "lag-llama",
+  "repo_id": "time-series-foundation-models/Lag-Llama",
+  "revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+  "runtime_vram_certified": false,
+  "blocked_at": "2026-08-01T09:55:52.117798+00:00",
+  "blocked_reason": "PARTIAL_SNAPSHOT",
+  "blocked_detail": "Pinned snapshot directory exists, but no model checkpoint or weight file is present.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with the Lag-Llama checkpoint file present.",
+  "snapshot_probe": {
+    "schema_version": 1,
+    "model_id": "lag-llama",
+    "repo_id": "time-series-foundation-models/Lag-Llama",
+    "revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+    "checked_at": "2026-08-01T09:55:52.117798+00:00",
+    "hf_home_candidates": [
+      "/mnt/e/env/huggingface",
+      "/mnt/e/env/huggingface/hub",
+      "/home/az/.cache/huggingface/hub"
+    ],
+    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--time-series-foundation-models--Lag-Llama",
+    "repo_cache_exists": true,
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--time-series-foundation-models--Lag-Llama/snapshots/72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+    "snapshot_exists": true,
+    "snapshot_revision_matches": true,
+    "required_files": [
+      "model checkpoint (*.ckpt or *.safetensors)"
+    ],
+    "weight_candidates": [],
+    "missing_files": [
+      "model checkpoint (*.ckpt or *.safetensors)"
+    ],
+    "existing_files": [
+      {
+        "name": "README.md",
+        "path": "/mnt/e/env/huggingface/hub/models--time-series-foundation-models--Lag-Llama/snapshots/72dcfc29da106acfe38250a60f4ae29d1e56a3d9/README.md",
+        "is_symlink": true,
+        "symlink_target": "../../blobs/65648515e4e018fb5a284e6806b5ac99cec37ea8",
+        "resolved_path": "/mnt/e/env/huggingface/hub/models--time-series-foundation-models--Lag-Llama/blobs/65648515e4e018fb5a284e6806b5ac99cec37ea8",
+        "size_bytes": 7361,
+        "sha256": "820cfd100de790ef0a96f319b398a2024d31a463856a6bb54612cf299b2867a4"
+      }
+    ],
+    "result": "PARTIAL_SNAPSHOT"
+  },
+  "gpu_used": false,
+  "cpu_fallback": false,
+  "cpu_preprocessing": null,
+  "peak_vram_bytes": null,
+  "finite": null,
+  "artifact_reference": {
+    "repo_id": "time-series-foundation-models/Lag-Llama",
+    "revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--time-series-foundation-models--Lag-Llama/snapshots/72dcfc29da106acfe38250a60f4ae29d1e56a3d9"
+  }
+}

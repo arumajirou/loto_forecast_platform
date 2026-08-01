@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "model_id": "kronos-base",
+  "repo_id": "NeoQuasar/Kronos-base",
+  "revision": "2b554741eca47781b64468546e77fef3e85130e6",
+  "certification_status": "BLOCKED",
+  "runtime_vram_certified": false,
+  "blocked_at": "2026-08-01T09:53:16.593464+00:00",
+  "blocked_reason": "PARTIAL_SNAPSHOT",
+  "blocked_detail": "Pinned snapshot directory exists, but required runtime files are missing.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
+  "limitations": [
+    "Pinned snapshot contains only README.md and is missing runtime files.",
+    "No CUDA inference was executed.",
+    "No model weight SHA-256 was certified.",
+    "Forecast accuracy was not evaluated."
+  ]
+}

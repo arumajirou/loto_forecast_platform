@@ -1,0 +1,21 @@
+{
+  "torch": "2.13.0+cu130",
+  "torch_cuda": "13.0",
+  "tabpfn": "8.2.0",
+  "tabpfn_time_series": "1.2.0",
+  "huggingface_hub": "1.26.0",
+  "cuda_available": true,
+  "compiled_arch_list": [
+    "sm_75",
+    "sm_80",
+    "sm_86",
+    "sm_90",
+    "sm_100",
+    "sm_120"
+  ],
+  "gpu": "NVIDIA GeForce RTX 5070 Ti",
+  "compute_capability": [
+    12,
+    0
+  ]
+}

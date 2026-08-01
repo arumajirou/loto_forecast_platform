@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "model_id": "lag-llama",
+  "blocked_reason": "PARTIAL_SNAPSHOT",
+  "blocked_detail": "Pinned snapshot directory exists, but no model checkpoint or weight file is present.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with the Lag-Llama checkpoint file present.",
+  "facts": [
+    "Repo cache exists: True",
+    "Snapshot path exists: True",
+    "Snapshot revision matches ledger revision: True",
+    "Missing files: model checkpoint (*.ckpt or *.safetensors)"
+  ]
+}

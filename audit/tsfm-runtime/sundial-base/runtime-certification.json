@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "model_id": "sundial-base",
+  "repo_id": "thuml/sundial-base-128m",
+  "revision": "3212e42564493f520593e5414af4367fc4b49226",
+  "runtime_status": "CERTIFIED",
+  "runtime_vram_certified": true,
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "runtime_cpu_preprocessing": true,
+  "certified_at": "2026-08-01T10:49:55.983698+00:00",
+  "runtime": {
+    "python_environment": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+    "model_class": "SundialForPrediction",
+    "parameter_device": "cuda:0",
+    "parameter_dtype": "torch.float32",
+    "input_series_count": 7,
+    "context_length": 64,
+    "prediction_length": 1,
+    "input_shape": [
+      7,
+      64
+    ],
+    "output_shape": [
+      7,
+      1,
+      1
+    ],
+    "output_finite": true,
+    "inference_iterations": 8,
+    "peak_vram_bytes": 611804160,
+    "cuda_device_name": "NVIDIA GeForce RTX 5070 Ti",
+    "compute_capability": [
+      12,
+      0
+    ]
+  },
+  "external_gpu_evidence": {
+    "runtime_pid": 83745,
+    "capture_count": 38,
+    "min_gpu_memory_mib": 26.0,
+    "max_gpu_memory_mib": 916.0
+  },
+  "checks": {
+    "runtime_pass": true,
+    "seven_series": true,
+    "prediction_length_one": true,
+    "output_shape": true,
+    "finite_output": true,
+    "cuda_model": true,
+    "cuda_input": true,
+    "cuda_output": true,
+    "no_cpu_fallback": true,
+    "positive_peak_vram": true,
+    "external_pid_capture": true,
+    "same_runtime_pid": true
+  },
+  "evidence_files": [
+    "runtime-result.json",
+    "external-gpu-pid-evidence.json",
+    "runtime-certification-check.json",
+    "runtime-command.log",
+    "runtime-exit-code.txt",
+    "nvidia-before.csv",
+    "nvidia-after.csv",
+    "nvidia-gpu-samples.csv",
+    "nvidia-process-samples.csv",
+    "remote-code-review.json",
+    "snapshot-probe.json",
+    "license-review.json"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "model_id": "timesfm-2.5-transformers",
+  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
+  "blocked_detail": "Repo cache exists, but the fixed revision snapshot directory is absent.",
+  "retry_condition": "Install the exact pinned Transformers revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
+  "facts": [
+    "Repo cache exists: True",
+    "Snapshot path exists: False",
+    "Snapshot revision matches ledger revision: False",
+    "Missing files: config.json, model.safetensors"
+  ]
+}

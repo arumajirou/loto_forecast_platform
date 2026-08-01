@@ -6,7 +6,7 @@ requires-python = ">=3.11,<3.13"
 dependencies = [
   "numpy>=1.26,<3",
   "pandas>=2.2",
-  "torch>=2.3",
+  "torch==2.12.1",
   "huggingface-hub>=0.24",
   "granite-tsfm>=0.2.27",
   "transformers>=4.46,<4.53",
@@ -17,3 +17,10 @@ loto-granite-ttm-provider = "run_granite_ttm_provider:main"
 
 [tool.uv]
 package = false
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }

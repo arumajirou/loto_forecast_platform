@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "model_id": "t0-alpha",
+  "repo_id": "theforecastingcompany/t0-alpha",
+  "revision": "f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+  "license": "apache-2.0",
+  "review_status": "APPROVED",
+  "commercial_use": true,
+  "attribution_required": true,
+  "redistribution_allowed": true,
+  "modification_allowed": true,
+  "patent_grant": true,
+  "notice_required_on_distribution": true,
+  "limitations": [
+    "Ledger marks this model as gated and the fixed local snapshot contains only README.md, with no config or weight files available for runtime execution."
+  ],
+  "review_notes": [
+    "Apache-2.0 from pinned snapshot README metadata."
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "model_id": "moirai-1.0-base",
+  "repo_cache_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base",
+  "repo_cache_exists": true,
+  "snapshots": [
+    "4fa939a8800d9da346c0280f3d9aeba0d2d35877"
+  ],
+  "refs": {}
+}

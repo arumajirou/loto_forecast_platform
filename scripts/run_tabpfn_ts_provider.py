@@ -56,36 +56,95 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
     import torch
-    from tabpfn.model_loading import resolve_model_path
-    from tabpfn_time_series import TabPFNMode, TabPFNTSPipeline
+    from tabpfn_time_series import (
+        TabPFNMode,
+        TabPFNTSPipeline,
+    )
 
     repo_id = str(request.get("repo_id", REPO_ID))
+    revision = str(request.get("revision") or REVISION)
     weight_filename = str(request.get("weight_filename") or WEIGHT_FILENAME)
+    local_files_only = bool(request.get("local_files_only", True))
+
     if repo_id != REPO_ID:
-        return {"status": "PROVIDER_NOT_IMPLEMENTED", "message": f"unsupported repo_id: {repo_id}"}
+        return {
+            "status": "PROVIDER_NOT_IMPLEMENTED",
+            "message": f"unsupported repo_id: {repo_id}",
+        }
+
+    if revision != REVISION:
+        return {
+            "status": "PROVIDER_NOT_IMPLEMENTED",
+            "message": f"unsupported revision: {revision}",
+        }
+
+    if not local_files_only:
+        return {
+            "status": "INVALID_REQUEST",
+            "message": "local_files_only must be true",
+        }
+
+    snapshot_value = request.get("snapshot_path")
+
+    if not snapshot_value:
+        return {
+            "status": "MODEL_WEIGHTS_MISSING",
+            "message": "snapshot_path is required",
+        }
+
+    snapshot_path = Path(str(snapshot_value)).resolve()
+
+    if snapshot_path.name != REVISION:
+        return {
+            "status": "MODEL_WEIGHTS_MISSING",
+            "message": (f"snapshot directory does not match fixed revision: {snapshot_path}"),
+        }
+
+    if weight_filename != WEIGHT_FILENAME:
+        return {
+            "status": "INVALID_REQUEST",
+            "message": (f"unsupported weight filename: {weight_filename}"),
+        }
+
+    # Keep the snapshot-visible path instead of resolving the final
+    # Hugging Face symlink. Hub snapshots link their files to the
+    # repository blobs directory, so resolving the file itself would
+    # incorrectly appear to escape the snapshot.
+    resolved_path = snapshot_path / WEIGHT_FILENAME
+
+    if resolved_path.parent != snapshot_path:
+        return {
+            "status": "INVALID_REQUEST",
+            "message": ("weight path escapes snapshot directory"),
+        }
 
     cuda_available = torch.cuda.is_available()
     execution_device = "cuda" if requested_device == "cuda" and cuda_available else "cpu"
     if execution_device == "cuda":
         torch.cuda.reset_peak_memory_stats()
 
-    tabpfn_model_config = {"model_path": weight_filename}
+    if not resolved_path.is_file():
+        return {
+            "status": "MODEL_WEIGHTS_MISSING",
+            "message": (f"fixed checkpoint not found: {resolved_path}"),
+        }
+
+    real_weight_path = resolved_path.resolve()
+    repo_cache_root = snapshot_path.parents[1]
+    blobs_root = (repo_cache_root / "blobs").resolve()
 
     try:
-        res = resolve_model_path(weight_filename, which="regressor", version="v2")
-        resolved_model_paths, _resolved_model_dirs, _resolved_model_names, _which = res
-        resolved_path = resolved_model_paths[0]
-    except Exception as exc:
+        real_weight_path.relative_to(blobs_root)
+    except ValueError:
         return {
-            "status": "MODEL_WEIGHTS_MISSING",
-            "message": f"failed to resolve checkpoint path: {exc}",
+            "status": "INVALID_REQUEST",
+            "message": (
+                "checkpoint symlink target is outside "
+                f"the fixed repository cache: {real_weight_path}"
+            ),
         }
 
-    if not resolved_path.exists():
-        return {
-            "status": "MODEL_WEIGHTS_MISSING",
-            "message": f"resolved checkpoint not found: {resolved_path}",
-        }
+    tabpfn_model_config = {"model_path": str(resolved_path)}
 
     try:
         pipeline = TabPFNTSPipeline(
@@ -162,7 +221,7 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         },
         "artifact_reference": {
             "repo_id": repo_id,
-            "revision": request.get("revision"),
+            "revision": revision,
             "snapshot_path": str(resolved_path.parent),
         },
     }

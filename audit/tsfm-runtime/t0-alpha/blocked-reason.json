@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "model_id": "t0-alpha",
+  "blocked_reason": "GATED_ACCESS_REQUIRED",
+  "blocked_detail": "Ledger marks this model as gated and the fixed local snapshot contains only README.md, with no config or weight files available for runtime execution.",
+  "retry_condition": "Accept/verify gated model access and install the exact pinned revision into the configured local Hugging Face cache with config.json and model weights.",
+  "facts": [
+    "Repo cache exists: True",
+    "Snapshot path exists: True",
+    "Snapshot revision matches ledger revision: True",
+    "Missing files: config.json, model weight file"
+  ]
+}

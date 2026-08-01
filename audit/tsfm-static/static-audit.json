@@ -1698,18 +1698,18 @@
     },
     {
       "model_id": "tabpfn-ts",
-      "repo_id": "Prior-Labs/TabPFN-v2-clf",
-      "revision": "f851f2a3c941544733b712d8c0f96dfae9b28862",
+      "repo_id": "Prior-Labs/TabPFN-v2-reg",
+      "revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
       "verified_at": "2026-08-01T07:44:10+00:00",
       "private": false,
       "gated": false,
       "gated_required": false,
       "disabled": false,
       "library_name": "tabpfn",
-      "pipeline_tag": "tabular-classification",
+      "pipeline_tag": "tabular-regression",
       "tags": [
         "tabpfn",
-        "tabular-classification",
+        "tabular-regression",
         "license:other",
         "region:us"
       ],
@@ -1718,37 +1718,20 @@
         "license_name": "priorlabs-1-1",
         "license_link": "https://github.com/PriorLabs/TabPFN/blob/49394b053a6759cfe68e90c21a2d51c31b396768/LICENSE",
         "library_name": "tabpfn",
-        "pipeline_tag": "tabular-classification"
+        "pipeline_tag": "tabular-regression"
       },
-      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
-      "license_status": "MANUAL_REVIEW_REQUIRED",
-      "file_count": 19,
-      "known_file_bytes": 309698789,
+      "card_error": null,
+      "license_status": "APPROVED_WITH_ATTRIBUTION",
+      "file_count": 1,
+      "known_file_bytes": 44390977,
       "hub_used_storage_bytes": null,
-      "weight_file_count": 13,
-      "known_weight_bytes": 280667328,
+      "weight_file_count": 1,
+      "known_weight_bytes": 44390977,
       "weight_files": [
-        "tabpfn-v2-classifier-finetuned-gn2p4bpt-xp6f0iqb.ckpt",
-        "tabpfn-v2-classifier-finetuned-llderlii-oyd7ul21.ckpt",
-        "tabpfn-v2-classifier-finetuned-od3j1g5m-4svepuy5.ckpt",
-        "tabpfn-v2-classifier-finetuned-vutqq28w-boexhu6h.ckpt",
-        "tabpfn-v2-classifier-finetuned-zk73skhh.ckpt",
-        "tabpfn-v2-classifier-finetuned-znskzxi4-tvvss6bp.ckpt",
-        "tabpfn-v2-classifier-gn2p4bpt.ckpt",
-        "tabpfn-v2-classifier-llderlii.ckpt",
-        "tabpfn-v2-classifier-od3j1g5m.ckpt",
-        "tabpfn-v2-classifier-v2_default.ckpt",
-        "tabpfn-v2-classifier-vutqq28w.ckpt",
-        "tabpfn-v2-classifier-znskzxi4.ckpt",
-        "tabpfn-v2-classifier.ckpt"
+        "tabpfn-v2-regressor.ckpt"
       ],
       "file_suffix_counts": {
-        ".ckpt": 13,
-        ".cpkt": 1,
-        ".json": 1,
-        ".md": 1,
-        ".txt": 1,
-        "<none>": 2
+        ".ckpt": 1
       },
       "python_files": [],
       "custom_code_markers": [],
@@ -1758,107 +1741,17 @@
       "has_safetensors": false,
       "has_pytorch_bin": false,
       "has_gguf": false,
-      "stored_weight_bytes": 280667328,
+      "stored_weight_bytes": 44390977,
       "stored_weights_within_16gb": true,
       "runtime_vram_certified": false,
       "files": [
         {
-          "path": ".DS_Store",
-          "size_bytes": 6148,
-          "is_weight": false
-        },
-        {
-          "path": ".gitattributes",
-          "size_bytes": 1662,
-          "is_weight": false
-        },
-        {
-          "path": "LICENSE.txt",
-          "size_bytes": 11483,
-          "is_weight": false
-        },
-        {
-          "path": "README.md",
-          "size_bytes": 2592,
-          "is_weight": false
-        },
-        {
-          "path": "config.json",
-          "size_bytes": 37,
-          "is_weight": false
-        },
-        {
-          "path": "tabpfn-v2-classifier-finetuned-gn2p4bpt-xp6f0iqb.ckpt",
-          "size_bytes": 12926661,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-finetuned-llderlii-oyd7ul21.ckpt",
-          "size_bytes": 29017861,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-finetuned-od3j1g5m-4svepuy5.ckpt",
-          "size_bytes": 29017797,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-finetuned-vutqq28w-boexhu6h.ckpt",
-          "size_bytes": 12926661,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-finetuned-zk73skhh.ckpt",
-          "size_bytes": 29009539,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-finetuned-zk73skhh.cpkt",
-          "size_bytes": 29009539,
-          "is_weight": false
-        },
-        {
-          "path": "tabpfn-v2-classifier-finetuned-znskzxi4-tvvss6bp.ckpt",
-          "size_bytes": 12926661,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-gn2p4bpt.ckpt",
-          "size_bytes": 12926661,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-llderlii.ckpt",
-          "size_bytes": 29017861,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-od3j1g5m.ckpt",
-          "size_bytes": 29017797,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-v2_default.ckpt",
-          "size_bytes": 29009539,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-vutqq28w.ckpt",
-          "size_bytes": 12926661,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier-znskzxi4.ckpt",
-          "size_bytes": 12926661,
-          "is_weight": true
-        },
-        {
-          "path": "tabpfn-v2-classifier.ckpt",
-          "size_bytes": 29016968,
+          "path": "tabpfn-v2-regressor.ckpt",
+          "size_bytes": 44390977,
           "is_weight": true
         }
       ],
-      "source": "https://huggingface.co/Prior-Labs/TabPFN-v2-clf/tree/f851f2a3c941544733b712d8c0f96dfae9b28862"
+      "source": "https://huggingface.co/Prior-Labs/TabPFN-v2-reg/tree/4972a65a1b30806315c6f92499959ffbfc69a673"
     },
     {
       "model_id": "timesfm-2.5-transformers",

@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "model_id": "chronos-t5-small",
+  "repo_id": "amazon/chronos-t5-small",
+  "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+  "runtime_vram_certified": true,
+  "provider_response": {
+    "schema_version": 1,
+    "provider_version": 1,
+    "status": "OK",
+    "model_id": "chronos-t5-small",
+    "repo_id": "amazon/chronos-t5-small",
+    "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472",
+    "predictions": [
+      2.896599292755127,
+      6.764428615570068,
+      12.237545013427734,
+      19.03568458557129,
+      24.727230072021484,
+      30.047983169555664,
+      34.75755310058594
+    ],
+    "prediction_shape": [
+      7
+    ],
+    "quantiles": [
+      [
+        1.0060886144638062,
+        1.7922413349151611,
+        1.9887795448303223,
+        2.994868040084839,
+        2.994868040084839,
+        2.994868040084839,
+        2.994868040084839,
+        3.1960854530334473,
+        5.1053147315979
+      ],
+      [
+        6.019720554351807,
+        6.019720554351807,
+        6.019720554351807,
+        6.019720554351807,
+        6.019720554351807,
+        7.012663841247559,
+        7.310547351837158,
+        8.005607604980469,
+        8.005607604980469
+      ],
+      [
+        10.978538513183594,
+        10.978538513183594,
+        10.978538513183594,
+        11.985743522644043,
+        11.985743522644043,
+        12.992949485778809,
+        12.992949485778809,
+        12.992949485778809,
+        13.093670845031738
+      ],
+      [
+        17.97659683227539,
+        17.97659683227539,
+        17.97659683227539,
+        18.060209274291992,
+        20.0669002532959,
+        20.0669002532959,
+        20.0669002532959,
+        20.0669002532959,
+        20.0669002532959
+      ],
+      [
+        24.0242977142334,
+        24.914085388183594,
+        24.914085388183594,
+        24.914085388183594,
+        24.914085388183594,
+        24.914085388183594,
+        24.914085388183594,
+        24.914085388183594,
+        24.914085388183594
+      ],
+      [
+        30.102123260498047,
+        30.102123260498047,
+        30.102123260498047,
+        30.102123260498047,
+        30.102123260498047,
+        30.102123260498047,
+        30.102123260498047,
+        30.102123260498047,
+        30.102123260498047
+      ],
+      [
+        33.94093322753906,
+        34.96171188354492,
+        34.96171188354492,
+        34.96171188354492,
+        34.96171188354492,
+        34.96171188354492,
+        34.96171188354492,
+        34.96171188354492,
+        34.96171188354492
+      ]
+    ],
+    "quantile_levels": [
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9
+    ],
+    "quantile_shape": [
+      7,
+      1,
+      9
+    ],
+    "mean_shape": [
+      7,
+      1
+    ],
+    "finite": true,
+    "properties": {
+      "library": "chronos",
+      "package": "chronos-forecasting",
+      "pipeline_class": "ChronosPipeline",
+      "model_class": "ChronosModel",
+      "backend": "torch",
+      "context_length": 512,
+      "maximum_context_length": 512,
+      "prediction_length": 1,
+      "num_samples": 20,
+      "temperature": 1.0,
+      "top_k": 50,
+      "top_p": 1.0,
+      "seed": 42,
+      "input_device": "cpu",
+      "tokenizer_device": "cpu",
+      "model_device": "cuda:0",
+      "parameter_dtype": "torch.float32",
+      "license": "Apache-2.0",
+      "license_commercial_use": true,
+      "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472",
+      "weight_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472/model.safetensors",
+      "weight_sha256": "9c8b6fde5300f72b01c173153bf9288fa0a200614275bf0585071ad71a6a3d43",
+      "config_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472/config.json",
+      "config_sha256": "76b7445a93491851e434733a138b67e26eda4375f83e08f80a07383c6b3f571a",
+      "generation_config_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472/generation_config.json",
+      "generation_config_sha256": "8f6833851ce53496a43ef87a975c766f7a3049e2d598ecef609a526ca6308534"
+    },
+    "gpu_evidence": {
+      "requested_device": "cuda",
+      "execution_device": "cuda:0",
+      "model_device": "cuda:0",
+      "input_device": "cpu",
+      "tokenizer_device": "cpu",
+      "cuda_available": true,
+      "gpu_requested": true,
+      "gpu_used": true,
+      "gpu_certification": "OBSERVED",
+      "resource_certification": "GPU_PASS",
+      "cpu_fallback": false,
+      "cpu_preprocessing": true,
+      "cpu_preprocessing_reason": "Chronos-T5 tokenizer and bucketize boundaries operate on CPU",
+      "fallback_reason": null,
+      "peak_vram_bytes": 2407026688,
+      "gpu_pid": 893940
+    },
+    "artifact_reference": {
+      "repo_id": "amazon/chronos-t5-small",
+      "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+      "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472"
+    }
+  },
+  "device": "cuda:0",
+  "input_device": "cpu",
+  "tokenizer_device": "cpu",
+  "cpu_preprocessing": true,
+  "cpu_fallback": false,
+  "peak_vram_bytes": 2407026688,
+  "prediction_shape": [
+    7
+  ],
+  "quantile_shape": [
+    7,
+    1,
+    9
+  ],
+  "mean_shape": [
+    7,
+    1
+  ],
+  "finite": true,
+  "context_length": 512,
+  "prediction_length": 1,
+  "num_samples": 20,
+  "weight_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472/model.safetensors",
+  "weight_sha256": "9c8b6fde5300f72b01c173153bf9288fa0a200614275bf0585071ad71a6a3d43",
+  "config_sha256": "76b7445a93491851e434733a138b67e26eda4375f83e08f80a07383c6b3f571a",
+  "generation_config_sha256": "8f6833851ce53496a43ef87a975c766f7a3049e2d598ecef609a526ca6308534",
+  "license": "Apache-2.0",
+  "license_commercial_use": true,
+  "artifact_reference": {
+    "repo_id": "amazon/chronos-t5-small",
+    "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472"
+  }
+}

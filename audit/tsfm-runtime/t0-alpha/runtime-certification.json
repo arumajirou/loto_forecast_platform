@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "model_id": "t0-alpha",
+  "repo_id": "theforecastingcompany/t0-alpha",
+  "revision": "f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+  "certification_status": "BLOCKED",
+  "runtime_vram_certified": false,
+  "blocked_reason": "GATED_ACCESS_REQUIRED",
+  "blocked_detail": "Ledger marks this model as gated and the fixed local snapshot contains only README.md, with no config or weight files available for runtime execution.",
+  "retry_condition": "Accept/verify gated model access and install the exact pinned revision into the configured local Hugging Face cache with config.json and model weights.",
+  "license_review_status": "APPROVED",
+  "gpu_used": false,
+  "cpu_fallback": false
+}

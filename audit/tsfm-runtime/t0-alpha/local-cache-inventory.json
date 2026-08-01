@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "model_id": "t0-alpha",
+  "repo_cache_path": "/mnt/e/env/huggingface/hub/models--theforecastingcompany--t0-alpha",
+  "repo_cache_exists": true,
+  "snapshots": [
+    "f8727c2357e0d81f1d9f56fe3aaac43068b5fc72"
+  ],
+  "fixed_snapshot_path": "/mnt/e/env/huggingface/hub/models--theforecastingcompany--t0-alpha/snapshots/f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+  "fixed_snapshot_exists": true,
+  "gated_required": true,
+  "expected_stored_weight_bytes": 406601492
+}

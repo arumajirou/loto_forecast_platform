@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "model_id": "moirai-1.0-base",
+  "runtime_executed": false,
+  "dependency_status": "NOT_EVALUATED",
+  "reason": "License review failed before runtime dependency probing."
+}

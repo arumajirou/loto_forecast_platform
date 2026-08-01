@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "model_id": "toto-2.0-4m",
+  "repo_id": "Datadog/Toto-2.0-4m",
+  "revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+  "license": "apache-2.0",
+  "review_status": "APPROVED",
+  "commercial_use": true,
+  "attribution_required": true,
+  "redistribution_allowed": true,
+  "modification_allowed": true,
+  "patent_grant": true,
+  "notice_required_on_distribution": true,
+  "limitations": [
+    "Pinned snapshot is complete, but the required Toto runtime package toto2/toto-models is not installed in the certification environment."
+  ],
+  "review_notes": [
+    "Apache-2.0 from pinned snapshot README metadata."
+  ]
+}

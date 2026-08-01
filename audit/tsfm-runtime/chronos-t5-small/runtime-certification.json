@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "model_id": "chronos-t5-small",
+  "repo_id": "amazon/chronos-t5-small",
+  "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+  "certification_status": "RUNTIME_CERTIFIED",
+  "runtime_vram_certified": true,
+  "license_review_status": "APPROVED",
+  "license": "Apache-2.0",
+  "license_commercial_use": true,
+  "license_attribution_required": true,
+  "package": "chronos-forecasting",
+  "pipeline_class": "ChronosPipeline",
+  "model_class": "ChronosModel",
+  "backend": "torch",
+  "device": "cuda:0",
+  "input_device": "cpu",
+  "tokenizer_device": "cpu",
+  "cpu_preprocessing": true,
+  "cpu_preprocessing_reason": "Chronos-T5 tokenizer and bucketize boundaries operate on CPU",
+  "gpu_used": true,
+  "cpu_fallback": false,
+  "peak_vram_bytes": 2407026688,
+  "context_length": 512,
+  "maximum_context_length": 512,
+  "prediction_length": 1,
+  "num_samples": 20,
+  "seed": 42,
+  "prediction_shape": [
+    7
+  ],
+  "quantile_shape": [
+    7,
+    1,
+    9
+  ],
+  "mean_shape": [
+    7,
+    1
+  ],
+  "finite": true,
+  "weight_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472/model.safetensors",
+  "weight_sha256": "9c8b6fde5300f72b01c173153bf9288fa0a200614275bf0585071ad71a6a3d43",
+  "config_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472/config.json",
+  "config_sha256": "76b7445a93491851e434733a138b67e26eda4375f83e08f80a07383c6b3f571a",
+  "generation_config_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472/generation_config.json",
+  "generation_config_sha256": "8f6833851ce53496a43ef87a975c766f7a3049e2d598ecef609a526ca6308534",
+  "artifact_reference": {
+    "repo_id": "amazon/chronos-t5-small",
+    "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-small/snapshots/a971ba21945c4f1796b17a91fe69214b5f4ad472"
+  },
+  "limitations": [
+    "Synthetic input only",
+    "One-step prediction only",
+    "Forecast accuracy was not evaluated",
+    "Production stability was not certified",
+    "CPU tokenization and preprocessing are required by this runtime",
+    "Certification applies only to the pinned revision and recorded environment"
+  ]
+}

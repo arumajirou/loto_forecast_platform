@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "model_id": "tirex-2",
+  "repo_id": "NX-AI/TiRex-2",
+  "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+  "runtime_vram_certified": true,
+  "provider_response": {
+    "status": "OK",
+    "schema_version": 1,
+    "provider_version": 1,
+    "repo_id": "NX-AI/TiRex-2",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--NX-AI--TiRex-2/snapshots/05e5b26db52bfb256f1ae1bdf785589850482de3",
+    "predictions": [
+      1.1600664854049683,
+      2.1600558757781982,
+      3.1600558757781982,
+      4.160065650939941,
+      5.160065650939941,
+      6.160065650939941,
+      7.160065650939941
+    ],
+    "prediction_shape": [
+      7
+    ],
+    "finite": true,
+    "properties": {
+      "library": "tirex2",
+      "package": "tirex-2",
+      "package_version": "0.1.1",
+      "license": "apache-2.0",
+      "backend": "torch",
+      "context_length": 512,
+      "max_context_length": 2048,
+      "prediction_length": 1,
+      "quantile_support": true,
+      "quantile_shape": [
+        7,
+        9,
+        1
+      ],
+      "weight_files": [
+        "/mnt/e/env/huggingface/hub/models--NX-AI--TiRex-2/snapshots/05e5b26db52bfb256f1ae1bdf785589850482de3/model.ckpt"
+      ],
+      "weight_sha256": {
+        "/mnt/e/env/huggingface/hub/models--NX-AI--TiRex-2/snapshots/05e5b26db52bfb256f1ae1bdf785589850482de3/model.ckpt": "184b160ffbe4c01a26beeba14015ff3507c7497e1f3577114187bbc1d19fcac1"
+      },
+      "config_sha256": "cddbe6d0be4919cb7b0cad747fb19a295264e129d1c0790cf62133b4cb5da727",
+      "snapshot_complete": true
+    },
+    "gpu_evidence": {
+      "requested_device": "cuda",
+      "execution_device": "cuda",
+      "cuda_available": true,
+      "gpu_requested": true,
+      "gpu_used": true,
+      "gpu_certification": "OBSERVED",
+      "resource_certification": "GPU_PASS",
+      "cpu_fallback": false,
+      "fallback_reason": null,
+      "peak_vram_bytes": 366283776,
+      "gpu_pid": 816059
+    },
+    "artifact_reference": {
+      "repo_id": "NX-AI/TiRex-2",
+      "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+      "snapshot_path": "/mnt/e/env/huggingface/hub/models--NX-AI--TiRex-2/snapshots/05e5b26db52bfb256f1ae1bdf785589850482de3"
+    }
+  },
+  "device": "cuda",
+  "peak_vram_bytes": 366283776,
+  "cuda_available": true,
+  "prediction_shape": [
+    7
+  ],
+  "predictions": [
+    1.1600664854049683,
+    2.1600558757781982,
+    3.1600558757781982,
+    4.160065650939941,
+    5.160065650939941,
+    6.160065650939941,
+    7.160065650939941
+  ],
+  "finite": true,
+  "context_length": 512,
+  "prediction_length": 1,
+  "quantile_shape": [
+    7,
+    9,
+    1
+  ],
+  "artifact_reference": {
+    "repo_id": "NX-AI/TiRex-2",
+    "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--NX-AI--TiRex-2/snapshots/05e5b26db52bfb256f1ae1bdf785589850482de3"
+  }
+}

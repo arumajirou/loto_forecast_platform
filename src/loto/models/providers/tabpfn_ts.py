@@ -2,6 +2,7 @@ from __future__ import annotations
 
 # ruff: noqa: E501
 import json
+import os
 import subprocess
 import tempfile
 from pathlib import Path
@@ -20,6 +21,12 @@ from loto.models.providers.subprocess import (
 ROOT = Path(__file__).resolve().parents[4]
 TABPFN_TS_ENV = ROOT / "environments" / "tabpfn-ts"
 TABPFN_TS_RUNNER = ROOT / "scripts" / "run_tabpfn_ts_provider.py"
+HF_HOME = Path(
+    os.environ.get(
+        "HF_HOME",
+        str(Path.home() / ".cache" / "huggingface"),
+    )
+)
 
 
 class TabPFNTSProvider(FoundationProvider):
@@ -52,6 +59,25 @@ class TabPFNTSProvider(FoundationProvider):
         self.validate_environment()
         return self
 
+    def _fixed_snapshot_path(self) -> Path:
+        repo_cache_name = "models--Prior-Labs--TabPFN-v2-reg"
+        snapshot = HF_HOME / "hub" / repo_cache_name / "snapshots" / self.revision
+        weight = snapshot / self.weight_filename
+
+        if not snapshot.is_dir():
+            raise FoundationProviderError(
+                "MODEL_WEIGHTS_MISSING",
+                (f"fixed TabPFN snapshot missing: {snapshot}"),
+            )
+
+        if not weight.is_file():
+            raise FoundationProviderError(
+                "MODEL_WEIGHTS_MISSING",
+                (f"fixed TabPFN checkpoint missing: {weight}"),
+            )
+
+        return snapshot.resolve()
+
     def _run_provider(self, history: pd.DataFrame) -> dict[str, Any]:
         self.validate_environment()
         columns = [f"n{i}" for i in range(1, 8)] + ["draw_date"]
@@ -63,7 +89,7 @@ class TabPFNTSProvider(FoundationProvider):
             "repo_id": self.repo_id,
             "revision": self.revision,
             "weight_filename": self.weight_filename,
-            "snapshot_path": None,
+            "snapshot_path": str(self._fixed_snapshot_path()),
             "local_files_only": True,
             "device": self.device,
             "dtype": "float32" if self.precision.startswith("32") else self.precision,

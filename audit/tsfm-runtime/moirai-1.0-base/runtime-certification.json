@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "model_id": "moirai-1.0-base",
+  "repo_id": "Salesforce/moirai-1.0-R-base",
+  "revision": "4fa939a8800d9da346c0280f3d9aeba0d2d35877",
+  "certification_status": "BLOCKED",
+  "runtime_vram_certified": false,
+  "license_review_status": "REJECTED",
+  "blocked_at": "2026-08-01T09:58:02.078648+00:00",
+  "blocked_reason": "LICENSE_REVIEW_REQUIRED",
+  "blocked_detail": "Pinned model declares cc-by-nc-4.0 non-commercial license; license review cannot be approved for commercial runtime certification.",
+  "retry_condition": "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai revision/model. A complete pinned snapshot with weights is also required before runtime probing.",
+  "limitations": [
+    "License is non-commercial.",
+    "Pinned snapshot contains only README.md and no weight file.",
+    "No CUDA inference was executed.",
+    "Forecast accuracy was not evaluated."
+  ]
+}

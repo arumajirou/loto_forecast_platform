@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "model_id": "moment-1-small",
+  "repo_id": "AutonLab/MOMENT-1-small",
+  "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
+  "certification_status": "BLOCKED",
+  "runtime_vram_certified": false,
+  "license_review_status": "BLOCKED",
+  "blocked_at": "2026-08-01T10:06:08.757310+00:00",
+  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
+  "blocked_detail": "Pinned snapshot directory is missing from the configured local Hugging Face cache.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files.",
+  "limitations": [
+    "No pinned snapshot was available.",
+    "No CUDA inference was executed.",
+    "No model weight SHA-256 was certified."
+  ]
+}

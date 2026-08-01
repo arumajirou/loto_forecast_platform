@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "model_id": "moment-1-small",
+  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
+  "blocked_detail": "Pinned snapshot directory is missing from the configured local Hugging Face cache.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files.",
+  "facts": [
+    "Repo cache exists: False",
+    "Snapshot path exists: False"
+  ]
+}

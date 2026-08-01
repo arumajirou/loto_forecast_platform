@@ -1,0 +1,7 @@
+PROJECT_ROOT=/mnt/e/env/ts/loto_forecast_platform
+cwd=/mnt/e/env/ts/loto_forecast_platform
+runtime_command=not executed
+reason=MODEL_WEIGHTS_MISSING
+checked_snapshot=/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2
+local_files_only=true
+implicit_network_fetch=false

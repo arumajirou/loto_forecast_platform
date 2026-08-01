@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "model_id": "tabpfn-ts",
+  "repo_id": "Prior-Labs/TabPFN-v2-reg",
+  "revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
+  "certification_status": "RUNTIME_CERTIFIED",
+  "runtime_vram_certified": true,
+  "license_review_status": "APPROVED_WITH_ATTRIBUTION",
+  "license": "Prior Labs License 1.1",
+  "license_commercial_use": true,
+  "license_attribution_required": true,
+  "package": "tabpfn-time-series",
+  "backend": "torch",
+  "device": "cuda",
+  "gpu_used": true,
+  "cpu_fallback": false,
+  "peak_vram_bytes": 114643968,
+  "context_length": 256,
+  "prediction_length": 1,
+  "prediction_shape": [
+    37
+  ],
+  "finite": true,
+  "weight_path": "/mnt/e/env/huggingface/hub/models--Prior-Labs--TabPFN-v2-reg/snapshots/4972a65a1b30806315c6f92499959ffbfc69a673/tabpfn-v2-regressor.ckpt",
+  "weight_sha256": "2ab5a07d5c41dfe6db9aa7ae106fc6de898326c2765be66505a07e2868c10736",
+  "config_sha256": "c40b7869f5343883697af1701e93c489cc586a67ea049f4b90c64cd60c4b1c8e",
+  "artifact_reference": {
+    "repo_id": "Prior-Labs/TabPFN-v2-reg",
+    "revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Prior-Labs--TabPFN-v2-reg/snapshots/4972a65a1b30806315c6f92499959ffbfc69a673"
+  },
+  "limitations": [
+    "Synthetic input only",
+    "One-step candidate-score prediction only",
+    "Forecast accuracy was not evaluated",
+    "Raw regression scores may be negative",
+    "Platform normalization is required before use as candidate probabilities",
+    "Production stability was not certified",
+    "Distribution requires Prior Labs attribution",
+    "Certification applies only to the exact V2 regressor revision and recorded environment"
+  ]
+}

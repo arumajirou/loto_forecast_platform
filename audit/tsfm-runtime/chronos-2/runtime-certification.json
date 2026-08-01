@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "model_id": "chronos-2",
+  "repo_id": "amazon/chronos-2",
+  "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+  "certification_status": "RUNTIME_CERTIFIED",
+  "runtime_vram_certified": true,
+  "license_review_status": "APPROVED",
+  "license": "Apache-2.0",
+  "license_commercial_use": true,
+  "license_attribution_required": true,
+  "package": "chronos-forecasting",
+  "pipeline_class": "Chronos2Pipeline",
+  "model_class": "Chronos2Model",
+  "backend": "torch",
+  "device": "cuda:0",
+  "model_device": "cuda:0",
+  "input_devices": [
+    "cpu",
+    "cpu",
+    "cpu",
+    "cpu",
+    "cpu",
+    "cpu",
+    "cpu"
+  ],
+  "cpu_preprocessing": true,
+  "cpu_preprocessing_reason": "Chronos 2 input preprocessing operates on CPU before CUDA inference",
+  "gpu_used": true,
+  "cpu_fallback": false,
+  "gpu_pid": 919682,
+  "peak_vram_bytes": 497113088,
+  "context_length": 512,
+  "maximum_context_length": 512,
+  "prediction_length": 1,
+  "batch_size": 7,
+  "cross_learning": false,
+  "seed": 42,
+  "prediction_shape": [
+    7
+  ],
+  "quantile_list_length": 7,
+  "mean_list_length": 7,
+  "quantile_shapes": [
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ]
+  ],
+  "mean_shapes": [
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ]
+  ],
+  "finite": true,
+  "weight_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c/model.safetensors",
+  "weight_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+  "config_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c/config.json",
+  "config_sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+  "artifact_reference": {
+    "repo_id": "amazon/chronos-2",
+    "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c"
+  },
+  "external_gpu_evidence": {
+    "process_samples_file": "nvidia-process-samples.csv",
+    "gpu_samples_file": "nvidia-gpu-samples.csv",
+    "gpu_pid": 919682,
+    "captured": true
+  },
+  "limitations": [
+    "Synthetic input only",
+    "One-step prediction only",
+    "Forecast accuracy was not evaluated",
+    "Production stability was not certified",
+    "CPU input preprocessing is required before CUDA inference",
+    "Certification applies only to the pinned revision and recorded environment"
+  ]
+}

@@ -1,0 +1,8 @@
+timestamp=2026-08-01T17:38:12+09:00
+hostname=az
+kernel=7.0.0-28-generic
+branch=feat/tirex-runtime-audit-v1
+commit=2784781934900bc3a08bca49814d736514cea4ac
+model_id=tirex-2
+repo_id=NX-AI/TiRex-2
+revision=05e5b26db52bfb256f1ae1bdf785589850482de3

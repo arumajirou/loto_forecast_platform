@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "model_id": "timesfm-2.5-transformers",
+  "repo_id": "google/timesfm-2.5-200m-transformers",
+  "revision": "5a9806b9b291fad9233b5249d88263f1846304d3",
+  "certification_status": "BLOCKED",
+  "runtime_vram_certified": false,
+  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
+  "blocked_detail": "Repo cache exists, but the fixed revision snapshot directory is absent.",
+  "retry_condition": "Install the exact pinned Transformers revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
+  "license_review_status": "BLOCKED",
+  "gpu_used": false,
+  "cpu_fallback": false
+}

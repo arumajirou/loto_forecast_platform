@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "model_id": "moirai-2.0-small",
+  "repo_id": "Salesforce/moirai-2.0-R-small",
+  "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+  "license": "cc-by-nc-4.0",
+  "review_status": "REJECTED",
+  "commercial_use": false,
+  "attribution_required": true,
+  "redistribution_allowed": true,
+  "modification_allowed": true,
+  "patent_grant": false,
+  "notice_required_on_distribution": true,
+  "limitations": [
+    "CC-BY-NC-4.0 restricts commercial use."
+  ],
+  "review_notes": [
+    "Pinned snapshot README metadata declares license: cc-by-nc-4.0.",
+    "The ledger category is E with reason non-commercial license.",
+    "Runtime certification is blocked before GPU probing because license approval is unavailable for commercial runtime use."
+  ]
+}

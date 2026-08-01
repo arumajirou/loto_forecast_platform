@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "model_id": "chronos-bolt-tiny",
+  "repo_id": "amazon/chronos-bolt-tiny",
+  "revision": "a0e552de83495b5c28c14c71c374f3e33280b340",
+  "certification_status": "RUNTIME_CERTIFIED",
+  "runtime_vram_certified": true,
+  "license_review_status": "APPROVED",
+  "license": "Apache-2.0",
+  "license_commercial_use": true,
+  "license_attribution_required": true,
+  "package": "chronos-forecasting",
+  "pipeline_class": "ChronosBoltPipeline",
+  "model_class": "ChronosBoltModelForForecasting",
+  "backend": "torch",
+  "device": "cuda:0",
+  "gpu_used": true,
+  "cpu_fallback": false,
+  "peak_vram_bytes": 47238144,
+  "context_length": 512,
+  "prediction_length": 1,
+  "prediction_shape": [
+    7
+  ],
+  "quantile_shape": [
+    7,
+    1,
+    9
+  ],
+  "mean_shape": [
+    7,
+    1
+  ],
+  "finite": true,
+  "weight_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-bolt-tiny/snapshots/a0e552de83495b5c28c14c71c374f3e33280b340/model.safetensors",
+  "weight_sha256": "75068728d376d2bec670379eeef4bfb4d24c0cfe24d957451f8d19b447030a32",
+  "config_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-bolt-tiny/snapshots/a0e552de83495b5c28c14c71c374f3e33280b340/config.json",
+  "config_sha256": "278f0086733031635fb1c861cb01c1bad6477420c7fcb19381a2993e335785e0",
+  "artifact_reference": {
+    "repo_id": "amazon/chronos-bolt-tiny",
+    "revision": "a0e552de83495b5c28c14c71c374f3e33280b340",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-bolt-tiny/snapshots/a0e552de83495b5c28c14c71c374f3e33280b340"
+  },
+  "limitations": [
+    "Synthetic input only",
+    "One-step prediction only",
+    "Forecast accuracy was not evaluated",
+    "Production stability was not certified",
+    "Certification applies only to the exact pinned revision and recorded environment"
+  ]
+}
