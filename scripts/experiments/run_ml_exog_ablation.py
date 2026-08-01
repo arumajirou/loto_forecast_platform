@@ -185,10 +185,7 @@ conditions = {
 }
 
 # 重複列を除去。
-conditions = {
-    key: list(dict.fromkeys(columns))
-    for key, columns in conditions.items()
-}
+conditions = {key: list(dict.fromkeys(columns)) for key, columns in conditions.items()}
 
 results: list[dict] = []
 prediction_rows: list[dict] = []
@@ -198,25 +195,17 @@ for model_name, prototype in MODELS.items():
         condition_dir = OUT / model_name / condition
         condition_dir.mkdir(parents=True, exist_ok=True)
 
-        working = df[
-            ["unique_id", "ds", "y"] + feature_cols
-        ].copy()
+        working = df[["unique_id", "ds", "y"] + feature_cols].copy()
 
         working = working.replace([np.inf, -np.inf], np.nan)
-        working = working.dropna(
-            subset=["y", *feature_cols]
-        ).reset_index(drop=True)
+        working = working.dropna(subset=["y", *feature_cols]).reset_index(drop=True)
 
         series_dates = {
             unique_id: list(group["ds"].sort_values().unique())
             for unique_id, group in working.groupby("unique_id")
         }
 
-        common_dates = sorted(
-            set.intersection(
-                *[set(dates) for dates in series_dates.values()]
-            )
-        )
+        common_dates = sorted(set.intersection(*[set(dates) for dates in series_dates.values()]))
 
         test_dates = common_dates[-N_WINDOWS:]
 
@@ -232,8 +221,7 @@ for model_name, prototype in MODELS.items():
 
             if train.empty or test.empty:
                 raise RuntimeError(
-                    f"empty fold model={model_name} "
-                    f"condition={condition} date={test_date}"
+                    f"empty fold model={model_name} condition={condition} date={test_date}"
                 )
 
             estimator = clone(prototype)
@@ -251,9 +239,7 @@ for model_name, prototype in MODELS.items():
 
             mae = mean_absolute_error(actual, prediction)
             mse = mean_squared_error(actual, prediction)
-            within1 = float(
-                np.mean(np.abs(actual - prediction) <= 1.0)
-            )
+            within1 = float(np.mean(np.abs(actual - prediction) <= 1.0))
 
             fold_maes.append(float(mae))
             fold_mses.append(float(mse))
@@ -269,12 +255,8 @@ for model_name, prototype in MODELS.items():
                         "unique_id": row["unique_id"],
                         "actual": float(actual[index]),
                         "prediction": float(prediction[index]),
-                        "absolute_error": float(
-                            abs(actual[index] - prediction[index])
-                        ),
-                        "within_1": bool(
-                            abs(actual[index] - prediction[index]) <= 1
-                        ),
+                        "absolute_error": float(abs(actual[index] - prediction[index])),
+                        "within_1": bool(abs(actual[index] - prediction[index]) <= 1),
                     }
                 )
 
@@ -316,16 +298,12 @@ for model_name, prototype in MODELS.items():
                 index=False,
             )
         except Exception as exc:
-            (
-                condition_dir / "feature_importance_error.txt"
-            ).write_text(
+            (condition_dir / "feature_importance_error.txt").write_text(
                 f"{type(exc).__name__}: {exc}",
                 encoding="utf-8",
             )
 
-        digest = hashlib.sha256(
-            model_path.read_bytes()
-        ).hexdigest()
+        digest = hashlib.sha256(model_path.read_bytes()).hexdigest()
 
         properties = {
             "model": model_name,
@@ -342,9 +320,7 @@ for model_name, prototype in MODELS.items():
             "python": platform.python_version(),
         }
 
-        (
-            condition_dir / "model_properties.json"
-        ).write_text(
+        (condition_dir / "model_properties.json").write_text(
             json.dumps(properties, indent=2),
             encoding="utf-8",
         )
@@ -356,8 +332,7 @@ results_df = pd.DataFrame(results)
 for model_name in results_df["model"].unique():
     baseline = float(
         results_df.loc[
-            (results_df["model"] == model_name)
-            & (results_df["condition"] == "no_exog"),
+            (results_df["model"] == model_name) & (results_df["condition"] == "no_exog"),
             "mean_mae",
         ].iloc[0]
     )
@@ -366,14 +341,7 @@ for model_name in results_df["model"].unique():
     results_df.loc[
         mask,
         "mae_improvement_percent_vs_no_exog",
-    ] = (
-        (
-            baseline
-            - results_df.loc[mask, "mean_mae"]
-        )
-        / baseline
-        * 100.0
-    )
+    ] = (baseline - results_df.loc[mask, "mean_mae"]) / baseline * 100.0
 
 results_df.to_csv(
     OUT / "ml_exog_results.csv",

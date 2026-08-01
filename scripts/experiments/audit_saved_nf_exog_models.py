@@ -24,20 +24,13 @@ def normalize(value: Any) -> Any:
         return [normalize(item) for item in value]
 
     if isinstance(value, dict):
-        return {
-            str(key): normalize(item)
-            for key, item in value.items()
-        }
+        return {str(key): normalize(item) for key, item in value.items()}
 
     return repr(value)
 
 
-for properties_path in sorted(
-    root.rglob("model_properties.json")
-):
-    properties = json.loads(
-        properties_path.read_text(encoding="utf-8")
-    )
+for properties_path in sorted(root.rglob("model_properties.json")):
+    properties = json.loads(properties_path.read_text(encoding="utf-8"))
 
     model_name = properties["model"]
     condition = properties["condition"]
@@ -54,29 +47,18 @@ for properties_path in sorted(
         nf = NeuralForecast.load(path=str(saved_path))
 
         if not nf.models:
-            raise RuntimeError(
-                "Loaded NeuralForecast contains no models"
-            )
+            raise RuntimeError("Loaded NeuralForecast contains no models")
 
         model = nf.models[0]
 
-        futr = list(
-            getattr(model, "futr_exog_list", []) or []
-        )
-        hist = list(
-            getattr(model, "hist_exog_list", []) or []
-        )
-        stat = list(
-            getattr(model, "stat_exog_list", []) or []
-        )
+        futr = list(getattr(model, "futr_exog_list", []) or [])
+        hist = list(getattr(model, "hist_exog_list", []) or [])
+        stat = list(getattr(model, "stat_exog_list", []) or [])
 
         record.update(
             {
                 "load_status": "PASS",
-                "loaded_class": (
-                    f"{type(model).__module__}."
-                    f"{type(model).__name__}"
-                ),
+                "loaded_class": (f"{type(model).__module__}.{type(model).__name__}"),
                 "alias": getattr(model, "alias", None),
                 "h": getattr(model, "h", None),
                 "input_size": getattr(
@@ -130,18 +112,9 @@ for properties_path in sorted(
             }
         )
 
-        record["futr_matches"] = (
-            futr
-            == properties.get("futr_exog_list", [])
-        )
-        record["hist_matches"] = (
-            hist
-            == properties.get("hist_exog_list", [])
-        )
-        record["stat_matches"] = (
-            stat
-            == properties.get("stat_exog_list", [])
-        )
+        record["futr_matches"] = futr == properties.get("futr_exog_list", [])
+        record["hist_matches"] = hist == properties.get("hist_exog_list", [])
+        record["stat_matches"] = stat == properties.get("stat_exog_list", [])
 
         record["property_contract_pass"] = all(
             [
@@ -155,9 +128,7 @@ for properties_path in sorted(
         record.update(
             {
                 "load_status": "FAIL",
-                "error": (
-                    f"{type(exc).__name__}: {exc}"
-                ),
+                "error": (f"{type(exc).__name__}: {exc}"),
                 "property_contract_pass": False,
             }
         )
@@ -183,43 +154,21 @@ for row in rows:
             "condition": row["condition"],
             "load_status": row["load_status"],
             "loaded_class": row.get("loaded_class"),
-            "futr_exog_count": row.get(
-                "futr_exog_count"
-            ),
-            "hist_exog_count": row.get(
-                "hist_exog_count"
-            ),
-            "stat_exog_count": row.get(
-                "stat_exog_count"
-            ),
-            "futr_exog_size": row.get(
-                "futr_exog_size"
-            ),
-            "hist_exog_size": row.get(
-                "hist_exog_size"
-            ),
-            "stat_exog_size": row.get(
-                "stat_exog_size"
-            ),
-            "futr_matches": row.get(
-                "futr_matches"
-            ),
-            "hist_matches": row.get(
-                "hist_matches"
-            ),
-            "stat_matches": row.get(
-                "stat_matches"
-            ),
-            "property_contract_pass": row.get(
-                "property_contract_pass"
-            ),
+            "futr_exog_count": row.get("futr_exog_count"),
+            "hist_exog_count": row.get("hist_exog_count"),
+            "stat_exog_count": row.get("stat_exog_count"),
+            "futr_exog_size": row.get("futr_exog_size"),
+            "hist_exog_size": row.get("hist_exog_size"),
+            "stat_exog_size": row.get("stat_exog_size"),
+            "futr_matches": row.get("futr_matches"),
+            "hist_matches": row.get("hist_matches"),
+            "stat_matches": row.get("stat_matches"),
+            "property_contract_pass": row.get("property_contract_pass"),
             "error": row.get("error"),
         }
     )
 
-df = pd.DataFrame(flat_rows).sort_values(
-    ["model", "condition"]
-)
+df = pd.DataFrame(flat_rows).sort_values(["model", "condition"])
 
 csv_path = root / "saved_model_exog_audit.csv"
 df.to_csv(csv_path, index=False)
@@ -228,10 +177,7 @@ print(df.to_string(index=False))
 print(f"\nJSON={json_path}")
 print(f"CSV={csv_path}")
 
-failed = df[
-    (df["load_status"] != "PASS")
-    | (df["property_contract_pass"] != True)
-]
+failed = df[(df["load_status"] != "PASS") | (df["property_contract_pass"] != True)]
 
 if not failed.empty:
     print("\nFAILED MODELS")

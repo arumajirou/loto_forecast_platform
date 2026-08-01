@@ -10,15 +10,9 @@ import neuralforecast.models as model_module
 from neuralforecast.common._base_auto import BaseAuto
 
 
-OUTPUT_JSON = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_matrix_v2.json"
-)
+OUTPUT_JSON = Path("artifacts/parameter_inventory/neuralforecast_auto_model_matrix_v2.json")
 
-OUTPUT_CSV = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_matrix_v2.csv"
-)
+OUTPUT_CSV = Path("artifacts/parameter_inventory/neuralforecast_auto_model_matrix_v2.csv")
 
 
 SPECIAL_NAME_MAP = {
@@ -110,12 +104,8 @@ for auto_name in sorted(dir(auto_module)):
             "accepts_valid_loss": "valid_loss" in parameters,
             "parameter_count": len(parameters),
             "required_parameters": required,
-            "model_signature": str(
-                inspect.signature(model_cls.__init__)
-            ),
-            "auto_signature": str(
-                inspect.signature(auto_cls.__init__)
-            ),
+            "model_signature": str(inspect.signature(model_cls.__init__)),
+            "auto_signature": str(inspect.signature(auto_cls.__init__)),
         }
     )
 
@@ -143,16 +133,9 @@ try:
 except Exception as exc:
     print("WARNING CSV export failed:", repr(exc))
 
-mapped = sum(
-    bool(record.get("base_model_found"))
-    for record in records
-)
+mapped = sum(bool(record.get("base_model_found")) for record in records)
 
-unmapped = [
-    record
-    for record in records
-    if not record.get("base_model_found")
-]
+unmapped = [record for record in records if not record.get("base_model_found")]
 
 print("valid_auto_classes=", len(records))
 print("mapped_base_models=", mapped)

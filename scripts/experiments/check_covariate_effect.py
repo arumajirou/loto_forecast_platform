@@ -24,14 +24,8 @@ future = data.slice_by_timestep(-h, None)
 known = future[predictor.known_covariates_names].copy()
 
 tests = {
-    "all_zero": {
-        column: 0.0
-        for column in predictor.known_covariates_names
-    },
-    "extreme_positive": {
-        column: 999.0
-        for column in predictor.known_covariates_names
-    },
+    "all_zero": {column: 0.0 for column in predictor.known_covariates_names},
+    "extreme_positive": {column: 999.0 for column in predictor.known_covariates_names},
     "column_specific": {
         "day_of_week": 6.0,
         "month_of_year": 12.0,
@@ -46,9 +40,7 @@ baseline = predictor.predict(
     known_covariates=known,
 ).to_data_frame()
 
-numeric = list(
-    baseline.select_dtypes(include="number").columns
-)
+numeric = list(baseline.select_dtypes(include="number").columns)
 
 results = {}
 
@@ -64,31 +56,18 @@ for test_name, replacement_map in tests.items():
         known_covariates=modified,
     ).to_data_frame()
 
-    difference = (
-        baseline[numeric]
-        .subtract(prediction[numeric])
-        .abs()
-    )
+    difference = baseline[numeric].subtract(prediction[numeric]).abs()
 
     results[test_name] = {
-        "mean_abs_change": float(
-            difference.to_numpy().mean()
-        ),
-        "max_abs_change": float(
-            difference.to_numpy().max()
-        ),
+        "mean_abs_change": float(difference.to_numpy().mean()),
+        "max_abs_change": float(difference.to_numpy().max()),
     }
 
 print(json.dumps(results, indent=2))
 
-max_change = max(
-    result["max_abs_change"]
-    for result in results.values()
-)
+max_change = max(result["max_abs_change"] for result in results.values())
 
 if max_change == 0:
-    raise RuntimeError(
-        "Chronos2 predictions did not react to any covariate perturbation"
-    )
+    raise RuntimeError("Chronos2 predictions did not react to any covariate perturbation")
 
 print("COVARIATE_EFFECT=PASS")

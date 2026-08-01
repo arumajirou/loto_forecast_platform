@@ -5,37 +5,22 @@ import json
 from pathlib import Path
 
 
-SOURCE = Path(
-    "configs/generated/"
-    "neuralforecast_normalized_fair_spaces.json"
-)
+SOURCE = Path("configs/generated/neuralforecast_normalized_fair_spaces.json")
 
-OUTPUT = Path(
-    "configs/generated/"
-    "neuralforecast_normalized_fixed_seed_spaces.json"
-)
+OUTPUT = Path("configs/generated/neuralforecast_normalized_fixed_seed_spaces.json")
 
 SEARCH_SEED = 42
 FORMAL_EVALUATION_SEEDS = [42, 123, 2026]
 
 
-data = json.loads(
-    SOURCE.read_text(encoding="utf-8")
-)
+data = json.loads(SOURCE.read_text(encoding="utf-8"))
 
 fixed = copy.deepcopy(data)
 
-fixed["metadata"]["purpose"] = (
-    "Backend-neutral fair comparison space "
-    "with fixed search seed"
-)
-fixed["metadata"]["search_seed_policy"] = (
-    "random_seed is fixed during hyperparameter search"
-)
+fixed["metadata"]["purpose"] = "Backend-neutral fair comparison space with fixed search seed"
+fixed["metadata"]["search_seed_policy"] = "random_seed is fixed during hyperparameter search"
 fixed["metadata"]["search_seed"] = SEARCH_SEED
-fixed["metadata"]["formal_evaluation_seeds"] = (
-    FORMAL_EVALUATION_SEEDS
-)
+fixed["metadata"]["formal_evaluation_seeds"] = FORMAL_EVALUATION_SEEDS
 
 changed = []
 

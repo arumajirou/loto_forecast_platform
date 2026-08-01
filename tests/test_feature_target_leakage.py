@@ -17,17 +17,10 @@ def load_data() -> pd.DataFrame:
         "DB_NAME",
     )
 
-    missing = [
-        name
-        for name in required
-        if not os.environ.get(name)
-    ]
+    missing = [name for name in required if not os.environ.get(name)]
 
     if missing:
-        pytest.skip(
-            "Database integration environment is not configured: "
-            + ", ".join(missing)
-        )
+        pytest.skip("Database integration environment is not configured: " + ", ".join(missing))
 
     url = (
         f"postgresql+psycopg://{os.environ['DB_USER']}:"
@@ -74,14 +67,8 @@ def test_diff_features_do_not_reconstruct_target():
         )
 
     reconstructions = {
-        "hist_diff_1": (
-            df["hist_lag_1"]
-            + df["hist_diff_1"]
-        ),
-        "hist_diff_7": (
-            df["hist_lag_7"]
-            + df["hist_diff_7"]
-        ),
+        "hist_diff_1": (df["hist_lag_1"] + df["hist_diff_1"]),
+        "hist_diff_7": (df["hist_lag_7"] + df["hist_diff_7"]),
     }
 
     for name, reconstruction in reconstructions.items():
@@ -102,7 +89,5 @@ def test_diff_features_do_not_reconstruct_target():
         )
 
         assert exact_rate < 0.99, (
-            f"Target leakage detected: "
-            f"{name} reconstructs y with "
-            f"exact_rate={exact_rate}"
+            f"Target leakage detected: {name} reconstructs y with exact_rate={exact_rate}"
         )

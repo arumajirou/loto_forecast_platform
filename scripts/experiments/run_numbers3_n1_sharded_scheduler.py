@@ -14,19 +14,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-WORKER = (
-    ROOT
-    / "scripts"
-    / "experiments"
-    / "run_numbers3_n1_rolling_worker.py"
-)
+WORKER = ROOT / "scripts" / "experiments" / "run_numbers3_n1_rolling_worker.py"
 
-OUTPUT_ROOT = (
-    ROOT
-    / "artifacts"
-    / "numbers3"
-    / "n1_rolling_parallel"
-)
+OUTPUT_ROOT = ROOT / "artifacts" / "numbers3" / "n1_rolling_parallel"
 
 MONITOR_CSV = OUTPUT_ROOT / "gpu_monitor.csv"
 STATUS_CSV = OUTPUT_ROOT / "scheduler_status.csv"
@@ -41,11 +31,7 @@ class JobSpec:
 
     @property
     def job_id(self) -> str:
-        return (
-            f"{self.model}"
-            f"_s{self.shard_index + 1}"
-            f"of{self.shard_count}"
-        )
+        return f"{self.model}_s{self.shard_index + 1}of{self.shard_count}"
 
 
 @dataclass
@@ -63,16 +49,12 @@ JOB_SPECS = [
     JobSpec("Informer", 0, 3, 1800),
     JobSpec("Informer", 1, 3, 1800),
     JobSpec("Informer", 2, 3, 1800),
-
     JobSpec("TimesNet", 0, 2, 600),
     JobSpec("TimesNet", 1, 2, 600),
-
     JobSpec("KAN", 0, 2, 600),
     JobSpec("KAN", 1, 2, 600),
-
     JobSpec("TCN", 0, 2, 500),
     JobSpec("TCN", 1, 2, 500),
-
     JobSpec("NLinear", 0, 1, 500),
     JobSpec("MLP", 0, 1, 500),
 ]
@@ -99,16 +81,10 @@ def query_gpu() -> dict[str, float]:
         text=True,
     )
 
-    values = [
-        value.strip()
-        for value in result.stdout.strip().split(",")
-    ]
+    values = [value.strip() for value in result.stdout.strip().split(",")]
 
     if len(values) != 6:
-        raise RuntimeError(
-            f"Unexpected nvidia-smi output: "
-            f"{result.stdout!r}"
-        )
+        raise RuntimeError(f"Unexpected nvidia-smi output: {result.stdout!r}")
 
     return {
         "total_mib": float(values[0]),
@@ -155,10 +131,7 @@ def start_job(
     model_dir = (
         OUTPUT_ROOT
         / spec.model.lower()
-        / (
-            f"shard_{spec.shard_index:02d}"
-            f"_of_{spec.shard_count:02d}"
-        )
+        / (f"shard_{spec.shard_index:02d}_of_{spec.shard_count:02d}")
     )
 
     model_dir.mkdir(
@@ -178,18 +151,10 @@ def start_job(
     env.update(
         {
             "NUMBERS3_MODEL_NAME": spec.model,
-            "NUMBERS3_ROLLING_POINTS": str(
-                rolling_points
-            ),
-            "NUMBERS3_SHARD_INDEX": str(
-                spec.shard_index
-            ),
-            "NUMBERS3_SHARD_COUNT": str(
-                spec.shard_count
-            ),
-            "PYTORCH_ALLOC_CONF": (
-                "expandable_segments:True"
-            ),
+            "NUMBERS3_ROLLING_POINTS": str(rolling_points),
+            "NUMBERS3_SHARD_INDEX": str(spec.shard_index),
+            "NUMBERS3_SHARD_COUNT": str(spec.shard_count),
+            "PYTORCH_ALLOC_CONF": ("expandable_segments:True"),
             "PYTHONUNBUFFERED": "1",
             "OMP_NUM_THREADS": "2",
             "MKL_NUM_THREADS": "2",
@@ -258,9 +223,7 @@ def main() -> int:
         raise FileNotFoundError(WORKER)
 
     if shutil.which("nvidia-smi") is None:
-        raise RuntimeError(
-            "nvidia-smi was not found"
-        )
+        raise RuntimeError("nvidia-smi was not found")
 
     OUTPUT_ROOT.mkdir(
         parents=True,
@@ -315,18 +278,11 @@ def main() -> int:
             if exit_code is None:
                 continue
 
-            elapsed = (
-                time.monotonic()
-                - job.started_at
-            )
+            elapsed = time.monotonic() - job.started_at
 
             job.log_handle.close()
 
-            status = (
-                "PASS"
-                if exit_code == 0
-                else "FAIL"
-            )
+            status = "PASS" if exit_code == 0 else "FAIL"
 
             row = {
                 "model": model,
@@ -336,12 +292,8 @@ def main() -> int:
                     elapsed,
                     3,
                 ),
-                "budget_mib": (
-                    job.spec.budget_mib
-                ),
-                "log_path": str(
-                    job.log_path.relative_to(ROOT)
-                ),
+                "budget_mib": (job.spec.budget_mib),
+                "log_path": str(job.log_path.relative_to(ROOT)),
             }
 
             finished.append(row)
@@ -363,34 +315,20 @@ def main() -> int:
 
             del running[model]
 
-        reserved_running = sum(
-            job.spec.budget_mib
-            for job in running.values()
-        )
+        reserved_running = sum(job.spec.budget_mib for job in running.values())
 
         # 空きVRAMとworker上限の両方を満たす限り投入。
         launched = True
 
-        while (
-            launched
-            and pending
-            and len(running) < args.max_workers
-        ):
+        while launched and pending and len(running) < args.max_workers:
             launched = False
 
             gpu = query_gpu()
 
-            usable_free = (
-                gpu["free_mib"]
-                - args.reserve_mib
-            )
+            usable_free = gpu["free_mib"] - args.reserve_mib
 
             # pending内で現在投入可能な最大予算モデルを選ぶ。
-            candidates = [
-                spec
-                for spec in pending
-                if spec.budget_mib <= usable_free
-            ]
+            candidates = [spec for spec in pending if spec.budget_mib <= usable_free]
 
             if not candidates:
                 break
@@ -427,18 +365,10 @@ def main() -> int:
             MONITOR_CSV,
             monitor_fields,
             {
-                "timestamp_utc": (
-                    datetime.now(timezone.utc)
-                    .isoformat()
-                ),
+                "timestamp_utc": (datetime.now(timezone.utc).isoformat()),
                 **gpu,
-                "running_jobs": ",".join(
-                    sorted(running)
-                ),
-                "reserved_job_budget_mib": sum(
-                    job.spec.budget_mib
-                    for job in running.values()
-                ),
+                "running_jobs": ",".join(sorted(running)),
+                "reserved_job_budget_mib": sum(job.spec.budget_mib for job in running.values()),
             },
         )
 
@@ -458,11 +388,7 @@ def main() -> int:
                 key=lambda item: item.budget_mib,
             )
 
-            if (
-                gpu["free_mib"]
-                - args.reserve_mib
-                < smallest.budget_mib
-            ):
+            if gpu["free_mib"] - args.reserve_mib < smallest.budget_mib:
                 raise RuntimeError(
                     "No job can be scheduled: "
                     f"free={gpu['free_mib']} MiB, "
@@ -474,11 +400,7 @@ def main() -> int:
 
         time.sleep(args.poll_seconds)
 
-    failed = [
-        row
-        for row in finished
-        if row["status"] != "PASS"
-    ]
+    failed = [row for row in finished if row["status"] != "PASS"]
 
     print()
     print("scheduler_finished")

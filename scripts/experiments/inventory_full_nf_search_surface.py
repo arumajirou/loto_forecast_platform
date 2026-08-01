@@ -41,13 +41,9 @@ def signature_info(obj: Any) -> dict[str, Any]:
                 "kind": str(parameter.kind),
                 "default": encode(parameter.default),
                 "annotation": encode(parameter.annotation),
-                "required": (
-                    parameter.default
-                    is inspect.Parameter.empty
-                ),
+                "required": (parameter.default is inspect.Parameter.empty),
             }
-            for name, parameter
-            in signature.parameters.items()
+            for name, parameter in signature.parameters.items()
         },
     }
 
@@ -82,9 +78,7 @@ for name in sorted(dir(auto_module)):
         None,
     )
 
-    entry["default_config_repr"] = repr(
-        default_config
-    )
+    entry["default_config_repr"] = repr(default_config)
 
     get_default = getattr(
         obj,
@@ -92,9 +86,7 @@ for name in sorted(dir(auto_module)):
         None,
     )
 
-    entry["has_get_default_config"] = callable(
-        get_default
-    )
+    entry["has_get_default_config"] = callable(get_default)
 
     for backend in ("ray", "optuna"):
         key = f"default_config_{backend}_repr"
@@ -177,14 +169,9 @@ for name in (
     obj = getattr(_base_auto, name, None)
 
     if obj is not None:
-        report["auto_support"][name] = signature_info(
-            obj
-        )
+        report["auto_support"][name] = signature_info(obj)
 
-out = Path(
-    "artifacts/parameter_inventory/"
-    "full_neuralforecast_search_surface.json"
-)
+out = Path("artifacts/parameter_inventory/full_neuralforecast_search_surface.json")
 out.parent.mkdir(parents=True, exist_ok=True)
 
 out.write_text(

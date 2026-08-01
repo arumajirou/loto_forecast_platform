@@ -7,28 +7,16 @@ from typing import Any
 import yaml
 
 
-SPACE_SOURCE = Path(
-    "configs/generated/"
-    "neuralforecast_normalized_fixed_seed_spaces.json"
-)
+SPACE_SOURCE = Path("configs/generated/neuralforecast_normalized_fixed_seed_spaces.json")
 
-SEARCH_SPEC_SOURCE = Path(
-    "configs/generated/"
-    "neuralforecast_complete_search_spec.yaml"
-)
+SEARCH_SPEC_SOURCE = Path("configs/generated/neuralforecast_complete_search_spec.yaml")
 
-OUTPUT_DIR = Path(
-    "configs/generated/neuralforecast_profiles"
-)
+OUTPUT_DIR = Path("configs/generated/neuralforecast_profiles")
 
 
-space = json.loads(
-    SPACE_SOURCE.read_text(encoding="utf-8")
-)
+space = json.loads(SPACE_SOURCE.read_text(encoding="utf-8"))
 
-search_spec = yaml.safe_load(
-    SEARCH_SPEC_SOURCE.read_text(encoding="utf-8")
-)
+search_spec = yaml.safe_load(SEARCH_SPEC_SOURCE.read_text(encoding="utf-8"))
 
 all_models = sorted(space["models"])
 
@@ -100,9 +88,7 @@ COMMON_POLICY: dict[str, Any] = {
 
 profiles: dict[str, dict[str, Any]] = {
     "smoke": {
-        "description": (
-            "Minimal runtime and compatibility certification"
-        ),
+        "description": ("Minimal runtime and compatibility certification"),
         "models": [
             "AutoDLinear",
             "AutoGRU",
@@ -141,9 +127,7 @@ profiles: dict[str, dict[str, Any]] = {
         "stop_on_first_error": False,
     },
     "screening": {
-        "description": (
-            "All-model low-cost screening"
-        ),
+        "description": ("All-model low-cost screening"),
         "models": all_models,
         "backends": [
             "optuna",
@@ -188,12 +172,8 @@ profiles: dict[str, dict[str, Any]] = {
         },
     },
     "broad": {
-        "description": (
-            "Broader search for screening winners"
-        ),
-        "models_from": (
-            "screening.promotion.top_k_models"
-        ),
+        "description": ("Broader search for screening winners"),
+        "models_from": ("screening.promotion.top_k_models"),
         "backends": [
             "optuna",
             "ray",
@@ -244,15 +224,9 @@ profiles: dict[str, dict[str, Any]] = {
         },
     },
     "fine": {
-        "description": (
-            "Model-specific fine search around broad winners"
-        ),
-        "configurations_from": (
-            "broad.promotion.top_k_configurations"
-        ),
-        "models_from": (
-            "broad.promotion.top_k_models"
-        ),
+        "description": ("Model-specific fine search around broad winners"),
+        "configurations_from": ("broad.promotion.top_k_configurations"),
+        "models_from": ("broad.promotion.top_k_models"),
         "backends": [
             "optuna",
         ],
@@ -308,12 +282,8 @@ profiles: dict[str, dict[str, Any]] = {
         },
     },
     "formal": {
-        "description": (
-            "Strict frozen-configuration outer evaluation"
-        ),
-        "configurations_from": (
-            "fine.promotion.top_k_configurations"
-        ),
+        "description": ("Strict frozen-configuration outer evaluation"),
+        "configurations_from": ("fine.promotion.top_k_configurations"),
         "search_enabled": False,
         "retune_inside_outer_fold": False,
         "configuration_frozen_before_test": True,
@@ -350,15 +320,11 @@ OUTPUT_DIR.mkdir(
 
 manifest: dict[str, Any] = {
     "metadata": {
-        "neuralforecast_version": (
-            space["metadata"]["neuralforecast_version"]
-        ),
+        "neuralforecast_version": (space["metadata"]["neuralforecast_version"]),
         "model_count": len(all_models),
         "profile_count": len(profiles),
         "space_source": str(SPACE_SOURCE),
-        "search_spec_source": str(
-            SEARCH_SPEC_SOURCE
-        ),
+        "search_spec_source": str(SEARCH_SPEC_SOURCE),
     },
     "profiles": {},
 }
@@ -367,11 +333,7 @@ for name, profile in profiles.items():
     payload = {
         "metadata": {
             "profile": name,
-            "neuralforecast_version": (
-                space["metadata"][
-                    "neuralforecast_version"
-                ]
-            ),
+            "neuralforecast_version": (space["metadata"]["neuralforecast_version"]),
         },
         "policy": COMMON_POLICY,
         "profile": profile,

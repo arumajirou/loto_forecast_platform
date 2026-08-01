@@ -13,14 +13,10 @@ from neuralforecast.common._base_auto import (
 
 
 CLASSIFICATION = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_classification_v2.json"
+    "artifacts/parameter_inventory/neuralforecast_auto_model_classification_v2.json"
 )
 
-OUTPUT = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_default_spaces.json"
-)
+OUTPUT = Path("artifacts/parameter_inventory/neuralforecast_auto_default_spaces.json")
 
 
 def encode(value: Any) -> Any:
@@ -37,17 +33,12 @@ def encode(value: Any) -> Any:
         return [encode(item) for item in value]
 
     if isinstance(value, dict):
-        return {
-            str(key): encode(item)
-            for key, item in value.items()
-        }
+        return {str(key): encode(item) for key, item in value.items()}
 
     return repr(value)
 
 
-classification = json.loads(
-    CLASSIFICATION.read_text(encoding="utf-8")
-)
+classification = json.loads(CLASSIFICATION.read_text(encoding="utf-8"))
 
 eligible = {
     record["auto_model"]
@@ -60,10 +51,7 @@ records = []
 for name in sorted(eligible):
     cls = getattr(auto_module, name)
 
-    if not (
-        inspect.isclass(cls)
-        and issubclass(cls, BaseAuto)
-    ):
+    if not (inspect.isclass(cls) and issubclass(cls, BaseAuto)):
         continue
 
     entry: dict[str, Any] = {
@@ -101,11 +89,7 @@ for name in sorted(eligible):
             entry["backends"][backend] = {
                 "status": "OK",
                 "resolved_config": encode(resolved),
-                "parameter_count": (
-                    len(resolved)
-                    if isinstance(resolved, dict)
-                    else None
-                ),
+                "parameter_count": (len(resolved) if isinstance(resolved, dict) else None),
             }
 
         except Exception as exc:

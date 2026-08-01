@@ -12,24 +12,14 @@ from neuralforecast.common._base_auto import BaseAuto
 
 
 CLASSIFICATION = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_classification_v2.json"
+    "artifacts/parameter_inventory/neuralforecast_auto_model_classification_v2.json"
 )
 
-MATRIX = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_matrix_v2.json"
-)
+MATRIX = Path("artifacts/parameter_inventory/neuralforecast_auto_model_matrix_v2.json")
 
-LOSSES = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_loss_classification_v2.json"
-)
+LOSSES = Path("artifacts/parameter_inventory/neuralforecast_loss_classification_v2.json")
 
-OUTPUT = Path(
-    "configs/generated/"
-    "neuralforecast_complete_search_spec.yaml"
-)
+OUTPUT = Path("configs/generated/neuralforecast_complete_search_spec.yaml")
 
 
 SPECIAL_NAME_MAP = {
@@ -78,17 +68,13 @@ POINT_LOSS_CONFIGS = [
         "name": "MAPE",
         "kwargs": {},
         "enabled": False,
-        "reason": (
-            "Potential instability for small target values"
-        ),
+        "reason": ("Potential instability for small target values"),
     },
     {
         "name": "SMAPE",
         "kwargs": {},
         "enabled": False,
-        "reason": (
-            "Enable only after zero/small-value audit"
-        ),
+        "reason": ("Enable only after zero/small-value audit"),
     },
     {
         "name": "MASE",
@@ -96,17 +82,13 @@ POINT_LOSS_CONFIGS = [
             "seasonality": [1, 7, 14],
         },
         "enabled": False,
-        "reason": (
-            "Requires justified seasonality"
-        ),
+        "reason": ("Requires justified seasonality"),
     },
     {
         "name": "relMSE",
         "kwargs": {},
         "enabled": False,
-        "reason": (
-            "Requires benchmark semantics audit"
-        ),
+        "reason": ("Requires benchmark semantics audit"),
     },
 ]
 
@@ -153,25 +135,19 @@ PROBABILISTIC_LOSS_CONFIGS = [
         "name": "NBMM",
         "kwargs": {},
         "enabled": False,
-        "reason": (
-            "Count-distribution suitability must be audited"
-        ),
+        "reason": ("Count-distribution suitability must be audited"),
     },
     {
         "name": "PMM",
         "kwargs": {},
         "enabled": False,
-        "reason": (
-            "Count-distribution suitability must be audited"
-        ),
+        "reason": ("Count-distribution suitability must be audited"),
     },
     {
         "name": "Tweedie",
         "kwargs": {},
         "enabled": False,
-        "reason": (
-            "Direct construction semantics require audit"
-        ),
+        "reason": ("Direct construction semantics require audit"),
     },
 ]
 
@@ -410,27 +386,16 @@ EXOG_GROUPS = {
 }
 
 
-classification = json.loads(
-    CLASSIFICATION.read_text(encoding="utf-8")
-)
+classification = json.loads(CLASSIFICATION.read_text(encoding="utf-8"))
 
-matrix = json.loads(
-    MATRIX.read_text(encoding="utf-8")
-)
+matrix = json.loads(MATRIX.read_text(encoding="utf-8"))
 
-losses = json.loads(
-    LOSSES.read_text(encoding="utf-8")
-)
+losses = json.loads(LOSSES.read_text(encoding="utf-8"))
 
-matrix_by_auto = {
-    record["auto_model"]: record
-    for record in matrix
-}
+matrix_by_auto = {record["auto_model"]: record for record in matrix}
 
 eligible_models = [
-    record
-    for record in classification["records"]
-    if record["eligible_current_policy"]
+    record for record in classification["records"] if record["eligible_current_policy"]
 ]
 
 models: dict[str, Any] = {}
@@ -446,11 +411,7 @@ for record in eligible_models:
 
     parameters = set(signature.parameters) - {"self"}
 
-    model_grid = {
-        key: value
-        for key, value in COMMON_MODEL_GRID.items()
-        if key in parameters
-    }
+    model_grid = {key: value for key, value in COMMON_MODEL_GRID.items() if key in parameters}
 
     models[auto_name] = {
         "base_model": base_name,
@@ -460,22 +421,12 @@ for record in eligible_models:
             "global",
             "global_position",
         ],
-        "required_parameters": (
-            matrix_record["required_parameters"]
-        ),
+        "required_parameters": (matrix_record["required_parameters"]),
         "supports": {
-            "future_exog": (
-                matrix_record["future_exog"]
-            ),
-            "historical_exog": (
-                matrix_record["historical_exog"]
-            ),
-            "static_exog": (
-                matrix_record["static_exog"]
-            ),
-            "categorical_exog": (
-                matrix_record["categorical_exog"]
-            ),
+            "future_exog": (matrix_record["future_exog"]),
+            "historical_exog": (matrix_record["historical_exog"]),
+            "static_exog": (matrix_record["static_exog"]),
+            "categorical_exog": (matrix_record["categorical_exog"]),
         },
         "common_parameter_grid": model_grid,
         "model_specific_parameters": sorted(
@@ -542,9 +493,7 @@ payload = {
     "cross_validation_grid": CV_GRID,
     "trainer_grid": TRAINER_GRID,
     "point_loss_grid": POINT_LOSS_CONFIGS,
-    "probabilistic_loss_grid": (
-        PROBABILISTIC_LOSS_CONFIGS
-    ),
+    "probabilistic_loss_grid": (PROBABILISTIC_LOSS_CONFIGS),
     "exogenous_groups": EXOG_GROUPS,
     "models": models,
 }

@@ -98,9 +98,7 @@ def build_auto_model(
     cls = auto_classes.get(model_name)
 
     if cls is None:
-        raise ValueError(
-            f"Unsupported auto model: {model_name}"
-        )
+        raise ValueError(f"Unsupported auto model: {model_name}")
 
     default_config = cls.get_default_config(
         h=h,

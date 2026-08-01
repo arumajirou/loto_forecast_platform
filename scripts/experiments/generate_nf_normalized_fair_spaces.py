@@ -5,20 +5,13 @@ from pathlib import Path
 from typing import Any
 
 
-OPTUNA_SOURCE = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_optuna_trial_calls.json"
-)
+OPTUNA_SOURCE = Path("artifacts/parameter_inventory/neuralforecast_optuna_trial_calls.json")
 
 COMPARISON_SOURCE = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_structured_space_comparison.json"
+    "artifacts/parameter_inventory/neuralforecast_auto_structured_space_comparison.json"
 )
 
-OUTPUT = Path(
-    "configs/generated/"
-    "neuralforecast_normalized_fair_spaces.json"
-)
+OUTPUT = Path("configs/generated/neuralforecast_normalized_fair_spaces.json")
 
 
 def normalize_categorical(
@@ -34,18 +27,11 @@ def normalize_categorical(
     return result
 
 
-optuna_records = json.loads(
-    OPTUNA_SOURCE.read_text(encoding="utf-8")
-)
+optuna_records = json.loads(OPTUNA_SOURCE.read_text(encoding="utf-8"))
 
-comparison_records = json.loads(
-    COMPARISON_SOURCE.read_text(encoding="utf-8")
-)
+comparison_records = json.loads(COMPARISON_SOURCE.read_text(encoding="utf-8"))
 
-comparison_by_model = {
-    record["auto_model"]: record
-    for record in comparison_records
-}
+comparison_by_model = {record["auto_model"]: record for record in comparison_records}
 
 models: dict[str, Any] = {}
 
@@ -58,8 +44,7 @@ for record in optuna_records:
     comparison = comparison_by_model[model]
 
     ray_effective_by_parameter = {
-        item["parameter"]: item["ray"]
-        for item in comparison["parameters"]
+        item["parameter"]: item["ray"] for item in comparison["parameters"]
     }
 
     parameters: dict[str, Any] = {}
@@ -71,9 +56,7 @@ for record in optuna_records:
         if kind == "categorical":
             parameters[name] = {
                 "kind": "categorical",
-                "values": normalize_categorical(
-                    call["choices"]
-                ),
+                "values": normalize_categorical(call["choices"]),
             }
             continue
 
@@ -135,23 +118,16 @@ for record in optuna_records:
                 "upper": common_upper,
                 "step": call.get("step", 1),
                 "log": call.get("log", False),
-                "normalization": (
-                    "intersection_of_optuna_and_ray"
-                ),
+                "normalization": ("intersection_of_optuna_and_ray"),
                 "official_optuna_upper": optuna_upper,
                 "official_ray_effective_upper": ray_upper,
             }
             continue
 
-        raise ValueError(
-            f"Unsupported kind: {model}.{name}={kind}"
-        )
+        raise ValueError(f"Unsupported kind: {model}.{name}={kind}")
 
     models[model] = {
-        "source": (
-            "intersection_of_neuralforecast_"
-            "optuna_and_ray_defaults"
-        ),
+        "source": ("intersection_of_neuralforecast_optuna_and_ray_defaults"),
         "parameters": parameters,
     }
 
@@ -160,16 +136,11 @@ payload = {
     "metadata": {
         "neuralforecast_version": "3.2.0",
         "model_count": len(models),
-        "purpose": (
-            "Backend-neutral fair comparison space"
-        ),
+        "purpose": ("Backend-neutral fair comparison space"),
         "integer_upper_policy": (
-            "Intersection of Optuna inclusive and "
-            "Ray effective exclusive ranges"
+            "Intersection of Optuna inclusive and Ray effective exclusive ranges"
         ),
-        "categorical_duplicate_policy": (
-            "Remove duplicates preserving order"
-        ),
+        "categorical_duplicate_policy": ("Remove duplicates preserving order"),
     },
     "models": models,
 }
@@ -191,9 +162,9 @@ OUTPUT.write_text(
 integer_parameters = [
     (model, name, value)
     for model, model_spec in models.items()
-    for name, value
-    in model_spec["parameters"].items()
-    if value["kind"] in {
+    for name, value in model_spec["parameters"].items()
+    if value["kind"]
+    in {
         "integer",
         "log_int",
     }
@@ -202,12 +173,8 @@ integer_parameters = [
 duplicate_normalized = [
     (model, name, value["values"])
     for model, model_spec in models.items()
-    for name, value
-    in model_spec["parameters"].items()
-    if (
-        value["kind"] == "categorical"
-        and name == "step_size"
-    )
+    for name, value in model_spec["parameters"].items()
+    if (value["kind"] == "categorical" and name == "step_size")
 ]
 
 print("models=", len(models))

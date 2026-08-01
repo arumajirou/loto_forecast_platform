@@ -10,12 +10,7 @@ from pathlib import Path
 ROOT = Path.cwd()
 STAMP = datetime.now().strftime("%Y%m%d-%H%M%S")
 
-output = (
-    ROOT
-    / "artifacts"
-    / "environment_recovery"
-    / f"main-recovered-{STAMP}"
-)
+output = ROOT / "artifacts" / "environment_recovery" / f"main-recovered-{STAMP}"
 
 output.mkdir(
     parents=True,
@@ -113,8 +108,7 @@ codes = {
             "run",
             "--frozen",
             "python",
-            "scripts/experiments/"
-            "smoke_instantiate_nf_models.py",
+            "scripts/experiments/smoke_instantiate_nf_models.py",
         ],
     ),
     "nvidia_smi": run(
@@ -133,42 +127,22 @@ required_success = {
     "nvidia_smi",
 }
 
-failed = {
-    name: code
-    for name, code in codes.items()
-    if (
-        name in required_success
-        and code != 0
-    )
-}
+failed = {name: code for name, code in codes.items() if (name in required_success and code != 0)}
 
-status = (
-    "PASS"
-    if not failed
-    else "FAIL"
-)
+status = "PASS" if not failed else "FAIL"
 
-selected_tests_text = (
-    output / "selected-tests.txt"
-).read_text(
-    encoding="utf-8"
-)
+selected_tests_text = (output / "selected-tests.txt").read_text(encoding="utf-8")
 
 database_test_status = (
     "SKIPPED_NOT_CONFIGURED"
     if (
         "skipped" in selected_tests_text.lower()
         and (
-            "Database integration environment"
-            in selected_tests_text
+            "Database integration environment" in selected_tests_text
             or "1 skipped" in selected_tests_text
         )
     )
-    else (
-        "EXECUTED_PASS"
-        if codes["selected_tests"] == 0
-        else "FAILED"
-    )
+    else ("EXECUTED_PASS" if codes["selected_tests"] == 0 else "FAILED")
 )
 
 report = {
@@ -176,9 +150,7 @@ report = {
     "output": str(output),
     "exit_codes": codes,
     "failed": failed,
-    "database_integration_test": (
-        database_test_status
-    ),
+    "database_integration_test": (database_test_status),
 }
 
 (output / "recovery-status.json").write_text(
@@ -190,11 +162,13 @@ report = {
     encoding="utf-8",
 )
 
-print(json.dumps(
-    report,
-    indent=2,
-    ensure_ascii=False,
-))
+print(
+    json.dumps(
+        report,
+        indent=2,
+        ensure_ascii=False,
+    )
+)
 
 if failed:
     raise SystemExit(1)

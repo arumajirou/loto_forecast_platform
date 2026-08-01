@@ -6,50 +6,28 @@ from pathlib import Path
 from typing import Any
 
 
-ROOT = Path(
-    "artifacts/runtime_certification"
-)
+ROOT = Path("artifacts/runtime_certification")
 
 SOURCES = {
-    "phase1": (
-        ROOT
-        / "neuralforecast_fit_predict_gpu_phase1.json"
-    ),
-    "phase2": (
-        ROOT
-        / "neuralforecast_fit_predict_gpu_phase2.json"
-    ),
-    "phase3": (
-        ROOT
-        / "neuralforecast_fit_predict_gpu_phase3.json"
-    ),
+    "phase1": (ROOT / "neuralforecast_fit_predict_gpu_phase1.json"),
+    "phase2": (ROOT / "neuralforecast_fit_predict_gpu_phase2.json"),
+    "phase3": (ROOT / "neuralforecast_fit_predict_gpu_phase3.json"),
 }
 
-OUTPUT_JSON = (
-    ROOT
-    / "neuralforecast_gpu_certification_summary.json"
-)
+OUTPUT_JSON = ROOT / "neuralforecast_gpu_certification_summary.json"
 
-OUTPUT_MD = (
-    ROOT
-    / "neuralforecast_gpu_certification_summary.md"
-)
+OUTPUT_MD = ROOT / "neuralforecast_gpu_certification_summary.md"
 
 
 def load_report(path: Path) -> dict[str, Any]:
     if not path.exists():
         raise FileNotFoundError(path)
 
-    return json.loads(
-        path.read_text(encoding="utf-8")
-    )
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def main() -> None:
-    reports = {
-        phase: load_report(path)
-        for phase, path in SOURCES.items()
-    }
+    reports = {phase: load_report(path) for phase, path in SOURCES.items()}
 
     all_results: list[dict[str, Any]] = []
 
@@ -59,46 +37,23 @@ def main() -> None:
             record["phase"] = phase
             all_results.append(record)
 
-    passed = [
-        result
-        for result in all_results
-        if result["status"] == "PASS"
-    ]
+    passed = [result for result in all_results if result["status"] == "PASS"]
 
-    failed = [
-        result
-        for result in all_results
-        if result["status"] != "PASS"
-    ]
+    failed = [result for result in all_results if result["status"] != "PASS"]
 
-    total_peak_vram = sum(
-        result["cuda_peak_memory_allocated"]
-        for result in passed
-    )
+    total_peak_vram = sum(result["cuda_peak_memory_allocated"] for result in passed)
 
     max_vram_result = max(
         passed,
-        key=lambda result: (
-            result["cuda_peak_memory_allocated"]
-        ),
+        key=lambda result: result["cuda_peak_memory_allocated"],
     )
 
     summary = {
-        "generated_at": datetime.now(
-            timezone.utc
-        ).isoformat(),
-        "status": (
-            "PASS"
-            if len(passed) == 23 and not failed
-            else "FAIL"
-        ),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "status": ("PASS" if len(passed) == 23 and not failed else "FAIL"),
         "gpu_name": reports["phase1"]["gpu_name"],
-        "torch_version": (
-            reports["phase1"]["torch_version"]
-        ),
-        "torch_cuda_build": (
-            reports["phase1"]["torch_cuda_build"]
-        ),
+        "torch_version": (reports["phase1"]["torch_version"]),
+        "torch_cuda_build": (reports["phase1"]["torch_cuda_build"]),
         "models": len(all_results),
         "passed": len(passed),
         "failed": len(failed),
@@ -110,18 +65,9 @@ def main() -> None:
             }
             for phase, report in reports.items()
         },
-        "maximum_peak_vram_model": (
-            max_vram_result["model"]
-        ),
-        "maximum_peak_vram_mib": (
-            max_vram_result[
-                "cuda_peak_memory_allocated"
-            ]
-            / 1024**2
-        ),
-        "sum_individual_peak_vram_mib": (
-            total_peak_vram / 1024**2
-        ),
+        "maximum_peak_vram_model": (max_vram_result["model"]),
+        "maximum_peak_vram_mib": (max_vram_result["cuda_peak_memory_allocated"] / 1024**2),
+        "sum_individual_peak_vram_mib": (total_peak_vram / 1024**2),
         "results": all_results,
     }
 
@@ -140,15 +86,8 @@ def main() -> None:
         f"- Status: **{summary['status']}**",
         f"- GPU: `{summary['gpu_name']}`",
         f"- PyTorch: `{summary['torch_version']}`",
-        (
-            "- CUDA build: "
-            f"`{summary['torch_cuda_build']}`"
-        ),
-        (
-            "- Certified models: "
-            f"**{summary['passed']}/"
-            f"{summary['models']}**"
-        ),
+        (f"- CUDA build: `{summary['torch_cuda_build']}`"),
+        (f"- Certified models: **{summary['passed']}/{summary['models']}**"),
         (
             "- Highest observed peak VRAM: "
             f"**{summary['maximum_peak_vram_model']} "
@@ -161,11 +100,7 @@ def main() -> None:
 
     for result in all_results:
         if result["status"] != "PASS":
-            lines.append(
-                f"| {result['phase']} "
-                f"| {result['model']} "
-                f"| ERROR | - | - | - | - |"
-            )
+            lines.append(f"| {result['phase']} | {result['model']} | ERROR | - | - | - | - |")
             continue
 
         lines.append(
@@ -207,16 +142,8 @@ def main() -> None:
                 "models": summary["models"],
                 "passed": summary["passed"],
                 "failed": summary["failed"],
-                "maximum_peak_vram_model": (
-                    summary[
-                        "maximum_peak_vram_model"
-                    ]
-                ),
-                "maximum_peak_vram_mib": (
-                    summary[
-                        "maximum_peak_vram_mib"
-                    ]
-                ),
+                "maximum_peak_vram_model": (summary["maximum_peak_vram_model"]),
+                "maximum_peak_vram_mib": (summary["maximum_peak_vram_mib"]),
                 "json": str(OUTPUT_JSON),
                 "markdown": str(OUTPUT_MD),
             },
@@ -228,9 +155,7 @@ def main() -> None:
     if summary["status"] != "PASS":
         raise SystemExit(1)
 
-    print(
-        "NF_GPU_CERTIFICATION_AGGREGATE=PASS"
-    )
+    print("NF_GPU_CERTIFICATION_AGGREGATE=PASS")
 
 
 if __name__ == "__main__":

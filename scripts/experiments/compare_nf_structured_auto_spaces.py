@@ -5,20 +5,11 @@ from pathlib import Path
 from typing import Any
 
 
-OPTUNA_SOURCE = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_optuna_trial_calls.json"
-)
+OPTUNA_SOURCE = Path("artifacts/parameter_inventory/neuralforecast_optuna_trial_calls.json")
 
-RAY_SOURCE = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_spaces_structured.json"
-)
+RAY_SOURCE = Path("artifacts/parameter_inventory/neuralforecast_auto_spaces_structured.json")
 
-OUTPUT = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_structured_space_comparison.json"
-)
+OUTPUT = Path("artifacts/parameter_inventory/neuralforecast_auto_structured_space_comparison.json")
 
 
 def canonical_optuna(
@@ -81,18 +72,10 @@ def canonical_ray(
         step = sampler.get("q", 1)
 
         # Ray Integer domains use an exclusive upper bound.
-        effective_upper = (
-            raw_upper - step
-            if raw_upper is not None
-            else None
-        )
+        effective_upper = raw_upper - step if raw_upper is not None else None
 
         return {
-            "kind": (
-                "log_int"
-                if "LogUniform" in sampler_class
-                else "integer"
-            ),
+            "kind": ("log_int" if "LogUniform" in sampler_class else "integer"),
             "lower": value.get("lower"),
             "upper": effective_upper,
             "raw_upper_exclusive": raw_upper,
@@ -128,29 +111,17 @@ def canonical_ray(
     return value
 
 
-optuna_records = json.loads(
-    OPTUNA_SOURCE.read_text(encoding="utf-8")
-)
+optuna_records = json.loads(OPTUNA_SOURCE.read_text(encoding="utf-8"))
 
-ray_records = json.loads(
-    RAY_SOURCE.read_text(encoding="utf-8")
-)
+ray_records = json.loads(RAY_SOURCE.read_text(encoding="utf-8"))
 
-optuna_by_model = {
-    record["auto_model"]: record
-    for record in optuna_records
-}
+optuna_by_model = {record["auto_model"]: record for record in optuna_records}
 
-ray_by_model = {
-    record["auto_model"]: record
-    for record in ray_records
-}
+ray_by_model = {record["auto_model"]: record for record in ray_records}
 
 results = []
 
-for model in sorted(
-    set(optuna_by_model) | set(ray_by_model)
-):
+for model in sorted(set(optuna_by_model) | set(ray_by_model)):
     optuna_record = optuna_by_model.get(model, {})
     ray_record = ray_by_model.get(model, {})
 
@@ -162,26 +133,19 @@ for model in sorted(
         )
     }
 
-    ray_parameters_raw = (
-        ray_record
-        .get("backends", {})
-        .get("ray", {})
-        .get("parameters", {})
-    )
+    ray_parameters_raw = ray_record.get("backends", {}).get("ray", {}).get("parameters", {})
 
     ray_parameters = {
         name: canonical_ray(value)
         for name, value in ray_parameters_raw.items()
-        if name not in {
+        if name
+        not in {
             "h",
             "loss",
         }
     }
 
-    names = sorted(
-        set(optuna_parameters)
-        | set(ray_parameters)
-    )
+    names = sorted(set(optuna_parameters) | set(ray_parameters))
 
     differences = []
 
@@ -210,14 +174,8 @@ for model in sorted(
         {
             "auto_model": model,
             "parameter_count": len(names),
-            "equivalent_count": sum(
-                item["equivalent"]
-                for item in differences
-            ),
-            "difference_count": sum(
-                not item["equivalent"]
-                for item in differences
-            ),
+            "equivalent_count": sum(item["equivalent"] for item in differences),
+            "difference_count": sum(not item["equivalent"] for item in differences),
             "parameters": differences,
         }
     )
@@ -244,10 +202,7 @@ for record in results:
 
 print(
     "total_differences=",
-    sum(
-        record["difference_count"]
-        for record in results
-    ),
+    sum(record["difference_count"] for record in results),
 )
 
 print("OUT=", OUTPUT)
