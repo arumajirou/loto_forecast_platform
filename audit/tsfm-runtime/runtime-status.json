@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "total_models": 21,
-  "runtime_certified_models": 3,
+  "runtime_certified_models": 4,
   "results": [
     {
       "model_id": "chronos-2",
@@ -361,8 +361,28 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 380613375,
-      "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
+      "runtime_revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+      "runtime_device": "cuda",
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 366283776,
+      "runtime_prediction_shape": [
+        7
+      ],
+      "runtime_quantile_shape": [
+        7,
+        9,
+        1
+      ],
+      "runtime_context_length": 512,
+      "runtime_prediction_length": 1,
+      "runtime_package_version": "0.1.1",
+      "runtime_weight_sha256": {
+        "/mnt/e/env/huggingface/hub/models--NX-AI--TiRex-2/snapshots/05e5b26db52bfb256f1ae1bdf785589850482de3/model.ckpt": "184b160ffbe4c01a26beeba14015ff3507c7497e1f3577114187bbc1d19fcac1"
+      },
+      "runtime_config_sha256": "cddbe6d0be4919cb7b0cad747fb19a295264e129d1c0790cf62133b4cb5da727"
     },
     {
       "model_id": "toto-2.0-4m",

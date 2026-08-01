@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "model_id": "tirex-2",
+  "repo_id": "NX-AI/TiRex-2",
+  "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+  "certification_status": "RUNTIME_CERTIFIED",
+  "runtime_vram_certified": true,
+  "license": "apache-2.0",
+  "package": "tirex-2",
+  "package_version": "0.1.1",
+  "backend": "torch",
+  "device": "cuda",
+  "gpu_used": true,
+  "cpu_fallback": false,
+  "peak_vram_bytes": 366283776,
+  "context_length": 512,
+  "max_context_length": 2048,
+  "prediction_length": 1,
+  "prediction_shape": [
+    7
+  ],
+  "quantile_shape": [
+    7,
+    9,
+    1
+  ],
+  "finite": true,
+  "weight_files": [
+    "/mnt/e/env/huggingface/hub/models--NX-AI--TiRex-2/snapshots/05e5b26db52bfb256f1ae1bdf785589850482de3/model.ckpt"
+  ],
+  "weight_sha256": {
+    "/mnt/e/env/huggingface/hub/models--NX-AI--TiRex-2/snapshots/05e5b26db52bfb256f1ae1bdf785589850482de3/model.ckpt": "184b160ffbe4c01a26beeba14015ff3507c7497e1f3577114187bbc1d19fcac1"
+  },
+  "config_sha256": "cddbe6d0be4919cb7b0cad747fb19a295264e129d1c0790cf62133b4cb5da727",
+  "snapshot_complete": true,
+  "artifact_reference": {
+    "repo_id": "NX-AI/TiRex-2",
+    "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--NX-AI--TiRex-2/snapshots/05e5b26db52bfb256f1ae1bdf785589850482de3"
+  },
+  "limitations": [
+    "Synthetic input only",
+    "Seven independent position series were used",
+    "Only a one-step forecast was evaluated",
+    "Forecast accuracy was not evaluated",
+    "Production stability was not certified",
+    "Certification applies only to the exact revision and recorded environment"
+  ]
+}
