@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "model_id": "moment-1-large",
+  "repo_id": "AutonLab/MOMENT-1-large",
+  "revision": "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
+  "checked_at": "2026-08-01T10:04:25.283385+00:00",
+  "hf_home_candidates": [
+    "/mnt/e/env/huggingface",
+    "/mnt/e/env/huggingface/hub",
+    "/home/az/.cache/huggingface/hub"
+  ],
+  "repo_cache_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large",
+  "repo_cache_exists": true,
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
+  "snapshot_exists": true,
+  "snapshot_revision_matches": true,
+  "existing_files": [
+    {
+      "name": "README.md",
+      "path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc/README.md",
+      "is_symlink": true,
+      "symlink_target": "../../blobs/bc7f2b3a0c16d64cd64900187a726acac7690197",
+      "resolved_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/blobs/bc7f2b3a0c16d64cd64900187a726acac7690197",
+      "size_bytes": 6306,
+      "sha256": "3b00cbfdecd6b64c96558eb3bd39049405aee6497c7e4788da4bc78db17611de"
+    }
+  ],
+  "weight_candidates": [],
+  "missing_files": [
+    "config.json",
+    "model weight file (*.safetensors, *.bin, *.ckpt, *.pt, or *.pth)"
+  ],
+  "result": "PARTIAL_SNAPSHOT"
+}

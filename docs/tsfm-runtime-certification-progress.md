@@ -6,12 +6,12 @@ Updated: 2026-08-01
 
 - Total models: 21
 - Runtime certified: 8
-- Blocked: 6
-- Pending: 7
+- Blocked: 7
+- Pending: 6
 - Formal certification progress: 38.1%
-- Judged progress: 66.7%
-- Current branch: feat/moirai-2-0-small-runtime-audit-v1
-- Next model: moment-1-large
+- Judged progress: 71.4%
+- Current branch: feat/moment-1-large-runtime-audit-v1
+- Next model: moment-1-small
 
 ## Certified
 
@@ -38,14 +38,12 @@ Updated: 2026-08-01
 
 ## Remaining Ledger Order
 
-1. moment-1-large
-2. moment-1-small
-3. sundial-base
-4. t0-alpha
-5. timesfm-2.5-transformers
-6. toto-2.0-4m
-7. toto-open-base
-
+1. moment-1-small
+2. sundial-base
+3. t0-alpha
+4. timesfm-2.5-transformers
+5. toto-2.0-4m
+6. toto-open-base
 ## Blocked
 
 ### chronos-t5-base
@@ -142,8 +140,8 @@ Updated: 2026-08-01
 ### moirai-2.0-small
 
 - Branch: feat/moirai-2-0-small-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: e4be0a6
+- Push: origin/feat/moirai-2-0-small-runtime-audit-v1
 - repo_id: Salesforce/moirai-2.0-R-small
 - revision: 30f43ff08c8494f4943ae1521e9d4e94a0fbb389
 - status: BLOCKED
@@ -158,3 +156,22 @@ Updated: 2026-08-01
 - dedicated test: tests/test_moirai_2_0_small_runtime_audit.py
 - hash verification: audit/tsfm-runtime/moirai-2.0-small/sha256sum.txt OK
 - resume condition: use only if policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai model. Runtime probing can resume only after license approval.
+
+### moment-1-large
+
+- Branch: feat/moment-1-large-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: AutonLab/MOMENT-1-large
+- revision: ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc
+- status: BLOCKED
+- blocked reason: PARTIAL_SNAPSHOT
+- checked snapshot: /mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc
+- snapshot finding: snapshot exists and revision matches, but only README.md is present
+- missing files: config.json, model weight file
+- runtime executed: false
+- CPU fallback: false
+- license: MIT from pinned snapshot README metadata, APPROVED
+- dedicated test: tests/test_moment_1_large_runtime_audit.py
+- hash verification: audit/tsfm-runtime/moment-1-large/sha256sum.txt OK
+- resume condition: Install the exact pinned revision into the configured local Hugging Face cache with config.json and model weight files present.

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "model_id": "moment-1-large",
+  "repo_id": "AutonLab/MOMENT-1-large",
+  "revision": "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
+  "certification_status": "BLOCKED",
+  "runtime_vram_certified": false,
+  "license_review_status": "APPROVED",
+  "blocked_at": "2026-08-01T10:04:25.283385+00:00",
+  "blocked_reason": "PARTIAL_SNAPSHOT",
+  "blocked_detail": "Pinned snapshot directory exists, but required runtime files are missing.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model weight files present.",
+  "limitations": [
+    "Pinned snapshot contains only README.md and is missing runtime files.",
+    "No CUDA inference was executed.",
+    "No model weight SHA-256 was certified.",
+    "Forecast accuracy was not evaluated."
+  ]
+}

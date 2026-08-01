@@ -1,0 +1,8 @@
+PROJECT_ROOT=/mnt/e/env/ts/loto_forecast_platform
+branch=feat/moment-1-large-runtime-audit-v1
+model_id=moment-1-large
+repo_id=AutonLab/MOMENT-1-large
+revision=ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc
+snapshot_path=/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc
+status=BLOCKED
+blocked_reason=PARTIAL_SNAPSHOT

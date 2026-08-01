@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "model_id": "moment-1-large",
+  "runtime_executed": false,
+  "dependency_status": "NOT_EVALUATED",
+  "reason": "Runtime dependency probing requires a complete pinned snapshot first."
+}
