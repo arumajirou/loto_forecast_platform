@@ -1,0 +1,25 @@
+PASS chronos-2: 29ec3766d36d6f73f0696f85560a422f50e8498c
+PASS chronos-bolt-tiny: a0e552de83495b5c28c14c71c374f3e33280b340
+PASS chronos-t5-base: ad294eaacead15db499b740ea4122266dd2a81a2
+PASS chronos-t5-small: a971ba21945c4f1796b17a91fe69214b5f4ad472
+PASS granite-flowstate-r1: 05effc6cb39ee16dce9dd0064ed1a76e4b8ff464
+PASS granite-patchtsmixer: 90dc5a88d45f032b7dceefb5d814ca2af54f2ff9
+PASS granite-patchtst: 7fe295d8bc8fbac8041b60ab351882634165517f
+PASS granite-ttm-r2: d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f
+PASS kronos-base: 2b554741eca47781b64468546e77fef3e85130e6
+PASS lag-llama: 72dcfc29da106acfe38250a60f4ae29d1e56a3d9
+PASS moirai-1.0-base: 4fa939a8800d9da346c0280f3d9aeba0d2d35877
+PASS moirai-2.0-small: 30f43ff08c8494f4943ae1521e9d4e94a0fbb389
+PASS moment-1-large: ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc
+PASS moment-1-small: 411e288267f82cce86296dbe4d6c8bc533cc162f
+PASS sundial-base: 3212e42564493f520593e5414af4367fc4b49226
+PASS t0-alpha: f8727c2357e0d81f1d9f56fe3aaac43068b5fc72
+PASS tabpfn-ts: f851f2a3c941544733b712d8c0f96dfae9b28862
+PASS timesfm-2.5-transformers: 5a9806b9b291fad9233b5249d88263f1846304d3
+PASS tirex-2: 05e5b26db52bfb256f1ae1bdf785589850482de3
+PASS toto-2.0-4m: 8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9
+PASS toto-open-base: 0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5
+{
+  "status": "PASS",
+  "verified": 21
+}
