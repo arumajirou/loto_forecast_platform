@@ -40,23 +40,49 @@ class WorkerOutput:
     model_artifact_payload: Any | None = None
 
 
-def canonical_to_long(master: pd.DataFrame) -> pd.DataFrame:
+def infer_position_columns(frame: pd.DataFrame) -> list[str]:
+    """Return canonical position columns in numeric order.
+
+    The original runtime was Loto7-only (n1..n7).  Numbers3 and other games use
+    fewer independent position series, so workers must derive the contract from
+    the supplied frame instead of silently fabricating missing positions.
+    """
+    columns = [
+        column for column in frame.columns if column.startswith("n") and column[1:].isdigit()
+    ]
+    return sorted(columns, key=lambda value: int(value[1:]))
+
+
+def canonical_to_long(
+    master: pd.DataFrame,
+    position_columns: list[str] | None = None,
+) -> pd.DataFrame:
+    columns = position_columns or infer_position_columns(master)
+    if not columns:
+        raise ValueError("no canonical position columns found")
     records: list[dict[str, Any]] = []
     for row in master.itertuples(index=False):
-        for position in range(1, 8):
-            records.append({
-                "unique_id": f"position-{position}",
-                "ds": pd.Timestamp(row.draw_date),
-                "y": float(getattr(row, f"n{position}")),
-            })
+        for index, column in enumerate(columns, start=1):
+            records.append(
+                {
+                    "unique_id": f"position-{index}",
+                    "ds": pd.Timestamp(row.draw_date),
+                    "y": float(getattr(row, column)),
+                }
+            )
     return pd.DataFrame(records).sort_values(["unique_id", "ds"]).reset_index(drop=True)
 
 
 def autohint_hierarchy_frame(history: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
     series_order = ["total", *[f"position-{position}" for position in range(1, 8)]]
     bottom_series_order = [f"position-{position}" for position in range(1, 8)]
-    internal_series_order = ["00-total", *[f"{position:02d}-position-{position}" for position in range(1, 8)]]
-    internal_bottom_series_order = [f"{position:02d}-position-{position}" for position in range(1, 8)]
+    internal_series_order = [
+        "00-total",
+        *[f"{position:02d}-position-{position}" for position in range(1, 8)],
+    ]
+    internal_bottom_series_order = [
+        f"{position:02d}-position-{position}" for position in range(1, 8)
+    ]
     internal_to_external = dict(zip(internal_series_order, series_order, strict=True))
     rows: list[dict[str, Any]] = []
     for row in history.itertuples(index=False):
@@ -64,7 +90,9 @@ def autohint_hierarchy_frame(history: pd.DataFrame) -> tuple[pd.DataFrame, dict[
         ds = pd.Timestamp(row.draw_date)
         rows.append({"unique_id": "00-total", "ds": ds, "y": float(values.sum())})
         for position, value in enumerate(values, start=1):
-            rows.append({"unique_id": f"{position:02d}-position-{position}", "ds": ds, "y": float(value)})
+            rows.append(
+                {"unique_id": f"{position:02d}-position-{position}", "ds": ds, "y": float(value)}
+            )
     frame = pd.DataFrame(rows).sort_values(["unique_id", "ds"]).reset_index(drop=True)
     s_matrix = np.vstack([np.ones(7, dtype=np.float32), np.eye(7, dtype=np.float32)])
     validation = {
@@ -112,7 +140,9 @@ def _robust_position_sigma(series: pd.Series) -> float:
     return float(np.clip(sigma, 0.75, 6.0))
 
 
-def position_values_to_candidate_probabilities(history: pd.DataFrame, values: np.ndarray) -> np.ndarray:
+def position_values_to_candidate_probabilities(
+    history: pd.DataFrame, values: np.ndarray
+) -> np.ndarray:
     """Convert seven model position forecasts into marginal selection probabilities.
 
     Each position is represented as a discrete Gaussian whose spread is estimated
@@ -181,12 +211,23 @@ class PositionSeriesWorker:
         seed: int = 42,
         device: str = "auto",
         precision: str = "32",
+        position_columns: list[str] | None = None,
     ):
         self.spec = spec
         self.params = spec.default_params | (params or {})
         self.seed = seed
         self.device = device
         self.precision = precision
+        self.position_columns = position_columns
+
+    def _columns(self, history: pd.DataFrame) -> list[str]:
+        columns = self.position_columns or infer_position_columns(history)
+        if not columns:
+            raise ValueError("no position columns available for worker")
+        missing = [column for column in columns if column not in history.columns]
+        if missing:
+            raise ValueError(f"history is missing position columns: {missing}")
+        return columns
 
     def forecast(self, history: pd.DataFrame) -> WorkerOutput:
         if self.spec.library in {"sklearn", "lightgbm"}:
@@ -216,7 +257,7 @@ class PositionSeriesWorker:
             output = self._foundation(history)
         else:
             raise NotImplementedError(f"no position worker for library={self.spec.library}")
-        if output.candidate_probabilities is None:
+        if output.candidate_probabilities is None and len(self._columns(history)) == 7:
             output.candidate_probabilities = normalize_worker_predictions(
                 task=getattr(self.spec, "task", "position_series"),
                 history=history,
@@ -229,16 +270,20 @@ class PositionSeriesWorker:
         for row in history.itertuples(index=False):
             selected = {int(getattr(row, f"n{i}")) for i in range(1, 8)}
             for candidate in range(1, 38):
-                rows.append({
-                    "unique_id": f"candidate-{candidate:02d}",
-                    "ds": pd.Timestamp(row.draw_date),
-                    "y": float(candidate in selected),
-                })
+                rows.append(
+                    {
+                        "unique_id": f"candidate-{candidate:02d}",
+                        "ds": pd.Timestamp(row.draw_date),
+                        "y": float(candidate in selected),
+                    }
+                )
         return pd.DataFrame(rows).sort_values(["unique_id", "ds"]).reset_index(drop=True)
 
     def _candidate_series(self, history: pd.DataFrame) -> WorkerOutput:
         if self.spec.library != "statsforecast":
-            raise RuntimeError(f"candidate_series worker is not implemented for library={self.spec.library}")
+            raise RuntimeError(
+                f"candidate_series worker is not implemented for library={self.spec.library}"
+            )
         from statsforecast import StatsForecast
 
         models_module = importlib.import_module("statsforecast.models")
@@ -263,7 +308,12 @@ class PositionSeriesWorker:
         values = np.asarray(sorted(ranked.tolist()), dtype=float)
         return WorkerOutput(
             values,
-            {"library": "statsforecast", "task": "candidate_series", "column": value_col, "params": params},
+            {
+                "library": "statsforecast",
+                "task": "candidate_series",
+                "column": value_col,
+                "params": params,
+            },
             probabilities,
             {"library": "statsforecast", "statsforecast": sf, "value_col": value_col},
         )
@@ -274,8 +324,8 @@ class PositionSeriesWorker:
         fit_params = {k: v for k, v in self.params.items() if k != "lags"}
         values: list[float] = []
         estimators: list[Any] = []
-        for position in range(1, 8):
-            series = history[f"n{position}"].astype(float).to_numpy()
+        for position, column in enumerate(self._columns(history), start=1):
+            series = history[column].astype(float).to_numpy()
             max_lag = max(lags)
             if len(series) <= max_lag + 2:
                 values.append(float(np.median(series)))
@@ -286,12 +336,15 @@ class PositionSeriesWorker:
             query = np.asarray([[series[-lag] for lag in lags]])
             if self.spec.library == "lightgbm":
                 from lightgbm import LGBMRegressor
+
                 estimator = LGBMRegressor(random_state=self.seed, verbosity=-1, **fit_params)
             elif self.spec.class_name == "ElasticNet":
                 from sklearn.linear_model import ElasticNet
+
                 estimator = ElasticNet(**fit_params)
             else:
                 from sklearn.linear_model import Ridge
+
                 estimator = Ridge(**fit_params)
             estimator.fit(x, y)
             estimators.append(estimator)
@@ -313,7 +366,7 @@ class PositionSeriesWorker:
         models_module = importlib.import_module("statsforecast.models")
         cls = getattr(models_module, self.spec.class_name)
         model = cls(**self.params)
-        frame = canonical_to_long(history)
+        frame = canonical_to_long(history, self._columns(history))
         sf = StatsForecast(models=[model], freq="7D", n_jobs=1)
         sf.fit(df=frame)
         prediction = sf.predict(h=1)
@@ -333,7 +386,7 @@ class PositionSeriesWorker:
     def _mlforecast(self, history: pd.DataFrame) -> WorkerOutput:
         from mlforecast import MLForecast
 
-        frame = canonical_to_long(history)
+        frame = canonical_to_long(history, self._columns(history))
         frame["ds"] = frame.groupby("unique_id").cumcount().astype(int)
         lags = self.params.get("lags", [1, 2, 3, 5, 10, 20])
         fit_params = {k: v for k, v in self.params.items() if k != "lags"}
@@ -376,7 +429,11 @@ class PositionSeriesWorker:
         params.setdefault("early_stop_patience_steps", 3)
         params.setdefault("loss", MAE())
         params.setdefault("random_seed", self.seed)
-        accelerator = "gpu" if self.device == "cuda" or (self.device == "auto" and torch.cuda.is_available()) else "cpu"
+        accelerator = (
+            "gpu"
+            if self.device == "cuda" or (self.device == "auto" and torch.cuda.is_available())
+            else "cpu"
+        )
         params.setdefault("accelerator", accelerator)
         params.setdefault("devices", 1)
         if self.spec.class_name in {
@@ -389,7 +446,7 @@ class PositionSeriesWorker:
             params.setdefault("precision", "32-true")
         model = cls(**params)
         nf = NeuralForecast(models=[model], freq="7D")
-        frame = canonical_to_long(history)
+        frame = canonical_to_long(history, self._columns(history))
 
         # NeuralForecast requires a validation window whenever early stopping
         # is enabled. Keep it bounded so short fold histories remain usable.
@@ -399,37 +456,51 @@ class PositionSeriesWorker:
             raise ValueError(
                 f"insufficient history for NeuralForecast validation: "
                 f"rows={len(history)}, val_size={val_size}"
-        )
+            )
 
         nf.fit(df=frame, val_size=val_size)
         prediction = nf.predict().reset_index()
         value_col = [c for c in prediction.columns if c not in {"unique_id", "ds", "index"}][0]
         values = prediction.sort_values("unique_id")[value_col].to_numpy(float)
-        return WorkerOutput(values, {
-            "library": "neuralforecast",
-            "accelerator": accelerator,
-            "column": value_col,
-            "val_size": val_size,
-            "params": params,
-        }, model_artifact_payload={
-            "library": "neuralforecast",
-            "neuralforecast": nf,
-            "frame": frame,
-            "value_col": value_col,
-            "params": params,
-            "val_size": val_size,
-        })
+        return WorkerOutput(
+            values,
+            {
+                "library": "neuralforecast",
+                "accelerator": accelerator,
+                "column": value_col,
+                "val_size": val_size,
+                "params": params,
+            },
+            model_artifact_payload={
+                "library": "neuralforecast",
+                "neuralforecast": nf,
+                "frame": frame,
+                "value_col": value_col,
+                "params": params,
+                "val_size": val_size,
+            },
+        )
 
     def _neuralforecast_auto(self, history: pd.DataFrame) -> WorkerOutput:
         import torch
         from neuralforecast import NeuralForecast
 
         controls = {
-            "backend", "num_samples", "cpus", "gpus", "parallel_trials", "refit_with_val",
-            "search_strategy", "early_stop_patience_steps",
+            "backend",
+            "num_samples",
+            "cpus",
+            "gpus",
+            "parallel_trials",
+            "refit_with_val",
+            "search_strategy",
+            "early_stop_patience_steps",
         }
         model_config = {k: v for k, v in self.params.items() if k not in controls}
-        gpus = int(self.params.get("gpus", 1 if (self.device in {"auto", "cuda"} and torch.cuda.is_available()) else 0))
+        gpus = int(
+            self.params.get(
+                "gpus", 1 if (self.device in {"auto", "cuda"} and torch.cuda.is_available()) else 0
+            )
+        )
         request = AutoModelRequest(
             model_name=self.spec.class_name,
             h=1,
@@ -442,7 +513,7 @@ class PositionSeriesWorker:
             refit_with_val=bool(self.params.get("refit_with_val", False)),
             precision=self.precision,
             early_stop_patience_steps=self.params.get("early_stop_patience_steps"),
-            n_series=7,
+            n_series=len(self._columns(history)),
             random_seed=self.seed,
             search_strategy=self.params.get("search_strategy", "auto"),
         )
@@ -452,40 +523,46 @@ class PositionSeriesWorker:
         runtime_params["devices"] = 1
         model = construct_auto_model(plan)
         nf = NeuralForecast(models=[model], freq="7D")
-        frame = canonical_to_long(history)
+        frame = canonical_to_long(history, self._columns(history))
         val_size = max(1, min(10, len(history) // 5))
         nf.fit(df=frame, val_size=val_size)
         prediction = nf.predict().reset_index()
         value_col = [c for c in prediction.columns if c not in {"unique_id", "ds", "index"}][0]
         values = prediction.sort_values("unique_id")[value_col].to_numpy(float)
-        return WorkerOutput(values, {
-            "library": "neuralforecast_auto",
-            "backend": plan.backend,
-            "search_algorithm": plan.search_algorithm,
-            "adjustments": list(plan.adjustments),
-            "column": value_col,
-            "val_size": val_size,
-            "params": runtime_params,
-        }, model_artifact_payload={
-            "library": "neuralforecast",
-            "neuralforecast": nf,
-            "frame": frame,
-            "value_col": value_col,
-            "params": runtime_params,
-            "val_size": val_size,
-            "auto_plan": {
+        return WorkerOutput(
+            values,
+            {
+                "library": "neuralforecast_auto",
                 "backend": plan.backend,
                 "search_algorithm": plan.search_algorithm,
                 "adjustments": list(plan.adjustments),
-                "constructor_kwargs": {
-                    key: str(value)
-                    for key, value in plan.constructor_kwargs.items()
-                    if key != "config"
+                "column": value_col,
+                "val_size": val_size,
+                "params": runtime_params,
+            },
+            model_artifact_payload={
+                "library": "neuralforecast",
+                "neuralforecast": nf,
+                "frame": frame,
+                "value_col": value_col,
+                "params": runtime_params,
+                "val_size": val_size,
+                "auto_plan": {
+                    "backend": plan.backend,
+                    "search_algorithm": plan.search_algorithm,
+                    "adjustments": list(plan.adjustments),
+                    "constructor_kwargs": {
+                        key: str(value)
+                        for key, value in plan.constructor_kwargs.items()
+                        if key != "config"
+                    },
                 },
             },
-        })
+        )
 
     def _autohint(self, history: pd.DataFrame) -> WorkerOutput:
+        if len(self._columns(history)) != 7:
+            raise ValueError("AutoHINT currently requires exactly 7 coherent position series")
         from neuralforecast import NeuralForecast
         from neuralforecast.losses.pytorch import DistributionLoss
         from neuralforecast.models import HINT, DLinear
@@ -525,9 +602,7 @@ class PositionSeriesWorker:
         value_col = [c for c in prediction.columns if c not in {"unique_id", "ds", "index"}][0]
         bottom_order = hierarchy["internal_bottom_series_order"]
         values = (
-            prediction.set_index("unique_id")
-            .loc[bottom_order, value_col]
-            .to_numpy(dtype=float)
+            prediction.set_index("unique_id").loc[bottom_order, value_col].to_numpy(dtype=float)
         )
         total = float(prediction.set_index("unique_id").loc["00-total", value_col])
         coherence_error = abs(total - float(values.sum()))
@@ -548,9 +623,7 @@ class PositionSeriesWorker:
             "column": value_col,
             "val_size": val_size,
             "hierarchy": {
-                key: value
-                for key, value in hierarchy.items()
-                if key != "summation_matrix"
+                key: value for key, value in hierarchy.items() if key != "summation_matrix"
             },
             "coherence_error": coherence_error,
         }
@@ -570,11 +643,19 @@ class PositionSeriesWorker:
 
     def _invoke_autogluon_subprocess(self, request: dict[str, Any]) -> dict[str, Any]:
         if not AUTOGLUON_ENV.exists():
-            raise WorkerSubprocessError("DEPENDENCY_MISSING", f"missing AutoGluon-TimeSeries environment: {AUTOGLUON_ENV}")
+            raise WorkerSubprocessError(
+                "DEPENDENCY_MISSING", f"missing AutoGluon-TimeSeries environment: {AUTOGLUON_ENV}"
+            )
         if not (AUTOGLUON_ENV / "uv.lock").exists():
-            raise WorkerSubprocessError("DEPENDENCY_MISSING", f"missing AutoGluon-TimeSeries lockfile: {AUTOGLUON_ENV / 'uv.lock'}")
+            raise WorkerSubprocessError(
+                "DEPENDENCY_MISSING",
+                f"missing AutoGluon-TimeSeries lockfile: {AUTOGLUON_ENV / 'uv.lock'}",
+            )
         if not AUTOGLUON_RUNNER.exists():
-            raise WorkerSubprocessError("PROVIDER_NOT_IMPLEMENTED", f"missing AutoGluon-TimeSeries runner: {AUTOGLUON_RUNNER}")
+            raise WorkerSubprocessError(
+                "PROVIDER_NOT_IMPLEMENTED",
+                f"missing AutoGluon-TimeSeries runner: {AUTOGLUON_RUNNER}",
+            )
         with tempfile.TemporaryDirectory(prefix="loto-autogluon-ts-") as tmp:
             request_path = Path(tmp) / "provider_request.json"
             response_path = Path(tmp) / "provider_response.json"
@@ -606,14 +687,17 @@ class PositionSeriesWorker:
             try:
                 response = json.loads(response_path.read_text(encoding="utf-8"))
             except json.JSONDecodeError as exc:
-                raise WorkerSubprocessError("ERROR", f"AutoGluon-TimeSeries provider returned invalid JSON: {exc}") from exc
+                raise WorkerSubprocessError(
+                    "ERROR", f"AutoGluon-TimeSeries provider returned invalid JSON: {exc}"
+                ) from exc
         if response.get("status") != "OK":
             raise WorkerSubprocessError(
                 str(response.get("status", "ERROR")),
                 str(response.get("message", "AutoGluon-TimeSeries provider failed")),
             )
         predictions = np.asarray(response.get("predictions"), dtype=float)
-        if predictions.shape != (7,) or not np.isfinite(predictions).all():
+        expected = len(request.get("position_columns", [])) or len(self._columns(history))
+        if predictions.shape != (expected,) or not np.isfinite(predictions).all():
             raise WorkerSubprocessError(
                 "PREDICTION_MISMATCH",
                 f"AutoGluon-TimeSeries provider returned invalid predictions shape={predictions.shape}",
@@ -621,7 +705,7 @@ class PositionSeriesWorker:
         return response
 
     def _autogluon(self, history: pd.DataFrame) -> WorkerOutput:
-        columns = [f"n{i}" for i in range(1, 8)] + ["draw_date"]
+        columns = [*self._columns(history), "draw_date"]
         payload = history[columns].copy()
         payload["draw_date"] = payload["draw_date"].astype(str)
         artifact_dir = tempfile.mkdtemp(prefix="loto-autogluon-artifact-")
@@ -631,6 +715,7 @@ class PositionSeriesWorker:
             "mode": "fit_predict_save",
             "artifact_dir": artifact_dir,
             "history": payload.to_dict(orient="records"),
+            "position_columns": self._columns(history),
             "presets": self.params.get("presets", "fast_training"),
             "time_limit": self.params.get("time_limit", 120),
             "prediction_length": 1,
@@ -662,8 +747,8 @@ class PositionSeriesWorker:
 
         models = []
         values = []
-        for position in range(1, 8):
-            source_series = history.set_index("draw_no")[f"n{position}"].astype(float)
+        for position, column in enumerate(self._columns(history), start=1):
+            source_series = history.set_index("draw_no")[column].astype(float)
             series = TimeSeries.from_series(source_series)
             model = RegressionEnsembleModel(
                 forecasting_models=[NaiveDrift(), ExponentialSmoothing()],
@@ -705,11 +790,13 @@ class PositionSeriesWorker:
 
         torch.load = _torch_load_allow_local_checkpoint
         frame = []
-        for position in range(1, 8):
-            frame.append({
-                "start": pd.Timestamp(history["draw_date"].iloc[0]),
-                "target": history[f"n{position}"].astype(float).to_numpy(),
-            })
+        for position, column in enumerate(self._columns(history), start=1):
+            frame.append(
+                {
+                    "start": pd.Timestamp(history["draw_date"].iloc[0]),
+                    "target": history[column].astype(float).to_numpy(),
+                }
+            )
         dataset = ListDataset(frame, freq="D")
         estimator = DeepAREstimator(
             freq="D",
@@ -737,7 +824,9 @@ class PositionSeriesWorker:
         finally:
             torch.load = original_torch_load
         forecasts = list(predictor.predict(dataset))
-        values = np.asarray([float(np.asarray(forecast.samples).mean(axis=0)[0]) for forecast in forecasts])
+        values = np.asarray(
+            [float(np.asarray(forecast.samples).mean(axis=0)[0]) for forecast in forecasts]
+        )
         metadata = {
             "library": "gluonts",
             "backend": "torch",
@@ -773,8 +862,8 @@ class PositionSeriesWorker:
         ridge_alpha = float(self.params.get("ridge", self.params.get("ridge_alpha", 1e-6)))
         models = []
         values = []
-        for position in range(1, 8):
-            series = history[f"n{position}"].astype(float).to_numpy()
+        for position, column in enumerate(self._columns(history), start=1):
+            series = history[column].astype(float).to_numpy()
             x_train = series[:-1].reshape(-1, 1)
             y_train = series[1:].reshape(-1, 1)
             reservoir = Reservoir(
@@ -812,7 +901,9 @@ class PositionSeriesWorker:
 
     def _foundation(self, history: pd.DataFrame) -> WorkerOutput:
         provider_cls = get_foundation_provider(self.spec)
-        provider = provider_cls(self.spec, self.params, seed=self.seed, device=self.device, precision=self.precision)
+        provider = provider_cls(
+            self.spec, self.params, seed=self.seed, device=self.device, precision=self.precision
+        )
         try:
             provider.load()
             values = provider.predict(history)
