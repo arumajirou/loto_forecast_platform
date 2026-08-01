@@ -9,6 +9,9 @@ DEVICE="${DEVICE:-cpu}"
 PRECISION="${PRECISION:-32}"
 TIMEOUT="${TIMEOUT:-300}"
 AVAILABLE_ONLY="${AVAILABLE_ONLY:-1}"
+VERIFY_GPU="${VERIFY_GPU:-0}"
+GPUS_PER_TRIAL="${GPUS_PER_TRIAL:-0}"
+PARALLEL_GPU_MODELS="${PARALLEL_GPU_MODELS:-1}"
 CATALOG_SOURCE="${CATALOG_SOURCE:-merged}"
 RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
 OUT="${OUT:-$ROOT/runs/all-model-argument-audit-$RUN_ID}"
@@ -17,6 +20,21 @@ mkdir -p "$OUT/matrix" "$OUT/runtime"
 AVAILABLE_FLAG=()
 if [[ "$AVAILABLE_ONLY" == "1" ]]; then
   AVAILABLE_FLAG=(--available-only)
+fi
+
+VERIFY_GPU_FLAG=()
+if [[ "$VERIFY_GPU" == "1" ]]; then
+  VERIFY_GPU_FLAG=(--verify-gpu)
+fi
+
+if [[ "$VERIFY_GPU" == "1" && "$DEVICE" != "cuda" ]]; then
+  echo "ERROR: VERIFY_GPU=1 requires DEVICE=cuda" >&2
+  exit 2
+fi
+
+if [[ "$VERIFY_GPU" == "1" && "$GPUS_PER_TRIAL" -lt 1 ]]; then
+  echo "ERROR: VERIFY_GPU=1 requires GPUS_PER_TRIAL>=1" >&2
+  exit 2
 fi
 
 uv run --no-sync python scripts/build_all_model_argument_audit.py \
@@ -48,6 +66,9 @@ fi
   --require-retrain \
   --require-property-validation \
   --verify-arguments \
+    "${VERIFY_GPU_FLAG[@]}" \
+    --gpus-per-trial "$GPUS_PER_TRIAL" \
+    --parallel-gpu-models "$PARALLEL_GPU_MODELS" \
   --timeout "$TIMEOUT" \
   --device "$DEVICE" \
   --precision "$PRECISION" \
