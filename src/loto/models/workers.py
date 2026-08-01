@@ -324,7 +324,7 @@ class PositionSeriesWorker:
         fit_params = {k: v for k, v in self.params.items() if k != "lags"}
         values: list[float] = []
         estimators: list[Any] = []
-        for position, column in enumerate(self._columns(history), start=1):
+        for _position, column in enumerate(self._columns(history), start=1):
             series = history[column].astype(float).to_numpy()
             max_lag = max(lags)
             if len(series) <= max_lag + 2:
@@ -753,7 +753,7 @@ class PositionSeriesWorker:
 
         models = []
         values = []
-        for position, column in enumerate(self._columns(history), start=1):
+        for _position, column in enumerate(self._columns(history), start=1):
             source_series = history.set_index("draw_no")[column].astype(float)
             series = TimeSeries.from_series(source_series)
             model = RegressionEnsembleModel(
@@ -796,7 +796,7 @@ class PositionSeriesWorker:
 
         torch.load = _torch_load_allow_local_checkpoint
         frame = []
-        for position, column in enumerate(self._columns(history), start=1):
+        for _position, column in enumerate(self._columns(history), start=1):
             frame.append(
                 {
                     "start": pd.Timestamp(history["draw_date"].iloc[0]),
