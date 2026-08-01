@@ -41,6 +41,47 @@ def _read_effective(argument: str, properties: dict[str, Any]) -> Any:
     return properties.get(argument, properties.get(aliases.get(argument, argument)))
 
 
+def merge_effective_properties(
+    *property_sets: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """Merge property snapshots while ignoring NOT_EXPOSED placeholders.
+
+    Later lifecycle snapshots take precedence only when they expose a concrete
+    value. Nested ``effective_parameters`` dictionaries are merged separately.
+    """
+
+    merged: dict[str, Any] = {}
+    merged_effective: dict[str, Any] = {}
+
+    for properties in property_sets:
+        if not isinstance(properties, dict):
+            continue
+
+        effective = properties.get("effective_parameters")
+        if isinstance(effective, dict):
+            for key, value in effective.items():
+                if not (
+                    isinstance(value, dict)
+                    and value.get("status") == "NOT_EXPOSED"
+                ):
+                    merged_effective[key] = value
+
+        for key, value in properties.items():
+            if key == "effective_parameters":
+                continue
+            if (
+                isinstance(value, dict)
+                and value.get("status") == "NOT_EXPOSED"
+            ):
+                continue
+            merged[key] = value
+
+    if merged_effective:
+        merged["effective_parameters"] = merged_effective
+
+    return merged
+
+
 def verify_arguments(
     requested: dict[str, Any],
     constructor_values: dict[str, Any],

@@ -14,7 +14,7 @@ from loto.data.canonical import canonicalize_loto7
 from loto.data.lineage import atomic_write_json
 from loto.evaluation.metrics import brier_score, log_loss
 from loto.features.pipeline import build_candidate_features, build_next_candidate_features
-from loto.models.argument_verifier import verify_arguments
+from loto.models.argument_verifier import merge_effective_properties, verify_arguments
 from loto.models.artifact_store import load_pickle_model, model_manifest
 from loto.models.catalog import ModelSpec
 from loto.models.factory import RuntimeModel
@@ -202,7 +202,16 @@ def run_candidate_lifecycle(
             errors.append({"stage": "retrain", "type": type(exc).__name__, "message": str(exc)})
             retrain_status = "FAILED"
             final_status = "RETRAIN_FAILED"
-    argument_evidence = verify_arguments(requested, requested, properties_after_fit or before)
+    argument_evidence = verify_arguments(
+        requested,
+        requested,
+        merge_effective_properties(
+            before,
+            properties_after_fit,
+            properties_after_load,
+            properties_after_retrain,
+        ),
+    )
     if final_status == "UNSUPPORTED_OPERATION":
         bad_args = [row for row in argument_evidence if row["status"] in {"IGNORED"}]
         if bad_args:

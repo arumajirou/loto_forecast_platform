@@ -32,7 +32,7 @@ WORKER_SUBPROCESS_LIBRARIES = {"autogluon"}
 
 from loto.data.canonical import canonicalize_loto7
 from loto.data.lineage import atomic_write_json
-from loto.models.argument_verifier import verify_arguments
+from loto.models.argument_verifier import merge_effective_properties, verify_arguments
 from loto.models.artifact_store import load_pickle_model, model_manifest, save_pickle_model
 from loto.models.catalog import ModelSpec, list_model_specs
 from loto.models.lifecycle import (
@@ -990,7 +990,16 @@ def run_foundation_lifecycle(
         properties_after_fit=properties_after_fit,
         properties_after_load=properties_after_load,
         properties_after_retrain=properties_after_retrain,
-        argument_evidence=verify_arguments(requested, requested, properties_after_fit or before),
+        argument_evidence=verify_arguments(
+            requested,
+            requested,
+            merge_effective_properties(
+                before,
+                properties_after_fit,
+                properties_after_load,
+                properties_after_retrain,
+            ),
+        ),
         resource_evidence={
             "before": resource_before,
             "after": resource_after,
@@ -1163,7 +1172,16 @@ def run_foundation_candidate_lifecycle(
         properties_after_fit=properties_after_fit,
         properties_after_load=properties_after_load,
         properties_after_retrain=properties_after_retrain,
-        argument_evidence=verify_arguments(requested, requested, properties_after_fit or before),
+        argument_evidence=verify_arguments(
+            requested,
+            requested,
+            merge_effective_properties(
+                before,
+                properties_after_fit,
+                properties_after_load,
+                properties_after_retrain,
+            ),
+        ),
         resource_evidence={
             "before": resource_before,
             "after": resource_after,
@@ -1713,7 +1731,16 @@ def run_worker_lifecycle(
         properties_after_fit=properties_after_fit,
         properties_after_load=properties_after_load,
         properties_after_retrain=properties_after_retrain,
-        argument_evidence=verify_arguments(requested, requested, properties_after_fit or before),
+        argument_evidence=verify_arguments(
+            requested,
+            requested,
+            merge_effective_properties(
+                before,
+                properties_after_fit,
+                properties_after_load,
+                properties_after_retrain,
+            ),
+        ),
         resource_evidence={"before": resource_before, "after": resource_after},
         errors=errors,
         final_status=final_status,
