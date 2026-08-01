@@ -5,15 +5,9 @@ RUNNER = Path("scripts/run_tabpfn_ts_provider.py")
 PROVIDER = Path("src/loto/models/providers/tabpfn_ts.py")
 PINS = Path("configs/tsfm/verified-revisions.json")
 STATIC_AUDIT = Path("audit/tsfm-static/static-audit.json")
-CERTIFICATION = Path(
-    "audit/tsfm-runtime/tabpfn-ts/runtime-certification.json"
-)
-RUNTIME = Path(
-    "audit/tsfm-runtime/tabpfn-ts/runtime-result.json"
-)
-RESPONSE = Path(
-    "audit/tsfm-runtime/tabpfn-ts/provider-response.json"
-)
+CERTIFICATION = Path("audit/tsfm-runtime/tabpfn-ts/runtime-certification.json")
+RUNTIME = Path("audit/tsfm-runtime/tabpfn-ts/runtime-result.json")
+RESPONSE = Path("audit/tsfm-runtime/tabpfn-ts/provider-response.json")
 STATUS = Path("audit/tsfm-runtime/runtime-status.json")
 
 REPO_ID = "Prior-Labs/TabPFN-v2-reg"
@@ -44,20 +38,10 @@ def test_tabpfn_provider_uses_fixed_snapshot() -> None:
 
 def test_tabpfn_identity_is_consistent() -> None:
     pins = json.loads(PINS.read_text(encoding="utf-8"))
-    static = json.loads(
-        STATIC_AUDIT.read_text(encoding="utf-8")
-    )
+    static = json.loads(STATIC_AUDIT.read_text(encoding="utf-8"))
 
-    pin = next(
-        row
-        for row in pins["pins"]
-        if row["model_id"] == "tabpfn-ts"
-    )
-    audit = next(
-        row
-        for row in static["results"]
-        if row["model_id"] == "tabpfn-ts"
-    )
+    pin = next(row for row in pins["pins"] if row["model_id"] == "tabpfn-ts")
+    audit = next(row for row in static["results"] if row["model_id"] == "tabpfn-ts")
 
     for row in (pin, audit):
         assert row["repo_id"] == REPO_ID
@@ -69,9 +53,7 @@ def test_tabpfn_identity_is_consistent() -> None:
 
 
 def test_tabpfn_runtime_is_gpu_backed() -> None:
-    runtime = json.loads(
-        RUNTIME.read_text(encoding="utf-8")
-    )
+    runtime = json.loads(RUNTIME.read_text(encoding="utf-8"))
 
     assert runtime["status"] == "PASS"
     assert runtime["runtime_vram_certified"] is True
@@ -82,9 +64,7 @@ def test_tabpfn_runtime_is_gpu_backed() -> None:
 
 
 def test_tabpfn_response_uses_fixed_artifact() -> None:
-    response = json.loads(
-        RESPONSE.read_text(encoding="utf-8")
-    )
+    response = json.loads(RESPONSE.read_text(encoding="utf-8"))
 
     gpu = response["gpu_evidence"]
     properties = response["properties"]
@@ -104,39 +84,23 @@ def test_tabpfn_response_uses_fixed_artifact() -> None:
 
     assert artifact["repo_id"] == REPO_ID
     assert artifact["revision"] == REVISION
-    assert properties["weight_path"].endswith(
-        f"{REVISION}/{WEIGHT}"
-    )
+    assert properties["weight_path"].endswith(f"{REVISION}/{WEIGHT}")
     assert properties["weight_sha256"]
     assert properties["config_sha256"]
 
 
 def test_tabpfn_license_is_recorded() -> None:
-    certification = json.loads(
-        CERTIFICATION.read_text(encoding="utf-8")
-    )
+    certification = json.loads(CERTIFICATION.read_text(encoding="utf-8"))
 
-    assert (
-        certification["license_review_status"]
-        == "APPROVED_WITH_ATTRIBUTION"
-    )
+    assert certification["license_review_status"] == "APPROVED_WITH_ATTRIBUTION"
     assert certification["license_commercial_use"] is True
-    assert (
-        certification["license_attribution_required"]
-        is True
-    )
+    assert certification["license_attribution_required"] is True
 
 
 def test_runtime_status_contains_five_certified_models() -> None:
-    status = json.loads(
-        STATUS.read_text(encoding="utf-8")
-    )
+    status = json.loads(STATUS.read_text(encoding="utf-8"))
 
-    row = next(
-        item
-        for item in status["results"]
-        if item["model_id"] == "tabpfn-ts"
-    )
+    row = next(item for item in status["results"] if item["model_id"] == "tabpfn-ts")
 
     assert status["runtime_certified_models"] == 5
     assert row["runtime_status"] == "CERTIFIED"
