@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[4]
 CHRONOS_BOLT_ENV = ROOT / "environments" / "autogluon-timeseries"
 CHRONOS_BOLT_RUNNER = ROOT / "scripts" / "run_chronos_bolt_provider.py"
 CHRONOS_T5_RUNNER = ROOT / "scripts" / "run_chronos_t5_provider.py"
+CHRONOS_2_RUNNER = ROOT / "scripts" / "run_chronos_2_provider.py"
 HF_HOME = Path(
     os.environ.get(
         "HF_HOME",
@@ -111,6 +112,37 @@ class ChronosProvider(FoundationProvider):
             and self._model_name() == "amazon/chronos-bolt-tiny"
             and self._revision() == "a0e552de83495b5c28c14c71c374f3e33280b340"
         )
+
+    def _is_chronos_2(self) -> bool:
+        return (
+            self.spec.model_id == "chronos-2"
+            and self._model_name() == "amazon/chronos-2"
+            and self._revision() == "29ec3766d36d6f73f0696f85560a422f50e8498c"
+        )
+
+    def _fixed_chronos_2_snapshot_path(self) -> Path:
+        revision = "29ec3766d36d6f73f0696f85560a422f50e8498c"
+        snapshot = HF_HOME / "hub" / "models--amazon--chronos-2" / "snapshots" / revision
+
+        required = [
+            snapshot / "model.safetensors",
+            snapshot / "config.json",
+        ]
+
+        if not snapshot.is_dir():
+            raise FoundationProviderError(
+                "MODEL_WEIGHTS_MISSING",
+                (f"fixed Chronos 2 snapshot missing: {snapshot}"),
+            )
+
+        for required_path in required:
+            if not required_path.is_file():
+                raise FoundationProviderError(
+                    "PARTIAL_SNAPSHOT",
+                    (f"required Chronos 2 file missing: {required_path}"),
+                )
+
+        return snapshot.resolve()
 
     def _is_chronos_t5_small(self) -> bool:
         return (
@@ -288,6 +320,127 @@ class ChronosProvider(FoundationProvider):
 
         return response
 
+    def _run_chronos_2_provider(
+        self,
+        history: pd.DataFrame,
+    ) -> dict[str, Any]:
+        python_path = CHRONOS_BOLT_ENV / ".venv" / "bin" / "python"
+
+        if not python_path.is_file():
+            raise FoundationProviderError(
+                "DEPENDENCY_MISSING",
+                (f"Chronos 2 Python missing: {python_path}"),
+            )
+
+        if not CHRONOS_2_RUNNER.is_file():
+            raise FoundationProviderError(
+                "PROVIDER_NOT_IMPLEMENTED",
+                (f"Chronos 2 runner missing: {CHRONOS_2_RUNNER}"),
+            )
+
+        columns = [f"n{i}" for i in range(1, 8)] + ["draw_date"]
+
+        missing = [column for column in columns if column not in history.columns]
+
+        if missing:
+            raise FoundationProviderError(
+                "INVALID_REQUEST",
+                f"missing history columns: {missing}",
+            )
+
+        request = {
+            "schema_version": 1,
+            "model_id": "chronos-2",
+            "repo_id": "amazon/chronos-2",
+            "revision": ("29ec3766d36d6f73f0696f85560a422f50e8498c"),
+            "snapshot_path": str(self._fixed_chronos_2_snapshot_path()),
+            "local_files_only": True,
+            "device": self.device,
+            "dtype": "float32",
+            "seed": 42,
+            "prediction_length": 1,
+            "batch_size": 7,
+            "context_length": 512,
+            "cross_learning": False,
+            "history": history[columns].to_dict(orient="records"),
+        }
+
+        with tempfile.TemporaryDirectory(prefix="chronos-2-provider-") as tmp:
+            tmp_path = Path(tmp)
+            request_path = tmp_path / "request.json"
+            response_path = tmp_path / "response.json"
+
+            request_path.write_text(
+                json.dumps(
+                    request,
+                    ensure_ascii=False,
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    str(python_path),
+                    str(CHRONOS_2_RUNNER),
+                    "--request",
+                    str(request_path),
+                    "--response",
+                    str(response_path),
+                ],
+                cwd=ROOT,
+                env={
+                    **os.environ,
+                    "HF_HOME": str(HF_HOME),
+                },
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            if not response_path.is_file():
+                raise FoundationProviderError(
+                    "PROVIDER_EXECUTION_FAILED",
+                    (
+                        "Chronos 2 runner produced no "
+                        f"response; rc={completed.returncode}; "
+                        f"stderr={completed.stderr}"
+                    ),
+                )
+
+            response = json.loads(response_path.read_text(encoding="utf-8"))
+
+        if response.get("status") != "OK":
+            raise FoundationProviderError(
+                str(
+                    response.get(
+                        "status",
+                        "PROVIDER_EXECUTION_FAILED",
+                    )
+                ),
+                str(
+                    response.get(
+                        "message",
+                        "Chronos 2 provider failed",
+                    )
+                ),
+            )
+
+        properties = response["properties"]
+
+        self.resolved = {
+            "repo_id": response["repo_id"],
+            "revision": response["revision"],
+            "snapshot_path": response["snapshot_path"],
+            "weight_paths": [properties["weight_path"]],
+            "weight_sha256": {properties["weight_path"]: properties["weight_sha256"]},
+            "config_sha256": properties["config_sha256"],
+            "runtime_response": response,
+        }
+
+        return response
+
     def _run_t5_provider(
         self,
         history: pd.DataFrame,
@@ -421,6 +574,11 @@ class ChronosProvider(FoundationProvider):
             self._fixed_t5_snapshot_path()
             return self
 
+        if self._is_chronos_2():
+            self.validate_environment()
+            self._fixed_chronos_2_snapshot_path()
+            return self
+
         resolved = self.resolve_model()
         import chronos
         import torch
@@ -465,6 +623,21 @@ class ChronosProvider(FoundationProvider):
                 raise FoundationProviderError(
                     "INVALID_OUTPUT",
                     (f"unexpected Chronos-T5 prediction shape: {values.shape}"),
+                )
+
+            return values
+
+        if self._is_chronos_2():
+            response = self._run_chronos_2_provider(history)
+            values = np.asarray(
+                response["predictions"],
+                dtype=float,
+            )
+
+            if values.shape != (7,):
+                raise FoundationProviderError(
+                    "INVALID_OUTPUT",
+                    (f"unexpected Chronos 2 prediction shape: {values.shape}"),
                 )
 
             return values

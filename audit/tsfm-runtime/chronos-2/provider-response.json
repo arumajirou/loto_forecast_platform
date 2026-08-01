@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "provider_version": 1,
+  "status": "OK",
+  "model_id": "chronos-2",
+  "repo_id": "amazon/chronos-2",
+  "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c",
+  "predictions": [
+    3.1177587509155273,
+    8.086743354797363,
+    13.077780723571777,
+    20.06511116027832,
+    24.934715270996094,
+    30.085248947143555,
+    35.040802001953125
+  ],
+  "prediction_shape": [
+    7
+  ],
+  "quantiles": [
+    [
+      2.8684349060058594,
+      2.9542043209075928,
+      3.015986204147339,
+      3.071610927581787,
+      3.1177587509155273,
+      3.166895866394043,
+      3.220970630645752,
+      3.2828426361083984,
+      3.365490436553955
+    ],
+    [
+      7.842370986938477,
+      7.927857398986816,
+      7.987325191497803,
+      8.042136192321777,
+      8.086743354797363,
+      8.13288688659668,
+      8.187056541442871,
+      8.251456260681152,
+      8.338980674743652
+    ],
+    [
+      12.846311569213867,
+      12.923985481262207,
+      12.977710723876953,
+      13.029850959777832,
+      13.077780723571777,
+      13.127701759338379,
+      13.183745384216309,
+      13.248697280883789,
+      13.33937931060791
+    ],
+    [
+      19.810338973999023,
+      19.901811599731445,
+      19.95857810974121,
+      20.010141372680664,
+      20.06511116027832,
+      20.116085052490234,
+      20.167022705078125,
+      20.224578857421875,
+      20.317853927612305
+    ],
+    [
+      24.712833404541016,
+      24.79439926147461,
+      24.84724235534668,
+      24.893985748291016,
+      24.934715270996094,
+      24.975784301757812,
+      25.025033950805664,
+      25.08304214477539,
+      25.165279388427734
+    ],
+    [
+      29.829326629638672,
+      29.921667098999023,
+      29.986351013183594,
+      30.04094886779785,
+      30.085248947143555,
+      30.13116455078125,
+      30.18633270263672,
+      30.249168395996094,
+      30.334821701049805
+    ],
+    [
+      34.80226135253906,
+      34.88060760498047,
+      34.94364547729492,
+      34.99809265136719,
+      35.040802001953125,
+      35.08573913574219,
+      35.139015197753906,
+      35.19879150390625,
+      35.27511978149414
+    ]
+  ],
+  "quantile_levels": [
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9
+  ],
+  "quantile_list_length": 7,
+  "mean_list_length": 7,
+  "quantile_shapes": [
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ],
+    [
+      1,
+      1,
+      9
+    ]
+  ],
+  "mean_shapes": [
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ]
+  ],
+  "finite": true,
+  "properties": {
+    "library": "chronos",
+    "package": "chronos-forecasting",
+    "pipeline_class": "Chronos2Pipeline",
+    "model_class": "Chronos2Model",
+    "backend": "torch",
+    "context_length": 512,
+    "maximum_context_length": 512,
+    "prediction_length": 1,
+    "batch_size": 7,
+    "cross_learning": false,
+    "seed": 42,
+    "input_devices": [
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu"
+    ],
+    "model_device": "cuda:0",
+    "parameter_dtype": "torch.float32",
+    "license": "Apache-2.0",
+    "license_commercial_use": true,
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "weight_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c/model.safetensors",
+    "weight_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+    "config_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c/config.json",
+    "config_sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031"
+  },
+  "gpu_evidence": {
+    "requested_device": "cuda",
+    "execution_device": "cuda:0",
+    "model_device": "cuda:0",
+    "input_devices": [
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu",
+      "cpu"
+    ],
+    "cuda_available": true,
+    "gpu_requested": true,
+    "gpu_used": true,
+    "gpu_certification": "OBSERVED",
+    "resource_certification": "GPU_PASS",
+    "cpu_fallback": false,
+    "cpu_preprocessing": true,
+    "cpu_preprocessing_reason": "Chronos 2 input preprocessing operates on CPU before CUDA inference",
+    "fallback_reason": null,
+    "peak_vram_bytes": 497113088,
+    "gpu_pid": 919682
+  },
+  "artifact_reference": {
+    "repo_id": "amazon/chronos-2",
+    "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-2/snapshots/29ec3766d36d6f73f0696f85560a422f50e8498c"
+  }
+}

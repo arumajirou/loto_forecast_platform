@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "total_models": 21,
-  "runtime_certified_models": 7,
+  "runtime_certified_models": 8,
   "results": [
     {
       "model_id": "chronos-2",
@@ -16,8 +16,101 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 477930472,
-      "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
+      "runtime_revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "runtime_device": "cuda:0",
+      "runtime_input_devices": [
+        "cpu",
+        "cpu",
+        "cpu",
+        "cpu",
+        "cpu",
+        "cpu",
+        "cpu"
+      ],
+      "runtime_cpu_preprocessing": true,
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 497113088,
+      "runtime_gpu_pid": 919682,
+      "runtime_prediction_shape": [
+        7
+      ],
+      "runtime_quantile_shapes": [
+        [
+          1,
+          1,
+          9
+        ],
+        [
+          1,
+          1,
+          9
+        ],
+        [
+          1,
+          1,
+          9
+        ],
+        [
+          1,
+          1,
+          9
+        ],
+        [
+          1,
+          1,
+          9
+        ],
+        [
+          1,
+          1,
+          9
+        ],
+        [
+          1,
+          1,
+          9
+        ]
+      ],
+      "runtime_mean_shapes": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "runtime_context_length": 512,
+      "runtime_prediction_length": 1,
+      "runtime_batch_size": 7,
+      "runtime_cross_learning": false,
+      "runtime_weight_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+      "runtime_config_sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+      "runtime_license_review": "APPROVED"
     },
     {
       "model_id": "chronos-bolt-tiny",

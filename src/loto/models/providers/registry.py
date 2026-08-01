@@ -31,6 +31,7 @@ FOUNDATION_PROVIDERS: dict[str, type[FoundationProvider]] = {
     "chronos": ChronosProvider,
     "chronos-bolt-tiny": ChronosProvider,
     "chronos-t5-small": ChronosProvider,
+    "chronos-2": ChronosProvider,
     "chronos-2-small": ChronosProvider,
     "sundial": SundialProvider,
     "timesfm": TimesFMProvider,
