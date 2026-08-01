@@ -30,7 +30,14 @@ uv run --no-sync python scripts/build_all_model_argument_audit.py \
 # argument verification and resource evidence collection.
 set +e
 
-uv run --no-sync python scripts/all_model_runtime_validation.py \
+RUNTIME_ENV=()
+if [[ "$DEVICE" == "cpu" ]]; then
+  RUNTIME_ENV=(env CUDA_VISIBLE_DEVICES="")
+elif [[ "$DEVICE" == "cuda" ]]; then
+  RUNTIME_ENV=(env CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}")
+fi
+
+"${RUNTIME_ENV[@]}" uv run --no-sync python scripts/all_model_runtime_validation.py \
   --catalog-source "$CATALOG_SOURCE" \
   --models "$MODELS" \
   "${AVAILABLE_FLAG[@]}" \
