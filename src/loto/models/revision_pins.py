@@ -8,12 +8,13 @@ objects.
 
 from __future__ import annotations
 
+import json
+import re
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import replace
 from datetime import UTC, datetime
-import json
 from pathlib import Path
-import re
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any
 
 from loto.models.catalog_full import ModelEntry
 
