@@ -855,13 +855,14 @@
     "device_class": "GPU_REQUIRED",
     "framework": "neuralforecast",
     "model_family": "hierarchical",
-    "current_resolved_device": "cpu (hardcoded)",
-    "gpu_support_rationale": "catalog.py tags 'gpu'; underlying AutoHINT/NBEATS architecture is the same GPU-capable PyTorch Lightning stack used by every other neuralforecast_auto model.",
+    "current_resolved_device": "runtime-selected from self.device",
+    "gpu_support_rationale": "workers._autohint resolves the DLinear base-model accelerator from self.device and torch.cuda.is_available(); strict GPU lifecycle audit verified Lightning GPU execution, positive VRAM peak, and matching nvidia-smi PID evidence.",
     "cpu_only_rationale": "n/a",
-    "blocking_reason": "workers._autohint hardcodes base_model_config['accelerator']='cpu' and never reads self.device at all, unlike _neuralforecast/_neuralforecast_auto. A pre-existing in-code AUDIT comment (dated 2026-07-31, referencing 'Phase 11') already flags this exact gap as deliberately deferred, not accidental. Confirmed by direct code read (lines 488-569 of workers.py).",
-    "required_fix": "Wire self.device into _autohint's base_model_config the same way _neuralforecast_auto does (accelerator = 'gpu' if self.device in {'auto','cuda'} and torch.cuda.is_available() else 'cpu'), then re-run a 1-fold GPU probe before treating it as formally eligible.",
-    "formal_eligibility": false,
-    "allow_cpu_fallback": false
+    "blocking_reason": null,
+    "required_fix": null,
+    "formal_eligibility": true,
+    "allow_cpu_fallback": false,
+    "gpu_support_status": "verified"
   },
   "autogluon-timeseries": {
     "device_class": "CPU_ONLY",

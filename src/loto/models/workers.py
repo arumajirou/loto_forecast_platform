@@ -564,12 +564,21 @@ class PositionSeriesWorker:
     def _autohint(self, history: pd.DataFrame) -> WorkerOutput:
         if len(self._columns(history)) != 7:
             raise ValueError("AutoHINT currently requires exactly 7 coherent position series")
+        import torch
         from neuralforecast import NeuralForecast
         from neuralforecast.losses.pytorch import DistributionLoss
         from neuralforecast.models import HINT, DLinear
 
         frame, hierarchy = autohint_hierarchy_frame(history)
         loss = DistributionLoss(distribution="Normal", level=[80], num_samples=20)
+        accelerator = (
+            "gpu"
+            if (
+                self.device in {"auto", "cuda"}
+                and torch.cuda.is_available()
+            )
+            else "cpu"
+        )
         base_model_config = {
             "h": 1,
             "input_size": min(16, max(8, len(history) // 3)),
@@ -579,10 +588,7 @@ class PositionSeriesWorker:
             "batch_size": int(self.params.get("batch_size", 8)),
             "learning_rate": float(self.params.get("learning_rate", 0.001)),
             "random_seed": self.seed,
-            # AUDIT (Phase 11, 2026-07-31): hardcoded, unlike _neuralforecast/_neuralforecast_auto
-            # which branch on self.device. Not yet reconciled with --device cuda/auto requests --
-            # left as-is pending a deliberate decision (see audit trail), not silently changed here.
-            "accelerator": "cpu",
+            "accelerator": accelerator,
             "devices": 1,
             "enable_progress_bar": False,
             "logger": False,
