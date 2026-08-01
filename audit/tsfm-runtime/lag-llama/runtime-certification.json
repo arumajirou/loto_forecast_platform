@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "model_id": "lag-llama",
+  "repo_id": "time-series-foundation-models/Lag-Llama",
+  "revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+  "certification_status": "BLOCKED",
+  "runtime_vram_certified": false,
+  "blocked_at": "2026-08-01T09:55:52.117798+00:00",
+  "blocked_reason": "PARTIAL_SNAPSHOT",
+  "blocked_detail": "Pinned snapshot directory exists, but no model checkpoint or weight file is present.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with the Lag-Llama checkpoint file present.",
+  "limitations": [
+    "Pinned snapshot contains only README.md and is missing the runtime checkpoint.",
+    "No CUDA inference was executed.",
+    "No weight SHA-256 was certified.",
+    "Forecast accuracy was not evaluated."
+  ]
+}

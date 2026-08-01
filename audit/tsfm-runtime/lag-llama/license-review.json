@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "model_id": "lag-llama",
+  "repo_id": "time-series-foundation-models/Lag-Llama",
+  "revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+  "license": "apache-2.0",
+  "review_status": "APPROVED",
+  "commercial_use": true,
+  "attribution_required": true,
+  "redistribution_allowed": true,
+  "modification_allowed": true,
+  "patent_grant": true,
+  "notice_required_on_distribution": true,
+  "limitations": [
+    "Runtime certification remains blocked because the snapshot is incomplete."
+  ],
+  "review_notes": [
+    "Pinned snapshot README metadata declares license: apache-2.0.",
+    "Apache-2.0 permits commercial use, modification, and redistribution with notice/license obligations.",
+    "Review covers only the pinned model card metadata available in the local snapshot."
+  ]
+}

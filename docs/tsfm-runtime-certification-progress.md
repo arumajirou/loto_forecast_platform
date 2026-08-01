@@ -6,12 +6,12 @@ Updated: 2026-08-01
 
 - Total models: 21
 - Runtime certified: 8
-- Blocked: 3
-- Pending: 10
+- Blocked: 4
+- Pending: 9
 - Formal certification progress: 38.1%
-- Judged progress: 52.4%
-- Current branch: feat/kronos-base-runtime-audit-v1
-- Next model: lag-llama
+- Judged progress: 57.1%
+- Current branch: feat/lag-llama-runtime-audit-v1
+- Next model: moirai-1.0-base
 
 ## Certified
 
@@ -38,16 +38,15 @@ Updated: 2026-08-01
 
 ## Remaining Ledger Order
 
-1. lag-llama
-2. moirai-1.0-base
-3. moirai-2.0-small
-4. moment-1-large
-5. moment-1-small
-6. sundial-base
-7. t0-alpha
-8. timesfm-2.5-transformers
-9. toto-2.0-4m
-10. toto-open-base
+1. moirai-1.0-base
+2. moirai-2.0-small
+3. moment-1-large
+4. moment-1-small
+5. sundial-base
+6. t0-alpha
+7. timesfm-2.5-transformers
+8. toto-2.0-4m
+9. toto-open-base
 
 ## Blocked
 
@@ -89,8 +88,8 @@ Updated: 2026-08-01
 ### kronos-base
 
 - Branch: feat/kronos-base-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: 0e13c2f
+- Push: origin/feat/kronos-base-runtime-audit-v1
 - repo_id: NeoQuasar/Kronos-base
 - revision: 2b554741eca47781b64468546e77fef3e85130e6
 - status: BLOCKED
@@ -104,3 +103,22 @@ Updated: 2026-08-01
 - dedicated test: tests/test_kronos_base_runtime_audit.py
 - hash verification: audit/tsfm-runtime/kronos-base/sha256sum.txt OK
 - resume condition: install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present, then rerun CUDA runtime certification with external PID sampling.
+
+### lag-llama
+
+- Branch: feat/lag-llama-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: time-series-foundation-models/Lag-Llama
+- revision: 72dcfc29da106acfe38250a60f4ae29d1e56a3d9
+- status: BLOCKED
+- blocked reason: PARTIAL_SNAPSHOT
+- checked snapshot: /mnt/e/env/huggingface/hub/models--time-series-foundation-models--Lag-Llama/snapshots/72dcfc29da106acfe38250a60f4ae29d1e56a3d9
+- snapshot finding: snapshot exists and revision matches, but only README.md is present
+- missing files: model checkpoint (*.ckpt or *.safetensors)
+- runtime executed: false
+- CPU fallback: false
+- license: Apache-2.0 from pinned snapshot README metadata, APPROVED
+- dedicated test: tests/test_lag_llama_runtime_audit.py
+- hash verification: audit/tsfm-runtime/lag-llama/sha256sum.txt OK
+- resume condition: install the exact pinned revision into the configured local Hugging Face cache with the Lag-Llama checkpoint file present, then rerun CUDA runtime certification with external PID sampling.

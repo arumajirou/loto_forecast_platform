@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "model_id": "lag-llama",
+  "repo_cache_path": "/mnt/e/env/huggingface/hub/models--time-series-foundation-models--Lag-Llama",
+  "repo_cache_exists": true,
+  "snapshots": [
+    "72dcfc29da106acfe38250a60f4ae29d1e56a3d9"
+  ],
+  "refs": {}
+}

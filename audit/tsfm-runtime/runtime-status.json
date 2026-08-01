@@ -388,7 +388,22 @@
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 39294567,
       "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_status": "BLOCKED",
+      "runtime_revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+      "runtime_blocked_reason": "PARTIAL_SNAPSHOT",
+      "runtime_blocked_detail": "Pinned snapshot directory exists, but no model checkpoint or weight file is present.",
+      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--time-series-foundation-models--Lag-Llama/snapshots/72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+      "runtime_missing_files": [
+        "model checkpoint (*.ckpt or *.safetensors)"
+      ],
+      "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with the Lag-Llama checkpoint file present.",
+      "runtime_resume_conditions": [
+        "Materialize the complete time-series-foundation-models/Lag-Llama snapshot at revision 72dcfc29da106acfe38250a60f4ae29d1e56a3d9.",
+        "Verify the checkpoint SHA-256 value from the pinned snapshot.",
+        "Confirm the Lag-Llama runtime package/environment and official estimator API.",
+        "Run CUDA inference with local_files_only=true and external nvidia-smi PID sampling."
+      ],
+      "runtime_license_review": "APPROVED"
     },
     {
       "model_id": "moirai-1.0-base",
@@ -601,6 +616,6 @@
     }
   ],
   "certified_models": 8,
-  "blocked_models": 3,
-  "pending_models": 10
+  "blocked_models": 4,
+  "pending_models": 9
 }
