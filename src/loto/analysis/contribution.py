@@ -7,7 +7,13 @@ import numpy as np
 import pandas as pd
 
 LOWER_IS_BETTER = {"position_mae", "position_mse", "brier", "log_loss", "mae", "mse"}
-HIGHER_IS_BETTER = {"element_within_1", "row_within_1", "mean_hits_at_7", "brier_skill_score", "accuracy"}
+HIGHER_IS_BETTER = {
+    "element_within_1",
+    "row_within_1",
+    "mean_hits_at_7",
+    "brier_skill_score",
+    "accuracy",
+}
 
 
 @dataclass(frozen=True)
@@ -60,7 +66,9 @@ def adjust_pvalues(pvalues: list[float], method: str) -> list[float]:
     return adjusted.tolist()
 
 
-def cluster_bootstrap(values_by_fold: pd.Series, *, iterations: int = 5000, seed: int = 42) -> tuple[float, float, float]:
+def cluster_bootstrap(
+    values_by_fold: pd.Series, *, iterations: int = 5000, seed: int = 42
+) -> tuple[float, float, float]:
     values = values_by_fold.to_numpy(dtype=float)
     values = values[np.isfinite(values)]
     if values.size == 0:
@@ -84,8 +92,9 @@ def paired_summary(
     candidate = frame[frame["condition"].eq(comparison.comparison_condition)]
     if reference.empty or candidate.empty:
         raise ValueError(f"missing comparison rows for {comparison.name}")
-    merge_keys = keys + (["feature_group"] if "feature_group" in candidate.columns else [])
-    paired = candidate.merge(reference, on=keys, suffixes=("_comparison", "_reference"), validate="many_to_one")
+    paired = candidate.merge(
+        reference, on=keys, suffixes=("_comparison", "_reference"), validate="many_to_one"
+    )
     records: list[dict[str, object]] = []
     actual_groups = [column for column in group_columns if column in paired.columns]
     for group_key, group in paired.groupby(actual_groups, dropna=False, sort=True):
@@ -117,7 +126,9 @@ def paired_summary(
             positive_fold_rate=float((fold_mean > 0).mean()),
             all_seeds_positive=bool((seed_mean > 0).all()),
             front_half_contribution=float(ordered[:midpoint].mean()),
-            back_half_contribution=float(ordered[midpoint:].mean()) if len(ordered[midpoint:]) else float(ordered[:midpoint].mean()),
+            back_half_contribution=float(ordered[midpoint:].mean())
+            if len(ordered[midpoint:])
+            else float(ordered[:midpoint].mean()),
             pvalue=paired_pvalue(fold_mean.to_numpy(float)),
         )
         records.append(record)

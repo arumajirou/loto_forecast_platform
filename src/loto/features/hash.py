@@ -9,7 +9,9 @@ import pandas as pd
 
 
 def stable_hash(payload: Any) -> str:
-    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str, separators=(",", ":"))
+    encoded = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, default=str, separators=(",", ":")
+    )
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
@@ -20,5 +22,9 @@ def frame_hash(frame: pd.DataFrame) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def protocol_hash(*, feature_manifest: Mapping[str, Any], cutoff: Any, transforms: Iterable[Any]) -> str:
-    return stable_hash({"feature_manifest": feature_manifest, "cutoff": cutoff, "transforms": list(transforms)})
+def protocol_hash(
+    *, feature_manifest: Mapping[str, Any], cutoff: Any, transforms: Iterable[Any]
+) -> str:
+    return stable_hash(
+        {"feature_manifest": feature_manifest, "cutoff": cutoff, "transforms": list(transforms)}
+    )

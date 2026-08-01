@@ -6,7 +6,11 @@ import pytest
 from loto.features.point_in_time import point_in_time_join
 from loto.features.registry import FeatureRegistry
 from loto.features.spec import Availability, FeatureSpec
-from loto.models.exogenous_adapters import mlforecast_predict_kwargs, neuralforecast_payload, timesfm_covariates
+from loto.models.exogenous_adapters import (
+    mlforecast_predict_kwargs,
+    neuralforecast_payload,
+    timesfm_covariates,
+)
 from loto.models.forecast_input import ForecastInput
 
 
@@ -39,8 +43,12 @@ def registry_with_target() -> FeatureRegistry:
 
 def test_point_in_time_join_never_uses_future() -> None:
     observations = pd.DataFrame({"id": [1, 1], "at": ["2026-01-02", "2026-01-04"]})
-    features = pd.DataFrame({"id": [1, 1], "known_at": ["2026-01-01", "2026-01-03"], "value": [10, 20]})
-    joined = point_in_time_join(observations, features, entity_keys=("id",), observation_time="at", feature_time="known_at")
+    features = pd.DataFrame(
+        {"id": [1, 1], "known_at": ["2026-01-01", "2026-01-03"], "value": [10, 20]}
+    )
+    joined = point_in_time_join(
+        observations, features, entity_keys=("id",), observation_time="at", feature_time="known_at"
+    )
     assert joined["value"].tolist() == [10, 20]
 
 

@@ -22,5 +22,11 @@ def build_drift_summary(reference: pd.DataFrame, current: pd.DataFrame) -> Drift
     report = Report([DataDriftPreset()])
     result = report.run(reference_data=reference, current_data=current)
     payload = result.dict()
-    drifted = tuple(sorted(str(item.get("column_name")) for item in payload.get("metrics", []) if item.get("value", {}).get("drift_detected") is True))
+    drifted = tuple(
+        sorted(
+            str(item.get("column_name"))
+            for item in payload.get("metrics", [])
+            if item.get("value", {}).get("drift_detected") is True
+        )
+    )
     return DriftSummary(len(reference), len(current), drifted, True)

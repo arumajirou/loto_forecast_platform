@@ -33,10 +33,16 @@ class FeatureRegistry:
         unknown = sorted(set(frame.columns) - set(self._items))
         if unknown and not allow_unknown:
             raise ValueError(f"unregistered feature columns: {unknown}")
-        missing = sorted(item.name for item in self._items.values() if item.required and item.name not in frame)
+        missing = sorted(
+            item.name for item in self._items.values() if item.required and item.name not in frame
+        )
         if missing:
             raise ValueError(f"missing required feature columns: {missing}")
-        forbidden = sorted(item.name for item in self._items.values() if item.availability == Availability.FORBIDDEN and item.name in frame)
+        forbidden = sorted(
+            item.name
+            for item in self._items.values()
+            if item.availability == Availability.FORBIDDEN and item.name in frame
+        )
         if forbidden:
             raise ValueError(f"forbidden feature columns present: {forbidden}")
 
