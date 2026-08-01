@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "model_id": "timesfm-2.5-transformers",
+  "runtime_executed": false,
+  "dependency_status": "NOT_EVALUATED",
+  "reason": "Runtime dependency probing requires an accessible complete pinned snapshot first."
+}
