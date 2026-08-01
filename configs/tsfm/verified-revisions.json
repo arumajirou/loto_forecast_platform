@@ -116,9 +116,9 @@
     },
     {
       "model_id": "tabpfn-ts",
-      "repo_id": "Prior-Labs/TabPFN-v2-clf",
-      "revision": "f851f2a3c941544733b712d8c0f96dfae9b28862",
-      "source": "https://huggingface.co/Prior-Labs/TabPFN-v2-clf/commit/f851f2a3c941544733b712d8c0f96dfae9b28862",
+      "repo_id": "Prior-Labs/TabPFN-v2-reg",
+      "revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
+      "source": "https://huggingface.co/Prior-Labs/TabPFN-v2-reg/commit/4972a65a1b30806315c6f92499959ffbfc69a673",
       "verified_at": "2026-08-01T07:18:10.829948+00:00"
     },
     {
