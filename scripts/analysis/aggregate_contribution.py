@@ -6,7 +6,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 LOWER_IS_BETTER = {
     "position_mae",
     "position_mse",
@@ -69,11 +68,7 @@ def aggregate_contributions(frame: pd.DataFrame) -> pd.DataFrame:
     if duplicate_full.any():
         raise ValueError("full_exogenous rows are not unique by model_id/fold/seed")
 
-    metrics = [
-        column
-        for column in frame.columns
-        if column in LOWER_IS_BETTER | HIGHER_IS_BETTER
-    ]
+    metrics = [column for column in frame.columns if column in LOWER_IS_BETTER | HIGHER_IS_BETTER]
     if not metrics:
         raise ValueError("no supported metric columns")
 
@@ -129,9 +124,7 @@ def aggregate_contributions(frame: pd.DataFrame) -> pd.DataFrame:
                         "absolute_contribution": float(np.mean(absolute)),
                         "relative_contribution_pct": relative_pct,
                         "relative_contribution_defined_rows": relative_rows,
-                        "zero_baseline_rows": int(
-                            np.sum(np.abs(ablated_values) <= 1e-12)
-                        ),
+                        "zero_baseline_rows": int(np.sum(np.abs(ablated_values) <= 1e-12)),
                         "ci95_low": ci_low,
                         "ci95_median": ci_median,
                         "ci95_high": ci_high,

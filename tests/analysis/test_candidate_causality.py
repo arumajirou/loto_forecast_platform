@@ -6,7 +6,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 MODULE = Path(__file__).parents[2] / "scripts/analysis/audit_candidate_feature_causality.py"
 SPEC = importlib.util.spec_from_file_location("audit_candidate_feature_causality", MODULE)
 assert SPEC and SPEC.loader
@@ -32,9 +31,7 @@ def _synthetic_frame(draws: int = 120, candidates: int = 37) -> pd.DataFrame:
             for window in mod.WINDOWS:
                 start = max(0, draw_index - window)
                 prior = history[start:draw_index, candidate_index]
-                row[f"freq_w{window}"] = (
-                    float(prior.mean()) if len(prior) else 0.0
-                )
+                row[f"freq_w{window}"] = float(prior.mean()) if len(prior) else 0.0
             rows.append(row)
     return pd.DataFrame(rows)
 

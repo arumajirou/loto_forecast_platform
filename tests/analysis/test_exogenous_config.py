@@ -20,8 +20,5 @@ def test_exogenous_config_has_forbidden_target_columns():
     assert {f"n{i}" for i in range(1, 8)} <= forbidden
     assert "num_sum" in forbidden
 
-    patterns = [
-        re.compile(pattern)
-        for pattern in draw["forbidden_current_draw_patterns"]
-    ]
+    patterns = [re.compile(pattern) for pattern in draw["forbidden_current_draw_patterns"]]
     assert any(pattern.fullmatch("hit_01") for pattern in patterns)

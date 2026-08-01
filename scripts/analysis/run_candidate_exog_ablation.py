@@ -11,7 +11,6 @@ import pandas as pd
 from loto.models.catalog import get_model_spec
 from loto.models.factory import RuntimeModel
 
-
 IDENTITY_FEATURES = [
     "candidate_scaled",
     "candidate_is_even",
@@ -71,9 +70,7 @@ def evaluate(
         "position_mse": float(np.mean(errors**2)),
         "element_within_1": float(np.mean(errors <= 1)),
         "row_within_1": float(np.all(errors <= 1)),
-        "mean_hits_at_7": float(
-            len(set(actual.tolist()) & set(predicted.tolist()))
-        ),
+        "mean_hits_at_7": float(len(set(actual.tolist()) & set(predicted.tolist()))),
         "brier": float(np.mean((probabilities - labels) ** 2)),
     }
 
@@ -101,27 +98,20 @@ def run_condition(
 
     model = _build_runtime_model(model_id, seed)
 
-    if not hasattr(model, "fit_candidate") or not hasattr(
-        model, "predict_candidate"
-    ):
-        raise RuntimeError(
-            "RuntimeModel does not expose fit_candidate/predict_candidate."
-        )
+    if not hasattr(model, "fit_candidate") or not hasattr(model, "predict_candidate"):
+        raise RuntimeError("RuntimeModel does not expose fit_candidate/predict_candidate.")
 
     model.fit_candidate(train_data, target_column="selected")
     result = model.predict_candidate(query_data)
 
     probabilities = getattr(result, "candidate_probabilities", None)
     if probabilities is None:
-        raise RuntimeError(
-            f"{model_id} did not return candidate probabilities"
-        )
+        raise RuntimeError(f"{model_id} did not return candidate probabilities")
 
     probabilities = np.asarray(probabilities, dtype=float)
     if probabilities.shape != (len(query),):
         raise RuntimeError(
-            f"{model_id}: expected {len(query)} probabilities, "
-            f"got {probabilities.shape}"
+            f"{model_id}: expected {len(query)} probabilities, got {probabilities.shape}"
         )
     if not np.isfinite(probabilities).all():
         raise RuntimeError(f"{model_id}: non-finite probabilities")
@@ -137,10 +127,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--input",
-        default=(
-            "runs/data-acquisition-loto7/features/"
-            "candidate_features_v2.parquet"
-        ),
+        default=("runs/data-acquisition-loto7/features/candidate_features_v2.parquet"),
     )
     parser.add_argument("--folds", type=int, default=30)
     parser.add_argument("--seed", type=int, default=42)
@@ -149,16 +136,11 @@ def main() -> None:
     args = parser.parse_args()
 
     timestamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
-    output_dir = Path(
-        args.output_dir
-        or f"runs/exogenous-ablation-candidate-{timestamp}"
-    )
+    output_dir = Path(args.output_dir or f"runs/exogenous-ablation-candidate-{timestamp}")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     input_path = Path(args.input)
-    frame = pd.read_parquet(input_path).sort_values(
-        ["draw_no", "candidate_number"]
-    )
+    frame = pd.read_parquet(input_path).sort_values(["draw_no", "candidate_number"])
 
     all_features = [
         *IDENTITY_FEATURES,
@@ -190,11 +172,7 @@ def main() -> None:
             (
                 "drop_group",
                 group_name,
-                [
-                    column
-                    for column in all_features
-                    if column not in group_columns
-                ],
+                [column for column in all_features if column not in group_columns],
             )
         )
 
@@ -205,9 +183,7 @@ def main() -> None:
         query = frame[frame["draw_no"] == test_draw].copy()
 
         if len(query) != 37:
-            raise RuntimeError(
-                f"draw {test_draw}: expected 37 rows, got {len(query)}"
-            )
+            raise RuntimeError(f"draw {test_draw}: expected 37 rows, got {len(query)}")
 
         actual = query.loc[
             query["selected"].eq(1),
@@ -215,10 +191,7 @@ def main() -> None:
         ].to_numpy(dtype=int)
 
         if len(actual) != 7:
-            raise RuntimeError(
-                f"draw {test_draw}: expected 7 selected numbers, "
-                f"got {len(actual)}"
-            )
+            raise RuntimeError(f"draw {test_draw}: expected 7 selected numbers, got {len(actual)}")
 
         for model_id in args.models:
             for condition, feature_group, feature_columns in conditions:
@@ -256,10 +229,7 @@ def main() -> None:
                     }
                 )
 
-        print(
-            f"fold={fold_index:03}/{len(test_draws):03} "
-            f"draw={test_draw} PASS"
-        )
+        print(f"fold={fold_index:03}/{len(test_draws):03} draw={test_draw} PASS")
 
     result = pd.DataFrame(records)
     csv_path = output_dir / "ablation_results.csv"

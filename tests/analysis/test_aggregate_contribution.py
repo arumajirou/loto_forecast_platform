@@ -6,7 +6,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 MODULE = Path(__file__).parents[2] / "scripts/analysis/aggregate_contribution.py"
 SPEC = importlib.util.spec_from_file_location("aggregate_contribution", MODULE)
 assert SPEC and SPEC.loader

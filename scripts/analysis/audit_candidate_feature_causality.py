@@ -7,7 +7,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 WINDOWS = (5, 10, 20, 30, 50, 100)
 
 
@@ -30,19 +29,11 @@ def compare_column(
     expected_count = expected_count[finite]
     expected_rate = expected_rate[finite]
 
-    count_match_rate = float(
-        np.isclose(actual, expected_count, atol=1e-10).mean()
-    )
-    rate_match_rate = float(
-        np.isclose(actual, expected_rate, atol=1e-10).mean()
-    )
+    count_match_rate = float(np.isclose(actual, expected_count, atol=1e-10).mean())
+    rate_match_rate = float(np.isclose(actual, expected_rate, atol=1e-10).mean())
 
     return {
-        "best_convention": (
-            "prior_count"
-            if count_match_rate >= rate_match_rate
-            else "prior_rate"
-        ),
+        "best_convention": ("prior_count" if count_match_rate >= rate_match_rate else "prior_rate"),
         "count_match_rate": count_match_rate,
         "rate_match_rate": rate_match_rate,
         "count_mae": float(np.mean(np.abs(actual - expected_count))),
@@ -78,10 +69,7 @@ def audit_frame(frame: pd.DataFrame) -> dict[str, object]:
 
     for window in WINDOWS:
         prior_count = (
-            selected_matrix.shift(1)
-            .rolling(window=window, min_periods=1)
-            .sum()
-            .fillna(0.0)
+            selected_matrix.shift(1).rolling(window=window, min_periods=1).sum().fillna(0.0)
         )
 
         prior_observation_count = np.minimum(
@@ -134,10 +122,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--input",
-        default=(
-            "runs/data-acquisition-loto7/features/"
-            "candidate_features_v2.parquet"
-        ),
+        default=("runs/data-acquisition-loto7/features/candidate_features_v2.parquet"),
     )
     parser.add_argument(
         "--output",
@@ -169,9 +154,7 @@ def main() -> None:
     print(f"OUTPUT={output_path.resolve()}")
 
     if not report["causality_pass"]:
-        raise SystemExit(
-            "Candidate frequency features failed the strict causality audit."
-        )
+        raise SystemExit("Candidate frequency features failed the strict causality audit.")
 
 
 if __name__ == "__main__":
