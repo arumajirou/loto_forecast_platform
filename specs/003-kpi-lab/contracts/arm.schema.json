@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loto.local/schemas/003/arm.schema.json",
+  "title": "ArmResult",
+  "description": "A ticket pool with coverage measured on sealed draws and under the uniform law.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["arm_id", "game", "construction", "n_tickets", "tolerance", "sealed_coverage", "monte_carlo_coverage", "schema_version"],
+  "properties": {
+    "arm_id": {"type": "string", "enum": ["A_reference", "B_model"]},
+    "game": {"type": "string"},
+    "construction": {"type": "string"},
+    "n_tickets": {"type": "integer", "minimum": 0},
+    "tolerance": {"type": "integer", "minimum": 0},
+    "tickets": {"type": "array", "items": {"type": "array", "items": {"type": "integer"}}},
+    "tickets_omitted": {"type": "boolean"},
+    "sealed_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+    "sealed_ci": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2},
+    "n_sealed_draws": {"type": "integer", "minimum": 0},
+    "monte_carlo_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+    "monte_carlo_ci": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2},
+    "n_monte_carlo": {"type": "integer", "minimum": 0},
+    "calibration_coverage": {"type": ["number", "null"]},
+    "overfit_gap": {"type": ["number", "null"], "description": "calibration minus sealed; large positive indicates fitting to the build window"},
+    "uniformity_gap": {"type": "number", "description": "sealed minus Monte-Carlo; positive beyond sampling error indicates exploited structure or a leak"},
+    "parameters": {"type": "object"},
+    "schema_version": {"type": "string"}
+  }
+}

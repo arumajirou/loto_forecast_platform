@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loto.local/schemas/003/feasibility-bound.schema.json",
+  "title": "FeasibilityBound",
+  "description": "Model-independent packing bound on the ticket count required for a coverage target.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["game", "outcome_space", "tolerance", "target_coverage", "max_neighbourhood", "lower_bound_tickets", "method", "schema_version"],
+  "properties": {
+    "game": {"type": "string"},
+    "family": {"type": "string", "enum": ["select", "digits"]},
+    "positions": {"type": "integer", "minimum": 1},
+    "universe_size": {"type": "integer", "minimum": 1},
+    "outcome_space": {"type": "integer", "minimum": 1},
+    "tolerance": {"type": "integer", "minimum": 0},
+    "target_coverage": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+    "max_neighbourhood": {"type": "integer", "minimum": 1},
+    "max_neighbourhood_ticket": {"type": "array", "items": {"type": "integer"}},
+    "naive_product_neighbourhood": {"type": "integer", "minimum": 1},
+    "mean_neighbourhood": {"type": "number", "minimum": 0},
+    "lower_bound_tickets": {"type": "integer", "minimum": 0},
+    "method": {"type": "string"},
+    "unit_price_jpy": {"type": ["integer", "null"]},
+    "lower_bound_cost_jpy": {"type": ["integer", "null"]},
+    "notes": {"type": "array", "items": {"type": "string"}},
+    "schema_version": {"type": "string"}
+  }
+}
