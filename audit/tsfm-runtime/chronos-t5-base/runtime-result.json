@@ -1,55 +1,48 @@
 {
   "schema_version": 1,
-  "status": "BLOCKED",
+  "status": "PASS",
   "model_id": "chronos-t5-base",
   "repo_id": "amazon/chronos-t5-base",
   "revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
-  "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T09:47:02.231582+00:00",
-  "blocked_reason": {
-    "code": "MODEL_WEIGHTS_MISSING",
-    "message": "Fixed local Hugging Face snapshot for the ledger revision is missing; runtime certification requires local_files_only and cannot fetch implicitly.",
-    "missing_snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
-    "checked_paths": [
-      "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
-      "/home/az/.cache/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2"
-    ],
-    "resume_conditions": [
-      "Place the pinned amazon/chronos-t5-base snapshot at the recorded revision in the local Hugging Face cache.",
-      "Verify model.safetensors, config.json, and generation_config.json SHA-256 values from the local snapshot.",
-      "Run the Chronos T5 base CUDA runtime probe with local_files_only=true and external nvidia-smi PID sampling."
-    ]
-  },
-  "provider_response": {
-    "schema_version": 1,
-    "provider_version": 1,
-    "status": "MODEL_WEIGHTS_MISSING",
-    "model_id": "chronos-t5-base",
-    "repo_id": "amazon/chronos-t5-base",
-    "revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
-    "message": "Fixed local Hugging Face snapshot for the ledger revision is missing; runtime certification requires local_files_only and cannot fetch implicitly.",
-    "blocker": {
-      "code": "MODEL_WEIGHTS_MISSING",
-      "message": "Fixed local Hugging Face snapshot for the ledger revision is missing; runtime certification requires local_files_only and cannot fetch implicitly.",
-      "missing_snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
-      "checked_paths": [
-        "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
-        "/home/az/.cache/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2"
-      ],
-      "resume_conditions": [
-        "Place the pinned amazon/chronos-t5-base snapshot at the recorded revision in the local Hugging Face cache.",
-        "Verify model.safetensors, config.json, and generation_config.json SHA-256 values from the local snapshot.",
-        "Run the Chronos T5 base CUDA runtime probe with local_files_only=true and external nvidia-smi PID sampling."
-      ]
-    }
-  },
-  "gpu_used": false,
-  "cpu_fallback": false,
-  "cpu_preprocessing": null,
-  "finite": null,
-  "artifact_reference": {
-    "repo_id": "amazon/chronos-t5-base",
-    "revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2"
-  }
+  "runtime_recorded_at": "2026-08-01T11:38:00.103794+00:00",
+  "runtime_pid": 402016,
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
+  "context_length": 64,
+  "prediction_length": 1,
+  "input_series_count": 7,
+  "prediction_values": [
+    13.268487930297852,
+    16.028932571411133,
+    8.480382919311523,
+    7.638036251068115,
+    9.612812995910645,
+    28.651391983032227,
+    36.03661346435547
+  ],
+  "prediction_shape": [
+    7
+  ],
+  "quantile_shape": [
+    7,
+    1,
+    9
+  ],
+  "mean_shape": [
+    7,
+    1
+  ],
+  "output_finite": true,
+  "parameter_device": "cuda:0",
+  "input_device": "cpu",
+  "tokenizer_device": "cpu",
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "runtime_cpu_preprocessing": true,
+  "peak_vram_bytes": 1606348800,
+  "weight_sha256": "44a2eef44aa13d9048a625ea289beb1ea5d709d7b2044f72134c974132644bf2",
+  "config_sha256": "20a32a40aa31ec99387b5b68f272ec49cbcfec61cfefafbd32ed81dfe474c243",
+  "generation_config_sha256": "8f6833851ce53496a43ef87a975c766f7a3049e2d598ecef609a526ca6308534",
+  "pipeline_class": "ChronosPipeline",
+  "model_class": "ChronosModel",
+  "package": "chronos-forecasting"
 }

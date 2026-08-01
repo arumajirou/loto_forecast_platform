@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "captured": true,
+  "model_id": "moirai-2.0-small",
+  "runtime_pid": 693777,
+  "capture_count": 13,
+  "min_gpu_memory_mib": 328.0,
+  "max_gpu_memory_mib": 372.0,
+  "samples": [
+    {
+      "timestamp": "2026/08/01 21:38:49.377",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 328.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:49.477",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 328.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:49.578",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 372.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:49.678",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 372.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:49.778",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 372.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:49.879",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 372.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:49.979",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 372.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:50.079",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 372.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:50.179",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 372.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:50.280",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 372.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:50.380",
+      "pid": 693777,
+      "process_name": ".venv-uni2ts/bin/python",
+      "used_memory_mib": 372.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:50.481",
+      "pid": 693777,
+      "process_name": "[No data]",
+      "used_memory_mib": 372.0
+    },
+    {
+      "timestamp": "2026/08/01 21:38:50.581",
+      "pid": 693777,
+      "process_name": "[No data]",
+      "used_memory_mib": 372.0
+    }
+  ]
+}

@@ -3,18 +3,7 @@
   "model_id": "timesfm-2.5-transformers",
   "repo_id": "google/timesfm-2.5-200m-transformers",
   "revision": "5a9806b9b291fad9233b5249d88263f1846304d3",
-  "license": "apache-2.0",
-  "review_status": "BLOCKED",
-  "commercial_use": false,
-  "attribution_required": false,
-  "redistribution_allowed": false,
-  "modification_allowed": false,
-  "patent_grant": false,
-  "notice_required_on_distribution": false,
-  "limitations": [
-    "Repo cache exists, but the fixed revision snapshot directory is absent."
-  ],
-  "review_notes": [
-    "Apache-2.0 from ledger; pinned local model card/license files are unavailable."
-  ]
+  "license": "Apache-2.0",
+  "commercial_use": true,
+  "review_status": "APPROVED"
 }

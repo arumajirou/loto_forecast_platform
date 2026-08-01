@@ -3,19 +3,7 @@
   "model_id": "moment-1-large",
   "repo_id": "AutonLab/MOMENT-1-large",
   "revision": "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
-  "license": "mit",
-  "review_status": "APPROVED",
+  "license": "MIT",
   "commercial_use": true,
-  "attribution_required": true,
-  "redistribution_allowed": true,
-  "modification_allowed": true,
-  "patent_grant": false,
-  "notice_required_on_distribution": true,
-  "limitations": [
-    "Runtime certification remains blocked because the snapshot is incomplete."
-  ],
-  "review_notes": [
-    "Pinned snapshot README metadata declares license: mit.",
-    "MIT permits commercial use, modification, and redistribution with copyright/license notice preservation."
-  ]
+  "review_status": "APPROVED"
 }

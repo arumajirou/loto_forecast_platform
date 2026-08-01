@@ -1,59 +1,133 @@
 {
   "schema_version": 1,
-  "status": "BLOCKED",
+  "status": "PASS",
   "model_id": "kronos-base",
   "repo_id": "NeoQuasar/Kronos-base",
   "revision": "2b554741eca47781b64468546e77fef3e85130e6",
-  "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T09:53:16.593464+00:00",
-  "blocked_reason": "PARTIAL_SNAPSHOT",
-  "blocked_detail": "Pinned snapshot directory exists, but required runtime files are missing.",
-  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
-  "snapshot_probe": {
-    "schema_version": 1,
-    "model_id": "kronos-base",
-    "repo_id": "NeoQuasar/Kronos-base",
-    "revision": "2b554741eca47781b64468546e77fef3e85130e6",
-    "checked_at": "2026-08-01T09:53:16.593464+00:00",
-    "hf_home_candidates": [
-      "/mnt/e/env/huggingface",
-      "/mnt/e/env/huggingface/hub",
-      "/home/az/.cache/huggingface/hub"
-    ],
-    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base",
-    "repo_cache_exists": true,
+  "tokenizer_repo_id": "NeoQuasar/Kronos-Tokenizer-base",
+  "tokenizer_revision": "0e0117387f39004a9016484a186a908917e22426",
+  "kronos_code_revision": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+  "runtime_recorded_at": "2026-08-01T12:19:01.230874+00:00",
+  "runtime_pid": 598858,
+  "prediction_shape": [
+    4,
+    6
+  ],
+  "prediction_columns": [
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "amount"
+  ],
+  "prediction_records": [
+    {
+      "timestamp": "2026-01-06 08:00:00",
+      "open": 107.26304626464844,
+      "high": 109.74463653564453,
+      "low": 107.15031433105469,
+      "close": 107.14485931396484,
+      "volume": 1403.7366943359375,
+      "amount": 157979.0625
+    },
+    {
+      "timestamp": "2026-01-06 09:00:00",
+      "open": 107.73763275146484,
+      "high": 108.5657958984375,
+      "low": 107.26870727539062,
+      "close": 108.11542510986328,
+      "volume": 1421.428955078125,
+      "amount": 158098.46875
+    },
+    {
+      "timestamp": "2026-01-06 10:00:00",
+      "open": 108.04729461669922,
+      "high": 108.35556030273438,
+      "low": 107.03328704833984,
+      "close": 107.4465560913086,
+      "volume": 1355.3350830078125,
+      "amount": 148117.25
+    },
+    {
+      "timestamp": "2026-01-06 11:00:00",
+      "open": 107.43083953857422,
+      "high": 108.1736068725586,
+      "low": 106.9709243774414,
+      "close": 107.63134002685547,
+      "volume": 1406.576171875,
+      "amount": 154611.046875
+    }
+  ],
+  "output_finite": true,
+  "model_class": "Kronos",
+  "tokenizer_class": "KronosTokenizer",
+  "predictor_class": "KronosPredictor",
+  "model_parameter_count": 102310592,
+  "tokenizer_parameter_count": 3958042,
+  "lookback": 128,
+  "prediction_length": 4,
+  "max_context": 512,
+  "native_domain": "financial_ohlcv_kline",
+  "runtime_certification_scope": "FULL_INFERENCE",
+  "tokenizer_executed": true,
+  "autoregressive_forecast_executed": true,
+  "native_domain_contract_used": true,
+  "lottery_domain_compatibility_certified": false,
+  "forecast_accuracy_certified": false,
+  "model_device": "cuda:0",
+  "tokenizer_device": "cuda:0",
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "peak_vram_bytes": 473748992,
+  "license": "MIT",
+  "commercial_use": true,
+  "model_artifact": {
     "snapshot_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6",
-    "snapshot_exists": true,
-    "snapshot_revision_matches": true,
-    "required_files": [
-      "config.json",
-      "model.safetensors"
-    ],
-    "missing_files": [
-      "config.json",
-      "model.safetensors"
-    ],
-    "existing_files": [
-      {
-        "name": "README.md",
+    "revision": "2b554741eca47781b64468546e77fef3e85130e6",
+    "files": {
+      "README.md": {
         "path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6/README.md",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/1a2dbfe2fa6b9c73a609c3917a55040aa9d52ef2",
         "resolved_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/blobs/1a2dbfe2fa6b9c73a609c3917a55040aa9d52ef2",
         "size_bytes": 8841,
         "sha256": "73fccc29fd1cda62e7e2b0467c0d2b6f5b551b46a4f4cac0c7bca51c0a0b4697"
+      },
+      "config.json": {
+        "path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6/config.json",
+        "resolved_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/blobs/b38b53ec92facc89fc178f641a951cbe9730ecc7",
+        "size_bytes": 228,
+        "sha256": "77ebc3038b647709b92be002f801d72e1a385f4c8c2c5aa1cc6cf21fcfe44eb2"
+      },
+      "model.safetensors": {
+        "path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6/model.safetensors",
+        "resolved_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/blobs/abff193acab6db1a0368e9773e75799d11403b6d054ee6d5f0a11aeabc5f4b83",
+        "size_bytes": 409264008,
+        "sha256": "abff193acab6db1a0368e9773e75799d11403b6d054ee6d5f0a11aeabc5f4b83"
       }
-    ],
-    "result": "PARTIAL_SNAPSHOT"
+    }
   },
-  "gpu_used": false,
-  "cpu_fallback": false,
-  "cpu_preprocessing": null,
-  "peak_vram_bytes": null,
-  "finite": null,
-  "artifact_reference": {
-    "repo_id": "NeoQuasar/Kronos-base",
-    "revision": "2b554741eca47781b64468546e77fef3e85130e6",
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6"
+  "tokenizer_artifact": {
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-Tokenizer-base/snapshots/0e0117387f39004a9016484a186a908917e22426",
+    "revision": "0e0117387f39004a9016484a186a908917e22426",
+    "files": {
+      "README.md": {
+        "path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-Tokenizer-base/snapshots/0e0117387f39004a9016484a186a908917e22426/README.md",
+        "resolved_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-Tokenizer-base/blobs/a1a20fa45ed35de0f6b4f94d434337cc6bd3f8b1",
+        "size_bytes": 8863,
+        "sha256": "24d59758e911d355a79608b6686610a14f649270d6d852f3d86b2a1e8232ce89"
+      },
+      "config.json": {
+        "path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-Tokenizer-base/snapshots/0e0117387f39004a9016484a186a908917e22426/config.json",
+        "resolved_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-Tokenizer-base/blobs/050b676e14720956dc6ff93a755e65dee5536807",
+        "size_bytes": 301,
+        "sha256": "2366e7ccfec76cbc19cf3c4c1b9c5d901be336ca1e83f2d2292c9bff381b77a2"
+      },
+      "model.safetensors": {
+        "path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-Tokenizer-base/snapshots/0e0117387f39004a9016484a186a908917e22426/model.safetensors",
+        "resolved_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-Tokenizer-base/blobs/59d85f6af76a2c3b8240ea06cb21db4213b4eeca053f246b23e29cf832fc6bee",
+        "size_bytes": 15842368,
+        "sha256": "59d85f6af76a2c3b8240ea06cb21db4213b4eeca053f246b23e29cf832fc6bee"
+      }
+    }
   }
 }

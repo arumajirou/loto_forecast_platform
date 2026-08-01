@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "captured": true,
+  "model_id": "moment-1-large",
+  "runtime_pid": 450256,
+  "capture_count": 13,
+  "min_gpu_memory_mib": 222.0,
+  "max_gpu_memory_mib": 1746.0,
+  "samples": [
+    {
+      "timestamp": "2026/08/01 20:46:26.302",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:26.503",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:26.703",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:26.903",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:27.104",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:27.304",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:27.504",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:27.705",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:27.906",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 570.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:28.107",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 1664.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:28.307",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 1746.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:28.508",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 1746.0
+    },
+    {
+      "timestamp": "2026/08/01 20:46:28.708",
+      "pid": 450256,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 1746.0
+    }
+  ]
+}

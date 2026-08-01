@@ -1,56 +1,56 @@
 {
   "schema_version": 1,
-  "status": "BLOCKED",
+  "status": "PASS",
   "model_id": "moment-1-large",
   "repo_id": "AutonLab/MOMENT-1-large",
   "revision": "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
-  "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T10:04:25.283385+00:00",
-  "blocked_reason": "PARTIAL_SNAPSHOT",
-  "blocked_detail": "Pinned snapshot directory exists, but required runtime files are missing.",
-  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model weight files present.",
-  "snapshot_probe": {
-    "schema_version": 1,
-    "model_id": "moment-1-large",
-    "repo_id": "AutonLab/MOMENT-1-large",
-    "revision": "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
-    "checked_at": "2026-08-01T10:04:25.283385+00:00",
-    "hf_home_candidates": [
-      "/mnt/e/env/huggingface",
-      "/mnt/e/env/huggingface/hub",
-      "/home/az/.cache/huggingface/hub"
-    ],
-    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large",
-    "repo_cache_exists": true,
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
-    "snapshot_exists": true,
-    "snapshot_revision_matches": true,
-    "existing_files": [
-      {
-        "name": "README.md",
-        "path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc/README.md",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/bc7f2b3a0c16d64cd64900187a726acac7690197",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/blobs/bc7f2b3a0c16d64cd64900187a726acac7690197",
-        "size_bytes": 6306,
-        "sha256": "3b00cbfdecd6b64c96558eb3bd39049405aee6497c7e4788da4bc78db17611de"
-      }
-    ],
-    "weight_candidates": [],
-    "missing_files": [
-      "config.json",
-      "model weight file (*.safetensors, *.bin, *.ckpt, *.pt, or *.pth)"
-    ],
-    "result": "PARTIAL_SNAPSHOT"
-  },
-  "gpu_used": false,
-  "cpu_fallback": false,
-  "cpu_preprocessing": null,
-  "peak_vram_bytes": null,
-  "finite": null,
-  "artifact_reference": {
-    "repo_id": "AutonLab/MOMENT-1-large",
-    "revision": "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc"
-  }
+  "runtime_recorded_at": "2026-08-01T11:47:15.953644+00:00",
+  "runtime_pid": 450256,
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
+  "input_series_count": 7,
+  "context_length": 512,
+  "prediction_length": 1,
+  "prediction_values": [
+    10.762974739074707,
+    14.594239234924316,
+    16.632692337036133,
+    19.80169677734375,
+    20.80169677734375,
+    24.281490325927734,
+    26.154542922973633
+  ],
+  "prediction_shape": [
+    7,
+    1,
+    1
+  ],
+  "output_finite": true,
+  "parameter_device": "cuda:0",
+  "input_device": "cuda:0",
+  "output_device": "cuda:0",
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "peak_vram_bytes": 1525199360,
+  "pipeline_class": "MOMENTPipeline",
+  "output_class": "TimeseriesOutputs",
+  "task_name": "forecasting",
+  "runtime_certification_scope": "EXECUTION_ONLY",
+  "forecast_head_status": "FINE_TUNING_REQUIRED",
+  "forecast_head_pretrained": false,
+  "forecast_accuracy_certified": false,
+  "config_sha256": "b0111650e8718e31d7e89575666aa3e140747d35279ec1a7c9f6ed7616c29433",
+  "weights": [
+    {
+      "name": "model.safetensors",
+      "path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc/model.safetensors",
+      "sha256": "a56928052ac6f5d09b97c3834bea6ce3aef9f02b513b5fac98954e7377801572",
+      "size_bytes": 1385501256
+    },
+    {
+      "name": "pytorch_model.bin",
+      "path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc/pytorch_model.bin",
+      "sha256": "52f5ee65c80790c7f6dab8736243368e193fcc04d2d642d9f69c89dd644bd199",
+      "size_bytes": 1385575757
+    }
+  ]
 }

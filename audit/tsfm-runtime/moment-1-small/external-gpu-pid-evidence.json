@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "captured": true,
+  "model_id": "moment-1-small",
+  "runtime_pid": 426259,
+  "capture_count": 4,
+  "min_gpu_memory_mib": 222.0,
+  "max_gpu_memory_mib": 498.0,
+  "samples": [
+    {
+      "timestamp": "2026/08/01 20:41:37.983",
+      "pid": 426259,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 20:41:38.183",
+      "pid": 426259,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 490.0
+    },
+    {
+      "timestamp": "2026/08/01 20:41:38.383",
+      "pid": 426259,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 498.0
+    },
+    {
+      "timestamp": "2026/08/01 20:41:38.584",
+      "pid": 426259,
+      "process_name": ".runtime-envs/moment/bin/python",
+      "used_memory_mib": 498.0
+    }
+  ]
+}

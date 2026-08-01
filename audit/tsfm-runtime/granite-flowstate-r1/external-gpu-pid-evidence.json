@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "captured": true,
+  "model_id": "granite-flowstate-r1",
+  "runtime_pid": 548753,
+  "capture_count": 9,
+  "min_gpu_memory_mib": 222.0,
+  "max_gpu_memory_mib": 1180.0,
+  "samples": [
+    {
+      "timestamp": "2026/08/01 21:06:51.037",
+      "pid": 548753,
+      "process_name": ".runtime-envs/flowstate/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 21:06:51.238",
+      "pid": 548753,
+      "process_name": ".runtime-envs/flowstate/bin/python",
+      "used_memory_mib": 232.0
+    },
+    {
+      "timestamp": "2026/08/01 21:06:51.438",
+      "pid": 548753,
+      "process_name": ".runtime-envs/flowstate/bin/python",
+      "used_memory_mib": 1178.0
+    },
+    {
+      "timestamp": "2026/08/01 21:06:51.639",
+      "pid": 548753,
+      "process_name": ".runtime-envs/flowstate/bin/python",
+      "used_memory_mib": 1180.0
+    },
+    {
+      "timestamp": "2026/08/01 21:06:51.839",
+      "pid": 548753,
+      "process_name": ".runtime-envs/flowstate/bin/python",
+      "used_memory_mib": 1180.0
+    },
+    {
+      "timestamp": "2026/08/01 21:06:52.039",
+      "pid": 548753,
+      "process_name": ".runtime-envs/flowstate/bin/python",
+      "used_memory_mib": 1180.0
+    },
+    {
+      "timestamp": "2026/08/01 21:06:52.241",
+      "pid": 548753,
+      "process_name": ".runtime-envs/flowstate/bin/python",
+      "used_memory_mib": 1180.0
+    },
+    {
+      "timestamp": "2026/08/01 21:06:52.442",
+      "pid": 548753,
+      "process_name": ".runtime-envs/flowstate/bin/python",
+      "used_memory_mib": 1172.0
+    },
+    {
+      "timestamp": "2026/08/01 21:06:52.642",
+      "pid": 548753,
+      "process_name": "[No data]",
+      "used_memory_mib": 1172.0
+    }
+  ]
+}

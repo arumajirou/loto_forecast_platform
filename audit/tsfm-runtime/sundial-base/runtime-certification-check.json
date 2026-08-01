@@ -1,0 +1,18 @@
+{
+  "model_id": "sundial-base",
+  "checks": {
+    "runtime_pass": true,
+    "seven_series": true,
+    "prediction_length_one": true,
+    "output_shape": true,
+    "finite_output": true,
+    "cuda_model": true,
+    "cuda_input": true,
+    "cuda_output": true,
+    "no_cpu_fallback": true,
+    "positive_peak_vram": true,
+    "external_pid_capture": true,
+    "same_runtime_pid": true
+  },
+  "all_pass": true
+}
