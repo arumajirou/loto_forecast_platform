@@ -50,30 +50,57 @@ def main() -> int:
     comparisons = [
         (
             "condition_contribution_summary.csv",
-            Comparison("drop_group", "full_exogenous", "drop_group"),
+            (
+                Comparison(
+                    "drop_group",
+                    "full_exogenous",
+                    "drop_group",
+                ),
+            ),
         ),
-        ("add_one_group_summary.csv", Comparison("add_group", "full_exogenous", "add_group")),
+        (
+            "add_one_group_summary.csv",
+            (
+                Comparison(
+                    "add_frequency",
+                    "identity_only",
+                    "add_frequency",
+                ),
+                Comparison(
+                    "add_gap",
+                    "identity_only",
+                    "add_gap",
+                ),
+            ),
+        ),
         (
             "permutation_contribution_summary.csv",
-            Comparison("permutation", "full_exogenous", "group_permutation"),
+            (
+                Comparison(
+                    "permutation",
+                    "full_exogenous",
+                    "group_permutation",
+                ),
+            ),
         ),
     ]
     written: list[str] = []
     stable_frames: list[pd.DataFrame] = []
-    for filename, comparison in comparisons:
+    for filename, comparison_group in comparisons:
         outputs = []
-        for metric in metric_columns:
-            try:
-                outputs.append(
-                    paired_summary(
-                        frame,
-                        comparison=comparison,
-                        metric=metric,
-                        bootstrap_iterations=args.bootstrap_iterations,
+        for comparison in comparison_group:
+            for metric in metric_columns:
+                try:
+                    outputs.append(
+                        paired_summary(
+                            frame,
+                            comparison=comparison,
+                            metric=metric,
+                            bootstrap_iterations=args.bootstrap_iterations,
+                        )
                     )
-                )
-            except ValueError:
-                continue
+                except ValueError:
+                    continue
         result = pd.concat(outputs, ignore_index=True) if outputs else pd.DataFrame()
         result.to_csv(args.output_dir / filename, index=False)
         written.append(filename)
