@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TSFM revision pins",
+  "type": "object",
+  "required": ["schema_version", "pins"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "generated_at": {"type": "string"},
+    "pins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["model_id", "repo_id", "revision"],
+        "properties": {
+          "model_id": {"type": "string", "minLength": 1},
+          "repo_id": {"type": "string", "minLength": 1},
+          "revision": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+          "source": {"type": "string"},
+          "verified_at": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

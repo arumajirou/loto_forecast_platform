@@ -18,6 +18,13 @@ import pandas as pd
 from loto.evaluation.theory_general import bounds_table, theoretical_bounds
 from loto.game.geometry import geometry_for, known_games
 from loto.models.catalog_full import build_catalog, catalog_counts
+from loto.models.revision_pins import (
+    RevisionPinError,
+    apply_manifest,
+    revision_report,
+    template_manifest,
+    validate_manifest,
+)
 from loto.verify.integrity import generate_manifest, verify_manifest
 
 __all__ = ["main", "build_parser"]
@@ -57,6 +64,42 @@ def _cmd_catalog(args: argparse.Namespace) -> int:
         return 0
     _emit(rows)
     return 0
+
+
+def _cmd_revisions(args: argparse.Namespace) -> int:
+    entries = build_catalog()
+    try:
+        if args.action == "template":
+            payload = template_manifest(entries)
+            if args.output:
+                Path(args.output).write_text(
+                    json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+                )
+                _emit({"status": "WRITTEN", "path": args.output, "pins": len(payload["pins"])})
+            else:
+                _emit(payload)
+            return 0
+        if not args.manifest:
+            raise RevisionPinError("--manifest is required for validate, report and apply")
+        validate_manifest(args.manifest, entries, require_complete=args.require_complete)
+        applied = apply_manifest(entries, args.manifest, require_complete=args.require_complete)
+        if args.action == "validate":
+            _emit({"status": "VALID", **revision_report(applied)})
+            return 0
+        if args.action == "report":
+            _emit(revision_report(applied))
+            return 0
+        rows = [entry.to_row() for entry in applied]
+        if not args.output:
+            raise RevisionPinError("--output is required for apply")
+        Path(args.output).write_text(
+            json.dumps(rows, indent=2, ensure_ascii=False, default=str) + "\n", encoding="utf-8"
+        )
+        _emit({"status": "WRITTEN", "path": args.output, **revision_report(applied)})
+        return 0
+    except RevisionPinError as exc:
+        _emit({"status": "INVALID", "error": str(exc)})
+        return 2
 
 
 def _cmd_integrity(args: argparse.Namespace) -> int:
@@ -184,6 +227,13 @@ def build_parser() -> argparse.ArgumentParser:
     catalog.add_argument("--unpinned", action="store_true", help="only UNPINNED revisions")
     catalog.add_argument("--csv", default=None, help="write the catalog to this CSV path")
     catalog.set_defaults(func=_cmd_catalog)
+
+    revisions = sub.add_parser("revisions", help="validate and apply explicit TSFM commit pins")
+    revisions.add_argument("action", choices=["template", "validate", "report", "apply"])
+    revisions.add_argument("--manifest", default=None)
+    revisions.add_argument("--output", default=None)
+    revisions.add_argument("--require-complete", action="store_true")
+    revisions.set_defaults(func=_cmd_revisions)
 
     integrity = sub.add_parser("integrity", help="generate or verify INTEGRITY.json")
     integrity.add_argument("action", choices=["generate", "check"])
