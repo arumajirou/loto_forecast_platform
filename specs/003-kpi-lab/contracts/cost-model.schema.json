@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loto.local/schemas/003/cost-model.schema.json",
+  "title": "CostEstimate",
+  "description": "Ticket spend and exact-match expectation. expected_return_jpy is never derived from a coverage figure, because coverage at tolerance >= 1 is not a prize condition in any of these games.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["game", "n_tickets", "unit_price_jpy", "total_cost_jpy", "exact_match_probability", "price_provenance", "payout_provenance"],
+  "properties": {
+    "game": {"type": "string"},
+    "n_tickets": {"type": "integer", "minimum": 0},
+    "unit_price_jpy": {"type": "integer", "minimum": 0},
+    "total_cost_jpy": {"type": "integer", "minimum": 0},
+    "exact_match_probability": {"type": "number", "minimum": 0, "maximum": 1, "description": "n_tickets / outcome_space. This, not coverage, is the win probability."},
+    "expected_return_jpy": {"type": ["number", "null"], "description": "Null unless a payout table is configured. Must never be computed from coverage."},
+    "net_expected_jpy": {"type": ["number", "null"]},
+    "price_provenance": {"type": "string", "minLength": 1},
+    "payout_provenance": {"type": "string", "minLength": 1},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

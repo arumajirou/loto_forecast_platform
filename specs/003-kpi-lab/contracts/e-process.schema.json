@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loto.local/schemas/003/e-process.schema.json",
+  "title": "EProcessState",
+  "description": "Serialised betting supermartingale. Restoring this state must reproduce the identical continuation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["log_wealth", "n_observations", "alpha", "bet_rule", "schema_version"],
+  "properties": {
+    "log_wealth": {"type": "number"},
+    "n_observations": {"type": "integer", "minimum": 0},
+    "n_positive": {"type": "integer", "minimum": 0},
+    "n_negative": {"type": "integer", "minimum": 0},
+    "n_ties": {"type": "integer", "minimum": 0},
+    "lambda_next": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.5, "description": "Predictable: computed from strictly past observations."},
+    "alpha": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+    "bet_rule": {"type": "string", "enum": ["fixed", "predictable_plugin"]},
+    "max_log_wealth": {"type": "number"},
+    "crossed_at": {"type": ["integer", "null"]},
+    "e_value": {"type": "number", "minimum": 0},
+    "max_e_value": {"type": "number", "minimum": 0},
+    "threshold": {"type": "number"},
+    "schema_version": {"type": "string"}
+  }
+}

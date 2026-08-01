@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loto.local/schemas/003/ledger-entry.schema.json",
+  "title": "LedgerEntry",
+  "description": "One hash-chained record. previous_hash links to the prior entry_hash so deletion or edit is detectable.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["sequence", "recorded_at", "event", "session_id", "payload", "previous_hash", "entry_hash", "schema_version"],
+  "properties": {
+    "sequence": {"type": "integer", "minimum": 1},
+    "recorded_at": {"type": "string"},
+    "event": {"type": "string", "enum": ["state_transition", "proposal_batch", "proposer_fallback", "experiment", "report_written"]},
+    "session_id": {"type": "string"},
+    "payload": {"type": "object"},
+    "previous_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "entry_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "schema_version": {"type": "string"}
+  }
+}

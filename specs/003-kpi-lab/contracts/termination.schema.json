@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loto.local/schemas/003/termination.schema.json",
+  "title": "LabReport",
+  "description": "Terminal verdict. Four of the five successful terminal states are negative results.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["session_id", "terminal_state", "reason", "kpi", "feasibility", "ledger_integrity", "schema_version"],
+  "properties": {
+    "session_id": {"type": "string"},
+    "terminal_state": {
+      "type": "string",
+      "enum": ["KPI_INFEASIBLE", "KPI_MET_DEGENERATE", "KPI_MET_NO_MODEL_VALUE", "KPI_MET_VERIFIED", "BUDGET_EXHAUSTED", "LEAK_DETECTED_SUSPENDED", "PROTOCOL_VIOLATION"]
+    },
+    "reason": {"type": "string", "minLength": 1},
+    "claims_model_skill": {"type": "boolean", "description": "True only for KPI_MET_VERIFIED."},
+    "successful_terminal": {"type": "boolean"},
+    "n_experiments": {"type": "integer", "minimum": 0},
+    "states_visited": {"type": "array", "items": {"type": "string"}},
+    "ledger_path": {"type": "string"},
+    "ledger_integrity": {
+      "type": "object",
+      "required": ["valid", "n_entries"],
+      "properties": {
+        "valid": {"type": "boolean"},
+        "n_entries": {"type": "integer", "minimum": 0},
+        "first_broken_sequence": {"type": ["integer", "null"]},
+        "detail": {"type": "string"}
+      }
+    },
+    "started_at": {"type": "string"},
+    "finished_at": {"type": "string"},
+    "schema_version": {"type": "string"}
+  }
+}
