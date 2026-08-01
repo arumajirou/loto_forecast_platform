@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "total_models": 21,
-  "runtime_certified_models": 1,
+  "runtime_certified_models": 2,
   "results": [
     {
       "model_id": "chronos-2",
@@ -130,8 +130,26 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 2472368,
-      "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
+      "runtime_revision": "7fe295d8bc8fbac8041b60ab351882634165517f",
+      "runtime_device": "cuda:0",
+      "runtime_gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "runtime_parameter_count": 614496,
+      "runtime_input_shape": [
+        1,
+        512,
+        7
+      ],
+      "runtime_prediction_shape": [
+        1,
+        96,
+        7
+      ],
+      "runtime_load_seconds": 2.975477996002155,
+      "runtime_inference_seconds": 0.14987252600258216,
+      "runtime_peak_allocated_bytes": 38647296,
+      "runtime_peak_reserved_bytes": 39845888
     },
     {
       "model_id": "granite-ttm-r2",

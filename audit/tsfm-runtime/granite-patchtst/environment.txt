@@ -1,0 +1,8 @@
+timestamp=2026-08-01T17:04:23+09:00
+hostname=az
+kernel=7.0.0-28-generic
+branch=feat/patchtst-runtime-audit-v1
+commit=272b0017ca3ec086099acc33bcbe1b1c101e0ab0
+model_id=granite-patchtst
+repo_id=ibm-granite/granite-timeseries-patchtst
+revision=7fe295d8bc8fbac8041b60ab351882634165517f
