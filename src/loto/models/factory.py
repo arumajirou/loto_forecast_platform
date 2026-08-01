@@ -13,16 +13,25 @@ import pandas as pd
 from loto.models.baselines import FrequencyCandidateAdapter, UniformCandidateAdapter
 from loto.models.catalog import ModelSpec, get_model_spec
 
-
 FEATURE_EXCLUDE = {
-    "draw_no", "draw_date", "candidate_number", "target", "next_target", "hit", "y",
-    "unique_id", "ds", "position", "actual",
+    "draw_no",
+    "draw_date",
+    "candidate_number",
+    "target",
+    "next_target",
+    "hit",
+    "y",
+    "unique_id",
+    "ds",
+    "position",
+    "actual",
 }
 
 
 def numeric_feature_columns(frame: pd.DataFrame) -> list[str]:
     return [
-        col for col in frame.columns
+        col
+        for col in frame.columns
         if col not in FEATURE_EXCLUDE and pd.api.types.is_numeric_dtype(frame[col])
     ]
 
@@ -42,7 +51,7 @@ class RuntimeModel:
         self.model: Any = None
         self.feature_columns: list[str] = []
 
-    def fit_candidate(self, train: pd.DataFrame, target_column: str = "selected") -> "RuntimeModel":
+    def fit_candidate(self, train: pd.DataFrame, target_column: str = "selected") -> RuntimeModel:
         if self.spec.model_id == "uniform":
             self.model = UniformCandidateAdapter().fit(train)
             return self
@@ -51,7 +60,11 @@ class RuntimeModel:
             return self
         if target_column not in train:
             raise ValueError(f"target column is missing: {target_column}")
-        self.feature_columns = numeric_feature_columns(train)
+        self.feature_columns = [
+            column for column in numeric_feature_columns(train) if column != target_column
+        ]
+        if target_column in self.feature_columns:
+            raise RuntimeError(f"target column leaked into features: {target_column}")
         if not self.feature_columns:
             raise ValueError("no numeric model features")
         X = train[self.feature_columns].replace([np.inf, -np.inf], np.nan).fillna(0.0)
@@ -60,6 +73,14 @@ class RuntimeModel:
         self.model.fit(X, y)
         return self
 
+    def _prepare_query_features(self, query: pd.DataFrame) -> pd.DataFrame:
+        missing_columns = [column for column in self.feature_columns if column not in query.columns]
+        if missing_columns:
+            missing = ", ".join(sorted(missing_columns))
+            raise ValueError(f"query is missing fitted feature columns: {missing}")
+
+        return query.loc[:, self.feature_columns].replace([np.inf, -np.inf], np.nan).fillna(0.0)
+
     def predict_candidate(self, query: pd.DataFrame) -> PredictionResult:
         if self.spec.model_id in {"uniform", "frequency"}:
             out = self.model.predict(query)
@@ -67,10 +88,14 @@ class RuntimeModel:
                 candidate_probabilities=out["probability"].to_numpy(float),
                 metadata={"rank_score": out["rank_score"].to_numpy(float).tolist()},
             )
-        X = query.reindex(columns=self.feature_columns, fill_value=0.0).replace([np.inf, -np.inf], np.nan).fillna(0.0)
+        X = self._prepare_query_features(query)
         if hasattr(self.model, "predict_proba"):
             probabilities = self.model.predict_proba(X)
-            probability = probabilities[:, 1] if probabilities.ndim == 2 and probabilities.shape[1] > 1 else probabilities.ravel()
+            probability = (
+                probabilities[:, 1]
+                if probabilities.ndim == 2 and probabilities.shape[1] > 1
+                else probabilities.ravel()
+            )
         elif hasattr(self.model, "decision_function"):
             raw = np.asarray(self.model.decision_function(X), dtype=float)
             probability = 1.0 / (1.0 + np.exp(-raw))
@@ -78,7 +103,7 @@ class RuntimeModel:
             probability = np.clip(np.asarray(self.model.predict(X), dtype=float), 0.0, 1.0)
         return PredictionResult(candidate_probabilities=probability, metadata={})
 
-    def fit_position(self, train_x: pd.DataFrame, train_y: np.ndarray) -> "RuntimeModel":
+    def fit_position(self, train_x: pd.DataFrame, train_y: np.ndarray) -> RuntimeModel:
         self.feature_columns = numeric_feature_columns(train_x)
         X = train_x[self.feature_columns].replace([np.inf, -np.inf], np.nan).fillna(0.0)
         self.model = self._construct_estimator(regression=True)
@@ -86,7 +111,7 @@ class RuntimeModel:
         return self
 
     def predict_position(self, query: pd.DataFrame) -> PredictionResult:
-        X = query.reindex(columns=self.feature_columns, fill_value=0.0).replace([np.inf, -np.inf], np.nan).fillna(0.0)
+        X = self._prepare_query_features(query)
         values = np.asarray(self.model.predict(X), dtype=float)
         return PredictionResult(position_values=values, metadata={})
 
@@ -96,21 +121,27 @@ class RuntimeModel:
         if self.spec.library == "sklearn":
             if model_id == "logistic":
                 from sklearn.linear_model import LogisticRegression
+
                 return LogisticRegression(random_state=self.seed, **params)
             if model_id == "ridge-position":
                 from sklearn.linear_model import Ridge
+
                 return Ridge(**params)
             if model_id == "elasticnet-position":
                 from sklearn.linear_model import ElasticNet
+
                 return ElasticNet(random_state=self.seed, **params)
             if model_id == "random-forest":
                 from sklearn.ensemble import RandomForestClassifier
+
                 return RandomForestClassifier(random_state=self.seed, **params)
             if model_id == "extra-trees":
                 from sklearn.ensemble import ExtraTreesClassifier
+
                 return ExtraTreesClassifier(random_state=self.seed, **params)
             if model_id == "hist-gradient-boosting":
                 from sklearn.ensemble import HistGradientBoostingClassifier
+
                 return HistGradientBoostingClassifier(random_state=self.seed, **params)
         if self.spec.library == "lightgbm":
             module = importlib.import_module("lightgbm")
@@ -130,22 +161,35 @@ class RuntimeModel:
             params.setdefault("random_seed", self.seed)
             return cls(**params)
         raise NotImplementedError(
-            f"model {model_id} uses worker adapter {self.spec.library}; invoke through WorkerGateway"
+            f"model {model_id} uses worker adapter "
+            f"{self.spec.library}; invoke through WorkerGateway"
         )
 
     def save(self, path: str | Path) -> Path:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("wb") as stream:
-            pickle.dump({"spec": self.spec.to_dict(), "params": self.params, "seed": self.seed,
-                         "feature_columns": self.feature_columns, "model": self.model}, stream)
+            pickle.dump(
+                {
+                    "spec": self.spec.to_dict(),
+                    "params": self.params,
+                    "seed": self.seed,
+                    "feature_columns": self.feature_columns,
+                    "model": self.model,
+                },
+                stream,
+            )
         return path
 
     @classmethod
-    def load(cls, path: str | Path) -> "RuntimeModel":
+    def load(cls, path: str | Path) -> RuntimeModel:
         with Path(path).open("rb") as stream:
             payload = pickle.load(stream)
-        runtime = cls(get_model_spec(payload["spec"]["model_id"]), payload["params"], seed=int(payload["seed"]))
+        runtime = cls(
+            get_model_spec(payload["spec"]["model_id"]),
+            payload["params"],
+            seed=int(payload["seed"]),
+        )
         runtime.feature_columns = list(payload["feature_columns"])
         runtime.model = payload["model"]
         return runtime
@@ -159,8 +203,17 @@ class WorkerGateway:
     contaminating the orchestrator environment.
     """
 
-    def build_job(self, model_id: str, *, params: dict[str, Any], input_uri: str,
-                  output_uri: str, seed: int, device: str, precision: str) -> dict[str, Any]:
+    def build_job(
+        self,
+        model_id: str,
+        *,
+        params: dict[str, Any],
+        input_uri: str,
+        output_uri: str,
+        seed: int,
+        device: str,
+        precision: str,
+    ) -> dict[str, Any]:
         spec = get_model_spec(model_id)
         return {
             "schema_version": "2.1.0",
