@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "model_id": "moirai-2.0-small",
+  "blocked_reason": "LICENSE_REVIEW_REQUIRED",
+  "blocked_detail": "Pinned model declares cc-by-nc-4.0 non-commercial license; license review cannot be approved for commercial runtime certification.",
+  "retry_condition": "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai model. Runtime probing can resume only after license approval.",
+  "facts": [
+    "Pinned README declares license: cc-by-nc-4.0.",
+    "Ledger category is E with reason non-commercial license.",
+    "Snapshot includes config.json and model.safetensors."
+  ]
+}

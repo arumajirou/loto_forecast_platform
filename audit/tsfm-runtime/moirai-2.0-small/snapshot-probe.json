@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "model_id": "moirai-2.0-small",
+  "repo_id": "Salesforce/moirai-2.0-R-small",
+  "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+  "checked_at": "2026-08-01T10:00:04.381111+00:00",
+  "repo_cache_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small",
+  "repo_cache_exists": true,
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small/snapshots/30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+  "snapshot_exists": true,
+  "snapshot_revision_matches": true,
+  "existing_files": [
+    {
+      "name": "README.md",
+      "path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small/snapshots/30f43ff08c8494f4943ae1521e9d4e94a0fbb389/README.md",
+      "is_symlink": true,
+      "symlink_target": "../../blobs/c8833bb32cb3909694efb546c58f857e54f4603a",
+      "resolved_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small/blobs/c8833bb32cb3909694efb546c58f857e54f4603a",
+      "size_bytes": 3170,
+      "sha256": "f6dbd74f440ef637ba986147717c2ddf38979b3fba3c35ed6768939822aec73a"
+    },
+    {
+      "name": "config.json",
+      "path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small/snapshots/30f43ff08c8494f4943ae1521e9d4e94a0fbb389/config.json",
+      "is_symlink": true,
+      "symlink_target": "../../blobs/e5117c0f34056ab8b5ef57202b9dffa6ad39059a",
+      "resolved_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small/blobs/e5117c0f34056ab8b5ef57202b9dffa6ad39059a",
+      "size_bytes": 291,
+      "sha256": "6b74b03c8ec199fabc352c0203465958142ca468183da68549652734836f853d"
+    },
+    {
+      "name": "model.safetensors",
+      "path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small/snapshots/30f43ff08c8494f4943ae1521e9d4e94a0fbb389/model.safetensors",
+      "is_symlink": true,
+      "symlink_target": "../../blobs/fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669",
+      "resolved_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small/blobs/fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669",
+      "size_bytes": 45557824,
+      "sha256": "fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669"
+    }
+  ],
+  "weight_candidates": [
+    "model.safetensors"
+  ],
+  "missing_files": [],
+  "weight_sha256": "fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669",
+  "config_sha256": "6b74b03c8ec199fabc352c0203465958142ca468183da68549652734836f853d",
+  "result": "LICENSE_REVIEW_REQUIRED"
+}

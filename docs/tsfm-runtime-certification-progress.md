@@ -6,12 +6,12 @@ Updated: 2026-08-01
 
 - Total models: 21
 - Runtime certified: 8
-- Blocked: 5
-- Pending: 8
+- Blocked: 6
+- Pending: 7
 - Formal certification progress: 38.1%
-- Judged progress: 61.9%
-- Current branch: feat/moirai-1-0-base-runtime-audit-v1
-- Next model: moirai-2.0-small
+- Judged progress: 66.7%
+- Current branch: feat/moirai-2-0-small-runtime-audit-v1
+- Next model: moment-1-large
 
 ## Certified
 
@@ -38,14 +38,13 @@ Updated: 2026-08-01
 
 ## Remaining Ledger Order
 
-1. moirai-2.0-small
-2. moment-1-large
-3. moment-1-small
-4. sundial-base
-5. t0-alpha
-6. timesfm-2.5-transformers
-7. toto-2.0-4m
-8. toto-open-base
+1. moment-1-large
+2. moment-1-small
+3. sundial-base
+4. t0-alpha
+5. timesfm-2.5-transformers
+6. toto-2.0-4m
+7. toto-open-base
 
 ## Blocked
 
@@ -125,8 +124,8 @@ Updated: 2026-08-01
 ### moirai-1.0-base
 
 - Branch: feat/moirai-1-0-base-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: e30dfbc
+- Push: origin/feat/moirai-1-0-base-runtime-audit-v1
 - repo_id: Salesforce/moirai-1.0-R-base
 - revision: 4fa939a8800d9da346c0280f3d9aeba0d2d35877
 - status: BLOCKED
@@ -139,3 +138,23 @@ Updated: 2026-08-01
 - dedicated test: tests/test_moirai_1_0_base_runtime_audit.py
 - hash verification: audit/tsfm-runtime/moirai-1.0-base/sha256sum.txt OK
 - resume condition: use only if policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai revision/model. A complete pinned snapshot with weights is also required before runtime probing.
+
+### moirai-2.0-small
+
+- Branch: feat/moirai-2-0-small-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: Salesforce/moirai-2.0-R-small
+- revision: 30f43ff08c8494f4943ae1521e9d4e94a0fbb389
+- status: BLOCKED
+- blocked reason: LICENSE_REVIEW_REQUIRED
+- checked snapshot: /mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small/snapshots/30f43ff08c8494f4943ae1521e9d4e94a0fbb389
+- snapshot finding: snapshot exists with config.json and model.safetensors
+- weight SHA-256: fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669
+- config SHA-256: 6b74b03c8ec199fabc352c0203465958142ca468183da68549652734836f853d
+- license: CC-BY-NC-4.0, REJECTED for commercial runtime certification
+- runtime executed: false
+- CPU fallback: false
+- dedicated test: tests/test_moirai_2_0_small_runtime_audit.py
+- hash verification: audit/tsfm-runtime/moirai-2.0-small/sha256sum.txt OK
+- resume condition: use only if policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai model. Runtime probing can resume only after license approval.

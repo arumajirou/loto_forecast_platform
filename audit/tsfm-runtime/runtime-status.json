@@ -447,7 +447,18 @@
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 45557824,
       "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_status": "BLOCKED",
+      "runtime_revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+      "runtime_blocked_reason": "LICENSE_REVIEW_REQUIRED",
+      "runtime_blocked_detail": "Pinned model declares cc-by-nc-4.0 non-commercial license; license review cannot be approved for commercial runtime certification.",
+      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small/snapshots/30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+      "retry_condition": "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai model. Runtime probing can resume only after license approval.",
+      "runtime_resume_conditions": [
+        "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai model. Runtime probing can resume only after license approval."
+      ],
+      "runtime_license_review": "REJECTED",
+      "runtime_weight_sha256": "fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669",
+      "runtime_config_sha256": "6b74b03c8ec199fabc352c0203465958142ca468183da68549652734836f853d"
     },
     {
       "model_id": "moment-1-large",
@@ -628,6 +639,6 @@
     }
   ],
   "certified_models": 8,
-  "blocked_models": 5,
-  "pending_models": 8
+  "blocked_models": 6,
+  "pending_models": 7
 }
