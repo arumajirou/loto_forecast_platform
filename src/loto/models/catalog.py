@@ -111,6 +111,9 @@ MODEL_SPECS: tuple[ModelSpec, ...] = (
     ModelSpec("nf-auto-softs", "mixer", "neuralforecast_auto", "position_series", "AutoSOFTS", "p1", "neuralforecast", ("gpu", "auto_hpo", "optuna", "ray", "checkpoint"), notes="Official NeuralForecast AutoModel; backend/search resolved at runtime"),
     ModelSpec("nf-auto-timemixer", "mixer", "neuralforecast_auto", "position_series", "AutoTimeMixer", "p1", "neuralforecast", ("gpu", "auto_hpo", "optuna", "ray", "checkpoint"), notes="Official NeuralForecast AutoModel; backend/search resolved at runtime"),
     ModelSpec("nf-auto-rmok", "kan", "neuralforecast_auto", "position_series", "AutoRMoK", "p1", "neuralforecast", ("gpu", "auto_hpo", "optuna", "ray", "checkpoint"), notes="Official NeuralForecast AutoModel; backend/search resolved at runtime"),
+    ModelSpec("nf-auto-softssharp", "mixer", "neuralforecast_auto", "position_series", "AutoSOFTSSharp", "p1", "neuralforecast", ("gpu", "auto_hpo", "optuna", "ray", "checkpoint", "multivariate"), notes="Official NeuralForecast AutoModel; requires n_series and multivariate input"),
+    ModelSpec("nf-auto-xlinear", "linear", "neuralforecast_auto", "position_series", "AutoXLinear", "p1", "neuralforecast", ("gpu", "auto_hpo", "optuna", "ray", "checkpoint", "multivariate"), notes="Official NeuralForecast AutoModel; requires n_series and multivariate input"),
+    ModelSpec("nf-auto-xlstm", "rnn", "neuralforecast_auto", "position_series", "AutoxLSTM", "p1", "neuralforecast", ("gpu", "auto_hpo", "optuna", "ray", "checkpoint"), notes="Official NeuralForecast AutoModel; backend/search resolved at runtime"),
     ModelSpec("autogluon-timeseries", "automl", "autogluon", "position_series", "TimeSeriesPredictor", "p1", "autogluon", ("ensemble", "probabilistic", "zero_shot")),
     ModelSpec("darts-ensemble", "framework", "darts", "position_series", "RegressionEnsembleModel", "p2", "darts", ("ensemble", "probabilistic")),
     ModelSpec(

@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
-  "catalog_count": 135,
-  "neuralforecast_count": 67,
+  "catalog_count": 138,
+  "neuralforecast_count": 70,
   "fixed_row_count": 34,
-  "auto_row_count": 33,
+  "auto_row_count": 36,
   "models": [
     {
       "model_id": "nf-dlinear",
@@ -2121,6 +2121,113 @@
         ],
         "available": true,
         "model_config_hash": "f85919cdf90e27da",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-softssharp",
+      "class_name": "AutoSOFTSSharp",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-softssharp",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mixer",
+        "class_name": "AutoSOFTSSharp",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint",
+          "multivariate"
+        ],
+        "available": true,
+        "model_config_hash": "e0ab8f121a0284a1",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-xlinear",
+      "class_name": "AutoXLinear",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-xlinear",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "linear",
+        "class_name": "AutoXLinear",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint",
+          "multivariate"
+        ],
+        "available": true,
+        "model_config_hash": "a30027b51072ddb6",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-xlstm",
+      "class_name": "AutoxLSTM",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-xlstm",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "rnn",
+        "class_name": "AutoxLSTM",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "edff80c5113b6cf1",
         "resolved_smoke_params": {
           "backend": "optuna",
           "num_samples": 1,

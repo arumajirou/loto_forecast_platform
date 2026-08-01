@@ -58,7 +58,7 @@ auto,AutoPatchTST,neuralforecast.auto,1,nf-auto-patchtst,true,REFERENCED,NOT_YET
 auto,AutoRMoK,neuralforecast.auto,1,nf-auto-rmok,true,REFERENCED,NOT_YET_EVALUATED
 auto,AutoRNN,neuralforecast.auto,1,nf-auto-rnn,true,REFERENCED,NOT_YET_EVALUATED
 auto,AutoSOFTS,neuralforecast.auto,1,nf-auto-softs,true,REFERENCED,NOT_YET_EVALUATED
-auto,AutoSOFTSSharp,neuralforecast.auto,0,,,MISSING,NOT_YET_EVALUATED
+auto,AutoSOFTSSharp,neuralforecast.auto,1,nf-auto-softssharp,true,REFERENCED,NOT_YET_EVALUATED
 auto,AutoStemGNN,neuralforecast.auto,1,nf-auto-stemgnn,true,REFERENCED,NOT_YET_EVALUATED
 auto,AutoTCN,neuralforecast.auto,1,nf-auto-tcn,true,REFERENCED,NOT_YET_EVALUATED
 auto,AutoTFT,neuralforecast.auto,1,nf-auto-tft,true,REFERENCED,NOT_YET_EVALUATED
@@ -69,6 +69,6 @@ auto,AutoTimeMixer,neuralforecast.auto,1,nf-auto-timemixer,true,REFERENCED,NOT_Y
 auto,AutoTimeXer,neuralforecast.auto,1,nf-auto-timexer,true,REFERENCED,NOT_YET_EVALUATED
 auto,AutoTimesNet,neuralforecast.auto,1,nf-auto-timesnet,true,REFERENCED,NOT_YET_EVALUATED
 auto,AutoVanillaTransformer,neuralforecast.auto,1,nf-auto-vanilla-transformer,true,REFERENCED,NOT_YET_EVALUATED
-auto,AutoXLinear,neuralforecast.auto,0,,,MISSING,NOT_YET_EVALUATED
+auto,AutoXLinear,neuralforecast.auto,1,nf-auto-xlinear,true,REFERENCED,NOT_YET_EVALUATED
 auto,AutoiTransformer,neuralforecast.auto,1,nf-auto-itransformer,true,REFERENCED,NOT_YET_EVALUATED
-auto,AutoxLSTM,neuralforecast.auto,0,,,MISSING,NOT_YET_EVALUATED
+auto,AutoxLSTM,neuralforecast.auto,1,nf-auto-xlstm,true,REFERENCED,NOT_YET_EVALUATED

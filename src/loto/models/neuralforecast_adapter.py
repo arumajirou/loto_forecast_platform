@@ -11,8 +11,17 @@ from typing import Any, Literal
 
 SUPPORTED_BACKENDS = {"optuna", "ray"}
 MODELS_REQUIRING_N_SERIES = {
-    "AutoTSMixer", "AutoTSMixerx", "AutoTimeMixer", "AutoRMoK", "AutoSOFTS",
-    "AutoStemGNN", "AutoMLPMultivariate", "AutoiTransformer", "AutoTimeXer",
+    "AutoTSMixer",
+    "AutoTSMixerx",
+    "AutoTimeMixer",
+    "AutoRMoK",
+    "AutoSOFTS",
+    "AutoSOFTSSharp",
+    "AutoXLinear",
+    "AutoStemGNN",
+    "AutoMLPMultivariate",
+    "AutoiTransformer",
+    "AutoTimeXer",
 }
 FFT_MODELS = {"AutoTimesNet", "AutoFEDformer"}
 

@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "stage": "smoke",
-  "generated_at": "2026-07-31T23:15:41.975262+00:00",
-  "code_fingerprint": "88716856f61ce744",
-  "model_count": 84,
+  "generated_at": "2026-08-01T05:48:38.061235+00:00",
+  "code_fingerprint": "aa119f6f321d6a37",
+  "model_count": 87,
   "models": {
     "uniform": {
       "library": "builtin",
@@ -1573,6 +1573,86 @@
       ],
       "available": true,
       "model_config_hash": "f85919cdf90e27da",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-softssharp": {
+      "library": "neuralforecast_auto",
+      "family": "mixer",
+      "class_name": "AutoSOFTSSharp",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint",
+        "multivariate"
+      ],
+      "available": true,
+      "model_config_hash": "e0ab8f121a0284a1",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-xlinear": {
+      "library": "neuralforecast_auto",
+      "family": "linear",
+      "class_name": "AutoXLinear",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint",
+        "multivariate"
+      ],
+      "available": true,
+      "model_config_hash": "a30027b51072ddb6",
+      "resolved_smoke_params": {
+        "backend": "optuna",
+        "num_samples": 1,
+        "max_steps": 2,
+        "parallel_trials": 1,
+        "refit_with_val": false,
+        "search_strategy": "random",
+        "input_size": 8,
+        "batch_size": 8
+      },
+      "resolve_error": null
+    },
+    "nf-auto-xlstm": {
+      "library": "neuralforecast_auto",
+      "family": "rnn",
+      "class_name": "AutoxLSTM",
+      "priority": "p1",
+      "capabilities": [
+        "gpu",
+        "auto_hpo",
+        "optuna",
+        "ray",
+        "checkpoint"
+      ],
+      "available": true,
+      "model_config_hash": "edff80c5113b6cf1",
       "resolved_smoke_params": {
         "backend": "optuna",
         "num_samples": 1,
