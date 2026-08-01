@@ -696,7 +696,13 @@ class PositionSeriesWorker:
                 str(response.get("message", "AutoGluon-TimeSeries provider failed")),
             )
         predictions = np.asarray(response.get("predictions"), dtype=float)
-        expected = len(request.get("position_columns", [])) or len(self._columns(history))
+        expected = len(
+            request.get("position_columns", [])
+        )
+        if expected <= 0:
+            raise WorkerSubprocessError(
+                "provider request has no position columns"
+            )
         if predictions.shape != (expected,) or not np.isfinite(predictions).all():
             raise WorkerSubprocessError(
                 "PREDICTION_MISMATCH",
