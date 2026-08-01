@@ -678,7 +678,19 @@
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 16582848,
       "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_status": "BLOCKED",
+      "runtime_revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+      "runtime_blocked_reason": "RUNTIME_DEPENDENCY_MISSING",
+      "runtime_blocked_detail": "Pinned snapshot is complete, but the required Toto runtime package toto2/toto-models is not installed in the certification environment.",
+      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+      "retry_condition": "Install the Toto runtime package compatible with the pinned checkpoint, then rerun CUDA runtime certification with external PID sampling.",
+      "runtime_resume_conditions": [
+        "Install the Toto runtime package compatible with the pinned checkpoint, then rerun CUDA runtime certification with external PID sampling."
+      ],
+      "runtime_license_review": "APPROVED",
+      "runtime_missing_files": [],
+      "runtime_weight_sha256": "316660d5afb47943e531f39242e0b02ca0b8bb73be5709dfe07ca80dfce9805e",
+      "runtime_config_sha256": "7a926d130e401ab0c5fdb3564f46c8d917bd05c7b3ae26b9c22d2da2ef01d2d8"
     },
     {
       "model_id": "toto-open-base",
@@ -698,6 +710,6 @@
     }
   ],
   "certified_models": 8,
-  "blocked_models": 11,
-  "pending_models": 2
+  "blocked_models": 12,
+  "pending_models": 1
 }

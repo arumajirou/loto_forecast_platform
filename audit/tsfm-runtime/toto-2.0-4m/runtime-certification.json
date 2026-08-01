@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "model_id": "toto-2.0-4m",
+  "repo_id": "Datadog/Toto-2.0-4m",
+  "revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+  "certification_status": "BLOCKED",
+  "runtime_vram_certified": false,
+  "blocked_reason": "RUNTIME_DEPENDENCY_MISSING",
+  "blocked_detail": "Pinned snapshot is complete, but the required Toto runtime package toto2/toto-models is not installed in the certification environment.",
+  "retry_condition": "Install the Toto runtime package compatible with the pinned checkpoint, then rerun CUDA runtime certification with external PID sampling.",
+  "license_review_status": "APPROVED",
+  "gpu_used": false,
+  "cpu_fallback": false
+}

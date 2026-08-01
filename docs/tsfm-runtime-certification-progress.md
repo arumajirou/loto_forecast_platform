@@ -6,12 +6,12 @@ Updated: 2026-08-01
 
 - Total models: 21
 - Runtime certified: 8
-- Blocked: 11
-- Pending: 2
+- Blocked: 12
+- Pending: 1
 - Formal certification progress: 38.1%
-- Judged progress: 90.5%
-- Current branch: feat/timesfm-2-5-transformers-runtime-audit-v1
-- Next model: toto-2.0-4m
+- Judged progress: 95.2%
+- Current branch: feat/toto-2-0-4m-runtime-audit-v1
+- Next model: toto-open-base
 ## Certified
 
 ### chronos-2
@@ -38,7 +38,7 @@ Updated: 2026-08-01
 ## Remaining Ledger Order
 
 1. t0-alpha
-2. toto-2.0-4m
+2. timesfm-2.5-transformers
 3. toto-open-base
 
 ## Blocked
@@ -231,8 +231,8 @@ Updated: 2026-08-01
 ### timesfm-2.5-transformers
 
 - Branch: feat/timesfm-2-5-transformers-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: 7920de4
+- Push: origin/feat/timesfm-2-5-transformers-runtime-audit-v1
 - repo_id: google/timesfm-2.5-200m-transformers
 - revision: 5a9806b9b291fad9233b5249d88263f1846304d3
 - status: BLOCKED
@@ -244,3 +244,20 @@ Updated: 2026-08-01
 - dedicated test: tests/test_timesfm_2_5_transformers_runtime_audit.py
 - hash verification: audit/tsfm-runtime/timesfm-2.5-transformers/sha256sum.txt OK
 - resume condition: Install the exact pinned Transformers revision into the configured local Hugging Face cache with config.json and model.safetensors present.
+
+### toto-2.0-4m
+
+- Branch: feat/toto-2-0-4m-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: Datadog/Toto-2.0-4m
+- revision: 8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9
+- status: BLOCKED
+- blocked reason: RUNTIME_DEPENDENCY_MISSING
+- checked snapshot: /mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9
+- runtime executed: false
+- CPU fallback: false
+- license: Apache-2.0 from pinned snapshot README metadata.
+- dedicated test: tests/test_toto_2_0_4m_runtime_audit.py
+- hash verification: audit/tsfm-runtime/toto-2.0-4m/sha256sum.txt OK
+- resume condition: Install the Toto runtime package compatible with the pinned checkpoint, then rerun CUDA runtime certification with external PID sampling.
