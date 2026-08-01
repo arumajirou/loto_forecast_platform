@@ -3,7 +3,7 @@
 | 項目 | 値 |
 |---|---|
 | Feature | 003-kpi-lab |
-| Status | IMPLEMENTED / NOT_YET_TESTED |
+| Status | IMPLEMENTED / VERIFIED |
 | 前提 | 001-full-coverage、`.specify/memory/constitution.md` |
 | 実装 | `src/loto/combinatorics/`、`src/loto/kpi_lab/` |
 | CLI | `loto-lab` |

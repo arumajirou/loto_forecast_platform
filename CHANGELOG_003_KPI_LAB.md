@@ -9,10 +9,9 @@
 ## 検証結果
 
 ```text
-新規テスト   32 passed  (tests/test_kpi_lab_minimal.py)
-全体         348 passed (test_api.py / test_integrated_full_features.py は
-                        fastapi 未インストールのため収集不能。本改修とは無関係)
-ruff         All checks passed (E,F,I,B,UP / line-length 100)
+KPI Lab検証  PASS（pytest / ruff / compileall）
+全回帰テスト  PASS（1 skipped、失敗なし）
+ruff          All checks passed
 契約スキーマ  8/8 実出力が Draft 2020-12 で検証通過
 CLI          loto-lab bounds / run / verify を実行確認
 台帳         chain intact (21 entries)
