@@ -42,7 +42,9 @@ class FrequencyCandidateAdapter(ModelAdapter):
         for candidate in range(1, 38):
             if candidate in grouped.index:
                 row = grouped.loc[candidate]
-                self._probabilities[candidate - 1] = (float(row["sum"]) + self.alpha * prior) / (float(row["count"]) + self.alpha)
+                self._probabilities[candidate - 1] = (float(row["sum"]) + self.alpha * prior) / (
+                    float(row["count"]) + self.alpha
+                )
         return self
 
     def predict(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -53,31 +55,43 @@ class FrequencyCandidateAdapter(ModelAdapter):
         return out
 
     def save(self, path: str | Path) -> Path:
-        p = Path(path); p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(json.dumps({"alpha": self.alpha, "probabilities": self._probabilities.tolist()}))
+        p = Path(path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(
+            json.dumps({"alpha": self.alpha, "probabilities": self._probabilities.tolist()})
+        )
         return p
 
     def load(self, path: str | Path) -> "FrequencyCandidateAdapter":
         obj = json.loads(Path(path).read_text())
-        self.alpha = float(obj["alpha"]); self._probabilities = np.asarray(obj["probabilities"], dtype=float)
+        self.alpha = float(obj["alpha"])
+        self._probabilities = np.asarray(obj["probabilities"], dtype=float)
         return self
 
 
 class LogisticCandidateAdapter(ModelAdapter):
-    capabilities = ModelCapabilities.PROBABILITY_PREDICTION | ModelCapabilities.RANKING_PREDICTION | ModelCapabilities.EXOGENOUS_FEATURES
+    capabilities = (
+        ModelCapabilities.PROBABILITY_PREDICTION
+        | ModelCapabilities.RANKING_PREDICTION
+        | ModelCapabilities.EXOGENOUS_FEATURES
+    )
 
     def __init__(self, c: float = 0.2, random_state: int = 42):
         self.model_id = f"logistic-c-{c:g}"
         self.c = c
         self.random_state = random_state
-        self.model = LogisticRegression(C=c, class_weight="balanced", max_iter=1000, random_state=random_state)
+        self.model = LogisticRegression(
+            C=c, class_weight="balanced", max_iter=1000, random_state=random_state
+        )
         self.feature_columns: list[str] = []
         self._fitted = False
 
     def fit(self, data: pd.DataFrame) -> "LogisticCandidateAdapter":
         self.validate_request(data)
         excluded = {"draw_id", "draw_no", "draw_date", "selected", "candidate_number"}
-        self.feature_columns = [c for c in data.columns if c not in excluded and pd.api.types.is_numeric_dtype(data[c])]
+        self.feature_columns = [
+            c for c in data.columns if c not in excluded and pd.api.types.is_numeric_dtype(data[c])
+        ]
         if not self.feature_columns or data["selected"].nunique() < 2:
             return self
         self.model.fit(data[self.feature_columns], data["selected"])

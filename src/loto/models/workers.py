@@ -572,12 +572,7 @@ class PositionSeriesWorker:
         frame, hierarchy = autohint_hierarchy_frame(history)
         loss = DistributionLoss(distribution="Normal", level=[80], num_samples=20)
         accelerator = (
-            "gpu"
-            if (
-                self.device in {"auto", "cuda"}
-                and torch.cuda.is_available()
-            )
-            else "cpu"
+            "gpu" if (self.device in {"auto", "cuda"} and torch.cuda.is_available()) else "cpu"
         )
         base_model_config = {
             "h": 1,
@@ -703,9 +698,7 @@ class PositionSeriesWorker:
                 str(response.get("message", "AutoGluon-TimeSeries provider failed")),
             )
         predictions = np.asarray(response.get("predictions"), dtype=float)
-        expected = len(
-            request.get("position_columns", [])
-        )
+        expected = len(request.get("position_columns", []))
         if expected <= 0:
             raise WorkerSubprocessError(
                 "INVALID_REQUEST",

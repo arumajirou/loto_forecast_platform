@@ -4,6 +4,7 @@ Plan resolution is dependency-light. Heavy optional imports occur only when an
 actual model is constructed, allowing catalog and configuration tests on CPU-only
 hosts.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

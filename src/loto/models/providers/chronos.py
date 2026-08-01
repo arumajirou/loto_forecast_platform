@@ -71,7 +71,9 @@ class ChronosProvider(FoundationProvider):
         if not config_path.exists():
             raise FoundationProviderError("PARTIAL_SNAPSHOT", f"config.json missing in {snapshot}")
         if not weights:
-            raise FoundationProviderError("MODEL_WEIGHTS_MISSING", f"no local weight files found in {snapshot}")
+            raise FoundationProviderError(
+                "MODEL_WEIGHTS_MISSING", f"no local weight files found in {snapshot}"
+            )
         self.snapshot_path = snapshot
         self.weight_paths = weights
         resolved_revision = revision or snapshot.name
@@ -84,7 +86,9 @@ class ChronosProvider(FoundationProvider):
             "weight_sha256": {str(path): self._sha256(path) for path in weights},
             "config_sha256": self._sha256(config_path),
             "snapshot_complete": True,
-            "snapshot_files": sorted(str(path.relative_to(snapshot)) for path in snapshot.rglob("*") if path.is_file()),
+            "snapshot_files": sorted(
+                str(path.relative_to(snapshot)) for path in snapshot.rglob("*") if path.is_file()
+            ),
         }
 
     def load(self) -> ChronosProvider:
@@ -135,30 +139,38 @@ class ChronosProvider(FoundationProvider):
         path.mkdir(parents=True, exist_ok=True)
         payload = self.inspect_properties()
         payload.update(getattr(self, "resolved", {}))
-        (path / "provider.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        (path / "provider.json").write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
         return path
 
     def load_saved(self, path: Path) -> ChronosProvider:
         provider_file = path / "provider.json"
         if not provider_file.exists():
-            raise FoundationProviderError("ARTIFACT_MISSING", f"provider artifact missing: {provider_file}")
+            raise FoundationProviderError(
+                "ARTIFACT_MISSING", f"provider artifact missing: {provider_file}"
+            )
         payload = json.loads(provider_file.read_text(encoding="utf-8"))
-        self.params["model_name"] = payload.get("model_name") or payload.get("repo_id") or self._model_name()
+        self.params["model_name"] = (
+            payload.get("model_name") or payload.get("repo_id") or self._model_name()
+        )
         return self.load()
 
     def inspect_properties(self) -> dict[str, Any]:
         data: dict[str, Any] = super().inspect_properties()
         resolved = getattr(self, "resolved", {})
-        data.update({
-            "model_name": self.params.get("model_name"),
-            "revision": resolved.get("revision") or self.params.get("revision"),
-            "zero_shot": True,
-            "snapshot_path": resolved.get("snapshot_path"),
-            "snapshot_complete": resolved.get("snapshot_complete"),
-            "config_sha256": resolved.get("config_sha256"),
-            "weight_paths": resolved.get("weight_paths"),
-            "weight_sha256": resolved.get("weight_sha256"),
-        })
+        data.update(
+            {
+                "model_name": self.params.get("model_name"),
+                "revision": resolved.get("revision") or self.params.get("revision"),
+                "zero_shot": True,
+                "snapshot_path": resolved.get("snapshot_path"),
+                "snapshot_complete": resolved.get("snapshot_complete"),
+                "config_sha256": resolved.get("config_sha256"),
+                "weight_paths": resolved.get("weight_paths"),
+                "weight_sha256": resolved.get("weight_sha256"),
+            }
+        )
         return data
 
     @staticmethod
@@ -179,7 +191,9 @@ class ChronosProvider(FoundationProvider):
             from huggingface_hub import constants
         except Exception:
             return None
-        repo_cache = Path(constants.HF_HUB_CACHE) / f"models--{model_name.replace('/', '--')}" / "snapshots"
+        repo_cache = (
+            Path(constants.HF_HUB_CACHE) / f"models--{model_name.replace('/', '--')}" / "snapshots"
+        )
         if not repo_cache.exists():
             return None
         candidates = sorted(

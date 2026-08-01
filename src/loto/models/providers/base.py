@@ -18,7 +18,9 @@ class FoundationProviderError(RuntimeError):
 
 
 class FoundationProvider(ABC):
-    def __init__(self, spec: ModelSpec, params: dict[str, Any], *, seed: int, device: str, precision: str):
+    def __init__(
+        self, spec: ModelSpec, params: dict[str, Any], *, seed: int, device: str, precision: str
+    ):
         self.spec = spec
         self.params = params
         self.seed = seed
@@ -51,7 +53,9 @@ class FoundationProvider(ABC):
         return self
 
     def retrain(self, history: pd.DataFrame) -> FoundationProvider:
-        raise FoundationProviderError("UNSUPPORTED_OPERATION", "zero-shot provider does not support retraining")
+        raise FoundationProviderError(
+            "UNSUPPORTED_OPERATION", "zero-shot provider does not support retraining"
+        )
 
     def inspect_properties(self) -> dict[str, Any]:
         return {

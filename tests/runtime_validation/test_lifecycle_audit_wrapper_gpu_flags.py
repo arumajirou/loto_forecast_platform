@@ -19,11 +19,5 @@ def test_wrapper_supports_strict_gpu_verification() -> None:
 def test_wrapper_rejects_invalid_strict_gpu_configuration() -> None:
     text = WRAPPER.read_text(encoding="utf-8")
 
-    assert (
-        '[[ "$VERIFY_GPU" == "1" && "$DEVICE" != "cuda" ]]'
-        in text
-    )
-    assert (
-        '[[ "$VERIFY_GPU" == "1" && "$GPUS_PER_TRIAL" -lt 1 ]]'
-        in text
-    )
+    assert '[[ "$VERIFY_GPU" == "1" && "$DEVICE" != "cuda" ]]' in text
+    assert '[[ "$VERIFY_GPU" == "1" && "$GPUS_PER_TRIAL" -lt 1 ]]' in text

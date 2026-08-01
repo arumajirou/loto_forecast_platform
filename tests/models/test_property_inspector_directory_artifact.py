@@ -38,15 +38,9 @@ def test_directory_artifact_properties(
     expected = hashlib.sha256()
     expected.update(b"model.ckpt")
     expected.update(b"\0")
-    expected.update(
-        hashlib.sha256(b"checkpoint").digest()
-    )
+    expected.update(hashlib.sha256(b"checkpoint").digest())
 
     assert properties["artifact_type"] == "directory"
     assert properties["artifact_file_count"] == 1
-    assert properties["model_file_size"] == len(
-        b"checkpoint"
-    )
-    assert properties["model_sha256"] == (
-        expected.hexdigest()
-    )
+    assert properties["model_file_size"] == len(b"checkpoint")
+    assert properties["model_sha256"] == (expected.hexdigest())

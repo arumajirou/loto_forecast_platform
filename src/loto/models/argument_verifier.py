@@ -60,19 +60,13 @@ def merge_effective_properties(
         effective = properties.get("effective_parameters")
         if isinstance(effective, dict):
             for key, value in effective.items():
-                if not (
-                    isinstance(value, dict)
-                    and value.get("status") == "NOT_EXPOSED"
-                ):
+                if not (isinstance(value, dict) and value.get("status") == "NOT_EXPOSED"):
                     merged_effective[key] = value
 
         for key, value in properties.items():
             if key == "effective_parameters":
                 continue
-            if (
-                isinstance(value, dict)
-                and value.get("status") == "NOT_EXPOSED"
-            ):
+            if isinstance(value, dict) and value.get("status") == "NOT_EXPOSED":
                 continue
             merged[key] = value
 
@@ -96,14 +90,16 @@ def verify_arguments(
             ordered_arguments.append(argument)
     for argument in ordered_arguments:
         if argument not in requested and argument not in constructor_values:
-            rows.append({
-                "argument": argument,
-                "requested": None,
-                "constructor_value": None,
-                "effective_value": None,
-                "evidence": [],
-                "status": "UNSUPPORTED",
-            })
+            rows.append(
+                {
+                    "argument": argument,
+                    "requested": None,
+                    "constructor_value": None,
+                    "effective_value": None,
+                    "evidence": [],
+                    "status": "UNSUPPORTED",
+                }
+            )
             continue
         requested_value = requested.get(argument)
         constructor_value = constructor_values.get(argument, requested_value)
@@ -125,12 +121,14 @@ def verify_arguments(
             status = "TRANSFORMED"
         else:
             status = "IGNORED"
-        rows.append({
-            "argument": argument,
-            "requested": requested_value,
-            "constructor_value": constructor_value,
-            "effective_value": effective_value,
-            "evidence": evidence,
-            "status": status,
-        })
+        rows.append(
+            {
+                "argument": argument,
+                "requested": requested_value,
+                "constructor_value": constructor_value,
+                "effective_value": effective_value,
+                "evidence": evidence,
+                "status": status,
+            }
+        )
     return rows
