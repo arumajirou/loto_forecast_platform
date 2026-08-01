@@ -224,7 +224,18 @@
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 36284680,
       "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_status": "BLOCKED",
+      "runtime_revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+      "runtime_blocked_reason": "FIXED_SNAPSHOT_MISSING",
+      "runtime_blocked_detail": "Pinned Hugging Face snapshot directory is missing; available loose model files cannot satisfy revision and snapshot symlink validation requirements.",
+      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+      "runtime_candidate_loose_model_path": "/mnt/e/env/ts/loto_platform_unified/runtime/tsfm_lab/models/ibm-granite__granite-timeseries-flowstate-r1",
+      "runtime_resume_conditions": [
+        "Materialize the pinned Hugging Face snapshot for ibm-granite/granite-timeseries-flowstate-r1 at revision 05effc6cb39ee16dce9dd0064ed1a76e4b8ff464.",
+        "Verify required model/config files and SHA-256 values from that snapshot.",
+        "Implement or select the correct FlowState runtime API and run CUDA inference with local_files_only=true.",
+        "Capture the runner GPU PID with external nvidia-smi process sampling."
+      ]
     },
     {
       "model_id": "granite-patchtsmixer",

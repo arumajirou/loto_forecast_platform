@@ -8,8 +8,8 @@ Updated: 2026-08-01
 - Runtime certified: 8
 - Remaining: 13
 - Progress: 38.1%
-- Current branch: feat/chronos-t5-base-runtime-audit-v1
-- Next model: granite-flowstate-r1
+- Current branch: feat/granite-flowstate-r1-runtime-audit-v1
+- Next model: kronos-base
 
 ## Certified
 
@@ -68,3 +68,21 @@ Updated: 2026-08-01
 - dedicated test: tests/test_chronos_t5_base_runtime_audit.py
 - hash verification: audit/tsfm-runtime/chronos-t5-base/sha256sum.txt OK
 - resume condition: provide the pinned local snapshot with model.safetensors, config.json, and generation_config.json, then rerun CUDA runtime certification with external PID sampling.
+
+### granite-flowstate-r1
+
+- Branch: feat/granite-flowstate-r1-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: ibm-granite/granite-timeseries-flowstate-r1
+- revision: 05effc6cb39ee16dce9dd0064ed1a76e4b8ff464
+- status: BLOCKED
+- blocked reason: FIXED_SNAPSHOT_MISSING
+- checked snapshot: /mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464
+- candidate loose files: /mnt/e/env/ts/loto_platform_unified/runtime/tsfm_lab/models/ibm-granite__granite-timeseries-flowstate-r1
+- runtime executed: false
+- CPU fallback: false
+- license: apache-2.0 from ledger, review BLOCKED until pinned snapshot license/model card is inspected
+- dedicated test: tests/test_granite_flowstate_r1_runtime_audit.py
+- hash verification: audit/tsfm-runtime/granite-flowstate-r1/sha256sum.txt OK
+- resume condition: materialize the pinned HF snapshot, verify SHA-256 values, implement/select the FlowState runtime API, and rerun CUDA runtime certification with external PID sampling.

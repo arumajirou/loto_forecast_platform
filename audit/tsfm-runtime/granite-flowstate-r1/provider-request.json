@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "model_id": "granite-flowstate-r1",
+  "repo_id": "ibm-granite/granite-timeseries-flowstate-r1",
+  "revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+  "local_files_only": true,
+  "device": "cuda",
+  "seed": 42,
+  "prediction_length": 1,
+  "synthetic_input": true
+}
