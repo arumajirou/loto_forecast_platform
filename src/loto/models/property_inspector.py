@@ -5,7 +5,7 @@ import importlib.metadata
 from pathlib import Path
 from typing import Any
 
-from loto.data.lineage import sha256_file
+from loto.models.artifact_store import artifact_summary
 from loto.models.catalog import ModelSpec
 
 PROPERTY_NAMES = (
@@ -42,6 +42,8 @@ PROPERTY_NAMES = (
     "model_file_path",
     "model_file_size",
     "model_sha256",
+    "artifact_type",
+    "artifact_file_count",
     "fit_supported",
     "refit_supported",
     "incremental_supported",
@@ -163,7 +165,21 @@ def inspect_model_properties(
     if artifact_path is not None:
         path = Path(artifact_path)
         result["model_file_path"] = str(path)
-        if path.exists() and path.is_file():
-            result["model_file_size"] = path.stat().st_size
-            result["model_sha256"] = sha256_file(path)
+
+        summary = artifact_summary(path)
+
+        if "size_bytes" in summary:
+            result["model_file_size"] = summary["size_bytes"]
+
+        if "sha256" in summary:
+            result["model_sha256"] = summary["sha256"]
+
+        result["artifact_type"] = summary.get(
+            "artifact_type",
+            "unknown",
+        )
+        result["artifact_file_count"] = summary.get(
+            "file_count",
+            0,
+        )
     return result

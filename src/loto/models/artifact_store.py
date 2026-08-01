@@ -26,6 +26,70 @@ def load_pickle_model(path: str | Path) -> Any:
         return pickle.load(stream)
 
 
+def artifact_summary(path: str | Path) -> dict[str, Any]:
+    """Return deterministic size and SHA-256 evidence for a file or directory."""
+
+    item = Path(path)
+
+    if not item.exists():
+        return {
+            "exists": False,
+            "artifact_type": "missing",
+        }
+
+    if item.is_file():
+        return {
+            "exists": True,
+            "artifact_type": "file",
+            "size_bytes": item.stat().st_size,
+            "sha256": sha256_file(item),
+            "file_count": 1,
+        }
+
+    if item.is_dir():
+        files = sorted(
+            candidate
+            for candidate in item.rglob("*")
+            if candidate.is_file()
+        )
+
+        digest = hashlib.sha256()
+        total_size = 0
+        entries: list[dict[str, Any]] = []
+
+        for file_path in files:
+            relative = file_path.relative_to(item).as_posix()
+            file_sha256 = sha256_file(file_path)
+            size_bytes = file_path.stat().st_size
+
+            digest.update(relative.encode("utf-8"))
+            digest.update(b"\0")
+            digest.update(bytes.fromhex(file_sha256))
+
+            total_size += size_bytes
+            entries.append(
+                {
+                    "path": relative,
+                    "size_bytes": size_bytes,
+                    "sha256": file_sha256,
+                }
+            )
+
+        return {
+            "exists": True,
+            "artifact_type": "directory",
+            "size_bytes": total_size,
+            "sha256": digest.hexdigest(),
+            "file_count": len(entries),
+            "files": entries,
+        }
+
+    return {
+        "exists": True,
+        "artifact_type": "unsupported",
+    }
+
+
 def model_manifest(
     path: str | Path,
     *,
@@ -46,27 +110,5 @@ def model_manifest(
         "load_test_status": load_test_status,
         "prediction_test_status": prediction_test_status,
     }
-    if item.exists() and item.is_file():
-        manifest.update({
-            "size_bytes": item.stat().st_size,
-            "sha256": sha256_file(item),
-        })
-    elif item.exists() and item.is_dir():
-        files = sorted(path for path in item.rglob("*") if path.is_file())
-        digest = hashlib.sha256()
-        total = 0
-        entries = []
-        for file_path in files:
-            rel = file_path.relative_to(item).as_posix()
-            file_sha = sha256_file(file_path)
-            size = file_path.stat().st_size
-            total += size
-            digest.update(rel.encode("utf-8"))
-            digest.update(file_sha.encode("utf-8"))
-            entries.append({"path": rel, "size_bytes": size, "sha256": file_sha})
-        manifest.update({
-            "size_bytes": total,
-            "sha256": digest.hexdigest(),
-            "files": entries,
-        })
+    manifest.update(artifact_summary(item))
     return manifest
