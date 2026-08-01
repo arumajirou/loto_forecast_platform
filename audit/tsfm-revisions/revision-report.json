@@ -1,0 +1,30 @@
+{
+  "total_repository_models": 21,
+  "pinned": 21,
+  "unpinned": 0,
+  "complete": true,
+  "pinned_models": [
+    "chronos-2",
+    "chronos-bolt-tiny",
+    "chronos-t5-small",
+    "chronos-t5-base",
+    "timesfm-2.5-transformers",
+    "granite-ttm-r2",
+    "granite-flowstate-r1",
+    "granite-patchtst",
+    "granite-patchtsmixer",
+    "moirai-2.0-small",
+    "moirai-1.0-base",
+    "tirex-2",
+    "toto-open-base",
+    "toto-2.0-4m",
+    "moment-1-small",
+    "moment-1-large",
+    "lag-llama",
+    "kronos-base",
+    "sundial-base",
+    "tabpfn-ts",
+    "t0-alpha"
+  ],
+  "unpinned_models": []
+}

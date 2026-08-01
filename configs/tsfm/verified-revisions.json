@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-01T07:18:10.829948+00:00",
+  "pins": [
+    {
+      "model_id": "chronos-2",
+      "repo_id": "amazon/chronos-2",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "source": "https://huggingface.co/amazon/chronos-2/commit/29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "chronos-bolt-tiny",
+      "repo_id": "amazon/chronos-bolt-tiny",
+      "revision": "a0e552de83495b5c28c14c71c374f3e33280b340",
+      "source": "https://huggingface.co/amazon/chronos-bolt-tiny/commit/a0e552de83495b5c28c14c71c374f3e33280b340",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "chronos-t5-base",
+      "repo_id": "amazon/chronos-t5-base",
+      "revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
+      "source": "https://huggingface.co/amazon/chronos-t5-base/commit/ad294eaacead15db499b740ea4122266dd2a81a2",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "chronos-t5-small",
+      "repo_id": "amazon/chronos-t5-small",
+      "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+      "source": "https://huggingface.co/amazon/chronos-t5-small/commit/a971ba21945c4f1796b17a91fe69214b5f4ad472",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "granite-flowstate-r1",
+      "repo_id": "ibm-granite/granite-timeseries-flowstate-r1",
+      "revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+      "source": "https://huggingface.co/ibm-granite/granite-timeseries-flowstate-r1/commit/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "granite-patchtsmixer",
+      "repo_id": "ibm-granite/granite-timeseries-patchtsmixer",
+      "revision": "90dc5a88d45f032b7dceefb5d814ca2af54f2ff9",
+      "source": "https://huggingface.co/ibm-granite/granite-timeseries-patchtsmixer/commit/90dc5a88d45f032b7dceefb5d814ca2af54f2ff9",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "granite-patchtst",
+      "repo_id": "ibm-granite/granite-timeseries-patchtst",
+      "revision": "7fe295d8bc8fbac8041b60ab351882634165517f",
+      "source": "https://huggingface.co/ibm-granite/granite-timeseries-patchtst/commit/7fe295d8bc8fbac8041b60ab351882634165517f",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "granite-ttm-r2",
+      "repo_id": "ibm-granite/granite-timeseries-ttm-r2",
+      "revision": "d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f",
+      "source": "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2/commit/d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "kronos-base",
+      "repo_id": "NeoQuasar/Kronos-base",
+      "revision": "2b554741eca47781b64468546e77fef3e85130e6",
+      "source": "https://huggingface.co/NeoQuasar/Kronos-base/commit/2b554741eca47781b64468546e77fef3e85130e6",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "lag-llama",
+      "repo_id": "time-series-foundation-models/Lag-Llama",
+      "revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+      "source": "https://huggingface.co/time-series-foundation-models/Lag-Llama/commit/72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "moirai-1.0-base",
+      "repo_id": "Salesforce/moirai-1.0-R-base",
+      "revision": "4fa939a8800d9da346c0280f3d9aeba0d2d35877",
+      "source": "https://huggingface.co/Salesforce/moirai-1.0-R-base/commit/4fa939a8800d9da346c0280f3d9aeba0d2d35877",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "moirai-2.0-small",
+      "repo_id": "Salesforce/moirai-2.0-R-small",
+      "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+      "source": "https://huggingface.co/Salesforce/moirai-2.0-R-small/commit/30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "moment-1-large",
+      "repo_id": "AutonLab/MOMENT-1-large",
+      "revision": "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
+      "source": "https://huggingface.co/AutonLab/MOMENT-1-large/commit/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "moment-1-small",
+      "repo_id": "AutonLab/MOMENT-1-small",
+      "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
+      "source": "https://huggingface.co/AutonLab/MOMENT-1-small/commit/411e288267f82cce86296dbe4d6c8bc533cc162f",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "sundial-base",
+      "repo_id": "thuml/sundial-base-128m",
+      "revision": "3212e42564493f520593e5414af4367fc4b49226",
+      "source": "https://huggingface.co/thuml/sundial-base-128m/commit/3212e42564493f520593e5414af4367fc4b49226",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "t0-alpha",
+      "repo_id": "theforecastingcompany/t0-alpha",
+      "revision": "f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+      "source": "https://huggingface.co/theforecastingcompany/t0-alpha/commit/f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "tabpfn-ts",
+      "repo_id": "Prior-Labs/TabPFN-v2-clf",
+      "revision": "f851f2a3c941544733b712d8c0f96dfae9b28862",
+      "source": "https://huggingface.co/Prior-Labs/TabPFN-v2-clf/commit/f851f2a3c941544733b712d8c0f96dfae9b28862",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "timesfm-2.5-transformers",
+      "repo_id": "google/timesfm-2.5-200m-transformers",
+      "revision": "5a9806b9b291fad9233b5249d88263f1846304d3",
+      "source": "https://huggingface.co/google/timesfm-2.5-200m-transformers/commit/5a9806b9b291fad9233b5249d88263f1846304d3",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "tirex-2",
+      "repo_id": "NX-AI/TiRex-2",
+      "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+      "source": "https://huggingface.co/NX-AI/TiRex-2/commit/05e5b26db52bfb256f1ae1bdf785589850482de3",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "toto-2.0-4m",
+      "repo_id": "Datadog/Toto-2.0-4m",
+      "revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+      "source": "https://huggingface.co/Datadog/Toto-2.0-4m/commit/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    },
+    {
+      "model_id": "toto-open-base",
+      "repo_id": "Datadog/Toto-Open-Base-1.0",
+      "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
+      "source": "https://huggingface.co/Datadog/Toto-Open-Base-1.0/commit/0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
+      "verified_at": "2026-08-01T07:18:10.829948+00:00"
+    }
+  ]
+}

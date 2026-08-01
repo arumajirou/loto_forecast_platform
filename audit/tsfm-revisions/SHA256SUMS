@@ -1,0 +1,4 @@
+f01a1ddb5d1e5d3483bf4b915b2331b9c6b7d80a2db7e42d3c5094dc6110967b  configs/tsfm/verified-revisions.json
+03be2571ef4ae3cbf183085e62a124130160ac484f23e89e0950fcc52888cfd3  audit/tsfm-revisions/resolution-evidence.json
+6ba024a2a60f42e0864a64fecd27dbc3be36a1486ead0d170b68224095ab68ec  audit/tsfm-revisions/revision-report.json
+de436f580883d7e826a206acc77191ed959cc79c09b43f35340281a5f43f61aa  audit/tsfm-revisions/revision-refetch-verification.log
