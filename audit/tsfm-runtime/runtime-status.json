@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "total_models": 21,
-  "runtime_certified_models": 5,
+  "runtime_certified_models": 6,
   "results": [
     {
       "model_id": "chronos-2",
@@ -32,8 +32,26 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 34622352,
-      "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
+      "runtime_revision": "a0e552de83495b5c28c14c71c374f3e33280b340",
+      "runtime_device": "cuda:0",
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 47238144,
+      "runtime_prediction_shape": [
+        7
+      ],
+      "runtime_quantile_shape": [
+        7,
+        1,
+        9
+      ],
+      "runtime_context_length": 512,
+      "runtime_prediction_length": 1,
+      "runtime_weight_sha256": "75068728d376d2bec670379eeef4bfb4d24c0cfe24d957451f8d19b447030a32",
+      "runtime_config_sha256": "278f0086733031635fb1c861cb01c1bad6477420c7fcb19381a2993e335785e0",
+      "runtime_license_review": "APPROVED"
     },
     {
       "model_id": "chronos-t5-base",

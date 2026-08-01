@@ -3,6 +3,9 @@ from __future__ import annotations
 # ruff: noqa: E501
 import hashlib
 import json
+import os
+import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -10,6 +13,16 @@ import numpy as np
 import pandas as pd
 
 from loto.models.providers.base import FoundationProvider, FoundationProviderError
+
+ROOT = Path(__file__).resolve().parents[4]
+CHRONOS_BOLT_ENV = ROOT / "environments" / "autogluon-timeseries"
+CHRONOS_BOLT_RUNNER = ROOT / "scripts" / "run_chronos_bolt_provider.py"
+HF_HOME = Path(
+    os.environ.get(
+        "HF_HOME",
+        str(Path.home() / ".cache" / "huggingface"),
+    )
+)
 
 
 class ChronosProvider(FoundationProvider):
@@ -91,7 +104,163 @@ class ChronosProvider(FoundationProvider):
             ),
         }
 
+    def _is_chronos_bolt_tiny(self) -> bool:
+        return (
+            self.spec.model_id == "chronos-bolt-tiny"
+            and self._model_name() == "amazon/chronos-bolt-tiny"
+            and self._revision() == "a0e552de83495b5c28c14c71c374f3e33280b340"
+        )
+
+    def _fixed_bolt_snapshot_path(self) -> Path:
+        revision = "a0e552de83495b5c28c14c71c374f3e33280b340"
+        snapshot = HF_HOME / "hub" / "models--amazon--chronos-bolt-tiny" / "snapshots" / revision
+
+        weight = snapshot / "model.safetensors"
+        config = snapshot / "config.json"
+
+        if not snapshot.is_dir():
+            raise FoundationProviderError(
+                "MODEL_WEIGHTS_MISSING",
+                (f"fixed Chronos-Bolt snapshot missing: {snapshot}"),
+            )
+
+        if not weight.is_file():
+            raise FoundationProviderError(
+                "MODEL_WEIGHTS_MISSING",
+                (f"fixed Chronos-Bolt weight missing: {weight}"),
+            )
+
+        if not config.is_file():
+            raise FoundationProviderError(
+                "PARTIAL_SNAPSHOT",
+                (f"fixed Chronos-Bolt config missing: {config}"),
+            )
+
+        return snapshot.resolve()
+
+    def _run_bolt_provider(
+        self,
+        history: pd.DataFrame,
+    ) -> dict[str, Any]:
+        python_path = CHRONOS_BOLT_ENV / ".venv" / "bin" / "python"
+
+        if not python_path.is_file():
+            raise FoundationProviderError(
+                "DEPENDENCY_MISSING",
+                (f"Chronos-Bolt Python missing: {python_path}"),
+            )
+
+        if not CHRONOS_BOLT_RUNNER.is_file():
+            raise FoundationProviderError(
+                "PROVIDER_NOT_IMPLEMENTED",
+                (f"Chronos-Bolt runner missing: {CHRONOS_BOLT_RUNNER}"),
+            )
+
+        columns = [f"n{i}" for i in range(1, 8)] + ["draw_date"]
+
+        missing = [column for column in columns if column not in history.columns]
+
+        if missing:
+            raise FoundationProviderError(
+                "INVALID_REQUEST",
+                f"missing history columns: {missing}",
+            )
+
+        request = {
+            "schema_version": 1,
+            "model_id": "chronos-bolt-tiny",
+            "repo_id": "amazon/chronos-bolt-tiny",
+            "revision": ("a0e552de83495b5c28c14c71c374f3e33280b340"),
+            "snapshot_path": str(self._fixed_bolt_snapshot_path()),
+            "local_files_only": True,
+            "device": self.device,
+            "dtype": "float32",
+            "prediction_length": 1,
+            "history": history[columns].to_dict(orient="records"),
+        }
+
+        with tempfile.TemporaryDirectory(prefix="chronos-bolt-provider-") as tmp:
+            tmp_path = Path(tmp)
+            request_path = tmp_path / "request.json"
+            response_path = tmp_path / "response.json"
+
+            request_path.write_text(
+                json.dumps(
+                    request,
+                    ensure_ascii=False,
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    str(python_path),
+                    str(CHRONOS_BOLT_RUNNER),
+                    "--request",
+                    str(request_path),
+                    "--response",
+                    str(response_path),
+                ],
+                cwd=ROOT,
+                env={
+                    **os.environ,
+                    "HF_HOME": str(HF_HOME),
+                },
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            if not response_path.is_file():
+                raise FoundationProviderError(
+                    "PROVIDER_EXECUTION_FAILED",
+                    (
+                        "Chronos-Bolt runner produced no "
+                        f"response; rc={completed.returncode}; "
+                        f"stderr={completed.stderr}"
+                    ),
+                )
+
+            response = json.loads(response_path.read_text(encoding="utf-8"))
+
+        if response.get("status") != "OK":
+            raise FoundationProviderError(
+                str(
+                    response.get(
+                        "status",
+                        "PROVIDER_EXECUTION_FAILED",
+                    )
+                ),
+                str(
+                    response.get(
+                        "message",
+                        "Chronos-Bolt provider failed",
+                    )
+                ),
+            )
+
+        self.resolved = {
+            "repo_id": response["repo_id"],
+            "revision": response["revision"],
+            "snapshot_path": response["snapshot_path"],
+            "weight_paths": [response["properties"]["weight_path"]],
+            "weight_sha256": {
+                response["properties"]["weight_path"]: response["properties"]["weight_sha256"]
+            },
+            "config_sha256": response["properties"]["config_sha256"],
+            "runtime_response": response,
+        }
+
+        return response
+
     def load(self) -> ChronosProvider:
+        if self._is_chronos_bolt_tiny():
+            self.validate_environment()
+            self._fixed_bolt_snapshot_path()
+            return self
+
         resolved = self.resolve_model()
         import chronos
         import torch
@@ -110,6 +279,21 @@ class ChronosProvider(FoundationProvider):
         return self
 
     def predict(self, history: pd.DataFrame) -> np.ndarray:
+        if self._is_chronos_bolt_tiny():
+            response = self._run_bolt_provider(history)
+            values = np.asarray(
+                response["predictions"],
+                dtype=float,
+            )
+
+            if values.shape != (7,):
+                raise FoundationProviderError(
+                    "INVALID_OUTPUT",
+                    (f"unexpected Chronos-Bolt prediction shape: {values.shape}"),
+                )
+
+            return values
+
         if not hasattr(self, "pipeline"):
             self.load()
         import torch
@@ -169,6 +353,7 @@ class ChronosProvider(FoundationProvider):
                 "config_sha256": resolved.get("config_sha256"),
                 "weight_paths": resolved.get("weight_paths"),
                 "weight_sha256": resolved.get("weight_sha256"),
+                "runtime_response": resolved.get("runtime_response"),
             }
         )
         return data
