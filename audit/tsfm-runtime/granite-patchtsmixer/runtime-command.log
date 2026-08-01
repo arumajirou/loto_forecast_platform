@@ -1,0 +1,45 @@
+/mnt/e/env/ts/loto_forecast_platform/.venv-v212-audit/lib/python3.12/site-packages/huggingface_hub/file_download.py:949: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "model_id": "granite-patchtsmixer",
+  "repo_id": "ibm-granite/granite-timeseries-patchtsmixer",
+  "revision": "90dc5a88d45f032b7dceefb5d814ca2af54f2ff9",
+  "started_at": "2026-08-01T07:56:26.088727+00:00",
+  "python": "3.12.13",
+  "torch": "2.13.0+cu130",
+  "cuda_available": true,
+  "runtime_vram_certified": true,
+  "completed_at": "2026-08-01T07:56:29.773564+00:00",
+  "load_seconds": 3.322588840001117,
+  "inference_seconds": 0.14175864699791418,
+  "total_seconds": 3.6848335489994497,
+  "device": "cuda:0",
+  "gpu_name": "NVIDIA GeForce RTX 5070 Ti",
+  "compute_capability": [
+    12,
+    0
+  ],
+  "parameter_device": "cuda:0",
+  "parameter_dtype": "torch.float32",
+  "parameter_count": 196144,
+  "context_length": 512,
+  "prediction_length": 96,
+  "num_input_channels": 7,
+  "input_shape": [
+    1,
+    512,
+    7
+  ],
+  "prediction_shape": [
+    1,
+    96,
+    7
+  ],
+  "prediction_finite": true,
+  "baseline_allocated_bytes": 0,
+  "baseline_reserved_bytes": 0,
+  "peak_allocated_bytes": 34823680,
+  "peak_reserved_bytes": 35651584
+}

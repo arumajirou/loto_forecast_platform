@@ -1,0 +1,8 @@
+timestamp=2026-08-01T16:56:17+09:00
+hostname=az
+kernel=7.0.0-28-generic
+branch=feat/tsfm-runtime-audit-v1
+commit=9162ad321308c25a1f7358b0ef0166daef3935e6
+model_id=granite-patchtsmixer
+repo_id=ibm-granite/granite-timeseries-patchtsmixer
+revision=90dc5a88d45f032b7dceefb5d814ca2af54f2ff9
