@@ -6,18 +6,20 @@ Updated: 2026-08-01
 
 - Total models: 21
 - Runtime certified: 8
-- Remaining: 13
-- Progress: 38.1%
-- Current branch: feat/granite-flowstate-r1-runtime-audit-v1
-- Next model: kronos-base
+- Blocked: 3
+- Pending: 10
+- Formal certification progress: 38.1%
+- Judged progress: 52.4%
+- Current branch: feat/kronos-base-runtime-audit-v1
+- Next model: lag-llama
 
 ## Certified
 
 ### chronos-2
 
 - Branch: feat/chronos-2-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: 8ee8146
+- Push: origin/feat/chronos-2-runtime-audit-v1
 - repo_id: amazon/chronos-2
 - revision: 29ec3766d36d6f73f0696f85560a422f50e8498c
 - runner: scripts/run_chronos_2_provider.py
@@ -36,27 +38,24 @@ Updated: 2026-08-01
 
 ## Remaining Ledger Order
 
-1. chronos-t5-base
-2. granite-flowstate-r1
-3. kronos-base
-4. lag-llama
-5. moirai-1.0-base
-6. moirai-2.0-small
-7. moment-1-large
-8. moment-1-small
-9. sundial-base
-10. t0-alpha
-11. timesfm-2.5-transformers
-12. toto-2.0-4m
-13. toto-open-base
+1. lag-llama
+2. moirai-1.0-base
+3. moirai-2.0-small
+4. moment-1-large
+5. moment-1-small
+6. sundial-base
+7. t0-alpha
+8. timesfm-2.5-transformers
+9. toto-2.0-4m
+10. toto-open-base
 
 ## Blocked
 
 ### chronos-t5-base
 
 - Branch: feat/chronos-t5-base-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: acf69da
+- Push: origin/feat/chronos-t5-base-runtime-audit-v1
 - repo_id: amazon/chronos-t5-base
 - revision: ad294eaacead15db499b740ea4122266dd2a81a2
 - status: BLOCKED
@@ -72,8 +71,8 @@ Updated: 2026-08-01
 ### granite-flowstate-r1
 
 - Branch: feat/granite-flowstate-r1-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: 2a4dc3e
+- Push: origin/feat/granite-flowstate-r1-runtime-audit-v1
 - repo_id: ibm-granite/granite-timeseries-flowstate-r1
 - revision: 05effc6cb39ee16dce9dd0064ed1a76e4b8ff464
 - status: BLOCKED
@@ -86,3 +85,22 @@ Updated: 2026-08-01
 - dedicated test: tests/test_granite_flowstate_r1_runtime_audit.py
 - hash verification: audit/tsfm-runtime/granite-flowstate-r1/sha256sum.txt OK
 - resume condition: materialize the pinned HF snapshot, verify SHA-256 values, implement/select the FlowState runtime API, and rerun CUDA runtime certification with external PID sampling.
+
+### kronos-base
+
+- Branch: feat/kronos-base-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: NeoQuasar/Kronos-base
+- revision: 2b554741eca47781b64468546e77fef3e85130e6
+- status: BLOCKED
+- blocked reason: PARTIAL_SNAPSHOT
+- checked snapshot: /mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6
+- snapshot finding: snapshot exists and revision matches, but only README.md is present
+- missing files: config.json, model.safetensors
+- runtime executed: false
+- CPU fallback: false
+- license: MIT from pinned snapshot README metadata, APPROVED
+- dedicated test: tests/test_kronos_base_runtime_audit.py
+- hash verification: audit/tsfm-runtime/kronos-base/sha256sum.txt OK
+- resume condition: install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present, then rerun CUDA runtime certification with external PID sampling.

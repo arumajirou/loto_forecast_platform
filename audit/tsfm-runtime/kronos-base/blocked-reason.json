@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "model_id": "kronos-base",
+  "blocked_reason": "PARTIAL_SNAPSHOT",
+  "blocked_detail": "Pinned snapshot directory exists, but required runtime files are missing.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
+  "facts": [
+    "Repo cache exists: True",
+    "Snapshot path exists: True",
+    "Snapshot revision matches ledger revision: True",
+    "Missing files: config.json, model.safetensors"
+  ]
+}

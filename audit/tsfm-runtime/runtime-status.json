@@ -356,7 +356,23 @@
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 409264008,
       "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_status": "BLOCKED",
+      "runtime_revision": "2b554741eca47781b64468546e77fef3e85130e6",
+      "runtime_blocked_reason": "PARTIAL_SNAPSHOT",
+      "runtime_blocked_detail": "Pinned snapshot directory exists, but required runtime files are missing.",
+      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6",
+      "runtime_missing_files": [
+        "config.json",
+        "model.safetensors"
+      ],
+      "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
+      "runtime_resume_conditions": [
+        "Materialize the complete NeoQuasar/Kronos-base snapshot at revision 2b554741eca47781b64468546e77fef3e85130e6.",
+        "Verify config.json and model.safetensors SHA-256 values from the pinned snapshot.",
+        "Confirm the Kronos tokenizer dependency snapshot required by KronosPredictor.",
+        "Run CUDA inference with local_files_only=true and external nvidia-smi PID sampling."
+      ],
+      "runtime_license_review": "APPROVED"
     },
     {
       "model_id": "lag-llama",
@@ -583,5 +599,8 @@
       "runtime_vram_certified": false,
       "runtime_status": "NOT_TESTED"
     }
-  ]
+  ],
+  "certified_models": 8,
+  "blocked_models": 3,
+  "pending_models": 10
 }

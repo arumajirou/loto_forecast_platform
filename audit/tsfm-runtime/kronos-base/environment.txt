@@ -1,0 +1,8 @@
+PROJECT_ROOT=/mnt/e/env/ts/loto_forecast_platform
+branch=feat/kronos-base-runtime-audit-v1
+model_id=kronos-base
+repo_id=NeoQuasar/Kronos-base
+revision=2b554741eca47781b64468546e77fef3e85130e6
+snapshot_path=/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6
+status=BLOCKED
+blocked_reason=PARTIAL_SNAPSHOT

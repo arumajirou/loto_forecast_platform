@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "status": "BLOCKED",
+  "model_id": "kronos-base",
+  "repo_id": "NeoQuasar/Kronos-base",
+  "revision": "2b554741eca47781b64468546e77fef3e85130e6",
+  "runtime_vram_certified": false,
+  "blocked_at": "2026-08-01T09:53:16.593464+00:00",
+  "blocked_reason": "PARTIAL_SNAPSHOT",
+  "blocked_detail": "Pinned snapshot directory exists, but required runtime files are missing.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
+  "snapshot_probe": {
+    "schema_version": 1,
+    "model_id": "kronos-base",
+    "repo_id": "NeoQuasar/Kronos-base",
+    "revision": "2b554741eca47781b64468546e77fef3e85130e6",
+    "checked_at": "2026-08-01T09:53:16.593464+00:00",
+    "hf_home_candidates": [
+      "/mnt/e/env/huggingface",
+      "/mnt/e/env/huggingface/hub",
+      "/home/az/.cache/huggingface/hub"
+    ],
+    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base",
+    "repo_cache_exists": true,
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6",
+    "snapshot_exists": true,
+    "snapshot_revision_matches": true,
+    "required_files": [
+      "config.json",
+      "model.safetensors"
+    ],
+    "missing_files": [
+      "config.json",
+      "model.safetensors"
+    ],
+    "existing_files": [
+      {
+        "name": "README.md",
+        "path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6/README.md",
+        "is_symlink": true,
+        "symlink_target": "../../blobs/1a2dbfe2fa6b9c73a609c3917a55040aa9d52ef2",
+        "resolved_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/blobs/1a2dbfe2fa6b9c73a609c3917a55040aa9d52ef2",
+        "size_bytes": 8841,
+        "sha256": "73fccc29fd1cda62e7e2b0467c0d2b6f5b551b46a4f4cac0c7bca51c0a0b4697"
+      }
+    ],
+    "result": "PARTIAL_SNAPSHOT"
+  },
+  "gpu_used": false,
+  "cpu_fallback": false,
+  "cpu_preprocessing": null,
+  "peak_vram_bytes": null,
+  "finite": null,
+  "artifact_reference": {
+    "repo_id": "NeoQuasar/Kronos-base",
+    "revision": "2b554741eca47781b64468546e77fef3e85130e6",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6"
+  }
+}

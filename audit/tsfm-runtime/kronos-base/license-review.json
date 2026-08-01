@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "model_id": "kronos-base",
+  "repo_id": "NeoQuasar/Kronos-base",
+  "revision": "2b554741eca47781b64468546e77fef3e85130e6",
+  "license": "mit",
+  "review_status": "APPROVED",
+  "commercial_use": true,
+  "attribution_required": true,
+  "redistribution_allowed": true,
+  "modification_allowed": true,
+  "patent_grant": false,
+  "notice_required_on_distribution": true,
+  "limitations": [
+    "Runtime certification remains blocked because the snapshot is incomplete."
+  ],
+  "review_notes": [
+    "Pinned snapshot README metadata declares license: mit.",
+    "MIT permits commercial use, modification, and redistribution with copyright/license notice preservation.",
+    "Review covers only the pinned model card metadata available in the local snapshot."
+  ]
+}
