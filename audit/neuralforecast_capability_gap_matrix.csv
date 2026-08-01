@@ -1,0 +1,11 @@
+capability,implementation_reference_found,status
+callbacks,False,MISSING_OR_UNEXPOSED
+cross_validation,False,MISSING_OR_UNEXPOSED
+futr_df,False,MISSING_OR_UNEXPOSED
+level,True,IMPLEMENTED_OR_REFERENCED
+optuna_options,False,MISSING_OR_UNEXPOSED
+predict_insample,False,MISSING_OR_UNEXPOSED
+prediction_intervals,False,MISSING_OR_UNEXPOSED
+quantiles,False,MISSING_OR_UNEXPOSED
+ray_options,False,MISSING_OR_UNEXPOSED
+static_df,False,MISSING_OR_UNEXPOSED

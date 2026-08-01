@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-08-01T05:30:42.463484+00:00",
+  "neuralforecast_version": "3.2.0",
+  "official_fixed_model_count": 37,
+  "official_auto_model_count": 79,
+  "model_row_count": 116,
+  "missing_model_reference_count": 17,
+  "argument_row_count": 52,
+  "missing_argument_count": 39,
+  "capability_row_count": 10,
+  "missing_capability_count": 9,
+  "outputs": [
+    "audit/neuralforecast_model_gap_matrix.csv",
+    "audit/neuralforecast_argument_gap_matrix.csv",
+    "audit/neuralforecast_capability_gap_matrix.csv",
+    "audit/neuralforecast_gap_report.md"
+  ]
+}
