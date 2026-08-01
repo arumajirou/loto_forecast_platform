@@ -1,0 +1,771 @@
+{
+  "generated_at": "2026-08-01T19:44:08.418028+00:00",
+  "status": "PASS",
+  "gpu_name": "NVIDIA GeForce RTX 5070 Ti",
+  "torch_version": "2.9.1+cu128",
+  "torch_cuda_build": "12.8",
+  "models": 23,
+  "passed": 23,
+  "failed": 0,
+  "phase_counts": {
+    "phase1": {
+      "models": 6,
+      "passed": 6,
+      "failed": 0
+    },
+    "phase2": {
+      "models": 10,
+      "passed": 10,
+      "failed": 0
+    },
+    "phase3": {
+      "models": 7,
+      "passed": 7,
+      "failed": 0
+    }
+  },
+  "maximum_peak_vram_model": "VanillaTransformer",
+  "maximum_peak_vram_mib": 112.134765625,
+  "sum_individual_peak_vram_mib": 838.3486328125,
+  "results": [
+    {
+      "model": "DLinear",
+      "status": "PASS",
+      "fit_seconds": 0.21294312000100035,
+      "predict_seconds": 0.014101336000749143,
+      "total_seconds": 0.2270444560017495,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_DLinear"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 17401344,
+      "cuda_peak_memory_reserved": 23068672,
+      "cuda_allocation_delta": 17401344,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase1_predictions/dlinear_predictions.csv",
+      "phase": "phase1"
+    },
+    {
+      "model": "NLinear",
+      "status": "PASS",
+      "fit_seconds": 0.019439855001110118,
+      "predict_seconds": 0.010255510998831596,
+      "total_seconds": 0.029695365999941714,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_NLinear"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 17392640,
+      "cuda_peak_memory_reserved": 23068672,
+      "cuda_allocation_delta": 17392640,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase1_predictions/nlinear_predictions.csv",
+      "phase": "phase1"
+    },
+    {
+      "model": "MLP",
+      "status": "PASS",
+      "fit_seconds": 0.06160220399760874,
+      "predict_seconds": 0.010984079002810176,
+      "total_seconds": 0.07258628300041892,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_MLP"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 18631680,
+      "cuda_peak_memory_reserved": 23068672,
+      "cuda_allocation_delta": 18631680,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase1_predictions/mlp_predictions.csv",
+      "phase": "phase1"
+    },
+    {
+      "model": "NHITS",
+      "status": "PASS",
+      "fit_seconds": 0.059200652001891285,
+      "predict_seconds": 0.020625588000257267,
+      "total_seconds": 0.07982624000214855,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_NHITS"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 20890624,
+      "cuda_peak_memory_reserved": 25165824,
+      "cuda_allocation_delta": 20890624,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase1_predictions/nhits_predictions.csv",
+      "phase": "phase1"
+    },
+    {
+      "model": "NBEATS",
+      "status": "PASS",
+      "fit_seconds": 0.0281046759992023,
+      "predict_seconds": 0.010302810002031038,
+      "total_seconds": 0.03840748600123334,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_NBEATS"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 18928640,
+      "cuda_peak_memory_reserved": 23068672,
+      "cuda_allocation_delta": 18928640,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase1_predictions/nbeats_predictions.csv",
+      "phase": "phase1"
+    },
+    {
+      "model": "PatchTST",
+      "status": "PASS",
+      "fit_seconds": 0.09192526799961342,
+      "predict_seconds": 0.010988938000082271,
+      "total_seconds": 0.1029142059996957,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_PatchTST"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 35665408,
+      "cuda_peak_memory_reserved": 71303168,
+      "cuda_allocation_delta": 35665408,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase1_predictions/patchtst_predictions.csv",
+      "phase": "phase1"
+    },
+    {
+      "model": "RNN",
+      "status": "PASS",
+      "fit_seconds": 0.34527032100231736,
+      "predict_seconds": 0.015168694997555576,
+      "total_seconds": 0.36043901599987294,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_RNN"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 28861440,
+      "cuda_peak_memory_reserved": 44040192,
+      "cuda_allocation_delta": 28861440,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase2_predictions/rnn_predictions.csv",
+      "phase": "phase2"
+    },
+    {
+      "model": "GRU",
+      "status": "PASS",
+      "fit_seconds": 0.027746459003537893,
+      "predict_seconds": 0.012019206998957088,
+      "total_seconds": 0.03976566600249498,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_GRU"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 30180864,
+      "cuda_peak_memory_reserved": 37748736,
+      "cuda_allocation_delta": 30180864,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase2_predictions/gru_predictions.csv",
+      "phase": "phase2"
+    },
+    {
+      "model": "LSTM",
+      "status": "PASS",
+      "fit_seconds": 0.02586480999889318,
+      "predict_seconds": 0.013247791001049336,
+      "total_seconds": 0.039112600999942515,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_LSTM"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 30479872,
+      "cuda_peak_memory_reserved": 37748736,
+      "cuda_allocation_delta": 30479872,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase2_predictions/lstm_predictions.csv",
+      "phase": "phase2"
+    },
+    {
+      "model": "DilatedRNN",
+      "status": "PASS",
+      "fit_seconds": 0.03891457599820569,
+      "predict_seconds": 0.02047399100047187,
+      "total_seconds": 0.05938856699867756,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_DilatedRNN"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 31646720,
+      "cuda_peak_memory_reserved": 37748736,
+      "cuda_allocation_delta": 31646720,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase2_predictions/dilatedrnn_predictions.csv",
+      "phase": "phase2"
+    },
+    {
+      "model": "TCN",
+      "status": "PASS",
+      "fit_seconds": 0.11184936900099274,
+      "predict_seconds": 0.023887969997304026,
+      "total_seconds": 0.13573733899829676,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_TCN"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 18740736,
+      "cuda_peak_memory_reserved": 23068672,
+      "cuda_allocation_delta": 18740736,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase2_predictions/tcn_predictions.csv",
+      "phase": "phase2"
+    },
+    {
+      "model": "BiTCN",
+      "status": "PASS",
+      "fit_seconds": 0.09315838199836435,
+      "predict_seconds": 0.017279096999118337,
+      "total_seconds": 0.11043747899748269,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_BiTCN"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 40410112,
+      "cuda_peak_memory_reserved": 58720256,
+      "cuda_allocation_delta": 40410112,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase2_predictions/bitcn_predictions.csv",
+      "phase": "phase2"
+    },
+    {
+      "model": "TiDE",
+      "status": "PASS",
+      "fit_seconds": 0.032767327000328805,
+      "predict_seconds": 0.011508922001667088,
+      "total_seconds": 0.04427624900199589,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_TiDE"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 19258880,
+      "cuda_peak_memory_reserved": 25165824,
+      "cuda_allocation_delta": 19258880,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase2_predictions/tide_predictions.csv",
+      "phase": "phase2"
+    },
+    {
+      "model": "TimesNet",
+      "status": "PASS",
+      "fit_seconds": 0.4812961060015368,
+      "predict_seconds": 0.022158728999784216,
+      "total_seconds": 0.503454835001321,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_TimesNet"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 23121920,
+      "cuda_peak_memory_reserved": 29360128,
+      "cuda_allocation_delta": 23121920,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase2_predictions/timesnet_predictions.csv",
+      "phase": "phase2"
+    },
+    {
+      "model": "TFT",
+      "status": "PASS",
+      "fit_seconds": 0.06833555299817817,
+      "predict_seconds": 0.02417753800182254,
+      "total_seconds": 0.09251309100000071,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_TFT"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 90034688,
+      "cuda_peak_memory_reserved": 130023424,
+      "cuda_allocation_delta": 90034688,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase2_predictions/tft_predictions.csv",
+      "phase": "phase2"
+    },
+    {
+      "model": "VanillaTransformer",
+      "status": "PASS",
+      "fit_seconds": 0.049871523999172496,
+      "predict_seconds": 0.01568614400093793,
+      "total_seconds": 0.06555766800011043,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_VanillaTransformer"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 117581824,
+      "cuda_peak_memory_reserved": 144703488,
+      "cuda_allocation_delta": 117581824,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase2_predictions/vanillatransformer_predictions.csv",
+      "phase": "phase2"
+    },
+    {
+      "model": "Autoformer",
+      "status": "PASS",
+      "fit_seconds": 0.576683265997417,
+      "predict_seconds": 0.017567324000992812,
+      "total_seconds": 0.5942505899984099,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_Autoformer"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 86666240,
+      "cuda_peak_memory_reserved": 109051904,
+      "cuda_allocation_delta": 86666240,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase3_predictions/autoformer_predictions.csv",
+      "phase": "phase3"
+    },
+    {
+      "model": "FEDformer",
+      "status": "PASS",
+      "fit_seconds": 0.9525673190000816,
+      "predict_seconds": 0.02707575100066606,
+      "total_seconds": 0.9796430700007477,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_FEDformer"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 50660864,
+      "cuda_peak_memory_reserved": 71303168,
+      "cuda_allocation_delta": 50660864,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase3_predictions/fedformer_predictions.csv",
+      "phase": "phase3"
+    },
+    {
+      "model": "Informer",
+      "status": "PASS",
+      "fit_seconds": 0.12261930600288906,
+      "predict_seconds": 0.028315145998931257,
+      "total_seconds": 0.15093445200182032,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_Informer"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 62060544,
+      "cuda_peak_memory_reserved": 75497472,
+      "cuda_allocation_delta": 62060544,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase3_predictions/informer_predictions.csv",
+      "phase": "phase3"
+    },
+    {
+      "model": "DeepAR",
+      "status": "PASS",
+      "fit_seconds": 0.09683437700005015,
+      "predict_seconds": 0.03009098500115215,
+      "total_seconds": 0.1269253620012023,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_DeepAR",
+        "cert_DeepAR-median",
+        "cert_DeepAR-lo-80",
+        "cert_DeepAR-hi-80"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 58991616,
+      "cuda_peak_memory_reserved": 90177536,
+      "cuda_allocation_delta": 58991616,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase3_predictions/deepar_predictions.csv",
+      "phase": "phase3"
+    },
+    {
+      "model": "DeepNPTS",
+      "status": "PASS",
+      "fit_seconds": 0.03449727999759489,
+      "predict_seconds": 0.012772924001183128,
+      "total_seconds": 0.047270203998778015,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_DeepNPTS"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 18749440,
+      "cuda_peak_memory_reserved": 23068672,
+      "cuda_allocation_delta": 18749440,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase3_predictions/deepnpts_predictions.csv",
+      "phase": "phase3"
+    },
+    {
+      "model": "KAN",
+      "status": "PASS",
+      "fit_seconds": 0.031318846999056404,
+      "predict_seconds": 0.00961339700006647,
+      "total_seconds": 0.040932243999122875,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_KAN"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 23787520,
+      "cuda_peak_memory_reserved": 31457280,
+      "cuda_allocation_delta": 23787520,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase3_predictions/kan_predictions.csv",
+      "phase": "phase3"
+    },
+    {
+      "model": "NBEATSx",
+      "status": "PASS",
+      "fit_seconds": 0.02976466800100752,
+      "predict_seconds": 0.02127506699980586,
+      "total_seconds": 0.05103973500081338,
+      "prediction_rows": 3,
+      "prediction_columns": [
+        "unique_id",
+        "ds",
+        "cert_NBEATSx"
+      ],
+      "prediction_finite": true,
+      "forward_calls": 5,
+      "forward_parameter_devices": [
+        "cuda:0"
+      ],
+      "forward_input_devices": [
+        "cuda:0"
+      ],
+      "cuda_forward_confirmed": true,
+      "post_run_parameter_devices": [
+        "cpu"
+      ],
+      "cuda_memory_allocated_before": 0,
+      "cuda_memory_reserved_before": 0,
+      "cuda_peak_memory_allocated": 18928640,
+      "cuda_peak_memory_reserved": 23068672,
+      "cuda_allocation_delta": 18928640,
+      "prediction_file": "artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase3_predictions/nbeatsx_predictions.csv",
+      "phase": "phase3"
+    }
+  ]
+}
