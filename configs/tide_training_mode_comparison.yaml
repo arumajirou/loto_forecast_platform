@@ -1,0 +1,103 @@
+experiment:
+  game: loto7
+  model: TiDE
+  seeds:
+    - 42
+    - 123
+    - 2026
+
+  outer_windows: 20
+  inner_windows: 10
+  optuna_trials: 40
+
+  prediction_length: 1
+  input_size: 64
+  max_steps_selection: 50
+  max_steps_final: 100
+  learning_rate: 0.001
+  batch_size: 32
+  scaler_type: robust
+
+training_modes:
+  - separate
+  - global
+  - global_position
+
+metrics:
+  primary: mae
+  secondary:
+    - mse
+    - within_1
+
+feature_groups:
+  calendar_raw:
+    type: future
+    columns:
+      - feat_year
+      - feat_month
+      - feat_day
+      - feat_dayofweek
+      - feat_weekofyear
+      - feat_dayofyear
+
+  calendar_flags:
+    type: future
+    columns:
+      - feat_is_weekend
+      - feat_is_month_start
+      - feat_is_month_end
+
+  calendar_cyclical:
+    type: future
+    columns:
+      - feat_dow_sin
+      - feat_dow_cos
+      - feat_month_sin
+      - feat_month_cos
+
+  lags_short:
+    type: historical
+    columns:
+      - hist_lag_1
+      - hist_lag_2
+      - hist_lag_3
+      - hist_lag_7
+
+  lags_long:
+    type: historical
+    columns:
+      - hist_lag_14
+      - hist_lag_28
+
+  rolling_mean:
+    type: historical
+    columns:
+      - hist_roll_mean_3
+      - hist_roll_mean_7
+      - hist_roll_mean_14
+      - hist_roll_mean_28
+
+  rolling_std:
+    type: historical
+    columns:
+      - hist_roll_std_7
+      - hist_roll_std_14
+      - hist_roll_std_28
+
+  rolling_range:
+    type: historical
+    columns:
+      - hist_roll_min_7
+      - hist_roll_max_7
+      - hist_roll_min_14
+      - hist_roll_max_14
+
+  ewm:
+    type: historical
+    columns:
+      - hist_ewm_mean_7
+      - hist_ewm_mean_14
+
+forbidden_features:
+  - hist_diff_1
+  - hist_diff_7

@@ -1,0 +1,13 @@
+future_exog:
+  - feat_month_sin
+  - feat_month_cos
+  - feat_dayofyear
+  - feat_dow_sin
+  - feat_dow_cos
+
+historical_exog:
+  - hist_lag_1
+  - hist_lag_2
+  - hist_lag_7
+  - hist_roll_mean_7
+  - hist_roll_std_7
