@@ -528,7 +528,18 @@
       "trust_remote_code_candidate": true,
       "stored_weight_bytes": 513341448,
       "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_status": "BLOCKED",
+      "runtime_revision": "3212e42564493f520593e5414af4367fc4b49226",
+      "runtime_blocked_reason": "TRUST_REMOTE_CODE_REVIEW_REQUIRED",
+      "runtime_blocked_detail": "Pinned snapshot includes custom remote-code files and requires trust_remote_code review before execution.",
+      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226",
+      "retry_condition": "Complete and approve a security review of the pinned remote-code files before running CUDA runtime certification.",
+      "runtime_resume_conditions": [
+        "Complete and approve a security review of the pinned remote-code files before running CUDA runtime certification."
+      ],
+      "runtime_license_review": "APPROVED",
+      "runtime_weight_sha256": "414435b508391f92afadd2aaeec418c806776aeccbce12e638d73a139ca5ca78",
+      "runtime_config_sha256": "173dd40c0a7e08a71b660110fd6334ee85eb9f6ce6f30df0a6cbaea3bb1ff3b4"
     },
     {
       "model_id": "t0-alpha",
@@ -661,6 +672,6 @@
     }
   ],
   "certified_models": 8,
-  "blocked_models": 8,
-  "pending_models": 5
+  "blocked_models": 9,
+  "pending_models": 4
 }

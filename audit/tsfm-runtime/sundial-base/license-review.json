@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "model_id": "sundial-base",
+  "repo_id": "thuml/sundial-base-128m",
+  "revision": "3212e42564493f520593e5414af4367fc4b49226",
+  "license": "apache-2.0",
+  "review_status": "APPROVED",
+  "commercial_use": true,
+  "attribution_required": true,
+  "redistribution_allowed": true,
+  "modification_allowed": true,
+  "patent_grant": true,
+  "notice_required_on_distribution": true,
+  "limitations": [
+    "Runtime certification remains blocked pending remote-code security review."
+  ],
+  "review_notes": [
+    "Ledger records apache-2.0 and pinned README/model metadata is available locally."
+  ]
+}

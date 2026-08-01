@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "model_id": "sundial-base",
+  "blocked_reason": "TRUST_REMOTE_CODE_REVIEW_REQUIRED",
+  "blocked_detail": "Pinned snapshot includes custom remote-code files and requires trust_remote_code review before execution.",
+  "retry_condition": "Complete and approve a security review of the pinned remote-code files before running CUDA runtime certification.",
+  "facts": [
+    "Snapshot includes custom Python model files.",
+    "README usage requires trust_remote_code=True."
+  ]
+}

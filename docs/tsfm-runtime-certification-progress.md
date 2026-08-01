@@ -6,12 +6,12 @@ Updated: 2026-08-01
 
 - Total models: 21
 - Runtime certified: 8
-- Blocked: 8
-- Pending: 5
+- Blocked: 9
+- Pending: 4
 - Formal certification progress: 38.1%
-- Judged progress: 76.2%
-- Current branch: feat/moment-1-small-runtime-audit-v1
-- Next model: sundial-base
+- Judged progress: 81.0%
+- Current branch: feat/sundial-base-runtime-audit-v1
+- Next model: t0-alpha
 
 ## Certified
 
@@ -179,8 +179,8 @@ Updated: 2026-08-01
 ### moment-1-small
 
 - Branch: feat/moment-1-small-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: 224a526
+- Push: origin/feat/moment-1-small-runtime-audit-v1
 - repo_id: AutonLab/MOMENT-1-small
 - revision: 411e288267f82cce86296dbe4d6c8bc533cc162f
 - status: BLOCKED
@@ -193,3 +193,23 @@ Updated: 2026-08-01
 - dedicated test: tests/test_moment_1_small_runtime_audit.py
 - hash verification: audit/tsfm-runtime/moment-1-small/sha256sum.txt OK
 - resume condition: Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files.
+
+### sundial-base
+
+- Branch: feat/sundial-base-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: thuml/sundial-base-128m
+- revision: 3212e42564493f520593e5414af4367fc4b49226
+- status: BLOCKED
+- blocked reason: TRUST_REMOTE_CODE_REVIEW_REQUIRED
+- checked snapshot: /mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226
+- snapshot finding: complete snapshot with custom Python remote-code files
+- weight SHA-256: 414435b508391f92afadd2aaeec418c806776aeccbce12e638d73a139ca5ca78
+- config SHA-256: 173dd40c0a7e08a71b660110fd6334ee85eb9f6ce6f30df0a6cbaea3bb1ff3b4
+- runtime executed: false
+- CPU fallback: false
+- license: Apache-2.0 APPROVED
+- dedicated test: tests/test_sundial_base_runtime_audit.py
+- hash verification: audit/tsfm-runtime/sundial-base/sha256sum.txt OK
+- resume condition: Complete and approve a security review of the pinned remote-code files before running CUDA runtime certification.

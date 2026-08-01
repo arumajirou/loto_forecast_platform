@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "model_id": "sundial-base",
+  "repo_id": "thuml/sundial-base-128m",
+  "revision": "3212e42564493f520593e5414af4367fc4b49226",
+  "certification_status": "BLOCKED",
+  "runtime_vram_certified": false,
+  "license_review_status": "APPROVED",
+  "blocked_at": "2026-08-01T10:07:40.754890+00:00",
+  "blocked_reason": "TRUST_REMOTE_CODE_REVIEW_REQUIRED",
+  "blocked_detail": "Pinned snapshot includes custom remote-code files and requires trust_remote_code review before execution.",
+  "retry_condition": "Complete and approve a security review of the pinned remote-code files before running CUDA runtime certification.",
+  "weight_sha256": "414435b508391f92afadd2aaeec418c806776aeccbce12e638d73a139ca5ca78",
+  "config_sha256": "173dd40c0a7e08a71b660110fd6334ee85eb9f6ce6f30df0a6cbaea3bb1ff3b4",
+  "limitations": [
+    "Remote code was not executed.",
+    "No CUDA inference was executed."
+  ]
+}
