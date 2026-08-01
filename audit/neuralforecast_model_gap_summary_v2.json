@@ -1,0 +1,41 @@
+{
+  "schema_version": 2,
+  "created_at": "2026-08-01T05:37:51.936732+00:00",
+  "neuralforecast_version": "3.2.0",
+  "official_fixed_count": 37,
+  "platform_fixed_count": 17,
+  "missing_fixed_count": 20,
+  "missing_fixed": [
+    "Autoformer",
+    "BiTCN",
+    "DeepNPTS",
+    "DilatedRNN",
+    "FEDformer",
+    "HINT",
+    "Informer",
+    "KAN",
+    "MLP",
+    "MLPMultivariate",
+    "RMoK",
+    "RNN",
+    "SOFTS",
+    "SOFTSSharp",
+    "StemGNN",
+    "TSMixerx",
+    "TimeLLM",
+    "TimeXer",
+    "XLinear",
+    "xLSTM"
+  ],
+  "official_auto_count": 36,
+  "platform_auto_count": 33,
+  "missing_auto_count": 3,
+  "missing_auto": [
+    "AutoSOFTSSharp",
+    "AutoXLinear",
+    "AutoxLSTM"
+  ],
+  "official_total": 73,
+  "platform_total": 50,
+  "missing_total": 23
+}
