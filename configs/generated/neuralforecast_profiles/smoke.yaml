@@ -1,0 +1,59 @@
+metadata:
+  profile: smoke
+  neuralforecast_version: 3.2.0
+policy:
+  game: loto7
+  horizon: 1
+  univariate_only: true
+  primary_metric: macro_mae
+  secondary_metrics:
+  - macro_mse
+  - macro_within_1
+  - all_positions_within_1
+  - positive_fold_rate
+  - training_seconds
+  - peak_vram_mib
+  forbidden_features:
+  - hist_diff_1
+  - hist_diff_7
+  search_seed: 42
+  formal_evaluation_seeds:
+  - 42
+  - 123
+  - 2026
+  fail_on_nonfinite_prediction: true
+  fail_on_cpu_fallback: true
+  require_cuda_evidence: true
+  require_prediction_shape_check: true
+  require_temporal_leakage_check: true
+profile:
+  description: Minimal runtime and compatibility certification
+  models:
+  - AutoDLinear
+  - AutoGRU
+  - AutoNHITS
+  - AutoTFT
+  - AutoTiDE
+  - AutoPatchTST
+  backends:
+  - optuna
+  search_space: normalized_fixed_seed
+  training_modes:
+  - separate
+  - global
+  - global_position
+  losses:
+  - name: MAE
+    kwargs: {}
+  exog_conditions:
+  - no_exog
+  - calendar_cyclical
+  num_samples: 1
+  outer_windows: 2
+  inner_windows: 1
+  max_steps_override: 5
+  val_size: 5
+  precision: 32-true
+  deterministic: true
+  benchmark: false
+  stop_on_first_error: false

@@ -1,0 +1,54 @@
+metadata:
+  profile: formal
+  neuralforecast_version: 3.2.0
+policy:
+  game: loto7
+  horizon: 1
+  univariate_only: true
+  primary_metric: macro_mae
+  secondary_metrics:
+  - macro_mse
+  - macro_within_1
+  - all_positions_within_1
+  - positive_fold_rate
+  - training_seconds
+  - peak_vram_mib
+  forbidden_features:
+  - hist_diff_1
+  - hist_diff_7
+  search_seed: 42
+  formal_evaluation_seeds:
+  - 42
+  - 123
+  - 2026
+  fail_on_nonfinite_prediction: true
+  fail_on_cpu_fallback: true
+  require_cuda_evidence: true
+  require_prediction_shape_check: true
+  require_temporal_leakage_check: true
+profile:
+  description: Strict frozen-configuration outer evaluation
+  configurations_from: fine.promotion.top_k_configurations
+  search_enabled: false
+  retune_inside_outer_fold: false
+  configuration_frozen_before_test: true
+  training_modes:
+  - separate
+  - global
+  - global_position
+  evaluation_seeds:
+  - 42
+  - 123
+  - 2026
+  outer_windows: 50
+  step_size: 1
+  refit: 1
+  precision: 32-true
+  deterministic: true
+  benchmark: false
+  save_predictions: true
+  save_checkpoints: true
+  save_fold_metrics: true
+  save_gpu_evidence: true
+  save_environment_lock: true
+  require_complete_fold_set: true

@@ -1,0 +1,2101 @@
+{
+  "metadata": {
+    "neuralforecast_version": "3.2.0",
+    "model_count": 24,
+    "purpose": "Backend-neutral fair comparison space with fixed search seed",
+    "integer_upper_policy": "Intersection of Optuna inclusive and Ray effective exclusive ranges",
+    "categorical_duplicate_policy": "Remove duplicates preserving order",
+    "search_seed_policy": "random_seed is fixed during hyperparameter search",
+    "search_seed": 42,
+    "formal_evaluation_seeds": [
+      42,
+      123,
+      2026
+    ]
+  },
+  "models": {
+    "AutoAutoformer": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            64,
+            128,
+            256
+          ]
+        },
+        "n_head": {
+          "kind": "categorical",
+          "values": [
+            4,
+            8
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000,
+            2000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoBiTCN": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32
+          ]
+        },
+        "dropout": {
+          "kind": "float",
+          "lower": 0.0,
+          "upper": 0.99,
+          "step": null,
+          "log": false
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000,
+            2000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoDLinear": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "moving_avg_window": {
+          "kind": "categorical",
+          "values": [
+            11,
+            25,
+            51
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "discrete_float",
+          "lower": 500.0,
+          "upper": 1500.0,
+          "step": 100.0,
+          "log": false
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoDeepAR": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "lstm_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "lstm_n_layers": {
+          "kind": "integer",
+          "lower": 1,
+          "upper": 3,
+          "step": 1,
+          "log": false,
+          "normalization": "intersection_of_optuna_and_ray",
+          "official_optuna_upper": 4,
+          "official_ray_effective_upper": 3
+        },
+        "lstm_dropout": {
+          "kind": "float",
+          "lower": 0.0,
+          "upper": 0.5,
+          "step": null,
+          "log": false
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            "robust",
+            "minmax1"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000,
+            2000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoDeepNPTS": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64
+          ]
+        },
+        "dropout": {
+          "kind": "float",
+          "lower": 0.0,
+          "upper": 0.99,
+          "step": null,
+          "log": false
+        },
+        "n_layers": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            4
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "discrete_float",
+          "lower": 500.0,
+          "upper": 1500.0,
+          "step": 100.0,
+          "log": false
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoDilatedRNN": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "cell_type": {
+          "kind": "categorical",
+          "values": [
+            "LSTM",
+            "GRU"
+          ]
+        },
+        "encoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "dilations": {
+          "kind": "categorical",
+          "values": [
+            [
+              [
+                1,
+                2
+              ],
+              [
+                4,
+                8
+              ]
+            ],
+            [
+              [
+                1,
+                2,
+                4,
+                8
+              ]
+            ]
+          ]
+        },
+        "context_size": {
+          "kind": "categorical",
+          "values": [
+            5,
+            10,
+            50
+          ]
+        },
+        "decoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            -1,
+            4,
+            16,
+            64
+          ]
+        },
+        "inference_input_size": {
+          "kind": "categorical",
+          "values": [
+            -1
+          ]
+        }
+      }
+    },
+    "AutoFEDformer": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            64,
+            128,
+            256
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000,
+            2000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoGRU": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "encoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "encoder_n_layers": {
+          "kind": "integer",
+          "lower": 1,
+          "upper": 3,
+          "step": 1,
+          "log": false,
+          "normalization": "intersection_of_optuna_and_ray",
+          "official_optuna_upper": 4,
+          "official_ray_effective_upper": 3
+        },
+        "context_size": {
+          "kind": "categorical",
+          "values": [
+            5,
+            10,
+            50
+          ]
+        },
+        "decoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            -1,
+            4,
+            16,
+            64
+          ]
+        },
+        "inference_input_size": {
+          "kind": "categorical",
+          "values": [
+            -1
+          ]
+        }
+      }
+    },
+    "AutoInformer": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            64,
+            128,
+            256
+          ]
+        },
+        "n_head": {
+          "kind": "categorical",
+          "values": [
+            4,
+            8
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000,
+            2000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoKAN": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "grid_size": {
+          "kind": "categorical",
+          "values": [
+            5,
+            10,
+            15
+          ]
+        },
+        "spline_order": {
+          "kind": "categorical",
+          "values": [
+            2,
+            3,
+            4
+          ]
+        },
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            64,
+            128,
+            256,
+            512
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "discrete_float",
+          "lower": 500.0,
+          "upper": 1500.0,
+          "step": 100.0,
+          "log": false
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoLSTM": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "encoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "encoder_n_layers": {
+          "kind": "integer",
+          "lower": 1,
+          "upper": 3,
+          "step": 1,
+          "log": false,
+          "normalization": "intersection_of_optuna_and_ray",
+          "official_optuna_upper": 4,
+          "official_ray_effective_upper": 3
+        },
+        "context_size": {
+          "kind": "categorical",
+          "values": [
+            5,
+            10,
+            50
+          ]
+        },
+        "decoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            -1,
+            4,
+            16,
+            64
+          ]
+        },
+        "inference_input_size": {
+          "kind": "categorical",
+          "values": [
+            -1
+          ]
+        }
+      }
+    },
+    "AutoMLP": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            256,
+            512,
+            1024
+          ]
+        },
+        "num_layers": {
+          "kind": "integer",
+          "lower": 2,
+          "upper": 5,
+          "step": 1,
+          "log": false,
+          "normalization": "intersection_of_optuna_and_ray",
+          "official_optuna_upper": 6,
+          "official_ray_effective_upper": 5
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoNBEATS": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoNBEATSx": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoNHITS": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "n_pool_kernel_size": {
+          "kind": "categorical",
+          "values": [
+            [
+              2,
+              2,
+              1
+            ],
+            [
+              1,
+              1,
+              1
+            ],
+            [
+              2,
+              2,
+              2
+            ],
+            [
+              4,
+              4,
+              4
+            ],
+            [
+              8,
+              4,
+              1
+            ],
+            [
+              16,
+              8,
+              1
+            ]
+          ]
+        },
+        "n_freq_downsample": {
+          "kind": "categorical",
+          "values": [
+            [
+              168,
+              24,
+              1
+            ],
+            [
+              24,
+              12,
+              1
+            ],
+            [
+              180,
+              60,
+              1
+            ],
+            [
+              60,
+              8,
+              1
+            ],
+            [
+              40,
+              20,
+              1
+            ],
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "discrete_float",
+          "lower": 500.0,
+          "upper": 1500.0,
+          "step": 100.0,
+          "log": false
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoNLinear": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "discrete_float",
+          "lower": 500.0,
+          "upper": 1500.0,
+          "step": 100.0,
+          "log": false
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoPatchTST": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            128,
+            256
+          ]
+        },
+        "n_heads": {
+          "kind": "categorical",
+          "values": [
+            4,
+            16
+          ]
+        },
+        "patch_len": {
+          "kind": "categorical",
+          "values": [
+            16,
+            24
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "revin": {
+          "kind": "categorical",
+          "values": [
+            false,
+            true
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000,
+            5000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoRNN": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "encoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "encoder_n_layers": {
+          "kind": "integer",
+          "lower": 1,
+          "upper": 3,
+          "step": 1,
+          "log": false,
+          "normalization": "intersection_of_optuna_and_ray",
+          "official_optuna_upper": 4,
+          "official_ray_effective_upper": 3
+        },
+        "context_size": {
+          "kind": "categorical",
+          "values": [
+            5,
+            10,
+            50
+          ]
+        },
+        "decoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            -1,
+            4,
+            16,
+            64
+          ]
+        },
+        "inference_input_size": {
+          "kind": "categorical",
+          "values": [
+            -1
+          ]
+        }
+      }
+    },
+    "AutoTCN": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "encoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "context_size": {
+          "kind": "categorical",
+          "values": [
+            5,
+            10,
+            50
+          ]
+        },
+        "decoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            -1,
+            4,
+            16,
+            64
+          ]
+        },
+        "inference_input_size": {
+          "kind": "categorical",
+          "values": [
+            -1
+          ]
+        }
+      }
+    },
+    "AutoTFT": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            64,
+            128,
+            256
+          ]
+        },
+        "n_head": {
+          "kind": "categorical",
+          "values": [
+            4,
+            8
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000,
+            2000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoTiDE": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            256,
+            512,
+            1024
+          ]
+        },
+        "decoder_output_dim": {
+          "kind": "categorical",
+          "values": [
+            8,
+            16,
+            32
+          ]
+        },
+        "temporal_decoder_dim": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128
+          ]
+        },
+        "num_encoder_layers": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3
+          ]
+        },
+        "num_decoder_layers": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3
+          ]
+        },
+        "temporal_width": {
+          "kind": "categorical",
+          "values": [
+            4,
+            8,
+            16
+          ]
+        },
+        "dropout": {
+          "kind": "categorical",
+          "values": [
+            0.0,
+            0.1,
+            0.2,
+            0.3,
+            0.5
+          ]
+        },
+        "layernorm": {
+          "kind": "categorical",
+          "values": [
+            true,
+            false
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 1e-05,
+          "upper": 0.01,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "discrete_float",
+          "lower": 500.0,
+          "upper": 1500.0,
+          "step": 100.0,
+          "log": false
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoTimesNet": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128
+          ]
+        },
+        "conv_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000,
+            2000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoVanillaTransformer": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "hidden_size": {
+          "kind": "categorical",
+          "values": [
+            64,
+            128,
+            256
+          ]
+        },
+        "n_head": {
+          "kind": "categorical",
+          "values": [
+            4,
+            8
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000,
+            2000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    },
+    "AutoxLSTM": {
+      "source": "intersection_of_neuralforecast_optuna_and_ray_defaults",
+      "parameters": {
+        "encoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "encoder_n_blocks": {
+          "kind": "integer",
+          "lower": 1,
+          "upper": 3,
+          "step": 1,
+          "log": false,
+          "normalization": "intersection_of_optuna_and_ray",
+          "official_optuna_upper": 4,
+          "official_ray_effective_upper": 3
+        },
+        "encoder_dropout": {
+          "kind": "float",
+          "lower": 0.0,
+          "upper": 0.99,
+          "step": null,
+          "log": false
+        },
+        "decoder_hidden_size": {
+          "kind": "categorical",
+          "values": [
+            16,
+            32,
+            64,
+            128
+          ]
+        },
+        "learning_rate": {
+          "kind": "log_float",
+          "lower": 0.0001,
+          "upper": 0.1,
+          "step": null,
+          "log": true
+        },
+        "scaler_type": {
+          "kind": "categorical",
+          "values": [
+            null,
+            "robust",
+            "standard"
+          ]
+        },
+        "max_steps": {
+          "kind": "categorical",
+          "values": [
+            500,
+            1000,
+            2000
+          ]
+        },
+        "batch_size": {
+          "kind": "categorical",
+          "values": [
+            32,
+            64,
+            128,
+            256
+          ]
+        },
+        "windows_batch_size": {
+          "kind": "categorical",
+          "values": [
+            128,
+            256,
+            512,
+            1024
+          ]
+        },
+        "random_seed": {
+          "kind": "fixed",
+          "value": 42,
+          "purpose": "hyperparameter_search_reproducibility"
+        },
+        "input_size": {
+          "kind": "categorical",
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "step_size": {
+          "kind": "categorical",
+          "values": [
+            1
+          ]
+        }
+      }
+    }
+  },
+  "normalization_report": {
+    "fixed_seed_models": 24,
+    "search_seed": 42,
+    "formal_evaluation_seeds": [
+      42,
+      123,
+      2026
+    ]
+  }
+}

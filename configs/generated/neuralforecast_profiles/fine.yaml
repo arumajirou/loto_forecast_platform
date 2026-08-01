@@ -1,0 +1,68 @@
+metadata:
+  profile: fine
+  neuralforecast_version: 3.2.0
+policy:
+  game: loto7
+  horizon: 1
+  univariate_only: true
+  primary_metric: macro_mae
+  secondary_metrics:
+  - macro_mse
+  - macro_within_1
+  - all_positions_within_1
+  - positive_fold_rate
+  - training_seconds
+  - peak_vram_mib
+  forbidden_features:
+  - hist_diff_1
+  - hist_diff_7
+  search_seed: 42
+  formal_evaluation_seeds:
+  - 42
+  - 123
+  - 2026
+  fail_on_nonfinite_prediction: true
+  fail_on_cpu_fallback: true
+  require_cuda_evidence: true
+  require_prediction_shape_check: true
+  require_temporal_leakage_check: true
+profile:
+  description: Model-specific fine search around broad winners
+  configurations_from: broad.promotion.top_k_configurations
+  models_from: broad.promotion.top_k_models
+  backends:
+  - optuna
+  search_spaces:
+  - normalized_fixed_seed
+  - custom_extended
+  training_modes:
+  - separate
+  - global
+  - global_position
+  losses:
+  - name: MAE
+    kwargs: {}
+  - name: MSE
+    kwargs: {}
+  - name: HuberLoss
+    kwargs_grid:
+      delta:
+      - 0.5
+      - 1.0
+      - 2.0
+  - name: TukeyLoss
+    kwargs_grid:
+      c:
+      - 2.0
+      - 4.685
+      - 8.0
+  num_samples: 100
+  outer_windows: 20
+  inner_windows: 10
+  max_steps_cap: 1500
+  val_size: 30
+  precision: 32-true
+  deterministic: true
+  benchmark: false
+  promotion:
+    top_k_configurations: 5

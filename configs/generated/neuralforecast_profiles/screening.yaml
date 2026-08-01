@@ -1,0 +1,86 @@
+metadata:
+  profile: screening
+  neuralforecast_version: 3.2.0
+policy:
+  game: loto7
+  horizon: 1
+  univariate_only: true
+  primary_metric: macro_mae
+  secondary_metrics:
+  - macro_mse
+  - macro_within_1
+  - all_positions_within_1
+  - positive_fold_rate
+  - training_seconds
+  - peak_vram_mib
+  forbidden_features:
+  - hist_diff_1
+  - hist_diff_7
+  search_seed: 42
+  formal_evaluation_seeds:
+  - 42
+  - 123
+  - 2026
+  fail_on_nonfinite_prediction: true
+  fail_on_cpu_fallback: true
+  require_cuda_evidence: true
+  require_prediction_shape_check: true
+  require_temporal_leakage_check: true
+profile:
+  description: All-model low-cost screening
+  models:
+  - AutoAutoformer
+  - AutoBiTCN
+  - AutoDLinear
+  - AutoDeepAR
+  - AutoDeepNPTS
+  - AutoDilatedRNN
+  - AutoFEDformer
+  - AutoGRU
+  - AutoInformer
+  - AutoKAN
+  - AutoLSTM
+  - AutoMLP
+  - AutoNBEATS
+  - AutoNBEATSx
+  - AutoNHITS
+  - AutoNLinear
+  - AutoPatchTST
+  - AutoRNN
+  - AutoTCN
+  - AutoTFT
+  - AutoTiDE
+  - AutoTimesNet
+  - AutoVanillaTransformer
+  - AutoxLSTM
+  backends:
+  - optuna
+  search_space: normalized_fixed_seed
+  training_modes:
+  - separate
+  - global
+  - global_position
+  losses:
+  - name: MAE
+    kwargs: {}
+  - name: HuberLoss
+    kwargs:
+      delta: 1.0
+  exog_conditions:
+  - no_exog
+  - calendar_cyclical
+  - lags_short
+  - rolling_mean
+  - all_safe_exog
+  num_samples: 5
+  outer_windows: 5
+  inner_windows: 3
+  max_steps_cap: 200
+  val_size: 10
+  precision: 32-true
+  deterministic: true
+  benchmark: false
+  promotion:
+    top_k_models: 8
+    minimum_success_rate: 0.8
+    maximum_nonfinite_predictions: 0

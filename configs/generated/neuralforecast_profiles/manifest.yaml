@@ -1,0 +1,22 @@
+metadata:
+  neuralforecast_version: 3.2.0
+  model_count: 24
+  profile_count: 5
+  space_source: configs/generated/neuralforecast_normalized_fixed_seed_spaces.json
+  search_spec_source: configs/generated/neuralforecast_complete_search_spec.yaml
+profiles:
+  smoke:
+    path: configs/generated/neuralforecast_profiles/smoke.yaml
+    description: Minimal runtime and compatibility certification
+  screening:
+    path: configs/generated/neuralforecast_profiles/screening.yaml
+    description: All-model low-cost screening
+  broad:
+    path: configs/generated/neuralforecast_profiles/broad.yaml
+    description: Broader search for screening winners
+  fine:
+    path: configs/generated/neuralforecast_profiles/fine.yaml
+    description: Model-specific fine search around broad winners
+  formal:
+    path: configs/generated/neuralforecast_profiles/formal.yaml
+    description: Strict frozen-configuration outer evaluation

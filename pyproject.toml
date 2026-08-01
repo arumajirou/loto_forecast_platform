@@ -15,6 +15,14 @@ dependencies = [
   "scipy>=1.14",
   "PyYAML>=6.0",
   "prometheus-client>=0.21",
+  "neuralforecast==3.2.0",
+  "torch==2.9.1",
+  "triton==3.5.1",
+  "transformers==4.57.6",
+  "huggingface-hub==0.36.2",
+  "pyarrow>=24.0.0,<25",
+  "optuna-dashboard>=0.20.0,<0.21",
+  "tabulate>=0.10.0,<0.11",
 ]
 
 [project.optional-dependencies]

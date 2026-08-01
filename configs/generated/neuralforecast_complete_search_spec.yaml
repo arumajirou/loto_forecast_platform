@@ -1,0 +1,1649 @@
+metadata:
+  neuralforecast_version: 3.2.0
+  game: loto7
+  horizon: 1
+  generated_from_runtime_introspection: true
+  eligible_auto_models: 24
+policy:
+  univariate_only: true
+  forbidden_features:
+  - hist_diff_1
+  - hist_diff_7
+  primary_metric: macro_mae
+  secondary_metrics:
+  - macro_mse
+  - macro_within_1
+  - all_positions_within_1
+  - positive_fold_rate
+  - training_seconds
+search_methods:
+- manual_coarse_grid
+- auto_default_optuna
+- auto_custom_optuna
+- auto_default_ray
+- auto_custom_ray
+- manual_fine_grid
+training_modes:
+- separate
+- global
+- global_position
+auto_wrapper_grid:
+  backend:
+  - optuna
+  - ray
+  num_samples:
+  - 20
+  - 50
+  - 100
+  - 200
+  time_budget:
+  - null
+  - 1800
+  - 3600
+  refit_with_val:
+  - false
+  - true
+  verbose:
+  - true
+  optuna_sampler:
+  - RandomSampler
+  - TPESampler
+  - QMCSampler
+  - CmaEsSampler
+  ray_scheduler:
+  - FIFOScheduler
+  - ASHAScheduler
+  - HyperBandScheduler
+  - MedianStoppingRule
+core_grid:
+  local_scaler_type:
+  - null
+  - standard
+  - robust
+  - minmax
+  local_static_scaler_type:
+  - null
+  - standard
+  - robust
+fit_grid:
+  val_size:
+  - 5
+  - 10
+  - 20
+  - 30
+  - 50
+  use_init_models:
+  - false
+cross_validation_grid:
+  n_windows:
+  - 5
+  - 10
+  - 20
+  - 50
+  step_size:
+  - 1
+  refit:
+  - false
+  - 1
+  - 5
+  - 10
+  use_init_models:
+  - false
+  - true
+trainer_grid:
+  precision:
+  - 32-true
+  - 16-mixed
+  - bf16-mixed
+  gradient_clip_val:
+  - 0.0
+  - 0.5
+  - 1.0
+  - 5.0
+  gradient_clip_algorithm:
+  - norm
+  - value
+  accumulate_grad_batches:
+  - 1
+  - 2
+  - 4
+  deterministic:
+  - true
+  - false
+  benchmark:
+  - false
+  - true
+point_loss_grid:
+- name: MAE
+  kwargs: {}
+  enabled: true
+- name: MSE
+  kwargs: {}
+  enabled: true
+- name: RMSE
+  kwargs: {}
+  enabled: true
+- name: HuberLoss
+  kwargs:
+    delta:
+    - 0.5
+    - 1.0
+    - 2.0
+  enabled: true
+- name: TukeyLoss
+  kwargs:
+    c:
+    - 2.0
+    - 4.685
+    - 8.0
+  enabled: true
+- name: MAPE
+  kwargs: {}
+  enabled: false
+  reason: Potential instability for small target values
+- name: SMAPE
+  kwargs: {}
+  enabled: false
+  reason: Enable only after zero/small-value audit
+- name: MASE
+  kwargs:
+    seasonality:
+    - 1
+    - 7
+    - 14
+  enabled: false
+  reason: Requires justified seasonality
+- name: relMSE
+  kwargs: {}
+  enabled: false
+  reason: Requires benchmark semantics audit
+probabilistic_loss_grid:
+- name: MQLoss
+  kwargs:
+    level:
+    - - 50
+    - - 80
+    - - 80
+      - 90
+    - - 50
+      - 80
+      - 90
+  enabled: true
+- name: DistributionLoss
+  kwargs:
+    distribution:
+    - Normal
+    - StudentT
+    level:
+    - - 80
+    - - 80
+      - 90
+  enabled: true
+- name: GMM
+  kwargs:
+    n_components:
+    - 1
+    - 2
+    - 3
+    - 5
+    level:
+    - - 80
+    - - 80
+      - 90
+  enabled: true
+- name: NBMM
+  kwargs: {}
+  enabled: false
+  reason: Count-distribution suitability must be audited
+- name: PMM
+  kwargs: {}
+  enabled: false
+  reason: Count-distribution suitability must be audited
+- name: Tweedie
+  kwargs: {}
+  enabled: false
+  reason: Direct construction semantics require audit
+exogenous_groups:
+  calendar_raw:
+    type: future
+    columns:
+    - feat_year
+    - feat_month
+    - feat_day
+    - feat_dayofweek
+    - feat_weekofyear
+    - feat_dayofyear
+  calendar_flags:
+    type: future
+    columns:
+    - feat_is_weekend
+    - feat_is_month_start
+    - feat_is_month_end
+  calendar_cyclical:
+    type: future
+    columns:
+    - feat_dow_sin
+    - feat_dow_cos
+    - feat_month_sin
+    - feat_month_cos
+  lags_short:
+    type: historical
+    columns:
+    - hist_lag_1
+    - hist_lag_2
+    - hist_lag_3
+    - hist_lag_7
+  lags_long:
+    type: historical
+    columns:
+    - hist_lag_14
+    - hist_lag_28
+  rolling_mean:
+    type: historical
+    columns:
+    - hist_roll_mean_3
+    - hist_roll_mean_7
+    - hist_roll_mean_14
+    - hist_roll_mean_28
+  rolling_std:
+    type: historical
+    columns:
+    - hist_roll_std_7
+    - hist_roll_std_14
+    - hist_roll_std_28
+  rolling_range:
+    type: historical
+    columns:
+    - hist_roll_min_7
+    - hist_roll_max_7
+    - hist_roll_min_14
+    - hist_roll_max_14
+  ewm:
+    type: historical
+    columns:
+    - hist_ewm_mean_7
+    - hist_ewm_mean_14
+models:
+  AutoAutoformer:
+    base_model: Autoformer
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: &id001
+      - 7
+      - 14
+      - 28
+      - 56
+      - 84
+      - 112
+      - 168
+      learning_rate: &id002
+      - 3.0e-05
+      - 0.0001
+      - 0.0003
+      - 0.001
+      - 0.003
+      - 0.01
+      max_steps: &id003
+      - 50
+      - 100
+      - 200
+      - 500
+      - 1000
+      batch_size: &id004
+      - 8
+      - 16
+      - 32
+      - 64
+      - 128
+      valid_batch_size: &id005
+      - null
+      - 16
+      - 32
+      - 64
+      windows_batch_size: &id006
+      - 64
+      - 128
+      - 256
+      - 512
+      - 1024
+      inference_windows_batch_size: &id007
+      - 64
+      - 128
+      - 256
+      - 512
+      - 1024
+      scaler_type: &id008
+      - identity
+      - standard
+      - robust
+      num_lr_decays: &id009
+      - -1
+      - 1
+      - 2
+      - 3
+      early_stop_patience_steps: &id010
+      - -1
+      - 3
+      - 5
+      - 10
+      - 20
+      val_check_steps: &id011
+      - 10
+      - 25
+      - 50
+      - 100
+      start_padding_enabled: &id012
+      - false
+      - true
+      training_data_availability_threshold: &id013
+      - 0.0
+      - 0.5
+      - 0.8
+      - 1.0
+      step_size: &id014
+      - 1
+      drop_last_loader: &id015
+      - false
+      - true
+      random_seed: &id016
+      - 42
+      - 123
+      - 2026
+    model_specific_parameters:
+    - MovingAvg_window
+    - activation
+    - conv_hidden_size
+    - decoder_input_size_multiplier
+    - decoder_layers
+    - dropout
+    - encoder_layers
+    - exclude_insample_y
+    - factor
+    - hidden_size
+    - n_head
+    - val_monitor
+    signature: '(self, h: int, input_size: int, stat_exog_list=None, hist_exog_list=None,
+      futr_exog_list=None, cat_exog_list=None, categorical_cardinalities=None, cat_emb_dim=''fastai'',
+      exclude_insample_y=False, decoder_input_size_multiplier: float = 0.5, hidden_size:
+      int = 128, dropout: float = 0.05, factor: int = 3, n_head: int = 4, conv_hidden_size:
+      int = 32, activation: str = ''gelu'', encoder_layers: int = 2, decoder_layers:
+      int = 1, MovingAvg_window: int = 25, loss=MAE(), valid_loss=None, max_steps:
+      int = 5000, learning_rate: float = 0.0001, num_lr_decays: int = -1, early_stop_patience_steps:
+      int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size:
+      int = 32, valid_batch_size: Optional[int] = None, windows_batch_size=1024, inference_windows_batch_size=1024,
+      start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoBiTCN:
+    base_model: BiTCN
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - dropout
+    - exclude_insample_y
+    - hidden_size
+    - val_monitor
+    signature: '(self, h: int, input_size: int, hidden_size: int = 16, dropout: float
+      = 0.5, futr_exog_list=None, hist_exog_list=None, stat_exog_list=None, cat_exog_list=None,
+      categorical_cardinalities=None, cat_emb_dim=''fastai'', exclude_insample_y=False,
+      loss=MAE(), valid_loss=None, max_steps: int = 1000, learning_rate: float = 0.001,
+      num_lr_decays: int = -1, early_stop_patience_steps: int = -1, val_monitor: str
+      = ''ptl/val_loss'', val_check_steps: int = 100, batch_size: int = 32, valid_batch_size:
+      Optional[int] = None, windows_batch_size=1024, inference_windows_batch_size=1024,
+      start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoDLinear:
+    base_model: DLinear
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - exclude_insample_y
+    - moving_avg_window
+    - val_monitor
+    signature: '(self, h: int, input_size: int, stat_exog_list=None, hist_exog_list=None,
+      futr_exog_list=None, exclude_insample_y=False, moving_avg_window: int = 25,
+      loss=MAE(), valid_loss=None, max_steps: int = 5000, learning_rate: float = 0.0001,
+      num_lr_decays: int = -1, early_stop_patience_steps: int = -1, val_monitor: str
+      = ''ptl/val_loss'', val_check_steps: int = 100, batch_size: int = 32, valid_batch_size:
+      Optional[int] = None, windows_batch_size=1024, inference_windows_batch_size=1024,
+      start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoDeepAR:
+    base_model: DeepAR
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - decoder_hidden_layers
+    - decoder_hidden_size
+    - exclude_insample_y
+    - h_train
+    - lstm_dropout
+    - lstm_hidden_size
+    - lstm_n_layers
+    - trajectory_samples
+    - val_monitor
+    signature: '(self, h, input_size: int = -1, h_train: int = 1, lstm_n_layers: int
+      = 2, lstm_hidden_size: int = 128, lstm_dropout: float = 0.1, decoder_hidden_layers:
+      int = 0, decoder_hidden_size: int = 0, trajectory_samples: int = 100, stat_exog_list=None,
+      hist_exog_list=None, futr_exog_list=None, exclude_insample_y=False, loss=DistributionLoss(),
+      valid_loss=MAE(), max_steps: int = 1000, learning_rate: float = 0.001, num_lr_decays:
+      int = 3, early_stop_patience_steps: int = -1, val_monitor: str = ''ptl/val_loss'',
+      val_check_steps: int = 100, batch_size: int = 32, valid_batch_size: Optional[int]
+      = None, windows_batch_size: int = 1024, inference_windows_batch_size: int =
+      -1, start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader=False,
+      alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None, lr_scheduler=None,
+      lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoDeepNPTS:
+    base_model: DeepNPTS
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - batch_norm
+    - dropout
+    - exclude_insample_y
+    - hidden_size
+    - n_layers
+    - val_monitor
+    signature: '(self, h, input_size: int, hidden_size: int = 32, batch_norm: bool
+      = True, dropout: float = 0.1, n_layers: int = 2, stat_exog_list=None, hist_exog_list=None,
+      futr_exog_list=None, cat_exog_list=None, categorical_cardinalities=None, cat_emb_dim=''fastai'',
+      exclude_insample_y=False, loss=MAE(), valid_loss=MAE(), max_steps: int = 1000,
+      learning_rate: float = 0.001, num_lr_decays: int = 3, early_stop_patience_steps:
+      int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size:
+      int = 32, valid_batch_size: Optional[int] = None, windows_batch_size: int =
+      1024, inference_windows_batch_size: int = 1024, start_padding_enabled=False,
+      training_data_availability_threshold=0.0, step_size: int = 1, scaler_type: str
+      = ''standard'', random_seed: int = 1, drop_last_loader=False, alias: Optional[str]
+      = None, optimizer=None, optimizer_kwargs=None, lr_scheduler=None, lr_scheduler_kwargs=None,
+      dataloader_kwargs=None, **trainer_kwargs)'
+  AutoDilatedRNN:
+    base_model: DilatedRNN
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - cell_type
+    - context_size
+    - decoder_hidden_size
+    - decoder_layers
+    - dilations
+    - encoder_hidden_size
+    - exclude_insample_y
+    - inference_input_size
+    - val_monitor
+    signature: '(self, h: int, input_size: int = -1, inference_input_size: Optional[int]
+      = None, cell_type: str = ''LSTM'', dilations: List[List[int]] = [[1, 2], [4,
+      8]], encoder_hidden_size: int = 128, context_size: int = 10, decoder_hidden_size:
+      int = 128, decoder_layers: int = 2, futr_exog_list=None, hist_exog_list=None,
+      stat_exog_list=None, exclude_insample_y=False, loss=MAE(), valid_loss=None,
+      max_steps: int = 1000, learning_rate: float = 0.001, num_lr_decays: int = 3,
+      early_stop_patience_steps: int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps:
+      int = 100, batch_size=32, valid_batch_size: Optional[int] = None, windows_batch_size=128,
+      inference_windows_batch_size=1024, start_padding_enabled=False, training_data_availability_threshold=0.0,
+      step_size: int = 1, scaler_type: str = ''robust'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoFEDformer:
+    base_model: FEDformer
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - MovingAvg_window
+    - activation
+    - conv_hidden_size
+    - decoder_input_size_multiplier
+    - decoder_layers
+    - dropout
+    - encoder_layers
+    - hidden_size
+    - mode_select
+    - modes
+    - n_head
+    - val_monitor
+    - version
+    signature: '(self, h: int, input_size: int, stat_exog_list=None, hist_exog_list=None,
+      futr_exog_list=None, cat_exog_list=None, categorical_cardinalities=None, cat_emb_dim=''fastai'',
+      decoder_input_size_multiplier: float = 0.5, version: str = ''Fourier'', modes:
+      int = 64, mode_select: str = ''random'', hidden_size: int = 128, dropout: float
+      = 0.05, n_head: int = 8, conv_hidden_size: int = 32, activation: str = ''gelu'',
+      encoder_layers: int = 2, decoder_layers: int = 1, MovingAvg_window: int = 25,
+      loss=MAE(), valid_loss=None, max_steps: int = 5000, learning_rate: float = 0.0001,
+      num_lr_decays: int = -1, early_stop_patience_steps: int = -1, val_monitor: str
+      = ''ptl/val_loss'', val_check_steps: int = 100, batch_size: int = 32, valid_batch_size:
+      Optional[int] = None, windows_batch_size=1024, inference_windows_batch_size=1024,
+      start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoGRU:
+    base_model: GRU
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - context_size
+    - decoder_hidden_size
+    - decoder_layers
+    - encoder_activation
+    - encoder_bias
+    - encoder_dropout
+    - encoder_hidden_size
+    - encoder_n_layers
+    - exclude_insample_y
+    - h_train
+    - inference_input_size
+    - recurrent
+    - val_monitor
+    signature: '(self, h: int, input_size: int = -1, inference_input_size: Optional[int]
+      = None, h_train: int = 1, encoder_n_layers: int = 2, encoder_hidden_size: int
+      = 200, encoder_activation: Optional[str] = None, encoder_bias: bool = True,
+      encoder_dropout: float = 0.0, context_size: Optional[int] = None, decoder_hidden_size:
+      int = 128, decoder_layers: int = 2, futr_exog_list=None, hist_exog_list=None,
+      stat_exog_list=None, exclude_insample_y=False, recurrent=False, loss=MAE(),
+      valid_loss=None, max_steps: int = 1000, learning_rate: float = 0.001, num_lr_decays:
+      int = -1, early_stop_patience_steps: int = -1, val_monitor: str = ''ptl/val_loss'',
+      val_check_steps: int = 100, batch_size=32, valid_batch_size: Optional[int] =
+      None, windows_batch_size=128, inference_windows_batch_size=1024, start_padding_enabled=False,
+      training_data_availability_threshold=0.0, step_size: int = 1, scaler_type: str
+      = ''robust'', random_seed=1, drop_last_loader=False, alias: Optional[str] =
+      None, optimizer=None, optimizer_kwargs=None, lr_scheduler=None, lr_scheduler_kwargs=None,
+      dataloader_kwargs=None, **trainer_kwargs)'
+  AutoInformer:
+    base_model: Informer
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - activation
+    - conv_hidden_size
+    - decoder_input_size_multiplier
+    - decoder_layers
+    - distil
+    - dropout
+    - encoder_layers
+    - exclude_insample_y
+    - factor
+    - hidden_size
+    - n_head
+    - val_monitor
+    signature: '(self, h: int, input_size: int, futr_exog_list=None, hist_exog_list=None,
+      stat_exog_list=None, cat_exog_list=None, categorical_cardinalities=None, cat_emb_dim=''fastai'',
+      exclude_insample_y=False, decoder_input_size_multiplier: float = 0.5, hidden_size:
+      int = 128, dropout: float = 0.05, factor: int = 3, n_head: int = 4, conv_hidden_size:
+      int = 32, activation: str = ''gelu'', encoder_layers: int = 2, decoder_layers:
+      int = 1, distil: bool = True, loss=MAE(), valid_loss=None, max_steps: int =
+      5000, learning_rate: float = 0.0001, num_lr_decays: int = -1, early_stop_patience_steps:
+      int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size:
+      int = 32, valid_batch_size: Optional[int] = None, windows_batch_size=1024, inference_windows_batch_size=1024,
+      start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoKAN:
+    base_model: KAN
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - enable_standalone_scale_spline
+    - exclude_insample_y
+    - grid_eps
+    - grid_range
+    - grid_size
+    - hidden_size
+    - n_hidden_layers
+    - scale_base
+    - scale_noise
+    - scale_spline
+    - spline_order
+    - val_monitor
+    signature: '(self, h, input_size, grid_size: int = 5, spline_order: int = 3, scale_noise:
+      float = 0.1, scale_base: float = 1.0, scale_spline: float = 1.0, enable_standalone_scale_spline:
+      bool = True, grid_eps: float = 0.02, grid_range: list = [-1, 1], n_hidden_layers:
+      int = 1, hidden_size: Union[int, list] = 512, stat_exog_list=None, hist_exog_list=None,
+      futr_exog_list=None, cat_exog_list=None, categorical_cardinalities=None, cat_emb_dim=''fastai'',
+      exclude_insample_y=False, loss=MAE(), valid_loss=None, max_steps: int = 1000,
+      learning_rate: float = 0.001, num_lr_decays: int = -1, early_stop_patience_steps:
+      int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size:
+      int = 32, valid_batch_size: Optional[int] = None, windows_batch_size=1024, inference_windows_batch_size=-1,
+      start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      dataloader_kwargs=None, **trainer_kwargs)'
+  AutoLSTM:
+    base_model: LSTM
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - context_size
+    - decoder_hidden_size
+    - decoder_layers
+    - encoder_bias
+    - encoder_dropout
+    - encoder_hidden_size
+    - encoder_n_layers
+    - exclude_insample_y
+    - h_train
+    - inference_input_size
+    - recurrent
+    - val_monitor
+    signature: '(self, h: int, input_size: int = -1, inference_input_size: Optional[int]
+      = None, h_train: int = 1, encoder_n_layers: int = 2, encoder_hidden_size: int
+      = 128, encoder_bias: bool = True, encoder_dropout: float = 0.0, context_size:
+      Optional[int] = None, decoder_hidden_size: int = 128, decoder_layers: int =
+      2, futr_exog_list=None, hist_exog_list=None, stat_exog_list=None, exclude_insample_y=False,
+      recurrent=False, loss=MAE(), valid_loss=None, max_steps: int = 1000, learning_rate:
+      float = 0.001, num_lr_decays: int = -1, early_stop_patience_steps: int = -1,
+      val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size=32,
+      valid_batch_size: Optional[int] = None, windows_batch_size=128, inference_windows_batch_size=1024,
+      start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''robust'', random_seed=1, drop_last_loader=False,
+      alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None, lr_scheduler=None,
+      lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoMLP:
+    base_model: MLP
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - exclude_insample_y
+    - hidden_size
+    - num_layers
+    - val_monitor
+    signature: '(self, h, input_size, stat_exog_list=None, hist_exog_list=None, futr_exog_list=None,
+      cat_exog_list=None, categorical_cardinalities=None, cat_emb_dim=''fastai'',
+      exclude_insample_y=False, num_layers=2, hidden_size=1024, loss=MAE(), valid_loss=None,
+      max_steps: int = 1000, learning_rate: float = 0.001, num_lr_decays: int = -1,
+      early_stop_patience_steps: int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps:
+      int = 100, batch_size: int = 32, valid_batch_size: Optional[int] = None, windows_batch_size=1024,
+      inference_windows_batch_size=-1, start_padding_enabled=False, training_data_availability_threshold=0.0,
+      step_size: int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoNBEATS:
+    base_model: NBEATS
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: false
+      historical_exog: false
+      static_exog: false
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - activation
+    - basis
+    - dropout_prob_theta
+    - mlp_units
+    - n_basis
+    - n_blocks
+    - n_harmonics
+    - n_polynomials
+    - shared_weights
+    - stack_types
+    - val_monitor
+    signature: '(self, h, input_size, n_harmonics: int = 2, n_polynomials: Optional[int]
+      = None, n_basis: int = 2, basis: str = ''polynomial'', stack_types: list = [''identity'',
+      ''trend'', ''seasonality''], n_blocks: list = [1, 1, 1], mlp_units: list = [[512,
+      512], [512, 512], [512, 512]], dropout_prob_theta: float = 0.0, activation:
+      str = ''ReLU'', shared_weights: bool = False, loss=MAE(), valid_loss=None, max_steps:
+      int = 1000, learning_rate: float = 0.001, num_lr_decays: int = 3, early_stop_patience_steps:
+      int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size:
+      int = 32, valid_batch_size: Optional[int] = None, windows_batch_size: int =
+      1024, inference_windows_batch_size: int = -1, start_padding_enabled=False, training_data_availability_threshold=0.0,
+      step_size: int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoNBEATSx:
+    base_model: NBEATSx
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - activation
+    - dropout_prob_theta
+    - exclude_insample_y
+    - mlp_units
+    - n_blocks
+    - n_harmonics
+    - n_polynomials
+    - shared_weights
+    - stack_types
+    - val_monitor
+    signature: '(self, h, input_size, futr_exog_list=None, hist_exog_list=None, stat_exog_list=None,
+      cat_exog_list=None, categorical_cardinalities=None, cat_emb_dim=''fastai'',
+      exclude_insample_y=False, n_harmonics=2, n_polynomials=2, stack_types: list
+      = [''identity'', ''trend'', ''seasonality''], n_blocks: list = [1, 1, 1], mlp_units:
+      list = [[512, 512], [512, 512], [512, 512]], dropout_prob_theta=0.0, activation=''ReLU'',
+      shared_weights=False, loss=MAE(), valid_loss=None, max_steps: int = 1000, learning_rate:
+      float = 0.001, num_lr_decays: int = 3, early_stop_patience_steps: int = -1,
+      val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size=32,
+      valid_batch_size: Optional[int] = None, windows_batch_size: int = 1024, inference_windows_batch_size:
+      int = -1, start_padding_enabled: bool = False, training_data_availability_threshold=0.0,
+      step_size: int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoNHITS:
+    base_model: NHITS
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - activation
+    - dropout_prob_theta
+    - exclude_insample_y
+    - interpolation_mode
+    - mlp_units
+    - n_blocks
+    - n_freq_downsample
+    - n_pool_kernel_size
+    - pooling_mode
+    - stack_types
+    - val_monitor
+    signature: '(self, h, input_size, futr_exog_list=None, hist_exog_list=None, stat_exog_list=None,
+      cat_exog_list=None, categorical_cardinalities=None, cat_emb_dim=''fastai'',
+      exclude_insample_y=False, stack_types: list = [''identity'', ''identity'', ''identity''],
+      n_blocks: list = [1, 1, 1], mlp_units: list = [[512, 512], [512, 512], [512,
+      512]], n_pool_kernel_size: list = [2, 2, 1], n_freq_downsample: list = [4, 2,
+      1], pooling_mode: str = ''MaxPool1d'', interpolation_mode: str = ''linear'',
+      dropout_prob_theta=0.0, activation=''ReLU'', loss=MAE(), valid_loss=None, max_steps:
+      int = 1000, learning_rate: float = 0.001, num_lr_decays: int = 3, early_stop_patience_steps:
+      int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size:
+      int = 32, valid_batch_size: Optional[int] = None, windows_batch_size: int =
+      1024, inference_windows_batch_size: int = -1, start_padding_enabled=False, training_data_availability_threshold=0.0,
+      step_size: int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader=False,
+      alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None, lr_scheduler=None,
+      lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoNLinear:
+    base_model: NLinear
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - exclude_insample_y
+    - val_monitor
+    signature: '(self, h: int, input_size: int, stat_exog_list=None, hist_exog_list=None,
+      futr_exog_list=None, exclude_insample_y=False, loss=MAE(), valid_loss=None,
+      max_steps: int = 5000, learning_rate: float = 0.0001, num_lr_decays: int = -1,
+      early_stop_patience_steps: int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps:
+      int = 100, batch_size: int = 32, valid_batch_size: Optional[int] = None, windows_batch_size=1024,
+      inference_windows_batch_size=1024, start_padding_enabled=False, training_data_availability_threshold=0.0,
+      step_size: int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoPatchTST:
+    base_model: PatchTST
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - activation
+    - attn_dropout
+    - batch_normalization
+    - dropout
+    - encoder_layers
+    - exclude_insample_y
+    - fc_dropout
+    - head_dropout
+    - hidden_size
+    - learn_pos_embed
+    - linear_hidden_size
+    - n_heads
+    - patch_len
+    - res_attention
+    - revin
+    - revin_affine
+    - revin_subtract_last
+    - stride
+    - val_monitor
+    signature: '(self, h, input_size, stat_exog_list=None, hist_exog_list=None, futr_exog_list=None,
+      exclude_insample_y=False, encoder_layers: int = 3, n_heads: int = 16, hidden_size:
+      int = 128, linear_hidden_size: int = 256, dropout: float = 0.2, fc_dropout:
+      float = 0.2, head_dropout: float = 0.0, attn_dropout: float = 0.0, patch_len:
+      int = 16, stride: int = 8, revin: bool = True, revin_affine: bool = False, revin_subtract_last:
+      bool = True, activation: str = ''gelu'', res_attention: bool = True, batch_normalization:
+      bool = False, learn_pos_embed: bool = True, loss=MAE(), valid_loss=None, max_steps:
+      int = 5000, learning_rate: float = 0.0001, num_lr_decays: int = -1, early_stop_patience_steps:
+      int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size:
+      int = 32, valid_batch_size: Optional[int] = None, windows_batch_size=1024, inference_windows_batch_size:
+      int = 1024, start_padding_enabled=False, training_data_availability_threshold=0.0,
+      step_size: int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoRNN:
+    base_model: RNN
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - context_size
+    - decoder_hidden_size
+    - decoder_layers
+    - encoder_activation
+    - encoder_bias
+    - encoder_dropout
+    - encoder_hidden_size
+    - encoder_n_layers
+    - exclude_insample_y
+    - h_train
+    - inference_input_size
+    - recurrent
+    - val_monitor
+    signature: '(self, h: int, input_size: int = -1, inference_input_size: Optional[int]
+      = None, h_train: int = 1, encoder_n_layers: int = 2, encoder_hidden_size: int
+      = 128, encoder_activation: str = ''tanh'', encoder_bias: bool = True, encoder_dropout:
+      float = 0.0, context_size: Optional[int] = None, decoder_hidden_size: int =
+      128, decoder_layers: int = 2, futr_exog_list=None, hist_exog_list=None, stat_exog_list=None,
+      exclude_insample_y=False, recurrent=False, loss=MAE(), valid_loss=None, max_steps:
+      int = 1000, learning_rate: float = 0.001, num_lr_decays: int = -1, early_stop_patience_steps:
+      int = -1, val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size=32,
+      valid_batch_size: Optional[int] = None, windows_batch_size=128, inference_windows_batch_size=1024,
+      start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''robust'', random_seed=1, drop_last_loader=False,
+      alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None, lr_scheduler=None,
+      lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoTCN:
+    base_model: TCN
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - context_size
+    - decoder_hidden_size
+    - decoder_layers
+    - dilations
+    - encoder_activation
+    - encoder_hidden_size
+    - inference_input_size
+    - kernel_size
+    - val_monitor
+    signature: '(self, h: int, input_size: int = -1, inference_input_size: Optional[int]
+      = None, kernel_size: int = 2, dilations: List[int] = [1, 2, 4, 8, 16], encoder_hidden_size:
+      int = 128, encoder_activation: str = ''ReLU'', context_size: int = 10, decoder_hidden_size:
+      int = 128, decoder_layers: int = 2, futr_exog_list=None, hist_exog_list=None,
+      stat_exog_list=None, loss=MAE(), valid_loss=None, max_steps: int = 1000, learning_rate:
+      float = 0.001, num_lr_decays: int = -1, early_stop_patience_steps: int = -1,
+      val_monitor: str = ''ptl/val_loss'', val_check_steps: int = 100, batch_size:
+      int = 32, valid_batch_size: Optional[int] = None, windows_batch_size=128, inference_windows_batch_size=1024,
+      start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''robust'', random_seed: int = 1, drop_last_loader=False,
+      alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None, lr_scheduler=None,
+      lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoTFT:
+    base_model: TFT
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - attn_dropout
+    - dropout
+    - grn_activation
+    - hidden_size
+    - n_head
+    - n_rnn_layers
+    - one_rnn_initial_state
+    - rnn_type
+    - tgt_size
+    - val_monitor
+    signature: '(self, h, input_size, tgt_size: int = 1, stat_exog_list=None, hist_exog_list=None,
+      futr_exog_list=None, hidden_size: int = 128, n_head: int = 4, attn_dropout:
+      float = 0.0, grn_activation: str = ''ELU'', n_rnn_layers: int = 1, rnn_type:
+      str = ''lstm'', one_rnn_initial_state: bool = False, dropout: float = 0.1, loss=MAE(),
+      valid_loss=None, max_steps: int = 1000, learning_rate: float = 0.001, num_lr_decays:
+      int = -1, early_stop_patience_steps: int = -1, val_monitor: str = ''ptl/val_loss'',
+      val_check_steps: int = 100, batch_size: int = 32, valid_batch_size: Optional[int]
+      = None, windows_batch_size: int = 1024, inference_windows_batch_size: int =
+      1024, start_padding_enabled=False, training_data_availability_threshold=0.0,
+      step_size: int = 1, scaler_type: str = ''robust'', random_seed: int = 1, drop_last_loader=False,
+      alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None, lr_scheduler=None,
+      lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoTiDE:
+    base_model: TiDE
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - decoder_output_dim
+    - dropout
+    - exclude_insample_y
+    - hidden_size
+    - layernorm
+    - num_decoder_layers
+    - num_encoder_layers
+    - temporal_decoder_dim
+    - temporal_width
+    - val_monitor
+    signature: '(self, h, input_size, hidden_size=512, decoder_output_dim=32, temporal_decoder_dim=128,
+      dropout=0.3, layernorm=True, num_encoder_layers=1, num_decoder_layers=1, temporal_width=4,
+      futr_exog_list=None, hist_exog_list=None, stat_exog_list=None, cat_exog_list=None,
+      categorical_cardinalities=None, cat_emb_dim=''fastai'', exclude_insample_y=False,
+      loss=MAE(), valid_loss=None, max_steps: int = 1000, learning_rate: float = 0.001,
+      num_lr_decays: int = -1, early_stop_patience_steps: int = -1, val_monitor: str
+      = ''ptl/val_loss'', val_check_steps: int = 100, batch_size: int = 32, valid_batch_size:
+      Optional[int] = None, windows_batch_size=1024, inference_windows_batch_size=1024,
+      start_padding_enabled=False, training_data_availability_threshold=0.0, step_size:
+      int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoTimesNet:
+    base_model: TimesNet
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - conv_hidden_size
+    - dropout
+    - encoder_layers
+    - exclude_insample_y
+    - hidden_size
+    - num_kernels
+    - top_k
+    - val_monitor
+    signature: '(self, h: int, input_size: int, stat_exog_list=None, hist_exog_list=None,
+      futr_exog_list=None, cat_exog_list=None, categorical_cardinalities=None, cat_emb_dim=''fastai'',
+      exclude_insample_y=False, hidden_size: int = 64, dropout: float = 0.1, conv_hidden_size:
+      int = 64, top_k: int = 5, num_kernels: int = 6, encoder_layers: int = 2, loss=MAE(),
+      valid_loss=None, max_steps: int = 1000, learning_rate: float = 0.0001, num_lr_decays:
+      int = -1, early_stop_patience_steps: int = -1, val_monitor: str = ''ptl/val_loss'',
+      val_check_steps: int = 100, batch_size: int = 32, valid_batch_size: Optional[int]
+      = None, windows_batch_size=64, inference_windows_batch_size=256, start_padding_enabled=False,
+      training_data_availability_threshold=0.0, step_size: int = 1, scaler_type: str
+      = ''standard'', random_seed: int = 1, drop_last_loader: bool = False, alias:
+      Optional[str] = None, optimizer=None, optimizer_kwargs=None, lr_scheduler=None,
+      lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoVanillaTransformer:
+    base_model: VanillaTransformer
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    - input_size
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: true
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - activation
+    - conv_hidden_size
+    - decoder_input_size_multiplier
+    - decoder_layers
+    - dropout
+    - encoder_layers
+    - exclude_insample_y
+    - hidden_size
+    - n_head
+    - val_monitor
+    signature: '(self, h: int, input_size: int, stat_exog_list=None, hist_exog_list=None,
+      futr_exog_list=None, cat_exog_list=None, categorical_cardinalities=None, cat_emb_dim=''fastai'',
+      exclude_insample_y=False, decoder_input_size_multiplier: float = 0.5, hidden_size:
+      int = 128, dropout: float = 0.05, n_head: int = 4, conv_hidden_size: int = 32,
+      activation: str = ''gelu'', encoder_layers: int = 2, decoder_layers: int = 1,
+      loss=MAE(), valid_loss=None, max_steps: int = 5000, learning_rate: float = 0.0001,
+      num_lr_decays: int = -1, early_stop_patience_steps: int = -1, val_monitor: str
+      = ''ptl/val_loss'', val_check_steps: int = 100, batch_size: int = 32, valid_batch_size:
+      Optional[int] = None, windows_batch_size=1024, inference_windows_batch_size:
+      int = 1024, start_padding_enabled=False, training_data_availability_threshold=0.0,
+      step_size: int = 1, scaler_type: str = ''identity'', random_seed: int = 1, drop_last_loader:
+      bool = False, alias: Optional[str] = None, optimizer=None, optimizer_kwargs=None,
+      lr_scheduler=None, lr_scheduler_kwargs=None, dataloader_kwargs=None, **trainer_kwargs)'
+  AutoxLSTM:
+    base_model: xLSTM
+    enabled: true
+    training_modes:
+    - separate
+    - global
+    - global_position
+    required_parameters:
+    - h
+    supports:
+      future_exog: true
+      historical_exog: true
+      static_exog: true
+      categorical_exog: false
+    common_parameter_grid:
+      input_size: *id001
+      learning_rate: *id002
+      max_steps: *id003
+      batch_size: *id004
+      valid_batch_size: *id005
+      windows_batch_size: *id006
+      inference_windows_batch_size: *id007
+      scaler_type: *id008
+      num_lr_decays: *id009
+      early_stop_patience_steps: *id010
+      val_check_steps: *id011
+      start_padding_enabled: *id012
+      training_data_availability_threshold: *id013
+      step_size: *id014
+      drop_last_loader: *id015
+      random_seed: *id016
+    model_specific_parameters:
+    - backbone
+    - decoder_activation
+    - decoder_dropout
+    - decoder_hidden_size
+    - decoder_layers
+    - encoder_bias
+    - encoder_dropout
+    - encoder_hidden_size
+    - encoder_n_blocks
+    - exclude_insample_y
+    - h_train
+    - inference_input_size
+    - recurrent
+    - val_monitor
+    signature: '(self, h: int, input_size: int = -1, inference_input_size: Optional[int]
+      = None, h_train: int = 1, encoder_n_blocks: int = 2, encoder_hidden_size: int
+      = 128, encoder_bias: bool = True, encoder_dropout: float = 0.1, decoder_hidden_size:
+      int = 128, decoder_layers: int = 2, decoder_dropout: float = 0.0, decoder_activation:
+      str = ''GELU'', backbone: str = ''mLSTM'', futr_exog_list=None, hist_exog_list=None,
+      stat_exog_list=None, exclude_insample_y=False, recurrent=False, loss=MAE(),
+      valid_loss=None, max_steps: int = 1000, learning_rate: float = 0.001, num_lr_decays:
+      int = -1, early_stop_patience_steps: int = -1, val_monitor: str = ''ptl/val_loss'',
+      val_check_steps: int = 100, batch_size=32, valid_batch_size: Optional[int] =
+      None, windows_batch_size=128, inference_windows_batch_size=1024, start_padding_enabled=False,
+      training_data_availability_threshold=0.0, step_size: int = 1, scaler_type: str
+      = ''robust'', random_seed=1, drop_last_loader=False, alias: Optional[str] =
+      None, optimizer=None, optimizer_kwargs=None, lr_scheduler=None, lr_scheduler_kwargs=None,
+      dataloader_kwargs=None, **trainer_kwargs)'
