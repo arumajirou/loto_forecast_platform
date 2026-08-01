@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "model_id": "sundial-base",
+  "repo_id": "thuml/sundial-base-128m",
+  "revision": "3212e42564493f520593e5414af4367fc4b49226",
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--thuml--sundial-base-128m/snapshots/3212e42564493f520593e5414af4367fc4b49226",
+  "pid": 58319,
+  "input_series_count": 7,
+  "prediction_length": 1,
+  "seed": 42,
+  "generate_signature": "(inputs: Optional[torch.Tensor] = None, generation_config: Optional[transformers.generation.configuration_utils.GenerationConfig] = None, logits_processor: Optional[transformers.generation.logits_process.LogitsProcessorList] = None, stopping_criteria: Optional[transformers.generation.stopping_criteria.StoppingCriteriaList] = None, prefix_allowed_tokens_fn: Optional[Callable[[int, torch.Tensor], List[int]]] = None, synced_gpus: Optional[bool] = None, assistant_model: Optional[ForwardRef('PreTrainedModel')] = None, streamer: Optional[ForwardRef('BaseStreamer')] = None, negative_prompt_ids: Optional[torch.Tensor] = None, negative_prompt_attention_mask: Optional[torch.Tensor] = None, revin: Optional[bool] = True, num_samples: Optional[int] = 1, **kwargs) -> Union[transformers.generation.utils.GenerateDecoderOnlyOutput, transformers.generation.utils.GenerateEncoderDecoderOutput, transformers.generation.utils.GenerateBeamDecoderOnlyOutput, transformers.generation.utils.GenerateBeamEncoderDecoderOutput, torch.LongTensor]",
+  "model_class": "SundialForPrediction",
+  "input_shape": [
+    7,
+    64
+  ],
+  "input_device": "cuda:0",
+  "output_type": "Tensor",
+  "output_shape": [
+    7,
+    1,
+    1
+  ],
+  "output_device": "cuda:0",
+  "output_dtype": "torch.float32",
+  "output_finite": true,
+  "output_sample": [
+    7.05391788482666,
+    11.611726760864258,
+    16.094200134277344,
+    20.558998107910156,
+    25.09014320373535,
+    29.582571029663086,
+    34.09307861328125
+  ],
+  "parameter_device": "cuda:0",
+  "allocated_vram_bytes": 608354816,
+  "reserved_vram_bytes": 668991488,
+  "peak_vram_bytes": 611803648,
+  "cpu_fallback": false
+}

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "total_models": 21,
-  "runtime_certified_models": 9,
+  "runtime_certified_models": 19,
   "results": [
     {
       "model_id": "chronos-2",
@@ -159,17 +159,37 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 805530528,
-      "runtime_vram_certified": false,
-      "runtime_status": "BLOCKED",
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
       "runtime_revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
-      "runtime_blocked_reason": "MODEL_WEIGHTS_MISSING",
-      "runtime_blocked_detail": "Fixed local Hugging Face snapshot for the ledger revision is missing; runtime certification requires local_files_only and cannot fetch implicitly.",
-      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
-      "runtime_resume_conditions": [
-        "Place the pinned amazon/chronos-t5-base snapshot at the recorded revision in the local Hugging Face cache.",
-        "Verify model.safetensors, config.json, and generation_config.json SHA-256 values from the local snapshot.",
-        "Run the Chronos T5 base CUDA runtime probe with local_files_only=true and external nvidia-smi PID sampling."
-      ]
+      "runtime_device": "cuda:0",
+      "runtime_input_device": "cpu",
+      "runtime_tokenizer_device": "cpu",
+      "runtime_cpu_preprocessing": true,
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 1606348800,
+      "runtime_gpu_pid": 402016,
+      "runtime_external_gpu_pid_captures": 11,
+      "runtime_external_max_gpu_memory_mib": 1876.0,
+      "runtime_prediction_shape": [
+        7
+      ],
+      "runtime_quantile_shape": [
+        7,
+        1,
+        9
+      ],
+      "runtime_mean_shape": [
+        7,
+        1
+      ],
+      "runtime_context_length": 64,
+      "runtime_prediction_length": 1,
+      "runtime_weight_sha256": "44a2eef44aa13d9048a625ea289beb1ea5d709d7b2044f72134c974132644bf2",
+      "runtime_config_sha256": "20a32a40aa31ec99387b5b68f272ec49cbcfec61cfefafbd32ed81dfe474c243",
+      "runtime_generation_config_sha256": "8f6833851ce53496a43ef87a975c766f7a3049e2d598ecef609a526ca6308534",
+      "runtime_license_review": "APPROVED"
     },
     {
       "model_id": "chronos-t5-small",
@@ -223,19 +243,46 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 36284680,
-      "runtime_vram_certified": false,
-      "runtime_status": "BLOCKED",
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
       "runtime_revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
-      "runtime_blocked_reason": "FIXED_SNAPSHOT_MISSING",
-      "runtime_blocked_detail": "Pinned Hugging Face snapshot directory is missing; available loose model files cannot satisfy revision and snapshot symlink validation requirements.",
-      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
-      "runtime_candidate_loose_model_path": "/mnt/e/env/ts/loto_platform_unified/runtime/tsfm_lab/models/ibm-granite__granite-timeseries-flowstate-r1",
-      "runtime_resume_conditions": [
-        "Materialize the pinned Hugging Face snapshot for ibm-granite/granite-timeseries-flowstate-r1 at revision 05effc6cb39ee16dce9dd0064ed1a76e4b8ff464.",
-        "Verify required model/config files and SHA-256 values from that snapshot.",
-        "Implement or select the correct FlowState runtime API and run CUDA inference with local_files_only=true.",
-        "Capture the runner GPU PID with external nvidia-smi process sampling."
-      ]
+      "runtime_device": "cuda:0",
+      "runtime_input_device": "cuda:0",
+      "runtime_mean_output_device": "cuda:0",
+      "runtime_quantile_output_device": "cuda:0",
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 824376832,
+      "runtime_gpu_pid": 548753,
+      "runtime_external_gpu_pid_captures": 9,
+      "runtime_external_max_gpu_memory_mib": 1180.0,
+      "runtime_certification_prediction_shape": [
+        7,
+        1,
+        1
+      ],
+      "runtime_mean_prediction_shape": [
+        7,
+        24,
+        1
+      ],
+      "runtime_quantile_prediction_shape": [
+        7,
+        9,
+        24,
+        1
+      ],
+      "runtime_context_length": 2048,
+      "runtime_prediction_length": 24,
+      "runtime_parameter_count": 9069312,
+      "runtime_certification_scope": "FULL_INFERENCE",
+      "forecast_head_executed": true,
+      "forecast_accuracy_certified": false,
+      "runtime_config_sha256": "ba2cfa7a3cfb6f0137e3c39bc855dbd4fa7a6a035136960b256e558a13902dc8",
+      "runtime_weight_sha256": "07a7844db841047d3a99ce9c6ce0ce5139a24d1f42e919c37c2d1e285fa0ff98",
+      "runtime_signature_sha256": "6ae2b1c2144889f57d3c499fe4dc93e4c4320b14d1211828664adb4ed4a55f0e",
+      "runtime_weight_size_bytes": 36284680,
+      "runtime_license_review": "APPROVED"
     },
     {
       "model_id": "granite-patchtsmixer",
@@ -355,24 +402,42 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 409264008,
-      "runtime_vram_certified": false,
-      "runtime_status": "BLOCKED",
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
       "runtime_revision": "2b554741eca47781b64468546e77fef3e85130e6",
-      "runtime_blocked_reason": "PARTIAL_SNAPSHOT",
-      "runtime_blocked_detail": "Pinned snapshot directory exists, but required runtime files are missing.",
-      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/2b554741eca47781b64468546e77fef3e85130e6",
-      "runtime_missing_files": [
-        "config.json",
-        "model.safetensors"
-      ],
       "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
-      "runtime_resume_conditions": [
-        "Materialize the complete NeoQuasar/Kronos-base snapshot at revision 2b554741eca47781b64468546e77fef3e85130e6.",
-        "Verify config.json and model.safetensors SHA-256 values from the pinned snapshot.",
-        "Confirm the Kronos tokenizer dependency snapshot required by KronosPredictor.",
-        "Run CUDA inference with local_files_only=true and external nvidia-smi PID sampling."
+      "runtime_license_review": "APPROVED",
+      "runtime_tokenizer_repo_id": "NeoQuasar/Kronos-Tokenizer-base",
+      "runtime_tokenizer_revision": "0e0117387f39004a9016484a186a908917e22426",
+      "runtime_code_revision": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+      "runtime_device": "cuda:0",
+      "runtime_tokenizer_device": "cuda:0",
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 473748992,
+      "runtime_gpu_pid": 598858,
+      "runtime_external_gpu_pid_captures": 9,
+      "runtime_external_max_gpu_memory_mib": 758.0,
+      "runtime_prediction_shape": [
+        4,
+        6
       ],
-      "runtime_license_review": "APPROVED"
+      "runtime_prediction_columns": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "amount"
+      ],
+      "runtime_model_parameter_count": 102310592,
+      "runtime_tokenizer_parameter_count": 3958042,
+      "runtime_certification_scope": "FULL_INFERENCE",
+      "tokenizer_executed": true,
+      "autoregressive_forecast_executed": true,
+      "native_domain_contract_used": true,
+      "lottery_domain_compatibility_certified": false,
+      "forecast_accuracy_certified": false
     },
     {
       "model_id": "lag-llama",
@@ -387,23 +452,25 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 39294567,
-      "runtime_vram_certified": false,
-      "runtime_status": "BLOCKED",
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
       "runtime_revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
-      "runtime_blocked_reason": "PARTIAL_SNAPSHOT",
-      "runtime_blocked_detail": "Pinned snapshot directory exists, but no model checkpoint or weight file is present.",
+      "runtime_blocked_reason": null,
+      "runtime_blocked_detail": null,
       "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--time-series-foundation-models--Lag-Llama/snapshots/72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
-      "runtime_missing_files": [
-        "model checkpoint (*.ckpt or *.safetensors)"
+      "runtime_missing_files": [],
+      "retry_condition": null,
+      "runtime_resume_conditions": [],
+      "runtime_license_review": "APPROVED",
+      "runtime_execution_device": "cuda",
+      "runtime_model_device": "cuda:0",
+      "runtime_cpu_fallback": false,
+      "runtime_prediction_shape": [
+        7
       ],
-      "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with the Lag-Llama checkpoint file present.",
-      "runtime_resume_conditions": [
-        "Materialize the complete time-series-foundation-models/Lag-Llama snapshot at revision 72dcfc29da106acfe38250a60f4ae29d1e56a3d9.",
-        "Verify the checkpoint SHA-256 value from the pinned snapshot.",
-        "Confirm the Lag-Llama runtime package/environment and official estimator API.",
-        "Run CUDA inference with local_files_only=true and external nvidia-smi PID sampling."
-      ],
-      "runtime_license_review": "APPROVED"
+      "runtime_prediction_finite": true,
+      "runtime_peak_vram_bytes": 256280576,
+      "runtime_checkpoint_sha256": "b5a5c4b8a0cfe9b81bdac35ed5d88b5033cd119b5206c28e9cd67c4b45fb2c96"
     },
     {
       "model_id": "moirai-1.0-base",
@@ -421,17 +488,19 @@
       "runtime_vram_certified": false,
       "runtime_status": "BLOCKED",
       "runtime_revision": "4fa939a8800d9da346c0280f3d9aeba0d2d35877",
-      "runtime_blocked_reason": "LICENSE_REVIEW_REQUIRED",
-      "runtime_blocked_detail": "Pinned model declares cc-by-nc-4.0 non-commercial license; license review cannot be approved for commercial runtime certification.",
+      "runtime_blocked_reason": "MODEL_WEIGHTS_MISSING",
+      "runtime_blocked_detail": "The exact pinned snapshot contains README.md but no config or model weight file.",
       "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base/snapshots/4fa939a8800d9da346c0280f3d9aeba0d2d35877",
       "runtime_missing_files": [
-        "model weight file (*.safetensors, *.bin, or *.ckpt)"
+        "config.json",
+        "model weight file"
       ],
-      "retry_condition": "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai revision/model. A complete pinned snapshot with weights is also required before runtime probing.",
+      "retry_condition": "Materialize the exact pinned snapshot with config and model weights.",
       "runtime_resume_conditions": [
-        "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai revision/model. A complete pinned snapshot with weights is also required before runtime probing."
+        "Materialize Salesforce/moirai-1.0-R-base revision 4fa939a8800d9da346c0280f3d9aeba0d2d35877 with config and model weights."
       ],
-      "runtime_license_review": "REJECTED"
+      "runtime_license_review": "APPROVED_PERSONAL_NONCOMMERCIAL",
+      "runtime_license_scope": "PERSONAL_NONCOMMERCIAL_ONLY"
     },
     {
       "model_id": "moirai-2.0-small",
@@ -446,19 +515,36 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 45557824,
-      "runtime_vram_certified": false,
-      "runtime_status": "BLOCKED",
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
       "runtime_revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
-      "runtime_blocked_reason": "LICENSE_REVIEW_REQUIRED",
-      "runtime_blocked_detail": "Pinned model declares cc-by-nc-4.0 non-commercial license; license review cannot be approved for commercial runtime certification.",
       "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-2.0-R-small/snapshots/30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
-      "retry_condition": "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai model. Runtime probing can resume only after license approval.",
-      "runtime_resume_conditions": [
-        "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai model. Runtime probing can resume only after license approval."
-      ],
-      "runtime_license_review": "REJECTED",
+      "runtime_license_review": "APPROVED_PERSONAL_NONCOMMERCIAL",
       "runtime_weight_sha256": "fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669",
-      "runtime_config_sha256": "6b74b03c8ec199fabc352c0203465958142ca468183da68549652734836f853d"
+      "runtime_config_sha256": "6b74b03c8ec199fabc352c0203465958142ca468183da68549652734836f853d",
+      "runtime_device": "cuda:0",
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 80993280,
+      "runtime_gpu_pid": 693777,
+      "runtime_external_gpu_pid_captures": 13,
+      "runtime_external_max_gpu_memory_mib": 372.0,
+      "runtime_prediction_shape": [
+        7
+      ],
+      "runtime_model_parameter_count": 11387208,
+      "runtime_context_length": 128,
+      "runtime_prediction_length": 1,
+      "runtime_target_dim": 7,
+      "runtime_certification_scope": "FULL_INFERENCE",
+      "native_forecast_contract_used": true,
+      "lottery_domain_compatibility_certified": false,
+      "forecast_accuracy_certified": false,
+      "license_scope": "PERSONAL_NONCOMMERCIAL_ONLY",
+      "personal_use": true,
+      "personal_noncommercial_use": true,
+      "commercial_use": false,
+      "commercial_deployment_certified": false
     },
     {
       "model_id": "moment-1-large",
@@ -473,21 +559,47 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 2771077013,
-      "runtime_vram_certified": false,
-      "runtime_status": "BLOCKED",
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
       "runtime_revision": "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
-      "runtime_blocked_reason": "PARTIAL_SNAPSHOT",
-      "runtime_blocked_detail": "Pinned snapshot directory exists, but required runtime files are missing.",
-      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
-      "runtime_missing_files": [
-        "config.json",
-        "model weight file (*.safetensors, *.bin, *.ckpt, *.pt, or *.pth)"
-      ],
       "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model weight files present.",
-      "runtime_resume_conditions": [
-        "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model weight files present."
+      "runtime_license_review": "APPROVED",
+      "runtime_device": "cuda:0",
+      "runtime_input_device": "cuda:0",
+      "runtime_output_device": "cuda:0",
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 1525199360,
+      "runtime_gpu_pid": 450256,
+      "runtime_external_gpu_pid_captures": 13,
+      "runtime_external_max_gpu_memory_mib": 1746.0,
+      "runtime_prediction_shape": [
+        7,
+        1,
+        1
       ],
-      "runtime_license_review": "APPROVED"
+      "runtime_context_length": 512,
+      "runtime_prediction_length": 1,
+      "runtime_certification_scope": "EXECUTION_ONLY",
+      "forecast_head_status": "FINE_TUNING_REQUIRED",
+      "forecast_head_pretrained": false,
+      "forecast_accuracy_certified": false,
+      "runtime_config_sha256": "b0111650e8718e31d7e89575666aa3e140747d35279ec1a7c9f6ed7616c29433",
+      "runtime_weight_sha256": "a56928052ac6f5d09b97c3834bea6ce3aef9f02b513b5fac98954e7377801572",
+      "runtime_weight_files": [
+        {
+          "name": "model.safetensors",
+          "path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc/model.safetensors",
+          "sha256": "a56928052ac6f5d09b97c3834bea6ce3aef9f02b513b5fac98954e7377801572",
+          "size_bytes": 1385501256
+        },
+        {
+          "name": "pytorch_model.bin",
+          "path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-large/snapshots/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc/pytorch_model.bin",
+          "sha256": "52f5ee65c80790c7f6dab8736243368e193fcc04d2d642d9f69c89dd644bd199",
+          "size_bytes": 1385575757
+        }
+      ]
     },
     {
       "model_id": "moment-1-small",
@@ -502,17 +614,47 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 303257025,
-      "runtime_vram_certified": false,
-      "runtime_status": "BLOCKED",
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
       "runtime_revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
-      "runtime_blocked_reason": "FIXED_SNAPSHOT_MISSING",
-      "runtime_blocked_detail": "Pinned snapshot directory is missing from the configured local Hugging Face cache.",
-      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f",
       "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files.",
-      "runtime_resume_conditions": [
-        "Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files."
+      "runtime_license_review": "APPROVED",
+      "runtime_device": "cuda:0",
+      "runtime_input_device": "cuda:0",
+      "runtime_output_device": "cuda:0",
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 197549568,
+      "runtime_gpu_pid": 426259,
+      "runtime_external_gpu_pid_captures": 4,
+      "runtime_external_max_gpu_memory_mib": 498.0,
+      "runtime_prediction_shape": [
+        7,
+        1,
+        1
       ],
-      "runtime_license_review": "BLOCKED"
+      "runtime_context_length": 512,
+      "runtime_prediction_length": 1,
+      "runtime_certification_scope": "EXECUTION_ONLY",
+      "forecast_head_status": "FINE_TUNING_REQUIRED",
+      "forecast_head_pretrained": false,
+      "forecast_accuracy_certified": false,
+      "runtime_config_sha256": "6456b8e6f017323e8ef372c338c993380e246cb6291ffb8ca21fe7dfc53d0a6f",
+      "runtime_weight_sha256": "785e6c6f57ffa7cac7e2a1fff6369618d49f2f441563ddea76c866231e5aa877",
+      "runtime_weight_files": [
+        {
+          "name": "model.safetensors",
+          "path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f/model.safetensors",
+          "sha256": "785e6c6f57ffa7cac7e2a1fff6369618d49f2f441563ddea76c866231e5aa877",
+          "size_bytes": 151615328
+        },
+        {
+          "name": "pytorch_model.bin",
+          "path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f/pytorch_model.bin",
+          "sha256": "90c566d82684b1136e0e4ea6ad15c9f7c94c65d8939704dcea7904caea8895b8",
+          "size_bytes": 151641697
+        }
+      ]
     },
     {
       "model_id": "sundial-base",
@@ -615,21 +757,50 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 925187448,
-      "runtime_vram_certified": false,
-      "runtime_status": "BLOCKED",
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
       "runtime_revision": "5a9806b9b291fad9233b5249d88263f1846304d3",
-      "runtime_blocked_reason": "FIXED_SNAPSHOT_MISSING",
-      "runtime_blocked_detail": "Repo cache exists, but the fixed revision snapshot directory is absent.",
-      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--google--timesfm-2.5-200m-transformers/snapshots/5a9806b9b291fad9233b5249d88263f1846304d3",
       "retry_condition": "Install the exact pinned Transformers revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
-      "runtime_resume_conditions": [
-        "Install the exact pinned Transformers revision into the configured local Hugging Face cache with config.json and model.safetensors present."
+      "runtime_license_review": "APPROVED",
+      "runtime_device": "cuda:0",
+      "runtime_input_devices": [
+        "cuda:0"
       ],
-      "runtime_license_review": "BLOCKED",
-      "runtime_missing_files": [
-        "config.json",
-        "model.safetensors"
-      ]
+      "runtime_mean_output_device": "cuda:0",
+      "runtime_full_output_device": "cuda:0",
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 1642211328,
+      "runtime_gpu_pid": 489233,
+      "runtime_external_gpu_pid_captures": 9,
+      "runtime_external_max_gpu_memory_mib": 2002.0,
+      "runtime_prediction_shape": [
+        7,
+        1
+      ],
+      "runtime_full_prediction_shape": [
+        7,
+        1,
+        10
+      ],
+      "runtime_native_mean_shape": [
+        7,
+        128
+      ],
+      "runtime_native_full_shape": [
+        7,
+        128,
+        10
+      ],
+      "runtime_context_length": 512,
+      "runtime_native_prediction_length": 128,
+      "runtime_certification_prediction_length": 1,
+      "runtime_certification_scope": "FULL_INFERENCE",
+      "forecast_head_executed": true,
+      "forecast_accuracy_certified": false,
+      "runtime_config_sha256": "452ecae918f67b2e7d0f2892ab424d1876939e70d077db3708a4fe8ca03a7de5",
+      "runtime_weight_sha256": "b53f6d52114e2ad786890f3c4637ce05f580b7800d6e24401f88b398b76035ef",
+      "runtime_weight_size_bytes": 925187448
     },
     {
       "model_id": "tirex-2",
@@ -680,20 +851,40 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 16582848,
-      "runtime_vram_certified": false,
-      "runtime_status": "BLOCKED",
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
       "runtime_revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
-      "runtime_blocked_reason": "RUNTIME_DEPENDENCY_MISSING",
-      "runtime_blocked_detail": "Pinned snapshot is complete, but the required Toto runtime package toto2/toto-models is not installed in the certification environment.",
-      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
-      "retry_condition": "Install the Toto runtime package compatible with the pinned checkpoint, then rerun CUDA runtime certification with external PID sampling.",
-      "runtime_resume_conditions": [
-        "Install the Toto runtime package compatible with the pinned checkpoint, then rerun CUDA runtime certification with external PID sampling."
-      ],
       "runtime_license_review": "APPROVED",
-      "runtime_missing_files": [],
       "runtime_weight_sha256": "316660d5afb47943e531f39242e0b02ca0b8bb73be5709dfe07ca80dfce9805e",
-      "runtime_config_sha256": "7a926d130e401ab0c5fdb3564f46c8d917bd05c7b3ae26b9c22d2da2ef01d2d8"
+      "runtime_config_sha256": "7a926d130e401ab0c5fdb3564f46c8d917bd05c7b3ae26b9c22d2da2ef01d2d8",
+      "runtime_code_revision": "44ea4e88852228039564aa3e76fac26aafac0803",
+      "runtime_device": "cuda:0",
+      "runtime_output_device": "cuda:0",
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 66428928,
+      "runtime_gpu_pid": 644605,
+      "runtime_external_gpu_pid_captures": 19,
+      "runtime_external_max_gpu_memory_mib": 358.0,
+      "runtime_input_shape": [
+        1,
+        7,
+        512
+      ],
+      "runtime_output_shape": [
+        9,
+        1,
+        7,
+        1
+      ],
+      "runtime_model_parameter_count": 4144448,
+      "runtime_certification_scope": "FULL_INFERENCE",
+      "probabilistic_forecast_executed": true,
+      "native_domain_contract_used": true,
+      "lottery_domain_compatibility_certified": false,
+      "forecast_accuracy_certified": false,
+      "commercial_use": true,
+      "personal_use": true
     },
     {
       "model_id": "toto-open-base",
@@ -708,25 +899,38 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 605239264,
-      "runtime_vram_certified": false,
-      "runtime_status": "BLOCKED",
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
       "runtime_revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
-      "runtime_blocked_reason": "FIXED_SNAPSHOT_MISSING",
-      "runtime_blocked_detail": "No local repo cache exists for the fixed pinned revision.",
+      "runtime_blocked_reason": null,
+      "runtime_blocked_detail": null,
       "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0/snapshots/0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
-      "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
-      "runtime_resume_conditions": [
-        "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present."
+      "retry_condition": null,
+      "runtime_resume_conditions": [],
+      "runtime_license_review": "APPROVED",
+      "runtime_missing_files": [],
+      "runtime_execution_device": "cuda",
+      "runtime_model_device": "cuda:0",
+      "runtime_output_device": "cuda:0",
+      "runtime_cpu_fallback": false,
+      "runtime_prediction_shape": [
+        7
       ],
-      "runtime_license_review": "BLOCKED",
-      "runtime_missing_files": [
-        "config.json",
-        "model.safetensors"
-      ]
+      "runtime_prediction_finite": true,
+      "runtime_sample_shape": [
+        1,
+        7,
+        1,
+        256
+      ],
+      "runtime_peak_vram_bytes": 1970505728,
+      "runtime_parameter_count": 151306080,
+      "runtime_config_sha256": "e381ed28a05898bf2ea3386adb839f9f2742d66d97825db492b6658d4af1f778",
+      "runtime_weight_sha256": "69b67e60decc90baf741729abcf1fe8fe0881e3e3337176042053c28a122fa4c"
     }
   ],
-  "certified_models": 9,
-  "blocked_models": 12,
+  "certified_models": 19,
+  "blocked_models": 2,
   "pending_models": 0,
   "judged_models": 21,
   "judged_progress_percent": 100.0,

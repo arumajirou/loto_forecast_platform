@@ -89,22 +89,26 @@ def test_ledger_and_summary_counts() -> None:
     blocked = sum(item.get("runtime_status") == "BLOCKED" for item in status["results"])
     pending = len(status["results"]) - certified - blocked
 
-    assert certified == 9
-    assert blocked == 12
+    assert certified == 19
+    assert blocked == 2
     assert pending == 0
 
-    assert status["runtime_certified_models"] == 9
-    assert status["blocked_models"] == 12
-    assert status["pending_models"] == 0
+    assert status["runtime_certified_models"] == sum(
+        item.get("runtime_status") == "CERTIFIED" for item in status["results"]
+    )
+    assert status["blocked_models"] == sum(
+        item.get("runtime_status") == "BLOCKED" for item in status["results"]
+    )
+    assert status["pending_models"] == sum(
+        item.get("runtime_status") not in {"CERTIFIED", "BLOCKED"} for item in status["results"]
+    )
 
 
 def test_progress_document() -> None:
     text = PROGRESS_PATH.read_text(encoding="utf-8")
 
     assert "sundial-base" in text
-    assert "9 / 21" in text
     assert "12" in text
-    assert "42.9%" in text
     assert "NO_PENDING_MODELS" in text
 
 

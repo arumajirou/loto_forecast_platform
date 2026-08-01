@@ -1,101 +1,151 @@
-from __future__ import annotations
-
 import hashlib
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODEL_ID = "chronos-t5-base"
-REPO_ID = "amazon/chronos-t5-base"
-REVISION = "ad294eaacead15db499b740ea4122266dd2a81a2"
 
-EVIDENCE_DIR = ROOT / "audit" / "tsfm-runtime" / MODEL_ID
-STATUS_PATH = ROOT / "audit" / "tsfm-runtime" / "runtime-status.json"
+EVIDENCE_DIR = PROJECT_ROOT / "audit" / "tsfm-runtime" / MODEL_ID
+
+STATUS_PATH = PROJECT_ROOT / "audit" / "tsfm-runtime" / "runtime-status.json"
+
+PROGRESS_PATH = PROJECT_ROOT / "docs" / "tsfm-runtime-certification-progress.md"
 
 
 def _load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_chronos_t5_base_blocked_evidence_is_complete() -> None:
-    required = {
-        "environment.txt",
-        "python-environment.json",
-        "provider-request.json",
-        "provider-response.json",
-        "runtime-result.json",
-        "runtime-command.log",
-        "nvidia-before.csv",
-        "nvidia-after.csv",
-        "nvidia-gpu-samples.csv",
-        "nvidia-process-samples.csv",
-        "nvidia-gpu-monitor.err",
-        "nvidia-process-monitor.err",
-        "license-review.json",
-        "runtime-certification.json",
-        "sha256sum.txt",
-    }
-
-    assert required.issubset({path.name for path in EVIDENCE_DIR.iterdir()})
-
-
-def test_chronos_t5_base_runtime_result_is_blocked() -> None:
+def test_runtime_inference_passed() -> None:
     result = _load_json(EVIDENCE_DIR / "runtime-result.json")
-    response = _load_json(EVIDENCE_DIR / "provider-response.json")
+
+    assert result["status"] == "PASS"
+    assert result["model_id"] == MODEL_ID
+
+    assert result["repo_id"] == ("amazon/chronos-t5-base")
+
+    assert result["revision"] == ("ad294eaacead15db499b740ea4122266dd2a81a2")
+
+    assert result["input_series_count"] == 7
+    assert result["context_length"] == 64
+    assert result["prediction_length"] == 1
+
+    assert result["prediction_shape"] == [7]
+    assert result["quantile_shape"] == [7, 1, 9]
+    assert result["mean_shape"] == [7, 1]
+
+    assert len(result["prediction_values"]) == 7
+    assert result["output_finite"] is True
+
+    assert result["parameter_device"] == "cuda:0"
+    assert result["input_device"] == "cpu"
+    assert result["tokenizer_device"] == "cpu"
+
+    assert result["runtime_gpu_used"] is True
+    assert result["runtime_cpu_fallback"] is False
+    assert result["runtime_cpu_preprocessing"] is True
+
+    assert result["peak_vram_bytes"] > 0
+
+
+def test_runtime_certification_passed() -> None:
     certification = _load_json(EVIDENCE_DIR / "runtime-certification.json")
 
-    assert result["status"] == "BLOCKED"
-    assert result["runtime_vram_certified"] is False
-    assert result["model_id"] == MODEL_ID
-    assert result["repo_id"] == REPO_ID
-    assert result["revision"] == REVISION
-    assert result["blocked_reason"]["code"] == "MODEL_WEIGHTS_MISSING"
-    assert result["gpu_used"] is False
-    assert result["cpu_fallback"] is False
+    assert certification["runtime_status"] == "CERTIFIED"
 
-    assert response["status"] == "MODEL_WEIGHTS_MISSING"
-    assert response["blocker"]["missing_snapshot_path"].endswith(REVISION)
+    assert certification["runtime_vram_certified"] is True
 
-    assert certification["certification_status"] == "BLOCKED"
-    assert certification["runtime_vram_certified"] is False
+    assert certification["runtime_gpu_used"] is True
+    assert certification["runtime_cpu_fallback"] is False
+
+    assert certification["checks"]
+    assert all(certification["checks"].values())
 
 
-def test_chronos_t5_base_license_is_not_approved_without_snapshot() -> None:
+def test_external_gpu_pid_evidence() -> None:
+    runtime = _load_json(EVIDENCE_DIR / "runtime-result.json")
+
+    gpu = _load_json(EVIDENCE_DIR / "external-gpu-pid-evidence.json")
+
+    assert gpu["captured"] is True
+    assert gpu["capture_count"] >= 1
+
+    assert gpu["runtime_pid"] == runtime["runtime_pid"]
+
+    assert gpu["max_gpu_memory_mib"] > 0
+    assert gpu["min_gpu_memory_mib"] >= 0
+
+
+def test_license_review_is_approved() -> None:
     review = _load_json(EVIDENCE_DIR / "license-review.json")
 
-    assert review["license"] == "apache-2.0"
-    assert review["review_status"] == "BLOCKED"
-    assert "unavailable" in review["limitations"][0]
+    assert review["review_status"] == "APPROVED"
+    assert review["license"].lower() == "apache-2.0"
+    assert review["commercial_use"] is True
 
 
-def test_chronos_t5_base_runtime_status_ledger_is_blocked() -> None:
+def test_runtime_status_ledger_is_certified() -> None:
     status = _load_json(STATUS_PATH)
 
     row = next(item for item in status["results"] if item["model_id"] == MODEL_ID)
 
-    assert len(status["results"]) == 21
-    assert status["runtime_certified_models"] == 8
-    assert row["runtime_status"] == "BLOCKED"
-    assert row["runtime_vram_certified"] is False
-    assert row["runtime_revision"] == REVISION
-    assert row["runtime_blocked_reason"] == "MODEL_WEIGHTS_MISSING"
-    assert row["runtime_snapshot_path"].endswith(REVISION)
-    assert row["runtime_resume_conditions"]
+    assert row["runtime_status"] == "CERTIFIED"
+
+    assert row["runtime_vram_certified"] is True
+
+    assert row["runtime_gpu_used"] is True
+    assert row["runtime_cpu_fallback"] is False
+    assert row["runtime_device"] == "cuda:0"
+    assert row["runtime_peak_vram_bytes"] > 0
+
+    assert status["total_models"] == len(status["results"])
+
+    assert status["runtime_certified_models"] == sum(
+        item.get("runtime_status") == "CERTIFIED" for item in status["results"]
+    )
+
+    assert status["blocked_models"] == sum(
+        item.get("runtime_status") == "BLOCKED" for item in status["results"]
+    )
+
+    assert status["pending_models"] == sum(
+        item.get("runtime_status") not in {"CERTIFIED", "BLOCKED"} for item in status["results"]
+    )
+
+    assert status["runtime_certified_models"] == sum(
+        item.get("runtime_status") == "CERTIFIED" for item in status["results"]
+    )
+    assert status["blocked_models"] == sum(
+        item.get("runtime_status") == "BLOCKED" for item in status["results"]
+    )
+    assert status["pending_models"] == sum(
+        item.get("runtime_status") not in {"CERTIFIED", "BLOCKED"} for item in status["results"]
+    )
 
 
-def test_chronos_t5_base_sha256_manifest_is_current() -> None:
-    manifest = EVIDENCE_DIR / "sha256sum.txt"
-    entries = [
-        line.split("  ", 1) for line in manifest.read_text(encoding="utf-8").splitlines() if line
-    ]
+def test_progress_document() -> None:
+    docs = PROGRESS_PATH.read_text(encoding="utf-8")
 
-    assert len(entries) >= 14
+    assert "### chronos-t5-base" in docs
+    assert "status: CERTIFIED" in docs
+    assert "- Total models: 21" in docs
 
-    for expected_digest, name in entries:
-        if name == "sha256sum.txt":
-            continue
 
-        actual_digest = hashlib.sha256((EVIDENCE_DIR / name).read_bytes()).hexdigest()
+def test_sha256_manifest() -> None:
+    manifest_path = EVIDENCE_DIR / "sha256sum.txt"
 
-        assert actual_digest == expected_digest
+    lines = manifest_path.read_text(encoding="utf-8").splitlines()
+
+    assert lines
+
+    for line in lines:
+        digest, relative_name = line.split(maxsplit=1)
+
+        relative_name = relative_name.lstrip("*")
+        file_path = EVIDENCE_DIR / relative_name
+
+        assert file_path.is_file(), relative_name
+
+        actual = hashlib.sha256(file_path.read_bytes()).hexdigest()
+
+        assert actual == digest, relative_name

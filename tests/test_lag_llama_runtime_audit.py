@@ -5,117 +5,112 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+AUDIT = ROOT / "audit" / "tsfm-runtime" / "lag-llama"
+LEDGER = ROOT / "audit" / "tsfm-runtime" / "runtime-status.json"
 
-MODEL_ID = "lag-llama"
-REPO_ID = "time-series-foundation-models/Lag-Llama"
 REVISION = "72dcfc29da106acfe38250a60f4ae29d1e56a3d9"
-BLOCKED_REASON = "PARTIAL_SNAPSHOT"
-
-EVIDENCE_DIR = ROOT / "audit" / "tsfm-runtime" / MODEL_ID
-STATUS_PATH = ROOT / "audit" / "tsfm-runtime" / "runtime-status.json"
-DOCS_PATH = ROOT / "docs" / "tsfm-runtime-certification-progress.md"
+CHECKPOINT_SHA256 = "b5a5c4b8a0cfe9b81bdac35ed5d88b5033cd119b5206c28e9cd67c4b45fb2c96"
 
 
-def _load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+def load_json(name: str) -> dict:
+    return json.loads((AUDIT / name).read_text(encoding="utf-8"))
 
 
-def test_lag_llama_snapshot_probe_records_partial_snapshot() -> None:
-    probe = _load_json(EVIDENCE_DIR / "snapshot-probe.json")
+def test_runtime_result_is_certified() -> None:
+    result = load_json("runtime-result.json")
 
-    assert probe["model_id"] == MODEL_ID
-    assert probe["repo_id"] == REPO_ID
-    assert probe["revision"] == REVISION
-    assert probe["snapshot_exists"] is True
-    assert probe["snapshot_revision_matches"] is True
-    assert probe["result"] == BLOCKED_REASON
-    assert probe["weight_candidates"] == []
-    assert probe["missing_files"] == ["model checkpoint (*.ckpt or *.safetensors)"]
-    assert probe["existing_files"][0]["name"] == "README.md"
-    assert probe["existing_files"][0]["is_symlink"] is True
-
-
-def test_lag_llama_runtime_result_is_blocked() -> None:
-    result = _load_json(EVIDENCE_DIR / "runtime-result.json")
-    certification = _load_json(EVIDENCE_DIR / "runtime-certification.json")
-    blocked = _load_json(EVIDENCE_DIR / "blocked-reason.json")
-
-    assert result["status"] == "BLOCKED"
-    assert result["runtime_vram_certified"] is False
-    assert result["model_id"] == MODEL_ID
-    assert result["repo_id"] == REPO_ID
+    assert result["status"] == "OK"
     assert result["revision"] == REVISION
-    assert result["blocked_reason"] == BLOCKED_REASON
-    assert result["retry_condition"]
-    assert result["gpu_used"] is False
-    assert result["cpu_fallback"] is False
-    assert result["peak_vram_bytes"] is None
-
-    assert certification["certification_status"] == "BLOCKED"
-    assert certification["runtime_vram_certified"] is False
-    assert certification["blocked_reason"] == BLOCKED_REASON
-    assert certification["retry_condition"] == result["retry_condition"]
-
-    assert blocked["blocked_reason"] == BLOCKED_REASON
-    assert "Missing files: model checkpoint (*.ckpt or *.safetensors)" in blocked["facts"]
+    assert result["prediction_shape"] == [7]
+    assert result["finite"] is True
 
 
-def test_lag_llama_license_review_is_approved_from_snapshot_readme() -> None:
-    review = _load_json(EVIDENCE_DIR / "license-review.json")
+def test_state_dict_loaded_exactly() -> None:
+    result = load_json("runtime-result.json")
 
-    assert review["model_id"] == MODEL_ID
-    assert review["repo_id"] == REPO_ID
-    assert review["revision"] == REVISION
-    assert review["license"] == "apache-2.0"
+    assert result["checkpoint_state_entries"] == 73
+    assert result["state_dict_missing_keys"] == []
+    assert result["state_dict_unexpected_keys"] == []
+
+
+def test_cuda_runtime_evidence() -> None:
+    result = load_json("runtime-result.json")
+    gpu = result["gpu_evidence"]
+
+    assert gpu["requested_device"] == "cuda"
+    assert gpu["execution_device"] == "cuda"
+    assert gpu["cuda_available"] is True
+    assert gpu["gpu_used"] is True
+    assert gpu["cpu_fallback"] is False
+    assert gpu["model_device"] == "cuda:0"
+    assert gpu["peak_vram_bytes"] > 0
+    assert gpu["gpu_pid"] is not None
+
+
+def test_checkpoint_hash_is_pinned() -> None:
+    result = load_json("runtime-result.json")
+    properties = result["properties"]
+
+    assert properties["checkpoint_sha256"] == CHECKPOINT_SHA256
+    assert properties["checkpoint_size_bytes"] == 29488819
+
+
+def test_runtime_certification() -> None:
+    certification = load_json("runtime-certification.json")
+
+    assert certification["runtime_status"] == "CERTIFIED"
+    assert certification["runtime_vram_certified"] is True
+    assert certification["runtime_gpu_used"] is True
+    assert certification["runtime_cpu_fallback"] is False
+    assert certification["checkpoint_sha256"] == CHECKPOINT_SHA256
+
+
+def test_license_review_is_approved() -> None:
+    review = load_json("license-review.json")
+
+    assert review["license"] == "Apache-2.0"
     assert review["review_status"] == "APPROVED"
     assert review["commercial_use"] is True
-    assert review["patent_grant"] is True
-    assert review["notice_required_on_distribution"] is True
 
 
-def test_lag_llama_runtime_status_ledger_is_blocked() -> None:
-    status = _load_json(STATUS_PATH)
+def test_ledger_is_certified() -> None:
+    data = json.loads(LEDGER.read_text(encoding="utf-8"))
 
-    row = next(item for item in status["results"] if item["model_id"] == MODEL_ID)
+    row = next(item for item in data["results"] if item["model_id"] == "lag-llama")
 
-    assert len(status["results"]) == 21
-    assert status["total_models"] == 21
-    assert status["runtime_certified_models"] == 8
-    assert status["certified_models"] == 8
-    assert status["blocked_models"] == 4
-    assert status["pending_models"] == 9
-
-    assert row["repo_id"] == REPO_ID
-    assert row["revision"] == REVISION
-    assert row["runtime_status"] == "BLOCKED"
-    assert row["runtime_vram_certified"] is False
+    assert row["runtime_status"] == "CERTIFIED"
+    assert row["runtime_vram_certified"] is True
     assert row["runtime_revision"] == REVISION
-    assert row["runtime_blocked_reason"] == BLOCKED_REASON
-    assert row["runtime_missing_files"] == ["model checkpoint (*.ckpt or *.safetensors)"]
-    assert row["retry_condition"]
-    assert row["runtime_license_review"] == "APPROVED"
+    assert row["runtime_cpu_fallback"] is False
+    assert row["runtime_prediction_shape"] == [7]
+    assert row["runtime_prediction_finite"] is True
+    assert row["runtime_checkpoint_sha256"] == CHECKPOINT_SHA256
 
 
-def test_lag_llama_docs_are_updated() -> None:
-    docs = DOCS_PATH.read_text(encoding="utf-8")
+def test_predictions_are_finite() -> None:
+    result = load_json("runtime-result.json")
 
-    assert "### lag-llama" in docs
-    assert "blocked reason: PARTIAL_SNAPSHOT" in docs
-    assert "Next model: moirai-1.0-base" in docs
-    assert "Blocked: 4" in docs
-    assert "Pending: 9" in docs
+    predictions = result["predictions"]
+
+    assert len(predictions) == 7
+    assert all(isinstance(value, int | float) for value in predictions)
 
 
-def test_lag_llama_sha256_manifest_is_current() -> None:
-    entries = [
-        line.split("  ", 1)
-        for line in (EVIDENCE_DIR / "sha256sum.txt").read_text(encoding="utf-8").splitlines()
-        if line
-    ]
+def test_manifest_is_current() -> None:
+    lines = (AUDIT / "sha256sum.txt").read_text(encoding="utf-8").splitlines()
 
-    assert len(entries) >= 8
+    assert lines
 
-    for expected_digest, name in entries:
-        actual_digest = hashlib.sha256((EVIDENCE_DIR / name).read_bytes()).hexdigest()
+    for line in lines:
+        expected, filename = line.split("  ", 1)
 
-        assert actual_digest == expected_digest
+        actual = hashlib.sha256((AUDIT / filename).read_bytes()).hexdigest()
+
+        assert expected == actual
+
+
+def test_accuracy_not_certified() -> None:
+    certification = load_json("runtime-certification.json")
+
+    assert certification["domain_compatibility_certified"] is False
+    assert certification["accuracy_certified"] is False

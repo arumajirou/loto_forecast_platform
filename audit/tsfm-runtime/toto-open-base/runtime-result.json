@@ -1,52 +1,66 @@
 {
+  "status": "OK",
   "schema_version": 1,
-  "status": "BLOCKED",
+  "provider_version": 1,
   "model_id": "toto-open-base",
   "repo_id": "Datadog/Toto-Open-Base-1.0",
   "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
-  "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T10:15:13.081194+00:00",
-  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
-  "blocked_detail": "No local repo cache exists for the fixed pinned revision.",
-  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
-  "snapshot_probe": {
-    "schema_version": 1,
-    "model_id": "toto-open-base",
-    "repo_id": "Datadog/Toto-Open-Base-1.0",
-    "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
-    "checked_at": "2026-08-01T10:15:13.081194+00:00",
-    "hf_home_candidates": [
-      "/mnt/e/env/huggingface",
-      "/mnt/e/env/huggingface/hub",
-      "/home/az/.cache/huggingface/hub"
-    ],
-    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0",
-    "repo_cache_exists": false,
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0/snapshots/0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
-    "snapshot_exists": false,
-    "snapshot_revision_matches": false,
-    "existing_files": [],
-    "weight_candidates": [],
-    "missing_files": [
-      "config.json",
-      "model.safetensors"
-    ],
-    "weight_sha256": null,
-    "config_sha256": null,
-    "gated_required": false,
-    "dependency_required": null,
-    "result": "FIXED_SNAPSHOT_MISSING"
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0/snapshots/0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
+  "model_class": "Toto",
+  "forecaster_class": "TotoForecaster",
+  "model_parameter_count": 151306080,
+  "input_shape": [
+    7,
+    512
+  ],
+  "prediction_length": 1,
+  "num_samples": 256,
+  "samples_per_batch": 64,
+  "sample_shape": [
+    1,
+    7,
+    1,
+    256
+  ],
+  "median_shape": [
+    1,
+    7,
+    1
+  ],
+  "prediction_shape": [
+    7
+  ],
+  "predictions": [
+    9.18661117553711,
+    14.184343338012695,
+    19.186748504638672,
+    24.185592651367188,
+    29.184633255004883,
+    34.18558120727539,
+    39.18524169921875
+  ],
+  "finite": true,
+  "properties": {
+    "package": "toto-ts",
+    "package_version": "0.2.0",
+    "torch_version": "2.13.0+cu130",
+    "context_length": 512,
+    "target_dim": 7,
+    "config_sha256": "e381ed28a05898bf2ea3386adb839f9f2742d66d97825db492b6658d4af1f778",
+    "weight_sha256": "69b67e60decc90baf741729abcf1fe8fe0881e3e3337176042053c28a122fa4c",
+    "weight_size_bytes": 605239264,
+    "license": "apache-2.0",
+    "snapshot_complete": true
   },
-  "gpu_used": false,
-  "cpu_fallback": false,
-  "cpu_preprocessing": null,
-  "peak_vram_bytes": null,
-  "finite": null,
-  "weight_sha256": null,
-  "config_sha256": null,
-  "artifact_reference": {
-    "repo_id": "Datadog/Toto-Open-Base-1.0",
-    "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0/snapshots/0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5"
+  "gpu_evidence": {
+    "requested_device": "cuda",
+    "execution_device": "cuda",
+    "cuda_available": true,
+    "gpu_used": true,
+    "cpu_fallback": false,
+    "model_device": "cuda:0",
+    "output_device": "cuda:0",
+    "peak_vram_bytes": 1970505728,
+    "gpu_pid": 821189
   }
 }

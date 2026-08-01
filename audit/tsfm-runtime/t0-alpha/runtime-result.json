@@ -1,62 +1,23 @@
 {
   "schema_version": 1,
-  "status": "BLOCKED",
   "model_id": "t0-alpha",
   "repo_id": "theforecastingcompany/t0-alpha",
   "revision": "f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--theforecastingcompany--t0-alpha/snapshots/f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+  "snapshot_exists": true,
+  "readme_exists": true,
+  "readme_sha256": "7437b64cfcb367277f1e8d0f8d17e7a196ffe9833d0618daa437981f295cd2f3",
+  "config_exists": false,
+  "weight_files": [],
+  "runtime_status": "BLOCKED",
   "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T10:12:16.132965+00:00",
   "blocked_reason": "GATED_ACCESS_REQUIRED",
-  "blocked_detail": "Ledger marks this model as gated and the fixed local snapshot contains only README.md, with no config or weight files available for runtime execution.",
-  "retry_condition": "Accept/verify gated model access and install the exact pinned revision into the configured local Hugging Face cache with config.json and model weights.",
-  "snapshot_probe": {
-    "schema_version": 1,
-    "model_id": "t0-alpha",
-    "repo_id": "theforecastingcompany/t0-alpha",
-    "revision": "f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
-    "checked_at": "2026-08-01T10:12:16.132965+00:00",
-    "hf_home_candidates": [
-      "/mnt/e/env/huggingface",
-      "/mnt/e/env/huggingface/hub",
-      "/home/az/.cache/huggingface/hub"
-    ],
-    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--theforecastingcompany--t0-alpha",
-    "repo_cache_exists": true,
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--theforecastingcompany--t0-alpha/snapshots/f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
-    "snapshot_exists": true,
-    "snapshot_revision_matches": true,
-    "existing_files": [
-      {
-        "name": "README.md",
-        "path": "/mnt/e/env/huggingface/hub/models--theforecastingcompany--t0-alpha/snapshots/f8727c2357e0d81f1d9f56fe3aaac43068b5fc72/README.md",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/9964c3dd90e231b00e7554de4601569fd6e7e928",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--theforecastingcompany--t0-alpha/blobs/9964c3dd90e231b00e7554de4601569fd6e7e928",
-        "size_bytes": 9393,
-        "sha256": "7437b64cfcb367277f1e8d0f8d17e7a196ffe9833d0618daa437981f295cd2f3"
-      }
-    ],
-    "weight_candidates": [],
-    "missing_files": [
-      "config.json",
-      "model weight file"
-    ],
-    "weight_sha256": null,
-    "config_sha256": null,
-    "gated_required": true,
-    "dependency_required": null,
-    "result": "GATED_ACCESS_REQUIRED"
-  },
-  "gpu_used": false,
-  "cpu_fallback": false,
-  "cpu_preprocessing": null,
-  "peak_vram_bytes": null,
-  "finite": null,
-  "weight_sha256": null,
-  "config_sha256": null,
-  "artifact_reference": {
-    "repo_id": "theforecastingcompany/t0-alpha",
-    "revision": "f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--theforecastingcompany--t0-alpha/snapshots/f8727c2357e0d81f1d9f56fe3aaac43068b5fc72"
-  }
+  "blocked_detail": "The pinned local snapshot contains README.md only. Gated access must be accepted and the exact pinned revision must be downloaded with config and model weights.",
+  "runtime_gpu_used": false,
+  "runtime_cpu_fallback": false,
+  "license": "Apache-2.0",
+  "license_review": "APPROVED",
+  "commercial_use": true,
+  "retry_condition": "Accept the model access terms, authenticate Hugging Face, and download revision f8727c2357e0d81f1d9f56fe3aaac43068b5fc72.",
+  "recorded_at": "2026-08-01T12:50:20.248769+00:00"
 }

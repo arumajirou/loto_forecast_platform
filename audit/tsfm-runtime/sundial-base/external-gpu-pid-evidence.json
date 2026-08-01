@@ -1,0 +1,237 @@
+{
+  "runtime_pid": 83745,
+  "capture_count": 38,
+  "captured": true,
+  "min_gpu_memory_mib": 26.0,
+  "max_gpu_memory_mib": 916.0,
+  "samples": [
+    {
+      "timestamp": "2026/08/01 19:48:05.480",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 26.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:05.610",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:05.729",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 870.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:05.843",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 870.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:05.959",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 870.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:06.076",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 870.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:06.190",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 870.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:06.305",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 870.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:06.421",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:06.537",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:06.651",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:06.767",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:06.881",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:06.995",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:07.109",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:07.223",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:07.339",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:07.454",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:07.569",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:07.684",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:07.797",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:07.911",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:08.025",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:08.140",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:08.256",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:08.371",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:08.485",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:08.598",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:08.711",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:08.826",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:08.941",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:09.056",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:09.171",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:09.285",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:09.399",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:09.513",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:09.627",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    },
+    {
+      "timestamp": "2026/08/01 19:48:09.741",
+      "pid": 83745,
+      "process_name": "/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv/bin/python",
+      "used_gpu_memory_mib": 916.0
+    }
+  ]
+}

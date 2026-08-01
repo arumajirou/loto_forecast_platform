@@ -3,12 +3,48 @@
   "model_id": "toto-open-base",
   "repo_id": "Datadog/Toto-Open-Base-1.0",
   "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
-  "certification_status": "BLOCKED",
-  "runtime_vram_certified": false,
-  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
-  "blocked_detail": "No local repo cache exists for the fixed pinned revision.",
-  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
-  "license_review_status": "BLOCKED",
-  "gpu_used": false,
-  "cpu_fallback": false
+  "runtime_status": "CERTIFIED",
+  "runtime_vram_certified": true,
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "execution_device": "cuda",
+  "model_device": "cuda:0",
+  "output_device": "cuda:0",
+  "input_shape": [
+    7,
+    512
+  ],
+  "sample_shape": [
+    1,
+    7,
+    1,
+    256
+  ],
+  "median_shape": [
+    1,
+    7,
+    1
+  ],
+  "prediction_shape": [
+    7
+  ],
+  "prediction_finite": true,
+  "prediction_length": 1,
+  "num_samples": 256,
+  "samples_per_batch": 64,
+  "model_parameter_count": 151306080,
+  "model_class": "Toto",
+  "forecaster_class": "TotoForecaster",
+  "peak_vram_bytes": 1970505728,
+  "gpu_pid": 821189,
+  "config_sha256": "e381ed28a05898bf2ea3386adb839f9f2742d66d97825db492b6658d4af1f778",
+  "weight_sha256": "69b67e60decc90baf741729abcf1fe8fe0881e3e3337176042053c28a122fa4c",
+  "weight_size_bytes": 605239264,
+  "license": "apache-2.0",
+  "license_review": "APPROVED",
+  "commercial_use": true,
+  "runtime_certification_scope": "CUDA_RUNTIME_ONLY",
+  "domain_compatibility_certified": false,
+  "accuracy_certified": false,
+  "certified_at": "2026-08-01T13:07:22.433728+00:00"
 }
