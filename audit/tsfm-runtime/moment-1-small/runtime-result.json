@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "BLOCKED",
+  "model_id": "moment-1-small",
+  "repo_id": "AutonLab/MOMENT-1-small",
+  "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
+  "runtime_vram_certified": false,
+  "blocked_at": "2026-08-01T10:06:08.757310+00:00",
+  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
+  "blocked_detail": "Pinned snapshot directory is missing from the configured local Hugging Face cache.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files.",
+  "snapshot_probe": {
+    "schema_version": 1,
+    "model_id": "moment-1-small",
+    "repo_id": "AutonLab/MOMENT-1-small",
+    "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
+    "checked_at": "2026-08-01T10:06:08.757310+00:00",
+    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small",
+    "repo_cache_exists": false,
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f",
+    "snapshot_exists": false,
+    "snapshot_revision_matches": false,
+    "existing_files": [],
+    "missing_files": [
+      "snapshot directory"
+    ],
+    "result": "FIXED_SNAPSHOT_MISSING"
+  },
+  "gpu_used": false,
+  "cpu_fallback": false,
+  "cpu_preprocessing": null,
+  "peak_vram_bytes": null,
+  "finite": null,
+  "artifact_reference": {
+    "repo_id": "AutonLab/MOMENT-1-small",
+    "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f"
+  }
+}

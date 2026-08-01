@@ -6,12 +6,12 @@ Updated: 2026-08-01
 
 - Total models: 21
 - Runtime certified: 8
-- Blocked: 7
-- Pending: 6
+- Blocked: 8
+- Pending: 5
 - Formal certification progress: 38.1%
-- Judged progress: 71.4%
-- Current branch: feat/moment-1-large-runtime-audit-v1
-- Next model: moment-1-small
+- Judged progress: 76.2%
+- Current branch: feat/moment-1-small-runtime-audit-v1
+- Next model: sundial-base
 
 ## Certified
 
@@ -160,8 +160,8 @@ Updated: 2026-08-01
 ### moment-1-large
 
 - Branch: feat/moment-1-large-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: 6a6a910
+- Push: origin/feat/moment-1-large-runtime-audit-v1
 - repo_id: AutonLab/MOMENT-1-large
 - revision: ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc
 - status: BLOCKED
@@ -175,3 +175,21 @@ Updated: 2026-08-01
 - dedicated test: tests/test_moment_1_large_runtime_audit.py
 - hash verification: audit/tsfm-runtime/moment-1-large/sha256sum.txt OK
 - resume condition: Install the exact pinned revision into the configured local Hugging Face cache with config.json and model weight files present.
+
+### moment-1-small
+
+- Branch: feat/moment-1-small-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: AutonLab/MOMENT-1-small
+- revision: 411e288267f82cce86296dbe4d6c8bc533cc162f
+- status: BLOCKED
+- blocked reason: FIXED_SNAPSHOT_MISSING
+- checked snapshot: /mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f
+- snapshot finding: repo cache missing
+- runtime executed: false
+- CPU fallback: false
+- license: MIT from ledger, review BLOCKED until pinned snapshot/model card is available
+- dedicated test: tests/test_moment_1_small_runtime_audit.py
+- hash verification: audit/tsfm-runtime/moment-1-small/sha256sum.txt OK
+- resume condition: Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files.

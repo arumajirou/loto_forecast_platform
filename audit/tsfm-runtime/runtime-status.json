@@ -503,7 +503,16 @@
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 303257025,
       "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_status": "BLOCKED",
+      "runtime_revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
+      "runtime_blocked_reason": "FIXED_SNAPSHOT_MISSING",
+      "runtime_blocked_detail": "Pinned snapshot directory is missing from the configured local Hugging Face cache.",
+      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f",
+      "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files.",
+      "runtime_resume_conditions": [
+        "Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files."
+      ],
+      "runtime_license_review": "BLOCKED"
     },
     {
       "model_id": "sundial-base",
@@ -652,6 +661,6 @@
     }
   ],
   "certified_models": 8,
-  "blocked_models": 7,
-  "pending_models": 6
+  "blocked_models": 8,
+  "pending_models": 5
 }
