@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "status": "BLOCKED",
+  "model_id": "toto-open-base",
+  "repo_id": "Datadog/Toto-Open-Base-1.0",
+  "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
+  "runtime_vram_certified": false,
+  "blocked_at": "2026-08-01T10:15:13.081194+00:00",
+  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
+  "blocked_detail": "No local repo cache exists for the fixed pinned revision.",
+  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
+  "snapshot_probe": {
+    "schema_version": 1,
+    "model_id": "toto-open-base",
+    "repo_id": "Datadog/Toto-Open-Base-1.0",
+    "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
+    "checked_at": "2026-08-01T10:15:13.081194+00:00",
+    "hf_home_candidates": [
+      "/mnt/e/env/huggingface",
+      "/mnt/e/env/huggingface/hub",
+      "/home/az/.cache/huggingface/hub"
+    ],
+    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0",
+    "repo_cache_exists": false,
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0/snapshots/0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
+    "snapshot_exists": false,
+    "snapshot_revision_matches": false,
+    "existing_files": [],
+    "weight_candidates": [],
+    "missing_files": [
+      "config.json",
+      "model.safetensors"
+    ],
+    "weight_sha256": null,
+    "config_sha256": null,
+    "gated_required": false,
+    "dependency_required": null,
+    "result": "FIXED_SNAPSHOT_MISSING"
+  },
+  "gpu_used": false,
+  "cpu_fallback": false,
+  "cpu_preprocessing": null,
+  "peak_vram_bytes": null,
+  "finite": null,
+  "weight_sha256": null,
+  "config_sha256": null,
+  "artifact_reference": {
+    "repo_id": "Datadog/Toto-Open-Base-1.0",
+    "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0/snapshots/0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5"
+  }
+}

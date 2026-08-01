@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "model_id": "toto-open-base",
+  "repo_cache_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0",
+  "repo_cache_exists": false,
+  "snapshots": [],
+  "fixed_snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0/snapshots/0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
+  "fixed_snapshot_exists": false,
+  "gated_required": false,
+  "expected_stored_weight_bytes": 605239264
+}

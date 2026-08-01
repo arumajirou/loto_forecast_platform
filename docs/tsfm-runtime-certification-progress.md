@@ -6,12 +6,12 @@ Updated: 2026-08-01
 
 - Total models: 21
 - Runtime certified: 8
-- Blocked: 12
-- Pending: 1
+- Blocked: 13
+- Pending: 0
 - Formal certification progress: 38.1%
-- Judged progress: 95.2%
-- Current branch: feat/toto-2-0-4m-runtime-audit-v1
-- Next model: toto-open-base
+- Judged progress: 100.0%
+- Current branch: feat/toto-open-base-runtime-audit-v1
+- Next model: NO_PENDING_MODELS
 ## Certified
 
 ### chronos-2
@@ -37,9 +37,7 @@ Updated: 2026-08-01
 
 ## Remaining Ledger Order
 
-1. t0-alpha
-2. timesfm-2.5-transformers
-3. toto-open-base
+No pending models remain.
 
 ## Blocked
 
@@ -248,8 +246,8 @@ Updated: 2026-08-01
 ### toto-2.0-4m
 
 - Branch: feat/toto-2-0-4m-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: 38ef45d
+- Push: origin/feat/toto-2-0-4m-runtime-audit-v1
 - repo_id: Datadog/Toto-2.0-4m
 - revision: 8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9
 - status: BLOCKED
@@ -261,3 +259,20 @@ Updated: 2026-08-01
 - dedicated test: tests/test_toto_2_0_4m_runtime_audit.py
 - hash verification: audit/tsfm-runtime/toto-2.0-4m/sha256sum.txt OK
 - resume condition: Install the Toto runtime package compatible with the pinned checkpoint, then rerun CUDA runtime certification with external PID sampling.
+
+### toto-open-base
+
+- Branch: feat/toto-open-base-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: Datadog/Toto-Open-Base-1.0
+- revision: 0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5
+- status: BLOCKED
+- blocked reason: FIXED_SNAPSHOT_MISSING
+- checked snapshot: /mnt/e/env/huggingface/hub/models--Datadog--Toto-Open-Base-1.0/snapshots/0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5
+- runtime executed: false
+- CPU fallback: false
+- license: Apache-2.0 from ledger; pinned local model card/license files are unavailable.
+- dedicated test: tests/test_toto_open_base_runtime_audit.py
+- hash verification: audit/tsfm-runtime/toto-open-base/sha256sum.txt OK
+- resume condition: Install the exact pinned revision into the configured local Hugging Face cache with config.json and model.safetensors present.
