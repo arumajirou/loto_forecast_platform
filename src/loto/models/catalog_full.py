@@ -47,7 +47,9 @@ PRIMARY_SOURCES: dict[str, str] = {
     "neuralforecast_auto": "github.com/Nixtla/neuralforecast @ main:neuralforecast/auto.py",
     "statsforecast": "github.com/Nixtla/statsforecast @ main:python/statsforecast/models.py",
     "mlforecast_auto": "github.com/Nixtla/mlforecast @ main:mlforecast/auto.py",
-    "hierarchicalforecast": "github.com/Nixtla/hierarchicalforecast @ main:hierarchicalforecast/methods.py",
+    "hierarchicalforecast": (
+        "github.com/Nixtla/hierarchicalforecast @ main:hierarchicalforecast/methods.py"
+    ),
     "tsfm": "huggingface.co/models?pipeline_tag=time-series-forecasting (2026-07-30)",
 }
 
@@ -414,7 +416,9 @@ TSFM_MODELS: tuple[dict[str, Any], ...] = (
         "package": "transformers",
         "family": "tsfm",
         "priority": "p0",
-        "notes": "transformers-native; preferred over the -pytorch checkpoint (no trust_remote_code)",
+        "notes": (
+            "transformers-native; preferred over the -pytorch checkpoint (no trust_remote_code)"
+        ),
     },
     {
         "model_id": "granite-ttm-r2",

@@ -14,7 +14,7 @@ class UniformCandidateAdapter(ModelAdapter):
     model_id = "uniform-7-over-37"
     capabilities = ModelCapabilities.PROBABILITY_PREDICTION | ModelCapabilities.RANKING_PREDICTION
 
-    def fit(self, data: pd.DataFrame) -> "UniformCandidateAdapter":
+    def fit(self, data: pd.DataFrame) -> UniformCandidateAdapter:
         return self
 
     def predict(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -33,7 +33,7 @@ class FrequencyCandidateAdapter(ModelAdapter):
         self.model_id = f"frequency-alpha-{self.alpha:g}"
         self._probabilities = np.full(37, 7 / 37, dtype=float)
 
-    def fit(self, data: pd.DataFrame) -> "FrequencyCandidateAdapter":
+    def fit(self, data: pd.DataFrame) -> FrequencyCandidateAdapter:
         self.validate_request(data)
         if not {"candidate_number", "selected"}.issubset(data.columns):
             raise ValueError("frequency model requires candidate_number and selected")
@@ -62,7 +62,7 @@ class FrequencyCandidateAdapter(ModelAdapter):
         )
         return p
 
-    def load(self, path: str | Path) -> "FrequencyCandidateAdapter":
+    def load(self, path: str | Path) -> FrequencyCandidateAdapter:
         obj = json.loads(Path(path).read_text())
         self.alpha = float(obj["alpha"])
         self._probabilities = np.asarray(obj["probabilities"], dtype=float)
@@ -86,7 +86,7 @@ class LogisticCandidateAdapter(ModelAdapter):
         self.feature_columns: list[str] = []
         self._fitted = False
 
-    def fit(self, data: pd.DataFrame) -> "LogisticCandidateAdapter":
+    def fit(self, data: pd.DataFrame) -> LogisticCandidateAdapter:
         self.validate_request(data)
         excluded = {"draw_id", "draw_no", "draw_date", "selected", "candidate_number"}
         self.feature_columns = [

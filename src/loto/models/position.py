@@ -11,7 +11,7 @@ class PositionFrequencyAdapter:
         self.alpha = alpha
         self.probabilities = np.full((7, 37), 1 / 37, dtype=float)
 
-    def fit(self, master: pd.DataFrame) -> "PositionFrequencyAdapter":
+    def fit(self, master: pd.DataFrame) -> PositionFrequencyAdapter:
         for pos in range(1, 8):
             col = f"n{pos}"
             counts = (
