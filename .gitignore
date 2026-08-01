@@ -92,7 +92,8 @@ audit/
 # Generated model artifacts
 runs/**/models/
 artifacts/models/
-checkpoints/
-*.ckpt
-*.pth
-*.pt
+
+# Local Numbers3 benchmark artifacts
+artifacts/numbers3/n1_rolling_parallel/
+artifacts/numbers3/n1_rolling_parallel_*/
+artifacts/numbers3/n1_deterministic_*/
