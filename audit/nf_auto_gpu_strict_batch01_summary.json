@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-08-01T04:55:11.438378+00:00",
+  "audit_type": "strict_gpu_quick",
+  "model_count": 6,
+  "pass_count": 6,
+  "gpu_verified_count": 6,
+  "all_pass": true,
+  "models": [
+    {
+      "model_id": "nf-auto-bitcn",
+      "final_status": "PASS",
+      "gpu_required": true,
+      "eligible": true,
+      "reasons": [
+        "lightning_gpu_accelerator_vram_and_pid_evidence"
+      ],
+      "trainer_accelerator": "gpu",
+      "trainer_devices": 1,
+      "cuda_available": true,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Ti",
+      "vram_peak_bytes": 261167104,
+      "vram_peak_mib": 249.07,
+      "gpu_process_observed": true,
+      "runtime_path": "runs/all-model-argument-audit-nf-auto-gpu-strict-real-batch01-20260801-135304/runtime/runtime-20260801-135309-6108338f/nf-auto-bitcn"
+    },
+    {
+      "model_id": "nf-auto-dlinear",
+      "final_status": "PASS",
+      "gpu_required": true,
+      "eligible": true,
+      "reasons": [
+        "lightning_gpu_accelerator_vram_and_pid_evidence"
+      ],
+      "trainer_accelerator": "gpu",
+      "trainer_devices": 1,
+      "cuda_available": true,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Ti",
+      "vram_peak_bytes": 67274752,
+      "vram_peak_mib": 64.16,
+      "gpu_process_observed": true,
+      "runtime_path": "runs/all-model-argument-audit-nf-auto-gpu-strict-real-batch01-20260801-135304/runtime/runtime-20260801-135309-6108338f/nf-auto-dlinear"
+    },
+    {
+      "model_id": "nf-auto-kan",
+      "final_status": "PASS",
+      "gpu_required": true,
+      "eligible": true,
+      "reasons": [
+        "lightning_gpu_accelerator_vram_and_pid_evidence"
+      ],
+      "trainer_accelerator": "gpu",
+      "trainer_devices": 1,
+      "cuda_available": true,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Ti",
+      "vram_peak_bytes": 261167104,
+      "vram_peak_mib": 249.07,
+      "gpu_process_observed": true,
+      "runtime_path": "runs/all-model-argument-audit-nf-auto-gpu-strict-real-batch01-20260801-135304/runtime/runtime-20260801-135309-6108338f/nf-auto-kan"
+    },
+    {
+      "model_id": "nf-auto-mlp",
+      "final_status": "PASS",
+      "gpu_required": true,
+      "eligible": true,
+      "reasons": [
+        "lightning_gpu_accelerator_vram_and_pid_evidence"
+      ],
+      "trainer_accelerator": "gpu",
+      "trainer_devices": 1,
+      "cuda_available": true,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Ti",
+      "vram_peak_bytes": 96657920,
+      "vram_peak_mib": 92.18,
+      "gpu_process_observed": true,
+      "runtime_path": "runs/all-model-argument-audit-nf-auto-gpu-strict-real-batch01-20260801-135304/runtime/runtime-20260801-135309-6108338f/nf-auto-mlp"
+    },
+    {
+      "model_id": "nf-auto-nlinear",
+      "final_status": "PASS",
+      "gpu_required": true,
+      "eligible": true,
+      "reasons": [
+        "lightning_gpu_accelerator_vram_and_pid_evidence"
+      ],
+      "trainer_accelerator": "gpu",
+      "trainer_devices": 1,
+      "cuda_available": true,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Ti",
+      "vram_peak_bytes": 67274752,
+      "vram_peak_mib": 64.16,
+      "gpu_process_observed": true,
+      "runtime_path": "runs/all-model-argument-audit-nf-auto-gpu-strict-real-batch01-20260801-135304/runtime/runtime-20260801-135309-6108338f/nf-auto-nlinear"
+    },
+    {
+      "model_id": "nf-auto-tcn",
+      "final_status": "PASS",
+      "gpu_required": true,
+      "eligible": true,
+      "reasons": [
+        "lightning_gpu_accelerator_vram_and_pid_evidence"
+      ],
+      "trainer_accelerator": "gpu",
+      "trainer_devices": 1,
+      "cuda_available": true,
+      "gpu_name": "NVIDIA GeForce RTX 5070 Ti",
+      "vram_peak_bytes": 261167104,
+      "vram_peak_mib": 249.07,
+      "gpu_process_observed": true,
+      "runtime_path": "runs/all-model-argument-audit-nf-auto-gpu-strict-real-batch01-20260801-135304/runtime/runtime-20260801-135309-6108338f/nf-auto-tcn"
+    }
+  ]
+}
