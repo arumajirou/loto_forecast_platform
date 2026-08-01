@@ -5,12 +5,12 @@ Updated: 2026-08-01
 ## Current Status
 
 - Total models: 21
-- Runtime certified: 17 / 21
-- Blocked: 4 / 21
+- Runtime certified: 19 / 21
+- Blocked: 2 / 21
 - Pending: 0 / 21
-- Formal certification progress: 81.0%
+- Formal certification progress: 90.5%
 - Judged progress: 100.0%
-- Current branch: feat/toto-open-base-runtime-audit-v1
+- Current branch: fix/sundial-ci-contracts-20260801-200848
 - Next model: NO_PENDING_MODELS
 ## Certified
 

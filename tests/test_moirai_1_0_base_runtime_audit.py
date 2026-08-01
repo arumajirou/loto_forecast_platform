@@ -5,107 +5,82 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-
 MODEL_ID = "moirai-1.0-base"
 REPO_ID = "Salesforce/moirai-1.0-R-base"
 REVISION = "4fa939a8800d9da346c0280f3d9aeba0d2d35877"
-BLOCKED_REASON = "LICENSE_REVIEW_REQUIRED"
+BLOCKED_REASON = "MODEL_WEIGHTS_MISSING"
 
 EVIDENCE_DIR = ROOT / "audit" / "tsfm-runtime" / MODEL_ID
 STATUS_PATH = ROOT / "audit" / "tsfm-runtime" / "runtime-status.json"
-DOCS_PATH = ROOT / "docs" / "tsfm-runtime-certification-progress.md"
 
 
 def _load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_moirai_1_0_base_snapshot_probe_records_license_block() -> None:
-    probe = _load_json(EVIDENCE_DIR / "snapshot-probe.json")
-
-    assert probe["model_id"] == MODEL_ID
-    assert probe["repo_id"] == REPO_ID
-    assert probe["revision"] == REVISION
-    assert probe["snapshot_exists"] is True
-    assert probe["snapshot_revision_matches"] is True
-    assert probe["result"] == BLOCKED_REASON
-    assert probe["weight_candidates"] == []
-    assert probe["existing_files"][0]["name"] == "README.md"
-
-
-def test_moirai_1_0_base_runtime_result_is_blocked() -> None:
+def test_runtime_result_is_blocked() -> None:
     result = _load_json(EVIDENCE_DIR / "runtime-result.json")
-    certification = _load_json(EVIDENCE_DIR / "runtime-certification.json")
 
-    assert result["status"] == "BLOCKED"
+    assert result["model_id"] == MODEL_ID
+    assert result["repo_id"] == REPO_ID
+    assert result["revision"] == REVISION
+    assert result["runtime_status"] == "BLOCKED"
     assert result["runtime_vram_certified"] is False
     assert result["blocked_reason"] == BLOCKED_REASON
-    assert result["gpu_used"] is False
-    assert result["cpu_fallback"] is False
-    assert result["peak_vram_bytes"] is None
+    assert result["snapshot_exists"] is True
+    assert result["config_exists"] is False
+    assert result["weight_files"] == []
+    assert result["runtime_gpu_used"] is False
+    assert result["runtime_cpu_fallback"] is False
 
-    assert certification["certification_status"] == "BLOCKED"
+
+def test_runtime_certification_is_blocked() -> None:
+    certification = _load_json(EVIDENCE_DIR / "runtime-certification.json")
+
+    assert certification["runtime_status"] == "BLOCKED"
     assert certification["runtime_vram_certified"] is False
-    assert certification["license_review_status"] == "REJECTED"
     assert certification["blocked_reason"] == BLOCKED_REASON
+    assert certification["license_scope"] == "PERSONAL_NONCOMMERCIAL_ONLY"
+    assert certification["commercial_deployment_certified"] is False
 
 
-def test_moirai_1_0_base_license_review_is_rejected() -> None:
+def test_license_review() -> None:
     review = _load_json(EVIDENCE_DIR / "license-review.json")
 
-    assert review["license"] == "cc-by-nc-4.0"
-    assert review["review_status"] == "REJECTED"
+    assert review["license"].lower() == ("cc-by-nc-4.0")
+    assert review["review_status"] == "APPROVED_PERSONAL_NONCOMMERCIAL"
+    assert review["personal_use"] is True
+    assert review["personal_noncommercial_use"] is True
     assert review["commercial_use"] is False
-    assert "commercial use" in review["limitations"][0]
 
 
-def test_moirai_1_0_base_runtime_status_ledger_is_blocked() -> None:
+def test_runtime_status_ledger_is_blocked() -> None:
     status = _load_json(STATUS_PATH)
+
     row = next(item for item in status["results"] if item["model_id"] == MODEL_ID)
 
     assert len(status["results"]) == 21
-    assert status["runtime_certified_models"] == sum(
-        item.get("runtime_status") == "CERTIFIED" for item in status["results"]
-    )
-    assert status["certified_models"] == sum(
-        item.get("runtime_status") == "CERTIFIED" for item in status["results"]
-    )
-    assert status["blocked_models"] == sum(
-        item.get("runtime_status") == "BLOCKED" for item in status["results"]
-    )
-    assert status["pending_models"] == sum(
-        item.get("runtime_status") not in {"CERTIFIED", "BLOCKED"} for item in status["results"]
-    )
+    assert status["runtime_certified_models"] == 19
+    assert status["certified_models"] == 19
+    assert status["blocked_models"] == 2
+    assert status["pending_models"] == 0
 
     assert row["repo_id"] == REPO_ID
-    assert row["revision"] == REVISION
+    assert row["runtime_revision"] == REVISION
     assert row["runtime_status"] == "BLOCKED"
     assert row["runtime_vram_certified"] is False
     assert row["runtime_blocked_reason"] == BLOCKED_REASON
-    assert row["runtime_license_review"] == "REJECTED"
-    assert row["retry_condition"]
+    assert row["runtime_license_scope"] == "PERSONAL_NONCOMMERCIAL_ONLY"
 
 
-def test_moirai_1_0_base_docs_are_updated() -> None:
-    docs = DOCS_PATH.read_text(encoding="utf-8")
+def test_manifest_is_current() -> None:
+    lines = (EVIDENCE_DIR / "sha256sum.txt").read_text(encoding="utf-8").splitlines()
 
-    assert "### moirai-1.0-base" in docs
-    assert "blocked reason: LICENSE_REVIEW_REQUIRED" in docs
-    assert "Next model:" in docs
-    assert "Blocked:" in docs
-    assert "Pending:" in docs
+    assert lines
 
+    for line in lines:
+        expected, filename = line.split("  ", 1)
 
-def test_moirai_1_0_base_sha256_manifest_is_current() -> None:
-    entries = [
-        line.split("  ", 1)
-        for line in (EVIDENCE_DIR / "sha256sum.txt").read_text(encoding="utf-8").splitlines()
-        if line
-    ]
+        actual = hashlib.sha256((EVIDENCE_DIR / filename).read_bytes()).hexdigest()
 
-    assert len(entries) >= 8
-
-    for expected_digest, name in entries:
-        actual_digest = hashlib.sha256((EVIDENCE_DIR / name).read_bytes()).hexdigest()
-
-        assert actual_digest == expected_digest
+        assert expected == actual

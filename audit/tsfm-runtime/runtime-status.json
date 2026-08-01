@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "total_models": 21,
-  "runtime_certified_models": 17,
+  "runtime_certified_models": 19,
   "results": [
     {
       "model_id": "chronos-2",
@@ -929,8 +929,8 @@
       "runtime_weight_sha256": "69b67e60decc90baf741729abcf1fe8fe0881e3e3337176042053c28a122fa4c"
     }
   ],
-  "certified_models": 17,
-  "blocked_models": 4,
+  "certified_models": 19,
+  "blocked_models": 2,
   "pending_models": 0,
   "judged_models": 21,
   "judged_progress_percent": 100.0,
