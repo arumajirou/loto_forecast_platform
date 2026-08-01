@@ -6,13 +6,12 @@ Updated: 2026-08-01
 
 - Total models: 21
 - Runtime certified: 8
-- Blocked: 9
-- Pending: 4
+- Blocked: 10
+- Pending: 3
 - Formal certification progress: 38.1%
-- Judged progress: 81.0%
-- Current branch: feat/sundial-base-runtime-audit-v1
-- Next model: t0-alpha
-
+- Judged progress: 85.7%
+- Current branch: feat/t0-alpha-runtime-audit-v1
+- Next model: timesfm-2.5-transformers
 ## Certified
 
 ### chronos-2
@@ -38,12 +37,10 @@ Updated: 2026-08-01
 
 ## Remaining Ledger Order
 
-1. moment-1-small
-2. sundial-base
-3. t0-alpha
-4. timesfm-2.5-transformers
-5. toto-2.0-4m
-6. toto-open-base
+1. timesfm-2.5-transformers
+2. toto-2.0-4m
+3. toto-open-base
+
 ## Blocked
 
 ### chronos-t5-base
@@ -197,8 +194,8 @@ Updated: 2026-08-01
 ### sundial-base
 
 - Branch: feat/sundial-base-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: 276b436
+- Push: origin/feat/sundial-base-runtime-audit-v1
 - repo_id: thuml/sundial-base-128m
 - revision: 3212e42564493f520593e5414af4367fc4b49226
 - status: BLOCKED
@@ -213,3 +210,20 @@ Updated: 2026-08-01
 - dedicated test: tests/test_sundial_base_runtime_audit.py
 - hash verification: audit/tsfm-runtime/sundial-base/sha256sum.txt OK
 - resume condition: Complete and approve a security review of the pinned remote-code files before running CUDA runtime certification.
+
+### t0-alpha
+
+- Branch: feat/t0-alpha-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: theforecastingcompany/t0-alpha
+- revision: f8727c2357e0d81f1d9f56fe3aaac43068b5fc72
+- status: BLOCKED
+- blocked reason: GATED_ACCESS_REQUIRED
+- checked snapshot: /mnt/e/env/huggingface/hub/models--theforecastingcompany--t0-alpha/snapshots/f8727c2357e0d81f1d9f56fe3aaac43068b5fc72
+- runtime executed: false
+- CPU fallback: false
+- license: Apache-2.0 from pinned snapshot README metadata.
+- dedicated test: tests/test_t0_alpha_runtime_audit.py
+- hash verification: audit/tsfm-runtime/t0-alpha/sha256sum.txt OK
+- resume condition: Accept/verify gated model access and install the exact pinned revision into the configured local Hugging Face cache with config.json and model weights.

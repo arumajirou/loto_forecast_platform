@@ -555,7 +555,20 @@
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 406601492,
       "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_status": "BLOCKED",
+      "runtime_revision": "f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+      "runtime_blocked_reason": "GATED_ACCESS_REQUIRED",
+      "runtime_blocked_detail": "Ledger marks this model as gated and the fixed local snapshot contains only README.md, with no config or weight files available for runtime execution.",
+      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--theforecastingcompany--t0-alpha/snapshots/f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+      "retry_condition": "Accept/verify gated model access and install the exact pinned revision into the configured local Hugging Face cache with config.json and model weights.",
+      "runtime_resume_conditions": [
+        "Accept/verify gated model access and install the exact pinned revision into the configured local Hugging Face cache with config.json and model weights."
+      ],
+      "runtime_license_review": "APPROVED",
+      "runtime_missing_files": [
+        "config.json",
+        "model weight file"
+      ]
     },
     {
       "model_id": "tabpfn-ts",
@@ -672,6 +685,6 @@
     }
   ],
   "certified_models": 8,
-  "blocked_models": 9,
-  "pending_models": 4
+  "blocked_models": 10,
+  "pending_models": 3
 }

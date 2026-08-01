@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "model_id": "t0-alpha",
+  "captured_at": "2026-08-01T10:12:16.132965+00:00",
+  "project_root": "/mnt/e/env/ts/loto_forecast_platform",
+  "hf_home_candidates": [
+    "/mnt/e/env/huggingface",
+    "/mnt/e/env/huggingface/hub",
+    "/home/az/.cache/huggingface/hub"
+  ],
+  "runtime_executed": false,
+  "cpu_fallback": false
+}
