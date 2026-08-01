@@ -18,7 +18,7 @@ python - <<PY
 from pathlib import Path
 import pandas as pd
 root=Path(${OUT@Q})
-files=sorted(root.glob('seed-*/ablation_results.csv'))
+files=sorted(root.glob('seed-*/robustness_v21_results.csv'))
 if not files: raise SystemExit('no campaign outputs')
 combined=pd.concat([pd.read_csv(p) for p in files], ignore_index=True)
 expected=int(${FOLDS@Q})*len(${SEEDS@Q}.split())*2*12
