@@ -11,3 +11,8 @@ dependencies = [
   "pandas>=2.2",
   "torch>=2.3",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
