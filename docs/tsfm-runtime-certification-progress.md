@@ -6,12 +6,12 @@ Updated: 2026-08-01
 
 - Total models: 21
 - Runtime certified: 8
-- Blocked: 4
-- Pending: 9
+- Blocked: 5
+- Pending: 8
 - Formal certification progress: 38.1%
-- Judged progress: 57.1%
-- Current branch: feat/lag-llama-runtime-audit-v1
-- Next model: moirai-1.0-base
+- Judged progress: 61.9%
+- Current branch: feat/moirai-1-0-base-runtime-audit-v1
+- Next model: moirai-2.0-small
 
 ## Certified
 
@@ -38,15 +38,14 @@ Updated: 2026-08-01
 
 ## Remaining Ledger Order
 
-1. moirai-1.0-base
-2. moirai-2.0-small
-3. moment-1-large
-4. moment-1-small
-5. sundial-base
-6. t0-alpha
-7. timesfm-2.5-transformers
-8. toto-2.0-4m
-9. toto-open-base
+1. moirai-2.0-small
+2. moment-1-large
+3. moment-1-small
+4. sundial-base
+5. t0-alpha
+6. timesfm-2.5-transformers
+7. toto-2.0-4m
+8. toto-open-base
 
 ## Blocked
 
@@ -107,8 +106,8 @@ Updated: 2026-08-01
 ### lag-llama
 
 - Branch: feat/lag-llama-runtime-audit-v1
-- Commit: pending
-- Push: pending
+- Commit: a9edfd8
+- Push: origin/feat/lag-llama-runtime-audit-v1
 - repo_id: time-series-foundation-models/Lag-Llama
 - revision: 72dcfc29da106acfe38250a60f4ae29d1e56a3d9
 - status: BLOCKED
@@ -122,3 +121,21 @@ Updated: 2026-08-01
 - dedicated test: tests/test_lag_llama_runtime_audit.py
 - hash verification: audit/tsfm-runtime/lag-llama/sha256sum.txt OK
 - resume condition: install the exact pinned revision into the configured local Hugging Face cache with the Lag-Llama checkpoint file present, then rerun CUDA runtime certification with external PID sampling.
+
+### moirai-1.0-base
+
+- Branch: feat/moirai-1-0-base-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: Salesforce/moirai-1.0-R-base
+- revision: 4fa939a8800d9da346c0280f3d9aeba0d2d35877
+- status: BLOCKED
+- blocked reason: LICENSE_REVIEW_REQUIRED
+- checked snapshot: /mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base/snapshots/4fa939a8800d9da346c0280f3d9aeba0d2d35877
+- snapshot finding: snapshot exists and revision matches, but only README.md is present
+- license: CC-BY-NC-4.0, REJECTED for commercial runtime certification
+- runtime executed: false
+- CPU fallback: false
+- dedicated test: tests/test_moirai_1_0_base_runtime_audit.py
+- hash verification: audit/tsfm-runtime/moirai-1.0-base/sha256sum.txt OK
+- resume condition: use only if policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai revision/model. A complete pinned snapshot with weights is also required before runtime probing.

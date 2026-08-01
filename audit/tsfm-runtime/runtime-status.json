@@ -419,7 +419,19 @@
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 365449072,
       "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_status": "BLOCKED",
+      "runtime_revision": "4fa939a8800d9da346c0280f3d9aeba0d2d35877",
+      "runtime_blocked_reason": "LICENSE_REVIEW_REQUIRED",
+      "runtime_blocked_detail": "Pinned model declares cc-by-nc-4.0 non-commercial license; license review cannot be approved for commercial runtime certification.",
+      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base/snapshots/4fa939a8800d9da346c0280f3d9aeba0d2d35877",
+      "runtime_missing_files": [
+        "model weight file (*.safetensors, *.bin, or *.ckpt)"
+      ],
+      "retry_condition": "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai revision/model. A complete pinned snapshot with weights is also required before runtime probing.",
+      "runtime_resume_conditions": [
+        "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai revision/model. A complete pinned snapshot with weights is also required before runtime probing."
+      ],
+      "runtime_license_review": "REJECTED"
     },
     {
       "model_id": "moirai-2.0-small",
@@ -616,6 +628,6 @@
     }
   ],
   "certified_models": 8,
-  "blocked_models": 4,
-  "pending_models": 9
+  "blocked_models": 5,
+  "pending_models": 8
 }

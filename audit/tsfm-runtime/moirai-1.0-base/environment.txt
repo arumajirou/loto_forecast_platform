@@ -1,0 +1,8 @@
+PROJECT_ROOT=/mnt/e/env/ts/loto_forecast_platform
+branch=feat/moirai-1-0-base-runtime-audit-v1
+model_id=moirai-1.0-base
+repo_id=Salesforce/moirai-1.0-R-base
+revision=4fa939a8800d9da346c0280f3d9aeba0d2d35877
+snapshot_path=/mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base/snapshots/4fa939a8800d9da346c0280f3d9aeba0d2d35877
+status=BLOCKED
+blocked_reason=LICENSE_REVIEW_REQUIRED
