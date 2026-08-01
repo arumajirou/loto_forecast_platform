@@ -1,50 +1,26 @@
 {
   "schema_version": 1,
-  "status": "BLOCKED",
   "model_id": "moirai-1.0-base",
   "repo_id": "Salesforce/moirai-1.0-R-base",
   "revision": "4fa939a8800d9da346c0280f3d9aeba0d2d35877",
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base/snapshots/4fa939a8800d9da346c0280f3d9aeba0d2d35877",
+  "snapshot_exists": true,
+  "readme_exists": true,
+  "readme_sha256": "e7613a243959e737bf8667b66683b6a4f72f83eb62af245e85fa136044e747dd",
+  "config_exists": false,
+  "weight_files": [],
+  "runtime_status": "BLOCKED",
   "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T09:58:02.078648+00:00",
-  "blocked_reason": "LICENSE_REVIEW_REQUIRED",
-  "blocked_detail": "Pinned model declares cc-by-nc-4.0 non-commercial license; license review cannot be approved for commercial runtime certification.",
-  "retry_condition": "Use only if the certification policy permits CC-BY-NC-4.0 non-commercial models; otherwise choose a commercially usable Moirai revision/model. A complete pinned snapshot with weights is also required before runtime probing.",
-  "snapshot_probe": {
-    "schema_version": 1,
-    "model_id": "moirai-1.0-base",
-    "repo_id": "Salesforce/moirai-1.0-R-base",
-    "revision": "4fa939a8800d9da346c0280f3d9aeba0d2d35877",
-    "checked_at": "2026-08-01T09:58:02.078648+00:00",
-    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base",
-    "repo_cache_exists": true,
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base/snapshots/4fa939a8800d9da346c0280f3d9aeba0d2d35877",
-    "snapshot_exists": true,
-    "snapshot_revision_matches": true,
-    "existing_files": [
-      {
-        "name": "README.md",
-        "path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base/snapshots/4fa939a8800d9da346c0280f3d9aeba0d2d35877/README.md",
-        "is_symlink": true,
-        "symlink_target": "../../blobs/8703e185fce71e25e5fca177e5b43995e4f9c586",
-        "resolved_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base/blobs/8703e185fce71e25e5fca177e5b43995e4f9c586",
-        "size_bytes": 5268,
-        "sha256": "e7613a243959e737bf8667b66683b6a4f72f83eb62af245e85fa136044e747dd"
-      }
-    ],
-    "weight_candidates": [],
-    "missing_files": [
-      "model weight file (*.safetensors, *.bin, or *.ckpt)"
-    ],
-    "result": "LICENSE_REVIEW_REQUIRED"
-  },
-  "gpu_used": false,
-  "cpu_fallback": false,
-  "cpu_preprocessing": null,
-  "peak_vram_bytes": null,
-  "finite": null,
-  "artifact_reference": {
-    "repo_id": "Salesforce/moirai-1.0-R-base",
-    "revision": "4fa939a8800d9da346c0280f3d9aeba0d2d35877",
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Salesforce--moirai-1.0-R-base/snapshots/4fa939a8800d9da346c0280f3d9aeba0d2d35877"
-  }
+  "blocked_reason": "MODEL_WEIGHTS_MISSING",
+  "blocked_detail": "The exact pinned snapshot contains README.md but no model config or weight file.",
+  "runtime_gpu_used": false,
+  "runtime_cpu_fallback": false,
+  "license": "CC-BY-NC-4.0",
+  "license_review": "APPROVED_PERSONAL_NONCOMMERCIAL",
+  "license_scope": "PERSONAL_NONCOMMERCIAL_ONLY",
+  "personal_use": true,
+  "personal_noncommercial_use": true,
+  "commercial_use": false,
+  "retry_condition": "Materialize the exact pinned snapshot with config and model weights.",
+  "recorded_at": "2026-08-01T12:54:44.118824+00:00"
 }

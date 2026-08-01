@@ -3,18 +3,8 @@
   "model_id": "toto-open-base",
   "repo_id": "Datadog/Toto-Open-Base-1.0",
   "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
-  "license": "apache-2.0",
-  "review_status": "BLOCKED",
-  "commercial_use": false,
-  "attribution_required": false,
-  "redistribution_allowed": false,
-  "modification_allowed": false,
-  "patent_grant": false,
-  "notice_required_on_distribution": false,
-  "limitations": [
-    "No local repo cache exists for the fixed pinned revision."
-  ],
-  "review_notes": [
-    "Apache-2.0 from ledger; pinned local model card/license files are unavailable."
-  ]
+  "license": "Apache-2.0",
+  "review_status": "APPROVED",
+  "commercial_use": true,
+  "runtime_certification_scope": "CUDA_RUNTIME_ONLY"
 }

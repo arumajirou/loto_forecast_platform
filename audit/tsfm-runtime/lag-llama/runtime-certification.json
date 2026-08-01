@@ -3,16 +3,35 @@
   "model_id": "lag-llama",
   "repo_id": "time-series-foundation-models/Lag-Llama",
   "revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
-  "certification_status": "BLOCKED",
-  "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T09:55:52.117798+00:00",
-  "blocked_reason": "PARTIAL_SNAPSHOT",
-  "blocked_detail": "Pinned snapshot directory exists, but no model checkpoint or weight file is present.",
-  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache with the Lag-Llama checkpoint file present.",
-  "limitations": [
-    "Pinned snapshot contains only README.md and is missing the runtime checkpoint.",
-    "No CUDA inference was executed.",
-    "No weight SHA-256 was certified.",
-    "Forecast accuracy was not evaluated."
-  ]
+  "runtime_status": "CERTIFIED",
+  "runtime_vram_certified": true,
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "execution_device": "cuda",
+  "model_device": "cuda:0",
+  "prediction_shape": [
+    7
+  ],
+  "prediction_finite": true,
+  "input_shape": [
+    7,
+    1200
+  ],
+  "context_length": 32,
+  "prediction_length": 1,
+  "num_samples": 100,
+  "peak_vram_bytes": 256280576,
+  "gpu_pid": 807883,
+  "checkpoint_sha256": "b5a5c4b8a0cfe9b81bdac35ed5d88b5033cd119b5206c28e9cd67c4b45fb2c96",
+  "checkpoint_size_bytes": 29488819,
+  "model_class": "LagLlamaLightningModule",
+  "estimator_class": "LagLlamaEstimator",
+  "state_dict_missing_keys": [],
+  "state_dict_unexpected_keys": [],
+  "license": "apache-2.0",
+  "license_review": "APPROVED",
+  "commercial_use": true,
+  "domain_compatibility_certified": false,
+  "accuracy_certified": false,
+  "certified_at": "2026-08-01T13:04:19.286055+00:00"
 }
