@@ -96,19 +96,39 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         freq="D",
         one_dim_target=False,
     )
+    if snapshot_path.name != revision:
+        raise RuntimeError(f"snapshot revision mismatch: {snapshot_path.name} != {revision}")
+
+    module = Moirai2Module.from_pretrained(
+        str(snapshot_path),
+        local_files_only=True,
+    )
+    module = module.to(execution_device).eval()
+
+    module_parameter = next(module.parameters())
+
+    if execution_device == "cuda":
+        if module_parameter.device.type != "cuda":
+            raise RuntimeError(f"Moirai module is not on CUDA: {module_parameter.device}")
+
     model = Moirai2Forecast(
-        module=Moirai2Module.from_pretrained(
-            repo_id,
-            revision=revision,
-            local_files_only=True,
-        ),
+        module=module,
         prediction_length=horizon,
         context_length=context_length,
         target_dim=7,
         feat_dynamic_real_dim=0,
         past_feat_dynamic_real_dim=0,
     )
-    forecast = next(iter(model.create_predictor(batch_size=1).predict(dataset)))
+
+    predictor = model.create_predictor(
+        batch_size=1,
+        device=execution_device,
+    )
+
+    forecast = next(iter(predictor.predict(dataset)))
+
+    if execution_device == "cuda":
+        torch.cuda.synchronize()
     median = np.asarray(forecast.quantile(0.5), dtype=float)
     if median.shape != (horizon, 7):
         return {
@@ -121,7 +141,9 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         "status": "OK",
         "schema_version": 1,
         "provider_version": 1,
+        "model_id": str(request.get("model_id", "moirai-2.0-small")),
         "repo_id": repo_id,
+        "revision": revision,
         "snapshot_path": str(snapshot_path),
         "predictions": predictions.astype(float).tolist(),
         "prediction_shape": list(predictions.shape),
@@ -158,8 +180,9 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
             "fallback_reason": None
             if execution_device == requested_device
             else "cuda_unavailable_or_not_selected",
-            "peak_vram_bytes": int(torch.cuda.max_memory_allocated()) if gpu_used else 0,
-            "gpu_pid": os.getpid() if gpu_used else None,
+            "model_device": str(module_parameter.device),
+            "peak_vram_bytes": (int(torch.cuda.max_memory_allocated()) if gpu_used else 0),
+            "gpu_pid": (os.getpid() if gpu_used else None),
         },
         "artifact_reference": {
             "repo_id": repo_id,
@@ -169,7 +192,7 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def main() -> None:
+def main() -> int:
     parser = argparse.ArgumentParser(description="Run Moirai provider in an isolated env")
     parser.add_argument("--request", required=True, type=Path)
     parser.add_argument("--response", required=True, type=Path)
@@ -180,6 +203,8 @@ def main() -> None:
         response = {"status": "ERROR", "error_type": type(exc).__name__, "message": str(exc)}
     _write_payload(args.response, response)
 
+    return 0 if response.get("status") == "OK" else 1
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

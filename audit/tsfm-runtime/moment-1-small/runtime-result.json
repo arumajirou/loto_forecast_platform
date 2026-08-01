@@ -1,39 +1,56 @@
 {
   "schema_version": 1,
-  "status": "BLOCKED",
+  "status": "PASS",
   "model_id": "moment-1-small",
   "repo_id": "AutonLab/MOMENT-1-small",
   "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
-  "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T10:06:08.757310+00:00",
-  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
-  "blocked_detail": "Pinned snapshot directory is missing from the configured local Hugging Face cache.",
-  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files.",
-  "snapshot_probe": {
-    "schema_version": 1,
-    "model_id": "moment-1-small",
-    "repo_id": "AutonLab/MOMENT-1-small",
-    "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
-    "checked_at": "2026-08-01T10:06:08.757310+00:00",
-    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small",
-    "repo_cache_exists": false,
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f",
-    "snapshot_exists": false,
-    "snapshot_revision_matches": false,
-    "existing_files": [],
-    "missing_files": [
-      "snapshot directory"
-    ],
-    "result": "FIXED_SNAPSHOT_MISSING"
-  },
-  "gpu_used": false,
-  "cpu_fallback": false,
-  "cpu_preprocessing": null,
-  "peak_vram_bytes": null,
-  "finite": null,
-  "artifact_reference": {
-    "repo_id": "AutonLab/MOMENT-1-small",
-    "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f"
-  }
+  "runtime_recorded_at": "2026-08-01T11:42:22.886629+00:00",
+  "runtime_pid": 426259,
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f",
+  "input_series_count": 7,
+  "context_length": 512,
+  "prediction_length": 1,
+  "prediction_values": [
+    9.384089469909668,
+    13.353927612304688,
+    17.58574104309082,
+    18.634859085083008,
+    19.634859085083008,
+    23.184961318969727,
+    24.897478103637695
+  ],
+  "prediction_shape": [
+    7,
+    1,
+    1
+  ],
+  "output_finite": true,
+  "parameter_device": "cuda:0",
+  "input_device": "cuda:0",
+  "output_device": "cuda:0",
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "peak_vram_bytes": 197549568,
+  "pipeline_class": "MOMENTPipeline",
+  "output_class": "TimeseriesOutputs",
+  "task_name": "forecasting",
+  "runtime_certification_scope": "EXECUTION_ONLY",
+  "forecast_head_status": "FINE_TUNING_REQUIRED",
+  "forecast_head_pretrained": false,
+  "forecast_accuracy_certified": false,
+  "config_sha256": "6456b8e6f017323e8ef372c338c993380e246cb6291ffb8ca21fe7dfc53d0a6f",
+  "weights": [
+    {
+      "name": "model.safetensors",
+      "path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f/model.safetensors",
+      "sha256": "785e6c6f57ffa7cac7e2a1fff6369618d49f2f441563ddea76c866231e5aa877",
+      "size_bytes": 151615328
+    },
+    {
+      "name": "pytorch_model.bin",
+      "path": "/mnt/e/env/huggingface/hub/models--AutonLab--MOMENT-1-small/snapshots/411e288267f82cce86296dbe4d6c8bc533cc162f/pytorch_model.bin",
+      "sha256": "90c566d82684b1136e0e4ea6ad15c9f7c94c65d8939704dcea7904caea8895b8",
+      "size_bytes": 151641697
+    }
+  ]
 }

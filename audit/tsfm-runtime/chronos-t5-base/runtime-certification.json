@@ -3,26 +3,24 @@
   "model_id": "chronos-t5-base",
   "repo_id": "amazon/chronos-t5-base",
   "revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
-  "certification_status": "BLOCKED",
-  "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T09:47:02.231582+00:00",
-  "blocked_reason": {
-    "code": "MODEL_WEIGHTS_MISSING",
-    "message": "Fixed local Hugging Face snapshot for the ledger revision is missing; runtime certification requires local_files_only and cannot fetch implicitly.",
-    "missing_snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
-    "checked_paths": [
-      "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
-      "/home/az/.cache/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2"
-    ],
-    "resume_conditions": [
-      "Place the pinned amazon/chronos-t5-base snapshot at the recorded revision in the local Hugging Face cache.",
-      "Verify model.safetensors, config.json, and generation_config.json SHA-256 values from the local snapshot.",
-      "Run the Chronos T5 base CUDA runtime probe with local_files_only=true and external nvidia-smi PID sampling."
-    ]
-  },
-  "limitations": [
-    "No local pinned snapshot was available for runtime loading.",
-    "No CUDA inference was executed.",
-    "Forecast accuracy was not evaluated."
-  ]
+  "runtime_status": "CERTIFIED",
+  "runtime_vram_certified": true,
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "certified_at": "2026-08-01T11:38:00.103794+00:00",
+  "checks": {
+    "runtime_status_pass": true,
+    "revision_match": true,
+    "prediction_count_7": true,
+    "prediction_shape_valid": true,
+    "quantile_shape_valid": true,
+    "mean_shape_valid": true,
+    "output_finite": true,
+    "gpu_used": true,
+    "cpu_fallback_false": true,
+    "model_on_cuda": true,
+    "peak_vram_positive": true,
+    "external_pid_captured": true,
+    "license_approved": true
+  }
 }

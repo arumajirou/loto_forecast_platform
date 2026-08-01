@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "captured": true,
+  "model_id": "timesfm-2.5-transformers",
+  "runtime_pid": 489233,
+  "capture_count": 9,
+  "min_gpu_memory_mib": 222.0,
+  "max_gpu_memory_mib": 2002.0,
+  "samples": [
+    {
+      "timestamp": "2026/08/01 20:54:05.601",
+      "pid": 489233,
+      "process_name": ".runtime-envs/timesfm/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 20:54:05.802",
+      "pid": 489233,
+      "process_name": ".runtime-envs/timesfm/bin/python",
+      "used_memory_mib": 1212.0
+    },
+    {
+      "timestamp": "2026/08/01 20:54:06.002",
+      "pid": 489233,
+      "process_name": ".runtime-envs/timesfm/bin/python",
+      "used_memory_mib": 1328.0
+    },
+    {
+      "timestamp": "2026/08/01 20:54:06.203",
+      "pid": 489233,
+      "process_name": ".runtime-envs/timesfm/bin/python",
+      "used_memory_mib": 1328.0
+    },
+    {
+      "timestamp": "2026/08/01 20:54:06.403",
+      "pid": 489233,
+      "process_name": ".runtime-envs/timesfm/bin/python",
+      "used_memory_mib": 1860.0
+    },
+    {
+      "timestamp": "2026/08/01 20:54:06.604",
+      "pid": 489233,
+      "process_name": ".runtime-envs/timesfm/bin/python",
+      "used_memory_mib": 2002.0
+    },
+    {
+      "timestamp": "2026/08/01 20:54:06.804",
+      "pid": 489233,
+      "process_name": ".runtime-envs/timesfm/bin/python",
+      "used_memory_mib": 2002.0
+    },
+    {
+      "timestamp": "2026/08/01 20:54:07.004",
+      "pid": 489233,
+      "process_name": ".runtime-envs/timesfm/bin/python",
+      "used_memory_mib": 2002.0
+    },
+    {
+      "timestamp": "2026/08/01 20:54:07.205",
+      "pid": 489233,
+      "process_name": ".runtime-envs/timesfm/bin/python",
+      "used_memory_mib": 2002.0
+    }
+  ]
+}

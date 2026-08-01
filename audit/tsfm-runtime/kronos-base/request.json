@@ -1,0 +1,9 @@
+{
+  "model_id": "kronos-base",
+  "repo_id": "NeoQuasar/Kronos-base",
+  "revision": "2b554741eca47781b64468546e77fef3e85130e6",
+  "tokenizer_repo_id": "NeoQuasar/Kronos-Tokenizer-base",
+  "tokenizer_revision": "0e0117387f39004a9016484a186a908917e22426",
+  "device": "cuda",
+  "local_files_only": true
+}

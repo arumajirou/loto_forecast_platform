@@ -1,52 +1,61 @@
 {
   "schema_version": 1,
-  "status": "BLOCKED",
+  "status": "PASS",
   "model_id": "timesfm-2.5-transformers",
   "repo_id": "google/timesfm-2.5-200m-transformers",
   "revision": "5a9806b9b291fad9233b5249d88263f1846304d3",
-  "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T10:13:41.720168+00:00",
-  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
-  "blocked_detail": "Repo cache exists, but the fixed revision snapshot directory is absent.",
-  "retry_condition": "Install the exact pinned Transformers revision into the configured local Hugging Face cache with config.json and model.safetensors present.",
-  "snapshot_probe": {
-    "schema_version": 1,
-    "model_id": "timesfm-2.5-transformers",
-    "repo_id": "google/timesfm-2.5-200m-transformers",
-    "revision": "5a9806b9b291fad9233b5249d88263f1846304d3",
-    "checked_at": "2026-08-01T10:13:41.720168+00:00",
-    "hf_home_candidates": [
-      "/mnt/e/env/huggingface",
-      "/mnt/e/env/huggingface/hub",
-      "/home/az/.cache/huggingface/hub"
-    ],
-    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--google--timesfm-2.5-200m-transformers",
-    "repo_cache_exists": true,
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--google--timesfm-2.5-200m-transformers/snapshots/5a9806b9b291fad9233b5249d88263f1846304d3",
-    "snapshot_exists": false,
-    "snapshot_revision_matches": false,
-    "existing_files": [],
-    "weight_candidates": [],
-    "missing_files": [
-      "config.json",
-      "model.safetensors"
-    ],
-    "weight_sha256": null,
-    "config_sha256": null,
-    "gated_required": false,
-    "dependency_required": null,
-    "result": "FIXED_SNAPSHOT_MISSING"
-  },
-  "gpu_used": false,
-  "cpu_fallback": false,
-  "cpu_preprocessing": null,
-  "peak_vram_bytes": null,
-  "finite": null,
-  "weight_sha256": null,
-  "config_sha256": null,
-  "artifact_reference": {
-    "repo_id": "google/timesfm-2.5-200m-transformers",
-    "revision": "5a9806b9b291fad9233b5249d88263f1846304d3",
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--google--timesfm-2.5-200m-transformers/snapshots/5a9806b9b291fad9233b5249d88263f1846304d3"
-  }
+  "runtime_recorded_at": "2026-08-01T11:54:20.496113+00:00",
+  "runtime_pid": 489233,
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--google--timesfm-2.5-200m-transformers/snapshots/5a9806b9b291fad9233b5249d88263f1846304d3",
+  "input_series_count": 7,
+  "context_length": 512,
+  "native_prediction_length": 128,
+  "certification_prediction_length": 1,
+  "prediction_values": [
+    8.938727378845215,
+    14.082359313964844,
+    22.641429901123047,
+    7.126893043518066,
+    8.126893997192383,
+    20.916667938232422,
+    21.75362777709961
+  ],
+  "prediction_shape": [
+    7,
+    1
+  ],
+  "full_prediction_shape": [
+    7,
+    1,
+    10
+  ],
+  "native_mean_shape": [
+    7,
+    128
+  ],
+  "native_full_shape": [
+    7,
+    128,
+    10
+  ],
+  "output_finite": true,
+  "parameter_device": "cuda:0",
+  "input_devices": [
+    "cuda:0"
+  ],
+  "mean_output_device": "cuda:0",
+  "full_output_device": "cuda:0",
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "peak_vram_bytes": 1642211328,
+  "model_class": "TimesFm2_5ModelForPrediction",
+  "output_class": "TimesFm2_5OutputForPrediction",
+  "parameter_dtype": "torch.float32",
+  "runtime_certification_scope": "FULL_INFERENCE",
+  "forecast_head_executed": true,
+  "forecast_accuracy_certified": false,
+  "config_sha256": "452ecae918f67b2e7d0f2892ab424d1876939e70d077db3708a4fe8ca03a7de5",
+  "weight_sha256": "b53f6d52114e2ad786890f3c4637ce05f580b7800d6e24401f88b398b76035ef",
+  "weight_size_bytes": 925187448,
+  "weight_path": "/mnt/e/env/huggingface/hub/models--google--timesfm-2.5-200m-transformers/snapshots/5a9806b9b291fad9233b5249d88263f1846304d3/model.safetensors"
 }

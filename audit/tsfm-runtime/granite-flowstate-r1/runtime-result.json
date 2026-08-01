@@ -1,55 +1,83 @@
 {
   "schema_version": 1,
-  "status": "BLOCKED",
+  "status": "PASS",
   "model_id": "granite-flowstate-r1",
   "repo_id": "ibm-granite/granite-timeseries-flowstate-r1",
   "revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
-  "runtime_vram_certified": false,
-  "blocked_at": "2026-08-01T09:49:12.358092+00:00",
-  "blocked_reason": {
-    "code": "FIXED_SNAPSHOT_MISSING",
-    "message": "Pinned Hugging Face snapshot directory is missing; available loose model files cannot satisfy revision and snapshot symlink validation requirements.",
-    "missing_snapshot_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
-    "repo_cache_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1",
-    "candidate_loose_model_path": "/mnt/e/env/ts/loto_platform_unified/runtime/tsfm_lab/models/ibm-granite__granite-timeseries-flowstate-r1",
-    "candidate_loose_model_files_present": true,
-    "resume_conditions": [
-      "Materialize the pinned Hugging Face snapshot for ibm-granite/granite-timeseries-flowstate-r1 at revision 05effc6cb39ee16dce9dd0064ed1a76e4b8ff464.",
-      "Verify required model/config files and SHA-256 values from that snapshot.",
-      "Implement or select the correct FlowState runtime API and run CUDA inference with local_files_only=true.",
-      "Capture the runner GPU PID with external nvidia-smi process sampling."
-    ]
-  },
-  "provider_response": {
-    "schema_version": 1,
-    "provider_version": 1,
-    "status": "FIXED_SNAPSHOT_MISSING",
-    "model_id": "granite-flowstate-r1",
-    "repo_id": "ibm-granite/granite-timeseries-flowstate-r1",
-    "revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
-    "message": "Pinned Hugging Face snapshot directory is missing; available loose model files cannot satisfy revision and snapshot symlink validation requirements.",
-    "blocker": {
-      "code": "FIXED_SNAPSHOT_MISSING",
-      "message": "Pinned Hugging Face snapshot directory is missing; available loose model files cannot satisfy revision and snapshot symlink validation requirements.",
-      "missing_snapshot_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
-      "repo_cache_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1",
-      "candidate_loose_model_path": "/mnt/e/env/ts/loto_platform_unified/runtime/tsfm_lab/models/ibm-granite__granite-timeseries-flowstate-r1",
-      "candidate_loose_model_files_present": true,
-      "resume_conditions": [
-        "Materialize the pinned Hugging Face snapshot for ibm-granite/granite-timeseries-flowstate-r1 at revision 05effc6cb39ee16dce9dd0064ed1a76e4b8ff464.",
-        "Verify required model/config files and SHA-256 values from that snapshot.",
-        "Implement or select the correct FlowState runtime API and run CUDA inference with local_files_only=true.",
-        "Capture the runner GPU PID with external nvidia-smi process sampling."
-      ]
+  "runtime_recorded_at": "2026-08-01T12:07:44.874554+00:00",
+  "runtime_pid": 548753,
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+  "input_series_count": 7,
+  "context_length": 2048,
+  "prediction_length": 24,
+  "channel_count": 1,
+  "quantile_count": 9,
+  "scale_factor": 1.0,
+  "prediction_values": [
+    11.364654541015625,
+    17.31812286376953,
+    20.115314483642578,
+    14.10447883605957,
+    15.104477882385254,
+    21.01846694946289,
+    19.326831817626953
+  ],
+  "certification_prediction_shape": [
+    7,
+    1,
+    1
+  ],
+  "mean_prediction_shape": [
+    7,
+    24,
+    1
+  ],
+  "quantile_prediction_shape": [
+    7,
+    9,
+    24,
+    1
+  ],
+  "output_finite": true,
+  "parameter_device": "cuda:0",
+  "input_device": "cuda:0",
+  "mean_output_device": "cuda:0",
+  "quantile_output_device": "cuda:0",
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "peak_vram_bytes": 824376832,
+  "model_class": "FlowStateForPrediction",
+  "output_class": "FlowStateForPredictionOutput",
+  "parameter_count": 9069312,
+  "parameter_dtype": "torch.float32",
+  "runtime_certification_scope": "FULL_INFERENCE",
+  "forecast_head_executed": true,
+  "forecast_accuracy_certified": false,
+  "config_sha256": "ba2cfa7a3cfb6f0137e3c39bc855dbd4fa7a6a035136960b256e558a13902dc8",
+  "weight_sha256": "07a7844db841047d3a99ce9c6ce0ce5139a24d1f42e919c37c2d1e285fa0ff98",
+  "weight_size_bytes": 36284680,
+  "signature_sha256": "6ae2b1c2144889f57d3c499fe4dc93e4c4320b14d1211828664adb4ed4a55f0e",
+  "readme_sha256": "b5bd505ea19ba711f6fefcb3980ee9c8d69f39eb5b02a38c095b9827123bc06f",
+  "files": {
+    "config.json": {
+      "path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464/config.json",
+      "sha256": "ba2cfa7a3cfb6f0137e3c39bc855dbd4fa7a6a035136960b256e558a13902dc8",
+      "size_bytes": 593
+    },
+    "model.safetensors": {
+      "path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464/model.safetensors",
+      "sha256": "07a7844db841047d3a99ce9c6ce0ce5139a24d1f42e919c37c2d1e285fa0ff98",
+      "size_bytes": 36284680
+    },
+    "model.sig": {
+      "path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464/model.sig",
+      "sha256": "6ae2b1c2144889f57d3c499fe4dc93e4c4320b14d1211828664adb4ed4a55f0e",
+      "size_bytes": 9072
+    },
+    "README.md": {
+      "path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464/README.md",
+      "sha256": "b5bd505ea19ba711f6fefcb3980ee9c8d69f39eb5b02a38c095b9827123bc06f",
+      "size_bytes": 7979
     }
-  },
-  "gpu_used": false,
-  "cpu_fallback": false,
-  "cpu_preprocessing": null,
-  "finite": null,
-  "artifact_reference": {
-    "repo_id": "ibm-granite/granite-timeseries-flowstate-r1",
-    "revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
-    "snapshot_path": "/mnt/e/env/huggingface/hub/models--ibm-granite--granite-timeseries-flowstate-r1/snapshots/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464"
   }
 }

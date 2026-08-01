@@ -3,19 +3,11 @@
   "model_id": "chronos-t5-base",
   "repo_id": "amazon/chronos-t5-base",
   "revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
-  "license": "apache-2.0",
-  "review_status": "BLOCKED",
-  "commercial_use": null,
-  "attribution_required": null,
-  "redistribution_allowed": null,
-  "modification_allowed": null,
-  "patent_grant": null,
-  "notice_required_on_distribution": null,
-  "limitations": [
-    "Local repository files/model card were unavailable for confirmation."
-  ],
-  "review_notes": [
-    "Ledger records apache-2.0, but the local pinned snapshot is missing.",
-    "Do not mark APPROVED until license files or model card for the pinned revision are inspected."
+  "license": "Apache-2.0",
+  "commercial_use": true,
+  "review_status": "APPROVED",
+  "review_basis": [
+    "Pinned snapshot model metadata",
+    "Runtime provider fixed license declaration"
   ]
 }

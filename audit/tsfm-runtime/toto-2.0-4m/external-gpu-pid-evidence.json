@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "captured": true,
+  "model_id": "toto-2.0-4m",
+  "runtime_pid": 644605,
+  "capture_count": 19,
+  "min_gpu_memory_mib": 10.0,
+  "max_gpu_memory_mib": 358.0,
+  "samples": [
+    {
+      "timestamp": "2026/08/01 21:27:59.078",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 10.0
+    },
+    {
+      "timestamp": "2026/08/01 21:27:59.179",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 21:27:59.279",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 222.0
+    },
+    {
+      "timestamp": "2026/08/01 21:27:59.379",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 268.0
+    },
+    {
+      "timestamp": "2026/08/01 21:27:59.480",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 312.0
+    },
+    {
+      "timestamp": "2026/08/01 21:27:59.581",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 356.0
+    },
+    {
+      "timestamp": "2026/08/01 21:27:59.681",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:27:59.782",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:27:59.882",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:27:59.982",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:28:00.083",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:28:00.183",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:28:00.284",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:28:00.384",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:28:00.484",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:28:00.585",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:28:00.685",
+      "pid": 644605,
+      "process_name": ".runtime-envs/toto/bin/python",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:28:00.785",
+      "pid": 644605,
+      "process_name": "[No data]",
+      "used_memory_mib": 358.0
+    },
+    {
+      "timestamp": "2026/08/01 21:28:00.886",
+      "pid": 644605,
+      "process_name": "[No data]",
+      "used_memory_mib": 358.0
+    }
+  ]
+}

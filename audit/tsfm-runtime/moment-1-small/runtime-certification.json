@@ -3,16 +3,28 @@
   "model_id": "moment-1-small",
   "repo_id": "AutonLab/MOMENT-1-small",
   "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
-  "certification_status": "BLOCKED",
-  "runtime_vram_certified": false,
-  "license_review_status": "BLOCKED",
-  "blocked_at": "2026-08-01T10:06:08.757310+00:00",
-  "blocked_reason": "FIXED_SNAPSHOT_MISSING",
-  "blocked_detail": "Pinned snapshot directory is missing from the configured local Hugging Face cache.",
-  "retry_condition": "Install the exact pinned revision into the configured local Hugging Face cache, including model card/license metadata, config, and model weight files.",
-  "limitations": [
-    "No pinned snapshot was available.",
-    "No CUDA inference was executed.",
-    "No model weight SHA-256 was certified."
-  ]
+  "runtime_status": "CERTIFIED",
+  "runtime_vram_certified": true,
+  "runtime_gpu_used": true,
+  "runtime_cpu_fallback": false,
+  "runtime_certification_scope": "EXECUTION_ONLY",
+  "forecast_head_status": "FINE_TUNING_REQUIRED",
+  "forecast_accuracy_certified": false,
+  "certified_at": "2026-08-01T11:42:22.886629+00:00",
+  "checks": {
+    "runtime_status_pass": true,
+    "prediction_shape_valid": true,
+    "output_finite": true,
+    "gpu_used": true,
+    "cpu_fallback_false": true,
+    "model_cuda": true,
+    "input_cuda": true,
+    "output_cuda": true,
+    "peak_vram_positive": true,
+    "external_pid_captured": true,
+    "license_approved": true,
+    "execution_scope_explicit": true,
+    "fine_tuning_required_recorded": true,
+    "forecast_accuracy_not_certified": true
+  }
 }

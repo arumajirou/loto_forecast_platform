@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "model_id": "toto-open-base",
+  "package": "toto-ts",
+  "package_version": "0.2.0",
+  "torch_version": "2.13.0+cu130",
+  "execution_device": "cuda",
+  "model_device": "cuda:0",
+  "output_device": "cuda:0",
+  "peak_vram_bytes": 1970505728
+}
