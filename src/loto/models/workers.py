@@ -496,6 +496,7 @@ class PositionSeriesWorker:
             "early_stop_patience_steps",
         }
         model_config = {k: v for k, v in self.params.items() if k not in controls}
+        model_config.setdefault("random_seed", self.seed)
         gpus = int(
             self.params.get(
                 "gpus", 1 if (self.device in {"auto", "cuda"} and torch.cuda.is_available()) else 0
