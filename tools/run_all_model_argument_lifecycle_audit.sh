@@ -9,6 +9,7 @@ DEVICE="${DEVICE:-cpu}"
 PRECISION="${PRECISION:-32}"
 TIMEOUT="${TIMEOUT:-300}"
 AVAILABLE_ONLY="${AVAILABLE_ONLY:-1}"
+CATALOG_SOURCE="${CATALOG_SOURCE:-merged}"
 RUN_ID="${RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
 OUT="${OUT:-$ROOT/runs/all-model-argument-audit-$RUN_ID}"
 
@@ -30,6 +31,7 @@ uv run --no-sync python scripts/build_all_model_argument_audit.py \
 set +e
 
 uv run --no-sync python scripts/all_model_runtime_validation.py \
+  --catalog-source "$CATALOG_SOURCE" \
   --models "$MODELS" \
   "${AVAILABLE_FLAG[@]}" \
   --require-fit \
