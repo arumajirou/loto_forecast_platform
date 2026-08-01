@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "model_id": "chronos-t5-base",
+  "python": "/mnt/e/env/ts/loto_forecast_platform/environments/autogluon-timeseries/.venv/bin/python",
+  "audit_python": "/mnt/e/env/ts/loto_forecast_platform/.venv-v212-audit/bin/python",
+  "runtime_executed": false,
+  "blocked_reason": "MODEL_WEIGHTS_MISSING"
+}

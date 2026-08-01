@@ -160,7 +160,16 @@
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 805530528,
       "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_status": "BLOCKED",
+      "runtime_revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
+      "runtime_blocked_reason": "MODEL_WEIGHTS_MISSING",
+      "runtime_blocked_detail": "Fixed local Hugging Face snapshot for the ledger revision is missing; runtime certification requires local_files_only and cannot fetch implicitly.",
+      "runtime_snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
+      "runtime_resume_conditions": [
+        "Place the pinned amazon/chronos-t5-base snapshot at the recorded revision in the local Hugging Face cache.",
+        "Verify model.safetensors, config.json, and generation_config.json SHA-256 values from the local snapshot.",
+        "Run the Chronos T5 base CUDA runtime probe with local_files_only=true and external nvidia-smi PID sampling."
+      ]
     },
     {
       "model_id": "chronos-t5-small",

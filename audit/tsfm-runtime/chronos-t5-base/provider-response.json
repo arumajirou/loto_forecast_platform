@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "provider_version": 1,
+  "status": "MODEL_WEIGHTS_MISSING",
+  "model_id": "chronos-t5-base",
+  "repo_id": "amazon/chronos-t5-base",
+  "revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
+  "message": "Fixed local Hugging Face snapshot for the ledger revision is missing; runtime certification requires local_files_only and cannot fetch implicitly.",
+  "blocker": {
+    "code": "MODEL_WEIGHTS_MISSING",
+    "message": "Fixed local Hugging Face snapshot for the ledger revision is missing; runtime certification requires local_files_only and cannot fetch implicitly.",
+    "missing_snapshot_path": "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
+    "checked_paths": [
+      "/mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2",
+      "/home/az/.cache/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2"
+    ],
+    "resume_conditions": [
+      "Place the pinned amazon/chronos-t5-base snapshot at the recorded revision in the local Hugging Face cache.",
+      "Verify model.safetensors, config.json, and generation_config.json SHA-256 values from the local snapshot.",
+      "Run the Chronos T5 base CUDA runtime probe with local_files_only=true and external nvidia-smi PID sampling."
+    ]
+  }
+}

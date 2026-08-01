@@ -8,8 +8,8 @@ Updated: 2026-08-01
 - Runtime certified: 8
 - Remaining: 13
 - Progress: 38.1%
-- Current branch: feat/chronos-2-runtime-audit-v1
-- Next model: chronos-t5-base
+- Current branch: feat/chronos-t5-base-runtime-audit-v1
+- Next model: granite-flowstate-r1
 
 ## Certified
 
@@ -52,4 +52,19 @@ Updated: 2026-08-01
 
 ## Blocked
 
-None recorded.
+### chronos-t5-base
+
+- Branch: feat/chronos-t5-base-runtime-audit-v1
+- Commit: pending
+- Push: pending
+- repo_id: amazon/chronos-t5-base
+- revision: ad294eaacead15db499b740ea4122266dd2a81a2
+- status: BLOCKED
+- blocked reason: MODEL_WEIGHTS_MISSING
+- checked snapshot: /mnt/e/env/huggingface/hub/models--amazon--chronos-t5-base/snapshots/ad294eaacead15db499b740ea4122266dd2a81a2
+- runtime executed: false
+- CPU fallback: false
+- license: apache-2.0 from ledger, review BLOCKED until local pinned model card or license files are inspected
+- dedicated test: tests/test_chronos_t5_base_runtime_audit.py
+- hash verification: audit/tsfm-runtime/chronos-t5-base/sha256sum.txt OK
+- resume condition: provide the pinned local snapshot with model.safetensors, config.json, and generation_config.json, then rerun CUDA runtime certification with external PID sampling.
