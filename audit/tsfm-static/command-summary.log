@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "expected": 21,
+  "audited": 21,
+  "failed": 0,
+  "output": "/mnt/e/env/ts/loto_forecast_platform/runs/tsfm-static-audit/20260801-164410/static-audit.json",
+  "output_sha256": "f890d9e98b6491958e111769c6cd0ea78b059454fbd1d00d5c239552a149c069",
+  "summary": "/mnt/e/env/ts/loto_forecast_platform/runs/tsfm-static-audit/20260801-164410/static-audit-summary.json",
+  "summary_sha256": "c1d1ed86fd5598a967e49414f8eee08b1da3919acb06e4185af4bb9f0d349dcc"
+}
