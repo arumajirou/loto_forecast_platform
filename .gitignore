@@ -87,3 +87,8 @@ src/*.egg-info/
 .external-model-probe/
 backups/
 reports/
+
+# Generated experiment and audit artifacts
+/exports/
+/loto_accuracy_audit_*.tar.gz
+/loto_accuracy_audit_*.tar.gz.sha256
