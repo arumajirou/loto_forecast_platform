@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "total_models": 21,
-  "runtime_certified_models": 6,
+  "runtime_certified_models": 7,
   "results": [
     {
       "model_id": "chronos-2",
@@ -82,8 +82,31 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 184632480,
-      "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
+      "runtime_revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+      "runtime_device": "cuda:0",
+      "runtime_input_device": "cpu",
+      "runtime_tokenizer_device": "cpu",
+      "runtime_cpu_preprocessing": true,
+      "runtime_gpu_used": true,
+      "runtime_cpu_fallback": false,
+      "runtime_peak_vram_bytes": 2407026688,
+      "runtime_prediction_shape": [
+        7
+      ],
+      "runtime_quantile_shape": [
+        7,
+        1,
+        9
+      ],
+      "runtime_context_length": 512,
+      "runtime_prediction_length": 1,
+      "runtime_num_samples": 20,
+      "runtime_weight_sha256": "9c8b6fde5300f72b01c173153bf9288fa0a200614275bf0585071ad71a6a3d43",
+      "runtime_config_sha256": "76b7445a93491851e434733a138b67e26eda4375f83e08f80a07383c6b3f571a",
+      "runtime_generation_config_sha256": "8f6833851ce53496a43ef87a975c766f7a3049e2d598ecef609a526ca6308534",
+      "runtime_license_review": "APPROVED"
     },
     {
       "model_id": "granite-flowstate-r1",

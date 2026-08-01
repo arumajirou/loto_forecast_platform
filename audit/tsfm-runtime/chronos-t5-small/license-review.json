@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "model_id": "chronos-t5-small",
+  "repo_id": "amazon/chronos-t5-small",
+  "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+  "license": "apache-2.0",
+  "review_status": "APPROVED",
+  "commercial_use": true,
+  "attribution_required": true,
+  "redistribution_allowed": true,
+  "modification_allowed": true,
+  "patent_grant": true,
+  "notice_required_on_distribution": true,
+  "review_notes": [
+    "Apache License 2.0 permits commercial use, modification, and redistribution.",
+    "License and NOTICE obligations must be preserved when applicable.",
+    "This review covers only the pinned repository revision."
+  ]
+}

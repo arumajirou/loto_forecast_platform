@@ -1,0 +1,8 @@
+timestamp=2026-08-01T18:17:31+09:00
+hostname=az
+kernel=Linux 7.0.0-28-generic x86_64 GNU/Linux
+python=Python 3.12.13
+branch=feat/chronos-t5-small-runtime-audit-v1
+commit=afb4213a30189c8db6e18b8c841b6316ef237a78
+driver=595.84
+gpu=NVIDIA GeForce RTX 5070 Ti

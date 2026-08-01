@@ -882,6 +882,21 @@ MODEL_SPECS: tuple[ModelSpec, ...] = (
         },
     ),
     ModelSpec(
+        "chronos-t5-small",
+        "tsfm",
+        "chronos",
+        "foundation",
+        "ChronosPipeline",
+        "p1",
+        "chronos",
+        ("zero_shot", "probabilistic", "gpu"),
+        {
+            "model_name": "amazon/chronos-t5-small",
+            "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+            "num_samples": 20,
+        },
+    ),
+    ModelSpec(
         "chronos-2-small",
         "tsfm",
         "chronos",
