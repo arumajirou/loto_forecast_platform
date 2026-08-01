@@ -57,7 +57,6 @@ environments/granite-ttm/environment_manifest.json
 # Generated packaging metadata
 src/loto_forecast_platform.egg-info/
 # Local experiment and validation outputs
-models/
 optuna.db
 *.ckpt
 *.safetensors
@@ -89,3 +88,11 @@ reports/
 *$py.class
 # Local audit evidence and backups
 audit/
+
+# Generated model artifacts
+runs/**/models/
+artifacts/models/
+checkpoints/
+*.ckpt
+*.pth
+*.pt
