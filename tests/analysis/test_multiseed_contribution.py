@@ -6,11 +6,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-
-MODULE = (
-    Path(__file__).parents[2]
-    / "scripts/analysis/aggregate_multiseed_contribution.py"
-)
+MODULE = Path(__file__).parents[2] / "scripts/analysis/aggregate_multiseed_contribution.py"
 SPEC = importlib.util.spec_from_file_location(
     "aggregate_multiseed_contribution",
     MODULE,

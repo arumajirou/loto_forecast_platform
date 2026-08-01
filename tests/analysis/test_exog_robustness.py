@@ -6,11 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
-MODULE = (
-    Path(__file__).parents[2]
-    / "scripts/analysis/run_candidate_exog_robustness.py"
-)
+MODULE = Path(__file__).parents[2] / "scripts/analysis/run_candidate_exog_robustness.py"
 SPEC = importlib.util.spec_from_file_location(
     "run_candidate_exog_robustness",
     MODULE,
@@ -22,10 +18,7 @@ SPEC.loader.exec_module(mod)
 
 def test_conditions_are_unique_and_hashed():
     conditions = mod.build_conditions()
-    keys = [
-        (item["condition"], item["feature_group"])
-        for item in conditions
-    ]
+    keys = [(item["condition"], item["feature_group"]) for item in conditions]
     assert len(keys) == len(set(keys))
     assert len(conditions) == 12
     assert all(len(item["feature_set_hash"]) == 64 for item in conditions)

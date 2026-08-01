@@ -4,11 +4,9 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-from typing import Iterable
 
 import numpy as np
 import pandas as pd
-
 
 LOWER_IS_BETTER = {
     "position_mae",
@@ -54,9 +52,7 @@ def validate_seed_frame(
     }
     missing = required - set(frame.columns)
     if missing:
-        raise ValueError(
-            f"{source}: missing required columns {sorted(missing)}"
-        )
+        raise ValueError(f"{source}: missing required columns {sorted(missing)}")
 
     models = sorted(frame["model_id"].dropna().astype(str).unique())
     folds = sorted(frame["fold"].dropna().unique())
@@ -90,9 +86,7 @@ def validate_seed_frame(
         keep=False,
     )
     if duplicates.any():
-        raise ValueError(
-            f"{source}: duplicate model/fold/seed/condition/group rows"
-        )
+        raise ValueError(f"{source}: duplicate model/fold/seed/condition/group rows")
 
     return {
         "source": str(source.resolve()),
@@ -177,11 +171,7 @@ def aggregate_multiseed(
     if dropped.empty:
         raise ValueError("no drop_group rows")
 
-    metrics = [
-        column
-        for column in frame.columns
-        if column in LOWER_IS_BETTER | HIGHER_IS_BETTER
-    ]
+    metrics = [column for column in frame.columns if column in LOWER_IS_BETTER | HIGHER_IS_BETTER]
     if not metrics:
         raise ValueError("no supported metric columns")
 
@@ -204,12 +194,8 @@ def aggregate_multiseed(
             sort=True,
         ):
             for metric in metrics:
-                full_values = model_frame[f"{metric}_full"].to_numpy(
-                    dtype=float
-                )
-                comparison_values = model_frame[
-                    f"{metric}_comparison"
-                ].to_numpy(dtype=float)
+                full_values = model_frame[f"{metric}_full"].to_numpy(dtype=float)
+                comparison_values = model_frame[f"{metric}_comparison"].to_numpy(dtype=float)
 
                 contributions = _contribution(
                     full_values,
@@ -217,17 +203,11 @@ def aggregate_multiseed(
                     metric=metric,
                 )
 
-                detail = model_frame[
-                    ["fold", "seed"]
-                ].copy()
+                detail = model_frame[["fold", "seed"]].copy()
                 detail["contribution"] = contributions
 
-                fold_mean = detail.groupby("fold")[
-                    "contribution"
-                ].mean()
-                seed_mean = detail.groupby("seed")[
-                    "contribution"
-                ].mean()
+                fold_mean = detail.groupby("fold")["contribution"].mean()
+                seed_mean = detail.groupby("seed")["contribution"].mean()
 
                 ci_low, ci_median, ci_high = _cluster_bootstrap_by_fold(
                     fold_mean,
@@ -236,9 +216,7 @@ def aggregate_multiseed(
                 )
 
                 midpoint = len(fold_mean) // 2
-                ordered_fold_values = fold_mean.sort_index().to_numpy(
-                    dtype=float
-                )
+                ordered_fold_values = fold_mean.sort_index().to_numpy(dtype=float)
                 front = ordered_fold_values[:midpoint]
                 back = ordered_fold_values[midpoint:]
 
@@ -251,45 +229,23 @@ def aggregate_multiseed(
                         "unique_folds": int(detail["fold"].nunique()),
                         "unique_seeds": int(detail["seed"].nunique()),
                         "full_mean": float(np.mean(full_values)),
-                        "comparison_mean": float(
-                            np.mean(comparison_values)
-                        ),
-                        "absolute_contribution": float(
-                            np.mean(contributions)
-                        ),
+                        "comparison_mean": float(np.mean(comparison_values)),
+                        "absolute_contribution": float(np.mean(contributions)),
                         "cluster_ci95_low": ci_low,
                         "cluster_ci95_median": ci_median,
                         "cluster_ci95_high": ci_high,
-                        "positive_fold_rate": float(
-                            np.mean(fold_mean > 0)
-                        ),
-                        "positive_seed_rate": float(
-                            np.mean(seed_mean > 0)
-                        ),
-                        "all_seeds_positive": bool(
-                            np.all(seed_mean > 0)
-                        ),
-                        "seed_min_contribution": float(
-                            seed_mean.min()
-                        ),
-                        "seed_max_contribution": float(
-                            seed_mean.max()
-                        ),
+                        "positive_fold_rate": float(np.mean(fold_mean > 0)),
+                        "positive_seed_rate": float(np.mean(seed_mean > 0)),
+                        "all_seeds_positive": bool(np.all(seed_mean > 0)),
+                        "seed_min_contribution": float(seed_mean.min()),
+                        "seed_max_contribution": float(seed_mean.max()),
                         "seed_std_contribution": (
-                            float(seed_mean.std(ddof=1))
-                            if len(seed_mean) > 1
-                            else 0.0
+                            float(seed_mean.std(ddof=1)) if len(seed_mean) > 1 else 0.0
                         ),
                         "front_half_contribution": (
-                            float(np.mean(front))
-                            if front.size
-                            else np.nan
+                            float(np.mean(front)) if front.size else np.nan
                         ),
-                        "back_half_contribution": (
-                            float(np.mean(back))
-                            if back.size
-                            else np.nan
-                        ),
+                        "back_half_contribution": (float(np.mean(back)) if back.size else np.nan),
                     }
                 )
 
@@ -300,9 +256,7 @@ def aggregate_multiseed(
                             "feature_group": feature_group,
                             "metric": metric,
                             "seed": int(seed_value),
-                            "seed_contribution": float(
-                                contribution_value
-                            ),
+                            "seed_contribution": float(contribution_value),
                         }
                     )
 
@@ -373,13 +327,8 @@ def write_outputs(
         "campaign": str(campaign.resolve()),
         "source_files": source_manifests,
         "combined_rows": int(len(combined)),
-        "models": sorted(
-            combined["model_id"].dropna().astype(str).unique()
-        ),
-        "seeds": sorted(
-            int(value)
-            for value in combined["seed"].dropna().unique()
-        ),
+        "models": sorted(combined["model_id"].dropna().astype(str).unique()),
+        "seeds": sorted(int(value) for value in combined["seed"].dropna().unique()),
         "fold_count": int(combined["fold"].nunique()),
         "condition_group_pairs": (
             combined[["condition", "feature_group"]]
@@ -393,16 +342,8 @@ def write_outputs(
                 "sha256": _sha256(combined_csv),
             },
             "combined_parquet": {
-                "path": (
-                    str(combined_parquet.resolve())
-                    if parquet_written
-                    else None
-                ),
-                "sha256": (
-                    _sha256(combined_parquet)
-                    if parquet_written
-                    else None
-                ),
+                "path": (str(combined_parquet.resolve()) if parquet_written else None),
+                "sha256": (_sha256(combined_parquet) if parquet_written else None),
                 "written": parquet_written,
                 "error": parquet_error,
             },
@@ -427,10 +368,7 @@ def write_outputs(
 
     print(f"COMBINED_ROWS={len(combined)}")
     print(f"SUMMARY_ROWS={len(summary)}")
-    print(
-        "STABLE_ROWS="
-        f"{int(summary['stable_across_seeds'].sum())}"
-    )
+    print(f"STABLE_ROWS={int(summary['stable_across_seeds'].sum())}")
     print(f"OUTPUT_DIR={output_dir.resolve()}")
     print(f"MANIFEST={manifest_json.resolve()}")
 
@@ -448,9 +386,7 @@ def main() -> None:
     args = parser.parse_args()
 
     campaign = Path(args.campaign)
-    output_dir = Path(
-        args.output_dir or campaign / "multiseed_analysis"
-    )
+    output_dir = Path(args.output_dir or campaign / "multiseed_analysis")
 
     combined, manifests = load_campaign(campaign)
     summary, seed_summary = aggregate_multiseed(

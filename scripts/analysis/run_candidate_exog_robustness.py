@@ -10,7 +10,6 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-
 IDENTITY_FEATURES = [
     "candidate_scaled",
     "candidate_is_even",
@@ -111,9 +110,7 @@ def build_conditions() -> list[dict[str, Any]]:
                 "condition": "drop_group",
                 "feature_group": group_name,
                 "feature_columns": [
-                    column
-                    for column in all_features
-                    if column not in group_columns
+                    column for column in all_features if column not in group_columns
                 ],
                 "permutation_group": None,
             }
@@ -128,9 +125,7 @@ def build_conditions() -> list[dict[str, Any]]:
         )
 
     for item in conditions:
-        item["feature_set_hash"] = feature_set_hash(
-            list(item["feature_columns"])
-        )
+        item["feature_set_hash"] = feature_set_hash(list(item["feature_columns"]))
 
     return conditions
 
@@ -162,9 +157,7 @@ def block_permute(
     if len(source_indexes) != row_count:
         raise RuntimeError("block permutation index size mismatch")
 
-    output.loc[:, columns] = (
-        output.iloc[source_indexes][columns].to_numpy()
-    )
+    output.loc[:, columns] = output.iloc[source_indexes][columns].to_numpy()
     return output
 
 
@@ -192,9 +185,7 @@ def evaluate(
         "position_mse": float(np.mean(errors**2)),
         "element_within_1": float(np.mean(errors <= 1)),
         "row_within_1": float(np.all(errors <= 1)),
-        "mean_hits_at_7": float(
-            len(set(actual.tolist()) & set(predicted.tolist()))
-        ),
+        "mean_hits_at_7": float(len(set(actual.tolist()) & set(predicted.tolist()))),
         "brier": float(np.mean((probabilities - labels) ** 2)),
     }
 
@@ -242,8 +233,7 @@ def run_condition(
 
     if probabilities.shape != (len(query),):
         raise RuntimeError(
-            f"{model_id}: expected {len(query)} probabilities, "
-            f"got {probabilities.shape}"
+            f"{model_id}: expected {len(query)} probabilities, got {probabilities.shape}"
         )
     if not np.isfinite(probabilities).all():
         raise RuntimeError(f"{model_id}: non-finite probabilities")
@@ -259,10 +249,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--input",
-        default=(
-            "runs/data-acquisition-loto7/features/"
-            "candidate_features_v2.parquet"
-        ),
+        default=("runs/data-acquisition-loto7/features/candidate_features_v2.parquet"),
     )
     parser.add_argument("--folds", type=int, default=30)
     parser.add_argument("--seed", type=int, default=42)
@@ -276,23 +263,14 @@ def main() -> None:
     args = parser.parse_args()
 
     timestamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
-    output_dir = Path(
-        args.output_dir
-        or f"runs/exogenous-robustness-{timestamp}"
-    )
+    output_dir = Path(args.output_dir or f"runs/exogenous-robustness-{timestamp}")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     input_path = Path(args.input)
-    frame = pd.read_parquet(input_path).sort_values(
-        ["draw_no", "candidate_number"]
-    )
+    frame = pd.read_parquet(input_path).sort_values(["draw_no", "candidate_number"])
 
     conditions = build_conditions()
-    all_columns = {
-        column
-        for condition in conditions
-        for column in condition["feature_columns"]
-    }
+    all_columns = {column for condition in conditions for column in condition["feature_columns"]}
 
     missing = {
         *all_columns,
@@ -320,9 +298,7 @@ def main() -> None:
         ].to_numpy(dtype=int)
 
         if len(query) != 37 or len(actual) != 7:
-            raise RuntimeError(
-                f"draw {test_draw}: invalid candidate geometry"
-            )
+            raise RuntimeError(f"draw {test_draw}: invalid candidate geometry")
 
         for model_id in args.models:
             for condition in conditions:
@@ -350,34 +326,21 @@ def main() -> None:
                         "seed": args.seed,
                         "condition": condition["condition"],
                         "feature_group": condition["feature_group"],
-                        "feature_count": len(
-                            condition["feature_columns"]
-                        ),
+                        "feature_count": len(condition["feature_columns"]),
                         "feature_columns": json.dumps(
                             condition["feature_columns"],
                             ensure_ascii=False,
                         ),
-                        "feature_set_hash": condition[
-                            "feature_set_hash"
-                        ],
-                        "permutation_group": (
-                            condition["permutation_group"] or ""
-                        ),
+                        "feature_set_hash": condition["feature_set_hash"],
+                        "permutation_group": (condition["permutation_group"] or ""),
                         "block_size": args.block_size,
-                        "actual_numbers": json.dumps(
-                            actual.tolist()
-                        ),
-                        "predicted_numbers": json.dumps(
-                            predicted.tolist()
-                        ),
+                        "actual_numbers": json.dumps(actual.tolist()),
+                        "predicted_numbers": json.dumps(predicted.tolist()),
                         **metrics,
                     }
                 )
 
-        print(
-            f"fold={fold_index:03}/{len(test_draws):03} "
-            f"draw={test_draw} PASS"
-        )
+        print(f"fold={fold_index:03}/{len(test_draws):03} draw={test_draw} PASS")
 
     result = pd.DataFrame(records)
     csv_path = output_dir / "robustness_results.csv"
