@@ -701,7 +701,8 @@ class PositionSeriesWorker:
         )
         if expected <= 0:
             raise WorkerSubprocessError(
-                "provider request has no position columns"
+                "INVALID_REQUEST",
+                "provider request has no position columns",
             )
         if predictions.shape != (expected,) or not np.isfinite(predictions).all():
             raise WorkerSubprocessError(
