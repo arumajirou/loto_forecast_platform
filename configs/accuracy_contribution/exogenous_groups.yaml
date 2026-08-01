@@ -1,0 +1,146 @@
+schema_version: 3
+game: loto7
+
+datasets:
+  candidate:
+    path: runs/data-acquisition-loto7/features/candidate_features_v2.parquet
+    key_columns:
+      - draw_no
+      - candidate_number
+    target_columns:
+      - selected
+
+    always_excluded:
+      - draw_id
+      - draw_no
+      - draw_date
+      - selected
+
+    groups:
+      candidate_identity:
+        - candidate_scaled
+        - candidate_is_even
+        - candidate_mod3
+        - candidate_mod10
+        - candidate_is_prime
+
+      historical_frequency:
+        - freq_w5
+        - freq_w10
+        - freq_w20
+        - freq_w30
+        - freq_w50
+        - freq_w100
+        - freq_all
+        - freq_exp
+
+      historical_gap:
+        - gap_draws
+
+  occurrence:
+    path: runs/data-acquisition-loto7/features/occurrence_features.parquet
+    key_columns:
+      - draw_no
+      - candidate_number
+    target_columns:
+      - target_hit_next
+
+    always_excluded:
+      - game
+      - draw_no
+      - draw_date
+      - target_hit_next
+
+    groups:
+      current_state_for_next_draw:
+        - hit_current
+
+      candidate_identity:
+        - candidate_mod3
+        - candidate_mod10
+        - candidate_is_even
+
+      historical_frequency:
+        - freq_last_5
+        - freq_last_10
+        - freq_last_20
+        - freq_last_30
+        - freq_last_50
+        - freq_last_100
+
+      historical_presence:
+        - seen_last_5
+        - seen_last_10
+        - seen_last_20
+        - seen_last_30
+        - seen_last_50
+        - seen_last_100
+
+      historical_gap:
+        - gap_since_seen
+
+  draw:
+    path: runs/data-acquisition-loto7/features/draw_features.parquet
+    key_columns:
+      - draw_no
+      - draw_date
+    target_columns:
+      - n1
+      - n2
+      - n3
+      - n4
+      - n5
+      - n6
+      - n7
+
+    future_known_groups:
+      calendar:
+        - year
+        - month
+        - day
+        - weekday
+        - is_month_start
+        - is_month_end
+
+    safe_pattern_groups:
+      number_frequency_history:
+        - '^hit_[0-9]{2}_lagroll(5|10|20|30|50|100)_freq$'
+
+      draw_stat_history:
+        - '^(num_sum|num_mean|num_range|num_even_count|num_prime_count|num_consecutive_pairs|gap_mean|ending_unique_count)_lagroll(5|10|20|30|50|100)_(mean|std)$'
+
+    forbidden_current_draw_columns:
+      - n1
+      - n2
+      - n3
+      - n4
+      - n5
+      - n6
+      - n7
+      - bonus1
+      - bonus2
+      - num_sum
+      - num_mean
+      - num_std
+      - num_min
+      - num_max
+      - num_range
+      - num_even_count
+      - num_odd_count
+      - num_prime_count
+      - num_low_count
+      - num_mid_count
+      - num_high_count
+      - num_mod0_count
+      - num_mod1_count
+      - num_mod2_count
+      - num_consecutive_pairs
+      - num_longest_run
+      - gap_mean
+      - gap_min
+      - gap_max
+      - ending_unique_count
+      - ending_entropy
+
+    forbidden_current_draw_patterns:
+      - '^hit_[0-9]{2}$'
