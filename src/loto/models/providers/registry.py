@@ -42,4 +42,6 @@ FOUNDATION_PROVIDERS: dict[str, type[FoundationProvider]] = {
 
 
 def get_foundation_provider(spec: ModelSpec) -> type[FoundationProvider]:
-    return FOUNDATION_PROVIDERS.get(spec.model_id) or FOUNDATION_PROVIDERS.get(spec.library, ProviderNotImplemented)
+    return FOUNDATION_PROVIDERS.get(spec.model_id) or FOUNDATION_PROVIDERS.get(
+        spec.library, ProviderNotImplemented
+    )

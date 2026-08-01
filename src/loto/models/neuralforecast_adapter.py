@@ -4,6 +4,7 @@ Plan resolution is dependency-light. Heavy optional imports occur only when an
 actual model is constructed, allowing catalog and configuration tests on CPU-only
 hosts.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -11,8 +12,17 @@ from typing import Any, Literal
 
 SUPPORTED_BACKENDS = {"optuna", "ray"}
 MODELS_REQUIRING_N_SERIES = {
-    "AutoTSMixer", "AutoTSMixerx", "AutoTimeMixer", "AutoRMoK", "AutoSOFTS",
-    "AutoStemGNN", "AutoMLPMultivariate", "AutoiTransformer", "AutoTimeXer",
+    "AutoTSMixer",
+    "AutoTSMixerx",
+    "AutoTimeMixer",
+    "AutoRMoK",
+    "AutoSOFTS",
+    "AutoSOFTSSharp",
+    "AutoXLinear",
+    "AutoStemGNN",
+    "AutoMLPMultivariate",
+    "AutoiTransformer",
+    "AutoTimeXer",
 }
 FFT_MODELS = {"AutoTimesNet", "AutoFEDformer"}
 

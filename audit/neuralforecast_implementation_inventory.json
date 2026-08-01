@@ -1,0 +1,5049 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-08-01T05:30:38.216083+00:00",
+  "catalog_source_path": "src/loto/models/catalog.py",
+  "catalog_source": "from __future__ import annotations\n\n# ruff: noqa: E501,I001,UP035\n\nfrom dataclasses import asdict, dataclass, field\nfrom importlib.util import find_spec\nfrom typing import Any, Iterable\n\n\nPACKAGE_MODULE_ALIASES = {\n    \"chronos\": (\"chronos\",),\n}\n\n\n@dataclass(frozen=True)\nclass ModelSpec:\n    model_id: str\n    family: str\n    library: str\n    task: str\n    class_name: str\n    priority: str = \"p1\"\n    package: str | None = None\n    capabilities: tuple[str, ...] = ()\n    default_params: dict[str, Any] = field(default_factory=dict)\n    notes: str = \"\"\n\n    @property\n    def available(self) -> bool:\n        if self.package is None:\n            return True\n        packages = PACKAGE_MODULE_ALIASES.get(self.package, (self.package,))\n        return any(find_spec(package) is not None for package in packages)\n\n    def to_dict(self) -> dict[str, Any]:\n        return asdict(self) | {\"available\": self.available}\n\n\n# The catalog is deliberately declarative: adding a model does not require changing\n# orchestration code. Unsupported/absent optional packages are reported, not hidden.\nMODEL_SPECS: tuple[ModelSpec, ...] = (\n    ModelSpec(\"uniform\", \"theory\", \"builtin\", \"candidate\", \"UniformCandidateAdapter\", \"p0\", capabilities=(\"probability\", \"ranking\")),\n    ModelSpec(\"frequency\", \"frequency\", \"builtin\", \"candidate\", \"FrequencyCandidateAdapter\", \"p0\", capabilities=(\"probability\", \"ranking\")),\n    ModelSpec(\"logistic\", \"linear\", \"sklearn\", \"candidate\", \"LogisticRegression\", \"p0\", \"sklearn\", (\"probability\", \"exogenous\"), {\"C\": 1.0, \"max_iter\": 1000}),\n    ModelSpec(\"ridge-position\", \"linear\", \"sklearn\", \"position_series\", \"Ridge\", \"p0\", \"sklearn\", (\"position\", \"exogenous\"), {\"alpha\": 1.0}),\n    ModelSpec(\"elasticnet-position\", \"linear\", \"sklearn\", \"position_series\", \"ElasticNet\", \"p1\", \"sklearn\", (\"position\", \"exogenous\"), {\"alpha\": 0.01, \"l1_ratio\": 0.5, \"max_iter\": 5000}),\n    ModelSpec(\"random-forest\", \"tree\", \"sklearn\", \"candidate\", \"RandomForestClassifier\", \"p1\", \"sklearn\", (\"probability\", \"exogenous\"), {\"n_estimators\": 300, \"min_samples_leaf\": 3, \"n_jobs\": -1}),\n    ModelSpec(\"extra-trees\", \"tree\", \"sklearn\", \"candidate\", \"ExtraTreesClassifier\", \"p0\", \"sklearn\", (\"probability\", \"exogenous\"), {\"n_estimators\": 300, \"min_samples_leaf\": 2, \"n_jobs\": -1}),\n    ModelSpec(\"hist-gradient-boosting\", \"tree\", \"sklearn\", \"candidate\", \"HistGradientBoostingClassifier\", \"p0\", \"sklearn\", (\"probability\", \"exogenous\"), {\"max_iter\": 200, \"learning_rate\": 0.05}),\n    ModelSpec(\"lightgbm-classifier\", \"tree\", \"lightgbm\", \"candidate\", \"LGBMClassifier\", \"p0\", \"lightgbm\", (\"probability\", \"ranking\", \"exogenous\", \"gpu_optional\"), {\"n_estimators\": 400, \"learning_rate\": 0.03, \"num_leaves\": 31}),\n    ModelSpec(\"lightgbm-position\", \"tree\", \"lightgbm\", \"position_series\", \"LGBMRegressor\", \"p0\", \"lightgbm\", (\"position\", \"exogenous\", \"gpu_optional\"), {\"n_estimators\": 400, \"learning_rate\": 0.03}),\n    ModelSpec(\"xgboost-classifier\", \"tree\", \"xgboost\", \"candidate\", \"XGBClassifier\", \"p1\", \"xgboost\", (\"probability\", \"exogenous\", \"gpu_optional\"), {\"n_estimators\": 400, \"learning_rate\": 0.03, \"max_depth\": 5}),\n    ModelSpec(\"catboost-classifier\", \"tree\", \"catboost\", \"candidate\", \"CatBoostClassifier\", \"p1\", \"catboost\", (\"probability\", \"exogenous\", \"gpu_optional\"), {\"iterations\": 400, \"learning_rate\": 0.03, \"verbose\": False}),\n    ModelSpec(\"stats-naive\", \"statistical\", \"statsforecast\", \"position_series\", \"Naive\", \"p0\", \"statsforecast\"),\n    ModelSpec(\"stats-historic-average\", \"statistical\", \"statsforecast\", \"position_series\", \"HistoricAverage\", \"p0\", \"statsforecast\"),\n    ModelSpec(\"stats-autoarima\", \"statistical\", \"statsforecast\", \"position_series\", \"AutoARIMA\", \"p0\", \"statsforecast\"),\n    ModelSpec(\"stats-autoets\", \"statistical\", \"statsforecast\", \"position_series\", \"AutoETS\", \"p0\", \"statsforecast\"),\n    ModelSpec(\"stats-autotheta\", \"statistical\", \"statsforecast\", \"position_series\", \"AutoTheta\", \"p0\", \"statsforecast\"),\n    ModelSpec(\"stats-autoces\", \"statistical\", \"statsforecast\", \"position_series\", \"AutoCES\", \"p1\", \"statsforecast\"),\n    ModelSpec(\"stats-croston\", \"intermittent\", \"statsforecast\", \"candidate_series\", \"CrostonClassic\", \"p1\", \"statsforecast\"),\n    ModelSpec(\"stats-tsb\", \"intermittent\", \"statsforecast\", \"candidate_series\", \"TSB\", \"p1\", \"statsforecast\"),\n    ModelSpec(\"mlforecast-ridge\", \"lag_ml\", \"mlforecast\", \"position_series\", \"Ridge\", \"p0\", \"mlforecast\", (\"lags\", \"exogenous\")),\n    ModelSpec(\"mlforecast-lightgbm\", \"lag_ml\", \"mlforecast\", \"position_series\", \"LGBMRegressor\", \"p0\", \"mlforecast\", (\"lags\", \"exogenous\", \"gpu_optional\")),\n    ModelSpec(\"nf-dlinear\", \"deep\", \"neuralforecast\", \"position_series\", \"DLinear\", \"p0\", \"neuralforecast\", (\"gpu\", \"checkpoint\")),\n    ModelSpec(\"nf-nlinear\", \"deep\", \"neuralforecast\", \"position_series\", \"NLinear\", \"p0\", \"neuralforecast\", (\"gpu\", \"checkpoint\")),\n    ModelSpec(\"nf-nhits\", \"deep\", \"neuralforecast\", \"position_series\", \"NHITS\", \"p0\", \"neuralforecast\", (\"gpu\", \"checkpoint\", \"exogenous\")),\n    ModelSpec(\"nf-nbeats\", \"deep\", \"neuralforecast\", \"position_series\", \"NBEATS\", \"p1\", \"neuralforecast\", (\"gpu\", \"checkpoint\")),\n    ModelSpec(\"nf-nbeatsx\", \"deep\", \"neuralforecast\", \"position_series\", \"NBEATSx\", \"p1\", \"neuralforecast\", (\"gpu\", \"checkpoint\", \"exogenous\")),\n    ModelSpec(\"nf-tide\", \"deep\", \"neuralforecast\", \"position_series\", \"TiDE\", \"p0\", \"neuralforecast\", (\"gpu\", \"checkpoint\", \"exogenous\")),\n    ModelSpec(\"nf-tcn\", \"deep\", \"neuralforecast\", \"position_series\", \"TCN\", \"p0\", \"neuralforecast\", (\"gpu\", \"checkpoint\")),\n    ModelSpec(\"nf-gru\", \"deep\", \"neuralforecast\", \"position_series\", \"GRU\", \"p0\", \"neuralforecast\", (\"gpu\", \"checkpoint\")),\n    ModelSpec(\"nf-lstm\", \"deep\", \"neuralforecast\", \"position_series\", \"LSTM\", \"p1\", \"neuralforecast\", (\"gpu\", \"checkpoint\")),\n    ModelSpec(\"nf-deepar\", \"deep_probabilistic\", \"neuralforecast\", \"position_series\", \"DeepAR\", \"p1\", \"neuralforecast\", (\"gpu\", \"probabilistic\")),\n    ModelSpec(\"nf-tft\", \"transformer\", \"neuralforecast\", \"position_series\", \"TFT\", \"p1\", \"neuralforecast\", (\"gpu\", \"exogenous\", \"attention\")),\n    ModelSpec(\"nf-patchtst\", \"transformer\", \"neuralforecast\", \"position_series\", \"PatchTST\", \"p1\", \"neuralforecast\", (\"gpu\",)),\n    ModelSpec(\"nf-timesnet\", \"transformer\", \"neuralforecast\", \"position_series\", \"TimesNet\", \"p1\", \"neuralforecast\", (\"gpu\",)),\n    ModelSpec(\"nf-tsmixer\", \"mixer\", \"neuralforecast\", \"position_series\", \"TSMixer\", \"p1\", \"neuralforecast\", (\"gpu\", \"multiseries\")),\n    ModelSpec(\"nf-timemixer\", \"mixer\", \"neuralforecast\", \"position_series\", \"TimeMixer\", \"p2\", \"neuralforecast\", (\"gpu\",)),\n    ModelSpec(\"nf-itransformer\", \"transformer\", \"neuralforecast\", \"position_series\", \"iTransformer\", \"p2\", \"neuralforecast\", (\"gpu\", \"multivariate\")),\n    ModelSpec(\"nf-vanilla-transformer\", \"transformer\", \"neuralforecast\", \"position_series\", \"VanillaTransformer\", \"p2\", \"neuralforecast\", (\"gpu\",)),\n    ModelSpec(\"nf-auto-rnn\", \"rnn\", \"neuralforecast_auto\", \"position_series\", \"AutoRNN\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-lstm\", \"rnn\", \"neuralforecast_auto\", \"position_series\", \"AutoLSTM\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-gru\", \"rnn\", \"neuralforecast_auto\", \"position_series\", \"AutoGRU\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-tcn\", \"cnn\", \"neuralforecast_auto\", \"position_series\", \"AutoTCN\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-deepar\", \"deep_probabilistic\", \"neuralforecast_auto\", \"position_series\", \"AutoDeepAR\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-dilatedrnn\", \"rnn\", \"neuralforecast_auto\", \"position_series\", \"AutoDilatedRNN\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-bitcn\", \"cnn\", \"neuralforecast_auto\", \"position_series\", \"AutoBiTCN\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-mlp\", \"mlp\", \"neuralforecast_auto\", \"position_series\", \"AutoMLP\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-nbeats\", \"mlp\", \"neuralforecast_auto\", \"position_series\", \"AutoNBEATS\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-nbeatsx\", \"mlp\", \"neuralforecast_auto\", \"position_series\", \"AutoNBEATSx\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-nhits\", \"mlp\", \"neuralforecast_auto\", \"position_series\", \"AutoNHITS\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-dlinear\", \"linear\", \"neuralforecast_auto\", \"position_series\", \"AutoDLinear\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-nlinear\", \"linear\", \"neuralforecast_auto\", \"position_series\", \"AutoNLinear\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-tide\", \"mlp\", \"neuralforecast_auto\", \"position_series\", \"AutoTiDE\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-deepnpts\", \"deep_probabilistic\", \"neuralforecast_auto\", \"position_series\", \"AutoDeepNPTS\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-kan\", \"kan\", \"neuralforecast_auto\", \"position_series\", \"AutoKAN\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-tft\", \"transformer\", \"neuralforecast_auto\", \"position_series\", \"AutoTFT\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-vanilla-transformer\", \"transformer\", \"neuralforecast_auto\", \"position_series\", \"AutoVanillaTransformer\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-informer\", \"transformer\", \"neuralforecast_auto\", \"position_series\", \"AutoInformer\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-autoformer\", \"transformer\", \"neuralforecast_auto\", \"position_series\", \"AutoAutoformer\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-fedformer\", \"transformer\", \"neuralforecast_auto\", \"position_series\", \"AutoFEDformer\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-patchtst\", \"transformer\", \"neuralforecast_auto\", \"position_series\", \"AutoPatchTST\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-itransformer\", \"transformer\", \"neuralforecast_auto\", \"position_series\", \"AutoiTransformer\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-timexer\", \"transformer\", \"neuralforecast_auto\", \"position_series\", \"AutoTimeXer\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-timesnet\", \"transformer\", \"neuralforecast_auto\", \"position_series\", \"AutoTimesNet\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-stemgnn\", \"graph\", \"neuralforecast_auto\", \"position_series\", \"AutoStemGNN\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-hint\", \"hierarchical\", \"neuralforecast_auto\", \"position_series\", \"AutoHINT\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-tsmixer\", \"mixer\", \"neuralforecast_auto\", \"position_series\", \"AutoTSMixer\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-tsmixerx\", \"mixer\", \"neuralforecast_auto\", \"position_series\", \"AutoTSMixerx\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-mlp-multivariate\", \"mlp\", \"neuralforecast_auto\", \"position_series\", \"AutoMLPMultivariate\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-softs\", \"mixer\", \"neuralforecast_auto\", \"position_series\", \"AutoSOFTS\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-timemixer\", \"mixer\", \"neuralforecast_auto\", \"position_series\", \"AutoTimeMixer\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"nf-auto-rmok\", \"kan\", \"neuralforecast_auto\", \"position_series\", \"AutoRMoK\", \"p1\", \"neuralforecast\", (\"gpu\", \"auto_hpo\", \"optuna\", \"ray\", \"checkpoint\"), notes=\"Official NeuralForecast AutoModel; backend/search resolved at runtime\"),\n    ModelSpec(\"autogluon-timeseries\", \"automl\", \"autogluon\", \"position_series\", \"TimeSeriesPredictor\", \"p1\", \"autogluon\", (\"ensemble\", \"probabilistic\", \"zero_shot\")),\n    ModelSpec(\"darts-ensemble\", \"framework\", \"darts\", \"position_series\", \"RegressionEnsembleModel\", \"p2\", \"darts\", (\"ensemble\", \"probabilistic\")),\n    ModelSpec(\n        \"gluonts-deepar\",\n        \"deep_probabilistic\",\n        \"gluonts\",\n        \"position_series\",\n        \"DeepAREstimator\",\n        \"p2\",\n        \"gluonts\",\n        (\"probabilistic\",),\n        {\"epochs\": 1, \"num_batches_per_epoch\": 2, \"context_length\": 16, \"num_samples\": 20},\n    ),\n    ModelSpec(\n        \"reservoir-esn\",\n        \"reservoir\",\n        \"reservoirpy\",\n        \"position\",\n        \"ESN\",\n        \"p1\",\n        \"reservoirpy\",\n        (\"position\",),\n        {\"reservoir_size\": 50, \"spectral_radius\": 0.9, \"leak_rate\": 0.3, \"ridge_alpha\": 1e-6},\n    ),\n    ModelSpec(\n        \"chronos-bolt-tiny\",\n        \"tsfm\",\n        \"chronos\",\n        \"foundation\",\n        \"ChronosBoltPipeline\",\n        \"p1\",\n        \"chronos\",\n        (\"zero_shot\", \"probabilistic\", \"gpu_optional\"),\n        {\n            \"model_name\": \"amazon/chronos-bolt-tiny\",\n            \"revision\": \"a0e552de83495b5c28c14c71c374f3e33280b340\",\n        },\n    ),\n    ModelSpec(\"chronos-2-small\", \"tsfm\", \"chronos\", \"foundation\", \"Chronos2Pipeline\", \"p1\", \"chronos\", (\"zero_shot\", \"fine_tuning\", \"exogenous\"), {\"model_name\": \"autogluon/chronos-2-small\"}),\n    ModelSpec(\"timesfm-2.5\", \"tsfm\", \"timesfm\", \"foundation\", \"TimesFM\", \"p1\", \"timesfm\", (\"zero_shot\", \"fine_tuning\", \"exogenous\", \"gpu\")),\n    ModelSpec(\"granite-ttm\", \"tsfm\", \"transformers\", \"foundation\", \"TinyTimeMixerForPrediction\", \"p1\", \"transformers\", (\"zero_shot\", \"fine_tuning\", \"gpu_optional\")),\n    ModelSpec(\n        \"tirex\",\n        \"tsfm\",\n        \"tirex\",\n        \"foundation\",\n        \"TiRex\",\n        \"p1\",\n        \"tirex\",\n        (\"zero_shot\", \"probabilistic\", \"gpu_optional\"),\n        {\n            \"model_name\": \"NX-AI/TiRex-2\",\n            \"revision\": \"05e5b26db52bfb256f1ae1bdf785589850482de3\",\n        },\n    ),\n    ModelSpec(\n        \"moirai\",\n        \"tsfm\",\n        \"uni2ts\",\n        \"foundation\",\n        \"Moirai2Forecast\",\n        \"p2\",\n        \"uni2ts\",\n        (\"zero_shot\", \"probabilistic\", \"gpu\"),\n        {\n            \"model_name\": \"Salesforce/moirai-2.0-R-small\",\n            \"revision\": \"30f43ff08c8494f4943ae1521e9d4e94a0fbb389\",\n        },\n    ),\n    ModelSpec(\n        \"sundial\",\n        \"tsfm\",\n        \"transformers\",\n        \"foundation\",\n        \"SundialForPrediction\",\n        \"p2\",\n        \"transformers\",\n        (\"zero_shot\", \"generative\", \"gpu\"),\n        {\n            \"model_name\": \"thuml/sundial-base-128m\",\n            \"revision\": \"3212e42564493f520593e5414af4367fc4b49226\",\n            \"trust_remote_code\": True,\n        },\n    ),\n    ModelSpec(\"tabpfn-ts\", \"foundation_tabular\", \"tabpfn_time_series\", \"candidate\", \"TabPFNTimeSeries\", \"p1\", \"tabpfn_time_series\", (\"zero_shot\", \"probability\", \"gpu_optional\")),\n)\n\n\ndef get_model_spec(model_id: str) -> ModelSpec:\n    for spec in MODEL_SPECS:\n        if spec.model_id == model_id:\n            return spec\n    raise KeyError(f\"unknown model_id: {model_id}\")\n\n\ndef list_model_specs(*, priority: str | None = None, available_only: bool = False) -> list[ModelSpec]:\n    values: Iterable[ModelSpec] = MODEL_SPECS\n    if priority:\n        values = (item for item in values if item.priority == priority)\n    if available_only:\n        values = (item for item in values if item.available)\n    return list(values)\n",
+  "files": [
+    {
+      "path": "src/loto/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/analysis/contribution.py",
+      "classes": [
+        "Comparison"
+      ],
+      "functions": [
+        "_normal_sf",
+        "adjust_pvalues",
+        "cluster_bootstrap",
+        "contribution",
+        "paired_pvalue",
+        "paired_summary"
+      ],
+      "called_attributes": [
+        "DataFrame",
+        "all",
+        "append",
+        "argsort",
+        "copy",
+        "default_rng",
+        "eq",
+        "erfc",
+        "groupby",
+        "integers",
+        "isfinite",
+        "mean",
+        "merge",
+        "nunique",
+        "ones",
+        "quantile",
+        "sort_index",
+        "sqrt",
+        "std",
+        "to_numpy",
+        "tolist",
+        "update"
+      ],
+      "keyword_arguments": [
+        "absolute_contribution",
+        "all_seeds_positive",
+        "axis",
+        "back_half_contribution",
+        "cluster_ci95_high",
+        "cluster_ci95_low",
+        "cluster_ci95_median",
+        "comparison",
+        "ddof",
+        "dropna",
+        "dtype",
+        "front_half_contribution",
+        "frozen",
+        "iterations",
+        "metric",
+        "on",
+        "paired_rows",
+        "positive_fold_rate",
+        "pvalue",
+        "size",
+        "sort",
+        "start",
+        "strict",
+        "suffixes",
+        "unique_folds",
+        "unique_seeds",
+        "validate"
+      ],
+      "relevant_strings": [
+        "log_loss"
+      ]
+    },
+    {
+      "path": "src/loto/api/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/api/app.py",
+      "classes": [
+        "ApprovalDecision",
+        "ApprovalRequest",
+        "ModelPlanRequest",
+        "ScoreRequest"
+      ],
+      "functions": [
+        "_run_directories",
+        "_safe_run",
+        "create_app",
+        "current_identity",
+        "dashboard",
+        "data_games",
+        "decide_approval",
+        "dep",
+        "health",
+        "latest_evaluation",
+        "latest_forecast",
+        "leaderboard",
+        "metrics",
+        "model_detail",
+        "model_plan",
+        "models",
+        "need",
+        "registry_rows",
+        "request_approval",
+        "run_artifacts",
+        "run_events",
+        "run_index",
+        "run_resources",
+        "run_summary",
+        "score_forecast",
+        "verify_latest"
+      ],
+      "called_attributes": [
+        "append",
+        "audit",
+        "decide_approval",
+        "encode",
+        "exists",
+        "get",
+        "is_dir",
+        "items",
+        "iterdir",
+        "list_rows",
+        "loads",
+        "lower",
+        "model_dump",
+        "post",
+        "read_csv",
+        "read_text",
+        "replace",
+        "request_approval",
+        "resolve",
+        "score_forecast",
+        "split",
+        "splitlines",
+        "startswith",
+        "stat",
+        "to_dict",
+        "values"
+      ],
+      "keyword_arguments": [
+        "available_only",
+        "default",
+        "default_factory",
+        "detail",
+        "encoding",
+        "errors",
+        "ge",
+        "include_in_schema",
+        "key",
+        "limit",
+        "max_length",
+        "media_type",
+        "min_length",
+        "orient",
+        "priority",
+        "response_class",
+        "reverse",
+        "status_code",
+        "title",
+        "version"
+      ],
+      "relevant_strings": [
+        "<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Loto Forecast Platform v2.1</title>\n<style>:root{color-scheme:light dark;--bg:#0b1020;--card:#151c31;--line:#33405f;--ok:#22c55e;--warn:#f59e0b}*{box-sizing:border-box}body{font-family:system-ui,sans-serif;max-width:1280px;margin:0 auto;padding:1.4rem;background:var(--bg);color:#e8eefc}.head{display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}.card{border:1px solid var(--line);padding:1rem;border-radius:.9rem;background:var(--card)}a{color:#93c5fd;font-weight:650}.status{display:inline-block;padding:.2rem .6rem;border-radius:99px;background:#166534}.metric{font-size:1.7rem;font-weight:700}.muted{opacity:.72}table{width:100%;border-collapse:collapse}td,th{padding:.5rem;border-bottom:1px solid var(--line);text-align:left;font-size:.9rem}code{word-break:break-all}</style></head><body>\n<div class='head'><div><h1>Loto Forecast Platform <small>v2.1</small></h1><p class='muted'>Loto Trusted Vertical Slice compatible</p></div><span class='status' id='health'>loading</span></div>\n<div class='grid'><div class='card'><div class='muted'>Models</div><div class='metric' id='models'>-</div><a href='/api/v2/models'>Registry</a></div><div class='card'><div class='muted'>Runs</div><div class='metric' id='runs'>-</div><a href='/api/v2/runs'>Run index</a></div><div class='card'><div class='muted'>Games</div><div class='metric' id='games'>-</div><a href='/api/v2/data/games'>Data sources</a></div><div class='card'><div class='muted'>Observability</div><a href='/metrics'>Prometheus</a> / <a href='/docs'>OpenAPI</a><p>events, resources, artifact status</p></div></div>\n<h2>Model Parameter Lab</h2><div class='card'><div class='grid'><label>AutoModel<select id='lab-model'></select></label><label>Backend<select id='lab-backend'><option>optuna</option><option>ray</option></select></label><label>Horizon<input id='lab-h' type='number' min='1' value='1'></label><label>Trials<input id='lab-trials' type='number' min='1' value='10'></label></div><p><button id='lab-plan' type='button'>Resolve plan</button></p><pre id='lab-output' class='muted'>Select a model and resolve a non-executing plan.</pre></div><h2>Latest leaderboard</h2><div class='card'><table><thead><tr><th>Rank</th><th>Model</th><th>Score</th><th>±1</th><th>MAE</th></tr></thead><tbody id='leaderboard'><tr><td colspan='5'>No result</td></tr></tbody></table></div>\n<script>const el=id=>document.getElementById(id);async function j(u,o){const r=await fetch(u,o);if(!r.ok)throw Error(r.status);return r.json()}Promise.allSettled([j('/health'),j('/api/v2/models'),j('/api/v2/runs'),j('/api/v2/data/games'),j('/api/v2/leaderboard')]).then(x=>{if(x[0].status==='fulfilled'){el('health').textContent=x[0].value.status;el('health').style.background='#166534'}el('models').textContent=x[1].status==='fulfilled'?x[1].value.length:'-';el('runs').textContent=x[2].status==='fulfilled'?x[2].value.length:'-';el('games').textContent=x[3].status==='fulfilled'?x[3].value.length:'-';if(x[1].status==='fulfilled'){el('lab-model').innerHTML=x[1].value.filter(m=>m.library==='neuralforecast_auto').map(m=>`<option value='${m.class_name}'>${m.class_name}</option>`).join('')}if(x[4].status==='fulfilled'){el('leaderboard').innerHTML=x[4].value.slice(0,10).map(r=>`<tr><td>${r.rank??''}</td><td>${r.model_id??''}</td><td>${Number(r.composite_score??0).toFixed(4)}</td><td>${Number(r.mean_within_1??0).toFixed(3)}</td><td>${Number(r.position_mae??0).toFixed(3)}</td></tr>`).join('')}});el('lab-plan').addEventListener('click',async()=>{try{const body={model_name:el('lab-model').value,backend:el('lab-backend').value,h:Number(el('lab-h').value),num_samples:Number(el('lab-trials').value)};el('lab-output').textContent=JSON.stringify(await j('/api/v2/model-plan',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}),null,2)}catch(e){el('lab-output').textContent='Plan unavailable: '+e}})</script></body></html>",
+        "auto"
+      ]
+    },
+    {
+      "path": "src/loto/calibration/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/calibration/calibrators.py",
+      "classes": [
+        "PlattCalibrator",
+        "TemperatureScaler"
+      ],
+      "functions": [
+        "__init__",
+        "__init__",
+        "fit",
+        "fit",
+        "transform",
+        "transform"
+      ],
+      "called_attributes": [
+        "arange",
+        "asarray",
+        "clip",
+        "exp",
+        "fit",
+        "geomspace",
+        "log",
+        "max",
+        "mean",
+        "predict_proba",
+        "ravel",
+        "reshape",
+        "sum",
+        "unique"
+      ],
+      "keyword_arguments": [
+        "C",
+        "axis",
+        "dtype",
+        "keepdims",
+        "max_iter"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/cli.py",
+      "classes": [],
+      "functions": [
+        "_json",
+        "_probe_torch",
+        "_registry",
+        "_secret",
+        "build_parser",
+        "main"
+      ],
+      "called_attributes": [
+        "ArgumentParser",
+        "add_argument",
+        "add_parser",
+        "add_subparsers",
+        "decide_approval",
+        "dumps",
+        "encode",
+        "from_file",
+        "fromisoformat",
+        "get",
+        "hexdigest",
+        "list_rows",
+        "loads",
+        "mkdir",
+        "model_dump_json",
+        "parse_args",
+        "platform",
+        "put_file",
+        "read_csv",
+        "read_text",
+        "request_approval",
+        "run",
+        "send_all",
+        "sha256",
+        "strftime",
+        "to_dict",
+        "update",
+        "write_resolved",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "action",
+        "available_only",
+        "backtest_draws",
+        "base_dir",
+        "capture_output",
+        "check",
+        "choices",
+        "continue_on_error",
+        "default",
+        "dest",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "fail_on_error",
+        "force",
+        "game",
+        "games",
+        "help",
+        "indent",
+        "namespace",
+        "nargs",
+        "now",
+        "output_dir",
+        "parents",
+        "policy",
+        "postgres_dsn",
+        "priority",
+        "prog",
+        "require_parquet",
+        "required",
+        "secret",
+        "sort_keys",
+        "source",
+        "source_file",
+        "source_files",
+        "text",
+        "timeout",
+        "type"
+      ],
+      "relevant_strings": [
+        "auto-coverage"
+      ]
+    },
+    {
+      "path": "src/loto/cli_v3.py",
+      "classes": [],
+      "functions": [
+        "_cmd_catalog",
+        "_cmd_games",
+        "_cmd_hierarchy",
+        "_cmd_integrity",
+        "_cmd_research",
+        "_cmd_theory",
+        "_emit",
+        "build_parser",
+        "main"
+      ],
+      "called_attributes": [
+        "ArgumentParser",
+        "DataFrame",
+        "add_argument",
+        "add_parser",
+        "add_subparsers",
+        "append",
+        "arange",
+        "choice",
+        "column_names",
+        "default_rng",
+        "dump",
+        "dumps",
+        "func",
+        "get",
+        "integers",
+        "items",
+        "iterdir",
+        "mkdir",
+        "parse_args",
+        "read_csv",
+        "set_defaults",
+        "to_csv",
+        "to_dict",
+        "to_row",
+        "tolist",
+        "uniform",
+        "write",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "action",
+        "alpha",
+        "choices",
+        "correction_method",
+        "data_version",
+        "default",
+        "description",
+        "dest",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "folds",
+        "func",
+        "game",
+        "help",
+        "holdout_size",
+        "indent",
+        "index",
+        "method",
+        "min_train_size",
+        "n_boot",
+        "parents",
+        "prog",
+        "release",
+        "replace",
+        "required",
+        "size",
+        "strict",
+        "strict_untracked",
+        "tau",
+        "test_size",
+        "type"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/config.py",
+      "classes": [
+        "EvaluationConfig",
+        "PlatformConfig",
+        "RuntimeConfig",
+        "SearchConfig"
+      ],
+      "functions": [
+        "resolve_config"
+      ],
+      "called_attributes": [
+        "dumps",
+        "encode",
+        "hexdigest",
+        "model_dump",
+        "model_validate",
+        "sha256"
+      ],
+      "keyword_arguments": [
+        "default",
+        "extra",
+        "ge",
+        "mode",
+        "separators",
+        "sort_keys"
+      ],
+      "relevant_strings": [
+        "optuna"
+      ]
+    },
+    {
+      "path": "src/loto/contracts.py",
+      "classes": [
+        "CandidateProbability",
+        "DatasetManifest",
+        "DecodedCombination",
+        "EvaluationReport",
+        "FeatureSetManifest",
+        "ForecastPackage",
+        "PositionProbability",
+        "PromotionDecision",
+        "StrictContract"
+      ],
+      "functions": [
+        "validate_forecast",
+        "validate_numbers"
+      ],
+      "called_attributes": [],
+      "keyword_arguments": [
+        "default_factory",
+        "extra",
+        "frozen",
+        "ge",
+        "le",
+        "max_length",
+        "min_length",
+        "mode",
+        "strict"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/contracts_general.py",
+      "classes": [
+        "GameContracts",
+        "_Strict"
+      ],
+      "functions": [
+        "__init__",
+        "_validate_combination",
+        "_validate_forecast",
+        "contracts_for",
+        "describe"
+      ],
+      "called_attributes": [
+        "validate_outcome"
+      ],
+      "keyword_arguments": [
+        "__base__",
+        "__validators__",
+        "candidate_number",
+        "candidates",
+        "combination",
+        "created_at",
+        "data_version",
+        "default",
+        "default_factory",
+        "draw_id",
+        "draw_time",
+        "extra",
+        "feature_set_id",
+        "forecast_id",
+        "frozen",
+        "game",
+        "ge",
+        "le",
+        "max_length",
+        "maxsize",
+        "metadata",
+        "min_length",
+        "mode",
+        "model_id",
+        "pattern",
+        "position",
+        "probability",
+        "protocol_hash",
+        "rank_score",
+        "score",
+        "values"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/coverage/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": [
+        "certify_auto_research",
+        "run_auto_research"
+      ]
+    },
+    {
+      "path": "src/loto/coverage/auto_research.py",
+      "classes": [
+        "ExperimentProposal",
+        "LocalLLMClient",
+        "SearchBudget"
+      ],
+      "functions": [
+        "__init__",
+        "_candidate_pool",
+        "_evaluate_general",
+        "_expand_space",
+        "_greedy_general",
+        "_hash",
+        "_legalize",
+        "_load_yaml",
+        "_number_columns",
+        "_point",
+        "_proposal_from_llm",
+        "_read_game_data",
+        "_walk_forward",
+        "add",
+        "build_grid",
+        "certify_auto_research",
+        "propose",
+        "run_auto_research",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "DataFrame",
+        "Request",
+        "abs",
+        "add",
+        "any",
+        "append",
+        "apply",
+        "arange",
+        "argmax",
+        "argmin",
+        "asarray",
+        "astype",
+        "ceil",
+        "clip",
+        "comb",
+        "concatenate",
+        "decode",
+        "default_rng",
+        "diff",
+        "dumps",
+        "encode",
+        "exists",
+        "eye",
+        "find",
+        "get",
+        "hexdigest",
+        "items",
+        "loads",
+        "max",
+        "maximum",
+        "mean",
+        "median",
+        "min",
+        "mkdir",
+        "normal",
+        "ones",
+        "open",
+        "pop",
+        "product",
+        "propose",
+        "read",
+        "read_csv",
+        "read_text",
+        "rfind",
+        "rint",
+        "rstrip",
+        "safe_load",
+        "sha256",
+        "solve",
+        "sort",
+        "std",
+        "sum",
+        "time",
+        "to_csv",
+        "to_dict",
+        "to_numpy",
+        "update",
+        "urlopen",
+        "values",
+        "vstack",
+        "write"
+      ],
+      "keyword_arguments": [
+        "available_only",
+        "axis",
+        "beam_width",
+        "columns",
+        "data",
+        "default",
+        "diversity",
+        "diversity_penalty",
+        "dtype",
+        "encoding",
+        "ensemble",
+        "ensure_ascii",
+        "errors",
+        "exist_ok",
+        "experiment_id",
+        "frozen",
+        "game",
+        "headers",
+        "index",
+        "key",
+        "max_candidates",
+        "model_id",
+        "params",
+        "parents",
+        "per_position_top",
+        "pool_size",
+        "seed",
+        "sort_keys",
+        "source",
+        "strict",
+        "target",
+        "timeout",
+        "tolerance"
+      ],
+      "relevant_strings": [
+        "auto research config must be a mapping",
+        "auto_coverage_certification.json",
+        "auto_research_summary.json",
+        "run auto-coverage before certification",
+        "runs/auto-coverage",
+        "stats-autoarima",
+        "stats-autoets"
+      ]
+    },
+    {
+      "path": "src/loto/coverage/core.py",
+      "classes": [
+        "CoverageConfig",
+        "CoverageEvaluation",
+        "PredictionSet"
+      ],
+      "functions": [
+        "__post_init__",
+        "_coverage_mask",
+        "augment_with_residual_offsets",
+        "evaluate_candidates",
+        "generate_candidate_pool",
+        "greedy_coverage_select",
+        "legal_loto7",
+        "position_probabilities",
+        "project_to_legal",
+        "simultaneous_conformal_radius",
+        "to_dict",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "abs",
+        "add",
+        "any",
+        "append",
+        "arange",
+        "argmax",
+        "argmin",
+        "argsort",
+        "asarray",
+        "astype",
+        "ceil",
+        "clip",
+        "diff",
+        "exp",
+        "fromkeys",
+        "log",
+        "max",
+        "mean",
+        "median",
+        "min",
+        "ones",
+        "partition",
+        "reshape",
+        "rint",
+        "sort",
+        "sum",
+        "tolist",
+        "update",
+        "vstack"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "candidate_count",
+        "draws",
+        "dtype",
+        "element_within_tolerance",
+        "exact_row_rate",
+        "frozen",
+        "key",
+        "mean_best_mae",
+        "median_best_mae",
+        "positions_within_tolerance_mean",
+        "repeat",
+        "reverse",
+        "row_within_tolerance",
+        "strict"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/coverage/runner.py",
+      "classes": [],
+      "functions": [
+        "_load_config",
+        "_numbers",
+        "_point_forecast",
+        "_walk_forward",
+        "certify_coverage_experiment",
+        "run_coverage_experiment"
+      ],
+      "called_attributes": [
+        "DataFrame",
+        "append",
+        "arange",
+        "asarray",
+        "astype",
+        "clip",
+        "exists",
+        "extend",
+        "fromkeys",
+        "get",
+        "hexdigest",
+        "insert",
+        "loads",
+        "mean",
+        "median",
+        "mkdir",
+        "read_bytes",
+        "read_csv",
+        "read_text",
+        "rint",
+        "safe_load",
+        "sha256",
+        "to_csv",
+        "to_dict",
+        "to_numpy",
+        "tolist",
+        "vstack"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "beam_width",
+        "calibration_coverage",
+        "candidates",
+        "columns",
+        "conformal_radius",
+        "diversity_penalty",
+        "dtype",
+        "encoding",
+        "exist_ok",
+        "index",
+        "limit",
+        "max_candidates",
+        "metadata",
+        "parents",
+        "per_position_top",
+        "pool_size",
+        "radius",
+        "source",
+        "target_coverage",
+        "tolerance"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/data/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/data/canonical.py",
+      "classes": [
+        "CanonicalDataError"
+      ],
+      "functions": [
+        "_frame_hash",
+        "canonicalize_loto7",
+        "save_manifest",
+        "to_candidate_table",
+        "to_position_table"
+      ],
+      "called_attributes": [
+        "DataFrame",
+        "any",
+        "append",
+        "astype",
+        "copy",
+        "dumps",
+        "duplicated",
+        "encode",
+        "get",
+        "hexdigest",
+        "insert",
+        "iterrows",
+        "map",
+        "max",
+        "min",
+        "mkdir",
+        "model_dump",
+        "reset_index",
+        "select_dtypes",
+        "sha256",
+        "sort_values",
+        "strftime",
+        "to_datetime",
+        "to_dict",
+        "to_json",
+        "to_numeric",
+        "to_pydatetime",
+        "validate_numbers",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "data_version",
+        "dataset_id",
+        "date_format",
+        "drop",
+        "encoding",
+        "ensure_ascii",
+        "errors",
+        "exist_ok",
+        "first_draw_date",
+        "first_draw_no",
+        "force_ascii",
+        "include",
+        "indent",
+        "last_draw_date",
+        "last_draw_no",
+        "mode",
+        "orient",
+        "parents",
+        "row_count",
+        "sha256",
+        "source",
+        "start",
+        "utc"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/data/datasets.py",
+      "classes": [],
+      "functions": [
+        "copy_bundle_to_postgres",
+        "write_dataset_bundle"
+      ],
+      "called_attributes": [
+        "append",
+        "begin",
+        "close",
+        "closing",
+        "commit",
+        "connect",
+        "dispose",
+        "execute",
+        "items",
+        "join",
+        "mkdir",
+        "mkstemp",
+        "replace",
+        "to_parquet",
+        "to_sql",
+        "unlink",
+        "with_suffix"
+      ],
+      "keyword_arguments": [
+        "chunksize",
+        "dir",
+        "exist_ok",
+        "if_exists",
+        "index",
+        "method",
+        "missing_ok",
+        "parents",
+        "pool_pre_ping",
+        "prefix",
+        "schema",
+        "suffix"
+      ],
+      "relevant_strings": [
+        "Atomically persist CSV/SQLite and optionally Parquet with explicit status.\n\n    Parquet failures are represented in the manifest. They are raised only when\n    ``require_parquet`` is true; this prevents silent artifact loss while keeping\n    the core installation dependency-light.\n    "
+      ]
+    },
+    {
+      "path": "src/loto/data/fetcher.py",
+      "classes": [
+        "FetchResult",
+        "PoliteHttpClient"
+      ],
+      "functions": [
+        "__init__",
+        "fetch_one"
+      ],
+      "called_attributes": [
+        "dumps",
+        "exists",
+        "get",
+        "hexdigest",
+        "isoformat",
+        "loads",
+        "mkdir",
+        "now",
+        "read",
+        "read_text",
+        "replace",
+        "sha256",
+        "sleep",
+        "with_suffix",
+        "write_bytes",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "headers",
+        "indent",
+        "parents",
+        "timeout"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/data/integrated.py",
+      "classes": [],
+      "functions": [
+        "_append_event",
+        "_materialize_source_file",
+        "_quality_report",
+        "acquire_and_build",
+        "acquire_and_build_many",
+        "feature_stage",
+        "fetch_stage",
+        "parse_stage",
+        "postgres_stage",
+        "run_stage"
+      ],
+      "called_attributes": [
+        "any",
+        "append",
+        "apply",
+        "copy2",
+        "diff",
+        "dumps",
+        "duplicated",
+        "exists",
+        "fetch_one",
+        "fillna",
+        "get",
+        "is_file",
+        "isdigit",
+        "isna",
+        "join",
+        "mkdir",
+        "model_dump",
+        "open",
+        "perf_counter",
+        "replace",
+        "resolve",
+        "startswith",
+        "stat",
+        "sum",
+        "to_datetime",
+        "to_dict",
+        "to_numeric",
+        "update",
+        "uuid4",
+        "values",
+        "with_suffix",
+        "write"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "default",
+        "encoding",
+        "ensure_ascii",
+        "error",
+        "errors",
+        "exist_ok",
+        "finished_at",
+        "force",
+        "game",
+        "inputs",
+        "metrics",
+        "mode",
+        "output_dir",
+        "outputs",
+        "parents",
+        "postgres_dsn",
+        "require_parquet",
+        "role",
+        "run_id",
+        "source",
+        "source_file",
+        "stage",
+        "started_at",
+        "status",
+        "subset",
+        "warnings",
+        "windows"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/data/lineage.py",
+      "classes": [
+        "StageManifest"
+      ],
+      "functions": [
+        "artifact_descriptor",
+        "atomic_write_frame_csv",
+        "atomic_write_json",
+        "atomic_write_text",
+        "frame_fingerprint",
+        "sha256_file",
+        "to_dict",
+        "utc_now_iso"
+      ],
+      "called_attributes": [
+        "dumps",
+        "encode",
+        "exists",
+        "fdopen",
+        "fileno",
+        "flush",
+        "fsync",
+        "hash_pandas_object",
+        "hexdigest",
+        "is_file",
+        "isoformat",
+        "mkdir",
+        "mkstemp",
+        "now",
+        "open",
+        "read",
+        "replace",
+        "sha256",
+        "stat",
+        "to_csv",
+        "to_numpy",
+        "tobytes",
+        "unlink",
+        "update",
+        "write"
+      ],
+      "keyword_arguments": [
+        "categorize",
+        "default",
+        "default_factory",
+        "dir",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "frozen",
+        "indent",
+        "index",
+        "missing_ok",
+        "newline",
+        "parents",
+        "prefix",
+        "suffix"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/data/lotteries.py",
+      "classes": [
+        "LotterySpec"
+      ],
+      "functions": [
+        "candidate_numbers",
+        "default_config_path",
+        "get_lottery_spec",
+        "load_lottery_specs",
+        "select_lottery_specs"
+      ],
+      "called_attributes": [
+        "get",
+        "items",
+        "loads",
+        "read_text",
+        "resolve",
+        "split",
+        "strip",
+        "values"
+      ],
+      "keyword_arguments": [
+        "bonus_count",
+        "digits_count",
+        "display_name",
+        "draw_weekdays",
+        "encoding",
+        "frozen",
+        "key",
+        "kind",
+        "main_count",
+        "number_max",
+        "number_min",
+        "url"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/data/parser.py",
+      "classes": [],
+      "functions": [
+        "_add_calendar",
+        "_candidate_numeric_columns",
+        "_find_first_column",
+        "_find_number_columns",
+        "_normalize_label",
+        "_split_digits",
+        "_to_int_or_none",
+        "normalize_raw_dataframe",
+        "parse_file",
+        "read_csv_flexible"
+      ],
+      "called_attributes": [
+        "DataFrame",
+        "Series",
+        "add",
+        "append",
+        "astype",
+        "between",
+        "compile",
+        "dropna",
+        "fillna",
+        "fullmatch",
+        "group",
+        "head",
+        "isna",
+        "items",
+        "lower",
+        "map",
+        "mean",
+        "normalize",
+        "read_csv",
+        "replace",
+        "search",
+        "strip",
+        "sub",
+        "to_datetime",
+        "to_numeric",
+        "zfill"
+      ],
+      "keyword_arguments": [
+        "dtype",
+        "encoding",
+        "errors",
+        "exclude_patterns",
+        "sep",
+        "source_url",
+        "start"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/data/provenance.py",
+      "classes": [
+        "ProvenanceIssue",
+        "ProvenanceReport"
+      ],
+      "functions": [
+        "check_provenance",
+        "status",
+        "to_dict",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "append",
+        "astype",
+        "dropna",
+        "fillna",
+        "is_object_dtype",
+        "is_string_dtype",
+        "isna",
+        "strip",
+        "sum",
+        "to_dict",
+        "unique"
+      ],
+      "keyword_arguments": [
+        "default_factory",
+        "frozen",
+        "rows"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/data/robots.py",
+      "classes": [
+        "RobotsDecision",
+        "RobotsPolicy"
+      ],
+      "functions": [
+        "__init__",
+        "_parser_for",
+        "_robots_url",
+        "audit",
+        "check",
+        "to_dict",
+        "wait"
+      ],
+      "called_attributes": [
+        "RobotFileParser",
+        "_parser_for",
+        "_robots_url",
+        "append",
+        "can_fetch",
+        "crawl_delay",
+        "get",
+        "monotonic",
+        "read",
+        "set_url",
+        "sleep",
+        "to_dict"
+      ],
+      "keyword_arguments": [
+        "allowed",
+        "crawl_delay",
+        "frozen",
+        "reason",
+        "robots_url",
+        "url"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/decoding/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/decoding/hybrid.py",
+      "classes": [],
+      "functions": [
+        "decode_hybrid"
+      ],
+      "called_attributes": [
+        "append",
+        "asarray",
+        "extend",
+        "items",
+        "sort",
+        "values"
+      ],
+      "keyword_arguments": [
+        "dtype",
+        "key",
+        "numbers",
+        "score"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/ensemble/stacking.py",
+      "classes": [
+        "NonNegativeEnsemble"
+      ],
+      "functions": [
+        "fit",
+        "loss",
+        "predict"
+      ],
+      "called_attributes": [
+        "asarray",
+        "einsum",
+        "full",
+        "mean",
+        "sum"
+      ],
+      "keyword_arguments": [
+        "bounds",
+        "constraints",
+        "dtype",
+        "method"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/evaluation/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/evaluation/conformal.py",
+      "classes": [
+        "ConformalInterval"
+      ],
+      "functions": [
+        "_conformal_quantile",
+        "adaptive_conformal",
+        "conformal_coverage",
+        "split_conformal",
+        "to_dict",
+        "weighted_interval_score",
+        "width"
+      ],
+      "called_attributes": [
+        "abs",
+        "append",
+        "asarray",
+        "ceil",
+        "clip",
+        "max",
+        "mean",
+        "quantile",
+        "ravel",
+        "tolist"
+      ],
+      "keyword_arguments": [
+        "alpha",
+        "clipped_to",
+        "dtype",
+        "finite_sample_guarantee",
+        "frozen",
+        "lower",
+        "method",
+        "n_calibration",
+        "quantile",
+        "upper"
+      ],
+      "relevant_strings": [
+        "Distribution-free prediction intervals via split conformal prediction.\n\nWhy this matters here: every probabilistic metric already in the platform (Brier, log loss,\nECE) scores a *distribution* the model asserts. None of them gives a finite-sample coverage\nguarantee. Split conformal does: given exchangeable calibration residuals, the interval\n\n    [pred - q, pred + q],  q = Quantile_{ceil((n+1)(1-alpha))/n}(|residual|)\n\ncovers the next observation with probability at least ``1 - alpha`` -- with no assumption\nabout the model, the noise shape, or correctness of the model at all. For an i.i.d. target\nlike a lottery draw this is the only interval that is honest by construction.\n\nExchangeability is the one real assumption, and it is violated by rolling-origin CV if the\ncalibration set precedes a regime change. :func:`split_conformal` therefore records the\ncalibration window so a downstream audit can check it, and\n:func:`adaptive_conformal` implements the online (ACI) update that recovers coverage under\ndrift by adjusting alpha from realised errors.\n",
+        "calibration arrays must align"
+      ]
+    },
+    {
+      "path": "src/loto/evaluation/detailed_metrics.py",
+      "classes": [],
+      "functions": [
+        "candidate_ranking_metrics",
+        "composite_score",
+        "detailed_draw_metrics",
+        "expected_calibration_error"
+      ],
+      "called_attributes": [
+        "abs",
+        "all",
+        "any",
+        "append",
+        "arange",
+        "argsort",
+        "array",
+        "asarray",
+        "items",
+        "linspace",
+        "log2",
+        "mean",
+        "median",
+        "min",
+        "ravel",
+        "sort",
+        "sqrt",
+        "square",
+        "std",
+        "sum"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "ddof",
+        "dtype",
+        "kind",
+        "start",
+        "strict"
+      ],
+      "relevant_strings": [
+        "targets and probabilities must be aligned 2-D arrays"
+      ]
+    },
+    {
+      "path": "src/loto/evaluation/leaderboard.py",
+      "classes": [
+        "Leaderboard",
+        "LeaderboardRow",
+        "ModelResult"
+      ],
+      "functions": [
+        "build_leaderboard",
+        "champion",
+        "composite_score",
+        "rankable",
+        "to_dict",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "append",
+        "asarray",
+        "get",
+        "items",
+        "mean",
+        "ravel",
+        "sort",
+        "sqrt",
+        "std",
+        "to_dict",
+        "vstack"
+      ],
+      "keyword_arguments": [
+        "adjusted_p",
+        "alpha",
+        "alternative",
+        "baseline_model_id",
+        "ci_high",
+        "ci_low",
+        "correction",
+        "correction_method",
+        "ddof",
+        "default_factory",
+        "delta_vs_baseline",
+        "dtype",
+        "elapsed_seconds",
+        "interpretation",
+        "is_control",
+        "key",
+        "loss_name",
+        "method",
+        "metrics",
+        "model_id",
+        "n",
+        "n_boot",
+        "n_significant",
+        "notes",
+        "point_estimate",
+        "protocol_hash",
+        "rank",
+        "raw_p",
+        "rows",
+        "sd",
+        "se",
+        "seed",
+        "significant",
+        "start",
+        "status",
+        "unranked",
+        "verdict"
+      ],
+      "relevant_strings": [
+        " has no per-draw losses; significance testing is impossible without a paired baseline",
+        "Per-draw loss, lower better. Required for significance testing.",
+        "Statistically defensible leaderboard construction.\n\nThe v2.1.0 leaderboard sorted models by a weighted composite score and reported rank 1 as the\n\"champion\". Three things were wrong with that:\n\n1. No sample size, dispersion or interval accompanied any point estimate, so rank 1 could not\n   be distinguished from rank 5.\n2. No multiplicity correction, so sweeping N models against a baseline guaranteed a spurious\n   winner.\n3. The composite weighted ``ece`` negatively, and the constant-prediction baseline attains\n   ``ece == 0`` by construction, so the objective structurally rewarded the trivial model.\n\nThis module fixes all three. Ranking requires per-draw losses, not just aggregates, because\nsignificance is not recoverable from a mean. A model that cannot supply per-draw losses is\nlisted as ``UNRANKED`` rather than being ranked on an aggregate.\n",
+        "log_loss",
+        "loss",
+        "loss_name",
+        "weighting 'ece' without a sharpness term is degenerate: a constant predictor attains ece=0 by construction. Add a brier/log_loss/interval_score weight."
+      ]
+    },
+    {
+      "path": "src/loto/evaluation/metrics.py",
+      "classes": [],
+      "functions": [
+        "brier_score",
+        "evaluate_draws",
+        "expected_calibration_error",
+        "log_loss",
+        "paired_draw_bootstrap"
+      ],
+      "called_attributes": [
+        "abs",
+        "any",
+        "array",
+        "asarray",
+        "clip",
+        "default_rng",
+        "integers",
+        "linspace",
+        "log",
+        "mean",
+        "percentile",
+        "ravel"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "dtype",
+        "size",
+        "strict"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/evaluation/metrics_general.py",
+      "classes": [],
+      "functions": [
+        "_as_matrix",
+        "evaluate_all",
+        "expected_calibration_error",
+        "mase",
+        "positional_metrics",
+        "probabilistic_metrics",
+        "ranking_metrics",
+        "reliability_curve",
+        "set_overlap_metrics",
+        "smape"
+      ],
+      "called_attributes": [
+        "abs",
+        "all",
+        "any",
+        "append",
+        "arange",
+        "argsort",
+        "array",
+        "asarray",
+        "astype",
+        "clip",
+        "linspace",
+        "log",
+        "log2",
+        "marginal_base_rate",
+        "max",
+        "mean",
+        "median",
+        "min",
+        "ravel",
+        "reshape",
+        "sort",
+        "sqrt",
+        "std",
+        "sum",
+        "update",
+        "where"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "bins",
+        "ddof",
+        "dtype",
+        "kind",
+        "strict",
+        "tau"
+      ],
+      "relevant_strings": [
+        "Brier / log loss / ECE over the marginal inclusion vector.\n\n    ``targets`` and ``probabilities`` both have shape ``(n_draws, inclusion_vector_length)``.\n    The uniform reference is included so that a Brier score can be read as a skill score\n    rather than an absolute number nobody can interpret.\n    ",
+        "Game-agnostic evaluation metrics.\n\nReplaces the Loto7-only ``metrics.py`` / ``detailed_metrics.py`` pair, both of which raised\non any array whose second axis was not exactly 7. Every shape here is derived from\n:class:`~loto.game.geometry.GameGeometry`.\n\nMetric families:\n\n* positional regression -- MAE / MSE / RMSE / median AE, per slot and pooled\n* tolerance hits -- within-tau at element and row level, per slot\n* set overlap -- hits@k and its full distribution (``select`` games only; a digit game has\n  no meaningful set overlap because digits repeat)\n* exact-match -- per slot and per row, plus the theoretical rate for reference\n* probabilistic -- Brier, log loss, ECE, reliability curve, plus MASE/sMAPE against the\n  seasonal-naive reference\n* ranking -- precision/recall/NDCG at k over the marginal inclusion vector\n",
+        "log_loss",
+        "log_loss_skill_score",
+        "log_loss_uniform_reference"
+      ]
+    },
+    {
+      "path": "src/loto/evaluation/multiplicity.py",
+      "classes": [
+        "Correction"
+      ],
+      "functions": [
+        "_validate",
+        "benjamini_hochberg",
+        "correct",
+        "family_wise_false_positive_probability",
+        "holm",
+        "n_rejected",
+        "paired_bootstrap_p",
+        "romano_wolf",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "abs",
+        "any",
+        "argsort",
+        "array",
+        "asarray",
+        "atleast_2d",
+        "default_rng",
+        "empty",
+        "integers",
+        "max",
+        "mean",
+        "ones",
+        "pop",
+        "quantile",
+        "ravel",
+        "sqrt",
+        "std",
+        "tolist",
+        "where"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "ddof",
+        "dtype",
+        "frozen",
+        "kind",
+        "size"
+      ],
+      "relevant_strings": [
+        "Paired bootstrap for the mean loss difference (candidate - baseline).\n\n    ``alternative='less'`` tests whether the candidate has *lower* loss. Returns the point\n    estimate, a bootstrap 95% interval and the one- or two-sided p-value.\n    ",
+        "Romano-Wolf step-down bootstrap. FWER <= alpha, exploits cross-model correlation.\n\n    ``losses_candidates`` has shape ``(m, n)``: per-draw loss for each of ``m`` candidates.\n    ``losses_baseline`` has shape ``(n,)``. Lower loss is better, so the one-sided\n    alternative is \"candidate loss < baseline loss\".\n\n    The bootstrap resamples *draws* (columns), which preserves the correlation between\n    candidates induced by their sharing the same evaluation draws.\n    ",
+        "losses_candidates must have shape (m, n) matching baseline (n,)",
+        "paired losses must align",
+        "romano_wolf requires loss matrices; call romano_wolf() directly"
+      ]
+    },
+    {
+      "path": "src/loto/evaluation/pace_gate.py",
+      "classes": [
+        "PaceConfig",
+        "PaceGate"
+      ],
+      "functions": [
+        "__init__",
+        "_lambda",
+        "decision",
+        "state",
+        "update"
+      ],
+      "called_attributes": [
+        "_lambda",
+        "asarray",
+        "clip",
+        "decision",
+        "exp",
+        "log",
+        "mean",
+        "state"
+      ],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/evaluation/promotion.py",
+      "classes": [
+        "PromotionInputs"
+      ],
+      "functions": [
+        "assess_promotion"
+      ],
+      "called_attributes": [
+        "extend",
+        "items"
+      ],
+      "keyword_arguments": [
+        "candidate_model_id",
+        "champion_model_id",
+        "decision",
+        "frozen",
+        "gates",
+        "reasons"
+      ],
+      "relevant_strings": [
+        "logloss_noninferior"
+      ]
+    },
+    {
+      "path": "src/loto/evaluation/protocol.py",
+      "classes": [
+        "ProtocolMismatch",
+        "ProtocolSpec"
+      ],
+      "functions": [
+        "__init__",
+        "assert_comparable",
+        "canonical",
+        "group_by_protocol",
+        "hash",
+        "protocol_hash",
+        "summary"
+      ],
+      "called_attributes": [
+        "__init__",
+        "append",
+        "canonical",
+        "dumps",
+        "encode",
+        "get",
+        "hexdigest",
+        "items",
+        "join",
+        "setdefault",
+        "sha256"
+      ],
+      "keyword_arguments": [
+        "default_factory",
+        "ensure_ascii",
+        "expected",
+        "found",
+        "frozen",
+        "separators",
+        "sort_keys"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/evaluation/sentinel.py",
+      "classes": [
+        "SentinelVerdict"
+      ],
+      "functions": [
+        "audit_feature_causality",
+        "margin",
+        "permutation_sentinel",
+        "run_sentinel_suite",
+        "time_shift_sentinel",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "abs",
+        "append",
+        "asarray",
+        "default_rng",
+        "flatnonzero",
+        "max",
+        "mean",
+        "nan_to_num",
+        "permutation",
+        "reshape",
+        "std",
+        "to_dict"
+      ],
+      "keyword_arguments": [
+        "baseline",
+        "control",
+        "ddof",
+        "detail",
+        "dtype",
+        "frozen",
+        "n_repeats",
+        "observed",
+        "tolerance",
+        "tripped"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/evaluation/shadow.py",
+      "classes": [],
+      "functions": [
+        "score_combination"
+      ],
+      "called_attributes": [
+        "abs",
+        "asarray",
+        "mean"
+      ],
+      "keyword_arguments": [
+        "dtype"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/evaluation/splits.py",
+      "classes": [
+        "Fold"
+      ],
+      "functions": [
+        "rolling_folds",
+        "split_development_holdout"
+      ],
+      "called_attributes": [
+        "append"
+      ],
+      "keyword_arguments": [
+        "fold_id",
+        "frozen",
+        "test_end",
+        "test_start",
+        "train_end",
+        "train_start"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/evaluation/theory.py",
+      "classes": [
+        "LotterySpec"
+      ],
+      "functions": [
+        "_mae",
+        "_window",
+        "position_pmf",
+        "solve_within_tau_optimum",
+        "total"
+      ],
+      "called_attributes": [
+        "append",
+        "get",
+        "items",
+        "values"
+      ],
+      "keyword_arguments": [
+        "frozen",
+        "key",
+        "strict"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/evaluation/theory_general.py",
+      "classes": [
+        "TheoryBounds"
+      ],
+      "functions": [
+        "_mae",
+        "_mse",
+        "_window",
+        "bounds_table",
+        "position_pmf",
+        "theoretical_bounds",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "append",
+        "get",
+        "is_legal",
+        "items",
+        "to_dict",
+        "values"
+      ],
+      "keyword_arguments": [
+        "expected_hits",
+        "family",
+        "frozen",
+        "game",
+        "key",
+        "legal_median",
+        "legal_tau",
+        "mae_floor",
+        "mean_prediction",
+        "median_prediction",
+        "median_within_tau",
+        "mse_floor",
+        "outcome_space",
+        "positions",
+        "single_ticket_probability",
+        "tau",
+        "tau_mae",
+        "tau_prediction",
+        "universe_size",
+        "within_tau_ceiling"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/events/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/events/publisher.py",
+      "classes": [
+        "EventPublisher"
+      ],
+      "functions": [
+        "__init__",
+        "publish"
+      ],
+      "called_attributes": [
+        "dumps",
+        "flush",
+        "isoformat",
+        "mkdir",
+        "now",
+        "open",
+        "uuid4",
+        "write"
+      ],
+      "keyword_arguments": [
+        "default",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "parents",
+        "sort_keys"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/experiment_config.py",
+      "classes": [
+        "CVConfig",
+        "DataConfig",
+        "ExperimentConfig",
+        "ObjectiveConfig",
+        "ObservabilityConfig",
+        "RuntimeConfig",
+        "SearchConfig"
+      ],
+      "functions": [
+        "config_hash",
+        "from_file",
+        "models_nonempty_unique",
+        "validate_sizes",
+        "windows_positive_unique",
+        "write_resolved"
+      ],
+      "called_attributes": [
+        "dumps",
+        "encode",
+        "fromkeys",
+        "hexdigest",
+        "mkdir",
+        "model_dump",
+        "model_validate",
+        "read_text",
+        "safe_dump",
+        "safe_load",
+        "sha256",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "allow_unicode",
+        "default_factory",
+        "encoding",
+        "exist_ok",
+        "extra",
+        "mode",
+        "parents",
+        "separators",
+        "sort_keys"
+      ],
+      "relevant_strings": [
+        "auto",
+        "optuna",
+        "ray"
+      ]
+    },
+    {
+      "path": "src/loto/features/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/features/hash.py",
+      "classes": [],
+      "functions": [
+        "frame_hash",
+        "protocol_hash",
+        "stable_hash"
+      ],
+      "called_attributes": [
+        "copy",
+        "dumps",
+        "encode",
+        "hexdigest",
+        "reindex",
+        "sha256",
+        "to_json"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "date_format",
+        "default",
+        "double_precision",
+        "ensure_ascii",
+        "orient",
+        "separators",
+        "sort_keys"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/features/legacy.py",
+      "classes": [],
+      "functions": [
+        "_add_rolling",
+        "_consecutive_pairs",
+        "_int_values",
+        "_longest_consecutive_run",
+        "_prime_set",
+        "_shannon_entropy",
+        "make_draw_features",
+        "make_occurrence_features"
+      ],
+      "called_attributes": [
+        "DataFrame",
+        "Series",
+        "add",
+        "any",
+        "append",
+        "astype",
+        "concat",
+        "copy",
+        "eq",
+        "fillna",
+        "from_records",
+        "get",
+        "isna",
+        "iterrows",
+        "log2",
+        "mean",
+        "reset_index",
+        "rolling",
+        "shift",
+        "sort_values",
+        "sqrt",
+        "std",
+        "sum",
+        "to_numeric",
+        "values"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "ddof",
+        "drop",
+        "errors",
+        "index",
+        "min_periods",
+        "na_position",
+        "strict"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/features/pipeline.py",
+      "classes": [],
+      "functions": [
+        "_feature_rows_for_index",
+        "_selection_matrix",
+        "build_candidate_features",
+        "build_next_candidate_features",
+        "feature_manifest"
+      ],
+      "called_attributes": [
+        "DataFrame",
+        "append",
+        "arange",
+        "asarray",
+        "astype",
+        "encode",
+        "full",
+        "hexdigest",
+        "items",
+        "iterrows",
+        "itertuples",
+        "max",
+        "mean",
+        "reset_index",
+        "sha256",
+        "sum",
+        "to_json",
+        "update",
+        "where",
+        "zeros"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "data_version",
+        "date_format",
+        "drop",
+        "dtype",
+        "exp_den",
+        "exp_num",
+        "feature_set_id",
+        "idx",
+        "index",
+        "last_seen",
+        "name",
+        "orient",
+        "row_count",
+        "selected",
+        "sha256",
+        "windows"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/features/point_in_time.py",
+      "classes": [],
+      "functions": [
+        "point_in_time_join"
+      ],
+      "called_attributes": [
+        "any",
+        "copy",
+        "duplicated",
+        "fillna",
+        "merge_asof",
+        "sort_values",
+        "to_datetime"
+      ],
+      "keyword_arguments": [
+        "allow_exact_matches",
+        "by",
+        "direction",
+        "left_on",
+        "right_on",
+        "utc"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/features/registry.py",
+      "classes": [
+        "FeatureRegistry"
+      ],
+      "functions": [
+        "get",
+        "manifest",
+        "names",
+        "register",
+        "validate_frame"
+      ],
+      "called_attributes": [
+        "to_dict",
+        "values"
+      ],
+      "keyword_arguments": [
+        "default_factory"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/features/spec.py",
+      "classes": [
+        "Availability",
+        "FeatureSpec"
+      ],
+      "functions": [
+        "to_dict"
+      ],
+      "called_attributes": [],
+      "keyword_arguments": [
+        "frozen",
+        "slots"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/game/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/game/geometry.py",
+      "classes": [
+        "GameGeometry"
+      ],
+      "functions": [
+        "__post_init__",
+        "ascending",
+        "bonus_column_names",
+        "column_names",
+        "distinct",
+        "expected_inclusion_mass",
+        "geometry_for",
+        "geometry_from_spec",
+        "inclusion_vector_length",
+        "is_legal",
+        "k",
+        "known_games",
+        "marginal_base_rate",
+        "n",
+        "outcome_space",
+        "to_dict",
+        "universe_size",
+        "validate_outcome",
+        "values"
+      ],
+      "called_attributes": [
+        "startswith",
+        "validate_outcome"
+      ],
+      "keyword_arguments": [
+        "bonus_count",
+        "display_name",
+        "draw_weekdays",
+        "family",
+        "frozen",
+        "key",
+        "maxsize",
+        "positions",
+        "strict",
+        "value_max",
+        "value_min"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/argument_verifier.py",
+      "classes": [],
+      "functions": [
+        "_read_effective",
+        "merge_effective_properties",
+        "verify_arguments"
+      ],
+      "called_attributes": [
+        "append",
+        "get",
+        "items"
+      ],
+      "keyword_arguments": [],
+      "relevant_strings": [
+        "gpus"
+      ]
+    },
+    {
+      "path": "src/loto/models/artifact_store.py",
+      "classes": [],
+      "functions": [
+        "artifact_summary",
+        "load_pickle_model",
+        "model_manifest",
+        "save_pickle_model",
+        "utc_now_iso"
+      ],
+      "called_attributes": [
+        "append",
+        "as_posix",
+        "dump",
+        "encode",
+        "exists",
+        "fromhex",
+        "hexdigest",
+        "is_dir",
+        "is_file",
+        "isoformat",
+        "load",
+        "mkdir",
+        "now",
+        "open",
+        "relative_to",
+        "rglob",
+        "sha256",
+        "stat",
+        "update"
+      ],
+      "keyword_arguments": [
+        "exist_ok",
+        "parents",
+        "protocol"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/base.py",
+      "classes": [
+        "ModelAdapter",
+        "ModelCapabilities"
+      ],
+      "functions": [
+        "fit",
+        "get_metadata",
+        "get_resource_requirements",
+        "load",
+        "predict",
+        "save",
+        "validate_request"
+      ],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": [
+        "gpu"
+      ]
+    },
+    {
+      "path": "src/loto/models/baselines.py",
+      "classes": [
+        "FrequencyCandidateAdapter",
+        "LogisticCandidateAdapter",
+        "UniformCandidateAdapter"
+      ],
+      "functions": [
+        "__init__",
+        "__init__",
+        "fit",
+        "fit",
+        "fit",
+        "load",
+        "predict",
+        "predict",
+        "predict",
+        "save"
+      ],
+      "called_attributes": [
+        "agg",
+        "asarray",
+        "clip",
+        "copy",
+        "dumps",
+        "fit",
+        "full",
+        "groupby",
+        "is_numeric_dtype",
+        "issubset",
+        "loads",
+        "map",
+        "mkdir",
+        "nunique",
+        "predict_proba",
+        "read_text",
+        "tolist",
+        "validate_request",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "C",
+        "class_weight",
+        "dtype",
+        "exist_ok",
+        "max_iter",
+        "parents",
+        "random_state"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/catalog.py",
+      "classes": [
+        "ModelSpec"
+      ],
+      "functions": [
+        "available",
+        "get_model_spec",
+        "list_model_specs",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "get"
+      ],
+      "keyword_arguments": [
+        "capabilities",
+        "default_factory",
+        "frozen",
+        "notes"
+      ],
+      "relevant_strings": [
+        "AutoARIMA",
+        "AutoAutoformer",
+        "AutoBiTCN",
+        "AutoCES",
+        "AutoDLinear",
+        "AutoDeepAR",
+        "AutoDeepNPTS",
+        "AutoDilatedRNN",
+        "AutoETS",
+        "AutoFEDformer",
+        "AutoGRU",
+        "AutoHINT",
+        "AutoInformer",
+        "AutoKAN",
+        "AutoLSTM",
+        "AutoMLP",
+        "AutoMLPMultivariate",
+        "AutoNBEATS",
+        "AutoNBEATSx",
+        "AutoNHITS",
+        "AutoNLinear",
+        "AutoPatchTST",
+        "AutoRMoK",
+        "AutoRNN",
+        "AutoSOFTS",
+        "AutoStemGNN",
+        "AutoTCN",
+        "AutoTFT",
+        "AutoTSMixer",
+        "AutoTSMixerx",
+        "AutoTheta",
+        "AutoTiDE",
+        "AutoTimeMixer",
+        "AutoTimeXer",
+        "AutoTimesNet",
+        "AutoVanillaTransformer",
+        "AutoiTransformer",
+        "Official NeuralForecast AutoModel; backend/search resolved at runtime",
+        "auto_hpo",
+        "autogluon",
+        "autogluon-timeseries",
+        "autogluon/chronos-2-small",
+        "automl",
+        "exogenous",
+        "gpu",
+        "gpu_optional",
+        "neuralforecast",
+        "neuralforecast_auto",
+        "nf-auto-autoformer",
+        "nf-auto-bitcn",
+        "nf-auto-deepar",
+        "nf-auto-deepnpts",
+        "nf-auto-dilatedrnn",
+        "nf-auto-dlinear",
+        "nf-auto-fedformer",
+        "nf-auto-gru",
+        "nf-auto-hint",
+        "nf-auto-informer",
+        "nf-auto-itransformer",
+        "nf-auto-kan",
+        "nf-auto-lstm",
+        "nf-auto-mlp",
+        "nf-auto-mlp-multivariate",
+        "nf-auto-nbeats",
+        "nf-auto-nbeatsx",
+        "nf-auto-nhits",
+        "nf-auto-nlinear",
+        "nf-auto-patchtst",
+        "nf-auto-rmok",
+        "nf-auto-rnn",
+        "nf-auto-softs",
+        "nf-auto-stemgnn",
+        "nf-auto-tcn",
+        "nf-auto-tft",
+        "nf-auto-tide",
+        "nf-auto-timemixer",
+        "nf-auto-timesnet",
+        "nf-auto-timexer",
+        "nf-auto-tsmixer",
+        "nf-auto-tsmixerx",
+        "nf-auto-vanilla-transformer",
+        "optuna",
+        "ray",
+        "stats-autoarima",
+        "stats-autoces",
+        "stats-autoets",
+        "stats-autotheta"
+      ]
+    },
+    {
+      "path": "src/loto/models/catalog_full.py",
+      "classes": [
+        "ModelEntry"
+      ],
+      "functions": [
+        "_builtin_and_sklearn",
+        "_framework_tier",
+        "_sf_family",
+        "build_catalog",
+        "catalog_by_library",
+        "catalog_counts",
+        "revision_status",
+        "to_row"
+      ],
+      "called_attributes": [
+        "add",
+        "append",
+        "extend",
+        "get",
+        "items",
+        "join",
+        "lower",
+        "setdefault"
+      ],
+      "keyword_arguments": [
+        "capabilities",
+        "class_name",
+        "default_factory",
+        "default_params",
+        "family",
+        "frozen",
+        "library",
+        "license",
+        "model_id",
+        "multivariate",
+        "notes",
+        "package",
+        "priority",
+        "repo_id",
+        "requires_n_series",
+        "revision",
+        "supports_exogenous",
+        "supports_probabilistic",
+        "task"
+      ],
+      "relevant_strings": [
+        "AutoARIMA",
+        "AutoAutoformer",
+        "AutoBiTCN",
+        "AutoCES",
+        "AutoCatboost",
+        "AutoDLinear",
+        "AutoDeepAR",
+        "AutoDeepNPTS",
+        "AutoDilatedRNN",
+        "AutoETS",
+        "AutoElasticNet",
+        "AutoFEDformer",
+        "AutoGRU",
+        "AutoHINT",
+        "AutoInformer",
+        "AutoKAN",
+        "AutoLSTM",
+        "AutoLasso",
+        "AutoLightGBM",
+        "AutoLinearRegression",
+        "AutoMFLES",
+        "AutoMLForecast wrapper with upstream default search space",
+        "AutoMLP",
+        "AutoMLPMultivariate",
+        "AutoNBEATS",
+        "AutoNBEATSx",
+        "AutoNHITS",
+        "AutoNLinear",
+        "AutoPatchTST",
+        "AutoRMoK",
+        "AutoRNN",
+        "AutoRandomForest",
+        "AutoRegressive",
+        "AutoRidge",
+        "AutoSOFTS",
+        "AutoSOFTSSharp",
+        "AutoStemGNN",
+        "AutoTBATS",
+        "AutoTCN",
+        "AutoTFT",
+        "AutoTSMixer",
+        "AutoTSMixerx",
+        "AutoTheta",
+        "AutoTiDE",
+        "AutoTimeMixer",
+        "AutoTimeXer",
+        "AutoTimesNet",
+        "AutoVanillaTransformer",
+        "AutoXGBoost",
+        "AutoXLinear",
+        "Autoformer",
+        "AutoiTransformer",
+        "AutonLab/MOMENT-1-large",
+        "AutonLab/MOMENT-1-small",
+        "AutoxLSTM",
+        "Complete model registry, built programmatically from primary-source name lists.\n\nConstitution principle I: counts are *computed*, never typed. Every list below is a verbatim\ntranscription of an upstream ``__all__`` at the recorded revision, so a drift between this\nfile and upstream is detectable by re-reading the upstream ``__all__``.\n\nPrimary sources (retrieved 2026-07-30):\n\n* ``neuralforecast/models/__init__.py``  -> :data:`NEURALFORECAST_MODELS`      (37)\n* ``neuralforecast/auto.py``             -> :data:`NEURALFORECAST_AUTOMODELS`   (36)\n* ``statsforecast/models.py``            -> :data:`STATSFORECAST_MODELS`        (41)\n* ``mlforecast/auto.py``                 -> :data:`MLFORECAST_AUTOMODELS`       (8)\n* ``hierarchicalforecast/methods.py``    -> :data:`RECONCILIATION_METHODS`      (10)\n* ``huggingface.co/models?pipeline_tag=time-series-forecasting`` -> :data:`TSFM_MODELS`\n\nTSFM entries carry ``repo_id`` but ``revision=None``. A ``None`` revision is deliberately\n*not* filled with a plausible-looking SHA: an unverified commit hash is worse than an\nexplicit gap, because it makes ``protocol_hash`` look reproducible when it is not. Run\n``loto models pin`` against a network-enabled environment to resolve them.\n",
+        "MLFORECAST_AUTOMODELS",
+        "NEURALFORECAST_AUTOMODELS",
+        "NEURALFORECAST_MODELS",
+        "autogluon",
+        "autogluon-timeseries",
+        "automl",
+        "exogenous",
+        "github.com/Nixtla/mlforecast @ main:mlforecast/auto.py",
+        "github.com/Nixtla/neuralforecast @ main:neuralforecast/auto.py",
+        "github.com/Nixtla/neuralforecast @ main:neuralforecast/models/__init__.py",
+        "mfauto-",
+        "mlforecast_auto",
+        "neuralforecast",
+        "neuralforecast_auto",
+        "nfauto-",
+        "official AutoModel; backend/search resolved at runtime",
+        "supports_exogenous"
+      ]
+    },
+    {
+      "path": "src/loto/models/exogenous_adapters.py",
+      "classes": [
+        "ExogenousPayload"
+      ],
+      "functions": [
+        "chronos2_predict_kwargs",
+        "mlforecast_fit_kwargs",
+        "mlforecast_predict_kwargs",
+        "neuralforecast_payload",
+        "timesfm_covariates"
+      ],
+      "called_attributes": [
+        "astype",
+        "is_numeric_dtype",
+        "tolist"
+      ],
+      "keyword_arguments": [
+        "frozen"
+      ],
+      "relevant_strings": [
+        "future_exogenous is empty"
+      ]
+    },
+    {
+      "path": "src/loto/models/factory.py",
+      "classes": [
+        "PredictionResult",
+        "RuntimeModel",
+        "WorkerGateway"
+      ],
+      "functions": [
+        "__init__",
+        "_construct_estimator",
+        "_prepare_query_features",
+        "build_job",
+        "fit_candidate",
+        "fit_position",
+        "load",
+        "numeric_feature_columns",
+        "predict_candidate",
+        "predict_position",
+        "save",
+        "write_job"
+      ],
+      "called_attributes": [
+        "_construct_estimator",
+        "_prepare_query_features",
+        "asarray",
+        "astype",
+        "clip",
+        "decision_function",
+        "dump",
+        "dumps",
+        "exp",
+        "fillna",
+        "fit",
+        "import_module",
+        "is_numeric_dtype",
+        "join",
+        "load",
+        "mkdir",
+        "open",
+        "predict",
+        "predict_proba",
+        "ravel",
+        "replace",
+        "setdefault",
+        "to_dict",
+        "to_numpy",
+        "tolist",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "candidate_probabilities",
+        "dtype",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "indent",
+        "metadata",
+        "parents",
+        "position_values",
+        "random_state",
+        "regression",
+        "seed"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/forecast_input.py",
+      "classes": [
+        "ForecastInput"
+      ],
+      "functions": [
+        "build",
+        "manifest"
+      ],
+      "called_attributes": [
+        "copy",
+        "get",
+        "isoformat",
+        "manifest",
+        "names"
+      ],
+      "keyword_arguments": [
+        "cutoff",
+        "cutoff_draw",
+        "cutoff_time",
+        "feature_columns",
+        "feature_manifest",
+        "feature_set_hash",
+        "frozen",
+        "future_exogenous",
+        "historical_exogenous",
+        "history",
+        "source_data_hash",
+        "static_exogenous",
+        "target_columns",
+        "transforms"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/lifecycle.py",
+      "classes": [
+        "ModelLifecycleResult"
+      ],
+      "functions": [
+        "candidate_metrics",
+        "run_candidate_lifecycle",
+        "to_dict",
+        "validate_prediction"
+      ],
+      "called_attributes": [
+        "abs",
+        "all",
+        "allclose",
+        "append",
+        "argsort",
+        "asarray",
+        "clip",
+        "copy",
+        "fit_candidate",
+        "get",
+        "isfinite",
+        "mean",
+        "median",
+        "mkdir",
+        "perf_counter",
+        "predict_candidate",
+        "reshape",
+        "save",
+        "sqrt",
+        "to_dict",
+        "tolist",
+        "zeros"
+      ],
+      "keyword_arguments": [
+        "argument_evidence",
+        "artifact_path",
+        "atol",
+        "default_factory",
+        "device",
+        "dtype",
+        "elapsed_seconds",
+        "errors",
+        "exist_ok",
+        "expected_shape",
+        "final_status",
+        "fit_status",
+        "gpu_required",
+        "library",
+        "library_version",
+        "load_status",
+        "load_test_status",
+        "metrics",
+        "model_artifact",
+        "model_id",
+        "params",
+        "parents",
+        "precision",
+        "predict_status",
+        "prediction_test_status",
+        "predictions",
+        "properties_after_fit",
+        "properties_after_load",
+        "properties_after_retrain",
+        "properties_before",
+        "reloaded_predictions",
+        "resource_evidence",
+        "retrain_status",
+        "retrained_predictions",
+        "rtol",
+        "save_status",
+        "seed",
+        "source",
+        "windows"
+      ],
+      "relevant_strings": [
+        "GPU_NOT_USED",
+        "GPU_PARTIAL",
+        "log_loss"
+      ]
+    },
+    {
+      "path": "src/loto/models/neuralforecast_adapter.py",
+      "classes": [
+        "AutoModelPlan",
+        "AutoModelRequest"
+      ],
+      "functions": [
+        "_build_search_algorithm",
+        "choose_backend",
+        "construct_auto_model",
+        "resolve_auto_model_plan"
+      ],
+      "called_attributes": [
+        "CmaEsSampler",
+        "RandomSampler",
+        "TPESampler",
+        "append",
+        "pop"
+      ],
+      "keyword_arguments": [
+        "cpus",
+        "default_factory",
+        "frozen",
+        "gpus",
+        "multivariate",
+        "num_samples",
+        "parallel_trials",
+        "random_state",
+        "requested",
+        "seed"
+      ],
+      "relevant_strings": [
+        "AutoFEDformer",
+        "AutoMLPMultivariate",
+        "AutoRMoK",
+        "AutoSOFTS",
+        "AutoStemGNN",
+        "AutoTSMixer",
+        "AutoTSMixerx",
+        "AutoTimeMixer",
+        "AutoTimeXer",
+        "AutoTimesNet",
+        "AutoiTransformer",
+        "NeuralForecast does not expose ",
+        "Ray OptunaSearch",
+        "Return ``(sampler_or_None, stable_name)``.\n\n    Constitution principle II: the previous implementation wrapped the whole body in\n    ``except Exception: return None, \"library_default\"``. That swallowed genuine bugs\n    (a typo in a sampler name, a version incompatibility, a bad seed type) and reported them\n    as an intentional fallback, and it made the test suite's verdict depend on whether optuna\n    happened to be installed.\n\n    Only ``ImportError`` is a legitimate fallback -- it means the optional package is absent,\n    which is a declared state. Every other exception propagates.\n    ",
+        "Validated planning layer for NeuralForecast AutoModels.\n\nPlan resolution is dependency-light. Heavy optional imports occur only when an\nactual model is constructed, allowing catalog and configuration tests on CPU-only\nhosts.\n",
+        "auto",
+        "fixed_optuna_config",
+        "library_default(optuna_absent)",
+        "library_default(ray_absent)",
+        "neuralforecast is not installed; install the full extra",
+        "optuna",
+        "ray"
+      ]
+    },
+    {
+      "path": "src/loto/models/position.py",
+      "classes": [
+        "PositionFrequencyAdapter"
+      ],
+      "functions": [
+        "__init__",
+        "fit",
+        "predict_matrix"
+      ],
+      "called_attributes": [
+        "copy",
+        "full",
+        "reindex",
+        "sum",
+        "to_numpy",
+        "value_counts"
+      ],
+      "keyword_arguments": [
+        "dtype",
+        "fill_value"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/property_inspector.py",
+      "classes": [],
+      "functions": [
+        "_effective_parameters",
+        "_library_version",
+        "_not_exposed",
+        "_serializable_parameter_value",
+        "inspect_model_properties"
+      ],
+      "called_attributes": [
+        "get",
+        "items",
+        "startswith",
+        "update",
+        "version"
+      ],
+      "keyword_arguments": [
+        "deep"
+      ],
+      "relevant_strings": [
+        "auto_hpo",
+        "gpu",
+        "gpu_optional",
+        "gpu_supported",
+        "loss",
+        "ray"
+      ]
+    },
+    {
+      "path": "src/loto/models/providers/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/providers/base.py",
+      "classes": [
+        "FoundationProvider",
+        "FoundationProviderError"
+      ],
+      "functions": [
+        "__init__",
+        "__init__",
+        "close",
+        "fit_or_prepare",
+        "inspect_properties",
+        "load",
+        "load_saved",
+        "predict",
+        "retrain",
+        "save",
+        "validate_environment"
+      ],
+      "called_attributes": [
+        "__init__",
+        "exists",
+        "mkdir",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "encoding",
+        "exist_ok",
+        "parents"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/providers/chronos.py",
+      "classes": [
+        "ChronosProvider"
+      ],
+      "functions": [
+        "_fallback_cached_snapshot",
+        "_model_name",
+        "_revision",
+        "_sha256",
+        "_weight_files",
+        "inspect_properties",
+        "load",
+        "load_saved",
+        "predict",
+        "resolve_model",
+        "save",
+        "save_reference",
+        "validate_environment"
+      ],
+      "called_attributes": [
+        "_fallback_cached_snapshot",
+        "_model_name",
+        "_revision",
+        "_sha256",
+        "_weight_files",
+        "append",
+        "asarray",
+        "cpu",
+        "detach",
+        "dumps",
+        "exists",
+        "from_pretrained",
+        "get",
+        "hexdigest",
+        "inspect_properties",
+        "is_available",
+        "is_dir",
+        "is_file",
+        "iterdir",
+        "load",
+        "loads",
+        "median",
+        "mkdir",
+        "numpy",
+        "open",
+        "predict",
+        "read",
+        "read_text",
+        "relative_to",
+        "replace",
+        "reshape",
+        "resolve_model",
+        "rglob",
+        "save_reference",
+        "sha256",
+        "stat",
+        "tensor",
+        "to_numpy",
+        "unsqueeze",
+        "update",
+        "validate_environment",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "allow_patterns",
+        "axis",
+        "device_map",
+        "dtype",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "indent",
+        "key",
+        "local_files_only",
+        "parents",
+        "prediction_length",
+        "repo_id",
+        "reverse",
+        "revision",
+        "torch_dtype"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/providers/granite_ttm.py",
+      "classes": [
+        "GraniteTTMProvider"
+      ],
+      "functions": [
+        "_run_provider",
+        "inspect_properties",
+        "load",
+        "load_saved",
+        "predict",
+        "resolve_model",
+        "save",
+        "save_reference",
+        "validate_environment"
+      ],
+      "called_attributes": [
+        "TemporaryDirectory",
+        "_run_provider",
+        "all",
+        "asarray",
+        "dumps",
+        "exists",
+        "get",
+        "inspect_properties",
+        "isfinite",
+        "load",
+        "loads",
+        "mkdir",
+        "read_text",
+        "reshape",
+        "resolve",
+        "run",
+        "save_reference",
+        "startswith",
+        "to_dict",
+        "update",
+        "validate_environment",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "capture_output",
+        "check",
+        "cwd",
+        "dtype",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "expected_shape",
+        "indent",
+        "orient",
+        "parents",
+        "prefix",
+        "text",
+        "timeout"
+      ],
+      "relevant_strings": [
+        "gpu_evidence"
+      ]
+    },
+    {
+      "path": "src/loto/models/providers/moirai.py",
+      "classes": [
+        "MoiraiProvider"
+      ],
+      "functions": [
+        "_run_provider",
+        "inspect_properties",
+        "load",
+        "load_saved",
+        "predict",
+        "save",
+        "validate_environment"
+      ],
+      "called_attributes": [
+        "TemporaryDirectory",
+        "_run_provider",
+        "asarray",
+        "copy",
+        "dumps",
+        "exists",
+        "get",
+        "inspect_properties",
+        "load",
+        "loads",
+        "mkdir",
+        "read_text",
+        "reshape",
+        "resolve",
+        "run",
+        "startswith",
+        "to_dict",
+        "update",
+        "validate_environment",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "capture_output",
+        "check",
+        "cwd",
+        "dtype",
+        "encoding",
+        "ensure_ascii",
+        "env",
+        "exist_ok",
+        "expected_shape",
+        "indent",
+        "orient",
+        "parents",
+        "prefix",
+        "text",
+        "timeout"
+      ],
+      "relevant_strings": [
+        "gpu_evidence"
+      ]
+    },
+    {
+      "path": "src/loto/models/providers/registry.py",
+      "classes": [
+        "ProviderNotImplemented"
+      ],
+      "functions": [
+        "get_foundation_provider",
+        "load",
+        "predict",
+        "validate_environment"
+      ],
+      "called_attributes": [
+        "get",
+        "validate_environment"
+      ],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/providers/subprocess/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/models/providers/subprocess/contract.py",
+      "classes": [
+        "SubprocessProviderContractError"
+      ],
+      "functions": [
+        "__init__",
+        "validate_provider_request",
+        "validate_provider_response"
+      ],
+      "called_attributes": [
+        "__init__",
+        "all",
+        "asarray",
+        "exists",
+        "get",
+        "isfinite"
+      ],
+      "keyword_arguments": [
+        "dtype"
+      ],
+      "relevant_strings": [
+        "GPU_PARTIAL",
+        "gpu_evidence",
+        "gpu_evidence must be present"
+      ]
+    },
+    {
+      "path": "src/loto/models/providers/sundial.py",
+      "classes": [
+        "SundialProvider"
+      ],
+      "functions": [
+        "_run_provider",
+        "inspect_properties",
+        "load",
+        "load_saved",
+        "predict",
+        "save",
+        "validate_environment"
+      ],
+      "called_attributes": [
+        "TemporaryDirectory",
+        "_run_provider",
+        "asarray",
+        "copy",
+        "dumps",
+        "exists",
+        "get",
+        "inspect_properties",
+        "load",
+        "loads",
+        "mkdir",
+        "read_text",
+        "reshape",
+        "resolve",
+        "run",
+        "startswith",
+        "to_dict",
+        "update",
+        "validate_environment",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "capture_output",
+        "check",
+        "cwd",
+        "dtype",
+        "encoding",
+        "ensure_ascii",
+        "env",
+        "exist_ok",
+        "expected_shape",
+        "indent",
+        "orient",
+        "parents",
+        "prefix",
+        "text",
+        "timeout"
+      ],
+      "relevant_strings": [
+        "gpu_evidence"
+      ]
+    },
+    {
+      "path": "src/loto/models/providers/tabpfn_ts.py",
+      "classes": [
+        "TabPFNTSProvider"
+      ],
+      "functions": [
+        "_run_provider",
+        "inspect_properties",
+        "load",
+        "load_saved",
+        "predict",
+        "save",
+        "validate_environment"
+      ],
+      "called_attributes": [
+        "TemporaryDirectory",
+        "_run_provider",
+        "asarray",
+        "astype",
+        "copy",
+        "dumps",
+        "exists",
+        "get",
+        "inspect_properties",
+        "load",
+        "loads",
+        "mkdir",
+        "read_text",
+        "reshape",
+        "resolve",
+        "run",
+        "startswith",
+        "to_dict",
+        "update",
+        "validate_environment",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "capture_output",
+        "check",
+        "cwd",
+        "dtype",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "expected_shape",
+        "indent",
+        "orient",
+        "parents",
+        "prefix",
+        "text",
+        "timeout"
+      ],
+      "relevant_strings": [
+        "gpu_evidence"
+      ]
+    },
+    {
+      "path": "src/loto/models/providers/timesfm.py",
+      "classes": [
+        "TimesFMProvider"
+      ],
+      "functions": [
+        "_run_provider",
+        "inspect_properties",
+        "load",
+        "load_saved",
+        "predict",
+        "save",
+        "validate_environment"
+      ],
+      "called_attributes": [
+        "TemporaryDirectory",
+        "_run_provider",
+        "asarray",
+        "dumps",
+        "exists",
+        "get",
+        "inspect_properties",
+        "load",
+        "loads",
+        "mkdir",
+        "read_text",
+        "reshape",
+        "resolve",
+        "run",
+        "startswith",
+        "to_dict",
+        "update",
+        "validate_environment",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "capture_output",
+        "check",
+        "cwd",
+        "dtype",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "expected_shape",
+        "indent",
+        "orient",
+        "parents",
+        "prefix",
+        "text",
+        "timeout"
+      ],
+      "relevant_strings": [
+        "gpu_evidence"
+      ]
+    },
+    {
+      "path": "src/loto/models/providers/tirex.py",
+      "classes": [
+        "TiRexProvider"
+      ],
+      "functions": [
+        "_run_provider",
+        "inspect_properties",
+        "load",
+        "load_saved",
+        "predict",
+        "save",
+        "validate_environment"
+      ],
+      "called_attributes": [
+        "TemporaryDirectory",
+        "_run_provider",
+        "asarray",
+        "dumps",
+        "exists",
+        "get",
+        "inspect_properties",
+        "load",
+        "loads",
+        "mkdir",
+        "read_text",
+        "reshape",
+        "resolve",
+        "run",
+        "startswith",
+        "to_dict",
+        "update",
+        "validate_environment",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "capture_output",
+        "check",
+        "cwd",
+        "dtype",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "expected_shape",
+        "indent",
+        "orient",
+        "parents",
+        "prefix",
+        "text",
+        "timeout"
+      ],
+      "relevant_strings": [
+        "gpu_evidence"
+      ]
+    },
+    {
+      "path": "src/loto/models/workers.py",
+      "classes": [
+        "PositionSeriesWorker",
+        "WorkerOutput",
+        "WorkerSubprocessError"
+      ],
+      "functions": [
+        "__init__",
+        "__init__",
+        "_autogluon",
+        "_autohint",
+        "_candidate_series",
+        "_candidate_series_frame",
+        "_columns",
+        "_darts",
+        "_foundation",
+        "_gluonts",
+        "_invoke_autogluon_subprocess",
+        "_lag_regression",
+        "_mlforecast",
+        "_neuralforecast",
+        "_neuralforecast_auto",
+        "_reservoir_esn",
+        "_robust_position_sigma",
+        "_statsforecast",
+        "_torch_load_allow_local_checkpoint",
+        "autohint_hierarchy_frame",
+        "canonical_to_long",
+        "forecast",
+        "infer_position_columns",
+        "normalize_worker_predictions",
+        "position_values_to_candidate_probabilities"
+      ],
+      "called_attributes": [
+        "DataFrame",
+        "TemporaryDirectory",
+        "Timestamp",
+        "__init__",
+        "_autogluon",
+        "_autohint",
+        "_candidate_series",
+        "_candidate_series_frame",
+        "_columns",
+        "_darts",
+        "_foundation",
+        "_gluonts",
+        "_invoke_autogluon_subprocess",
+        "_lag_regression",
+        "_mlforecast",
+        "_neuralforecast",
+        "_neuralforecast_auto",
+        "_reservoir_esn",
+        "_statsforecast",
+        "abs",
+        "all",
+        "allclose",
+        "append",
+        "arange",
+        "argsort",
+        "asarray",
+        "ascontiguousarray",
+        "astype",
+        "clip",
+        "close",
+        "copy",
+        "cumcount",
+        "diff",
+        "dropna",
+        "dumps",
+        "exists",
+        "exp",
+        "eye",
+        "fit",
+        "from_series",
+        "full",
+        "get",
+        "groupby",
+        "hexdigest",
+        "import_module",
+        "inspect_properties",
+        "is_available",
+        "isdigit",
+        "isfinite",
+        "items",
+        "itertuples",
+        "load",
+        "loads",
+        "manual_seed",
+        "matrix_rank",
+        "mean",
+        "median",
+        "mkdtemp",
+        "ones",
+        "predict",
+        "prod",
+        "read_text",
+        "reset_index",
+        "reshape",
+        "resolve",
+        "run",
+        "seed",
+        "set_index",
+        "setdefault",
+        "sha256",
+        "sort_values",
+        "startswith",
+        "std",
+        "sum",
+        "to_dict",
+        "to_numeric",
+        "to_numpy",
+        "tobytes",
+        "tolist",
+        "train",
+        "values",
+        "vstack",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "S",
+        "axis",
+        "backend",
+        "batch_size",
+        "capture_output",
+        "check",
+        "config",
+        "context_length",
+        "cpus",
+        "cwd",
+        "device",
+        "df",
+        "distr_output",
+        "distribution",
+        "drop",
+        "dtype",
+        "early_stop_patience_steps",
+        "encoding",
+        "ensure_ascii",
+        "errors",
+        "forecasting_models",
+        "freq",
+        "gpus",
+        "h",
+        "hidden_size",
+        "history",
+        "index",
+        "input_dim",
+        "key",
+        "lags",
+        "level",
+        "lr",
+        "model",
+        "model_artifact_payload",
+        "model_name",
+        "models",
+        "n_jobs",
+        "n_series",
+        "num_batches_per_epoch",
+        "num_layers",
+        "num_parallel_samples",
+        "num_samples",
+        "orient",
+        "output_dim",
+        "parallel_trials",
+        "precision",
+        "prediction_length",
+        "prefix",
+        "random_seed",
+        "random_state",
+        "reconciliation",
+        "refit_with_val",
+        "regression_train_n_points",
+        "ridge",
+        "search_strategy",
+        "seed",
+        "sr",
+        "start",
+        "strict",
+        "task",
+        "text",
+        "timeout",
+        "trainer_kwargs",
+        "units",
+        "val_size",
+        "values",
+        "verbosity"
+      ],
+      "relevant_strings": [
+        "AutoGluon-TimeSeries provider failed",
+        "AutoGluon-TimeSeries provider returned invalid JSON: ",
+        "AutoGluon-TimeSeries provider returned invalid predictions shape=",
+        "AutoGluon-TimeSeries subprocess failed rc=",
+        "AutoHINT",
+        "AutoHINT currently requires exactly 7 coherent position series",
+        "DistributionLoss(Normal)",
+        "auto",
+        "auto_plan",
+        "autogluon",
+        "autogluon-timeseries",
+        "autohint_fixed",
+        "gpu",
+        "gpus",
+        "insufficient history for NeuralForecast validation: rows=",
+        "loss",
+        "loto-autogluon-artifact-",
+        "loto-autogluon-ts-",
+        "missing AutoGluon-TimeSeries environment: ",
+        "missing AutoGluon-TimeSeries lockfile: ",
+        "missing AutoGluon-TimeSeries runner: ",
+        "neuralforecast",
+        "neuralforecast.models",
+        "neuralforecast_auto",
+        "ray_required",
+        "run_autogluon_timeseries_provider.py",
+        "valid_loss"
+      ]
+    },
+    {
+      "path": "src/loto/notifications.py",
+      "classes": [
+        "NotificationConfig",
+        "NotificationSender",
+        "NotifyResult"
+      ],
+      "functions": [
+        "__init__",
+        "_env_bool",
+        "build_run_summary",
+        "format_summary_text",
+        "from_env",
+        "redacted",
+        "send_all",
+        "send_email",
+        "send_file",
+        "send_webhook",
+        "to_dict",
+        "write_notification_report"
+      ],
+      "called_attributes": [
+        "Request",
+        "SMTP",
+        "append",
+        "create_default_context",
+        "dumps",
+        "encode",
+        "exists",
+        "extend",
+        "from_env",
+        "get",
+        "getenv",
+        "is_absolute",
+        "items",
+        "join",
+        "login",
+        "lower",
+        "mkdir",
+        "open",
+        "removeprefix",
+        "send_file",
+        "send_message",
+        "set_content",
+        "split",
+        "starttls",
+        "strip",
+        "to_dict",
+        "urlopen",
+        "write"
+      ],
+      "keyword_arguments": [
+        "context",
+        "data",
+        "default",
+        "email_enabled",
+        "email_to",
+        "enabled",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "file_enabled",
+        "file_path",
+        "frozen",
+        "headers",
+        "method",
+        "parents",
+        "smtp_from",
+        "smtp_host",
+        "smtp_password",
+        "smtp_port",
+        "smtp_starttls",
+        "smtp_user",
+        "timeout",
+        "webhook_enabled",
+        "webhook_url"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/observability/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/observability/evidently_bridge.py",
+      "classes": [
+        "DriftSummary"
+      ],
+      "functions": [
+        "build_drift_summary"
+      ],
+      "called_attributes": [
+        "dict",
+        "get",
+        "run"
+      ],
+      "keyword_arguments": [
+        "current_data",
+        "frozen",
+        "reference_data"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/observability/gpu.py",
+      "classes": [],
+      "functions": [
+        "collect_gpu_evidence",
+        "evaluate_gpu_evidence"
+      ],
+      "called_attributes": [
+        "append",
+        "device_count",
+        "get",
+        "get_device_name",
+        "getpid",
+        "is_available",
+        "max_memory_allocated",
+        "memory_allocated",
+        "parameters",
+        "run",
+        "splitlines",
+        "startswith",
+        "strip",
+        "update"
+      ],
+      "keyword_arguments": [
+        "capture_output",
+        "check",
+        "text",
+        "timeout"
+      ],
+      "relevant_strings": [
+        "--query-compute-apps=pid,gpu_uuid,used_memory",
+        "gpu_count",
+        "gpu_evidence_complete",
+        "gpu_name",
+        "gpu_required"
+      ]
+    },
+    {
+      "path": "src/loto/observability/metrics.py",
+      "classes": [],
+      "functions": [
+        "observe_trial"
+      ],
+      "called_attributes": [
+        "inc",
+        "items",
+        "labels",
+        "observe",
+        "set"
+      ],
+      "keyword_arguments": [
+        "metric",
+        "model_id",
+        "status"
+      ],
+      "relevant_strings": [
+        "Whether GPU evidence gate passed",
+        "loto_gpu_evidence_ok"
+      ]
+    },
+    {
+      "path": "src/loto/observability/mlflow_bridge.py",
+      "classes": [
+        "MlflowBridge"
+      ],
+      "functions": [
+        "__init__",
+        "record_run"
+      ],
+      "called_attributes": [
+        "exists",
+        "is_file",
+        "items",
+        "log_artifact",
+        "log_metrics",
+        "log_params",
+        "set_experiment",
+        "set_tracking_uri",
+        "start_run"
+      ],
+      "keyword_arguments": [
+        "run_name"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/observability/runtime.py",
+      "classes": [
+        "JsonEventLogger",
+        "ResourceMonitor"
+      ],
+      "functions": [
+        "__enter__",
+        "__exit__",
+        "_gpu_snapshot",
+        "_process_snapshot",
+        "_run",
+        "emit",
+        "now_iso",
+        "start",
+        "stop"
+      ],
+      "called_attributes": [
+        "Process",
+        "Thread",
+        "append",
+        "children",
+        "clear",
+        "cpu_percent",
+        "dumps",
+        "getpid",
+        "is_set",
+        "isoformat",
+        "join",
+        "memory_info",
+        "mkdir",
+        "now",
+        "num_threads",
+        "open",
+        "platform",
+        "python_version",
+        "run",
+        "set",
+        "split",
+        "splitlines",
+        "start",
+        "stop",
+        "strip",
+        "update",
+        "wait",
+        "with_suffix",
+        "write"
+      ],
+      "keyword_arguments": [
+        "capture_output",
+        "check",
+        "daemon",
+        "default",
+        "default_factory",
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "init",
+        "interval",
+        "name",
+        "parents",
+        "recursive",
+        "repr",
+        "target",
+        "text",
+        "timeout"
+      ],
+      "relevant_strings": [
+        "--query-gpu=",
+        "gpu",
+        "gpus",
+        "timestamp,index,uuid,name,utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw",
+        "utilization_gpu_percent"
+      ]
+    },
+    {
+      "path": "src/loto/observability/tracing.py",
+      "classes": [
+        "TraceManager"
+      ],
+      "functions": [
+        "__init__",
+        "span"
+      ],
+      "called_attributes": [
+        "add_span_processor",
+        "create",
+        "debug",
+        "getLogger",
+        "get_tracer",
+        "perf_counter",
+        "set_tracer_provider",
+        "start_as_current_span"
+      ],
+      "keyword_arguments": [
+        "attributes",
+        "endpoint",
+        "resource"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/optimization/search.py",
+      "classes": [
+        "SearchResult"
+      ],
+      "functions": [
+        "_ray_space",
+        "_suggest_optuna",
+        "optimize_optuna",
+        "optimize_ray",
+        "trainable",
+        "wrapped"
+      ],
+      "called_attributes": [
+        "CmaEsSampler",
+        "HyperbandPruner",
+        "MedianPruner",
+        "NopPruner",
+        "RandomSampler",
+        "TPESampler",
+        "TuneConfig",
+        "Tuner",
+        "choice",
+        "create_study",
+        "fit",
+        "get",
+        "get_best_result",
+        "items",
+        "loguniform",
+        "optimize",
+        "qrandint",
+        "report",
+        "suggest_categorical",
+        "suggest_float",
+        "suggest_int",
+        "uniform",
+        "with_resources"
+      ],
+      "keyword_arguments": [
+        "catch",
+        "direction",
+        "frozen",
+        "log",
+        "metric",
+        "mode",
+        "multivariate",
+        "n_jobs",
+        "n_trials",
+        "num_samples",
+        "param_space",
+        "pruner",
+        "run_config",
+        "sampler",
+        "seed",
+        "step",
+        "stop",
+        "storage_path",
+        "timeout",
+        "tune_config"
+      ],
+      "relevant_strings": [
+        "gpu",
+        "optuna",
+        "ray"
+      ]
+    },
+    {
+      "path": "src/loto/orchestration/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/orchestration/pipeline.py",
+      "classes": [],
+      "functions": [
+        "_candidate_targets",
+        "run_trusted_vertical_slice",
+        "stage"
+      ],
+      "called_attributes": [
+        "DataFrame",
+        "append",
+        "asarray",
+        "audit",
+        "create_run",
+        "dumps",
+        "fit",
+        "get",
+        "inc",
+        "items",
+        "itertuples",
+        "labels",
+        "max",
+        "mkdir",
+        "model_dump",
+        "now",
+        "predict",
+        "predict_matrix",
+        "publish",
+        "put_file",
+        "read_csv",
+        "record_forecast",
+        "record_run",
+        "record_stage",
+        "record_task",
+        "register_forecast",
+        "register_model",
+        "to_csv",
+        "to_numpy",
+        "to_pydatetime",
+        "update_run",
+        "uuid4",
+        "write_text",
+        "zeros"
+      ],
+      "keyword_arguments": [
+        "candidate_number",
+        "candidates",
+        "combination",
+        "created_at",
+        "current_stage",
+        "data_version",
+        "days",
+        "draw_id",
+        "draw_time",
+        "dtype",
+        "encoding",
+        "ensure_ascii",
+        "error",
+        "exist_ok",
+        "feature_set_id",
+        "forecast_id",
+        "gpu_required",
+        "indent",
+        "index",
+        "metadata",
+        "minutes",
+        "mode",
+        "model_id",
+        "namespace",
+        "output_uri",
+        "parents",
+        "payload",
+        "probability",
+        "rank_score",
+        "release_id",
+        "source",
+        "stage",
+        "status",
+        "top_k",
+        "windows"
+      ],
+      "relevant_strings": [
+        "log_loss"
+      ]
+    },
+    {
+      "path": "src/loto/orchestration/research.py",
+      "classes": [],
+      "functions": [
+        "_candidate_fold",
+        "_metric_bundle",
+        "_position_fold",
+        "_rank_to_combo",
+        "_resume_keys",
+        "_targets",
+        "_tune_candidate_params",
+        "_write_parquet",
+        "objective",
+        "run_research_experiment"
+      ],
+      "called_attributes": [
+        "DataFrame",
+        "agg",
+        "append",
+        "arange",
+        "asarray",
+        "astype",
+        "build_job",
+        "clip",
+        "copy",
+        "dumps",
+        "emit",
+        "exists",
+        "extend",
+        "fit",
+        "fit_candidate",
+        "forecast",
+        "format_exc",
+        "get",
+        "groupby",
+        "insert",
+        "itertuples",
+        "loads",
+        "mean",
+        "mkdir",
+        "perf_counter",
+        "predict_candidate",
+        "predict_matrix",
+        "read_csv",
+        "read_text",
+        "record_run",
+        "reset_index",
+        "rint",
+        "send_all",
+        "sort",
+        "sort_values",
+        "span",
+        "start",
+        "stat",
+        "stop",
+        "to_csv",
+        "to_dict",
+        "to_parquet",
+        "tolist",
+        "update",
+        "uuid4",
+        "write_job",
+        "write_resolved",
+        "zeros"
+      ],
+      "keyword_arguments": [
+        "as_index",
+        "ascending",
+        "base_dir",
+        "capture_gpu",
+        "cpus_per_trial",
+        "device",
+        "drop",
+        "dtype",
+        "encoding",
+        "error",
+        "exist_ok",
+        "expanding",
+        "failed_trials",
+        "failures",
+        "folds",
+        "gap",
+        "gpu_required",
+        "gpus_per_trial",
+        "index",
+        "input_uri",
+        "jobs",
+        "k",
+        "metrics",
+        "min_train_size",
+        "model_id",
+        "otlp_endpoint",
+        "output_dir",
+        "output_uri",
+        "package",
+        "params",
+        "parents",
+        "precision",
+        "pruner",
+        "sampler",
+        "seed",
+        "sort_keys",
+        "source",
+        "status",
+        "successful_trials",
+        "test_size",
+        "timeout_seconds",
+        "top_k",
+        "trial_id",
+        "trials",
+        "windows"
+      ],
+      "relevant_strings": [
+        "gpu",
+        "gpu_certification",
+        "log_loss",
+        "optuna",
+        "ray"
+      ]
+    },
+    {
+      "path": "src/loto/orchestration/research_v3.py",
+      "classes": [
+        "ResearchConfig",
+        "ResearchOutcome"
+      ],
+      "functions": [
+        "__post_init__",
+        "_fit_predict",
+        "_legalise",
+        "_rolling_mean_builder",
+        "_score",
+        "_slot_matrix",
+        "effective_test_draws",
+        "frequency_predictor",
+        "run_research",
+        "statistical_power_note",
+        "theory_median_predictor",
+        "theory_modal_predictor",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "Series",
+        "abs",
+        "append",
+        "arange",
+        "asarray",
+        "canonical",
+        "clip",
+        "column_names",
+        "empty_like",
+        "extend",
+        "items",
+        "mean",
+        "median",
+        "perf_counter",
+        "ravel",
+        "reset_index",
+        "reshape",
+        "rint",
+        "rolling",
+        "shift",
+        "sort",
+        "sqrt",
+        "state",
+        "statistical_power_note",
+        "std",
+        "tile",
+        "to_dict",
+        "to_numpy",
+        "tolist",
+        "update",
+        "vstack"
+      ],
+      "keyword_arguments": [
+        "alpha",
+        "axis",
+        "baseline",
+        "baseline_model_id",
+        "clip",
+        "conformal",
+        "correction_method",
+        "data_version",
+        "default_factory",
+        "development_rows",
+        "drop",
+        "dtype",
+        "elapsed_seconds",
+        "expanding",
+        "exponential_halflives",
+        "family",
+        "feature_windows",
+        "folds",
+        "game",
+        "gap",
+        "geometry",
+        "higher_is_better",
+        "holdout_evaluated",
+        "holdout_rows",
+        "holdout_sealed",
+        "horizon",
+        "index",
+        "is_control",
+        "leaderboard",
+        "loss_name",
+        "metric_set",
+        "metrics",
+        "min_draws",
+        "min_periods",
+        "min_train_size",
+        "model_id",
+        "n_boot",
+        "n_repeats",
+        "notes",
+        "objective_primary",
+        "objective_weights",
+        "pace",
+        "per_draw_loss",
+        "positions",
+        "power_note",
+        "protocol",
+        "protocol_hash",
+        "seeds",
+        "sentinel",
+        "stage_status",
+        "status",
+        "target_mode",
+        "tau",
+        "test_size",
+        "theory",
+        "tolerance",
+        "universe_size",
+        "warnings"
+      ],
+      "relevant_strings": [
+        "Wired research orchestrator.\n\nIn v2.1.0 the statistical-acceptance layer existed but was dead code: ``pace_gate``,\n``promotion``, ``calibration.calibrators`` and ``ensemble.stacking`` were referenced only from\ntests, and ``calibrators`` had 0% coverage. The leaderboard sorted on a raw composite with no\nsignificance test. This module is the integration that was missing.\n\nExecution order, and why:\n\n1. **Protocol fingerprint first.** ``protocol_hash`` is computed before any model runs, so a\n   result can never exist without the conditions that produced it.\n2. **Split holdout before anything reads the data.** The development slice is the only thing\n   handed to models; the holdout is returned as an opaque handle.\n3. **Causality audit** on the feature builder -- exact, not statistical.\n4. **Mandatory controls** are injected whether or not the caller asked for them.\n5. **Per-draw losses retained**, because significance is not recoverable from a mean.\n6. **Leakage sentinel** runs on the winning configuration.\n7. **Multiplicity-corrected leaderboard**; champion is ``None`` unless something actually won.\n8. **Conformal intervals** on the champion (or on the baseline when nothing won).\n9. **PACE gate** consumes the paired hit vectors for an anytime-valid adoption decision.\n\nEvery stage writes a typed status record. A stage that degrades says so.\n"
+      ]
+    },
+    {
+      "path": "src/loto/orchestration/resource_scheduler.py",
+      "classes": [
+        "ResourceLease",
+        "ResourcePolicy",
+        "ResourceScheduler"
+      ],
+      "functions": [
+        "__init__",
+        "acquire",
+        "gpu_resource_status",
+        "release",
+        "report",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "BoundedSemaphore",
+        "Lock",
+        "acquire",
+        "append",
+        "release",
+        "run",
+        "splitlines",
+        "strip",
+        "time",
+        "to_dict"
+      ],
+      "keyword_arguments": [
+        "capture_output",
+        "check",
+        "default_factory",
+        "frozen",
+        "kind",
+        "lease_id",
+        "started_at",
+        "text",
+        "timeout"
+      ],
+      "relevant_strings": [
+        "--query-gpu=memory.free",
+        "GPU trial requested but max_parallel_gpu_models is 0",
+        "WAITING_FOR_GPU_RESOURCE",
+        "gpu",
+        "max_parallel_gpu_models",
+        "max_parallel_gpu_models must be >= 0",
+        "running_gpu_trials"
+      ]
+    },
+    {
+      "path": "src/loto/orchestration/state_machine.py",
+      "classes": [
+        "RunStateMachine"
+      ],
+      "functions": [
+        "can_run",
+        "mark_completed",
+        "next_stage"
+      ],
+      "called_attributes": [
+        "add",
+        "can_run",
+        "index"
+      ],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/plugins/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/plugins/base.py",
+      "classes": [
+        "LotterySpec"
+      ],
+      "functions": [
+        "validate_numbers"
+      ],
+      "called_attributes": [],
+      "keyword_arguments": [
+        "draw_interval_days",
+        "frozen",
+        "max_number",
+        "name",
+        "picks",
+        "strict"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/reconciliation/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/reconciliation/hierarchy.py",
+      "classes": [
+        "Hierarchy"
+      ],
+      "functions": [
+        "_projection",
+        "aggregate",
+        "build_number_hierarchy",
+        "coherence_error",
+        "n_bottom",
+        "n_total",
+        "reconcile",
+        "reconcile_with_hierarchicalforecast"
+      ],
+      "called_attributes": [
+        "abs",
+        "append",
+        "array",
+        "asarray",
+        "clip",
+        "cov",
+        "diag",
+        "extend",
+        "eye",
+        "max",
+        "ones",
+        "pinv",
+        "reshape",
+        "sum",
+        "vstack",
+        "zeros"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "bottom_labels",
+        "ddof",
+        "dtype",
+        "frozen",
+        "labels",
+        "method",
+        "summing_matrix"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/registry/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/registry/artifacts.py",
+      "classes": [
+        "ArtifactStore"
+      ],
+      "functions": [
+        "__init__",
+        "put_file",
+        "put_json",
+        "sha256"
+      ],
+      "called_attributes": [
+        "as_uri",
+        "copy2",
+        "dumps",
+        "exists",
+        "hexdigest",
+        "mkdir",
+        "open",
+        "put_file",
+        "read",
+        "replace",
+        "resolve",
+        "sha256",
+        "stat",
+        "unlink",
+        "update",
+        "with_suffix",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "indent",
+        "missing_ok",
+        "namespace",
+        "parents",
+        "sort_keys"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/registry/database.py",
+      "classes": [
+        "Database"
+      ],
+      "functions": [
+        "__init__",
+        "connect",
+        "placeholder"
+      ],
+      "called_attributes": [
+        "close",
+        "commit",
+        "connect",
+        "mkdir",
+        "removeprefix",
+        "rollback",
+        "startswith"
+      ],
+      "keyword_arguments": [
+        "exist_ok",
+        "parents"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/registry/full.py",
+      "classes": [
+        "PlatformRegistry"
+      ],
+      "functions": [
+        "__init__",
+        "_init_schema",
+        "_now",
+        "audit",
+        "completed_stages",
+        "create_run",
+        "decide_approval",
+        "list_rows",
+        "record_task",
+        "register_forecast",
+        "register_model",
+        "request_approval",
+        "score_forecast",
+        "update_run"
+      ],
+      "called_attributes": [
+        "_init_schema",
+        "_now",
+        "connect",
+        "cursor",
+        "dumps",
+        "execute",
+        "fetchall",
+        "fetchone",
+        "isoformat",
+        "join",
+        "now"
+      ],
+      "keyword_arguments": [
+        "default",
+        "ensure_ascii"
+      ],
+      "relevant_strings": [
+        " AUTOINCREMENT"
+      ]
+    },
+    {
+      "path": "src/loto/registry/release.py",
+      "classes": [],
+      "functions": [
+        "_sha",
+        "create_release_bundle",
+        "verify_release_bundle"
+      ],
+      "called_attributes": [
+        "dumps",
+        "encode",
+        "exists",
+        "get",
+        "hexdigest",
+        "isoformat",
+        "items",
+        "loads",
+        "mkdir",
+        "now",
+        "open",
+        "read",
+        "read_text",
+        "resolve",
+        "sha256",
+        "stat",
+        "update",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "encoding",
+        "ensure_ascii",
+        "exist_ok",
+        "indent",
+        "parents",
+        "separators",
+        "sort_keys"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/registry/sqlite.py",
+      "classes": [
+        "Registry"
+      ],
+      "functions": [
+        "__init__",
+        "_connect",
+        "_init",
+        "list_stage_events",
+        "record_forecast",
+        "record_stage"
+      ],
+      "called_attributes": [
+        "_connect",
+        "_init",
+        "close",
+        "commit",
+        "connect",
+        "dumps",
+        "execute",
+        "executescript",
+        "fetchall",
+        "isoformat",
+        "loads",
+        "mkdir",
+        "now",
+        "rollback"
+      ],
+      "keyword_arguments": [
+        "default",
+        "ensure_ascii",
+        "exist_ok",
+        "parents"
+      ],
+      "relevant_strings": [
+        "\n            PRAGMA journal_mode=WAL;\n            CREATE TABLE IF NOT EXISTS stage_events(\n              id INTEGER PRIMARY KEY AUTOINCREMENT, run_id TEXT NOT NULL, stage TEXT NOT NULL,\n              status TEXT NOT NULL, created_at TEXT NOT NULL, payload_json TEXT NOT NULL);\n            CREATE TABLE IF NOT EXISTS forecasts(\n              forecast_id TEXT PRIMARY KEY, run_id TEXT NOT NULL, created_at TEXT NOT NULL,\n              sealed_json TEXT NOT NULL, verified INTEGER NOT NULL);\n            "
+      ]
+    },
+    {
+      "path": "src/loto/runtime/executor.py",
+      "classes": [
+        "ExecutionResult",
+        "IsolatedExecutor"
+      ],
+      "functions": [
+        "__init__",
+        "run_python_module"
+      ],
+      "called_attributes": [
+        "dumps",
+        "mkdir",
+        "open",
+        "perf_counter",
+        "run",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "check",
+        "elapsed_seconds",
+        "encoding",
+        "env",
+        "exist_ok",
+        "frozen",
+        "indent",
+        "parents",
+        "returncode",
+        "status",
+        "stderr",
+        "stderr_path",
+        "stdout",
+        "stdout_path",
+        "timed_out",
+        "timeout"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/scheduling.py",
+      "classes": [
+        "RunLock",
+        "SchedulePolicy",
+        "ScheduledRun"
+      ],
+      "functions": [
+        "__enter__",
+        "__exit__",
+        "__init__",
+        "acquire",
+        "build_schedule_plan",
+        "from_file",
+        "next_scheduled_run",
+        "release",
+        "write_schedule_plan"
+      ],
+      "called_attributes": [
+        "acquire",
+        "append",
+        "astimezone",
+        "close",
+        "combine",
+        "date",
+        "dumps",
+        "encode",
+        "get",
+        "getpid",
+        "isoformat",
+        "mkdir",
+        "now",
+        "open",
+        "read_text",
+        "release",
+        "safe_load",
+        "unlink",
+        "weekday",
+        "write"
+      ],
+      "keyword_arguments": [
+        "days",
+        "encoding",
+        "exist_ok",
+        "frozen",
+        "key",
+        "missing_ok",
+        "now",
+        "parents",
+        "policy",
+        "tzinfo"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/sealing/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/sealing/manifest.py",
+      "classes": [],
+      "functions": [
+        "_canonical_bytes",
+        "seal_payload",
+        "verify_seal"
+      ],
+      "called_attributes": [
+        "compare_digest",
+        "deepcopy",
+        "dumps",
+        "encode",
+        "hexdigest",
+        "isoformat",
+        "new",
+        "now",
+        "sha256"
+      ],
+      "keyword_arguments": [
+        "default",
+        "ensure_ascii",
+        "separators",
+        "sort_keys"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/security.py",
+      "classes": [
+        "Identity"
+      ],
+      "functions": [
+        "authenticate",
+        "parse_tokens",
+        "require_role"
+      ],
+      "called_attributes": [
+        "compare_digest",
+        "encode",
+        "get",
+        "hexdigest",
+        "items",
+        "sha256",
+        "split",
+        "strip"
+      ],
+      "keyword_arguments": [
+        "frozen"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/strategy/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/strategy/popularity.py",
+      "classes": [
+        "PopularityModel"
+      ],
+      "functions": [
+        "_design_matrix",
+        "combination_features",
+        "expected_value_ratio",
+        "fit_popularity",
+        "predict_log_share",
+        "score_combinations",
+        "suggest_unpopular",
+        "to_dict",
+        "usable"
+      ],
+      "called_attributes": [
+        "add",
+        "any",
+        "append",
+        "arange",
+        "argsort",
+        "array",
+        "asarray",
+        "astype",
+        "atleast_2d",
+        "choice",
+        "default_rng",
+        "diff",
+        "empty",
+        "exp",
+        "eye",
+        "hstack",
+        "log",
+        "log1p",
+        "max",
+        "mean",
+        "min",
+        "ones",
+        "permutation",
+        "predict_log_share",
+        "quantile",
+        "ravel",
+        "solve",
+        "std",
+        "sum",
+        "tolist",
+        "unique",
+        "vstack",
+        "where"
+      ],
+      "keyword_arguments": [
+        "axis",
+        "coefficients",
+        "ddof",
+        "default_factory",
+        "diagnostics",
+        "dtype",
+        "feature_names",
+        "frozen",
+        "game",
+        "intercept",
+        "kind",
+        "n_observations",
+        "permutation_p_value",
+        "r_squared",
+        "replace",
+        "residual_sd",
+        "return_counts",
+        "ridge_lambda",
+        "sales_adjusted",
+        "size",
+        "strict"
+      ],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/validation/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/validation/argument_matrix.py",
+      "classes": [
+        "ArgumentCase",
+        "ArgumentInventory"
+      ],
+      "functions": [
+        "_resolve_class",
+        "_signature_rows",
+        "build_argument_inventory",
+        "build_smoke_cases",
+        "to_dict",
+        "to_dict"
+      ],
+      "called_attributes": [
+        "add",
+        "append",
+        "get",
+        "import_module",
+        "isclass",
+        "items",
+        "setdefault",
+        "signature"
+      ],
+      "keyword_arguments": [
+        "argument",
+        "case_id",
+        "changed_argument",
+        "class_name",
+        "default",
+        "expected_checks",
+        "frozen",
+        "kind",
+        "library",
+        "model_id",
+        "profile",
+        "reason",
+        "requested_params",
+        "required",
+        "smoke_eligible",
+        "smoke_value",
+        "source"
+      ],
+      "relevant_strings": [
+        "gpus",
+        "mlforecast.auto",
+        "mlforecast_auto",
+        "neuralforecast",
+        "neuralforecast.auto",
+        "neuralforecast.models",
+        "neuralforecast_auto",
+        "not mutated automatically; domain or interaction is model-specific"
+      ]
+    },
+    {
+      "path": "src/loto/verify/__init__.py",
+      "classes": [],
+      "functions": [],
+      "called_attributes": [],
+      "keyword_arguments": [],
+      "relevant_strings": []
+    },
+    {
+      "path": "src/loto/verify/integrity.py",
+      "classes": [
+        "IntegrityReport"
+      ],
+      "functions": [
+        "_is_excluded",
+        "file_digest",
+        "generate_manifest",
+        "iter_tracked_files",
+        "main",
+        "ok",
+        "render",
+        "status",
+        "to_dict",
+        "verify_manifest"
+      ],
+      "called_attributes": [
+        "ArgumentParser",
+        "add_argument",
+        "add_parser",
+        "add_subparsers",
+        "append",
+        "as_posix",
+        "dumps",
+        "encode",
+        "endswith",
+        "extend",
+        "get",
+        "hexdigest",
+        "is_dir",
+        "is_file",
+        "is_symlink",
+        "isoformat",
+        "items",
+        "join",
+        "loads",
+        "now",
+        "parse_args",
+        "read",
+        "read_text",
+        "relative_to",
+        "render",
+        "replace",
+        "resolve",
+        "rglob",
+        "sha256",
+        "startswith",
+        "to_dict",
+        "update",
+        "write_text"
+      ],
+      "keyword_arguments": [
+        "action",
+        "default",
+        "default_factory",
+        "description",
+        "dest",
+        "encoding",
+        "ensure_ascii",
+        "generated_at",
+        "help",
+        "indent",
+        "manifest",
+        "manifest_digest_actual",
+        "manifest_digest_expected",
+        "manifest_path",
+        "manifest_schema",
+        "n_tracked",
+        "nargs",
+        "prog",
+        "release",
+        "required",
+        "root",
+        "separators",
+        "sort_keys",
+        "strict_untracked"
+      ],
+      "relevant_strings": []
+    }
+  ]
+}

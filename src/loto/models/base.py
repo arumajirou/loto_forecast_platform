@@ -29,7 +29,7 @@ class ModelAdapter(ABC):
             raise ValueError("training/prediction data must not be empty")
 
     @abstractmethod
-    def fit(self, data: pd.DataFrame) -> "ModelAdapter": ...
+    def fit(self, data: pd.DataFrame) -> ModelAdapter: ...
 
     @abstractmethod
     def predict(self, data: pd.DataFrame) -> pd.DataFrame: ...
@@ -37,7 +37,7 @@ class ModelAdapter(ABC):
     def save(self, path: str | Path) -> Path:
         raise NotImplementedError
 
-    def load(self, path: str | Path) -> "ModelAdapter":
+    def load(self, path: str | Path) -> ModelAdapter:
         raise NotImplementedError
 
     def get_metadata(self) -> dict[str, Any]:

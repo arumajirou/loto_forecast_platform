@@ -66,9 +66,11 @@ def _library_version(package: str | None) -> str | dict[str, str]:
 
 
 def _not_exposed(name: str) -> dict[str, str]:
-    return {"property": name, "status": "NOT_EXPOSED", "reason": "not exposed by this adapter/model"}
-
-
+    return {
+        "property": name,
+        "status": "NOT_EXPOSED",
+        "reason": "not exposed by this adapter/model",
+    }
 
 
 def _serializable_parameter_value(value: Any) -> Any:
@@ -113,26 +115,33 @@ def inspect_model_properties(
 ) -> dict[str, Any]:
     params = dict(params or {})
     result: dict[str, Any] = {name: _not_exposed(name) for name in PROPERTY_NAMES}
-    result.update({
-        "model_id": spec.model_id,
-        "class_name": spec.class_name,
-        "library": spec.library,
-        "library_version": _library_version(spec.package),
-        "task": spec.task,
-        "capabilities": list(spec.capabilities),
-        "device": device or params.get("device", _not_exposed("device")),
-        "precision": precision or params.get("precision", _not_exposed("precision")),
-        "fit_supported": hasattr(model, "fit") if model is not None else spec.task in {"candidate", "position_series", "candidate_series"},
-        "refit_supported": spec.task in {"candidate", "position_series", "candidate_series"},
-        "incremental_supported": hasattr(model, "partial_fit") if model is not None else False,
-        "save_supported": True,
-        "load_supported": True,
-        "predict_supported": hasattr(model, "predict") if model is not None else True,
-        "predict_proba_supported": hasattr(model, "predict_proba") if model is not None else False,
-        "gpu_supported": any(cap in spec.capabilities for cap in ("gpu", "gpu_optional")),
-        "parallel_supported": any(cap in spec.capabilities for cap in ("auto_hpo", "ray")) or spec.library in {"sklearn", "lightgbm"},
-        "effective_parameters": _effective_parameters(model, params),
-    })
+    result.update(
+        {
+            "model_id": spec.model_id,
+            "class_name": spec.class_name,
+            "library": spec.library,
+            "library_version": _library_version(spec.package),
+            "task": spec.task,
+            "capabilities": list(spec.capabilities),
+            "device": device or params.get("device", _not_exposed("device")),
+            "precision": precision or params.get("precision", _not_exposed("precision")),
+            "fit_supported": hasattr(model, "fit")
+            if model is not None
+            else spec.task in {"candidate", "position_series", "candidate_series"},
+            "refit_supported": spec.task in {"candidate", "position_series", "candidate_series"},
+            "incremental_supported": hasattr(model, "partial_fit") if model is not None else False,
+            "save_supported": True,
+            "load_supported": True,
+            "predict_supported": hasattr(model, "predict") if model is not None else True,
+            "predict_proba_supported": hasattr(model, "predict_proba")
+            if model is not None
+            else False,
+            "gpu_supported": any(cap in spec.capabilities for cap in ("gpu", "gpu_optional")),
+            "parallel_supported": any(cap in spec.capabilities for cap in ("auto_hpo", "ray"))
+            or spec.library in {"sklearn", "lightgbm"},
+            "effective_parameters": _effective_parameters(model, params),
+        }
+    )
     mapping = {
         "input_size": ("input_size",),
         "horizon": ("h", "horizon", "prediction_length"),

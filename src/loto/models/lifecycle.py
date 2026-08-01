@@ -76,7 +76,9 @@ class ModelLifecycleResult:
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
-        payload["model_artifact"] = None if self.model_artifact is None else str(self.model_artifact)
+        payload["model_artifact"] = (
+            None if self.model_artifact is None else str(self.model_artifact)
+        )
         for key in ("predictions", "reloaded_predictions", "retrained_predictions"):
             value = getattr(self, key)
             payload[key] = None if value is None else np.asarray(value).tolist()
@@ -86,12 +88,16 @@ class ModelLifecycleResult:
 def validate_prediction(values: np.ndarray, *, expected_shape: tuple[int, ...]) -> None:
     arr = np.asarray(values, dtype=float)
     if arr.shape != expected_shape:
-        raise ValueError(f"prediction shape mismatch: expected={expected_shape}, actual={arr.shape}")
+        raise ValueError(
+            f"prediction shape mismatch: expected={expected_shape}, actual={arr.shape}"
+        )
     if not np.all(np.isfinite(arr)):
         raise ValueError("prediction contains NaN or Inf")
 
 
-def candidate_metrics(actual_numbers: list[int], probabilities: np.ndarray, *, elapsed_seconds: float) -> dict[str, Any]:
+def candidate_metrics(
+    actual_numbers: list[int], probabilities: np.ndarray, *, elapsed_seconds: float
+) -> dict[str, Any]:
     target = np.zeros(37, dtype=float)
     target[np.asarray(actual_numbers, dtype=int) - 1] = 1.0
     clipped = np.clip(np.asarray(probabilities, dtype=float), 1e-9, 1.0 - 1e-9)
@@ -125,11 +131,15 @@ def run_candidate_lifecycle(
     output_dir.mkdir(parents=True, exist_ok=True)
     if "draw_id" not in master.columns or "available_at" not in master.columns:
         master, _manifest = canonicalize_loto7(master, source="lifecycle")
-    requested = spec.default_params | params | {"seed": seed, "device": device, "precision": precision}
+    requested = (
+        spec.default_params | params | {"seed": seed, "device": device, "precision": precision}
+    )
     train = build_candidate_features(master.iloc[:-1].copy(), windows=windows)
     query = build_next_candidate_features(master.iloc[:-1].copy(), windows=windows)
     actual = [int(master.iloc[-1][f"n{i}"]) for i in range(1, 8)]
-    before = inspect_model_properties(spec, None, params=requested, device=device, precision=precision)
+    before = inspect_model_properties(
+        spec, None, params=requested, device=device, precision=precision
+    )
     errors: list[dict[str, Any]] = []
     resource_before = collect_gpu_evidence(gpu_required=False)
     model_artifact: Path | None = None
@@ -147,7 +157,9 @@ def run_candidate_lifecycle(
         runtime = RuntimeModel(spec, params, seed=seed).fit_candidate(train)
         fit_elapsed = time.perf_counter() - started
         fit_status = "OK"
-        properties_after_fit = inspect_model_properties(spec, runtime.model, params=requested, device=device, precision=precision)
+        properties_after_fit = inspect_model_properties(
+            spec, runtime.model, params=requested, device=device, precision=precision
+        )
         started = time.perf_counter()
         output = runtime.predict_candidate(query)
         pred_elapsed = time.perf_counter() - started
@@ -173,16 +185,25 @@ def run_candidate_lifecycle(
             loaded_runtime = RuntimeModel(spec, reloaded["params"], seed=int(reloaded["seed"]))
             loaded_runtime.feature_columns = list(reloaded["feature_columns"])
             loaded_runtime.model = reloaded["model"]
-            reloaded_predictions = np.asarray(loaded_runtime.predict_candidate(query).candidate_probabilities, dtype=float)
+            reloaded_predictions = np.asarray(
+                loaded_runtime.predict_candidate(query).candidate_probabilities, dtype=float
+            )
             validate_prediction(reloaded_predictions, expected_shape=(37,))
             if not np.allclose(predictions, reloaded_predictions, atol=tolerance, rtol=0.0):
                 final_status = "PREDICTION_MISMATCH"
             load_status = "OK"
             properties_after_load = inspect_model_properties(
-                spec, loaded_runtime.model, params=requested, artifact_path=model_artifact, device=device, precision=precision
+                spec,
+                loaded_runtime.model,
+                params=requested,
+                artifact_path=model_artifact,
+                device=device,
+                precision=precision,
             )
         except Exception as exc:
-            errors.append({"stage": "load_predict", "type": type(exc).__name__, "message": str(exc)})
+            errors.append(
+                {"stage": "load_predict", "type": type(exc).__name__, "message": str(exc)}
+            )
             load_status = "FAILED"
             final_status = "LOAD_FAILED"
     if load_status == "OK":
@@ -193,11 +214,15 @@ def run_candidate_lifecycle(
             started = time.perf_counter()
             retrained = RuntimeModel(spec, params, seed=seed).fit_candidate(retrain)
             retrain_elapsed = time.perf_counter() - started
-            retrained_predictions = np.asarray(retrained.predict_candidate(retrain_query).candidate_probabilities, dtype=float)
+            retrained_predictions = np.asarray(
+                retrained.predict_candidate(retrain_query).candidate_probabilities, dtype=float
+            )
             validate_prediction(retrained_predictions, expected_shape=(37,))
             retrain_status = "OK"
             metrics["retraining_time_seconds"] = retrain_elapsed
-            properties_after_retrain = inspect_model_properties(spec, retrained.model, params=requested, device=device, precision=precision)
+            properties_after_retrain = inspect_model_properties(
+                spec, retrained.model, params=requested, device=device, precision=precision
+            )
         except Exception as exc:
             errors.append({"stage": "retrain", "type": type(exc).__name__, "message": str(exc)})
             retrain_status = "FAILED"
@@ -216,7 +241,10 @@ def run_candidate_lifecycle(
         bad_args = [row for row in argument_evidence if row["status"] in {"IGNORED"}]
         if bad_args:
             final_status = "ARGUMENT_NOT_APPLIED"
-        elif all(status == "OK" for status in (fit_status, predict_status, save_status, load_status, retrain_status)):
+        elif all(
+            status == "OK"
+            for status in (fit_status, predict_status, save_status, load_status, retrain_status)
+        ):
             final_status = "PASS"
     resource_after = collect_gpu_evidence(gpu_required=False)
     resource_evidence = {"before": resource_before, "after": resource_after}

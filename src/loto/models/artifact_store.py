@@ -47,11 +47,7 @@ def artifact_summary(path: str | Path) -> dict[str, Any]:
         }
 
     if item.is_dir():
-        files = sorted(
-            candidate
-            for candidate in item.rglob("*")
-            if candidate.is_file()
-        )
+        files = sorted(candidate for candidate in item.rglob("*") if candidate.is_file())
 
         digest = hashlib.sha256()
         total_size = 0

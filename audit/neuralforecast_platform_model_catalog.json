@@ -1,0 +1,2250 @@
+{
+  "schema_version": 2,
+  "catalog_count": 138,
+  "neuralforecast_count": 70,
+  "fixed_row_count": 34,
+  "auto_row_count": 36,
+  "models": [
+    {
+      "model_id": "nf-dlinear",
+      "class_name": "DLinear",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[22]",
+      "raw": {
+        "model_id": "nf-dlinear",
+        "family": "deep",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "DLinear",
+        "priority": "p0",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-nlinear",
+      "class_name": "NLinear",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[23]",
+      "raw": {
+        "model_id": "nf-nlinear",
+        "family": "deep",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "NLinear",
+        "priority": "p0",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-nhits",
+      "class_name": "NHITS",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[24]",
+      "raw": {
+        "model_id": "nf-nhits",
+        "family": "deep",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "NHITS",
+        "priority": "p0",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "checkpoint",
+          "exogenous"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-nbeats",
+      "class_name": "NBEATS",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[25]",
+      "raw": {
+        "model_id": "nf-nbeats",
+        "family": "deep",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "NBEATS",
+        "priority": "p1",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-nbeatsx",
+      "class_name": "NBEATSx",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[26]",
+      "raw": {
+        "model_id": "nf-nbeatsx",
+        "family": "deep",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "NBEATSx",
+        "priority": "p1",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "checkpoint",
+          "exogenous"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-tide",
+      "class_name": "TiDE",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[27]",
+      "raw": {
+        "model_id": "nf-tide",
+        "family": "deep",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "TiDE",
+        "priority": "p0",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "checkpoint",
+          "exogenous"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-tcn",
+      "class_name": "TCN",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[28]",
+      "raw": {
+        "model_id": "nf-tcn",
+        "family": "deep",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "TCN",
+        "priority": "p0",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-gru",
+      "class_name": "GRU",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[29]",
+      "raw": {
+        "model_id": "nf-gru",
+        "family": "deep",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "GRU",
+        "priority": "p0",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-lstm",
+      "class_name": "LSTM",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[30]",
+      "raw": {
+        "model_id": "nf-lstm",
+        "family": "deep",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "LSTM",
+        "priority": "p1",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-deepar",
+      "class_name": "DeepAR",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[31]",
+      "raw": {
+        "model_id": "nf-deepar",
+        "family": "deep_probabilistic",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "DeepAR",
+        "priority": "p1",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "probabilistic"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-tft",
+      "class_name": "TFT",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[32]",
+      "raw": {
+        "model_id": "nf-tft",
+        "family": "transformer",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "TFT",
+        "priority": "p1",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "exogenous",
+          "attention"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-patchtst",
+      "class_name": "PatchTST",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[33]",
+      "raw": {
+        "model_id": "nf-patchtst",
+        "family": "transformer",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "PatchTST",
+        "priority": "p1",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-timesnet",
+      "class_name": "TimesNet",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[34]",
+      "raw": {
+        "model_id": "nf-timesnet",
+        "family": "transformer",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "TimesNet",
+        "priority": "p1",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-tsmixer",
+      "class_name": "TSMixer",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[35]",
+      "raw": {
+        "model_id": "nf-tsmixer",
+        "family": "mixer",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "TSMixer",
+        "priority": "p1",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "multiseries"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-timemixer",
+      "class_name": "TimeMixer",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[36]",
+      "raw": {
+        "model_id": "nf-timemixer",
+        "family": "mixer",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "TimeMixer",
+        "priority": "p2",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-itransformer",
+      "class_name": "iTransformer",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[37]",
+      "raw": {
+        "model_id": "nf-itransformer",
+        "family": "transformer",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "iTransformer",
+        "priority": "p2",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu",
+          "multivariate"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-vanilla-transformer",
+      "class_name": "VanillaTransformer",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": "neuralforecast",
+      "path": "$[38]",
+      "raw": {
+        "model_id": "nf-vanilla-transformer",
+        "family": "transformer",
+        "library": "neuralforecast",
+        "task": "position_series",
+        "class_name": "VanillaTransformer",
+        "priority": "p2",
+        "package": "neuralforecast",
+        "capabilities": [
+          "gpu"
+        ],
+        "default_params": {},
+        "notes": "",
+        "available": false
+      },
+      "catalog_path": "configs/model_catalog.json"
+    },
+    {
+      "model_id": "nf-dlinear",
+      "class_name": "DLinear",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-dlinear",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "deep",
+        "class_name": "DLinear",
+        "priority": "p0",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "41b89e8175bb55db",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-nlinear",
+      "class_name": "NLinear",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-nlinear",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "deep",
+        "class_name": "NLinear",
+        "priority": "p0",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "6f1408ea6d1944bf",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-nhits",
+      "class_name": "NHITS",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-nhits",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "deep",
+        "class_name": "NHITS",
+        "priority": "p0",
+        "capabilities": [
+          "gpu",
+          "checkpoint",
+          "exogenous"
+        ],
+        "available": true,
+        "model_config_hash": "8c6da8157a6dddeb",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-nbeats",
+      "class_name": "NBEATS",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-nbeats",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "deep",
+        "class_name": "NBEATS",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "10531f23570455a0",
+        "resolved_smoke_params": {
+          "stack_types": [
+            "identity"
+          ],
+          "n_blocks": [
+            1
+          ],
+          "mlp_units": [
+            [
+              64,
+              64
+            ]
+          ],
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-nbeatsx",
+      "class_name": "NBEATSx",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-nbeatsx",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "deep",
+        "class_name": "NBEATSx",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "checkpoint",
+          "exogenous"
+        ],
+        "available": true,
+        "model_config_hash": "bb8d12e76fdb2cf5",
+        "resolved_smoke_params": {
+          "stack_types": [
+            "identity"
+          ],
+          "n_blocks": [
+            1
+          ],
+          "mlp_units": [
+            [
+              64,
+              64
+            ]
+          ],
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-tide",
+      "class_name": "TiDE",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-tide",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "deep",
+        "class_name": "TiDE",
+        "priority": "p0",
+        "capabilities": [
+          "gpu",
+          "checkpoint",
+          "exogenous"
+        ],
+        "available": true,
+        "model_config_hash": "e1a3b5cd420623b2",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-tcn",
+      "class_name": "TCN",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-tcn",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "deep",
+        "class_name": "TCN",
+        "priority": "p0",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "c938be6782ce5e97",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-gru",
+      "class_name": "GRU",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-gru",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "deep",
+        "class_name": "GRU",
+        "priority": "p0",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "db2f8aaa1b6b1ee2",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-lstm",
+      "class_name": "LSTM",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-lstm",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "deep",
+        "class_name": "LSTM",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "e8e8610c7fccb756",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-deepar",
+      "class_name": "DeepAR",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-deepar",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "deep_probabilistic",
+        "class_name": "DeepAR",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "probabilistic"
+        ],
+        "available": true,
+        "model_config_hash": "57e203794f9233f2",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-tft",
+      "class_name": "TFT",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-tft",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "transformer",
+        "class_name": "TFT",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "exogenous",
+          "attention"
+        ],
+        "available": true,
+        "model_config_hash": "12302047f4cfad63",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 32,
+          "hidden_size": 16,
+          "n_head": 2
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-patchtst",
+      "class_name": "PatchTST",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-patchtst",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "transformer",
+        "class_name": "PatchTST",
+        "priority": "p1",
+        "capabilities": [
+          "gpu"
+        ],
+        "available": true,
+        "model_config_hash": "750ea5a6a1fcfb91",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 32,
+          "hidden_size": 16,
+          "n_heads": 2
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-timesnet",
+      "class_name": "TimesNet",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-timesnet",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "transformer",
+        "class_name": "TimesNet",
+        "priority": "p1",
+        "capabilities": [
+          "gpu"
+        ],
+        "available": true,
+        "model_config_hash": "9f214aa680221b41",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 32,
+          "hidden_size": 16
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-tsmixer",
+      "class_name": "TSMixer",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-tsmixer",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "mixer",
+        "class_name": "TSMixer",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "multiseries"
+        ],
+        "available": true,
+        "model_config_hash": "d0fac00615219ef6",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 32
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-timemixer",
+      "class_name": "TimeMixer",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-timemixer",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "mixer",
+        "class_name": "TimeMixer",
+        "priority": "p2",
+        "capabilities": [
+          "gpu"
+        ],
+        "available": true,
+        "model_config_hash": "71f09f4266c4d9c6",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 32
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-itransformer",
+      "class_name": "iTransformer",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-itransformer",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "transformer",
+        "class_name": "iTransformer",
+        "priority": "p2",
+        "capabilities": [
+          "gpu",
+          "multivariate"
+        ],
+        "available": true,
+        "model_config_hash": "b7bb4af6e394b9b6",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 32,
+          "hidden_size": 16,
+          "n_heads": 2
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-vanilla-transformer",
+      "class_name": "VanillaTransformer",
+      "library": "neuralforecast",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-vanilla-transformer",
+      "raw": {
+        "library": "neuralforecast",
+        "family": "transformer",
+        "class_name": "VanillaTransformer",
+        "priority": "p2",
+        "capabilities": [
+          "gpu"
+        ],
+        "available": true,
+        "model_config_hash": "0877bce3af2f055a",
+        "resolved_smoke_params": {
+          "max_steps": 2,
+          "val_check_steps": 1,
+          "early_stop_patience_steps": -1,
+          "batch_size": 8,
+          "input_size": 32,
+          "hidden_size": 16,
+          "n_head": 2
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-rnn",
+      "class_name": "AutoRNN",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-rnn",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "rnn",
+        "class_name": "AutoRNN",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "8addc2b6663d9acc",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-lstm",
+      "class_name": "AutoLSTM",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-lstm",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "rnn",
+        "class_name": "AutoLSTM",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "d877d602e2a78333",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-gru",
+      "class_name": "AutoGRU",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-gru",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "rnn",
+        "class_name": "AutoGRU",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "094eddb4e627d27a",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-tcn",
+      "class_name": "AutoTCN",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-tcn",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "cnn",
+        "class_name": "AutoTCN",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "e354214610e343bd",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-deepar",
+      "class_name": "AutoDeepAR",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-deepar",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "deep_probabilistic",
+        "class_name": "AutoDeepAR",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "2d1a51e607d3bac7",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-dilatedrnn",
+      "class_name": "AutoDilatedRNN",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-dilatedrnn",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "rnn",
+        "class_name": "AutoDilatedRNN",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "c3a3d6d6edb03d2a",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-bitcn",
+      "class_name": "AutoBiTCN",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-bitcn",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "cnn",
+        "class_name": "AutoBiTCN",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "3a60f5d00f637719",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-mlp",
+      "class_name": "AutoMLP",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-mlp",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mlp",
+        "class_name": "AutoMLP",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "bdf57fdb22b6542b",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-nbeats",
+      "class_name": "AutoNBEATS",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-nbeats",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mlp",
+        "class_name": "AutoNBEATS",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "aa43be0ac1f1bd33",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8,
+          "stack_types": [
+            "identity"
+          ],
+          "n_blocks": [
+            1
+          ],
+          "mlp_units": [
+            [
+              64,
+              64
+            ]
+          ]
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-nbeatsx",
+      "class_name": "AutoNBEATSx",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-nbeatsx",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mlp",
+        "class_name": "AutoNBEATSx",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "540c44cec9caa190",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8,
+          "stack_types": [
+            "identity"
+          ],
+          "n_blocks": [
+            1
+          ],
+          "mlp_units": [
+            [
+              64,
+              64
+            ]
+          ]
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-nhits",
+      "class_name": "AutoNHITS",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-nhits",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mlp",
+        "class_name": "AutoNHITS",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "d6335251896041eb",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-dlinear",
+      "class_name": "AutoDLinear",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-dlinear",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "linear",
+        "class_name": "AutoDLinear",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "4bc5be4aa420cd2c",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-nlinear",
+      "class_name": "AutoNLinear",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-nlinear",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "linear",
+        "class_name": "AutoNLinear",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "55c5a78a07f3affd",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-tide",
+      "class_name": "AutoTiDE",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-tide",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mlp",
+        "class_name": "AutoTiDE",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "203eca6c54f353e3",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-deepnpts",
+      "class_name": "AutoDeepNPTS",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-deepnpts",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "deep_probabilistic",
+        "class_name": "AutoDeepNPTS",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "0f777d67221fe556",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-kan",
+      "class_name": "AutoKAN",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-kan",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "kan",
+        "class_name": "AutoKAN",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "caf66485c9bb4c4e",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-tft",
+      "class_name": "AutoTFT",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-tft",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "transformer",
+        "class_name": "AutoTFT",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "b6f8fdddac5b8f1b",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-vanilla-transformer",
+      "class_name": "AutoVanillaTransformer",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-vanilla-transformer",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "transformer",
+        "class_name": "AutoVanillaTransformer",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "e4a9623a0dcb9294",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-informer",
+      "class_name": "AutoInformer",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-informer",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "transformer",
+        "class_name": "AutoInformer",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "5c7fdb5afce0c47e",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 32,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-autoformer",
+      "class_name": "AutoAutoformer",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-autoformer",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "transformer",
+        "class_name": "AutoAutoformer",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "31be1a92223f277e",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 32,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-fedformer",
+      "class_name": "AutoFEDformer",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-fedformer",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "transformer",
+        "class_name": "AutoFEDformer",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "cf53de2d4d755372",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 32,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-patchtst",
+      "class_name": "AutoPatchTST",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-patchtst",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "transformer",
+        "class_name": "AutoPatchTST",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "5ee152c27e83b73a",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 32,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-itransformer",
+      "class_name": "AutoiTransformer",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-itransformer",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "transformer",
+        "class_name": "AutoiTransformer",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "cd741726f74a29f5",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 32,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-timexer",
+      "class_name": "AutoTimeXer",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-timexer",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "transformer",
+        "class_name": "AutoTimeXer",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "08ff2e8ec00f5644",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 32,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-timesnet",
+      "class_name": "AutoTimesNet",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-timesnet",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "transformer",
+        "class_name": "AutoTimesNet",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "ea5308fb31b3e069",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 32,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-stemgnn",
+      "class_name": "AutoStemGNN",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-stemgnn",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "graph",
+        "class_name": "AutoStemGNN",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "4873e565c2c0a860",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-hint",
+      "class_name": "AutoHINT",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-hint",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "hierarchical",
+        "class_name": "AutoHINT",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "d66d27e03393b3d2",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-tsmixer",
+      "class_name": "AutoTSMixer",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-tsmixer",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mixer",
+        "class_name": "AutoTSMixer",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "5ffd6d8bc5587420",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-tsmixerx",
+      "class_name": "AutoTSMixerx",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-tsmixerx",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mixer",
+        "class_name": "AutoTSMixerx",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "da123fcd1cc948c8",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-mlp-multivariate",
+      "class_name": "AutoMLPMultivariate",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-mlp-multivariate",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mlp",
+        "class_name": "AutoMLPMultivariate",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "80bccae7f67ae804",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-softs",
+      "class_name": "AutoSOFTS",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-softs",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mixer",
+        "class_name": "AutoSOFTS",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "a440d513e7c175f3",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-timemixer",
+      "class_name": "AutoTimeMixer",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-timemixer",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mixer",
+        "class_name": "AutoTimeMixer",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "1fb567b34dc4d3d4",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-rmok",
+      "class_name": "AutoRMoK",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-rmok",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "kan",
+        "class_name": "AutoRMoK",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "f85919cdf90e27da",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-softssharp",
+      "class_name": "AutoSOFTSSharp",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-softssharp",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "mixer",
+        "class_name": "AutoSOFTSSharp",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint",
+          "multivariate"
+        ],
+        "available": true,
+        "model_config_hash": "e0ab8f121a0284a1",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-xlinear",
+      "class_name": "AutoXLinear",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-xlinear",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "linear",
+        "class_name": "AutoXLinear",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint",
+          "multivariate"
+        ],
+        "available": true,
+        "model_config_hash": "a30027b51072ddb6",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    },
+    {
+      "model_id": "nf-auto-xlstm",
+      "class_name": "AutoxLSTM",
+      "library": "neuralforecast_auto",
+      "framework": null,
+      "package": null,
+      "path": "$.models.nf-auto-xlstm",
+      "raw": {
+        "library": "neuralforecast_auto",
+        "family": "rnn",
+        "class_name": "AutoxLSTM",
+        "priority": "p1",
+        "capabilities": [
+          "gpu",
+          "auto_hpo",
+          "optuna",
+          "ray",
+          "checkpoint"
+        ],
+        "available": true,
+        "model_config_hash": "edff80c5113b6cf1",
+        "resolved_smoke_params": {
+          "backend": "optuna",
+          "num_samples": 1,
+          "max_steps": 2,
+          "parallel_trials": 1,
+          "refit_with_val": false,
+          "search_strategy": "random",
+          "input_size": 8,
+          "batch_size": 8
+        },
+        "resolve_error": null
+      },
+      "catalog_path": "configs/formal_backtest_smoke_catalog.json"
+    }
+  ],
+  "validation": {
+    "statsforecast_rows_present": [],
+    "missing_model_ids": []
+  }
+}

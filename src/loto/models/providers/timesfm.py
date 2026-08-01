@@ -27,11 +27,17 @@ class TimesFMProvider(FoundationProvider):
 
     def validate_environment(self) -> dict[str, Any]:
         if not TIMESFM_ENV.exists():
-            raise FoundationProviderError("DEPENDENCY_MISSING", f"missing TimesFM environment: {TIMESFM_ENV}")
+            raise FoundationProviderError(
+                "DEPENDENCY_MISSING", f"missing TimesFM environment: {TIMESFM_ENV}"
+            )
         if not (TIMESFM_ENV / "uv.lock").exists():
-            raise FoundationProviderError("DEPENDENCY_MISSING", f"missing TimesFM lockfile: {TIMESFM_ENV / 'uv.lock'}")
+            raise FoundationProviderError(
+                "DEPENDENCY_MISSING", f"missing TimesFM lockfile: {TIMESFM_ENV / 'uv.lock'}"
+            )
         if not TIMESFM_RUNNER.exists():
-            raise FoundationProviderError("PROVIDER_NOT_IMPLEMENTED", f"missing TimesFM runner: {TIMESFM_RUNNER}")
+            raise FoundationProviderError(
+                "PROVIDER_NOT_IMPLEMENTED", f"missing TimesFM runner: {TIMESFM_RUNNER}"
+            )
         return {
             "environment": str(TIMESFM_ENV),
             "runner": str(TIMESFM_RUNNER),
@@ -87,10 +93,16 @@ class TimesFMProvider(FoundationProvider):
             try:
                 response = json.loads(response_path.read_text(encoding="utf-8"))
             except json.JSONDecodeError as exc:
-                raise FoundationProviderError("PREDICT_FAILED", f"TimesFM provider returned invalid JSON: {exc}") from exc
+                raise FoundationProviderError(
+                    "PREDICT_FAILED", f"TimesFM provider returned invalid JSON: {exc}"
+                ) from exc
         if response.get("status") != "OK":
             message = str(response.get("message", "TimesFM provider failed"))
-            status = "MODEL_WEIGHTS_MISSING" if "snapshot" in message or "local" in message else "PREDICT_FAILED"
+            status = (
+                "MODEL_WEIGHTS_MISSING"
+                if "snapshot" in message or "local" in message
+                else "PREDICT_FAILED"
+            )
             raise FoundationProviderError(status, message)
         try:
             validate_provider_response(response, expected_shape=(7,))
@@ -111,24 +123,30 @@ class TimesFMProvider(FoundationProvider):
             payload["artifact_reference"] = self.last_response.get("artifact_reference", {})
             payload["provider_properties"] = self.last_response.get("properties", {})
             payload["gpu_evidence"] = self.last_response.get("gpu_evidence", {})
-        (path / "provider.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        (path / "provider.json").write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
         return path
 
     def load_saved(self, path: Path) -> TimesFMProvider:
         if not (path / "provider.json").exists():
-            raise FoundationProviderError("ARTIFACT_MISSING", f"provider artifact missing: {path / 'provider.json'}")
+            raise FoundationProviderError(
+                "ARTIFACT_MISSING", f"provider artifact missing: {path / 'provider.json'}"
+            )
         self.saved_reference = json.loads((path / "provider.json").read_text(encoding="utf-8"))
         return self.load()
 
     def inspect_properties(self) -> dict[str, Any]:
         data = super().inspect_properties()
-        data.update({
-            "repo_id": self.repo_id,
-            "zero_shot": True,
-            "environment": str(TIMESFM_ENV),
-            "subprocess_provider": True,
-            **getattr(self, "resolved", {}),
-        })
+        data.update(
+            {
+                "repo_id": self.repo_id,
+                "zero_shot": True,
+                "environment": str(TIMESFM_ENV),
+                "subprocess_provider": True,
+                **getattr(self, "resolved", {}),
+            }
+        )
         if hasattr(self, "last_response"):
             data.update(self.last_response.get("properties", {}))
         return data

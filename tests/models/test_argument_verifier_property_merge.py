@@ -33,10 +33,7 @@ def test_load_property_replaces_fit_not_exposed_seed() -> None:
         merged,
     )
 
-    by_argument = {
-        row["argument"]: row
-        for row in rows
-    }
+    by_argument = {row["argument"]: row for row in rows}
 
     assert by_argument["seed"]["effective_value"] == 42
     assert by_argument["seed"]["status"] == "VERIFIED"

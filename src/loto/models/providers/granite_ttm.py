@@ -27,11 +27,17 @@ class GraniteTTMProvider(FoundationProvider):
 
     def validate_environment(self) -> dict[str, Any]:
         if not GRANITE_ENV.exists():
-            raise FoundationProviderError("DEPENDENCY_MISSING", f"missing Granite environment: {GRANITE_ENV}")
+            raise FoundationProviderError(
+                "DEPENDENCY_MISSING", f"missing Granite environment: {GRANITE_ENV}"
+            )
         if not (GRANITE_ENV / "uv.lock").exists():
-            raise FoundationProviderError("DEPENDENCY_MISSING", f"missing Granite lockfile: {GRANITE_ENV / 'uv.lock'}")
+            raise FoundationProviderError(
+                "DEPENDENCY_MISSING", f"missing Granite lockfile: {GRANITE_ENV / 'uv.lock'}"
+            )
         if not GRANITE_RUNNER.exists():
-            raise FoundationProviderError("PROVIDER_NOT_IMPLEMENTED", f"missing Granite runner: {GRANITE_RUNNER}")
+            raise FoundationProviderError(
+                "PROVIDER_NOT_IMPLEMENTED", f"missing Granite runner: {GRANITE_RUNNER}"
+            )
         return {
             "environment": str(GRANITE_ENV),
             "runner": str(GRANITE_RUNNER),
@@ -93,10 +99,16 @@ class GraniteTTMProvider(FoundationProvider):
             try:
                 response = json.loads(response_path.read_text(encoding="utf-8"))
             except json.JSONDecodeError as exc:
-                raise FoundationProviderError("PREDICT_FAILED", f"Granite provider returned invalid JSON: {exc}") from exc
+                raise FoundationProviderError(
+                    "PREDICT_FAILED", f"Granite provider returned invalid JSON: {exc}"
+                ) from exc
         if response.get("status") != "OK":
             message = str(response.get("message", "Granite provider failed"))
-            status = "MODEL_WEIGHTS_MISSING" if "snapshot" in message or "local" in message else "PREDICT_FAILED"
+            status = (
+                "MODEL_WEIGHTS_MISSING"
+                if "snapshot" in message or "local" in message
+                else "PREDICT_FAILED"
+            )
             raise FoundationProviderError(status, message)
         try:
             validate_provider_response(response, expected_shape=(7,))
@@ -110,9 +122,13 @@ class GraniteTTMProvider(FoundationProvider):
         response = self._run_provider(history)
         values = np.asarray(response["predictions"], dtype=float).reshape(-1)
         if values.shape != (7,):
-            raise FoundationProviderError("INVALID_PREDICTION", f"Granite prediction shape mismatch: {values.shape}")
+            raise FoundationProviderError(
+                "INVALID_PREDICTION", f"Granite prediction shape mismatch: {values.shape}"
+            )
         if not np.isfinite(values).all():
-            raise FoundationProviderError("INVALID_PREDICTION", "Granite predictions contain NaN or Inf")
+            raise FoundationProviderError(
+                "INVALID_PREDICTION", "Granite predictions contain NaN or Inf"
+            )
         return values
 
     def save(self, path: Path) -> Path:
@@ -125,24 +141,30 @@ class GraniteTTMProvider(FoundationProvider):
             payload["artifact_reference"] = self.last_response.get("artifact_reference", {})
             payload["provider_properties"] = self.last_response.get("properties", {})
             payload["gpu_evidence"] = self.last_response.get("gpu_evidence", {})
-        (path / "provider.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        (path / "provider.json").write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
         return path
 
     def load_saved(self, path: Path) -> GraniteTTMProvider:
         if not (path / "provider.json").exists():
-            raise FoundationProviderError("ARTIFACT_MISSING", f"provider artifact missing: {path / 'provider.json'}")
+            raise FoundationProviderError(
+                "ARTIFACT_MISSING", f"provider artifact missing: {path / 'provider.json'}"
+            )
         self.saved_reference = json.loads((path / "provider.json").read_text(encoding="utf-8"))
         return self.load()
 
     def inspect_properties(self) -> dict[str, Any]:
         data = super().inspect_properties()
-        data.update({
-            "repo_id": self.repo_id,
-            "zero_shot": True,
-            "environment": str(GRANITE_ENV),
-            "subprocess_provider": True,
-            **getattr(self, "resolved", {}),
-        })
+        data.update(
+            {
+                "repo_id": self.repo_id,
+                "zero_shot": True,
+                "environment": str(GRANITE_ENV),
+                "subprocess_provider": True,
+                **getattr(self, "resolved", {}),
+            }
+        )
         if hasattr(self, "last_response"):
             data.update(self.last_response.get("properties", {}))
         return data
