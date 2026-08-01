@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "total_models": 21,
-  "runtime_certified_models": 2,
+  "runtime_certified_models": 3,
   "results": [
     {
       "model_id": "chronos-2",
@@ -164,8 +164,29 @@
       "gated_required": false,
       "trust_remote_code_candidate": false,
       "stored_weight_bytes": 3245512,
-      "runtime_vram_certified": false,
-      "runtime_status": "NOT_TESTED"
+      "runtime_vram_certified": true,
+      "runtime_status": "CERTIFIED",
+      "runtime_revision": "d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f",
+      "runtime_device": "cuda:0",
+      "runtime_gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "runtime_torch": "2.12.1+cu130",
+      "runtime_torch_cuda": "13.0",
+      "runtime_parameter_count": 805280,
+      "runtime_input_shape": [
+        7,
+        512,
+        1
+      ],
+      "runtime_prediction_shape": [
+        7,
+        96,
+        1
+      ],
+      "runtime_load_seconds": 0.013861996998457471,
+      "runtime_inference_seconds": 0.13352739100082545,
+      "runtime_peak_allocated_bytes": 37356544,
+      "runtime_peak_reserved_bytes": 37748736,
+      "environment_reproduced_from_lockfile": true
     },
     {
       "model_id": "kronos-base",

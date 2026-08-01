@@ -1,0 +1,20 @@
+{
+  "torch": "2.12.1+cu130",
+  "torch_cuda": "13.0",
+  "transformers": "4.51.3",
+  "granite_tsfm": "0.3.1",
+  "cuda_available": true,
+  "compiled_arch_list": [
+    "sm_75",
+    "sm_80",
+    "sm_86",
+    "sm_90",
+    "sm_100",
+    "sm_120"
+  ],
+  "gpu": "NVIDIA GeForce RTX 5070 Ti",
+  "compute_capability": [
+    12,
+    0
+  ]
+}
