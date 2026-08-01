@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "classification": {
+    "A": "static candidate for 16 GiB runtime test",
+    "B": "offload or quantization candidate",
+    "C": "gated or remote-code review required",
+    "D": "size or dependency information incomplete",
+    "E": "license blocks or requires manual review"
+  },
+  "results": [
+    {
+      "model_id": "chronos-2",
+      "repo_id": "amazon/chronos-2",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 477930472,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "chronos-bolt-tiny",
+      "repo_id": "amazon/chronos-bolt-tiny",
+      "revision": "a0e552de83495b5c28c14c71c374f3e33280b340",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 34622352,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "chronos-t5-base",
+      "repo_id": "amazon/chronos-t5-base",
+      "revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 805530528,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "chronos-t5-small",
+      "repo_id": "amazon/chronos-t5-small",
+      "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 184632480,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "granite-flowstate-r1",
+      "repo_id": "ibm-granite/granite-timeseries-flowstate-r1",
+      "revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 36284680,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "granite-patchtsmixer",
+      "repo_id": "ibm-granite/granite-timeseries-patchtsmixer",
+      "revision": "90dc5a88d45f032b7dceefb5d814ca2af54f2ff9",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 1585929,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "granite-patchtst",
+      "repo_id": "ibm-granite/granite-timeseries-patchtst",
+      "revision": "7fe295d8bc8fbac8041b60ab351882634165517f",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 2472368,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "granite-ttm-r2",
+      "repo_id": "ibm-granite/granite-timeseries-ttm-r2",
+      "revision": "d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 3245512,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "kronos-base",
+      "repo_id": "NeoQuasar/Kronos-base",
+      "revision": "2b554741eca47781b64468546e77fef3e85130e6",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "mit",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 409264008,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "lag-llama",
+      "repo_id": "time-series-foundation-models/Lag-Llama",
+      "revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 39294567,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "moirai-1.0-base",
+      "repo_id": "Salesforce/moirai-1.0-R-base",
+      "revision": "4fa939a8800d9da346c0280f3d9aeba0d2d35877",
+      "category": "E",
+      "reasons": [
+        "non-commercial license"
+      ],
+      "license": "cc-by-nc-4.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 365449072,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "moirai-2.0-small",
+      "repo_id": "Salesforce/moirai-2.0-R-small",
+      "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+      "category": "E",
+      "reasons": [
+        "non-commercial license"
+      ],
+      "license": "cc-by-nc-4.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 45557824,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "moment-1-large",
+      "repo_id": "AutonLab/MOMENT-1-large",
+      "revision": "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "mit",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 2771077013,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "moment-1-small",
+      "repo_id": "AutonLab/MOMENT-1-small",
+      "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "mit",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 303257025,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "sundial-base",
+      "repo_id": "thuml/sundial-base-128m",
+      "revision": "3212e42564493f520593e5414af4367fc4b49226",
+      "category": "C",
+      "reasons": [
+        "remote code review required"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": true,
+      "stored_weight_bytes": 513341448,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "t0-alpha",
+      "repo_id": "theforecastingcompany/t0-alpha",
+      "revision": "f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+      "category": "C",
+      "reasons": [
+        "gated repository"
+      ],
+      "license": "apache-2.0",
+      "gated": "auto",
+      "gated_required": true,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 406601492,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "tabpfn-ts",
+      "repo_id": "Prior-Labs/TabPFN-v2-clf",
+      "revision": "f851f2a3c941544733b712d8c0f96dfae9b28862",
+      "category": "E",
+      "reasons": [
+        "license requires manual review"
+      ],
+      "license": "other",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 280667328,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "timesfm-2.5-transformers",
+      "repo_id": "google/timesfm-2.5-200m-transformers",
+      "revision": "5a9806b9b291fad9233b5249d88263f1846304d3",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 925187448,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "tirex-2",
+      "repo_id": "NX-AI/TiRex-2",
+      "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 380613375,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "toto-2.0-4m",
+      "repo_id": "Datadog/Toto-2.0-4m",
+      "revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 16582848,
+      "runtime_vram_certified": false
+    },
+    {
+      "model_id": "toto-open-base",
+      "repo_id": "Datadog/Toto-Open-Base-1.0",
+      "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
+      "category": "A",
+      "reasons": [
+        "stored weights are within 16 GiB"
+      ],
+      "license": "apache-2.0",
+      "gated": false,
+      "gated_required": false,
+      "trust_remote_code_candidate": false,
+      "stored_weight_bytes": 605239264,
+      "runtime_vram_certified": false
+    }
+  ]
+}

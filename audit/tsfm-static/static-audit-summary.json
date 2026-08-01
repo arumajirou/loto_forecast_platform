@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "generated_at": "2026-08-01T07:44:10+00:00",
+  "expected_models": 21,
+  "audited_models": 21,
+  "failed_models": 0,
+  "private_models": 0,
+  "gated_models": 1,
+  "disabled_models": 0,
+  "trust_remote_code_candidates": 1,
+  "models_with_safetensors": 19,
+  "models_with_gguf": 0,
+  "stored_weights_within_16gb": 21,
+  "runtime_vram_certified_models": 0,
+  "license_status_counts": {
+    "DECLARED_REVIEW_REQUIRED": 20,
+    "MANUAL_REVIEW_REQUIRED": 1
+  },
+  "errors": []
+}

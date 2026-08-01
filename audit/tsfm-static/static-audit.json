@@ -1,0 +1,2273 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "generated_at": "2026-08-01T07:44:10+00:00",
+  "manifest": "configs/tsfm/verified-revisions.json",
+  "manifest_sha256": "f01a1ddb5d1e5d3483bf4b915b2331b9c6b7d80a2db7e42d3c5094dc6110967b",
+  "expected_models": 21,
+  "audited_models": 21,
+  "failed_models": 0,
+  "results": [
+    {
+      "model_id": "chronos-2",
+      "repo_id": "amazon/chronos-2",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "chronos-forecasting",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "chronos-forecasting",
+        "safetensors",
+        "t5",
+        "time series",
+        "forecasting",
+        "foundation models",
+        "pretrained models",
+        "time-series-forecasting",
+        "dataset:autogluon/chronos_datasets",
+        "dataset:Salesforce/GiftEvalPretrain",
+        "arxiv:2403.07815",
+        "arxiv:2510.15821",
+        "license:apache-2.0",
+        "deploy:sagemaker",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "library_name": "chronos-forecasting",
+        "pipeline_tag": "time-series-forecasting",
+        "datasets": [
+          "autogluon/chronos_datasets",
+          "Salesforce/GiftEvalPretrain"
+        ],
+        "tags": [
+          "time series",
+          "forecasting",
+          "foundation models",
+          "pretrained models",
+          "safetensors"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 4,
+      "known_file_bytes": 477940831,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 477930472,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": [
+        "Chronos2Model"
+      ],
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 477930472,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 7773,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 1067,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 477930472,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/amazon/chronos-2/tree/29ec3766d36d6f73f0696f85560a422f50e8498c"
+    },
+    {
+      "model_id": "chronos-bolt-tiny",
+      "repo_id": "amazon/chronos-bolt-tiny",
+      "revision": "a0e552de83495b5c28c14c71c374f3e33280b340",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "chronos-forecasting",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "chronos-forecasting",
+        "safetensors",
+        "t5",
+        "time series",
+        "forecasting",
+        "pretrained models",
+        "foundation models",
+        "time series foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "arxiv:1910.10683",
+        "arxiv:2403.07815",
+        "license:apache-2.0",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "library_name": "chronos-forecasting",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time series",
+          "forecasting",
+          "pretrained models",
+          "foundation models",
+          "time series foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 4,
+      "known_file_bytes": 34633650,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 34622352,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": [
+        "ChronosBoltModelForForecasting"
+      ],
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 34622352,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 8659,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 1120,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 34622352,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/amazon/chronos-bolt-tiny/tree/a0e552de83495b5c28c14c71c374f3e33280b340"
+    },
+    {
+      "model_id": "chronos-t5-base",
+      "repo_id": "amazon/chronos-t5-base",
+      "revision": "ad294eaacead15db499b740ea4122266dd2a81a2",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "chronos-forecasting",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "chronos-forecasting",
+        "safetensors",
+        "t5",
+        "time series",
+        "forecasting",
+        "pretrained models",
+        "foundation models",
+        "time series foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "arxiv:2403.07815",
+        "arxiv:1910.10683",
+        "license:apache-2.0",
+        "deploy:sagemaker",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "library_name": "chronos-forecasting",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time series",
+          "forecasting",
+          "pretrained models",
+          "foundation models",
+          "time series foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 6,
+      "known_file_bytes": 805771745,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 805530528,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 2,
+        ".md": 1,
+        ".png": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": [
+        "T5ForConditionalGeneration"
+      ],
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 805530528,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 6146,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 1116,
+          "is_weight": false
+        },
+        {
+          "path": "figures/main-figure.png",
+          "size_bytes": 232294,
+          "is_weight": false
+        },
+        {
+          "path": "generation_config.json",
+          "size_bytes": 142,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 805530528,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/amazon/chronos-t5-base/tree/ad294eaacead15db499b740ea4122266dd2a81a2"
+    },
+    {
+      "model_id": "chronos-t5-small",
+      "repo_id": "amazon/chronos-t5-small",
+      "revision": "a971ba21945c4f1796b17a91fe69214b5f4ad472",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "chronos-forecasting",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "chronos-forecasting",
+        "safetensors",
+        "t5",
+        "time series",
+        "forecasting",
+        "pretrained models",
+        "foundation models",
+        "time series foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "arxiv:2403.07815",
+        "arxiv:1910.10683",
+        "license:apache-2.0",
+        "deploy:sagemaker",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "library_name": "chronos-forecasting",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time series",
+          "forecasting",
+          "pretrained models",
+          "foundation models",
+          "time series foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 6,
+      "known_file_bytes": 184873697,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 184632480,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 2,
+        ".md": 1,
+        ".png": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": [
+        "T5ForConditionalGeneration"
+      ],
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 184632480,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 6149,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 1113,
+          "is_weight": false
+        },
+        {
+          "path": "figures/main-figure.png",
+          "size_bytes": 232294,
+          "is_weight": false
+        },
+        {
+          "path": "generation_config.json",
+          "size_bytes": 142,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 184632480,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/amazon/chronos-t5-small/tree/a971ba21945c4f1796b17a91fe69214b5f4ad472"
+    },
+    {
+      "model_id": "granite-flowstate-r1",
+      "repo_id": "ibm-granite/granite-timeseries-flowstate-r1",
+      "revision": "05effc6cb39ee16dce9dd0064ed1a76e4b8ff464",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": null,
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "safetensors",
+        "flowstate",
+        "time series",
+        "forecasting",
+        "pretrained models",
+        "foundation models",
+        "time series foundation models",
+        "time-series",
+        "state space model",
+        "ssm",
+        "time-series-forecasting",
+        "arxiv:2508.05287",
+        "license:apache-2.0",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time series",
+          "forecasting",
+          "pretrained models",
+          "foundation models",
+          "time series foundation models",
+          "time-series",
+          "state space model",
+          "ssm"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 7,
+      "known_file_bytes": 37180966,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 36284680,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".png": 2,
+        ".safetensors": 1,
+        ".sig": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": [
+        "FlowStateModel"
+      ],
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 36284680,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1628,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 7979,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 593,
+          "is_weight": false
+        },
+        {
+          "path": "figs/FlowState.png",
+          "size_bytes": 600975,
+          "is_weight": false
+        },
+        {
+          "path": "figs/flowstate_performance.png",
+          "size_bytes": 276039,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 36284680,
+          "is_weight": true
+        },
+        {
+          "path": "model.sig",
+          "size_bytes": 9072,
+          "is_weight": false
+        }
+      ],
+      "source": "https://huggingface.co/ibm-granite/granite-timeseries-flowstate-r1/tree/05effc6cb39ee16dce9dd0064ed1a76e4b8ff464"
+    },
+    {
+      "model_id": "granite-patchtsmixer",
+      "repo_id": "ibm-granite/granite-timeseries-patchtsmixer",
+      "revision": "90dc5a88d45f032b7dceefb5d814ca2af54f2ff9",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "transformers",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "transformers",
+        "pytorch",
+        "safetensors",
+        "patchtsmixer",
+        "time series",
+        "forecasting",
+        "pretrained models",
+        "foundation models",
+        "time series foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "arxiv:2306.09364",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time series",
+          "forecasting",
+          "pretrained models",
+          "foundation models",
+          "time series foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 8,
+      "known_file_bytes": 2478411,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 2,
+      "known_weight_bytes": 1585929,
+      "weight_files": [
+        "model.safetensors",
+        "pytorch_model.bin"
+      ],
+      "file_suffix_counts": {
+        ".bin": 1,
+        ".jpg": 1,
+        ".json": 2,
+        ".md": 1,
+        ".png": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": [
+        "PatchTSMixerForPrediction"
+      ],
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": true,
+      "has_gguf": false,
+      "stored_weight_bytes": 1585929,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 6919,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 1182,
+          "is_weight": false
+        },
+        {
+          "path": "generation_config.json",
+          "size_bytes": 74,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 789328,
+          "is_weight": true
+        },
+        {
+          "path": "patchtsmixer_arch.jpg",
+          "size_bytes": 213119,
+          "is_weight": false
+        },
+        {
+          "path": "pytorch_model.bin",
+          "size_bytes": 796601,
+          "is_weight": true
+        },
+        {
+          "path": "results.png",
+          "size_bytes": 669669,
+          "is_weight": false
+        }
+      ],
+      "source": "https://huggingface.co/ibm-granite/granite-timeseries-patchtsmixer/tree/90dc5a88d45f032b7dceefb5d814ca2af54f2ff9"
+    },
+    {
+      "model_id": "granite-patchtst",
+      "repo_id": "ibm-granite/granite-timeseries-patchtst",
+      "revision": "7fe295d8bc8fbac8041b60ab351882634165517f",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "transformers",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "transformers",
+        "safetensors",
+        "patchtst",
+        "generated_from_trainer",
+        "time series",
+        "forecasting",
+        "pretrained models",
+        "foundation models",
+        "time series foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "arxiv:2211.14730",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "generated_from_trainer",
+          "time series",
+          "forecasting",
+          "pretrained models",
+          "foundation models",
+          "time series foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 6,
+      "known_file_bytes": 2820203,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 2472368,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 2,
+        ".md": 1,
+        ".png": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": [
+        "PatchTSTForPrediction"
+      ],
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 2472368,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 6491,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 1287,
+          "is_weight": false
+        },
+        {
+          "path": "generation_config.json",
+          "size_bytes": 74,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 2472368,
+          "is_weight": true
+        },
+        {
+          "path": "patchtst_architecture.png",
+          "size_bytes": 338464,
+          "is_weight": false
+        }
+      ],
+      "source": "https://huggingface.co/ibm-granite/granite-timeseries-patchtst/tree/7fe295d8bc8fbac8041b60ab351882634165517f"
+    },
+    {
+      "model_id": "granite-ttm-r2",
+      "repo_id": "ibm-granite/granite-timeseries-ttm-r2",
+      "revision": "d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "granite-tsfm",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "granite-tsfm",
+        "safetensors",
+        "tinytimemixer",
+        "time series",
+        "forecasting",
+        "pretrained models",
+        "foundation models",
+        "time series foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "arxiv:2401.03955",
+        "license:apache-2.0",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "library_name": "granite-tsfm",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time series",
+          "forecasting",
+          "pretrained models",
+          "foundation models",
+          "time series foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 8,
+      "known_file_bytes": 3814712,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 2,
+      "known_weight_bytes": 3245512,
+      "weight_files": [
+        "model.safetensors",
+        "training_args.bin"
+      ],
+      "file_suffix_counts": {
+        ".bin": 1,
+        ".json": 2,
+        ".md": 1,
+        ".safetensors": 1,
+        ".webp": 2,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": [
+        "TinyTimeMixerForPrediction"
+      ],
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": true,
+      "has_gguf": false,
+      "stored_weight_bytes": 3245512,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 18233,
+          "is_weight": false
+        },
+        {
+          "path": "benchmarks.webp",
+          "size_bytes": 170404,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 1563,
+          "is_weight": false
+        },
+        {
+          "path": "generation_config.json",
+          "size_bytes": 69,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 3240592,
+          "is_weight": true
+        },
+        {
+          "path": "training_args.bin",
+          "size_bytes": 4920,
+          "is_weight": true
+        },
+        {
+          "path": "ttm_image.webp",
+          "size_bytes": 377412,
+          "is_weight": false
+        }
+      ],
+      "source": "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2/tree/d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f"
+    },
+    {
+      "model_id": "kronos-base",
+      "repo_id": "NeoQuasar/Kronos-base",
+      "revision": "2b554741eca47781b64468546e77fef3e85130e6",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": null,
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "safetensors",
+        "Finance",
+        "Candlestick",
+        "K-line",
+        "time-series-forecasting",
+        "arxiv:2508.02739",
+        "license:mit",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "mit",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "Finance",
+          "Candlestick",
+          "K-line"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 4,
+      "known_file_bytes": 409274596,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 409264008,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 409264008,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 8841,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 228,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 409264008,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/NeoQuasar/Kronos-base/tree/2b554741eca47781b64468546e77fef3e85130e6"
+    },
+    {
+      "model_id": "lag-llama",
+      "repo_id": "time-series-foundation-models/Lag-Llama",
+      "revision": "72dcfc29da106acfe38250a60f4ae29d1e56a3d9",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": null,
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "safetensors",
+        "time series",
+        "forecasting",
+        "pretrained models",
+        "foundation models",
+        "time series foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "arxiv:2310.08278",
+        "license:apache-2.0",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time series",
+          "forecasting",
+          "pretrained models",
+          "foundation models",
+          "time series foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 6,
+      "known_file_bytes": 39441403,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 2,
+      "known_weight_bytes": 39294567,
+      "weight_files": [
+        "lag-llama.ckpt",
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".ckpt": 1,
+        ".md": 2,
+        ".safetensors": 1,
+        ".webp": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 39294567,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 7361,
+          "is_weight": false
+        },
+        {
+          "path": "images/README.md",
+          "size_bytes": 0,
+          "is_weight": false
+        },
+        {
+          "path": "images/lagllama.webp",
+          "size_bytes": 137956,
+          "is_weight": false
+        },
+        {
+          "path": "lag-llama.ckpt",
+          "size_bytes": 29488819,
+          "is_weight": true
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 9805748,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/time-series-foundation-models/Lag-Llama/tree/72dcfc29da106acfe38250a60f4ae29d1e56a3d9"
+    },
+    {
+      "model_id": "moirai-1.0-base",
+      "repo_id": "Salesforce/moirai-1.0-R-base",
+      "revision": "4fa939a8800d9da346c0280f3d9aeba0d2d35877",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "transformers",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "transformers",
+        "safetensors",
+        "time series",
+        "forecasting",
+        "pretrained models",
+        "foundation models",
+        "time series foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "arxiv:2402.02592",
+        "license:cc-by-nc-4.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "cc-by-nc-4.0",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time series",
+          "forecasting",
+          "pretrained models",
+          "foundation models",
+          "time series foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 5,
+      "known_file_bytes": 365770808,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 365449072,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".png": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 365449072,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 5268,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 683,
+          "is_weight": false
+        },
+        {
+          "path": "figures/architecture.png",
+          "size_bytes": 314266,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 365449072,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/Salesforce/moirai-1.0-R-base/tree/4fa939a8800d9da346c0280f3d9aeba0d2d35877"
+    },
+    {
+      "model_id": "moirai-2.0-small",
+      "repo_id": "Salesforce/moirai-2.0-R-small",
+      "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": null,
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "safetensors",
+        "time series",
+        "forecasting",
+        "pretrained models",
+        "foundation models",
+        "time series foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "arxiv:2403.07815",
+        "arxiv:2402.02592",
+        "arxiv:2511.11698",
+        "license:cc-by-nc-4.0",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "cc-by-nc-4.0",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time series",
+          "forecasting",
+          "pretrained models",
+          "foundation models",
+          "time series foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 4,
+      "known_file_bytes": 45562804,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 45557824,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 45557824,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 3170,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 291,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 45557824,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/Salesforce/moirai-2.0-R-small/tree/30f43ff08c8494f4943ae1521e9d4e94a0fbb389"
+    },
+    {
+      "model_id": "moment-1-large",
+      "repo_id": "AutonLab/MOMENT-1-large",
+      "revision": "ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "transformers",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "transformers",
+        "pytorch",
+        "safetensors",
+        "time series",
+        "forecasting",
+        "classification",
+        "anomaly detection",
+        "imputation",
+        "pretrained models",
+        "foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "dataset:AutonLab/Timeseries-PILE",
+        "arxiv:2402.03885",
+        "license:mit",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "mit",
+        "pipeline_tag": "time-series-forecasting",
+        "datasets": [
+          "AutonLab/Timeseries-PILE"
+        ],
+        "tags": [
+          "time series",
+          "forecasting",
+          "classification",
+          "anomaly detection",
+          "imputation",
+          "transformers",
+          "pretrained models",
+          "foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 5,
+      "known_file_bytes": 2771085789,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 2,
+      "known_weight_bytes": 2771077013,
+      "weight_files": [
+        "model.safetensors",
+        "pytorch_model.bin"
+      ],
+      "file_suffix_counts": {
+        ".bin": 1,
+        ".json": 1,
+        ".md": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": true,
+      "has_gguf": false,
+      "stored_weight_bytes": 2771077013,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 6306,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 951,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 1385501256,
+          "is_weight": true
+        },
+        {
+          "path": "pytorch_model.bin",
+          "size_bytes": 1385575757,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/AutonLab/MOMENT-1-large/tree/ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc"
+    },
+    {
+      "model_id": "moment-1-small",
+      "repo_id": "AutonLab/MOMENT-1-small",
+      "revision": "411e288267f82cce86296dbe4d6c8bc533cc162f",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "transformers",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "transformers",
+        "pytorch",
+        "safetensors",
+        "time series",
+        "forecasting",
+        "classification",
+        "anomaly detection",
+        "imputation",
+        "pretrained models",
+        "foundation models",
+        "time-series",
+        "time-series-forecasting",
+        "dataset:AutonLab/Timeseries-PILE",
+        "arxiv:2402.03885",
+        "license:mit",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "mit",
+        "pipeline_tag": "time-series-forecasting",
+        "datasets": [
+          "AutonLab/Timeseries-PILE"
+        ],
+        "tags": [
+          "time series",
+          "forecasting",
+          "classification",
+          "anomaly detection",
+          "imputation",
+          "transformers",
+          "pretrained models",
+          "foundation models",
+          "time-series"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 5,
+      "known_file_bytes": 303265796,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 2,
+      "known_weight_bytes": 303257025,
+      "weight_files": [
+        "model.safetensors",
+        "pytorch_model.bin"
+      ],
+      "file_suffix_counts": {
+        ".bin": 1,
+        ".json": 1,
+        ".md": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": true,
+      "has_gguf": false,
+      "stored_weight_bytes": 303257025,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 6305,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 947,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 151615328,
+          "is_weight": true
+        },
+        {
+          "path": "pytorch_model.bin",
+          "size_bytes": 151641697,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/AutonLab/MOMENT-1-small/tree/411e288267f82cce86296dbe4d6c8bc533cc162f"
+    },
+    {
+      "model_id": "sundial-base",
+      "repo_id": "thuml/sundial-base-128m",
+      "revision": "3212e42564493f520593e5414af4367fc4b49226",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "transformers",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "transformers",
+        "safetensors",
+        "sundial",
+        "text-generation",
+        "time series",
+        "time-series",
+        "forecasting",
+        "foundation models",
+        "pretrained models",
+        "generative models",
+        "time series foundation models",
+        "time-series-forecasting",
+        "custom_code",
+        "dataset:thuml/UTSD",
+        "dataset:Salesforce/lotsa_data",
+        "dataset:autogluon/chronos_datasets",
+        "arxiv:2502.00816",
+        "arxiv:2403.07815",
+        "license:apache-2.0",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "library_name": "transformers",
+        "pipeline_tag": "time-series-forecasting",
+        "datasets": [
+          "thuml/UTSD",
+          "Salesforce/lotsa_data",
+          "autogluon/chronos_datasets"
+        ],
+        "tags": [
+          "time series",
+          "time-series",
+          "forecasting",
+          "foundation models",
+          "pretrained models",
+          "generative models",
+          "time series foundation models"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 9,
+      "known_file_bytes": 513397914,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 513341448,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 2,
+        ".md": 1,
+        ".py": 4,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [
+        "configuration_sundial.py",
+        "flow_loss.py",
+        "modeling_sundial.py",
+        "ts_generation_mixin.py"
+      ],
+      "custom_code_markers": [
+        "configuration_sundial.py",
+        "modeling_sundial.py"
+      ],
+      "config_auto_map": {
+        "AutoConfig": "configuration_sundial.SundialConfig",
+        "AutoModelForCausalLM": "modeling_sundial.SundialForPrediction"
+      },
+      "config_architectures": [
+        "SundialForPrediction"
+      ],
+      "trust_remote_code_candidate": true,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 513341448,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 6555,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 739,
+          "is_weight": false
+        },
+        {
+          "path": "configuration_sundial.py",
+          "size_bytes": 1577,
+          "is_weight": false
+        },
+        {
+          "path": "flow_loss.py",
+          "size_bytes": 7829,
+          "is_weight": false
+        },
+        {
+          "path": "generation_config.json",
+          "size_bytes": 69,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 513341448,
+          "is_weight": true
+        },
+        {
+          "path": "modeling_sundial.py",
+          "size_bytes": 24413,
+          "is_weight": false
+        },
+        {
+          "path": "ts_generation_mixin.py",
+          "size_bytes": 13765,
+          "is_weight": false
+        }
+      ],
+      "source": "https://huggingface.co/thuml/sundial-base-128m/tree/3212e42564493f520593e5414af4367fc4b49226"
+    },
+    {
+      "model_id": "t0-alpha",
+      "repo_id": "theforecastingcompany/t0-alpha",
+      "revision": "f8727c2357e0d81f1d9f56fe3aaac43068b5fc72",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": "auto",
+      "gated_required": true,
+      "disabled": false,
+      "library_name": "tfc-t0",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "tfc-t0",
+        "safetensors",
+        "time-series",
+        "forecasting",
+        "probabilistic-forecasting",
+        "foundation-models",
+        "pretrained-models",
+        "covariates",
+        "pytorch",
+        "model_hub_mixin",
+        "pytorch_model_hub_mixin",
+        "time-series-forecasting",
+        "license:apache-2.0",
+        "model-index",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "library_name": "tfc-t0",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time-series",
+          "forecasting",
+          "probabilistic-forecasting",
+          "foundation-models",
+          "pretrained-models",
+          "covariates",
+          "pytorch",
+          "safetensors",
+          "model_hub_mixin",
+          "pytorch_model_hub_mixin"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 9,
+      "known_file_bytes": 410763562,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 406601492,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".png": 3,
+        ".safetensors": 1,
+        "<none>": 3
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 406601492,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1718,
+          "is_weight": false
+        },
+        {
+          "path": "LICENSE",
+          "size_bytes": 10768,
+          "is_weight": false
+        },
+        {
+          "path": "NOTICE",
+          "size_bytes": 486,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 9393,
+          "is_weight": false
+        },
+        {
+          "path": "assets/enedis_with_holidays.png",
+          "size_bytes": 1362412,
+          "is_weight": false
+        },
+        {
+          "path": "assets/medicam_with_cov.png",
+          "size_bytes": 1426040,
+          "is_weight": false
+        },
+        {
+          "path": "assets/medicam_without_cov.png",
+          "size_bytes": 1351003,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 250,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 406601492,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/theforecastingcompany/t0-alpha/tree/f8727c2357e0d81f1d9f56fe3aaac43068b5fc72"
+    },
+    {
+      "model_id": "tabpfn-ts",
+      "repo_id": "Prior-Labs/TabPFN-v2-clf",
+      "revision": "f851f2a3c941544733b712d8c0f96dfae9b28862",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "tabpfn",
+      "pipeline_tag": "tabular-classification",
+      "tags": [
+        "tabpfn",
+        "tabular-classification",
+        "license:other",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "other",
+        "license_name": "priorlabs-1-1",
+        "license_link": "https://github.com/PriorLabs/TabPFN/blob/49394b053a6759cfe68e90c21a2d51c31b396768/LICENSE",
+        "library_name": "tabpfn",
+        "pipeline_tag": "tabular-classification"
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "MANUAL_REVIEW_REQUIRED",
+      "file_count": 19,
+      "known_file_bytes": 309698789,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 13,
+      "known_weight_bytes": 280667328,
+      "weight_files": [
+        "tabpfn-v2-classifier-finetuned-gn2p4bpt-xp6f0iqb.ckpt",
+        "tabpfn-v2-classifier-finetuned-llderlii-oyd7ul21.ckpt",
+        "tabpfn-v2-classifier-finetuned-od3j1g5m-4svepuy5.ckpt",
+        "tabpfn-v2-classifier-finetuned-vutqq28w-boexhu6h.ckpt",
+        "tabpfn-v2-classifier-finetuned-zk73skhh.ckpt",
+        "tabpfn-v2-classifier-finetuned-znskzxi4-tvvss6bp.ckpt",
+        "tabpfn-v2-classifier-gn2p4bpt.ckpt",
+        "tabpfn-v2-classifier-llderlii.ckpt",
+        "tabpfn-v2-classifier-od3j1g5m.ckpt",
+        "tabpfn-v2-classifier-v2_default.ckpt",
+        "tabpfn-v2-classifier-vutqq28w.ckpt",
+        "tabpfn-v2-classifier-znskzxi4.ckpt",
+        "tabpfn-v2-classifier.ckpt"
+      ],
+      "file_suffix_counts": {
+        ".ckpt": 13,
+        ".cpkt": 1,
+        ".json": 1,
+        ".md": 1,
+        ".txt": 1,
+        "<none>": 2
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": false,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 280667328,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".DS_Store",
+          "size_bytes": 6148,
+          "is_weight": false
+        },
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1662,
+          "is_weight": false
+        },
+        {
+          "path": "LICENSE.txt",
+          "size_bytes": 11483,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 2592,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 37,
+          "is_weight": false
+        },
+        {
+          "path": "tabpfn-v2-classifier-finetuned-gn2p4bpt-xp6f0iqb.ckpt",
+          "size_bytes": 12926661,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-finetuned-llderlii-oyd7ul21.ckpt",
+          "size_bytes": 29017861,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-finetuned-od3j1g5m-4svepuy5.ckpt",
+          "size_bytes": 29017797,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-finetuned-vutqq28w-boexhu6h.ckpt",
+          "size_bytes": 12926661,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-finetuned-zk73skhh.ckpt",
+          "size_bytes": 29009539,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-finetuned-zk73skhh.cpkt",
+          "size_bytes": 29009539,
+          "is_weight": false
+        },
+        {
+          "path": "tabpfn-v2-classifier-finetuned-znskzxi4-tvvss6bp.ckpt",
+          "size_bytes": 12926661,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-gn2p4bpt.ckpt",
+          "size_bytes": 12926661,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-llderlii.ckpt",
+          "size_bytes": 29017861,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-od3j1g5m.ckpt",
+          "size_bytes": 29017797,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-v2_default.ckpt",
+          "size_bytes": 29009539,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-vutqq28w.ckpt",
+          "size_bytes": 12926661,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier-znskzxi4.ckpt",
+          "size_bytes": 12926661,
+          "is_weight": true
+        },
+        {
+          "path": "tabpfn-v2-classifier.ckpt",
+          "size_bytes": 29016968,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/Prior-Labs/TabPFN-v2-clf/tree/f851f2a3c941544733b712d8c0f96dfae9b28862"
+    },
+    {
+      "model_id": "timesfm-2.5-transformers",
+      "repo_id": "google/timesfm-2.5-200m-transformers",
+      "revision": "5a9806b9b291fad9233b5249d88263f1846304d3",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "transformers",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "transformers",
+        "safetensors",
+        "timesfm2_5",
+        "timesfm",
+        "time-series-forecasting",
+        "arxiv:2310.10688",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "library_name": "transformers",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "transformers",
+          "timesfm",
+          "timesfm2_5",
+          "time-series-forecasting",
+          "arxiv:2310.10688"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 4,
+      "known_file_bytes": 925192277,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 925187448,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": [
+        "TimesFm2_5ModelForPrediction"
+      ],
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 925187448,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 2396,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 914,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 925187448,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/google/timesfm-2.5-200m-transformers/tree/5a9806b9b291fad9233b5249d88263f1846304d3"
+    },
+    {
+      "model_id": "tirex-2",
+      "repo_id": "NX-AI/TiRex-2",
+      "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "tirex-2",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "tirex-2",
+        "time-series-forecasting",
+        "dataset:autogluon/chronos_datasets",
+        "dataset:Salesforce/lotsa_data",
+        "arxiv:2607.01204",
+        "license:apache-2.0",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "library_name": "tirex-2",
+        "pipeline_tag": "time-series-forecasting",
+        "datasets": [
+          "autogluon/chronos_datasets",
+          "Salesforce/lotsa_data"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 7,
+      "known_file_bytes": 380686967,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 380613375,
+      "weight_files": [
+        "model.ckpt"
+      ],
+      "file_suffix_counts": {
+        ".ckpt": 1,
+        ".md": 1,
+        ".svg": 1,
+        ".yaml": 1,
+        "<none>": 3
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": false,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 380613375,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1519,
+          "is_weight": false
+        },
+        {
+          "path": "LICENSE",
+          "size_bytes": 10173,
+          "is_weight": false
+        },
+        {
+          "path": "NOTICE",
+          "size_bytes": 248,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 5521,
+          "is_weight": false
+        },
+        {
+          "path": "model-config.yaml",
+          "size_bytes": 1204,
+          "is_weight": false
+        },
+        {
+          "path": "model.ckpt",
+          "size_bytes": 380613375,
+          "is_weight": true
+        },
+        {
+          "path": "tirex.svg",
+          "size_bytes": 54927,
+          "is_weight": false
+        }
+      ],
+      "source": "https://huggingface.co/NX-AI/TiRex-2/tree/05e5b26db52bfb256f1ae1bdf785589850482de3"
+    },
+    {
+      "model_id": "toto-2.0-4m",
+      "repo_id": "Datadog/Toto-2.0-4m",
+      "revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "pytorch",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "pytorch",
+        "safetensors",
+        "time-series-forecasting",
+        "foundation-models",
+        "pretrained-models",
+        "time-series",
+        "timeseries",
+        "forecasting",
+        "observability",
+        "pytorch_model_hub_mixin",
+        "arxiv:2602.12147",
+        "arxiv:2605.20119",
+        "license:apache-2.0",
+        "model-index",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "library_name": "pytorch",
+        "pipeline_tag": "time-series-forecasting",
+        "tags": [
+          "time-series-forecasting",
+          "foundation-models",
+          "pretrained-models",
+          "time-series",
+          "timeseries",
+          "forecasting",
+          "observability",
+          "safetensors",
+          "pytorch_model_hub_mixin"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 7,
+      "known_file_bytes": 17727464,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 16582848,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".png": 3,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 16582848,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1694,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 7307,
+          "is_weight": false
+        },
+        {
+          "path": "assets/architecture.png",
+          "size_bytes": 436711,
+          "is_weight": false
+        },
+        {
+          "path": "assets/pareto.png",
+          "size_bytes": 302199,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 592,
+          "is_weight": false
+        },
+        {
+          "path": "figures/architecture.png",
+          "size_bytes": 396113,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 16582848,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/Datadog/Toto-2.0-4m/tree/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9"
+    },
+    {
+      "model_id": "toto-open-base",
+      "repo_id": "Datadog/Toto-Open-Base-1.0",
+      "revision": "0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5",
+      "verified_at": "2026-08-01T07:44:10+00:00",
+      "private": false,
+      "gated": false,
+      "gated_required": false,
+      "disabled": false,
+      "library_name": "transformers",
+      "pipeline_tag": "time-series-forecasting",
+      "tags": [
+        "transformers",
+        "safetensors",
+        "time-series-forecasting",
+        "foundation models",
+        "pretrained models",
+        "time series foundation models",
+        "time series",
+        "time-series",
+        "timeseries",
+        "forecasting",
+        "observability",
+        "dataset:Salesforce/GiftEvalPretrain",
+        "dataset:autogluon/chronos_datasets",
+        "arxiv:2505.14766",
+        "license:apache-2.0",
+        "model-index",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "card_metadata": {
+        "license": "apache-2.0",
+        "pipeline_tag": "time-series-forecasting",
+        "datasets": [
+          "Salesforce/GiftEvalPretrain",
+          "autogluon/chronos_datasets"
+        ],
+        "tags": [
+          "time-series-forecasting",
+          "foundation models",
+          "pretrained models",
+          "time series foundation models",
+          "time series",
+          "time-series",
+          "timeseries",
+          "transformers",
+          "forecasting",
+          "safetensors",
+          "observability"
+        ]
+      },
+      "card_error": "TypeError: RepoCard.load() got an unexpected keyword argument 'revision'",
+      "license_status": "DECLARED_REVIEW_REQUIRED",
+      "file_count": 6,
+      "known_file_bytes": 605699137,
+      "hub_used_storage_bytes": null,
+      "weight_file_count": 1,
+      "known_weight_bytes": 605239264,
+      "weight_files": [
+        "model.safetensors"
+      ],
+      "file_suffix_counts": {
+        ".json": 1,
+        ".md": 1,
+        ".png": 2,
+        ".safetensors": 1,
+        "<none>": 1
+      },
+      "python_files": [],
+      "custom_code_markers": [],
+      "config_auto_map": null,
+      "config_architectures": null,
+      "trust_remote_code_candidate": false,
+      "has_safetensors": true,
+      "has_pytorch_bin": false,
+      "has_gguf": false,
+      "stored_weight_bytes": 605239264,
+      "stored_weights_within_16gb": true,
+      "runtime_vram_certified": false,
+      "files": [
+        {
+          "path": ".gitattributes",
+          "size_bytes": 1637,
+          "is_weight": false
+        },
+        {
+          "path": "README.md",
+          "size_bytes": 7372,
+          "is_weight": false
+        },
+        {
+          "path": "config.json",
+          "size_bytes": 582,
+          "is_weight": false
+        },
+        {
+          "path": "figures/architecture.png",
+          "size_bytes": 238760,
+          "is_weight": false
+        },
+        {
+          "path": "figures/rankings.png",
+          "size_bytes": 211522,
+          "is_weight": false
+        },
+        {
+          "path": "model.safetensors",
+          "size_bytes": 605239264,
+          "is_weight": true
+        }
+      ],
+      "source": "https://huggingface.co/Datadog/Toto-Open-Base-1.0/tree/0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5"
+    }
+  ],
+  "errors": []
+}
