@@ -97,3 +97,6 @@ artifacts/models/
 artifacts/numbers3/n1_rolling_parallel/
 artifacts/numbers3/n1_rolling_parallel_*/
 artifacts/numbers3/n1_deterministic_*/
+
+configs/database.local.env
+configs/platform.env
