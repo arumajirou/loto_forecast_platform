@@ -1,0 +1,5 @@
+model_id,family,role,formal_status
+numbers3-n1-train-only-constant,train_only_constant,reference_baseline,BASELINE_ONLY
+numbers3-n1-dirichlet-w20-a5,rolling_dirichlet,shadow_baseline,BASELINE_ONLY
+numbers3-n1-tree-depth4,decision_tree_classifier,shadow_candidate,REJECTED
+numbers3-n1-multinomial-logistic,multinomial_logistic,shadow_candidate,REJECTED

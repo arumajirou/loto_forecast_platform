@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+psycopg2-binary
+neuralforecast
+ray[tune]
+optuna
+psutil
+pyyaml
+prometheus-client

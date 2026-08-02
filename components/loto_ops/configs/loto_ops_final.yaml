@@ -1,0 +1,135 @@
+# ============================================================================
+# loto_ops_final.yaml — Production Configuration (Phase 11 Fixed)
+# ============================================================================
+# 
+# This configuration file fixes the optimal parameters discovered through
+# empirical validation (MTP n_draft=2 + Workflow F).
+# 
+# Key fixed parameters:
+# - fast_mode.n_draft: 2 (MTP conservative setting)
+# - performance.default_mode: "light"
+# - performance.unified_engine: "postgres-ctas"
+#
+# Generated: 2026-07-19
+# Evaluator: Senior AI Agent Harness Designer
+# Validation: tests/benchmarks/validation_evaluation.py
+# Sealed Evaluation: tests/benchmarks/sealed_evaluation.py
+# Report: .ai/reports/11_sealed_evaluation.md
+#
+# ============================================================================
+
+paths:
+  loto_life_project: "/mnt/e/env/ts/loto_life_feature_pipeline"
+  loto_forecast_project: "components/loto_forecast_engine"
+  ops_project: "/mnt/e/env/ts/loto_ops"
+  zip_output_dir: "/mnt/e/env/ts/zips"
+
+db:
+  host: "127.0.0.1"
+  port: 5432
+  user: "loto"
+  password: "CHANGE_ME"
+  database: "loto"
+  maintenance_database: "postgres"
+
+pipeline:
+  default_games: "all"
+  require_exog: false
+  allow_no_exog: true
+  postgres_write_mode: "copy"
+  table_limit_default: 100
+  table_limit_max: 5000
+
+scheduler:
+  time: "06:30"
+  systemd_unit_name: "loto-ops-weekday"
+
+# ============================================================================
+# MTP Configuration — FIXED TO OPTIMAL SETTINGS
+# ============================================================================
+# Validated through empirical measurement on validation and sealed datasets.
+# Config 2 (n_draft=2 + Workflow F) achieved 100% success on sealed tasks
+# with no overfitting detected.
+# ============================================================================
+fast_mode:
+  enabled: true
+  # MTP conservative setting — validated optimal
+  n_draft: 2
+  cpu_workers: 16
+  copy_jobs: 6
+  polars_threads: 24
+  partition_by_game: true
+  use_unlogged_staging: true
+  skip_legacy_postgres_write: true
+  export_parquet: true
+  export_partitioned_csv: true
+  postgres_session_tuning:
+    synchronous_commit: "off"
+    work_mem: "256MB"
+    maintenance_work_mem: "4GB"
+    max_parallel_workers_per_gather: 8
+
+# ============================================================================
+# Performance Configuration — FIXED TO PRODUCTION SETTINGS
+# ============================================================================
+performance:
+  default_mode: "light"
+  unified_engine: "postgres-ctas"
+  daily_mode: "light"
+  full_mode_requires_env: true
+  max_auto_full_memory_gb: 48
+  heavy_exog_tables:
+    - chronos
+    - merlion
+    - pypots
+    - timesfm
+    - uni2ts
+  resource_governor:
+    copy_jobs_max: 8
+    exog_workers_max: 16
+    polars_threads_max: 32
+  unified_fast:
+    unlogged_staging: true
+    work_mem: "256MB"
+    maintenance_work_mem: "2GB"
+    default_max_exog_cols: null
+
+# ============================================================================
+# Workflow Configuration — FIXED TO VALIDATED OPTIMAL
+# ============================================================================
+# Workflow F (balanced hybrid) selected based on sealed evaluation results.
+# Achieves 100% success rate on unseen tasks with acceptable overhead.
+# ============================================================================
+workflow:
+  selected_workflow: "F"
+  workflow_description: "balanced_hybrid"
+  max_retries: 3
+  retry_backoff_base: 1.0
+  retry_backoff_max: 30.0
+
+# ============================================================================
+# Monitoring and Incident Response
+# ============================================================================
+monitoring:
+  incident_log_dir: "shared-ai-memory/incidents"
+  error_classes:
+    - "E"  # Execution errors
+    - "T"  # Timeout errors
+    - "V"  # Validation errors
+    - "M"  # Metadata errors
+    - "U"  # Unknown errors
+  alert_thresholds:
+    success_rate_warning: 0.80
+    success_rate_critical: 0.60
+    token_usage_warning: 1000
+    elapsed_time_warning: 60.0
+
+# ============================================================================
+# Handover Configuration
+# ============================================================================
+handover:
+  export_handover: true
+  import_handover: true
+  handover_dir: "shared-ai-memory/handovers"
+  latest_handover_file: "latest_handover.json"
+  resume_enabled: true

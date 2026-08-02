@@ -1,0 +1,18 @@
+# Loto Ops scheduling policy
+systemd_user:
+  enabled: true
+  weekday_time: "06:30"
+  weekday_calendar: "Mon..Fri *-*-* 06:30:00"
+  persistent: true
+  start_ui_at_login: true
+  run_pipeline_at_login: true
+  open_browser_at_login: true
+  ui_port: 8520
+
+pipeline:
+  mode: "light"
+  daily_once_guard: true
+  startup_run_weekends: true
+  notifications:
+    gmail: true
+    slack: true

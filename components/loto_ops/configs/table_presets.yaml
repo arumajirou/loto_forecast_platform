@@ -1,0 +1,16 @@
+important_tables:
+  - schema: dataset
+    table: loto_y_ts
+    label: 原系列
+  - schema: dataset
+    table: loto_hist_feat
+    label: 履歴特徴量
+  - schema: dataset
+    table: loto_y_ts_unified
+    label: 統合データセット
+  - schema: exog
+    table: loto_y_ts_exog
+    label: 外生特徴量
+  - schema: meta
+    table: model_run
+    label: 実行履歴

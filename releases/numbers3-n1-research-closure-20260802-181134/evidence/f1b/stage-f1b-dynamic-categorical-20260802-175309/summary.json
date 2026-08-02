@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "run_id": "stage-f1b-dynamic-categorical-20260802-175309",
+  "data_sha256": "d2c599f24ef457e7a66d4607fe475c61c8900197c867b2e00fc172f58fa48355",
+  "data_rows": 7039,
+  "train_rows": 6539,
+  "holdout_rows": 500,
+  "time_bin_size": 50,
+  "number_of_train_bins": 131,
+  "number_of_holdout_bins": 10,
+  "svi_steps": 8000,
+  "posterior_samples": 2000,
+  "training_seconds": 13.095282595000754,
+  "initial_loss": 142631.390625,
+  "final_loss": 17328.865234375,
+  "loss_finite": true,
+  "innovation_shape": [
+    2000,
+    131,
+    10
+  ],
+  "probability_shape": [
+    500,
+    10
+  ],
+  "probability_finite": true,
+  "probability_sum_check": true,
+  "mean_innovation_scale": 0.20324742060154677,
+  "multiclass_brier": 0.9473738356028966,
+  "multiclass_log_loss": 2.5975635084635336,
+  "uniform_log_loss": 2.302585092994046,
+  "selected_constant": 8,
+  "dynamic_hit": 0.288,
+  "dirichlet_hit": 0.3,
+  "dynamic_advantage_vs_dirichlet": -0.01200000000000001,
+  "continue_to_f1c": false,
+  "jax_backend": "cpu",
+  "cpu_fallback": true
+}

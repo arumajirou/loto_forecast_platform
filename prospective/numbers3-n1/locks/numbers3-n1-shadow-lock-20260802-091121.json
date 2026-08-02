@@ -1,0 +1,104 @@
+{
+  "actual": null,
+  "code": {
+    "git_commit": "1ab091ada92684470175b038b7d8f5715e2ba239",
+    "git_status_sha256": "20a9c534caa799e53f173e3a3a4bf7cebebd3c91e1cb8eb347e19a9244695be6",
+    "module_sha256": "acbcc7496a57922fac1a06b6fbd95bc0886598f9bbaa219e31240ae0b56295c0"
+  },
+  "created_at_utc": "2026-08-02T09:11:21.702079+00:00",
+  "cutoff_ds": "2026-07-31 00:00:00",
+  "data": {
+    "path": "/mnt/e/env/ts/loto_forecast_platform/data/exports/numbers3/numbers3_n1.parquet",
+    "rows": 7039,
+    "sha256": "d2c599f24ef457e7a66d4607fe475c61c8900197c867b2e00fc172f58fa48355"
+  },
+  "models": {
+    "multinomial_logistic": {
+      "confidence": 0.36364544907677143,
+      "prediction": 8,
+      "selected_features": [
+        "freq_7_5",
+        "freq_7_100",
+        "lag_7",
+        "lag_29",
+        "freq_1_10",
+        "freq_6_10",
+        "lag_90",
+        "lag_27",
+        "freq_2_200",
+        "freq_1_200",
+        "lag_26",
+        "freq_0_10",
+        "freq_8_50",
+        "lag_17",
+        "freq_0_20",
+        "freq_6_200",
+        "freq_3_50",
+        "lag_88",
+        "lag_19",
+        "lag_67",
+        "lag_72",
+        "freq_6_50",
+        "freq_9_100",
+        "min_200",
+        "freq_4_200",
+        "lag_83",
+        "freq_3_5",
+        "freq_5_50",
+        "lag_55",
+        "lag_22"
+      ]
+    },
+    "rolling_dirichlet_w20_a5": {
+      "confidence": 0.34285714285714286,
+      "prediction": 4,
+      "selected_features": []
+    },
+    "train_only_constant": {
+      "confidence": null,
+      "prediction": 8,
+      "selected_features": []
+    },
+    "tree_depth4": {
+      "confidence": 0.31846414455110106,
+      "prediction": 7,
+      "selected_features": [
+        "freq_7_5",
+        "freq_7_100",
+        "lag_7",
+        "lag_29",
+        "freq_1_10",
+        "freq_6_10",
+        "lag_90",
+        "lag_27",
+        "freq_2_200",
+        "freq_1_200",
+        "lag_26",
+        "freq_0_10",
+        "freq_8_50",
+        "lag_17",
+        "freq_0_20",
+        "freq_6_200",
+        "freq_3_50",
+        "lag_88",
+        "lag_19",
+        "lag_67",
+        "lag_72",
+        "freq_6_50",
+        "freq_9_100",
+        "min_200",
+        "freq_4_200",
+        "lag_83",
+        "freq_3_5",
+        "freq_5_50",
+        "lag_55",
+        "lag_22"
+      ]
+    }
+  },
+  "primary_metric": "Hit@±1",
+  "schema_version": "1.0",
+  "seed": 20260802,
+  "status": "LOCKED_BEFORE_ACTUAL",
+  "target_ds": "2026-08-03 00:00:00"
+}

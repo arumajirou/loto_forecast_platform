@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "data_sha256": "d2c599f24ef457e7a66d4607fe475c61c8900197c867b2e00fc172f58fa48355",
+  "parallel_workers": 8,
+  "minimum_rows": 20,
+  "prediction_files_examined": 76,
+  "aligned_model_groups": 1034,
+  "formal_pass_groups": 2,
+  "pseudo_accuracy_confirmed_groups": 232,
+  "audit_failure_count": 0,
+  "bootstrap_iterations_per_group": 20000,
+  "bootstrap_block_length": 10,
+  "formal_criteria": {
+    "hit_difference_min": 0.02,
+    "bootstrap_ci_lower_gt": 0.0,
+    "prediction_mode_share_max": 0.7,
+    "prediction_unique_min": 3,
+    "winning_blocks_min": 3,
+    "mae_not_worse": true,
+    "mse_not_worse": true
+  }
+}

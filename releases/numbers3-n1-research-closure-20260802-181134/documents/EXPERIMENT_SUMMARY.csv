@@ -1,0 +1,6 @@
+stage,method,evaluation,hit_at_pm1,decision
+F0c,tree_depth4,repeated temporal rolling audit,0.31320000000000003,CLOSE_90_PERCENT_RESEARCH
+F1a,numpyro_multinomial_hit_optimal,single holdout smoke,0.302,REJECT_STATIC_BAYESIAN
+F1b,dynamic_grw_hit_optimal,single holdout smoke,0.288,REJECT_DYNAMIC_GRW
+F2a,multinomial_logistic_calibrated_hit,single holdout smoke,0.34,CONDITIONAL_ONLY
+F2b,multinomial_logistic,5 temporal splits x multiple seeds,0.3,REJECT_F2_LOGISTIC_AS_FORMAL_MODEL

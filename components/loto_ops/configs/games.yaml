@@ -1,0 +1,31 @@
+games:
+  mini:
+    url: "https://loto-life.net/csv/mini"
+    number_min: 1
+    number_max: 31
+    number_count: 5
+  loto6:
+    url: "https://loto-life.net/csv/loto6"
+    number_min: 1
+    number_max: 43
+    number_count: 6
+  loto7:
+    url: "https://loto-life.net/csv/loto7"
+    number_min: 1
+    number_max: 37
+    number_count: 7
+  bingo5:
+    url: "https://loto-life.net/csv/bingo5"
+    number_min: 1
+    number_max: 40
+    number_count: 8
+  numbers3:
+    url: "https://loto-life.net/csv/numbers3"
+    number_min: 0
+    number_max: 9
+    number_count: 3
+  numbers4:
+    url: "https://loto-life.net/csv/numbers4"
+    number_min: 0
+    number_max: 9
+    number_count: 4

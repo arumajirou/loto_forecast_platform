@@ -1,0 +1,13 @@
+[Unit]
+Description=Check Numbers3 N1 actual and evaluate locked forecast
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/mnt/e/env/ts/loto_forecast_platform
+ExecStart=/usr/bin/bash /mnt/e/env/ts/loto_forecast_platform/scripts/operations/check_numbers3_n1_actual.sh
+Nice=10
+
+[Install]
+WantedBy=default.target

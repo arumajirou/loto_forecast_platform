@@ -1,0 +1,34 @@
+name: inspect_recent_logs
+purpose: Inspect recent pipeline logs and summarize failures without modifying runtime state.
+trigger:
+  - A command fails or returns an unexpected status.
+  - An operator requests the latest execution summary.
+preconditions:
+  - The log directory exists and is readable.
+prohibited_conditions:
+  - Log files may contain secrets that have not been redacted.
+required_tools:
+  - find
+  - tail
+  - grep
+ordered_steps:
+  - Locate recent log and status files by modification time.
+  - Read bounded tails rather than entire large files.
+  - Extract errors, warnings, exit codes, and run identifiers.
+  - Correlate messages by timestamp and run ID.
+  - Save a concise read-only inspection report.
+validation:
+  - Source log files remain unchanged.
+  - Every finding cites a concrete file and line or timestamp.
+rollback: Delete only the generated inspection report.
+known_failures:
+  - Logs are missing or rotated.
+  - Timestamps use inconsistent time zones.
+  - Output was truncated before the root error.
+version: 1.0.0
+evidence:
+  - Inspection report
+  - Source file list
+  - Report SHA-256 digest
+success_count: 0
+failure_count: 0

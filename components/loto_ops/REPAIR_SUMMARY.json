@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "version": "v3",
+  "project_directory": "loto_ops",
+  "recommended_install_path": "/mnt/e/env/ts/loto_ops",
+  "tests_passed": 114,
+  "ui": {
+    "application": "Streamlit",
+    "url": "http://127.0.0.1:8520",
+    "auto_start": true
+  },
+  "scheduling": {
+    "startup_pipeline": true,
+    "weekday_daily": true,
+    "on_calendar": "Mon..Fri *-*-* 06:30:00",
+    "persistent": true,
+    "daily_duplicate_guard": true
+  },
+  "notifications": {
+    "gmail_smtp": true,
+    "slack_incoming_webhook": true,
+    "on_success": true,
+    "on_failure": true,
+    "secrets_bundled": false
+  },
+  "security": {
+    "runtime_env": "~/.config/loto-ops/runtime.env",
+    "runtime_env_mode": "0600",
+    "pgpass": "~/.pgpass",
+    "pgpass_mode": "0600"
+  }
+}

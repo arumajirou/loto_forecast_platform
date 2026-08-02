@@ -1,0 +1,15 @@
+line-length = 100
+target-version = "py311"
+
+[lint]
+extend-ignore = ["RUF001", "RUF003"]
+select = ["E", "F", "W", "I", "B", "UP", "C4", "SIM", "RUF"]
+ignore = ["E501"]
+
+[lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
