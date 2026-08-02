@@ -11,6 +11,8 @@ TOOL="${PROJECT_ROOT}/tools/nf_loto_research_closure"
 LOCK_DIR="${PROJECT_ROOT}/prospective/numbers3-n1/locks"
 RESULT_DIR="${PROJECT_ROOT}/prospective/numbers3-n1/evaluations"
 DATA="${PROJECT_ROOT}/data/exports/numbers3/numbers3_n1.parquet"
+SYNC_NUMBERS3_N1_FROM_POSTGRES="${PROJECT_ROOT}/scripts/operations/sync_numbers3_n1_from_postgres.py"
+SYNC_RESULT_DIR="${PROJECT_ROOT}/logs/data-refresh-audit"
 LOG_DIR="${PROJECT_ROOT}/logs/prospective-actual-watch"
 
 mkdir -p \
@@ -31,6 +33,88 @@ echo "RUN_ID=${RUN_ID}"
 echo "STARTED_AT_UTC=$(date -u --iso-8601=seconds)"
 echo "PROJECT_ROOT=${PROJECT_ROOT}"
 echo "DATA=${DATA}"
+
+mkdir -p "${SYNC_RESULT_DIR}"
+
+SYNC_RESULT="${SYNC_RESULT_DIR}/numbers3-n1-monitor-sync-${RUN_ID}.json"
+
+echo "SYNC_SCRIPT=${SYNC_NUMBERS3_N1_FROM_POSTGRES}"
+echo "SYNC_RESULT=${SYNC_RESULT}"
+
+if test ! -f "${SYNC_NUMBERS3_N1_FROM_POSTGRES}"
+then
+  echo "ERROR: Numbers3 N1 PostgreSQL sync script is missing"
+  echo "STATUS=SYNC_FAILED"
+  echo "MONITORING_ACTION=RETRY"
+  exit 1
+fi
+
+"${PROJECT_ROOT}/.venv/bin/python" \
+  "${SYNC_NUMBERS3_N1_FROM_POSTGRES}" \
+  --target "${DATA}" |
+tee "${SYNC_RESULT}"
+
+SYNC_RC=${PIPESTATUS[0]}
+
+echo "SYNC_RC=${SYNC_RC}"
+
+if test "${SYNC_RC}" -ne 0
+then
+  echo "ERROR: Numbers3 N1 PostgreSQL sync failed"
+  echo "STATUS=SYNC_FAILED"
+  echo "MONITORING_ACTION=RETRY"
+  exit "${SYNC_RC}"
+fi
+
+"${PROJECT_ROOT}/.venv/bin/python" - \
+  "${SYNC_RESULT}" <<'PY_SYNC'
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+
+payload = json.loads(
+    path.read_text(encoding="utf-8")
+)
+
+assert payload["status"] == "PASS"
+assert payload["source_rows"] == payload["output_rows"]
+assert payload["duplicate_ds"] == 0
+assert payload["null_ds"] == 0
+assert payload["null_y"] == 0
+
+print(
+    "SYNC_STATUS="
+    f"{payload['status']}"
+)
+print(
+    "SYNC_CHANGED="
+    f"{str(payload['changed']).lower()}"
+)
+print(
+    "SYNC_MAX_DS="
+    f"{payload['max_ds']}"
+)
+print(
+    "SYNC_OUTPUT_SHA256="
+    f"{payload['output_sha256']}"
+)
+PY_SYNC
+
+SYNC_VERIFY_RC=$?
+
+echo "SYNC_VERIFY_RC=${SYNC_VERIFY_RC}"
+
+if test "${SYNC_VERIFY_RC}" -ne 0
+then
+  echo "ERROR: Numbers3 N1 synchronization contract failed"
+  echo "STATUS=SYNC_CONTRACT_FAILED"
+  echo "MONITORING_ACTION=RETRY"
+  exit "${SYNC_VERIFY_RC}"
+fi
 
 test -s "${DATA}" || {
   echo "STATUS=DATA_NOT_AVAILABLE"
