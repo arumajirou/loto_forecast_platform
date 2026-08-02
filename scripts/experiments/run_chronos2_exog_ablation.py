@@ -9,7 +9,6 @@ import pandas as pd
 from autogluon.timeseries import TimeSeriesDataFrame, TimeSeriesPredictor
 from sqlalchemy import create_engine
 
-
 ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
 RUN_ID = time.strftime("chronos2-exog-ablation-%Y%m%d-%H%M%S")
 OUT = ROOT / "artifacts" / "experiments" / RUN_ID

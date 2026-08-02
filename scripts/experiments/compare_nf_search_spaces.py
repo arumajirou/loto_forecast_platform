@@ -5,7 +5,6 @@ from pathlib import Path
 
 import yaml
 
-
 SPEC = Path("configs/generated/neuralforecast_complete_search_spec.yaml")
 
 DEFAULTS = Path("artifacts/parameter_inventory/neuralforecast_auto_default_spaces.json")

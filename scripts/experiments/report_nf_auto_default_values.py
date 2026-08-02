@@ -6,7 +6,6 @@ from typing import Any
 
 import pandas as pd
 
-
 SOURCE = Path("artifacts/parameter_inventory/neuralforecast_auto_default_spaces.json")
 
 OUTPUT_CSV = Path("artifacts/parameter_inventory/neuralforecast_auto_default_values.csv")

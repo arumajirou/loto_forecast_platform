@@ -6,7 +6,6 @@ from typing import Any
 
 import yaml
 
-
 SPACE_SOURCE = Path("configs/generated/neuralforecast_normalized_fixed_seed_spaces.json")
 
 SEARCH_SPEC_SOURCE = Path("configs/generated/neuralforecast_complete_search_spec.yaml")

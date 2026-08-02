@@ -13,17 +13,15 @@ import torch
 from neuralforecast import NeuralForecast
 from neuralforecast.losses.pytorch import MAE
 from neuralforecast.models import (
-    DeepAR,
     GRU,
     LSTM,
-    NBEATSx,
     NHITS,
     TCN,
     TFT,
+    NBEATSx,
     TiDE,
 )
 from sqlalchemy import create_engine
-
 
 ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
 RUN_ID = time.strftime("nf-exog-ablation-%Y%m%d-%H%M%S")
@@ -300,7 +298,7 @@ for model_name, builder in MODEL_BUILDERS.items():
             fold_mse.append(float(np.mean((actual - prediction) ** 2)))
             fold_within1.append(float(np.mean(errors <= 1.0)))
 
-            for index, row in merged.iterrows():
+            for _index, row in merged.iterrows():
                 prediction_rows.append(
                     {
                         "model": model_name,

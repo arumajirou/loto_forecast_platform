@@ -4,8 +4,8 @@ import os
 
 import numpy as np
 import pandas as pd
-from sqlalchemy import create_engine
 import pytest
+from sqlalchemy import create_engine
 
 
 def load_data() -> pd.DataFrame:

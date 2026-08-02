@@ -8,7 +8,6 @@ from typing import Any
 import neuralforecast
 from neuralforecast import models
 
-
 MODEL_NAMES = [
     "TiDE",
     "TFT",

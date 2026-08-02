@@ -4,11 +4,9 @@ import hashlib
 import json
 import os
 import platform
-import subprocess
 import time
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import torch
 from autogluon.timeseries import (
@@ -16,7 +14,6 @@ from autogluon.timeseries import (
     TimeSeriesPredictor,
 )
 from sqlalchemy import create_engine
-
 
 ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
 RUN_ID = time.strftime("chronos2-exog-%Y%m%d-%H%M%S")

@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-
 SOURCE = Path("artifacts/parameter_inventory/neuralforecast_auto_default_spaces.json")
 
 OUTPUT = Path("artifacts/parameter_inventory/neuralforecast_auto_backend_differences.json")

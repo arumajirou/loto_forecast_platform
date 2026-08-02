@@ -8,7 +8,6 @@ from typing import Any
 import pandas as pd
 from neuralforecast import NeuralForecast
 
-
 root = Path(sys.argv[1])
 rows: list[dict[str, Any]] = []
 
@@ -177,7 +176,7 @@ print(df.to_string(index=False))
 print(f"\nJSON={json_path}")
 print(f"CSV={csv_path}")
 
-failed = df[(df["load_status"] != "PASS") | (df["property_contract_pass"] != True)]
+failed = df[(df["load_status"] != "PASS") | ~df["property_contract_pass"].astype(bool)]
 
 if not failed.empty:
     print("\nFAILED MODELS")

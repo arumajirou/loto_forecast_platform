@@ -14,7 +14,6 @@ from neuralforecast.losses.pytorch import MAE
 from neuralforecast.models import TFT
 from sqlalchemy import create_engine
 
-
 ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
 RUN_ID = time.strftime("tft-selected-exog-%Y%m%d-%H%M%S")
 OUT = ROOT / "artifacts" / "experiments" / RUN_ID
@@ -269,7 +268,7 @@ for seed in SEEDS:
 
             fold_metrics.append(metrics)
 
-            for index, row in merged.iterrows():
+            for _index, row in merged.iterrows():
                 predictions.append(
                     {
                         **metrics,

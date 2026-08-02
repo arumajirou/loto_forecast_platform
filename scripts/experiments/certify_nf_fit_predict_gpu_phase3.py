@@ -5,29 +5,27 @@ import json
 import math
 import time
 import traceback
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
 import torch
-
 from neuralforecast import NeuralForecast
 from neuralforecast.losses.pytorch import (
-    DistributionLoss,
     MAE,
+    DistributionLoss,
 )
 from neuralforecast.models import (
+    KAN,
     Autoformer,
     DeepAR,
     DeepNPTS,
     FEDformer,
     Informer,
-    KAN,
     NBEATSx,
 )
-
 
 OUTPUT = Path("artifacts/runtime_certification/neuralforecast_fit_predict_gpu_phase3.json")
 
@@ -416,7 +414,7 @@ def main() -> None:
     failed = sum(item["status"] == "ERROR" for item in results)
 
     report = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "python_cuda_available": (torch.cuda.is_available()),
         "torch_version": torch.__version__,
         "torch_cuda_build": (torch.version.cuda),

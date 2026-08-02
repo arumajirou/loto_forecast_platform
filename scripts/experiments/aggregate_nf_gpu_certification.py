@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-
 
 ROOT = Path("artifacts/runtime_certification")
 
@@ -49,7 +48,7 @@ def main() -> None:
     )
 
     summary = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "status": ("PASS" if len(passed) == 23 and not failed else "FAIL"),
         "gpu_name": reports["phase1"]["gpu_name"],
         "torch_version": (reports["phase1"]["torch_version"]),
@@ -125,7 +124,11 @@ def main() -> None:
             "- CUDA allocation increased during execution.",
             "- Prediction output contained only finite values.",
             "",
-            "xLSTM is excluded from this main-environment report because it is isolated in a separate dependency environment.",
+            (
+                "xLSTM is excluded from this main-environment report "
+                "because it is isolated in a separate dependency "
+                "environment."
+            ),
             "",
         ]
     )

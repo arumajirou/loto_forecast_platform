@@ -1,22 +1,21 @@
 from __future__ import annotations
 
 import optuna
-
 from neuralforecast.auto import (
-    AutoTiDE,
-    AutoTFT,
     AutoGRU,
     AutoLSTM,
-    AutoTCN,
     AutoNBEATSx,
     AutoNHITS,
+    AutoTCN,
+    AutoTFT,
+    AutoTiDE,
 )
 from neuralforecast.losses.pytorch import MAE
 
 from loto.auto_search_spaces import (
-    tide_config,
-    tft_config,
     recurrent_config,
+    tft_config,
+    tide_config,
 )
 
 

@@ -7,7 +7,6 @@ from typing import Any
 
 import neuralforecast.auto as auto_module
 
-
 SOURCE = Path("artifacts/parameter_inventory/full_neuralforecast_search_surface.json")
 
 OUTPUT_JSON = Path("artifacts/parameter_inventory/neuralforecast_auto_model_classification.json")

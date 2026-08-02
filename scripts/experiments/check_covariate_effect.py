@@ -4,12 +4,10 @@ import json
 import sys
 from pathlib import Path
 
-import numpy as np
 from autogluon.timeseries import (
     TimeSeriesDataFrame,
     TimeSeriesPredictor,
 )
-
 
 predictor_path = Path(sys.argv[1])
 data_path = Path(sys.argv[2])

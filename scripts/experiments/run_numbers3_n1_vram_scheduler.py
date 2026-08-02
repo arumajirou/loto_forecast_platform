@@ -5,12 +5,10 @@ import csv
 import os
 import shutil
 import subprocess
-import sys
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -295,8 +293,6 @@ def main() -> int:
 
             del running[model]
 
-        reserved_running = sum(job.spec.budget_mib for job in running.values())
-
         # 空きVRAMとworker上限の両方を満たす限り投入。
         launched = True
 
@@ -345,7 +341,7 @@ def main() -> int:
             MONITOR_CSV,
             monitor_fields,
             {
-                "timestamp_utc": (datetime.now(timezone.utc).isoformat()),
+                "timestamp_utc": (datetime.now(UTC).isoformat()),
                 **gpu,
                 "running_jobs": ",".join(sorted(running)),
                 "reserved_job_budget_mib": sum(job.spec.budget_mib for job in running.values()),
