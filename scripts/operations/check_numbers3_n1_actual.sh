@@ -81,14 +81,102 @@ echo "FINISHED_AT_UTC=$(date -u --iso-8601=seconds)"
 
 case "${STATUS}" in
   WAITING_FOR_ACTUAL)
+    echo "MONITORING_ACTION=CONTINUE"
     exit 0
     ;;
-  ALREADY_REGISTERED)
+
+  PASS|ALREADY_REGISTERED)
+    COMPLETION_DIR="${RESULT_DIR}/completion"
+    COMPLETION_FILE="${COMPLETION_DIR}/CURRENT_ACTUAL_EVALUATION_COMPLETE.json"
+
+    mkdir -p "${COMPLETION_DIR}"
+
+    LOCK_SHA256="$(
+      sha256sum "${CURRENT_LOCK}" |
+      awk '{print $1}'
+    )"
+
+    COMPLETED_AT_UTC="$(
+      date -u --iso-8601=seconds
+    )"
+
+    python3 -       "${COMPLETION_FILE}"       "${STATUS}"       "${CURRENT_LOCK}"       "${LOCK_SHA256}"       "${COMPLETED_AT_UTC}" <<'PY_COMPLETE'
+import json
+import os
+import sys
+import tempfile
+from pathlib import Path
+
+output = Path(sys.argv[1])
+
+payload = {
+    "schema_version": "1.0",
+    "status": sys.argv[2],
+    "source_lock": str(
+        Path(sys.argv[3]).resolve()
+    ),
+    "source_lock_sha256": sys.argv[4],
+    "completed_at_utc": sys.argv[5],
+    "monitoring_action": (
+        "TIMER_DISABLED_AFTER_COMPLETION"
+    ),
+}
+
+output.parent.mkdir(
+    parents=True,
+    exist_ok=True,
+)
+
+fd, temporary_name = tempfile.mkstemp(
+    prefix=f".{output.name}.",
+    dir=output.parent,
+    text=True,
+)
+
+temporary = Path(temporary_name)
+
+try:
+    with os.fdopen(
+        fd,
+        "w",
+        encoding="utf-8",
+    ) as handle:
+        json.dump(
+            payload,
+            handle,
+            ensure_ascii=False,
+            indent=2,
+        )
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+
+    temporary.replace(output)
+finally:
+    if temporary.exists():
+        temporary.unlink()
+
+print(f"COMPLETION_FILE={output}")
+PY_COMPLETE
+
+    sha256sum       "${COMPLETION_FILE}"       > "${COMPLETION_FILE}.sha256"
+
+    (
+      cd "${COMPLETION_DIR}"
+      sha256sum -c         "$(basename "${COMPLETION_FILE}.sha256")"
+    )
+
+    if command -v systemctl >/dev/null 2>&1
+    then
+      systemctl --user disable         loto-numbers3-n1-actual-check.timer         || true
+
+      systemctl --user stop         loto-numbers3-n1-actual-check.timer         || true
+    fi
+
+    echo "MONITORING_ACTION=TIMER_DISABLED_AFTER_COMPLETION"
     exit 0
     ;;
-  PASS)
-    exit 0
-    ;;
+
   *)
     echo "ERROR: unexpected status: ${STATUS}"
     exit 1
