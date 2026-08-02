@@ -2,8 +2,7 @@
 Description=Hourly Numbers3 N1 actual availability check
 
 [Timer]
-OnBootSec=10min
-OnUnitActiveSec=1h
+OnCalendar=hourly
 Persistent=true
 AccuracySec=5min
 Unit=loto-numbers3-n1-actual-check.service
