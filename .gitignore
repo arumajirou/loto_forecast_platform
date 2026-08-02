@@ -21,7 +21,7 @@ ray_results/
 logs/
 runs/
 outputs/
-artifacts/
+/artifacts/
 *.log
 *.pid
 # Local databases and generated data

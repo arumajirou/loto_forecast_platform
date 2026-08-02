@@ -41,7 +41,7 @@ configs/*.local.yaml
 configs/*.local.yml
 runtime/
 runs/
-artifacts/
+/artifacts/
 .test-runtime/
 MagicMock/
 # Python/tool caches
