@@ -1,0 +1,12 @@
+quality:
+  fail_if_empty: true
+  fail_if_future_date: true
+  warn_if_exog_missing: true
+  max_null_rate_warn: 0.5
+  duplicate_key_limit: 0
+  expected_tables:
+    - dataset.loto_y_ts
+    - dataset.loto_hist_feat
+    - dataset.loto_y_ts_unified
+  optional_tables:
+    - exog.loto_y_ts_exog

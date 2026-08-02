@@ -1,0 +1,36 @@
+tables:
+  dataset.loto_y_ts:
+    required_columns:
+      - loto
+      - ds
+      - unique_id
+      - ts_type
+      - y
+      - exec_ts
+      - updated_ts
+      - proc_seconds
+    unique_key_like:
+      - loto
+      - unique_id
+      - ts_type
+      - ds
+
+  dataset.loto_hist_feat:
+    required_columns:
+      - loto
+      - ds
+      - unique_id
+    prefix_columns:
+      - hist_
+    unique_key_like:
+      - loto
+      - unique_id
+      - ds
+
+  dataset.loto_y_ts_unified:
+    required_columns:
+      - loto
+      - ds
+      - unique_id
+      - ts_type
+      - y

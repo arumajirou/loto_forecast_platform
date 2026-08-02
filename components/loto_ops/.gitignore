@@ -1,0 +1,56 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Secrets
+.env
+*.env
+configs/notify.env
+configs/*.secret*
+*.pem
+*.key
+# Runtime outputs
+logs/
+/artifacts/
+*.log
+# Local DB / data
+*.sqlite
+*.sqlite3
+*.db
+data/
+tmp/
+.cache/
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+# Local environments and secrets
+.env.*
+!.env.example
+.loto_ops_env
+runtime.env
+configs/platform.env
+configs/*.local.yaml
+configs/*.local.yml
+runtime/
+runs/
+artifacts/
+.test-runtime/
+MagicMock/
+# Python/tool caches
+# Temporary repair and backup files
+*.bak-*
+*.before-*
+*~
+*.tmp
+# Runtime handover state
+workflow_*_handover.json
+shared-ai-memory/handovers/*.json
+!shared-ai-memory/handovers/.gitkeep

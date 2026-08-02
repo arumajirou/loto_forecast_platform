@@ -1,0 +1,64 @@
+paths:
+  loto_life_project: "/mnt/e/env/ts/loto_life_feature_pipeline"
+  loto_forecast_project: "/mnt/e/env/ts/loto_neuralforecast_pipeline"
+  ops_project: "/mnt/e/env/ts/loto_ops"
+  zip_output_dir: "/mnt/e/env/ts/zips"
+
+db:
+  host: "127.0.0.1"
+  port: 5432
+  user: "loto"
+  password: "CHANGE_ME"
+  database: "loto"
+  maintenance_database: "postgres"
+
+pipeline:
+  default_games: "all"
+  require_exog: false
+  allow_no_exog: true
+  postgres_write_mode: "copy"
+  table_limit_default: 100
+  table_limit_max: 5000
+
+scheduler:
+  time: "06:30"
+  systemd_unit_name: "loto-ops-weekday"
+
+fast_mode:
+  enabled: true
+  cpu_workers: 16
+  copy_jobs: 6
+  polars_threads: 24
+  partition_by_game: true
+  use_unlogged_staging: true
+  skip_legacy_postgres_write: true
+  export_parquet: true
+  export_partitioned_csv: true
+  postgres_session_tuning:
+    synchronous_commit: "off"
+    work_mem: "256MB"
+    maintenance_work_mem: "4GB"
+    max_parallel_workers_per_gather: 8
+
+
+performance:
+  default_mode: "light"
+  unified_engine: "postgres-ctas"
+  daily_mode: "light"
+  full_mode_requires_env: true
+  max_auto_full_memory_gb: 48
+  heavy_exog_tables:
+    - chronos
+    - merlion
+    - pypots
+    - timesfm
+    - uni2ts
+  resource_governor:
+    copy_jobs_max: 8
+    exog_workers_max: 16
+    polars_threads_max: 32
+  unified_fast:
+    unlogged_staging: true
+    work_mem: "256MB"
+    maintenance_work_mem: "2GB"
+    default_max_exog_cols: null

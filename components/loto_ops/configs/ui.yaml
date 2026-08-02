@@ -1,0 +1,19 @@
+app:
+  title: "Loto Ops Console"
+  layout: "wide"
+  default_page: "Overview"
+
+tables:
+  default_limit: 100
+  max_limit: 5000
+
+safety:
+  require_confirm_text: true
+  confirm_text: "RESET"
+
+artifacts:
+  zip_output_dir: "/mnt/e/env/fc/zips"
+
+refresh:
+  dashboard_ttl_seconds: 10
+  table_ttl_seconds: 30

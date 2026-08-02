@@ -1,0 +1,39 @@
+name: recover_failed_command
+purpose: Recover a failed command through evidence-backed diagnosis, isolated repair, and rollback-safe validation.
+trigger:
+  - A reproducible command exits nonzero.
+  - A regression test identifies a specific broken contract.
+preconditions:
+  - The failing command and its inputs are known.
+  - A backup or isolated copy can be created.
+prohibited_conditions:
+  - Destructive repair without a verified backup.
+  - Force deletion of an uninspected working tree.
+required_tools:
+  - cp
+  - diff
+  - pytest
+  - sha256sum
+ordered_steps:
+  - Capture the command, environment, exit code, and relevant logs.
+  - Create an isolated candidate and preserve the original hash.
+  - Apply the smallest change that addresses the confirmed cause.
+  - Run targeted tests, integration tests, and the full suite.
+  - Apply atomically only after all acceptance checks pass.
+  - Preserve rollback instructions and evidence hashes.
+validation:
+  - Targeted and full tests return exit code zero.
+  - The loaded module path points to the repaired source.
+  - The final file hash matches the approved candidate.
+rollback: Atomically restore the pre-change backup and verify its SHA-256 digest.
+known_failures:
+  - The candidate is built from a stale source revision.
+  - Tests load a different module through PYTHONPATH contamination.
+  - A hidden external dependency is missing.
+version: 1.0.0
+evidence:
+  - Before and after SHA-256 digests
+  - Unified diff
+  - Targeted and full test logs
+success_count: 0
+failure_count: 0

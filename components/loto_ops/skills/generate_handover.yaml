@@ -1,0 +1,35 @@
+name: generate_handover
+purpose: Generate a portable handover record from the latest or selected pipeline run manifest.
+trigger:
+  - A pipeline run completes or fails.
+  - Another agent or operator needs the latest execution state.
+preconditions:
+  - A readable run_manifest.json exists.
+  - The handover output directory is writable.
+prohibited_conditions:
+  - The manifest contains unredacted secrets or personal information.
+required_tools:
+  - loto-ops export-handover
+  - sha256sum
+ordered_steps:
+  - Select the requested run ID or locate the latest valid manifest.
+  - Validate that the manifest is valid JSON.
+  - Build the handover payload without secrets.
+  - Write the handover atomically and report its path.
+  - Record a SHA-256 digest for evidence.
+validation:
+  - The command returns exit code zero.
+  - The handover JSON contains run_id, status, timestamp, and artifacts.
+  - The output parses as valid JSON.
+rollback: Remove only the newly generated handover file and restore the previous backup when present.
+known_failures:
+  - No run manifest is available.
+  - The manifest is malformed.
+  - The output directory is not writable.
+version: 1.0.0
+evidence:
+  - CLI exit code
+  - Handover JSON path
+  - SHA-256 digest
+success_count: 0
+failure_count: 0

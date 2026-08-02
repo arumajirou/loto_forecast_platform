@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "hermes-bellama-integration-harness-v1.2",
+  "title": "Hermes BeeLlama Integration Harness Schema v1.2",
+  "description": "JSON Schema for Hermes/BeeLlama integration harness context ledger events",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_type", "timestamp", "run_id"],
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "enum": ["file_read", "command_run", "assistant_response", "tool_call"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "file_read": {
+      "type": ["object", "null"],
+      "properties": {
+        "file_path": {"type": "string"},
+        "canonical_path": {"type": "string"},
+        "duplicate_kind": {"type": "string"},
+        "token_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "command_info": {
+      "type": ["object", "null"],
+      "properties": {
+        "command": {"type": "string"},
+        "command_category": {"enum": ["build", "test", "deploy", "misc", null]},
+        "exit_code": {"type": ["integer", "null"]},
+        "stdout_preview": {"type": ["string", "null"]},
+        "stderr_preview": {"type": ["string", "null"]}
+      }
+    },
+    "assistant_response": {
+      "type": ["object", "null"],
+      "properties": {
+        "token_measurement": {"type": "object", "properties": {
+          "method": {"enum": ["actual", "model_tokenizer", "heuristic", "unavailable"]},
+          "measurement_scope": {"enum": ["api_request", "tool_payload", "assistant_message", "unknown"]},
+          "actual_input_tokens": {"type": ["integer", "null"], "minimum": 0},
+          "actual_output_tokens": {"type": ["integer", "null"], "minimum": 0},
+          "estimated_tokens": {"type": ["integer", "null"], "minimum": 0},
+          "model_id": {"type": ["string", "null"]},
+          "estimation_formula": {"type": ["string", "null"]},
+          "confidence": {"enum": ["high", "medium", "low"]}
+        }},
+        "model_used": {"type": ["string", "null"]},
+        "context_length": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "tool_call": {
+      "type": ["object", "null"],
+      "properties": {
+        "tool_name": {"type": "string"},
+        "tool_input": {"type": ["object", "null"]},
+        "tool_output": {"type": ["object", "null"]},
+        "tool_output_hash": {"type": ["string", "null"]},
+        "tool_output_size": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "output_metrics": {
+      "type": "object",
+      "properties": {
+        "total_tokens": {"type": ["integer", "null"], "minimum": 0},
+        "cache_hits": {"type": ["integer", "null"], "minimum": 0},
+        "tool_outputs_externalized": {"type": ["integer", "null"], "minimum": 0}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event_type": {"const": "file_read"}
+        }
+      },
+      "then": {
+        "required": ["file_read", "output_metrics"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {"const": "command_run"}
+        }
+      },
+      "then": {
+        "required": ["command_info", "output_metrics"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {"const": "assistant_response"}
+        }
+      },
+      "then": {
+        "required": ["assistant_response", "output_metrics"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {"const": "tool_call"}
+        }
+      },
+      "then": {
+        "required": ["tool_call", "output_metrics"]
+      }
+    }
+  ]
+}
