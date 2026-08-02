@@ -20,7 +20,7 @@
 
 paths:
   loto_life_project: "/mnt/e/env/ts/loto_life_feature_pipeline"
-  loto_forecast_project: "/mnt/e/env/ts/loto_neuralforecast_pipeline"
+  loto_forecast_project: "components/loto_forecast_engine"
   ops_project: "/mnt/e/env/ts/loto_ops"
   zip_output_dir: "/mnt/e/env/ts/zips"
 
