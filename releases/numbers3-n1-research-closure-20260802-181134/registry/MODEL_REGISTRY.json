@@ -1,0 +1,26 @@
+[
+  {
+    "model_id": "numbers3-n1-train-only-constant",
+    "family": "train_only_constant",
+    "role": "reference_baseline",
+    "formal_status": "BASELINE_ONLY"
+  },
+  {
+    "model_id": "numbers3-n1-dirichlet-w20-a5",
+    "family": "rolling_dirichlet",
+    "role": "shadow_baseline",
+    "formal_status": "BASELINE_ONLY"
+  },
+  {
+    "model_id": "numbers3-n1-tree-depth4",
+    "family": "decision_tree_classifier",
+    "role": "shadow_candidate",
+    "formal_status": "REJECTED"
+  },
+  {
+    "model_id": "numbers3-n1-multinomial-logistic",
+    "family": "multinomial_logistic",
+    "role": "shadow_candidate",
+    "formal_status": "REJECTED"
+  }
+]

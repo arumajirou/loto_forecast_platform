@@ -1,0 +1,4 @@
+method,multiclass_brier,multiclass_log_loss,better_than_uniform_log_loss
+ordinal_logistic_calibrated,0.899980898878909,2.302534918160276,True
+multinomial_logistic_calibrated,0.8999166670530717,2.302196939590769,True
+catboost_multiclass_calibrated,0.9001997049762338,2.3031833970400344,False

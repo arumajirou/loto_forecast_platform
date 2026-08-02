@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "run_id": "stage-f0c-final-rolling-audit-20260802-170153",
+  "data_sha256": "d2c599f24ef457e7a66d4607fe475c61c8900197c867b2e00fc172f58fa48355",
+  "data_rows": 7039,
+  "feature_rows": 6839,
+  "feature_count": 194,
+  "block_size": 500,
+  "n_splits": 5,
+  "total_test_rows": 2500,
+  "rolling_one_step": true,
+  "tree_refit_interval": 20,
+  "shuffle_replicates_per_method": 200,
+  "reproducible_full_coverage_models": [],
+  "selective_90_models": [],
+  "best_method": "tree_depth4",
+  "best_mean_hit": 0.31320000000000003,
+  "decision": "CLOSE_90_PERCENT_RESEARCH",
+  "replacement_target": {
+    "stage_1_hit": 0.35,
+    "stage_2_hit": 0.4,
+    "prospective_required": true
+  }
+}

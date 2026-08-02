@@ -1,0 +1,35 @@
+{
+  "created_at_utc": "2026-08-02T09:17:43.450863+00:00",
+  "records": [
+    {
+      "file": "numbers3-n1-shadow-lock-20260802-091121.json",
+      "target_ds": "2026-08-03 00:00:00",
+      "cutoff_ds": "2026-07-31 00:00:00",
+      "status": "INVALIDATED_IMPLEMENTATION_DEFECT",
+      "valid_baseline_predictions": [
+        "train_only_constant",
+        "rolling_dirichlet_w20_a5"
+      ],
+      "invalid_predictions": [
+        "tree_depth4",
+        "multinomial_logistic"
+      ],
+      "reason": "v1.0.0 reused the last observed feature row instead of generating an unlabeled future target row."
+    },
+    {
+      "file": "numbers3-n1-shadow-lock-20260802-091138.json",
+      "target_ds": "2026-08-03 00:00:00",
+      "cutoff_ds": "2026-07-31 00:00:00",
+      "status": "INVALIDATED_IMPLEMENTATION_DEFECT",
+      "valid_baseline_predictions": [
+        "train_only_constant",
+        "rolling_dirichlet_w20_a5"
+      ],
+      "invalid_predictions": [
+        "tree_depth4",
+        "multinomial_logistic"
+      ],
+      "reason": "v1.0.0 reused the last observed feature row instead of generating an unlabeled future target row."
+    }
+  ]
+}

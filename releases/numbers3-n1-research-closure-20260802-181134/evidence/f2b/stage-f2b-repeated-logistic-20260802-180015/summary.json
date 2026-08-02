@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "run_id": "stage-f2b-repeated-logistic-20260802-180015",
+  "data_sha256": "d2c599f24ef457e7a66d4607fe475c61c8900197c867b2e00fc172f58fa48355",
+  "raw_rows": 7039,
+  "feature_rows": 6839,
+  "test_rows_per_split": 500,
+  "calibration_rows_per_split": 500,
+  "n_splits": 5,
+  "seeds": [
+    17,
+    42,
+    137,
+    2026,
+    20260802
+  ],
+  "seed_count": 5,
+  "top_feature_count": 30,
+  "bootstrap_iterations": 20000,
+  "bootstrap_block_length": 10,
+  "formal_pass_models": [],
+  "decision": "REJECT_F2_LOGISTIC_AS_FORMAL_MODEL",
+  "best_method": "multinomial_logistic",
+  "best_mean_hit": 0.3,
+  "best_worst_split_hit": 0.2904,
+  "training_seconds": 43.77694623900061
+}

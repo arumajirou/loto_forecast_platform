@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "created_at_utc": "2026-08-02T09:11:34.920021+00:00",
+  "dataset": {
+    "path": "/mnt/e/env/ts/loto_forecast_platform/data/exports/numbers3/numbers3_n1.parquet",
+    "sha256": "d2c599f24ef457e7a66d4607fe475c61c8900197c867b2e00fc172f58fa48355",
+    "rows": 7039,
+    "minimum_ds": "1994-10-07 00:00:00",
+    "maximum_ds": "2026-07-31 00:00:00",
+    "target_minimum": 0,
+    "target_maximum": 9
+  },
+  "primary_metric": "Hit@±1",
+  "research_targets": {
+    "hit_at_pm1_90": {
+      "status": "CLOSED",
+      "supported": false
+    },
+    "hit_at_pm1_35": {
+      "status": "NOT_ACHIEVED",
+      "supported": false
+    }
+  },
+  "formal_production_model": null,
+  "prospective_promotion": false,
+  "formal_pass_models": [],
+  "shadow_models": [
+    "train_only_constant",
+    "rolling_dirichlet_w20_a5",
+    "tree_depth4",
+    "multinomial_logistic"
+  ],
+  "minimum_prospective_rows": 100,
+  "prediction_lock_required": true,
+  "prediction_lock_algorithm": "SHA-256",
+  "model_search_status": "FROZEN_UNTIL_NEW_INFORMATION",
+  "source_runs": {
+    "f0c": "/mnt/e/env/ts/loto_forecast_platform/artifacts/numbers3/stage-f0c-final-rolling-audit-20260802-170153",
+    "f1a": "/mnt/e/env/ts/loto_forecast_platform/artifacts/numbers3/stage-f1a-numpyro-categorical-20260802-174629",
+    "f1b": "/mnt/e/env/ts/loto_forecast_platform/artifacts/numbers3/stage-f1b-dynamic-categorical-20260802-175309",
+    "f2a": "/mnt/e/env/ts/loto_forecast_platform/artifacts/numbers3/stage-f2a-ordinal-catboost-20260802-175559",
+    "f2b": "/mnt/e/env/ts/loto_forecast_platform/artifacts/numbers3/stage-f2b-repeated-logistic-20260802-180015",
+    "constant_audit": "/mnt/e/env/ts/loto_forecast_platform/artifacts/numbers3/train-only-constant-audit-20260802-164451"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "python": "3.13.13",
+  "jax": "0.11.0",
+  "numpyro": "0.21.0",
+  "jax_backend": "cpu",
+  "jax_devices": [
+    {
+      "id": 0,
+      "platform": "cpu",
+      "device_kind": "cpu"
+    }
+  ],
+  "cpu_fallback": true,
+  "pid": 769260,
+  "git_commit": "1ab091ada92684470175b038b7d8f5715e2ba239",
+  "git_status": " M .gitignore\n M README.md\n M pyproject.toml\n M scripts/experiments/run_chronos2_exog_ablation.py\n M scripts/experiments/run_chronos2_exog_smoke.py\n M scripts/experiments/run_ml_exog_ablation.py\n M scripts/experiments/run_neuralforecast_exog_ablation.py\n M scripts/experiments/run_numbers3_n1_deepar_only.py\n M scripts/experiments/run_numbers3_n1_nf_phase1.py\n M scripts/experiments/run_numbers3_n1_nf_phase2.py\n M scripts/experiments/run_numbers3_n1_nf_phase3.py\n M scripts/experiments/run_numbers3_n1_rolling_top6.py\n M scripts/experiments/run_numbers3_n1_rolling_worker.py\n M scripts/experiments/run_numbers3_n1_sharded_scheduler.py\n M scripts/experiments/run_numbers3_n1_tft_only.py\n M scripts/experiments/run_numbers3_n1_vram_scheduler.py\n M scripts/experiments/run_tft_selected_exog_comparison.py\n M uv.lock\n?? chronos\n?? components/\n?? configs/experiments/\n?? configs/generated/tcn-v2/\n?? configs/loto7_auto_research.yaml\n?? configs/loto7_full_grid_research.yaml\n?? configs/platform.env\n?? create_numbers3_n1_analysis_zip.sh\n?? data/\n?? deploy/systemd/backup-20260802-013104/\n?? docs/experiments/\n?? extensions/\n?? releases/\n?? scripts/analysis/audit_numbers3_n1_features.py\n?? scripts/experiments/analyze_tcn_screening_v2.py\n?? scripts/experiments/generate_tcn_staged_design.py\n?? scripts/experiments/manual/\n?? scripts/experiments/run_numbers3_n1_nf_exog_grid.py\n?? scripts/experiments/run_numbers3_n1_nf_parallel.sh\n?? scripts/experiments/run_numbers3_n1_tcn_exhaustive.py\n?? scripts/experiments/run_tcn_interaction_v2.sh\n?? scripts/experiments/run_tcn_interaction_v2_parallel.sh\n?? scripts/experiments/run_tcn_screening_v2.sh\n?? scripts/experiments/run_tcn_screening_v2_parallel.sh\n?? scripts/experiments/validate_grid_against_signatures.py\n?? scripts/loto-ops-integrated.sh\n?? scripts/loto-platform\n?? tests/experiments/\n?? torch\n"
+}
