@@ -3,42 +3,23 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+SOURCE = Path("artifacts/parameter_inventory/neuralforecast_auto_default_spaces.json")
 
-SOURCE = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_default_spaces.json"
-)
-
-OUTPUT = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_backend_differences.json"
-)
+OUTPUT = Path("artifacts/parameter_inventory/neuralforecast_auto_backend_differences.json")
 
 
-records = json.loads(
-    SOURCE.read_text(encoding="utf-8")
-)
+records = json.loads(SOURCE.read_text(encoding="utf-8"))
 
 differences = []
 
 for record in records:
     model = record["auto_model"]
 
-    optuna = (
-        record["backends"]
-        .get("optuna", {})
-        .get("resolved_config", {})
-    )
+    optuna = record["backends"].get("optuna", {}).get("resolved_config", {})
 
-    ray = (
-        record["backends"]
-        .get("ray", {})
-        .get("resolved_config", {})
-    )
+    ray = record["backends"].get("ray", {}).get("resolved_config", {})
 
-    all_keys = sorted(
-        set(optuna) | set(ray)
-    )
+    all_keys = sorted(set(optuna) | set(ray))
 
     parameter_differences = []
 
@@ -64,9 +45,7 @@ for record in records:
     differences.append(
         {
             "auto_model": model,
-            "difference_count": len(
-                parameter_differences
-            ),
+            "difference_count": len(parameter_differences),
             "differences": parameter_differences,
         }
     )
@@ -80,10 +59,7 @@ OUTPUT.write_text(
     encoding="utf-8",
 )
 
-total = sum(
-    record["difference_count"]
-    for record in differences
-)
+total = sum(record["difference_count"] for record in differences)
 
 for record in differences:
     print(

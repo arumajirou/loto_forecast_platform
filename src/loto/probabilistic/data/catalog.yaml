@@ -1,0 +1,1274 @@
+schema_version: 1.0.0
+batch_id: PPL-01
+status: IMPLEMENTED_NATIVE_PRIMARY
+scope_note: Full bounded catalog for this project. Every model has one implemented
+  primary path; all declared cross-backend combinations are a separate exhaustive scope.
+models:
+- model_id: pp-uniform-dirichlet
+  family: conjugate
+  role: control
+  likelihood: Categorical
+  latent_structure: symmetric Dirichlet prior only
+  backends:
+  - builtin
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-static-dirichlet-categorical
+  family: conjugate
+  role: baseline
+  likelihood: Categorical
+  latent_structure: static Dirichlet posterior
+  backends:
+  - builtin
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-expanding-dirichlet-categorical
+  family: conjugate
+  role: baseline
+  likelihood: Categorical
+  latent_structure: expanding Dirichlet posterior
+  backends:
+  - builtin
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-rolling-dirichlet-categorical
+  family: conjugate
+  role: candidate
+  likelihood: Categorical
+  latent_structure: rolling-window Dirichlet posterior
+  backends:
+  - builtin
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-discounted-dirichlet-categorical
+  family: conjugate
+  role: candidate
+  likelihood: Categorical
+  latent_structure: exponentially discounted sufficient statistics
+  backends:
+  - builtin
+  - pymc
+  - numpyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: false
+  notes: ''
+- model_id: pp-empirical-bayes-dirichlet
+  family: empirical_bayes
+  role: candidate
+  likelihood: Categorical
+  latent_structure: concentration estimated from development data
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-dirichlet-multinomial
+  family: conjugate
+  role: candidate
+  likelihood: DirichletMultinomial
+  latent_structure: window count vector
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - window_count
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-beta-binomial-position
+  family: conjugate
+  role: candidate
+  likelihood: BetaBinomial
+  latent_structure: per-position inclusion probability
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - select_position_inclusion
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-beta-binomial-candidate
+  family: conjugate
+  role: candidate
+  likelihood: BetaBinomial
+  latent_structure: per-candidate inclusion probability
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - select_candidate_inclusion
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-hierarchical-dirichlet-digits
+  family: hierarchical
+  role: candidate
+  likelihood: Categorical
+  latent_structure: global-to-digit partial pooling
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  priority: p0
+  supports_exogenous: false
+  hierarchical: true
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-hierarchical-dirichlet-games
+  family: hierarchical
+  role: candidate
+  likelihood: Categorical
+  latent_structure: global-to-game-to-position partial pooling
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: false
+  hierarchical: true
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-multinomial-logit-normal
+  family: bayesian_regression
+  role: candidate
+  likelihood: Categorical
+  latent_structure: multinomial logit with Normal priors
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p0
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-multinomial-logit-laplace
+  family: bayesian_regression
+  role: candidate
+  likelihood: Categorical
+  latent_structure: multinomial logit with Laplace shrinkage
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-multinomial-logit-horseshoe
+  family: bayesian_regression
+  role: candidate
+  likelihood: Categorical
+  latent_structure: multinomial logit with horseshoe shrinkage
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-multinomial-logit-regularized-horseshoe
+  family: bayesian_regression
+  role: candidate
+  likelihood: Categorical
+  latent_structure: multinomial logit with regularized horseshoe
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-multinomial-probit
+  family: bayesian_regression
+  role: research
+  likelihood: Categorical
+  latent_structure: latent Gaussian multinomial probit
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-ordinal-cumulative-logit
+  family: ordinal
+  role: candidate
+  likelihood: OrderedLogistic
+  latent_structure: cumulative-logit latent score
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_ordinal
+  - select_position_ordinal
+  priority: p0
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-ordinal-adjacent-category
+  family: ordinal
+  role: candidate
+  likelihood: Categorical
+  latent_structure: adjacent-category logit
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_ordinal
+  - select_position_ordinal
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-ordinal-continuation-ratio
+  family: ordinal
+  role: candidate
+  likelihood: Bernoulli sequence
+  latent_structure: continuation-ratio logits
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_ordinal
+  - select_position_ordinal
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-bayesian-spline-categorical
+  family: semi_parametric
+  role: candidate
+  likelihood: Categorical
+  latent_structure: penalized spline logits
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-bayesian-gam-categorical
+  family: semi_parametric
+  role: candidate
+  likelihood: Categorical
+  latent_structure: additive smooth logit functions
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-bart-categorical
+  family: tree_bayesian
+  role: candidate
+  likelihood: Categorical/Bernoulli
+  latent_structure: Bayesian additive regression trees
+  backends:
+  - pymc_bart
+  tasks:
+  - digit_categorical
+  - select_candidate_inclusion
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-gp-categorical
+  family: gaussian_process
+  role: research
+  likelihood: Categorical
+  latent_structure: latent Gaussian process logits
+  backends:
+  - pymc
+  - numpyro
+  - pyro
+  - tfp
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-dynamic-dirichlet-discount
+  family: dynamic_conjugate
+  role: candidate
+  likelihood: Categorical
+  latent_structure: discounted Dirichlet state evolution
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: false
+  notes: ''
+- model_id: pp-logistic-normal-random-walk
+  family: state_space
+  role: candidate
+  likelihood: Categorical
+  latent_structure: logit Gaussian random walk
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: false
+  notes: ''
+- model_id: pp-local-level-categorical
+  family: state_space
+  role: candidate
+  likelihood: Categorical
+  latent_structure: local-level latent logits
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: false
+  notes: ''
+- model_id: pp-local-linear-trend-categorical
+  family: state_space
+  role: candidate
+  likelihood: Categorical
+  latent_structure: local level plus latent slope
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: false
+  notes: ''
+- model_id: pp-dynamic-regression-categorical
+  family: state_space
+  role: candidate
+  likelihood: Categorical
+  latent_structure: time-varying regression coefficients
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: false
+  notes: ''
+- model_id: pp-dynamic-horseshoe-categorical
+  family: state_space
+  role: research
+  likelihood: Categorical
+  latent_structure: dynamic shrinkage process on coefficients
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-single-changepoint-categorical
+  family: changepoint
+  role: candidate
+  likelihood: Categorical
+  latent_structure: single discrete changepoint
+  backends:
+  - pymc
+  - numpyro
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: false
+  notes: ''
+- model_id: pp-multiple-changepoint-categorical
+  family: changepoint
+  role: research
+  likelihood: Categorical
+  latent_structure: bounded multiple changepoints
+  backends:
+  - pymc
+  - numpyro
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-hmm-categorical
+  family: regime_switching
+  role: candidate
+  likelihood: Categorical
+  latent_structure: finite-state hidden Markov chain
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: false
+  notes: ''
+- model_id: pp-hsmm-categorical
+  family: regime_switching
+  role: research
+  likelihood: Categorical
+  latent_structure: hidden semi-Markov duration states
+  backends:
+  - pyro
+  - numpyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-switching-logistic-normal
+  family: regime_switching
+  role: research
+  likelihood: Categorical
+  latent_structure: regime-switching logistic-normal state
+  backends:
+  - pyro
+  - numpyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-switching-dynamic-regression
+  family: regime_switching
+  role: research
+  likelihood: Categorical
+  latent_structure: regime-specific dynamic coefficients
+  backends:
+  - pyro
+  - numpyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-seasonal-harmonic-categorical
+  family: state_space
+  role: research
+  likelihood: Categorical
+  latent_structure: latent harmonic components in logits
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-gaussian-process-time-varying-logit
+  family: gaussian_process
+  role: research
+  likelihood: Categorical
+  latent_structure: time-index Gaussian process logits
+  backends:
+  - pymc
+  - numpyro
+  - pyro
+  - tfp
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-poisson-candidate-count
+  family: count
+  role: candidate
+  likelihood: Poisson
+  latent_structure: candidate counts by causal window
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - window_count
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-negative-binomial-candidate-count
+  family: count
+  role: candidate
+  likelihood: NegativeBinomial
+  latent_structure: overdispersed candidate counts
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - window_count
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-zero-inflated-poisson-count
+  family: count
+  role: research
+  likelihood: ZeroInflatedPoisson
+  latent_structure: zero-inflated candidate counts
+  backends:
+  - pymc
+  - numpyro
+  - pyro
+  tasks:
+  - window_count
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-zero-inflated-negative-binomial-count
+  family: count
+  role: research
+  likelihood: ZeroInflatedNegativeBinomial
+  latent_structure: zero-inflated overdispersed counts
+  backends:
+  - pymc
+  - numpyro
+  - pyro
+  tasks:
+  - window_count
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-beta-binomial-overdispersed
+  family: count
+  role: candidate
+  likelihood: BetaBinomial
+  latent_structure: overdispersed inclusion counts
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - select_candidate_inclusion
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-multinomial-logistic-normal-count
+  family: count
+  role: candidate
+  likelihood: Multinomial
+  latent_structure: logistic-normal category probabilities
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - window_count
+  priority: p1
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-poisson-lognormal-count
+  family: count
+  role: research
+  likelihood: Poisson
+  latent_structure: lognormal random effects
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - window_count
+  priority: p2
+  supports_exogenous: true
+  hierarchical: true
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-hurdle-count
+  family: count
+  role: research
+  likelihood: HurdlePoisson/HurdleNB
+  latent_structure: separate zero and positive count processes
+  backends:
+  - pymc
+  - numpyro
+  - pyro
+  tasks:
+  - window_count
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-finite-mixture-categorical
+  family: mixture
+  role: research
+  likelihood: Categorical
+  latent_structure: finite mixture of category distributions
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-mixture-of-experts-categorical
+  family: mixture
+  role: research
+  likelihood: Categorical
+  latent_structure: covariate-gated mixture of experts
+  backends:
+  - pymc
+  - numpyro
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-latent-class-categorical
+  family: mixture
+  role: research
+  likelihood: Categorical
+  latent_structure: latent class allocation
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-dirichlet-process-categorical
+  family: nonparametric
+  role: research
+  likelihood: Categorical
+  latent_structure: truncated Dirichlet-process mixture
+  backends:
+  - pymc
+  - numpyro
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-hierarchical-dirichlet-process
+  family: nonparametric
+  role: research
+  likelihood: Categorical
+  latent_structure: hierarchical Dirichlet process across groups
+  backends:
+  - pyro
+  - numpyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: false
+  hierarchical: true
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-sticky-hdp-hmm
+  family: nonparametric
+  role: research
+  likelihood: Categorical
+  latent_structure: sticky truncated HDP-HMM
+  backends:
+  - pyro
+  - numpyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-dp-changepoint
+  family: nonparametric
+  role: research
+  likelihood: Categorical
+  latent_structure: Bayesian nonparametric changepoint partition
+  backends:
+  - pyro
+  - numpyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-bayesian-kernel-mixture
+  family: nonparametric
+  role: research
+  likelihood: Categorical
+  latent_structure: kernel mixture over latent value locations
+  backends:
+  - pymc
+  - numpyro
+  - pyro
+  tasks:
+  - digit_ordinal
+  - select_position_ordinal
+  priority: p2
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-bayesian-mlp
+  family: deep_probabilistic
+  role: research
+  likelihood: Categorical
+  latent_structure: variational Bayesian dense network
+  backends:
+  - pyro
+  - tfp
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-bayesian-tcn
+  family: deep_probabilistic
+  role: research
+  likelihood: Categorical
+  latent_structure: Bayesian/variational temporal convolution network
+  backends:
+  - pyro
+  - tfp
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-bayesian-gru
+  family: deep_probabilistic
+  role: research
+  likelihood: Categorical
+  latent_structure: Bayesian/variational GRU
+  backends:
+  - pyro
+  - tfp
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-bayesian-lstm
+  family: deep_probabilistic
+  role: research
+  likelihood: Categorical
+  latent_structure: Bayesian/variational LSTM
+  backends:
+  - pyro
+  - tfp
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-bayesian-transformer
+  family: deep_probabilistic
+  role: research
+  likelihood: Categorical
+  latent_structure: Bayesian output head and/or variational attention blocks
+  backends:
+  - pyro
+  - tfp
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-variational-rnn
+  family: deep_probabilistic
+  role: research
+  likelihood: Categorical
+  latent_structure: latent-variable recurrent sequence model
+  backends:
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-deep-markov-model
+  family: deep_probabilistic
+  role: research
+  likelihood: Categorical
+  latent_structure: nonlinear latent Markov state model
+  backends:
+  - pyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-neural-hmm
+  family: deep_probabilistic
+  role: research
+  likelihood: Categorical
+  latent_structure: neural emissions with discrete regimes
+  backends:
+  - pyro
+  - numpyro
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: true
+  experimental: true
+  notes: ''
+- model_id: pp-bayesian-embedding-categorical
+  family: deep_probabilistic
+  role: research
+  likelihood: Categorical
+  latent_structure: Bayesian embeddings for categorical covariates
+  backends:
+  - pyro
+  - tfp
+  tasks:
+  - digit_categorical
+  - select_position_categorical
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-bayesian-neural-ordinal
+  family: deep_probabilistic
+  role: research
+  likelihood: OrderedLogistic
+  latent_structure: neural latent score with ordered cutpoints
+  backends:
+  - pyro
+  - tfp
+  tasks:
+  - digit_ordinal
+  - select_position_ordinal
+  priority: p2
+  supports_exogenous: true
+  hierarchical: false
+  dynamic: false
+  experimental: true
+  notes: ''
+- model_id: pp-bayesian-model-averaging
+  family: ensemble
+  role: meta
+  likelihood: Posterior mixture
+  latent_structure: posterior model probability weights
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - ensemble
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-psis-loo-stacking
+  family: ensemble
+  role: meta
+  likelihood: Predictive mixture
+  latent_structure: PSIS-LOO stacking weights
+  backends:
+  - arviz
+  tasks:
+  - ensemble
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-dynamic-model-averaging
+  family: ensemble
+  role: meta
+  likelihood: Predictive mixture
+  latent_structure: time-varying model weights
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - ensemble
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: true
+  experimental: false
+  notes: ''
+- model_id: pp-bayesian-beta-calibration
+  family: calibration
+  role: meta
+  likelihood: Bernoulli
+  latent_structure: Bayesian beta calibration
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - calibration
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-bayesian-dirichlet-calibration
+  family: calibration
+  role: meta
+  likelihood: Categorical
+  latent_structure: Bayesian Dirichlet calibration
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - calibration
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-bayesian-temperature-calibration
+  family: calibration
+  role: meta
+  likelihood: Categorical
+  latent_structure: posterior over temperature parameter
+  backends:
+  - pymc
+  - numpyro
+  - stan
+  tasks:
+  - calibration
+  priority: p1
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-posterior-utility-hit1
+  family: decision
+  role: meta
+  likelihood: Posterior predictive
+  latent_structure: maximize posterior Hit@±1 probability
+  backends:
+  - builtin
+  tasks:
+  - decision
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-posterior-utility-hit1-mse
+  family: decision
+  role: meta
+  likelihood: Posterior predictive
+  latent_structure: Hit@±1 utility with expected squared-error penalty
+  backends:
+  - builtin
+  tasks:
+  - decision
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''
+- model_id: pp-posterior-constrained-decoder
+  family: decision
+  role: meta
+  likelihood: Posterior predictive
+  latent_structure: legal constrained joint decoder
+  backends:
+  - builtin
+  tasks:
+  - decision
+  priority: p0
+  supports_exogenous: false
+  hierarchical: false
+  dynamic: false
+  experimental: false
+  notes: ''

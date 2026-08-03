@@ -100,3 +100,13 @@ artifacts/numbers3/n1_deterministic_*/
 
 configs/database.local.env
 configs/platform.env
+
+# Probabilistic execution API secrets
+.env.ppl-api
+.env.ppl-notify
+
+# Probabilistic local runtime state
+runs/probabilistic-*/
+artifacts/probabilistic-api/
+artifacts/probabilistic-notifications/
+artifacts/probabilistic-acceleration-preflight.json

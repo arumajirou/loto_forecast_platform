@@ -8,8 +8,7 @@ class TrialLike(Protocol):
         self,
         name: str,
         choices: list[Any],
-    ) -> Any:
-        ...
+    ) -> Any: ...
 
     def suggest_float(
         self,
@@ -19,8 +18,7 @@ class TrialLike(Protocol):
         *,
         step: float | None = None,
         log: bool = False,
-    ) -> float:
-        ...
+    ) -> float: ...
 
     def suggest_int(
         self,
@@ -30,8 +28,7 @@ class TrialLike(Protocol):
         *,
         step: int = 1,
         log: bool = False,
-    ) -> int:
-        ...
+    ) -> int: ...
 
 
 def build_optuna_config(
@@ -51,9 +48,7 @@ def build_optuna_config(
             values = list(spec["values"])
 
             if not values:
-                raise ValueError(
-                    f"{name}: empty categorical values"
-                )
+                raise ValueError(f"{name}: empty categorical values")
 
             if len(values) == 1:
                 config[name] = values[0]
@@ -75,11 +70,7 @@ def build_optuna_config(
                 name,
                 float(spec["lower"]),
                 float(spec["upper"]),
-                step=(
-                    None
-                    if step is None
-                    else float(step)
-                ),
+                step=(None if step is None else float(step)),
                 log=bool(spec.get("log", False)),
             )
             continue
@@ -97,9 +88,7 @@ def build_optuna_config(
             )
             continue
 
-        raise ValueError(
-            f"{name}: unsupported search kind {kind!r}"
-        )
+        raise ValueError(f"{name}: unsupported search kind {kind!r}")
 
     return config
 
@@ -122,9 +111,7 @@ def build_ray_space(
             values = list(spec["values"])
 
             if not values:
-                raise ValueError(
-                    f"{name}: empty categorical values"
-                )
+                raise ValueError(f"{name}: empty categorical values")
 
             if len(values) == 1:
                 space[name] = values[0]
@@ -150,9 +137,7 @@ def build_ray_space(
             step = spec.get("step")
 
             if step is None:
-                raise ValueError(
-                    f"{name}: discrete_float requires step"
-                )
+                raise ValueError(f"{name}: discrete_float requires step")
 
             space[name] = tune.quniform(
                 float(spec["lower"]),
@@ -174,12 +159,9 @@ def build_ray_space(
 
         if kind == "log_int":
             raise ValueError(
-                f"{name}: log_int is not supported by "
-                "the current backend-neutral builder"
+                f"{name}: log_int is not supported by the current backend-neutral builder"
             )
 
-        raise ValueError(
-            f"{name}: unsupported search kind {kind!r}"
-        )
+        raise ValueError(f"{name}: unsupported search kind {kind!r}")
 
     return space

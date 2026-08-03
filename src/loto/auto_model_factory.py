@@ -1,22 +1,21 @@
 from __future__ import annotations
 
 import optuna
-
 from neuralforecast.auto import (
-    AutoTiDE,
-    AutoTFT,
     AutoGRU,
     AutoLSTM,
-    AutoTCN,
     AutoNBEATSx,
     AutoNHITS,
+    AutoTCN,
+    AutoTFT,
+    AutoTiDE,
 )
 from neuralforecast.losses.pytorch import MAE
 
 from loto.auto_search_spaces import (
-    tide_config,
-    tft_config,
     recurrent_config,
+    tft_config,
+    tide_config,
 )
 
 
@@ -98,9 +97,7 @@ def build_auto_model(
     cls = auto_classes.get(model_name)
 
     if cls is None:
-        raise ValueError(
-            f"Unsupported auto model: {model_name}"
-        )
+        raise ValueError(f"Unsupported auto model: {model_name}")
 
     default_config = cls.get_default_config(
         h=h,

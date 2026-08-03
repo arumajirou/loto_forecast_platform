@@ -1,0 +1,10 @@
+schema_version: 1.0.0
+primary_metric: hit_at_1
+minimum_improvement_points: 2.0
+confidence_interval_lower_bound_gt: 0.0
+minimum_block_wins: 4
+blocks: 5
+mae_worsening_max_fraction: 0.10
+mse_worsening_max_fraction: 0.15
+sealed_holdout_required: true
+prospective_required: true

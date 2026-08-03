@@ -1,0 +1,6 @@
+schema_version: 1.0.0
+policy:
+  silent_substitution: false
+  builtin_reference_for_all_models: true
+  native_backend_requires_explicit_selection: true
+  native_probe_only_in_release: false

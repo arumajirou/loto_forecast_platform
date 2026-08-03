@@ -1,0 +1,5 @@
+schema_version: 1.0.0
+profiles:
+  light_cpu: {max_parallel: 8, cpu: 1, gpu: 0}
+  heavy_cpu: {max_parallel: 2, cpu: 4, gpu: 0}
+  gpu: {max_parallel: 1, cpu: 2, gpu: 1}

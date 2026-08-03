@@ -1,0 +1,71 @@
+from __future__ import annotations
+
+from typing import Any
+
+import numpy as np
+
+from loto.probabilistic.backends.base import ProbabilisticBackend
+from loto.probabilistic.models.reference import fit_reference, posterior_draws
+from loto.probabilistic.native import NativePosterior
+
+
+class BuiltinBackend(ProbabilisticBackend):
+    backend_id = "builtin"
+    modules = ()
+    implemented = True
+
+    def execute(
+        self,
+        spec: Any,
+        *,
+        y: np.ndarray,
+        classes: int,
+        target_mode: str,
+        geometry: Any,
+        config: Any,
+        seed: int,
+        inference_profile_id: str | None = None,
+    ) -> NativePosterior:
+        posterior = fit_reference(
+            spec,
+            y=y,
+            classes=classes,
+            target_mode=target_mode,
+            geometry=geometry,
+            config=config,
+            seed=seed,
+        )
+        draws = posterior_draws(
+            posterior,
+            draws=config.native_draws
+            if config.backend_policy == "primary_native"
+            else config.posterior_draws,
+            seed=seed,
+        )
+        primary_analytic = spec.primary_backend == "builtin"
+        return NativePosterior(
+            model_id=spec.model_id,
+            backend=self.backend_id,
+            family=spec.family,
+            target_mode=target_mode,
+            game=geometry.key,
+            probability_draws=draws,
+            metadata={
+                **posterior.metadata,
+                "native_graph_id": spec.native_graph_id,
+                "implementation_kind": "analytic" if primary_analytic else "reference",
+                "native_analytic": primary_analytic,
+                "inference_profile_id": inference_profile_id,
+            },
+            diagnostics={
+                "posterior_finite": bool(np.isfinite(draws).all()),
+                "probability_simplex_valid": bool(np.allclose(draws.sum(axis=-1), 1.0, atol=1e-7)),
+                "rhat_max": None,
+                "ess_bulk_min": None,
+                "ess_tail_min": None,
+                "divergences": None,
+                "elbo_finite": None,
+                "elbo_stable": None,
+            },
+            native_payload=posterior,
+        )

@@ -208,6 +208,256 @@ def _cmd_hierarchy(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_probabilistic(args: argparse.Namespace) -> int:
+    from loto.probabilistic.backends import probe_backends
+    from loto.probabilistic.catalog import (
+        catalog_counts as ppl_catalog_counts,
+    )
+    from loto.probabilistic.catalog import (
+        get_inference_profile,
+        get_probabilistic_model_spec,
+        list_inference_profiles,
+        list_probabilistic_model_specs,
+    )
+    from loto.probabilistic.compatibility import decide_compatibility
+    from loto.probabilistic.config import load_run_config
+    from loto.probabilistic.native_registry import list_native_implementations, native_coverage
+    from loto.probabilistic.planner import plan_summary
+    from loto.probabilistic.runner import (
+        compare_run,
+        diagnose_run,
+        load_status,
+        run_probabilistic,
+    )
+
+    action = args.ppl_action
+    if action == "catalog-list":
+        rows = [
+            spec.to_dict()
+            for spec in list_probabilistic_model_specs(family=args.family, priority=args.priority)
+        ]
+        _emit({"counts": ppl_catalog_counts(), "models": rows})
+        return 0
+    if action == "catalog-show":
+        try:
+            _emit(get_probabilistic_model_spec(args.model_id).to_dict())
+            return 0
+        except KeyError:
+            _emit({"status": "NOT_FOUND", "model_id": args.model_id})
+            return 2
+    if action == "profiles-list":
+        _emit([profile.to_dict() for profile in list_inference_profiles(backend=args.backend)])
+        return 0
+    if action == "profiles-show":
+        try:
+            _emit(get_inference_profile(args.profile_id).to_dict())
+            return 0
+        except KeyError:
+            _emit({"status": "NOT_FOUND", "profile_id": args.profile_id})
+            return 2
+    if action == "backends":
+        _emit(probe_backends())
+        return 0
+    if action == "native-coverage":
+        _emit(
+            {
+                "coverage": native_coverage(),
+                "implementations": [item.to_dict() for item in list_native_implementations()],
+            }
+        )
+        return 0
+    if action == "compatibility":
+        try:
+            spec = get_probabilistic_model_spec(args.model_id)
+            decision = decide_compatibility(
+                spec,
+                geometry=geometry_for(args.game),
+                backend=args.backend,
+                profile_id=args.profile_id,
+                include_experimental=args.include_experimental,
+            )
+        except (KeyError, ValueError) as exc:
+            _emit({"status": "INVALID", "error": str(exc)})
+            return 2
+        _emit(decision.to_dict())
+        return 0 if decision.allowed else 3
+    if action in {"validate-config", "plan", "smoke", "run"}:
+        try:
+            config = load_run_config(args.config)
+            if action == "smoke":
+                config = config.model_copy(update={"profile": "smoke"})
+            elif action == "run" and config.profile == "smoke":
+                config = config.model_copy(update={"profile": "standard"})
+        except Exception as exc:
+            _emit({"status": "CONFIG_INVALID", "error": f"{type(exc).__name__}: {exc}"})
+            return 2
+        if action == "validate-config":
+            _emit(
+                {
+                    "status": "VALID",
+                    "config": config.model_dump(mode="json"),
+                    **plan_summary(config),
+                }
+            )
+            return 0
+        if action == "plan":
+            _emit(plan_summary(config))
+            return 0
+        result = run_probabilistic(config)
+        _emit(result)
+        return 0 if result["status"] in {"PASS", "DRY_RUN"} else 3
+    if action == "status":
+        try:
+            _emit(load_status(args.run_dir))
+            return 0
+        except Exception as exc:
+            _emit({"status": "NOT_FOUND", "error": str(exc)})
+            return 2
+    if action == "diagnose":
+        try:
+            _emit(diagnose_run(args.run_dir))
+            return 0
+        except Exception as exc:
+            _emit({"status": "NOT_FOUND", "error": str(exc)})
+            return 2
+    if action == "compare":
+        try:
+            _emit(compare_run(args.run_dir))
+            return 0
+        except Exception as exc:
+            _emit({"status": "NOT_FOUND", "error": str(exc)})
+            return 2
+    if action.startswith("api-") or action.startswith("tts-") or action.startswith("run-"):
+        from loto.probabilistic.api_cli import (
+            ApiClient,
+            ProbabilisticApiCliError,
+            create_api_environment,
+            serve_api,
+        )
+
+        try:
+            if action == "api-token-create":
+                _emit(
+                    create_api_environment(
+                        args.root,
+                        host=args.host,
+                        port=args.port,
+                        voicevox_url=args.voicevox_url,
+                        force=args.force,
+                    )
+                )
+                return 0
+            if action == "api-serve":
+                _emit(
+                    {
+                        "status": "STARTING",
+                        "root": str(Path(args.root).resolve()),
+                        "host": args.host,
+                        "port": args.port,
+                    }
+                )
+                serve_api(
+                    root=args.root,
+                    host=args.host,
+                    port=args.port,
+                    access_log=not args.no_access_log,
+                )
+                return 0
+
+            client = ApiClient.from_environment(root=args.root, base_url=args.base_url)
+            if action == "api-health":
+                _emit(client.json("GET", "/health", authenticated=False))
+                return 0
+            if action == "api-profiles":
+                _emit(client.json("GET", "/api/v1/profiles"))
+                return 0
+            if action == "tts-status":
+                _emit(client.json("GET", "/api/v1/tts/status"))
+                return 0
+            if action == "tts-play":
+                _emit(
+                    client.json(
+                        "POST",
+                        "/api/v1/tts/play",
+                        payload={
+                            "text": args.text,
+                            "speaker": args.speaker,
+                            "speed_scale": args.speed_scale,
+                        },
+                        timeout=150.0,
+                    )
+                )
+                return 0
+            if action == "tts-synthesize":
+                body, content_type = client.request(
+                    "POST",
+                    "/api/v1/tts/synthesize",
+                    payload={
+                        "text": args.text,
+                        "speaker": args.speaker,
+                        "speed_scale": args.speed_scale,
+                    },
+                    timeout=150.0,
+                )
+                output = Path(args.output).expanduser().resolve()
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_bytes(body)
+                _emit(
+                    {
+                        "status": "WRITTEN",
+                        "path": str(output),
+                        "bytes": len(body),
+                        "content_type": content_type,
+                    }
+                )
+                return 0
+            if action == "run-start":
+                overrides = {
+                    "outer_workers": args.outer_workers,
+                    "max_heavy_cpu_jobs": args.max_heavy_cpu_jobs,
+                    "speech_enabled": args.speech_enabled,
+                    "email_enabled": args.email_enabled,
+                }
+                overrides = {key: value for key, value in overrides.items() if value is not None}
+                _emit(
+                    client.json(
+                        "POST",
+                        "/api/v1/runs",
+                        payload={
+                            "profile": args.profile,
+                            "run_id": args.run_id,
+                            "preflight": args.preflight,
+                            "overrides": overrides,
+                        },
+                        timeout=120.0,
+                    )
+                )
+                return 0
+            if action == "run-current":
+                _emit(client.json("GET", "/api/v1/runs/current"))
+                return 0
+            if action == "run-stop":
+                run_id = args.run_id
+                if run_id is None:
+                    current = client.json("GET", "/api/v1/runs/current")
+                    run_id = current.get("run_id")
+                if not run_id:
+                    raise ProbabilisticApiCliError("no current run was found")
+                _emit(
+                    client.json(
+                        "POST",
+                        f"/api/v1/runs/{run_id}/stop",
+                        payload={"force": args.force},
+                    )
+                )
+                return 0
+        except ProbabilisticApiCliError as exc:
+            _emit({"status": "API_ERROR", "error": str(exc)})
+            return 2
+    _emit({"status": "NOT_IMPLEMENTED", "action": action})
+    return 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="loto3", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -262,6 +512,113 @@ def build_parser() -> argparse.ArgumentParser:
     research.add_argument("--output", default=None)
     research.add_argument("--verbose", action="store_true")
     research.set_defaults(func=_cmd_research)
+
+    probabilistic = sub.add_parser(
+        "probabilistic", help="probabilistic-programming model catalog and runner"
+    )
+    psub = probabilistic.add_subparsers(dest="ppl_action", required=True)
+
+    pcl = psub.add_parser("catalog-list", help="list all 72 probabilistic models")
+    pcl.add_argument("--family", default=None)
+    pcl.add_argument("--priority", choices=["p0", "p1", "p2"], default=None)
+    pcl.set_defaults(func=_cmd_probabilistic)
+    pcs = psub.add_parser("catalog-show", help="show one probabilistic model")
+    pcs.add_argument("model_id")
+    pcs.set_defaults(func=_cmd_probabilistic)
+
+    ppl = psub.add_parser("profiles-list", help="list inference profiles")
+    ppl.add_argument("--backend", default=None)
+    ppl.set_defaults(func=_cmd_probabilistic)
+    pps = psub.add_parser("profiles-show", help="show one inference profile")
+    pps.add_argument("profile_id")
+    pps.set_defaults(func=_cmd_probabilistic)
+    pb = psub.add_parser("backends", help="probe optional backend packages")
+    pb.set_defaults(func=_cmd_probabilistic)
+    pnc = psub.add_parser("native-coverage", help="show all 72 primary native implementations")
+    pnc.set_defaults(func=_cmd_probabilistic)
+
+    pc = psub.add_parser("compatibility", help="check model/game/backend compatibility")
+    pc.add_argument("--model-id", required=True)
+    pc.add_argument("--game", choices=known_games(), default="numbers3")
+    pc.add_argument("--backend", default="builtin")
+    pc.add_argument("--profile-id", default=None)
+    pc.add_argument("--include-experimental", action="store_true")
+    pc.set_defaults(func=_cmd_probabilistic)
+
+    for name in ("validate-config", "plan", "smoke", "run"):
+        command = psub.add_parser(name)
+        command.add_argument("--config", required=True)
+        command.set_defaults(func=_cmd_probabilistic)
+    for name in ("status", "diagnose", "compare"):
+        command = psub.add_parser(name)
+        command.add_argument("--run-dir", required=True)
+        command.set_defaults(func=_cmd_probabilistic)
+
+    api_token = psub.add_parser("api-token-create", help="create or rotate the local API token")
+    api_token.add_argument("--root", default=".")
+    api_token.add_argument("--host", default="127.0.0.1")
+    api_token.add_argument("--port", type=int, default=8765)
+    api_token.add_argument("--voicevox-url", default="http://127.0.0.1:50021")
+    api_token.add_argument("--force", action="store_true")
+    api_token.set_defaults(func=_cmd_probabilistic)
+
+    api_serve = psub.add_parser("api-serve", help="serve the authenticated execution API")
+    api_serve.add_argument("--root", default=".")
+    api_serve.add_argument("--host", default=None)
+    api_serve.add_argument("--port", type=int, default=None)
+    api_serve.add_argument("--no-access-log", action="store_true")
+    api_serve.set_defaults(func=_cmd_probabilistic)
+
+    for name, help_text in (
+        ("api-health", "check API health"),
+        ("api-profiles", "list allowed API run profiles"),
+        ("tts-status", "check the Japanese TTS backend"),
+        ("run-current", "show the current API-managed run"),
+    ):
+        command = psub.add_parser(name, help=help_text)
+        command.add_argument("--root", default=".")
+        command.add_argument("--base-url", default=None)
+        command.set_defaults(func=_cmd_probabilistic)
+
+    tts_play = psub.add_parser("tts-play", help="speak Japanese through VOICEVOX API")
+    tts_play.add_argument("--root", default=".")
+    tts_play.add_argument("--base-url", default=None)
+    tts_play.add_argument("--text", required=True)
+    tts_play.add_argument("--speaker", type=int, default=3)
+    tts_play.add_argument("--speed-scale", type=float, default=1.15)
+    tts_play.set_defaults(func=_cmd_probabilistic)
+
+    tts_synthesize = psub.add_parser("tts-synthesize", help="write VOICEVOX WAV output")
+    tts_synthesize.add_argument("--root", default=".")
+    tts_synthesize.add_argument("--base-url", default=None)
+    tts_synthesize.add_argument("--text", required=True)
+    tts_synthesize.add_argument("--output", required=True)
+    tts_synthesize.add_argument("--speaker", type=int, default=3)
+    tts_synthesize.add_argument("--speed-scale", type=float, default=1.15)
+    tts_synthesize.set_defaults(func=_cmd_probabilistic)
+
+    run_start = psub.add_parser("run-start", help="start a permitted probabilistic run profile")
+    run_start.add_argument("--root", default=".")
+    run_start.add_argument("--base-url", default=None)
+    run_start.add_argument(
+        "--profile",
+        choices=["fast_cpu", "fast_gpu", "standard", "resume_stopped"],
+        default="fast_cpu",
+    )
+    run_start.add_argument("--run-id", default=None)
+    run_start.add_argument("--preflight", action=argparse.BooleanOptionalAction, default=True)
+    run_start.add_argument("--outer-workers", type=int, default=None)
+    run_start.add_argument("--max-heavy-cpu-jobs", type=int, default=None)
+    run_start.add_argument("--speech-enabled", action=argparse.BooleanOptionalAction, default=None)
+    run_start.add_argument("--email-enabled", action=argparse.BooleanOptionalAction, default=None)
+    run_start.set_defaults(func=_cmd_probabilistic)
+
+    run_stop = psub.add_parser("run-stop", help="stop the current or named API-managed run")
+    run_stop.add_argument("--root", default=".")
+    run_stop.add_argument("--base-url", default=None)
+    run_stop.add_argument("--run-id", default=None)
+    run_stop.add_argument("--force", action="store_true")
+    run_stop.set_defaults(func=_cmd_probabilistic)
 
     hierarchy = sub.add_parser("hierarchy", help="inspect and test the reconciliation hierarchy")
     hierarchy.add_argument(

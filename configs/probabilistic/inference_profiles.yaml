@@ -1,0 +1,251 @@
+schema_version: 1.0.0
+batch_id: PPL-01
+status: PROPOSED
+profiles:
+- profile_id: pymc-nuts
+  backend: pymc
+  algorithm: NUTS
+  tier: confirmatory
+  continuous_only: true
+  default:
+    chains: 4
+    draws: 1000
+    tune: 1000
+    target_accept: 0.9
+- profile_id: pymc-hmc
+  backend: pymc
+  algorithm: HMC
+  tier: research
+  continuous_only: true
+  default:
+    chains: 4
+    draws: 1000
+    tune: 1000
+- profile_id: pymc-categorical-gibbs
+  backend: pymc
+  algorithm: CategoricalGibbsMetropolis
+  tier: discrete
+  continuous_only: false
+  default:
+    chains: 4
+    draws: 2000
+    tune: 1000
+- profile_id: pymc-metropolis
+  backend: pymc
+  algorithm: Metropolis
+  tier: fallback
+  continuous_only: false
+  default:
+    chains: 4
+    draws: 4000
+    tune: 2000
+- profile_id: pymc-slice
+  backend: pymc
+  algorithm: Slice
+  tier: fallback
+  continuous_only: true
+  default:
+    chains: 4
+    draws: 2000
+    tune: 1000
+- profile_id: pymc-smc
+  backend: pymc
+  algorithm: SMC
+  tier: multimodal
+  continuous_only: false
+  default:
+    draws: 2000
+    chains: 4
+- profile_id: pymc-advi-meanfield
+  backend: pymc
+  algorithm: ADVI mean-field
+  tier: screening
+  continuous_only: true
+  default:
+    steps: 30000
+    posterior_draws: 2000
+- profile_id: pymc-advi-fullrank
+  backend: pymc
+  algorithm: Full-rank ADVI
+  tier: screening
+  continuous_only: true
+  default:
+    steps: 30000
+    posterior_draws: 2000
+- profile_id: pymc-blackjax-nuts
+  backend: pymc+blackjax
+  algorithm: BlackJAX NUTS
+  tier: accelerated
+  continuous_only: true
+  default:
+    chains: 4
+    draws: 1000
+    tune: 1000
+- profile_id: pymc-numpyro-nuts
+  backend: pymc+numpyro
+  algorithm: NumPyro NUTS
+  tier: accelerated
+  continuous_only: true
+  default:
+    chains: 4
+    draws: 1000
+    tune: 1000
+- profile_id: numpyro-nuts
+  backend: numpyro
+  algorithm: NUTS
+  tier: confirmatory
+  continuous_only: true
+  default:
+    chains: 4
+    samples: 1000
+    warmup: 1000
+- profile_id: numpyro-hmc
+  backend: numpyro
+  algorithm: HMC
+  tier: research
+  continuous_only: true
+  default:
+    chains: 4
+    samples: 1000
+    warmup: 1000
+- profile_id: numpyro-mixedhmc
+  backend: numpyro
+  algorithm: MixedHMC
+  tier: discrete
+  continuous_only: false
+  default:
+    chains: 4
+    samples: 1500
+    warmup: 1000
+- profile_id: numpyro-svi-normal
+  backend: numpyro
+  algorithm: SVI AutoNormal
+  tier: screening
+  continuous_only: false
+  default:
+    steps: 30000
+    posterior_draws: 2000
+- profile_id: numpyro-svi-lowrank
+  backend: numpyro
+  algorithm: SVI AutoLowRankMultivariateNormal
+  tier: screening
+  continuous_only: true
+  default:
+    steps: 30000
+    posterior_draws: 2000
+- profile_id: pyro-nuts
+  backend: pyro
+  algorithm: NUTS
+  tier: confirmatory
+  continuous_only: true
+  default:
+    chains: 4
+    samples: 1000
+    warmup: 1000
+- profile_id: pyro-svi-autonormal
+  backend: pyro
+  algorithm: SVI AutoNormal
+  tier: deep_screening
+  continuous_only: false
+  default:
+    steps: 50000
+    particles: 8
+    posterior_draws: 2000
+- profile_id: pyro-svi-autolowrank
+  backend: pyro
+  algorithm: SVI AutoLowRankMultivariateNormal
+  tier: deep_screening
+  continuous_only: true
+  default:
+    steps: 50000
+    particles: 8
+    posterior_draws: 2000
+- profile_id: pyro-smc
+  backend: pyro
+  algorithm: Sequential Monte Carlo
+  tier: sequential
+  continuous_only: false
+  default:
+    particles: 2048
+- profile_id: stan-nuts
+  backend: cmdstanpy
+  algorithm: NUTS-HMC
+  tier: audit
+  continuous_only: true
+  default:
+    chains: 4
+    iter_sampling: 1000
+    iter_warmup: 1000
+    adapt_delta: 0.9
+- profile_id: stan-pathfinder
+  backend: cmdstanpy
+  algorithm: Pathfinder
+  tier: screening
+  continuous_only: true
+  default:
+    num_paths: 4
+    draws: 2000
+- profile_id: stan-advi
+  backend: cmdstanpy
+  algorithm: ADVI
+  tier: screening
+  continuous_only: true
+  default:
+    iter: 30000
+    output_samples: 2000
+- profile_id: stan-map
+  backend: cmdstanpy
+  algorithm: MAP optimization
+  tier: diagnostic
+  continuous_only: true
+  default: {}
+- profile_id: blackjax-nuts-direct
+  backend: blackjax
+  algorithm: NUTS
+  tier: research
+  continuous_only: true
+  default:
+    chains: 4
+    samples: 1000
+    warmup: 1000
+- profile_id: blackjax-tempered-smc
+  backend: blackjax
+  algorithm: Adaptive tempered SMC
+  tier: multimodal
+  continuous_only: true
+  default:
+    particles: 2048
+- profile_id: blackjax-pathfinder
+  backend: blackjax
+  algorithm: Pathfinder
+  tier: screening
+  continuous_only: true
+  default:
+    paths: 4
+    draws: 2000
+- profile_id: tfp-nuts
+  backend: tensorflow_probability
+  algorithm: NUTS
+  tier: quarantine
+  continuous_only: true
+  default:
+    chains: 4
+    samples: 1000
+    burnin: 1000
+- profile_id: tfp-hmc
+  backend: tensorflow_probability
+  algorithm: HMC
+  tier: quarantine
+  continuous_only: true
+  default:
+    chains: 4
+    samples: 1000
+    burnin: 1000
+- profile_id: tfp-vi
+  backend: tensorflow_probability
+  algorithm: Variational inference
+  tier: quarantine
+  continuous_only: false
+  default:
+    steps: 50000
+    posterior_draws: 2000

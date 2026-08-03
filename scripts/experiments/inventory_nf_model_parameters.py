@@ -8,7 +8,6 @@ from typing import Any
 import neuralforecast
 from neuralforecast import models
 
-
 MODEL_NAMES = [
     "TiDE",
     "TFT",
@@ -78,30 +77,20 @@ for model_name in MODEL_NAMES:
             "default": serializable(parameter.default),
             "annotation": (
                 repr(parameter.annotation)
-                if parameter.annotation
-                is not inspect.Parameter.empty
+                if parameter.annotation is not inspect.Parameter.empty
                 else None
             ),
-            "required": (
-                parameter.default
-                is inspect.Parameter.empty
-            ),
+            "required": (parameter.default is inspect.Parameter.empty),
         }
 
     catalog["models"][model_name] = {
         "available": True,
-        "class": (
-            f"{model_class.__module__}."
-            f"{model_class.__name__}"
-        ),
+        "class": (f"{model_class.__module__}.{model_class.__name__}"),
         "signature": str(signature),
         "parameters": parameters,
     }
 
-out = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_model_parameters.json"
-)
+out = Path("artifacts/parameter_inventory/neuralforecast_model_parameters.json")
 out.parent.mkdir(parents=True, exist_ok=True)
 
 out.write_text(

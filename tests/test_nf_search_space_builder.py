@@ -14,11 +14,7 @@ from loto.nf_search_space_builder import (
     build_ray_space,
 )
 
-
-SOURCE = Path(
-    "configs/generated/"
-    "neuralforecast_normalized_fixed_seed_spaces.json"
-)
+SOURCE = Path("configs/generated/neuralforecast_normalized_fixed_seed_spaces.json")
 
 
 class RecordingTrial:
@@ -30,9 +26,7 @@ class RecordingTrial:
         name,
         choices,
     ):
-        self.calls.append(
-            ("categorical", name, choices)
-        )
+        self.calls.append(("categorical", name, choices))
         return choices[0]
 
     def suggest_float(
@@ -79,15 +73,13 @@ class RecordingTrial:
 
 
 def load_spaces():
-    return json.loads(
-        SOURCE.read_text(encoding="utf-8")
-    )
+    return json.loads(SOURCE.read_text(encoding="utf-8"))
 
 
 def test_every_model_builds_optuna_config():
     data = load_spaces()
 
-    for model, spec in data["models"].items():
+    for _model, spec in data["models"].items():
         trial = RecordingTrial()
 
         config = build_optuna_config(
@@ -105,10 +97,8 @@ def test_every_model_builds_optuna_config():
 def test_every_model_builds_ray_space():
     data = load_spaces()
 
-    for model, spec in data["models"].items():
-        space = build_ray_space(
-            spec["parameters"]
-        )
+    for _model, spec in data["models"].items():
+        space = build_ray_space(spec["parameters"])
 
         assert space
         assert space["random_seed"] == 42

@@ -8,16 +8,11 @@ from typing import Any
 import neuralforecast.auto as auto_module
 from neuralforecast.common._base_auto import BaseAuto
 
-
 CLASSIFICATION = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_classification_v2.json"
+    "artifacts/parameter_inventory/neuralforecast_auto_model_classification_v2.json"
 )
 
-OUTPUT = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_optuna_trial_calls.json"
-)
+OUTPUT = Path("artifacts/parameter_inventory/neuralforecast_optuna_trial_calls.json")
 
 
 class RecordingTrial:
@@ -56,9 +51,7 @@ class RecordingTrial:
         values: list[Any],
     ) -> Any:
         if not values:
-            raise ValueError(
-                "suggest_categorical received no choices"
-            )
+            raise ValueError("suggest_categorical received no choices")
 
         strategy = self.categorical_strategy
 
@@ -97,19 +90,9 @@ class RecordingTrial:
         log: bool = False,
     ) -> float:
         if log and step is not None:
-            raise ValueError(
-                "Optuna does not allow log=True with step"
-            )
+            raise ValueError("Optuna does not allow log=True with step")
 
-        kind = (
-            "log_float"
-            if log
-            else (
-                "discrete_float"
-                if step is not None
-                else "float"
-            )
-        )
+        kind = "log_float" if log else ("discrete_float" if step is not None else "float")
 
         selected = float(low)
 
@@ -119,11 +102,7 @@ class RecordingTrial:
                 "kind": kind,
                 "low": float(low),
                 "high": float(high),
-                "step": (
-                    None
-                    if step is None
-                    else float(step)
-                ),
+                "step": (None if step is None else float(step)),
                 "log": bool(log),
                 "api": "suggest_float",
             },
@@ -144,11 +123,7 @@ class RecordingTrial:
         return self._record(
             {
                 "parameter": name,
-                "kind": (
-                    "log_int"
-                    if log
-                    else "integer"
-                ),
+                "kind": ("log_int" if log else "integer"),
                 "low": int(low),
                 "high": int(high),
                 "step": int(step),
@@ -255,9 +230,7 @@ class RecordingTrial:
         return False
 
 
-classification = json.loads(
-    CLASSIFICATION.read_text(encoding="utf-8")
-)
+classification = json.loads(CLASSIFICATION.read_text(encoding="utf-8"))
 
 eligible = [
     record["auto_model"]
@@ -270,10 +243,7 @@ records = []
 for name in sorted(eligible):
     cls = getattr(auto_module, name)
 
-    if not (
-        inspect.isclass(cls)
-        and issubclass(cls, BaseAuto)
-    ):
+    if not (inspect.isclass(cls) and issubclass(cls, BaseAuto)):
         continue
 
     trial = RecordingTrial(
@@ -293,11 +263,7 @@ for name in sorted(eligible):
                 backend="optuna",
             )
 
-        resolved = (
-            config_fn(trial)
-            if callable(config_fn)
-            else config_fn
-        )
+        resolved = config_fn(trial) if callable(config_fn) else config_fn
 
         records.append(
             {
@@ -335,11 +301,7 @@ OUTPUT.write_text(
     encoding="utf-8",
 )
 
-errors = [
-    record
-    for record in records
-    if record["status"] != "OK"
-]
+errors = [record for record in records if record["status"] != "OK"]
 
 for record in records:
     print(
