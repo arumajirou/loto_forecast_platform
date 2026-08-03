@@ -7,30 +7,96 @@ permissions:
   contents: write
 
 jobs:
-  lint-fix:
+  apply-batch8:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: agent/ppl02-batch7-gaussian-copula
+          ref: agent/ppl02-batch8-bocpd
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
       - name: Install Ruff
         run: python -m pip install ruff==0.16.1
-      - name: Apply exact Ruff lint fix
+      - name: Apply, format, lint, and commit Batch 8
         run: |
-          python -m ruff check --fix src/loto/probabilistic/backends/builtin.py
-          python -m ruff format src/loto/probabilistic/backends/builtin.py
-          python -m ruff check src/loto/probabilistic/backends/builtin.py
-          python -m ruff format --check src/loto/probabilistic/backends/builtin.py
+          cp docs/.ppl02-batch8-existing.patch /tmp/ppl02-batch8-existing.patch
+          git apply --check /tmp/ppl02-batch8-existing.patch
+          git apply /tmp/ppl02-batch8-existing.patch
+          rm docs/.ppl02-batch8-existing.patch
+          python -m ruff check --fix \
+            src/loto/probabilistic/models/bocpd_native.py \
+            src/loto/probabilistic/contracts.py \
+            src/loto/probabilistic/config.py \
+            src/loto/probabilistic/catalog.py \
+            src/loto/probabilistic/native_registry.py \
+            src/loto/probabilistic/backends/builtin.py \
+            src/loto/probabilistic/models/__init__.py \
+            tests/probabilistic/test_ppl02_bocpd.py \
+            tests/probabilistic/test_native_full_coverage.py \
+            tests/probabilistic/test_reference_models.py \
+            tests/probabilistic/test_catalog.py \
+            tests/probabilistic/test_cli.py \
+            tests/probabilistic/test_config_and_plan.py
+          python -m ruff format \
+            src/loto/probabilistic/models/bocpd_native.py \
+            src/loto/probabilistic/contracts.py \
+            src/loto/probabilistic/config.py \
+            src/loto/probabilistic/catalog.py \
+            src/loto/probabilistic/native_registry.py \
+            src/loto/probabilistic/backends/builtin.py \
+            src/loto/probabilistic/models/__init__.py \
+            tests/probabilistic/test_ppl02_bocpd.py \
+            tests/probabilistic/test_native_full_coverage.py \
+            tests/probabilistic/test_reference_models.py \
+            tests/probabilistic/test_catalog.py \
+            tests/probabilistic/test_cli.py \
+            tests/probabilistic/test_config_and_plan.py
+          python -m ruff check \
+            src/loto/probabilistic/models/bocpd_native.py \
+            src/loto/probabilistic/contracts.py \
+            src/loto/probabilistic/config.py \
+            src/loto/probabilistic/catalog.py \
+            src/loto/probabilistic/native_registry.py \
+            src/loto/probabilistic/backends/builtin.py \
+            src/loto/probabilistic/models/__init__.py \
+            tests/probabilistic/test_ppl02_bocpd.py \
+            tests/probabilistic/test_native_full_coverage.py \
+            tests/probabilistic/test_reference_models.py \
+            tests/probabilistic/test_catalog.py \
+            tests/probabilistic/test_cli.py \
+            tests/probabilistic/test_config_and_plan.py
+          python -m ruff format --check \
+            src/loto/probabilistic/models/bocpd_native.py \
+            src/loto/probabilistic/contracts.py \
+            src/loto/probabilistic/config.py \
+            src/loto/probabilistic/catalog.py \
+            src/loto/probabilistic/native_registry.py \
+            src/loto/probabilistic/backends/builtin.py \
+            src/loto/probabilistic/models/__init__.py \
+            tests/probabilistic/test_ppl02_bocpd.py \
+            tests/probabilistic/test_native_full_coverage.py \
+            tests/probabilistic/test_reference_models.py \
+            tests/probabilistic/test_catalog.py \
+            tests/probabilistic/test_cli.py \
+            tests/probabilistic/test_config_and_plan.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/loto/probabilistic/backends/builtin.py
-          if git diff --cached --quiet; then
-            echo "No lint changes required"
-          else
-            git commit -m "style(probabilistic): organize builtin imports"
-            git push origin HEAD:agent/ppl02-batch7-gaussian-copula
-          fi
+          git add \
+            src/loto/probabilistic/models/bocpd_native.py \
+            src/loto/probabilistic/contracts.py \
+            src/loto/probabilistic/config.py \
+            src/loto/probabilistic/catalog.py \
+            src/loto/probabilistic/native_registry.py \
+            src/loto/probabilistic/backends/builtin.py \
+            src/loto/probabilistic/models/__init__.py \
+            tests/probabilistic/test_ppl02_bocpd.py \
+            tests/probabilistic/test_native_full_coverage.py \
+            tests/probabilistic/test_reference_models.py \
+            tests/probabilistic/test_catalog.py \
+            tests/probabilistic/test_cli.py \
+            tests/probabilistic/test_config_and_plan.py \
+            docs/.ppl02-batch8-existing.patch
+          git commit -m "feat(probabilistic): integrate BOCPD changepoint model"
+          git push origin HEAD:agent/ppl02-batch8-bocpd
