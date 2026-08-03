@@ -10,6 +10,10 @@ from loto.probabilistic.statuses import CompatibilityReason
 def compatible_task(spec: ProbabilisticModelSpec, geometry: GameGeometry) -> str | None:
     if geometry.family == "digits":
         preference = (
+            "categorical_context",
+            "joint_discrete_copula",
+            "dynamic_multinomial",
+            "online_changepoint",
             "digit_categorical",
             "digit_ordinal",
             "window_count",
@@ -19,6 +23,10 @@ def compatible_task(spec: ProbabilisticModelSpec, geometry: GameGeometry) -> str
         )
     else:
         preference = (
+            "fixed_cardinality_subset",
+            "ordered_without_replacement",
+            "dynamic_multinomial",
+            "online_changepoint",
             "select_position_categorical",
             "select_position_ordinal",
             "select_candidate_inclusion",
@@ -79,6 +87,7 @@ def decide_compatibility(
     backend: str = "builtin",
     profile_id: str | None = None,
     include_experimental: bool = True,
+    draw_order_verified: bool = False,
 ) -> CompatibilityDecision:
     task = compatible_task(spec, geometry)
     if task is None:
@@ -93,6 +102,15 @@ def decide_compatibility(
     if spec.experimental and not include_experimental:
         return CompatibilityDecision(
             False, CompatibilityReason.EXPERIMENTAL_DISABLED, None, profile_id, None
+        )
+    if task == "ordered_without_replacement" and not draw_order_verified:
+        return CompatibilityDecision(
+            False,
+            CompatibilityReason.DRAW_ORDER_REQUIRED,
+            None,
+            profile_id,
+            None,
+            ("draw_order_verified=false",),
         )
     # The builtin reference backend is available for every implemented catalog entry.
     if backend != "builtin" and backend not in spec.backends:

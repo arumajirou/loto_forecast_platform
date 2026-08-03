@@ -1,9 +1,26 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+from enum import StrEnum
 from typing import Any, Literal
 
+import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+
+class TargetMode(StrEnum):
+    """Machine-readable probabilistic target representations.
+
+    Existing PPL-01 task strings remain valid. These values add the PPL-02
+    contracts without renaming or silently substituting any existing target.
+    """
+
+    FIXED_CARDINALITY_SUBSET = "fixed_cardinality_subset"
+    CATEGORICAL_CONTEXT = "categorical_context"
+    DYNAMIC_MULTINOMIAL = "dynamic_multinomial"
+    JOINT_DISCRETE_COPULA = "joint_discrete_copula"
+    ONLINE_CHANGEPOINT = "online_changepoint"
+    ORDERED_WITHOUT_REPLACEMENT = "ordered_without_replacement"
 
 
 @dataclass(frozen=True)
@@ -57,6 +74,27 @@ class CompatibilityDecision:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class NativeFitContext:
+    trial_id: str
+    game: str
+    target_mode: str
+    train_end: int
+    seed: int
+    feature_set_hash: str
+    data_version: str
+
+
+@dataclass
+class NativePredictiveResult:
+    point_prediction: list[int]
+    candidate_probabilities: np.ndarray | None = None
+    joint_samples: np.ndarray | None = None
+    log_probability_actual: float | None = None
+    diagnostics: dict[str, Any] = field(default_factory=dict)
+    state: dict[str, Any] = field(default_factory=dict)
 
 
 class PredictiveDistribution(BaseModel):
@@ -113,6 +151,8 @@ class ProbabilisticRunConfig(BaseModel):
     run_id: str | None = None
     profile: Literal["smoke", "standard", "full", "exhaustive"] = "smoke"
     games: list[str] = Field(default_factory=lambda: ["numbers3", "loto7"])
+    target_modes: list[TargetMode] = Field(default_factory=list)
+    require_verified_draw_order: bool = True
     inputs: dict[str, str] = Field(default_factory=dict)
     output: str = "runs/probabilistic"
     models: list[str] | Literal["all"] = "all"
@@ -187,6 +227,13 @@ class ProbabilisticRunConfig(BaseModel):
     def games_not_empty(cls, value: list[str]) -> list[str]:
         if not value:
             raise ValueError("games must not be empty")
+        return value
+
+    @field_validator("target_modes")
+    @classmethod
+    def target_modes_unique(cls, value: list[TargetMode]) -> list[TargetMode]:
+        if len(value) != len(set(value)):
+            raise ValueError("target_modes must not contain duplicates")
         return value
 
     @model_validator(mode="after")

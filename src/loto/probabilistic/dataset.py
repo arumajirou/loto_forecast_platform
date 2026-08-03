@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,7 @@ import pandas as pd
 
 from loto.game.geometry import GameGeometry, geometry_for
 from loto.probabilistic.config import stable_hash
+from loto.probabilistic.contracts import TargetMode
 
 
 @dataclass(frozen=True)
@@ -20,6 +22,13 @@ class DatasetBundle:
     draw_ids: tuple[str, ...]
     data_version: str
     feature_set_hash: str
+    candidate_indicator: np.ndarray | None = None
+    set_members: tuple[tuple[int, ...], ...] | None = None
+    set_cardinality: int | None = None
+    position_tokens: np.ndarray | None = None
+    joint_tokens: tuple[str, ...] | None = None
+    draw_order: np.ndarray | None = None
+    draw_order_verified: bool = False
 
     @property
     def rows(self) -> int:
@@ -59,19 +68,78 @@ def _resolve_columns(frame: pd.DataFrame, geometry: GameGeometry) -> list[str]:
     )
 
 
-def load_dataset(path: str | Path, game: str) -> DatasetBundle:
+def _resolve_named_columns(frame: pd.DataFrame, names: Sequence[str]) -> list[str]:
+    lower_map = {str(col).lower(): str(col) for col in frame.columns}
+    resolved = [lower_map.get(str(name).lower()) for name in names]
+    if not all(resolved):
+        missing = [name for name, value in zip(names, resolved, strict=True) if value is None]
+        raise ValueError(f"draw order columns are missing: {missing}")
+    return [str(value) for value in resolved]
+
+
+def _candidate_indicator(values: np.ndarray, geometry: GameGeometry) -> np.ndarray:
+    indicator = np.zeros((len(values), geometry.universe_size), dtype=np.int8)
+    zero_based = values - geometry.value_min
+    for row_index, row in enumerate(zero_based):
+        indicator[row_index, row] = 1
+    return indicator
+
+
+def _validated_draw_order(
+    frame: pd.DataFrame,
+    *,
+    columns: Sequence[str],
+    values: np.ndarray,
+    geometry: GameGeometry,
+) -> np.ndarray:
+    if geometry.family != "select":
+        raise ValueError("draw order is only valid for select-family games")
+    if len(columns) != geometry.positions:
+        raise ValueError(
+            f"draw order requires {geometry.positions} columns, got {len(columns)}"
+        )
+    resolved = _resolve_named_columns(frame, columns)
+    ordered = frame[resolved].to_numpy(dtype=int)
+    for index, (ordered_row, sorted_row) in enumerate(
+        zip(ordered, values, strict=True)
+    ):
+        if len(set(ordered_row.tolist())) != geometry.positions:
+            raise ValueError(f"draw order row {index} contains duplicates")
+        if any(value not in geometry.values for value in ordered_row):
+            raise ValueError(f"draw order row {index} contains an out-of-range value")
+        if set(ordered_row.tolist()) != set(sorted_row.tolist()):
+            raise ValueError(f"draw order row {index} does not match the legal result set")
+    return ordered
+
+
+def load_dataset(
+    path: str | Path,
+    game: str,
+    *,
+    draw_order_columns: Sequence[str] | None = None,
+    draw_order_verified: bool = False,
+) -> DatasetBundle:
     source = Path(path)
     if source.suffix.lower() in {".parquet", ".pq"}:
         frame = pd.read_parquet(source)
     else:
         frame = pd.read_csv(source)
     return bundle_from_frame(
-        frame, game=game, data_version=f"{source.name}-{source.stat().st_size}"
+        frame,
+        game=game,
+        data_version=f"{source.name}-{source.stat().st_size}",
+        draw_order_columns=draw_order_columns,
+        draw_order_verified=draw_order_verified,
     )
 
 
 def bundle_from_frame(
-    frame: pd.DataFrame, *, game: str, data_version: str | None = None
+    frame: pd.DataFrame,
+    *,
+    game: str,
+    data_version: str | None = None,
+    draw_order_columns: Sequence[str] | None = None,
+    draw_order_verified: bool = False,
 ) -> DatasetBundle:
     geometry = geometry_for(game)
     columns = _resolve_columns(frame, geometry)
@@ -81,6 +149,18 @@ def bundle_from_frame(
     values = target.to_numpy(dtype=int)
     for row in values:
         geometry.validate_outcome(row.tolist())
+
+    if draw_order_verified and draw_order_columns is None:
+        raise ValueError("draw_order_verified=true requires explicit draw_order_columns")
+    draw_order = None
+    if draw_order_columns is not None:
+        draw_order = _validated_draw_order(
+            frame,
+            columns=draw_order_columns,
+            values=values,
+            geometry=geometry,
+        )
+
     draw_col = next(
         (col for col in frame.columns if str(col).lower() in {"draw_no", "draw", "round", "id"}),
         None,
@@ -96,6 +176,20 @@ def bundle_from_frame(
     normalized = normalized.rename(
         columns=dict(zip(columns, geometry.column_names(), strict=False))
     )
+
+    candidate_indicator = None
+    set_members = None
+    set_cardinality = None
+    position_tokens = None
+    joint_tokens = None
+    if geometry.family == "select":
+        candidate_indicator = _candidate_indicator(values, geometry)
+        set_members = tuple(tuple(int(item) for item in row) for row in values)
+        set_cardinality = geometry.positions
+    else:
+        position_tokens = values.copy()
+        joint_tokens = tuple("".join(str(int(item)) for item in row) for row in values)
+
     return DatasetBundle(
         game=game,
         geometry=geometry,
@@ -104,6 +198,13 @@ def bundle_from_frame(
         draw_ids=draw_ids,
         data_version=version,
         feature_set_hash=feature_set_hash,
+        candidate_indicator=candidate_indicator,
+        set_members=set_members,
+        set_cardinality=set_cardinality,
+        position_tokens=position_tokens,
+        joint_tokens=joint_tokens,
+        draw_order=draw_order,
+        draw_order_verified=bool(draw_order is not None and draw_order_verified),
     )
 
 
@@ -144,8 +245,25 @@ def task_arrays(bundle: DatasetBundle, target_mode: str) -> tuple[np.ndarray, in
         "select_position_categorical",
         "select_position_ordinal",
         "select_position_inclusion",
+        TargetMode.CATEGORICAL_CONTEXT,
+        TargetMode.DYNAMIC_MULTINOMIAL,
+        TargetMode.JOINT_DISCRETE_COPULA,
+        TargetMode.ONLINE_CHANGEPOINT,
     }:
+        if target_mode in {
+            TargetMode.CATEGORICAL_CONTEXT,
+            TargetMode.JOINT_DISCRETE_COPULA,
+        } and geometry.family != "digits":
+            raise ValueError(f"{target_mode} requires a digits-family game")
         return zero_based, geometry.universe_size
+    if target_mode == TargetMode.FIXED_CARDINALITY_SUBSET:
+        if geometry.family != "select" or bundle.candidate_indicator is None:
+            raise ValueError("fixed_cardinality_subset requires a select-family game")
+        return bundle.candidate_indicator.copy(), geometry.universe_size
+    if target_mode == TargetMode.ORDERED_WITHOUT_REPLACEMENT:
+        if not bundle.draw_order_verified or bundle.draw_order is None:
+            raise ValueError("ordered_without_replacement requires verified draw order")
+        return bundle.draw_order - geometry.value_min, geometry.universe_size
     if target_mode in {"select_candidate_inclusion", "window_count"}:
         incidence = np.zeros((bundle.rows, geometry.universe_size), dtype=int)
         if geometry.family == "select":
