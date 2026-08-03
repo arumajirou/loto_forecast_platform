@@ -70,9 +70,7 @@ def thresholds_from_marginals(
     if not np.isfinite(values).all() or np.any(values <= 0):
         raise ValueError("marginal probabilities must be finite and strictly positive")
     values = values / values.sum(axis=1, keepdims=True)
-    thresholds = np.empty(
-        (values.shape[0], values.shape[1] + 1), dtype=np.float64
-    )
+    thresholds = np.empty((values.shape[0], values.shape[1] + 1), dtype=np.float64)
     thresholds[:, 0] = -np.inf
     thresholds[:, -1] = np.inf
     cumulative = np.cumsum(values, axis=1)[:, :-1]
@@ -228,9 +226,9 @@ class GaussianCopulaCategoricalState:
             raise ValueError("joint samples have invalid shape")
         output = np.empty((self.positions, self.classes), dtype=np.float64)
         for position in range(self.positions):
-            output[position] = np.bincount(
-                values[:, position], minlength=self.classes
-            ) / len(values)
+            output[position] = np.bincount(values[:, position], minlength=self.classes) / len(
+                values
+            )
         return output
 
     def to_metadata_dict(self) -> dict[str, Any]:

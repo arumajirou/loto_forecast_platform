@@ -191,8 +191,7 @@ def load_probabilistic_catalog(
         raise ValueError(f"{source}: models must be a list")
     for ppl02_row in _PPL02_ROWS:
         if not any(
-            isinstance(row, dict) and row.get("model_id") == ppl02_row["model_id"]
-            for row in rows
+            isinstance(row, dict) and row.get("model_id") == ppl02_row["model_id"] for row in rows
         ):
             rows = [*rows, dict(ppl02_row)]
     from loto.probabilistic.native_registry import get_native_implementation

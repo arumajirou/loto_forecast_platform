@@ -34,9 +34,7 @@ def list_native_implementations() -> tuple[NativeImplementation, ...]:
             raise ValueError("native implementation rows must be mappings")
         model_id = str(row.get("model_id", "")).strip()
         if not model_id or model_id in seen:
-            raise ValueError(
-                f"duplicate or empty native model_id: {model_id!r}"
-            )
+            raise ValueError(f"duplicate or empty native model_id: {model_id!r}")
         seen.add(model_id)
         output.append(
             NativeImplementation(

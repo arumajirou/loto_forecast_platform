@@ -199,9 +199,7 @@ class PyMCBackend(ProbabilisticBackend):
         if spec.model_id == COPULA_MODEL_ID:
             matrices = _posterior_matrix_values(idata, "copula_correlation_matrix")
             mean_correlation = matrices.mean(axis=0)
-            minimum_eigenvalue = min(
-                float(np.linalg.eigvalsh(matrix).min()) for matrix in matrices
-            )
+            minimum_eigenvalue = min(float(np.linalg.eigvalsh(matrix).min()) for matrix in matrices)
             metadata["posterior_correlation_mean"] = mean_correlation.tolist()
             metadata["posterior_correlation_draw_shape"] = list(matrices.shape)
             diagnostics.update(

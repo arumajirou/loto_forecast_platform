@@ -35,9 +35,7 @@ def build_gaussian_copula_graph(
     )
     complete = state.latent_scores[np.isfinite(state.latent_scores).all(axis=1)]
     if len(complete) < max(3, state.positions + 1):
-        raise ValueError(
-            "Gaussian copula requires enough complete rows for correlation inference"
-        )
+        raise ValueError("Gaussian copula requires enough complete rows for correlation inference")
     with pm.Model() as model:
         scale_dist = pm.LogNormal.dist(
             mu=0.0,
