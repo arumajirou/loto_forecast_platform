@@ -45,9 +45,7 @@ class MultinomialDGLMState:
     def __post_init__(self) -> None:
         self.state_mean = np.asarray(self.state_mean, dtype=np.float64)
         self.state_covariance = np.asarray(self.state_covariance, dtype=np.float64)
-        self.one_step_probabilities = np.asarray(
-            self.one_step_probabilities, dtype=np.float64
-        )
+        self.one_step_probabilities = np.asarray(self.one_step_probabilities, dtype=np.float64)
         self.update_applied = np.asarray(self.update_applied, dtype=bool)
         if self.model_id != MODEL_ID:
             raise ValueError(f"unexpected model_id: {self.model_id}")
@@ -127,9 +125,7 @@ class MultinomialDGLMState:
         rng = np.random.default_rng(seed)
         output = np.empty((draws, self.positions, self.classes), dtype=np.float64)
         for position in range(self.positions):
-            covariance, _ = _ensure_psd(
-                self.state_covariance[position], self.covariance_floor
-            )
+            covariance, _ = _ensure_psd(self.state_covariance[position], self.covariance_floor)
             samples = rng.multivariate_normal(
                 self.state_mean[position], covariance, size=draws, check_valid="raise"
             )
