@@ -22,6 +22,11 @@ from loto.probabilistic.contracts import (
     ProbabilisticModelSpec,
     ProbabilisticRunConfig,
 )
+from loto.probabilistic.subset_evaluation import (
+    SubsetEvaluationResult,
+    evaluate_conditional_bernoulli,
+    verify_fixed_prediction,
+)
 
 __all__ = [
     "CompatibilityDecision",
@@ -30,9 +35,12 @@ __all__ = [
     "PredictiveDistribution",
     "ProbabilisticModelSpec",
     "ProbabilisticRunConfig",
+    "SubsetEvaluationResult",
     "catalog_counts",
+    "evaluate_conditional_bernoulli",
     "get_inference_profile",
     "get_probabilistic_model_spec",
     "list_inference_profiles",
     "list_probabilistic_model_specs",
+    "verify_fixed_prediction",
 ]

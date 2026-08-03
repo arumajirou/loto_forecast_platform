@@ -69,7 +69,7 @@ class ProbabilisticArtifactStore:
         for path in sorted(
             p for p in self.root.rglob("*") if p.is_file() and not p.name.endswith(".tmp")
         ):
-            if path.name == "SHA256SUMS.json":
+            if path.name in {"SHA256SUMS.json", "ARTIFACT_MANIFEST.json"}:
                 continue
             files.append(
                 {
@@ -78,6 +78,6 @@ class ProbabilisticArtifactStore:
                     "sha256": _sha256(path),
                 }
             )
-        return self.write_json(
-            "SHA256SUMS.json", {"schema_version": 1, "metadata": metadata or {}, "files": files}
-        )
+        payload = {"schema_version": 1, "metadata": metadata or {}, "files": files}
+        self.write_json("ARTIFACT_MANIFEST.json", payload)
+        return self.write_json("SHA256SUMS.json", payload)
