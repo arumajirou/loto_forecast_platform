@@ -21,6 +21,7 @@ _ALLOWED_FAMILIES = {
     "changepoint",
     "conjugate",
     "count",
+    "copula",
     "decision",
     "deep_probabilistic",
     "dynamic_conjugate",
@@ -72,7 +73,29 @@ _PPL02_DGLM_ROW: dict[str, Any] = {
     "experimental": True,
     "notes": "PPL-02 M04; predict-before-update dynamic multinomial filter",
 }
-_PPL02_ROWS = (_PPL02_CONDITIONAL_BERNOULLI_ROW, _PPL02_DGLM_ROW)
+_PPL02_COPULA_ROW: dict[str, Any] = {
+    "model_id": "pp-gaussian-copula-categorical",
+    "family": "copula",
+    "role": "candidate",
+    "likelihood": "LatentGaussianCopulaCategorical",
+    "latent_structure": (
+        "fold-fitted categorical margins with ordered Gaussian thresholds and an "
+        "LKJ-regularized latent correlation matrix"
+    ),
+    "backends": ["pymc"],
+    "tasks": ["joint_discrete_copula"],
+    "priority": "p0",
+    "supports_exogenous": False,
+    "hierarchical": False,
+    "dynamic": False,
+    "experimental": True,
+    "notes": "PPL-02 M05; Numbers3/4 static Gaussian copula with fixed margins",
+}
+_PPL02_ROWS = (
+    _PPL02_CONDITIONAL_BERNOULLI_ROW,
+    _PPL02_DGLM_ROW,
+    _PPL02_COPULA_ROW,
+)
 
 _ALLOWED_ROLES = {"control", "baseline", "candidate", "research", "meta"}
 _ALLOWED_PRIORITIES = {"p0", "p1", "p2"}
@@ -133,6 +156,7 @@ def _strategy_for(model_id: str, family: str) -> str:
         return "hierarchical_pooling"
     if family in {
         "bayesian_regression",
+        "copula",
         "ordinal",
         "semi_parametric",
         "tree_bayesian",

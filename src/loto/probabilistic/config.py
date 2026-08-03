@@ -72,6 +72,12 @@ def execution_fingerprint(
             "dglm_max_state_variance": run_config.dglm_max_state_variance,
             "dglm_include_trend": run_config.dglm_include_trend,
             "dglm_seasonal_periods": run_config.dglm_seasonal_periods,
+            "copula_marginal_prior": run_config.copula_marginal_prior,
+            "copula_lkj_eta": run_config.copula_lkj_eta,
+            "copula_scale_prior_sigma": run_config.copula_scale_prior_sigma,
+            "copula_threshold_epsilon": run_config.copula_threshold_epsilon,
+            "copula_correlation_shrinkage": run_config.copula_correlation_shrinkage,
+            "copula_correlation_floor": run_config.copula_correlation_floor,
         }
     )
     inference_profile_hash = stable_hash(

@@ -192,6 +192,12 @@ class ProbabilisticRunConfig(BaseModel):
     dglm_max_state_variance: float = Field(default=1e6, gt=0.0)
     dglm_include_trend: bool = False
     dglm_seasonal_periods: list[float] = Field(default_factory=list)
+    copula_marginal_prior: float = Field(default=0.5, gt=0.0, le=1e6)
+    copula_lkj_eta: float = Field(default=2.0, gt=0.0, le=1e6)
+    copula_scale_prior_sigma: float = Field(default=0.1, gt=0.0, le=10.0)
+    copula_threshold_epsilon: float = Field(default=1e-6, gt=0.0, lt=0.5)
+    copula_correlation_shrinkage: float = Field(default=0.05, ge=0.0, le=1.0)
+    copula_correlation_floor: float = Field(default=1e-8, gt=0.0, le=1.0)
     utility_lambda_mse: float = Field(default=0.02, ge=0.0)
     dry_run: bool = False
     save_posterior_draws: bool = False

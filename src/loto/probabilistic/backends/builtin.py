@@ -5,10 +5,12 @@ from typing import Any
 import numpy as np
 
 from loto.probabilistic.backends.base import ProbabilisticBackend
-from loto.probabilistic.models.dglm_native import (
-    MODEL_ID as DGLM_MODEL_ID,
+from loto.probabilistic.models.copula_native import (
+    MODEL_ID as COPULA_MODEL_ID,
+    fit_gaussian_copula_categorical,
 )
 from loto.probabilistic.models.dglm_native import (
+    MODEL_ID as DGLM_MODEL_ID,
     fit_multinomial_dglm,
 )
 from loto.probabilistic.models.reference import fit_reference, posterior_draws
@@ -33,6 +35,55 @@ class BuiltinBackend(ProbabilisticBackend):
         seed: int,
         inference_profile_id: str | None = None,
     ) -> NativePosterior:
+        if spec.model_id == COPULA_MODEL_ID:
+            state = fit_gaussian_copula_categorical(
+                y,
+                game=geometry.key,
+                classes=classes,
+                config=config,
+                seed=seed,
+            )
+            draw_count = (
+                config.native_draws
+                if config.backend_policy == "primary_native"
+                else config.posterior_draws
+            )
+            draws = state.probability_draws(draw_count)
+            minimum_eigenvalue = float(np.linalg.eigvalsh(state.correlation).min())
+            return NativePosterior(
+                model_id=spec.model_id,
+                backend=self.backend_id,
+                family=spec.family,
+                target_mode=target_mode,
+                game=geometry.key,
+                probability_draws=draws,
+                metadata={
+                    **state.to_metadata_dict(),
+                    "native_graph_id": spec.native_graph_id,
+                    "implementation_kind": "analytic_copula_initialization",
+                    "native_analytic": True,
+                    "primary_backend": spec.primary_backend,
+                    "inference_profile_id": inference_profile_id,
+                },
+                diagnostics={
+                    "posterior_finite": bool(np.isfinite(draws).all()),
+                    "probability_simplex_valid": bool(
+                        np.allclose(draws.sum(axis=-1), 1.0, atol=1e-7)
+                    ),
+                    "correlation_psd": minimum_eigenvalue >= -1e-8,
+                    "correlation_min_eigenvalue": minimum_eigenvalue,
+                    "correlation_repair": state.correlation_repair,
+                    "marginal_preservation": True,
+                    "rhat_max": None,
+                    "ess_bulk_min": None,
+                    "ess_tail_min": None,
+                    "divergences": None,
+                    "elbo_finite": None,
+                    "elbo_stable": None,
+                },
+                native_payload=state,
+            )
+
         if spec.model_id == DGLM_MODEL_ID:
             state = fit_multinomial_dglm(
                 y,

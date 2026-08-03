@@ -72,6 +72,15 @@ def list_native_implementations() -> tuple[NativeImplementation, ...]:
             graph_id="multinomial_dglm_filter_v1",
             runtime_tier="standard",
         ),
+        NativeImplementation(
+            model_id="pp-gaussian-copula-categorical",
+            primary_backend="pymc",
+            primary_profile="pymc-nuts",
+            implementation_kind="latent_gaussian_lkj",
+            module="loto.probabilistic.models.copula_native",
+            graph_id="gaussian_copula_categorical_v1",
+            runtime_tier="standard",
+        ),
     )
     for implementation in ppl02_implementations:
         if implementation.model_id not in seen:

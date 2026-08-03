@@ -61,6 +61,7 @@ def required_resource_class(spec: ProbabilisticModelSpec, backend: str) -> str:
                 "state_space",
                 "regime_switching",
                 "changepoint",
+                "copula",
                 "count",
             }
             else "light_cpu"
@@ -75,6 +76,7 @@ def required_resource_class(spec: ProbabilisticModelSpec, backend: str) -> str:
         "state_space",
         "regime_switching",
         "changepoint",
+        "copula",
     }:
         return "heavy_cpu"
     return "light_cpu"
