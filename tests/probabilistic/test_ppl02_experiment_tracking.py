@@ -210,9 +210,7 @@ def test_evaluate_and_persist_wrapper_keeps_prediction_actual_unknown(tmp_path: 
     )
     assert report.run_id == "ppl02-explicit-test-run"
     assert result.prospective_prediction["payload"]["actual_known"] is False
-    run_record = json.loads(
-        (tmp_path / "tracking/run_record.json").read_text(encoding="utf-8")
-    )
+    run_record = json.loads((tmp_path / "tracking/run_record.json").read_text(encoding="utf-8"))
     assert run_record["actual_known"] is False
     assert run_record["prediction_payload_sha256"] == report.prediction_payload_sha256
 

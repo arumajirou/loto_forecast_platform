@@ -27,12 +27,7 @@ def write_parquet(
 def _records(frame: pd.DataFrame) -> list[dict[str, Any]]:
     output: list[dict[str, Any]] = []
     for row in frame.to_dict(orient="records"):
-        output.append(
-            {
-                key: (None if pd.isna(value) else value)
-                for key, value in row.items()
-            }
-        )
+        output.append({key: (None if pd.isna(value) else value) for key, value in row.items()})
     return output
 
 
@@ -77,15 +72,26 @@ def write_duckdb(
             [
                 run_record.get(key)
                 for key in (
-                    "run_id", "created_at", "model_id", "model_revision", "game",
-                    "status", "config_hash", "data_hash", "code_hash", "git_commit",
-                    "prediction_payload_sha256", "artifact_uri",
+                    "run_id",
+                    "created_at",
+                    "model_id",
+                    "model_revision",
+                    "game",
+                    "status",
+                    "config_hash",
+                    "data_hash",
+                    "code_hash",
+                    "git_commit",
+                    "prediction_payload_sha256",
+                    "artifact_uri",
                 )
             ]
             + [json.dumps(run_record, ensure_ascii=False, default=str)],
         )
         for table, frame in frames.items():
-            connection.execute(f"DELETE FROM ppl02_{table} WHERE run_id = ?", [run_record["run_id"]])
+            connection.execute(
+                f"DELETE FROM ppl02_{table} WHERE run_id = ?", [run_record["run_id"]]
+            )
             if not frame.empty:
                 connection.register("incoming", frame)
                 connection.execute(f"INSERT INTO ppl02_{table} SELECT * FROM incoming")
@@ -128,21 +134,38 @@ def write_postgres(
         for statement in ddl.values():
             connection.execute(text(statement))
         for table in _TABLES:
-            connection.execute(text(f"DELETE FROM ppl02_{table} WHERE run_id = :run_id"), {"run_id": run_record["run_id"]})
+            connection.execute(
+                text(f"DELETE FROM ppl02_{table} WHERE run_id = :run_id"),
+                {"run_id": run_record["run_id"]},
+            )
         record = dict(run_record)
         record["record_json"] = json.dumps(run_record, ensure_ascii=False, default=str)
         columns = [
-            "run_id", "created_at", "model_id", "model_revision", "game", "status",
-            "config_hash", "data_hash", "code_hash", "git_commit",
-            "prediction_payload_sha256", "artifact_uri", "record_json",
+            "run_id",
+            "created_at",
+            "model_id",
+            "model_revision",
+            "game",
+            "status",
+            "config_hash",
+            "data_hash",
+            "code_hash",
+            "git_commit",
+            "prediction_payload_sha256",
+            "artifact_uri",
+            "record_json",
         ]
         connection.execute(
-            text(f"INSERT INTO ppl02_runs ({','.join(columns)}) VALUES ({','.join(':'+c for c in columns)})"),
+            text(
+                f"INSERT INTO ppl02_runs ({','.join(columns)}) VALUES ({','.join(':' + c for c in columns)})"
+            ),
             {key: record.get(key) for key in columns},
         )
         for table, frame in frames.items():
             if not frame.empty:
-                frame.to_sql(f"ppl02_{table}", connection, if_exists="append", index=False, method="multi")
+                frame.to_sql(
+                    f"ppl02_{table}", connection, if_exists="append", index=False, method="multi"
+                )
     safe_uri = engine.url.render_as_string(hide_password=True)
     engine.dispose()
     return safe_uri, 1 + sum(len(frame) for frame in frames.values())
@@ -158,8 +181,15 @@ def write_mlflow(
     params = {
         key: run_record[key]
         for key in (
-            "run_id", "model_id", "model_revision", "game", "status",
-            "config_hash", "data_hash", "code_hash", "git_commit",
+            "run_id",
+            "model_id",
+            "model_revision",
+            "game",
+            "status",
+            "config_hash",
+            "data_hash",
+            "code_hash",
+            "git_commit",
             "prediction_payload_sha256",
         )
     }
