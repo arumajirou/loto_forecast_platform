@@ -26,7 +26,7 @@ from sklearn.preprocessing import StandardScaler
 from sqlalchemy import create_engine
 from xgboost import XGBRegressor
 
-ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
+ROOT = Path(__file__).resolve().parents[2]
 RUN_ID = time.strftime("ml-exog-ablation-%Y%m%d-%H%M%S")
 OUT = ROOT / "artifacts" / "experiments" / RUN_ID
 OUT.mkdir(parents=True, exist_ok=False)
