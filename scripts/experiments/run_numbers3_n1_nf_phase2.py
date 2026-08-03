@@ -28,21 +28,9 @@ from neuralforecast.models import (
 
 ROOT = Path(__file__).resolve().parents[2]
 
-DATA_DIR = (
-    ROOT
-    / "data"
-    / "exports"
-    / "numbers3"
-    / "splits"
-    / "n1_holdout200_ordinal"
-)
+DATA_DIR = ROOT / "data" / "exports" / "numbers3" / "splits" / "n1_holdout200_ordinal"
 
-OUTPUT_DIR = (
-    ROOT
-    / "artifacts"
-    / "numbers3"
-    / "n1_nf_phase2"
-)
+OUTPUT_DIR = ROOT / "artifacts" / "numbers3" / "n1_nf_phase2"
 
 HORIZON = 200
 INPUT_SIZE = 256
@@ -209,53 +197,24 @@ def evaluate(
     return {
         "model": name,
         "status": "PASS",
-        "raw_mae": float(
-            np.mean(np.abs(raw_error))
-        ),
-        "raw_mse": float(
-            np.mean(raw_error**2)
-        ),
-        "raw_rmse": float(
-            np.sqrt(np.mean(raw_error**2))
-        ),
-        "digit_mae": float(
-            np.mean(np.abs(digit_error))
-        ),
-        "digit_mse": float(
-            np.mean(digit_error**2)
-        ),
-        "digit_rmse": float(
-            np.sqrt(np.mean(digit_error**2))
-        ),
-        "within_1_rate": float(
-            np.mean(np.abs(digit_error) <= 1)
-        ),
-        "exact_rate": float(
-            np.mean(digit_error == 0)
-        ),
+        "raw_mae": float(np.mean(np.abs(raw_error))),
+        "raw_mse": float(np.mean(raw_error**2)),
+        "raw_rmse": float(np.sqrt(np.mean(raw_error**2))),
+        "digit_mae": float(np.mean(np.abs(digit_error))),
+        "digit_mse": float(np.mean(digit_error**2)),
+        "digit_rmse": float(np.sqrt(np.mean(digit_error**2))),
+        "within_1_rate": float(np.mean(np.abs(digit_error) <= 1)),
+        "exact_rate": float(np.mean(digit_error == 0)),
         "prediction_min": float(raw.min()),
         "prediction_max": float(raw.max()),
         "prediction_mean": float(raw.mean()),
-        "digit_prediction_mean": float(
-            digit.mean()
-        ),
+        "digit_prediction_mean": float(digit.mean()),
         "fit_seconds": float(fit_seconds),
-        "predict_seconds": float(
-            predict_seconds
-        ),
-        "peak_vram_mib": float(
-            peak_vram_mib
-        ),
-        "beats_digit_mae_baseline": bool(
-            np.mean(np.abs(digit_error)) < 2.56
-        ),
-        "beats_within_1_baseline": bool(
-            np.mean(np.abs(digit_error) <= 1)
-            > 0.325
-        ),
-        "beats_exact_baseline": bool(
-            np.mean(digit_error == 0) > 0.17
-        ),
+        "predict_seconds": float(predict_seconds),
+        "peak_vram_mib": float(peak_vram_mib),
+        "beats_digit_mae_baseline": bool(np.mean(np.abs(digit_error)) < 2.56),
+        "beats_within_1_baseline": bool(np.mean(np.abs(digit_error) <= 1) > 0.325),
+        "beats_exact_baseline": bool(np.mean(digit_error == 0) > 0.17),
     }
 
 
@@ -272,43 +231,23 @@ def main() -> None:
         exist_ok=True,
     )
 
-    train = (
-        pd.read_parquet(
-            DATA_DIR / "train.parquet"
-        )
-        .sort_values("ds")
-        .reset_index(drop=True)
-    )
+    train = pd.read_parquet(DATA_DIR / "train.parquet").sort_values("ds").reset_index(drop=True)
 
-    test = (
-        pd.read_parquet(
-            DATA_DIR / "test.parquet"
-        )
-        .sort_values("ds")
-        .reset_index(drop=True)
-    )
+    test = pd.read_parquet(DATA_DIR / "test.parquet").sort_values("ds").reset_index(drop=True)
 
-    train = train[
-        ["unique_id", "ds", "y"]
-    ].copy()
+    train = train[["unique_id", "ds", "y"]].copy()
 
-    train["unique_id"] = (
-        train["unique_id"].astype(str)
-    )
+    train["unique_id"] = train["unique_id"].astype(str)
     train["ds"] = train["ds"].astype(int)
     train["y"] = train["y"].astype(float)
 
-    actual = test["y"].to_numpy(
-        dtype=float
-    )
+    actual = test["y"].to_numpy(dtype=float)
 
     assert len(train) == 6839
     assert len(test) == 200
     assert torch.cuda.is_available()
 
-    torch.set_float32_matmul_precision(
-        "high"
-    )
+    torch.set_float32_matmul_precision("high")
 
     rows: list[dict[str, Any]] = []
     prediction_frames: list[pd.DataFrame] = []
@@ -331,54 +270,28 @@ def main() -> None:
 
             fit_started = time.perf_counter()
             nf.fit(df=train)
-            fit_seconds = (
-                time.perf_counter()
-                - fit_started
-            )
+            fit_seconds = time.perf_counter() - fit_started
 
-            predict_started = (
-                time.perf_counter()
-            )
+            predict_started = time.perf_counter()
             forecast = nf.predict()
-            predict_seconds = (
-                time.perf_counter()
-                - predict_started
-            )
+            predict_seconds = time.perf_counter() - predict_started
 
-            columns = [
-                column
-                for column in forecast.columns
-                if column
-                not in {"unique_id", "ds"}
-            ]
+            columns = [column for column in forecast.columns if column not in {"unique_id", "ds"}]
 
             if len(columns) != 1:
-                raise RuntimeError(
-                    f"Unexpected forecast columns: "
-                    f"{columns}"
-                )
+                raise RuntimeError(f"Unexpected forecast columns: {columns}")
 
             forecast_column = columns[0]
 
-            raw = forecast[
-                forecast_column
-            ].to_numpy(dtype=float)
+            raw = forecast[forecast_column].to_numpy(dtype=float)
 
             if len(raw) != len(actual):
-                raise RuntimeError(
-                    f"Prediction length={len(raw)}, "
-                    f"expected={len(actual)}"
-                )
+                raise RuntimeError(f"Prediction length={len(raw)}, expected={len(actual)}")
 
             if not np.isfinite(raw).all():
-                raise RuntimeError(
-                    "Non-finite predictions detected"
-                )
+                raise RuntimeError("Non-finite predictions detected")
 
-            peak_vram_mib = (
-                torch.cuda.max_memory_allocated()
-                / 1024**2
-            )
+            peak_vram_mib = torch.cuda.max_memory_allocated() / 1024**2
 
             result = evaluate(
                 name=name,
@@ -396,14 +309,10 @@ def main() -> None:
                     {
                         "model": name,
                         "ds": test["ds"].to_numpy(),
-                        "original_ds": test[
-                            "original_ds"
-                        ].to_numpy(),
+                        "original_ds": test["original_ds"].to_numpy(),
                         "actual": actual,
                         "prediction_raw": raw,
-                        "prediction_digit": (
-                            digitize(raw)
-                        ),
+                        "prediction_digit": (digitize(raw)),
                     }
                 )
             )
@@ -438,13 +347,9 @@ def main() -> None:
                 {
                     "model": name,
                     "status": "FAIL",
-                    "error_type": (
-                        type(exc).__name__
-                    ),
+                    "error_type": (type(exc).__name__),
                     "error": str(exc),
-                    "traceback": (
-                        traceback.format_exc()
-                    ),
+                    "traceback": (traceback.format_exc()),
                 }
             )
 
@@ -477,20 +382,11 @@ def main() -> None:
             na_position="last",
         )
 
-    csv_output = (
-        OUTPUT_DIR
-        / "numbers3_n1_nf_phase2_results.csv"
-    )
+    csv_output = OUTPUT_DIR / "numbers3_n1_nf_phase2_results.csv"
 
-    json_output = (
-        OUTPUT_DIR
-        / "numbers3_n1_nf_phase2_results.json"
-    )
+    json_output = OUTPUT_DIR / "numbers3_n1_nf_phase2_results.json"
 
-    predictions_output = (
-        OUTPUT_DIR
-        / "numbers3_n1_nf_phase2_predictions.parquet"
-    )
+    predictions_output = OUTPUT_DIR / "numbers3_n1_nf_phase2_predictions.parquet"
 
     results.to_csv(
         csv_output,
@@ -537,22 +433,14 @@ def main() -> None:
     print()
     print("=== Phase 2 results ===")
     print(
-        results[
-            display_columns
-        ].to_string(
+        results[display_columns].to_string(
             index=False,
-            float_format=(
-                lambda value: f"{value:.6f}"
-            ),
+            float_format=(lambda value: f"{value:.6f}"),
         )
     )
 
-    passed = int(
-        (results["status"] == "PASS").sum()
-    )
-    failed = int(
-        (results["status"] == "FAIL").sum()
-    )
+    passed = int((results["status"] == "PASS").sum())
+    failed = int((results["status"] == "FAIL").sum())
 
     print()
     print("models=", len(results))
@@ -566,13 +454,9 @@ def main() -> None:
     )
 
     if failed:
-        print(
-            "NUMBERS3_N1_NF_PHASE2=PARTIAL"
-        )
+        print("NUMBERS3_N1_NF_PHASE2=PARTIAL")
     else:
-        print(
-            "NUMBERS3_N1_NF_PHASE2=PASS"
-        )
+        print("NUMBERS3_N1_NF_PHASE2=PASS")
 
 
 if __name__ == "__main__":

@@ -25,7 +25,7 @@ from neuralforecast.models import (
 from sqlalchemy import create_engine
 
 
-ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
+ROOT = Path(__file__).resolve().parents[2]
 RUN_ID = time.strftime("nf-exog-ablation-%Y%m%d-%H%M%S")
 OUT = ROOT / "artifacts" / "experiments" / RUN_ID
 OUT.mkdir(parents=True, exist_ok=False)

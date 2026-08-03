@@ -24,20 +24,9 @@ from neuralforecast.models import (
 
 ROOT = Path(__file__).resolve().parents[2]
 
-DATA_PATH = (
-    ROOT
-    / "data"
-    / "exports"
-    / "numbers3"
-    / "numbers3_n1.parquet"
-)
+DATA_PATH = ROOT / "data" / "exports" / "numbers3" / "numbers3_n1.parquet"
 
-OUTPUT_DIR = (
-    ROOT
-    / "artifacts"
-    / "numbers3"
-    / "n1_rolling_top6"
-)
+OUTPUT_DIR = ROOT / "artifacts" / "numbers3" / "n1_rolling_top6"
 
 ROLLING_POINTS = 50
 INPUT_SIZE = 256
@@ -71,9 +60,7 @@ def common_kwargs() -> dict[str, Any]:
     }
 
 
-def factories() -> list[
-    tuple[str, Callable[[], Any]]
-]:
+def factories() -> list[tuple[str, Callable[[], Any]]]:
     return [
         (
             "MLP",
@@ -162,11 +149,7 @@ def main() -> None:
         exist_ok=True,
     )
 
-    df = (
-        pd.read_parquet(DATA_PATH)
-        .sort_values("ds")
-        .reset_index(drop=True)
-    )
+    df = pd.read_parquet(DATA_PATH).sort_values("ds").reset_index(drop=True)
 
     df["original_ds"] = pd.to_datetime(df["ds"])
     df["ds"] = np.arange(len(df), dtype=int)
@@ -192,9 +175,7 @@ def main() -> None:
         ):
             cleanup()
 
-            history = df.iloc[:test_index][
-                ["unique_id", "ds", "y"]
-            ].copy()
+            history = df.iloc[:test_index][["unique_id", "ds", "y"]].copy()
 
             actual_row = df.iloc[test_index]
             actual = float(actual_row["y"])
@@ -211,35 +192,23 @@ def main() -> None:
 
                 fit_start = time.perf_counter()
                 nf.fit(df=history)
-                fit_seconds = (
-                    time.perf_counter() - fit_start
-                )
+                fit_seconds = time.perf_counter() - fit_start
 
                 predict_start = time.perf_counter()
                 forecast = nf.predict()
-                predict_seconds = (
-                    time.perf_counter() - predict_start
-                )
+                predict_seconds = time.perf_counter() - predict_start
 
                 columns = [
-                    column
-                    for column in forecast.columns
-                    if column not in {"unique_id", "ds"}
+                    column for column in forecast.columns if column not in {"unique_id", "ds"}
                 ]
 
                 if len(columns) != 1:
-                    raise RuntimeError(
-                        f"Unexpected columns: {columns}"
-                    )
+                    raise RuntimeError(f"Unexpected columns: {columns}")
 
-                raw = float(
-                    forecast[columns[0]].iloc[0]
-                )
+                raw = float(forecast[columns[0]].iloc[0])
 
                 if not np.isfinite(raw):
-                    raise RuntimeError(
-                        "Non-finite prediction"
-                    )
+                    raise RuntimeError("Non-finite prediction")
 
                 digit = digitize(raw)
                 error = actual - raw
@@ -249,35 +218,19 @@ def main() -> None:
                     "model": model_name,
                     "status": "PASS",
                     "test_index": int(test_index),
-                    "original_ds": str(
-                        actual_row["original_ds"]
-                    ),
+                    "original_ds": str(actual_row["original_ds"]),
                     "actual": actual,
                     "prediction_raw": raw,
                     "prediction_digit": digit,
                     "raw_abs_error": abs(error),
                     "raw_squared_error": error**2,
-                    "digit_abs_error": abs(
-                        digit_error
-                    ),
-                    "digit_squared_error": (
-                        digit_error**2
-                    ),
-                    "within_1": int(
-                        abs(digit_error) <= 1
-                    ),
-                    "exact": int(
-                        digit_error == 0
-                    ),
+                    "digit_abs_error": abs(digit_error),
+                    "digit_squared_error": (digit_error**2),
+                    "within_1": int(abs(digit_error) <= 1),
+                    "exact": int(digit_error == 0),
                     "fit_seconds": fit_seconds,
-                    "predict_seconds": (
-                        predict_seconds
-                    ),
-                    "peak_vram_mib": (
-                        torch.cuda
-                        .max_memory_allocated()
-                        / 1024**2
-                    ),
+                    "predict_seconds": (predict_seconds),
+                    "peak_vram_mib": (torch.cuda.max_memory_allocated() / 1024**2),
                 }
 
                 rows.append(row)
@@ -295,20 +248,12 @@ def main() -> None:
                     {
                         "model": model_name,
                         "status": "FAIL",
-                        "test_index": int(
-                            test_index
-                        ),
-                        "original_ds": str(
-                            actual_row["original_ds"]
-                        ),
+                        "test_index": int(test_index),
+                        "original_ds": str(actual_row["original_ds"]),
                         "actual": actual,
-                        "error_type": (
-                            type(exc).__name__
-                        ),
+                        "error_type": (type(exc).__name__),
                         "error": str(exc),
-                        "traceback": (
-                            traceback.format_exc()
-                        ),
+                        "traceback": (traceback.format_exc()),
                     }
                 )
 
@@ -322,19 +267,14 @@ def main() -> None:
 
     detail = pd.DataFrame(rows)
 
-    detail_path = (
-        OUTPUT_DIR
-        / "numbers3_n1_rolling_top6_detail.parquet"
-    )
+    detail_path = OUTPUT_DIR / "numbers3_n1_rolling_top6_detail.parquet"
 
     detail.to_parquet(
         detail_path,
         index=False,
     )
 
-    passed = detail[
-        detail["status"] == "PASS"
-    ].copy()
+    passed = detail[detail["status"] == "PASS"].copy()
 
     summary = (
         passed.groupby("model")
@@ -399,38 +339,24 @@ def main() -> None:
         )
     )
 
-    summary["beats_mae_baseline"] = (
-        summary["digit_mae"] < 2.56
-    )
+    summary["beats_mae_baseline"] = summary["digit_mae"] < 2.56
 
-    summary["beats_within_1_baseline"] = (
-        summary["within_1_rate"] > 0.325
-    )
+    summary["beats_within_1_baseline"] = summary["within_1_rate"] > 0.325
 
-    summary["beats_exact_baseline"] = (
-        summary["exact_rate"] > 0.17
-    )
+    summary["beats_exact_baseline"] = summary["exact_rate"] > 0.17
 
-    summary_path = (
-        OUTPUT_DIR
-        / "numbers3_n1_rolling_top6_summary.csv"
-    )
+    summary_path = OUTPUT_DIR / "numbers3_n1_rolling_top6_summary.csv"
 
     summary.to_csv(
         summary_path,
         index=False,
     )
 
-    json_path = (
-        OUTPUT_DIR
-        / "numbers3_n1_rolling_top6_summary.json"
-    )
+    json_path = OUTPUT_DIR / "numbers3_n1_rolling_top6_summary.json"
 
     json_path.write_text(
         json.dumps(
-            summary.to_dict(
-                orient="records"
-            ),
+            summary.to_dict(orient="records"),
             indent=2,
             ensure_ascii=False,
         ),
@@ -446,9 +372,7 @@ def main() -> None:
         )
     )
 
-    failures = int(
-        (detail["status"] == "FAIL").sum()
-    )
+    failures = int((detail["status"] == "FAIL").sum())
 
     print()
     print("rows=", len(detail))
@@ -457,13 +381,9 @@ def main() -> None:
     print("summary=", summary_path)
 
     if failures:
-        print(
-            "NUMBERS3_N1_ROLLING_TOP6=PARTIAL"
-        )
+        print("NUMBERS3_N1_ROLLING_TOP6=PARTIAL")
     else:
-        print(
-            "NUMBERS3_N1_ROLLING_TOP6=PASS"
-        )
+        print("NUMBERS3_N1_ROLLING_TOP6=PASS")
 
 
 if __name__ == "__main__":

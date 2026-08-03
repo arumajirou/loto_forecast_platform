@@ -15,7 +15,7 @@ from neuralforecast.models import TFT
 from sqlalchemy import create_engine
 
 
-ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
+ROOT = Path(__file__).resolve().parents[2]
 RUN_ID = time.strftime(
     "tft-selected-exog-%Y%m%d-%H%M%S"
 )
