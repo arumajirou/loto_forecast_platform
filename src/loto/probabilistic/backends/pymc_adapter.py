@@ -137,9 +137,7 @@ class PyMCBackend(ProbabilisticBackend):
         profile = get_inference_profile(profile_id)
         settings = profile_settings(config, profile)
         graph_builder = (
-            build_gaussian_copula_graph
-            if spec.model_id == COPULA_MODEL_ID
-            else build_pymc_graph
+            build_gaussian_copula_graph if spec.model_id == COPULA_MODEL_ID else build_pymc_graph
         )
         graph = graph_builder(
             spec,
@@ -172,7 +170,9 @@ class PyMCBackend(ProbabilisticBackend):
                 )
                 losses = list(np.asarray(getattr(approximation, "hist", []), dtype=float))
                 idata = approximation.sample(
-                    draws=settings["posterior_draws"], random_seed=seed, return_inferencedata=True
+                    draws=settings["posterior_draws"],
+                    random_seed=seed,
+                    return_inferencedata=True,
                 )
             else:
                 idata = pm.sample(
