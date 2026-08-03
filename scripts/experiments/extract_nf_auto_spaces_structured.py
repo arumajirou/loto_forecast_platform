@@ -26,14 +26,10 @@ except ImportError:
 
 
 CLASSIFICATION = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_classification_v2.json"
+    "artifacts/parameter_inventory/neuralforecast_auto_model_classification_v2.json"
 )
 
-OUTPUT = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_spaces_structured.json"
-)
+OUTPUT = Path("artifacts/parameter_inventory/neuralforecast_auto_spaces_structured.json")
 
 
 def json_safe(value: Any) -> Any:
@@ -50,10 +46,7 @@ def json_safe(value: Any) -> Any:
         return [json_safe(item) for item in value]
 
     if isinstance(value, dict):
-        return {
-            str(key): json_safe(item)
-            for key, item in value.items()
-        }
+        return {str(key): json_safe(item) for key, item in value.items()}
 
     return repr(value)
 
@@ -79,9 +72,7 @@ def encode_ray_sampler(
     ):
         if hasattr(sampler, name):
             try:
-                result[name] = json_safe(
-                    getattr(sampler, name)
-                )
+                result[name] = json_safe(getattr(sampler, name))
             except Exception:
                 pass
 
@@ -115,12 +106,8 @@ def encode_ray_domain(
         result.update(
             {
                 "kind": "integer_range",
-                "lower": json_safe(
-                    getattr(value, "lower", None)
-                ),
-                "upper": json_safe(
-                    getattr(value, "upper", None)
-                ),
+                "lower": json_safe(getattr(value, "lower", None)),
+                "upper": json_safe(getattr(value, "upper", None)),
             }
         )
 
@@ -128,12 +115,8 @@ def encode_ray_domain(
         result.update(
             {
                 "kind": "float_range",
-                "lower": json_safe(
-                    getattr(value, "lower", None)
-                ),
-                "upper": json_safe(
-                    getattr(value, "upper", None)
-                ),
+                "lower": json_safe(getattr(value, "lower", None)),
+                "upper": json_safe(getattr(value, "upper", None)),
             }
         )
 
@@ -151,9 +134,7 @@ def encode_ray_domain(
 
     sampler = getattr(value, "sampler", None)
 
-    result["sampler"] = encode_ray_sampler(
-        sampler
-    )
+    result["sampler"] = encode_ray_sampler(sampler)
 
     return result
 
@@ -214,9 +195,7 @@ def encode_optuna_value(
     }
 
 
-classification = json.loads(
-    CLASSIFICATION.read_text(encoding="utf-8")
-)
+classification = json.loads(CLASSIFICATION.read_text(encoding="utf-8"))
 
 eligible = [
     record["auto_model"]
@@ -229,10 +208,7 @@ records = []
 for name in sorted(eligible):
     cls = getattr(auto_module, name)
 
-    if not (
-        inspect.isclass(cls)
-        and issubclass(cls, BaseAuto)
-    ):
+    if not (inspect.isclass(cls) and issubclass(cls, BaseAuto)):
         continue
 
     entry: dict[str, Any] = {
@@ -261,13 +237,9 @@ for name in sorted(eligible):
 
             for key, value in config.items():
                 if backend == "ray":
-                    encoded[key] = encode_ray_domain(
-                        value
-                    )
+                    encoded[key] = encode_ray_domain(value)
                 else:
-                    encoded[key] = encode_optuna_value(
-                        value
-                    )
+                    encoded[key] = encode_optuna_value(value)
 
             entry["backends"][backend] = {
                 "status": "OK",

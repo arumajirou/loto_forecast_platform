@@ -4,7 +4,6 @@ import sys
 
 import pandas as pd
 
-
 path = sys.argv[1]
 df = pd.read_parquet(path)
 
@@ -23,16 +22,11 @@ for column, (lower, upper) in ranges.items():
         errors.append(f"missing column: {column}")
         continue
 
-    invalid = df[
-        df[column].isna()
-        | (df[column] < lower)
-        | (df[column] > upper)
-    ]
+    invalid = df[df[column].isna() | (df[column] < lower) | (df[column] > upper)]
 
     if not invalid.empty:
         errors.append(
-            f"{column}: invalid_rows={len(invalid)} "
-            f"min={df[column].min()} max={df[column].max()}"
+            f"{column}: invalid_rows={len(invalid)} min={df[column].min()} max={df[column].max()}"
         )
 
 if errors:

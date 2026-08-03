@@ -14,17 +14,9 @@ from neuralforecast.losses.pytorch import MAE
 from neuralforecast.models import TFT
 from sqlalchemy import create_engine
 
-
 ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
-RUN_ID = time.strftime(
-    "tft-selected-exog-%Y%m%d-%H%M%S"
-)
-OUT = (
-    ROOT
-    / "artifacts"
-    / "experiments"
-    / RUN_ID
-)
+RUN_ID = time.strftime("tft-selected-exog-%Y%m%d-%H%M%S")
+OUT = ROOT / "artifacts" / "experiments" / RUN_ID
 OUT.mkdir(parents=True, exist_ok=False)
 
 torch.set_float32_matmul_precision("high")
@@ -70,11 +62,7 @@ ALL_HISTORICAL = [
     "hist_ewm_mean_14",
 ]
 
-selection = yaml.safe_load(
-    (
-        ROOT / "configs/tft_selected_exog.yaml"
-    ).read_text(encoding="utf-8")
-)
+selection = yaml.safe_load((ROOT / "configs/tft_selected_exog.yaml").read_text(encoding="utf-8"))
 
 SELECTED_FUTURE = selection.get(
     "future_exog",
@@ -87,15 +75,11 @@ SELECTED_HISTORICAL = selection.get(
 
 for column in SELECTED_FUTURE:
     if column not in ALL_FUTURE:
-        raise ValueError(
-            f"Unknown selected future feature: {column}"
-        )
+        raise ValueError(f"Unknown selected future feature: {column}")
 
 for column in SELECTED_HISTORICAL:
     if column not in ALL_HISTORICAL:
-        raise ValueError(
-            f"Unknown selected historical feature: {column}"
-        )
+        raise ValueError(f"Unknown selected historical feature: {column}")
 
 CONDITIONS = {
     "no_exog": {
@@ -120,11 +104,7 @@ CONDITIONS = {
     },
 }
 
-all_columns = list(
-    dict.fromkeys(
-        ALL_FUTURE + ALL_HISTORICAL
-    )
-)
+all_columns = list(dict.fromkeys(ALL_FUTURE + ALL_HISTORICAL))
 
 db_url = (
     f"postgresql+psycopg://{os.environ['DB_USER']}:"
@@ -151,15 +131,10 @@ df = pd.read_sql(
 )
 
 df["actual_ds"] = pd.to_datetime(df["ds"])
-df["draw_index"] = (
-    df.groupby("unique_id").cumcount()
-)
-df["ds"] = (
-    pd.Timestamp("2000-01-01")
-    + pd.to_timedelta(
-        df["draw_index"],
-        unit="D",
-    )
+df["draw_index"] = df.groupby("unique_id").cumcount()
+df["ds"] = pd.Timestamp("2000-01-01") + pd.to_timedelta(
+    df["draw_index"],
+    unit="D",
 )
 
 df["y"] = pd.to_numeric(
@@ -180,18 +155,9 @@ df = df.replace(
 
 # 全条件で同じ行を使うため、
 # 最大特徴集合の欠損をまとめて除外する。
-df = df.dropna(
-    subset=["y", *all_columns]
-).reset_index(drop=True)
+df = df.dropna(subset=["y", *all_columns]).reset_index(drop=True)
 
-common_dates = sorted(
-    set.intersection(
-        *[
-            set(group["ds"])
-            for _, group in df.groupby("unique_id")
-        ]
-    )
-)
+common_dates = sorted(set.intersection(*[set(group["ds"]) for _, group in df.groupby("unique_id")]))
 
 test_dates = common_dates[-N_WINDOWS:]
 
@@ -220,13 +186,9 @@ for seed in SEEDS:
             test_dates,
             start=1,
         ):
-            train_df = model_df[
-                model_df["ds"] < test_date
-            ].copy()
+            train_df = model_df[model_df["ds"] < test_date].copy()
 
-            test_df = model_df[
-                model_df["ds"] == test_date
-            ].copy()
+            test_df = model_df[model_df["ds"] == test_date].copy()
 
             model = TFT(
                 h=H,
@@ -262,24 +224,21 @@ for seed in SEEDS:
                     ]
                 ].copy()
 
-                forecast = nf.predict(
-                    futr_df=futr_df
-                )
+                forecast = nf.predict(futr_df=futr_df)
             else:
                 forecast = nf.predict()
 
             pred_col = [
                 column
                 for column in forecast.columns
-                if column not in {
+                if column
+                not in {
                     "unique_id",
                     "ds",
                 }
             ][0]
 
-            merged = test_df[
-                ["unique_id", "ds", "y"]
-            ].merge(
+            merged = test_df[["unique_id", "ds", "y"]].merge(
                 forecast[
                     [
                         "unique_id",
@@ -291,33 +250,19 @@ for seed in SEEDS:
                 how="inner",
             )
 
-            actual = merged["y"].to_numpy(
-                dtype=float
-            )
-            predicted = merged[
-                pred_col
-            ].to_numpy(dtype=float)
+            actual = merged["y"].to_numpy(dtype=float)
+            predicted = merged[pred_col].to_numpy(dtype=float)
 
-            errors = np.abs(
-                actual - predicted
-            )
+            errors = np.abs(actual - predicted)
 
             metrics = {
                 "seed": seed,
                 "condition": condition,
                 "fold": fold,
                 "test_date": str(test_date),
-                "mae": float(
-                    np.mean(errors)
-                ),
-                "mse": float(
-                    np.mean(
-                        (actual - predicted) ** 2
-                    )
-                ),
-                "within_1": float(
-                    np.mean(errors <= 1.0)
-                ),
+                "mae": float(np.mean(errors)),
+                "mse": float(np.mean((actual - predicted) ** 2)),
+                "within_1": float(np.mean(errors <= 1.0)),
                 "training_seconds": elapsed,
             }
 
@@ -329,15 +274,8 @@ for seed in SEEDS:
                         **metrics,
                         "unique_id": row["unique_id"],
                         "actual": float(row["y"]),
-                        "prediction": float(
-                            row[pred_col]
-                        ),
-                        "absolute_error": float(
-                            abs(
-                                row["y"]
-                                - row[pred_col]
-                            )
-                        ),
+                        "prediction": float(row[pred_col]),
+                        "absolute_error": float(abs(row["y"] - row[pred_col])),
                     }
                 )
 
@@ -349,49 +287,22 @@ for seed in SEEDS:
                 "condition": condition,
                 "future_features": exog["futr"],
                 "historical_features": exog["hist"],
-                "n_future_features": len(
-                    exog["futr"]
-                ),
-                "n_historical_features": len(
-                    exog["hist"]
-                ),
-                "mean_mae": float(
-                    fold_df["mae"].mean()
-                ),
-                "median_mae": float(
-                    fold_df["mae"].median()
-                ),
-                "std_mae": float(
-                    fold_df["mae"].std()
-                ),
-                "mean_mse": float(
-                    fold_df["mse"].mean()
-                ),
-                "mean_within_1": float(
-                    fold_df["within_1"].mean()
-                ),
+                "n_future_features": len(exog["futr"]),
+                "n_historical_features": len(exog["hist"]),
+                "mean_mae": float(fold_df["mae"].mean()),
+                "median_mae": float(fold_df["mae"].median()),
+                "std_mae": float(fold_df["mae"].std()),
+                "mean_mse": float(fold_df["mse"].mean()),
+                "mean_within_1": float(fold_df["within_1"].mean()),
                 "positive_fold_rate": None,
-                "total_training_seconds": float(
-                    fold_df[
-                        "training_seconds"
-                    ].sum()
-                ),
+                "total_training_seconds": float(fold_df["training_seconds"].sum()),
             }
         )
 
 results_df = pd.DataFrame(results)
 
-baseline = (
-    results_df[
-        results_df["condition"] == "no_exog"
-    ][
-        ["seed", "mean_mae"]
-    ]
-    .rename(
-        columns={
-            "mean_mae": "baseline_mae"
-        }
-    )
+baseline = results_df[results_df["condition"] == "no_exog"][["seed", "mean_mae"]].rename(
+    columns={"mean_mae": "baseline_mae"}
 )
 
 results_df = results_df.merge(
@@ -400,15 +311,8 @@ results_df = results_df.merge(
     how="left",
 )
 
-results_df[
-    "mae_improvement_percent_vs_no_exog"
-] = (
-    (
-        results_df["baseline_mae"]
-        - results_df["mean_mae"]
-    )
-    / results_df["baseline_mae"]
-    * 100.0
+results_df["mae_improvement_percent_vs_no_exog"] = (
+    (results_df["baseline_mae"] - results_df["mean_mae"]) / results_df["baseline_mae"] * 100.0
 )
 
 prediction_df = pd.DataFrame(predictions)
@@ -425,45 +329,24 @@ for index, row in results_df.iterrows():
 
     condition_fold = (
         prediction_df[
-            (prediction_df["seed"] == seed)
-            & (
-                prediction_df["condition"]
-                == row["condition"]
-            )
+            (prediction_df["seed"] == seed) & (prediction_df["condition"] == row["condition"])
         ]
-        .groupby("fold")[
-            "absolute_error"
-        ]
+        .groupby("fold")["absolute_error"]
         .mean()
     )
 
     baseline_fold = (
-        prediction_df[
-            (prediction_df["seed"] == seed)
-            & (
-                prediction_df["condition"]
-                == "no_exog"
-            )
-        ]
-        .groupby("fold")[
-            "absolute_error"
-        ]
+        prediction_df[(prediction_df["seed"] == seed) & (prediction_df["condition"] == "no_exog")]
+        .groupby("fold")["absolute_error"]
         .mean()
     )
 
-    common = condition_fold.index.intersection(
-        baseline_fold.index
-    )
+    common = condition_fold.index.intersection(baseline_fold.index)
 
     results_df.loc[
         index,
         "positive_fold_rate",
-    ] = float(
-        (
-            condition_fold.loc[common]
-            < baseline_fold.loc[common]
-        ).mean()
-    )
+    ] = float((condition_fold.loc[common] < baseline_fold.loc[common]).mean())
 
 results_df.to_csv(
     OUT / "tft_selected_exog_results.csv",
@@ -476,8 +359,7 @@ prediction_df.to_parquet(
 )
 
 summary = (
-    results_df
-    .groupby("condition")
+    results_df.groupby("condition")
     .agg(
         mean_mae=("mean_mae", "mean"),
         std_across_seeds=(
@@ -533,9 +415,7 @@ print(
             "positive_fold_rate",
         ]
     ]
-    .sort_values(
-        ["seed", "mean_mae"]
-    )
+    .sort_values(["seed", "mean_mae"])
     .to_string(index=False)
 )
 

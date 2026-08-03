@@ -8,21 +8,11 @@ from typing import Any
 import neuralforecast.models as models
 from neuralforecast.losses.pytorch import MAE
 
+SPACE_SOURCE = Path("configs/generated/neuralforecast_normalized_fixed_seed_spaces.json")
 
-SPACE_SOURCE = Path(
-    "configs/generated/"
-    "neuralforecast_normalized_fixed_seed_spaces.json"
-)
+MATRIX_SOURCE = Path("artifacts/parameter_inventory/neuralforecast_auto_model_matrix_v2.json")
 
-MATRIX_SOURCE = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_matrix_v2.json"
-)
-
-OUTPUT = Path(
-    "artifacts/runtime_certification/"
-    "neuralforecast_model_instantiation_smoke.json"
-)
+OUTPUT = Path("artifacts/runtime_certification/neuralforecast_model_instantiation_smoke.json")
 
 
 def resolve_value(
@@ -45,64 +35,39 @@ def resolve_value(
     }:
         return spec["lower"]
 
-    raise ValueError(
-        f"Unsupported kind {kind!r}"
-    )
+    raise ValueError(f"Unsupported kind {kind!r}")
 
 
-spaces = json.loads(
-    SPACE_SOURCE.read_text(encoding="utf-8")
-)
+spaces = json.loads(SPACE_SOURCE.read_text(encoding="utf-8"))
 
-matrix = json.loads(
-    MATRIX_SOURCE.read_text(encoding="utf-8")
-)
+matrix = json.loads(MATRIX_SOURCE.read_text(encoding="utf-8"))
 
-matrix_by_auto = {
-    record["auto_model"]: record
-    for record in matrix
-}
+matrix_by_auto = {record["auto_model"]: record for record in matrix}
 
 results = []
 
-for auto_name, model_space in (
-    spaces["models"].items()
-):
+for auto_name, model_space in spaces["models"].items():
     matrix_record = matrix_by_auto[auto_name]
     base_name = matrix_record["base_model"]
     model_cls = getattr(models, base_name)
 
-    signature = inspect.signature(
-        model_cls.__init__
-    )
+    signature = inspect.signature(model_cls.__init__)
 
-    accepted = set(signature.parameters) - {
-        "self"
-    }
+    accepted = set(signature.parameters) - {"self"}
 
-    candidate = {
-        name: resolve_value(spec)
-        for name, spec
-        in model_space["parameters"].items()
-    }
+    candidate = {name: resolve_value(spec) for name, spec in model_space["parameters"].items()}
 
     candidate.update(
         {
             "h": 1,
             "loss": MAE(),
             "valid_loss": MAE(),
-            "alias": (
-                f"smoke_{base_name}"
-            ),
+            "alias": (f"smoke_{base_name}"),
         }
     )
 
     # Do not pass tuning-only or unsupported keys.
-    config = {
-        key: value
-        for key, value in candidate.items()
-        if key in accepted
-    }
+    config = {key: value for key, value in candidate.items() if key in accepted}
 
     # Keep constructor certification inexpensive.
     if "max_steps" in config:
@@ -116,13 +81,8 @@ for auto_name, model_space in (
         if current == -1:
             config["input_size"] = 3
 
-        if (
-            "inference_input_size" in config
-            and config["inference_input_size"] == -1
-        ):
-            config["inference_input_size"] = int(
-                config["input_size"]
-            )
+        if "inference_input_size" in config and config["inference_input_size"] == -1:
+            config["inference_input_size"] = int(config["input_size"])
 
         # Encoder-decoder Transformer models require enough
         # context for decoder_input_size_multiplier=0.5.
@@ -139,9 +99,7 @@ for auto_name, model_space in (
 
         # PatchTST needs context at least as long as a patch.
         if base_name == "PatchTST":
-            patch_len = int(
-                config.get("patch_len", 16)
-            )
+            patch_len = int(config.get("patch_len", 16))
             config["input_size"] = max(
                 int(config["input_size"]),
                 patch_len,
@@ -165,9 +123,7 @@ for auto_name, model_space in (
                 "auto_model": auto_name,
                 "base_model": base_name,
                 "status": "PASS",
-                "instance_class": (
-                    type(instance).__name__
-                ),
+                "instance_class": (type(instance).__name__),
                 "config": config,
             }
         )
@@ -183,10 +139,7 @@ for auto_name, model_space in (
 
         status = (
             "OPTIONAL_DEPENDENCY_MISSING"
-            if (
-                base_name == "xLSTM"
-                and "Please install `xlstm`" in error_text
-            )
+            if (base_name == "xLSTM" and "Please install `xlstm`" in error_text)
             else "ERROR"
         )
 
@@ -223,21 +176,11 @@ OUTPUT.write_text(
     encoding="utf-8",
 )
 
-passed = sum(
-    record["status"] == "PASS"
-    for record in results
-)
+passed = sum(record["status"] == "PASS" for record in results)
 
-optional_missing = sum(
-    record["status"]
-    == "OPTIONAL_DEPENDENCY_MISSING"
-    for record in results
-)
+optional_missing = sum(record["status"] == "OPTIONAL_DEPENDENCY_MISSING" for record in results)
 
-failed = sum(
-    record["status"] == "ERROR"
-    for record in results
-)
+failed = sum(record["status"] == "ERROR" for record in results)
 
 print("models=", len(results))
 print("passed=", passed)
@@ -251,9 +194,6 @@ print("OUT=", OUTPUT)
 if failed:
     print("NF_MODEL_INSTANTIATION_SMOKE=PARTIAL")
 elif optional_missing:
-    print(
-        "NF_MODEL_INSTANTIATION_SMOKE="
-        "PASS_WITH_OPTIONAL_MISSING"
-    )
+    print("NF_MODEL_INSTANTIATION_SMOKE=PASS_WITH_OPTIONAL_MISSING")
 else:
     print("NF_MODEL_INSTANTIATION_SMOKE=PASS")

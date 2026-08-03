@@ -9,7 +9,6 @@ import pandas as pd
 from autogluon.timeseries import TimeSeriesDataFrame, TimeSeriesPredictor
 from sqlalchemy import create_engine
 
-
 ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
 RUN_ID = time.strftime("chronos2-exog-ablation-%Y%m%d-%H%M%S")
 OUT = ROOT / "artifacts" / "experiments" / RUN_ID
@@ -56,17 +55,10 @@ df = pd.read_sql(query, engine)
 
 df["actual_date"] = pd.to_datetime(df["actual_date"])
 df["draw_index"] = df.groupby("item_id").cumcount()
-df["timestamp"] = (
-    pd.Timestamp("2000-01-01")
-    + pd.to_timedelta(df["draw_index"], unit="D")
-)
+df["timestamp"] = pd.Timestamp("2000-01-01") + pd.to_timedelta(df["draw_index"], unit="D")
 
 df["days_since_previous_draw"] = (
-    df.groupby("item_id")["actual_date"]
-    .diff()
-    .dt.days
-    .fillna(0)
-    .astype(float)
+    df.groupby("item_id")["actual_date"].diff().dt.days.fillna(0).astype(float)
 )
 
 exog_cols = [
@@ -101,11 +93,7 @@ for condition, known_cols in conditions.items():
         shifted = condition_data.to_data_frame().copy()
 
         for column in exog_cols:
-            shifted[column] = (
-                shifted.groupby(level="item_id")[column]
-                .shift(1)
-                .bfill()
-            )
+            shifted[column] = shifted.groupby(level="item_id")[column].shift(1).bfill()
 
         condition_data = TimeSeriesDataFrame(shifted)
 
@@ -170,11 +158,7 @@ baseline = float(
     ].iloc[0]
 )
 
-results_df["improvement_percent_vs_no_exog"] = (
-    (baseline - results_df["mae"])
-    / baseline
-    * 100.0
-)
+results_df["improvement_percent_vs_no_exog"] = (baseline - results_df["mae"]) / baseline * 100.0
 
 results_df.to_csv(OUT / "ablation_results.csv", index=False)
 

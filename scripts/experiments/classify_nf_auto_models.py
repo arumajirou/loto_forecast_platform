@@ -7,21 +7,11 @@ from typing import Any
 
 import neuralforecast.auto as auto_module
 
+SOURCE = Path("artifacts/parameter_inventory/full_neuralforecast_search_surface.json")
 
-SOURCE = Path(
-    "artifacts/parameter_inventory/"
-    "full_neuralforecast_search_surface.json"
-)
+OUTPUT_JSON = Path("artifacts/parameter_inventory/neuralforecast_auto_model_classification.json")
 
-OUTPUT_JSON = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_classification.json"
-)
-
-OUTPUT_CSV = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_classification.csv"
-)
+OUTPUT_CSV = Path("artifacts/parameter_inventory/neuralforecast_auto_model_classification.csv")
 
 
 def get_required_parameters(
@@ -35,15 +25,10 @@ def get_required_parameters(
         if name == "self":
             continue
 
-        if (
-            parameter.default
-            is inspect.Parameter.empty
-            and parameter.kind
-            not in {
-                inspect.Parameter.VAR_POSITIONAL,
-                inspect.Parameter.VAR_KEYWORD,
-            }
-        ):
+        if parameter.default is inspect.Parameter.empty and parameter.kind not in {
+            inspect.Parameter.VAR_POSITIONAL,
+            inspect.Parameter.VAR_KEYWORD,
+        }:
             required.append(name)
 
     return required
@@ -52,9 +37,7 @@ def get_required_parameters(
 def get_parameter_names(
     cls: type[Any],
 ) -> set[str]:
-    return set(
-        inspect.signature(cls.__init__).parameters
-    ) - {"self"}
+    return set(inspect.signature(cls.__init__).parameters) - {"self"}
 
 
 def classify(
@@ -66,9 +49,7 @@ def classify(
 
     underlying = getattr(cls, "_model", None)
 
-    has_default_config = callable(
-        getattr(cls, "get_default_config", None)
-    )
+    has_default_config = callable(getattr(cls, "get_default_config", None))
 
     requires_n_series = "n_series" in required
     accepts_n_series = "n_series" in parameters
@@ -79,22 +60,11 @@ def classify(
         "reconciliation",
     }
 
-    is_hierarchical = bool(
-        hierarchical_markers.intersection(parameters)
-    )
+    is_hierarchical = bool(hierarchical_markers.intersection(parameters))
 
-    supports_future_exog = (
-        "futr_exog_list" in parameters
-        or has_default_config
-    )
-    supports_historical_exog = (
-        "hist_exog_list" in parameters
-        or has_default_config
-    )
-    supports_static_exog = (
-        "stat_exog_list" in parameters
-        or has_default_config
-    )
+    supports_future_exog = "futr_exog_list" in parameters or has_default_config
+    supports_historical_exog = "hist_exog_list" in parameters or has_default_config
+    supports_static_exog = "stat_exog_list" in parameters or has_default_config
 
     if name in {"BaseAuto"}:
         category = "base_or_support"
@@ -104,17 +74,12 @@ def classify(
     elif is_hierarchical:
         category = "hierarchical_or_wrapper"
         eligible = False
-        exclusion_reason = (
-            "Requires hierarchy/reconciliation design"
-        )
+        exclusion_reason = "Requires hierarchy/reconciliation design"
 
     elif requires_n_series:
         category = "multivariate"
         eligible = False
-        exclusion_reason = (
-            "Requires n_series; excluded by current "
-            "univariate-only policy"
-        )
+        exclusion_reason = "Requires n_series; excluded by current univariate-only policy"
 
     else:
         category = "univariate_or_global"
@@ -134,19 +99,11 @@ def classify(
         "requires_n_series": requires_n_series,
         "is_hierarchical_or_wrapper": is_hierarchical,
         "has_get_default_config": has_default_config,
-        "supports_future_exog_candidate": (
-            supports_future_exog
-        ),
-        "supports_historical_exog_candidate": (
-            supports_historical_exog
-        ),
-        "supports_static_exog_candidate": (
-            supports_static_exog
-        ),
+        "supports_future_exog_candidate": (supports_future_exog),
+        "supports_historical_exog_candidate": (supports_historical_exog),
+        "supports_static_exog_candidate": (supports_static_exog),
         "underlying_model_repr": repr(underlying),
-        "signature": str(
-            inspect.signature(cls.__init__)
-        ),
+        "signature": str(inspect.signature(cls.__init__)),
     }
 
 
@@ -201,11 +158,7 @@ print("total_auto_classes=", len(records))
 for category, count in sorted(counts.items()):
     print(f"{category}={count}")
 
-eligible = [
-    record["auto_model"]
-    for record in records
-    if record["eligible_current_policy"]
-]
+eligible = [record["auto_model"] for record in records if record["eligible_current_policy"]]
 
 excluded = [
     (

@@ -13,17 +13,15 @@ import torch
 from neuralforecast import NeuralForecast
 from neuralforecast.losses.pytorch import MAE
 from neuralforecast.models import (
-    DeepAR,
     GRU,
     LSTM,
-    NBEATSx,
     NHITS,
     TCN,
     TFT,
+    NBEATSx,
     TiDE,
 )
 from sqlalchemy import create_engine
-
 
 ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
 RUN_ID = time.strftime("nf-exog-ablation-%Y%m%d-%H%M%S")
@@ -103,10 +101,7 @@ df["actual_ds"] = pd.to_datetime(df["ds"])
 df["draw_index"] = df.groupby("unique_id").cumcount()
 
 # NeuralForecastにも規則的なインデックスを使用する。
-df["ds"] = (
-    pd.Timestamp("2000-01-01")
-    + pd.to_timedelta(df["draw_index"], unit="D")
-)
+df["ds"] = pd.Timestamp("2000-01-01") + pd.to_timedelta(df["draw_index"], unit="D")
 
 df["y"] = pd.to_numeric(df["y"], errors="coerce")
 
@@ -119,9 +114,7 @@ for column in FUTURE_EXOG + HISTORICAL_EXOG:
 df = df.replace([np.inf, -np.inf], np.nan)
 
 # historical exogの初期欠損行を除去。
-df = df.dropna(
-    subset=["y", *FUTURE_EXOG, *HISTORICAL_EXOG]
-).reset_index(drop=True)
+df = df.dropna(subset=["y", *FUTURE_EXOG, *HISTORICAL_EXOG]).reset_index(drop=True)
 
 conditions = {
     "no_exog": {
@@ -257,12 +250,7 @@ for model_name, builder in MODEL_BUILDERS.items():
         model_df = df[selected_cols].copy()
 
         common_dates = sorted(
-            set.intersection(
-                *[
-                    set(group["ds"])
-                    for _, group in model_df.groupby("unique_id")
-                ]
-            )
+            set.intersection(*[set(group["ds"]) for _, group in model_df.groupby("unique_id")])
         )
 
         test_dates = common_dates[-N_WINDOWS:]
@@ -286,33 +274,23 @@ for model_name, builder in MODEL_BUILDERS.items():
             nf.fit(df=train_df)
 
             if exog["futr"]:
-                futr_df = test_df[
-                    ["unique_id", "ds", *exog["futr"]]
-                ].copy()
+                futr_df = test_df[["unique_id", "ds", *exog["futr"]]].copy()
                 forecast = nf.predict(futr_df=futr_df)
             else:
                 forecast = nf.predict()
 
             prediction_column = [
-                column
-                for column in forecast.columns
-                if column not in {"unique_id", "ds"}
+                column for column in forecast.columns if column not in {"unique_id", "ds"}
             ][0]
 
-            merged = test_df[
-                ["unique_id", "ds", "y"]
-            ].merge(
-                forecast[
-                    ["unique_id", "ds", prediction_column]
-                ],
+            merged = test_df[["unique_id", "ds", "y"]].merge(
+                forecast[["unique_id", "ds", prediction_column]],
                 on=["unique_id", "ds"],
                 how="inner",
             )
 
             actual = merged["y"].to_numpy(dtype=float)
-            prediction = merged[
-                prediction_column
-            ].to_numpy(dtype=float)
+            prediction = merged[prediction_column].to_numpy(dtype=float)
 
             errors = np.abs(actual - prediction)
 
@@ -329,15 +307,8 @@ for model_name, builder in MODEL_BUILDERS.items():
                         "unique_id": row["unique_id"],
                         "ds": str(row["ds"]),
                         "actual": float(row["y"]),
-                        "prediction": float(
-                            row[prediction_column]
-                        ),
-                        "absolute_error": float(
-                            abs(
-                                row["y"]
-                                - row[prediction_column]
-                            )
-                        ),
+                        "prediction": float(row[prediction_column]),
+                        "absolute_error": float(abs(row["y"] - row[prediction_column])),
                     }
                 )
 
@@ -358,15 +329,10 @@ for model_name, builder in MODEL_BUILDERS.items():
             save_dataset=True,
         )
 
-        model_files = [
-            path
-            for path in save_path.rglob("*")
-            if path.is_file()
-        ]
+        model_files = [path for path in save_path.rglob("*") if path.is_file()]
 
         hashes = {
-            str(path.relative_to(run_dir)):
-                hashlib.sha256(path.read_bytes()).hexdigest()
+            str(path.relative_to(run_dir)): hashlib.sha256(path.read_bytes()).hexdigest()
             for path in model_files
         }
 
@@ -385,11 +351,7 @@ for model_name, builder in MODEL_BUILDERS.items():
             "torch_version": torch.__version__,
             "cuda_version": torch.version.cuda,
             "cuda_available": torch.cuda.is_available(),
-            "gpu_name": (
-                torch.cuda.get_device_name(0)
-                if torch.cuda.is_available()
-                else None
-            ),
+            "gpu_name": (torch.cuda.get_device_name(0) if torch.cuda.is_available() else None),
             "python": platform.python_version(),
             "saved_model_path": str(save_path),
         }
@@ -411,8 +373,7 @@ results_df = pd.DataFrame(results)
 for model_name in results_df["model"].unique():
     baseline = float(
         results_df.loc[
-            (results_df["model"] == model_name)
-            & (results_df["condition"] == "no_exog"),
+            (results_df["model"] == model_name) & (results_df["condition"] == "no_exog"),
             "mean_mae",
         ].iloc[0]
     )
@@ -422,14 +383,7 @@ for model_name in results_df["model"].unique():
     results_df.loc[
         mask,
         "mae_improvement_percent_vs_no_exog",
-    ] = (
-        (
-            baseline
-            - results_df.loc[mask, "mean_mae"]
-        )
-        / baseline
-        * 100.0
-    )
+    ] = (baseline - results_df.loc[mask, "mean_mae"]) / baseline * 100.0
 
 results_df.to_csv(
     OUT / "neuralforecast_exog_results.csv",

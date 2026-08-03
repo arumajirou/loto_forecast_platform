@@ -10,7 +10,6 @@ from pathlib import Path
 
 from loto.probabilistic.progress import render_dashboard
 
-
 FINAL_STATUSES = {"PASS", "PARTIAL", "FAILED", "STOPPED_BY_USER", "DRY_RUN"}
 
 

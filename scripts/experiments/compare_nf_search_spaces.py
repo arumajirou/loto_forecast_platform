@@ -5,85 +5,48 @@ from pathlib import Path
 
 import yaml
 
+SPEC = Path("configs/generated/neuralforecast_complete_search_spec.yaml")
 
-SPEC = Path(
-    "configs/generated/"
-    "neuralforecast_complete_search_spec.yaml"
-)
+DEFAULTS = Path("artifacts/parameter_inventory/neuralforecast_auto_default_spaces.json")
 
-DEFAULTS = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_default_spaces.json"
-)
-
-OUTPUT = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_search_space_comparison.json"
-)
+OUTPUT = Path("artifacts/parameter_inventory/neuralforecast_search_space_comparison.json")
 
 
-spec = yaml.safe_load(
-    SPEC.read_text(encoding="utf-8")
-)
+spec = yaml.safe_load(SPEC.read_text(encoding="utf-8"))
 
-defaults = json.loads(
-    DEFAULTS.read_text(encoding="utf-8")
-)
+defaults = json.loads(DEFAULTS.read_text(encoding="utf-8"))
 
-default_by_model = {
-    record["auto_model"]: record
-    for record in defaults
-}
+default_by_model = {record["auto_model"]: record for record in defaults}
 
 records = []
 
 for auto_name, model_spec in spec["models"].items():
-    custom_common = set(
-        model_spec["common_parameter_grid"]
-    )
+    custom_common = set(model_spec["common_parameter_grid"])
 
-    listed_specific = set(
-        model_spec["model_specific_parameters"]
-    )
+    listed_specific = set(model_spec["model_specific_parameters"])
 
     default_record = default_by_model.get(
         auto_name,
         {},
     )
 
-    optuna_result = (
-        default_record
-        .get("backends", {})
-        .get("optuna", {})
-    )
+    optuna_result = default_record.get("backends", {}).get("optuna", {})
 
     default_config = optuna_result.get(
         "resolved_config",
         {},
     )
 
-    default_keys = (
-        set(default_config)
-        if isinstance(default_config, dict)
-        else set()
-    )
+    default_keys = set(default_config) if isinstance(default_config, dict) else set()
 
     records.append(
         {
             "auto_model": auto_name,
             "base_model": model_spec["base_model"],
-            "default_status": optuna_result.get(
-                "status"
-            ),
-            "official_default_keys": sorted(
-                default_keys
-            ),
-            "custom_common_keys": sorted(
-                custom_common
-            ),
-            "listed_specific_keys": sorted(
-                listed_specific
-            ),
+            "default_status": optuna_result.get("status"),
+            "official_default_keys": sorted(default_keys),
+            "custom_common_keys": sorted(custom_common),
+            "listed_specific_keys": sorted(listed_specific),
             "official_not_in_custom": sorted(
                 default_keys
                 - custom_common
@@ -97,9 +60,7 @@ for auto_name, model_spec in spec["models"].items():
                     "stat_exog_list",
                 }
             ),
-            "custom_not_in_official_default": sorted(
-                custom_common - default_keys
-            ),
+            "custom_not_in_official_default": sorted(custom_common - default_keys),
         }
     )
 
