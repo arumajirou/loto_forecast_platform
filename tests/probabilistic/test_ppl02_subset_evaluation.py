@@ -188,9 +188,7 @@ def test_artifacts_include_dual_manifest_and_verified_prediction(tmp_path: Path)
         (tmp_path / "prospective/prediction.fixed.json").read_text(encoding="utf-8")
     )
     assert verify_fixed_prediction(sealed)
-    report = json.loads(
-        (tmp_path / "report/VERIFICATION_REPORT.json").read_text(encoding="utf-8")
-    )
+    report = json.loads((tmp_path / "report/VERIFICATION_REPORT.json").read_text(encoding="utf-8"))
     assert report["future_actual_in_prediction_payload"] is False
     assert report["prediction_sha256_verified"] is True
     assert report["ppl01_model_ids_modified"] == 0

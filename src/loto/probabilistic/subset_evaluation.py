@@ -209,9 +209,7 @@ def _score_prediction(
         "joint_log_loss": float(-joint_log_probability),
     }
     for position in range(1, geometry.positions + 1):
-        metrics[f"position_{position}_hit_at_1"] = positional[
-            f"position_{position}_within_1"
-        ]
+        metrics[f"position_{position}_hit_at_1"] = positional[f"position_{position}_within_1"]
         metrics[f"position_{position}_mae"] = positional[f"position_{position}_mae"]
         metrics[f"position_{position}_mse"] = positional[f"position_{position}_mse"]
     if not all(np.isfinite(value) for value in metrics.values()):
@@ -519,11 +517,7 @@ def evaluate_conditional_bernoulli(
     best_score = baseline_scores[best_baseline]
     gain = float(model_score - best_score)
     required_gain = float(config.subset_research_gain_min)
-    status = (
-        TrialStatus.PASS.value
-        if gain > required_gain
-        else TrialStatus.RESEARCH_NO_GAIN.value
-    )
+    status = TrialStatus.PASS.value if gain > required_gain else TrialStatus.RESEARCH_NO_GAIN.value
     promotion = {
         "status": status,
         "primary_metric": primary_metric,
