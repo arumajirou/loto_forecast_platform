@@ -43,8 +43,7 @@ _PPL02_CONDITIONAL_BERNOULLI_ROW: dict[str, Any] = {
     "role": "candidate",
     "likelihood": "ConditionalBernoulliFixedK",
     "latent_structure": (
-        "candidate log-weights with an exact fixed-cardinality normalizer "
-        "and MAP/Laplace posterior"
+        "candidate log-weights with an exact fixed-cardinality normalizer and MAP/Laplace posterior"
     ),
     "backends": ["builtin"],
     "tasks": ["fixed_cardinality_subset"],

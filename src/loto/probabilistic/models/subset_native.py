@@ -150,9 +150,7 @@ class ConditionalBernoulliPosterior:
         self.map_logits = np.asarray(self.map_logits, dtype=np.float64)
         self.covariance = np.asarray(self.covariance, dtype=np.float64)
         self.logit_draws = np.asarray(self.logit_draws, dtype=np.float64)
-        self.candidate_marginal_draws = np.asarray(
-            self.candidate_marginal_draws, dtype=np.float64
-        )
+        self.candidate_marginal_draws = np.asarray(self.candidate_marginal_draws, dtype=np.float64)
         self.joint_samples = np.asarray(self.joint_samples, dtype=np.int64)
         candidates = self.map_logits.size
         if self.model_id != MODEL_ID:
@@ -173,9 +171,7 @@ class ConditionalBernoulliPosterior:
         )
         if not all(np.isfinite(array).all() for array in arrays):
             raise ValueError("posterior contains non-finite values")
-        if not np.allclose(
-            self.candidate_marginal_draws.sum(axis=1), self.cardinality, atol=1e-8
-        ):
+        if not np.allclose(self.candidate_marginal_draws.sum(axis=1), self.cardinality, atol=1e-8):
             raise ValueError("candidate marginals do not sum to cardinality")
         for sample in self.joint_samples:
             if len(set(sample.tolist())) != self.cardinality:
@@ -201,9 +197,7 @@ class ConditionalBernoulliPosterior:
 
     @property
     def point_indices(self) -> tuple[int, ...]:
-        chosen = np.argpartition(self.candidate_marginals, -self.cardinality)[
-            -self.cardinality :
-        ]
+        chosen = np.argpartition(self.candidate_marginals, -self.cardinality)[-self.cardinality :]
         return tuple(sorted(int(index) for index in chosen))
 
     def posterior_predictive_log_probability(self, subset: list[int] | tuple[int, ...]) -> float:
@@ -365,10 +359,7 @@ def fit_conditional_bernoulli_map(
         [fixed_cardinality_marginals(draw, inferred_cardinality) for draw in logit_draws]
     ).astype(np.float64)
     joint_samples = np.asarray(
-        [
-            sample_conditional_bernoulli(draw, inferred_cardinality, rng=rng)
-            for draw in logit_draws
-        ],
+        [sample_conditional_bernoulli(draw, inferred_cardinality, rng=rng) for draw in logit_draws],
         dtype=np.int64,
     )
     return ConditionalBernoulliPosterior(

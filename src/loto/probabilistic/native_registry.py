@@ -51,8 +51,7 @@ def list_native_implementations() -> tuple[NativeImplementation, ...]:
         )
     if len(output) < 72:
         raise ValueError(
-            "native implementation registry must preserve all 72 PPL-01 rows; "
-            f"got {len(output)}"
+            f"native implementation registry must preserve all 72 PPL-01 rows; got {len(output)}"
         )
     ppl02_model_id = "pp-conditional-bernoulli-fixed-k"
     if ppl02_model_id not in seen:

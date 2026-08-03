@@ -158,9 +158,10 @@ def test_baselines_are_finite_and_frequency_uses_training_only() -> None:
     assert np.isfinite(frequency)
     changed_future = indicator.copy()
     changed_future[-1] = np.roll(changed_future[-1], 1)
-    assert frequency_fixed_k_log_probability(
-        changed_future[:-1], actual, pseudocount=0.5
-    ) == frequency
+    assert (
+        frequency_fixed_k_log_probability(changed_future[:-1], actual, pseudocount=0.5)
+        == frequency
+    )
 
 
 def test_builtin_backend_emits_joint_evidence(tmp_path: Path) -> None:
