@@ -1,0 +1,18 @@
+[Unit]
+Description=LOTO Probabilistic Execution API
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=@ROOT@
+EnvironmentFile=-@ROOT@/.env.ppl-notify
+EnvironmentFile=@ROOT@/.env.ppl-api
+ExecStart=@UV@ run loto3 probabilistic api-serve --root @ROOT@ --no-access-log
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillMode=control-group
+
+[Install]
+WantedBy=default.target

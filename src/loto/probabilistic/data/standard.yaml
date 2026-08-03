@@ -1,0 +1,21 @@
+schema_version: 1.0.0
+profile: standard
+games: [numbers3, loto7]
+output: runs/probabilistic
+models: all
+backends: [builtin]
+include_experimental: true
+outer_workers: 8
+max_gpu_jobs: 1
+max_heavy_cpu_jobs: 2
+seeds: [42]
+folds: 1
+test_size: 20
+min_train_size: 200
+posterior_draws: 256
+synthetic_rows: 300
+rolling_window: 20
+discount_factor: 0.97
+prior_concentration: 1.0
+utility_lambda_mse: 0.02
+sealed_holdout: true

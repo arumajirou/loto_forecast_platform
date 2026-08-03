@@ -1,0 +1,8 @@
+SUPPORTED_LIKELIHOODS = {
+    "Categorical", "DirichletMultinomial", "BetaBinomial", "OrderedLogistic",
+    "AdjacentCategoryLogit", "ContinuationRatio", "MultinomialProbit", "Poisson",
+    "NegativeBinomial", "ZeroInflatedPoisson", "ZeroInflatedNegativeBinomial",
+    "PoissonLognormal", "Hurdle", "MixtureCategorical", "NeuralCategorical",
+    "ModelWeights", "BetaCalibration", "DirichletCalibration", "TemperatureScaling",
+    "Utility", "ConstrainedDecision",
+}

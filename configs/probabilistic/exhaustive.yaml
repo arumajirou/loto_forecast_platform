@@ -1,0 +1,22 @@
+schema_version: 1.0.0
+profile: exhaustive
+games: [numbers3, loto7]
+output: runs/probabilistic
+models: all
+backends: [builtin, pymc, numpyro, pyro, stan, blackjax, tfp]
+inference_profiles: []
+include_experimental: true
+outer_workers: 8
+max_gpu_jobs: 1
+max_heavy_cpu_jobs: 2
+seeds: [42]
+folds: 1
+test_size: 5
+min_train_size: 100
+posterior_draws: 128
+synthetic_rows: 150
+rolling_window: 20
+discount_factor: 0.97
+prior_concentration: 1.0
+utility_lambda_mse: 0.02
+dry_run: true

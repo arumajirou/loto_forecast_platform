@@ -1,0 +1,11 @@
+schema_version: 1.0.0
+profiles:
+  - profile_id: symmetric-dirichlet-v1
+    concentration: 1.0
+    positive_mass_required: true
+  - profile_id: weak-dirichlet-v1
+    concentration: 0.5
+    positive_mass_required: true
+  - profile_id: strong-smoothing-dirichlet-v1
+    concentration: 5.0
+    positive_mass_required: true

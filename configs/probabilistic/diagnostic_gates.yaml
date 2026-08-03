@@ -1,0 +1,4 @@
+schema_version: 1.0.0
+mcmc: {rhat_max: 1.01, ess_bulk_min: 400, divergences_max: 0}
+reference: {simplex_tolerance: 1.0e-7, finite_required: true}
+prediction: {minimum_entropy_fraction: 0.02}

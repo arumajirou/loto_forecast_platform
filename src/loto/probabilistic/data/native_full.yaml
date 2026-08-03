@@ -1,0 +1,33 @@
+schema_version: 1.0.0
+profile: full
+backend_policy: primary_native
+games: [numbers3, loto7]
+output: runs/probabilistic-native
+models: all
+backends: []
+include_experimental: true
+outer_workers: 8
+max_gpu_jobs: 1
+max_heavy_cpu_jobs: 2
+seeds: [42, 43, 44, 45, 46]
+folds: 5
+test_size: 100
+min_train_size: 500
+posterior_draws: 1000
+synthetic_rows: 800
+rolling_window: 20
+discount_factor: 0.97
+prior_concentration: 1.0
+utility_lambda_mse: 0.02
+save_posterior_draws: true
+sealed_holdout: true
+prospective_min_draws: 100
+native_chains: 4
+native_warmup: 1000
+native_draws: 1000
+native_svi_steps: 30000
+native_particles: 8
+native_max_train_rows: 2000
+native_target_accept: 0.92
+native_progressbar: true
+native_device: auto
