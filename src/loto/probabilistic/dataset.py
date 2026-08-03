@@ -95,14 +95,10 @@ def _validated_draw_order(
     if geometry.family != "select":
         raise ValueError("draw order is only valid for select-family games")
     if len(columns) != geometry.positions:
-        raise ValueError(
-            f"draw order requires {geometry.positions} columns, got {len(columns)}"
-        )
+        raise ValueError(f"draw order requires {geometry.positions} columns, got {len(columns)}")
     resolved = _resolve_named_columns(frame, columns)
     ordered = frame[resolved].to_numpy(dtype=int)
-    for index, (ordered_row, sorted_row) in enumerate(
-        zip(ordered, values, strict=True)
-    ):
+    for index, (ordered_row, sorted_row) in enumerate(zip(ordered, values, strict=True)):
         if len(set(ordered_row.tolist())) != geometry.positions:
             raise ValueError(f"draw order row {index} contains duplicates")
         if any(value not in geometry.values for value in ordered_row):
@@ -250,10 +246,14 @@ def task_arrays(bundle: DatasetBundle, target_mode: str) -> tuple[np.ndarray, in
         TargetMode.JOINT_DISCRETE_COPULA,
         TargetMode.ONLINE_CHANGEPOINT,
     }:
-        if target_mode in {
-            TargetMode.CATEGORICAL_CONTEXT,
-            TargetMode.JOINT_DISCRETE_COPULA,
-        } and geometry.family != "digits":
+        if (
+            target_mode
+            in {
+                TargetMode.CATEGORICAL_CONTEXT,
+                TargetMode.JOINT_DISCRETE_COPULA,
+            }
+            and geometry.family != "digits"
+        ):
             raise ValueError(f"{target_mode} requires a digits-family game")
         return zero_based, geometry.universe_size
     if target_mode == TargetMode.FIXED_CARDINALITY_SUBSET:

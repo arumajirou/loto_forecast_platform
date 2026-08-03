@@ -100,8 +100,16 @@ def test_draw_order_requires_explicit_verified_columns() -> None:
 def test_draw_order_must_match_result_set() -> None:
     frame = pd.DataFrame(
         {
-            "n1": [1], "n2": [2], "n3": [3], "n4": [4], "n5": [5],
-            "o1": [1], "o2": [2], "o3": [3], "o4": [4], "o5": [6],
+            "n1": [1],
+            "n2": [2],
+            "n3": [3],
+            "n4": [4],
+            "n5": [5],
+            "o1": [1],
+            "o2": [2],
+            "o3": [3],
+            "o4": [4],
+            "o5": [6],
         }
     )
     with pytest.raises(ValueError, match="does not match"):
