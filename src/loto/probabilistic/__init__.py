@@ -22,6 +22,13 @@ from loto.probabilistic.contracts import (
     ProbabilisticModelSpec,
     ProbabilisticRunConfig,
 )
+from loto.probabilistic.experiment_tracking import (
+    ExperimentPersistenceError,
+    ExperimentTrackingConfig,
+    ExperimentTrackingReport,
+    evaluate_and_persist_conditional_bernoulli,
+    persist_experiment_tracking,
+)
 from loto.probabilistic.subset_evaluation import (
     SubsetEvaluationResult,
     evaluate_conditional_bernoulli,
@@ -29,6 +36,9 @@ from loto.probabilistic.subset_evaluation import (
 )
 
 __all__ = [
+    "ExperimentTrackingReport",
+    "ExperimentTrackingConfig",
+    "ExperimentPersistenceError",
     "CompatibilityDecision",
     "DiagnosticReport",
     "InferenceProfileSpec",
@@ -37,6 +47,8 @@ __all__ = [
     "ProbabilisticRunConfig",
     "SubsetEvaluationResult",
     "catalog_counts",
+    "persist_experiment_tracking",
+    "evaluate_and_persist_conditional_bernoulli",
     "evaluate_conditional_bernoulli",
     "get_inference_profile",
     "get_probabilistic_model_spec",
