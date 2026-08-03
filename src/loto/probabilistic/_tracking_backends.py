@@ -157,7 +157,8 @@ def write_postgres(
         ]
         connection.execute(
             text(
-                f"INSERT INTO ppl02_runs ({','.join(columns)}) VALUES ({','.join(':' + c for c in columns)})"
+                "INSERT INTO ppl02_runs "
+                f"({','.join(columns)}) VALUES ({','.join(':' + c for c in columns)})"
             ),
             {key: record.get(key) for key in columns},
         )
