@@ -53,19 +53,30 @@ def list_native_implementations() -> tuple[NativeImplementation, ...]:
         raise ValueError(
             f"native implementation registry must preserve all 72 PPL-01 rows; got {len(output)}"
         )
-    ppl02_model_id = "pp-conditional-bernoulli-fixed-k"
-    if ppl02_model_id not in seen:
-        output.append(
-            NativeImplementation(
-                model_id=ppl02_model_id,
-                primary_backend="builtin",
-                primary_profile=None,
-                implementation_kind="analytic_map_laplace",
-                module="loto.probabilistic.models.subset_native",
-                graph_id="conditional_bernoulli_fixed_k_v1",
-                runtime_tier="standard",
-            )
-        )
+    ppl02_implementations = (
+        NativeImplementation(
+            model_id="pp-conditional-bernoulli-fixed-k",
+            primary_backend="builtin",
+            primary_profile=None,
+            implementation_kind="analytic_map_laplace",
+            module="loto.probabilistic.models.subset_native",
+            graph_id="conditional_bernoulli_fixed_k_v1",
+            runtime_tier="standard",
+        ),
+        NativeImplementation(
+            model_id="pp-multinomial-dglm",
+            primary_backend="builtin",
+            primary_profile=None,
+            implementation_kind="sequential_laplace_filter",
+            module="loto.probabilistic.models.dglm_native",
+            graph_id="multinomial_dglm_filter_v1",
+            runtime_tier="standard",
+        ),
+    )
+    for implementation in ppl02_implementations:
+        if implementation.model_id not in seen:
+            output.append(implementation)
+            seen.add(implementation.model_id)
     return tuple(output)
 
 
