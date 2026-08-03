@@ -46,8 +46,7 @@ class BuiltinBackend(ProbabilisticBackend):
             )
             draws = state.probability_draws(draws=draw_count, seed=seed)
             covariance_min = min(
-                float(np.linalg.eigvalsh(covariance).min())
-                for covariance in state.state_covariance
+                float(np.linalg.eigvalsh(covariance).min()) for covariance in state.state_covariance
             )
             return NativePosterior(
                 model_id=spec.model_id,
