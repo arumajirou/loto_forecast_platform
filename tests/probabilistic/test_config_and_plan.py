@@ -9,11 +9,11 @@ from loto.probabilistic.planner import build_plan, plan_summary
 def test_smoke_plan_has_one_runnable_reference_trial_per_model() -> None:
     config = load_run_config(Path("configs/probabilistic/smoke.yaml"))
     plan = build_plan(config)
-    assert len(plan) == 72
+    assert len(plan) == 73
     assert all(item.allowed for item in plan)
     assert {item.backend for item in plan} == {"builtin"}
-    assert len({item.model_id for item in plan}) == 72
-    assert plan_summary(config)["trials_allowed"] == 72
+    assert len({item.model_id for item in plan}) == 73
+    assert plan_summary(config)["trials_allowed"] == 73
 
 
 def test_hash_is_order_stable() -> None:

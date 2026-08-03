@@ -176,6 +176,15 @@ class ProbabilisticRunConfig(BaseModel):
     rolling_window: int = Field(default=20, ge=2)
     discount_factor: float = Field(default=0.97, gt=0.0, le=1.0)
     prior_concentration: float = Field(default=1.0, gt=0.0)
+    subset_prior_scale: float = Field(default=2.0, gt=0.0)
+    subset_initial_pseudocount: float = Field(default=0.5, gt=0.0)
+    subset_max_iter: int = Field(default=500, ge=10, le=100000)
+    subset_tolerance: float = Field(default=1e-9, gt=0.0, le=1.0)
+    subset_gradient_tolerance: float = Field(default=1e-3, gt=0.0, le=1.0)
+    subset_laplace_ridge: float = Field(default=1e-8, ge=0.0, le=1.0)
+    subset_require_convergence: bool = True
+    subset_research_gain_min: float = Field(default=0.0, ge=0.0)
+    subset_ece_bins: int = Field(default=10, ge=2, le=100)
     utility_lambda_mse: float = Field(default=0.02, ge=0.0)
     dry_run: bool = False
     save_posterior_draws: bool = False

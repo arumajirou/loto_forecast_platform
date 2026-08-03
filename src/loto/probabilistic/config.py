@@ -62,6 +62,9 @@ def execution_fingerprint(
             "prior_concentration": run_config.prior_concentration,
             "rolling_window": run_config.rolling_window,
             "discount_factor": run_config.discount_factor,
+            "subset_prior_scale": run_config.subset_prior_scale,
+            "subset_initial_pseudocount": run_config.subset_initial_pseudocount,
+            "subset_laplace_ridge": run_config.subset_laplace_ridge,
         }
     )
     inference_profile_hash = stable_hash(

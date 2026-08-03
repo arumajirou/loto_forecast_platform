@@ -25,6 +25,7 @@ _ALLOWED_FAMILIES = {
     "deep_probabilistic",
     "dynamic_conjugate",
     "empirical_bayes",
+    "fixed_subset",
     "ensemble",
     "gaussian_process",
     "hierarchical",
@@ -36,6 +37,25 @@ _ALLOWED_FAMILIES = {
     "state_space",
     "tree_bayesian",
 }
+_PPL02_CONDITIONAL_BERNOULLI_ROW: dict[str, Any] = {
+    "model_id": "pp-conditional-bernoulli-fixed-k",
+    "family": "fixed_subset",
+    "role": "candidate",
+    "likelihood": "ConditionalBernoulliFixedK",
+    "latent_structure": (
+        "candidate log-weights with an exact fixed-cardinality normalizer "
+        "and MAP/Laplace posterior"
+    ),
+    "backends": ["builtin"],
+    "tasks": ["fixed_cardinality_subset"],
+    "priority": "p0",
+    "supports_exogenous": False,
+    "hierarchical": False,
+    "dynamic": False,
+    "experimental": True,
+    "notes": "PPL-02 M01; exact O(Kk) normalizer and backward-DP sampler",
+}
+
 _ALLOWED_ROLES = {"control", "baseline", "candidate", "research", "meta"}
 _ALLOWED_PRIORITIES = {"p0", "p1", "p2"}
 
@@ -89,6 +109,8 @@ def _strategy_for(model_id: str, family: str) -> str:
         return "dirichlet"
     if family == "empirical_bayes":
         return "empirical_bayes"
+    if family == "fixed_subset":
+        return "fixed_cardinality_subset"
     if family == "hierarchical":
         return "hierarchical_pooling"
     if family in {
@@ -125,6 +147,12 @@ def load_probabilistic_catalog(
     rows = payload.get("models")
     if not isinstance(rows, list):
         raise ValueError(f"{source}: models must be a list")
+    if not any(
+        isinstance(row, dict)
+        and row.get("model_id") == _PPL02_CONDITIONAL_BERNOULLI_ROW["model_id"]
+        for row in rows
+    ):
+        rows = [*rows, dict(_PPL02_CONDITIONAL_BERNOULLI_ROW)]
     from loto.probabilistic.native_registry import get_native_implementation
 
     specs: list[ProbabilisticModelSpec] = []
@@ -291,7 +319,7 @@ def catalog_counts() -> dict[str, Any]:
 
 
 def build_unified_catalog_rows() -> list[dict[str, Any]]:
-    """Return the existing 174 entries plus the 72 PPL entries without ID collision."""
+    """Return existing and probabilistic entries without any model-ID collision."""
     from loto.models.catalog_full import build_catalog
 
     existing = [entry.to_row() | {"catalog_source": "existing"} for entry in build_catalog()]

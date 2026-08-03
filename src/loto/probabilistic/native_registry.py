@@ -49,8 +49,24 @@ def list_native_implementations() -> tuple[NativeImplementation, ...]:
                 runtime_tier=str(row.get("runtime_tier", "standard")),
             )
         )
-    if len(output) != 72:
-        raise ValueError(f"native implementation registry must contain 72 rows, got {len(output)}")
+    if len(output) < 72:
+        raise ValueError(
+            "native implementation registry must preserve all 72 PPL-01 rows; "
+            f"got {len(output)}"
+        )
+    ppl02_model_id = "pp-conditional-bernoulli-fixed-k"
+    if ppl02_model_id not in seen:
+        output.append(
+            NativeImplementation(
+                model_id=ppl02_model_id,
+                primary_backend="builtin",
+                primary_profile=None,
+                implementation_kind="analytic_map_laplace",
+                module="loto.probabilistic.models.subset_native",
+                graph_id="conditional_bernoulli_fixed_k_v1",
+                runtime_tier="standard",
+            )
+        )
     return tuple(output)
 
 
@@ -73,5 +89,5 @@ def native_coverage() -> dict[str, Any]:
         "models": len(rows),
         "by_primary_backend": dict(sorted(by_backend.items())),
         "by_implementation_kind": dict(sorted(by_kind.items())),
-        "all_primary_paths_declared": len(rows) == 72,
+        "all_primary_paths_declared": len(rows) >= 72,
     }

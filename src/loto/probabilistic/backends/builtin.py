@@ -6,6 +6,7 @@ import numpy as np
 
 from loto.probabilistic.backends.base import ProbabilisticBackend
 from loto.probabilistic.models.reference import fit_reference, posterior_draws
+from loto.probabilistic.models.subset_native import MODEL_ID, fit_conditional_bernoulli_map
 from loto.probabilistic.native import NativePosterior
 
 
@@ -26,6 +27,49 @@ class BuiltinBackend(ProbabilisticBackend):
         seed: int,
         inference_profile_id: str | None = None,
     ) -> NativePosterior:
+        if spec.model_id == MODEL_ID:
+            posterior = fit_conditional_bernoulli_map(
+                y,
+                game=geometry.key,
+                config=config,
+                seed=seed,
+                cardinality=geometry.positions,
+            )
+            draws = posterior.normalized_probability_draws
+            return NativePosterior(
+                model_id=spec.model_id,
+                backend=self.backend_id,
+                family=spec.family,
+                target_mode=target_mode,
+                game=geometry.key,
+                probability_draws=draws,
+                metadata={
+                    **posterior.to_metadata_dict(),
+                    "native_graph_id": spec.native_graph_id,
+                    "implementation_kind": "analytic_map_laplace",
+                    "native_analytic": True,
+                    "inference_profile_id": inference_profile_id,
+                },
+                diagnostics={
+                    "posterior_finite": bool(np.isfinite(draws).all()),
+                    "probability_simplex_valid": bool(
+                        np.allclose(draws.sum(axis=-1), 1.0, atol=1e-7)
+                    ),
+                    "cardinality_valid_rate": 1.0,
+                    "duplicate_violation_rate": 0.0,
+                    "optimizer_success": posterior.optimizer_success,
+                    "gradient_norm": posterior.gradient_norm,
+                    "laplace_ridge": posterior.laplace_ridge,
+                    "rhat_max": None,
+                    "ess_bulk_min": None,
+                    "ess_tail_min": None,
+                    "divergences": None,
+                    "elbo_finite": None,
+                    "elbo_stable": None,
+                },
+                native_payload=posterior,
+            )
+
         posterior = fit_reference(
             spec,
             y=y,
