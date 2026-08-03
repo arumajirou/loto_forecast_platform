@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -159,7 +160,7 @@ def test_optional_mlflow_failure_is_partial_not_false_success(tmp_path: Path) ->
     assert report.backends[0].required is False
     assert report.prediction_payload_sha256 == result.prospective_prediction["payload_sha256"]
     assert report.device["pid"] > 0
-    assert report.git_commit == "UNAVAILABLE"
+    assert report.git_commit == os.getenv("GITHUB_SHA", "UNAVAILABLE")
 
 
 @pytest.mark.skipif(
