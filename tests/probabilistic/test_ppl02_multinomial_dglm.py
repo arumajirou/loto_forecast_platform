@@ -120,9 +120,7 @@ def test_missing_draw_is_skipped_without_state_corruption() -> None:
 def test_saved_state_resume_matches_continuous_run(tmp_path) -> None:
     rng = np.random.default_rng(17)
     observations = rng.integers(0, 3, size=(140, 2))
-    exogenous = np.column_stack(
-        [np.sin(np.arange(140) / 7.0), np.cos(np.arange(140) / 11.0)]
-    )
+    exogenous = np.column_stack([np.sin(np.arange(140) / 7.0), np.cos(np.arange(140) / 11.0)])
     config = _config(dglm_seasonal_periods=[12.0])
 
     continuous = fit_multinomial_dglm(
