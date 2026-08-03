@@ -80,14 +80,20 @@ def test_start_status_stop_and_log(tmp_path):
 def test_preflight_and_notification_test(tmp_path):
     client = TestClient(create_app(tmp_path, manager=FakeManager(), token="secret"))
     headers = {"Authorization": "Bearer secret"}
-    assert client.post(
-        "/api/v1/preflight", headers=headers, json={"profile": "fast_gpu"}
-    ).json()["passed"] is True
-    assert client.post(
-        "/api/v1/notifications/test",
-        headers=headers,
-        json={"speech": True, "email": False},
-    ).json()["status"] == "PASS"
+    assert (
+        client.post("/api/v1/preflight", headers=headers, json={"profile": "fast_gpu"}).json()[
+            "passed"
+        ]
+        is True
+    )
+    assert (
+        client.post(
+            "/api/v1/notifications/test",
+            headers=headers,
+            json={"speech": True, "email": False},
+        ).json()["status"]
+        == "PASS"
+    )
 
 
 def test_voicevox_tts_endpoints(tmp_path, monkeypatch):

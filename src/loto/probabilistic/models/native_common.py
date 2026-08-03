@@ -50,7 +50,9 @@ def lag_features(y: np.ndarray, classes: int) -> tuple[np.ndarray, np.ndarray]:
     return lag, next_lag
 
 
-def categorical_design(y: np.ndarray, classes: int, *, degree: int = 2, harmonics: int = 1) -> tuple[np.ndarray, np.ndarray]:
+def categorical_design(
+    y: np.ndarray, classes: int, *, degree: int = 2, harmonics: int = 1
+) -> tuple[np.ndarray, np.ndarray]:
     values = np.asarray(y)
     if values.ndim == 1:
         values = values[:, None]
@@ -63,21 +65,28 @@ def categorical_design(y: np.ndarray, classes: int, *, degree: int = 2, harmonic
     return X.astype(float), X_next.astype(float)
 
 
-def categorical_counts(y: np.ndarray, classes: int, weights: np.ndarray | None = None) -> np.ndarray:
+def categorical_counts(
+    y: np.ndarray, classes: int, weights: np.ndarray | None = None
+) -> np.ndarray:
     values = np.asarray(y, dtype=int)
     if values.ndim == 1:
         values = values[:, None]
-    row_weights = np.ones(len(values), dtype=float) if weights is None else np.asarray(weights, dtype=float)
+    row_weights = (
+        np.ones(len(values), dtype=float) if weights is None else np.asarray(weights, dtype=float)
+    )
     counts = np.zeros((values.shape[1], classes), dtype=float)
     for position in range(values.shape[1]):
-        counts[position] = np.bincount(
-            values[:, position], weights=row_weights, minlength=classes
-        )
+        counts[position] = np.bincount(values[:, position], weights=row_weights, minlength=classes)
     return counts
 
 
 def empirical_probabilities(
-    y: np.ndarray, classes: int, *, prior: float = 1.0, window: int | None = None, discount: float | None = None
+    y: np.ndarray,
+    classes: int,
+    *,
+    prior: float = 1.0,
+    window: int | None = None,
+    discount: float | None = None,
 ) -> np.ndarray:
     values = np.asarray(y, dtype=int)
     if window is not None:
@@ -91,7 +100,9 @@ def empirical_probabilities(
     return alpha / alpha.sum(axis=-1, keepdims=True)
 
 
-def base_probability_bank(y: np.ndarray, classes: int, *, prior: float, window: int, discount: float) -> np.ndarray:
+def base_probability_bank(
+    y: np.ndarray, classes: int, *, prior: float, window: int, discount: float
+) -> np.ndarray:
     values = np.asarray(y, dtype=int)
     if values.ndim == 1:
         values = values[:, None]
@@ -103,7 +114,9 @@ def base_probability_bank(y: np.ndarray, classes: int, *, prior: float, window: 
     return np.stack([uniform, full, recent, discounted], axis=0)
 
 
-def gaussian_kernel_probabilities(location_draws: np.ndarray, classes: int, *, scale: float = 1.0) -> np.ndarray:
+def gaussian_kernel_probabilities(
+    location_draws: np.ndarray, classes: int, *, scale: float = 1.0
+) -> np.ndarray:
     locations = np.asarray(location_draws, dtype=float)
     if locations.ndim == 1:
         locations = locations[:, None]
@@ -127,21 +140,40 @@ def profile_settings(config: Any, profile: Any | None) -> dict[str, Any]:
     profile_id = getattr(profile, "profile_id", None)
     return {
         "profile_id": profile_id,
-        "algorithm": getattr(profile, "algorithm", "native-default") if profile else "native-default",
+        "algorithm": getattr(profile, "algorithm", "native-default")
+        if profile
+        else "native-default",
         "chains": min(int(defaults.get("chains", config.native_chains)), config.native_chains),
         "draws": min(
-            int(defaults.get("draws", defaults.get("samples", defaults.get("iter_sampling", config.native_draws)))),
+            int(
+                defaults.get(
+                    "draws",
+                    defaults.get("samples", defaults.get("iter_sampling", config.native_draws)),
+                )
+            ),
             config.native_draws,
         ),
         "warmup": min(
-            int(defaults.get("tune", defaults.get("warmup", defaults.get("iter_warmup", config.native_warmup)))),
+            int(
+                defaults.get(
+                    "tune",
+                    defaults.get("warmup", defaults.get("iter_warmup", config.native_warmup)),
+                )
+            ),
             config.native_warmup,
         ),
-        "steps": min(int(defaults.get("steps", defaults.get("iter", config.native_svi_steps))), config.native_svi_steps),
-        "particles": min(int(defaults.get("particles", config.native_particles)), config.native_particles),
+        "steps": min(
+            int(defaults.get("steps", defaults.get("iter", config.native_svi_steps))),
+            config.native_svi_steps,
+        ),
+        "particles": min(
+            int(defaults.get("particles", config.native_particles)), config.native_particles
+        ),
         "target_accept": max(
             float(defaults.get("target_accept", defaults.get("adapt_delta", 0.9))),
             float(config.native_target_accept),
         ),
-        "posterior_draws": min(int(defaults.get("posterior_draws", config.native_draws)), config.native_draws),
+        "posterior_draws": min(
+            int(defaults.get("posterior_draws", config.native_draws)), config.native_draws
+        ),
     }

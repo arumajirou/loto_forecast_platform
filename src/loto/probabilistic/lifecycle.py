@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import math
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -12,13 +11,13 @@ import pandas as pd
 
 from loto.evaluation.protocol import ProtocolSpec
 from loto.probabilistic.artifact_store import ProbabilisticArtifactStore
+from loto.probabilistic.backends import get_backend
 from loto.probabilistic.catalog import get_probabilistic_model_spec
 from loto.probabilistic.config import execution_fingerprint
 from loto.probabilistic.dataset import DatasetBundle, task_arrays
 from loto.probabilistic.decision import choose_points
 from loto.probabilistic.decoder import decode
 from loto.probabilistic.diagnostics import diagnose_probabilities
-from loto.probabilistic.backends import get_backend
 from loto.probabilistic.models.reference import ReferencePosterior
 from loto.probabilistic.native import NativePosterior
 from loto.probabilistic.predictive import summarize_draws
@@ -62,7 +61,9 @@ class TrialResult:
         }
 
 
-def _protocol(bundle: DatasetBundle, *, target_mode: str, train_rows: int, test_size: int, seed: int) -> ProtocolSpec:
+def _protocol(
+    bundle: DatasetBundle, *, target_mode: str, train_rows: int, test_size: int, seed: int
+) -> ProtocolSpec:
     return ProtocolSpec(
         game=bundle.game,
         family=bundle.geometry.family,
@@ -84,15 +85,24 @@ def _protocol(bundle: DatasetBundle, *, target_mode: str, train_rows: int, test_
     )
 
 
-def _normalize_probabilities(probabilities: np.ndarray, bundle: DatasetBundle, target_mode: str) -> np.ndarray:
+def _normalize_probabilities(
+    probabilities: np.ndarray, bundle: DatasetBundle, target_mode: str
+) -> np.ndarray:
     probs = np.asarray(probabilities, dtype=float)
     geometry = bundle.geometry
     if geometry.family == "digits" and probs.shape[0] == 1:
         probs = np.repeat(probs, geometry.positions, axis=0)
-    if geometry.family == "select" and target_mode in {"select_candidate_inclusion", "window_count"}:
+    if geometry.family == "select" and target_mode in {
+        "select_candidate_inclusion",
+        "window_count",
+    }:
         if probs.shape[0] != 1:
             probs = probs.mean(axis=0, keepdims=True)
-    if geometry.family == "select" and target_mode == "select_position_inclusion" and probs.shape[0] != geometry.positions:
+    if (
+        geometry.family == "select"
+        and target_mode == "select_position_inclusion"
+        and probs.shape[0] != geometry.positions
+    ):
         probs = np.repeat(probs.mean(axis=0, keepdims=True), geometry.positions, axis=0)
     probs = np.maximum(probs, 1e-15)
     probs /= probs.sum(axis=-1, keepdims=True)
@@ -182,9 +192,13 @@ def _merge_native_diagnostics(
     ):
         if native.get(key) is not None:
             probability_report[key] = native[key]
-    warnings = list(dict.fromkeys([*probability_report.get("warnings", []), *native.get("warnings", [])]))
+    warnings = list(
+        dict.fromkeys([*probability_report.get("warnings", []), *native.get("warnings", [])])
+    )
     failures = list(
-        dict.fromkeys([*probability_report.get("failure_codes", []), *native.get("failure_codes", [])])
+        dict.fromkeys(
+            [*probability_report.get("failure_codes", []), *native.get("failure_codes", [])]
+        )
     )
     rhat = probability_report.get("rhat_max")
     divergences = probability_report.get("divergences")
@@ -279,7 +293,11 @@ def run_trial(
     train_rows = min(train_rows, bundle.rows - 1)
     test_size = min(config.test_size, bundle.rows - train_rows)
     protocol = _protocol(
-        bundle, target_mode=trial.target_mode, train_rows=train_rows, test_size=test_size, seed=trial.seed
+        bundle,
+        target_mode=trial.target_mode,
+        train_rows=train_rows,
+        test_size=test_size,
+        seed=trial.seed,
     )
     fingerprints = execution_fingerprint(
         protocol_hash=protocol.hash,
@@ -292,7 +310,17 @@ def run_trial(
     try:
         prediction_rows: list[dict[str, Any]] = []
         metric_rows: list[dict[str, float]] = []
-        last: tuple[NativePosterior, np.ndarray, pd.DataFrame, list[int], dict[str, float], dict[str, Any]] | None = None
+        last: (
+            tuple[
+                NativePosterior,
+                np.ndarray,
+                pd.DataFrame,
+                list[int],
+                dict[str, float],
+                dict[str, Any],
+            ]
+            | None
+        ) = None
         for cutoff in range(train_rows, train_rows + test_size):
             last = _fit_predict_once(
                 model_id=trial.model_id,
@@ -331,10 +359,11 @@ def run_trial(
             fingerprint=fingerprints["execution_fingerprint"],
         )
         posterior, mean, summary, decoded, _, diagnostics = final
-        aggregated = {
-            key: float(np.mean([row[key] for row in metric_rows]))
-            for key in metric_rows[0]
-        } if metric_rows else {}
+        aggregated = (
+            {key: float(np.mean([row[key] for row in metric_rows])) for key in metric_rows[0]}
+            if metric_rows
+            else {}
+        )
         store.write_json("model_spec.json", spec.to_dict())
         store.write_json("protocol.json", protocol.summary())
         store.write_json("execution_fingerprint.json", fingerprints)
@@ -344,7 +373,9 @@ def run_trial(
             store.write_json("posterior_reference.json", posterior.native_payload.to_dict())
         store.write_table("posterior_summary.csv", summary)
         store.write_table("rolling_predictions.csv", pd.DataFrame(prediction_rows))
-        store.write_json("next_prediction.json", {"values": decoded, "probabilities": mean.tolist()})
+        store.write_json(
+            "next_prediction.json", {"values": decoded, "probabilities": mean.tolist()}
+        )
         store.write_json("diagnostics.json", diagnostics)
         result = TrialResult(
             status="PASS" if diagnostics["status"] != "FAIL" else "POSTERIOR_INVALID",
@@ -367,7 +398,9 @@ def run_trial(
         return result
     except Exception as exc:
         result = TrialResult(
-            status="MODEL_BUILD_FAILED" if isinstance(exc, (ValueError, NotImplementedError)) else "INFERENCE_FAILED",
+            status="MODEL_BUILD_FAILED"
+            if isinstance(exc, (ValueError, NotImplementedError))
+            else "INFERENCE_FAILED",
             trial_id=trial.trial_id,
             model_id=trial.model_id,
             family=trial.family,

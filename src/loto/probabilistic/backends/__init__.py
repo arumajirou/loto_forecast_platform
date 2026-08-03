@@ -34,8 +34,7 @@ def get_backend(name: str) -> ProbabilisticBackend:
 def probe_backends() -> list[dict[str, object]]:
     unique = {value.backend_id: value for value in _BACKENDS.values()}
     return [
-        backend.probe().to_dict()
-        for backend in sorted(unique.values(), key=lambda x: x.backend_id)
+        backend.probe().to_dict() for backend in sorted(unique.values(), key=lambda x: x.backend_id)
     ]
 
 

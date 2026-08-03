@@ -60,7 +60,6 @@ from loto.probabilistic.models.native_common import (
     base_probability_bank,
     bounded_training_data,
     categorical_design,
-    empirical_probabilities,
 )
 
 
@@ -91,7 +90,9 @@ def _flatten(y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return values.reshape(-1), position_index
 
 
-def _observe_categorical(pm: Any, probabilities: Any, y: np.ndarray, name: str = "observed") -> None:
+def _observe_categorical(
+    pm: Any, probabilities: Any, y: np.ndarray, name: str = "observed"
+) -> None:
     observed, _ = _flatten(y)
     pm.Categorical(name, p=probabilities, observed=observed)
 
@@ -183,9 +184,7 @@ def _build_hierarchical(pm: Any, y: np.ndarray, classes: int, prior: float, mode
     if model_id == "pp-hierarchical-dirichlet-games":
         game_probability = pm.Dirichlet("game_probability", a=pooling * global_probability)
         local_pooling = pm.Gamma("position_pooling", alpha=2.0, beta=0.1)
-        p = pm.Dirichlet(
-            "p", a=local_pooling * game_probability, shape=(positions, classes)
-        )
+        p = pm.Dirichlet("p", a=local_pooling * game_probability, shape=(positions, classes))
     else:
         p = pm.Dirichlet("p", a=pooling * global_probability, shape=(positions, classes))
     _observe_categorical(pm, _categorical_probability_rows(p, y), y)
@@ -209,9 +208,7 @@ def _build_categorical_regression(
     features = X.shape[1]
     intercept = pm.Normal("intercept", 0.0, 1.0, shape=(positions, classes))
     beta = _regression_prior(pm, pt, model_id, (positions, features, classes))
-    logits = intercept[position_index] + pt.sum(
-        beta[position_index] * X_rows[:, :, None], axis=1
-    )
+    logits = intercept[position_index] + pt.sum(beta[position_index] * X_rows[:, :, None], axis=1)
     if model_id == "pp-multinomial-probit":
         positive = 0.5 * (1.0 + pt.erf(logits / np.sqrt(2.0)))
         probabilities = positive / positive.sum(axis=-1, keepdims=True)
@@ -307,7 +304,6 @@ def _build_gp(pm: Any, pt: Any, y: np.ndarray, classes: int, *, time_varying: bo
     return _softmax(pm, next_logits)
 
 
-
 def _build_dynamic_dirichlet(
     pm: Any,
     pt: Any,
@@ -324,12 +320,8 @@ def _build_dynamic_dirichlet(
     concentration = 40.0
     alpha_discount = max(discount_center * concentration, 1e-3)
     beta_discount = max((1.0 - discount_center) * concentration, 1e-3)
-    discount = pm.Beta(
-        "discount", alpha=alpha_discount, beta=beta_discount
-    )
-    p = pm.Dirichlet(
-        "p", a=np.full(classes, prior), shape=(positions, classes)
-    )
+    discount = pm.Beta("discount", alpha=alpha_discount, beta=beta_discount)
+    p = pm.Dirichlet("p", a=np.full(classes, prior), shape=(positions, classes))
     row_age = np.repeat(np.arange(len(y) - 1, -1, -1, dtype=float), positions)
     weights = discount**row_age
     selected = p[position_index, observed]
@@ -338,6 +330,7 @@ def _build_dynamic_dirichlet(
         pt.sum(weights * pt.log(pt.maximum(selected, 1e-15))),
     )
     return p
+
 
 def _build_dynamic(pm: Any, pt: Any, y: np.ndarray, classes: int, model_id: str) -> Any:
     positions = y.shape[1]
@@ -377,9 +370,7 @@ def _build_dynamic(pm: Any, pt: Any, y: np.ndarray, classes: int, model_id: str)
         if model_id == "pp-local-level-categorical":
             next_logits = logits_state[:, :, -1]
         else:
-            innovation = pm.Normal(
-                "next_innovation", 0.0, sigma, shape=(positions, classes)
-            )
+            innovation = pm.Normal("next_innovation", 0.0, sigma, shape=(positions, classes))
             next_logits = logits_state[:, :, -1] + innovation
     rows = logits_state.dimshuffle(2, 0, 1).reshape((n * positions, classes))
     pm.Categorical("observed", p=_softmax(pm, rows), observed=observed)
@@ -421,9 +412,7 @@ def _build_hmm(pm: Any, pt: Any, y: np.ndarray, classes: int) -> Any:
     transition = pm.Dirichlet(
         "transition", a=np.ones(regimes) + np.eye(regimes) * 3.0, shape=(regimes, regimes)
     )
-    emission = pm.Dirichlet(
-        "emission", a=np.ones(classes), shape=(regimes, positions, classes)
-    )
+    emission = pm.Dirichlet("emission", a=np.ones(classes), shape=(regimes, positions, classes))
     initial = pm.Dirichlet("initial", a=np.ones(regimes))
     states = [pm.Categorical("state_0", p=initial)]
     pm.Categorical("observed_0", p=emission[states[0]], observed=y[0])
@@ -470,9 +459,7 @@ def _build_counts(pm: Any, pt: Any, y: np.ndarray, model_id: str, prior: float) 
     elif model_id == "pp-zero-inflated-negative-binomial-count":
         psi = pm.Beta("nonzero_probability", alpha=2.0, beta=2.0, shape=classes)
         alpha = pm.HalfNormal("overdispersion", sigma=5.0)
-        pm.ZeroInflatedNegativeBinomial(
-            "observed", psi=psi, mu=rate, alpha=alpha, observed=values
-        )
+        pm.ZeroInflatedNegativeBinomial("observed", psi=psi, mu=rate, alpha=alpha, observed=values)
         rate = psi * rate
     elif model_id == "pp-hurdle-count":
         psi = pm.Beta("positive_probability", alpha=2.0, beta=2.0, shape=classes)
@@ -504,12 +491,16 @@ def _build_mixture(pm: Any, pt: Any, y: np.ndarray, classes: int, model_id: str)
         grid = np.arange(classes)
         kernels = np.exp(-0.5 * ((grid[None, :] - centers[:, None]) / 1.25) ** 2)
         kernels /= kernels.sum(axis=1, keepdims=True)
-        weights = pm.Dirichlet("kernel_weights", a=np.ones(components_count), shape=(positions, components_count))
+        weights = pm.Dirichlet(
+            "kernel_weights", a=np.ones(components_count), shape=(positions, components_count)
+        )
         p = pt.dot(weights, kernels)
         _observe_categorical(pm, _categorical_probability_rows(p, y), y)
         return p
     if model_id == "pp-dirichlet-process-categorical":
-        v = pm.Beta("stick", alpha=1.0, beta=pm.Gamma("dp_alpha", 2.0, 1.0), shape=components_count - 1)
+        v = pm.Beta(
+            "stick", alpha=1.0, beta=pm.Gamma("dp_alpha", 2.0, 1.0), shape=components_count - 1
+        )
         weights = pm.Deterministic("weights", _stick_breaking(pt, v))
     else:
         weights = pm.Dirichlet("weights", a=np.ones(components_count))
@@ -522,9 +513,7 @@ def _build_mixture(pm: Any, pt: Any, y: np.ndarray, classes: int, model_id: str)
         gate_intercept = pm.Normal("gate_intercept", 0.0, 1.0, shape=components_count)
         gate_slope = pm.Normal("gate_slope", 0.0, 1.0, shape=components_count)
         gate = _softmax(pm, gate_intercept[None, :] + time[:, None] * gate_slope[None, :])
-        probabilities = pt.sum(
-            gate[:, :, None, None] * components[None, :, :, :], axis=1
-        )
+        probabilities = pt.sum(gate[:, :, None, None] * components[None, :, :, :], axis=1)
         observed, _ = _flatten(y)
         pm.Categorical(
             "observed", p=probabilities.reshape((n * positions, classes)), observed=observed
@@ -536,7 +525,16 @@ def _build_mixture(pm: Any, pt: Any, y: np.ndarray, classes: int, model_id: str)
     return p
 
 
-def _build_meta(pm: Any, pt: Any, y: np.ndarray, classes: int, model_id: str, prior: float, window: int, discount: float) -> Any:
+def _build_meta(
+    pm: Any,
+    pt: Any,
+    y: np.ndarray,
+    classes: int,
+    model_id: str,
+    prior: float,
+    window: int,
+    discount: float,
+) -> Any:
     bank = base_probability_bank(y, classes, prior=prior, window=window, discount=discount)
     positions = y.shape[1]
     observed, position_index = _flatten(y)
@@ -545,9 +543,7 @@ def _build_meta(pm: Any, pt: Any, y: np.ndarray, classes: int, model_id: str, pr
         p = pt.sum(weights[:, None, None] * bank, axis=0)
     elif model_id == "pp-dynamic-model-averaging":
         n = len(y)
-        weight_logits = pm.GaussianRandomWalk(
-            "weight_logits", sigma=0.3, shape=(n, bank.shape[0])
-        )
+        weight_logits = pm.GaussianRandomWalk("weight_logits", sigma=0.3, shape=(n, bank.shape[0]))
         weights = _softmax(pm, weight_logits)
         p_rows = pt.sum(weights[:, :, None, None] * bank[None, :, :, :], axis=1)
         pm.Categorical(
@@ -662,7 +658,10 @@ def build_pymc_graph(
             "pp-seasonal-harmonic-categorical",
         }:
             p = _build_dynamic(pm, pt, values, classes, model_id)
-        elif model_id in {"pp-single-changepoint-categorical", "pp-multiple-changepoint-categorical"}:
+        elif model_id in {
+            "pp-single-changepoint-categorical",
+            "pp-multiple-changepoint-categorical",
+        }:
             p = _build_changepoint(pm, pt, values, classes, model_id)
         elif model_id == "pp-hmm-categorical":
             # Keep explicit discrete state space bounded for SMC smoke and audit runs.

@@ -45,7 +45,9 @@ def _safe_statistic(function: Any, idata: Any, reducer: str) -> float | None:
         return None
 
 
-def _diagnostics(idata: Any, *, variational: bool, losses: list[float] | None = None) -> dict[str, Any]:
+def _diagnostics(
+    idata: Any, *, variational: bool, losses: list[float] | None = None
+) -> dict[str, Any]:
     diagnostics: dict[str, Any] = {
         "posterior_finite": True,
         "probability_simplex_valid": True,
@@ -88,7 +90,9 @@ def _diagnostics(idata: Any, *, variational: bool, losses: list[float] | None = 
         for name in ("reached_max_treedepth", "tree_depth"):
             try:
                 values = np.asarray(sample_stats[name])
-                diagnostics["max_treedepth_hits"] = int(values.sum()) if name.startswith("reached") else None
+                diagnostics["max_treedepth_hits"] = (
+                    int(values.sum()) if name.startswith("reached") else None
+                )
                 break
             except Exception:
                 continue

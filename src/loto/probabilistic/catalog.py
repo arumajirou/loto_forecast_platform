@@ -3,23 +3,38 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from dataclasses import replace
-from functools import lru_cache
-from importlib.util import find_spec
 import subprocess
 import sys
+from collections.abc import Iterable
+from functools import cache
+from importlib.util import find_spec
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import yaml
 
 from loto.probabilistic.contracts import InferenceProfileSpec, ProbabilisticModelSpec
 
 _ALLOWED_FAMILIES = {
-    "bayesian_regression", "calibration", "changepoint", "conjugate", "count",
-    "decision", "deep_probabilistic", "dynamic_conjugate", "empirical_bayes",
-    "ensemble", "gaussian_process", "hierarchical", "mixture", "nonparametric",
-    "ordinal", "regime_switching", "semi_parametric", "state_space", "tree_bayesian",
+    "bayesian_regression",
+    "calibration",
+    "changepoint",
+    "conjugate",
+    "count",
+    "decision",
+    "deep_probabilistic",
+    "dynamic_conjugate",
+    "empirical_bayes",
+    "ensemble",
+    "gaussian_process",
+    "hierarchical",
+    "mixture",
+    "nonparametric",
+    "ordinal",
+    "regime_switching",
+    "semi_parametric",
+    "state_space",
+    "tree_bayesian",
 }
 _ALLOWED_ROLES = {"control", "baseline", "candidate", "research", "meta"}
 _ALLOWED_PRIORITIES = {"p0", "p1", "p2"}
@@ -76,7 +91,13 @@ def _strategy_for(model_id: str, family: str) -> str:
         return "empirical_bayes"
     if family == "hierarchical":
         return "hierarchical_pooling"
-    if family in {"bayesian_regression", "ordinal", "semi_parametric", "tree_bayesian", "gaussian_process"}:
+    if family in {
+        "bayesian_regression",
+        "ordinal",
+        "semi_parametric",
+        "tree_bayesian",
+        "gaussian_process",
+    }:
         return "context_transition"
     if family in {"dynamic_conjugate", "state_space", "changepoint", "regime_switching"}:
         return "dynamic_context"
@@ -95,7 +116,9 @@ def _strategy_for(model_id: str, family: str) -> str:
     return "generic"
 
 
-def load_probabilistic_catalog(path: str | Path | None = None) -> tuple[ProbabilisticModelSpec, ...]:
+def load_probabilistic_catalog(
+    path: str | Path | None = None,
+) -> tuple[ProbabilisticModelSpec, ...]:
     source = Path(path) if path else _data_path("catalog.yaml")
     payload = _safe_yaml(source)
     schema_version = str(payload.get("schema_version", "1.0.0"))
@@ -217,7 +240,7 @@ def get_inference_profile(profile_id: str) -> InferenceProfileSpec:
     raise KeyError(profile_id)
 
 
-@lru_cache(maxsize=None)
+@cache
 def backend_available(backend: str) -> bool:
     modules = _BACKEND_IMPORTS.get(backend, (backend,))
     if not modules:
@@ -281,8 +304,11 @@ def build_unified_catalog_rows() -> list[dict[str, Any]]:
             "priority": spec.priority,
             "role": spec.role,
             "capabilities": [
-                "probability", "posterior_distribution", "posterior_predictive",
-                "uncertainty_diagnostics", "probabilistic_programming",
+                "probability",
+                "posterior_distribution",
+                "posterior_predictive",
+                "uncertainty_diagnostics",
+                "probabilistic_programming",
             ],
             "available": True,
             "implementation_status": spec.implementation_status,

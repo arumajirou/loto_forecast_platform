@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -37,7 +37,7 @@ class ReferencePosterior:
         }
 
     @classmethod
-    def from_dict(cls, payload: dict[str, Any]) -> "ReferencePosterior":
+    def from_dict(cls, payload: dict[str, Any]) -> ReferencePosterior:
         return cls(
             model_id=str(payload["model_id"]),
             family=str(payload["family"]),
@@ -49,18 +49,24 @@ class ReferencePosterior:
         )
 
 
-def _categorical_counts(y: np.ndarray, classes: int, weights: np.ndarray | None = None) -> np.ndarray:
+def _categorical_counts(
+    y: np.ndarray, classes: int, weights: np.ndarray | None = None
+) -> np.ndarray:
     if y.ndim == 1:
         y = y[:, None]
     counts = np.zeros((y.shape[1], classes), dtype=float)
-    row_weights = np.ones(y.shape[0], dtype=float) if weights is None else np.asarray(weights, dtype=float)
+    row_weights = (
+        np.ones(y.shape[0], dtype=float) if weights is None else np.asarray(weights, dtype=float)
+    )
     for position in range(y.shape[1]):
         counts[position] = np.bincount(y[:, position], weights=row_weights, minlength=classes)
     return counts
 
 
 def _incidence_counts(y: np.ndarray, classes: int, weights: np.ndarray | None = None) -> np.ndarray:
-    row_weights = np.ones(y.shape[0], dtype=float) if weights is None else np.asarray(weights, dtype=float)
+    row_weights = (
+        np.ones(y.shape[0], dtype=float) if weights is None else np.asarray(weights, dtype=float)
+    )
     if y.ndim == 1:
         y = y[:, None]
     counts = (y * row_weights[:, None]).sum(axis=0, dtype=float)
@@ -104,15 +110,17 @@ def _dynamic_weights(n: int, model_id: str, discount: float, window: int) -> np.
     if any(token in model_id for token in ("hmm", "switching", "hsmm")):
         weights = np.power(discount, age)
         if n >= 3:
-            recent_center = np.mean(np.arange(n)[-min(window, n):])
+            recent_center = np.mean(np.arange(n)[-min(window, n) :])
             weights *= 0.75 + 0.25 * (np.arange(n) >= recent_center)
         return weights
     return np.power(discount, age)
 
 
-def _mixture_alpha(y: np.ndarray, classes: int, prior: float, window: int, model_id: str) -> np.ndarray:
+def _mixture_alpha(
+    y: np.ndarray, classes: int, prior: float, window: int, model_id: str
+) -> np.ndarray:
     full = _categorical_counts(y, classes)
-    recent = _categorical_counts(y[-min(window, len(y)):], classes)
+    recent = _categorical_counts(y[-min(window, len(y)) :], classes)
     transition = _transition_counts(y, classes, prior=0.0)
     if "mixture-of-experts" in model_id:
         weights = (0.25, 0.45, 0.30)
@@ -138,7 +146,7 @@ def _sequence_bootstrap_alpha(
         receptive = max(window * 2, 40)
     elif "tcn" in model_id:
         receptive = max(window, 32)
-    recent = y[-min(receptive, len(y)):]
+    recent = y[-min(receptive, len(y)) :]
     recency = np.linspace(0.25, 1.0, len(recent))
     alpha = prior + _categorical_counts(recent, classes, recency)
     alpha += 0.35 * _transition_counts(y, classes, prior=0.0)
@@ -192,10 +200,12 @@ def fit_reference(
     elif strategy == "dirichlet":
         alpha = prior + _categorical_counts(y, classes)
     elif strategy == "rolling_dirichlet":
-        recent = y[-min(config.rolling_window, len(y)):]
+        recent = y[-min(config.rolling_window, len(y)) :]
         alpha = prior + _categorical_counts(recent, classes)
     elif strategy == "discounted_dirichlet":
-        weights = _dynamic_weights(len(y), spec.model_id, config.discount_factor, config.rolling_window)
+        weights = _dynamic_weights(
+            len(y), spec.model_id, config.discount_factor, config.rolling_window
+        )
         alpha = prior + _categorical_counts(y, classes, weights)
     elif strategy == "empirical_bayes":
         counts = _categorical_counts(y, classes)
@@ -207,22 +217,32 @@ def fit_reference(
         global_counts = local.sum(axis=0, keepdims=True)
         global_probs = global_counts / np.maximum(global_counts.sum(), 1.0)
         pooling = 0.35 if "digits" in spec.model_id else 0.50
-        alpha = prior + (1.0 - pooling) * local + pooling * local.sum(axis=1, keepdims=True) * global_probs
+        alpha = (
+            prior
+            + (1.0 - pooling) * local
+            + pooling * local.sum(axis=1, keepdims=True) * global_probs
+        )
         metadata["pooling_weight"] = pooling
     elif strategy == "context_transition":
         alpha = prior + _transition_counts(y, classes, prior=0.0)
         if spec.family == "ordinal":
-            kernel = np.exp(-0.5 * ((np.arange(classes)[:, None] - np.arange(classes)[None, :]) / 1.5) ** 2)
+            kernel = np.exp(
+                -0.5 * ((np.arange(classes)[:, None] - np.arange(classes)[None, :]) / 1.5) ** 2
+            )
             alpha = alpha @ kernel
         elif spec.family == "semi_parametric":
-            alpha += 0.25 * _categorical_counts(y[-min(50, len(y)):], classes)
+            alpha += 0.25 * _categorical_counts(y[-min(50, len(y)) :], classes)
         elif spec.family == "gaussian_process":
-            weights = np.exp(-0.5 * (np.arange(len(y) - 1, -1, -1) / max(10.0, config.rolling_window)) ** 2)
+            weights = np.exp(
+                -0.5 * (np.arange(len(y) - 1, -1, -1) / max(10.0, config.rolling_window)) ** 2
+            )
             alpha += 0.5 * _categorical_counts(y, classes, weights)
         elif spec.family == "tree_bayesian":
-            alpha += 0.6 * _categorical_counts(y[-min(config.rolling_window, len(y)):], classes)
+            alpha += 0.6 * _categorical_counts(y[-min(config.rolling_window, len(y)) :], classes)
     elif strategy == "dynamic_context":
-        weights = _dynamic_weights(len(y), spec.model_id, config.discount_factor, config.rolling_window)
+        weights = _dynamic_weights(
+            len(y), spec.model_id, config.discount_factor, config.rolling_window
+        )
         alpha = prior + _categorical_counts(y, classes, weights)
         alpha += 0.25 * _transition_counts(y, classes, prior=0.0)
     elif strategy == "count_posterior":
@@ -244,7 +264,7 @@ def fit_reference(
         alpha = _sequence_bootstrap_alpha(y, classes, prior, config.rolling_window, spec.model_id)
     elif strategy == "ensemble_reference":
         a = prior + _categorical_counts(y, classes)
-        b = prior + _categorical_counts(y[-min(config.rolling_window, len(y)):], classes)
+        b = prior + _categorical_counts(y[-min(config.rolling_window, len(y)) :], classes)
         c = prior + _transition_counts(y, classes, prior=0.0)
         alpha = (a + b + c) / 3.0
     elif strategy == "calibration_reference":
@@ -275,9 +295,7 @@ def fit_reference(
     )
 
 
-def posterior_draws(
-    posterior: ReferencePosterior, *, draws: int, seed: int
-) -> np.ndarray:
+def posterior_draws(posterior: ReferencePosterior, *, draws: int, seed: int) -> np.ndarray:
     rng = np.random.default_rng(seed)
     output = np.empty((draws, posterior.alpha.shape[0], posterior.alpha.shape[1]), dtype=float)
     for position, alpha in enumerate(posterior.alpha):

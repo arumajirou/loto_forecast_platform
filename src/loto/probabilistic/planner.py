@@ -138,7 +138,10 @@ def build_plan(config: ProbabilisticRunConfig) -> list[TrialPlan]:
                             )
                         )
                         continue
-                    if config.profile == "exhaustive" and profile.backend not in {backend, "cmdstanpy" if backend == "stan" else backend}:
+                    if config.profile == "exhaustive" and profile.backend not in {
+                        backend,
+                        "cmdstanpy" if backend == "stan" else backend,
+                    }:
                         continue
                 decision = decide_compatibility(
                     spec,
@@ -148,7 +151,9 @@ def build_plan(config: ProbabilisticRunConfig) -> list[TrialPlan]:
                     include_experimental=config.include_experimental,
                 )
                 for seed in config.seeds:
-                    trial_id = f"{spec.model_id}__{game}__{backend}__{profile_id or 'analytic'}__s{seed}"
+                    trial_id = (
+                        f"{spec.model_id}__{game}__{backend}__{profile_id or 'analytic'}__s{seed}"
+                    )
                     trials.append(
                         TrialPlan(
                             trial_id=trial_id,

@@ -66,7 +66,9 @@ class ProbabilisticArtifactStore:
 
     def manifest(self, *, metadata: dict[str, Any] | None = None) -> Path:
         files = []
-        for path in sorted(p for p in self.root.rglob("*") if p.is_file() and not p.name.endswith(".tmp")):
+        for path in sorted(
+            p for p in self.root.rglob("*") if p.is_file() and not p.name.endswith(".tmp")
+        ):
             if path.name == "SHA256SUMS.json":
                 continue
             files.append(

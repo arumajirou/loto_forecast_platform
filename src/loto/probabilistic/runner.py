@@ -112,9 +112,7 @@ def _read_status_files(run_dir: Path) -> dict[str, dict[str, Any]]:
 
 
 def _best_result(results: list[dict[str, Any]]) -> dict[str, Any] | None:
-    candidates = [
-        row for row in results if row.get("status") == "PASS" and row.get("metrics")
-    ]
+    candidates = [row for row in results if row.get("status") == "PASS" and row.get("metrics")]
     if not candidates:
         return None
     row = min(
@@ -233,8 +231,7 @@ def _write_final_artifacts(
         "status_counts": counts,
         "protocol_groups": len(leaderboards),
         "leaderboard_paths": sorted(
-            str(path.relative_to(run_dir))
-            for path in (run_dir / "comparison").glob("*.csv")
+            str(path.relative_to(run_dir)) for path in (run_dir / "comparison").glob("*.csv")
         ),
     }
     store.write_json("report/summary.json", report)
@@ -302,11 +299,7 @@ def run_probabilistic(config: ProbabilisticRunConfig) -> dict[str, Any]:
         skip_ids = set(existing)
         retained_existing = list(existing.values())
     elif config.resume_policy == "skip_pass":
-        skip_ids = {
-            trial_id
-            for trial_id, row in existing.items()
-            if row.get("status") == "PASS"
-        }
+        skip_ids = {trial_id for trial_id, row in existing.items() if row.get("status") == "PASS"}
         retained_existing = [existing[trial_id] for trial_id in sorted(skip_ids)]
 
     results: list[dict[str, Any]] = [*blocked, *retained_existing]
@@ -328,8 +321,10 @@ def run_probabilistic(config: ProbabilisticRunConfig) -> dict[str, Any]:
     )
     for row in retained_existing:
         trial = plan_by_id.get(str(row.get("trial_id")))
-        resource = policy.effective_resource(trial) if trial is not None else str(
-            row.get("resource_class") or "light_cpu"
+        resource = (
+            policy.effective_resource(trial)
+            if trial is not None
+            else str(row.get("resource_class") or "light_cpu")
         )
         elapsed = row.get("elapsed_seconds")
         if elapsed is not None:
@@ -350,10 +345,7 @@ def run_probabilistic(config: ProbabilisticRunConfig) -> dict[str, Any]:
     last_notified_completed = len(retained_existing)
 
     def current_progress(status: str) -> dict[str, Any]:
-        running_resources = {
-            trial.trial_id: resource
-            for trial, resource in future_map.values()
-        }
+        running_resources = {trial.trial_id: resource for trial, resource in future_map.values()}
         eta = estimator.estimate(
             dispatcher.pending_by_resource(),
             running_resources,
@@ -437,9 +429,7 @@ def run_probabilistic(config: ProbabilisticRunConfig) -> dict[str, Any]:
                     subject, body = progress_message(progress)
                     if config.email_on_progress:
                         notifier.email(subject, body)
-                    eta_text = (progress.get("eta") or {}).get(
-                        "estimated_remaining_text", "不明"
-                    )
+                    eta_text = (progress.get("eta") or {}).get("estimated_remaining_text", "不明")
                     notifier.speak(
                         f"進捗は{progress['completed_allowed']}件中{len(allowed_all)}件、"
                         f"{progress['progress_percent']}パーセントです。"
@@ -470,15 +460,11 @@ def run_probabilistic(config: ProbabilisticRunConfig) -> dict[str, Any]:
                     resource,
                     result.get("elapsed_seconds"),
                 )
-                results = [
-                    row for row in results if row.get("trial_id") != result.get("trial_id")
-                ]
+                results = [row for row in results if row.get("trial_id") != result.get("trial_id")]
                 results.append(result)
                 store.write_json(f"status/{trial.trial_id}.json", result)
 
-                completed_allowed = len(
-                    [row for row in results if row.get("status") != "BLOCKED"]
-                )
+                completed_allowed = len([row for row in results if row.get("status") != "BLOCKED"])
                 should_count_notify = (
                     completed_allowed - last_notified_completed >= config.notify_every_completed
                 )
@@ -501,9 +487,7 @@ def run_probabilistic(config: ProbabilisticRunConfig) -> dict[str, Any]:
                         should_count_notify and config.email_on_progress
                     ):
                         notifier.email(subject, body)
-                    eta_text = (progress.get("eta") or {}).get(
-                        "estimated_remaining_text", "不明"
-                    )
+                    eta_text = (progress.get("eta") or {}).get("estimated_remaining_text", "不明")
                     notifier.speak(
                         f"{completed_allowed}件完了しました。"
                         f"直近のモデルは{result.get('model_id')}、"
@@ -538,6 +522,7 @@ def run_probabilistic(config: ProbabilisticRunConfig) -> dict[str, Any]:
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
         notifier.close()
+
 
 def load_status(run_dir: str | Path) -> dict[str, Any]:
     root = Path(run_dir)

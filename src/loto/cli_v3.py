@@ -208,11 +208,12 @@ def _cmd_hierarchy(args: argparse.Namespace) -> int:
     return 0
 
 
-
 def _cmd_probabilistic(args: argparse.Namespace) -> int:
     from loto.probabilistic.backends import probe_backends
     from loto.probabilistic.catalog import (
         catalog_counts as ppl_catalog_counts,
+    )
+    from loto.probabilistic.catalog import (
         get_inference_profile,
         get_probabilistic_model_spec,
         list_inference_profiles,
@@ -220,8 +221,8 @@ def _cmd_probabilistic(args: argparse.Namespace) -> int:
     )
     from loto.probabilistic.compatibility import decide_compatibility
     from loto.probabilistic.config import load_run_config
+    from loto.probabilistic.native_registry import list_native_implementations, native_coverage
     from loto.probabilistic.planner import plan_summary
-    from loto.probabilistic.native_registry import native_coverage, list_native_implementations
     from loto.probabilistic.runner import (
         compare_run,
         diagnose_run,
@@ -233,9 +234,7 @@ def _cmd_probabilistic(args: argparse.Namespace) -> int:
     if action == "catalog-list":
         rows = [
             spec.to_dict()
-            for spec in list_probabilistic_model_specs(
-                family=args.family, priority=args.priority
-            )
+            for spec in list_probabilistic_model_specs(family=args.family, priority=args.priority)
         ]
         _emit({"counts": ppl_catalog_counts(), "models": rows})
         return 0
@@ -260,10 +259,12 @@ def _cmd_probabilistic(args: argparse.Namespace) -> int:
         _emit(probe_backends())
         return 0
     if action == "native-coverage":
-        _emit({
-            "coverage": native_coverage(),
-            "implementations": [item.to_dict() for item in list_native_implementations()],
-        })
+        _emit(
+            {
+                "coverage": native_coverage(),
+                "implementations": [item.to_dict() for item in list_native_implementations()],
+            }
+        )
         return 0
     if action == "compatibility":
         try:
@@ -291,7 +292,13 @@ def _cmd_probabilistic(args: argparse.Namespace) -> int:
             _emit({"status": "CONFIG_INVALID", "error": f"{type(exc).__name__}: {exc}"})
             return 2
         if action == "validate-config":
-            _emit({"status": "VALID", "config": config.model_dump(mode="json"), **plan_summary(config)})
+            _emit(
+                {
+                    "status": "VALID",
+                    "config": config.model_dump(mode="json"),
+                    **plan_summary(config),
+                }
+            )
             return 0
         if action == "plan":
             _emit(plan_summary(config))
@@ -450,6 +457,7 @@ def _cmd_probabilistic(args: argparse.Namespace) -> int:
     _emit({"status": "NOT_IMPLEMENTED", "action": action})
     return 2
 
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="loto3", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -504,7 +512,6 @@ def build_parser() -> argparse.ArgumentParser:
     research.add_argument("--output", default=None)
     research.add_argument("--verbose", action="store_true")
     research.set_defaults(func=_cmd_research)
-
 
     probabilistic = sub.add_parser(
         "probabilistic", help="probabilistic-programming model catalog and runner"

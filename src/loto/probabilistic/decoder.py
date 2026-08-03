@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import lru_cache
+from functools import cache
 
 import numpy as np
 
@@ -13,14 +13,14 @@ def decode_select_positions(probabilities: np.ndarray, geometry: GameGeometry) -
     if probs.shape != (geometry.positions, geometry.universe_size):
         # Candidate inclusion distribution: select the top-k candidates.
         if probs.shape[0] == 1 and probs.shape[1] == geometry.universe_size:
-            chosen = np.argpartition(probs[0], -geometry.positions)[-geometry.positions:]
+            chosen = np.argpartition(probs[0], -geometry.positions)[-geometry.positions :]
             return sorted((chosen + geometry.value_min).tolist())
         raise ValueError(
             f"expected {(geometry.positions, geometry.universe_size)}, got {probs.shape}"
         )
     logp = np.log(np.maximum(probs, 1e-15))
 
-    @lru_cache(maxsize=None)
+    @cache
     def solve(position: int, previous: int) -> tuple[float, tuple[int, ...]]:
         if position == geometry.positions:
             return 0.0, ()
@@ -42,7 +42,9 @@ def decode_select_positions(probabilities: np.ndarray, geometry: GameGeometry) -
     return values
 
 
-def decode(probabilities: np.ndarray, geometry: GameGeometry, point_values: np.ndarray) -> list[int]:
+def decode(
+    probabilities: np.ndarray, geometry: GameGeometry, point_values: np.ndarray
+) -> list[int]:
     if geometry.family == "digits":
         values = [int(x) for x in point_values.tolist()]
         geometry.validate_outcome(values)

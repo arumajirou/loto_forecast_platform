@@ -77,7 +77,7 @@ class PredictiveDistribution(BaseModel):
     execution_fingerprint: str
 
     @model_validator(mode="after")
-    def validate_interval(self) -> "PredictiveDistribution":
+    def validate_interval(self) -> PredictiveDistribution:
         if self.hdi_low > self.hdi_high:
             raise ValueError("hdi_low must not exceed hdi_high")
         return self
@@ -190,7 +190,7 @@ class ProbabilisticRunConfig(BaseModel):
         return value
 
     @model_validator(mode="after")
-    def validate_parallelism(self) -> "ProbabilisticRunConfig":
+    def validate_parallelism(self) -> ProbabilisticRunConfig:
         if self.max_heavy_cpu_jobs > self.outer_workers:
             raise ValueError("max_heavy_cpu_jobs cannot exceed outer_workers")
         if self.max_gpu_jobs > self.outer_workers:

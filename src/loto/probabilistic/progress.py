@@ -9,7 +9,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any
 
-
 _RESOURCE_CLASSES = ("gpu", "heavy_cpu", "light_cpu")
 
 
@@ -48,9 +47,7 @@ class ProgressEstimator:
     limits: dict[str, int]
     defaults: dict[str, float]
     started_at_wall: float = field(default_factory=time.time)
-    durations: dict[str, list[float]] = field(
-        default_factory=lambda: defaultdict(list)
-    )
+    durations: dict[str, list[float]] = field(default_factory=lambda: defaultdict(list))
     running_started: dict[str, float] = field(default_factory=dict)
     running_resource: dict[str, str] = field(default_factory=dict)
 
@@ -112,8 +109,7 @@ class ProgressEstimator:
         active_resources = {
             resource
             for resource in _RESOURCE_CLASSES
-            if pending_by_resource.get(resource, 0) > 0
-            or resource in running_trials.values()
+            if pending_by_resource.get(resource, 0) > 0 or resource in running_trials.values()
         }
         minimum_samples = min(
             (samples_by_resource[resource] for resource in active_resources),

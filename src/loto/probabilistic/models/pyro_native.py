@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 
@@ -32,7 +33,9 @@ class PyroGraph:
     metadata: dict[str, Any]
 
 
-def _sample_matrix(pyro: Any, dist: Any, name: str, rows: int, cols: int, scale: float = 0.35) -> Any:
+def _sample_matrix(
+    pyro: Any, dist: Any, name: str, rows: int, cols: int, scale: float = 0.35
+) -> Any:
     return pyro.sample(
         name,
         dist.Normal(0.0, scale).expand((rows, cols)).to_event(2),
@@ -257,7 +260,8 @@ def _neural_hmm_model(y: Any, classes: int, positions: int) -> None:
     state = pyro.sample(
         "state_0",
         dist.RelaxedOneHotCategoricalStraightThrough(
-            temperature=torch.tensor(0.5, device=y.device), logits=torch.zeros(regimes, device=y.device)
+            temperature=torch.tensor(0.5, device=y.device),
+            logits=torch.zeros(regimes, device=y.device),
         ),
     )
     logits_rows = []
@@ -300,7 +304,8 @@ def _embedding_model(y: Any, classes: int, positions: int) -> None:
     _observe(pyro, dist, logits, y)
     next_hidden = torch.cat([value_embedding[y[-1]], position_embedding], dim=-1)
     pyro.deterministic(
-        "next_probabilities", torch.softmax(torch.matmul(torch.tanh(next_hidden), projection) + bias, -1)
+        "next_probabilities",
+        torch.softmax(torch.matmul(torch.tanh(next_hidden), projection) + bias, -1),
     )
 
 

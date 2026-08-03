@@ -63,9 +63,7 @@ def create_api_environment(
     resolved_root = resolve_root(root)
     target = resolved_root / ".env.ppl-api"
     if target.exists() and not force:
-        raise ProbabilisticApiCliError(
-            f"{target} already exists; pass --force to rotate the token"
-        )
+        raise ProbabilisticApiCliError(f"{target} already exists; pass --force to rotate the token")
     token = secrets.token_urlsafe(48)
     lines = [
         f"export LOTO_PPL_ROOT={shlex.quote(str(resolved_root))}",
@@ -97,22 +95,14 @@ class ApiClient:
         *,
         root: str | Path | None = None,
         base_url: str | None = None,
-    ) -> "ApiClient":
+    ) -> ApiClient:
         resolved_root = resolve_root(root)
         values = _parse_export_file(resolved_root / ".env.ppl-api")
-        host = os.environ.get(
-            "LOTO_PPL_API_HOST", values.get("LOTO_PPL_API_HOST", "127.0.0.1")
-        )
-        port = os.environ.get(
-            "LOTO_PPL_API_PORT", values.get("LOTO_PPL_API_PORT", "8765")
-        )
-        token = os.environ.get(
-            "LOTO_PPL_API_TOKEN", values.get("LOTO_PPL_API_TOKEN", "")
-        )
+        host = os.environ.get("LOTO_PPL_API_HOST", values.get("LOTO_PPL_API_HOST", "127.0.0.1"))
+        port = os.environ.get("LOTO_PPL_API_PORT", values.get("LOTO_PPL_API_PORT", "8765"))
+        token = os.environ.get("LOTO_PPL_API_TOKEN", values.get("LOTO_PPL_API_TOKEN", ""))
         if not token:
-            raise ProbabilisticApiCliError(
-                "LOTO_PPL_API_TOKEN is missing; run api-token-create"
-            )
+            raise ProbabilisticApiCliError("LOTO_PPL_API_TOKEN is missing; run api-token-create")
         return cls(base_url=(base_url or f"http://{host}:{port}").rstrip("/"), token=token)
 
     def request(
@@ -142,9 +132,7 @@ class ApiClient:
                 return response.read(), response.headers.get_content_type()
         except urllib.error.HTTPError as exc:
             body = exc.read().decode("utf-8", errors="replace")
-            raise ProbabilisticApiCliError(
-                f"HTTP {exc.code} {method} {path}: {body}"
-            ) from exc
+            raise ProbabilisticApiCliError(f"HTTP {exc.code} {method} {path}: {body}") from exc
         except urllib.error.URLError as exc:
             raise ProbabilisticApiCliError(
                 f"API unavailable at {self.base_url}: {exc.reason}"
@@ -181,22 +169,16 @@ def serve_api(
 ) -> None:
     resolved_root = resolve_root(root)
     values = _parse_export_file(resolved_root / ".env.ppl-api")
-    token = os.environ.get(
-        "LOTO_PPL_API_TOKEN", values.get("LOTO_PPL_API_TOKEN", "")
-    )
+    token = os.environ.get("LOTO_PPL_API_TOKEN", values.get("LOTO_PPL_API_TOKEN", ""))
     if not token:
-        raise ProbabilisticApiCliError(
-            "API token is not configured; run api-token-create first"
-        )
+        raise ProbabilisticApiCliError("API token is not configured; run api-token-create first")
     os.environ.setdefault("LOTO_PPL_ROOT", str(resolved_root))
     os.environ.setdefault("LOTO_PPL_API_TOKEN", token)
     selected_host = host or os.environ.get(
         "LOTO_PPL_API_HOST", values.get("LOTO_PPL_API_HOST", "127.0.0.1")
     )
     selected_port = port or int(
-        os.environ.get(
-            "LOTO_PPL_API_PORT", values.get("LOTO_PPL_API_PORT", "8765")
-        )
+        os.environ.get("LOTO_PPL_API_PORT", values.get("LOTO_PPL_API_PORT", "8765"))
     )
     try:
         import uvicorn

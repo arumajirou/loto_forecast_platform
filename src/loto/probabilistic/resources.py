@@ -2,12 +2,22 @@ from __future__ import annotations
 
 import threading
 from collections import deque
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Iterator
+from typing import Any
 
-
-GPU_CAPABLE_BACKENDS = frozenset({"numpyro", "pyro", "blackjax", "pymc+blackjax", "pymc+numpyro", "tfp", "tensorflow_probability"})
+GPU_CAPABLE_BACKENDS = frozenset(
+    {
+        "numpyro",
+        "pyro",
+        "blackjax",
+        "pymc+blackjax",
+        "pymc+numpyro",
+        "tfp",
+        "tensorflow_probability",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -29,11 +39,7 @@ class ProbabilisticResourcePolicy:
     def effective_resource(self, trial: Any) -> str:
         backend = str(getattr(trial, "backend", ""))
         declared = str(getattr(trial, "resource_class", "") or "light_cpu")
-        if (
-            self.gpu_priority
-            and self.native_device != "cpu"
-            and backend in set(self.gpu_backends)
-        ):
+        if self.gpu_priority and self.native_device != "cpu" and backend in set(self.gpu_backends):
             return "gpu"
         if declared == "gpu":
             return "gpu"

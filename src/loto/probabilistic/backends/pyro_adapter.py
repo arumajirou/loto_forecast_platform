@@ -43,7 +43,7 @@ class PyroBackend(ProbabilisticBackend):
             raise RuntimeError(f"Pyro backend unavailable: {probe.detail}")
         import pyro
         import torch
-        from pyro.infer import MCMC, NUTS, Predictive, SVI, Trace_ELBO
+        from pyro.infer import MCMC, NUTS, SVI, Predictive, Trace_ELBO
         from pyro.infer.autoguide import AutoDiagonalNormal, AutoLowRankMultivariateNormal
         from pyro.optim import ClippedAdam
 
@@ -144,9 +144,7 @@ class PyroBackend(ProbabilisticBackend):
                 "algorithm": profile.algorithm,
                 "settings": settings,
                 "resolved_device": device,
-                "cuda_device_name": (
-                    torch.cuda.get_device_name(0) if device == "cuda" else None
-                ),
+                "cuda_device_name": (torch.cuda.get_device_name(0) if device == "cuda" else None),
                 "peak_vram_bytes": (
                     int(torch.cuda.max_memory_allocated(0)) if device == "cuda" else 0
                 ),

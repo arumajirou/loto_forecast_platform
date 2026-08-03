@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import subprocess
+import sys
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from importlib.util import find_spec
-import subprocess
-import sys
 from typing import Any
 
 
@@ -51,10 +51,17 @@ class ProbabilisticBackend(ABC):
             except Exception as exc:
                 available = False
                 error = f"{type(exc).__name__}: {exc}"
-        detail = "ready" if available and self.implemented else (
-            f"package import failed: {error}" if discoverable and not available else (
-                "package unavailable" if not available else
-                "adapter contract present; native family implementation is opt-in"
+        detail = (
+            "ready"
+            if available and self.implemented
+            else (
+                f"package import failed: {error}"
+                if discoverable and not available
+                else (
+                    "package unavailable"
+                    if not available
+                    else "adapter contract present; native family implementation is opt-in"
+                )
             )
         )
         return BackendProbe(

@@ -10,7 +10,9 @@ from loto.probabilistic.native import NativeImplementation
 
 
 def _source_path() -> Path:
-    project = Path(__file__).resolve().parents[3] / "configs" / "probabilistic" / "native_primary.yaml"
+    project = (
+        Path(__file__).resolve().parents[3] / "configs" / "probabilistic" / "native_primary.yaml"
+    )
     if project.exists():
         return project
     packaged = Path(__file__).resolve().parent / "data" / "native_primary.yaml"
@@ -38,7 +40,9 @@ def list_native_implementations() -> tuple[NativeImplementation, ...]:
             NativeImplementation(
                 model_id=model_id,
                 primary_backend=str(row["primary_backend"]),
-                primary_profile=(str(row["primary_profile"]) if row.get("primary_profile") else None),
+                primary_profile=(
+                    str(row["primary_profile"]) if row.get("primary_profile") else None
+                ),
                 implementation_kind=str(row["implementation_kind"]),
                 module=str(row["module"]),
                 graph_id=str(row["graph_id"]),

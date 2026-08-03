@@ -22,7 +22,6 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from loto.probabilistic.config import load_run_config, write_resolved_config
 
-
 PROFILE_CONFIGS: dict[str, str] = {
     "fast_cpu": "configs/probabilistic/native_fast_cpu_api.yaml",
     "fast_gpu": "configs/probabilistic/native_fast_gpu_dashboard.yaml",
@@ -152,16 +151,16 @@ def _voicevox_get_json(path: str, *, timeout: float = 10.0) -> Any:
 
 def _voicevox_synthesize(request: TtsRequest) -> bytes:
     base = _voicevox_base_url()
-    query_url = base + "/audio_query?" + urllib.parse.urlencode(
-        {"speaker": request.speaker, "text": request.text}
+    query_url = (
+        base
+        + "/audio_query?"
+        + urllib.parse.urlencode({"speaker": request.speaker, "text": request.text})
     )
     audio_query_request = urllib.request.Request(query_url, data=b"", method="POST")
     with urllib.request.urlopen(audio_query_request, timeout=30) as response:
         query = json.loads(response.read().decode("utf-8"))
     query["speedScale"] = request.speed_scale
-    synthesis_url = base + "/synthesis?" + urllib.parse.urlencode(
-        {"speaker": request.speaker}
-    )
+    synthesis_url = base + "/synthesis?" + urllib.parse.urlencode({"speaker": request.speaker})
     synthesis_request = urllib.request.Request(
         synthesis_url,
         data=json.dumps(query, ensure_ascii=False).encode("utf-8"),
@@ -298,9 +297,7 @@ class ApiRunManager:
 
     def _validate_run_id(self, run_id: str) -> None:
         if not RUN_ID_RE.fullmatch(run_id):
-            raise ApiValidationError(
-                "run_id must match ^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
-            )
+            raise ApiValidationError("run_id must match ^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$")
 
     def _resolve_config(self, request: StartRunRequest) -> tuple[Any, Path]:
         relative = PROFILE_CONFIGS.get(request.profile)
@@ -316,9 +313,7 @@ class ApiRunManager:
 
         unknown = sorted(set(request.overrides) - SAFE_OVERRIDE_FIELDS)
         if unknown:
-            raise ApiValidationError(
-                "unsupported override fields: " + ", ".join(unknown)
-            )
+            raise ApiValidationError("unsupported override fields: " + ", ".join(unknown))
 
         config = load_run_config(source)
         updates = dict(request.overrides)
@@ -326,9 +321,7 @@ class ApiRunManager:
             self._validate_run_id(request.run_id)
             updates["run_id"] = request.run_id
         elif request.profile != "resume_stopped":
-            updates["run_id"] = (
-                "api-" + time.strftime("%Y%m%d-%H%M%S") + "-" + request.profile
-            )
+            updates["run_id"] = "api-" + time.strftime("%Y%m%d-%H%M%S") + "-" + request.profile
         config = config.model_copy(update=updates)
         # Re-validate after model_copy because update is intentionally low-level.
         config = type(config).model_validate(config.model_dump(mode="json"))
@@ -368,9 +361,7 @@ class ApiRunManager:
             "passed": completed.returncode == 0,
         }
         if completed.returncode != 0:
-            raise ApiValidationError(
-                "acceleration preflight failed; inspect " + str(output)
-            )
+            raise ApiValidationError("acceleration preflight failed; inspect " + str(output))
         return result
 
     def start(self, request: StartRunRequest) -> dict[str, Any]:
@@ -684,7 +675,7 @@ def create_app(
                 try:
                     payload = run_manager.status(run_id)
                 except KeyError:
-                    yield "event: error\ndata: {\"detail\":\"run not found\"}\n\n"
+                    yield 'event: error\ndata: {"detail":"run not found"}\n\n'
                     return
                 encoded = json.dumps(payload, ensure_ascii=False, default=str)
                 if encoded != last:

@@ -65,7 +65,9 @@ def load_dataset(path: str | Path, game: str) -> DatasetBundle:
         frame = pd.read_parquet(source)
     else:
         frame = pd.read_csv(source)
-    return bundle_from_frame(frame, game=game, data_version=f"{source.name}-{source.stat().st_size}")
+    return bundle_from_frame(
+        frame, game=game, data_version=f"{source.name}-{source.stat().st_size}"
+    )
 
 
 def bundle_from_frame(
@@ -91,7 +93,9 @@ def bundle_from_frame(
     version = data_version or f"{game}-frame-{len(frame)}-{stable_hash(values.tolist())[:12]}"
     feature_set_hash = stable_hash({"columns": columns, "rows": len(frame), "game": game})
     normalized = frame.copy()
-    normalized = normalized.rename(columns=dict(zip(columns, geometry.column_names(), strict=False)))
+    normalized = normalized.rename(
+        columns=dict(zip(columns, geometry.column_names(), strict=False))
+    )
     return DatasetBundle(
         game=game,
         geometry=geometry,
@@ -121,7 +125,7 @@ def synthetic_dataset(game: str, *, rows: int = 240, seed: int = 42) -> DatasetB
             scores = rng.normal(0.0, 1.0, size=geometry.universe_size)
             seasonal = np.sin(index / 23.0 + np.arange(geometry.universe_size) / 7.0)
             scores += 0.12 * seasonal
-            chosen = np.argpartition(scores, -geometry.positions)[-geometry.positions:]
+            chosen = np.argpartition(scores, -geometry.positions)[-geometry.positions :]
             vals = sorted((chosen + geometry.value_min).tolist())
         output.append(
             {"draw_no": index + 1, **dict(zip(geometry.column_names(), vals, strict=False))}
@@ -135,7 +139,10 @@ def task_arrays(bundle: DatasetBundle, target_mode: str) -> tuple[np.ndarray, in
     geometry = bundle.geometry
     zero_based = bundle.values - geometry.value_min
     if target_mode in {
-        "digit_categorical", "digit_ordinal", "select_position_categorical", "select_position_ordinal",
+        "digit_categorical",
+        "digit_ordinal",
+        "select_position_categorical",
+        "select_position_ordinal",
         "select_position_inclusion",
     }:
         return zero_based, geometry.universe_size

@@ -38,7 +38,7 @@ class NotificationSettings:
     notification_fail_open: bool = True
 
     @classmethod
-    def from_config(cls, config: Any) -> "NotificationSettings":
+    def from_config(cls, config: Any) -> NotificationSettings:
         return cls(
             speech_enabled=bool(config.speech_enabled),
             speech_language=str(config.speech_language),
@@ -53,9 +53,7 @@ class NotificationSettings:
                 else None
             ),
             open_jtalk_voice=(
-                str(config.open_jtalk_voice)
-                if getattr(config, "open_jtalk_voice", None)
-                else None
+                str(config.open_jtalk_voice) if getattr(config, "open_jtalk_voice", None) else None
             ),
             email_enabled=bool(config.email_enabled),
             email_to=tuple(str(value) for value in config.email_to),
@@ -128,7 +126,9 @@ class NotificationManager:
             if shutil.which(name):
                 subprocess.run(command, check=True, timeout=120)
                 return name
-        raise RuntimeError("no WAV player found; install pulseaudio-utils, alsa-utils, mpv, or ffmpeg")
+        raise RuntimeError(
+            "no WAV player found; install pulseaudio-utils, alsa-utils, mpv, or ffmpeg"
+        )
 
     def _voicevox_available(self) -> bool:
         url = self.settings.voicevox_url.rstrip("/") + "/version"
@@ -141,9 +141,8 @@ class NotificationManager:
     def _speak_voicevox(self, text: str) -> dict[str, Any]:
         base = self.settings.voicevox_url.rstrip("/")
         speaker = self.settings.voicevox_speaker
-        query_url = (
-            f"{base}/audio_query?"
-            + urllib.parse.urlencode({"speaker": speaker, "text": text})
+        query_url = f"{base}/audio_query?" + urllib.parse.urlencode(
+            {"speaker": speaker, "text": text}
         )
         request = urllib.request.Request(query_url, method="POST")
         with urllib.request.urlopen(request, timeout=30) as response:

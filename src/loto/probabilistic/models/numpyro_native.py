@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 
@@ -70,7 +71,9 @@ def jax_softmax(jnp: Any, value: Any, axis: int = -1) -> Any:
     return out / jnp.sum(out, axis=axis, keepdims=True)
 
 
-def _switching_logistic_model(y: Any, classes: int, positions: int, X: Any, X_next: Any, dynamic: bool) -> None:
+def _switching_logistic_model(
+    y: Any, classes: int, positions: int, X: Any, X_next: Any, dynamic: bool
+) -> None:
     import jax.numpy as jnp
     import numpyro
     import numpyro.distributions as dist

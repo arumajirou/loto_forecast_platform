@@ -51,7 +51,7 @@ class NumPyroBackend(ProbabilisticBackend):
             raise RuntimeError(f"NumPyro backend unavailable: {probe.detail}")
         import jax
         import numpyro
-        from numpyro.infer import MCMC, NUTS, Predictive, SVI, Trace_ELBO
+        from numpyro.infer import MCMC, NUTS, SVI, Predictive, Trace_ELBO
         from numpyro.infer.autoguide import AutoLowRankMultivariateNormal, AutoNormal
         from numpyro.optim import Adam
 
@@ -107,9 +107,7 @@ class NumPyroBackend(ProbabilisticBackend):
                 )
                 try:
                     extra = mcmc.get_extra_fields(group_by_chain=False)
-                    diagnostics["divergences"] = int(
-                        np.asarray(extra.get("diverging", [])).sum()
-                    )
+                    diagnostics["divergences"] = int(np.asarray(extra.get("diverging", [])).sum())
                 except Exception:
                     pass
                 native_payload = mcmc

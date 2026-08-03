@@ -37,7 +37,9 @@ class BuiltinBackend(ProbabilisticBackend):
         )
         draws = posterior_draws(
             posterior,
-            draws=config.native_draws if config.backend_policy == "primary_native" else config.posterior_draws,
+            draws=config.native_draws
+            if config.backend_policy == "primary_native"
+            else config.posterior_draws,
             seed=seed,
         )
         primary_analytic = spec.primary_backend == "builtin"
@@ -57,9 +59,7 @@ class BuiltinBackend(ProbabilisticBackend):
             },
             diagnostics={
                 "posterior_finite": bool(np.isfinite(draws).all()),
-                "probability_simplex_valid": bool(
-                    np.allclose(draws.sum(axis=-1), 1.0, atol=1e-7)
-                ),
+                "probability_simplex_valid": bool(np.allclose(draws.sum(axis=-1), 1.0, atol=1e-7)),
                 "rhat_max": None,
                 "ess_bulk_min": None,
                 "ess_tail_min": None,

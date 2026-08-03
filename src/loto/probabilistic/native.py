@@ -32,8 +32,7 @@ class NativePosterior:
             draws = draws[:, None, :]
         if draws.ndim != 3:
             raise ValueError(
-                "probability_draws must have shape (draw, position, class); "
-                f"got {draws.shape}"
+                f"probability_draws must have shape (draw, position, class); got {draws.shape}"
             )
         if draws.shape[0] < 1 or draws.shape[1] < 1 or draws.shape[2] < 2:
             raise ValueError(f"invalid probability_draws shape: {draws.shape}")
