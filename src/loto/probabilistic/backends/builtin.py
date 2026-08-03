@@ -7,10 +7,14 @@ import numpy as np
 from loto.probabilistic.backends.base import ProbabilisticBackend
 from loto.probabilistic.models.copula_native import (
     MODEL_ID as COPULA_MODEL_ID,
+)
+from loto.probabilistic.models.copula_native import (
     fit_gaussian_copula_categorical,
 )
 from loto.probabilistic.models.dglm_native import (
     MODEL_ID as DGLM_MODEL_ID,
+)
+from loto.probabilistic.models.dglm_native import (
     fit_multinomial_dglm,
 )
 from loto.probabilistic.models.reference import fit_reference, posterior_draws
