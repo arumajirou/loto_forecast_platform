@@ -7,56 +7,81 @@ permissions:
   contents: write
 
 jobs:
-  apply-batch8:
+  apply-batch9:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: agent/ppl02-batch8-bocpd
+          ref: agent/ppl02-batch9-prior-profiles
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
       - name: Install Ruff
         run: python -m pip install ruff==0.16.1
-      - name: Apply, format, lint, and commit Batch 8
+      - name: Verify, apply, format, and commit Batch 9
         shell: bash
         run: |
           set -euo pipefail
-          FILES=(
-            src/loto/probabilistic/models/bocpd_native.py
-            src/loto/probabilistic/contracts.py
+
+          PYTHON_FILES=(
+            src/loto/probabilistic/__init__.py
+            src/loto/probabilistic/compatibility.py
             src/loto/probabilistic/config.py
-            src/loto/probabilistic/catalog.py
-            src/loto/probabilistic/native_registry.py
-            src/loto/probabilistic/backends/builtin.py
-            src/loto/probabilistic/models/__init__.py
-            tests/probabilistic/test_ppl02_bocpd.py
-            tests/probabilistic/test_native_full_coverage.py
-            tests/probabilistic/test_reference_models.py
-            tests/probabilistic/test_catalog.py
-            tests/probabilistic/test_cli.py
-            tests/probabilistic/test_config_and_plan.py
+            src/loto/probabilistic/contracts.py
+            src/loto/probabilistic/planner.py
+            src/loto/probabilistic/priors.py
+            src/loto/probabilistic/statuses.py
+            tests/probabilistic/test_ppl02_prior_profiles.py
           )
-          cp docs/.ppl02-batch8-existing.patch /tmp/ppl02-batch8-existing.patch
-          git apply --check --exclude=src/loto/probabilistic/backends/builtin.py \
-            /tmp/ppl02-batch8-existing.patch
-          git apply --exclude=src/loto/probabilistic/backends/builtin.py \
-            /tmp/ppl02-batch8-existing.patch
-          cp docs/.ppl02-batch8-builtin.py \
-            src/loto/probabilistic/backends/builtin.py
-          rm \
-            docs/.ppl02-batch8-existing.patch \
-            docs/.ppl02-batch8-builtin.py
-          python -m ruff check --fix "${FILES[@]}"
-          python -m ruff format "${FILES[@]}"
-          python -m ruff check "${FILES[@]}"
-          python -m ruff format --check "${FILES[@]}"
+          PRODUCT_FILES=(
+            docs/probabilistic/PPL02_PRIOR_PROFILES.md
+            src/loto/probabilistic/__init__.py
+            src/loto/probabilistic/compatibility.py
+            src/loto/probabilistic/config.py
+            src/loto/probabilistic/contracts.py
+            src/loto/probabilistic/data/prior_profiles.yaml
+            src/loto/probabilistic/planner.py
+            src/loto/probabilistic/priors.py
+            src/loto/probabilistic/statuses.py
+            tests/probabilistic/test_ppl02_prior_profiles.py
+          )
+          STAGING_FILES=(
+            docs/.ppl02-batch9-patch.part00
+            docs/.ppl02-batch9-patch.b64.00
+            docs/.ppl02-batch9-patch.b64.01
+            docs/.ppl02-batch9-patch.b64.02
+            docs/.ppl02-batch9-patch.b64.03
+            docs/.ppl02-batch9-patch.b64.04
+            docs/.ppl02-batch9-patch.hex.00
+            docs/.ppl02-batch9-patch.hex
+          )
+
+          python - <<'PY'
+          from pathlib import Path
+
+          encoded = Path("docs/.ppl02-batch9-patch.hex").read_text(encoding="ascii").strip()
+          Path("/tmp/ppl02-batch9-clean.patch.gz").write_bytes(bytes.fromhex(encoded))
+          PY
+
+          test "$(sha256sum /tmp/ppl02-batch9-clean.patch.gz | cut -d' ' -f1)" = \
+            "899ec02d982ba810d18ec18ef2cae81c1dba5ed11eac784fa6b0dd2ba129b8fa"
+          gzip -dc /tmp/ppl02-batch9-clean.patch.gz > /tmp/ppl02-batch9-clean.patch
+          test "$(sha256sum /tmp/ppl02-batch9-clean.patch | cut -d' ' -f1)" = \
+            "2717dfc8ad93a008c2657d5a75a328fd5e3dd724eecd6ea06d7f0caaab4ba1b2"
+
+          git apply --check /tmp/ppl02-batch9-clean.patch
+          git apply /tmp/ppl02-batch9-clean.patch
+
+          python -m ruff check --fix "${PYTHON_FILES[@]}"
+          python -m ruff format "${PYTHON_FILES[@]}"
+          python -m ruff check "${PYTHON_FILES[@]}"
+          python -m ruff format --check "${PYTHON_FILES[@]}"
+          python -m compileall -q "${PYTHON_FILES[@]}"
+
+          git rm -f -- "${STAGING_FILES[@]}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            "${FILES[@]}" \
-            docs/.ppl02-batch8-existing.patch \
-            docs/.ppl02-batch8-builtin.py
-          git commit -m "feat(probabilistic): integrate BOCPD changepoint model"
-          git push origin HEAD:agent/ppl02-batch8-bocpd
+          git add -- "${PRODUCT_FILES[@]}"
+          git commit -m "feat(probabilistic): add PPL-02 prior profile contracts"
+          git push origin HEAD:agent/ppl02-batch9-prior-profiles
