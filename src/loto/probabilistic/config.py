@@ -10,6 +10,7 @@ from typing import Any
 import yaml
 
 from loto.probabilistic.contracts import ProbabilisticRunConfig
+from loto.probabilistic.priors import get_prior_profile
 
 
 def canonical_json(value: Any) -> str:
@@ -25,7 +26,13 @@ def load_run_config(path: str | Path) -> ProbabilisticRunConfig:
     payload = yaml.safe_load(source.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise ValueError("run config must be a YAML mapping")
-    return ProbabilisticRunConfig.model_validate(payload)
+    config = ProbabilisticRunConfig.model_validate(payload)
+    if config.prior_profile is not None:
+        try:
+            get_prior_profile(config.prior_profile)
+        except KeyError as exc:
+            raise ValueError(str(exc)) from exc
+    return config
 
 
 def write_resolved_config(config: ProbabilisticRunConfig, path: str | Path) -> Path:
@@ -57,8 +64,15 @@ def execution_fingerprint(
     inference_profile_id: str | None = None,
 ) -> dict[str, str]:
     model_spec_hash = stable_hash(model_spec.to_dict())
+    selected_prior_profile = (
+        get_prior_profile(run_config.prior_profile).model_dump(mode="json")
+        if run_config.prior_profile is not None
+        else None
+    )
     prior_spec_hash = stable_hash(
         {
+            "prior_profile": run_config.prior_profile,
+            "prior_profile_spec": selected_prior_profile,
             "prior_concentration": run_config.prior_concentration,
             "rolling_window": run_config.rolling_window,
             "discount_factor": run_config.discount_factor,
