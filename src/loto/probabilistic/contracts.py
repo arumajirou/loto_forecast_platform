@@ -185,6 +185,13 @@ class ProbabilisticRunConfig(BaseModel):
     subset_require_convergence: bool = True
     subset_research_gain_min: float = Field(default=0.0, ge=0.0)
     subset_ece_bins: int = Field(default=10, ge=2, le=100)
+    dglm_discount_factor: float = Field(default=0.97, gt=0.0, le=1.0)
+    dglm_prior_variance: float = Field(default=4.0, gt=0.0, le=1e6)
+    dglm_observation_jitter: float = Field(default=1e-6, gt=0.0, le=1.0)
+    dglm_covariance_floor: float = Field(default=1e-10, ge=0.0, le=1.0)
+    dglm_max_state_variance: float = Field(default=1e6, gt=0.0)
+    dglm_include_trend: bool = False
+    dglm_seasonal_periods: list[float] = Field(default_factory=list)
     utility_lambda_mse: float = Field(default=0.02, ge=0.0)
     dry_run: bool = False
     save_posterior_draws: bool = False
@@ -243,6 +250,15 @@ class ProbabilisticRunConfig(BaseModel):
     def target_modes_unique(cls, value: list[TargetMode]) -> list[TargetMode]:
         if len(value) != len(set(value)):
             raise ValueError("target_modes must not contain duplicates")
+        return value
+
+    @field_validator("dglm_seasonal_periods")
+    @classmethod
+    def dglm_periods_valid(cls, value: list[float]) -> list[float]:
+        if any(period <= 1.0 for period in value):
+            raise ValueError("dglm_seasonal_periods must contain values greater than one")
+        if len(value) != len(set(value)):
+            raise ValueError("dglm_seasonal_periods must not contain duplicates")
         return value
 
     @model_validator(mode="after")
