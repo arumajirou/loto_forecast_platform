@@ -70,7 +70,9 @@ def thresholds_from_marginals(
     if not np.isfinite(values).all() or np.any(values <= 0):
         raise ValueError("marginal probabilities must be finite and strictly positive")
     values = values / values.sum(axis=1, keepdims=True)
-    thresholds = np.empty((values.shape[0], values.shape[1] + 1), dtype=np.float64)
+    thresholds = np.empty(
+        (values.shape[0], values.shape[1] + 1), dtype=np.float64
+    )
     thresholds[:, 0] = -np.inf
     thresholds[:, -1] = np.inf
     cumulative = np.cumsum(values, axis=1)[:, :-1]
@@ -161,9 +163,7 @@ class GaussianCopulaCategoricalState:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.marginal_probabilities = np.asarray(
-            self.marginal_probabilities, dtype=np.float64
-        )
+        self.marginal_probabilities = np.asarray(self.marginal_probabilities, dtype=np.float64)
         self.thresholds = np.asarray(self.thresholds, dtype=np.float64)
         self.correlation = np.asarray(self.correlation, dtype=np.float64)
         self.latent_scores = np.asarray(self.latent_scores, dtype=np.float64)
