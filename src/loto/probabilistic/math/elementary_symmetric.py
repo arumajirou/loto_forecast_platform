@@ -91,8 +91,7 @@ def fixed_cardinality_marginals(
         lower = max(0, exclusion_degree - (values.size - index - 1))
         upper = min(index, exclusion_degree)
         log_excluding = logsumexp_terms(
-            prefix[index, left_degree]
-            + suffix[index + 1, exclusion_degree - left_degree]
+            prefix[index, left_degree] + suffix[index + 1, exclusion_degree - left_degree]
             for left_degree in range(lower, upper + 1)
         )
         log_marginal = log_weight + log_excluding - log_normalizer
