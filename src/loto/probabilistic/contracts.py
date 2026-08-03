@@ -198,6 +198,15 @@ class ProbabilisticRunConfig(BaseModel):
     copula_threshold_epsilon: float = Field(default=1e-6, gt=0.0, lt=0.5)
     copula_correlation_shrinkage: float = Field(default=0.05, ge=0.0, le=1.0)
     copula_correlation_floor: float = Field(default=1e-8, gt=0.0, le=1.0)
+    bocpd_hazard_type: Literal["constant"] = "constant"
+    bocpd_expected_run_length: float = Field(default=200.0, gt=1.0, le=1e9)
+    bocpd_max_run_length: int = Field(default=512, ge=1, le=100000)
+    bocpd_posterior_mass_prune: float = Field(default=1e-8, ge=0.0, lt=1.0)
+    bocpd_prior_concentration: float = Field(default=0.5, gt=0.0, le=1e6)
+    bocpd_alert_threshold: float = Field(default=0.5, ge=0.0, le=1.0)
+    bocpd_min_evidence_count: int = Field(default=20, ge=1, le=1000000)
+    bocpd_cooldown: int = Field(default=20, ge=0, le=1000000)
+    bocpd_min_observed_fraction: float = Field(default=1.0, gt=0.0, le=1.0)
     utility_lambda_mse: float = Field(default=0.02, ge=0.0)
     dry_run: bool = False
     save_posterior_draws: bool = False

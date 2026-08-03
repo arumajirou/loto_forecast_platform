@@ -81,6 +81,15 @@ def list_native_implementations() -> tuple[NativeImplementation, ...]:
             graph_id="gaussian_copula_categorical_v1",
             runtime_tier="standard",
         ),
+        NativeImplementation(
+            model_id="pp-bocpd-dirichlet-categorical",
+            primary_backend="builtin",
+            primary_profile=None,
+            implementation_kind="exact_online_message_passing",
+            module="loto.probabilistic.models.bocpd_native",
+            graph_id="bocpd_dirichlet_categorical_v1",
+            runtime_tier="standard",
+        ),
     )
     for implementation in ppl02_implementations:
         if implementation.model_id not in seen:

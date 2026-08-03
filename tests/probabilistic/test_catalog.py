@@ -14,19 +14,19 @@ from loto.probabilistic.catalog import (
 def test_catalog_has_all_designed_entries() -> None:
     models = list_probabilistic_model_specs()
     profiles = list_inference_profiles()
-    assert len(models) == 75
+    assert len(models) == 76
     assert len(profiles) == 29
-    assert len({item.model_id for item in models}) == 75
+    assert len({item.model_id for item in models}) == 76
     assert len({item.profile_id for item in profiles}) == 29
     assert all(item.implementation_status == "IMPLEMENTED" for item in models)
 
 
 def test_unified_catalog_is_computed_not_hard_coded() -> None:
     counts = unified_catalog_counts()
-    assert counts == {"existing": 174, "probabilistic": 75, "total": 249}
+    assert counts == {"existing": 174, "probabilistic": 76, "total": 250}
     rows = build_unified_catalog_rows()
     assert len({row["model_id"] for row in rows}) == len(rows)
-    assert catalog_counts()["probabilistic_models"] == 75
+    assert catalog_counts()["probabilistic_models"] == 76
 
 
 def test_ppl01_model_ids_remain_byte_for_byte_stable() -> None:
@@ -35,6 +35,7 @@ def test_ppl01_model_ids_remain_byte_for_byte_stable() -> None:
         "pp-conditional-bernoulli-fixed-k",
         "pp-multinomial-dglm",
         "pp-gaussian-copula-categorical",
+        "pp-bocpd-dirichlet-categorical",
     }
     ppl01_ids = [item for item in model_ids if item not in ppl02_ids]
     ordered = ("\n".join(ppl01_ids) + "\n").encode()

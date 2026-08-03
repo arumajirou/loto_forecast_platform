@@ -45,4 +45,4 @@ def test_all_models_fit_and_draw_on_a_compatible_geometry() -> None:
         assert np.isfinite(draws).all()
         assert np.allclose(draws.sum(axis=-1), 1.0)
         fitted += 1
-    assert fitted == 75
+    assert fitted == 76

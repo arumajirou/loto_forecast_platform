@@ -5,18 +5,12 @@ from typing import Any
 import numpy as np
 
 from loto.probabilistic.backends.base import ProbabilisticBackend
-from loto.probabilistic.models.copula_native import (
-    MODEL_ID as COPULA_MODEL_ID,
-)
-from loto.probabilistic.models.copula_native import (
-    fit_gaussian_copula_categorical,
-)
-from loto.probabilistic.models.dglm_native import (
-    MODEL_ID as DGLM_MODEL_ID,
-)
-from loto.probabilistic.models.dglm_native import (
-    fit_multinomial_dglm,
-)
+from loto.probabilistic.models.bocpd_native import MODEL_ID as BOCPD_MODEL_ID
+from loto.probabilistic.models.bocpd_native import fit_bocpd_dirichlet_categorical
+from loto.probabilistic.models.copula_native import MODEL_ID as COPULA_MODEL_ID
+from loto.probabilistic.models.copula_native import fit_gaussian_copula_categorical
+from loto.probabilistic.models.dglm_native import MODEL_ID as DGLM_MODEL_ID
+from loto.probabilistic.models.dglm_native import fit_multinomial_dglm
 from loto.probabilistic.models.reference import fit_reference, posterior_draws
 from loto.probabilistic.models.subset_native import MODEL_ID, fit_conditional_bernoulli_map
 from loto.probabilistic.native import NativePosterior
@@ -39,6 +33,61 @@ class BuiltinBackend(ProbabilisticBackend):
         seed: int,
         inference_profile_id: str | None = None,
     ) -> NativePosterior:
+        if spec.model_id == BOCPD_MODEL_ID:
+            state = fit_bocpd_dirichlet_categorical(
+                y,
+                game=geometry.key,
+                classes=classes,
+                config=config,
+                seed=seed,
+            )
+            draw_count = (
+                config.native_draws
+                if config.backend_policy == "primary_native"
+                else config.posterior_draws
+            )
+            draws = state.probability_draws(draw_count, seed=seed)
+            return NativePosterior(
+                model_id=spec.model_id,
+                backend=self.backend_id,
+                family=spec.family,
+                target_mode=target_mode,
+                game=geometry.key,
+                probability_draws=draws,
+                metadata={
+                    **state.to_metadata_dict(),
+                    "native_graph_id": spec.native_graph_id,
+                    "implementation_kind": "exact_online_message_passing",
+                    "native_analytic": True,
+                    "inference_profile_id": inference_profile_id,
+                    "alert_events": list(state.alert_events),
+                    "automatic_retraining": False,
+                },
+                diagnostics={
+                    "posterior_finite": bool(np.isfinite(draws).all()),
+                    "probability_simplex_valid": bool(
+                        np.allclose(draws.sum(axis=-1), 1.0, atol=1e-7)
+                    ),
+                    "run_length_posterior_valid": bool(
+                        np.isfinite(state.run_length_posterior).all()
+                        and np.isclose(state.run_length_posterior.sum(), 1.0)
+                    ),
+                    "current_changepoint_probability": (state.current_changepoint_probability),
+                    "map_run_length": state.map_run_length,
+                    "active_run_lengths": int(len(state.run_lengths)),
+                    "cumulative_pruned_mass": state.cumulative_pruned_mass,
+                    "alert_count": len(state.alert_events),
+                    "data_quality_pass_rate": float(state.data_quality_pass.mean()),
+                    "rhat_max": None,
+                    "ess_bulk_min": None,
+                    "ess_tail_min": None,
+                    "divergences": None,
+                    "elbo_finite": None,
+                    "elbo_stable": None,
+                },
+                native_payload=state,
+            )
+
         if spec.model_id == COPULA_MODEL_ID:
             state = fit_gaussian_copula_categorical(
                 y,

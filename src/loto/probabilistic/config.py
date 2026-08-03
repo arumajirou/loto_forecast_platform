@@ -78,6 +78,15 @@ def execution_fingerprint(
             "copula_threshold_epsilon": run_config.copula_threshold_epsilon,
             "copula_correlation_shrinkage": run_config.copula_correlation_shrinkage,
             "copula_correlation_floor": run_config.copula_correlation_floor,
+            "bocpd_hazard_type": run_config.bocpd_hazard_type,
+            "bocpd_expected_run_length": run_config.bocpd_expected_run_length,
+            "bocpd_max_run_length": run_config.bocpd_max_run_length,
+            "bocpd_posterior_mass_prune": run_config.bocpd_posterior_mass_prune,
+            "bocpd_prior_concentration": run_config.bocpd_prior_concentration,
+            "bocpd_alert_threshold": run_config.bocpd_alert_threshold,
+            "bocpd_min_evidence_count": run_config.bocpd_min_evidence_count,
+            "bocpd_cooldown": run_config.bocpd_cooldown,
+            "bocpd_min_observed_fraction": run_config.bocpd_min_observed_fraction,
         }
     )
     inference_profile_hash = stable_hash(

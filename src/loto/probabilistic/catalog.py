@@ -91,10 +91,29 @@ _PPL02_COPULA_ROW: dict[str, Any] = {
     "experimental": True,
     "notes": "PPL-02 M05; Numbers3/4 static Gaussian copula with fixed margins",
 }
+_PPL02_BOCPD_ROW: dict[str, Any] = {
+    "model_id": "pp-bocpd-dirichlet-categorical",
+    "family": "changepoint",
+    "role": "candidate",
+    "likelihood": "DirichletCategoricalBOCPD",
+    "latent_structure": (
+        "exact online run-length posterior with constant hazard and per-run-length "
+        "Dirichlet categorical sufficient statistics"
+    ),
+    "backends": ["builtin"],
+    "tasks": ["online_changepoint"],
+    "priority": "p0",
+    "supports_exogenous": False,
+    "hierarchical": False,
+    "dynamic": True,
+    "experimental": True,
+    "notes": "PPL-02 M06; pruned BOCPD monitor with RETRAIN_RECOMMENDED events",
+}
 _PPL02_ROWS = (
     _PPL02_CONDITIONAL_BERNOULLI_ROW,
     _PPL02_DGLM_ROW,
     _PPL02_COPULA_ROW,
+    _PPL02_BOCPD_ROW,
 )
 
 _ALLOWED_ROLES = {"control", "baseline", "candidate", "research", "meta"}

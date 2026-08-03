@@ -112,15 +112,11 @@ class BOCPDDirichletCategoricalState:
         if draws < 1:
             raise ValueError("draws must be positive")
         rng = np.random.default_rng(self.seed if seed is None else seed)
-        components = rng.choice(
-            len(self.run_lengths), size=draws, p=self.run_length_posterior
-        )
+        components = rng.choice(len(self.run_lengths), size=draws, p=self.run_length_posterior)
         output = np.empty((draws, self.positions, self.classes), dtype=np.float64)
         for draw, component in enumerate(components):
             for position in range(self.positions):
-                output[draw, position] = rng.dirichlet(
-                    self.dirichlet_alpha[component, position]
-                )
+                output[draw, position] = rng.dirichlet(self.dirichlet_alpha[component, position])
         return output
 
     @property
@@ -206,9 +202,7 @@ class BOCPDDirichletCategoricalState:
                 current_step=int(metadata["current_step"]),
                 evidence_count=int(metadata["evidence_count"]),
                 one_step_probabilities=arrays["one_step_probabilities"].astype(np.float64),
-                changepoint_probabilities=arrays["changepoint_probabilities"].astype(
-                    np.float64
-                ),
+                changepoint_probabilities=arrays["changepoint_probabilities"].astype(np.float64),
                 map_run_length_history=arrays["map_run_length_history"].astype(np.int64),
                 pruned_mass_history=arrays["pruned_mass_history"].astype(np.float64),
                 data_quality_pass=arrays["data_quality_pass"].astype(bool),
@@ -387,9 +381,7 @@ def fit_bocpd_dirichlet_categorical(
             ),
             axis=0,
         )
-        candidate_run_lengths = np.concatenate(
-            (np.array([0], dtype=np.int64), run_lengths + 1)
-        )
+        candidate_run_lengths = np.concatenate((np.array([0], dtype=np.int64), run_lengths + 1))
 
         within_cap = candidate_run_lengths <= state.max_run_length
         above_mass = candidate_posterior >= state.posterior_mass_prune
@@ -414,9 +406,7 @@ def fit_bocpd_dirichlet_categorical(
         map_history.append(int(run_lengths[int(np.argmax(posterior))]))
         pruned_history.append(discarded_mass)
 
-        cooldown_ok = (
-            last_alert_step is None or step - last_alert_step >= state.cooldown
-        )
+        cooldown_ok = last_alert_step is None or step - last_alert_step >= state.cooldown
         if (
             changepoint_probability >= state.alert_threshold
             and evidence_count >= state.minimum_evidence_count
