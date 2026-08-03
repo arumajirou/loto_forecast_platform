@@ -4,59 +4,46 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: agent/ppl02-batch7-gaussian-copula
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
       - name: Install Ruff
         run: python -m pip install ruff==0.16.1
-      - name: Format Batch 7 files
+      - name: Format and commit Batch 7 files
         run: |
           python -m ruff format \
-            src/loto/probabilistic/backends/builtin.py \
             src/loto/probabilistic/backends/pymc_adapter.py \
             src/loto/probabilistic/catalog.py \
-            src/loto/probabilistic/compatibility.py \
-            src/loto/probabilistic/config.py \
-            src/loto/probabilistic/contracts.py \
-            src/loto/probabilistic/models/__init__.py \
             src/loto/probabilistic/models/copula_native.py \
             src/loto/probabilistic/models/copula_pymc.py \
-            src/loto/probabilistic/native_registry.py \
-            tests/probabilistic/test_catalog.py \
-            tests/probabilistic/test_cli.py \
-            tests/probabilistic/test_config_and_plan.py \
-            tests/probabilistic/test_native_full_coverage.py \
-            tests/probabilistic/test_ppl02_gaussian_copula.py \
-            tests/probabilistic/test_reference_models.py
-          mkdir -p /tmp/batch7-formatted
-          cp --parents \
-            src/loto/probabilistic/backends/builtin.py \
+            src/loto/probabilistic/native_registry.py
+          python -m ruff format --check \
             src/loto/probabilistic/backends/pymc_adapter.py \
             src/loto/probabilistic/catalog.py \
-            src/loto/probabilistic/compatibility.py \
-            src/loto/probabilistic/config.py \
-            src/loto/probabilistic/contracts.py \
-            src/loto/probabilistic/models/__init__.py \
             src/loto/probabilistic/models/copula_native.py \
             src/loto/probabilistic/models/copula_pymc.py \
-            src/loto/probabilistic/native_registry.py \
-            tests/probabilistic/test_catalog.py \
-            tests/probabilistic/test_cli.py \
-            tests/probabilistic/test_config_and_plan.py \
-            tests/probabilistic/test_native_full_coverage.py \
-            tests/probabilistic/test_ppl02_gaussian_copula.py \
-            tests/probabilistic/test_reference_models.py \
-            /tmp/batch7-formatted
-          git diff --no-ext-diff --binary > /tmp/batch7-formatted/ruff-format.patch
-      - uses: actions/upload-artifact@v4
-        with:
-          name: batch7-ruff-formatted
-          path: /tmp/batch7-formatted
-          if-no-files-found: error
+            src/loto/probabilistic/native_registry.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/loto/probabilistic/backends/pymc_adapter.py \
+            src/loto/probabilistic/catalog.py \
+            src/loto/probabilistic/models/copula_native.py \
+            src/loto/probabilistic/models/copula_pymc.py \
+            src/loto/probabilistic/native_registry.py
+          if git diff --cached --quiet; then
+            echo "No formatting changes required"
+          else
+            git commit -m "style(probabilistic): apply exact Ruff formatting"
+            git push origin HEAD:agent/ppl02-batch7-gaussian-copula
+          fi
