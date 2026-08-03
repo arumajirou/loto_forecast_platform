@@ -65,6 +65,13 @@ def execution_fingerprint(
             "subset_prior_scale": run_config.subset_prior_scale,
             "subset_initial_pseudocount": run_config.subset_initial_pseudocount,
             "subset_laplace_ridge": run_config.subset_laplace_ridge,
+            "dglm_discount_factor": run_config.dglm_discount_factor,
+            "dglm_prior_variance": run_config.dglm_prior_variance,
+            "dglm_observation_jitter": run_config.dglm_observation_jitter,
+            "dglm_covariance_floor": run_config.dglm_covariance_floor,
+            "dglm_max_state_variance": run_config.dglm_max_state_variance,
+            "dglm_include_trend": run_config.dglm_include_trend,
+            "dglm_seasonal_periods": run_config.dglm_seasonal_periods,
         }
     )
     inference_profile_hash = stable_hash(
