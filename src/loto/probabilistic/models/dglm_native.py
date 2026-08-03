@@ -51,9 +51,7 @@ def _update_one(
     posterior_precision = 0.5 * (posterior_precision + posterior_precision.T)
     condition = float(np.linalg.cond(posterior_precision))
     if not np.isfinite(condition) or condition > 1e14:
-        raise ValueError(
-            "DGLM_FILTER_DIVERGED: posterior precision is singular or ill-conditioned"
-        )
+        raise ValueError("DGLM_FILTER_DIVERGED: posterior precision is singular or ill-conditioned")
     updated_covariance = np.linalg.inv(posterior_precision)
     score = jacobian.T @ (response - non_reference)
     updated_mean = mean + updated_covariance @ score
