@@ -54,6 +54,25 @@ _PPL02_CONDITIONAL_BERNOULLI_ROW: dict[str, Any] = {
     "experimental": True,
     "notes": "PPL-02 M01; exact O(Kk) normalizer and backward-DP sampler",
 }
+_PPL02_DGLM_ROW: dict[str, Any] = {
+    "model_id": "pp-multinomial-dglm",
+    "family": "state_space",
+    "role": "candidate",
+    "likelihood": "MultinomialLogit",
+    "latent_structure": (
+        "reference-category dynamic generalized linear model with discount evolution "
+        "and sequential Laplace/EKF updates"
+    ),
+    "backends": ["builtin"],
+    "tasks": ["dynamic_multinomial"],
+    "priority": "p0",
+    "supports_exogenous": True,
+    "hierarchical": False,
+    "dynamic": True,
+    "experimental": True,
+    "notes": "PPL-02 M04; predict-before-update dynamic multinomial filter",
+}
+_PPL02_ROWS = (_PPL02_CONDITIONAL_BERNOULLI_ROW, _PPL02_DGLM_ROW)
 
 _ALLOWED_ROLES = {"control", "baseline", "candidate", "research", "meta"}
 _ALLOWED_PRIORITIES = {"p0", "p1", "p2"}
@@ -146,12 +165,12 @@ def load_probabilistic_catalog(
     rows = payload.get("models")
     if not isinstance(rows, list):
         raise ValueError(f"{source}: models must be a list")
-    if not any(
-        isinstance(row, dict)
-        and row.get("model_id") == _PPL02_CONDITIONAL_BERNOULLI_ROW["model_id"]
-        for row in rows
-    ):
-        rows = [*rows, dict(_PPL02_CONDITIONAL_BERNOULLI_ROW)]
+    for ppl02_row in _PPL02_ROWS:
+        if not any(
+            isinstance(row, dict) and row.get("model_id") == ppl02_row["model_id"]
+            for row in rows
+        ):
+            rows = [*rows, dict(ppl02_row)]
     from loto.probabilistic.native_registry import get_native_implementation
 
     specs: list[ProbabilisticModelSpec] = []
