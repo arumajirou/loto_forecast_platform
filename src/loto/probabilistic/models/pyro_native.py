@@ -21,7 +21,7 @@ PYRO_NATIVE_MODEL_IDS = frozenset(
     }
 )
 
-from loto.probabilistic.models.native_common import bounded_training_data
+from loto.probabilistic.models.native_common import bounded_training_data  # noqa: E402
 
 
 @dataclass(frozen=True)
@@ -100,7 +100,6 @@ def _tcn_model(y: Any, classes: int, positions: int) -> None:
     import torch.nn.functional as F
 
     x, _ = _base_inputs(torch, y, classes, positions)
-    n = y.shape[0]
     channels = 8
     # One sequence per position: (positions, input_channels, time)
     sequence = x.permute(1, 2, 0)

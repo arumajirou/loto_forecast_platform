@@ -193,7 +193,8 @@ def render_dashboard(progress: dict[str, Any], width: int = 36) -> str:
         f"PPL01 {progress.get('status', 'UNKNOWN')}  {progress.get('timestamp', '')}",
         f"{progress_bar(percent, width)} {percent:6.2f}%  {completed}/{total}",
         (
-            f"PASS={counts.get('PASS', 0)}  NON-PASS={max(completed - int(counts.get('PASS', 0)), 0)}  "
+            f"PASS={counts.get('PASS', 0)}  "
+            f"NON-PASS={max(completed - int(counts.get('PASS', 0)), 0)}  "
             f"残り={max(total - completed, 0)}"
         ),
         (

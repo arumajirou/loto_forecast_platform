@@ -61,7 +61,7 @@ class PyMCBartBackend(ProbabilisticBackend):
         profile_id = inference_profile_id or spec.primary_profile or "pymc-nuts"
         profile = get_inference_profile(profile_id)
         settings = profile_settings(config, profile)
-        with pm.Model() as model:
+        with pm.Model():
             X_data = pm.Data("X", X_train)
             mu = pmb.BART("mu", X_data, target, m=32)
             sigma = pm.HalfNormal("sigma", sigma=1.5)

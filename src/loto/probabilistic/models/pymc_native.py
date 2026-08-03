@@ -56,7 +56,7 @@ PYMC_NATIVE_MODEL_IDS = frozenset(
     }
 )
 
-from loto.probabilistic.models.native_common import (
+from loto.probabilistic.models.native_common import (  # noqa: E402
     base_probability_bank,
     bounded_training_data,
     categorical_design,

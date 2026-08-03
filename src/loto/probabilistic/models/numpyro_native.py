@@ -17,7 +17,7 @@ NUMPYRO_NATIVE_MODEL_IDS = frozenset(
     }
 )
 
-from loto.probabilistic.models.native_common import bounded_training_data, categorical_design
+from loto.probabilistic.models.native_common import bounded_training_data, categorical_design  # noqa: E402
 
 
 @dataclass(frozen=True)
