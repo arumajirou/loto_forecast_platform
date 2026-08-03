@@ -43,9 +43,7 @@ def main() -> int:
     manager = NotificationManager(NotificationSettings.from_config(config), log_path)
     success = True
     if args.speech:
-        ok, detail = manager.test_speech_sync(
-            "ロト確率モデルの日本語音声通知テストです。"
-        )
+        ok, detail = manager.test_speech_sync("ロト確率モデルの日本語音声通知テストです。")
         print(f"SPEECH_STATUS={'PASS' if ok else 'FAIL'}")
         print(f"SPEECH_DETAIL={detail}")
         success &= ok

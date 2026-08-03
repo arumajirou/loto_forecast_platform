@@ -69,9 +69,7 @@ def main() -> int:
 
     while True:
         progress_path = (
-            explicit / "report" / "progress.json"
-            if explicit is not None
-            else discover(output_root)  # type: ignore[arg-type]
+            explicit / "report" / "progress.json" if explicit is not None else discover(output_root)  # type: ignore[arg-type]
         )
         if progress_path is None or not progress_path.is_file():
             if not process_alive(args.runner_pid) and time.monotonic() - missing_since > 3:
