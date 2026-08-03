@@ -79,7 +79,7 @@ def load_spaces():
 def test_every_model_builds_optuna_config():
     data = load_spaces()
 
-    for model, spec in data["models"].items():
+    for _model, spec in data["models"].items():
         trial = RecordingTrial()
 
         config = build_optuna_config(
@@ -97,7 +97,7 @@ def test_every_model_builds_optuna_config():
 def test_every_model_builds_ray_space():
     data = load_spaces()
 
-    for model, spec in data["models"].items():
+    for _model, spec in data["models"].items():
         space = build_ray_space(spec["parameters"])
 
         assert space

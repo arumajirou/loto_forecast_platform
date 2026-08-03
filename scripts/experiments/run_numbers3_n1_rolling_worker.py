@@ -336,9 +336,9 @@ def main() -> None:
 
     detail = pd.DataFrame(rows)
 
-    detail_path = (
-        OUTPUT_DIR
-        / f"numbers3_n1_{MODEL_NAME.lower()}_shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_detail.parquet"
+    detail_path = OUTPUT_DIR / (
+        f"numbers3_n1_{MODEL_NAME.lower()}_"
+        f"shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_detail.parquet"
     )
 
     detail.to_parquet(
@@ -417,9 +417,8 @@ def main() -> None:
 
     summary["beats_exact_baseline"] = summary["exact_rate"] > 0.17
 
-    summary_path = (
-        OUTPUT_DIR
-        / f"numbers3_n1_{MODEL_NAME.lower()}_shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_summary.csv"
+    summary_path = OUTPUT_DIR / (
+        f"numbers3_n1_{MODEL_NAME.lower()}_shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_summary.csv"
     )
 
     summary.to_csv(
@@ -427,9 +426,9 @@ def main() -> None:
         index=False,
     )
 
-    json_path = (
-        OUTPUT_DIR
-        / f"numbers3_n1_{MODEL_NAME.lower()}_shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_summary.json"
+    json_path = OUTPUT_DIR / (
+        f"numbers3_n1_{MODEL_NAME.lower()}_"
+        f"shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_summary.json"
     )
 
     json_path.write_text(

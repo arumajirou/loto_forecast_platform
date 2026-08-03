@@ -293,8 +293,6 @@ def main() -> int:
 
             del running[model]
 
-        reserved_running = sum(job.spec.budget_mib for job in running.values())
-
         # 空きVRAMとworker上限の両方を満たす限り投入。
         launched = True
 
