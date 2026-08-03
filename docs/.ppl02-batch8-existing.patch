@@ -1,0 +1,332 @@
+diff --git a/src/loto/probabilistic/contracts.py b/src/loto/probabilistic/contracts.py
+--- a/src/loto/probabilistic/contracts.py
++++ b/src/loto/probabilistic/contracts.py
+@@ -198,6 +198,15 @@
+     copula_threshold_epsilon: float = Field(default=1e-6, gt=0.0, lt=0.5)
+     copula_correlation_shrinkage: float = Field(default=0.05, ge=0.0, le=1.0)
+     copula_correlation_floor: float = Field(default=1e-8, gt=0.0, le=1.0)
++    bocpd_hazard_type: Literal["constant"] = "constant"
++    bocpd_expected_run_length: float = Field(default=200.0, gt=1.0, le=1e9)
++    bocpd_max_run_length: int = Field(default=512, ge=1, le=100000)
++    bocpd_posterior_mass_prune: float = Field(default=1e-8, ge=0.0, lt=1.0)
++    bocpd_prior_concentration: float = Field(default=0.5, gt=0.0, le=1e6)
++    bocpd_alert_threshold: float = Field(default=0.5, ge=0.0, le=1.0)
++    bocpd_min_evidence_count: int = Field(default=20, ge=1, le=1000000)
++    bocpd_cooldown: int = Field(default=20, ge=0, le=1000000)
++    bocpd_min_observed_fraction: float = Field(default=1.0, gt=0.0, le=1.0)
+     utility_lambda_mse: float = Field(default=0.02, ge=0.0)
+     dry_run: bool = False
+     save_posterior_draws: bool = False
+diff --git a/src/loto/probabilistic/config.py b/src/loto/probabilistic/config.py
+--- a/src/loto/probabilistic/config.py
++++ b/src/loto/probabilistic/config.py
+@@ -78,6 +78,15 @@
+             "copula_threshold_epsilon": run_config.copula_threshold_epsilon,
+             "copula_correlation_shrinkage": run_config.copula_correlation_shrinkage,
+             "copula_correlation_floor": run_config.copula_correlation_floor,
++            "bocpd_hazard_type": run_config.bocpd_hazard_type,
++            "bocpd_expected_run_length": run_config.bocpd_expected_run_length,
++            "bocpd_max_run_length": run_config.bocpd_max_run_length,
++            "bocpd_posterior_mass_prune": run_config.bocpd_posterior_mass_prune,
++            "bocpd_prior_concentration": run_config.bocpd_prior_concentration,
++            "bocpd_alert_threshold": run_config.bocpd_alert_threshold,
++            "bocpd_min_evidence_count": run_config.bocpd_min_evidence_count,
++            "bocpd_cooldown": run_config.bocpd_cooldown,
++            "bocpd_min_observed_fraction": run_config.bocpd_min_observed_fraction,
+         }
+     )
+     inference_profile_hash = stable_hash(
+diff --git a/src/loto/probabilistic/catalog.py b/src/loto/probabilistic/catalog.py
+--- a/src/loto/probabilistic/catalog.py
++++ b/src/loto/probabilistic/catalog.py
+@@ -91,10 +91,29 @@
+     "experimental": True,
+     "notes": "PPL-02 M05; Numbers3/4 static Gaussian copula with fixed margins",
+ }
++_PPL02_BOCPD_ROW: dict[str, Any] = {
++    "model_id": "pp-bocpd-dirichlet-categorical",
++    "family": "changepoint",
++    "role": "candidate",
++    "likelihood": "DirichletCategoricalBOCPD",
++    "latent_structure": (
++        "exact online run-length posterior with constant hazard and per-run-length "
++        "Dirichlet categorical sufficient statistics"
++    ),
++    "backends": ["builtin"],
++    "tasks": ["online_changepoint"],
++    "priority": "p0",
++    "supports_exogenous": False,
++    "hierarchical": False,
++    "dynamic": True,
++    "experimental": True,
++    "notes": "PPL-02 M06; pruned BOCPD monitor with RETRAIN_RECOMMENDED events",
++}
+ _PPL02_ROWS = (
+     _PPL02_CONDITIONAL_BERNOULLI_ROW,
+     _PPL02_DGLM_ROW,
+     _PPL02_COPULA_ROW,
++    _PPL02_BOCPD_ROW,
+ )
+ 
+ _ALLOWED_ROLES = {"control", "baseline", "candidate", "research", "meta"}
+diff --git a/src/loto/probabilistic/native_registry.py b/src/loto/probabilistic/native_registry.py
+--- a/src/loto/probabilistic/native_registry.py
++++ b/src/loto/probabilistic/native_registry.py
+@@ -81,6 +81,15 @@
+             graph_id="gaussian_copula_categorical_v1",
+             runtime_tier="standard",
+         ),
++        NativeImplementation(
++            model_id="pp-bocpd-dirichlet-categorical",
++            primary_backend="builtin",
++            primary_profile=None,
++            implementation_kind="exact_online_message_passing",
++            module="loto.probabilistic.models.bocpd_native",
++            graph_id="bocpd_dirichlet_categorical_v1",
++            runtime_tier="standard",
++        ),
+     )
+     for implementation in ppl02_implementations:
+         if implementation.model_id not in seen:
+diff --git a/src/loto/probabilistic/backends/builtin.py b/src/loto/probabilistic/backends/builtin.py
+--- a/src/loto/probabilistic/backends/builtin.py
++++ b/src/loto/probabilistic/backends/builtin.py
+@@ -5,6 +5,8 @@
+ import numpy as np
+ 
+ from loto.probabilistic.backends.base import ProbabilisticBackend
++from loto.probabilistic.models.bocpd_native import MODEL_ID as BOCPD_MODEL_ID
++from loto.probabilistic.models.bocpd_native import fit_bocpd_dirichlet_categorical
+ from loto.probabilistic.models.copula_native import MODEL_ID as COPULA_MODEL_ID
+ from loto.probabilistic.models.copula_native import fit_gaussian_copula_categorical
+ from loto.probabilistic.models.dglm_native import MODEL_ID as DGLM_MODEL_ID
+@@ -31,6 +33,63 @@
+         seed: int,
+         inference_profile_id: str | None = None,
+     ) -> NativePosterior:
++        if spec.model_id == BOCPD_MODEL_ID:
++            state = fit_bocpd_dirichlet_categorical(
++                y,
++                game=geometry.key,
++                classes=classes,
++                config=config,
++                seed=seed,
++            )
++            draw_count = (
++                config.native_draws
++                if config.backend_policy == "primary_native"
++                else config.posterior_draws
++            )
++            draws = state.probability_draws(draw_count, seed=seed)
++            return NativePosterior(
++                model_id=spec.model_id,
++                backend=self.backend_id,
++                family=spec.family,
++                target_mode=target_mode,
++                game=geometry.key,
++                probability_draws=draws,
++                metadata={
++                    **state.to_metadata_dict(),
++                    "native_graph_id": spec.native_graph_id,
++                    "implementation_kind": "exact_online_message_passing",
++                    "native_analytic": True,
++                    "inference_profile_id": inference_profile_id,
++                    "alert_events": list(state.alert_events),
++                    "automatic_retraining": False,
++                },
++                diagnostics={
++                    "posterior_finite": bool(np.isfinite(draws).all()),
++                    "probability_simplex_valid": bool(
++                        np.allclose(draws.sum(axis=-1), 1.0, atol=1e-7)
++                    ),
++                    "run_length_posterior_valid": bool(
++                        np.isfinite(state.run_length_posterior).all()
++                        and np.isclose(state.run_length_posterior.sum(), 1.0)
++                    ),
++                    "current_changepoint_probability": (
++                        state.current_changepoint_probability
++                    ),
++                    "map_run_length": state.map_run_length,
++                    "active_run_lengths": int(len(state.run_lengths)),
++                    "cumulative_pruned_mass": state.cumulative_pruned_mass,
++                    "alert_count": len(state.alert_events),
++                    "data_quality_pass_rate": float(state.data_quality_pass.mean()),
++                    "rhat_max": None,
++                    "ess_bulk_min": None,
++                    "ess_tail_min": None,
++                    "divergences": None,
++                    "elbo_finite": None,
++                    "elbo_stable": None,
++                },
++                native_payload=state,
++            )
++
+         if spec.model_id == COPULA_MODEL_ID:
+             state = fit_gaussian_copula_categorical(
+                 y,
+diff --git a/src/loto/probabilistic/models/__init__.py b/src/loto/probabilistic/models/__init__.py
+--- a/src/loto/probabilistic/models/__init__.py
++++ b/src/loto/probabilistic/models/__init__.py
+@@ -1,5 +1,9 @@
+ """Probabilistic model implementations and legacy reference helpers."""
+ 
++from loto.probabilistic.models.bocpd_native import (
++    BOCPDDirichletCategoricalState,
++    fit_bocpd_dirichlet_categorical,
++)
+ from loto.probabilistic.models.copula_native import (
+     GaussianCopulaCategoricalState,
+     fit_gaussian_copula_categorical,
+@@ -12,10 +16,12 @@
+ )
+ 
+ __all__ = [
++    "BOCPDDirichletCategoricalState",
+     "ConditionalBernoulliPosterior",
+     "GaussianCopulaCategoricalState",
+     "MultinomialDGLMState",
+     "ReferencePosterior",
++    "fit_bocpd_dirichlet_categorical",
+     "fit_conditional_bernoulli_map",
+     "fit_gaussian_copula_categorical",
+     "fit_multinomial_dglm",
+diff --git a/tests/probabilistic/test_native_full_coverage.py b/tests/probabilistic/test_native_full_coverage.py
+--- a/tests/probabilistic/test_native_full_coverage.py
++++ b/tests/probabilistic/test_native_full_coverage.py
+@@ -12,8 +12,8 @@
+ def test_all_models_have_one_primary_native_path() -> None:
+     implementations = list_native_implementations()
+     specs = {spec.model_id: spec for spec in list_probabilistic_model_specs()}
+-    assert len(implementations) == 75
+-    assert len({item.model_id for item in implementations}) == 75
++    assert len(implementations) == 76
++    assert len({item.model_id for item in implementations}) == 76
+     assert set(specs) == {item.model_id for item in implementations}
+     for item in implementations:
+         spec = specs[item.model_id]
+@@ -34,6 +34,7 @@
+         "builtin": {
+             "pp-conditional-bernoulli-fixed-k",
+             "pp-multinomial-dglm",
++            "pp-bocpd-dirichlet-categorical",
+             "pp-uniform-dirichlet",
+             "pp-static-dirichlet-categorical",
+             "pp-expanding-dirichlet-categorical",
+@@ -48,13 +49,13 @@
+     for item in implementations:
+         actual.setdefault(item.primary_backend, set()).add(item.model_id)
+     assert actual == expected
+-    assert sum(map(len, actual.values())) == 75
++    assert sum(map(len, actual.values())) == 76
+ 
+ 
+ def test_native_full_plan_never_silently_adds_builtin() -> None:
+     config = load_run_config("configs/probabilistic/native_smoke.yaml")
+     trials = build_plan(config)
+-    assert len(trials) == 75
++    assert len(trials) == 76
+     implementation = {item.model_id: item for item in list_native_implementations()}
+     for trial in trials:
+         assert trial.backend == implementation[trial.model_id].primary_backend
+@@ -63,11 +64,11 @@
+ 
+ def test_native_coverage_counts() -> None:
+     coverage = native_coverage()
+-    assert coverage["models"] == 75
++    assert coverage["models"] == 76
+     assert coverage["all_primary_paths_declared"] is True
+     assert coverage["by_primary_backend"] == {
+         "arviz": 1,
+-        "builtin": 10,
++        "builtin": 11,
+         "numpyro": 6,
+         "pymc": 47,
+         "pymc_bart": 1,
+diff --git a/tests/probabilistic/test_reference_models.py b/tests/probabilistic/test_reference_models.py
+--- a/tests/probabilistic/test_reference_models.py
++++ b/tests/probabilistic/test_reference_models.py
+@@ -45,4 +45,4 @@
+         assert np.isfinite(draws).all()
+         assert np.allclose(draws.sum(axis=-1), 1.0)
+         fitted += 1
+-    assert fitted == 75
++    assert fitted == 76
+diff --git a/tests/probabilistic/test_catalog.py b/tests/probabilistic/test_catalog.py
+--- a/tests/probabilistic/test_catalog.py
++++ b/tests/probabilistic/test_catalog.py
+@@ -14,19 +14,19 @@
+ def test_catalog_has_all_designed_entries() -> None:
+     models = list_probabilistic_model_specs()
+     profiles = list_inference_profiles()
+-    assert len(models) == 75
++    assert len(models) == 76
+     assert len(profiles) == 29
+-    assert len({item.model_id for item in models}) == 75
++    assert len({item.model_id for item in models}) == 76
+     assert len({item.profile_id for item in profiles}) == 29
+     assert all(item.implementation_status == "IMPLEMENTED" for item in models)
+ 
+ 
+ def test_unified_catalog_is_computed_not_hard_coded() -> None:
+     counts = unified_catalog_counts()
+-    assert counts == {"existing": 174, "probabilistic": 75, "total": 249}
++    assert counts == {"existing": 174, "probabilistic": 76, "total": 250}
+     rows = build_unified_catalog_rows()
+     assert len({row["model_id"] for row in rows}) == len(rows)
+-    assert catalog_counts()["probabilistic_models"] == 75
++    assert catalog_counts()["probabilistic_models"] == 76
+ 
+ 
+ def test_ppl01_model_ids_remain_byte_for_byte_stable() -> None:
+@@ -35,6 +35,7 @@
+         "pp-conditional-bernoulli-fixed-k",
+         "pp-multinomial-dglm",
+         "pp-gaussian-copula-categorical",
++        "pp-bocpd-dirichlet-categorical",
+     }
+     ppl01_ids = [item for item in model_ids if item not in ppl02_ids]
+     ordered = ("\n".join(ppl01_ids) + "\n").encode()
+diff --git a/tests/probabilistic/test_cli.py b/tests/probabilistic/test_cli.py
+--- a/tests/probabilistic/test_cli.py
++++ b/tests/probabilistic/test_cli.py
+@@ -8,17 +8,17 @@
+ def test_cli_catalog_and_plan(capsys) -> None:
+     assert main(["probabilistic", "catalog-list"]) == 0
+     payload = json.loads(capsys.readouterr().out)
+-    assert payload["counts"]["probabilistic_models"] == 75
+-    assert len(payload["models"]) == 75
++    assert payload["counts"]["probabilistic_models"] == 76
++    assert len(payload["models"]) == 76
+ 
+     assert main(["probabilistic", "plan", "--config", "configs/probabilistic/smoke.yaml"]) == 0
+     plan = json.loads(capsys.readouterr().out)
+-    assert plan["trials_allowed"] == 75
++    assert plan["trials_allowed"] == 76
+ 
+ 
+ def test_cli_native_coverage(capsys) -> None:
+     assert main(["probabilistic", "native-coverage"]) == 0
+     payload = json.loads(capsys.readouterr().out)
+-    assert payload["coverage"]["models"] == 75
++    assert payload["coverage"]["models"] == 76
+     assert payload["coverage"]["all_primary_paths_declared"] is True
+-    assert len(payload["implementations"]) == 75
++    assert len(payload["implementations"]) == 76
+diff --git a/tests/probabilistic/test_config_and_plan.py b/tests/probabilistic/test_config_and_plan.py
+--- a/tests/probabilistic/test_config_and_plan.py
++++ b/tests/probabilistic/test_config_and_plan.py
+@@ -9,11 +9,11 @@
+ def test_smoke_plan_has_one_runnable_reference_trial_per_model() -> None:
+     config = load_run_config(Path("configs/probabilistic/smoke.yaml"))
+     plan = build_plan(config)
+-    assert len(plan) == 75
++    assert len(plan) == 76
+     assert all(item.allowed for item in plan)
+     assert {item.backend for item in plan} == {"builtin"}
+-    assert len({item.model_id for item in plan}) == 75
+-    assert plan_summary(config)["trials_allowed"] == 75
++    assert len({item.model_id for item in plan}) == 76
++    assert plan_summary(config)["trials_allowed"] == 76
+ 
+ 
+ def test_hash_is_order_stable() -> None:
