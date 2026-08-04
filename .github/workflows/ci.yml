@@ -36,7 +36,7 @@ jobs:
 
       - name: Install project and test dependencies
         run: |
-          python -m pip install             --no-cache-dir             -e ".[api,dev]"
+          python -m pip install             --no-cache-dir             -e ".[api,dev,postgres]"
 
       - name: Show disk usage after install
         run: df -h

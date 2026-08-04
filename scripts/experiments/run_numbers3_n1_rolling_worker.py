@@ -5,8 +5,9 @@ import json
 import os
 import time
 import traceback
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -14,14 +15,13 @@ import torch
 from neuralforecast import NeuralForecast
 from neuralforecast.losses.pytorch import MAE
 from neuralforecast.models import (
-    Informer,
     KAN,
     MLP,
-    NLinear,
     TCN,
+    Informer,
+    NLinear,
     TimesNet,
 )
-
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -336,9 +336,9 @@ def main() -> None:
 
     detail = pd.DataFrame(rows)
 
-    detail_path = (
-        OUTPUT_DIR
-        / f"numbers3_n1_{MODEL_NAME.lower()}_shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_detail.parquet"
+    detail_path = OUTPUT_DIR / (
+        f"numbers3_n1_{MODEL_NAME.lower()}_"
+        f"shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_detail.parquet"
     )
 
     detail.to_parquet(
@@ -417,9 +417,8 @@ def main() -> None:
 
     summary["beats_exact_baseline"] = summary["exact_rate"] > 0.17
 
-    summary_path = (
-        OUTPUT_DIR
-        / f"numbers3_n1_{MODEL_NAME.lower()}_shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_summary.csv"
+    summary_path = OUTPUT_DIR / (
+        f"numbers3_n1_{MODEL_NAME.lower()}_shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_summary.csv"
     )
 
     summary.to_csv(
@@ -427,9 +426,9 @@ def main() -> None:
         index=False,
     )
 
-    json_path = (
-        OUTPUT_DIR
-        / f"numbers3_n1_{MODEL_NAME.lower()}_shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_summary.json"
+    json_path = OUTPUT_DIR / (
+        f"numbers3_n1_{MODEL_NAME.lower()}_"
+        f"shard_{SHARD_INDEX:02d}_of_{SHARD_COUNT:02d}_summary.json"
     )
 
     json_path.write_text(

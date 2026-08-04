@@ -4,8 +4,9 @@ import gc
 import json
 import time
 import traceback
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -13,14 +14,13 @@ import torch
 from neuralforecast import NeuralForecast
 from neuralforecast.losses.pytorch import MAE
 from neuralforecast.models import (
-    DLinear,
     MLP,
     NBEATS,
     NHITS,
+    DLinear,
     NLinear,
     PatchTST,
 )
-
 
 ROOT = Path(__file__).resolve().parents[2]
 

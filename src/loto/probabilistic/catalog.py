@@ -21,10 +21,12 @@ _ALLOWED_FAMILIES = {
     "changepoint",
     "conjugate",
     "count",
+    "copula",
     "decision",
     "deep_probabilistic",
     "dynamic_conjugate",
     "empirical_bayes",
+    "fixed_subset",
     "ensemble",
     "gaussian_process",
     "hierarchical",
@@ -36,6 +38,84 @@ _ALLOWED_FAMILIES = {
     "state_space",
     "tree_bayesian",
 }
+_PPL02_CONDITIONAL_BERNOULLI_ROW: dict[str, Any] = {
+    "model_id": "pp-conditional-bernoulli-fixed-k",
+    "family": "fixed_subset",
+    "role": "candidate",
+    "likelihood": "ConditionalBernoulliFixedK",
+    "latent_structure": (
+        "candidate log-weights with an exact fixed-cardinality normalizer and MAP/Laplace posterior"
+    ),
+    "backends": ["builtin"],
+    "tasks": ["fixed_cardinality_subset"],
+    "priority": "p0",
+    "supports_exogenous": False,
+    "hierarchical": False,
+    "dynamic": False,
+    "experimental": True,
+    "notes": "PPL-02 M01; exact O(Kk) normalizer and backward-DP sampler",
+}
+_PPL02_DGLM_ROW: dict[str, Any] = {
+    "model_id": "pp-multinomial-dglm",
+    "family": "state_space",
+    "role": "candidate",
+    "likelihood": "MultinomialLogit",
+    "latent_structure": (
+        "reference-category dynamic generalized linear model with discount evolution "
+        "and sequential Laplace/EKF updates"
+    ),
+    "backends": ["builtin"],
+    "tasks": ["dynamic_multinomial"],
+    "priority": "p0",
+    "supports_exogenous": True,
+    "hierarchical": False,
+    "dynamic": True,
+    "experimental": True,
+    "notes": "PPL-02 M04; predict-before-update dynamic multinomial filter",
+}
+_PPL02_COPULA_ROW: dict[str, Any] = {
+    "model_id": "pp-gaussian-copula-categorical",
+    "family": "copula",
+    "role": "candidate",
+    "likelihood": "LatentGaussianCopulaCategorical",
+    "latent_structure": (
+        "fold-fitted categorical margins with ordered Gaussian thresholds and an "
+        "LKJ-regularized latent correlation matrix"
+    ),
+    "backends": ["pymc"],
+    "tasks": ["joint_discrete_copula"],
+    "priority": "p0",
+    "supports_exogenous": False,
+    "hierarchical": False,
+    "dynamic": False,
+    "experimental": True,
+    "notes": "PPL-02 M05; Numbers3/4 static Gaussian copula with fixed margins",
+}
+_PPL02_BOCPD_ROW: dict[str, Any] = {
+    "model_id": "pp-bocpd-dirichlet-categorical",
+    "family": "changepoint",
+    "role": "candidate",
+    "likelihood": "DirichletCategoricalBOCPD",
+    "latent_structure": (
+        "exact online run-length posterior with constant hazard and per-run-length "
+        "Dirichlet categorical sufficient statistics"
+    ),
+    "backends": ["builtin"],
+    "tasks": ["online_changepoint"],
+    "priority": "p0",
+    "supports_exogenous": False,
+    "hierarchical": False,
+    "dynamic": True,
+    "experimental": True,
+    "notes": "PPL-02 M06; pruned BOCPD monitor with RETRAIN_RECOMMENDED events",
+}
+_PPL02_ROWS = (
+    _PPL02_CONDITIONAL_BERNOULLI_ROW,
+    _PPL02_DGLM_ROW,
+    _PPL02_COPULA_ROW,
+    _PPL02_BOCPD_ROW,
+)
+
 _ALLOWED_ROLES = {"control", "baseline", "candidate", "research", "meta"}
 _ALLOWED_PRIORITIES = {"p0", "p1", "p2"}
 
@@ -89,10 +169,13 @@ def _strategy_for(model_id: str, family: str) -> str:
         return "dirichlet"
     if family == "empirical_bayes":
         return "empirical_bayes"
+    if family == "fixed_subset":
+        return "fixed_cardinality_subset"
     if family == "hierarchical":
         return "hierarchical_pooling"
     if family in {
         "bayesian_regression",
+        "copula",
         "ordinal",
         "semi_parametric",
         "tree_bayesian",
@@ -125,6 +208,11 @@ def load_probabilistic_catalog(
     rows = payload.get("models")
     if not isinstance(rows, list):
         raise ValueError(f"{source}: models must be a list")
+    for ppl02_row in _PPL02_ROWS:
+        if not any(
+            isinstance(row, dict) and row.get("model_id") == ppl02_row["model_id"] for row in rows
+        ):
+            rows = [*rows, dict(ppl02_row)]
     from loto.probabilistic.native_registry import get_native_implementation
 
     specs: list[ProbabilisticModelSpec] = []
@@ -291,7 +379,7 @@ def catalog_counts() -> dict[str, Any]:
 
 
 def build_unified_catalog_rows() -> list[dict[str, Any]]:
-    """Return the existing 174 entries plus the 72 PPL entries without ID collision."""
+    """Return existing and probabilistic entries without any model-ID collision."""
     from loto.models.catalog_full import build_catalog
 
     existing = [entry.to_row() | {"catalog_source": "existing"} for entry in build_catalog()]

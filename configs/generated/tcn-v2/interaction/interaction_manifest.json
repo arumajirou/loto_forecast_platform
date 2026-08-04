@@ -1,0 +1,66 @@
+[
+  {
+    "design_id": "interaction-01-i128-srobust-lr0.0003",
+    "input_size": 128,
+    "scaler_type": "robust",
+    "learning_rate": 0.0003,
+    "config_path": "configs/generated/tcn-v2/interaction/interaction-01-i128-srobust-lr0.0003.yaml",
+    "expected_trials": 120
+  },
+  {
+    "design_id": "interaction-02-i128-srobust-lr0.001",
+    "input_size": 128,
+    "scaler_type": "robust",
+    "learning_rate": 0.001,
+    "config_path": "configs/generated/tcn-v2/interaction/interaction-02-i128-srobust-lr0.001.yaml",
+    "expected_trials": 120
+  },
+  {
+    "design_id": "interaction-03-i128-sstandard-lr0.0003",
+    "input_size": 128,
+    "scaler_type": "standard",
+    "learning_rate": 0.0003,
+    "config_path": "configs/generated/tcn-v2/interaction/interaction-03-i128-sstandard-lr0.0003.yaml",
+    "expected_trials": 120
+  },
+  {
+    "design_id": "interaction-04-i128-sstandard-lr0.001",
+    "input_size": 128,
+    "scaler_type": "standard",
+    "learning_rate": 0.001,
+    "config_path": "configs/generated/tcn-v2/interaction/interaction-04-i128-sstandard-lr0.001.yaml",
+    "expected_trials": 120
+  },
+  {
+    "design_id": "interaction-05-i256-srobust-lr0.0003",
+    "input_size": 256,
+    "scaler_type": "robust",
+    "learning_rate": 0.0003,
+    "config_path": "configs/generated/tcn-v2/interaction/interaction-05-i256-srobust-lr0.0003.yaml",
+    "expected_trials": 120
+  },
+  {
+    "design_id": "interaction-06-i256-srobust-lr0.001",
+    "input_size": 256,
+    "scaler_type": "robust",
+    "learning_rate": 0.001,
+    "config_path": "configs/generated/tcn-v2/interaction/interaction-06-i256-srobust-lr0.001.yaml",
+    "expected_trials": 120
+  },
+  {
+    "design_id": "interaction-07-i256-sstandard-lr0.0003",
+    "input_size": 256,
+    "scaler_type": "standard",
+    "learning_rate": 0.0003,
+    "config_path": "configs/generated/tcn-v2/interaction/interaction-07-i256-sstandard-lr0.0003.yaml",
+    "expected_trials": 120
+  },
+  {
+    "design_id": "interaction-08-i256-sstandard-lr0.001",
+    "input_size": 256,
+    "scaler_type": "standard",
+    "learning_rate": 0.001,
+    "config_path": "configs/generated/tcn-v2/interaction/interaction-08-i256-sstandard-lr0.001.yaml",
+    "expected_trials": 120
+  }
+]

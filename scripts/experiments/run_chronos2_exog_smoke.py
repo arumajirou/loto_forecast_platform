@@ -4,11 +4,9 @@ import hashlib
 import json
 import os
 import platform
-import subprocess
 import time
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import torch
 from autogluon.timeseries import (
@@ -17,8 +15,7 @@ from autogluon.timeseries import (
 )
 from sqlalchemy import create_engine
 
-
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path("/mnt/e/env/ts/loto_forecast_platform")
 RUN_ID = time.strftime("chronos2-exog-%Y%m%d-%H%M%S")
 OUT = ROOT / "artifacts" / "models" / RUN_ID
 OUT.mkdir(parents=True, exist_ok=False)
@@ -85,17 +82,10 @@ df["draw_index"] = df.groupby("item_id").cumcount()
 # AutoGluon requires a regular timestamp index.
 # Preserve actual calendar information in covariate columns.
 base_timestamp = pd.Timestamp("2000-01-01")
-df["timestamp"] = (
-    base_timestamp
-    + pd.to_timedelta(df["draw_index"], unit="D")
-)
+df["timestamp"] = base_timestamp + pd.to_timedelta(df["draw_index"], unit="D")
 
 df["days_since_previous_draw"] = (
-    df.groupby("item_id")["actual_date"]
-    .diff()
-    .dt.days
-    .fillna(0)
-    .astype(float)
+    df.groupby("item_id")["actual_date"].diff().dt.days.fillna(0).astype(float)
 )
 
 for column in [
@@ -205,18 +195,9 @@ pred_loaded = loaded.predict(
 before = pred.to_data_frame().select_dtypes("number")
 after = pred_loaded.to_data_frame().select_dtypes("number")
 
-max_abs_diff = float(
-    before.subtract(after)
-    .abs()
-    .to_numpy()
-    .max()
-)
+max_abs_diff = float(before.subtract(after).abs().to_numpy().max())
 
-model_files = sorted(
-    path
-    for path in predictor_path.rglob("*")
-    if path.is_file()
-)
+model_files = sorted(path for path in predictor_path.rglob("*") if path.is_file())
 
 hashes = {}
 for path in model_files:
@@ -288,8 +269,6 @@ print("RELOAD_MAX_ABS_DIFF=", max_abs_diff)
 print("GPU_INFO=", gpu_info)
 
 if max_abs_diff > 1e-5:
-    raise RuntimeError(
-        f"Reload prediction mismatch: {max_abs_diff}"
-    )
+    raise RuntimeError(f"Reload prediction mismatch: {max_abs_diff}")
 
 print("CHRONOS2_EXOG_SMOKE=PASS")

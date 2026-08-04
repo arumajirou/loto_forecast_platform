@@ -4,27 +4,27 @@ import gc
 import json
 import time
 import traceback
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 import pandas as pd
 import torch
 from neuralforecast import NeuralForecast
 from neuralforecast.losses.pytorch import (
-    DistributionLoss,
     MAE,
+    DistributionLoss,
 )
 from neuralforecast.models import (
+    KAN,
     Autoformer,
     DeepAR,
     DeepNPTS,
     FEDformer,
     Informer,
-    KAN,
     NBEATSx,
 )
-
 
 ROOT = Path(__file__).resolve().parents[2]
 
