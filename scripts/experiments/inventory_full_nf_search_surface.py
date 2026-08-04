@@ -7,8 +7,8 @@ from typing import Any
 
 import neuralforecast
 import neuralforecast.auto as auto_module
-import neuralforecast.models as model_module
 import neuralforecast.losses.pytorch as loss_module
+import neuralforecast.models as model_module
 from neuralforecast import NeuralForecast
 from neuralforecast.common import _base_auto
 

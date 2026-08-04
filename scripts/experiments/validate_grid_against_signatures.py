@@ -6,7 +6,6 @@ from pathlib import Path
 import yaml
 from neuralforecast import models
 
-
 CONFIG = Path("configs/loto7_full_grid_research.yaml")
 
 config = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))

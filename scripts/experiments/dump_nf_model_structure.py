@@ -6,7 +6,6 @@ from pathlib import Path
 
 from neuralforecast import NeuralForecast
 
-
 root = Path(sys.argv[1])
 output = {}
 

@@ -14,7 +14,6 @@ from neuralforecast.losses.pytorch import MAE
 from neuralforecast.models import TFT
 from sqlalchemy import create_engine
 
-
 ROOT = Path(__file__).resolve().parents[2]
 RUN_ID = time.strftime("tft-selected-exog-%Y%m%d-%H%M%S")
 OUT = ROOT / "artifacts" / "experiments" / RUN_ID

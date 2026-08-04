@@ -5,11 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-import yaml
-import neuralforecast.auto as auto_module
 import neuralforecast.models as model_module
-from neuralforecast.common._base_auto import BaseAuto
-
+import yaml
 
 CLASSIFICATION = Path(
     "artifacts/parameter_inventory/neuralforecast_auto_model_classification_v2.json"

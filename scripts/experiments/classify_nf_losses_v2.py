@@ -5,9 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-import torch.nn as nn
 import neuralforecast.losses.pytorch as losses
-
+import torch.nn as nn
 
 OUTPUT = Path("artifacts/parameter_inventory/neuralforecast_loss_classification_v2.json")
 

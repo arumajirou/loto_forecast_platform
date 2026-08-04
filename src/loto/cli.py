@@ -468,13 +468,12 @@ def main(argv=None):
             config_path = Path(args.model_config)
             text = config_path.read_text(encoding="utf-8")
             model_configs = (
-                json.loads(text)
-                if config_path.suffix.lower() == ".json"
-                else yaml.safe_load(text)
+                json.loads(text) if config_path.suffix.lower() == ".json" else yaml.safe_load(text)
             ) or {}
             if not isinstance(model_configs, dict):
                 raise SystemExit("--model-config must contain a mapping")
         freq: str | int = int(args.freq) if str(args.freq).lstrip("-").isdigit() else args.freq
+
         def split_csv(value: str) -> tuple[str, ...]:
             return tuple(item.strip() for item in value.split(",") if item.strip())
 

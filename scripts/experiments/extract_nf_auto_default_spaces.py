@@ -11,7 +11,6 @@ from neuralforecast.common._base_auto import (
     MockTrial,
 )
 
-
 CLASSIFICATION = Path(
     "artifacts/parameter_inventory/neuralforecast_auto_model_classification_v2.json"
 )

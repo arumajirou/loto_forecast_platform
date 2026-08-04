@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-
 OPTUNA_SOURCE = Path("artifacts/parameter_inventory/neuralforecast_optuna_trial_calls.json")
 
 RAY_SOURCE = Path("artifacts/parameter_inventory/neuralforecast_auto_spaces_structured.json")

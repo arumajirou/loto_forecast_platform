@@ -140,9 +140,7 @@ def load_database_table(source: DatabaseTableSource) -> pd.DataFrame:
     """Load one complete table from SQLite or a SQLAlchemy-supported database."""
     table = _validate_identifier(source.table, label="table")
     schema = _validate_identifier(source.schema, label="schema") if source.schema else None
-    order_by = (
-        _validate_identifier(source.order_by, label="order_by") if source.order_by else None
-    )
+    order_by = _validate_identifier(source.order_by, label="order_by") if source.order_by else None
     sqlite_path = _sqlite_path(source.db_url)
     if sqlite_path is not None:
         if not sqlite_path.exists():
@@ -258,9 +256,7 @@ def list_automodel_specs() -> list[ModelSpec]:
     return [spec for spec in list_model_specs() if spec.library == "neuralforecast_auto"]
 
 
-def _resolve_specs(
-    requested: tuple[str, ...], excluded: tuple[str, ...]
-) -> list[ModelSpec]:
+def _resolve_specs(requested: tuple[str, ...], excluded: tuple[str, ...]) -> list[ModelSpec]:
     all_specs = list_automodel_specs()
     by_token = {token: spec for spec in all_specs for token in (spec.model_id, spec.class_name)}
     if not requested or "all" in requested:
@@ -363,8 +359,7 @@ def _prediction_value_column(prediction: pd.DataFrame, alias: str) -> str:
         column
         for column in candidates
         if not any(
-            marker in str(column).lower()
-            for marker in ("-lo-", "-hi-", "median", "quantile")
+            marker in str(column).lower() for marker in ("-lo-", "-hi-", "median", "quantile")
         )
     ]
     if point_candidates:
@@ -524,9 +519,7 @@ def _worker_entry(config_payload: dict[str, Any], spec_payload: dict[str, Any], 
         **config_payload,
     )
     spec = next(
-        item
-        for item in list_automodel_specs()
-        if item.model_id == spec_payload["model_id"]
+        item for item in list_automodel_specs() if item.model_id == spec_payload["model_id"]
     )
     panel = pd.read_csv(panel_path)
     return _run_single_model(config, spec, panel)

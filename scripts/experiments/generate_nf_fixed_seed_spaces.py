@@ -4,7 +4,6 @@ import copy
 import json
 from pathlib import Path
 
-
 SOURCE = Path("configs/generated/neuralforecast_normalized_fair_spaces.json")
 
 OUTPUT = Path("configs/generated/neuralforecast_normalized_fixed_seed_spaces.json")

@@ -13,17 +13,15 @@ import torch
 from neuralforecast import NeuralForecast
 from neuralforecast.losses.pytorch import MAE
 from neuralforecast.models import (
-    DeepAR,
     GRU,
     LSTM,
-    NBEATSx,
     NHITS,
     TCN,
     TFT,
+    NBEATSx,
     TiDE,
 )
 from sqlalchemy import create_engine
-
 
 ROOT = Path(__file__).resolve().parents[2]
 RUN_ID = time.strftime("nf-exog-ablation-%Y%m%d-%H%M%S")

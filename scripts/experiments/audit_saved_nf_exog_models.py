@@ -8,7 +8,6 @@ from typing import Any
 import pandas as pd
 from neuralforecast import NeuralForecast
 
-
 root = Path(sys.argv[1])
 rows: list[dict[str, Any]] = []
 

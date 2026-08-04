@@ -8,7 +8,6 @@ from typing import Any
 import neuralforecast.models as models
 from neuralforecast.losses.pytorch import MAE
 
-
 SPACE_SOURCE = Path("configs/generated/neuralforecast_normalized_fixed_seed_spaces.json")
 
 MATRIX_SOURCE = Path("artifacts/parameter_inventory/neuralforecast_auto_model_matrix_v2.json")

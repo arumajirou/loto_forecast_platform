@@ -8,7 +8,6 @@ from typing import Any
 import neuralforecast.auto as auto_module
 from neuralforecast.common._base_auto import BaseAuto
 
-
 OUTPUT_JSON = Path("artifacts/parameter_inventory/neuralforecast_auto_model_classification_v2.json")
 
 OUTPUT_CSV = Path("artifacts/parameter_inventory/neuralforecast_auto_model_classification_v2.csv")
