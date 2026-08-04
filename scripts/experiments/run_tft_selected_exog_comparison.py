@@ -268,7 +268,7 @@ for seed in SEEDS:
 
             fold_metrics.append(metrics)
 
-            for index, row in merged.iterrows():
+            for _index, row in merged.iterrows():
                 predictions.append(
                     {
                         **metrics,

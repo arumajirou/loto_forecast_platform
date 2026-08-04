@@ -298,7 +298,7 @@ for model_name, builder in MODEL_BUILDERS.items():
             fold_mse.append(float(np.mean((actual - prediction) ** 2)))
             fold_within1.append(float(np.mean(errors <= 1.0)))
 
-            for index, row in merged.iterrows():
+            for _index, row in merged.iterrows():
                 prediction_rows.append(
                     {
                         "model": model_name,

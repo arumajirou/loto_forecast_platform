@@ -124,7 +124,8 @@ def main() -> None:
             "- CUDA allocation increased during execution.",
             "- Prediction output contained only finite values.",
             "",
-            "xLSTM is excluded from this main-environment report because it is isolated in a separate dependency environment.",
+            "xLSTM is excluded from this main-environment report because "
+            "it is isolated in a separate dependency environment.",
             "",
         ]
     )
