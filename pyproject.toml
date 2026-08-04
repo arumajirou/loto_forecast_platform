@@ -26,6 +26,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+auto-campaign = ["optuna>=4,<5", "statsforecast>=2,<3", "psutil>=6,<8"]
 api = ["fastapi>=0.115,<0.120", "starlette<0.49", "httpx>=0.27,<1", "uvicorn>=0.34"]
 mlflow = ["mlflow>=3.0"]
 dev = [
@@ -45,6 +46,7 @@ frameworks = ["u8darts>=0.37", "gluonts>=0.16", "lightning>=2", "sktime>=0.37", 
 tsfm = ["transformers>=4.50", "accelerate>=1.5", "chronos-forecasting>=2.0"]
 
 [project.scripts]
+loto-auto-campaign = "loto.auto_campaign.cli:main"
 loto-lab = "loto.kpi_lab.cli:main"
 loto = "loto.cli:main"
 loto3 = "loto.cli_v3:main"
@@ -68,3 +70,13 @@ select = ["E", "F", "I", "B", "UP"]
 [tool.ruff.lint.per-file-ignores]
 "src/loto/api/app.py" = ["B008", "E501"]
 "src/loto/registry/full.py" = ["E501"]
+
+[dependency-groups]
+dev = [
+    "allpairspy>=2.5.1",
+    "openpyxl>=3.1.5",
+]
+
+[tool.mypy]
+python_version = "3.13"
+ignore_missing_imports = true

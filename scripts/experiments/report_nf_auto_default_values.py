@@ -7,20 +7,11 @@ from typing import Any
 import pandas as pd
 
 
-SOURCE = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_default_spaces.json"
-)
+SOURCE = Path("artifacts/parameter_inventory/neuralforecast_auto_default_spaces.json")
 
-OUTPUT_CSV = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_default_values.csv"
-)
+OUTPUT_CSV = Path("artifacts/parameter_inventory/neuralforecast_auto_default_values.csv")
 
-OUTPUT_MD = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_default_values.md"
-)
+OUTPUT_MD = Path("artifacts/parameter_inventory/neuralforecast_auto_default_values.md")
 
 
 def value_type(value: Any) -> str:
@@ -50,18 +41,14 @@ def value_type(value: Any) -> str:
     return type(value).__name__
 
 
-records = json.loads(
-    SOURCE.read_text(encoding="utf-8")
-)
+records = json.loads(SOURCE.read_text(encoding="utf-8"))
 
 rows: list[dict[str, Any]] = []
 
 for record in records:
     model = record["auto_model"]
 
-    for backend, backend_result in (
-        record["backends"].items()
-    ):
+    for backend, backend_result in record["backends"].items():
         status = backend_result["status"]
 
         if status != "OK":
@@ -118,14 +105,7 @@ summary = (
         parameter_count=("parameter", "count"),
         value_types=(
             "value_type",
-            lambda series: ", ".join(
-                sorted(
-                    {
-                        str(value)
-                        for value in series.dropna()
-                    }
-                )
-            ),
+            lambda series: ", ".join(sorted({str(value) for value in series.dropna()})),
         ),
     )
     .reset_index()
@@ -141,14 +121,7 @@ markdown_lines = [
 ]
 
 for row in summary.itertuples(index=False, name=None):
-    markdown_lines.append(
-        "| "
-        + " | ".join(
-            str(value).replace("|", "\\|")
-            for value in row
-        )
-        + " |"
-    )
+    markdown_lines.append("| " + " | ".join(str(value).replace("|", "\\|") for value in row) + " |")
 
 OUTPUT_MD.write_text(
     "\n".join(markdown_lines) + "\n",

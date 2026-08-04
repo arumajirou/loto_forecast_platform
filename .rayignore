@@ -1,0 +1,13 @@
+# Added by NeuralForecast all-AutoModel campaign
+.git/
+.venv*/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+artifacts/
+releases/
+zips/
+**/__pycache__/
+*.zip
+*.parquet
+data/postgres_load/

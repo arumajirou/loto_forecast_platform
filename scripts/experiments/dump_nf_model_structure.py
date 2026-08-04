@@ -10,17 +10,10 @@ from neuralforecast import NeuralForecast
 root = Path(sys.argv[1])
 output = {}
 
-for properties_path in sorted(
-    root.rglob("model_properties.json")
-):
-    properties = json.loads(
-        properties_path.read_text(encoding="utf-8")
-    )
+for properties_path in sorted(root.rglob("model_properties.json")):
+    properties = json.loads(properties_path.read_text(encoding="utf-8"))
 
-    key = (
-        f"{properties['model']}/"
-        f"{properties['condition']}"
-    )
+    key = f"{properties['model']}/{properties['condition']}"
 
     saved_path = Path(properties["saved_model_path"])
     nf = NeuralForecast.load(path=str(saved_path))

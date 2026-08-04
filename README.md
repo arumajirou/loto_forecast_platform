@@ -94,6 +94,28 @@ i.i.d. な抽選に対してこれが**正解**であり、v2.1.0 がこれを�
 TSFM 21 件は `revision` 未固定（`UNPINNED`）です。未確認のコミットSHAは
 **捏造しません**。protocol_hash の再現性を偽ることになるためです。`loto3 catalog --unpinned` で列挙できます。
 
+### DBからNeuralForecast AutoModelを実行
+
+SQLiteまたはPostgreSQLのテーブルを読み込み、Numbers4の`d1`～`d4`を4系列へ変換して、
+登録済み36 AutoModelを一括実行できます。最初にdry-runでDBスキーマと実行計画を確認してください。
+
+```bash
+uv run loto neuralforecast automodel-run \
+  --db-url /absolute/path/to/datasets.sqlite3 \
+  --table normalized_draws \
+  --game numbers4 \
+  --output runs/numbers4-nf-auto \
+  --models all \
+  --backend optuna \
+  --workers 8 \
+  --gpus 1 \
+  --max-gpu-jobs 1 \
+  --dry-run
+```
+
+実学習、smoke設定、AutoHINTのRay専用処理、成果物構成は
+[`docs/NEURALFORECAST_DB_AUTOMODEL.md`](docs/NEURALFORECAST_DB_AUTOMODEL.md)を参照してください。
+
 ## 理論限界
 
 [`docs/THEORETICAL_BOUNDS.md`](docs/THEORETICAL_BOUNDS.md)（`loto3 theory` で再生成）。

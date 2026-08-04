@@ -9,15 +9,9 @@ import neuralforecast.auto as auto_module
 import neuralforecast.models as model_module
 
 
-OUTPUT_JSON = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_matrix.json"
-)
+OUTPUT_JSON = Path("artifacts/parameter_inventory/neuralforecast_auto_model_matrix.json")
 
-OUTPUT_CSV = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_matrix.csv"
-)
+OUTPUT_CSV = Path("artifacts/parameter_inventory/neuralforecast_auto_model_matrix.csv")
 
 
 SPECIAL_NAME_MAP = {
@@ -34,12 +28,10 @@ def parameter_info(
 
     required = [
         name
-        for name, parameter
-        in signature.parameters.items()
+        for name, parameter in signature.parameters.items()
         if (
             name != "self"
-            and parameter.default
-            is inspect.Parameter.empty
+            and parameter.default is inspect.Parameter.empty
             and parameter.kind
             not in {
                 inspect.Parameter.VAR_POSITIONAL,
@@ -99,46 +91,20 @@ for auto_name in sorted(dir(auto_module)):
             "auto_model": auto_name,
             "base_model": base_name,
             "base_model_found": True,
-            "future_exog": (
-                "futr_exog_list" in parameters
-            ),
-            "historical_exog": (
-                "hist_exog_list" in parameters
-            ),
-            "static_exog": (
-                "stat_exog_list" in parameters
-            ),
+            "future_exog": ("futr_exog_list" in parameters),
+            "historical_exog": ("hist_exog_list" in parameters),
+            "static_exog": ("stat_exog_list" in parameters),
             "categorical_exog": supports_cat,
-            "requires_input_size": (
-                "input_size" in required
-            ),
-            "accepts_input_size": (
-                "input_size" in parameters
-            ),
-            "requires_n_series": (
-                "n_series" in required
-            ),
-            "accepts_n_series": (
-                "n_series" in parameters
-            ),
-            "accepts_loss": (
-                "loss" in parameters
-            ),
-            "accepts_valid_loss": (
-                "valid_loss" in parameters
-            ),
+            "requires_input_size": ("input_size" in required),
+            "accepts_input_size": ("input_size" in parameters),
+            "requires_n_series": ("n_series" in required),
+            "accepts_n_series": ("n_series" in parameters),
+            "accepts_loss": ("loss" in parameters),
+            "accepts_valid_loss": ("valid_loss" in parameters),
             "parameter_count": len(parameters),
             "required_parameters": required,
-            "model_signature": str(
-                inspect.signature(
-                    model_cls.__init__
-                )
-            ),
-            "auto_signature": str(
-                inspect.signature(
-                    auto_cls.__init__
-                )
-            ),
+            "model_signature": str(inspect.signature(model_cls.__init__)),
+            "auto_signature": str(inspect.signature(auto_cls.__init__)),
         }
     )
 
@@ -173,18 +139,12 @@ print(
 
 print(
     "mapped_base_models=",
-    sum(
-        bool(record.get("base_model_found"))
-        for record in records
-    ),
+    sum(bool(record.get("base_model_found")) for record in records),
 )
 
 print(
     "unmapped=",
-    sum(
-        not bool(record.get("base_model_found"))
-        for record in records
-    ),
+    sum(not bool(record.get("base_model_found")) for record in records),
 )
 
 print("\n=== UNMAPPED ===")

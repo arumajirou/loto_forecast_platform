@@ -9,10 +9,7 @@ import torch.nn as nn
 import neuralforecast.losses.pytorch as losses
 
 
-OUTPUT = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_loss_classification_v2.json"
-)
+OUTPUT = Path("artifacts/parameter_inventory/neuralforecast_loss_classification_v2.json")
 
 
 EXCLUDED_HELPERS = {
@@ -108,8 +105,7 @@ for name in sorted(dir(losses)):
             "signature": str(signature),
             "required_parameters": [
                 parameter_name
-                for parameter_name, parameter
-                in signature.parameters.items()
+                for parameter_name, parameter in signature.parameters.items()
                 if (
                     parameter_name != "self"
                     and parameter.default is inspect.Parameter.empty

@@ -1,0 +1,14 @@
+light:
+  gpu_concurrency: 4
+  gpus_per_trial: 0.25
+medium:
+  gpu_concurrency: 2
+  gpus_per_trial: 0.5
+heavy:
+  gpu_concurrency: 1
+  gpus_per_trial: 1.0
+oom_policy:
+  - retry_same_config_lower_concurrency
+  - retry_same_config_single_gpu
+  - mark_FAILED_OOM
+cpu_fallback: forbidden

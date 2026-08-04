@@ -1,0 +1,6 @@
+default: model_default
+point_losses: [MAE, MSE]
+probabilistic_models:
+  AutoDeepAR: model_default
+  AutoHINT: GMM+sCRPS
+external_selection_metric: hit_pm1

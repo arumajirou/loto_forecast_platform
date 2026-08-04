@@ -9,15 +9,9 @@ import neuralforecast.auto as auto_module
 from neuralforecast.common._base_auto import BaseAuto
 
 
-OUTPUT_JSON = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_classification_v2.json"
-)
+OUTPUT_JSON = Path("artifacts/parameter_inventory/neuralforecast_auto_model_classification_v2.json")
 
-OUTPUT_CSV = Path(
-    "artifacts/parameter_inventory/"
-    "neuralforecast_auto_model_classification_v2.csv"
-)
+OUTPUT_CSV = Path("artifacts/parameter_inventory/neuralforecast_auto_model_classification_v2.csv")
 
 
 def required_parameters(
@@ -43,9 +37,7 @@ def required_parameters(
 def parameter_names(
     cls: type[Any],
 ) -> set[str]:
-    return set(
-        inspect.signature(cls.__init__).parameters
-    ) - {"self"}
+    return set(inspect.signature(cls.__init__).parameters) - {"self"}
 
 
 records: list[dict[str, Any]] = []
@@ -80,9 +72,7 @@ for exported_name in sorted(dir(auto_module)):
         "reconciliation",
     }
 
-    is_hierarchical = bool(
-        hierarchical_markers.intersection(parameters)
-    )
+    is_hierarchical = bool(hierarchical_markers.intersection(parameters))
 
     requires_n_series = "n_series" in required
 
@@ -114,12 +104,8 @@ for exported_name in sorted(dir(auto_module)):
             "requires_n_series": requires_n_series,
             "accepts_n_series": "n_series" in parameters,
             "is_hierarchical_or_wrapper": is_hierarchical,
-            "has_default_config": callable(
-                getattr(obj, "get_default_config", None)
-            ),
-            "signature": str(
-                inspect.signature(obj.__init__)
-            ),
+            "has_default_config": callable(getattr(obj, "get_default_config", None)),
+            "signature": str(inspect.signature(obj.__init__)),
         }
     )
 
