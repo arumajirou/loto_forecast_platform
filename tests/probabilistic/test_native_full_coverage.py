@@ -9,11 +9,11 @@ from loto.probabilistic.native_registry import list_native_implementations, nati
 from loto.probabilistic.planner import build_plan
 
 
-def test_all_72_models_have_one_primary_native_path() -> None:
+def test_all_models_have_one_primary_native_path() -> None:
     implementations = list_native_implementations()
     specs = {spec.model_id: spec for spec in list_probabilistic_model_specs()}
-    assert len(implementations) == 72
-    assert len({item.model_id for item in implementations}) == 72
+    assert len(implementations) == 76
+    assert len({item.model_id for item in implementations}) == 76
     assert set(specs) == {item.model_id for item in implementations}
     for item in implementations:
         spec = specs[item.model_id]
@@ -26,12 +26,15 @@ def test_all_72_models_have_one_primary_native_path() -> None:
 def test_native_builder_dispatch_is_complete() -> None:
     implementations = list_native_implementations()
     expected = {
-        "pymc": PYMC_NATIVE_MODEL_IDS,
+        "pymc": set(PYMC_NATIVE_MODEL_IDS) | {"pp-gaussian-copula-categorical"},
         "numpyro": NUMPYRO_NATIVE_MODEL_IDS,
         "pyro": PYRO_NATIVE_MODEL_IDS,
         "pymc_bart": {"pp-bart-categorical"},
         "arviz": {"pp-psis-loo-stacking"},
         "builtin": {
+            "pp-conditional-bernoulli-fixed-k",
+            "pp-multinomial-dglm",
+            "pp-bocpd-dirichlet-categorical",
             "pp-uniform-dirichlet",
             "pp-static-dirichlet-categorical",
             "pp-expanding-dirichlet-categorical",
@@ -46,13 +49,13 @@ def test_native_builder_dispatch_is_complete() -> None:
     for item in implementations:
         actual.setdefault(item.primary_backend, set()).add(item.model_id)
     assert actual == expected
-    assert sum(map(len, actual.values())) == 72
+    assert sum(map(len, actual.values())) == 76
 
 
 def test_native_full_plan_never_silently_adds_builtin() -> None:
     config = load_run_config("configs/probabilistic/native_smoke.yaml")
     trials = build_plan(config)
-    assert len(trials) == 72
+    assert len(trials) == 76
     implementation = {item.model_id: item for item in list_native_implementations()}
     for trial in trials:
         assert trial.backend == implementation[trial.model_id].primary_backend
@@ -61,13 +64,13 @@ def test_native_full_plan_never_silently_adds_builtin() -> None:
 
 def test_native_coverage_counts() -> None:
     coverage = native_coverage()
-    assert coverage["models"] == 72
+    assert coverage["models"] == 76
     assert coverage["all_primary_paths_declared"] is True
     assert coverage["by_primary_backend"] == {
         "arviz": 1,
-        "builtin": 8,
+        "builtin": 11,
         "numpyro": 6,
-        "pymc": 46,
+        "pymc": 47,
         "pymc_bart": 1,
         "pyro": 10,
     }

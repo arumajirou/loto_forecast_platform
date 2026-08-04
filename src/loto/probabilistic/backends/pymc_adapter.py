@@ -6,6 +6,8 @@ import numpy as np
 
 from loto.probabilistic.backends.base import ProbabilisticBackend
 from loto.probabilistic.catalog import get_inference_profile
+from loto.probabilistic.models.copula_native import MODEL_ID as COPULA_MODEL_ID
+from loto.probabilistic.models.copula_pymc import build_gaussian_copula_graph
 from loto.probabilistic.models.native_common import profile_settings
 from loto.probabilistic.models.pymc_native import build_pymc_graph
 from loto.probabilistic.native import NativePosterior
@@ -28,6 +30,16 @@ def _posterior_values(idata: Any, variable: str) -> np.ndarray:
     if values.ndim != 3:
         raise ValueError(f"{variable} must reduce to (draw, position, class); got {values.shape}")
     return values
+
+
+def _posterior_matrix_values(idata: Any, variable: str) -> np.ndarray:
+    posterior = getattr(idata, "posterior", None)
+    if posterior is None or variable not in posterior:
+        raise ValueError(f"PyMC result has no posterior variable {variable}")
+    values = np.asarray(posterior[variable].values, dtype=float)
+    if values.ndim != 4:
+        raise ValueError(f"{variable} must have chain/draw/matrix dimensions; got {values.shape}")
+    return values.reshape(values.shape[0] * values.shape[1], *values.shape[2:])
 
 
 def _safe_statistic(function: Any, idata: Any, reducer: str) -> float | None:
@@ -124,7 +136,10 @@ class PyMCBackend(ProbabilisticBackend):
         profile_id = inference_profile_id or spec.primary_profile or "pymc-nuts"
         profile = get_inference_profile(profile_id)
         settings = profile_settings(config, profile)
-        graph = build_pymc_graph(
+        graph_builder = (
+            build_gaussian_copula_graph if spec.model_id == COPULA_MODEL_ID else build_pymc_graph
+        )
+        graph = graph_builder(
             spec,
             y=y,
             classes=classes,
@@ -155,7 +170,9 @@ class PyMCBackend(ProbabilisticBackend):
                 )
                 losses = list(np.asarray(getattr(approximation, "hist", []), dtype=float))
                 idata = approximation.sample(
-                    draws=settings["posterior_draws"], random_seed=seed, return_inferencedata=True
+                    draws=settings["posterior_draws"],
+                    random_seed=seed,
+                    return_inferencedata=True,
                 )
             else:
                 idata = pm.sample(
@@ -170,6 +187,33 @@ class PyMCBackend(ProbabilisticBackend):
                     compute_convergence_checks=True,
                 )
         draws = _posterior_values(idata, graph.probability_variable)
+        metadata = {
+            **(graph.metadata or {}),
+            "native_graph_id": graph.graph_id,
+            "inference_profile_id": profile_id,
+            "algorithm": profile.algorithm,
+            "settings": settings,
+            "library_version": getattr(pm, "__version__", "unknown"),
+        }
+        diagnostics = _diagnostics(idata, variational=variational, losses=losses)
+        if spec.model_id == COPULA_MODEL_ID:
+            matrices = _posterior_matrix_values(idata, "copula_correlation_matrix")
+            mean_correlation = matrices.mean(axis=0)
+            minimum_eigenvalue = min(float(np.linalg.eigvalsh(matrix).min()) for matrix in matrices)
+            metadata["posterior_correlation_mean"] = mean_correlation.tolist()
+            metadata["posterior_correlation_draw_shape"] = list(matrices.shape)
+            diagnostics.update(
+                correlation_posterior_finite=bool(np.isfinite(matrices).all()),
+                correlation_posterior_psd=minimum_eigenvalue >= -1e-8,
+                correlation_min_eigenvalue=minimum_eigenvalue,
+                marginal_preservation=bool(
+                    np.allclose(
+                        draws.mean(axis=0),
+                        np.asarray(graph.metadata["marginal_probabilities"], dtype=float),
+                        atol=1e-10,
+                    )
+                ),
+            )
         return NativePosterior(
             model_id=spec.model_id,
             backend=self.backend_id,
@@ -177,15 +221,8 @@ class PyMCBackend(ProbabilisticBackend):
             target_mode=target_mode,
             game=geometry.key,
             probability_draws=draws,
-            metadata={
-                **(graph.metadata or {}),
-                "native_graph_id": graph.graph_id,
-                "inference_profile_id": profile_id,
-                "algorithm": profile.algorithm,
-                "settings": settings,
-                "library_version": getattr(pm, "__version__", "unknown"),
-            },
-            diagnostics=_diagnostics(idata, variational=variational, losses=losses),
+            metadata=metadata,
+            diagnostics=diagnostics,
             native_payload=idata,
         )
 

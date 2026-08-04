@@ -10,6 +10,7 @@ from typing import Any
 import yaml
 
 from loto.probabilistic.contracts import ProbabilisticRunConfig
+from loto.probabilistic.priors import get_prior_profile
 
 
 def canonical_json(value: Any) -> str:
@@ -25,7 +26,13 @@ def load_run_config(path: str | Path) -> ProbabilisticRunConfig:
     payload = yaml.safe_load(source.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise ValueError("run config must be a YAML mapping")
-    return ProbabilisticRunConfig.model_validate(payload)
+    config = ProbabilisticRunConfig.model_validate(payload)
+    if config.prior_profile is not None:
+        try:
+            get_prior_profile(config.prior_profile)
+        except KeyError as exc:
+            raise ValueError(str(exc)) from exc
+    return config
 
 
 def write_resolved_config(config: ProbabilisticRunConfig, path: str | Path) -> Path:
@@ -57,11 +64,43 @@ def execution_fingerprint(
     inference_profile_id: str | None = None,
 ) -> dict[str, str]:
     model_spec_hash = stable_hash(model_spec.to_dict())
+    selected_prior_profile = (
+        get_prior_profile(run_config.prior_profile).model_dump(mode="json")
+        if run_config.prior_profile is not None
+        else None
+    )
     prior_spec_hash = stable_hash(
         {
+            "prior_profile": run_config.prior_profile,
+            "prior_profile_spec": selected_prior_profile,
             "prior_concentration": run_config.prior_concentration,
             "rolling_window": run_config.rolling_window,
             "discount_factor": run_config.discount_factor,
+            "subset_prior_scale": run_config.subset_prior_scale,
+            "subset_initial_pseudocount": run_config.subset_initial_pseudocount,
+            "subset_laplace_ridge": run_config.subset_laplace_ridge,
+            "dglm_discount_factor": run_config.dglm_discount_factor,
+            "dglm_prior_variance": run_config.dglm_prior_variance,
+            "dglm_observation_jitter": run_config.dglm_observation_jitter,
+            "dglm_covariance_floor": run_config.dglm_covariance_floor,
+            "dglm_max_state_variance": run_config.dglm_max_state_variance,
+            "dglm_include_trend": run_config.dglm_include_trend,
+            "dglm_seasonal_periods": run_config.dglm_seasonal_periods,
+            "copula_marginal_prior": run_config.copula_marginal_prior,
+            "copula_lkj_eta": run_config.copula_lkj_eta,
+            "copula_scale_prior_sigma": run_config.copula_scale_prior_sigma,
+            "copula_threshold_epsilon": run_config.copula_threshold_epsilon,
+            "copula_correlation_shrinkage": run_config.copula_correlation_shrinkage,
+            "copula_correlation_floor": run_config.copula_correlation_floor,
+            "bocpd_hazard_type": run_config.bocpd_hazard_type,
+            "bocpd_expected_run_length": run_config.bocpd_expected_run_length,
+            "bocpd_max_run_length": run_config.bocpd_max_run_length,
+            "bocpd_posterior_mass_prune": run_config.bocpd_posterior_mass_prune,
+            "bocpd_prior_concentration": run_config.bocpd_prior_concentration,
+            "bocpd_alert_threshold": run_config.bocpd_alert_threshold,
+            "bocpd_min_evidence_count": run_config.bocpd_min_evidence_count,
+            "bocpd_cooldown": run_config.bocpd_cooldown,
+            "bocpd_min_observed_fraction": run_config.bocpd_min_observed_fraction,
         }
     )
     inference_profile_hash = stable_hash(

@@ -49,8 +49,52 @@ def list_native_implementations() -> tuple[NativeImplementation, ...]:
                 runtime_tier=str(row.get("runtime_tier", "standard")),
             )
         )
-    if len(output) != 72:
-        raise ValueError(f"native implementation registry must contain 72 rows, got {len(output)}")
+    if len(output) < 72:
+        raise ValueError(
+            f"native implementation registry must preserve all 72 PPL-01 rows; got {len(output)}"
+        )
+    ppl02_implementations = (
+        NativeImplementation(
+            model_id="pp-conditional-bernoulli-fixed-k",
+            primary_backend="builtin",
+            primary_profile=None,
+            implementation_kind="analytic_map_laplace",
+            module="loto.probabilistic.models.subset_native",
+            graph_id="conditional_bernoulli_fixed_k_v1",
+            runtime_tier="standard",
+        ),
+        NativeImplementation(
+            model_id="pp-multinomial-dglm",
+            primary_backend="builtin",
+            primary_profile=None,
+            implementation_kind="sequential_laplace_filter",
+            module="loto.probabilistic.models.dglm_native",
+            graph_id="multinomial_dglm_filter_v1",
+            runtime_tier="standard",
+        ),
+        NativeImplementation(
+            model_id="pp-gaussian-copula-categorical",
+            primary_backend="pymc",
+            primary_profile="pymc-nuts",
+            implementation_kind="latent_gaussian_lkj",
+            module="loto.probabilistic.models.copula_native",
+            graph_id="gaussian_copula_categorical_v1",
+            runtime_tier="standard",
+        ),
+        NativeImplementation(
+            model_id="pp-bocpd-dirichlet-categorical",
+            primary_backend="builtin",
+            primary_profile=None,
+            implementation_kind="exact_online_message_passing",
+            module="loto.probabilistic.models.bocpd_native",
+            graph_id="bocpd_dirichlet_categorical_v1",
+            runtime_tier="standard",
+        ),
+    )
+    for implementation in ppl02_implementations:
+        if implementation.model_id not in seen:
+            output.append(implementation)
+            seen.add(implementation.model_id)
     return tuple(output)
 
 
@@ -73,5 +117,5 @@ def native_coverage() -> dict[str, Any]:
         "models": len(rows),
         "by_primary_backend": dict(sorted(by_backend.items())),
         "by_implementation_kind": dict(sorted(by_kind.items())),
-        "all_primary_paths_declared": len(rows) == 72,
+        "all_primary_paths_declared": len(rows) >= 72,
     }

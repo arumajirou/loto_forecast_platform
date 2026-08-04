@@ -1,9 +1,26 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+from enum import StrEnum
 from typing import Any, Literal
 
+import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+
+class TargetMode(StrEnum):
+    """Machine-readable probabilistic target representations.
+
+    Existing PPL-01 task strings remain valid. These values add the PPL-02
+    contracts without renaming or silently substituting any existing target.
+    """
+
+    FIXED_CARDINALITY_SUBSET = "fixed_cardinality_subset"
+    CATEGORICAL_CONTEXT = "categorical_context"
+    DYNAMIC_MULTINOMIAL = "dynamic_multinomial"
+    JOINT_DISCRETE_COPULA = "joint_discrete_copula"
+    ONLINE_CHANGEPOINT = "online_changepoint"
+    ORDERED_WITHOUT_REPLACEMENT = "ordered_without_replacement"
 
 
 @dataclass(frozen=True)
@@ -57,6 +74,27 @@ class CompatibilityDecision:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class NativeFitContext:
+    trial_id: str
+    game: str
+    target_mode: str
+    train_end: int
+    seed: int
+    feature_set_hash: str
+    data_version: str
+
+
+@dataclass
+class NativePredictiveResult:
+    point_prediction: list[int]
+    candidate_probabilities: np.ndarray | None = None
+    joint_samples: np.ndarray | None = None
+    log_probability_actual: float | None = None
+    diagnostics: dict[str, Any] = field(default_factory=dict)
+    state: dict[str, Any] = field(default_factory=dict)
 
 
 class PredictiveDistribution(BaseModel):
@@ -113,6 +151,8 @@ class ProbabilisticRunConfig(BaseModel):
     run_id: str | None = None
     profile: Literal["smoke", "standard", "full", "exhaustive"] = "smoke"
     games: list[str] = Field(default_factory=lambda: ["numbers3", "loto7"])
+    target_modes: list[TargetMode] = Field(default_factory=list)
+    require_verified_draw_order: bool = True
     inputs: dict[str, str] = Field(default_factory=dict)
     output: str = "runs/probabilistic"
     models: list[str] | Literal["all"] = "all"
@@ -136,6 +176,38 @@ class ProbabilisticRunConfig(BaseModel):
     rolling_window: int = Field(default=20, ge=2)
     discount_factor: float = Field(default=0.97, gt=0.0, le=1.0)
     prior_concentration: float = Field(default=1.0, gt=0.0)
+    prior_profile: str | None = None
+    subset_prior_scale: float = Field(default=2.0, gt=0.0)
+    subset_initial_pseudocount: float = Field(default=0.5, gt=0.0)
+    subset_max_iter: int = Field(default=500, ge=10, le=100000)
+    subset_tolerance: float = Field(default=1e-9, gt=0.0, le=1.0)
+    subset_gradient_tolerance: float = Field(default=1e-3, gt=0.0, le=1.0)
+    subset_laplace_ridge: float = Field(default=1e-8, ge=0.0, le=1.0)
+    subset_require_convergence: bool = True
+    subset_research_gain_min: float = Field(default=0.0, ge=0.0)
+    subset_ece_bins: int = Field(default=10, ge=2, le=100)
+    dglm_discount_factor: float = Field(default=0.97, gt=0.0, le=1.0)
+    dglm_prior_variance: float = Field(default=4.0, gt=0.0, le=1e6)
+    dglm_observation_jitter: float = Field(default=1e-6, gt=0.0, le=1.0)
+    dglm_covariance_floor: float = Field(default=1e-10, ge=0.0, le=1.0)
+    dglm_max_state_variance: float = Field(default=1e6, gt=0.0)
+    dglm_include_trend: bool = False
+    dglm_seasonal_periods: list[float] = Field(default_factory=list)
+    copula_marginal_prior: float = Field(default=0.5, gt=0.0, le=1e6)
+    copula_lkj_eta: float = Field(default=2.0, gt=0.0, le=1e6)
+    copula_scale_prior_sigma: float = Field(default=0.1, gt=0.0, le=10.0)
+    copula_threshold_epsilon: float = Field(default=1e-6, gt=0.0, lt=0.5)
+    copula_correlation_shrinkage: float = Field(default=0.05, ge=0.0, le=1.0)
+    copula_correlation_floor: float = Field(default=1e-8, gt=0.0, le=1.0)
+    bocpd_hazard_type: Literal["constant"] = "constant"
+    bocpd_expected_run_length: float = Field(default=200.0, gt=1.0, le=1e9)
+    bocpd_max_run_length: int = Field(default=512, ge=1, le=100000)
+    bocpd_posterior_mass_prune: float = Field(default=1e-8, ge=0.0, lt=1.0)
+    bocpd_prior_concentration: float = Field(default=0.5, gt=0.0, le=1e6)
+    bocpd_alert_threshold: float = Field(default=0.5, ge=0.0, le=1.0)
+    bocpd_min_evidence_count: int = Field(default=20, ge=1, le=1000000)
+    bocpd_cooldown: int = Field(default=20, ge=0, le=1000000)
+    bocpd_min_observed_fraction: float = Field(default=1.0, gt=0.0, le=1.0)
     utility_lambda_mse: float = Field(default=0.02, ge=0.0)
     dry_run: bool = False
     save_posterior_draws: bool = False
@@ -187,6 +259,32 @@ class ProbabilisticRunConfig(BaseModel):
     def games_not_empty(cls, value: list[str]) -> list[str]:
         if not value:
             raise ValueError("games must not be empty")
+        return value
+
+    @field_validator("prior_profile")
+    @classmethod
+    def prior_profile_not_blank(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("prior_profile must not be blank")
+        return normalized
+
+    @field_validator("target_modes")
+    @classmethod
+    def target_modes_unique(cls, value: list[TargetMode]) -> list[TargetMode]:
+        if len(value) != len(set(value)):
+            raise ValueError("target_modes must not contain duplicates")
+        return value
+
+    @field_validator("dglm_seasonal_periods")
+    @classmethod
+    def dglm_periods_valid(cls, value: list[float]) -> list[float]:
+        if any(period <= 1.0 for period in value):
+            raise ValueError("dglm_seasonal_periods must contain values greater than one")
+        if len(value) != len(set(value)):
+            raise ValueError("dglm_seasonal_periods must not contain duplicates")
         return value
 
     @model_validator(mode="after")
