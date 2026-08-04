@@ -29,6 +29,15 @@ from loto.probabilistic.experiment_tracking import (
     evaluate_and_persist_conditional_bernoulli,
     persist_experiment_tracking,
 )
+from loto.probabilistic.priors import (
+    PriorProfileDecision,
+    PriorProfileSpec,
+    PriorToyVerificationReport,
+    decide_prior_profile_compatibility,
+    get_prior_profile,
+    list_prior_profiles,
+    verify_prior_profile_toy,
+)
 from loto.probabilistic.subset_evaluation import (
     SubsetEvaluationResult,
     evaluate_conditional_bernoulli,
@@ -43,6 +52,9 @@ __all__ = [
     "DiagnosticReport",
     "InferenceProfileSpec",
     "PredictiveDistribution",
+    "PriorProfileDecision",
+    "PriorProfileSpec",
+    "PriorToyVerificationReport",
     "ProbabilisticModelSpec",
     "ProbabilisticRunConfig",
     "SubsetEvaluationResult",
@@ -54,5 +66,9 @@ __all__ = [
     "get_probabilistic_model_spec",
     "list_inference_profiles",
     "list_probabilistic_model_specs",
+    "decide_prior_profile_compatibility",
+    "get_prior_profile",
+    "list_prior_profiles",
+    "verify_prior_profile_toy",
     "verify_fixed_prediction",
 ]

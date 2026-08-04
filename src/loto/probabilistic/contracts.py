@@ -176,6 +176,7 @@ class ProbabilisticRunConfig(BaseModel):
     rolling_window: int = Field(default=20, ge=2)
     discount_factor: float = Field(default=0.97, gt=0.0, le=1.0)
     prior_concentration: float = Field(default=1.0, gt=0.0)
+    prior_profile: str | None = None
     subset_prior_scale: float = Field(default=2.0, gt=0.0)
     subset_initial_pseudocount: float = Field(default=0.5, gt=0.0)
     subset_max_iter: int = Field(default=500, ge=10, le=100000)
@@ -259,6 +260,16 @@ class ProbabilisticRunConfig(BaseModel):
         if not value:
             raise ValueError("games must not be empty")
         return value
+
+    @field_validator("prior_profile")
+    @classmethod
+    def prior_profile_not_blank(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("prior_profile must not be blank")
+        return normalized
 
     @field_validator("target_modes")
     @classmethod

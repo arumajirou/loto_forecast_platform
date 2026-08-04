@@ -4,6 +4,10 @@ from loto.game.geometry import GameGeometry
 from loto.probabilistic.backends import get_backend
 from loto.probabilistic.catalog import backend_available, get_inference_profile
 from loto.probabilistic.contracts import CompatibilityDecision, ProbabilisticModelSpec
+from loto.probabilistic.priors import (
+    decide_prior_profile_compatibility,
+    get_prior_profile,
+)
 from loto.probabilistic.statuses import CompatibilityReason
 
 
@@ -90,6 +94,9 @@ def decide_compatibility(
     profile_id: str | None = None,
     include_experimental: bool = True,
     draw_order_verified: bool = False,
+    prior_profile_id: str | None = None,
+    exogenous_features_available: bool = False,
+    exogenous_feature_count: int = 0,
 ) -> CompatibilityDecision:
     task = compatible_task(spec, geometry)
     if task is None:
@@ -124,6 +131,38 @@ def decide_compatibility(
             None,
             (f"declared={','.join(spec.backends)}",),
         )
+    if prior_profile_id:
+        try:
+            prior_profile = get_prior_profile(prior_profile_id)
+        except KeyError:
+            return CompatibilityDecision(
+                False,
+                CompatibilityReason.UNKNOWN_PRIOR_PROFILE,
+                backend,
+                profile_id,
+                None,
+                (f"prior_profile={prior_profile_id}",),
+            )
+        prior_decision = decide_prior_profile_compatibility(
+            prior_profile,
+            model_spec=spec,
+            backend=backend,
+            exogenous_features_available=exogenous_features_available,
+            exogenous_feature_count=exogenous_feature_count,
+        )
+        if not prior_decision.allowed or not prior_decision.execution_ready:
+            return CompatibilityDecision(
+                False,
+                CompatibilityReason(prior_decision.reason_code),
+                backend,
+                profile_id,
+                None,
+                (
+                    f"prior_profile={prior_profile_id}",
+                    *prior_decision.details,
+                ),
+            )
+
     if not backend_available(backend):
         return CompatibilityDecision(
             False, CompatibilityReason.BACKEND_UNAVAILABLE, backend, profile_id, None
@@ -179,5 +218,6 @@ def decide_compatibility(
         (
             f"target_mode={task}",
             "reference_backend=true" if backend == "builtin" else "native_backend=true",
+            *((f"prior_profile={prior_profile_id}",) if prior_profile_id is not None else ()),
         ),
     )

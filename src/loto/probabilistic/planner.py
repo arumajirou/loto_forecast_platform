@@ -22,6 +22,7 @@ class TrialPlan:
     target_mode: str
     backend: str
     inference_profile_id: str | None
+    prior_profile_id: str | None
     resource_class: str | None
     allowed: bool
     reason_code: str
@@ -86,6 +87,7 @@ def build_plan(config: ProbabilisticRunConfig) -> list[TrialPlan]:
                     target_mode="",
                     backend="builtin",
                     inference_profile_id=None,
+                    prior_profile_id=config.prior_profile,
                     resource_class=None,
                     allowed=False,
                     reason_code="TARGET_MODE_UNSUPPORTED",
@@ -130,6 +132,7 @@ def build_plan(config: ProbabilisticRunConfig) -> list[TrialPlan]:
                                 target_mode=target_mode,
                                 backend=backend,
                                 inference_profile_id=profile_id,
+                                prior_profile_id=config.prior_profile,
                                 resource_class=None,
                                 allowed=False,
                                 reason_code="UNKNOWN_INFERENCE_PROFILE",
@@ -149,6 +152,9 @@ def build_plan(config: ProbabilisticRunConfig) -> list[TrialPlan]:
                     backend=backend,
                     profile_id=profile_id,
                     include_experimental=config.include_experimental,
+                    prior_profile_id=config.prior_profile,
+                    exogenous_features_available=spec.supports_exogenous,
+                    exogenous_feature_count=1 if spec.supports_exogenous else 0,
                 )
                 for seed in config.seeds:
                     trial_id = (
@@ -163,6 +169,7 @@ def build_plan(config: ProbabilisticRunConfig) -> list[TrialPlan]:
                             target_mode=target_mode,
                             backend=backend,
                             inference_profile_id=profile_id,
+                            prior_profile_id=config.prior_profile,
                             resource_class=decision.required_resource_class,
                             allowed=decision.allowed,
                             reason_code=str(decision.reason_code),

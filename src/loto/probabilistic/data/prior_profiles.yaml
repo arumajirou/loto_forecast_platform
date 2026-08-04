@@ -1,11 +1,43 @@
-schema_version: 1.0.0
+schema_version: 2.0.0
 profiles:
   - profile_id: symmetric-dirichlet-v1
+    family: dirichlet
     concentration: 1.0
     positive_mass_required: true
+    supported_backends: [builtin, pymc, numpyro, pyro, cmdstanpy]
+    requires_exogenous: false
+    execution_status: CONTRACT_ONLY
+    notes: Positive mass on every legal category.
   - profile_id: weak-dirichlet-v1
+    family: dirichlet
     concentration: 0.5
     positive_mass_required: true
+    supported_backends: [builtin, pymc, numpyro, pyro, cmdstanpy]
+    requires_exogenous: false
+    execution_status: CONTRACT_ONLY
+    notes: Weak symmetric smoothing for categorical outcomes.
   - profile_id: strong-smoothing-dirichlet-v1
+    family: dirichlet
     concentration: 5.0
     positive_mass_required: true
+    supported_backends: [builtin, pymc, numpyro, pyro, cmdstanpy]
+    requires_exogenous: false
+    execution_status: CONTRACT_ONLY
+    notes: Strong symmetric smoothing for small samples.
+  - profile_id: r2d2
+    family: r2d2
+    r2_alpha: 1.0
+    r2_beta: 4.0
+    allocation: dirichlet
+    supported_backends: [pymc, numpyro]
+    requires_exogenous: true
+    execution_status: CONTRACT_ONLY
+    notes: PPL-02 Batch 9 contract and toy verification; model adapters are P1.
+  - profile_id: spike_slab
+    family: spike_slab
+    inclusion_probability: 0.1
+    slab_scale: 1.0
+    supported_backends: [pymc, numpyro]
+    requires_exogenous: true
+    execution_status: CONTRACT_ONLY
+    notes: PPL-02 Batch 9 contract and explicit toy inclusion posterior; model adapters are P1.
