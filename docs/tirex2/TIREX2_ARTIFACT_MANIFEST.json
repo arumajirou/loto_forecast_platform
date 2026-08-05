@@ -2,7 +2,7 @@
   "schema_version": 1,
   "status": "PARTIALLY_VERIFIED",
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
-  "focused_tests": "37 passed",
+  "focused_tests": "38 passed",
   "compileall": "PASS",
   "line_length_gate": "PASS",
   "ruff": "UNAVAILABLE",
@@ -41,8 +41,8 @@
     },
     {
       "path": "docs/tirex2/TIREX2_CHANGELOG.md",
-      "sha256": "3c9826228c7056033e5ec676e9635926b407998af747763ec7d9a843114cf210",
-      "size_bytes": 746
+      "sha256": "4f169b5532bc492778ef728ee4349842a7298c1ecbd79ec85374000e4c8c5802",
+      "size_bytes": 766
     },
     {
       "path": "docs/tirex2/TIREX2_COVARIATE_MATRIX.csv",
@@ -96,8 +96,8 @@
     },
     {
       "path": "docs/tirex2/TIREX2_RUNBOOK.md",
-      "sha256": "e8e53668f17a2e37af82a9faefc4dfbdae9556c28f77d72d75a658c301d67a6f",
-      "size_bytes": 561
+      "sha256": "ac6716eb9549e41441c18f3ae7749ffb4e56ee810fca896d4cc0f0806ce3197d",
+      "size_bytes": 836
     },
     {
       "path": "docs/tirex2/TIREX2_RUNTIME_CERTIFICATION.csv",
@@ -121,12 +121,12 @@
     },
     {
       "path": "docs/tirex2/TIREX2_TEST_PLAN.md",
-      "sha256": "a49da7bb92082cf4209b1f1de7d38bdc24c369db34abecd748ef6bbfa7e55795",
-      "size_bytes": 842
+      "sha256": "9c1dd15b73a8f12fb5620189268efea90af4dcdf320d219843df2bac0729881c",
+      "size_bytes": 930
     },
     {
       "path": "docs/tirex2/TIREX2_VERIFICATION_REPORT.md",
-      "sha256": "66bad9f936f72c0cf3e7b8d1249fa55812dbeaef23607733c73c9e9e8687758b",
+      "sha256": "6080f34ff066f84b312d5eae7e8d447666b403a99dc24b9ff406da479e034e33",
       "size_bytes": 1074
     },
     {
@@ -136,8 +136,8 @@
     },
     {
       "path": "scripts/run_tirex2_provider.py",
-      "sha256": "8f7fa48cacec9e36dd4bc680a871d1b40a0a84a40262a0724b1b7585db6929b0",
-      "size_bytes": 9554
+      "sha256": "0948af26024732f0a9ad69c85660b5c9715445b6f7758439b1e68568f05b940e",
+      "size_bytes": 9632
     },
     {
       "path": "src/loto/adapters/tirex2/__init__.py",
@@ -176,8 +176,8 @@
     },
     {
       "path": "src/loto/tirex2_campaign/runtime_certification.py",
-      "sha256": "22043673f3b7ff0e7c73b7342da09b674ce1b2b13a1e1f584fbbdb576b97de5b",
-      "size_bytes": 5881
+      "sha256": "66d138b760123c722254e5a2ec5566a9f736ae9853a87a254de2060074742228",
+      "size_bytes": 6847
     },
     {
       "path": "tests/adapters/tirex2/test_contracts.py",
@@ -196,8 +196,8 @@
     },
     {
       "path": "tests/tirex2_campaign/test_runtime_certification.py",
-      "sha256": "44875d4eeb85736c2fd0168c783d5a4d4b6a15a5774ef2a7e1579d1db0ba9c50",
-      "size_bytes": 3059
+      "sha256": "d4b83b7e6c27d5f2cac354d01113884a72781acc64b87e9e8b5377f33c928de8",
+      "size_bytes": 4019
     }
   ]
 }
