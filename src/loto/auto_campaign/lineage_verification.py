@@ -7,7 +7,6 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from .contracts import CampaignStage
 from .lineage_integrity import verify_lineage_artifacts
 from .persistence import write_json, write_sha256s
 from .promotion_gate import GATED_STAGES
