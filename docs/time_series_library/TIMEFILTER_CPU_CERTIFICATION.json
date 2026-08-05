@@ -1,0 +1,216 @@
+{
+  "boundaries": {
+    "ci": "BLOCKED_PRE_RUN",
+    "gpu_runtime": "EXECUTION_PENDING",
+    "holdout_prospective": "NOT_OPENED",
+    "isolated_uv_lock": "BLOCKED_OFFLINE_CACHE_MISS_EINOPS",
+    "pattn": "BLOCKED_MISSING_REFORMER_PYTORCH",
+    "real_data_metrics": "NOT_EXECUTED",
+    "target_torch_2_9_1_runtime": "EXECUTION_PENDING",
+    "wpmixer": "BLOCKED_MISSING_PYWT"
+  },
+  "dependency_tamper_rejection": {
+    "error": "ValueError: pinned source mismatch: layers/Embed.py: expected 977e25568d37b9dd0efd442dcc5b33eab9843d71, got 5eb1ba593046ff6163fe71aad0bc66fe1255967a",
+    "expected_exit_code": 2,
+    "provider_status": "FAILED",
+    "status": "PASS"
+  },
+  "executed_at_utc": "2026-08-05T11:15:24Z",
+  "fit_save": {
+    "checkpoint_sha256": "f42d722cd631ad613e3f9fc54d27176bd7de5e9b51285707da6d5f7a83521fbe",
+    "cpu_fallback": false,
+    "cuda_available": false,
+    "device": "cpu",
+    "finite_prediction": true,
+    "finite_state_dict": true,
+    "graph_geometry": {
+      "alpha": 0.1,
+      "channels": 3,
+      "cross_region_size": 6,
+      "d_ff": 16,
+      "d_model": 8,
+      "dropout": 0.0,
+      "e_layers": 1,
+      "expected_parameter_count": 586,
+      "head_dim": 4,
+      "knn_zero_count": 1,
+      "mask_shape": [
+        12,
+        3,
+        12
+      ],
+      "n_heads": 2,
+      "noisy_gating": true,
+      "num_patches": 4,
+      "patch_len": 2,
+      "positional_embedding": true,
+      "positional_limit": 10000,
+      "pred_len": 2,
+      "same_channel_region_size": 3,
+      "same_time_region_size": 2,
+      "seq_len": 8,
+      "stride": 2,
+      "token_count": 12,
+      "top_p": 0.5
+    },
+    "input_device": "cpu",
+    "input_sha256": "afec1c7517505c22af8861fdd5b40ff7c0cd3bf2b426c707f3ac9925c4224561",
+    "losses": [
+      0.060030724853277206,
+      0.056843336671590805,
+      0.0539623498916626
+    ],
+    "output_device": "cpu",
+    "parameter_count": 586,
+    "parameter_devices": [
+      "cpu"
+    ],
+    "prediction_before_sha256": "2270fb92bcfb02ffa8fd4c8203dc4f33438b4b029d0c2be39cd4678775824850",
+    "prediction_shape": [
+      2,
+      2,
+      3
+    ],
+    "process_id": 56652,
+    "python": "3.13.5",
+    "torch": "2.10.0+cpu",
+    "train_steps": 3
+  },
+  "focused_validation": {
+    "compileall": "PASS",
+    "frets_contract": "7 passed",
+    "line_length_100": "PASS",
+    "provider_contract": "6 passed",
+    "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT",
+    "scinet_contract": "7 passed",
+    "segrnn_contract": "8 passed",
+    "split_total": "35 passed",
+    "timefilter_contract": "7 passed",
+    "tsmixer_lightts_dedicated_tests": "NOT_PRESENT_IN_LOCAL_STAGE"
+  },
+  "formal_configuration": {
+    "alpha": 0.1,
+    "c_out": 3,
+    "d_ff": 16,
+    "d_model": 8,
+    "dropout": 0.0,
+    "e_layers": 1,
+    "enc_in": 3,
+    "n_heads": 2,
+    "num_class": 1,
+    "patch_len": 2,
+    "pos": true,
+    "pred_len": 2,
+    "seq_len": 8,
+    "task_name": "long_term_forecast",
+    "top_p": 0.5
+  },
+  "geometry_matrix": {
+    "all_finite": true,
+    "all_parameter_formula_match": true,
+    "block_counts": [
+      1,
+      2,
+      3
+    ],
+    "case_count": 6,
+    "channels": [
+      1,
+      2,
+      3,
+      5,
+      7
+    ],
+    "head_counts": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "patch_lengths": [
+      2,
+      3,
+      4,
+      6
+    ],
+    "sequence_lengths": [
+      4,
+      8,
+      9,
+      12,
+      16,
+      24
+    ],
+    "status": "PASS"
+  },
+  "load_predict": {
+    "different_process_from_fit": true,
+    "finite_prediction": true,
+    "input_device": "cpu",
+    "output_device": "cpu",
+    "parameter_devices": [
+      "cpu"
+    ],
+    "prediction_after_sha256": "2270fb92bcfb02ffa8fd4c8203dc4f33438b4b029d0c2be39cd4678775824850",
+    "prediction_shape": [
+      2,
+      2,
+      3
+    ],
+    "process_id": 56676,
+    "strict_state_load": true
+  },
+  "model_name": "TimeFilter",
+  "roundtrip": {
+    "after_sha256": "2270fb92bcfb02ffa8fd4c8203dc4f33438b4b029d0c2be39cd4678775824850",
+    "after_shape": [
+      2,
+      2,
+      3
+    ],
+    "atol": 1e-08,
+    "before_sha256": "2270fb92bcfb02ffa8fd4c8203dc4f33438b4b029d0c2be39cd4678775824850",
+    "before_shape": [
+      2,
+      2,
+      3
+    ],
+    "equal_within_tolerance": true,
+    "finite": true,
+    "max_abs_error": 0.0,
+    "rtol": 1e-08,
+    "same_shape": true,
+    "status": "PASS"
+  },
+  "schema_version": "1.0",
+  "source_identity": {
+    "files": {
+      "layers/Embed.py": {
+        "actual_git_blob_sha": "977e25568d37b9dd0efd442dcc5b33eab9843d71",
+        "expected_git_blob_sha": "977e25568d37b9dd0efd442dcc5b33eab9843d71",
+        "sha256": "17e7c3577324c41a0da427a199c955b782fde905aabb1f7cbc3c4e15ebd4ae35"
+      },
+      "layers/StandardNorm.py": {
+        "actual_git_blob_sha": "990d0fdc17751b724354e70b89fd6d3ff0f4dd29",
+        "expected_git_blob_sha": "990d0fdc17751b724354e70b89fd6d3ff0f4dd29",
+        "sha256": "3f690dc5fc0e395d4f1ffe6396717548d18bd04f4518258308bbe5f392703f5f"
+      },
+      "layers/TimeFilter_layers.py": {
+        "actual_git_blob_sha": "437c3bfd135c2d2b907c7332311ac553c8a2d523",
+        "expected_git_blob_sha": "437c3bfd135c2d2b907c7332311ac553c8a2d523",
+        "sha256": "3441713bdb54de1153afe3d5e746de4e251c07b545492180a073c4f275df6b9f"
+      },
+      "models/TimeFilter.py": {
+        "actual_git_blob_sha": "ff952b4a7741ad2772fde3e41b0d97bc2bbe7e19",
+        "expected_git_blob_sha": "ff952b4a7741ad2772fde3e41b0d97bc2bbe7e19",
+        "sha256": "6cbce92f112a9907fe6117ea23527bf1864c0ea00721a812d786e86e0a1b0724"
+      }
+    },
+    "model_name": "TimeFilter",
+    "policy": "pinned",
+    "status": "VERIFIED"
+  },
+  "status": "VERIFIED_CPU_PROVIDER",
+  "upstream_revision": "4e938a1767106324dd753b2a44832bf870a0252e"
+}

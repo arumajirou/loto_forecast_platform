@@ -1,10 +1,10 @@
 {
-  "certified_model_count": 6,
+  "certified_model_count": 7,
   "discovery_method": "GitHub code search for top-level class Model at pinned revision",
   "limitations": [
     "This is a pinned source-search inventory, not a complete local full-tree AST execution.",
     "Direct git clone and complete source-tree discovery were blocked by DNS.",
-    "Only DLinear, TSMixer, LightTS, SegRNN, FreTS, and SCINet have pinned CPU runtime evidence."
+    "Only DLinear, TSMixer, LightTS, SegRNN, FreTS, SCINet, and TimeFilter have pinned CPU runtime evidence."
   ],
   "model_count": 41,
   "models": [
@@ -126,7 +126,7 @@
     },
     {
       "model_name": "TimeFilter",
-      "runtime_status": "EXECUTION_PENDING"
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
     },
     {
       "model_name": "Autoformer",

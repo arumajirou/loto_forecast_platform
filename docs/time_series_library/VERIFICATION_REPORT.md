@@ -2,88 +2,68 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / SIX_PINNED_CPU_MODELS_VERIFIED / ISOLATED_LOCK_BLOCKED`
+`PARTIALLY_VERIFIED / SEVEN_PINNED_CPU_MODELS_VERIFIED / ISOLATED_LOCK_BLOCKED`
 
 ## Revisions
 
 - project base: `d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0`;
-- previous PR head: `a895e50e017ce1d430946b034e8435f4db31346d`;
+- previous PR head: `c5145e49e220ee11a88bbdd03ceafcf07756e9d2`;
 - upstream revision: `4e938a1767106324dd753b2a44832bf870a0252e`.
 
-## Existing certified models
+## TimeFilter source closure
 
-DLinear, TSMixer, LightTS, SegRNN, and FreTS remain certified. Their request schemas
-passed the split focused regression suite.
+- model: `ff952b4a7741ad2772fde3e41b0d97bc2bbe7e19`;
+- graph layers: `437c3bfd135c2d2b907c7332311ac553c8a2d523`;
+- normalization: `990d0fdc17751b724354e70b89fd6d3ff0f4dd29`;
+- embedding: `977e25568d37b9dd0efd442dcc5b33eab9843d71`.
 
-## Candidate decision
+All four identities were verified. A separately modified embedding dependency was
+rejected before construction with provider exit code two.
 
-PAttn was not selected because importing its pinned attention dependency requires the
-missing `reformer_pytorch` package. WPMixer requires missing `pywt`. TimeFilter is
-executable but has a wider four-file source and graph-mask contract. SCINet is a
-single-file PyTorch lane and was selected first.
+## Formal CPU runtime
 
-## SCINet source identity
+Configuration: sequence `8`, horizon `2`, channels `3`, width `8`, heads `2`,
+feed-forward width `16`, patch length `2`, one graph block, `alpha=0.1`, `top_p=0.5`.
 
-- `models/SCINet.py`: `740d0f7d88e8a94aa7fe12c745f0876af7b0fc08`;
-- SHA-256: `06dcae9cfce5d3dc09e8db9b537479421848ee678ffbd1d3ca0b5c335a1baf25`.
-
-## SCINet runtime
-
-- CPU construction: `PASS`;
+- construction: `PASS`;
 - three bounded fit steps: `PASS`;
-- finite losses `0.0958132371`, `0.0804666504`, `0.0676129088`;
-- raw output shape `[2, 28, 3]`: `PASS`;
-- zero-filled raw prefix: `PASS`;
-- final forecast shape `[2, 4, 3]`: `PASS`;
-- finite prediction and state dictionary: `PASS`;
-- parameter count `11824`: formula match;
-- fit PID `47332` and load PID `50903` differ: `PASS`;
-- strict state-dictionary reload: `PASS`;
-- prediction SHA-256 equality: `PASS`;
-- prediction SHA-256 `116e418080dcb1657fc320e11c00c2a9efd1ce8db56166b282d383b4edd3df3e`;
-- maximum absolute error `0.0`: `PASS`.
+- losses `0.0600307249`, `0.0568433367`, `0.0539623499`;
+- prediction shape `[2, 2, 3]`: `PASS`;
+- finite prediction/state: `PASS`;
+- parameter count `586`: formula match;
+- mask shape `[12, 3, 12]`: `PASS`;
+- mask region sizes `2`, `3`, and `6`: `PASS`;
+- fit PID `56652`, load PID `56676`: separate processes;
+- strict state load: `PASS`;
+- prediction SHA `2270fb92bcfb02ffa8fd4c8203dc4f33438b4b029d0c2be39cd4678775824850`;
+- maximum absolute roundtrip error `0.0`: `PASS`.
 
-Six pinned-source geometry cases passed with stack modes one and two, sequence lengths
-8 through 24, odd sequence lengths, one through seven channels, raw-output checks,
-module-count checks, finite state, and exact parameter formulas.
-
-## Fail-closed checks
-
-- wrong model/operation combination rejected: `PASS`;
-- `seq_len < 8` rejected: `PASS`;
-- stack count outside one or two rejected: `PASS`;
-- silently ignored non-zero dropout rejected: `PASS`;
-- unverified source rejected: `PASS`;
-- tampered checkpoint geometry rejected: `PASS`;
-- fixture and pinned certification separated: `PASS`.
+Six real pinned-source geometry cases passed. Coverage includes sequence lengths 4 to
+24, patch lengths 2 to 6, one to seven channels, two to six heads, one to three graph
+blocks, identity gating, noisy gating, finite state, graph-mask counts, and exact
+parameter formulas.
 
 ## Focused validation
 
-- provider regression: `6 passed`;
-- FreTS regression: `7 passed`;
-- SegRNN regression: `8 passed`;
-- SCINet contract: `7 passed`;
-- split focused total: `28 passed`;
-- Python compileall: `PASS`;
+- provider contract: `6 passed`;
+- FreTS: `7 passed`;
+- SCINet: `7 passed`;
+- SegRNN: `8 passed`;
+- TimeFilter: `7 passed`;
+- split focused total: `35 passed`;
+- compileall: `PASS`;
 - 100-character Python line policy: `PASS`;
 - Ruff: `NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT`.
 
-## Blocked
+Dedicated TSMixer and LightTS test files were not present in this local publication
+stage, so this increment does not claim that they were rerun. Their previously
+published evidence is retained unchanged.
 
-Direct GitHub clone remains blocked by DNS. `uv lock --offline` failed because
-`einops==0.8.1` was absent from the local cache. No isolated `uv.lock` was created, and
-root dependency files were not modified.
+## Blocked and unclaimed
 
-Earlier GitHub Actions runs remain `CI_BLOCKED_PRE_RUN`; this increment does not claim
-CI success.
-
-## Not claimed
-
-- all-model import, construction, training, or inference;
-- exact Torch 2.9.1 isolated runtime success;
-- GPU PID, VRAM, device, or no-CPU-fallback certification;
-- Foundation Model or Mamba execution;
-- real lottery Hit@±1, MAE, MSE, or RMSE;
-- baseline superiority;
-- Holdout or Prospective results;
-- merge readiness.
+- isolated Torch 2.9.1 lock: blocked by offline cache/network limits;
+- PAttn: missing `reformer_pytorch`;
+- WPMixer: missing `pywt`;
+- GitHub Actions: `CI_BLOCKED_PRE_RUN` from prior runs;
+- GPU, Holdout, Prospective, Hit@±1, MAE, MSE, RMSE, baseline superiority, and merge
+  readiness: not executed or not claimed.

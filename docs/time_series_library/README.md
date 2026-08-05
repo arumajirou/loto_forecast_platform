@@ -2,17 +2,17 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / SIX_PINNED_CPU_MODELS_VERIFIED / FULL_MATRIX_PENDING`
+`PARTIALLY_VERIFIED / SEVEN_PINNED_CPU_MODELS_VERIFIED / FULL_MATRIX_PENDING`
 
 This integration isolates `thuml/Time-Series-Library` at revision
 `4e938a1767106324dd753b2a44832bf870a0252e` from the root runtime.
 
 ## Source policy
 
-Provider requests default to `source_policy="pinned"`. Registered operations verify
-upstream Git blob identities before import, construction, fit, or reload. A missing or
-mismatched file fails closed. `source_policy="test_fixture"` is restricted to focused
-contract tests and is never reported as upstream certification.
+Requests default to `source_policy="pinned"`. Registered operations verify every file
+in their executable source closure before import, construction, fit, or reload.
+`source_policy="test_fixture"` is restricted to focused tests and is never reported as
+upstream certification.
 
 ## Certified CPU models
 
@@ -21,42 +21,41 @@ contract tests and is never reported as upstream certification.
 - LightTS;
 - SegRNN;
 - FreTS;
-- SCINet.
+- SCINet;
+- TimeFilter.
 
-Each passed construction, bounded fit, finite prediction/state checks, atomic artifact
-writes, process exit, strict reload in a separate process, and prediction equality at
-`rtol=1e-8`, `atol=1e-8`.
+Each lane has bounded fit, finite prediction/state checks, atomic artifact writes,
+process exit, strict reload in a separate process, and prediction equality evidence.
 
-## Provider operations
+## TimeFilter operations
 
-- `discover`;
-- `dlinear_fit_save` and `dlinear_load_predict`;
-- `tsmixer_fit_save` and `tsmixer_load_predict`;
-- `lightts_fit_save` and `lightts_load_predict`;
-- `segrnn_fit_save` and `segrnn_load_predict`;
-- `frets_fit_save` and `frets_load_predict`;
-- `scinet_fit_save` and `scinet_load_predict`;
-- `verify_roundtrip`.
+- `timefilter_fit_save`;
+- `timefilter_load_predict`.
 
-SCINet request:
+Example:
 
 ```json
 {
-  "operation": "scinet_fit_save",
-  "model_name": "SCINet",
+  "operation": "timefilter_fit_save",
+  "model_name": "TimeFilter",
   "source_policy": "pinned",
-  "seq_len": 12,
-  "pred_len": 4,
+  "seq_len": 8,
+  "pred_len": 2,
   "channels": 3,
-  "scinet_stacks": 2,
+  "d_model": 8,
+  "timefilter_patch_len": 2,
+  "timefilter_n_heads": 2,
+  "timefilter_d_ff": 16,
+  "timefilter_alpha": 0.1,
+  "timefilter_top_p": 0.5,
+  "e_layers": 1,
   "dropout": 0.0,
   "train_steps": 3
 }
 ```
 
-SCINet rejects sequences shorter than eight, stack counts outside one or two, and
-non-zero dropout that the upstream implementation would silently ignore. The provider
-records the full upstream output and emits only its final forecast horizon.
+TimeFilter rejects non-divisible patches, odd positional widths, incompatible head
+counts, excessive positional token counts, and modified checkpoint graph geometry.
 
 ## Leakage boundary
 
@@ -66,9 +65,6 @@ Prospective data are not opened by runtime smokes.
 
 ## Runtime boundary
 
-The available runtime uses Python 3.13.5 and Torch 2.10.0 CPU. The declared isolated
-lane targets Torch 2.9.1. Its lock remains blocked by network and offline-cache limits,
-so exact target-environment certification is pending.
-
-A model listed by discovery is not runtime-certified. GPU success additionally requires
-actual CUDA device, process, VRAM, output, and no-CPU-fallback evidence.
+The available runtime used Python 3.13.5 and Torch 2.10.0 CPU. The declared isolated
+lane targets Torch 2.9.1. Exact target-environment, GPU, real-data accuracy, CI, and
+merge readiness remain unclaimed.

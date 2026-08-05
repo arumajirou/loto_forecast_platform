@@ -44,8 +44,8 @@
     },
     {
       "path": "LIGHTWEIGHT_MODEL_SELECTION.md",
-      "sha256": "0a5e43c8731ffc346d1a9101541bcc5f4d2d4e87719e2dad78fbb5557c5ee271",
-      "size_bytes": 1866,
+      "sha256": "fd50f0daa6d56d1c5a18f6b4b4730e5186864a813187f03ae9f0f356654d7db8",
+      "size_bytes": 1385,
       "status": "generated_and_verified"
     },
     {
@@ -56,8 +56,8 @@
     },
     {
       "path": "MODEL_INVENTORY_PINNED_SEARCH.json",
-      "sha256": "d31f3fe0f676bca707e08d81e4173215dbd8bc6e04165754ff0aed804d988f22",
-      "size_bytes": 4357,
+      "sha256": "fd13532807b05840415f11fea88427013e1570625a5114a9bbd93f32c1209356",
+      "size_bytes": 4373,
       "status": "generated_and_verified"
     },
     {
@@ -68,27 +68,27 @@
     },
     {
       "path": "README.md",
-      "sha256": "4615adf1e5edf1b8499901cd44227cd7531854a19ba6cfa41748a698f71a8c9b",
-      "size_bytes": 2366,
+      "sha256": "e658250beccc77151f765505a998a4adf672c3bfa93166169ad749ea65d8e055",
+      "size_bytes": 1924,
       "status": "generated_and_verified"
     },
     {
       "path": "SCINET_CPU_CERTIFICATION.json",
       "sha256": "74254f083a495fe86e9c5d4370e06d85e8419837ed44f510357e67a264597c20",
       "size_bytes": 4231,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "SCINET_GEOMETRY_MATRIX.json",
       "sha256": "a9d4cf38ffacc83eab71a568d3c416fbc178f2f4ff5af5a1c3f22579842e1952",
       "size_bytes": 4484,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "SCINET_PARAMETER_CONTRACT.md",
       "sha256": "c9094d10f355a22b5fff4cee4a98f3c45f0d9f52ca395ac9a01bc5390bdc93f0",
       "size_bytes": 1708,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "SEGRNN_CPU_CERTIFICATION.json",
@@ -109,6 +109,24 @@
       "status": "existing_remote"
     },
     {
+      "path": "TIMEFILTER_CPU_CERTIFICATION.json",
+      "sha256": "4bf63c671e078ee57b0a549f8ad4b98e784a74820453a455d8a06611d63fcba4",
+      "size_bytes": 5738,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "TIMEFILTER_GEOMETRY_MATRIX.json",
+      "sha256": "039c84f3c9a770b587195d51250621ccdb846120e8eb41bbbdc782115bfb7d3b",
+      "size_bytes": 9867,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "TIMEFILTER_PARAMETER_CONTRACT.md",
+      "sha256": "cbc3eb4ed44db7f77b103c8c357771c071d07986c852a252d2a2ee3a8180b76a",
+      "size_bytes": 2129,
+      "status": "generated_and_verified"
+    },
+    {
       "path": "TSMIXER_CPU_CERTIFICATION.json",
       "sha256": "bde710c279b252dca8c98532f0ee5cb75f4f62ac9825af94719797d85a3a3395",
       "size_bytes": 3634,
@@ -116,8 +134,8 @@
     },
     {
       "path": "VERIFICATION_REPORT.md",
-      "sha256": "1a52621e9725d078cdbaf3b2953a7022438ea90f3fbaca29274a0267ca708397",
-      "size_bytes": 3162,
+      "sha256": "e0d2000cd49c0e465a7229ccb0c24a7977d1329f6619051a9fa531e0835dda88",
+      "size_bytes": 2571,
       "status": "generated_and_verified"
     }
   ],
@@ -137,66 +155,54 @@
     "LightTS",
     "SegRNN",
     "FreTS",
-    "SCINet"
+    "SCINet",
+    "TimeFilter"
   ],
   "code_evidence": [
     {
       "path": "src/loto/time_series_library_campaign/contracts.py",
-      "sha256": "2acd60ce478cebf086e15d12356c488257321b55b8fa5670840ff34626191652",
-      "size_bytes": 8014
+      "sha256": "916f3ef45be8a783eb3ebdc2a2d6ce5fbe4ea0c9d9cc18bb4d7d5abc97e96e11",
+      "size_bytes": 9637
     },
     {
       "path": "src/loto/time_series_library_campaign/provider.py",
-      "sha256": "62f9c83617859bd9444dd335cd48f7cf2170cc1170567640e6f2e0daf1fe84d7",
-      "size_bytes": 5094
+      "sha256": "f61d479db0ed16e3cb4f40ce12ca4f7ece675946bb8ab649bdd6ae3fface71b6",
+      "size_bytes": 5426
     },
     {
-      "path": "src/loto/time_series_library_campaign/frets_runtime.py",
-      "sha256": "3a4fd67c7cbc0b539238b20161408a4619bd5cd79306ed523c180f6d31498bd9",
-      "size_bytes": 11810
+      "path": "src/loto/time_series_library_campaign/timefilter_runtime.py",
+      "sha256": "1fc753b563f59dfa330c2a2f8e4e34b9a1bd468adf19db57569d637036f4ec76",
+      "size_bytes": 16255
     },
     {
-      "path": "src/loto/time_series_library_campaign/scinet_runtime.py",
-      "sha256": "93a27bb6d462e86eb6dc43825ab7804f197e33a1f1a212ea4212958e83af04a0",
-      "size_bytes": 14081
+      "path": "tests/time_series_library_campaign/test_timefilter_contract.py",
+      "sha256": "f6ae8e59a3b2263a7eda257c5949ed863864f9bab22095fc0ebb5b07e5064a80",
+      "size_bytes": 7141
     },
     {
-      "path": "tests/time_series_library_campaign/test_frets_contract.py",
-      "sha256": "810953bcd568a8e828da96eee9c6cc39297368de09601814997b30e45896b2f0",
-      "size_bytes": 8346
-    },
-    {
-      "path": "tests/time_series_library_campaign/test_frets_checkpoint_contract.py",
-      "sha256": "9377697002bfe66ef0bbd696570923f7664e532c49ad4a3aadd7635ac76f7416",
-      "size_bytes": 4601
-    },
-    {
-      "path": "tests/time_series_library_campaign/test_scinet_contract.py",
-      "sha256": "04ba67bf20fbf38b71432961804fbba8b5578324035f8180270d6108df64eafe",
-      "size_bytes": 6703
-    },
-    {
-      "path": "tests/time_series_library_campaign/test_scinet_checkpoint_contract.py",
-      "sha256": "600ef9f4b68b9161d0bc0212d841948dbd3e262c7a7bd1c8026400ab154f45ae",
-      "size_bytes": 3422
+      "path": "tests/time_series_library_campaign/test_timefilter_checkpoint_contract.py",
+      "sha256": "e795c36bab2873c2eaf6b421654cd09b5b7da8d1af4576d66199489549a72458",
+      "size_bytes": 3665
     },
     {
       "path": "external/time-series-library/UPSTREAM_REVISION.json",
-      "sha256": "e6eacff5c6b5e2ed09d17f58331719fb0a7b52fdb860a911e439f1825147118a",
-      "size_bytes": 1266
+      "sha256": "23d00f6ad88bfba423727ac91d0f54cf9875a61ea219d198e6f7776e568be634",
+      "size_bytes": 1570
     }
   ],
   "focused_validation": {
     "compileall": "PASS",
-    "frets_regression": "7 passed",
+    "frets_contract": "7 passed",
     "line_length_100": "PASS",
-    "provider_regression": "6 passed",
+    "provider_contract": "6 passed",
     "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT",
     "scinet_contract": "7 passed",
-    "segrnn_regression": "8 passed",
-    "split_total": "28 passed"
+    "segrnn_contract": "8 passed",
+    "split_total": "35 passed",
+    "timefilter_contract": "7 passed",
+    "tsmixer_lightts_dedicated_tests": "NOT_PRESENT_IN_LOCAL_STAGE"
   },
-  "parent_head": "a895e50e017ce1d430946b034e8435f4db31346d",
+  "parent_head": "c5145e49e220ee11a88bbdd03ceafcf07756e9d2",
   "project_pr": 54,
   "schema_version": "1.0",
   "status": "PARTIALLY_VERIFIED",

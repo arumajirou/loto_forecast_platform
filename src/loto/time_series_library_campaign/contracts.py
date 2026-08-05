@@ -36,6 +36,8 @@ class Operation(StrEnum):
     FRETS_LOAD_PREDICT = "frets_load_predict"
     SCINET_FIT_SAVE = "scinet_fit_save"
     SCINET_LOAD_PREDICT = "scinet_load_predict"
+    TIMEFILTER_FIT_SAVE = "timefilter_fit_save"
+    TIMEFILTER_LOAD_PREDICT = "timefilter_load_predict"
     VERIFY_ROUNDTRIP = "verify_roundtrip"
 
 
@@ -100,6 +102,12 @@ class ProviderRequest(BaseModel):
     segrnn_seg_len: int = Field(default=2, ge=1, le=4096)
     frets_channel_independence: Literal["0", "1"] = "1"
     scinet_stacks: Literal[1, 2] = 1
+    timefilter_patch_len: int = Field(default=4, ge=1, le=4096)
+    timefilter_n_heads: int = Field(default=2, ge=1, le=128)
+    timefilter_d_ff: int = Field(default=32, ge=1, le=65536)
+    timefilter_alpha: float = Field(default=0.1, ge=0.0, le=1.0)
+    timefilter_top_p: float = Field(default=0.5, ge=0.0, le=1.0)
+    timefilter_pos: bool = True
     checkpoint_path: Path | None = None
     input_path: Path | None = None
     before_prediction_path: Path | None = None
@@ -133,6 +141,10 @@ class ProviderRequest(BaseModel):
             Operation.SCINET_FIT_SAVE,
             Operation.SCINET_LOAD_PREDICT,
         }
+        timefilter_ops = {
+            Operation.TIMEFILTER_FIT_SAVE,
+            Operation.TIMEFILTER_LOAD_PREDICT,
+        }
         load_ops = {
             Operation.DLINEAR_LOAD_PREDICT,
             Operation.TSMIXER_LOAD_PREDICT,
@@ -140,6 +152,7 @@ class ProviderRequest(BaseModel):
             Operation.SEGRNN_LOAD_PREDICT,
             Operation.FRETS_LOAD_PREDICT,
             Operation.SCINET_LOAD_PREDICT,
+            Operation.TIMEFILTER_LOAD_PREDICT,
         }
         if self.operation in dlinear_ops and self.model_name != "DLinear":
             raise ValueError("DLinear operations require model_name=DLinear")
@@ -153,6 +166,8 @@ class ProviderRequest(BaseModel):
             raise ValueError("FreTS operations require model_name=FreTS")
         if self.operation in scinet_ops and self.model_name != "SCINet":
             raise ValueError("SCINet operations require model_name=SCINet")
+        if self.operation in timefilter_ops and self.model_name != "TimeFilter":
+            raise ValueError("TimeFilter operations require model_name=TimeFilter")
         if self.operation in lightts_ops:
             if self.d_model < 16:
                 raise ValueError("LightTS requires d_model >= 16")
@@ -177,6 +192,18 @@ class ProviderRequest(BaseModel):
                 raise ValueError("SCINet requires seq_len >= 8 for tree level 3")
             if self.dropout != 0.0:
                 raise ValueError("SCINet requires dropout=0.0 because upstream ignores it")
+        if self.operation == Operation.TIMEFILTER_FIT_SAVE:
+            if self.timefilter_patch_len > self.seq_len:
+                raise ValueError("TimeFilter requires patch_len <= seq_len")
+            if self.seq_len % self.timefilter_patch_len != 0:
+                raise ValueError("TimeFilter requires seq_len divisible by patch_len")
+            if self.d_model % 2 != 0:
+                raise ValueError("TimeFilter requires even d_model for positional embedding")
+            if self.d_model % self.timefilter_n_heads != 0:
+                raise ValueError("TimeFilter requires d_model divisible by n_heads")
+            token_count = self.channels * (self.seq_len // self.timefilter_patch_len)
+            if token_count > 10000:
+                raise ValueError("TimeFilter token count exceeds positional limit 10000")
         if self.operation in load_ops and (
             self.checkpoint_path is None or self.input_path is None
         ):

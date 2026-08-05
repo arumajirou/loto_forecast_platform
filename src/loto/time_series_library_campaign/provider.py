@@ -37,6 +37,10 @@ from .segrnn_runtime import (
     fit_save as segrnn_fit_save,
     load_predict as segrnn_load_predict,
 )
+from .timefilter_runtime import (
+    fit_save as timefilter_fit_save,
+    load_predict as timefilter_load_predict,
+)
 from .tsmixer_runtime import (
     fit_save as tsmixer_fit_save,
     load_predict as tsmixer_load_predict,
@@ -88,6 +92,10 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
         return scinet_fit_save(request)
     if request.operation == Operation.SCINET_LOAD_PREDICT:
         return scinet_load_predict(request)
+    if request.operation == Operation.TIMEFILTER_FIT_SAVE:
+        return timefilter_fit_save(request)
+    if request.operation == Operation.TIMEFILTER_LOAD_PREDICT:
+        return timefilter_load_predict(request)
     assert request.before_prediction_path is not None
     assert request.after_prediction_path is not None
     verification = verify_prediction_files(
