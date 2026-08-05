@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "operation": "inventory",
+  "output_dir": "artifacts/sktime/inventory-example",
+  "environment_lane": "core-py313",
+  "expected_sktime_version": "1.0.1",
+  "device": "cpu",
+  "seed": 1
+}
