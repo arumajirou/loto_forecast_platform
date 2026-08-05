@@ -2,7 +2,7 @@
 
 ## Frozen provenance
 
-The implementation targets only MLForecast `1.0.31`, tag `v1.0.31`, commit `c8f8b6d25184dcbed2454e185a92f3f8ef2e17e8`. Runtime version mismatch is fatal.
+The implementation targets only MLForecast `1.1.0`, tag `v1.1.0`, commit `a1609efddf8cf1a83510a50cd5487b66f32271c6`. Runtime version mismatch is fatal.
 
 ## Requirements
 
@@ -45,7 +45,7 @@ Fit:
 
 Cross-validation additionally maps `n_windows`, `h`, `step_size`, `refit`, `input_size`, and `level`.
 
-The schema intentionally excludes arguments absent from 1.0.31.
+The schema maps the verified 1.1.0 constructor and fit arguments used by this runner and rejects unknown keys.
 
 ## Frozen Auto API mapping
 
@@ -80,7 +80,7 @@ Fit:
 
 - Ruff format and lint pass.
 - Python compilation and focused tests pass.
-- Runtime imports exactly MLForecast 1.0.31.
+- Runtime imports exactly MLForecast 1.1.0.
 - All eight AutoModels construct.
 - Core Ridge and AutoRidge fit/predict/save/load smoke tests pass.
 - Holdout and Prospective known-future keys exactly match expected horizons.

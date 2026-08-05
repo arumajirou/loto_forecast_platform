@@ -12,7 +12,7 @@ from loto.mlforecast.provenance import (
 
 
 def test_runtime_version_exact_match(monkeypatch) -> None:
-    monkeypatch.setattr(metadata, "version", lambda package: "1.0.31")
+    monkeypatch.setattr(metadata, "version", lambda package: "1.1.0")
     result = verify_mlforecast_runtime()
     assert result["installed_version"] == MLFORECAST_REQUIRED_VERSION
     assert result["upstream_commit"] == MLFORECAST_UPSTREAM_COMMIT

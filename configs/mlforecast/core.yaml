@@ -1,4 +1,4 @@
-required_mlforecast_version: "1.0.31"
+required_mlforecast_version: "1.1.0"
 mode: core
 id_col: unique_id
 time_col: ds
@@ -37,6 +37,8 @@ core:
           min_samples: 2
   date_features: []
   num_threads: 1
+  date_features_as_dummies: false
+  drop_auxiliary_columns: true
   target_transforms:
     - kind: local_standard_scaler
       params: {}
@@ -44,5 +46,6 @@ core:
   fitted: false
   as_numpy: false
   validate_data: true
+  cache_train_df: true
   cv_n_windows: 3
   cv_refit: true

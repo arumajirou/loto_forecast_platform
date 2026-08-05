@@ -37,15 +37,23 @@ def test_holdout_horizon_must_match() -> None:
 
 
 def test_runtime_version_is_frozen() -> None:
-    assert MLForecastRunConfig().required_mlforecast_version == "1.0.31"
+    assert MLForecastRunConfig().required_mlforecast_version == "1.1.0"
     with pytest.raises(ValidationError):
-        MLForecastRunConfig(required_mlforecast_version="1.1.0")
+        MLForecastRunConfig(required_mlforecast_version="1.0.31")
 
 
-def test_newer_unfrozen_arguments_fail_closed() -> None:
-    for field in ("date_features_as_dummies", "drop_auxiliary_columns", "cache_train_df"):
-        with pytest.raises(ValidationError):
-            CoreConfig.model_validate({field: True})
+def test_mlforecast_110_constructor_and_fit_arguments_are_accepted() -> None:
+    config = CoreConfig(
+        date_features_as_dummies=True,
+        drop_auxiliary_columns=["group"],
+        cache_train_df=False,
+        max_horizon=2,
+        horizon_features={1: ["known_h1"], 2: ["known_h2"]},
+    )
+    assert config.date_features_as_dummies is True
+    assert config.drop_auxiliary_columns == ["group"]
+    assert config.cache_train_df is False
+    assert config.horizon_features == {1: ["known_h1"], 2: ["known_h2"]}
 
 
 def test_feature_declarations_are_disjoint() -> None:

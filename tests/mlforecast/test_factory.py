@@ -86,6 +86,8 @@ def test_core_constructor_uses_only_frozen_arguments(monkeypatch) -> None:
         "date_features",
         "num_threads",
         "target_transforms",
+        "date_features_as_dummies",
+        "drop_auxiliary_columns",
     }
 
 

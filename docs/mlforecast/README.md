@@ -9,12 +9,12 @@ This subsystem adds a dedicated, leakage-safe MLForecast path. It is independent
 | Field | Value |
 |---|---|
 | package | `mlforecast` |
-| required version | `1.0.31` |
-| tag | `v1.0.31` |
-| commit | `c8f8b6d25184dcbed2454e185a92f3f8ef2e17e8` |
-| wheel SHA-256 | `941c4623f3440e0c3fa63db9df0a9ad198045cdb04bd624c8188edd11c74a441` |
+| required version | `1.1.0` |
+| tag | `v1.1.0` |
+| commit | `a1609efddf8cf1a83510a50cd5487b66f32271c6` |
+| wheel SHA-256 | `PENDING_DOWNLOAD_VERIFICATION` |
 
-Version `1.1.0` is not part of this contract. The runtime checks the installed distribution version and fails closed unless it is exactly `1.0.31`.
+Version `1.1.0` is the verified target. The runtime checks the installed distribution version and fails closed on any other version.
 
 ## Supported Core estimators
 
@@ -27,9 +27,9 @@ Version `1.1.0` is not part of this contract. The runtime checks the installed d
 - `xgboost`
 - `catboost`
 
-The configuration maps to the frozen 1.0.31 constructor and fit/CV APIs: lags, lag transforms, date features, target transforms, static features, known-future exogenous features, prediction intervals, fitting options, cross-validation, update, save, and load.
+The configuration maps to the frozen 1.1.0 constructor and fit/CV APIs: lags, lag transforms, date features, target transforms, static features, known-future exogenous features, prediction intervals, fitting options, cross-validation, update, save, and load.
 
-Arguments not present in 1.0.31, including `date_features_as_dummies`, `drop_auxiliary_columns`, and `cache_train_df`, are rejected by the strict Pydantic schema rather than silently ignored.
+The verified 1.1.0 arguments `date_features_as_dummies`, `drop_auxiliary_columns`, `cache_train_df`, `horizon_features`, and `horizon_feature_templates` are mapped explicitly. Unknown keys are rejected.
 
 ## Supported AutoMLForecast models
 
@@ -69,7 +69,7 @@ The PR intentionally does not edit shared dependency files. Run the dedicated mo
 
 ```bash
 uv run \
-  --with mlforecast==1.0.31 \
+  --with mlforecast==1.1.0 \
   --with 'lightgbm>=4.6' \
   --with xgboost \
   --with catboost \
@@ -82,7 +82,7 @@ Auto mode:
 
 ```bash
 uv run \
-  --with mlforecast==1.0.31 \
+  --with mlforecast==1.1.0 \
   --with 'lightgbm>=4.6' \
   --with xgboost \
   --with catboost \
@@ -103,7 +103,7 @@ Each run stores the raw source copy, canonical input, Train/Holdout, configurati
 
 Runtime certification requires:
 
-1. exact `mlforecast==1.0.31`;
+1. exact `mlforecast==1.1.0`;
 2. model save;
 3. `MLForecast.load()`;
 4. repeated prediction with identical keys and columns;
@@ -116,7 +116,7 @@ This implementation does not claim real-data accuracy improvement, Holdout super
 
 ## Official sources
 
-- https://pypi.org/project/mlforecast/1.0.31/
-- https://github.com/Nixtla/mlforecast/tree/v1.0.31
+- https://pypi.org/project/mlforecast/1.1.0/
+- https://github.com/Nixtla/mlforecast/tree/v1.1.0
 - https://nixtlaverse.nixtla.io/mlforecast/forecast.html
 - https://nixtlaverse.nixtla.io/mlforecast/auto.html

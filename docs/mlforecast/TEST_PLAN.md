@@ -9,10 +9,10 @@
 
 ## Contract tests
 
-- exact version `1.0.31` accepted; other versions rejected;
+- exact version `1.1.0` accepted; other versions rejected;
 - all eight AutoModel names accepted;
 - unknown model and unknown fields rejected;
-- unsupported post-1.0.31 arguments rejected;
+- unknown arguments rejected; 1.1.0 constructor and fit arguments accepted;
 - malformed search spaces rejected;
 - static and known-future feature sets are disjoint;
 - unclassified feature columns rejected;
@@ -27,7 +27,7 @@
 Using the verified wheel:
 
 1. verify wheel SHA-256;
-2. verify `importlib.metadata.version("mlforecast") == "1.0.31"`;
+2. verify `importlib.metadata.version("mlforecast") == "1.1.0"`;
 3. Core Ridge fit/predict;
 4. Core save/load/re-predict;
 5. AutoRidge with two Optuna trials;

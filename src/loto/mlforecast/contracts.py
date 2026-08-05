@@ -107,7 +107,7 @@ class PredictionIntervalsConfig(BaseModel):
 
 
 class CoreConfig(BaseModel):
-    """Arguments mapped to the frozen MLForecast 1.0.31 APIs."""
+    """Arguments mapped to the frozen MLForecast 1.1.0 APIs."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -120,15 +120,20 @@ class CoreConfig(BaseModel):
     date_features: list[str] = Field(default_factory=list)
     num_threads: int = Field(default=1, ge=1)
     target_transforms: list[TargetTransformSpec] = Field(default_factory=list)
+    date_features_as_dummies: bool = False
+    drop_auxiliary_columns: bool | list[str] = True
 
     dropna: bool = True
     keep_last_n: int | None = Field(default=None, ge=1)
     max_horizon: int | None = Field(default=None, ge=1)
     horizons: list[int] | None = None
+    horizon_features: dict[int, list[str]] | None = None
+    horizon_feature_templates: list[str] | None = None
     fitted: bool = False
     as_numpy: bool = False
     weight_col: str | None = None
     validate_data: bool = True
+    cache_train_df: bool = True
     prediction_intervals: PredictionIntervalsConfig | None = None
 
     cv_n_windows: int = Field(default=3, ge=1)
@@ -186,11 +191,19 @@ class CoreConfig(BaseModel):
                 raise ValueError(f"{field_name} reference unselected models: {unknown}")
         if self.max_horizon is not None and self.horizons is not None:
             raise ValueError("max_horizon and horizons are mutually exclusive")
+        if self.horizon_features is not None and self.horizon_feature_templates is not None:
+            raise ValueError(
+                "horizon_features and horizon_feature_templates are mutually exclusive"
+            )
+        if (self.horizon_features is not None or self.horizon_feature_templates is not None) and (
+            self.max_horizon is None and self.horizons is None
+        ):
+            raise ValueError("horizon-specific features require max_horizon or horizons")
         return self
 
 
 class AutoConfig(BaseModel):
-    """Arguments mapped to AutoMLForecast 1.0.31 constructor and fit APIs."""
+    """Arguments mapped to AutoMLForecast 1.1.0 constructor and fit APIs."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -210,10 +223,13 @@ class AutoConfig(BaseModel):
     keep_last_n: int | None = Field(default=None, ge=1)
     max_horizon: int | None = Field(default=None, ge=1)
     horizons: list[int] | None = None
+    horizon_features: dict[int, list[str]] | None = None
+    horizon_feature_templates: list[str] | None = None
     fitted: bool = False
     as_numpy: bool = False
     weight_col: str | None = None
     validate_data: bool = True
+    cache_train_df: bool = True
     prediction_intervals: PredictionIntervalsConfig | None = None
 
     sampler: Literal["tpe", "random", "qmc", "cmaes"] = "tpe"
@@ -256,6 +272,14 @@ class AutoConfig(BaseModel):
             raise ValueError(f"search spaces reference unselected models: {unknown}")
         if self.max_horizon is not None and self.horizons is not None:
             raise ValueError("max_horizon and horizons are mutually exclusive")
+        if self.horizon_features is not None and self.horizon_feature_templates is not None:
+            raise ValueError(
+                "horizon_features and horizon_feature_templates are mutually exclusive"
+            )
+        if (self.horizon_features is not None or self.horizon_feature_templates is not None) and (
+            self.max_horizon is None and self.horizons is None
+        ):
+            raise ValueError("horizon-specific features require max_horizon or horizons")
         return self
 
 
@@ -264,7 +288,7 @@ class MLForecastRunConfig(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    required_mlforecast_version: Literal["1.0.31"] = "1.0.31"
+    required_mlforecast_version: Literal["1.1.0"] = "1.1.0"
     mode: RunMode = RunMode.CORE
     id_col: str = "unique_id"
     time_col: str = "ds"

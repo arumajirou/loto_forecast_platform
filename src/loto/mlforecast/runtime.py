@@ -91,6 +91,8 @@ def _fit_predict(
             refit=config.core.cv_refit,
             max_horizon=config.core.max_horizon,
             horizons=config.core.horizons,
+            horizon_features=config.core.horizon_features,
+            horizon_feature_templates=config.core.horizon_feature_templates,
             prediction_intervals=intervals,
             level=levels,
             input_size=config.core.cv_input_size,
@@ -140,7 +142,7 @@ def _fit_predict(
         id_col=config.id_col,
         time_col=config.time_col,
         target_col=config.target_col,
-        **{key: value in kwargs.items() if value is not None},
+        **{key: value for key, value in kwargs.items() if value is not None},
     )
     first_model = next(iter(model.models_.values()))
     x_df = _validated_x_df(first_model, holdout_features, h=config.h, config=config)

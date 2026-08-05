@@ -133,7 +133,7 @@ def build_prediction_intervals(config: PredictionIntervalsConfig | None) -> Any 
 
 
 def build_core_forecast(config: CoreConfig, *, seed: int) -> Any:
-    """Map the strict local contract to the MLForecast 1.0.31 constructor."""
+    """Map the strict local contract to the MLForecast 1.1.0 constructor."""
     from mlforecast import MLForecast
 
     models = {
@@ -148,6 +148,8 @@ def build_core_forecast(config: CoreConfig, *, seed: int) -> Any:
         date_features=config.date_features or None,
         num_threads=config.num_threads,
         target_transforms=build_target_transforms(config.target_transforms),
+        date_features_as_dummies=config.date_features_as_dummies,
+        drop_auxiliary_columns=config.drop_auxiliary_columns,
     )
 
 
@@ -157,12 +159,15 @@ def core_fit_kwargs(config: CoreConfig) -> dict[str, Any]:
         "keep_last_n": config.keep_last_n,
         "max_horizon": config.max_horizon,
         "horizons": config.horizons,
+        "horizon_features": config.horizon_features,
+        "horizon_feature_templates": config.horizon_feature_templates,
         "prediction_intervals": build_prediction_intervals(config.prediction_intervals),
         "fitted": config.fitted,
         "as_numpy": config.as_numpy,
         "weight_col": config.weight_col,
         "models_fit_kwargs": config.models_fit_kwargs or None,
         "validate_data": config.validate_data,
+        "cache_train_df": config.cache_train_df,
     }
     return {key: value for key, value in kwargs.items() if value is not None}
 
@@ -200,14 +205,17 @@ def _auto_mlf_fit_config(config: AutoConfig, static_features: list[str]) -> dict
         "keep_last_n": config.keep_last_n,
         "max_horizon": config.max_horizon,
         "horizons": config.horizons,
+        "horizon_features": config.horizon_features,
+        "horizon_feature_templates": config.horizon_feature_templates,
         "as_numpy": config.as_numpy,
         "validate_data": config.validate_data,
+        "cache_train_df": config.cache_train_df,
     }
     return {key: value for key, value in kwargs.items() if value is not None}
 
 
 def build_auto_forecast(config: AutoConfig, *, static_features: list[str]) -> Any:
-    """Build AutoMLForecast 1.0.31 with any subset of its eight AutoModels."""
+    """Build AutoMLForecast 1.1.0 with any subset of its eight AutoModels."""
     from mlforecast import auto as auto_module
 
     models: dict[str, Any] = {}
