@@ -1,0 +1,15 @@
+{
+  "phase": "AUTOGLUON_P10_CERTIFICATION_ISOLATION",
+  "status": "PARTIALLY_VERIFIED",
+  "focused_runtime_tests_passed": 9,
+  "related_tests_passed": 34,
+  "compileall": "PASS",
+  "line_length_over_100": 0,
+  "ruff": "NOT_RUN",
+  "mypy": "NOT_RUN",
+  "full_pytest": "NOT_RUN",
+  "real_autogluon_runtime": "BLOCKED_RUNTIME",
+  "github_ci": "CI_BLOCKED_PRE_RUN",
+  "gpu_certification": "NOT_RUN",
+  "new_workflow_runs_for_head": 0
+}
