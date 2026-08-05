@@ -144,18 +144,19 @@ claimed for an incomplete draw. Ranking uses `reconciled` for complete draws and
 
 ## Required baselines
 
-| Baseline | History-only definition |
+| Baseline | Prediction-time definition |
 |---|---|
 | `random_uniform` | Seeded sample without replacement from 1..31, sorted |
-| `fixed_center` | Per-position midpoint of historical minimum and maximum |
-| `mean` | Per-position arithmetic mean |
-| `median` | Per-position median |
+| `fixed_center` | History-independent fixed sequence `[6, 11, 16, 21, 26]`, derived only from the 1..31 domain and five positions |
+| `mean` | Per-position historical arithmetic mean |
+| `median` | Per-position historical median |
 | `last` | Most recent historical draw |
-| `frequency` | Five most frequent numbers with deterministic tie-breaking |
-| `statistical_ar1` | Per-position AR(1) with intercept by least squares |
+| `frequency` | Five most frequent historical numbers with deterministic tie-breaking |
+| `statistical_ar1` | Per-position AR(1) with intercept fitted on history by least squares |
 
 AR(1) falls back to the last value only when underidentified or non-finite. Fallback
-positions are recorded. Random uses an explicit seed, default `1`.
+positions are recorded. Random uses an explicit seed, default `1`. The fixed-value
+baseline does not depend on history or actual values.
 
 ## Seed aggregation and ranking
 
