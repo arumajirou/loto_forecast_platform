@@ -4,8 +4,10 @@
 
 - Pull request: #48
 - Branch: `agent/hierarchicalforecast-runtime-certification`
-- State: `PARTIALLY_VERIFIED / LOCK_CONTRACT_TESTS_PASS / CI_BLOCKED_RUNNER_START`
+- State: `PARTIALLY_VERIFIED / LOCK_CONTRACT_TESTS_PASS / CI_BLOCKED_PRE_RUN`
 - Promotion verdict: `NOT_READY_FOR_REVIEW`
+- Canonical CI blocker: issue #58
+- PR-specific CI dependency: issue #61
 
 The PR remains Draft until the formal promotion gate succeeds on the exact current clean head and
 GitHub Actions produces real passing steps and logs.
@@ -41,8 +43,8 @@ dev tools                = pytest, pytest-cov, Ruff, mypy, Pydantic
 ```
 
 The broad declaration is not presented as an exact pin. Formal success depends on `uv sync
---locked` and a new standard-library validator requiring the lock to resolve only version 1.5.1.
-The validator records SHA-256 values for both `pyproject.toml` and `uv.lock`.
+--locked` and a standard-library validator requiring the lock to resolve only version 1.5.1. The
+validator records SHA-256 values for both `pyproject.toml` and `uv.lock`.
 
 Isolated verification:
 
@@ -141,12 +143,30 @@ other roots but does not replace them.
 | real `/mnt/e` publication | pending |
 | standalone verification of real ZIP | pending |
 | formal promotion-gate exit 0 | pending |
-| GitHub Actions real-step success | blocked by issue #61 |
+| GitHub Actions real-step success | blocked by canonical issue #58 |
 
-## CI blocker
+## CI blocker evidence
 
-The failure class remains `BLOCKED_RUNNER_START`: jobs finish with `steps=null` and no logs. This is
-not Python test-failure evidence and provides no CI verification. Issue #61 remains open.
+The repository is private and `.github/workflows/ci.yml` contains real steps on
+`runs-on: ubuntu-latest`. Independent PRs #55, #56, #57, and #48 reproduce the same pre-run
+failure. The latest PR #48 observation is:
+
+```text
+head                    a97b5f58367e423625678debf6c7b49d7eca6821
+workflow run            31001553962 / #1869
+job                    92291396321
+conclusion             failure
+configured steps       present
+API step list          empty
+job log                404 BlobNotFound
+artifacts              none
+commit statuses        none
+```
+
+The supported classification is `CI_BLOCKED_PRE_RUN / REPOSITORY_OR_ACCOUNT_INFRASTRUCTURE`.
+This is not Python test-failure evidence. Issue #58 is the canonical owner-action tracker; issue
+#61 records only PR #48's dependency. Unchanged zero-step heads should not generate repeated
+reruns or duplicate comments.
 
 ## Verdict
 
