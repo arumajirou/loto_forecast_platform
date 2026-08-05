@@ -31,12 +31,14 @@ uv run --project "${ROOT}" python -m loto.adapters.gluonts.p6_campaign_cli \
 CAMPAIGN_RC=$?
 set -e
 
-python - "${ROOT}" "${REPO_ROOT}" "${OUT}" "${LANE}" "${RUN_ID}" <<'PY'
+uv run --project "${ROOT}" python - \
+  "${ROOT}" "${REPO_ROOT}" "${OUT}" "${LANE}" "${RUN_ID}" <<'PY_INNER'
 from __future__ import annotations
 
 import hashlib
 import importlib.metadata
 import json
+import os
 import platform
 import sys
 from pathlib import Path
@@ -62,6 +64,27 @@ def version(name: str) -> str | None:
     except importlib.metadata.PackageNotFoundError:
         return None
 
+
+def torch_runtime() -> dict[str, object]:
+    try:
+        import torch
+
+        return {
+            "imported": True,
+            "cuda_available": bool(torch.cuda.is_available()),
+            "cuda_device_count": int(torch.cuda.device_count()),
+            "cuda_devices": [
+                torch.cuda.get_device_name(index)
+                for index in range(torch.cuda.device_count())
+            ],
+        }
+    except Exception as exc:
+        return {
+            "imported": False,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+
+
 result_path = out / "p6_campaign_result.json"
 manifest_path = out / "p6_campaign_manifest.json"
 result = json.loads(result_path.read_text("utf-8"))
@@ -72,8 +95,13 @@ provenance = {
     "lane": lane,
     "status": result["status"],
     "workers": result["workers"],
+    "process_id": os.getpid(),
     "python": platform.python_version(),
     "python_executable": sys.executable,
+    "python_prefix": sys.prefix,
+    "platform": platform.platform(),
+    "machine": platform.machine(),
+    "torch_runtime": torch_runtime(),
     "versions": {
         "gluonts": version("gluonts"),
         "torch": version("torch"),
@@ -97,12 +125,15 @@ provenance = {
     json.dumps(provenance, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
     encoding="utf-8",
 )
-PY
+PY_INNER
 
-find "${OUT}" -type f ! -name P6_SHA256SUMS -print0 \
-  | sort -z \
-  | xargs -0 sha256sum \
-  > "${OUT}/P6_SHA256SUMS"
+(
+  cd "${OUT}"
+  find . -type f ! -name P6_SHA256SUMS -print0 \
+    | sort -z \
+    | xargs -0 sha256sum \
+    > P6_SHA256SUMS
+)
 
 if [[ "${CAMPAIGN_RC}" -ne 0 ]]; then
   echo "P6_GLUONTS_ALL_MODELS=FAILED"
