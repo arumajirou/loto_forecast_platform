@@ -7,6 +7,7 @@ RUN_ID="${RUN_ID:-merlion-bootstrap-$(date -u +%Y%m%dT%H%M%SZ)}"
 OUT="${OUT:-${ROOT}/artifacts/merlion-bootstrap/${RUN_ID}}"
 LOG="${OUT}/bootstrap.log"
 EXIT_FILE="${OUT}/exit_code"
+PYTHON_REQUEST="${MERLION_PYTHON:-3.11}"
 STAGE="initialize"
 mkdir -p "${OUT}"
 
@@ -56,6 +57,7 @@ export PYTHONPATH="${ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}"
 echo "RUN_ID=${RUN_ID}"
 echo "ROOT=${ROOT}"
 echo "ENV_DIR=${ENV_DIR}"
+echo "PYTHON_REQUEST=${PYTHON_REQUEST}"
 
 STAGE="preflight"
 python3 "${ROOT}/scripts/run_merlion_core_preflight.py" \
@@ -67,10 +69,16 @@ command -v uv
 uv --version
 
 STAGE="python_311_resolution"
-uv python find 3.11
+RESOLVED_PYTHON="$(uv python find --no-python-downloads "${PYTHON_REQUEST}")"
+"${RESOLVED_PYTHON}" -c \
+  'import sys; assert sys.version_info[:2] == (3, 11), sys.version; print(sys.version)'
+printf '%s\n' "${RESOLVED_PYTHON}" > "${OUT}/PYTHON_PATH.txt"
 
 STAGE="lock_resolution"
-uv lock --project "${ENV_DIR}" --python 3.11
+uv lock \
+  --project "${ENV_DIR}" \
+  --python "${RESOLVED_PYTHON}" \
+  --no-sources
 test -s "${ENV_DIR}/uv.lock"
 
 STAGE="lock_audit"
@@ -86,13 +94,23 @@ sha256sum \
   "${OUT}/PREFLIGHT.json" \
   "${OUT}/DEPENDENCY_AUDIT.json" \
   "${OUT}/DEPENDENCY_INVENTORY.csv" \
+  "${OUT}/PYTHON_PATH.txt" \
   | tee "${OUT}/dependency-sha256.txt"
 
 STAGE="frozen_sync"
-uv sync --project "${ENV_DIR}" --frozen --python 3.11
+uv sync \
+  --project "${ENV_DIR}" \
+  --frozen \
+  --python "${RESOLVED_PYTHON}" \
+  --no-sources
 
 STAGE="runtime_identity"
-uv run --project "${ENV_DIR}" --frozen python - <<'PY'
+uv run \
+  --project "${ENV_DIR}" \
+  --frozen \
+  --python "${RESOLVED_PYTHON}" \
+  --no-sources \
+  python - <<'PY'
 import importlib.metadata
 import numpy
 import sys

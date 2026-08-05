@@ -2,53 +2,66 @@
 
 ## Status boundary
 
-The preflight, bootstrap, and certification stages are deliberately separate.
+The preflight, bootstrap, evidence packaging, and certification stages are separate.
 
 - Preflight checks uv, Python 3.11 availability, DNS, disk space, and writable paths.
 - Bootstrap creates, audits, and syncs the isolated lock. It is not runtime certification.
+- Evidence packaging preserves either `BOOTSTRAP_PASS` or `BOOTSTRAP_BLOCKED` without promotion.
 - Formal certification requires the lock to be committed, the repository to be clean, and
   `uv sync --frozen` to pass.
-- A valid `BLOCKED` evidence bundle proves only that the failed attempt was recorded correctly.
 
-## 1. Preflight
+## 1. Recommended one-command resume
 
-```bash
-cd /mnt/e/env/ts/loto_forecast_platform
-PYTHONPATH="$PWD/src" python3 scripts/run_merlion_core_preflight.py \
-  --root "$PWD" \
-  --output artifacts/merlion-preflight/manual/PREFLIGHT.json
-```
-
-`BLOCKED` must be resolved before dependency work. `DEGRADED` means bootstrap may use a local
-cache but network-backed resolution is not currently available.
-
-## 2. Bootstrap and review the lock
+The resume runner never uses sudo, never changes the system Python, and never updates shell
+profiles. When Python 3.11 is absent and GitHub is reachable, uv installs a managed interpreter
+under `artifacts/merlion-managed-python/` with `--no-bin`.
 
 ```bash
 cd /mnt/e/env/ts/loto_forecast_platform
-RUN_ID="merlion-bootstrap-$(date -u +%Y%m%dT%H%M%SZ)" \
-  bash scripts/bootstrap_merlion_core_env.sh
+SESSION=merlion-core-bootstrap \
+  bash scripts/start_merlion_core_bootstrap_tmux.sh
 ```
 
-Inspect:
+Monitor:
+
+```bash
+tmux attach -t merlion-core-bootstrap
+```
+
+The runner performs preflight, writes `BOOTSTRAP_PLAN.json`, provisions Python 3.11 only when
+allowed, executes bootstrap with the exact interpreter path, and creates a verified evidence ZIP.
+
+## 2. Evidence outputs
 
 ```text
-PREFLIGHT.json
-DEPENDENCY_AUDIT.json
-DEPENDENCY_INVENTORY.csv
-dependency-sha256.txt
-bootstrap.log
-exit_code
-BOOTSTRAP_FAILURE.json  # only when blocked
+artifacts/merlion-bootstrap/<RUN_ID>/PREFLIGHT.json
+artifacts/merlion-bootstrap/<RUN_ID>/BOOTSTRAP_PLAN.json
+artifacts/merlion-bootstrap/<RUN_ID>/PYTHON_PROVISION.log
+artifacts/merlion-bootstrap/<RUN_ID>/PYTHON_PATH.txt
+artifacts/merlion-bootstrap/<RUN_ID>/DEPENDENCY_AUDIT.json
+artifacts/merlion-bootstrap/<RUN_ID>/DEPENDENCY_INVENTORY.csv
+artifacts/merlion-bootstrap/<RUN_ID>/BOOTSTRAP_FAILURE.json
+artifacts/merlion-bootstrap-packages/<RUN_ID>.zip
+artifacts/merlion-bootstrap-packages/<RUN_ID>.zip.sha256
+artifacts/merlion-bootstrap-packages/<RUN_ID>.verification.json
 ```
 
-Review `environments/merlion-core-py311/uv.lock`, package sources, versions, and hashes. The lock
-contains no reliable license inventory; license review remains a separate required action. Commit
-the isolated lock only after review. Do not modify the root lock.
+A blocked run still produces a ZIP. Verification confirms evidence integrity but does not change
+`BOOTSTRAP_BLOCKED` into a success state.
 
-## 3. Formal certification
+## 3. Bootstrap safety
 
-Run in tmux so terminal closure does not lose execution or logs.
+The bootstrap resolves one exact Python 3.11 executable and passes its path to every uv command.
+It uses `--no-sources` for lock, sync, and run so workspace, Git, URL, and local source overrides
+cannot silently enter the isolated environment.
+
+Review `environments/merlion-core-py311/uv.lock`, package sources, versions, hashes, and licenses.
+The lock contains no reliable license inventory; license review remains a separate required action.
+Commit the isolated lock only after review. Do not modify the root lock.
+
+## 4. Formal runtime certification
+
+After the reviewed lock is committed, run from the exact clean commit:
 
 ```bash
 cd /mnt/e/env/ts/loto_forecast_platform
@@ -56,23 +69,11 @@ SESSION=merlion-core-certification \
   bash scripts/start_merlion_core_certification_tmux.sh
 ```
 
-Inspect:
-
-```text
-IDENTITY.json
-DISCOVERY.json
-MODEL_RUNTIME_MATRIX.json
-VERIFICATION_REPORT.json
-ARTIFACT_MANIFEST.json
-SHA256SUMS
-provider-work/models/**
-```
-
 Formal success requires `RUNTIME_CERTIFIED`, all three models `RUNTIME_VERIFIED`, distinct
 train/load process IDs, prediction equality, package/version/revision agreement, and complete
 SHA-256 verification.
 
-## 4. Failure handling
+## 5. Failure handling
 
-Do not overwrite a failed Run. Preserve its Run ID and evidence. Fix only the classified cause,
-run focused tests, and use a new Run ID. Do not open Holdout or Prospective data in this phase.
+Do not overwrite a failed Run. Preserve its Run ID and evidence ZIP. Fix only the classified
+cause, run focused tests, and use a new Run ID. Do not open Holdout or Prospective data here.
