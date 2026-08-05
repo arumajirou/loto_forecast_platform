@@ -751,7 +751,6 @@ def export_portable_bundle(run_root: Path, output: Path) -> dict[str, Any]:
         raise ValueError("portable output must use the .zip extension")
     if output.exists():
         raise FileExistsError(output)
-    output.parent.mkdir(parents=True, exist_ok=True)
     entries = _collect_entries(run_root)
     for entry in entries:
         source = entry["path"]
@@ -759,6 +758,7 @@ def export_portable_bundle(run_root: Path, output: Path) -> dict[str, Any]:
             raise ValueError(
                 f"portable output must not be inside a source run: {source}"
             )
+    output.parent.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory(
         prefix="portable-artifact-",
