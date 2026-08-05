@@ -9,7 +9,7 @@ cd "$ROOT"
 OUTPUT_DIR="${1:-$ROOT/artifacts/mlforecast-handoff}"
 
 uv run --frozen -- \
-  python -m loto.mlforecast.handoff \
+  python -m loto.mlforecast.handoff_guard \
   --build \
   --repo-root "$ROOT" \
   --output-dir "$OUTPUT_DIR"
@@ -20,7 +20,7 @@ ZIP="$OUTPUT_DIR/mlforecast-handoff-$SHORT_SHA.zip"
 SIDECAR="$ZIP.sha256"
 
 uv run --frozen -- \
-  python -m loto.mlforecast.handoff \
+  python -m loto.mlforecast.handoff_guard \
   --verify \
   --zip "$ZIP" \
   --sha256 "$SIDECAR"
