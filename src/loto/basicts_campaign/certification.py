@@ -11,6 +11,8 @@ from typing import Any
 
 from loto.basicts_campaign.installed_provenance import (
     EXPECTED_DISTRIBUTION_NAME,
+    EXPECTED_IMPORT_NAME,
+    EXPECTED_PACKAGE_INIT,
     EXPECTED_REPOSITORY_URL,
 )
 
@@ -174,6 +176,11 @@ def _verify_response(directory: Path, operation: str) -> dict[str, Any]:
     return response
 
 
+def _require_digest(value: Any, field: str) -> None:
+    if not isinstance(value, str) or DIGEST_PATTERN.fullmatch(value) is None:
+        raise CertificationError(f"identity {field} is invalid")
+
+
 def _verify_identity_provenance(evidence: dict[str, Any]) -> None:
     required = {
         "installed_provenance_status": "PASS",
@@ -183,6 +190,9 @@ def _verify_identity_provenance(evidence: dict[str, Any]) -> None:
         "direct_url_vcs": "git",
         "direct_url_commit_id": EXPECTED_UPSTREAM_REVISION,
         "direct_url_requested_revision": EXPECTED_UPSTREAM_REVISION,
+        "import_origin_status": "PASS",
+        "import_name": EXPECTED_IMPORT_NAME,
+        "distribution_package_entry": EXPECTED_PACKAGE_INIT,
     }
     for field, expected in required.items():
         if evidence.get(field) != expected:
@@ -190,11 +200,26 @@ def _verify_identity_provenance(evidence: dict[str, Any]) -> None:
                 f"identity provenance mismatch for {field}: "
                 f"expected {expected!r}, got {evidence.get(field)!r}"
             )
-    direct_url_sha256 = evidence.get("direct_url_sha256")
-    if not isinstance(direct_url_sha256, str) or DIGEST_PATTERN.fullmatch(
-        direct_url_sha256
-    ) is None:
-        raise CertificationError("identity direct_url_sha256 is invalid")
+    if evidence.get("import_provider_distributions") != [EXPECTED_DISTRIBUTION_NAME]:
+        raise CertificationError("identity import provider mapping is invalid")
+
+    package_init = evidence.get("distribution_package_init")
+    import_origin = evidence.get("import_spec_origin")
+    if not isinstance(package_init, str) or not Path(package_init).is_absolute():
+        raise CertificationError("identity distribution_package_init is invalid")
+    if package_init != import_origin:
+        raise CertificationError("identity import origin differs from distribution package")
+    if not Path(package_init).as_posix().endswith(f"/{EXPECTED_PACKAGE_INIT}"):
+        raise CertificationError("identity distribution package path has an unexpected suffix")
+
+    locations = evidence.get("import_submodule_search_locations")
+    expected_location = str(Path(package_init).parent)
+    if locations != [expected_location]:
+        raise CertificationError("identity package search locations are inconsistent")
+    if not isinstance(evidence.get("module_already_loaded"), bool):
+        raise CertificationError("identity module_already_loaded is invalid")
+    _require_digest(evidence.get("direct_url_sha256"), "direct_url_sha256")
+    _require_digest(evidence.get("import_origin_sha256"), "import_origin_sha256")
 
 
 def verify_provider_bundle(directory: Path, operation: str) -> dict[str, Any]:
@@ -296,6 +321,7 @@ def certify_p0(
             "isolated_python_lane": "3.11",
             "identity": True,
             "installed_package_git_provenance": True,
+            "import_origin_bound_to_distribution": True,
             "config_import_allowlist": True,
             "dlinear_cpu_fit_predict": True,
             "save_load_repredict_exact": True,
