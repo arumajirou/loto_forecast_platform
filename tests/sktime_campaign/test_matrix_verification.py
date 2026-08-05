@@ -6,15 +6,30 @@ from pathlib import Path
 
 import pytest
 
+from loto.sktime_campaign.matrix import MODEL_SPECS
 from loto.sktime_campaign.matrix_verification import (
+    FORMAL_P1_FORECAST_HORIZON,
     FORMAL_P1_MODEL_IDS,
+    FORMAL_P1_SEED,
+    FORMAL_P1_SERIES,
+    FORMAL_THREAD_LIMITS,
     verify_matrix_bundle,
 )
+from loto.sktime_campaign.protocol import SmokeModelId
 from loto.sktime_campaign.verification import VerificationError
 
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _canonical_sha256(payload: object) -> str:
+    encoded = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -53,15 +68,26 @@ def _matrix_bundle(directory: Path) -> None:
     directory.mkdir()
     results = []
     for model_id in FORMAL_P1_MODEL_IDS:
+        enum_id = SmokeModelId(model_id)
+        spec = MODEL_SPECS[enum_id]
         archive = directory / f"{model_id}_model.zip"
         archive.write_bytes(b"PK-test-" + model_id.encode())
         values = [3.0, 4.0]
+        versions = {distribution: "test-version" for distribution in spec.required_distributions}
+        versions["sktime"] = "1.0.1"
         results.append(
             {
                 "model_id": model_id,
+                "class_path": spec.class_path,
+                "constructor": spec.constructor,
+                "required_distributions": list(spec.required_distributions),
+                "dependency_versions": versions,
+                "missing_dependencies": [],
                 "status": "PASS",
                 "device": "cpu",
                 "cpu_fallback": False,
+                "seed": FORMAL_P1_SEED,
+                "input_rows": len(FORMAL_P1_SERIES),
                 "dependency_status": "PASS",
                 "import_status": "PASS",
                 "construct_status": "PASS",
@@ -69,8 +95,8 @@ def _matrix_bundle(directory: Path) -> None:
                 "predict_status": "PASS",
                 "save_load_status": "PASS",
                 "prediction_finite": True,
-                "forecast_horizon": [1, 2],
-                "expected_prediction_index": [9, 10],
+                "forecast_horizon": list(FORMAL_P1_FORECAST_HORIZON),
+                "expected_prediction_index": [25, 26],
                 "prediction_shape": [2],
                 "prediction_before_save": values,
                 "prediction_after_load": values,
@@ -86,6 +112,16 @@ def _matrix_bundle(directory: Path) -> None:
         "status": "PASS",
         "device": "cpu",
         "cpu_fallback": False,
+        "seed": FORMAL_P1_SEED,
+        "thread_limits": FORMAL_THREAD_LIMITS,
+        "input_contract": {
+            "series_rows": len(FORMAL_P1_SERIES),
+            "series_sha256": _canonical_sha256(list(FORMAL_P1_SERIES)),
+            "forecast_horizon": list(FORMAL_P1_FORECAST_HORIZON),
+            "forecast_horizon_sha256": _canonical_sha256(
+                list(FORMAL_P1_FORECAST_HORIZON)
+            ),
+        },
         "requested_model_ids": list(FORMAL_P1_MODEL_IDS),
         "summary": {
             "status": "PASS",
@@ -123,6 +159,7 @@ def test_verify_matrix_bundle_passes(tmp_path: Path) -> None:
 
     assert report["status"] == "PASS"
     assert report["passed"] == len(FORMAL_P1_MODEL_IDS)
+    assert report["thread_limits"] == FORMAL_THREAD_LIMITS
 
 
 def test_verify_matrix_bundle_rejects_partial_status(tmp_path: Path) -> None:
@@ -144,4 +181,19 @@ def test_verify_matrix_bundle_rejects_model_archive_tamper(tmp_path: Path) -> No
     archive.write_bytes(b"tampered")
 
     with pytest.raises(VerificationError, match="SHA-256 mismatch"):
+        verify_matrix_bundle(bundle)
+
+
+def test_verify_matrix_bundle_rejects_thread_limit_drift(tmp_path: Path) -> None:
+    bundle = tmp_path / "smoke-matrix"
+    _matrix_bundle(bundle)
+    matrix = json.loads((bundle / "SMOKE_MATRIX.json").read_text())
+    matrix["thread_limits"]["OMP_NUM_THREADS"] = "8"
+    _write_json(bundle / "SMOKE_MATRIX.json", matrix)
+    response = json.loads((bundle / "response.json").read_text())
+    response["matrix"] = matrix
+    _write_json(bundle / "response.json", response)
+    _finalize_bundle(bundle)
+
+    with pytest.raises(VerificationError, match="thread limits mismatch"):
         verify_matrix_bundle(bundle)
