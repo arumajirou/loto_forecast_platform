@@ -20,7 +20,8 @@
 - real q0.1-q0.9 CPU/GPU inference;
 - real two-process snapshot reload and prediction reproduction;
 - external GPU PID/UUID/VRAM and post-exit release verification;
-- full repository pytest and GitHub Actions;
+- full repository pytest;
+- GitHub Actions was invoked but blocked before any workflow step (`CI_BLOCKED_RUNNER_START`);
 - OOF, Holdout, Prospective, Hit@±1, calibration, or baseline superiority.
 
 Hermetic tests validate project-side contracts and comparison logic only. They are not model
