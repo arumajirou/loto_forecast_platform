@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "phase": "AUTOGLUON_P17_PROMOTION_ELIGIBILITY",
+  "status": "PARTIALLY_VERIFIED",
+  "focused_tests": {
+    "passed": 20,
+    "failed": 0
+  },
+  "compileall": "PASS",
+  "line_length_over_100": 0,
+  "ruff": "NOT_AVAILABLE",
+  "mypy": "NOT_AVAILABLE",
+  "full_pytest": "NOT_RUN",
+  "github_ci": "CI_BLOCKED_PRE_RUN",
+  "real_autogluon_runtime": "BLOCKED_RUNTIME",
+  "real_holdout_score": "NOT_RUN",
+  "real_prospective_scores": "NOT_RUN",
+  "real_promotion_eligibility": "NOT_RUN",
+  "default_policy": {
+    "minimum_prospective_windows": 3,
+    "minimum_prospective_draws": 3,
+    "hit_at_1_target": 0.9,
+    "maximum_hit_at_1_drop": 0.05,
+    "maximum_mae_increase": 0.5,
+    "require_all_windows_stable": true,
+    "require_all_baselines_beaten": true
+  },
+  "safety": {
+    "human_approval_required": true,
+    "human_approval_granted": false,
+    "automatic_promotion": false,
+    "automatic_retraining": false,
+    "registry_write_allowed": false,
+    "promotion_status": "NOT_PROMOTED"
+  },
+  "files": {
+    "configs/autogluon_campaign/p17_promotion_eligibility_policy.json": {
+      "bytes": 341,
+      "sha256": "c8c855c3519e117170098527e5c7fec92c1392e7d027f466faf44d7459e03131"
+    },
+    "docs/autogluon/P17_PROMOTION_ELIGIBILITY.md": {
+      "bytes": 5350,
+      "sha256": "42e3a5992643fa069cebafdb532faedfea530f89c7bec70c28d91689d185c818"
+    },
+    "scripts/run_autogluon_p17_promotion.py": {
+      "bytes": 125,
+      "sha256": "3cc53e7408d4d99f378123e9728481145825d551f852d602c65cd2ebf83f2aed"
+    },
+    "src/loto/autogluon_campaign/promotion_eligibility.py": {
+      "bytes": 6832,
+      "sha256": "acd657139d790a6e269903ac4c18514b5b4e63ce901fd2d9540fd6eb76789721"
+    },
+    "src/loto/autogluon_campaign/promotion_eligibility_cli.py": {
+      "bytes": 3013,
+      "sha256": "8335b6ed0ce84fa829e81350b644be435cb7df069904edcf73c37db14a7451c8"
+    },
+    "src/loto/autogluon_campaign/promotion_eligibility_contract.py": {
+      "bytes": 8418,
+      "sha256": "26403ac1814be508f3b186b58646e25a2ac8298319903a9c336d88f21301abe7"
+    },
+    "src/loto/autogluon_campaign/promotion_eligibility_io.py": {
+      "bytes": 4744,
+      "sha256": "6237ae59b6fd8907453ee10a5b45afe2d0fc7df5de6a078bdfcc1d18a14abc26"
+    },
+    "src/loto/autogluon_campaign/promotion_eligibility_rules.py": {
+      "bytes": 6467,
+      "sha256": "452942c6c4bf06c6ab802143826efed2a4e3a883cbf905975d847b9c544fa57b"
+    },
+    "tests/autogluon_campaign/p17_test_support.py": {
+      "bytes": 5418,
+      "sha256": "b3b1505e9f136757effe42ee34eae563ec086d4d0f96bc41c061ab7bebfdc797"
+    },
+    "tests/autogluon_campaign/test_promotion_eligibility_integrity.py": {
+      "bytes": 7019,
+      "sha256": "e35c04cca8bf0265b8d6215a2d3e3dcecf84a54d517336eb59515e1886aed5dd"
+    },
+    "tests/autogluon_campaign/test_promotion_eligibility_rules.py": {
+      "bytes": 5025,
+      "sha256": "6327548b8ee6adb5f10ba0f84235da30639f170866a8d1f0e6e1da9ef0a02d25"
+    }
+  }
+}
