@@ -13,16 +13,20 @@ branch code as failing, and it does not count as passing CI evidence.
 
 - Workflow: `.github/workflows/ci.yml`
 - Workflow name: `ci`
-- Head: `b6e039110405ebbe99ae340689db954bac9f48a7`
-- Run ID: `30984380940`
-- Run number: `946`
-- Job ID: `92235697380`
+- Head: `616b3d330b063338382194d31b9780d955bd2ca6`
+- Run ID: `30985512951`
+- Run number: `1033`
+- Job ID: `92239226331`
 - Job name: `test`
 - Conclusion: `failure`
 - Job steps returned by GitHub API: empty
 - Downloadable job log: absent
-- Workflow artifacts: none
-- Commit combined statuses: none
+- Workflow artifacts: none observed
+- Runner-execution evidence: absent
+
+The latest commit adds documentation only. The repeated zero-step result therefore adds evidence
+that the external runner-start blocker is independent of the HierarchicalForecast implementation
+code path.
 
 ## Workflow definition check
 
