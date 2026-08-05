@@ -1,0 +1,4 @@
+mode,status,reason
+batch_recompute,SUPPORTED_CONTRACT,initial provider mode
+incremental_streaming,UNVERIFIED,public stable package API not verified
+stream_state_save_load,UNVERIFIED,no supported public API claimed
