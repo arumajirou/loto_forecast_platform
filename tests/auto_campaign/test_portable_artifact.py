@@ -181,11 +181,16 @@ def test_zip_path_traversal_is_rejected(tmp_path: Path) -> None:
     assert not (tmp_path / "escape.txt").exists()
 
 
-def test_output_inside_source_run_is_rejected(tmp_path: Path) -> None:
+def test_output_inside_source_run_is_rejected_without_mutation(tmp_path: Path) -> None:
     target, _coverage, _bundle = _bundle_fixture(tmp_path)
+    unexpected_parent = target / "new-export-directory"
+    output = unexpected_parent / "portable.zip"
 
     with pytest.raises(ValueError, match="must not be inside a source run"):
-        export_portable_bundle(target, target / "portable.zip")
+        export_portable_bundle(target, output)
+
+    assert not output.exists()
+    assert not unexpected_parent.exists()
 
 
 def test_source_symlink_is_rejected(tmp_path: Path) -> None:
