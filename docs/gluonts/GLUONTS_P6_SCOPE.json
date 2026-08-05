@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "P6A_NINE_ESTIMATOR_CONSTRUCTOR_MATRIX",
+  "phase": "P6_ALL_NINE_ESTIMATOR_LIFECYCLE",
   "status": "PARTIALLY_VERIFIED",
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
   "branch": "feat/gluonts-probabilistic-contract-v1",
@@ -20,9 +20,12 @@
     "EXECUTION_PENDING",
     "DISCOVERED_ONLY",
     "CONSTRUCTED_ONLY",
+    "VERIFIED",
     "FAILED"
   ],
+  "focused_tests": 21,
   "formal_runtime_verified_models": 0,
-  "next_phase": "P6B_BOUNDED_FIT_PREDICT_SERIALIZE_RELOAD",
+  "real_runtime_claims": "EXECUTION_PENDING",
+  "next_phase": "P7_TARGET_MACHINE_EXECUTION_AND_FAILURE_CLASSIFICATION",
   "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
 }
