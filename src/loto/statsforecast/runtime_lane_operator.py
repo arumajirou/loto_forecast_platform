@@ -238,6 +238,30 @@ def send_tts_notification(
     }
 
 
+def _safe_notification_call(
+    channel: str,
+    notifier: Callable[..., dict[str, Any]],
+    *args: str,
+) -> dict[str, Any]:
+    try:
+        result = notifier(*args)
+    except Exception as exc:
+        return {
+            "channel": channel,
+            "status": "FAILED",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+        }
+    if not isinstance(result, dict):
+        return {
+            "channel": channel,
+            "status": "FAILED",
+            "error_type": "TypeError",
+            "error": "notification result must be a dictionary",
+        }
+    return result
+
+
 def _render_markdown(report: Mapping[str, Any]) -> str:
     lines = [
         "# StatsForecast Target-host Operator Report",
@@ -431,16 +455,18 @@ def run_target_host_operator(
     notification_results: list[dict[str, Any]] = []
     if enable_tts:
         notifier = tts_notifier or send_tts_notification
-        notification_results.append(notifier(message))
+        notification_results.append(
+            _safe_notification_call("tts", notifier, message)
+        )
     else:
         notification_results.append(
             {"channel": "tts", "status": "DISABLED"}
         )
     if enable_email:
         if email_notifier is None:
-            settings = email_settings_from_env(environment)
 
             def configured_email(subject_value: str, body_value: str) -> dict[str, Any]:
+                settings = email_settings_from_env(environment)
                 return send_email_notification(
                     subject_value,
                     body_value,
@@ -449,7 +475,12 @@ def run_target_host_operator(
 
             email_notifier = configured_email
         notification_results.append(
-            email_notifier(subject, _render_markdown(report))
+            _safe_notification_call(
+                "email",
+                email_notifier,
+                subject,
+                _render_markdown(report),
+            )
         )
     else:
         notification_results.append(
