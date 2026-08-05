@@ -10,6 +10,13 @@ from loto.sktime_campaign.holdout_scoring import (
     HoldoutActuals,
     HoldoutScoringRequest,
 )
+from loto.sktime_campaign.prospective import (
+    DriftPolicy,
+    ObservedHistory,
+    ProspectiveActuals,
+    ProspectiveMonitoringRequest,
+    ProspectiveRequest,
+)
 from loto.sktime_campaign.protocol import (
     ProviderOperation,
     ProviderRequest,
@@ -25,9 +32,14 @@ from loto.sktime_campaign.rolling_origin import (
 __all__ = [
     "BaselineId",
     "ChronologicalSplit",
+    "DriftPolicy",
     "GameMatrix",
     "HoldoutActuals",
     "HoldoutScoringRequest",
+    "ObservedHistory",
+    "ProspectiveActuals",
+    "ProspectiveMonitoringRequest",
+    "ProspectiveRequest",
     "ProviderOperation",
     "ProviderRequest",
     "ProviderResponse",
