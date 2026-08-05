@@ -21,6 +21,16 @@ from .foundation_models import (
     capability_matrix_sha256,
     run_foundation_matrix,
 )
+from .historical_evaluation import (
+    HistoricalContractReport,
+    HistoricalForecastPolicy,
+    HistoricalPoint,
+    HistoricalRuntimeEvidence,
+    build_contract_report,
+    collect_darts_runtime_evidence,
+    expected_fit_origins,
+    expected_origins,
+)
 from .protocol import DartsRequest, DartsResponse, GameGeometry
 from .provenance import RunProvenance, build_run_provenance
 from .regression_models import (
@@ -55,6 +65,10 @@ __all__ = [
     "FoundationModelConfig",
     "FoundationSourceConfig",
     "GameGeometry",
+    "HistoricalContractReport",
+    "HistoricalForecastPolicy",
+    "HistoricalPoint",
+    "HistoricalRuntimeEvidence",
     "MetricVector",
     "OOFConfig",
     "REGRESSION_MODEL_IDENTITIES",
@@ -70,13 +84,17 @@ __all__ = [
     "TorchRuntimeObservation",
     "TorchTrainingContract",
     "aggregate_all",
+    "build_contract_report",
     "build_expanding_folds",
     "build_mlforecast_parity_payload",
     "build_parallel_plan",
     "build_run_provenance",
     "capability_matrix_sha256",
     "certify_device_use",
+    "collect_darts_runtime_evidence",
     "evaluate_predictions",
+    "expected_fit_origins",
+    "expected_origins",
     "run_foundation_matrix",
     "run_oof",
     "run_regression_matrix",
