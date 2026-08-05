@@ -1,0 +1,38 @@
+schema_version: 1
+profile_name: darts-torch
+python_min: [3, 11]
+python_max_exclusive: [3, 14]
+package_versions:
+  darts: 0.46.1
+  torch: 2.9.1
+required_imports:
+  - darts
+  - torch
+  - lightning
+  - huggingface_hub
+  - safetensors
+required_model_exports:
+  - NBEATSModel
+  - NHiTSModel
+  - TCNModel
+  - TFTModel
+  - DLinearModel
+  - NLinearModel
+  - TiDEModel
+  - TSMixerModel
+  - TransformerModel
+  - RNNModel
+  - Chronos2Model
+  - TimesFM2p5Model
+  - TiRexModel
+  - PatchTSTFMModel
+optional_imports:
+  - tirex
+lockfile_path: environments/darts-torch/uv.lock
+require_cuda: true
+require_nvidia_smi: true
+allow_cpu_fallback: false
+allow_network: false
+smoke_models:
+  - NLinearModel
+timeout_seconds: 180

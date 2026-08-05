@@ -1,0 +1,45 @@
+schema_version: 1
+profile_name: darts-notorch
+python_min: [3, 11]
+python_max_exclusive: [3, 14]
+package_versions:
+  darts: 0.46.1
+required_imports:
+  - darts
+  - numpy
+  - pandas
+  - pydantic
+  - statsforecast
+  - lightgbm
+  - xgboost
+  - catboost
+required_model_exports:
+  - NaiveMean
+  - NaiveSeasonal
+  - NaiveDrift
+  - NaiveMovingAverage
+  - ARIMA
+  - AutoARIMA
+  - ExponentialSmoothing
+  - Theta
+  - Croston
+  - LinearRegressionModel
+  - RandomForestModel
+  - LightGBMModel
+  - XGBModel
+  - CatBoostModel
+  - SKLearnModel
+  - NaiveEnsembleModel
+  - RegressionEnsembleModel
+  - ConformalNaiveModel
+  - ConformalQRModel
+optional_imports: []
+lockfile_path: environments/darts-notorch/uv.lock
+require_cuda: false
+require_nvidia_smi: false
+allow_cpu_fallback: false
+allow_network: false
+smoke_models:
+  - NaiveMean
+  - LinearRegressionModel
+timeout_seconds: 120
