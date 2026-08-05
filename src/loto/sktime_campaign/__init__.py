@@ -6,6 +6,10 @@ from loto.sktime_campaign.benchmark import (
     GameMatrix,
     ValidationBenchmarkRequest,
 )
+from loto.sktime_campaign.holdout_scoring import (
+    HoldoutActuals,
+    HoldoutScoringRequest,
+)
 from loto.sktime_campaign.protocol import (
     ProviderOperation,
     ProviderRequest,
@@ -22,6 +26,8 @@ __all__ = [
     "BaselineId",
     "ChronologicalSplit",
     "GameMatrix",
+    "HoldoutActuals",
+    "HoldoutScoringRequest",
     "ProviderOperation",
     "ProviderRequest",
     "ProviderResponse",
