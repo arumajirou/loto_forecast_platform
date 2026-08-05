@@ -321,6 +321,10 @@ def _copy_source_evidence(run_root: Path, output: Path) -> dict[str, Any]:
     records: dict[str, Any] = {}
     for name in (
         "manifest.json",
+        "campaign_config.json",
+        "data_contract.json",
+        "PROMOTION_GATE.json",
+        "LINEAGE.json",
         PREDICTION_LOCK_PATH,
         "VERIFICATION_SEAL.json",
         "VERIFICATION_REPORT.json",
