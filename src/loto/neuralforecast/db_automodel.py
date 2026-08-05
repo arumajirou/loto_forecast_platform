@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import sqlite3
 import time
 import traceback
@@ -29,6 +30,7 @@ from loto.models.neuralforecast_adapter import (
     construct_auto_model,
     resolve_auto_model_plan,
 )
+from loto.neuralforecast.runtime_certification import certify_saved_runtime
 
 _IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _LAYOUTS = {"auto", "wide", "long"}
@@ -72,7 +74,7 @@ class AutoModelCampaignConfig:
     workers: int = 1
     max_gpu_jobs: int = 1
     precision: str = "32-true"
-    random_seed: int = 42
+    random_seed: int = 1
     search_strategy: Literal["auto", "random", "tpe", "cmaes"] = "auto"
     refit_with_val: bool = False
     local_scaler_type: str | None = None
@@ -80,6 +82,8 @@ class AutoModelCampaignConfig:
     use_init_models: bool = False
     fit_verbose: bool = False
     save_models: bool = False
+    verify_load_predict: bool = True
+    require_gpu_execution: bool | None = None
     dry_run: bool = False
     model_configs: dict[str, dict[str, Any]] = field(default_factory=dict)
 
@@ -104,6 +108,13 @@ class AutoModelCampaignConfig:
             raise ValueError("workers must be >= 1")
         if self.max_gpu_jobs < 1:
             raise ValueError("max_gpu_jobs must be >= 1")
+        if self.gpus > 0 and self.parallel_trials > 1:
+            raise ValueError(
+                "GPU campaigns require parallel_trials=1; use workers/max_gpu_jobs "
+                "for bounded outer concurrency"
+            )
+        if self.require_gpu_execution is True and self.gpus < 1:
+            raise ValueError("require_gpu_execution=True requires gpus >= 1")
 
 
 def _validate_identifier(value: str, *, label: str) -> str:
@@ -410,6 +421,7 @@ def _run_single_model(
         "model_id": spec.model_id,
         "class_name": spec.class_name,
         "status": "RUNNING",
+        "certification_status": "PENDING",
         "started_at": utc_now_iso(),
     }
     try:
@@ -482,17 +494,46 @@ def _run_single_model(
         )
         prediction_path = model_dir / "predictions.csv"
         decoded.to_csv(prediction_path, index=False)
-        if config.save_models:
-            nf.save(str(model_dir / "neuralforecast"), save_dataset=True, overwrite=True)
+
+        certification: dict[str, Any] = {
+            "status": "SKIPPED",
+            "reason": "verify_load_predict is disabled",
+        }
+        certification_status = "TRAIN_ONLY"
+        model_path = model_dir / "neuralforecast"
+        if config.verify_load_predict:
+            require_gpu = (
+                config.gpus > 0
+                if config.require_gpu_execution is None
+                else config.require_gpu_execution
+            )
+            certification = certify_saved_runtime(
+                neuralforecast=nf,
+                neuralforecast_class=NeuralForecast,
+                model_path=model_path,
+                prediction_before=prediction,
+                alias=alias,
+                verbose=config.fit_verbose,
+                require_gpu=require_gpu,
+            )
+            atomic_write_json(model_dir / "runtime_certification.json", certification)
+            certification_status = "RUNTIME_CERTIFIED"
+            if not config.save_models:
+                shutil.rmtree(model_path, ignore_errors=True)
+        elif config.save_models:
+            nf.save(str(model_path), save_dataset=True, overwrite=True)
+
         report.update(
             {
                 "status": "SUCCEEDED",
+                "certification_status": certification_status,
                 "finished_at": utc_now_iso(),
                 "elapsed_seconds": time.perf_counter() - started,
                 "prediction_rows": int(len(decoded)),
                 "point_column": value_col,
                 "prediction_path": str(prediction_path),
                 "plan": plan_payload,
+                "runtime_certification": certification,
                 "decoded_predictions": decoded[
                     ["unique_id", "ds", "raw_prediction", "decoded_prediction"]
                 ].to_dict(orient="records"),
@@ -502,6 +543,7 @@ def _run_single_model(
         report.update(
             {
                 "status": "FAILED",
+                "certification_status": "FAILED",
                 "finished_at": utc_now_iso(),
                 "elapsed_seconds": time.perf_counter() - started,
                 "error": f"{type(exc).__name__}: {exc}",
@@ -532,8 +574,11 @@ def build_campaign_plan(config: AutoModelCampaignConfig, panel: pd.DataFrame) ->
     if config.gpus > 0:
         effective_workers = min(config.workers, config.max_gpu_jobs)
         queue_policy = "gpu_bounded_queue"
+    require_gpu = (
+        config.gpus > 0 if config.require_gpu_execution is None else config.require_gpu_execution
+    )
     return {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "game": config.game,
         "source": {
             "db_url": mask_database_url(config.source.db_url),
@@ -570,8 +615,26 @@ def build_campaign_plan(config: AutoModelCampaignConfig, panel: pd.DataFrame) ->
             "requested_workers": config.workers,
             "effective_workers": effective_workers,
             "max_gpu_jobs": config.max_gpu_jobs,
+            "parallel_trials": config.parallel_trials,
             "queue_policy": queue_policy,
             "maximum_parallel_trials": effective_workers * config.parallel_trials,
+            "gpu_parallel_trials_fail_closed": config.gpus > 0,
+        },
+        "runtime_certification": {
+            "verify_load_predict": config.verify_load_predict,
+            "require_gpu_execution": require_gpu,
+            "retain_model_bundle": config.save_models,
+            "required_checks": [
+                "save",
+                "load",
+                "predict",
+                "finite_predictions",
+                "finite_state_dict",
+                "shape_match",
+                "prediction_match",
+                "device_evidence",
+                "cpu_fallback_rejection_when_gpu_required",
+            ],
         },
         "models": [
             {
@@ -628,8 +691,9 @@ def run_automodel_campaign(config: AutoModelCampaignConfig) -> dict[str, Any]:
     plan_path = atomic_write_json(output / "campaign_plan.json", plan)
     if config.dry_run:
         result = {
-            "schema_version": "1.0.0",
+            "schema_version": "1.1.0",
             "status": "DRY_RUN_VERIFIED",
+            "certification_status": "NOT_EXECUTED",
             "plan_path": str(plan_path),
             "panel_path": str(panel_path),
             "model_count": len(plan["models"]),
@@ -664,18 +728,32 @@ def run_automodel_campaign(config: AutoModelCampaignConfig) -> dict[str, Any]:
                         {
                             "model_id": futures[future],
                             "status": "FAILED",
+                            "certification_status": "FAILED",
                             "error": f"{type(exc).__name__}: {exc}",
                         }
                     )
 
     succeeded = [report for report in reports if report.get("status") == "SUCCEEDED"]
     failed = [report for report in reports if report.get("status") != "SUCCEEDED"]
+    certified = [
+        report
+        for report in succeeded
+        if report.get("certification_status") == "RUNTIME_CERTIFIED"
+    ]
     status = "SUCCEEDED" if not failed else "PARTIAL" if succeeded else "FAILED"
+    if failed:
+        certification_status = "PARTIAL" if certified else "FAILED"
+    elif len(certified) == len(reports):
+        certification_status = "RUNTIME_CERTIFIED"
+    else:
+        certification_status = "TRAIN_ONLY"
     result = {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "status": status,
+        "certification_status": certification_status,
         "started_model_count": len(reports),
         "succeeded_model_count": len(succeeded),
+        "runtime_certified_model_count": len(certified),
         "failed_model_count": len(failed),
         "plan_path": str(plan_path),
         "panel_path": str(panel_path),
