@@ -52,7 +52,18 @@ Using the verified wheel:
 3. Verify wheel `METADATA` has `Name: mlforecast` and `Version: 1.1.0`.
 4. Verify the installed distribution reports version 1.1.0.
 5. Fit/predict/save/load Core Ridge and require finite two-series output.
-6. Run seeded AutoRidge with two Optuna trials and at least one complete trial.
+6. Run seeded AutoRidge with two Optuna trials and require every requested trial to complete.
 7. Require predictions before and after load to match at `rtol=atol=1e-8`.
 8. Persist process/CPU/thread information, predictions, trials, manifest, and sums.
 9. Treat skipped, partial, missing-wheel, version-mismatch, or non-finite results as failure.
+
+## Source handoff gates
+
+1. Require the complete documentation set listed in `REQUIREMENTS.md`.
+2. Package only Git-tracked files from the MLForecast scope.
+3. Reject a dirty MLForecast scope, symlinks, unsafe archive paths, duplicate names, and existing output files.
+4. Include read-only snapshots of `pyproject.toml` and `uv.lock`.
+5. Generate `SOURCE_PROVENANCE.json`, `VERSION`, `ARTIFACT_MANIFEST.json`, and `SHA256SUMS`.
+6. Require deterministic ZIP bytes for identical source commit and content.
+7. Verify ZIP sidecar, sorted entries, fixed timestamps, manifest records, and checksum equality.
+8. Treat missing documents, tampering, or untracked generated files as failure.

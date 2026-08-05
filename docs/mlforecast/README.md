@@ -1,6 +1,6 @@
 # MLForecast / AutoMLForecast integration
 
-**Status:** `PYPI_DIGEST_VERIFIED / LOCAL_CONTRACT_VERIFIED / INSTALLED_RUNTIME_PENDING`
+**Status:** `PYPI_DIGEST_VERIFIED / LOCAL_CONTRACT_HARDENED / PORTABLE_BUNDLE_VERIFIER_VERIFIED / SOURCE_HANDOFF_VERIFIED / INSTALLED_RUNTIME_PENDING`
 
 This subsystem adds a dedicated, leakage-safe MLForecast path. It is independent of PR #43 and changes only `src/loto/mlforecast`, `tests/mlforecast`, `configs/mlforecast`, and `docs/mlforecast`.
 
@@ -158,3 +158,25 @@ uv run --frozen --with artifacts/mlforecast-wheel/mlforecast-1.1.0-py3-none-any.
 Formal success requires the printed status to be `RUNTIME_CERTIFIED`. The run
 directory contains `RUNTIME_CERTIFICATION.json`, prediction CSVs, Optuna trial
 records, saved model bundles, `ARTIFACT_MANIFEST.json`, and `SHA256SUMS`.
+
+## Source handoff bundle
+
+After the MLForecast scope is committed and clean, build a deterministic source handoff package:
+
+```bash
+bash docs/mlforecast/build_handoff_bundle.sh
+```
+
+The package contains the required documentation set, MLForecast source, tests, configurations, frozen provenance, read-only snapshots of `pyproject.toml` and `uv.lock`, `SOURCE_PROVENANCE.json`, `VERSION`, `ARTIFACT_MANIFEST.json`, and `SHA256SUMS`. The builder includes only Git-tracked files from the MLForecast scope and fails closed when the scope is dirty.
+
+A received handoff package must be verified before use:
+
+```bash
+uv run --frozen -- \
+  python -m loto.mlforecast.handoff \
+  --verify \
+  --zip /absolute/path/mlforecast-handoff-<SHA>.zip \
+  --sha256 /absolute/path/mlforecast-handoff-<SHA>.zip.sha256
+```
+
+Formal success is `HANDOFF_VERIFIED`. This verifies source-package integrity only; it does not replace installed runtime certification.

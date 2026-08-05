@@ -1,145 +1,134 @@
-# MLForecast Runtime Certification Runbook
+# MLForecast runbook
 
-## Purpose
-
-Use this runbook to produce tamper-evident evidence that the frozen
-`mlforecast==1.1.0` wheel can be loaded and can complete Core Ridge and
-AutoRidge fit, predict, save, load, and re-predict lifecycles.
-
-This is not a real-data accuracy evaluation and does not certify Holdout,
-Prospective, GPU, MLflow, PostgreSQL, or multi-seed campaign results.
-
-## Preconditions
-
-- repository checkout containing PR #46 head;
-- `uv` available in `PATH`;
-- GNU `sha256sum`;
-- repository `uv.lock` present;
-- network access to official PyPI storage when the frozen wheel is absent;
-- sufficient free space for the wheel, models, and ZIP bundle.
-
-Confirm the checked-out commit before execution:
+## 1. Update the branch safely
 
 ```bash
 cd /mnt/e/env/ts/loto_forecast_platform || exit 1
-git rev-parse HEAD
+
+git fetch origin
+git switch feat/mlforecast-core-automl-contract-v1
+git pull --ff-only origin feat/mlforecast-core-automl-contract-v1
+
 git status --short
 ```
 
-The expected PR head for this revision is recorded in the pull request body.
-Do not treat a different commit as evidence for that head.
+Do not use force pull, force push, or direct main changes.
 
-## Standard execution
+## 2. Fast local gates
 
 ```bash
-cd /mnt/e/env/ts/loto_forecast_platform || exit 1
-
-docs/mlforecast/run_runtime_certification.sh
+uv run python -m compileall -q src/loto/mlforecast tests/mlforecast
+uv run pytest -q tests/mlforecast
+uv run ruff format --check src/loto/mlforecast tests/mlforecast
+uv run ruff check src/loto/mlforecast tests/mlforecast
+bash -n docs/mlforecast/run_runtime_certification.sh
+bash -n docs/mlforecast/build_handoff_bundle.sh
 ```
 
-The script can also be launched by absolute path from another directory. It
-resolves the repository relative to its own location instead of the caller's
-current Git repository.
+Run focused tests first. Repository-wide pytest and CI belong at the final integration stage.
 
-## Keep the terminal open
+## 3. Runtime certification
 
 ```bash
-cd /mnt/e/env/ts/loto_forecast_platform || exit 1
-
 set +e
-docs/mlforecast/run_runtime_certification.sh
+bash docs/mlforecast/run_runtime_certification.sh
 status=$?
-printf '\nEXIT_STATUS=%s\n' "$status"
-read -r -p 'Press Enter to close...'
-exit "$status"
+set -e
+
+printf 'EXIT_STATUS=%s\n' "$status"
 ```
 
-## Custom paths
-
-```bash
-docs/mlforecast/run_runtime_certification.sh \
-  /absolute/path/mlforecast-1.1.0-py3-none-any.whl \
-  /absolute/path/certification-runs \
-  /absolute/path/certification-bundles
-```
-
-Disable automatic wheel download:
-
-```bash
-MLFORECAST_AUTO_DOWNLOAD=0 \
-  docs/mlforecast/run_runtime_certification.sh
-```
-
-## Exit codes
+Exit classes:
 
 | Code | Meaning |
 |---:|---|
-| `0` | Runtime status was `RUNTIME_CERTIFIED` and evidence ZIP creation passed. |
-| `1` | Python certification failed, but the failure run was bundled successfully. |
-| `2` | Prerequisite missing, such as wheel, `uv`, `sha256sum`, or `uv.lock`. |
-| `3` | Wheel SHA-256 mismatch. Python execution did not start. |
-| `4` | New Run ID detection was ambiguous or no new run directory was created. |
-| `5` | Run evidence existed but manifest verification or ZIP creation failed. |
+| 0 | Runtime certified and portable bundle independently verified |
+| 1 | Runtime failed, but valid failure evidence was bundled and verified |
+| 2 | Missing prerequisite or unavailable wheel |
+| 3 | Wheel SHA-256 mismatch |
+| 4 | Invalid or ambiguous Run ID |
+| 5 | Source-run bundling failure |
+| 6 | Independent ZIP verification failure |
 
-Do not convert codes `1` through `5` into success in outer scripts.
+Only exit `0` plus `RUNTIME_CERTIFIED` is formal success.
 
-## Success verification
-
-The command prints `RUN_ID`, `RUN_DIR`, `BUNDLE`, and `BUNDLE_SHA256`.
-Verify the ZIP digest:
+## 4. Inspect runtime evidence
 
 ```bash
-cd artifacts/mlforecast-runtime-bundles || exit 1
-sha256sum -c <RUN_ID>.zip.sha256
+RUN_ID="$(basename "$(readlink -f artifacts/mlforecast-runtime-certification/LATEST 2>/dev/null || true)")"
+
+find "artifacts/mlforecast-runtime-certification/$RUN_ID" -maxdepth 3 -type f -printf '%P\n' | sort
+cat "artifacts/mlforecast-runtime-certification/$RUN_ID/RUNTIME_CERTIFICATION.json"
+sha256sum -c "artifacts/mlforecast-runtime-bundles/$RUN_ID.zip.sha256"
+cat "artifacts/mlforecast-runtime-bundles/$RUN_ID.verification.json"
 ```
 
-Inspect the archive:
+When no `LATEST` pointer exists, use the `RUN_ID=` printed by the runtime script.
+
+## 5. Verify a received runtime ZIP
 
 ```bash
-unzip -l <RUN_ID>.zip
-unzip -p <RUN_ID>.zip \
-  '<RUN_ID>/BUNDLE_VERIFICATION.json'
-unzip -p <RUN_ID>.zip \
-  '<RUN_ID>/RUNTIME_CERTIFICATION.json'
+uv run --frozen -- \
+  python -m loto.mlforecast.bundle \
+  --verify-zip /absolute/path/<RUN_ID>.zip \
+  --sha256 /absolute/path/<RUN_ID>.zip.sha256 \
+  --verification-report /absolute/path/<RUN_ID>.verification.json
 ```
 
-Formal success requires all of the following:
+Do not extract an unverified ZIP.
 
-- shell exit code `0`;
-- report status `RUNTIME_CERTIFIED`;
-- ZIP SHA-256 verification passes;
-- source status in `BUNDLE_VERIFICATION.json` is `RUNTIME_CERTIFIED`;
-- Core and Auto model directories and prediction files are present.
+## 6. Build the source handoff ZIP
 
-## Failure handling
+The MLForecast scope must be committed and clean.
 
-For exit code `1`, keep both the run directory and ZIP. The ZIP contains the
-available failure report and artifacts. Do not delete or overwrite the source
-run before root-cause analysis.
+```bash
+bash docs/mlforecast/build_handoff_bundle.sh
+```
 
-For exit code `3`, preserve the mismatched wheel separately and obtain a fresh
-copy from the frozen official URL. Never bypass the digest check.
+The builder fails if `configs/mlforecast`, `docs/mlforecast`, `src/loto/mlforecast`, or `tests/mlforecast` contains uncommitted changes.
 
-For exit code `4`, check for concurrent certification processes writing to the
-same output root. Use separate output roots when parallel operator tests are
-unavoidable.
+## 7. Verify a received source handoff ZIP
 
-For exit code `5`, inspect `ARTIFACT_MANIFEST.json`, `SHA256SUMS`, symlinks,
-unexpected files, and missing model or prediction artifacts. Do not manually
-edit a run directory and then claim it as certified.
+```bash
+uv run --frozen -- \
+  python -m loto.mlforecast.handoff \
+  --verify \
+  --zip /absolute/path/mlforecast-handoff-<SHA>.zip \
+  --sha256 /absolute/path/mlforecast-handoff-<SHA>.zip.sha256
+```
 
-## Re-run policy
+Expected status: `HANDOFF_VERIFIED`.
 
-Each run receives a unique timestamp-based Run ID. Bundles are never
-silently overwritten. After correcting the root cause, execute a new run and
-retain the previous failed evidence for comparison.
+## 8. Operational monitoring
 
-Do not repeatedly rerun GitHub Actions while the hosted runner has zero steps
-and no logs. Treat that condition as infrastructure-blocked, not code success
-or failure.
+Certification is CPU-based and single-threaded by contract. Monitor from a separate terminal:
 
-## Parallelism policy
+```bash
+watch -n 2 '
+  printf "=== processes ===\n"
+  pgrep -af "loto.mlforecast|mlforecast" || true
+  printf "\n=== cpu and memory ===\n"
+  ps -o pid,ppid,stat,etime,%cpu,%mem,rss,cmd -C python 2>/dev/null || true
+'
+```
 
-This certification remains single-threaded by design. For formal prediction
-campaigns, use eight outer workers under the project policy, retain inner
-thread limits, preserve all seeds, and report mean, variance, and worst values.
+GPU use is not required for Ridge or AutoRidge certification. Record GPU state only as environment evidence; do not claim GPU acceleration.
+
+## 9. Failure handling
+
+- Preserve the generated Run directory and bundle.
+- Do not overwrite raw input or existing Run IDs.
+- Record the exact exit code and terminal output.
+- Verify failure bundles before sharing them.
+- Do not reinterpret `BUNDLE_VERIFIED` as runtime success.
+- Do not continue to formal campaigns after any runtime lifecycle failure.
+
+## 10. Final integration boundary
+
+Before Ready or merge:
+
+1. exact installed-wheel runtime certification passes;
+2. Ruff and focused tests pass in the target environment;
+3. no shared-scope changes are present without explicit approval;
+4. GitHub Actions failure is either resolved or documented as a runner-level zero-step blocker;
+5. the PR remains Draft until evidence is reviewed.
