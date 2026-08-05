@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "P3_RUNTIME_INVENTORY",
+  "phase": "P4_DEEPAR_CPU_CERTIFICATION",
   "status": "PARTIALLY_VERIFIED",
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
   "branch": "feat/gluonts-probabilistic-contract-v1",
@@ -46,6 +46,29 @@
     "serialize",
     "device"
   ],
-  "runtime_claims": "EXECUTION_PENDING",
+  "p4_smoke_checks": [
+    "version",
+    "import",
+    "constructor",
+    "dataset",
+    "fit",
+    "predict",
+    "shape",
+    "finite",
+    "device"
+  ],
+  "p4_artifacts": [
+    "runtime_inventory.json",
+    "deepar_cpu_smoke.json",
+    "artifact_manifest.json",
+    "environment_provenance.json",
+    "SHA256SUMS"
+  ],
+  "p4_bootstrap_scripts": [
+    "environments/gluonts-compat/bootstrap_and_certify.sh",
+    "environments/gluonts-latest/bootstrap_and_certify.sh"
+  ],
+  "formal_runtime_verified_models": 0,
+  "real_runtime_claims": "EXECUTION_PENDING",
   "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
 }
