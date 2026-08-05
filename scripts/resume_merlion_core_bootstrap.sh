@@ -49,6 +49,25 @@ python3 "${ROOT}/scripts/run_merlion_core_preflight.py" \
   || true
 
 set +e
+python3 "${ROOT}/scripts/record_merlion_git_provenance.py" \
+  --root "${ROOT}" \
+  --output "${OUT}/GIT_PROVENANCE.json"
+GIT_CODE=$?
+set -e
+if [[ "${GIT_CODE}" -ne 0 ]]; then
+  write_failure "git_provenance" "${GIT_CODE}"
+  python3 "${ROOT}/scripts/package_merlion_bootstrap_evidence.py" \
+    --run-dir "${OUT}" \
+    --environment-dir "${ENV_DIR}" \
+    --run-id "${RUN_ID}" \
+    --output "${ZIP_PATH}" \
+    --verification "${VERIFY_PATH}"
+  printf 'BOOTSTRAP_RESUME_EXIT_CODE=%s\n' "${GIT_CODE}"
+  printf 'BOOTSTRAP_EVIDENCE_ZIP=%s\n' "${ZIP_PATH}"
+  exit "${GIT_CODE}"
+fi
+
+set +e
 python3 "${ROOT}/scripts/run_merlion_core_bootstrap_resume.py" \
   --root "${ROOT}" \
   --preflight "${OUT}/PREFLIGHT.json" \
