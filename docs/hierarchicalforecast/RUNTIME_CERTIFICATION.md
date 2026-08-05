@@ -10,9 +10,14 @@ uv sync --extra full
 uv run loto-hierarchicalforecast-certify
 ```
 
-The console script resolves to `loto.reconciliation.runtime_certification:main`. The module
-form remains available for diagnostics, but the registered script is the documented operational
-entry point.
+The console script resolves to
+`loto.reconciliation.package_certification:main`. It executes the runtime matrix, verifies the
+written evidence, creates a deterministic ZIP, reopens and verifies that ZIP, and writes a
+SHA-256 sidecar. The module-only form remains available for diagnostics:
+
+```bash
+uv run python -m loto.reconciliation.runtime_certification
+```
 
 The default run uses seed `1` and executes the same deterministic synthetic input for every
 reconciler within each select-family game:
@@ -50,10 +55,11 @@ tolerance.
 
 | Status | Exit | Meaning |
 |---|---:|---|
-| `VERIFIED` | 0 | Exact version and every formal case passed |
-| `BLOCKED_DEPENDENCY` | 2 | The optional package could not be imported |
-| `FAILED_VERSION_MISMATCH` | 2 | Distribution/module version evidence is inconsistent or differs from `1.5.1` |
-| `FAILED_RUNTIME` | 2 | At least one method returned an unexpected status, shape, non-finite value, incoherence, or exception |
+| `VERIFIED` | 0 | Exact version, every formal case, and ZIP verification passed |
+| `BLOCKED_DEPENDENCY` | 2 | The optional package could not be imported; evidence ZIP is still written |
+| `FAILED_VERSION_MISMATCH` | 2 | Distribution/module version evidence is inconsistent or differs from `1.5.1`; evidence ZIP is still written |
+| `FAILED_RUNTIME` | 2 | At least one method returned an unexpected status, shape, non-finite value, incoherence, or exception; evidence ZIP is still written |
+| `FAILED_PACKAGING` | 3 | Required files, hashes, manifest, safe paths, ZIP contents, or ZIP verification failed |
 
 A method exception does not terminate the matrix. The harness records the exception and
 traceback, continues the remaining cases, and returns `FAILED_RUNTIME`.
@@ -69,17 +75,31 @@ Each run creates
 - `ARTIFACT_MANIFEST.json`
 - `SHA256SUMS`
 
+The package layer then creates sibling files:
+
+- `hierarchicalforecast-runtime-<UTC>-<PID>.zip`
+- `hierarchicalforecast-runtime-<UTC>-<PID>.zip.sha256`
+
+The ZIP contains the five run artifacts plus `PACKAGE_MANIFEST.json`. ZIP member paths are
+restricted to the Run ID prefix, duplicate members and path traversal are rejected, and every
+archived file is checked again against its recorded byte count and SHA-256.
+
 The evidence records the run ID, UTC timestamps, validated configuration and hash, synthetic
 input data hash, Git commit, source-code hashes, package versions, process ID, CPU-only device
 boundary, per-method duration and warnings, output hashes, output shape, finite checks, and
 coherence checks.
 
-Verify the package after the run:
+Verify the result after the run:
 
 ```bash
-cd artifacts/hierarchicalforecast-runtime/<run-id>
+cd artifacts/hierarchicalforecast-runtime
+sha256sum -c <run-id>.zip.sha256
+unzip -t <run-id>.zip
+cd <run-id>
 sha256sum -c SHA256SUMS
 ```
+
+See `docs/hierarchicalforecast/RUNBOOK.md` for failure diagnosis and evidence handoff.
 
 ## Certification boundary
 
