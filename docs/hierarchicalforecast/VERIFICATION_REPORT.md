@@ -2,47 +2,49 @@
 
 ## Report status
 
-- Component: HierarchicalForecast reconciliation adapter and runtime certification
+- Component: HierarchicalForecast reconciliation adapter, runtime certification, immutable package,
+  and hardened target-machine operator
 - Pull request: #48
 - Branch: `agent/hierarchicalforecast-runtime-certification`
-- Base branch: `main`
-- Base commit: `d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0`
-- Verification state: `PARTIALLY_VERIFIED / CI_BLOCKED_RUNNER_START`
-- Formal promotion state: `NOT_READY`
+- Verification state:
+  `PARTIALLY_VERIFIED / HARDENED_OPERATOR_TESTS_PASS / CI_BLOCKED_RUNNER_START`
+- Formal promotion state: `NOT_READY_FOR_REVIEW`
 
-The branch must remain Draft until the real installed
-`hierarchicalforecast==1.5.1` matrix and repository CI both produce usable evidence.
+The branch must remain Draft until a real installed `hierarchicalforecast==1.5.1` run and repository
+CI both produce usable passing evidence.
 
 ## Scope
 
 This report covers:
 
-- actual upstream `fit_predict()` execution through the project adapter
-- all ten registered HierarchicalForecast reconciler classes
-- grouped-hierarchy compatibility and strict-tree rejection
-- shape, finite-value, and coherence validation
-- deterministic runtime-certification orchestration
-- artifact manifests and SHA-256 verification
-- immutable deterministic ZIP packaging and sidecar verification
-- target-machine locked provisioning and independent evidence verification
-- structured failure statuses and exit codes
-- focused tests and static checks performed in the isolated review environment
+- upstream `fit_predict()` execution through the adapter;
+- all ten registered reconciliation classes;
+- grouped-hierarchy compatibility and strict-tree rejection;
+- shape, finite-value, and coherence validation;
+- deterministic 40-case runtime orchestration;
+- runtime artifact manifests and SHA-256;
+- deterministic immutable ZIP and sidecar;
+- target-machine locked provisioning;
+- independent runtime, case, source, filesystem, and package verification;
+- preflight and postflight Git integrity;
+- structured failure states and focused tests.
 
-This report does not cover forecasting accuracy or claim improvement in Hit@±1, MAE, MSE,
-RMSE, Holdout, or Prospective performance.
+This work does not evaluate or claim improvement in Hit@±1, MAE, MSE, RMSE, Holdout, or
+Prospective performance.
 
-## Formal runtime matrix
+## Formal matrix
 
-The default certification uses seed `1` and four select-family games:
+The default certification uses:
 
-- `mini`
-- `loto6`
-- `loto7`
-- `bingo5`
+- games: `mini`, `loto6`, `loto7`, `bingo5`;
+- methods: ten registered HierarchicalForecast reconcilers;
+- seed: `1`;
+- horizon: `4`;
+- in-sample size: `32`;
+- coherence tolerance: `1e-8`;
+- total: 40 cases.
 
-It evaluates ten upstream classes per game for 40 formal cases.
-
-Expected executable classes:
+Expected executable methods:
 
 - `BottomUp`
 - `BottomUpSparse`
@@ -51,72 +53,75 @@ Expected executable classes:
 - `OptimalCombination`
 - `ERM`
 
-Expected grouped-hierarchy rejection:
+Expected grouped-hierarchy rejections:
 
 - `TopDown`
 - `TopDownSparse`
 - `MiddleOut`
 - `MiddleOutSparse`
 
-A case is accepted only when its expected status matches. Executable cases must also record real
-execution, the imported package version, expected shape, finite values, and coherence within the
-configured tolerance.
-
 ## Evidence reviewed
 
-### Adapter and runtime contract
+### Adapter contract
 
-`VERIFIED_WITH_TEST_DOUBLES`
+`VERIFIED_WITH_DETERMINISTIC_TEST_DOUBLES`
 
-- the selected upstream class is constructed with validated options
-- `fit_predict()` is called for executable methods
-- sparse methods receive a CSR summing matrix
-- paired in-sample actual and fitted matrices are required when upstream declares `insample=True`
-- output shape and finite values are checked
-- coherence is measured rather than assumed
-- strict-tree methods are rejected before construction for the grouped number hierarchy
-- unexpected method exceptions are retained and do not stop the remaining matrix
+- executable methods call `fit_predict()`;
+- sparse methods receive CSR;
+- ERM receives paired in-sample arrays;
+- constructor and execution errors fail closed;
+- result shape, finite values, and coherence are checked;
+- strict-tree methods are rejected before execution for the grouped hierarchy.
 
-### Packaging contract
+### Runtime-certification contract
+
+`VERIFIED_WITH_DETERMINISTIC_TEST_DOUBLES`
+
+- all 40 rows are retained;
+- one case exception does not abort remaining cases;
+- dependency, version, runtime, and blocked states remain distinct;
+- runtime JSON, manifest, and `SHA256SUMS` are written atomically;
+- runtime source, environment, Git, device, and package evidence is recorded.
+
+### Immutable-package contract
 
 `VERIFIED`
 
-- required artifact coverage is checked
-- `SHA256SUMS` coverage and digests are checked
-- artifact-manifest sizes and hashes are checked
-- Run ID and certification status are cross-checked
-- member names are restricted to one Run ID prefix
-- duplicate ZIP members and path traversal are rejected
-- canonical package-manifest bytes are checked
-- ZIP metadata is fixed for deterministic output
-- temporary ZIPs are verified before publication
-- identical existing packages are reused without overwrite
-- differing existing ZIPs or sidecars are rejected without overwrite
-- failed temporary packages are removed
+- required runtime coverage and checksums are verified;
+- unsafe paths and duplicates are rejected;
+- package-manifest bytes are canonical;
+- ZIP metadata and order are deterministic;
+- temporary ZIP verification occurs before publication;
+- identical existing packages may be reused;
+- differing ZIPs or sidecars are preserved and rejected.
 
-### Target-machine operator contract
+### Hardened target-machine operator
 
-`IMPLEMENTED / VERIFIED_WITH_SYNTHETIC_EVIDENCE`
+`VERIFIED_WITH_SYNTHETIC_SEALED_EVIDENCE`
 
-The target-machine runner:
+The target operator now independently verifies rather than trusting the CLI summary. Hardening
+confirmed in the reviewed implementation includes:
 
-- requires a clean Git worktree and optionally an exact expected head SHA
-- provisions with `uv sync --extra full --locked`
-- queries the installed package through `uv run --locked`
-- executes the registered formal certifier through `uv run --locked`
-- independently reopens all runtime JSON artifacts and verifies their checksums
-- independently inspects all 40 method/game rows
-- requires 24 actual executions and 16 explicit grouped-hierarchy rejections
-- independently verifies ZIP paths, sidecar, members, metadata, manifest bytes, sizes, and hashes
-- writes separate operator logs, report, manifest, and portable `SHA256SUMS`
-- fails closed on dirty Git state, version drift, case evidence drift, or package tampering
+- mandatory expected Git SHA;
+- no production sync-bypass option;
+- locked synchronization and execution;
+- clean and unchanged Git state before and after certification;
+- rejection of symbolic-link roots, path components, runtime files, package files, and operator
+  files;
+- exact runtime directory and manifest coverage;
+- duplicate manifest-row rejection;
+- independent 40-case game/method partition;
+- independent shape, finite, coherence, and array-hash evidence checks;
+- exact formal configuration evidence;
+- exact dependency and CPU-device evidence;
+- recomputation of `hierarchy.py` and `runtime_certification.py` source SHA-256;
+- recomputation of runtime code-set SHA-256;
+- independent ZIP metadata, manifest, member, and sidecar verification;
+- separate operator evidence Run ID and SHA manifest.
 
-The operator runner is not yet evidence that the real installed 1.5.1 package passed. It is the
-reviewed mechanism for obtaining and independently validating that missing evidence.
+## Focused test evidence
 
-### Focused tests
-
-The focused evidence is the sum of separate isolated runs, not one repository-wide pytest run.
+The totals below are the sum of separate isolated runs, not one repository-wide pytest invocation.
 
 | Test group | Result |
 |---|---:|
@@ -125,83 +130,86 @@ The focused evidence is the sum of separate isolated runs, not one repository-wi
 | Runtime-certification tests | 9 passed |
 | Console-entry tests | 2 passed |
 | Immutable package-certification tests | 11 passed |
-| Target-machine operator tests | 8 passed |
-| Total unique focused evidence | 61 passed |
+| Hardened target verification tests | 9 passed |
+| Hardened target operator tests | 6 passed |
+| **Total unique focused evidence** | **68 passed** |
 
-The eight target-machine tests cover successful independent verification, bad summary counts,
-sidecar drift, removed actual-execution evidence, checksum traversal, successful operator evidence
-publication, exact-version mismatch, and dirty-worktree rejection.
+The new 15-test target batch was also executed together against an exact local reconstruction of
+the published Git blobs:
 
-### Static checks
+```text
+15 passed
+```
 
-- Python compileall: `PASS`
-- Python line-length inspection, maximum 100: `PASS`
-- simple secret-pattern scan: `PASS`
-- remote/local Git blob equality for reviewed files: `PASS`
-- local Ruff: `NOT_RUN`, Ruff was not installed or cached
-- local mypy: `NOT_RUN`
+## Static and transfer checks
+
+- Python compileall for the hardened target files: `PASS`
+- Python lines over 100 characters in the hardened target files: `0`
+- target wrapper `--help`: `PASS`
+- required `--expected-git-sha` visible in the CLI: `PASS`
+- remote/local Git blob equality for all ten hardened target files: `PASS`
+- Ruff: `NOT_RUN`; Ruff was not installed or cached
+- mypy: `NOT_RUN`
 - repository-wide pytest: `NOT_RUN`
 
-## External contract evidence
+## Security-review findings resolved
 
-The Nixtla `v1.5.1` source contract was reviewed for the methods used by the adapter.
+The third-party review identified and corrected the following risks:
 
-Confirmed source-level expectations include:
+1. no postflight Git recheck;
+2. symbolic-link runtime artifacts accepted as regular files;
+3. duplicate runtime-manifest rows not explicitly rejected;
+4. executable case records trusted through aggregate checks without independent shape, finite,
+   coherence, and array-evidence validation;
+5. production CLI allowed synchronization bypass;
+6. expected Git SHA was optional;
+7. runtime-recorded source hashes were not recomputed by the operator;
+8. monolithic runner mixed process, filesystem, runtime, and package responsibilities.
 
-- `MinTrace(method="ols")` does not require in-sample arrays
-- `fit_predict(S, y_hat, ...)` returns a result containing `mean`
-- MinTrace supports grouped hierarchies
-- TopDown and MiddleOut require a strict hierarchy
-- ERM requires in-sample evidence
-- sparse variants declare sparse execution
+All are covered by the current split implementation and focused tests.
 
-Source inspection is not a substitute for an installed-package runtime execution.
+## Upstream contract evidence
+
+Nixtla v1.5.1 source inspection previously confirmed the expected API-level behavior for MinTrace,
+TopDown, MiddleOut, ERM, grouped hierarchies, sparse variants, and `mean` output handling. Source
+inspection is not a substitute for the still-pending installed-package execution.
 
 ## GitHub review state
 
-- unresolved inline review threads: `0`
-- human approval: `NONE`
-- human requested changes: `NONE`
-- only external review submission: Sourcery access notification, not a code review
-- mergeability reported by GitHub: `true`
-- branch divergence at the latest audit: behind `0`
+- unresolved inline review threads: `0` at the latest review audit;
+- human approval: none;
+- requested changes: none;
+- GitHub reports the PR mergeable;
+- the PR remains Draft.
 
 ## GitHub Actions state
 
-`BLOCKED_RUNNER_START`
+`BLOCKED_RUNNER_START`, tracked by issue #61.
 
-The latest inspected target-runner head produced:
+The latest previously inspected head completed its CI job as failure with `steps=null` and no job
+log. Checkout, setup, dependency installation, Ruff, compileall, and pytest did not execute. This is
+not accepted as Python test-failure evidence, but it provides no CI verification.
 
-- head: `936c6f57f8a475bfda2e32f512d8690cae620339`
-- run: `30987420472` / run #1138
-- job: `92245315209`
-- conclusion: `failure`
-- `steps=null`
-- no checkout log
-- no dependency-installation log
-- no Ruff, compileall, or pytest log
-
-This is not accepted as a code-test failure, but it also does not provide CI verification. Issue
-#61 tracks the repository/account runner-start blocker.
+The final hardened head must be inspected once GitHub creates its automatic run. Do not manually
+rerun repeatedly while the external condition remains unchanged.
 
 ## Promotion gates
 
 | Gate | State | Required evidence |
 |---|---|---|
-| Adapter contract | PASS | Focused contract tests |
-| Ten-class partition | PASS | Complete state-matrix tests |
-| Runtime orchestration | PASS_WITH_DOUBLES | 40-case deterministic harness tests |
-| Immutable evidence package | PASS | ZIP, manifest, sidecar, tamper tests |
-| Target-machine operator | PASS_WITH_SYNTHETIC_EVIDENCE | Eight focused operator tests |
-| Unresolved review threads | PASS | Zero unresolved threads |
-| Real package runtime | PENDING | Installed `hierarchicalforecast==1.5.1`, 40/40 expected cases |
-| Console installation | PENDING_TARGET_HOST | Installed entry point executes in locked target environment |
-| Repository CI | BLOCKED | Workflow creates steps and required checks pass |
-| Forecast accuracy | NOT_APPLICABLE | Separate time-ordered experiment required |
+| Adapter execution contract | PASS with test doubles | focused adapter tests |
+| Ten-class state partition | PASS | complete matrix tests |
+| Runtime orchestration | PASS with test doubles | deterministic runtime tests |
+| Immutable evidence package | PASS | corruption and immutability tests |
+| Hardened target operator | PASS with synthetic sealed evidence | 15 focused tests |
+| Real package runtime | PENDING | exact 1.5.1, 40/40, 24 executions, 16 rejections |
+| Ruff and supported typing | PENDING | exact commands and results |
+| Combined focused suite | PENDING | one recorded invocation |
+| Repository-wide pytest | PENDING | one classified full run |
+| GitHub Actions | BLOCKED | real steps, logs, and passing checks |
+| Forecast accuracy | NOT_APPLICABLE | separate chronological experiment |
 
-## Formal acceptance procedure
-
-Run on a clean checkout of the intended target commit:
+## Formal target command
 
 ```bash
 cd /mnt/e/env/ts/loto_forecast_platform-pr48
@@ -213,38 +221,31 @@ python3 scripts/run_hierarchicalforecast_target_certification.py \
   --expected-git-sha "${EXPECTED_HEAD}"
 ```
 
-The target runner performs locked synchronization, exact-version verification, formal execution,
-and independent runtime/ZIP verification. It writes a separate operator evidence directory with
-`OPERATOR_REPORT.json`, logs, manifest, and `SHA256SUMS`.
+Formal acceptance requires:
 
-Promotion requires all of the following:
-
-1. operator command exit code is `0`
-2. operator status is `VERIFIED` and `formal_success=true`
-3. installed distribution version is exactly `1.5.1`
-4. expected, executed, and passed cases are all `40`
-5. failed cases are `0`
-6. 24 executable cases record `actual_execution=true`
-7. 16 grouped-hierarchy rejections record `actual_execution=false`
-8. exact-version and module/distribution consistency checks are true
-9. runtime `SHA256SUMS`, ZIP sidecar, ZIP structure, and package manifest pass independent checks
-10. operator `SHA256SUMS` passes
-11. repository Ruff and required static checks pass
-12. focused and repository-wide pytest pass
-13. repository CI starts real steps and required checks pass
-
-Do not overwrite or delete a mismatched ZIP or sidecar to manufacture a passing rerun. Preserve
-it as incident evidence and create a new certification Run ID after investigation.
+```text
+operator exit             = 0
+operator status           = VERIFIED
+runtime status            = VERIFIED
+expected/executed/passed  = 40/40/40
+failed                     = 0
+actual executions          = 24
+grouped rejections         = 16
+runtime SHA256SUMS         = PASS
+operator SHA256SUMS        = PASS
+ZIP and sidecar            = PASS
+preflight/postflight Git   = same clean commit
+```
 
 ## Final verdict
 
 `NOT_READY_FOR_REVIEW`
 
-The implementation and focused verification are strong enough for target-machine certification,
-but formal readiness is blocked by two missing evidence classes:
+The implementation is ready for target-machine execution, but formal promotion remains blocked by:
 
-- real installed HierarchicalForecast 1.5.1 execution across all 40 cases
-- functioning repository CI with actual workflow steps and test logs
+- real installed HierarchicalForecast 1.5.1 execution;
+- Ruff, supported typing, combined focused, and full pytest evidence;
+- GitHub Actions with actual runner steps and passing checks.
 
-The PR must remain Draft. No merge, auto-merge, force push, or direct push to `main` is authorized
-by this report.
+No merge, auto-merge, ready transition, force push, or direct push to `main` is authorized by this
+report.
