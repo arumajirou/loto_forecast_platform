@@ -28,39 +28,7 @@ def _load_runner() -> ModuleType:
 RUNNER = _load_runner()
 
 
-def _install_provider_import_stubs() -> None:
-    base = ModuleType("loto.models.providers.base")
-
-    class FoundationProviderError(RuntimeError):
-        def __init__(self, status: str, message: str):
-            super().__init__(message)
-            self.status = status
-
-    class FoundationProvider:
-        def inspect_properties(self) -> dict[str, Any]:
-            return {}
-
-    base.FoundationProvider = FoundationProvider
-    base.FoundationProviderError = FoundationProviderError
-    subprocess_module = ModuleType("loto.models.providers.subprocess")
-
-    class SubprocessProviderContractError(ValueError):
-        def __init__(self, status: str, message: str):
-            super().__init__(message)
-            self.status = status
-
-    subprocess_module.SubprocessProviderContractError = SubprocessProviderContractError
-    subprocess_module.validate_provider_request = lambda request: None
-    subprocess_module.validate_provider_response = lambda response, expected_shape: None
-    sys.modules.setdefault("loto", ModuleType("loto"))
-    sys.modules.setdefault("loto.models", ModuleType("loto.models"))
-    sys.modules.setdefault("loto.models.providers", ModuleType("loto.models.providers"))
-    sys.modules["loto.models.providers.base"] = base
-    sys.modules["loto.models.providers.subprocess"] = subprocess_module
-
-
 def _load_adapter() -> ModuleType:
-    _install_provider_import_stubs()
     path = PROJECT_ROOT / "src" / "loto" / "models" / "providers" / "sundial.py"
     spec = importlib.util.spec_from_file_location("sundial_adapter_v2", path)
     assert spec is not None and spec.loader is not None
