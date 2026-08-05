@@ -17,7 +17,6 @@ from .p6_contract import (
     P6Status,
     artifact_tree_sha256,
     atomic_write_json,
-    manifest_sha256,
     prediction_sha256,
     sha256_json,
 )
