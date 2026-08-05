@@ -11,6 +11,48 @@ This workflow is CPU-safe. It does not claim GPU training, reload inference, PID
 or CPU-fallback certification. When no target-host evidence is supplied, GPU status is
 always written as `EXECUTION_PENDING`.
 
+## Integrated execution
+
+The standard API coverage stage now executes the state resolver automatically:
+
+```bash
+uv run loto-auto-campaign \
+  --config configs/auto_campaign/campaign.yaml \
+  run \
+  --stage api-coverage \
+  --output artifacts/<run>
+```
+
+The integrated pipeline performs these steps in order:
+
+1. execute the existing API coverage cases;
+2. retain the original plan, result, per-case, failure, and manifest artifacts;
+3. load `API_ARGUMENT_COVERAGE_RESULT.parquet`;
+4. build the all-36-AutoModel constructor/default-config matrix;
+5. resolve every static catalog row to an explicit verification state;
+6. write the nested `coverage-state` bundle;
+7. update the root manifest and regenerate the portable root `SHA256SUMS`.
+
+The original API coverage top-level `status` remains compatible. The integrated root
+manifest adds:
+
+```text
+coverage_state_schema_version
+coverage_state_status
+verification_status
+coverage_state_path
+gpu_runtime_status
+coverage_state
+```
+
+A resolver failure does not delete completed API case results. It writes
+`coverage_state_failure.json`, changes the root status to `PARTIAL`, records
+`verification_status=FAILED`, regenerates `SHA256SUMS`, and causes the existing CLI
+non-PASS exit contract to return exit code 2.
+
+A successful `--resume` execution replaces the prior `coverage-state` directory and
+removes stale `coverage_state_failure.json` evidence.
+
 ## State model
 
 | State | Meaning |
@@ -41,14 +83,14 @@ The command dynamically discovers every `BaseAuto` subclass exported by
 The matrix does not call `fit`, `predict`, `save`, or `load`. It proves constructor and
 default-config contracts only.
 
-## Usage
+## Standalone usage
 
-Resolve an existing API coverage result:
+Resolve an existing API coverage result without rerunning the cases:
 
 ```bash
 uv run python -m loto.auto_campaign.coverage_state \
   --api-results artifacts/<run>/API_ARGUMENT_COVERAGE_RESULT.parquet \
-  --output artifacts/<run>/coverage-state
+  --output artifacts/<run>/coverage-state-manual
 ```
 
 Build the signature matrix when optional default-config dependencies are unavailable:
@@ -64,9 +106,25 @@ default-config probes were skipped.
 
 ## Artifacts
 
+Integrated root:
+
 ```text
+API_ARGUMENT_COVERAGE_PLAN.parquet
+API_ARGUMENT_COVERAGE_RESULT.csv
+API_ARGUMENT_COVERAGE_RESULT.parquet
+failures.json
+manifest.json
+SHA256SUMS
+coverage_state_failure.json  # only on resolver failure
+```
+
+Nested `coverage-state` bundle:
+
+```text
+AUTO_CONSTRUCTOR_CONTRACT_MATRIX.json
 AUTO_CONSTRUCTOR_CONTRACT_MATRIX.csv
 AUTO_CONSTRUCTOR_CONTRACT_MATRIX.parquet
+API_ARGUMENT_COVERAGE_RESOLVED.json
 API_ARGUMENT_COVERAGE_RESOLVED.csv
 API_ARGUMENT_COVERAGE_RESOLVED.parquet
 COVERAGE_SUMMARY.json
@@ -74,13 +132,15 @@ manifest.json
 SHA256SUMS
 ```
 
-`manifest.json` includes the argument-status counts, constructor-model count, API result
-count, and the explicit GPU execution boundary.
+JSON is the evidence source of record. Nested values are converted to deterministic JSON
+strings before CSV and Parquet output to avoid ambiguous or backend-dependent tabular
+types.
 
 ## Fail-closed rules
 
 The command fails or records `FAILED` when any of these occur:
 
+- the API result Parquet is missing;
 - discovered AutoModel count differs from 36;
 - a registered constructor lacks `h` or `config`;
 - a supported backend default-config probe raises;
