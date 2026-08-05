@@ -32,7 +32,7 @@ FOCUSED_TESTS = (
     "tests/test_reconciliation_promotion_gate.py",
     "tests/test_reconciliation_quality_gate.py",
 )
-EXPECTED_FOCUSED_TESTS = 92
+EXPECTED_FOCUSED_TESTS = 95
 RUFF_SCOPE = ("src", "scripts", "tests")
 MYPY_SCOPE = (
     "src/loto/reconciliation/hierarchy.py",
@@ -187,7 +187,17 @@ def execute(
         )
         command(
             "ruff_format",
-            ["uv", "run", "--locked", "python", "-m", "ruff", "format", "--check", *RUFF_SCOPE],
+            [
+                "uv",
+                "run",
+                "--locked",
+                "python",
+                "-m",
+                "ruff",
+                "format",
+                "--check",
+                *RUFF_SCOPE,
+            ],
             "FAILED_RUFF_FORMAT",
         )
         command(
@@ -265,7 +275,7 @@ def execute(
             "ruff_lint": True,
             "compileall": True,
             "mypy": True,
-            "focused_92": True,
+            "focused_95": True,
             "full_pytest": not skip_full_suite,
         }
         exit_code = 0
