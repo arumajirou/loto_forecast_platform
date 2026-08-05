@@ -1,5 +1,15 @@
 # Moirai 2.0 Changelog
 
+## 0.3.0
+
+- Added a two-process pinned-snapshot runtime certification harness.
+- Added canonical prediction and nine-quantile SHA-256 comparison.
+- Added torch forward input/output tensor-device observation.
+- Added external `nvidia-smi` PID, GPU UUID, VRAM, and post-exit PID-release evidence.
+- Added immutable per-run request, response, logs, exit code, monitor samples, and manifests.
+- Added strict failure gates for same PID, changed predictions, changed artifacts, and CPU fallback.
+- Added P8 focused tests, change scope, test plan, verification report, and run configuration.
+
 ## 0.2.0
 
 - Wired past-only covariates to native `past_feat_dynamic_real`.

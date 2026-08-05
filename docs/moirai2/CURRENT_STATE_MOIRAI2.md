@@ -1,14 +1,15 @@
 # Current State: Moirai 2.0
 
-Status: `PARTIALLY_VERIFIED / P0_P7_IMPLEMENTED / REAL_UNI2TS_RUNTIME_PENDING`
+Status: `PARTIALLY_VERIFIED / P0_P8_IMPLEMENTED / REAL_UNI2TS_RUNTIME_PENDING`.
 
-The isolated Contract v2 from PR #83 remains the stacked base. P7 now compiles past-only and
-known-future covariates into the native GluonTS fields consumed by `Moirai2Forecast`:
+PR #83 provides P0-P6 Contract v2 and PR #86 provides P7 native covariate wiring. P8 adds an
+isolated runtime-certification harness without changing shared workers, catalogs, root dependencies,
+common CLI, workflows, the top-level README, Moirai 1.x, Moirai-MoE, or other TSFM providers.
 
-- `past_feat_dynamic_real`: past-only features aligned to the target history;
-- `feat_dynamic_real`: known-future features aligned to target history plus forecast horizon.
+P8 runs the same immutable request and explicit pinned snapshot in two separate provider processes.
+It compares point output and all nine native quantiles by canonical SHA-256, verifies model and
+covariate artifact identity, observes forward input/output tensor devices, and records external GPU
+PID, UUID, VRAM, and post-exit PID release evidence when CUDA is requested.
 
-P7 also includes covariate dimensions in the 512-token budget, preserves calendar gaps, hashes
-ordered feature matrices and the future tail, rejects target/covariate name collisions, and verifies
-response identity in the adapter. A fake-boundary runner test proves the wiring without claiming a
-real Uni2TS model load. Real supported-lane and CUDA13-experimental execution remain pending.
+Local pure and fake-boundary verification has passed. No real Uni2TS snapshot load, real predictor
+execution, real CUDA observation, full repository test, or successful GitHub Actions run is claimed.

@@ -5,9 +5,14 @@ arbitrary_position_count,IMPLEMENTED,contract and runner are dynamic
 horizon_1_2_5,IMPLEMENTED,token budget validated
 native_quantiles,IMPLEMENTED,all nine retained
 past_covariates,IMPLEMENTED_FAKE_RUNTIME_VERIFIED,native past_feat_dynamic_real wiring
-known_future_covariates,IMPLEMENTED_FAKE_RUNTIME_VERIFIED,native feat_dynamic_real wiring and availability evidence
+known_future_covariates,IMPLEMENTED_FAKE_RUNTIME_VERIFIED,native feat_dynamic_real wiring
 covariate_matrix_hashing,IMPLEMENTED,ordered matrix and future-tail SHA-256
 token_budget_with_covariates,IMPLEMENTED,target plus both covariate classes
+forward_tensor_device_observation,IMPLEMENTED_LOCAL_CPU_VERIFIED,real lane pending
+separate_process_snapshot_reload,IMPLEMENTED_EXECUTION_PENDING,two real provider runs pending
+prediction_sha256_comparison,IMPLEMENTED,exact point and nine-quantile identity
+external_gpu_pid_uuid_vram,IMPLEMENTED_EXECUTION_PENDING,real CUDA evidence pending
+post_exit_gpu_pid_release,IMPLEMENTED_EXECUTION_PENDING,real CUDA evidence pending
 fine_tuning,UPSTREAM_PATH_UNVERIFIED,out of current scope
 holdout,NOT_OPENED,out of current scope
 prospective,NOT_OPENED,out of current scope
