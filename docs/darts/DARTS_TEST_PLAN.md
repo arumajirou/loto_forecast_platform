@@ -22,13 +22,20 @@
 18. rejection of best-seed-only adoption.
 19. baseline mean/worst Hit@±1 champion gate and `NO_CHAMPION` result.
 20. data/config/code provenance hash stability and tamper sensitivity.
+21. nine-model Local statistical identity and failure-retention matrix.
+22. six-model Regression identity matrix and estimator-factory contract.
+23. target/past lag leakage rejection and future-lag coverage checks.
+24. position-local and global-sequence Regression execution contracts.
+25. MLForecast parity payload stability and tamper sensitivity.
+26. Regression constructor/fit/predict no-silent-drop enforcement.
 
 ## Pending runtime gates
 
 - resolve `darts[notorch]==0.46.1` and `darts[torch]==0.46.1` locks;
 - discover real executable model count;
-- smoke NaiveDrift, ExponentialSmoothing and RegressionEnsembleModel;
-- run real multi-seed OOF using identical model and baseline folds;
+- run the real P5 Local statistical matrix;
+- run the real P6 Regression matrix with sklearn and optional GBDT dependencies;
+- run real multi-seed OOF using identical Darts/MLForecast folds and estimators;
 - real save/load/re-predict certification;
 - one Torch global-model smoke;
 - GPU PID, VRAM and CPU-fallback evidence;

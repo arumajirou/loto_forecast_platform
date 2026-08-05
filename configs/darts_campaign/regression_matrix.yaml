@@ -1,0 +1,36 @@
+schema_version: 1
+run_id: darts-p6-regression-matrix
+series_layout: position_global_sequence
+horizon: 1
+seed: 1
+models:
+  - public_name: LinearRegressionModel
+  - public_name: RandomForestModel
+  - public_name: LightGBMModel
+  - public_name: XGBModel
+  - public_name: CatBoostModel
+  - public_name: SKLearnModel
+    estimator_id: sklearn-ridge-v1
+lag_contract:
+  lags: [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1]
+  lags_past_covariates: [-4, -3, -2, -1]
+  lags_future_covariates: [-1, 0, 1]
+  output_chunk_length: 1
+  output_chunk_shift: 0
+  multi_models: true
+  use_static_covariates: false
+  likelihood: null
+  quantiles: []
+  random_state: 1
+past_covariate_columns: [calendar_age]
+future_covariate_columns: [draw_month]
+static_covariate_columns: []
+fit_args: {}
+predict_args: {}
+comparison:
+  library: mlforecast
+  require_same_estimator: true
+  require_same_lags: true
+  require_same_exogenous_columns: true
+  require_same_folds: true
+  require_same_seed: true

@@ -1,4 +1,4 @@
-"""Isolated Darts 0.46.1 discovery, evaluation, and certification contracts."""
+"""Isolated Darts discovery, evaluation, and certification contracts."""
 
 from .artifacts import seal_predictions, verify_prediction_seal
 from .campaign import (
@@ -14,6 +14,14 @@ from .campaign import (
 from .evaluation import evaluate_predictions
 from .protocol import DartsRequest, DartsResponse, GameGeometry
 from .provenance import RunProvenance, build_run_provenance
+from .regression_models import (
+    REGRESSION_MODEL_IDENTITIES,
+    RegressionCampaignConfig,
+    RegressionLagContract,
+    RegressionModelConfig,
+    build_mlforecast_parity_payload,
+    run_regression_matrix,
+)
 
 __all__ = [
     "CandidateAggregate",
@@ -23,12 +31,18 @@ __all__ = [
     "GameGeometry",
     "MetricVector",
     "OOFConfig",
+    "REGRESSION_MODEL_IDENTITIES",
+    "RegressionCampaignConfig",
+    "RegressionLagContract",
+    "RegressionModelConfig",
     "RunProvenance",
     "aggregate_all",
     "build_expanding_folds",
+    "build_mlforecast_parity_payload",
     "build_run_provenance",
     "evaluate_predictions",
     "run_oof",
+    "run_regression_matrix",
     "seal_predictions",
     "select_champion",
     "verify_prediction_seal",

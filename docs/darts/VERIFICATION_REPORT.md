@@ -18,7 +18,6 @@
 
 - focused evaluation/certification tests: 4 passed;
 - cumulative focused Darts contract tests at that increment: 14 passed;
-- Python compileall: PASS;
 - chronological Train/Holdout isolation: PASS;
 - Hit@±1, position-wise and all-position metrics: PASS;
 - deterministic random/fixed/mean/median/last/frequency/seasonal baselines: PASS;
@@ -29,19 +28,36 @@
 ## Third increment
 
 - focused OOF/multi-seed/provenance tests: 6 passed;
-- expanding chronological folds: PASS;
-- Train/Validation adjacency and non-overlap: PASS;
-- source-frame immutability under evaluator mutation: PASS;
+- expanding chronological folds and non-overlap: PASS;
 - identical fold coverage required for every seed: PASS;
 - mean, population variance, and worst-seed retention: PASS;
 - best-seed-only adoption rejection: PASS;
-- baseline mean/worst Hit@±1 gate: PASS;
-- `NO_CHAMPION` fail-closed outcome: implemented and unit covered;
-- data/config/code SHA-256 tamper sensitivity: PASS;
-- Python compileall and AST parse for third-increment files: PASS;
-- lines over repository 100-character limit in third-increment files: 0;
-- YAML configuration parse: PASS;
-- GitHub Actions remains classified `BLOCKED_PRE_RUN` when steps are not created.
+- baseline mean/worst Hit@±1 gate and `NO_CHAMPION`: PASS;
+- data/config/code SHA-256 tamper sensitivity: PASS.
+
+## P5 Local statistical increment
+
+- focused Local statistical matrix tests: 6 passed;
+- nine required identities and missing-dependency retention: PASS;
+- constructor/fit/predict no-silent-drop rule: PASS;
+- per-model failure isolation and finite shape checks: PASS;
+- source-frame immutability: PASS.
+
+## P6 Regression increment
+
+- focused Regression contract tests: 8 passed;
+- six required Regression identities: PASS;
+- negative target/past lag enforcement: PASS;
+- future-covariate horizon coverage: PASS;
+- likelihood/quantile consistency: PASS;
+- `SKLearnModel` estimator identity/factory contract: PASS;
+- position-local and global-sequence fake-runtime execution: PASS;
+- dependency/runtime failure retention: PASS;
+- unknown argument rejection: PASS;
+- prediction position/horizon/finite validation: PASS;
+- raw target-frame immutability: PASS;
+- MLForecast parity SHA-256 stability and tamper sensitivity: PASS;
+- compileall, AST parse, YAML parse, and 100-character line inspection: PASS.
 
 ## Blocked
 
@@ -49,7 +65,7 @@
 - `darts==0.46.1` was not available from the configured registry;
 - GitHub tag dependency resolution failed;
 - no environment `uv.lock` could be generated;
-- real Darts discovery, OOF fit/predict, persistence and GPU certification remain pending;
-- GitHub Actions hosted jobs failed before step creation and produced no job logs.
+- real Darts Local/Regression discovery, OOF, persistence, and GPU certification remain pending;
+- the latest GitHub Actions failure is not treated as a code failure without usable step logs.
 
 No real Darts runtime or accuracy claim is inferred from fake-runtime and contract tests.
