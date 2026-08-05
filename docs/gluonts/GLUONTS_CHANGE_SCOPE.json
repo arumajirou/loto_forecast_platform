@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "P5_PREDICTOR_LIFECYCLE",
+  "phase": "P6_ALL_NINE_ESTIMATOR_LIFECYCLE",
   "status": "PARTIALLY_VERIFIED",
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
   "branch": "feat/gluonts-probabilistic-contract-v1",
@@ -8,6 +8,7 @@
     "environments/gluonts-compat/**",
     "environments/gluonts-latest/**",
     "src/loto/adapters/gluonts/**",
+    "src/loto/gluonts_campaign/**",
     "tests/adapters/gluonts/**",
     "tests/gluonts_campaign/**",
     "docs/gluonts/**"
@@ -27,12 +28,15 @@
     "backtest",
     "model_discovery",
     "distribution_discovery",
-    "runtime_certify"
+    "runtime_certify",
+    "p6_campaign"
   ],
-  "p5_required_checks": {
+  "model_count": 9,
+  "p6_required_checks": {
     "fit_serialize": [
       "version",
       "import",
+      "signature",
       "constructor",
       "dataset",
       "fit",
@@ -57,15 +61,17 @@
       "identity"
     ]
   },
-  "p5_artifacts": [
-    "predictor_artifact_manifest.json",
-    "certification_dataset.json",
-    "predictor_lifecycle.json",
-    "lifecycle_manifest.json",
-    "environment_provenance.json",
-    "SHA256SUMS"
+  "p6_artifacts": [
+    "p6_certification_dataset.json",
+    "p6_constructor_arguments.json",
+    "p6_predictor_manifest.json",
+    "p6_campaign_result.json",
+    "p6_campaign_manifest.json",
+    "p6_environment_provenance.json",
+    "P6_SHA256SUMS"
   ],
   "real_runtime_claims": "EXECUTION_PENDING",
   "formally_verified_lifecycles": 0,
+  "next_phase": "P7_TARGET_MACHINE_EXECUTION_AND_FAILURE_CLASSIFICATION",
   "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
 }
