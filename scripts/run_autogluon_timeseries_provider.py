@@ -3,11 +3,15 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
 
 
 def _load_payload(path: Path) -> dict[str, Any]:
@@ -20,12 +24,7 @@ def _write_payload(path: Path, payload: dict[str, Any]) -> None:
 
 
 def _history_to_long(history: list[dict[str, Any]]) -> pd.DataFrame:
-    """Convert lottery draws to seven regular position series.
-
-    Actual lottery dates are not perfectly weekly because of schedule changes
-    and holidays. AutoGluon requires a regular time index, so one draw is
-    represented as one synthetic daily step while preserving draw order.
-    """
+    """Convert legacy Loto7 draws to seven regular position series."""
     rows: list[dict[str, Any]] = []
     base_timestamp = pd.Timestamp("2000-01-01")
 
@@ -43,7 +42,7 @@ def _history_to_long(history: list[dict[str, Any]]) -> pd.DataFrame:
     return pd.DataFrame(rows).sort_values(["item_id", "timestamp"]).reset_index(drop=True)
 
 
-def run_provider(request: dict[str, Any]) -> dict[str, Any]:
+def _run_provider_v1(request: dict[str, Any]) -> dict[str, Any]:
     requested_device = str(request.get("device", "cpu"))
     if requested_device != "cuda":
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
@@ -118,7 +117,6 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         }
 
     execution_device = "cuda" if requested_device == "cuda" and cuda_available else "cpu"
-    # fast_training / very_light preset trains statistical + tabular-ML models only, never on GPU
     gpu_used = False
 
     try:
@@ -163,6 +161,16 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def run_provider(request: dict[str, Any]) -> dict[str, Any]:
+    if request.get("schema_version") == 2:
+        if str(SRC) not in sys.path:
+            sys.path.insert(0, str(SRC))
+        from loto.adapters.autogluon.provider import run_provider_v2
+
+        return run_provider_v2(request)
+    return _run_provider_v1(request)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run AutoGluon-TimeSeries provider in an isolated env"
@@ -170,10 +178,33 @@ def main() -> None:
     parser.add_argument("--request", required=True, type=Path)
     parser.add_argument("--response", required=True, type=Path)
     args = parser.parse_args()
+    request = _load_payload(args.request)
     try:
-        response = run_provider(_load_payload(args.request))
+        response = run_provider(request)
     except Exception as exc:
-        response = {"status": "ERROR", "error_type": type(exc).__name__, "message": str(exc)}
+        if request.get("schema_version") == 2:
+            response = {
+                "schema_version": 2,
+                "provider_version": 2,
+                "run_id": str(request.get("run_id") or "unknown-run"),
+                "status": "ERROR",
+                "operation": str(request.get("operation") or "discover"),
+                "predictions": [],
+                "model_inventory": [],
+                "ensemble_inventory": [],
+                "argument_ledger": [],
+                "artifacts": {},
+                "metadata": {},
+                "runtime_evidence": None,
+                "error": {
+                    "code": "UNHANDLED_PROVIDER_EXCEPTION",
+                    "phase": "main",
+                    "message": str(exc),
+                    "error_type": type(exc).__name__,
+                },
+            }
+        else:
+            response = {"status": "ERROR", "error_type": type(exc).__name__, "message": str(exc)}
     _write_payload(args.response, response)
 
 
