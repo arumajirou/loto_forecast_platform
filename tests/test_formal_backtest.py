@@ -35,7 +35,7 @@ def dummy_train_df():
             {
                 "draw_id": f"loto7-{idx}",
                 "draw_no": idx,
-                "draw_date": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * idx),
+                "draw_date": pd.Timestamp("2026-01-01") + pd.to_timedelta(7 * idx, unit="D"),
                 "n1": 2,
                 "n2": 6,
                 "n3": 11,
@@ -45,7 +45,7 @@ def dummy_train_df():
                 "n7": 34,
                 "bonus1": 3,
                 "bonus2": 15,
-                "available_at": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * idx),
+                "available_at": pd.Timestamp("2026-01-01") + pd.to_timedelta(7 * idx, unit="D"),
             }
         )
     return pd.DataFrame(data)
@@ -59,7 +59,7 @@ def dummy_test_row():
             {
                 "draw_id": "loto7-21",
                 "draw_no": 21,
-                "draw_date": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * 21),
+                "draw_date": pd.Timestamp("2026-01-01") + pd.to_timedelta(7 * 21, unit="D"),
                 "n1": 3,
                 "n2": 7,
                 "n3": 12,
@@ -69,7 +69,7 @@ def dummy_test_row():
                 "n7": 35,
                 "bonus1": 4,
                 "bonus2": 16,
-                "available_at": pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * 21),
+                "available_at": pd.Timestamp("2026-01-01") + pd.to_timedelta(7 * 21, unit="D"),
             }
         ]
     )

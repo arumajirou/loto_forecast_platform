@@ -61,7 +61,8 @@ def sample_master(rows: int = 90) -> pd.DataFrame:
         data.append(
             {
                 "draw_no": i + 1,
-                "draw_date": pd.Timestamp("2020-01-01", tz="UTC") + pd.Timedelta(days=i * 7),
+                "draw_date": pd.Timestamp("2020-01-01", tz="UTC")
+                + pd.to_timedelta(i * 7, unit="D"),
                 **{f"n{j + 1}": numbers[j] for j in range(7)},
             }
         )
