@@ -1,20 +1,21 @@
 # AutoGluon TimeSeries Protocol v2 — Foundation Specification
 
-Status: IMPLEMENTED_FOUNDATION / locally verified contract and inventory layers
+Status: IMPLEMENTED_P4 / locally verified contract, inventory, and provider-plan layers
 
 ## Scope
 
-This batch introduces an AutoGluon-specific request/response contract, dynamic lottery
-geometry, and pinned runtime inventory without changing the common model catalog, common
-worker dispatch, root CLI, root dependencies, or CI workflows.
+This branch introduces an AutoGluon-specific request/response contract, dynamic lottery
+geometry, pinned runtime inventory, and a schema-v2 provider execution route without
+changing the common model catalog, common worker dispatch, root CLI, root dependencies,
+or CI workflows.
 
 ## Invariants
 
 - schema and provider version are exactly 2;
 - unknown request fields fail closed;
 - default random seed is 1;
-- explicit model modes require explicit model identities;
-- preset AutoML cannot silently accept and ignore model IDs;
+- explicit model modes require unique explicit model identities;
+- preset AutoML cannot silently accept and ignore model IDs or model dictionaries;
 - every execution request carries a game geometry;
 - prediction length equals the geometry horizon;
 - source order is preserved and hashed;
@@ -33,6 +34,19 @@ worker dispatch, root CLI, root dependencies, or CI workflows.
 - unknown runtime aliases and missing source aliases fail to `PARTIAL`;
 - package absence fails to `ERROR` without erasing the source manifest;
 - inventory JSON is atomically written and protected by a canonical SHA-256.
+
+## Provider P4 invariants
+
+- schema v1 remains unchanged for the existing common worker;
+- schema v2 supports preset, explicit single, explicit multi, and bounded HPO plans;
+- explicit model IDs are converted to AutoGluon `hyperparameters` keys;
+- explicit single and HPO modes disable presets and ensembles;
+- unsupported or contradictory arguments return structured errors instead of being
+  ignored;
+- successful runs persist effective plan and timeline evidence with SHA-256 values;
+- prediction item IDs, horizon, shape, means, quantile columns, and finite values are
+  verified before success;
+- GPU use is not certified merely because CUDA is available.
 
 ## Deferred integration
 
