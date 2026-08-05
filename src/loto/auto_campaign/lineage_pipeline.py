@@ -1,15 +1,17 @@
-"""Compose the promotion gate with chronological lineage enforcement."""
+"""Compose promotion, chronological lineage, and prospective locking."""
 
 from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from .contracts import CampaignConfig, CampaignStage
 from .lineage_integrity import evaluate_lineage_inputs, write_run_lineage
-from .persistence import verify_sha256s, write_json
+from .persistence import verify_sha256s, write_json, write_sha256s
+from .prediction_lock import freeze_prospective_predictions
 from .promotion_gate import evaluate_promotion_gate, run_stage_with_promotion_gate
 from .verification_seal import verify_verification_seal
 
@@ -72,6 +74,42 @@ def _input_verification_failures(
     return failures
 
 
+def _record_prediction_lock_failure(
+    run_root: Path,
+    exc: BaseException,
+) -> dict[str, Any]:
+    failure = {
+        "schema_version": "all-auto-prediction-lock-failure-v1",
+        "status": "FAILED",
+        "failed_at": datetime.now(UTC).isoformat(),
+        "error_type": type(exc).__name__,
+        "error": str(exc),
+        "actual_known_at_lock": "UNKNOWN",
+    }
+    write_json(run_root / "PREDICTION_LOCK_FAILURE.json", failure)
+    manifest_path = run_root / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest.update(
+        {
+            "status": "PARTIAL",
+            "prediction_lock_status": "FAILED",
+            "prediction_lock_path": "PREDICTION_LOCK_FAILURE.json",
+            "actual_known_at_lock": "UNKNOWN",
+        }
+    )
+    write_json(manifest_path, manifest)
+    write_sha256s(run_root)
+    return {
+        "status": "PARTIAL",
+        "stage": CampaignStage.PROSPECTIVE.value,
+        "lineage_status": manifest.get("lineage_status"),
+        "prediction_lock_status": "FAILED",
+        "prediction_lock_path": "PREDICTION_LOCK_FAILURE.json",
+        "prediction_lock_failure": failure,
+        "failures": [f"prediction-lock:{type(exc).__name__}: {exc}"],
+    }
+
+
 def run_stage_with_promotion_and_lineage(
     *,
     runner: Callable[..., dict[str, Any]],
@@ -85,7 +123,7 @@ def run_stage_with_promotion_and_lineage(
     resume: bool,
     predecessor_run: Path | None = None,
 ) -> dict[str, Any]:
-    """Block invalid chains, run the existing gate, then freeze lineage."""
+    """Block invalid inputs, run the stage, freeze lineage, then lock predictions."""
 
     lineage_input = evaluate_lineage_inputs(
         target_stage=target_stage,
@@ -151,7 +189,7 @@ def run_stage_with_promotion_and_lineage(
     if coverage_run is None:
         raise AssertionError("passing promotion gate must have a coverage run")
 
-    return write_run_lineage(
+    lineage_result = write_run_lineage(
         run_root=run_root,
         target_stage=target_stage,
         source_run=source_run,
@@ -159,3 +197,15 @@ def run_stage_with_promotion_and_lineage(
         coverage_run=coverage_run,
         runtime_run=runtime_run,
     )
+    if target_stage != CampaignStage.PROSPECTIVE:
+        return lineage_result
+
+    try:
+        lock_result = freeze_prospective_predictions(run_root)
+    except (OSError, ValueError) as exc:
+        return _record_prediction_lock_failure(run_root, exc)
+    return {
+        **lineage_result,
+        **lock_result,
+        "lineage_status": lineage_result.get("lineage_status", "PASS"),
+    }
