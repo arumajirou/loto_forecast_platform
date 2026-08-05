@@ -64,8 +64,23 @@ def expected_revision() -> str:
     return ProviderRequest.model_fields["expected_upstream_revision"].default
 
 
+def provenance() -> dict[str, str]:
+    revision = expected_revision()
+    return {
+        "installed_provenance_status": "PASS",
+        "distribution_name": "BasicTS",
+        "distribution_version": "1.1.0",
+        "direct_url_repository": "https://github.com/GestaltCogTeam/BasicTS",
+        "direct_url_vcs": "git",
+        "direct_url_commit_id": revision,
+        "direct_url_requested_revision": revision,
+        "direct_url_sha256": "a" * 64,
+    }
+
+
 def test_identity_and_manifest(monkeypatch, tmp_path) -> None:
     monkeypatch.setattr(runtime, "installed_basicts_version", lambda: "1.1.0")
+    monkeypatch.setattr(runtime, "verify_installed_basicts_provenance", provenance)
     monkeypatch.setenv(runtime.REVISION_ENV, expected_revision())
     request = ProviderRequest(
         operation=ProviderOperation.IDENTITY,
@@ -73,13 +88,33 @@ def test_identity_and_manifest(monkeypatch, tmp_path) -> None:
     )
     response = runtime.execute_request(request)
     assert response.status is ProviderStatus.PASS
+    assert response.evidence["installed_provenance_status"] == "PASS"
+    assert response.evidence["direct_url_commit_id"] == expected_revision()
     assert (tmp_path / "ARTIFACT_MANIFEST.json").is_file()
     assert_sha256sums(tmp_path)
+
+
+def test_identity_rejects_provenance_version_drift(monkeypatch, tmp_path) -> None:
+    bad = provenance()
+    bad["distribution_version"] = "0.0.0"
+    monkeypatch.setattr(runtime, "installed_basicts_version", lambda: "1.1.0")
+    monkeypatch.setattr(runtime, "verify_installed_basicts_provenance", lambda: bad)
+    monkeypatch.setenv(runtime.REVISION_ENV, expected_revision())
+    request = ProviderRequest(
+        operation=ProviderOperation.IDENTITY,
+        output_dir=str(tmp_path),
+    )
+
+    response = runtime.execute_request(request)
+
+    assert response.status is ProviderStatus.FAILED
+    assert "provenance metadata differ" in response.error["message"]
 
 
 def test_dlinear_smoke_fit_save_load(monkeypatch, tmp_path) -> None:
     install_fake_basicts(monkeypatch)
     monkeypatch.setattr(runtime, "installed_basicts_version", lambda: "1.1.0")
+    monkeypatch.setattr(runtime, "verify_installed_basicts_provenance", provenance)
     monkeypatch.setenv(runtime.REVISION_ENV, expected_revision())
     request = ProviderRequest(
         operation=ProviderOperation.DLINEAR_SMOKE,
