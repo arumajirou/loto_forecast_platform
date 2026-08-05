@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from typing import Callable
 
 from .p6_contract import P6Operation, P6ProviderRequest, P6StageEvidence
