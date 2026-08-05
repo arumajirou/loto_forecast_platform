@@ -154,6 +154,7 @@ def certify_model(
         "champion_eligible": contract.champion_eligible,
         "status": RuntimeStatus.EXECUTION_FAILED.value,
         "lifecycle_status": "NOT_RUN",
+        "lifecycle_requested": lifecycle,
     }
     model_dir = run_dir / "models" / model_name
     model_dir.mkdir(parents=True, exist_ok=True)
@@ -173,6 +174,7 @@ def certify_model(
             freq=1,
             horizon=horizon,
             parameters=parameters,
+            levels=None,
         )
         prediction.to_csv(model_dir / "forecast.csv", index=False)
         result.update(
@@ -202,8 +204,10 @@ def certify_model(
             result["lifecycle_evidence"] = lifecycle_evidence
             if not lifecycle_evidence["passed"]:
                 result["status"] = RuntimeStatus.VALIDATION_FAILED.value
-        else:
+        elif contract.expected_status is ExpectedStatus.EXPECTED_NEGATIVE_PASS:
             result["lifecycle_status"] = "EXPECTED_NOT_APPLICABLE"
+        else:
+            result["lifecycle_status"] = "NOT_REQUESTED"
     except Exception as exc:
         result["error_type"] = type(exc).__name__
         result["error"] = str(exc)
