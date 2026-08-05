@@ -61,6 +61,11 @@ def _component_summary(result: Mapping[str, Any]) -> dict[str, Any]:
     promotion = result.get("promotion_gate_verification")
     lineage = result.get("lineage_verification")
     prediction = result.get("prediction_lock_verification")
+    prediction_status = (
+        prediction.get("status") if isinstance(prediction, Mapping) else None
+    )
+    if prediction_status == "NOT_APPLICABLE":
+        prediction_status = None
     return {
         "overall_status": result.get("status"),
         "legacy_manifest_status": result.get("run_manifest_status"),
@@ -69,9 +74,7 @@ def _component_summary(result: Mapping[str, Any]) -> dict[str, Any]:
             promotion.get("status") if isinstance(promotion, Mapping) else None
         ),
         "lineage_status": lineage.get("status") if isinstance(lineage, Mapping) else None,
-        "prediction_lock_status": (
-            prediction.get("status") if isinstance(prediction, Mapping) else None
-        ),
+        "prediction_lock_status": prediction_status,
         "failure_count": len(result.get("failures") or []),
     }
 
@@ -95,6 +98,17 @@ def _stable_payload(
     }
 
 
+def _normalize_existing_stable(existing: Mapping[str, Any]) -> dict[str, Any]:
+    stable = {key: value for key, value in existing.items() if key != "sealed_at"}
+    stable.setdefault("prediction_lock_sha256", None)
+    components = stable.get("components")
+    if isinstance(components, Mapping):
+        normalized_components = dict(components)
+        normalized_components.setdefault("prediction_lock_status", None)
+        stable["components"] = normalized_components
+    return stable
+
+
 def write_verification_seal(
     root: Path,
     result: Mapping[str, Any],
@@ -113,11 +127,7 @@ def write_verification_seal(
         except (OSError, json.JSONDecodeError):
             existing = None
         if isinstance(existing, dict):
-            existing_stable = {
-                key: value
-                for key, value in existing.items()
-                if key != "sealed_at"
-            }
+            existing_stable = _normalize_existing_stable(existing)
             if existing_stable == stable and str(existing.get("sealed_at") or "").strip():
                 sealed_at = str(existing["sealed_at"])
 
