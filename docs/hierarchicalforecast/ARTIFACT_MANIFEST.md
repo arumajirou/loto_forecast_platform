@@ -9,9 +9,10 @@
 - Integrity root for source artifacts: exact Git commit at execution or handoff time
 - Integrity root for runtime artifacts: per-run `ARTIFACT_MANIFEST.json` and `SHA256SUMS`
 - Integrity root for transfer package: `<run-id>.zip.sha256`
+- Integrity root for operator evidence: operator `ARTIFACT_MANIFEST.json` and `SHA256SUMS`
 
 This document inventories the component artifacts and their roles. It does not replace the
-machine-generated runtime manifest or SHA-256 files.
+machine-generated runtime or operator manifests and SHA-256 files.
 
 ## Source implementation artifacts
 
@@ -20,6 +21,7 @@ machine-generated runtime manifest or SHA-256 files.
 | `src/loto/reconciliation/hierarchy.py` | upstream adapter, dispatch, execution, shape/finite/coherence validation | focused contract verified |
 | `src/loto/reconciliation/runtime_certification.py` | formal 40-case orchestration and runtime evidence writer | verified with deterministic test doubles; real 1.5.1 pending |
 | `src/loto/reconciliation/package_certification.py` | evidence verification, immutable deterministic ZIP, sidecar, CLI | focused package verification passed |
+| `scripts/run_hierarchicalforecast_target_certification.py` | locked target provisioning, formal execution, independent runtime/ZIP verification | eight focused operator tests passed; real target run pending |
 | `pyproject.toml` | registers `loto-hierarchicalforecast-certify` | entry-point resolution verified |
 
 ## Test artifacts
@@ -31,19 +33,22 @@ machine-generated runtime manifest or SHA-256 files.
 | `tests/test_reconciliation_runtime_certification.py` | formal matrix, artifacts, dependency/version/runtime failure behavior | 9 passed |
 | `tests/test_reconciliation_console_script.py` | console entry metadata and callable resolution | 2 passed |
 | `tests/test_reconciliation_package_certification.py` | immutable ZIP, sidecar, corruption/path rejection, phase failures | 11 passed |
+| `tests/test_reconciliation_target_machine_certification.py` | operator orchestration, independent verification, tamper and preflight rejection | 8 passed |
 
-Unique focused evidence across separate isolated runs: 53 passed.
+Unique focused evidence across separate isolated runs: 61 passed.
 
 ## Documentation artifacts
 
 | Path | Purpose |
 |---|---|
+| `docs/hierarchicalforecast/README.md` | component overview and documentation map |
 | `docs/hierarchicalforecast/REQUIREMENTS.md` | acceptance requirements and promotion gates |
 | `docs/hierarchicalforecast/SPECIFICATION.md` | public command, matrix, artifacts, statuses, and package specification |
 | `docs/hierarchicalforecast/ARCHITECTURE.md` | layer boundaries, data flow, trust boundaries, and failure isolation |
 | `docs/hierarchicalforecast/DATA_CONTRACT.md` | input/output shapes, invariants, determinism, artifact and immutability contracts |
 | `docs/hierarchicalforecast/TEST_PLAN.md` | focused, target-machine, full-suite, and CI verification plan |
-| `docs/hierarchicalforecast/RUNTIME_CERTIFICATION.md` | operator-facing runtime certification reference |
+| `docs/hierarchicalforecast/RUNTIME_CERTIFICATION.md` | runtime certification reference |
+| `docs/hierarchicalforecast/TARGET_MACHINE_CERTIFICATION.md` | locked one-command execution and independent operator verification |
 | `docs/hierarchicalforecast/RUNBOOK.md` | formal execution, verification, diagnosis, and handoff procedure |
 | `docs/hierarchicalforecast/VERIFICATION_REPORT.md` | current evidence, gaps, and formal readiness verdict |
 | `docs/hierarchicalforecast/HANDOFF.md` | next-operator commands, evidence requirements, and prohibited shortcuts |
@@ -53,7 +58,7 @@ Unique focused evidence across separate isolated runs: 53 passed.
 
 ## Runtime artifact bundle
 
-Every invocation creates a unique run directory:
+Every formal runtime invocation creates a unique run directory:
 
 ```text
 artifacts/hierarchicalforecast-runtime/<run-id>/
@@ -92,7 +97,33 @@ ZIP contents:
 `PACKAGE_MANIFEST.json` binds the runtime files by path, byte count, and SHA-256 and records the
 Run ID, certification status, and content-set SHA-256. The sidecar binds the final ZIP bytes.
 
+## Operator evidence bundle
+
+Every target-machine runner invocation creates a separate operator directory:
+
+```text
+artifacts/hierarchicalforecast-target-runs/<operator-run-id>/
+```
+
+Possible contents, depending on the phase reached:
+
+| File | Purpose |
+|---|---|
+| `sync.stdout.log` / `sync.stderr.log` | locked environment synchronization output |
+| `version.stdout.log` / `version.stderr.log` | exact installed-version probe output |
+| `certification.stdout.log` / `certification.stderr.log` | formal command output |
+| `COMMANDS.json` | commands, return codes, durations, paths, and timestamps |
+| `OPERATOR_REPORT.json` | operator status, phase, Git evidence, version, runtime and package verdict |
+| `ARTIFACT_MANIFEST.json` | operator file byte counts and SHA-256 values |
+| `SHA256SUMS` | portable checksum root for operator evidence |
+
+The operator Run ID is intentionally distinct from the formal runtime Run ID. A successful
+operator report records the runtime Run ID, runtime directory, ZIP path, ZIP SHA-256, 40-case
+summary, and 24/16 method partition.
+
 ## Verification commands
+
+Formal runtime evidence:
 
 ```bash
 cd artifacts/hierarchicalforecast-runtime
@@ -102,12 +133,20 @@ cd <run-id>
 sha256sum -c SHA256SUMS
 ```
 
+Operator evidence:
+
+```bash
+cd artifacts/hierarchicalforecast-target-runs/<operator-run-id>
+sha256sum -c SHA256SUMS
+```
+
 ## Evidence not yet available
 
 The manifest records the following as pending rather than silently treating them as successful:
 
 - real installed `hierarchicalforecast==1.5.1` 40-case runtime bundle
-- installed console-script execution in the isolated review environment
+- real target-machine `OPERATOR_REPORT.json` with `status=VERIFIED`
+- installed console-script success on the target host
 - Ruff result
 - mypy result for the supported typed scope
 - repository-wide pytest result
@@ -117,15 +156,18 @@ Issue #61 tracks the GitHub Actions runner-start blocker.
 
 ## Handoff rule
 
-Transfer the ZIP and sidecar together. Record the following in the verification report or handoff:
+Transfer the runtime ZIP and sidecar together and retain the corresponding operator evidence
+directory. Record the following in the verification report or handoff:
 
-- Run ID
+- operator Run ID
+- runtime Run ID
 - Git commit
 - exact installed HierarchicalForecast version
 - certification status and case counts
+- executed/rejected method partition
 - ZIP SHA-256
-- verification command results
+- runtime and operator checksum verification results
 - GitHub Actions run and job IDs
 
-Do not overwrite source runtime evidence, a mismatched ZIP, or a mismatched sidecar. Create a new
-Run ID after investigating any inconsistency.
+Do not overwrite source runtime evidence, operator evidence, a mismatched ZIP, or a mismatched
+sidecar. Create new Run IDs after investigating any inconsistency.
