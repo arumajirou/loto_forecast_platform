@@ -8,9 +8,11 @@ from pathlib import Path
 from loto.statsforecast.runtime_lane import (
     execute_runtime_lane,
     fetch_release_artifact,
+    inspect_target_host_archive,
     prepare_offline_bundle,
     run_target_host_certification,
     verify_target_host_package,
+    write_admission_artifacts,
 )
 
 
@@ -51,8 +53,27 @@ def main(argv: list[str] | None = None) -> int:
     verify_parser = subparsers.add_parser("verify-package")
     verify_parser.add_argument("--archive", type=Path, required=True)
 
+    admission_parser = subparsers.add_parser("admit-package")
+    admission_parser.add_argument("--archive", type=Path, required=True)
+    admission_parser.add_argument("--output-dir", type=Path, required=True)
+    admission_parser.add_argument("--expected-commit", required=True)
+    admission_parser.add_argument("--expected-seed", type=int, default=1)
+
     args = parser.parse_args(argv)
 
+    if args.command == "admit-package":
+        report = inspect_target_host_archive(
+            args.archive,
+            expected_commit=args.expected_commit,
+            expected_seed=args.expected_seed,
+        )
+        paths = write_admission_artifacts(report, args.output_dir)
+        print(f"ADMISSION_STATUS={report['status']}")
+        print(f"DECISION={report['decision']}")
+        print(f"ADMISSION_JSON={paths['json']}")
+        print(f"ADMISSION_MARKDOWN={paths['markdown']}")
+        print(f"ADMISSION_SHA256SUMS={paths['sha256sums']}")
+        return 0 if report["formal_pass"] else 2
     if args.command == "verify-package":
         report = verify_target_host_package(args.archive)
         print(json.dumps(report, ensure_ascii=False, sort_keys=True))
@@ -74,7 +95,6 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ARCHIVE_SHA256={result.archive_sha256_path}")
         print(f"STATUS={result.status}")
         return 0 if result.status == "PASS" else 2
-
     if args.command == "fetch-release":
         artifact = fetch_release_artifact(args.wheelhouse)
         print(f"ARTIFACT={artifact}")
