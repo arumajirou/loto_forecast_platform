@@ -189,13 +189,17 @@ def _artifact_kwargs(
     effective_kwargs: dict[str, Any],
     ledger: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    return {
-        "effective_constructor_kwargs": effective_kwargs,
-        "argument_coverage": ledger,
-        "unexplained_dropped_arguments": [
-            row["argument"] for row in ledger if row["status"] == "DROPPED"
-        ],
-    }
+    artifact = dict(effective_kwargs)
+    artifact.update(
+        {
+            "effective_constructor_kwargs": effective_kwargs,
+            "argument_coverage": ledger,
+            "unexplained_dropped_arguments": [
+                row["argument"] for row in ledger if row["status"] == "DROPPED"
+            ],
+        }
+    )
+    return artifact
 
 
 def _hint_model(
