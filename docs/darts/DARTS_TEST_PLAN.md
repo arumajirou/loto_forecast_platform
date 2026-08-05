@@ -9,7 +9,7 @@
 5. argument acceptance and fail-closed rejection.
 6. draw-number uniqueness, monotonicity and gap-free checks.
 7. raw-frame immutability.
-8. position-local shape.
+8. position-local, multivariate, and global-sequence shape contracts.
 9. fake-runtime reproduction of the current two-model regression ensemble.
 10. chronological Train/Holdout isolation.
 11. Hit@±1, position-wise Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE.
@@ -28,22 +28,26 @@
 24. position-local and global-sequence Regression execution contracts.
 25. MLForecast parity payload stability and tamper sensitivity.
 26. Regression constructor/fit/predict no-silent-drop enforcement.
-27. ten-model Torch identity and shared-training contract.
-28. explicit scheduler/loss/likelihood/metric object resolution.
-29. position-local and global-sequence Torch execution contracts.
-30. CUDA parameter/prediction device, PID, VRAM, allocated, and reserved evidence.
-31. CPU fallback rejection and per-model failure isolation.
-32. Torch prediction position, horizon, finite-value, and input immutability checks.
+27. ten-model Torch identity, shared training, and per-model isolation contracts.
+28. GPU parameter/prediction device, PID, VRAM, and CUDA-memory evidence.
+29. CPU fallback and requested/effective accelerator mismatch rejection.
+30. four-model Foundation identity and capability-matrix SHA-256.
+31. immutable Foundation model revision and local-artifact manifest requirements.
+32. zero-shot optimizer-step/parameter-change rejection.
+33. fine-tuning effectiveness and TiRex partial-fine-tuning restrictions.
+34. Foundation covariate capability drift and unsupported-input rejection.
+35. Foundation package/model dependency failure retention.
 
 ## Pending runtime gates
 
 - resolve `darts[notorch]==0.46.1` and `darts[torch]==0.46.1` locks;
-- discover real executable model count;
-- run the real P5 Local statistical matrix;
-- run the real P6 Regression matrix with sklearn and optional GBDT dependencies;
-- run real multi-seed OOF using identical Darts/MLForecast folds and estimators;
-- real save/load/re-predict certification;
-- run the real P7 Torch matrix with `darts[torch]==0.46.1`;
-- certify CUDA parameter/prediction devices, GPU PID, VRAM, and CPU fallback rejection;
-- certify manual save/load, best/last checkpoints, weights, and CPU/GPU map locations;
-- repository Ruff and full pytest after a GitHub hosted runner starts normally.
+- discover the real executable model count;
+- run the real P5 Local statistical and P6 Regression matrices;
+- run real P7 Torch models with device, PID, and memory evidence;
+- pin unresolved Chronos2 and TiRex Hugging Face revisions;
+- generate and verify portable local Foundation model manifests;
+- run P8 zero-shot and fine-tuning tracks with real models;
+- verify real Foundation covariate and probabilistic behavior;
+- run real multi-seed OOF using identical cross-library conditions;
+- certify real save/load/checkpoint behavior;
+- run repository Ruff and full pytest after a hosted runner starts normally.
