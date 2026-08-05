@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-import json
 import traceback
 from contextvars import ContextVar
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from threading import RLock
 from types import ModuleType
@@ -16,6 +15,7 @@ import pandas as pd
 from loto.models.neuralforecast_search_space import (
     SearchSpaceProfile,
     profile_ray_config,
+    unavailable_search_space_profile,
 )
 from loto.neuralforecast.db_search_space_persistence import (
     persist_database_search_space_evidence,
@@ -76,10 +76,6 @@ def _resolve_interceptor(request: Any) -> Any:
     plan = context.resolve_delegate(request)
     profile = plan.search_space_profile
     if profile is None:
-        from loto.models.neuralforecast_search_space import (
-            unavailable_search_space_profile,
-        )
-
         profile = unavailable_search_space_profile(
             backend=plan.backend,
             model_name=plan.model_name,
@@ -198,12 +194,21 @@ def _run_single_model(config: Any, spec: Any, panel: pd.DataFrame) -> dict[str, 
         _CORE.construct_auto_model = _construct_interceptor
         try:
             if spec.class_name == "AutoHINT":
-                _persist(
-                    context,
-                    unavailable_autohint_profile(),
-                    phase="planning",
-                    backend="ray",
+                preflight_profile = unavailable_autohint_profile()
+                preflight_backend = "ray"
+            else:
+                preflight_backend = config.backend
+                preflight_profile = unavailable_search_space_profile(
+                    backend=preflight_backend,
+                    model_name=spec.class_name,
+                    reason="search-space planning has not completed",
                 )
+            _persist(
+                context,
+                preflight_profile,
+                phase="planning",
+                backend=preflight_backend,
+            )
             report = _ORIGINALS["run_single_model"](config, spec, panel)
         except Exception as exc:  # defensive boundary outside the stable core
             report = {

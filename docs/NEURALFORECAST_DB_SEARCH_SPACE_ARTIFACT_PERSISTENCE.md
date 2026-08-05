@@ -52,7 +52,8 @@ The model report records one of two phases:
 - `planning`: dependency-light evidence available before the model constructor;
 - `runtime_resolved`: evidence obtained from the constructed model's resolved config.
 
-For ordinary AutoModels, `AutoModelPlan.search_space_profile` is persisted before
+For ordinary AutoModels, an honest `UNAVAILABLE` preflight profile is written before
+plan resolution. `AutoModelPlan.search_space_profile` replaces it before
 `construct_auto_model`. After construction, an adapter-attached runtime profile is
 preferred. If none is attached, the runtime model config is inspected with the planning
 profile as an explicit fallback.

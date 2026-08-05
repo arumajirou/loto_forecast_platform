@@ -22,26 +22,56 @@ def _atomic_write_json(path, payload):
 def _fresh_core(*, run_single=None, run_campaign=None) -> ModuleType:
     core = ModuleType("fake_db_core")
     core.atomic_write_json = _atomic_write_json
-    core._build_hint_panel = lambda panel: (panel, [[1.0]], {})
-    core.resolve_auto_model_plan = lambda request: request
-    core.construct_auto_model = lambda plan: plan
-    core._construct_auto_hint = lambda config, panel: (object(), panel, None, {})
-    core._run_single_model = run_single or (
-        lambda config, spec, panel: {
+
+    def build_hint_panel(panel):
+        return panel, [[1.0]], {}
+
+    def resolve(request):
+        return request
+
+    def construct(plan):
+        return plan
+
+    def construct_hint(config, panel):
+        return object(), panel, None, {}
+
+    def default_run_single(config, spec, panel):
+        return {
             "model_id": spec.model_id,
             "class_name": spec.class_name,
             "status": "SUCCEEDED",
             "certification_status": "TRAIN_ONLY",
         }
-    )
-    core._worker_entry = lambda *args: None
-    core.build_campaign_plan = lambda config, panel: {"schema_version": "1.1.0"}
-    core.run_automodel_campaign = run_campaign or (
-        lambda config: {"schema_version": "1.1.0", "reports": []}
-    )
-    core.AutoModelCampaignConfig = lambda **kwargs: SimpleNamespace(**kwargs)
-    core.DatabaseTableSource = lambda **kwargs: SimpleNamespace(**kwargs)
-    core.list_automodel_specs = lambda: []
+
+    def worker_entry(*args):
+        return None
+
+    def build_plan(config, panel):
+        return {"schema_version": "1.1.0"}
+
+    def default_campaign(config):
+        return {"schema_version": "1.1.0", "reports": []}
+
+    def campaign_config(**kwargs):
+        return SimpleNamespace(**kwargs)
+
+    def source(**kwargs):
+        return SimpleNamespace(**kwargs)
+
+    def specs():
+        return []
+
+    core._build_hint_panel = build_hint_panel
+    core.resolve_auto_model_plan = resolve
+    core.construct_auto_model = construct
+    core._construct_auto_hint = construct_hint
+    core._run_single_model = run_single or default_run_single
+    core._worker_entry = worker_entry
+    core.build_campaign_plan = build_plan
+    core.run_automodel_campaign = run_campaign or default_campaign
+    core.AutoModelCampaignConfig = campaign_config
+    core.DatabaseTableSource = source
+    core.list_automodel_specs = specs
 
     facade._CORE = None
     facade._ORIGINALS.clear()
@@ -54,6 +84,7 @@ def _config(tmp_path: Path, *, dry_run: bool = False):
         output_dir=str(tmp_path),
         random_seed=1,
         num_samples=10,
+        backend="optuna",
         dry_run=dry_run,
         h=1,
         model_configs={},
@@ -96,10 +127,13 @@ def test_facade_persists_planning_and_runtime_profiles_and_restores_hooks(
         }
 
     core = _fresh_core(run_single=run_single)
-    monkey_resolve = lambda _request: plan
-    monkey_construct = lambda _plan: SimpleNamespace(
-        search_space_profile=runtime.model_dump(mode="json")
-    )
+
+    def monkey_resolve(_request):
+        return plan
+
+    def monkey_construct(_plan):
+        return SimpleNamespace(search_space_profile=runtime.model_dump(mode="json"))
+
     core.resolve_auto_model_plan = monkey_resolve
     core.construct_auto_model = monkey_construct
 
@@ -139,7 +173,9 @@ def test_constructor_failure_keeps_planning_evidence_and_restores_hooks(
         raise AssertionError("unreachable")
 
     core = _fresh_core(run_single=run_single)
-    monkey_resolve = lambda _request: plan
+
+    def monkey_resolve(_request):
+        return plan
 
     def monkey_construct(_plan):
         raise RuntimeError("constructor intentionally failed")
@@ -155,6 +191,27 @@ def test_constructor_failure_keeps_planning_evidence_and_restores_hooks(
     assert report["search_space_evidence"]["artifacts"]["verification_status"] == "PASS"
     assert core.resolve_auto_model_plan is monkey_resolve
     assert core.construct_auto_model is monkey_construct
+
+
+def test_plan_resolution_failure_keeps_preflight_evidence(tmp_path: Path) -> None:
+    def run_single(config, spec, panel):
+        core.resolve_auto_model_plan(object())
+        raise AssertionError("unreachable")
+
+    core = _fresh_core(run_single=run_single)
+
+    def fail_resolve(_request):
+        raise ValueError("plan intentionally failed")
+
+    core.resolve_auto_model_plan = fail_resolve
+    report = core._run_single_model(_config(tmp_path), _spec(), pd.DataFrame())
+
+    assert report["status"] == "FAILED"
+    assert "plan intentionally failed" in report["error"]
+    evidence = report["search_space_evidence"]
+    assert evidence["phase"] == "planning"
+    assert evidence["profile"]["completeness"] == "UNAVAILABLE"
+    assert evidence["artifacts"]["verification_status"] == "PASS"
 
 
 def test_autohint_persists_unavailable_then_ray_profile_before_constructor(
@@ -241,8 +298,9 @@ def test_campaign_plan_and_summary_are_additive(tmp_path: Path) -> None:
         search_seed=1,
         num_samples=4,
     )
-    core = _fresh_core(
-        run_campaign=lambda config: {
+
+    def run_campaign(config):
+        return {
             "schema_version": "1.1.0",
             "reports": [
                 {
@@ -253,7 +311,8 @@ def test_campaign_plan_and_summary_are_additive(tmp_path: Path) -> None:
                 }
             ],
         }
-    )
+
+    core = _fresh_core(run_campaign=run_campaign)
 
     plan = core.build_campaign_plan(SimpleNamespace(), pd.DataFrame())
     result = core.run_automodel_campaign(_config(tmp_path))
@@ -269,7 +328,11 @@ def test_campaign_plan_and_summary_are_additive(tmp_path: Path) -> None:
 
 def test_dry_run_is_unchanged_and_installer_is_idempotent(tmp_path: Path) -> None:
     original_result = {"schema_version": "1.1.0", "status": "DRY_RUN_VERIFIED"}
-    core = _fresh_core(run_campaign=lambda config: dict(original_result))
+
+    def run_campaign(config):
+        return dict(original_result)
+
+    core = _fresh_core(run_campaign=run_campaign)
     installed_run = core.run_automodel_campaign
 
     facade.install(core)
