@@ -21,6 +21,8 @@ class ProviderOperation(StrEnum):
 
     FIT_PREDICT = "fit_predict"
     LOAD_PREDICT = "load_predict"
+    EVALUATE = "evaluate"
+    BACKTEST = "backtest"
     MODEL_DISCOVERY = "model_discovery"
     DISTRIBUTION_DISCOVERY = "distribution_discovery"
     RUNTIME_CERTIFY = "runtime_certify"
@@ -137,8 +139,13 @@ class GluonTSProviderRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_operation_contract(self) -> GluonTSProviderRequest:
-        if self.operation is ProviderOperation.FIT_PREDICT and not self.dataset:
-            raise ValueError("fit_predict requires at least one dataset item")
+        data_operations = {
+            ProviderOperation.FIT_PREDICT,
+            ProviderOperation.EVALUATE,
+            ProviderOperation.BACKTEST,
+        }
+        if self.operation in data_operations and not self.dataset:
+            raise ValueError(f"{self.operation.value} requires at least one dataset item")
         if self.operation is ProviderOperation.LOAD_PREDICT and not self.artifact_dir:
             raise ValueError("load_predict requires artifact_dir")
         if self.device is DeviceRequest.CUDA and self.resource_policy.max_gpu_jobs < 1:
