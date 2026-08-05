@@ -15,12 +15,12 @@ from .runtime_lane_artifacts import (
     sha256_file,
     verify_portable_sha256sums,
 )
-from .runtime_lane_execution import execute_runtime_lane
-from .runtime_lane_end_to_end import (
+from .runtime_lane_end_to_end_hardening import (
     EndToEndResult,
     resolve_git_context,
     run_end_to_end_certification,
 )
+from .runtime_lane_execution import execute_runtime_lane
 from .runtime_lane_triage import TriageResult, triage_end_to_end_run
 from .runtime_lane_target import (
     TargetHostResult,
