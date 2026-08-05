@@ -1,4 +1,4 @@
-# Darts first-increment test plan
+# Darts contract test plan
 
 ## Executed local gates
 
@@ -11,13 +11,25 @@
 7. raw-frame immutability.
 8. position-local shape.
 9. fake-runtime reproduction of the current two-model regression ensemble.
-10. compileall, focused pytest, AST parse and line-length inspection.
+10. chronological Train/Holdout isolation.
+11. Hit@±1, position-wise Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE.
+12. deterministic Random, fixed, mean, median, last, frequency, and seasonal baselines.
+13. fake-model save/load/re-predict equality and failure evidence retention.
+14. Prospective SHA-256 sealing and tamper detection.
+15. expanding-window OOF fold adjacency and non-overlap.
+16. identical fold coverage across multiple seeds.
+17. per-seed mean, population variance, and worst-value retention.
+18. rejection of best-seed-only adoption.
+19. baseline mean/worst Hit@±1 champion gate and `NO_CHAMPION` result.
+20. data/config/code provenance hash stability and tamper sensitivity.
 
 ## Pending runtime gates
 
 - resolve `darts[notorch]==0.46.1` and `darts[torch]==0.46.1` locks;
 - discover real executable model count;
 - smoke NaiveDrift, ExponentialSmoothing and RegressionEnsembleModel;
+- run real multi-seed OOF using identical model and baseline folds;
 - real save/load/re-predict certification;
 - one Torch global-model smoke;
-- GPU PID, VRAM and CPU-fallback evidence.
+- GPU PID, VRAM and CPU-fallback evidence;
+- repository Ruff and full pytest after a GitHub hosted runner starts normally.
