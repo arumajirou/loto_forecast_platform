@@ -120,3 +120,10 @@ def test_replay_classification_exact_close_and_divergent() -> None:
     )
     assert divergent["classification"] == "DIVERGENT"
     assert divergent["passed"] is False
+
+
+def test_invalid_json_is_classified_as_certification_error(tmp_path: Path) -> None:
+    path = tmp_path / "broken.json"
+    path.write_text("{broken", encoding="utf-8")
+    with pytest.raises(HARNESS.CertificationError):
+        HARNESS.load_json(path)
