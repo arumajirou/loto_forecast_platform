@@ -1,0 +1,12 @@
+capability,status,notes
+identity,IMPLEMENTED,pinned model/package/license identity
+zero_shot_predict,IMPLEMENTED_RUNTIME_PENDING,real Uni2TS run pending
+arbitrary_position_count,IMPLEMENTED,contract and runner are dynamic
+horizon_1_2_5,IMPLEMENTED,token budget validated
+native_quantiles,IMPLEMENTED,all nine retained
+past_covariates,IMPLEMENTED_RUNTIME_PENDING,schema accepted; P7 runtime rejects
+known_future_covariates,IMPLEMENTED_RUNTIME_PENDING,availability contract; P7 runtime rejects
+fine_tuning,UPSTREAM_PATH_UNVERIFIED,out of initial scope
+holdout,NOT_OPENED,out of initial scope
+prospective,NOT_OPENED,out of initial scope
+commercial_promotion,BLOCKED_BY_LICENSE,fail closed
