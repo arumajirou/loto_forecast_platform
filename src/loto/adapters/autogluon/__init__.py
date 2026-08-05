@@ -17,6 +17,15 @@ from .contracts import (
 )
 from .execution import ExecutionPlan, ExecutionPlanError, build_execution_plan
 from .geometry import CompiledHistory, TimelineMappingRow, compile_regular_history
+from .search_spaces import (
+    SPACE_MARKER,
+    SUPPORTED_SPACE_TYPES,
+    SearchSpaceDescriptorError,
+    contains_search_space_descriptor,
+    is_search_space_descriptor,
+    materialize_search_spaces,
+    validate_search_space_descriptors,
+)
 from .inventory import (
     AutoGluonRuntimeInventory,
     EnsembleInventoryEntry,
@@ -71,4 +80,11 @@ __all__ = [
     "discover_runtime_inventory",
     "run_provider_v2",
     "write_runtime_inventory",
+    "SPACE_MARKER",
+    "SUPPORTED_SPACE_TYPES",
+    "SearchSpaceDescriptorError",
+    "contains_search_space_descriptor",
+    "is_search_space_descriptor",
+    "materialize_search_spaces",
+    "validate_search_space_descriptors",
 ]
