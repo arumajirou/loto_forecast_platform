@@ -1,0 +1,28 @@
+[project]
+name = "loto-tslib-core-runtime"
+version = "0.1.0"
+description = "Isolated CPU contract runtime for thuml/Time-Series-Library"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "einops==0.8.1",
+  "numpy==2.1.2",
+  "pandas==2.3.3",
+  "pydantic>=2.10,<3",
+  "PyWavelets==1.9.0",
+  "scikit-learn==1.7.2",
+  "torch==2.9.1",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8,<10",
+  "ruff>=0.9,<1",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
