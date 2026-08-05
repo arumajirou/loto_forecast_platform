@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import math
 from pathlib import Path
 from typing import Any
 
+from loto.sktime_campaign.matrix import MODEL_SPECS
 from loto.sktime_campaign.protocol import SmokeModelId
 from loto.sktime_campaign.verification import (
     VerificationError,
@@ -25,6 +28,50 @@ FORMAL_P1_MODEL_IDS: tuple[str, ...] = (
     SmokeModelId.EXPONENTIAL_SMOOTHING.value,
     SmokeModelId.THETA.value,
 )
+FORMAL_P1_FORECAST_HORIZON: tuple[int, ...] = (1, 2)
+FORMAL_P1_SERIES: tuple[float, ...] = (
+    4,
+    7,
+    3,
+    8,
+    6,
+    9,
+    5,
+    10,
+    7,
+    11,
+    8,
+    12,
+    9,
+    13,
+    10,
+    14,
+    11,
+    15,
+    12,
+    16,
+    13,
+    17,
+    14,
+    18,
+)
+FORMAL_P1_SEED = 1
+FORMAL_THREAD_LIMITS: dict[str, str] = {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+}
+
+
+def _canonical_sha256(payload: Any) -> str:
+    encoded = json.dumps(
+        payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def _require_pass_matrix_response(directory: Path) -> dict[str, Any]:
@@ -47,12 +94,85 @@ def _require_pass_matrix_response(directory: Path) -> dict[str, Any]:
     return response
 
 
-def _verify_pass_result(directory: Path, result: dict[str, Any]) -> None:
+def _verify_formal_request(run_dir: Path) -> dict[str, Any]:
+    request = _load_json(run_dir / "smoke-matrix-request.json")
+    if not isinstance(request, dict):
+        raise VerificationError("formal P1 request must contain an object")
+
+    expected_fields: dict[str, Any] = {
+        "schema_version": "1.0",
+        "operation": "smoke_matrix",
+        "environment_lane": "classic-py312",
+        "expected_sktime_version": "1.0.1",
+        "model_ids": list(FORMAL_P1_MODEL_IDS),
+        "forecast_horizon": list(FORMAL_P1_FORECAST_HORIZON),
+        "series": list(FORMAL_P1_SERIES),
+        "save_load": True,
+        "device": "cpu",
+        "seed": FORMAL_P1_SEED,
+    }
+    for key, expected in expected_fields.items():
+        if request.get(key) != expected:
+            raise VerificationError(
+                f"formal P1 request mismatch for {key}: "
+                f"expected={expected}, got={request.get(key)}"
+            )
+
+    expected_output = (run_dir / "smoke-matrix").resolve()
+    actual_output = Path(str(request.get("output_dir", ""))).resolve()
+    if actual_output != expected_output:
+        raise VerificationError(
+            "formal P1 output_dir mismatch: "
+            f"expected={expected_output}, got={actual_output}"
+        )
+    return request
+
+
+def _verify_pass_result(
+    directory: Path,
+    result: dict[str, Any],
+    *,
+    expected_model_id: str,
+) -> None:
     model_id = str(result.get("model_id", ""))
+    if model_id != expected_model_id:
+        raise VerificationError(
+            f"matrix model ID mismatch: expected={expected_model_id}, got={model_id}"
+        )
+
+    spec = MODEL_SPECS[SmokeModelId(model_id)]
+    expected_spec = {
+        "class_path": spec.class_path,
+        "constructor": spec.constructor,
+        "required_distributions": list(spec.required_distributions),
+    }
+    for key, expected in expected_spec.items():
+        if result.get(key) != expected:
+            raise VerificationError(
+                f"matrix fixed spec mismatch for {model_id}: "
+                f"{key} expected={expected}, got={result.get(key)}"
+            )
+
     if result.get("status") != "PASS":
         raise VerificationError(f"matrix model is not PASS: {model_id}")
     if result.get("device") != "cpu" or result.get("cpu_fallback") is not False:
         raise VerificationError(f"matrix CPU boundary is invalid: {model_id}")
+    if result.get("seed") != FORMAL_P1_SEED:
+        raise VerificationError(f"matrix seed mismatch: {model_id}")
+    if result.get("input_rows") != len(FORMAL_P1_SERIES):
+        raise VerificationError(f"matrix input row count mismatch: {model_id}")
+
+    missing_dependencies = result.get("missing_dependencies")
+    if missing_dependencies != []:
+        raise VerificationError(f"matrix dependencies are missing: {model_id}")
+    versions = result.get("dependency_versions")
+    if not isinstance(versions, dict) or versions.get("sktime") != "1.0.1":
+        raise VerificationError(f"matrix sktime dependency evidence is invalid: {model_id}")
+    for distribution in spec.required_distributions:
+        if not isinstance(versions.get(distribution), str) or not versions[distribution]:
+            raise VerificationError(
+                f"matrix dependency version is missing for {model_id}: {distribution}"
+            )
 
     for phase in (
         "dependency_status",
@@ -89,10 +209,10 @@ def _verify_pass_result(directory: Path, result: dict[str, Any]) -> None:
 
     horizon = result.get("forecast_horizon")
     expected_index = result.get("expected_prediction_index")
-    if not isinstance(horizon, list) or not isinstance(expected_index, list):
-        raise VerificationError(f"matrix horizon evidence is missing: {model_id}")
-    if len(horizon) != len(before) or len(expected_index) != len(before):
-        raise VerificationError(f"matrix horizon length mismatch: {model_id}")
+    if horizon != list(FORMAL_P1_FORECAST_HORIZON):
+        raise VerificationError(f"matrix forecast horizon mismatch: {model_id}")
+    if not isinstance(expected_index, list) or len(expected_index) != len(before):
+        raise VerificationError(f"matrix prediction index evidence mismatch: {model_id}")
 
     save_load = result.get("save_load")
     if not isinstance(save_load, dict) or save_load.get("status") != "PASS":
@@ -124,6 +244,27 @@ def verify_matrix_bundle(directory: Path) -> dict[str, Any]:
         raise VerificationError("smoke matrix aggregate status is not PASS")
     if matrix.get("device") != "cpu" or matrix.get("cpu_fallback") is not False:
         raise VerificationError("smoke matrix CPU boundary is invalid")
+    if matrix.get("seed") != FORMAL_P1_SEED:
+        raise VerificationError("smoke matrix seed is not the formal seed")
+    if matrix.get("thread_limits") != FORMAL_THREAD_LIMITS:
+        raise VerificationError(
+            "smoke matrix thread limits mismatch: "
+            f"expected={FORMAL_THREAD_LIMITS}, got={matrix.get('thread_limits')}"
+        )
+
+    expected_input_contract = {
+        "series_rows": len(FORMAL_P1_SERIES),
+        "series_sha256": _canonical_sha256(list(FORMAL_P1_SERIES)),
+        "forecast_horizon": list(FORMAL_P1_FORECAST_HORIZON),
+        "forecast_horizon_sha256": _canonical_sha256(
+            list(FORMAL_P1_FORECAST_HORIZON)
+        ),
+    }
+    if matrix.get("input_contract") != expected_input_contract:
+        raise VerificationError(
+            "formal P1 input contract mismatch: "
+            f"expected={expected_input_contract}, got={matrix.get('input_contract')}"
+        )
 
     requested = matrix.get("requested_model_ids")
     if requested != list(FORMAL_P1_MODEL_IDS):
@@ -145,8 +286,12 @@ def verify_matrix_bundle(directory: Path) -> dict[str, Any]:
             f"expected={list(FORMAL_P1_MODEL_IDS)}, got={result_ids}"
         )
 
-    for result in results:
-        _verify_pass_result(directory, result)
+    for expected_model_id, result in zip(FORMAL_P1_MODEL_IDS, results, strict=True):
+        _verify_pass_result(
+            directory,
+            result,
+            expected_model_id=expected_model_id,
+        )
 
     summary = matrix.get("summary")
     if not isinstance(summary, dict):
@@ -181,6 +326,8 @@ def verify_matrix_bundle(directory: Path) -> dict[str, Any]:
         "operation": "smoke_matrix",
         "model_ids": list(FORMAL_P1_MODEL_IDS),
         "passed": len(FORMAL_P1_MODEL_IDS),
+        "input_contract": expected_input_contract,
+        "thread_limits": FORMAL_THREAD_LIMITS,
         "sha256_records": len(sha_records),
     }
 
@@ -189,6 +336,7 @@ def finalize_p1_run(run_dir: Path) -> dict[str, Any]:
     """Verify inventory plus the four-model classic P1 smoke matrix."""
 
     run_dir = run_dir.resolve()
+    request = _verify_formal_request(run_dir)
     inventory = verify_inventory_bundle(run_dir / "inventory")
     matrix = verify_matrix_bundle(run_dir / "smoke-matrix")
     report = {
@@ -196,6 +344,7 @@ def finalize_p1_run(run_dir: Path) -> dict[str, Any]:
         "status": "PASS",
         "certification_scope": "sktime-classic-py312-p1",
         "sktime_version": "1.0.1",
+        "formal_request_sha256": _canonical_sha256(request),
         "inventory": inventory,
         "smoke_matrix": matrix,
         "certification_boundaries": {
