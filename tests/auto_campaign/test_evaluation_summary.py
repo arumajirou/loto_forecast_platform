@@ -183,6 +183,13 @@ def test_summary_preserves_stage_backend_and_config_identity(tmp_path: Path) -> 
             ["backend", "config_index"],
             kind="stable",
         )
+        identity = list(
+            zip(
+                frame["backend"],
+                frame["config_index"],
+                strict=True,
+            )
+        )
         assert frame["stage"].tolist() == ["oof", "oof", "oof"]
-        assert list(zip(frame["backend"], frame["config_index"], strict=True)) == expected_identity
+        assert identity == expected_identity
         assert frame[hit_column].tolist() == expected_hit_pm1
