@@ -113,3 +113,40 @@ def test_offline_bundle_requires_selected_wheel_and_lock(tmp_path) -> None:
     report = verify_offline_bundle(tmp_path)
     assert report["status"] == "FAILED"
     assert any("selected StatsForecast artifact is missing" in item for item in report["failures"])
+
+
+def test_offline_bundle_rejects_selected_sdist(tmp_path) -> None:
+    (tmp_path / "project").mkdir()
+    (tmp_path / "project" / "pyproject.toml").write_text(
+        "[project]\n", encoding="utf-8"
+    )
+    (tmp_path / "project" / "uv.lock").write_text(
+        "version = 1\n", encoding="utf-8"
+    )
+    (tmp_path / "requirements.txt").write_text("", encoding="utf-8")
+    packages = tmp_path / "packages"
+    packages.mkdir()
+    artifact = packages / "statsforecast-2.1.1.tar.gz"
+    artifact.write_bytes(b"sdist")
+    selection = {
+        "selected": {
+            "filename": artifact.name,
+            "sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
+        }
+    }
+    (tmp_path / "PYPI_RELEASE_SELECTION.json").write_text(
+        json.dumps(selection), encoding="utf-8"
+    )
+    rows = []
+    for path in sorted(tmp_path.rglob("*")):
+        if path.is_file():
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            rows.append(
+                f"{digest}  {path.relative_to(tmp_path).as_posix()}"
+            )
+    (tmp_path / "SHA256SUMS").write_text(
+        "\n".join(rows) + "\n", encoding="utf-8"
+    )
+    report = verify_offline_bundle(tmp_path)
+    assert report["status"] == "FAILED"
+    assert any("not a wheel" in item for item in report["failures"])
