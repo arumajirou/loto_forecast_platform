@@ -6,15 +6,18 @@
     "environments/statsforecast-py313/**",
     "scripts/run_statsforecast_runtime_lane.py",
     "src/loto/statsforecast/runtime_lane.py",
+    "src/loto/statsforecast/runtime_lane_admission.py",
     "src/loto/statsforecast/runtime_lane_artifacts.py",
     "src/loto/statsforecast/runtime_lane_execution.py",
+    "src/loto/statsforecast/runtime_lane_target.py",
     "src/loto/statsforecast/runtime_lane_wheel_policy.py",
     "tests/statsforecast/test_runtime_lane.py",
+    "tests/statsforecast/test_runtime_lane_admission.py",
     "configs/statsforecast/release_manifest.json",
     "docs/statsforecast/RUNTIME_LANE_RUNBOOK.md",
-    "docs/statsforecast/STATSFORECAST_RUNTIME_LANE_CHANGE_SCOPE.json",
-    "src/loto/statsforecast/runtime_lane_target.py",
-    "docs/statsforecast/TARGET_HOST_EXECUTION.md"
+    "docs/statsforecast/RUNTIME_ADMISSION.md",
+    "docs/statsforecast/TARGET_HOST_EXECUTION.md",
+    "docs/statsforecast/STATSFORECAST_RUNTIME_LANE_CHANGE_SCOPE.json"
   ],
   "forbidden_paths": [
     "pyproject.toml",
