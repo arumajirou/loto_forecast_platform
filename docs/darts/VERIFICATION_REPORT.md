@@ -95,8 +95,25 @@
 - argument ledger, matrix failure retention, and evidence SHA-256: PASS;
 - compileall, AST parse, YAML/JSON parse, and line-length inspection: PASS.
 
-Documented focused increment runs total 94 tests. They were not all executed together in
-one environment, so this is not a single 94-test certification run.
+## P12 cross-library comparison increment
+
+- focused tests: 14 passed;
+- all eight execution tracks and wrapper/standalone identity rules: PASS;
+- immutable versions, base revisions, and SHA-256 validation: PASS;
+- common data/split/fold/seed/lag/covariate/Train-only fitting contract: PASS;
+- target leakage and target-as-covariate rejection: PASS;
+- one canonical execution per duplicated base algorithm: PASS;
+- GPU effective-device, PID, VRAM, and CPU-fallback rejection: PASS_CONTRACT;
+- exact prediction-key and complete position coverage parity: PASS;
+- Hit@±1 metric family, MAE, MSE, RMSE, seed mean/variance/worst: PASS;
+- wrapper prediction/metric delta reporting without algorithm double counting: PASS;
+- strict wrapper parity option and prediction-drift rejection: PASS;
+- canonical-only seven-baseline champion gate: PASS;
+- provider failure retention and report SHA-256 tamper sensitivity: PASS;
+- compileall, AST parse, YAML parse, and line-length inspection: PASS.
+
+Documented focused increment runs total 108 tests. They were not all executed together in
+one environment, so this is not a single 108-test certification run.
 
 ## Blocked
 
@@ -106,5 +123,7 @@ one environment, so this is not a single 94-test certification run.
 - Chronos2 and TiRex revisions remain intentionally unresolved in example configs;
 - no real Foundation, historical, ensemble/conformal, or persistence runtime occurred;
 - no real checkpoint, weights, cross-device, GPU PID, VRAM, or replay result exists;
+- no real Darts/NeuralForecast/MLForecast/StatsForecast/AutoGluon comparison occurred;
+- no real wrapper parity, deduplicated ranking, or cross-library champion exists;
 - no real CUDA, persistence, accuracy, Holdout, or Prospective claim is made;
 - GitHub Actions jobs continue to fail before step creation and produce no logs.
