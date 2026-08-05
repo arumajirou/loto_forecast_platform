@@ -37,6 +37,7 @@ def test_all_required_baselines_are_finite_and_deterministic() -> None:
     assert metadata["history_rows"] == 4
     assert metadata["horizon"] == 2
     assert metadata["random_seed"] == 1
+    assert metadata["fixed_value_vector"] == [6.0, 11.0, 16.0, 21.0, 26.0]
     for name, values in first.items():
         assert values.shape == (2, 5)
         assert np.isfinite(values).all()
@@ -50,6 +51,27 @@ def test_random_seed_changes_only_random_baseline() -> None:
     assert not np.array_equal(first["random_uniform"], second["random_uniform"])
     for name in set(BASELINE_NAMES) - {"random_uniform"}:
         np.testing.assert_allclose(first[name], second[name])
+
+
+def test_fixed_center_is_independent_of_history_values() -> None:
+    first, _ = generate_prospective_baselines(_history(), horizon=2)
+    shifted_history = np.asarray(
+        [
+            [5, 10, 15, 20, 25],
+            [6, 11, 16, 21, 26],
+            [7, 12, 17, 22, 27],
+            [8, 13, 18, 23, 28],
+        ],
+        dtype=float,
+    )
+    second, metadata = generate_prospective_baselines(shifted_history, horizon=2)
+
+    np.testing.assert_array_equal(first["fixed_center"], second["fixed_center"])
+    np.testing.assert_array_equal(
+        second["fixed_center"],
+        np.asarray([[6, 11, 16, 21, 26]] * 2, dtype=float),
+    )
+    assert "history-independent" in metadata["fixed_value_definition"]
 
 
 def test_constant_series_records_statistical_fallback() -> None:
