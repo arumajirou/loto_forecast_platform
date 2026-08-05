@@ -62,19 +62,23 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
         failures.append("actuals lock status must be LOCKED")
     if actuals_lock.get("actual_known") is not True:
         failures.append("actuals lock actual_known must be true")
-    scoring_ids = {
-        str(value)
-        for value in (
-            manifest.get("scoring_id"),
-            report.get("scoring_id"),
-            actuals_lock.get("scoring_id"),
-        )
-        if str(value or "").strip()
-    }
-    if len(scoring_ids) != 1:
+    if actuals_lock.get("actual_publication_time_verified") is not False:
+        failures.append("actuals lock must not claim verified publication time")
+    if report.get("actual_publication_time_verified") is not False:
+        failures.append("scoring report must not claim verified publication time")
+    scoring_id_values = [
+        str(manifest.get("scoring_id") or "").strip(),
+        str(report.get("scoring_id") or "").strip(),
+        str(actuals_lock.get("scoring_id") or "").strip(),
+    ]
+    if any(not value for value in scoring_id_values) or len(set(scoring_id_values)) != 1:
         failures.append("scoring_id is missing or inconsistent across artifacts")
-    if manifest.get("scoring_code_sha256") != report.get("scoring_code_sha256"):
-        failures.append("scoring code SHA differs between manifest and report")
+    code_hash_values = [
+        str(manifest.get("scoring_code_sha256") or "").strip(),
+        str(report.get("scoring_code_sha256") or "").strip(),
+    ]
+    if any(not value for value in code_hash_values) or len(set(code_hash_values)) != 1:
+        failures.append("scoring code SHA is missing or inconsistent")
     if report.get("priority_metric") != "hit_pm1":
         failures.append("scoring report priority_metric must be hit_pm1")
     if actuals_lock:
@@ -102,6 +106,10 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
         source_evidence = {}
     for name in (
         "manifest.json",
+        "campaign_config.json",
+        "data_contract.json",
+        "PROMOTION_GATE.json",
+        "LINEAGE.json",
         PREDICTION_LOCK_PATH,
         "VERIFICATION_SEAL.json",
         "VERIFICATION_REPORT.json",
@@ -148,6 +156,9 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
             failures.append(f"actuals lock input missing: {field}")
         elif record.get("sha256") != sha256_file(path):
             failures.append(f"actuals lock input SHA mismatch: {field}")
+        report_field = "history_sha256" if field == "history_input" else "actuals_sha256"
+        if report.get(report_field) != record.get("sha256"):
+            failures.append(f"scoring report {report_field} mismatch")
     normalized_actuals = root / "ACTUALS_NORMALIZED.parquet"
     if normalized_actuals.is_file() and actuals_lock.get("actuals_normalized_sha256") != (
         sha256_file(normalized_actuals)
@@ -233,6 +244,7 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
         "SCORED_PREDICTIONS.parquet",
         "METRICS.parquet",
         "POSITION_METRICS.parquet",
+        "PER_SEED_METRICS.parquet",
         "SEED_SUMMARY.parquet",
         "RANKING.parquet",
         "BASELINE_COMPARISON.parquet",
@@ -243,6 +255,8 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
     try:
         metrics = pd.read_parquet(root / "METRICS.parquet")
         positions = pd.read_parquet(root / "POSITION_METRICS.parquet")
+        per_seed = pd.read_parquet(root / "PER_SEED_METRICS.parquet")
+        seed_summary = pd.read_parquet(root / "SEED_SUMMARY.parquet")
         ranking = pd.read_parquet(root / "RANKING.parquet")
         baselines = pd.read_parquet(root / "BASELINE_PREDICTIONS.parquet")
     except (OSError, ValueError) as exc:
@@ -261,6 +275,19 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
             failures.append("METRICS.parquet is empty or missing required metrics")
         if positions.empty or "unique_id" not in positions.columns:
             failures.append("POSITION_METRICS.parquet is empty or missing unique_id")
+        if per_seed.empty or "seed" not in per_seed.columns:
+            failures.append("PER_SEED_METRICS.parquet is empty or missing seed")
+        required_summary_columns = {
+            "hit_pm1_mean",
+            "hit_pm1_var",
+            "hit_pm1_min",
+            "worst_seed_hit_pm1",
+            "seed_count",
+        }
+        if seed_summary.empty or not required_summary_columns.issubset(
+            seed_summary.columns
+        ):
+            failures.append("SEED_SUMMARY.parquet is missing seed aggregates")
         if ranking.empty or "rank" not in ranking.columns:
             failures.append("RANKING.parquet is empty or missing rank")
         expected_baselines = {
