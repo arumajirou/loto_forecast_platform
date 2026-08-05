@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from .api_coverage import run_api_coverage
+from .api_coverage_pipeline import run_api_coverage_pipeline
 from .contracts import CampaignStage
 from .runner import inventory, load_config, plan, run_stage, verify_run
 
@@ -76,7 +76,7 @@ def main() -> None:
         else:
             selected_stage = CampaignStage(args.stage)
             if selected_stage == CampaignStage.API_COVERAGE:
-                result = run_api_coverage(
+                result = run_api_coverage_pipeline(
                     project,
                     config,
                     output.resolve(),
