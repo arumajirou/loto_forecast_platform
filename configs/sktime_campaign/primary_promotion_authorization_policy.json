@@ -1,0 +1,23 @@
+{
+  "authorization_ttl_seconds": 1800,
+  "required_roles": [
+    "model_owner",
+    "independent_reviewer",
+    "operations_owner"
+  ],
+  "required_acknowledgements": [
+    "P10_METRICS_AND_BASELINES_REVIEWED",
+    "REAL_PROSPECTIVE_CHRONOLOGY_REVIEWED",
+    "RUNTIME_AND_ARTIFACT_IDENTITY_REVIEWED",
+    "PRIMARY_IMPACT_AND_ROLLBACK_REVIEWED",
+    "MONITORING_AND_ABORT_THRESHOLDS_REVIEWED"
+  ],
+  "minimum_post_promotion_draws": 3,
+  "minimum_post_promotion_hit_at_1": 0.9,
+  "maximum_post_promotion_mae": 1.0,
+  "clear_canary_on_commit": true,
+  "automatic_primary_promotion": false,
+  "automatic_retraining": false,
+  "automatic_rollback": false,
+  "prediction_publication_allowed_before_p12": false
+}
