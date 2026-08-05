@@ -1,0 +1,29 @@
+{
+  "blind_retry_stopped": true,
+  "code_failure_demonstrated": false,
+  "failure_class": "CI_BLOCKED_PRE_RUN",
+  "interpretation": "No checkout, dependency, lint, compile, or pytest step was recorded.",
+  "runs": [
+    {
+      "head": "3523e1b0a2514cbfe30579a21e1aec1f48e690a2",
+      "job_ids": [
+        92235445014,
+        92236656825
+      ],
+      "log": "BlobNotFound",
+      "recorded_steps": 0,
+      "run_id": 30984298493
+    },
+    {
+      "head": "c67f6b0ce10b06661427a1b00c85b9c1e4643439",
+      "job_ids": [
+        92242748700
+      ],
+      "log": "BlobNotFound",
+      "recorded_steps": 0,
+      "run_id": 30986619815
+    }
+  ],
+  "schema_version": "1.0",
+  "status": "BLOCKED"
+}

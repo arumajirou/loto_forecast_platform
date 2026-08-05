@@ -2,28 +2,27 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / DLINEAR_AND_TSMIXER_CPU_VERIFIED / FULL_MATRIX_PENDING`
+`PARTIALLY_VERIFIED / DLINEAR_TSMIXER_LIGHTTS_CPU_VERIFIED / FULL_MATRIX_PENDING`
 
 This integration isolates `thuml/Time-Series-Library` at revision
 `4e938a1767106324dd753b2a44832bf870a0252e` from the root runtime.
 
 ## Source policy
 
-Provider requests default to `source_policy="pinned"`. DLinear and TSMixer operations
-verify registered upstream Git blob identities before import, construction, fit, or
-reload. A missing or mismatched file fails closed.
-
-`source_policy="test_fixture"` is restricted to focused contract tests and is never
-reported as upstream runtime certification.
+Provider requests default to `source_policy="pinned"`. Registered operations verify
+upstream Git blob identities before import, construction, fit, or reload. A missing or
+mismatched file fails closed. `source_policy="test_fixture"` is restricted to focused
+contract tests and is never reported as upstream certification.
 
 ## Certified CPU models
 
 - DLinear;
-- TSMixer.
+- TSMixer;
+- LightTS.
 
-Both passed construction, bounded fit, finite prediction and state checks, atomic
-checkpoint/input/prediction writes, process exit, strict reload in a separate process,
-and prediction equality within `rtol=1e-8`, `atol=1e-8`.
+Each passed construction, bounded fit, finite prediction/state checks, atomic artifact
+writes, process exit, strict reload in a separate process, and prediction equality at
+`rtol=1e-8`, `atol=1e-8`.
 
 ## Provider operations
 
@@ -32,23 +31,30 @@ and prediction equality within `rtol=1e-8`, `atol=1e-8`.
 - `dlinear_load_predict`;
 - `tsmixer_fit_save`;
 - `tsmixer_load_predict`;
+- `lightts_fit_save`;
+- `lightts_load_predict`;
 - `verify_roundtrip`.
 
-TSMixer request example:
+LightTS request with explicit padding:
 
 ```json
 {
-  "operation": "tsmixer_fit_save",
-  "model_name": "TSMixer",
+  "operation": "lightts_fit_save",
+  "model_name": "LightTS",
   "source_policy": "pinned",
   "seq_len": 8,
-  "pred_len": 2,
+  "pred_len": 5,
   "channels": 3,
   "d_model": 16,
   "dropout": 0.0,
-  "e_layers": 2
+  "lightts_chunk_size": 24,
+  "lightts_allow_padding": true
 }
 ```
+
+LightTS rejects `d_model < 16`, values not divisible by 4, and implicit padding. Its
+requested/effective chunk geometry is stored in the checkpoint and revalidated before
+strict reload.
 
 ## Leakage boundary
 

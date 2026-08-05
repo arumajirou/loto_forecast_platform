@@ -20,6 +20,10 @@ from .data import (
     materialize_training_bundle,
     validate_frame,
 )
+from .lightts_runtime import (
+    fit_save as lightts_fit_save,
+    load_predict as lightts_load_predict,
+)
 from .runtime import fit_save, load_predict, verify_prediction_files
 from .tsmixer_runtime import (
     fit_save as tsmixer_fit_save,
@@ -56,6 +60,10 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
         return tsmixer_fit_save(request)
     if request.operation == Operation.TSMIXER_LOAD_PREDICT:
         return tsmixer_load_predict(request)
+    if request.operation == Operation.LIGHTTS_FIT_SAVE:
+        return lightts_fit_save(request)
+    if request.operation == Operation.LIGHTTS_LOAD_PREDICT:
+        return lightts_load_predict(request)
     assert request.before_prediction_path is not None
     assert request.after_prediction_path is not None
     verification = verify_prediction_files(

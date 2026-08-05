@@ -1,0 +1,246 @@
+{
+  "implicit_padding_rejection": {
+    "error": "Value error, LightTS padding requires lightts_allow_padding=true: padding_length=2",
+    "status": "REJECTED_AS_DESIGNED"
+  },
+  "matrix": [
+    {
+      "case_id": 1,
+      "chunk_geometry": {
+        "allow_padding": false,
+        "channels": 1,
+        "chunk_size": 1,
+        "d_model": 16,
+        "input_seq_len": 4,
+        "num_chunks": 4,
+        "padded_seq_len": 4,
+        "padding_length": 0,
+        "pred_len": 1,
+        "requested_chunk_size": 24,
+        "stage12_bottleneck_width": 1,
+        "stage12_hidden_width": 4,
+        "stage3_bottleneck_width": 2,
+        "stage3_input_width": 8
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "parameter_count": 192,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        1,
+        1
+      ],
+      "request": {
+        "channels": 1,
+        "chunk": 24,
+        "d_model": 16,
+        "lightts_allow_padding": false,
+        "pred_len": 1,
+        "seq_len": 4
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": 2,
+      "chunk_geometry": {
+        "allow_padding": true,
+        "channels": 3,
+        "chunk_size": 5,
+        "d_model": 16,
+        "input_seq_len": 8,
+        "num_chunks": 2,
+        "padded_seq_len": 10,
+        "padding_length": 2,
+        "pred_len": 5,
+        "requested_chunk_size": 24,
+        "stage12_bottleneck_width": 1,
+        "stage12_hidden_width": 4,
+        "stage3_bottleneck_width": 2,
+        "stage3_input_width": 8
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "parameter_count": 264,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        5,
+        3
+      ],
+      "request": {
+        "channels": 3,
+        "chunk": 24,
+        "d_model": 16,
+        "lightts_allow_padding": true,
+        "pred_len": 5,
+        "seq_len": 8
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": 3,
+      "chunk_geometry": {
+        "allow_padding": true,
+        "channels": 3,
+        "chunk_size": 3,
+        "d_model": 20,
+        "input_seq_len": 16,
+        "num_chunks": 6,
+        "padded_seq_len": 18,
+        "padding_length": 2,
+        "pred_len": 3,
+        "requested_chunk_size": 24,
+        "stage12_bottleneck_width": 1,
+        "stage12_hidden_width": 5,
+        "stage3_bottleneck_width": 2,
+        "stage3_input_width": 10
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "parameter_count": 380,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        3,
+        3
+      ],
+      "request": {
+        "channels": 3,
+        "chunk": 24,
+        "d_model": 20,
+        "lightts_allow_padding": true,
+        "pred_len": 3,
+        "seq_len": 16
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": 4,
+      "chunk_geometry": {
+        "allow_padding": false,
+        "channels": 1,
+        "chunk_size": 24,
+        "d_model": 16,
+        "input_seq_len": 24,
+        "num_chunks": 1,
+        "padded_seq_len": 24,
+        "padding_length": 0,
+        "pred_len": 24,
+        "requested_chunk_size": 24,
+        "stage12_bottleneck_width": 1,
+        "stage12_hidden_width": 4,
+        "stage3_bottleneck_width": 2,
+        "stage3_input_width": 8
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "parameter_count": 998,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        24,
+        1
+      ],
+      "request": {
+        "channels": 1,
+        "chunk": 24,
+        "d_model": 16,
+        "lightts_allow_padding": false,
+        "pred_len": 24,
+        "seq_len": 24
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": 5,
+      "chunk_geometry": {
+        "allow_padding": true,
+        "channels": 3,
+        "chunk_size": 24,
+        "d_model": 20,
+        "input_seq_len": 25,
+        "num_chunks": 2,
+        "padded_seq_len": 48,
+        "padding_length": 23,
+        "pred_len": 24,
+        "requested_chunk_size": 24,
+        "stage12_bottleneck_width": 1,
+        "stage12_hidden_width": 5,
+        "stage3_bottleneck_width": 2,
+        "stage3_input_width": 10
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "parameter_count": 1692,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        24,
+        3
+      ],
+      "request": {
+        "channels": 3,
+        "chunk": 24,
+        "d_model": 20,
+        "lightts_allow_padding": true,
+        "pred_len": 24,
+        "seq_len": 25
+      },
+      "status": "PASS"
+    },
+    {
+      "case_id": 6,
+      "chunk_geometry": {
+        "allow_padding": true,
+        "channels": 7,
+        "chunk_size": 5,
+        "d_model": 24,
+        "input_seq_len": 32,
+        "num_chunks": 7,
+        "padded_seq_len": 35,
+        "padding_length": 3,
+        "pred_len": 7,
+        "requested_chunk_size": 5,
+        "stage12_bottleneck_width": 1,
+        "stage12_hidden_width": 6,
+        "stage3_bottleneck_width": 3,
+        "stage3_input_width": 12
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "parameter_count": 769,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        7,
+        7
+      ],
+      "request": {
+        "channels": 7,
+        "chunk": 5,
+        "d_model": 24,
+        "lightts_allow_padding": true,
+        "pred_len": 7,
+        "seq_len": 32
+      },
+      "status": "PASS"
+    }
+  ],
+  "schema_version": "1.0",
+  "source_git_blob": "a2051e44d864ec4ec5e72e59660b98c30c93a902",
+  "status": "VERIFIED",
+  "upstream_revision": "4e938a1767106324dd753b2a44832bf870a0252e"
+}

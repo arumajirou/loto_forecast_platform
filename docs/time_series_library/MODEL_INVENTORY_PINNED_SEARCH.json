@@ -1,9 +1,10 @@
 {
+  "certified_model_count": 3,
   "discovery_method": "GitHub code search for top-level class Model at pinned revision",
   "limitations": [
-    "This is a pinned code-search inventory, not a local full-tree AST execution.",
+    "This is a pinned source-search inventory, not a complete local full-tree AST execution.",
     "Direct git clone and complete source-tree discovery were blocked by DNS.",
-    "Only DLinear core source identity and CPU runtime are certified in this increment."
+    "Only DLinear, TSMixer, and LightTS have separate pinned CPU runtime evidence."
   ],
   "model_count": 41,
   "models": [
@@ -69,7 +70,7 @@
     },
     {
       "model_name": "LightTS",
-      "runtime_status": "EXECUTION_PENDING"
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
     },
     {
       "model_name": "Sundial",
@@ -81,7 +82,7 @@
     },
     {
       "model_name": "DLinear",
-      "runtime_status": "EXECUTION_PENDING"
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
     },
     {
       "model_name": "TimeXer",
@@ -89,7 +90,7 @@
     },
     {
       "model_name": "TSMixer",
-      "runtime_status": "EXECUTION_PENDING"
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
     },
     {
       "model_name": "Reformer",

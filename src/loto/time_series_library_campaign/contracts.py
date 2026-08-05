@@ -28,6 +28,8 @@ class Operation(StrEnum):
     DLINEAR_LOAD_PREDICT = "dlinear_load_predict"
     TSMIXER_FIT_SAVE = "tsmixer_fit_save"
     TSMIXER_LOAD_PREDICT = "tsmixer_load_predict"
+    LIGHTTS_FIT_SAVE = "lightts_fit_save"
+    LIGHTTS_LOAD_PREDICT = "lightts_load_predict"
     VERIFY_ROUNDTRIP = "verify_roundtrip"
 
 
@@ -87,6 +89,8 @@ class ProviderRequest(BaseModel):
     d_model: int = Field(default=16, ge=4)
     dropout: float = Field(default=0.0, ge=0.0, lt=1.0)
     e_layers: int = Field(default=2, ge=1, le=32)
+    lightts_chunk_size: int = Field(default=24, ge=1, le=4096)
+    lightts_allow_padding: bool = False
     checkpoint_path: Path | None = None
     input_path: Path | None = None
     before_prediction_path: Path | None = None
@@ -104,14 +108,33 @@ class ProviderRequest(BaseModel):
             Operation.TSMIXER_FIT_SAVE,
             Operation.TSMIXER_LOAD_PREDICT,
         }
+        lightts_ops = {
+            Operation.LIGHTTS_FIT_SAVE,
+            Operation.LIGHTTS_LOAD_PREDICT,
+        }
         load_ops = {
             Operation.DLINEAR_LOAD_PREDICT,
             Operation.TSMIXER_LOAD_PREDICT,
+            Operation.LIGHTTS_LOAD_PREDICT,
         }
         if self.operation in dlinear_ops and self.model_name != "DLinear":
             raise ValueError("DLinear operations require model_name=DLinear")
         if self.operation in tsmixer_ops and self.model_name != "TSMixer":
             raise ValueError("TSMixer operations require model_name=TSMixer")
+        if self.operation in lightts_ops and self.model_name != "LightTS":
+            raise ValueError("LightTS operations require model_name=LightTS")
+        if self.operation in lightts_ops:
+            if self.d_model < 16:
+                raise ValueError("LightTS requires d_model >= 16")
+            if self.d_model % 4 != 0:
+                raise ValueError("LightTS requires d_model divisible by 4")
+            chunk_size = min(self.pred_len, self.seq_len, self.lightts_chunk_size)
+            padding_length = (-self.seq_len) % chunk_size
+            if padding_length and not self.lightts_allow_padding:
+                raise ValueError(
+                    "LightTS padding requires lightts_allow_padding=true: "
+                    f"padding_length={padding_length}"
+                )
         if self.operation in load_ops and (
             self.checkpoint_path is None or self.input_path is None
         ):
