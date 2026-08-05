@@ -4,84 +4,69 @@
 
 `PARTIALLY_VERIFIED / LOCAL_CONTRACT_VERIFIED / REAL_RUNTIME_BLOCKED`
 
-## First increment
+## P1-P4 foundation
 
-- Python compileall: PASS;
-- focused pytest: 10 passed;
-- Python AST parse: PASS, 13 files;
-- lines over repository 100-character limit: 0;
-- raw-input immutability test: PASS;
-- fake-runtime current-ensemble reproduction: PASS;
-- simple secret-pattern scan: PASS.
+- initial focused tests: 10 passed;
+- protocol, discovery, argument ledger, GameGeometry, and adapters: PASS;
+- current RegressionEnsembleModel fake-runtime reproduction: PASS.
 
-## Second increment
+## Evaluation and persistence increment
 
-- focused evaluation/certification tests: 4 passed;
-- cumulative focused Darts contract tests at that increment: 14 passed;
-- chronological Train/Holdout isolation: PASS;
-- Hit@±1, position-wise and all-position metrics: PASS;
-- deterministic random/fixed/mean/median/last/frequency/seasonal baselines: PASS;
-- fake-model save/load/re-predict equality: PASS;
-- prospective SHA-256 tamper detection: PASS;
-- manifest and portable SHA256SUMS verification: PASS.
+- focused tests: 4 passed;
+- Train/Holdout isolation and Hit@±1 metric family: PASS;
+- deterministic baseline family: PASS;
+- save/load/re-predict and Prospective SHA-256 contracts: PASS.
 
-## Third increment
+## OOF, multi-seed, and provenance increment
 
-- focused OOF/multi-seed/provenance tests: 6 passed;
-- expanding chronological folds and non-overlap: PASS;
-- identical fold coverage required for every seed: PASS;
-- mean, population variance, and worst-seed retention: PASS;
-- best-seed-only adoption rejection: PASS;
-- baseline mean/worst Hit@±1 gate and `NO_CHAMPION`: PASS;
-- data/config/code SHA-256 tamper sensitivity: PASS.
+- focused tests: 6 passed;
+- chronological folds, identical seed coverage, mean/variance/worst retention: PASS;
+- best-seed-only rejection, baseline gate, and `NO_CHAMPION`: PASS;
+- data/config/code hash tamper sensitivity: PASS.
 
 ## P5 Local statistical increment
 
-- focused Local statistical matrix tests: 6 passed;
-- nine required identities and missing-dependency retention: PASS;
-- constructor/fit/predict no-silent-drop rule: PASS;
-- per-model failure isolation and finite shape checks: PASS;
-- source-frame immutability: PASS.
+- focused tests: 6 passed;
+- nine identities, missing-dependency retention, argument rejection: PASS;
+- per-model isolation, finite shape, and raw-frame immutability: PASS.
 
 ## P6 Regression increment
 
-- focused Regression contract tests: 8 passed;
-- six required Regression identities: PASS;
-- negative target/past lag enforcement: PASS;
-- future-covariate horizon coverage: PASS;
-- likelihood/quantile consistency: PASS;
-- `SKLearnModel` estimator identity/factory contract: PASS;
-- position-local and global-sequence fake-runtime execution: PASS;
-- dependency/runtime failure retention: PASS;
-- unknown argument rejection: PASS;
-- prediction position/horizon/finite validation: PASS;
-- raw target-frame immutability: PASS;
-- MLForecast parity SHA-256 stability and tamper sensitivity: PASS;
-- compileall, AST parse, YAML parse, and 100-character line inspection: PASS.
+- focused tests: 8 passed;
+- six identities, lags/covariates, local/global paths: PASS;
+- estimator identity, dependency retention, and MLForecast parity SHA-256: PASS.
 
 ## P7 Torch increment
 
-- focused Torch contract tests: 11 passed;
-- ten required Torch identities: PASS;
-- shared chunk/epoch/batch/seed/Lightning trainer contract: PASS;
-- serialized `max_gpu_jobs=1` policy: PASS;
-- runtime object identity resolver requirement: PASS;
-- position-local and global-sequence fake-runtime execution: PASS;
-- CUDA parameter/prediction device evidence checks: PASS;
-- GPU PID and VRAM/CUDA-memory evidence requirements: PASS;
-- CPU fallback and requested/effective accelerator mismatch rejection: PASS;
-- package-level and per-model dependency/runtime failure retention: PASS;
-- prediction shape/finite and raw-frame immutability: PASS;
-- compileall, AST parse, YAML/JSON parse, and line-length checks: PASS.
+- focused tests: 11 passed;
+- ten identities, shared training, local/global fake-runtime paths: PASS;
+- CUDA parameter/prediction devices, GPU PID, and memory evidence: PASS_CONTRACT;
+- CPU fallback, accelerator mismatch, and dependency failure retention: PASS.
+
+## P8 Foundation increment
+
+- focused tests: 12 passed;
+- Chronos2, TimesFM2p5, TiRex, and PatchTSTFM identities: PASS;
+- stable capability-matrix SHA-256: PASS;
+- immutable model revision and local-artifact manifest contract: PASS;
+- variable input chunks and model-specific limits: PASS;
+- TiRex license and partial-fine-tuning restrictions: PASS;
+- runtime capability drift and unsupported-covariate rejection: PASS;
+- zero-shot and fine-tuning runtime-evidence gates: PASS;
+- package dependency failure retention: PASS;
+- local, multivariate, and global-sequence fake-runtime paths: PASS;
+- prediction shape, finite values, device evidence, and raw-frame immutability: PASS;
+- compileall, AST parse, YAML/JSON parse, and line-length inspection: PASS.
+
+Documented focused increment runs total 57 tests. They were not all executed together in
+one environment, so this is not a single 57-test certification run.
 
 ## Blocked
 
-- Ruff executable was absent and the configured package registry did not expose Ruff;
-- `darts==0.46.1` was not available from the configured registry;
-- GitHub tag dependency resolution failed;
-- no environment `uv.lock` could be generated;
-- real Darts Local/Regression/Torch execution, OOF, persistence, and GPU certification
-  remain pending;
-- the latest GitHub Actions failure is not treated as a code failure without usable step logs.
-
-No real Darts runtime or accuracy claim is inferred from fake-runtime and contract tests.
+- Ruff was unavailable from the configured package registry;
+- `darts==0.46.1` and its optional Foundation dependencies were unavailable;
+- notorch and torch lockfiles could not be generated;
+- Chronos2 and TiRex revisions remain intentionally unresolved in example configs;
+- no Foundation model download, local manifest, zero-shot, or fine-tuning run occurred;
+- no real CUDA, persistence, accuracy, Holdout, or Prospective claim is made;
+- GitHub Actions jobs continue to fail before step creation and produce no logs.
