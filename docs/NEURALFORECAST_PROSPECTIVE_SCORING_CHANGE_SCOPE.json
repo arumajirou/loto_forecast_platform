@@ -9,7 +9,7 @@
     "strict prediction-time Raw history SHA-256 matching",
     "separate atomic scoring artifact outside the source Prospective run",
     "Hit@±1 as the primary metric with all-position and position-level Hit@±1",
-    "MAE, MSE, RMSE, exact-hit, mean, variance, minimum, maximum, and worst-seed reporting",
+    "MAE, MSE, RMSE, exact-hit, per-seed, mean, variance, minimum, maximum, and worst-seed reporting",
     "Random, fixed-center, mean, median, last, frequency, and statistical AR(1) baselines",
     "history-only baseline fitting without actual-value access",
     "raw, rounded, and reconciled complete-draw comparison under identical conditions",
@@ -33,7 +33,9 @@
     "merge or main branch changes"
   ],
   "execution_boundaries": {
-    "local_synthetic_smoke": "EXECUTION_PENDING",
+    "dependency_minimal_baseline_metric_smoke": "PASS_9_TESTS",
+    "dependency_minimal_end_to_end_smoke": "PASS",
+    "smoke_parquet_backend": "PANDAS_PICKLE_STAND_IN_NOT_FORMAL_PARQUET_VALIDATION",
     "repository_ruff_compileall_mypy_pytest": "EXECUTION_PENDING",
     "github_actions": "PENDING",
     "real_locked_prospective_scoring": "EXECUTION_PENDING",
