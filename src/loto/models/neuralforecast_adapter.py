@@ -10,6 +10,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+from .neuralforecast_search_policy import (
+    SearchPolicyDecision,
+    instantiate_search_algorithm,
+    resolve_search_policy,
+)
+
 SUPPORTED_BACKENDS = {"optuna", "ray"}
 MODELS_REQUIRING_N_SERIES = {
     "AutoTSMixer",
@@ -44,6 +50,7 @@ class AutoModelRequest:
     n_series: int | None = None
     random_seed: int = 42
     search_strategy: Literal["auto", "random", "tpe", "cmaes"] = "auto"
+    allow_search_fallback: bool = False
     verbose: bool = True
 
 
@@ -56,6 +63,8 @@ class AutoModelPlan:
     precision: str
     adjustments: tuple[str, ...] = field(default_factory=tuple)
     search_algorithm: str = "library_default"
+    search_policy: SearchPolicyDecision | None = None
+    allow_search_fallback: bool = False
     ray_options: dict[str, Any] | None = None
     optuna_options: dict[str, Any] | None = None
 
@@ -71,50 +80,16 @@ def choose_backend(*, gpus: int, cpus: int, requested: str | None, parallel_tria
 
 
 def _build_search_algorithm(backend: str, strategy: str, *, seed: int, num_samples: int):
-    """Return ``(sampler_or_None, stable_name)``.
+    """Compatibility wrapper around the shared search-policy implementation."""
 
-    Constitution principle II: the previous implementation wrapped the whole body in
-    ``except Exception: return None, "library_default"``. That swallowed genuine bugs
-    (a typo in a sampler name, a version incompatibility, a bad seed type) and reported them
-    as an intentional fallback, and it made the test suite's verdict depend on whether optuna
-    happened to be installed.
-
-    Only ``ImportError`` is a legitimate fallback -- it means the optional package is absent,
-    which is a declared state. Every other exception propagates.
-    """
-    if backend not in SUPPORTED_BACKENDS:
-        raise ValueError(f"unsupported backend: {backend}")
-    if strategy not in ("auto", "random", "tpe", "cmaes"):
-        raise ValueError(f"unsupported search strategy: {strategy}")
-
-    if backend == "optuna":
-        try:
-            import optuna
-        except ImportError:
-            return None, "library_default(optuna_absent)"
-        selected = strategy
-        if selected == "auto":
-            selected = "random" if num_samples < 10 else "tpe"
-        if selected == "random":
-            return optuna.samplers.RandomSampler(seed=seed), "RandomSampler"
-        if selected == "cmaes":
-            return optuna.samplers.CmaEsSampler(seed=seed), "CmaEsSampler"
-        return (
-            optuna.samplers.TPESampler(seed=seed, multivariate=True),
-            "TPESampler(multivariate=True)",
-        )
-
-    if num_samples < 10 or strategy == "random":
-        try:
-            from ray.tune.search.basic_variant import BasicVariantGenerator
-        except ImportError:
-            return None, "library_default(ray_absent)"
-        return BasicVariantGenerator(random_state=seed), "BasicVariantGenerator"
-    try:
-        from ray.tune.search.optuna import OptunaSearch
-    except ImportError:
-        return None, "library_default(ray_absent)"
-    return OptunaSearch(seed=seed), "Ray OptunaSearch"
+    decision = resolve_search_policy(
+        backend=backend,
+        strategy=strategy,
+        search_seed=seed,
+        num_samples=num_samples,
+    )
+    materialized = instantiate_search_algorithm(decision, allow_fallback=True)
+    return materialized.algorithm, materialized.decision.effective_algorithm_name
 
 
 def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
@@ -140,8 +115,12 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
     if request.model_name in FFT_MODELS and precision in {"16", "16-mixed", "bf16", "bf16-mixed"}:
         precision = "32-true"
         adjustments.append("precision_adjusted_for_fft")
-    search_alg, search_name = _build_search_algorithm(
-        backend, request.search_strategy, seed=request.random_seed, num_samples=request.num_samples
+    search_policy = resolve_search_policy(
+        backend=backend,
+        strategy=request.search_strategy,
+        search_seed=request.random_seed,
+        num_samples=request.num_samples,
+        model_name=request.model_name,
     )
     constructor_kwargs: dict[str, Any] = {
         "h": request.h,
@@ -159,7 +138,6 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
     needs_n_series = request.model_name in MODELS_REQUIRING_N_SERIES
     if needs_n_series and request.n_series is not None:
         config["n_series"] = int(request.n_series)
-    if needs_n_series and request.n_series is not None:
         constructor_kwargs["n_series"] = int(request.n_series)
     # Empty config intentionally delegates to the official per-model default search space.
     if config:
@@ -169,8 +147,6 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
             adjustments.append("fixed_optuna_config")
         else:
             constructor_kwargs["config"] = config
-    if search_alg is not None:
-        constructor_kwargs["search_alg"] = search_alg
     return AutoModelPlan(
         model_name=request.model_name,
         backend=backend,
@@ -178,7 +154,9 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
         constructor_kwargs=constructor_kwargs,
         precision=precision,
         adjustments=tuple(adjustments),
-        search_algorithm=search_name,
+        search_algorithm=search_policy.effective_algorithm_name,
+        search_policy=search_policy,
+        allow_search_fallback=request.allow_search_fallback,
         ray_options={"cpus": request.cpus, "gpus": request.gpus} if backend == "ray" else None,
         optuna_options={"study_kwargs": {"n_jobs": request.parallel_trials}}
         if backend == "optuna" and request.parallel_trials > 1
@@ -195,6 +173,15 @@ def construct_auto_model(plan: AutoModelPlan):
     if cls is None:
         raise ValueError(f"NeuralForecast does not expose {plan.model_name}")
     kwargs = dict(plan.constructor_kwargs)
+    if plan.search_policy is not None:
+        materialized = instantiate_search_algorithm(
+            plan.search_policy,
+            allow_fallback=plan.allow_search_fallback,
+        )
+        if materialized.algorithm is not None:
+            kwargs["search_alg"] = materialized.algorithm
+    else:
+        materialized = None
     if plan.ray_options is not None:
         ray_options_cls = getattr(nf_auto, "RayOptions", None)
         if ray_options_cls is None:
@@ -205,4 +192,7 @@ def construct_auto_model(plan: AutoModelPlan):
         if optuna_options_cls is None:
             raise ValueError("NeuralForecast does not expose OptunaOptions")
         kwargs["optuna_options"] = optuna_options_cls(**plan.optuna_options)
-    return cls(**kwargs)
+    model = cls(**kwargs)
+    if materialized is not None:
+        model.search_policy_decision = materialized.decision.model_dump(mode="json")
+    return model

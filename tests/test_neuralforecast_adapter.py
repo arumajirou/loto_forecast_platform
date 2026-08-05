@@ -31,3 +31,21 @@ def test_early_stop_is_placed_inside_model_config_not_constructor_kwargs():
     )
     assert plan.config["early_stop_patience_steps"] == 5
     assert "early_stop_patience_steps" not in plan.constructor_kwargs
+
+
+def test_plan_resolution_is_dependency_light_and_uses_shared_policy():
+    plan = resolve_auto_model_plan(
+        AutoModelRequest(
+            model_name="AutoNHITS",
+            h=1,
+            backend="ray",
+            num_samples=10,
+            random_seed=1,
+        )
+    )
+
+    assert plan.search_algorithm == "OptunaSearch"
+    assert plan.search_policy is not None
+    assert plan.search_policy.model_name == "AutoNHITS"
+    assert plan.search_policy.search_seed == 1
+    assert "search_alg" not in plan.constructor_kwargs
