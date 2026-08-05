@@ -1,5 +1,8 @@
 """Reconciled forecasts must be exactly coherent."""
 
+import sys
+import types
+
 import numpy as np
 import pytest
 
@@ -26,9 +29,9 @@ def test_summing_matrix_aggregates_correctly():
     h = build_number_hierarchy(G)
     bottom = np.ones(37)
     full = h.aggregate(bottom)
-    assert full[0] == 37.0  # total
-    assert full[1] + full[2] == 37.0  # odd + even
-    assert full[-1] == 1.0  # individual number
+    assert full[0] == 37.0
+    assert full[1] + full[2] == 37.0
+    assert full[-1] == 1.0
 
 
 @pytest.mark.parametrize("method", AVAILABLE_METHODS)
@@ -44,7 +47,7 @@ def test_every_method_returns_a_coherent_forecast(method):
 def test_incoherent_base_is_detected_before_reconciliation():
     h = build_number_hierarchy(G)
     base = np.zeros((h.n_total, 1))
-    base[0] = 100.0  # total says 100, bottom says 0
+    base[0] = 100.0
     out = reconcile(base, h, method="ols")
     assert out["base_incoherence"] > 1.0
     assert out["coherence_error"] < 1e-8
@@ -88,9 +91,148 @@ def test_coherence_error_of_a_coherent_pair_is_zero():
     assert coherence_error(h.aggregate(bottom), bottom, h) == pytest.approx(0.0)
 
 
-def test_upstream_delegation_reports_unavailable_rather_than_faking():
+def test_upstream_dependency_is_optional_but_never_constructor_only():
     h = build_number_hierarchy(G)
     out = reconcile_with_hierarchicalforecast(np.ones((h.n_total, 1)), h)
-    assert out["status"] in ("AVAILABLE", "UNAVAILABLE")
-    if out["status"] == "UNAVAILABLE":
+    assert out["status"] in {"VERIFIED", "UNAVAILABLE"}
+    if out["status"] == "VERIFIED":
+        assert out["actual_execution"] is True
+        assert out["coherence_error"] <= out["coherence_tolerance"]
+    else:
+        assert out["actual_execution"] is False
         assert "uv sync" in out["remedy"]
+
+
+def _install_fake_hierarchicalforecast(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    classes: dict[str, type],
+    strict: bool,
+) -> None:
+    package = types.ModuleType("hierarchicalforecast")
+    package.__path__ = []
+    package.__version__ = "1.5.1-test"
+    methods = types.ModuleType("hierarchicalforecast.methods")
+    utils = types.ModuleType("hierarchicalforecast.utils")
+    for name, cls in classes.items():
+        setattr(methods, name, cls)
+    utils.is_strictly_hierarchical = lambda _s, _tags: strict
+    package.methods = methods
+    package.utils = utils
+    monkeypatch.setitem(sys.modules, "hierarchicalforecast", package)
+    monkeypatch.setitem(sys.modules, "hierarchicalforecast.methods", methods)
+    monkeypatch.setitem(sys.modules, "hierarchicalforecast.utils", utils)
+
+
+def test_upstream_delegate_executes_fit_predict_and_verifies(monkeypatch):
+    class FakeMinTrace:
+        is_strictly_hierarchical = False
+        is_sparse_method = False
+        instances = []
+
+        def __init__(self, method):
+            self.method = method
+            self.insample = False
+            self.called = False
+            self.__class__.instances.append(self)
+
+        def fit_predict(self, S, y_hat, y_insample=None, y_hat_insample=None, tags=None):
+            self.called = True
+            assert y_insample is None
+            assert y_hat_insample is None
+            assert "number" in tags
+            return {"mean": S @ y_hat[-S.shape[1] :]}
+
+    _install_fake_hierarchicalforecast(
+        monkeypatch,
+        classes={"MinTrace": FakeMinTrace},
+        strict=False,
+    )
+    h = build_number_hierarchy(G)
+    base = np.arange(h.n_total, dtype=float).reshape(-1, 1)
+    out = reconcile_with_hierarchicalforecast(base, h)
+
+    assert out["status"] == "VERIFIED"
+    assert out["actual_execution"] is True
+    assert out["upstream_options"] == {"method": "ols"}
+    assert out["coherence_error"] <= out["coherence_tolerance"]
+    assert FakeMinTrace.instances[0].called is True
+
+
+def test_upstream_strict_method_rejects_grouped_number_hierarchy(monkeypatch):
+    class FakeTopDown:
+        is_strictly_hierarchical = True
+        is_sparse_method = False
+
+        def __init__(self, method):
+            raise AssertionError("constructor must not run for an incompatible hierarchy")
+
+    _install_fake_hierarchicalforecast(
+        monkeypatch,
+        classes={"TopDown": FakeTopDown},
+        strict=False,
+    )
+    h = build_number_hierarchy(G)
+    out = reconcile_with_hierarchicalforecast(
+        np.ones((h.n_total, 1)),
+        h,
+        method="TopDown",
+    )
+
+    assert out["status"] == "UNSUPPORTED_HIERARCHY"
+    assert out["actual_execution"] is False
+
+
+def test_upstream_insample_method_fails_closed_without_inputs(monkeypatch):
+    class FakeERM:
+        is_strictly_hierarchical = False
+        is_sparse_method = False
+
+        def __init__(self, method):
+            self.method = method
+            self.insample = True
+
+        def fit_predict(self, S, y_hat, y_insample, y_hat_insample):
+            raise AssertionError("fit_predict must not run without in-sample arrays")
+
+    _install_fake_hierarchicalforecast(
+        monkeypatch,
+        classes={"ERM": FakeERM},
+        strict=False,
+    )
+    h = build_number_hierarchy(G)
+    out = reconcile_with_hierarchicalforecast(
+        np.ones((h.n_total, 1)),
+        h,
+        method="ERM",
+    )
+
+    assert out["status"] == "REQUIRES_INSAMPLE"
+    assert out["actual_execution"] is False
+
+
+def test_upstream_incoherent_output_is_not_certified(monkeypatch):
+    class FakeMinTrace:
+        is_strictly_hierarchical = False
+        is_sparse_method = False
+
+        def __init__(self, method):
+            self.method = method
+            self.insample = False
+
+        def fit_predict(self, S, y_hat):
+            return {"mean": y_hat.copy()}
+
+    _install_fake_hierarchicalforecast(
+        monkeypatch,
+        classes={"MinTrace": FakeMinTrace},
+        strict=False,
+    )
+    h = build_number_hierarchy(G)
+    base = np.zeros((h.n_total, 1))
+    base[0] = 100.0
+    out = reconcile_with_hierarchicalforecast(base, h)
+
+    assert out["status"] == "VALIDATION_FAILED"
+    assert out["actual_execution"] is True
+    assert out["coherence_error"] > out["coherence_tolerance"]
