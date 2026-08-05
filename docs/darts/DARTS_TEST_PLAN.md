@@ -75,9 +75,19 @@
 
 - resolve `darts[notorch]==0.46.1` and `darts[torch]==0.46.1` locks;
 - discover the real executable model count;
-- run the real P5-P10 model and evaluation contracts;
+- run the real P5 Local statistical and P6 Regression matrices;
+- run real P7 Torch models with device, PID, and memory evidence;
+- pin unresolved Chronos2 and TiRex Hugging Face revisions;
+- generate and verify portable local Foundation model manifests;
+- run P8 zero-shot and fine-tuning tracks with real models;
+- verify real Foundation covariate and probabilistic behavior;
+- run real P9 `historical_forecasts`, `backtest`, and `residuals` calls;
+- certify real optimized/general parity and exact retraining counts;
+- run real P10 ensemble and conformal models on identical OOF folds and seeds;
+- certify real stacking separation, interval coverage, and interval width;
 - run real P11 manual, clean, checkpoint, weights, and cross-device paths;
 - certify real process restart, artifact SHA-256, and prediction replay;
 - certify real GPU PID, VRAM, CUDA allocation, and CPU fallback behavior;
 - run real multi-seed OOF using identical cross-library conditions;
+- certify real save/load/checkpoint behavior;
 - run repository Ruff and full pytest after a hosted runner starts normally.
