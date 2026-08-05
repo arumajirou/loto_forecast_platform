@@ -1,0 +1,12 @@
+{
+  "minimum_prospective_windows": 3,
+  "minimum_prospective_draws": 3,
+  "hit_at_1_target": 0.9,
+  "maximum_hit_at_1_drop": 0.05,
+  "maximum_mae_increase": 0.5,
+  "require_all_windows_stable": true,
+  "require_all_baselines_beaten": true,
+  "automatic_promotion": false,
+  "automatic_retraining": false,
+  "registry_write_allowed": false
+}
