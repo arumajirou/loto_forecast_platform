@@ -1,0 +1,15 @@
+{
+  "repository": "https://github.com/thuml/Time-Series-Library",
+  "revision": "4e938a1767106324dd753b2a44832bf870a0252e",
+  "retrieved_at_utc": "2026-08-05T06:14:00Z",
+  "tracked_blobs": {
+    "requirements.txt": "6a092bbbc105ce844996dee027ea838cc93667d1",
+    "run.py": "unknown_from_connector_snapshot",
+    "exp/exp_basic.py": "844aaa8d43557344e19d5c0608bbf0acd8fd9bcb",
+    "exp/exp_long_term_forecasting.py": "5c1d282eb6feed27b8ca4034c7268462fe26ebfe",
+    "data_provider/data_factory.py": "7fc458f69bc75032b799789b8b1581c80d98d46d",
+    "data_provider/data_loader.py": "ea28fdccd272e5108c42aa079d7104d287be9745",
+    "models/DLinear.py": "3f4d666a9ffe7fb6f58627ba43f1a9d3d9804d78"
+  },
+  "scope": "P0 core contract lane only; no foundation-model or Mamba certification"
+}
