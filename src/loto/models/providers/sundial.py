@@ -299,6 +299,11 @@ class SundialProvider(FoundationProvider):
     def _effective_request_options(
         self,
     ) -> tuple[int, tuple[float, ...], bool, str]:
+        if not self.precision.startswith("32"):
+            raise FoundationProviderError(
+                "UNSUPPORTED_PRECISION",
+                f"Sundial provider v2 supports only FP32, got {self.precision}",
+            )
         num_samples = _normalize_num_samples(self.params.get("num_samples", 3))
         quantile_levels = _normalize_quantile_levels(self.params.get("quantile_levels"))
         revin = self.params.get("revin", True)
