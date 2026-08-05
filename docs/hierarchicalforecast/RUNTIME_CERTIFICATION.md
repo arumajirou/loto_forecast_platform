@@ -7,8 +7,12 @@ runtime and integration check, not a forecasting-accuracy experiment.
 
 ```bash
 uv sync --extra full
-uv run python -m loto.reconciliation.runtime_certification
+uv run loto-hierarchicalforecast-certify
 ```
+
+The console script resolves to `loto.reconciliation.runtime_certification:main`. The module
+form remains available for diagnostics, but the registered script is the documented operational
+entry point.
 
 The default run uses seed `1` and executes the same deterministic synthetic input for every
 reconciler within each select-family game:
@@ -21,7 +25,7 @@ reconciler within each select-family game:
 A narrower diagnostic run is available without changing the formal default:
 
 ```bash
-uv run python -m loto.reconciliation.runtime_certification \
+uv run loto-hierarchicalforecast-certify \
   --games loto7 \
   --horizon 4 \
   --insample-size 32 \
