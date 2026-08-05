@@ -1,0 +1,5 @@
+track,status
+zero_shot,schema_ready
+position_local,deferred
+shared_positions,deferred
+multi_game,deferred

@@ -1,0 +1,16 @@
+schema_version: 1
+base_model_id: timesfm-2.5-200m
+formal_horizons: [1, 2, 5]
+context_lengths: [64, 128, 256, 512, 1024]
+backend: pytorch_native
+device: cuda
+seed: 1
+local_files_only: true
+forecast_config:
+  normalize_inputs: true
+  use_continuous_quantile_head: true
+  force_flip_invariance: true
+  infer_is_positive: true
+  fix_quantile_crossing: true
+  return_backcast: false
+  torch_compile: false

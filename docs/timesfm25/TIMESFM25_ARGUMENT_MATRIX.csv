@@ -1,0 +1,6 @@
+argument,status,validation
+context_length,implemented,1..16384 and <= history length
+prediction_length,implemented,1..1024; formal 1/2/5
+revision,implemented,mandatory and manifest matched
+local_files_only,implemented,must be true
+unknown_fields,implemented,rejected

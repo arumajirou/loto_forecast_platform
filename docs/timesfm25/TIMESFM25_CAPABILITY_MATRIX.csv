@@ -1,0 +1,6 @@
+capability,status
+batched_univariate,true
+joint_multivariate,false
+cross_series_attention,false
+xreg_training,deferred
+lora_training,deferred

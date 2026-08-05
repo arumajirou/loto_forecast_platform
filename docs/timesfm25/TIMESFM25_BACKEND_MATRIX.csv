@@ -1,0 +1,5 @@
+backend,repo_id,revision,runtime_status
+pytorch_native,google/timesfm-2.5-200m-pytorch,1d952420fba87f3c6dee4f240de0f1a0fbc790e3,implemented_not_gpu_certified
+pytorch_source,google/timesfm-2.5-200m-pytorch,1d952420fba87f3c6dee4f240de0f1a0fbc790e3,schema_only
+transformers,google/timesfm-2.5-200m-transformers,5a9806b9b291fad9233b5249d88263f1846304d3,schema_only_github_evidence_blocked
+xreg,google/timesfm-2.5-200m-pytorch,1d952420fba87f3c6dee4f240de0f1a0fbc790e3,deferred
