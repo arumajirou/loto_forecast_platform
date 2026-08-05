@@ -10,7 +10,7 @@
 - added fail-closed covariate chronology contract;
 - added schema-v1 Loto7 compatibility conversion;
 - added trusted snapshot hash checks;
-- added isolated provider and two-process reload certification harness;
+- added isolated provider with fail-signaling exit codes and two-process certification CLI;
 - added focused hermetic tests and documentation evidence.
 
 Real TiRex-2 import, snapshot load, CPU/GPU inference, external GPU PID matching, full pytest,
