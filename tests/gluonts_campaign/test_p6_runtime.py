@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
 import pytest
+
+ROOT = Path(__file__).resolve().parents[2]
+PROVIDER_SRC = ROOT / "environments" / "gluonts-compat" / "src"
+sys.path.insert(0, str(PROVIDER_SRC))
 
 from loto_gluonts_provider.p6_contract import (
     FailureCategory,
