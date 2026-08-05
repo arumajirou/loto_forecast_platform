@@ -139,15 +139,16 @@ uv run --project "${ENV_DIR}" --group dev \
     --request "${RUN_DIR}/naive-smoke-request.json" \
     | tee "${RUN_DIR}/naive-smoke-provider.log"
 
+git status --short | tee "${RUN_DIR}/git-status-after.txt"
+
 uv run --project "${ENV_DIR}" --group dev \
     python "${ROOT}/scripts/verify_sktime_p0_run.py" \
     --run "${RUN_DIR}" \
-    | tee "${RUN_DIR}/verification.log"
+    | tee "${LOG_DIR}/verification.log"
 
 (
     cd "${RUN_DIR}"
     sha256sum -c SHA256SUMS
 )
 
-git status --short | tee "${RUN_DIR}/git-status-after.txt"
 printf 'SKTIME_P0_STATUS=VERIFIED\n'
