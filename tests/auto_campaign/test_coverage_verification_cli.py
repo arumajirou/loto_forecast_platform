@@ -7,7 +7,11 @@ from typing import Any
 import pytest
 
 from loto.auto_campaign import cli
-from loto.auto_campaign.coverage_verification import verify_coverage_state_artifacts
+from loto.auto_campaign.coverage_verification import (
+    _json_list,
+    _json_object,
+    verify_coverage_state_artifacts,
+)
 
 
 def test_noncoverage_run_remains_not_applicable(tmp_path: Path) -> None:
@@ -23,6 +27,21 @@ def test_noncoverage_run_remains_not_applicable(tmp_path: Path) -> None:
         "gpu_runtime_status": None,
         "failures": [],
     }
+
+
+def test_empty_json_evidence_is_rejected(tmp_path: Path) -> None:
+    object_path = tmp_path / "empty-object.json"
+    list_path = tmp_path / "empty-list.json"
+    object_path.write_text("{}\n", encoding="utf-8")
+    list_path.write_text("[]\n", encoding="utf-8")
+    failures: list[str] = []
+
+    assert _json_object(object_path, failures, "object") == {}
+    assert _json_list(list_path, failures, "list") == []
+    assert failures == [
+        f"object must not be empty: {object_path}",
+        f"list must not be empty: {list_path}",
+    ]
 
 
 def test_cli_routes_verify_through_coverage_wrapper(
