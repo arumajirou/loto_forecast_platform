@@ -1,0 +1,3 @@
+run_id,lane,device,model_device,cpu_fallback,peak_vram_bytes,shape,finite,quantiles,process_match,status
+legacy-evidence,legacy_reproduction,cuda,cuda:0,false,497113088,[7],true,0.1..0.9,true,REFERENCE_ONLY
+p0-p4-current,current_reviewed,NOT_RUN,NOT_RUN,NOT_RUN,NOT_RUN,NOT_RUN,NOT_RUN,NOT_RUN,NOT_RUN,NOT_RUN

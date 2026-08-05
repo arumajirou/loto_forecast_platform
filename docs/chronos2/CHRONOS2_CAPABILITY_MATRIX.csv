@@ -1,0 +1,10 @@
+capability,contract,compile,mock_runtime,real_runtime
+univariate,YES,YES,YES,NOT_RUN
+cross_learning,YES,YES,YES,NOT_RUN
+multivariate,YES,YES,YES,NOT_RUN
+past_covariates,YES,YES,YES,NOT_RUN
+known_future_covariates,YES,YES,YES,NOT_RUN
+quantiles,YES,YES,YES,NOT_RUN
+cpu_inference,YES,YES,MOCK_ONLY,NOT_RUN
+gpu_inference,YES,YES,SCHEMA_ONLY,NOT_RUN
+reference_reload,YES,YES,PATH_TESTED,NOT_RUN

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-08-05",
+  "legacy_reproduction": {
+    "repo_id": "amazon/chronos-2",
+    "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "purpose": "reproduce prior RTX 5070 Ti evidence"
+  },
+  "current_reviewed": {
+    "repo_id": "amazon/chronos-2",
+    "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "purpose": "Hugging Face main reviewed on 2026-08-05"
+  },
+  "same_revision": true,
+  "mix_metrics_across_lanes": false
+}

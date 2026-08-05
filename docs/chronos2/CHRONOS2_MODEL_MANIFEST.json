@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "REFERENCE_ONLY",
+  "reviewed_at": "2026-08-05",
+  "package": {
+    "name": "chronos-forecasting",
+    "version": "2.3.1",
+    "source_revision": "7dc4435706a4454feb79df44ca9f33631f3027bf",
+    "wheel_sha256": "d9d00ec9b1621235bfb26685638bf054885f4c000863678f1c775dfab2697496",
+    "sdist_sha256": "785116f3f10aaac44a315700c5e4de71a5fe6385c9c771722d688f402fe75083"
+  },
+  "model": {
+    "repo_id": "amazon/chronos-2",
+    "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "legacy_weight_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+    "legacy_config_sha256": "ef1143bfdc9c0376d9a056eefca46cb4b1ec3d0ffacd541ff56feb40fb708031",
+    "runtime_rehash_required": true
+  }
+}
