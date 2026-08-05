@@ -11,6 +11,8 @@ ROOT = Path(__file__).resolve().parents[2]
 PROVIDER_SRC = ROOT / "environments" / "gluonts-compat" / "src"
 sys.path.insert(0, str(PROVIDER_SRC))
 
+from loto.adapters.gluonts.p6_registry import model_specs
+from loto_gluonts_provider import p6_fit_runtime, p6_reload_runtime, p6_runtime
 from loto_gluonts_provider.p6_contract import (
     FailureCategory,
     P6DatasetItem,
@@ -18,8 +20,6 @@ from loto_gluonts_provider.p6_contract import (
     P6ProviderRequest,
     P6Status,
 )
-from loto.adapters.gluonts.p6_registry import model_specs
-from loto_gluonts_provider import p6_runtime
 
 
 class FakeTorch:
@@ -139,7 +139,7 @@ def test_all_nine_models_fit_serialize_and_reload(
         artifact_dir=str(artifact_dir),
         dataset=[item()],
     )
-    monkeypatch.setattr(p6_runtime.os, "getpid", lambda: 1001)
+    monkeypatch.setattr(p6_fit_runtime.os, "getpid", lambda: 1001)
     fit = p6_runtime.fit_serialize(
         fit_request,
         bindings_loader=bindings,
@@ -160,7 +160,7 @@ def test_all_nine_models_fit_serialize_and_reload(
         context_length=(spec.default_context_length if spec.supports_context_length else None),
         artifact_dir=str(artifact_dir),
     )
-    monkeypatch.setattr(p6_runtime.os, "getpid", lambda: 1002)
+    monkeypatch.setattr(p6_reload_runtime.os, "getpid", lambda: 1002)
     reload = p6_runtime.load_predict(
         load_request,
         bindings_loader=bindings,
