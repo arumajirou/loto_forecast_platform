@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
+
 def _normalize(value: Any) -> Any:
     if value is None:
         return None
@@ -205,7 +206,7 @@ def _compare_mlflow(
     for field, value in checks.items():
         if parent_tags.get(field) != value:
             failures.append(
-                f"MLflow parent tag mismatch {field}: "
+                f"MLFflow parent tag mismatch {field}: "
                 f"expected={value!r}, actual={parent_tags.get(field)!r}"
             )
     param_checks = {

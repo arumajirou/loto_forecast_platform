@@ -10,6 +10,7 @@ from typing import Any
 
 from .persistence import sha256_file, write_json, write_sha256s
 from .prospective_registry import verify_prospective_registry
+from .prospective_registry_contract import _canonical_sha256
 from .prospective_registry_payload import _safe_error
 from .prospective_registry_reconciliation_backends import (
     query_mlflow,
@@ -37,7 +38,7 @@ from .prospective_registry_reconciliation_verification import (
     _reconciliation_inventory,
     verify_registry_reconciliation,
 )
-from .prospective_registry_contract import _canonical_sha256
+
 
 def default_reconciliation_backends() -> ReconciliationBackendFunctions:
     return ReconciliationBackendFunctions(

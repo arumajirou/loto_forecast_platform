@@ -24,6 +24,7 @@ from .prospective_registry_payload import (
     _seed_metric_frame,
 )
 
+
 def _copy_tree_exact(source: Path, target: Path) -> dict[str, Any]:
     if source.is_symlink() or not source.is_dir():
         raise ValueError(f"registry receipt must be a regular directory: {source}")
@@ -122,53 +123,5 @@ def _expected_snapshot(receipt_root: Path) -> dict[str, Any]:
         raise ValueError("PASS registry receipt lacks finalized backend receipts")
     parent_run_id = str(mlflow_receipt.get("parent_run_id") or "")
     if not parent_run_id:
-        raise ValueError("MLflow parent run ID is missing from registry receipt")
-    if postgres_finalize.get("mlflow_parent_run_id") != parent_run_id:
-        raise ValueError("receipt PostgreSQL and MLflow parent run IDs differ")
-    backend_policy = payload.get("backend_policy")
-    if not isinstance(backend_policy, dict):
-        raise ValueError("registry payload backend policy is missing")
-    mlflow_artifacts = [
-        {
-            "path": "registry_evidence/REGISTRY_PAYLOAD.json",
-            "sha256": sha256_file(receipt_root / REGISTRY_PAYLOAD),
-        },
-        {
-            "path": (
-                "registry_evidence/source_evidence/"
-                "ARTIFACT_MANIFEST.json"
-            ),
-            "sha256": sha256_file(
-                receipt_root / "source_evidence" / "ARTIFACT_MANIFEST.json"
-            ),
-        },
-    ]
-    if backend_policy.get("artifact_mode") == "full":
-        mlflow_artifacts.append(
-            {
-                "path": "scoring_artifact/SCORING_REPORT.json",
-                "sha256": sha256_file(
-                    receipt_root / "source_evidence" / "SCORING_REPORT.json"
-                ),
-            }
-        )
-    expected = {
-        "schema_version": RECONCILIATION_SCHEMA_VERSION,
-        "registry_id": registry_id,
-        "registry_namespace": payload["registry_namespace"],
-        "scoring_id": payload["scoring_id"],
-        "payload_sha256": payload["payload_sha256"],
-        "created_at": payload["created_at"],
-        "source": payload["source"],
-        "counts": payload["counts"],
-        "backend_policy": backend_policy,
-        "receipt_mlflow_parent_run_id": parent_run_id,
-        "candidates": candidates.to_dict(orient="records"),
-        "seed_metrics": seed_metrics.to_dict(orient="records"),
-        "position_metrics": position_metrics.to_dict(orient="records"),
-        "artifacts": artifacts.to_dict(orient="records"),
-        "mlflow_artifacts": mlflow_artifacts,
-    }
-    expected["expected_sha256"] = _canonical_sha256(expected)
-    return expected
-
+        raise ValueErroŠ“S›İÈ\™[[ˆQ\ÈZ\ÜÚ[™Èœ›ÛH™YÚ\İH™XÙZ\ŠBˆYˆÜİÜ™\×Ùš[˜[^™K™Ù]
+›[›İ×Ü\™[Ü[—ÚYŠHOH\™[Ü[—ÚY‚ˆ˜Z\ÙH˜[YQ\œ›â‚'&V6V—B÷7Fw&U5ÂæBÔÆfÆ÷r&VçB'Vâ”G2F–ffW""¢&6¶VæE÷öÆ–7’Ò–ÆöBævWB‚&&6¶VæE÷öÆ–7’"¢–bæ÷B—6–ç7Fæ6R†&6¶VæE÷öÆ–7’ÂF–7B“ ¢&—6RfÇVTTW'&÷"‚'&Vv—7G'’–ÆöB&6¶VæBöÆ–7’—2Ö—76–ær"¢ÖÆfÆ÷uö'F–f7G2Ò°¢°¢'F‚#¢'&Vv—7G'•öWf–FVæ6Rõ$Tt•5E%•õ”ÄôBæ§6öâ"À¢'6†#Sb#¢6†#Seöf–ÆR‡&V6V—E÷&ö÷Bò$Tt•5E%•õ”ÄôB’À¢ÒÀ¢°¢'F‚#¢€¢'&Vv—7G'•öWf–FVæ6R÷6÷W&6UöWf–FVæ6Rò ¢$%D”d5EôÔä”dU5Bæ§6öâ ¢’À¢'6†#Sb#¢6†#Seöf–ÆR€¢&V6V—E÷&ö÷Bò'6÷W&6UöWf–FVæ6R"ò$%D”d5EôÔä”dU5Bæ§6öâ ¢’À¢ÒÀ¢Ğ¢–b&6¶VæE÷öÆ–7’ævWB‚&'F–f7EöÖöFR"’ÓÒ&gVÆÂ# ¢ÖÆfÆ÷uö'F–f7G2æVæB€¢°¢'F‚#¢'66÷&–æuö'F–f7Bõ44õ$”äuõ$Uõ%Bæ§6öâ"À¢'6†#Sb#¢6†#Seöf–ÆR€¢&V6V—E÷&ö÷Bò'6÷W&6UöWf–FVæ6R"ò%44õ$”äuõ$Uõ%Bæ§6öâ ¢’À¢Ğ¢¢W‡V7FVBÒ°¢'66†VÖ÷fW'6–öâ#¢$T4ôä4”Ä”D”ôåõ44„TÔõdU%4”ôâÀ¢'&Vv—7G'•ö–B#¢&Vv—7G'•ö–BÀ¢'&Vv—7G'•öæÖW76R#¢–ÆöE²'&Vv—7G'•öæÖW76R%ÒÀ¢'66÷&–æuö–B#¢–ÆöE²'66÷&–æuö–B%ÒÀ¢'–ÆöE÷6†#Sb#¢–ÆöE²'–ÆöE÷6†#Sb%ÒÀ¢&7&VFVEöB#¢–ÆöE²&7&VFVEöB%ÒÀ¢'6÷W&6R#¢–ÆöE²'6÷W&6R%ÒÀ¢&6÷VçG2#¢–ÆöE²&6÷VçG2%ÒÀ¢&&6¶VæE÷öÆ–7’#¢&6¶VæE÷öÆ–7’À¢'&V6V—EöÖÆfÆ÷u÷&VçE÷'Våö–B#¢&VçE÷'Våö–BÀ¢&6æF–FFW2#¢6æF–FFW2çFõöF–7B†÷&–VçCÒ'&V6÷&G2"’À¢'6VVEöÖWG&–72#¢6VVEöÖWG&–72çFõöF–7B†÷&–VçCÒ'&V6÷&G2"’À¢'÷6—F–öåöÖWG&–72#¢÷6—F–öåöÖWG&–72çFõöF–7B†÷&–VçCÒ'&V6÷&G2"’À¢&'F–f7G2#¢'F–f7G2çFõöF–7B†÷&–VçCÒ'&V6÷&G2"’À¢&ÖÆfÆ÷uö'F–f7G2#¢ÖÆfÆ÷uö'F–f7G2À¢Ğ¢W‡V7FVE²&W‡V7FVE÷6†#Sb%ÒÒö6æöæ–6Å÷6†#Sb†W‡V7FVB¢&WGW&âW‡V7FV@ 

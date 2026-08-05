@@ -17,6 +17,7 @@ from .prospective_registry_reconciliation_contract import (
     RECONCILIATION_SCHEMA_VERSION,
 )
 
+
 def _reconciliation_inventory(root: Path) -> list[dict[str, Any]]:
     excluded = {RECONCILIATION_MANIFEST, "SHA256SUMS"}
     return [
