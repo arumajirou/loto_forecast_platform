@@ -37,6 +37,14 @@
 33. fine-tuning effectiveness and TiRex partial-fine-tuning restrictions.
 34. Foundation covariate capability drift and unsupported-input rejection.
 35. Foundation package/model dependency failure retention.
+36. complete chronological historical-forecast origin generation.
+37. exact boolean and integer-cadence retrain schedules.
+38. prefit evidence requirement for `retrain=false`.
+39. complete origin/target/position historical-record coverage.
+40. manual Hit@±1 and Darts backtest MAE/MSE/RMSE parity.
+41. `actual - prediction` residual sign, order, shape, and numeric parity.
+42. optimized versus general historical forecast prediction parity.
+43. historical API no-silent-drop ledger and policy/record SHA-256.
 
 ## Pending runtime gates
 
@@ -48,6 +56,8 @@
 - generate and verify portable local Foundation model manifests;
 - run P8 zero-shot and fine-tuning tracks with real models;
 - verify real Foundation covariate and probabilistic behavior;
+- run real P9 `historical_forecasts`, `backtest`, and `residuals` calls;
+- certify real optimized/general parity and exact retraining counts;
 - run real multi-seed OOF using identical cross-library conditions;
 - certify real save/load/checkpoint behavior;
 - run repository Ruff and full pytest after a hosted runner starts normally.
