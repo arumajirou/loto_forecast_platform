@@ -1,6 +1,6 @@
 # MLForecast / AutoMLForecast integration
 
-**Status:** `PYPI_DIGEST_VERIFIED / LOCAL_CONTRACT_HARDENED / PORTABLE_BUNDLE_VERIFIER_VERIFIED / SOURCE_HANDOFF_VERIFIED / INSTALLED_RUNTIME_PENDING`
+**Status:** `PYPI_DIGEST_VERIFIED / LOCAL_CONTRACT_HARDENED / PORTABLE_BUNDLE_VERIFIER_VERIFIED / STRICT_SOURCE_HANDOFF_GUARD_VERIFIED / INSTALLED_RUNTIME_PENDING`
 
 This subsystem adds a dedicated, leakage-safe MLForecast path. It is independent of PR #43 and changes only `src/loto/mlforecast`, `tests/mlforecast`, `configs/mlforecast`, and `docs/mlforecast`.
 
@@ -161,22 +161,24 @@ records, saved model bundles, `ARTIFACT_MANIFEST.json`, and `SHA256SUMS`.
 
 ## Source handoff bundle
 
-After the MLForecast scope is committed and clean, build a deterministic source handoff package:
+After the MLForecast scope and the shared `pyproject.toml` / `uv.lock` snapshots are committed and clean, build a deterministic source handoff package:
 
 ```bash
 bash docs/mlforecast/build_handoff_bundle.sh
 ```
 
-The package contains the required documentation set, MLForecast source, tests, configurations, frozen provenance, read-only snapshots of `pyproject.toml` and `uv.lock`, `SOURCE_PROVENANCE.json`, `VERSION`, `ARTIFACT_MANIFEST.json`, and `SHA256SUMS`. The builder includes only Git-tracked files from the MLForecast scope and fails closed when the scope is dirty.
+The formal script routes both construction and verification through `loto.mlforecast.handoff_guard`. It records repository state before and after construction, packages only Git-tracked MLForecast files, and fails closed if the branch is detached, any included input is dirty, or the repository changes while the ZIP is being built.
+
+The strict guard checks the sidecar digest, CRCs, sorted unique regular members, portable paths, member-count and uncompressed-size limits, complete required source/config/test/document sets, exact manifest membership, `SHA256SUMS`, provenance, `VERSION`, frozen base SHA, and the frozen MLForecast upstream contract.
 
 A received handoff package must be verified before use:
 
 ```bash
 uv run --frozen -- \
-  python -m loto.mlforecast.handoff \
+  python -m loto.mlforecast.handoff_guard \
   --verify \
   --zip /absolute/path/mlforecast-handoff-<SHA>.zip \
   --sha256 /absolute/path/mlforecast-handoff-<SHA>.zip.sha256
 ```
 
-Formal success is `HANDOFF_VERIFIED`. This verifies source-package integrity only; it does not replace installed runtime certification.
+Formal success is `HANDOFF_VERIFIED`. This verifies source-package integrity and completeness only; it does not authenticate the publisher and does not replace installed runtime certification. The compatibility verifier in `handoff.py` is not the formal acceptance path.
