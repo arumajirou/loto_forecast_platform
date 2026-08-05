@@ -1,13 +1,13 @@
 # AutoGluon TimeSeries Protocol v2 — Foundation Specification
 
-Status: IMPLEMENTED_P4 / locally verified contract, inventory, and provider-plan layers
+Status: IMPLEMENTED_P5_HARNESS / real AutoGluon runtime execution pending
 
 ## Scope
 
 This branch introduces an AutoGluon-specific request/response contract, dynamic lottery
-geometry, pinned runtime inventory, and a schema-v2 provider execution route without
-changing the common model catalog, common worker dispatch, root CLI, root dependencies,
-or CI workflows.
+geometry, pinned runtime inventory, a schema-v2 provider execution route, and a P5
+runtime-certification harness without changing the common model catalog, common worker
+dispatch, root CLI, root dependencies, or CI workflows.
 
 ## Invariants
 
@@ -47,6 +47,17 @@ or CI workflows.
 - prediction item IDs, horizon, shape, means, quantile columns, and finite values are
   verified before success;
 - GPU use is not certified merely because CUDA is available.
+
+## P5 runtime certification
+
+- JSON-safe `Categorical`, `Int`, and `Real` search-space descriptors are validated
+  before execution and materialized only inside the isolated AutoGluon runtime;
+- JSON search spaces are accepted only in HPO mode; HPO without custom spaces remains
+  backward compatible;
+- seven deterministic scenarios certify `Naive`, `Theta`, preset, multi-model, bounded
+  HPO, save/load, provider PID, output shape, finite values, and forced CPU fallback;
+- every request, response, log, artifact reference, report, and SHA-256 is retained;
+- real AutoGluon and GPU execution remain unverified until the dedicated environment runs.
 
 ## Deferred integration
 
