@@ -51,6 +51,16 @@ constructor dictionaries do not cross the JSON boundary.
 Every model receives the same immutable univariate series, RangeIndex, relative
 forecast horizon, CPU boundary, seed, and single-thread environment.
 
+The formal verifier also recomputes and checks:
+
+- the exact four model IDs, class paths, constructors, and required distributions;
+- the fixed 24-point input series SHA-256;
+- the fixed `fh=[1,2]` SHA-256;
+- `seed=1`;
+- `OMP_NUM_THREADS`, `MKL_NUM_THREADS`, `OPENBLAS_NUM_THREADS`, and
+  `NUMEXPR_NUM_THREADS` all equal to `1`;
+- the exact formal request payload and target output directory.
+
 ## Per-model phases
 
 Each result retains separate states for:
