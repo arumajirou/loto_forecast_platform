@@ -2,7 +2,7 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / CONTRACT_IMPLEMENTED / REAL_RUNTIME_PENDING`
+`PARTIALLY_VERIFIED / CONTRACT_AND_CERTIFICATION_HARNESS_IMPLEMENTED / REAL_RUNTIME_PENDING`
 
 This change preserves the existing seven-position, one-step point forecast API while making the
 Sundial generated samples the canonical provider output.
@@ -29,6 +29,21 @@ The provider now retains:
 - only FP32 is accepted;
 - a CUDA request fails when CUDA is unavailable or CPU execution is observed;
 - invalid sample shapes, non-finite values, crossing quantiles, or point parity drift fail.
+
+## Target-host certification harness
+
+The branch includes a separate-process harness and launcher that execute:
+
+- CPU smoke with `num_samples=1`;
+- CUDA runs with `num_samples=1,3,20,50,100`;
+- two same-seed CUDA replay runs with `num_samples=20`;
+- internal and external GPU PID checks;
+- internal and external VRAM checks;
+- malformed-response and per-case timeout gates;
+- immutable evidence output with an artifact manifest and SHA-256 ledger.
+
+Formal provider-v2 GPU success is granted only when the harness prints
+`SUNDIAL_PROVIDER_V2_CERTIFICATION=PASS` on the target host.
 
 ## Compatibility
 
