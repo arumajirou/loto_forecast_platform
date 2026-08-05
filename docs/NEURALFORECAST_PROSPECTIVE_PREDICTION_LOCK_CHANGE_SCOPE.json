@@ -1,0 +1,54 @@
+{
+  "schema_version": "change-scope-v1.0.0",
+  "scope_id": "neuralforecast-prospective-prediction-lock",
+  "stacked_base_branch": "agent/p0-portable-artifact-export",
+  "stacked_base_sha": "0b3a58ec4acc8c15916d5c464fdde186b1b36926",
+  "dependency_pr": 60,
+  "in_scope": [
+    "automatic campaign-level prospective prediction locking after lineage creation",
+    "binding of all task prediction files, task freezes, task manifests, and task SHA manifests",
+    "binding of run configuration, data contract, promotion gate, lineage, code, and data hashes",
+    "canonical prediction lock SHA-256 with local UTC timestamp",
+    "rejection of actual-bearing artifacts and retroactive locking after verification seal creation",
+    "PARTIAL run downgrade and PREDICTION_LOCK_FAILURE.json on lock failure",
+    "standard verify integration before verification seal creation",
+    "verification seal prediction-lock hash and component binding",
+    "portable bundle relocated prediction-lock re-verification",
+    "legacy non-prospective verification seal byte preservation",
+    "focused lock, pipeline, standard verify, portable verify, and compatibility tests",
+    "operator documentation"
+  ],
+  "out_of_scope": [
+    "external trusted timestamp authority",
+    "digital signatures",
+    "remote append-only transparency log publication",
+    "actual-result ingestion or scoring",
+    "model training or accuracy improvement",
+    "GPU campaign execution",
+    "manual retroactive lock creation for already sealed runs",
+    "merge or main branch changes"
+  ],
+  "execution_boundaries": {
+    "local_synthetic_smoke": "REQUIRED",
+    "repository_ruff_compileall_mypy_pytest": "REQUIRED",
+    "github_actions": "PENDING",
+    "local_gpu": "EXECUTION_PENDING",
+    "timestamp_authority": "LOCAL_SYSTEM_UTC_ONLY",
+    "merge": "USER_APPROVAL_REQUIRED"
+  },
+  "expected_changed_files": [
+    "docs/NEURALFORECAST_PROSPECTIVE_PREDICTION_LOCK.md",
+    "docs/NEURALFORECAST_PROSPECTIVE_PREDICTION_LOCK_CHANGE_SCOPE.json",
+    "src/loto/auto_campaign/cli.py",
+    "src/loto/auto_campaign/lineage_pipeline.py",
+    "src/loto/auto_campaign/lineage_verification.py",
+    "src/loto/auto_campaign/portable_prediction_verification.py",
+    "src/loto/auto_campaign/prediction_lock.py",
+    "src/loto/auto_campaign/verification_seal.py",
+    "tests/auto_campaign/test_portable_prediction_verification.py",
+    "tests/auto_campaign/test_prediction_lock.py",
+    "tests/auto_campaign/test_prediction_lock_legacy_seal.py",
+    "tests/auto_campaign/test_prediction_lock_pipeline.py",
+    "tests/auto_campaign/test_prediction_lock_verification.py"
+  ]
+}
