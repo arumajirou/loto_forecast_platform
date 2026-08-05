@@ -12,6 +12,7 @@ from loto.basicts_campaign.orchestration import (
     CommandExecutionError,
     OrchestrationError,
     _prepare_requests,
+    _prepared_lock_sha256,
     _run_checked,
     _safe_run_id,
     _write_portable_bundle,
@@ -120,6 +121,38 @@ def test_portable_bundle_rejects_symbolic_links(tmp_path: Path) -> None:
             tmp_path,
             {"schema_version": "1.0", "status": "FAILED", "run_id": "run-1"},
         )
+
+
+def test_prepared_lock_sha256_accepts_matching_formal_audit(tmp_path: Path) -> None:
+    lockfile = tmp_path / "uv.lock"
+    lockfile.write_text("lock\n", encoding="utf-8")
+    digest = hashlib.sha256(lockfile.read_bytes()).hexdigest()
+    artifacts_root = tmp_path / "formal"
+    preflight = artifacts_root / "preflight"
+    preflight.mkdir(parents=True)
+    (preflight / "UV_RESOLUTION_AUDIT.json").write_text(
+        json.dumps({"status": "PASS", "lockfile": {"sha256": digest}}),
+        encoding="utf-8",
+    )
+
+    assert _prepared_lock_sha256(artifacts_root, lockfile) == digest
+
+
+def test_prepared_lock_sha256_rejects_lock_drift(tmp_path: Path) -> None:
+    lockfile = tmp_path / "uv.lock"
+    lockfile.write_text("before\n", encoding="utf-8")
+    digest = hashlib.sha256(lockfile.read_bytes()).hexdigest()
+    artifacts_root = tmp_path / "formal"
+    preflight = artifacts_root / "preflight"
+    preflight.mkdir(parents=True)
+    (preflight / "UV_RESOLUTION_AUDIT.json").write_text(
+        json.dumps({"status": "PASS", "lockfile": {"sha256": digest}}),
+        encoding="utf-8",
+    )
+    lockfile.write_text("after\n", encoding="utf-8")
+
+    with pytest.raises(OrchestrationError, match="changed after formal preflight"):
+        _prepared_lock_sha256(artifacts_root, lockfile)
 
 
 @pytest.mark.parametrize("value", ["../escape", "with space", "", "slash/name"])
