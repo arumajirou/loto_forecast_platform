@@ -34,6 +34,7 @@ from .prospective_scoring_support import (
     UPPER_BOUND,
     ScoringOptions,
     _canonical_sha256,
+    _code_sha256,
     _copy_source_evidence,
     _file_inventory,
     _normalize_input_table,
@@ -77,6 +78,23 @@ def score_locked_prospective_run(
 
     source_manifest, prediction_lock = _source_verification(run_root)
     source_before = _source_fingerprint(run_root)
+    scoring_code_sha256 = _code_sha256(
+        [
+            Path(__file__),
+            Path(generate_prospective_baselines.__code__.co_filename),
+            Path(_extract_locked_predictions.__code__.co_filename),
+            Path(_source_verification.__code__.co_filename),
+            Path(verify_prospective_scoring.__code__.co_filename),
+        ]
+    )
+    scoring_identity = {
+        "prediction_lock_sha256": source_before[PREDICTION_LOCK_PATH],
+        "history_sha256": sha256_file(history_path),
+        "actuals_sha256": sha256_file(actuals_path),
+        "scoring_code_sha256": scoring_code_sha256,
+        "random_seed": options.random_seed,
+    }
+    scoring_id = f"prospective-score-{_canonical_sha256(scoring_identity)[:20]}"
     if sha256_file(history_path) != source_manifest.get("data_sha256"):
         raise ValueError(
             "history SHA-256 differs from the data used for prediction: "
@@ -245,6 +263,7 @@ def score_locked_prospective_run(
         actuals_lock_payload: dict[str, Any] = {
             "schema_version": ACTUALS_LOCK_SCHEMA_VERSION,
             "status": "LOCKED",
+            "scoring_id": scoring_id,
             "ingested_at": datetime.now(UTC).isoformat(),
             "actual_known": True,
             "actual_source_label": options.actual_source_label,
@@ -274,6 +293,8 @@ def score_locked_prospective_run(
         report = {
             "schema_version": SCORING_SCHEMA_VERSION,
             "status": "PASS",
+            "scoring_id": scoring_id,
+            "scoring_code_sha256": scoring_code_sha256,
             "created_at": datetime.now(UTC).isoformat(),
             "priority_metric": "hit_pm1",
             "source_run": str(run_root),
@@ -307,6 +328,8 @@ def score_locked_prospective_run(
         manifest_payload: dict[str, Any] = {
             "schema_version": SCORING_SCHEMA_VERSION,
             "status": "PASS",
+            "scoring_id": scoring_id,
+            "scoring_code_sha256": scoring_code_sha256,
             "created_at": report["created_at"],
             "source_run": str(run_root),
             "source_run_id": source_manifest.get("run_id"),
@@ -334,6 +357,8 @@ def score_locked_prospective_run(
     return {
         "status": "PASS",
         "schema_version": SCORING_SCHEMA_VERSION,
+        "scoring_id": scoring_id,
+        "scoring_code_sha256": scoring_code_sha256,
         "output": str(output),
         "source_run": str(run_root),
         "prediction_lock_sha256": source_before[PREDICTION_LOCK_PATH],
