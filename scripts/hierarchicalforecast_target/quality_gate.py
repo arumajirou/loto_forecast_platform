@@ -178,7 +178,7 @@ def execute(
 
         command(
             "pip_check",
-            ["uv", "run", "--locked", "python", "-m", "pip", "check"],
+            ["uv", "pip", "check"],
             "FAILED_PIP_CHECK",
         )
         command(
