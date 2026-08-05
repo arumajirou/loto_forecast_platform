@@ -5,6 +5,8 @@ import importlib.metadata as metadata
 import json
 import os
 import platform
+import shutil
+import subprocess
 import sys
 import traceback
 import zipfile
@@ -40,6 +42,14 @@ class CertificationResult:
     run_id: str
     run_dir: Path
     report_path: Path
+
+
+THREAD_ENVIRONMENT_VARIABLES = (
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+)
 
 
 def verify_wheel_file(
@@ -101,6 +111,40 @@ def _panel(rows: int = 48) -> pd.DataFrame:
     return pd.DataFrame(records)
 
 
+def _validated_prediction_keys(prediction: pd.DataFrame) -> pd.DataFrame:
+    required = ["unique_id", "ds"]
+    missing = [column for column in required if column not in prediction.columns]
+    if missing:
+        raise RuntimeError(f"missing prediction key columns: {missing}")
+    if prediction.duplicated(required).any():
+        raise RuntimeError("duplicate prediction keys detected")
+    return prediction[required].sort_values(required).reset_index(drop=True)
+
+
+def _assert_prediction_keys_match(before: pd.DataFrame, after: pd.DataFrame) -> None:
+    before_keys = _validated_prediction_keys(before)
+    after_keys = _validated_prediction_keys(after)
+    if not before_keys.equals(after_keys):
+        raise RuntimeError("save/load prediction key mismatch")
+
+
+def _validate_trial_completion(study: Any, requested_trials: int) -> dict[str, int]:
+    observed_trials = len(study.trials)
+    complete_trials = sum(trial.state.name == "COMPLETE" for trial in study.trials)
+    if observed_trials != requested_trials or complete_trials != requested_trials:
+        raise RuntimeError(
+            "AutoRidge trial contract failed: "
+            f"requested={requested_trials}, observed={observed_trials}, "
+            f"complete={complete_trials}"
+        )
+    if not np.isfinite(float(study.best_value)):
+        raise RuntimeError("AutoRidge best objective is non-finite")
+    return {
+        "observed_trials": observed_trials,
+        "complete_trials": complete_trials,
+    }
+
+
 def _prediction_check(
     prediction: pd.DataFrame,
     *,
@@ -114,6 +158,7 @@ def _prediction_check(
         )
     if column not in prediction.columns:
         raise RuntimeError(f"missing prediction column: {column}")
+    _validated_prediction_keys(prediction)
     values = prediction[column].to_numpy(dtype=float)
     finite = bool(np.isfinite(values).all())
     if not finite:
@@ -142,6 +187,8 @@ def _save_load_check(
     loaded = MLForecast.load(str(model_dir))
     repeated = loaded.predict(h=1)
     _prediction_check(repeated, column=column, expected_rows=prediction.shape[0])
+    _assert_prediction_keys_match(prediction, repeated)
+    keys_match = True
     before = prediction.sort_values(["unique_id", "ds"])[column].to_numpy(float)
     after = repeated.sort_values(["unique_id", "ds"])[column].to_numpy(float)
     match = bool(np.allclose(before, after, rtol=1e-8, atol=1e-8))
@@ -149,6 +196,7 @@ def _save_load_check(
         raise RuntimeError(f"save/load prediction mismatch for {column}")
     return {
         "path": str(model_dir),
+        "key_match": keys_match,
         "prediction_match": match,
         "rtol": 1e-8,
         "atol": 1e-8,
@@ -219,12 +267,8 @@ def _auto_certification(
     study = model.results_["AutoRidge"]
     trial_frame = study.trials_dataframe()
     trial_frame.to_csv(run_dir / "auto_ridge_trials.csv", index=False)
-    complete_trials = sum(trial.state.name == "COMPLETE" for trial in study.trials)
-    if len(study.trials) != trials or complete_trials < 1:
-        raise RuntimeError(
-            "AutoRidge trial contract failed: "
-            f"requested={trials}, observed={len(study.trials)}, complete={complete_trials}"
-        )
+    trial_summary = _validate_trial_completion(study, trials)
+    complete_trials = trial_summary["complete_trials"]
 
     fitted = model.models_["AutoRidge"]
     saved = _save_load_check(
@@ -245,6 +289,28 @@ def _auto_certification(
         "prediction": check,
         "save_load": saved,
     }
+
+
+def _thread_environment() -> dict[str, str]:
+    values = {name: os.getenv(name) for name in THREAD_ENVIRONMENT_VARIABLES}
+    invalid = {name: value for name, value in values.items() if value != "1"}
+    if invalid:
+        raise RuntimeError(
+            "single-thread runtime contract requires all thread variables to equal '1': "
+            f"{invalid}"
+        )
+    return {name: str(value) for name, value in values.items()}
+
+
+def _git_commit() -> str | None:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
 
 
 def _runtime_environment() -> dict[str, Any]:
@@ -273,16 +339,10 @@ def _runtime_environment() -> dict[str, Any]:
         "cpu_affinity_count": affinity,
         "device": "cpu",
         "gpu_required": False,
+        "git_commit": _git_commit(),
+        "certifier_sha256": sha256_file(Path(__file__)),
         "cuda_visible_devices": os.getenv("CUDA_VISIBLE_DEVICES"),
-        "thread_environment": {
-            name: os.getenv(name)
-            for name in (
-                "OMP_NUM_THREADS",
-                "MKL_NUM_THREADS",
-                "OPENBLAS_NUM_THREADS",
-                "NUMEXPR_NUM_THREADS",
-            )
-        },
+        "thread_environment": _thread_environment(),
         "packages": packages,
     }
 
@@ -309,7 +369,18 @@ def run_certification(
         "upstream": upstream_contract(),
     }
     try:
-        report["wheel"] = verify_wheel_file(wheel_path)
+        wheel_info = verify_wheel_file(wheel_path)
+        input_dir = run_dir / "inputs"
+        input_dir.mkdir(parents=True, exist_ok=False)
+        archived_wheel = input_dir / wheel_path.name
+        shutil.copy2(wheel_path.resolve(), archived_wheel)
+        archived_sha256 = sha256_file(archived_wheel)
+        if archived_sha256 != wheel_info["sha256"]:
+            raise RuntimeError("archived wheel SHA-256 mismatch after copy")
+        report["wheel"] = wheel_info | {
+            "archived_path": str(archived_wheel),
+            "archived_sha256": archived_sha256,
+        }
         report["runtime"] = verify_mlforecast_runtime()
         report["environment"] = _runtime_environment()
         panel = _panel()

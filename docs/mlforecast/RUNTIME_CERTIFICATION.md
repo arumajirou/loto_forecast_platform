@@ -29,7 +29,8 @@ OMP_NUM_THREADS=1 \
 MKL_NUM_THREADS=1 \
 OPENBLAS_NUM_THREADS=1 \
 NUMEXPR_NUM_THREADS=1 \
-uv run --no-sync python -m loto.mlforecast.certify \
+uv run --frozen --with artifacts/mlforecast-wheel/mlforecast-1.1.0-py3-none-any.whl -- \
+  python -m loto.mlforecast.certify \
   --wheel artifacts/mlforecast-wheel/mlforecast-1.1.0-py3-none-any.whl \
   --output-root artifacts/mlforecast-runtime-certification \
   --seed 1 \
