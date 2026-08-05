@@ -22,7 +22,8 @@ contract and focused tests.
 
 Installed-distribution provenance is a separate required layer. See
 `docs/basicts/INSTALLED_PROVENANCE.md`. The environment revision marker and lockfile do not replace
-verification of the loaded distribution's `direct_url.json`.
+verification of the installed distribution's `direct_url.json` or the actual `basicts` import
+origin selected by Python.
 
 ## Preconditions
 
@@ -69,9 +70,10 @@ another `uv lock` or explicit `uv sync`. Every core `uv run` uses `--frozen`; uv
 synchronize the already prepared environment, but it cannot update the lockfile silently. The core
 also verifies the lock SHA-256 again before certification.
 
-Before identity, configuration, or DLinear can pass, the provider reads the installed `BasicTS`
-distribution metadata and requires exact non-editable Git provenance for the frozen repository and
-commit. Missing or changed `direct_url.json` evidence is a formal failure.
+Before identity, configuration, or DLinear can pass, the provider requires exact non-editable Git
+provenance for the installed `BasicTS` distribution. It also binds Python's actual `basicts` import
+spec to the distribution-located `basicts/__init__.py`, rejects ambiguous provider mappings and
+shadow packages, and retains the imported file SHA-256.
 
 The core status records one of these environment modes:
 
@@ -122,6 +124,7 @@ The verifier fails closed on:
 - non-frozen core model commands;
 - formal, preflight, core, certificate, or lock SHA-256 cross-link disagreement;
 - installed distribution repository, VCS, commit, or requested-revision disagreement;
+- import-provider ambiguity, package-file drift, or import-origin shadowing;
 - provider identity, allowlist, or DLinear evidence disagreement.
 
 The following shell checks remain useful as an independent implementation of the checksum review:
@@ -159,9 +162,23 @@ PASS requires the verifier and all checksum commands to succeed. The verificatio
 status, dependency audit, core status, and core certificate must all report `PASS`. For a formal
 run, `core/P0_RUN_STATUS.json` must record `environment_mode=FORMAL_PREFLIGHT_REUSE`.
 
-The identity response must record `installed_provenance_status=PASS`, distribution `BasicTS`
-version `1.1.0`, repository `https://github.com/GestaltCogTeam/BasicTS`, VCS `git`, and the exact
-frozen commit as both `direct_url_commit_id` and `direct_url_requested_revision`.
+The identity response must record the exact direct Git provenance and these import-origin fields:
+
+```text
+installed_provenance_status=PASS
+import_origin_status=PASS
+import_name=basicts
+import_provider_distributions=["BasicTS"]
+distribution_package_entry=basicts/__init__.py
+distribution_package_init=<absolute installed file>
+import_spec_origin=<same absolute installed file>
+import_submodule_search_locations=[<installed basicts package directory>]
+import_origin_sha256=<64 lowercase hexadecimal characters>
+```
+
+`distribution_package_init` and `import_spec_origin` must be identical. The certificate must set
+both `certified.installed_package_git_provenance=true` and
+`certified.import_origin_bound_to_distribution=true`.
 
 The verification report certifies the retained evidence only. It does not rerun installation,
 training, inference, or accuracy evaluation.
@@ -175,6 +192,10 @@ Review at least:
 - BasicTS lock and workspace-metadata source, version, and revision;
 - installed BasicTS distribution name, version, repository, VCS, commit, and requested revision;
 - SHA-256 of the raw installed `direct_url.json` consumed by the provider;
+- exact import-to-distribution mapping for `basicts`;
+- equality of distribution package file, import spec origin, and package search location;
+- SHA-256 of the resolved `basicts/__init__.py`;
+- whether `basicts` was already loaded and, if so, the verified loaded module origin;
 - resolved versions of easy-torch, numpy, setuptools, torch, and transformers;
 - CPython implementation and 3.11 version;
 - absence of workspace conflicts;
@@ -195,6 +216,6 @@ Use `FORMAL_P0_STATUS.json` and the recorded `failed_phase` first. Then inspect 
 under `preflight/logs/` or `core/logs/`. Do not repeatedly rerun an unchanged failure. Preserve the
 failed bundle for comparison with the next Run ID.
 
-A failure in dependency resolution, installed provenance, identity, import allowlisting, DLinear
-execution, persistence, re-prediction, finite-value checks, shape checks, or SHA-256 verification is
-a formal failure. It must not be converted to PASS manually.
+A failure in dependency resolution, installed provenance, import-origin binding, identity, import
+allowlisting, DLinear execution, persistence, re-prediction, finite-value checks, shape checks, or
+SHA-256 verification is a formal failure. It must not be converted to PASS manually.
