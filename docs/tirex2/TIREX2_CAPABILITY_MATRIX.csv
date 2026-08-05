@@ -1,0 +1,8 @@
+capability,status,notes
+arbitrary_target_count,VERIFIED_HERMETIC,contract and normalization tests
+multi_horizon,VERIFIED_HERMETIC,1 2 5
+all_nine_quantiles,VERIFIED_HERMETIC,retained in response
+position_local,VERIFIED_HERMETIC,contract only
+position_batch_independent,PARTIALLY_VERIFIED,provider wiring not real-runtime tested
+position_joint_multivariate,PARTIALLY_VERIFIED,provider wiring not real-runtime tested
+real_tirex2_inference,EXECUTION_PENDING,package and snapshot unavailable in authoring runtime
