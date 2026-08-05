@@ -16,6 +16,11 @@ from .runtime_lane_artifacts import (
     verify_portable_sha256sums,
 )
 from .runtime_lane_execution import execute_runtime_lane
+from .runtime_lane_end_to_end import (
+    EndToEndResult,
+    resolve_git_context,
+    run_end_to_end_certification,
+)
 from .runtime_lane_target import (
     TargetHostResult,
     collect_target_host_preflight,
@@ -32,6 +37,7 @@ __all__ = [
     "PYPI_JSON_URL",
     "TARGET_PACKAGE",
     "TARGET_VERSION",
+    "EndToEndResult",
     "TargetHostResult",
     "collect_target_host_preflight",
     "create_deterministic_zip",
@@ -41,6 +47,8 @@ __all__ = [
     "inspect_target_host_archive",
     "prepare_offline_bundle",
     "render_admission_markdown",
+    "resolve_git_context",
+    "run_end_to_end_certification",
     "run_target_host_certification",
     "select_compatible_release_file",
     "sha256_file",
