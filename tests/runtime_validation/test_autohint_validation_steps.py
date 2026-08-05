@@ -13,8 +13,7 @@ def _history(rows: int = 12) -> pd.DataFrame:
         data.append(
             {
                 "draw_no": index + 1,
-                "draw_date": pd.Timestamp("2026-01-01")
-                + pd.to_timedelta(index * 7, unit="D"),
+                "draw_date": pd.Timestamp("2026-01-01") + pd.to_timedelta(index * 7, unit="D"),
                 **{f"n{position}": position for position in range(1, 8)},
             }
         )
