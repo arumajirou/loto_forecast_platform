@@ -37,12 +37,14 @@ class AutoModelRequest:
     gpus: int = 0
     parallel_trials: int = 1
     num_samples: int = 10
+    time_budget: int | None = None
     refit_with_val: bool = False
     precision: str = "32-true"
     early_stop_patience_steps: int | None = None
     n_series: int | None = None
     random_seed: int = 42
     search_strategy: Literal["auto", "random", "tpe", "cmaes"] = "auto"
+    verbose: bool = True
 
 
 @dataclass(frozen=True)
@@ -54,6 +56,8 @@ class AutoModelPlan:
     precision: str
     adjustments: tuple[str, ...] = field(default_factory=tuple)
     search_algorithm: str = "library_default"
+    ray_options: dict[str, Any] | None = None
+    optuna_options: dict[str, Any] | None = None
 
 
 def choose_backend(*, gpus: int, cpus: int, requested: str | None, parallel_trials: int = 1) -> str:
@@ -144,11 +148,12 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
         "config": None,
         "backend": backend,
         "num_samples": request.num_samples,
+        "time_budget": request.time_budget,
         "refit_with_val": request.refit_with_val,
-        # neuralforecast >= 3.2.0 removed the legacy cpus/gpus
-        # constructor arguments. Optuna runs in-process, so these values
-        # must not be forwarded to AutoModel constructors.
-        "verbose": True,
+        # NeuralForecast 3.2.0 rejects the legacy cpus/gpus arguments in
+        # BaseAuto. Ray resources are materialized lazily as RayOptions by
+        # construct_auto_model; Optuna resources are bounded by the outer queue.
+        "verbose": request.verbose,
         "alias": f"{request.model_name}-{backend}",
     }
     needs_n_series = request.model_name in MODELS_REQUIRING_N_SERIES
@@ -167,13 +172,17 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
     if search_alg is not None:
         constructor_kwargs["search_alg"] = search_alg
     return AutoModelPlan(
-        request.model_name,
-        backend,
-        config,
-        constructor_kwargs,
-        precision,
-        tuple(adjustments),
-        search_name,
+        model_name=request.model_name,
+        backend=backend,
+        config=config,
+        constructor_kwargs=constructor_kwargs,
+        precision=precision,
+        adjustments=tuple(adjustments),
+        search_algorithm=search_name,
+        ray_options={"cpus": request.cpus, "gpus": request.gpus} if backend == "ray" else None,
+        optuna_options={"study_kwargs": {"n_jobs": request.parallel_trials}}
+        if backend == "optuna" and request.parallel_trials > 1
+        else None,
     )
 
 
@@ -185,4 +194,15 @@ def construct_auto_model(plan: AutoModelPlan):
     cls = getattr(nf_auto, plan.model_name, None)
     if cls is None:
         raise ValueError(f"NeuralForecast does not expose {plan.model_name}")
-    return cls(**plan.constructor_kwargs)
+    kwargs = dict(plan.constructor_kwargs)
+    if plan.ray_options is not None:
+        ray_options_cls = getattr(nf_auto, "RayOptions", None)
+        if ray_options_cls is None:
+            raise ValueError("NeuralForecast does not expose RayOptions")
+        kwargs["ray_options"] = ray_options_cls(**plan.ray_options)
+    if plan.optuna_options is not None:
+        optuna_options_cls = getattr(nf_auto, "OptunaOptions", None)
+        if optuna_options_cls is None:
+            raise ValueError("NeuralForecast does not expose OptunaOptions")
+        kwargs["optuna_options"] = optuna_options_cls(**plan.optuna_options)
+    return cls(**kwargs)

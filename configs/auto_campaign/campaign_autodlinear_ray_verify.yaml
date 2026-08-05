@@ -1,0 +1,52 @@
+campaign_id_prefix: verify-autodlinear-ray
+data_path: runs/data-acquisition-all/mini/normalized/mini.csv
+output_root: artifacts/verify-autodlinear-ray
+h: 1
+freq: 1
+number_columns: [P1, P2, P3, P4, P5]
+draw_id_candidates: [draw_id, draw, 回号, 開催回, id, draw_no]
+draw_index_candidates: [draw_index, index, 回号, 開催回, draw_no]
+model_seeds: [1]
+local_scaler_type: null
+local_static_scaler_type: null
+include_tracks: [u_shared]
+include_models: [AutoDLinear]
+exclude_models: []
+max_steps_smoke: 1
+val_check_steps_smoke: 1
+max_tasks: null
+split:
+  validation_draws: 50
+  holdout_draws: 20
+  oof_folds: 5
+  oof_validation_draws: 10
+  oof_origins_per_fold: 3
+search:
+  backend: ray
+  num_samples: 1
+  search_seed: 1
+  time_budget: null
+  refit_with_val: false
+  verbose: false
+  optuna_smoke: false
+  coverage_random_samples: 4
+resources:
+  logical_workers: 8
+  cpus_per_trial: 4.0
+  gpus_per_trial: 0.25
+  gpu_concurrency: 4
+  accelerator: gpu
+  devices: 1
+  precision: 32-true
+  max_retries: 2
+  parallel_fixed_tasks: true
+persistence:
+  persist_all_successful_trials: true
+  require_trial_checkpoint: true
+  verify_load_predict: true
+  atomic_write: true
+  save_dataset: true
+  freeze_prospective: true
+extra_base_auto_args: {}
+extra_neuralforecast_args: {}
+extra_fit_args: {}

@@ -188,6 +188,49 @@ def build_parser() -> argparse.ArgumentParser:
     plan.add_argument("--now")
     plan.add_argument("--write")
 
+    nf = sub.add_parser("neuralforecast")
+    nfsub = nf.add_subparsers(dest="action", required=True)
+    nf_list = nfsub.add_parser("automodel-list")
+    nf_list.add_argument("--format", choices=["json", "table"], default="table")
+    nf_run = nfsub.add_parser("automodel-run")
+    nf_run.add_argument("--db-url", required=True, help="SQLite path/URL or SQLAlchemy URL")
+    nf_run.add_argument("--table", default="normalized_draws")
+    nf_run.add_argument("--schema")
+    nf_run.add_argument("--order-by", default="draw_no")
+    nf_run.add_argument("--game", default="numbers4")
+    nf_run.add_argument("--layout", choices=["auto", "wide", "long"], default="auto")
+    nf_run.add_argument("--value-columns", default="")
+    nf_run.add_argument("--id-col", default="unique_id")
+    nf_run.add_argument("--time-col", default="draw_no")
+    nf_run.add_argument("--target-col", default="y")
+    nf_run.add_argument("--models", default="all")
+    nf_run.add_argument("--exclude-models", default="")
+    nf_run.add_argument("--output", required=True)
+    nf_run.add_argument("--h", type=int, default=1)
+    nf_run.add_argument("--freq", default="1")
+    nf_run.add_argument("--val-size", type=int, default=20)
+    nf_run.add_argument("--backend", choices=["optuna", "ray"], default="optuna")
+    nf_run.add_argument("--num-samples", type=int, default=10)
+    nf_run.add_argument("--time-budget", type=int)
+    nf_run.add_argument("--cpus", type=int, default=4)
+    nf_run.add_argument("--gpus", type=int, default=0)
+    nf_run.add_argument("--parallel-trials", type=int, default=1)
+    nf_run.add_argument("--workers", type=int, default=1)
+    nf_run.add_argument("--max-gpu-jobs", type=int, default=1)
+    nf_run.add_argument("--precision", default="32-true")
+    nf_run.add_argument("--seed", type=int, default=42)
+    nf_run.add_argument(
+        "--search-strategy", choices=["auto", "random", "tpe", "cmaes"], default="auto"
+    )
+    nf_run.add_argument("--refit-with-val", action="store_true")
+    nf_run.add_argument("--local-scaler-type")
+    nf_run.add_argument("--local-static-scaler-type")
+    nf_run.add_argument("--use-init-models", action="store_true")
+    nf_run.add_argument("--fit-verbose", action="store_true")
+    nf_run.add_argument("--save-models", action="store_true")
+    nf_run.add_argument("--model-config", help="JSON/YAML mapping keyed by model id/class")
+    nf_run.add_argument("--dry-run", action="store_true")
+
     system = sub.add_parser("system")
     ssub = system.add_subparsers(dest="action", required=True)
     ssub.add_parser("doctor")
@@ -388,6 +431,95 @@ def main(argv=None):
             plan["written_to"] = args.write
         _json(plan)
         return 0
+
+    if args.group == "neuralforecast" and args.action == "automodel-list":
+        from loto.neuralforecast.db_automodel import list_automodel_specs
+
+        rows = [
+            {
+                "model_id": spec.model_id,
+                "class_name": spec.class_name,
+                "priority": spec.priority,
+                "available": spec.available,
+            }
+            for spec in list_automodel_specs()
+        ]
+        if args.format == "json":
+            _json(rows)
+        else:
+            print(f"{'MODEL ID':32} {'CLASS':28} {'PRI':4} AVAILABLE")
+            for row in rows:
+                print(
+                    f"{row['model_id'][:32]:32} {row['class_name'][:28]:28} "
+                    f"{row['priority']:4} {row['available']}"
+                )
+        return 0
+    if args.group == "neuralforecast" and args.action == "automodel-run":
+        from loto.neuralforecast.db_automodel import (
+            AutoModelCampaignConfig,
+            DatabaseTableSource,
+            run_automodel_campaign,
+        )
+
+        model_configs = {}
+        if args.model_config:
+            import yaml
+
+            config_path = Path(args.model_config)
+            text = config_path.read_text(encoding="utf-8")
+            model_configs = (
+                json.loads(text) if config_path.suffix.lower() == ".json" else yaml.safe_load(text)
+            ) or {}
+            if not isinstance(model_configs, dict):
+                raise SystemExit("--model-config must contain a mapping")
+        freq: str | int = int(args.freq) if str(args.freq).lstrip("-").isdigit() else args.freq
+
+        def split_csv(value: str) -> tuple[str, ...]:
+            return tuple(item.strip() for item in value.split(",") if item.strip())
+
+        config = AutoModelCampaignConfig(
+            source=DatabaseTableSource(
+                db_url=args.db_url,
+                table=args.table,
+                schema=args.schema,
+                order_by=args.order_by or None,
+            ),
+            output_dir=args.output,
+            game=args.game,
+            layout=args.layout,
+            value_columns=split_csv(args.value_columns),
+            id_col=args.id_col,
+            time_col=args.time_col,
+            target_col=args.target_col,
+            models=split_csv(args.models) or ("all",),
+            exclude_models=split_csv(args.exclude_models),
+            h=args.h,
+            freq=freq,
+            val_size=args.val_size,
+            backend=args.backend,
+            num_samples=args.num_samples,
+            time_budget=args.time_budget,
+            cpus=args.cpus,
+            gpus=args.gpus,
+            parallel_trials=args.parallel_trials,
+            workers=args.workers,
+            max_gpu_jobs=args.max_gpu_jobs,
+            precision=args.precision,
+            random_seed=args.seed,
+            search_strategy=args.search_strategy,
+            refit_with_val=args.refit_with_val,
+            local_scaler_type=args.local_scaler_type,
+            local_static_scaler_type=args.local_static_scaler_type,
+            use_init_models=args.use_init_models,
+            fit_verbose=args.fit_verbose,
+            save_models=args.save_models,
+            dry_run=args.dry_run,
+            model_configs=model_configs,
+        )
+        result = run_automodel_campaign(config)
+        _json(result)
+        return 0 if result["status"] in {"SUCCEEDED", "DRY_RUN_VERIFIED"} else 2
+
     if args.group == "system":
         model_specs = list_model_specs()
         info = {

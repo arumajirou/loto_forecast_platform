@@ -1,0 +1,9 @@
+finite_categories: all
+numeric_quantiles: [0.0, 0.25, 0.5, 0.75, 1.0]
+pairwise: true
+random_samples_per_numeric_domain: 4
+backends: [ray, optuna]
+local_scalers: [null, standard, robust, robust-iqr, minmax, boxcox]
+fit_validation_branches:
+  - {val_size: 50, val_df: null}
+  - {val_size: 0, val_df: explicit}
