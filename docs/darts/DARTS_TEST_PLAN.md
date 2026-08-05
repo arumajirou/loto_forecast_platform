@@ -45,6 +45,18 @@
 41. `actual - prediction` residual sign, order, shape, and numeric parity.
 42. optimized versus general historical forecast prediction parity.
 43. historical API no-silent-drop ledger and policy/record SHA-256.
+44. four-model ensemble/conformal identity retention and identity SHA-256.
+45. chronological Train, calibration, and evaluation partition enforcement.
+46. unavailable base-model and per-task failure retention.
+47. pre-fitted global-model and output-chunk-shift compatibility rules.
+48. constructor, fit, and predict scoped no-silent-drop argument ledger.
+49. `NaiveEnsembleModel` arithmetic-mean parity.
+50. regression stacking key completeness and evaluation-leakage rejection.
+51. conformal quantile ordering, uniqueness, median, and pair validation.
+52. `ConformalQRModel` probabilistic-base requirement.
+53. conformal quantile non-crossing and base-median parity.
+54. nominal/empirical interval coverage, width, and all-position metrics.
+55. P10 matrix failure isolation, SHA-256 tamper sensitivity, and immutability.
 
 ## Pending runtime gates
 
@@ -58,6 +70,8 @@
 - verify real Foundation covariate and probabilistic behavior;
 - run real P9 `historical_forecasts`, `backtest`, and `residuals` calls;
 - certify real optimized/general parity and exact retraining counts;
+- run real P10 ensemble and conformal models on identical OOF folds and seeds;
+- certify real stacking separation, interval coverage, and interval width;
 - run real multi-seed OOF using identical cross-library conditions;
 - certify real save/load/checkpoint behavior;
 - run repository Ruff and full pytest after a hosted runner starts normally.
