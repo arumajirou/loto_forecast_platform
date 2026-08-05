@@ -224,7 +224,7 @@ def score_locked_prospective_run(
             number_columns=number_columns,
             expected_ds=expected_ds,
         )
-        seed_summary, ranking = _seed_summary(metrics)
+        per_seed_metrics, seed_summary, ranking = _seed_summary(metrics)
         baseline_comparison, champion = _baseline_comparison(ranking)
 
         tables = {
@@ -250,6 +250,11 @@ def score_locked_prospective_run(
                 position_metrics,
                 work,
                 "POSITION_METRICS",
+            ),
+            "per_seed_metrics": _write_table(
+                per_seed_metrics,
+                work,
+                "PER_SEED_METRICS",
             ),
             "seed_summary": _write_table(seed_summary, work, "SEED_SUMMARY"),
             "ranking": _write_table(ranking, work, "RANKING"),
