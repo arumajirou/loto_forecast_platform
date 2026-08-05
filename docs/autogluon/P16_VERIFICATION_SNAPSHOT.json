@@ -1,0 +1,51 @@
+{
+  "compileall": "PASS",
+  "files": {
+    "configs/autogluon_campaign/p16_holdout_prospective_policy.json": {
+      "bytes": 783,
+      "sha256": "3b3d2d419535685c0d56730838ee38d9ad294ad23fd6d6ef631fea6fc113ff0f"
+    },
+    "docs/autogluon/P16_HOLDOUT_PROSPECTIVE.md": {
+      "bytes": 5033,
+      "sha256": "467760510978f1dd78de11eff44fa756a38fb3132176d2ca02a20d55a616284b"
+    },
+    "src/loto/autogluon_campaign/holdout_prospective.py": {
+      "bytes": 13420,
+      "sha256": "a0223dda4340cefbde5f7715314c5ad7c51dcc781ad928675af65c4621de5613"
+    },
+    "src/loto/autogluon_campaign/holdout_prospective_lock.py": {
+      "bytes": 4969,
+      "sha256": "522cdbf376e9965f363ea3b9cce5c83e73181db861bc260ccda2c5ec75e1c252"
+    },
+    "src/loto/autogluon_campaign/holdout_prospective_score.py": {
+      "bytes": 8578,
+      "sha256": "281f8e65bfe0f40e8b7718caa9ae15e97d7bd8e8b2cbf89c8f5fdb3c00c3c558"
+    },
+    "tests/autogluon_campaign/test_holdout_prospective.py": {
+      "bytes": 10448,
+      "sha256": "ba8edf1ca05d02640c3e25aa638a168d45e1c7e7ac4b68451973248f07a2cf92"
+    }
+  },
+  "full_pytest": "NOT_RUN",
+  "github_ci": "CI_BLOCKED_PRE_RUN",
+  "line_length_over_100": 0,
+  "model_seeds": [
+    1,
+    2,
+    3
+  ],
+  "mypy": "NOT_RUN",
+  "p16_focused_tests": {
+    "failed": 0,
+    "passed": 12
+  },
+  "phase": "AUTOGLUON_P16_HOLDOUT_PROSPECTIVE",
+  "primary_metric": "Hit@±1",
+  "real_autogluon_runtime": "BLOCKED_RUNTIME",
+  "real_holdout": "NOT_RUN",
+  "real_prospective": "NOT_RUN",
+  "required_baselines": 7,
+  "ruff": "NOT_AVAILABLE",
+  "schema_version": 1,
+  "status": "PARTIALLY_VERIFIED"
+}
