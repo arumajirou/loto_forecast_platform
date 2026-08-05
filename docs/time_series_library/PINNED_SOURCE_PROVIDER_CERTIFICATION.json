@@ -1,0 +1,106 @@
+{
+  "boundaries": {
+    "full_model_source_tree_discovery": "BLOCKED_DNS",
+    "gpu_runtime": "EXECUTION_PENDING",
+    "holdout_prospective": "NOT_OPENED",
+    "isolated_uv_lock": "BLOCKED_OFFLINE_CACHE_MISS_EINOPS",
+    "real_data_metrics": "NOT_EXECUTED",
+    "real_pinned_dlinear_cpu_provider": "VERIFIED",
+    "target_torch_2_9_1_runtime": "EXECUTION_PENDING"
+  },
+  "executed_at_utc": "2026-08-05T06:46:00Z",
+  "fit_save": {
+    "checkpoint_sha256": "3b569fa3145aa7b5934043d75223d68d2a4e0c119f9a618fe93d9e26a688210d",
+    "finite_prediction": true,
+    "finite_state_dict": true,
+    "input_sha256": "afec1c7517505c22af8861fdd5b40ff7c0cd3bf2b426c707f3ac9925c4224561",
+    "prediction_sha256": "78c11b9133e11d1b595e3e5bf45bb6cffaa3973f89049b2f3089a4301dfb4e08",
+    "prediction_shape": [
+      2,
+      2,
+      3
+    ],
+    "source_identity": {
+      "files": {
+        "layers/Autoformer_EncDec.py": {
+          "actual_git_blob_sha": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
+          "expected_git_blob_sha": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
+          "sha256": "48745b4bb647355e9845792a855df9c59fd7df7fcc664c765351fec390c4073e"
+        },
+        "models/DLinear.py": {
+          "actual_git_blob_sha": "3f4d666a9ffe7fb6f58627ba43f1a9d3d9804d78",
+          "expected_git_blob_sha": "3f4d666a9ffe7fb6f58627ba43f1a9d3d9804d78",
+          "sha256": "e03acaf97e70c85ea6bda6776b3a62550f84470afa7bc53dffccb6121626e7eb"
+        }
+      },
+      "policy": "pinned",
+      "status": "VERIFIED"
+    },
+    "status": "PASS",
+    "train_steps": 3
+  },
+  "focused_validation": {
+    "compileall": "PASS",
+    "line_length_100": "PASS",
+    "pytest": "6 passed",
+    "unverified_source_fail_closed": "PASS"
+  },
+  "load_predict": {
+    "finite_prediction": true,
+    "prediction_sha256": "78c11b9133e11d1b595e3e5bf45bb6cffaa3973f89049b2f3089a4301dfb4e08",
+    "prediction_shape": [
+      2,
+      2,
+      3
+    ],
+    "source_identity": {
+      "files": {
+        "layers/Autoformer_EncDec.py": {
+          "actual_git_blob_sha": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
+          "expected_git_blob_sha": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
+          "sha256": "48745b4bb647355e9845792a855df9c59fd7df7fcc664c765351fec390c4073e"
+        },
+        "models/DLinear.py": {
+          "actual_git_blob_sha": "3f4d666a9ffe7fb6f58627ba43f1a9d3d9804d78",
+          "expected_git_blob_sha": "3f4d666a9ffe7fb6f58627ba43f1a9d3d9804d78",
+          "sha256": "e03acaf97e70c85ea6bda6776b3a62550f84470afa7bc53dffccb6121626e7eb"
+        }
+      },
+      "policy": "pinned",
+      "status": "VERIFIED"
+    },
+    "status": "PASS",
+    "strict_state_load": true
+  },
+  "project_head_before_increment": "00718d3207a2d33338644c1d85e2aff0222fad46",
+  "project_pr": 54,
+  "roundtrip": {
+    "atol": 1e-08,
+    "equal_within_tolerance": true,
+    "finite": true,
+    "max_abs_error": 0.0,
+    "prediction_hash_equal": true,
+    "rtol": 1e-08,
+    "same_shape": true,
+    "status": "PASS"
+  },
+  "run_id": "tslib-pinned-source-provider-cpu-20260805",
+  "runtime": {
+    "cuda_available": false,
+    "device": "cpu",
+    "python": "3.13.5",
+    "target_environment_match": false,
+    "target_isolated_torch": "2.9.1",
+    "torch": "2.10.0+cpu"
+  },
+  "schema_version": "1.0",
+  "status": "PARTIALLY_VERIFIED",
+  "upstream": {
+    "repository": "https://github.com/thuml/Time-Series-Library",
+    "revision": "4e938a1767106324dd753b2a44832bf870a0252e",
+    "verified_git_blobs": {
+      "layers/Autoformer_EncDec.py": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
+      "models/DLinear.py": "3f4d666a9ffe7fb6f58627ba43f1a9d3d9804d78"
+    }
+  }
+}

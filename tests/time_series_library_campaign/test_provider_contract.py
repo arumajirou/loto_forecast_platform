@@ -55,6 +55,14 @@ def _frame(rows: int = 12) -> pd.DataFrame:
     )
 
 
+def _script() -> Path:
+    return (
+        Path(__file__).resolve().parents[2]
+        / "scripts"
+        / "run_time_series_library_provider.py"
+    )
+
+
 def test_split_contract_fails_closed() -> None:
     with pytest.raises(ValueError):
         SplitContract(
@@ -101,14 +109,45 @@ def test_provider_request_rejects_gpu_in_core_lane(tmp_path: Path) -> None:
         )
 
 
+def test_pinned_policy_rejects_unverified_source(tmp_path: Path) -> None:
+    source_root = tmp_path / "upstream"
+    _write_fake_tslib(source_root)
+    request_path = tmp_path / "request.json"
+    response_path = tmp_path / "response.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "operation": "dlinear_fit_save",
+                "source_root": str(source_root),
+                "output_dir": str(tmp_path / "fit"),
+                "train_steps": 1,
+            }
+        ),
+        encoding="utf-8",
+    )
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(_script()),
+            "--request",
+            str(request_path),
+            "--response",
+            str(response_path),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 2
+    payload = json.loads(response_path.read_text(encoding="utf-8"))
+    assert payload["status"] == "FAILED"
+    assert "pinned source" in payload["errors"][0]
+
+
 def test_dlinear_cross_process_save_load_roundtrip(tmp_path: Path) -> None:
     source_root = tmp_path / "upstream"
     _write_fake_tslib(source_root)
-    script = (
-        Path(__file__).resolve().parents[2]
-        / "scripts"
-        / "run_time_series_library_provider.py"
-    )
+    script = _script()
     fit_dir = tmp_path / "fit"
     fit_request = tmp_path / "fit_request.json"
     fit_response = tmp_path / "fit_response.json"
@@ -117,6 +156,7 @@ def test_dlinear_cross_process_save_load_roundtrip(tmp_path: Path) -> None:
             {
                 "operation": "dlinear_fit_save",
                 "source_root": str(source_root),
+                "source_policy": "test_fixture",
                 "output_dir": str(fit_dir),
                 "seed": 1,
                 "seq_len": 8,
@@ -143,6 +183,7 @@ def test_dlinear_cross_process_save_load_roundtrip(tmp_path: Path) -> None:
     assert first.returncode == 0, first.stderr
     fit_payload = json.loads(fit_response.read_text(encoding="utf-8"))
     assert fit_payload["status"] == "PASS"
+    assert fit_payload["evidence"]["source_identity"]["status"] == "TEST_FIXTURE"
 
     load_dir = tmp_path / "load"
     load_request = tmp_path / "load_request.json"
@@ -152,6 +193,7 @@ def test_dlinear_cross_process_save_load_roundtrip(tmp_path: Path) -> None:
             {
                 "operation": "dlinear_load_predict",
                 "source_root": str(source_root),
+                "source_policy": "test_fixture",
                 "output_dir": str(load_dir),
                 "seed": 1,
                 "checkpoint_path": fit_payload["artifacts"]["checkpoint"],
@@ -176,6 +218,7 @@ def test_dlinear_cross_process_save_load_roundtrip(tmp_path: Path) -> None:
     assert second.returncode == 0, second.stderr
     load_payload = json.loads(load_response.read_text(encoding="utf-8"))
     assert load_payload["status"] == "PASS"
+    assert load_payload["evidence"]["strict_state_load"] is True
 
     verify_request = tmp_path / "verify_request.json"
     verify_response = tmp_path / "verify_response.json"

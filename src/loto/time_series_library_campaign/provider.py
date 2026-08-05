@@ -11,6 +11,7 @@ from .contracts import (
     ProviderRequest,
     ProviderResponse,
     ProviderStatus,
+    SourcePolicy,
     SplitContract,
 )
 from .data import (
@@ -98,6 +99,7 @@ __all__ = [
     "ProviderRequest",
     "ProviderResponse",
     "ProviderStatus",
+    "SourcePolicy",
     "SplitContract",
     "discover_models",
     "execute_request",

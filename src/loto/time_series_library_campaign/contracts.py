@@ -11,6 +11,11 @@ UPSTREAM_REVISION = "4e938a1767106324dd753b2a44832bf870a0252e"
 PROTOCOL_VERSION = "1.0"
 
 
+class SourcePolicy(StrEnum):
+    PINNED = "pinned"
+    TEST_FIXTURE = "test_fixture"
+
+
 class ProviderStatus(StrEnum):
     PASS = "PASS"
     FAILED = "FAILED"
@@ -70,6 +75,7 @@ class ProviderRequest(BaseModel):
     source_root: Path
     output_dir: Path
     model_name: str = "DLinear"
+    source_policy: SourcePolicy = SourcePolicy.PINNED
     device: Literal["cpu"] = "cpu"
     seed: int = 1
     seq_len: int = Field(default=16, ge=4)

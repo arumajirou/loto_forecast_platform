@@ -12,8 +12,13 @@ from typing import Any, Iterator
 
 import numpy as np
 
-from .contracts import ProviderRequest, ProviderResponse, ProviderStatus
-from .data import atomic_numpy, sha256_file
+from .contracts import (
+    ProviderRequest,
+    ProviderResponse,
+    ProviderStatus,
+    SourcePolicy,
+)
+from .data import atomic_numpy, sha256_file, verify_pinned_dlinear_source
 
 
 @contextmanager
@@ -65,9 +70,20 @@ def dlinear_config(request: ProviderRequest) -> dict[str, Any]:
     }
 
 
+
+def source_evidence(request: ProviderRequest) -> dict[str, Any]:
+    if request.source_policy == SourcePolicy.TEST_FIXTURE:
+        return {
+            "status": "TEST_FIXTURE",
+            "policy": request.source_policy.value,
+        }
+    return verify_pinned_dlinear_source(request.source_root)
+
+
 def fit_save(request: ProviderRequest) -> ProviderResponse:
     import torch
 
+    identity = source_evidence(request)
     seed_everything(request.seed)
     request.output_dir.mkdir(parents=True, exist_ok=True)
     config = dlinear_config(request)
@@ -120,6 +136,7 @@ def fit_save(request: ProviderRequest) -> ProviderResponse:
             "finite_prediction": True,
             "finite_state_dict": True,
             "train_steps": request.train_steps,
+            "source_identity": identity,
             "checkpoint_sha256": sha256_file(checkpoint),
             "input_sha256": sha256_file(input_path),
             "prediction_sha256": sha256_file(before_path),
@@ -132,6 +149,7 @@ def load_predict(request: ProviderRequest) -> ProviderResponse:
 
     assert request.checkpoint_path is not None
     assert request.input_path is not None
+    identity = source_evidence(request)
     seed_everything(request.seed)
     checkpoint = torch.load(request.checkpoint_path, map_location="cpu", weights_only=True)
     model = load_dlinear(request.source_root)(SimpleNamespace(**checkpoint["config"]))
@@ -156,6 +174,8 @@ def load_predict(request: ProviderRequest) -> ProviderResponse:
             "cpu_fallback": False,
             "prediction_shape": list(prediction.shape),
             "finite_prediction": True,
+            "strict_state_load": True,
+            "source_identity": identity,
             "prediction_sha256": sha256_file(after_path),
         },
     )

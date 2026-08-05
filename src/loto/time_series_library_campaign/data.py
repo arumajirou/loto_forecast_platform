@@ -22,6 +22,47 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+
+
+PINNED_DLINEAR_GIT_BLOBS = {
+    "models/DLinear.py": "3f4d666a9ffe7fb6f58627ba43f1a9d3d9804d78",
+    "layers/Autoformer_EncDec.py": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
+}
+
+
+def git_blob_sha(path: Path) -> str:
+    content = path.read_bytes()
+    header = f"blob {len(content)}\0".encode("ascii")
+    return hashlib.sha1(header + content).hexdigest()
+
+
+def verify_pinned_dlinear_source(source_root: Path) -> dict[str, Any]:
+    files: dict[str, dict[str, str]] = {}
+    errors: list[str] = []
+    for relative_path, expected in PINNED_DLINEAR_GIT_BLOBS.items():
+        path = source_root / relative_path
+        if not path.is_file():
+            errors.append(f"missing pinned source file: {relative_path}")
+            continue
+        actual = git_blob_sha(path)
+        files[relative_path] = {
+            "expected_git_blob_sha": expected,
+            "actual_git_blob_sha": actual,
+            "sha256": sha256_file(path),
+        }
+        if actual != expected:
+            errors.append(
+                f"pinned source mismatch: {relative_path}: expected {expected}, got {actual}"
+            )
+    if errors:
+        raise ValueError("; ".join(errors))
+    return {
+        "status": "VERIFIED",
+        "policy": "pinned",
+        "files": files,
+    }
+
+
 def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(

@@ -2,57 +2,41 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / CORE_CONTRACT_IMPLEMENTED / REAL_UPSTREAM_RUNTIME_PENDING`
+`PARTIALLY_VERIFIED / REAL_PINNED_DLINEAR_CPU_VERIFIED / FULL_MATRIX_PENDING`
 
-This first increment creates an isolated process-boundary contract for
-`thuml/Time-Series-Library` at revision
-`4e938a1767106324dd753b2a44832bf870a0252e`.
+This integration isolates `thuml/Time-Series-Library` at revision
+`4e938a1767106324dd753b2a44832bf870a0252e` from the root runtime.
 
-## Scope
+## Source policy
 
-Included:
+Provider requests default to `source_policy="pinned"`. DLinear fit and load operations
+verify the Git blob identities of both the upstream DLinear model and its Autoformer
+series-decomposition dependency before execution. A mismatch fails closed.
+
+`source_policy="test_fixture"` exists only for focused contract tests. Its response is
+marked `TEST_FIXTURE` and must not be interpreted as upstream runtime certification.
+
+## Included
 
 - fixed upstream provenance;
 - isolated CPU dependency lane;
 - strict Pydantic request and response schemas;
 - draw-sequence `GameGeometry`;
 - explicit Train, Validation, Holdout, and Prospective boundaries;
-- training materialization that excludes Holdout and Prospective rows;
-- AST-based runtime model inventory without importing optional dependencies;
-- DLinear CPU construct, one-step fit, finite-state, save, process-exit, load,
-  and re-predict contract;
+- training materialization containing only Train and Validation rows;
+- AST-based model inventory without importing optional dependencies;
+- DLinear CPU fit, finite-state, save, process-exit, load, and re-predict contract;
 - SHA-256 evidence for checkpoint, input, and predictions;
 - fail-closed response status and exit code 2.
 
-Excluded:
+## Real runtime result
 
-- root dependency changes;
-- common worker or model catalog changes;
-- Foundation Models and Mamba;
-- GPU certification;
-- real lottery Holdout or Prospective evaluation;
-- accuracy or baseline-superiority claims.
+The PR provider was executed with exact pinned upstream DLinear source files. CPU fit,
+save, strict reload in a separate process, and re-prediction passed. Predictions were
+bitwise identical with maximum absolute error `0.0`.
 
-## Why the upstream training loop is not reused directly
-
-The upstream custom dataset computes a fixed 70/10/20 split internally and the
-long-term training loop evaluates test loss during every epoch. The project requires
-externally controlled chronological boundaries and no Holdout access during model
-selection. The provider therefore defines its own split and artifact boundary.
-
-## Core lane setup
-
-```bash
-cd /absolute/path/to/loto_forecast_platform/environments/tslib-core
-uv sync
-
-git clone https://github.com/thuml/Time-Series-Library \
-  /absolute/path/to/Time-Series-Library
-cd /absolute/path/to/Time-Series-Library
-git checkout 4e938a1767106324dd753b2a44832bf870a0252e
-```
-
-No root `uv.lock` is modified.
+The available runtime used Torch 2.10.0 CPU. Resolution and execution of the declared
+Torch 2.9.1 isolated environment remain blocked by network and offline-cache limits.
 
 ## Provider operations
 
@@ -61,19 +45,16 @@ No root `uv.lock` is modified.
 - `dlinear_load_predict`
 - `verify_roundtrip`
 
-Example:
+Example request field:
 
-```bash
-cd /absolute/path/to/loto_forecast_platform
-uv run --project environments/tslib-core \
-  python scripts/run_time_series_library_provider.py \
-  --request /absolute/path/to/request.json \
-  --response /absolute/path/to/response.json
+```json
+{
+  "source_policy": "pinned"
+}
 ```
 
 ## Certification boundary
 
-A model listed by discovery is not runtime certified. DLinear is certified only after
-both subprocesses and the comparison operation return `PASS`. GPU success additionally
-requires a later lane with parameter, input, output, PID, VRAM, and no-CPU-fallback
-evidence.
+A model listed by discovery is not runtime certified. GPU success additionally requires
+parameter, input, output, PID, VRAM, and no-CPU-fallback evidence. Holdout and
+Prospective data remain unopened in this increment.

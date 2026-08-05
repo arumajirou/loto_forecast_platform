@@ -1,0 +1,14 @@
+{
+  "exit_code": 1,
+  "failure_class": "OFFLINE_CACHE_MISS",
+  "first_missing_requirement": "einops==0.8.1",
+  "lock_created": false,
+  "message": "einops was not found in the cache while network access was disabled",
+  "operation": "uv lock --offline",
+  "project": "environments/tslib-core/pyproject.toml",
+  "python": "3.13.5",
+  "root_uv_lock_modified": false,
+  "schema_version": "1.0",
+  "status": "BLOCKED",
+  "uv_version": "0.10.0"
+}
