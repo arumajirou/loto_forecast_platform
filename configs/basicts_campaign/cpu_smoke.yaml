@@ -1,0 +1,21 @@
+schema_version: loto-basicts-provider-v1
+request_id: basicts-cpu-smoke
+operation: construct_forward_save_load_smoke
+artifact_dir: artifacts/basicts/cpu-smoke
+config:
+  model:
+    module: loto.adapters.basicts.smoke_model
+    name: TinyLinearForecaster
+  optimizer:
+    module: torch.optim
+    name: Adam
+  lr_scheduler: null
+  input_len: 8
+  output_len: 1
+  channels: 3
+  seed: 1
+  gpus: null
+  eval_after_train: false
+  test_interval: null
+  deterministic: true
+dataset: null

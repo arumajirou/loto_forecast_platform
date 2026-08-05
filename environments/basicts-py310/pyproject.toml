@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loto-basicts-provider"
+version = "0.1.0"
+description = "Version-isolated BasicTS provider for loto_forecast_platform"
+requires-python = ">=3.10,<3.11"
+dependencies = [
+  "BasicTS==1.1.0",
+  "numpy>=1.26,<3",
+  "pandas>=2.2,<3",
+  "pydantic>=2.10,<3",
+]
+
+[tool.uv]
+package = false
