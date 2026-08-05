@@ -3,7 +3,7 @@
 ## Objective
 
 Verify the reconciliation adapter, 40-case runtime-certification harness, immutable evidence
-package, operational command, and promotion gates introduced by PR #48.
+package, target-machine operator, operational commands, and promotion gates introduced by PR #48.
 
 ## Test strategy
 
@@ -15,9 +15,10 @@ repository-wide validation.
 3. runtime-certification tests
 4. console-entry tests
 5. immutable package tests
-6. target-machine real-package certification
-7. repository static checks and full pytest
-8. GitHub Actions verification
+6. target-machine operator tests
+7. target-machine real-package certification
+8. repository static checks and full pytest
+9. GitHub Actions verification
 
 Focused tests must run before repository-wide tests. A passing test double does not replace the
 real installed `hierarchicalforecast==1.5.1` certification.
@@ -131,6 +132,38 @@ Required coverage:
 
 Current isolated evidence: 11 passed.
 
+## Target-machine operator tests
+
+Targets:
+
+```text
+scripts/run_hierarchicalforecast_target_certification.py
+tests/test_reconciliation_target_machine_certification.py
+```
+
+Required coverage:
+
+- a complete synthetic 40-case runtime and ZIP bundle passes independent verification
+- an incorrect summary count fails closed
+- a mismatched ZIP sidecar fails closed
+- removed `actual_execution=true` evidence is detected even after runtime hashes are recomputed
+- unsafe checksum traversal is rejected
+- successful orchestration publishes operator report, command logs, manifest, and SHA256SUMS
+- exact-version mismatch returns non-success while retaining operator evidence
+- a dirty Git worktree fails preflight
+
+Current isolated evidence: 8 passed.
+
+The target-machine operator additionally requires, during real execution:
+
+- clean Git state and optional exact expected head SHA
+- `uv sync --extra full --locked`
+- exact installed version `1.5.1`
+- `uv run --locked` for version query and formal command
+- independent verification of all 40 rows
+- exactly 24 executed and 16 rejected cases
+- runtime artifact and ZIP re-verification
+
 ## Static checks
 
 Run after focused implementation tests:
@@ -162,55 +195,70 @@ python -m pytest -q \
   tests/test_reconciliation_upstream_matrix.py \
   tests/test_reconciliation_runtime_certification.py \
   tests/test_reconciliation_console_script.py \
-  tests/test_reconciliation_package_certification.py
+  tests/test_reconciliation_package_certification.py \
+  tests/test_reconciliation_target_machine_certification.py
 ```
 
-Current unique focused evidence across separate isolated runs: 53 passed.
+Current unique focused evidence across separate isolated runs: 61 passed.
 
-The value 53 must not be described as one repository invocation unless the combined command is
+The value 61 must not be described as one repository invocation unless the combined command is
 actually executed and recorded.
 
 ## Target-machine real-package test
 
-Precondition:
+From a clean checkout of the intended branch head:
 
 ```bash
-uv sync --extra full
-uv run python - <<'PY'
-from importlib.metadata import version
-assert version("hierarchicalforecast") == "1.5.1"
-print(version("hierarchicalforecast"))
-PY
+cd /mnt/e/env/ts/loto_forecast_platform-pr48
+
+git fetch origin agent/hierarchicalforecast-runtime-certification
+EXPECTED_HEAD="$(git rev-parse origin/agent/hierarchicalforecast-runtime-certification)"
+
+python3 scripts/run_hierarchicalforecast_target_certification.py \
+  --expected-git-sha "${EXPECTED_HEAD}"
 ```
 
-Formal execution:
-
-```bash
-uv run loto-hierarchicalforecast-certify
-```
+The operator internally executes locked synchronization, exact-version verification, and the
+registered formal certifier. It then independently verifies runtime files, all 40 case rows, the
+24/16 execution partition, ZIP members and metadata, canonical package manifest, sidecar, and
+content hashes.
 
 Required result:
 
 ```text
-exit_code      = 0
-status         = VERIFIED
-expected_cases = 40
-executed_cases = 40
-passed_cases   = 40
-failed_cases   = 0
+exit_code                       = 0
+operator_status                  = VERIFIED
+operator_formal_success          = true
+installed_version                = 1.5.1
+summary.expected_cases           = 40
+summary.executed_cases           = 40
+summary.passed_cases             = 40
+summary.failed_cases             = 0
+method_partition.executed_cases  = 24
+method_partition.rejected_cases  = 16
 ```
 
-Integrity verification:
+Retain both evidence roots:
+
+```text
+artifacts/hierarchicalforecast-runtime/<run-id>/
+artifacts/hierarchicalforecast-runtime/<run-id>.zip
+artifacts/hierarchicalforecast-runtime/<run-id>.zip.sha256
+
+artifacts/hierarchicalforecast-target-runs/<operator-run-id>/
+```
+
+Verify the operator evidence with:
 
 ```bash
-cd artifacts/hierarchicalforecast-runtime
-sha256sum -c <run-id>.zip.sha256
-unzip -t <run-id>.zip
-cd <run-id>
-sha256sum -c SHA256SUMS
+(
+  cd artifacts/hierarchicalforecast-target-runs/<operator-run-id>
+  sha256sum -c SHA256SUMS
+)
 ```
 
-Retain Run ID, ZIP SHA-256, Git commit, exact package version, summary counts, and command logs.
+Retain Run IDs, ZIP SHA-256, Git commit, exact package version, summary counts, method partition,
+command logs, and checksum verification output.
 
 ## Repository-wide tests
 
@@ -247,16 +295,17 @@ Required evidence:
 - pytest result exists
 - required check concludes successfully
 
-Issue #61 tracks the current zero-step runner-start blocker. A rerun with no steps, no logs, and no
-artifacts is not new code-validation evidence.
+Issue #61 tracks the current zero-step runner-start blocker. The latest inspected target-runner
+head produced run #1138 with `steps=null` and no logs. A repeated zero-step run is not new
+code-validation evidence.
 
 ## Promotion decision table
 
 | Evidence | Required before ready for review |
 |---|---|
-| 53 focused tests | yes; currently available |
+| 61 focused tests | yes; currently available across separate runs |
 | real 1.5.1 40-case success | yes; pending |
-| ZIP and SHA verification | yes; pending real run |
+| runtime and operator SHA verification | yes; pending real run |
 | Ruff | yes; pending |
 | mypy where required | yes; pending |
 | full pytest | yes; pending |
@@ -265,7 +314,7 @@ artifacts is not new code-validation evidence.
 
 ## Regression policy
 
-Any future code change to the adapter, runtime harness, package layer, entry point, or artifact
-schema requires rerunning the affected focused tests. Changes to dependencies, workflow, or
-packaging require a new target-machine certification Run ID. Raw evidence from prior runs must not
-be overwritten.
+Any future code change to the adapter, runtime harness, package layer, target-machine operator,
+entry point, or artifact schema requires rerunning the affected focused tests. Changes to
+dependencies, workflow, or packaging require a new target-machine certification Run ID. Raw
+evidence from prior runs must not be overwritten.
