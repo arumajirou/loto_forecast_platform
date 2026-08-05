@@ -1,39 +1,55 @@
 # Moirai 2.0 Verification Report
 
-Status: `PARTIALLY_VERIFIED / P8A_CAMPAIGN_LOCAL_PASS / REAL_RUNTIME_PENDING`.
+Status: `PARTIALLY_VERIFIED / P8B_LOCK_REVIEW_LOCAL_PASS / TARGET_HOST_PENDING`.
 
 ## Retained evidence
 
 - P0-P6 Contract v2 and focused tests from PR #83;
 - P7 covariate compilation, native field wiring, hashes, and fake-boundary tests from PR #86;
-- P8 two-process reload, prediction hash, forward-device, and GPU evidence logic from PR #87.
+- P8 two-process reload, prediction hash, forward-device, and GPU evidence logic from PR #87;
+- P8A deterministic six-case campaign and all-case formal gate from PR #89.
 
-## P8A executed locally
+## P8B executed locally
 
-- exact six-case request matrix generation: `PASS`;
-- deterministic target history and fixed seed 1: `PASS`;
-- draw-sequence gap-free timestamps: `PASS`;
-- calendar-time timestamps with intentional missing periods: `PASS`;
-- exact past-only and known-future feature lengths: `PASS`;
-- known-at-prediction-time evidence with no actual-value marker: `PASS`;
-- reviewed-lock presence and exact lock-version rejection logic: `PASS`;
-- snapshot required-file and SHA-256 evidence: `PASS`;
-- all-six-case formal gate and subset non-formal behavior: `PASS`;
-- missing case and changed reload flag rejection: `PASS`;
-- focused pytest: `19 passed`;
+- exact direct-dependency pin parsing: `PASS`;
+- non-destructive candidate generation boundary: `PASS` with mocked `uv lock`;
+- registry package inventory and dependency-edge accounting: `PASS`;
+- registry artifact hash requirement: `PASS`;
+- VCS, path, and editable source rejection: `PASS`;
+- unsupported source and unresolved dependency rejection: `PASS`;
+- direct dependency version mismatch rejection: `PASS`;
+- multi-version package warning retention: `PASS`;
+- failed automated review approval rejection: `PASS`;
+- reviewer and timezone-aware review evidence: `PASS`;
+- dry-run installation leaves the lane and candidate artifact unchanged: `PASS`;
+- explicit token and expected candidate-lock SHA guard: `PASS`;
+- atomic installation of lock, report, and approval with separate evidence: `PASS`;
+- existing-lock replacement SHA guard: `PASS`;
+- installed lock/report/approval cross-hash validation: `PASS`;
+- tampered lock, report, missing approval, and lane mismatch rejection: `PASS`;
+- P8A preflight integration: `PASS`;
+- focused pytest: `36 passed`.
+
+## Static gates
+
 - Python compileall: `PASS`;
-- Python source lines over 100 characters: `0`.
+- structured JSON and CSV parsing: `PASS`;
+- Python source lines over 100 characters: `0`;
+- P8B delta SHA-256 manifest: `PASS`;
+- cumulative manifest cross-check: `PASS`;
+- simple secret-pattern scan: `PASS`.
 
 ## Not executed or certified
 
-- actual isolated lockfile resolution or human lock review;
-- frozen synchronization and frozen import/device probe on the target host;
+- real `uv lock` resolution for either isolated lane;
+- human dependency graph review or installation into a target-host lane;
+- frozen synchronization and frozen import/device probe;
 - real Uni2TS import, snapshot load, predictor, or all-nine-quantile inference;
 - twelve real provider processes across the six formal cases;
 - real GPU PID, UUID, VRAM, or post-exit release evidence;
 - Ruff, mypy, full repository pytest, or successful GitHub Actions steps;
 - OOF, Holdout, Prospective, Hit@±1, MAE, MSE, RMSE, calibration, or baselines.
 
-The generated covariates are deterministic runtime-certification features, not proposed forecasting
-features. No accuracy or leakage-superiority claim is made. Research-only licensing continues to
-block production champion eligibility, automatic promotion, and commercial deployment.
+Automated review success is not represented as human approval. Candidate generation does not modify
+a runtime lane. Research-only licensing continues to block production champion eligibility,
+automatic promotion, and commercial deployment.
