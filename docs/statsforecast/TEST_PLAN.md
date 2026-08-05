@@ -10,9 +10,10 @@
 6. chronological disjoint Train/Validation/Holdout splits;
 7. Hit@±1, position Hit@±1, all-position Hit@±1, MAE, MSE, RMSE;
 8. deterministic baseline behavior;
-9. injected fake runtime construction and output validation;
+9. injected fake runtime construction, complete inventory, and output validation;
 10. fail-closed argument ledger;
-11. Prospective seal tamper detection.
+11. Prospective seal tamper detection;
+12. runtime certifier missing-package bundle and fake save/load lifecycle.
 
 ## Runtime certification pending
 
