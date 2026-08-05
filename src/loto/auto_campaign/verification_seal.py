@@ -60,6 +60,7 @@ def _component_summary(result: Mapping[str, Any]) -> dict[str, Any]:
     coverage = result.get("coverage_state_verification")
     promotion = result.get("promotion_gate_verification")
     lineage = result.get("lineage_verification")
+    prediction = result.get("prediction_lock_verification")
     return {
         "overall_status": result.get("status"),
         "legacy_manifest_status": result.get("run_manifest_status"),
@@ -68,6 +69,9 @@ def _component_summary(result: Mapping[str, Any]) -> dict[str, Any]:
             promotion.get("status") if isinstance(promotion, Mapping) else None
         ),
         "lineage_status": lineage.get("status") if isinstance(lineage, Mapping) else None,
+        "prediction_lock_status": (
+            prediction.get("status") if isinstance(prediction, Mapping) else None
+        ),
         "failure_count": len(result.get("failures") or []),
     }
 
@@ -86,6 +90,7 @@ def _stable_payload(
         "manifest_sha256": _optional_file_hash(root / "manifest.json"),
         "promotion_gate_sha256": _optional_file_hash(root / "PROMOTION_GATE.json"),
         "lineage_sha256": _optional_file_hash(root / "LINEAGE.json"),
+        "prediction_lock_sha256": _optional_file_hash(root / "PREDICTION_LOCK.json"),
         "components": _component_summary(result),
     }
 
@@ -176,6 +181,7 @@ def verify_verification_seal(root: Path) -> dict[str, Any]:
         ("manifest_sha256", "manifest.json"),
         ("promotion_gate_sha256", "PROMOTION_GATE.json"),
         ("lineage_sha256", "LINEAGE.json"),
+        ("prediction_lock_sha256", "PREDICTION_LOCK.json"),
     ):
         try:
             current = _optional_file_hash(root / filename)
@@ -193,6 +199,11 @@ def verify_verification_seal(root: Path) -> dict[str, Any]:
     components = payload.get("components")
     if not isinstance(components, Mapping) or components.get("overall_status") != "PASS":
         failures.append("verification seal components do not record overall PASS")
+    if (root / "PREDICTION_LOCK.json").is_file():
+        if not isinstance(components, Mapping):
+            failures.append("verification seal prediction components missing")
+        elif components.get("prediction_lock_status") != "PASS":
+            failures.append("verification seal does not record prediction lock PASS")
 
     return {
         "status": "PASS" if not failures else "FAIL",
