@@ -1,0 +1,122 @@
+{
+  "boundaries": {
+    "gpu_runtime": "EXECUTION_PENDING",
+    "holdout_prospective": "NOT_OPENED",
+    "isolated_uv_lock": "BLOCKED_OFFLINE_CACHE_MISS_EINOPS",
+    "lightts_runtime": "EXECUTION_PENDING",
+    "real_data_metrics": "NOT_EXECUTED",
+    "segrnn_runtime": "EXECUTION_PENDING",
+    "target_torch_2_9_1_runtime": "EXECUTION_PENDING"
+  },
+  "fit_save": {
+    "checkpoint_sha256": "b16e7eb39d65c255884c507e076c380dcf70110eb759133da1e30ef61b7a2e66",
+    "effective_config": {
+      "d_model": 16,
+      "dropout": 0.0,
+      "e_layers": 2,
+      "enc_in": 3,
+      "num_class": 1,
+      "pred_len": 2,
+      "seq_len": 8,
+      "task_name": "long_term_forecast"
+    },
+    "finite_prediction": true,
+    "finite_state_dict": true,
+    "input_sha256": "afec1c7517505c22af8861fdd5b40ff7c0cd3bf2b426c707f3ac9925c4224561",
+    "prediction_sha256": "d78524872a5f9e387bbe17950dd97078fe4097c539113f5544af7c7ea3958280",
+    "prediction_shape": [
+      2,
+      2,
+      3
+    ],
+    "process_id": 3310,
+    "source_identity": {
+      "files": {
+        "models/TSMixer.py": {
+          "actual_git_blob_sha": "76884d467f17d64aa87d8e22cc9f0aa6231914cf",
+          "expected_git_blob_sha": "76884d467f17d64aa87d8e22cc9f0aa6231914cf",
+          "sha256": "a82942ddc22cba59f4161f3ea480eb0e474eba6f0ab2d13f2bd949f100b2ce87"
+        }
+      },
+      "model_name": "TSMixer",
+      "policy": "pinned",
+      "status": "VERIFIED"
+    },
+    "status": "PASS",
+    "train_steps": 3
+  },
+  "focused_validation": {
+    "compileall": "PASS",
+    "line_length_100": "PASS",
+    "pytest": "9 passed",
+    "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT",
+    "unverified_source_fail_closed": "PASS",
+    "wrong_model_name_fail_closed": "PASS"
+  },
+  "load_predict": {
+    "finite_prediction": true,
+    "prediction_sha256": "d78524872a5f9e387bbe17950dd97078fe4097c539113f5544af7c7ea3958280",
+    "prediction_shape": [
+      2,
+      2,
+      3
+    ],
+    "process_id": 3330,
+    "source_identity": {
+      "files": {
+        "models/TSMixer.py": {
+          "actual_git_blob_sha": "76884d467f17d64aa87d8e22cc9f0aa6231914cf",
+          "expected_git_blob_sha": "76884d467f17d64aa87d8e22cc9f0aa6231914cf",
+          "sha256": "a82942ddc22cba59f4161f3ea480eb0e474eba6f0ab2d13f2bd949f100b2ce87"
+        }
+      },
+      "model_name": "TSMixer",
+      "policy": "pinned",
+      "status": "VERIFIED"
+    },
+    "status": "PASS",
+    "strict_state_load": true
+  },
+  "project_head_before_increment": "3523e1b0a2514cbfe30579a21e1aec1f48e690a2",
+  "project_pr": 54,
+  "roundtrip": {
+    "after_sha256": "d78524872a5f9e387bbe17950dd97078fe4097c539113f5544af7c7ea3958280",
+    "after_shape": [
+      2,
+      2,
+      3
+    ],
+    "atol": 1e-08,
+    "before_sha256": "d78524872a5f9e387bbe17950dd97078fe4097c539113f5544af7c7ea3958280",
+    "before_shape": [
+      2,
+      2,
+      3
+    ],
+    "different_processes": true,
+    "equal_within_tolerance": true,
+    "finite": true,
+    "max_abs_error": 0.0,
+    "prediction_hash_equal": true,
+    "rtol": 1e-08,
+    "same_shape": true,
+    "status": "PASS"
+  },
+  "run_id": "tslib-pinned-tsmixer-cpu-20260805",
+  "runtime": {
+    "cpu_fallback": false,
+    "cuda_available": false,
+    "device": "cpu",
+    "python": "3.13.5",
+    "target_environment_match": false,
+    "target_isolated_torch": "2.9.1",
+    "torch": "2.10.0+cpu"
+  },
+  "schema_version": "1.0",
+  "status": "PARTIALLY_VERIFIED",
+  "upstream": {
+    "model_git_blob_sha": "76884d467f17d64aa87d8e22cc9f0aa6231914cf",
+    "repository": "https://github.com/thuml/Time-Series-Library",
+    "revision": "4e938a1767106324dd753b2a44832bf870a0252e"
+  }
+}

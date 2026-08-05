@@ -2,49 +2,67 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / REAL_PINNED_DLINEAR_CPU_VERIFIED / ISOLATED_LOCK_BLOCKED`
+`PARTIALLY_VERIFIED / DLINEAR_AND_TSMIXER_CPU_VERIFIED / ISOLATED_LOCK_BLOCKED`
 
 ## Revisions
 
-- project base: `d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0`
-- upstream: `thuml/Time-Series-Library`
-- upstream revision: `4e938a1767106324dd753b2a44832bf870a0252e`
+- project base: `d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0`;
+- previous PR head: `3523e1b0a2514cbfe30579a21e1aec1f48e690a2`;
+- upstream revision: `4e938a1767106324dd753b2a44832bf870a0252e`.
 
-## Verified
+## DLinear regression
 
-- provider protocol and chronological split contract;
-- Holdout and Prospective exclusion from training materialization;
-- default pinned-source policy;
-- fail-closed rejection of an unverified DLinear fixture;
-- exact Git blob identity for upstream `models/DLinear.py`;
-- exact Git blob identity for upstream `layers/Autoformer_EncDec.py`;
-- real pinned DLinear CPU construct and three bounded fit steps;
-- finite prediction and finite state dictionary;
-- checkpoint save followed by load in a separate provider process;
-- strict state-dictionary load;
-- prediction shape `[2, 2, 3]` before and after reload;
-- equal prediction SHA-256 before and after reload;
-- equality within `rtol=1e-8`, `atol=1e-8`;
-- maximum absolute reload error `0.0`;
-- Python compileall and focused pytest: `6 passed`.
+The existing DLinear pinned-source and separate-process persistence contract remains
+unchanged. Its legacy operations continue to pass the focused suite.
 
-## Partially verified
+## TSMixer
 
-Pinned GitHub code search returned 41 model modules with `class Model`. This is a
-source-search inventory, not a complete local full-tree AST run. Every model other than
-DLinear remains `EXECUTION_PENDING`.
+Verified against `models/TSMixer.py` Git blob
+`76884d467f17d64aa87d8e22cc9f0aa6231914cf`:
+
+- pinned source identity: `VERIFIED`;
+- CPU construction: `PASS`;
+- three bounded fit steps: `PASS`;
+- effective configuration persisted: `PASS`;
+- prediction shape `[2, 2, 3]`: `PASS`;
+- finite prediction and state dictionary: `PASS`;
+- atomic save artifacts: `PASS`;
+- fit and load process IDs differ: `PASS`;
+- strict state-dictionary reload: `PASS`;
+- reloaded prediction finite: `PASS`;
+- prediction SHA-256 equality: `PASS`;
+- `rtol=1e-8`, `atol=1e-8`: `PASS`;
+- maximum absolute error `0.0`: `PASS`.
+
+## Focused validation
+
+- Python compileall: `PASS`;
+- focused pytest: `9 passed`;
+- 100-character Python line policy: `PASS`;
+- Ruff: `NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT`;
+- wrong model name rejected: `PASS`;
+- unverified pinned TSMixer source rejected: `PASS`;
+- fixture and certification policies separated: `PASS`.
+
+## Candidate boundary
+
+LightTS is deferred until chunk geometry and `d_model` reduction constraints are
+formalized. SegRNN is deferred until `seg_len` divisibility and its Autoformer layer
+dependency are formalized.
+
+Pinned source search still reports 41 model modules. DLinear and TSMixer are separately
+CPU-certified; the remaining model runtime matrix is pending.
 
 ## Blocked
 
-The execution environment could not resolve GitHub DNS. `uv lock --offline` also failed
-because `einops==0.8.1` was absent from the local uv cache. No isolated `uv.lock` was
-created, and the root `uv.lock` was not modified.
+Direct GitHub clone remains blocked by DNS. `uv lock --offline` failed because
+`einops==0.8.1` was absent from the local cache. No isolated `uv.lock` was created, and
+root dependency files were not modified.
 
 ## Runtime boundary
 
-The real DLinear smoke used Python 3.13.5 and Torch 2.10.0 CPU already available in the
-execution environment. The declared isolated lane targets Torch 2.9.1; execution in that
-exact resolved environment remains pending.
+The real model smokes used Python 3.13.5 and Torch 2.10.0 CPU. The declared isolated
+lane targets Torch 2.9.1; execution in that exact environment remains pending.
 
 ## Not claimed
 

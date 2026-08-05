@@ -26,6 +26,8 @@ class Operation(StrEnum):
     DISCOVER = "discover"
     DLINEAR_FIT_SAVE = "dlinear_fit_save"
     DLINEAR_LOAD_PREDICT = "dlinear_load_predict"
+    TSMIXER_FIT_SAVE = "tsmixer_fit_save"
+    TSMIXER_LOAD_PREDICT = "tsmixer_load_predict"
     VERIFY_ROUNDTRIP = "verify_roundtrip"
 
 
@@ -82,6 +84,9 @@ class ProviderRequest(BaseModel):
     pred_len: int = Field(default=1, ge=1)
     channels: int = Field(default=1, ge=1)
     train_steps: int = Field(default=1, ge=0, le=100)
+    d_model: int = Field(default=16, ge=4)
+    dropout: float = Field(default=0.0, ge=0.0, lt=1.0)
+    e_layers: int = Field(default=2, ge=1, le=32)
     checkpoint_path: Path | None = None
     input_path: Path | None = None
     before_prediction_path: Path | None = None
@@ -91,7 +96,23 @@ class ProviderRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_operation_fields(self) -> ProviderRequest:
-        if self.operation == Operation.DLINEAR_LOAD_PREDICT and (
+        dlinear_ops = {
+            Operation.DLINEAR_FIT_SAVE,
+            Operation.DLINEAR_LOAD_PREDICT,
+        }
+        tsmixer_ops = {
+            Operation.TSMIXER_FIT_SAVE,
+            Operation.TSMIXER_LOAD_PREDICT,
+        }
+        load_ops = {
+            Operation.DLINEAR_LOAD_PREDICT,
+            Operation.TSMIXER_LOAD_PREDICT,
+        }
+        if self.operation in dlinear_ops and self.model_name != "DLinear":
+            raise ValueError("DLinear operations require model_name=DLinear")
+        if self.operation in tsmixer_ops and self.model_name != "TSMixer":
+            raise ValueError("TSMixer operations require model_name=TSMixer")
+        if self.operation in load_ops and (
             self.checkpoint_path is None or self.input_path is None
         ):
             raise ValueError("load/predict requires checkpoint_path and input_path")

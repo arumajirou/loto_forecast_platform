@@ -21,6 +21,10 @@ from .data import (
     validate_frame,
 )
 from .runtime import fit_save, load_predict, verify_prediction_files
+from .tsmixer_runtime import (
+    fit_save as tsmixer_fit_save,
+    load_predict as tsmixer_load_predict,
+)
 
 
 def execute_request(request: ProviderRequest) -> ProviderResponse:
@@ -48,6 +52,10 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
         return fit_save(request)
     if request.operation == Operation.DLINEAR_LOAD_PREDICT:
         return load_predict(request)
+    if request.operation == Operation.TSMIXER_FIT_SAVE:
+        return tsmixer_fit_save(request)
+    if request.operation == Operation.TSMIXER_LOAD_PREDICT:
+        return tsmixer_load_predict(request)
     assert request.before_prediction_path is not None
     assert request.after_prediction_path is not None
     verification = verify_prediction_files(

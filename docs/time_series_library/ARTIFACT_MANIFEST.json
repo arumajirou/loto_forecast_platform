@@ -1,0 +1,46 @@
+{
+  "artifacts": [
+    {
+      "path": "LOCK_RESOLUTION_REPORT.json",
+      "sha256": "4fcc4dd5941bc2c1701b4e950bfdfa0fb8a900e874980019259827cd9c882051",
+      "size_bytes": 442
+    },
+    {
+      "path": "MODEL_INVENTORY_PINNED_SEARCH.json",
+      "sha256": "2dd34f62e9f45f505580c4784e499632a432b57ffc42c6157cac12299806ea54",
+      "size_bytes": 4283
+    },
+    {
+      "path": "PINNED_SOURCE_PROVIDER_CERTIFICATION.json",
+      "sha256": "4095a101d67e177f7c10a86e8fd803957c71e0be4687b9554c5e536f6d9d15ee",
+      "size_bytes": 3640
+    },
+    {
+      "path": "TSMIXER_CPU_CERTIFICATION.json",
+      "sha256": "bde710c279b252dca8c98532f0ee5cb75f4f62ac9825af94719797d85a3a3395",
+      "size_bytes": 3634
+    },
+    {
+      "path": "LIGHTWEIGHT_MODEL_SELECTION.md",
+      "sha256": "24980833d617acc721028d1761e598870179906ea1264d0d879ffc3614785fed",
+      "size_bytes": 916
+    },
+    {
+      "path": "README.md",
+      "sha256": "0ad03d39b84e8af929b95a5691834f5d3e98bc834675686b789aebffa4f93706",
+      "size_bytes": 1951
+    },
+    {
+      "path": "VERIFICATION_REPORT.md",
+      "sha256": "9230d6624f31a68cc165bf9f04bd6f358c7c671853ff00b91cb451852874d9cb",
+      "size_bytes": 2498
+    }
+  ],
+  "certified_models": [
+    "DLinear",
+    "TSMixer"
+  ],
+  "schema_version": "1.0",
+  "status": "PARTIALLY_VERIFIED",
+  "upstream_revision": "4e938a1767106324dd753b2a44832bf870a0252e"
+}
