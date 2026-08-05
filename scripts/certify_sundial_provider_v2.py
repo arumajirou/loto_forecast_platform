@@ -33,7 +33,10 @@ def write_json(path: Path, value: Any) -> None:
 
 
 def load_json(path: Path) -> dict[str, Any]:
-    value = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CertificationError(f"cannot read JSON object {path}: {exc}") from exc
     if not isinstance(value, dict):
         raise CertificationError(f"expected JSON object: {path}")
     return value
@@ -240,6 +243,7 @@ def run_case(
     device: str,
     num_samples: int,
     seed: int,
+    timeout_seconds: int,
 ) -> dict[str, Any]:
     case_dir = output / "cases" / name
     case_dir.mkdir(parents=True)
@@ -291,7 +295,16 @@ def run_case(
         monitor: list[dict[str, Any]] = []
         seen = False
         peak = 0
+        timed_out = False
         while proc.poll() is None:
+            if time.monotonic() - started > timeout_seconds:
+                timed_out = True
+                proc.terminate()
+                try:
+                    proc.wait(timeout=10)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                break
             processes = gpu_processes()
             used = processes.get(proc.pid, 0)
             seen = seen or proc.pid in processes
@@ -303,7 +316,13 @@ def run_case(
         case_dir / "gpu-monitor.json",
         {"pid": proc.pid, "external_seen": seen, "external_peak_mib": peak, "rows": monitor},
     )
-    response = load_json(response_path) if response_path.is_file() else {}
+    response: dict[str, Any] = {}
+    response_read_error: str | None = None
+    if response_path.is_file():
+        try:
+            response = load_json(response_path)
+        except CertificationError as exc:
+            response_read_error = str(exc)
     reasons = validate_response(
         response,
         pid=proc.pid,
@@ -312,6 +331,10 @@ def run_case(
         external_seen=seen,
         external_peak_mib=peak,
     )
+    if response_read_error is not None:
+        reasons.append("INVALID_RESPONSE_JSON")
+    if timed_out:
+        reasons.append("CASE_TIMEOUT")
     if return_code != 0:
         reasons.append(f"RETURN_CODE_{return_code}")
     return {
@@ -328,6 +351,9 @@ def run_case(
         "external_peak_vram_mib": peak,
         "request_sha256": sha256(request_path),
         "response_sha256": sha256(response_path) if response_path.is_file() else None,
+        "response_read_error": response_read_error,
+        "timed_out": timed_out,
+        "timeout_seconds": timeout_seconds,
     }
 
 
@@ -368,6 +394,7 @@ def main() -> int:
     parser.add_argument("--sample-counts", type=parse_counts, default=(1, 3, 20, 50, 100))
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--replay-samples", type=int, default=20)
+    parser.add_argument("--case-timeout", type=int, default=1800)
     args = parser.parse_args()
 
     root = args.repo_root.expanduser().resolve()
@@ -397,6 +424,8 @@ def main() -> int:
             "snapshot": snapshot_evidence,
             "remote_code_review_sha256": sha256(review_path),
             "sundial_lock_sha256": sha256(root / "environments/sundial/uv.lock"),
+            "runner_sha256": sha256(root / "scripts/run_sundial_provider.py"),
+            "harness_sha256": sha256(Path(__file__).resolve()),
         },
     )
 
@@ -411,6 +440,7 @@ def main() -> int:
             device="cpu",
             num_samples=1,
             seed=args.seed,
+            timeout_seconds=args.case_timeout,
         )
     ]
     for count in args.sample_counts:
@@ -425,6 +455,7 @@ def main() -> int:
                 device="cuda",
                 num_samples=count,
                 seed=args.seed,
+                timeout_seconds=args.case_timeout,
             )
         )
     for name in ("cuda-replay-a", "cuda-replay-b"):
@@ -439,6 +470,7 @@ def main() -> int:
                 device="cuda",
                 num_samples=args.replay_samples,
                 seed=args.seed,
+                timeout_seconds=args.case_timeout,
             )
         )
 
@@ -447,7 +479,14 @@ def main() -> int:
         for name in ("cuda-replay-a", "cuda-replay-b")
     ]
     if all(path.is_file() for path in replay_paths):
-        replay = compare_replays(load_json(replay_paths[0]), load_json(replay_paths[1]))
+        try:
+            replay = compare_replays(load_json(replay_paths[0]), load_json(replay_paths[1]))
+        except CertificationError as exc:
+            replay = {
+                "classification": "INVALID_RESPONSE",
+                "passed": False,
+                "reason": str(exc),
+            }
     else:
         replay = {"classification": "NOT_EVALUATED", "passed": False}
     write_json(output / "reproducibility.json", replay)
@@ -461,6 +500,7 @@ def main() -> int:
         "revision": REVISION,
         "sample_counts": list(args.sample_counts),
         "seed": args.seed,
+        "case_timeout_seconds": args.case_timeout,
         "cases": cases,
         "reproducibility": replay,
         "formal_gpu_certification": status == "PASS",
