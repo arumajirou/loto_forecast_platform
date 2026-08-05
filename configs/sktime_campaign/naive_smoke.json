@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "operation": "naive_smoke",
+  "output_dir": "artifacts/sktime/naive-smoke-example",
+  "environment_lane": "core-py313",
+  "expected_sktime_version": "1.0.1",
+  "model_name": "NaiveForecaster",
+  "strategy": "last",
+  "forecast_horizon": [1],
+  "series": [4, 7, 3, 8, 6, 9, 5, 10],
+  "save_load": true,
+  "device": "cpu",
+  "seed": 1
+}
