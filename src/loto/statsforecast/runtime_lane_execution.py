@@ -11,10 +11,10 @@ from .runtime_lane_artifacts import (
     run_command,
     utc_now,
     venv_python,
-    verify_offline_bundle,
     verify_portable_sha256sums,
     write_json,
 )
+from .runtime_lane_wheel_policy import verify_offline_bundle
 
 
 def execute_runtime_lane(
