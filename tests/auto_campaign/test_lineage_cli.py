@@ -31,7 +31,7 @@ def test_cli_routes_source_and_predecessor_separately(
         return {"status": "PASS"}
 
     monkeypatch.setattr(cli, "load_config", lambda _path: FakeConfig())
-    monkeypatch.setattr(cli, "run_stage_with_promotion_and_lineage", fake_run)
+    monkeypatch.setattr(cli, "run_stage_with_promotion_gate", fake_run)
     output = tmp_path / "holdout"
     monkeypatch.setattr(
         sys,
