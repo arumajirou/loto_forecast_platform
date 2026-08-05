@@ -2,15 +2,13 @@
 
 ## Status
 
-`IMPLEMENTED / ISOLATED_9_TESTS_PASS / FORMAL_77_AND_FULL_SUITE_PENDING`
+`IMPLEMENTED / ISOLATED_QUALITY_TESTS_PASS / FORMAL_77_AND_FULL_SUITE_PENDING`
 
-The quality gate runs the remaining local promotion checks in a fixed order and preserves all
-command, JUnit, Git, and checksum evidence. It is separate from the real
+The quality gate runs the remaining local promotion checks in a fixed order and preserves command,
+JUnit, Git, and checksum evidence. It is separate from the real
 `hierarchicalforecast==1.5.1` runtime certification.
 
 ## Formal command
-
-Run from a clean checkout of the current PR head:
 
 ```bash
 cd /mnt/e/env/ts/loto_forecast_platform-pr48
@@ -22,12 +20,10 @@ python3 scripts/run_hierarchicalforecast_quality_gate.py \
   --expected-git-sha "${EXPECTED_HEAD}"
 ```
 
-`--expected-git-sha` is mandatory. The production CLI does not expose synchronization or
-full-suite bypasses.
+`--expected-git-sha` is mandatory. Production does not expose synchronization or full-suite
+bypasses.
 
 ## Execution order
-
-The runner executes the following sequence:
 
 ```text
 1. clean expected Git commit preflight
@@ -36,20 +32,18 @@ The runner executes the following sequence:
 4. Ruff format check over src, scripts, tests
 5. Ruff lint over src, scripts, tests
 6. compileall over src, scripts, tests
-7. mypy over the reconciliation and target-operator scope
+7. mypy over reconciliation and target modules
 8. focused pytest with JUnit XML
 9. repository-wide pytest with JUnit XML
 10. unchanged clean Git commit postflight
-11. immutable quality evidence manifest and SHA256SUMS
+11. immutable quality manifest and SHA256SUMS
 ```
 
 The repository-wide pytest step runs only after every lighter check and the focused suite pass.
-This follows the project policy of deferring the heaviest verification until implementation and
-focused checks are complete.
 
 ## Focused-suite contract
 
-The focused suite contains these files:
+The focused suite contains:
 
 ```text
 tests/test_reconciliation.py
@@ -62,7 +56,7 @@ tests/test_reconciliation_target_operator.py
 tests/test_reconciliation_quality_gate.py
 ```
 
-Formal acceptance requires the JUnit XML to report exactly:
+Formal acceptance requires:
 
 ```text
 tests    = 77
@@ -70,8 +64,8 @@ failures = 0
 errors   = 0
 ```
 
-The exact count is intentional. Adding or removing a focused test requires an explicit contract
-update rather than silently changing the promotion evidence.
+The package-test count remains eleven after portable-publication strengthening, so the exact focused
+contract remains 77.
 
 ## mypy scope
 
@@ -79,27 +73,20 @@ update rather than silently changing the promotion evidence.
 src/loto/reconciliation/hierarchy.py
 src/loto/reconciliation/runtime_certification.py
 src/loto/reconciliation/package_certification.py
+src/loto/reconciliation/portable_package_certification.py
 scripts/hierarchicalforecast_target/
 ```
 
-The gate uses the repository's checked-in `[tool.mypy]` configuration.
+The gate uses the checked-in `[tool.mypy]` configuration.
 
 ## Evidence directory
 
-Each invocation creates a unique directory:
-
 ```text
 artifacts/hierarchicalforecast-quality-runs/<quality-run-id>/
-├── sync.stdout.log / sync.stderr.log
-├── pip_check.stdout.log / pip_check.stderr.log
-├── ruff_format.stdout.log / ruff_format.stderr.log
-├── ruff_lint.stdout.log / ruff_lint.stderr.log
-├── compileall.stdout.log / compileall.stderr.log
-├── mypy.stdout.log / mypy.stderr.log
-├── focused_pytest.stdout.log / focused_pytest.stderr.log
-├── focused.junit.xml
-├── full_pytest.stdout.log / full_pytest.stderr.log
-├── full.junit.xml
+├── sync and dependency logs
+├── Ruff, compileall, and mypy logs
+├── focused_pytest logs and focused.junit.xml
+├── full_pytest logs and full.junit.xml
 ├── COMMANDS.json
 ├── QUALITY_REPORT.json
 ├── ARTIFACT_MANIFEST.json
@@ -108,22 +95,7 @@ artifacts/hierarchicalforecast-quality-runs/<quality-run-id>/
 
 Failure evidence is retained. A failed command does not erase earlier logs.
 
-## Statuses
-
-- `VERIFIED`
-- `FAILED_PREFLIGHT`
-- `FAILED_SYNC`
-- `FAILED_PIP_CHECK`
-- `FAILED_RUFF_FORMAT`
-- `FAILED_RUFF_LINT`
-- `FAILED_COMPILEALL`
-- `FAILED_MYPY`
-- `FAILED_FOCUSED_TESTS`
-- `FAILED_FULL_TESTS`
-- `FAILED_POSTFLIGHT_GIT_DRIFT`
-- `FAILED_QUALITY_BOOTSTRAP`
-
-## Exit codes
+## Statuses and exit codes
 
 | Exit | Meaning |
 |---:|---|
@@ -131,11 +103,16 @@ Failure evidence is retained. A failed command does not erase earlier logs.
 | 2 | a quality command or JUnit contract failed after evidence creation |
 | 3 | bootstrap, preflight, path, or postflight integrity failed |
 
+Structured statuses include `FAILED_SYNC`, `FAILED_PIP_CHECK`, `FAILED_RUFF_FORMAT`,
+`FAILED_RUFF_LINT`, `FAILED_COMPILEALL`, `FAILED_MYPY`, `FAILED_FOCUSED_TESTS`,
+`FAILED_FULL_TESTS`, and `FAILED_POSTFLIGHT_GIT_DRIFT`.
+
 ## Current evidence boundary
 
-The quality-gate implementation has nine isolated tests passing. The branch now has 77 cumulative
-focused tests across separate isolated runs. A single formal 77-test run, Ruff, mypy, and the
-repository-wide pytest remain pending until this command is executed on the target machine.
+The quality-gate implementation tests remain passing in isolation. The portable publication module
+is included in Ruff, compileall, mypy, and package tests. The exact package and console subset
+produced 13 passing tests with compileall PASS and no Python line over 100 characters.
 
-This runner does not replace the real HierarchicalForecast 1.5.1 runtime certification or GitHub
-Actions evidence. All three evidence roots are required before the PR may leave Draft status.
+A single formal 77-test run, formal Ruff, formal mypy, and repository-wide pytest remain pending on
+the target machine. This runner does not replace real HierarchicalForecast 1.5.1 certification or
+GitHub Actions evidence.
