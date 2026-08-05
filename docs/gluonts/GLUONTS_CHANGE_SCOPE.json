@@ -1,13 +1,15 @@
 {
   "schema_version": 1,
-  "phase": "P6_ALL_NINE_ESTIMATOR_LIFECYCLE",
+  "phase": "P7_TARGET_MACHINE_EVIDENCE_AUDIT",
   "status": "PARTIALLY_VERIFIED",
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
   "branch": "feat/gluonts-probabilistic-contract-v1",
   "owned_paths": [
     "environments/gluonts-compat/**",
     "environments/gluonts-latest/**",
+    "environments/gluonts-p7-target-machine.sh",
     "src/loto/adapters/gluonts/**",
+    "src/loto/gluonts_campaign/**",
     "tests/adapters/gluonts/**",
     "tests/gluonts_campaign/**",
     "docs/gluonts/**"
@@ -28,56 +30,52 @@
     "model_discovery",
     "distribution_discovery",
     "runtime_certify",
-    "p6_campaign"
+    "p6_campaign",
+    "p7_cross_lane_audit"
   ],
-  "model_count": 9,
-  "outer_workers": 8,
+  "model_count_per_lane": 9,
+  "maximum_model_lane_lifecycles": 18,
+  "outer_workers_per_lane": 8,
   "threads_per_job": 1,
-  "device": "cpu",
-  "p6_required_checks": {
-    "fit_serialize": [
-      "registry",
-      "version",
-      "import",
-      "signature",
-      "resource_policy",
-      "constructor",
-      "dataset",
-      "fit",
-      "predict",
-      "shape",
-      "finite",
-      "device",
-      "serialize",
-      "artifact_integrity"
-    ],
-    "reload_predict": [
-      "registry",
-      "version",
-      "manifest",
-      "artifact_integrity",
-      "process_restart",
-      "deserialize",
-      "dataset",
-      "predict",
-      "shape",
-      "finite",
-      "device",
-      "identity"
-    ]
-  },
-  "p6_artifacts": [
-    "p6_certification_dataset.json",
-    "p6_constructor_arguments.json",
-    "p6_predictor_manifest.json",
+  "certification_device": "cpu",
+  "p7_evidence_states": [
+    "VALID",
+    "INCOMPLETE",
+    "INVALID"
+  ],
+  "p7_certification_states": [
+    "VERIFIED",
+    "PARTIALLY_VERIFIED",
+    "BLOCKED",
+    "FAILED",
+    "NOT_EVALUATED"
+  ],
+  "p7_required_evidence": [
     "p6_campaign_result.json",
     "p6_campaign_manifest.json",
     "p6_environment_provenance.json",
-    "P6_SHA256SUMS"
+    "P6_SHA256SUMS",
+    "lane pyproject.toml SHA-256",
+    "lane uv.lock SHA-256",
+    "registry source SHA-256",
+    "contract source SHA-256",
+    "isolated Python executable and prefix",
+    "GluonTS and Torch runtime versions"
   ],
-  "focused_tests": 21,
+  "p7_artifacts": [
+    "p7_target_machine_audit.json",
+    "p7_failure_matrix.json",
+    "p7_artifact_manifest.json",
+    "P7_SHA256SUMS",
+    "P7_EXECUTION_SHA256SUMS",
+    "gpu_process_monitor.log",
+    "compat_bootstrap.rc",
+    "latest_bootstrap.rc",
+    "p7_audit.rc"
+  ],
+  "p7_focused_tests": 9,
   "real_runtime_claims": "EXECUTION_PENDING",
-  "formally_verified_lifecycles": 0,
-  "next_phase": "P7_TARGET_MACHINE_EXECUTION_AND_FAILURE_CLASSIFICATION",
+  "formally_verified_model_lane_lifecycles": 0,
+  "next_phase": "P7B_TARGET_MACHINE_RUN_AND_EVIDENCE_BACKED_REMEDIATION",
   "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
 }
