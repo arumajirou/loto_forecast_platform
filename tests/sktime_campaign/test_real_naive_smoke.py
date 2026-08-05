@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 from importlib.metadata import version
+from importlib.util import find_spec
 
 import pytest
 
-pytest.importorskip("sktime")
-
 from loto.sktime_campaign.protocol import ProviderRequest
 from loto.sktime_campaign.runtime import run_naive_smoke
+
+pytestmark = pytest.mark.skipif(
+    find_spec("sktime") is None,
+    reason="sktime is isolated from the default project test environment",
+)
 
 
 def test_real_naive_fit_predict_save_load(tmp_path) -> None:
