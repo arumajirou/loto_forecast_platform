@@ -137,11 +137,24 @@ def _validate_model_data_preconditions(
     if contract.minimum_seasons is None:
         return
     season_length = parameters.get("season_length")
-    if not isinstance(season_length, int) or isinstance(season_length, bool):
-        raise ValueError(f"model {model_name} requires integer season_length")
-    if season_length < 1:
-        raise ValueError("season_length must be positive")
-    required_rows = contract.minimum_seasons * season_length
+    if isinstance(season_length, int) and not isinstance(season_length, bool):
+        seasonalities = (season_length,)
+    elif isinstance(season_length, (list, tuple)) and season_length:
+        seasonalities = tuple(season_length)
+        if any(
+            not isinstance(value, int)
+            or isinstance(value, bool)
+            or value < 1
+            for value in seasonalities
+        ):
+            raise ValueError("season_length values must be positive integers")
+    else:
+        raise ValueError(
+            f"model {model_name} requires integer or non-empty sequence season_length"
+        )
+    if any(value < 1 for value in seasonalities):
+        raise ValueError("season_length values must be positive")
+    required_rows = contract.minimum_seasons * max(seasonalities)
     too_short = {
         str(unique_id): len(group)
         for unique_id, group in panel.groupby("unique_id", sort=False)
@@ -183,7 +196,7 @@ class StatsForecastRuntimeAdapter:
         freq: int | str,
         horizon: int,
         parameters: dict[str, Any] | None = None,
-        levels: tuple[int, ...] = (80, 90),
+        levels: tuple[int, ...] | None = (80, 90),
     ) -> tuple[pd.DataFrame, dict[str, Any]]:
         validate_long_panel(panel)
         if horizon < 1:
@@ -196,7 +209,12 @@ class StatsForecastRuntimeAdapter:
         )
         model = self.build_model(model_name, resolved_parameters)
         engine = self.core_class(models=[model], freq=freq, n_jobs=1)
-        prediction = engine.forecast(df=panel.copy(deep=True), h=horizon, level=list(levels))
+        level_values = None if levels is None else list(levels)
+        prediction = engine.forecast(
+            df=panel.copy(deep=True),
+            h=horizon,
+            level=level_values,
+        )
         unique_ids = {str(value) for value in panel["unique_id"].unique()}
         expected_rows = len(unique_ids) * horizon
         evidence = validate_forecast_output(
