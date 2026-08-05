@@ -64,12 +64,7 @@ def test_local_combined_metrics_preserve_config_index(tmp_path: Path) -> None:
             zip(actual, predictions, strict=True),
             start=1,
         ):
-            task_root = (
-                tmp_path
-                / "tasks"
-                / f"config-{config_index}"
-                / f"position-{position}"
-            )
+            task_root = tmp_path / "tasks" / f"config-{config_index}" / f"position-{position}"
             task_root.mkdir(parents=True)
             pd.DataFrame(
                 [
