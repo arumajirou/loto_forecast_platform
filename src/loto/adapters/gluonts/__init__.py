@@ -51,6 +51,15 @@ from loto.adapters.gluonts.p7_contract import (
     P7ModelClassification,
     P7TargetMachineAudit,
 )
+from loto.adapters.gluonts.p7b_contract import (
+    P7BExecutionJournal,
+    P7BExecutionManifest,
+    P7BExecutionState,
+    P7BSourceIdentity,
+    P7BStage,
+    P7BStageRecord,
+    P7BStageState,
+)
 from loto.adapters.gluonts.protocol import (
     ArgumentState,
     DatasetItem,
@@ -121,6 +130,13 @@ __all__ = [
     "P6StageInvocation",
     "P6Status",
     "P6_EXPECTED_MODELS",
+    "P7BExecutionJournal",
+    "P7BExecutionManifest",
+    "P7BExecutionState",
+    "P7BSourceIdentity",
+    "P7BStage",
+    "P7BStageRecord",
+    "P7BStageState",
     "P7CertificationStatus",
     "P7EvidenceState",
     "P7FailureCategory",
