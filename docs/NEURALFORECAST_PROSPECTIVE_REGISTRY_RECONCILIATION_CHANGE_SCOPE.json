@@ -41,7 +41,8 @@
     "formal_pyarrow": "EXECUTION_PENDING",
     "live_postgres_read": "EXECUTION_PENDING",
     "live_mlflow_read_and_artifact_download": "EXECUTION_PENDING",
-    "github_actions": "PENDING",
+    "github_actions": "CI_BLOCKED_PRE_RUN_STEPS_NULL",
+    "github_actions_latest_ids": "RECORDED_IN_PULL_REQUEST_BODY",
     "merge": "USER_APPROVAL_REQUIRED"
   },
   "expected_changed_files": [
