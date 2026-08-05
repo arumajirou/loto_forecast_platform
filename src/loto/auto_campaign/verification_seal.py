@@ -129,7 +129,7 @@ def write_verification_seal(
         if isinstance(existing, dict):
             existing_stable = _normalize_existing_stable(existing)
             if existing_stable == stable and str(existing.get("sealed_at") or "").strip():
-                sealed_at = str(existing["sealed_at"])
+                return existing
 
     payload = {**stable, "sealed_at": sealed_at}
     write_json(target, payload)
