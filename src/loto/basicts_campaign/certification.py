@@ -9,6 +9,9 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from loto.basicts_campaign.dlinear_runtime_provenance import (
+    DLINEAR_MODULE_CONTRACTS,
+)
 from loto.basicts_campaign.installed_provenance import (
     EXPECTED_DISTRIBUTION_NAME,
     EXPECTED_IMPORT_NAME,
@@ -265,6 +268,71 @@ def _verify_identity_provenance(evidence: dict[str, Any]) -> None:
     )
 
 
+def _verify_dlinear_module_provenance(evidence: dict[str, Any]) -> None:
+    if evidence.get("dlinear_module_provenance_status") != "PASS":
+        raise CertificationError("DLinear module provenance status is not PASS")
+    modules = evidence.get("dlinear_runtime_modules")
+    if not isinstance(modules, list) or len(modules) != len(DLINEAR_MODULE_CONTRACTS):
+        raise CertificationError("DLinear runtime module evidence is incomplete")
+    by_label = {
+        item.get("label"): item
+        for item in modules
+        if isinstance(item, dict) and isinstance(item.get("label"), str)
+    }
+    if len(by_label) != len(DLINEAR_MODULE_CONTRACTS):
+        raise CertificationError("DLinear runtime module labels are invalid")
+
+    for label, module_name, entry, symbol in DLINEAR_MODULE_CONTRACTS:
+        item = by_label.get(label)
+        if item is None:
+            raise CertificationError(f"DLinear module evidence is missing: {label}")
+        required = {
+            "module_name": module_name,
+            "required_symbol": symbol,
+            "symbol_module": module_name,
+            "distribution_entry": entry,
+            "record_status": "PASS",
+            "record_hash_mode": "sha256",
+        }
+        for field, expected in required.items():
+            if item.get(field) != expected:
+                raise CertificationError(
+                    f"DLinear module evidence mismatch for {label}.{field}: "
+                    f"expected {expected!r}, got {item.get(field)!r}"
+                )
+        distribution_path = item.get("distribution_path")
+        spec_origin = item.get("import_spec_origin")
+        loaded_file = item.get("loaded_module_file")
+        if (
+            not isinstance(distribution_path, str)
+            or not Path(distribution_path).is_absolute()
+            or distribution_path != spec_origin
+            or distribution_path != loaded_file
+        ):
+            raise CertificationError(f"DLinear module path mismatch for {label}")
+        if not Path(distribution_path).as_posix().endswith(f"/{entry}"):
+            raise CertificationError(
+                f"DLinear distribution path suffix mismatch for {label}"
+            )
+        _require_record_digest(
+            item.get("record_hash_value"),
+            f"DLinear {label}.record_hash_value",
+        )
+        _require_record_size(
+            item.get("record_size_bytes"),
+            f"DLinear {label}.record_size_bytes",
+        )
+        module_digest = item.get("module_file_sha256")
+        if not isinstance(module_digest, str) or DIGEST_PATTERN.fullmatch(
+            module_digest
+        ) is None:
+            raise CertificationError(
+                f"DLinear module_file_sha256 is invalid for {label}"
+            )
+        if not isinstance(item.get("module_already_loaded"), bool):
+            raise CertificationError(f"DLinear module loaded-state is invalid for {label}")
+
+
 def verify_provider_bundle(directory: Path, operation: str) -> dict[str, Any]:
     """Verify one provider response bundle and operation-specific PASS evidence."""
 
@@ -308,6 +376,7 @@ def verify_provider_bundle(directory: Path, operation: str) -> dict[str, Any]:
             isinstance(value, int) and value > 0 for value in shape
         ):
             raise CertificationError("DLinear prediction shape is invalid")
+        _verify_dlinear_module_provenance(evidence)
     else:
         raise CertificationError(f"unsupported P0 operation: {operation}")
 
@@ -366,6 +435,7 @@ def certify_p0(
             "installed_package_git_provenance": True,
             "installed_record_integrity": True,
             "import_origin_bound_to_distribution": True,
+            "dlinear_module_origin_bound_to_distribution": True,
             "config_import_allowlist": True,
             "dlinear_cpu_fit_predict": True,
             "save_load_repredict_exact": True,
