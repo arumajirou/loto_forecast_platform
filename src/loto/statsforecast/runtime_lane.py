@@ -1,10 +1,10 @@
 """StatsForecast 2.1.1 isolated environment and evidence helpers."""
 
 from .runtime_lane_admission import (
-    inspect_target_host_archive,
     render_admission_markdown,
     write_admission_artifacts,
 )
+from .runtime_lane_admission_hardening import inspect_target_host_archive
 from .runtime_lane_artifacts import (
     PYPI_JSON_URL,
     TARGET_PACKAGE,

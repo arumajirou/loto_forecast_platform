@@ -19,7 +19,7 @@ Exit code `0` means `RUNTIME_CERTIFIED`. Exit code `2` means `MERGE_BLOCKED`.
 The gate requires all of the following:
 
 - outer ZIP and sidecar SHA-256 verification;
-- no ambiguous duplicate evidence files or special ZIP member types;
+- no ambiguous tuplicate evidence files or special ZIP member types;
 - Python 3.13, clean worktree, and the explicitly supplied Git commit;
 - successful lock, sync, certification, wheelhouse, and nested checksum evidence;
 - exact `statsforecast==2.1.1` package identity and hashed distribution files;
@@ -38,3 +38,10 @@ Generated admission evidence:
 
 The command does not merge, mark a PR ready, or certify predictive accuracy. It certifies
 only the submitted package's runtime and evidence contract.
+
+## Hardened point-certificate compatibility
+
+The exported admission entry point adds a second fail-closed layer for the hardened
+certifier. Every model row must prove point mode, no requested interval levels, CPU
+execution, GPU non-applicability, no GPU PID or VRAM claim, no CPU fallback, and
+`n_jobs=1`. Packages created by the earlier implicit-interval certifier are rejected.
