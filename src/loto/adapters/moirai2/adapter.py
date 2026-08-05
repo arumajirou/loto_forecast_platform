@@ -109,6 +109,48 @@ class Moirai2Adapter:
             )
         return response
 
+    @staticmethod
+    def _verify_covariate_response(
+        request: Moirai2ProviderRequest,
+        response: Moirai2ProviderResponse,
+    ) -> None:
+        expected_past = sorted(request.past_covariates)
+        expected_future = sorted(request.future_covariates)
+        evidence = response.covariate_evidence
+        if evidence is None:
+            raise Moirai2AdapterError(
+                "COVARIATE_EVIDENCE_MISSING",
+                "provider response must retain covariate evidence",
+            )
+        if evidence.past.names != expected_past:
+            raise Moirai2AdapterError(
+                "COVARIATE_IDENTITY_MISMATCH",
+                "past covariate names differ from the request",
+            )
+        if evidence.known_future.names != expected_future:
+            raise Moirai2AdapterError(
+                "COVARIATE_IDENTITY_MISMATCH",
+                "known-future covariate names differ from the request",
+            )
+        if expected_past and evidence.past.sha256 is None:
+            raise Moirai2AdapterError(
+                "COVARIATE_HASH_MISSING",
+                "past covariate matrix SHA-256 is required",
+            )
+        if expected_future and (
+            evidence.known_future.sha256 is None
+            or evidence.known_future_tail_sha256 is None
+        ):
+            raise Moirai2AdapterError(
+                "COVARIATE_HASH_MISSING",
+                "known-future matrix and tail SHA-256 values are required",
+            )
+        if evidence.actuals_used:
+            raise Moirai2AdapterError(
+                "FUTURE_LEAKAGE_DETECTED",
+                "provider reported actual values in covariate construction",
+            )
+
     def run(self, request: Moirai2ProviderRequest) -> Moirai2ProviderResponse:
         self.validate_environment()
         with tempfile.TemporaryDirectory(prefix="loto-moirai2-") as temporary:
@@ -148,4 +190,6 @@ class Moirai2Adapter:
             payload = json.loads(response_path.read_text(encoding="utf-8"))
             if process.returncode != 0 and payload.get("status") == "OK":
                 raise Moirai2AdapterError("PROVIDER_EXIT_MISMATCH", str(process.returncode))
-        return self.parse_response(payload)
+        response = self.parse_response(payload)
+        self._verify_covariate_response(request, response)
+        return response

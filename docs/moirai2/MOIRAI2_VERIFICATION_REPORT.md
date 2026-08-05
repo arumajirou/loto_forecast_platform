@@ -1,37 +1,39 @@
 # Moirai 2.0 Verification Report
 
-Status: `PARTIALLY_VERIFIED / LOCAL_CONTRACT_TESTS_PASS / REAL_RUNTIME_PENDING`.
+Status: `PARTIALLY_VERIFIED / P7_FAKE_RUNTIME_PASS / REAL_RUNTIME_PENDING`.
 
-## Executed locally
+## P0-P6 evidence retained from PR #83
 
 - focused pytest: `28 passed`;
 - Python `compileall`: `PASS`;
-- direct provider `identity` smoke: `PASS`;
-- JSON, TOML, and CSV parsing: `PASS`;
-- Python source lines over 100 characters: `0`;
-- Moirai-owned changed-path audit: `PASS`;
-- SHA-256 manifest verification: `PASS`;
-- simple secret-pattern scan: `PASS`.
+- provider identity smoke: `PASS`;
+- structured-file parsing, path audit, SHA-256 verification, and secret scan: `PASS`.
 
-The focused suite covers strict unknown-key rejection, dynamic position counts, horizons 1/2/5,
-legacy schema conversion, context non-clamping, covariate chronology and availability evidence,
-required game geometries, license fail-closed behavior, constrained integer projection, exact native
-quantile inventory, finite values, crossing rejection, deterministic draw mapping, calendar gaps,
-token budgets, package hashes, model hashes, and snapshot mismatch rejection.
+## P7 executed locally
+
+- changed-scope and related regression pytest: `30 passed`;
+- fake Torch/GluonTS/Uni2TS runner boundary: `PASS`;
+- past-only matrix shape and native field: `PASS`;
+- known-future history-plus-horizon shape and native field: `PASS`;
+- ordered feature identity and SHA-256 evidence: `PASS`;
+- calendar gap expansion: `PASS`;
+- target/covariate and cross-group collision rejection: `PASS`;
+- covariate-aware token-budget rejection: `PASS`;
+- univariate target shape and `one_dim_target=true`: `PASS`;
+- Python `compileall`: `PASS`;
+- Python source lines over 100 characters: `0`.
 
 ## Not executed or certified
 
-- Ruff and mypy were unavailable in the execution environment;
-- isolated `uv.lock` resolution and frozen synchronization;
-- installation of either runtime lane;
-- real Uni2TS import through an isolated lane;
-- snapshot download/cache verification against the actual 45.6 MB weight file;
-- real model load or q0.1-q0.9 inference;
-- separate-process snapshot reload and re-prediction;
-- CUDA PID, GPU UUID, VRAM before/peak/after, and external PID matching;
-- full repository pytest or GitHub Actions success;
-- OOF, Holdout, Prospective, accuracy, baseline superiority, calibration, or fine-tuning;
-- shared worker, catalog, CLI, registry, or production integration.
+- Ruff and mypy were unavailable in the authoring environment;
+- isolated lockfile resolution and frozen synchronization;
+- real Uni2TS import, snapshot load, or predictor execution;
+- real native covariate transform and observed-mask behavior;
+- all-nine-quantile inference with covariates;
+- separate-process reload and re-prediction;
+- CUDA PID, UUID, VRAM, and no-fallback certification;
+- full repository pytest or successful GitHub Actions steps;
+- OOF, Holdout, Prospective, accuracy, baseline superiority, calibration, or fine-tuning.
 
-No unexecuted item is represented as success. Research-only license policy keeps production
-champion eligibility and automatic promotion disabled.
+The fake boundary verifies project-side field names, shapes, dimensions, and response evidence. It is
+not represented as model-runtime certification.
