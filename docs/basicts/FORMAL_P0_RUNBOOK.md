@@ -84,9 +84,40 @@ A failed run returns exit code `2` and retains a diagnostic bundle with `status=
 
 ## Independent verification
 
+Run the read-only verifier after the formal command. Its report is deliberately written beside the
+source bundle so the original recursive manifest and checksum set remain immutable.
+
 ```bash
 RUN_DIR="${ARTIFACTS_ROOT}/${RUN_ID}"
+VERIFY_REPORT="${ARTIFACTS_ROOT}/${RUN_ID}.verification.json"
 
+PYTHONPATH="${PWD}/src" \
+python -m loto.basicts_campaign.formal_verification \
+  --run-dir "${RUN_DIR}" \
+  --output "${VERIFY_REPORT}"
+
+(
+  cd "${ARTIFACTS_ROOT}"
+  sha256sum -c "$(basename "${VERIFY_REPORT}").sha256"
+)
+
+python -m json.tool "${VERIFY_REPORT}"
+```
+
+The verifier fails closed on:
+
+- symbolic links or unsafe relative paths;
+- missing, duplicate, additional, or modified files;
+- recursive manifest or SHA-256 disagreement;
+- dependency metadata, uv version, Python lane, or package drift;
+- missing command logs or an unexpected command phase order;
+- non-frozen core model commands;
+- formal, preflight, core, certificate, or lock SHA-256 cross-link disagreement;
+- provider identity, allowlist, or DLinear evidence disagreement.
+
+The following shell checks remain useful as an independent implementation of the checksum review:
+
+```bash
 (
   cd "${RUN_DIR}"
   sha256sum -c SHA256SUMS
@@ -109,9 +140,12 @@ RUN_DIR="${ARTIFACTS_ROOT}/${RUN_ID}"
 )
 ```
 
-PASS requires all checksum commands to succeed and all three status documents to report `PASS`.
-For a formal run, `core/P0_RUN_STATUS.json` must also record
-`environment_mode=FORMAL_PREFLIGHT_REUSE`.
+PASS requires the verifier and all checksum commands to succeed. The verification report, formal
+status, dependency audit, core status, and core certificate must all report `PASS`. For a formal
+run, `core/P0_RUN_STATUS.json` must record `environment_mode=FORMAL_PREFLIGHT_REUSE`.
+
+The verification report certifies the retained evidence only. It does not rerun installation,
+training, inference, or accuracy evaluation.
 
 ## Mandatory review before promotion
 
