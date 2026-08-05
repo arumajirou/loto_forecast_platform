@@ -21,6 +21,7 @@ from .runtime_lane_end_to_end import (
     resolve_git_context,
     run_end_to_end_certification,
 )
+from .runtime_lane_triage import TriageResult, triage_end_to_end_run
 from .runtime_lane_target import (
     TargetHostResult,
     collect_target_host_preflight,
@@ -39,6 +40,7 @@ __all__ = [
     "TARGET_VERSION",
     "EndToEndResult",
     "TargetHostResult",
+    "TriageResult",
     "collect_target_host_preflight",
     "create_deterministic_zip",
     "execute_runtime_lane",
@@ -50,6 +52,7 @@ __all__ = [
     "resolve_git_context",
     "run_end_to_end_certification",
     "run_target_host_certification",
+    "triage_end_to_end_run",
     "select_compatible_release_file",
     "sha256_file",
     "verify_offline_bundle",
