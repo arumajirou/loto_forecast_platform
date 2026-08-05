@@ -46,27 +46,33 @@
 ## P8 Foundation increment
 
 - focused tests: 12 passed;
-- Chronos2, TimesFM2p5, TiRex, and PatchTSTFM identities: PASS;
-- stable capability-matrix SHA-256: PASS;
-- immutable model revision and local-artifact manifest contract: PASS;
-- variable input chunks and model-specific limits: PASS;
-- TiRex license and partial-fine-tuning restrictions: PASS;
-- runtime capability drift and unsupported-covariate rejection: PASS;
-- zero-shot and fine-tuning runtime-evidence gates: PASS;
-- package dependency failure retention: PASS;
-- local, multivariate, and global-sequence fake-runtime paths: PASS;
-- prediction shape, finite values, device evidence, and raw-frame immutability: PASS;
-- compileall, AST parse, YAML/JSON parse, and line-length inspection: PASS.
+- four identities and stable capability-matrix SHA-256: PASS;
+- immutable revision, artifact manifest, limits, and TiRex restrictions: PASS;
+- capability drift, zero-shot, and fine-tuning evidence gates: PASS;
+- fake-runtime layouts, finite predictions, device evidence, immutability: PASS.
 
-Documented focused increment runs total 57 tests. They were not all executed together in
-one environment, so this is not a single 57-test certification run.
+## P9 Historical evaluation increment
+
+- focused tests: 12 passed;
+- complete chronological origins and exact forecast-key coverage: PASS;
+- boolean/integer retrain schedules and prefit evidence: PASS;
+- Hit@±1, position Hit@±1, all-position Hit@±1, MAE, MSE, RMSE: PASS;
+- Darts backtest MAE/MSE/RMSE parity and mismatch rejection: PASS_CONTRACT;
+- residual sign, order, shape, and numeric parity: PASS_CONTRACT;
+- optimized/general historical forecast parity: PASS_CONTRACT;
+- API argument ledger and policy/record SHA-256: PASS;
+- source-frame immutability: PASS;
+- compileall, AST parse, YAML parse, and line-length inspection: PASS.
+
+Documented focused increment runs total 69 tests. They were not all executed together in
+one environment, so this is not a single 69-test certification run.
 
 ## Blocked
 
 - Ruff was unavailable from the configured package registry;
-- `darts==0.46.1` and its optional Foundation dependencies were unavailable;
+- `darts==0.46.1` and optional dependencies were unavailable;
 - notorch and torch lockfiles could not be generated;
 - Chronos2 and TiRex revisions remain intentionally unresolved in example configs;
-- no Foundation model download, local manifest, zero-shot, or fine-tuning run occurred;
+- no real Foundation or P9 historical-evaluation runtime occurred;
 - no real CUDA, persistence, accuracy, Holdout, or Prospective claim is made;
 - GitHub Actions jobs continue to fail before step creation and produce no logs.
