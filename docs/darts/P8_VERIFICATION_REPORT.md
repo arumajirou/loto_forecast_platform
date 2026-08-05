@@ -29,6 +29,6 @@ Not executed:
 - real CUDA, GPU PID, VRAM, or CPU-fallback certification;
 - real OOF, Holdout, Prospective, or Hit@±1 improvement.
 
-GitHub Actions run `30986557539` / #1088, job `92242545039`, failed before
+GitHub Actions run `30986655857` / #1097, job `92242867934`, failed before
 step creation with `steps=null` and no job logs. This is classified
 `CI_BLOCKED_PRE_RUN`, not a code or test failure.
