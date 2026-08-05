@@ -8,6 +8,8 @@ OUT="${OUT:-${ROOT}/artifacts/merlion-bootstrap/${RUN_ID}}"
 LOG="${OUT}/bootstrap.log"
 EXIT_FILE="${OUT}/exit_code"
 PYTHON_REQUEST="${MERLION_PYTHON:-3.11}"
+PREFLIGHT_MODE="${MERLION_PREFLIGHT_MODE:-GENERATE}"
+PREFLIGHT_PATH="${OUT}/PREFLIGHT.json"
 STAGE="initialize"
 mkdir -p "${OUT}"
 
@@ -58,11 +60,34 @@ echo "RUN_ID=${RUN_ID}"
 echo "ROOT=${ROOT}"
 echo "ENV_DIR=${ENV_DIR}"
 echo "PYTHON_REQUEST=${PYTHON_REQUEST}"
+echo "PREFLIGHT_MODE=${PREFLIGHT_MODE}"
 
-STAGE="preflight"
-python3 "${ROOT}/scripts/run_merlion_core_preflight.py" \
-  --root "${ROOT}" \
-  --output "${OUT}/PREFLIGHT.json"
+case "${PREFLIGHT_MODE}" in
+  GENERATE)
+    STAGE="preflight"
+    python3 "${ROOT}/scripts/run_merlion_core_preflight.py" \
+      --root "${ROOT}" \
+      --output "${PREFLIGHT_PATH}"
+    ;;
+  REUSE)
+    STAGE="preflight_reuse"
+    test -f "${PREFLIGHT_PATH}"
+    test ! -L "${PREFLIGHT_PATH}"
+    LINEAGE_ARGS=(--preflight "${PREFLIGHT_PATH}")
+    if [[ -n "${MERLION_PREFLIGHT_REPORT_SHA256:-}" ]]; then
+      LINEAGE_ARGS+=(
+        --expected-report-sha256
+        "${MERLION_PREFLIGHT_REPORT_SHA256}"
+      )
+    fi
+    python3 "${ROOT}/scripts/verify_merlion_bootstrap_lineage.py" \
+      "${LINEAGE_ARGS[@]}"
+    ;;
+  *)
+    echo "BLOCKED: invalid MERLION_PREFLIGHT_MODE=${PREFLIGHT_MODE}" >&2
+    exit 2
+    ;;
+esac
 
 STAGE="uv_identity"
 command -v uv
@@ -126,7 +151,7 @@ PY
 
 STAGE="complete"
 echo "BOOTSTRAP_STATUS=PASS"
-echo "NEXT_ACTION=review and commit environments/merlion-core-py311/uv.lock"
+echo "NEXT_ACTION=review and admit environments/merlion-core-py311/uv.lock"
 
 if [[ -t 0 && "${WAIT_FOR_ENTER:-1}" == "1" ]]; then
   read -r -p "Press Enter to close..." _
