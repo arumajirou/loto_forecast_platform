@@ -5,7 +5,9 @@
 - Pull request: `#48`;
 - branch: `agent/hierarchicalforecast-runtime-certification`;
 - base: `main`;
-- status: `PARTIALLY_VERIFIED / LOCK_CONTRACT_TESTS_PASS / CI_BLOCKED_RUNNER_START`;
+- status: `PARTIALLY_VERIFIED / LOCK_CONTRACT_TESTS_PASS / CI_BLOCKED_PRE_RUN`;
+- canonical repository CI blocker: `#58`;
+- PR-specific dependency tracker: `#61`;
 - Draft: retained;
 - review-ready authorization: none;
 - merge authorization: none.
@@ -139,10 +141,19 @@ A formal run must stop rather than install an unlocked substitute.
 5. Execute real installed HierarchicalForecast 1.5.1 for all 40 cases.
 6. Publish and independently verify the real `/mnt/e` ZIP and sidecar.
 7. Record all quality/runtime/operator/promotion Run IDs and hashes.
-8. Resolve issue #61 with an Actions run containing real successful steps and logs.
+8. Resolve canonical issue #58 with an Actions run containing real successful steps and logs.
 
-Current GitHub Actions failures occur before step creation (`steps=null`, no job log). They are not
-Python test-failure evidence. Do not repeatedly rerun until an external condition changes.
+Issue #61 records only this PR's dependency on #58. Current Actions failures occur before step
+creation, with an empty API step list and no job-log blob. They are not Python test-failure
+evidence. Do not repeatedly rerun or append a comment for every unchanged branch head.
+
+## Owner-side CI action
+
+Inspect repository **Settings → Actions → General**, account **Billing & plans → Metered usage /
+Budgets and alerts**, repository **Settings → Actions → Runners**, and the failed run page for any
+billing, policy, account, or runner banner. If GitHub reports account/repository Actions disabled
+and normal settings cannot restore it, contact GitHub Support. Record any materially new finding in
+issue #58.
 
 ## Evidence to return after execution
 
@@ -187,6 +198,7 @@ claim is supported by this runtime certification work.
 
 ## Recommended next action
 
-Run the exact formal continuation command above on the target machine. Keep the PR Draft unless the
-entire local promotion gate and a real-step GitHub Actions run both pass and the verification report
-is updated with every required identifier and hash.
+First complete the owner-side Actions checks recorded in issue #58. After the external condition is
+changed, run the exact formal continuation command above on the target machine. Keep the PR Draft
+unless the entire local promotion gate and a real-step GitHub Actions run both pass and the
+verification report is updated with every required identifier and hash.
