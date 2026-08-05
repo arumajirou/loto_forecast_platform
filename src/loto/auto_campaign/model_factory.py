@@ -12,6 +12,14 @@ from loto.models.neuralforecast_search_policy import (
     resolve_search_policy,
 )
 
+from loto.models.neuralforecast_search_space import (
+    SearchSpaceProfile,
+    profile_fixed_config,
+    profile_optuna_config,
+    profile_ray_config,
+)
+from loto.models.neuralforecast_search_space_artifacts import persist_search_space_artifacts
+
 from .contracts import CampaignConfig
 from .data_tracks import hint_summing_matrix
 from .domains import freeze_config
@@ -19,15 +27,65 @@ from .registry import get_auto_class, get_default_config
 from .trial_persistence import persistent_auto_class
 
 
+
+def _search_space_evidence_root(trial_root: Path) -> Path:
+    """Return a task-key-specific evidence directory that survives task failure."""
+
+    resolved = trial_root.resolve()
+    for parent in (resolved, *resolved.parents):
+        if parent.name == "trial_work":
+            relative = resolved.relative_to(parent)
+            return parent.parent / "search_space_profiles" / relative
+    return resolved / "search_space_profile"
+
+
+def _search_space_profile(
+    *,
+    model_name: str,
+    backend: str,
+    config_value: Any,
+    fixed_values: dict[str, Any] | None,
+) -> SearchSpaceProfile:
+    if fixed_values is not None:
+        return profile_fixed_config(fixed_values, backend=backend, model_name=model_name)
+    if backend == "ray":
+        if not isinstance(config_value, dict):
+            raise TypeError("Ray search-space profile requires a dict config")
+        return profile_ray_config(config_value, model_name=model_name)
+    if not callable(config_value):
+        raise TypeError("Optuna search-space profile requires a callable config")
+    return profile_optuna_config(config_value, model_name=model_name)
+
+
+def _persist_search_space_profile(
+    *,
+    trial_root: Path,
+    profile: SearchSpaceProfile,
+    model_name: str,
+    backend: str,
+    alias: str,
+    seed: int,
+    num_samples: int,
+    smoke: bool,
+) -> dict[str, Any]:
+    return persist_search_space_artifacts(
+        _search_space_evidence_root(trial_root),
+        profile,
+        context={
+            "model_name": model_name,
+            "backend": backend,
+            "alias": alias,
+            "seed": seed,
+            "num_samples": num_samples,
+            "smoke": smoke,
+            "trial_root": str(trial_root),
+        },
+    )
+
 def _ray_options(config: CampaignConfig):
     from neuralforecast.common._base_auto import RayOptions
     from ray import tune
 
-    # NeuralForecast falls back to `ray.air.RunConfig(...)` internally
-    # (_base_auto.py) whenever `RayOptions.run_config` is None, which triggers
-    # Ray's "RunConfig class should be imported from ray.tune" deprecation
-    # warning. Supplying our own `tune.RunConfig` here avoids that fallback
-    # entirely rather than suppressing the warning it would raise.
     return RayOptions(
         run_config=tune.RunConfig(callbacks=None, verbose=1),
         cpus=config.resources.cpus_per_trial,
@@ -74,8 +132,6 @@ def _search_materialization(
 
 
 def _trainer_controls(config: CampaignConfig, *, seed: int) -> dict[str, Any]:
-    """Settings that must be explicit in every model/trial configuration."""
-
     return {
         "accelerator": config.resources.accelerator,
         "devices": config.resources.devices,
@@ -96,8 +152,6 @@ def _augment_search_config(
     backend: str,
     controls: dict[str, Any],
 ) -> Any:
-    """Keep official search domains while adding campaign runtime controls."""
-
     if backend == "ray":
         if not isinstance(value, dict):
             raise TypeError("Ray AutoModel config must be a dict")
@@ -144,8 +198,6 @@ def _common_kwargs(
         "callbacks": None,
         "ray_options": _ray_options(config) if backend == "ray" else RayOptions(),
         "optuna_options": _optuna_options() if backend == "optuna" else OptunaOptions(),
-        # These remain explicit for API coverage. NeuralForecast 3.2.0 rejects
-        # any non-None value, so resources are passed through RayOptions.
         "cpus": None,
         "gpus": None,
     }
@@ -163,15 +215,6 @@ def _constructor_argument_decisions(
     *,
     strict_keys: set[str],
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    """Classify every proposed constructor argument before model creation.
-
-    Explicit user overrides are fail-closed: when the installed NeuralForecast
-    class does not accept one, model construction is rejected instead of
-    silently dropping it. Framework-supplied common arguments that are absent
-    from a model-specific signature are retained in an auditable ledger as
-    ``NOT_APPLICABLE`` or ``UNSUPPORTED_BY_VERSION``.
-    """
-
     signature = inspect.signature(cls)
     accepts_var_kwargs = any(
         parameter.kind is inspect.Parameter.VAR_KEYWORD
@@ -212,7 +255,10 @@ def _constructor_argument_decisions(
 def _artifact_kwargs(
     effective_kwargs: dict[str, Any],
     ledger: list[dict[str, Any]],
-    search_policy: SearchPolicyDecision,
+    search_policy: SearchPolicyDecision | None = None,
+    *,
+    search_space_profile: SearchSpaceProfile | None = None,
+    search_space_artifacts: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     artifact = dict(effective_kwargs)
     artifact.update(
@@ -222,7 +268,15 @@ def _artifact_kwargs(
             "unexplained_dropped_arguments": [
                 row["argument"] for row in ledger if row["status"] == "DROPPED"
             ],
-            "search_policy": search_policy.model_dump(mode="json"),
+            "search_policy": (
+                search_policy.model_dump(mode="json") if search_policy is not None else None
+            ),
+            "search_space_profile": (
+                search_space_profile.model_dump(mode="json")
+                if search_space_profile is not None
+                else None
+            ),
+            "search_space_artifacts": search_space_artifacts,
         }
     )
     return artifact
@@ -285,6 +339,23 @@ def _hint_model(
     else:
         config_value = base_config
 
+    search_space_profile = _search_space_profile(
+        model_name="AutoHINT",
+        backend=backend,
+        config_value=config_value,
+        fixed_values=base_config if fixed_config is not None or smoke else None,
+    )
+    search_space_artifacts = _persist_search_space_profile(
+        trial_root=trial_root,
+        profile=search_space_profile,
+        model_name="AutoHINT",
+        backend=backend,
+        alias=alias,
+        seed=seed,
+        num_samples=num_samples,
+        smoke=smoke,
+    )
+
     proposed_kwargs, search_policy = _common_kwargs(
         config=config,
         backend=backend,
@@ -310,7 +381,15 @@ def _hint_model(
     model.trial_artifact_root = str(trial_root)
     model.argument_coverage = ledger
     model.search_policy_decision = search_policy.model_dump(mode="json")
-    return model, config_value, _artifact_kwargs(kwargs, ledger, search_policy)
+    model.search_space_profile = search_space_profile.model_dump(mode="json")
+    model.search_space_artifacts = search_space_artifacts
+    return model, config_value, _artifact_kwargs(
+        kwargs,
+        ledger,
+        search_policy,
+        search_space_profile=search_space_profile,
+        search_space_artifacts=search_space_artifacts,
+    )
 
 
 def build_auto_model(
@@ -371,8 +450,6 @@ def build_auto_model(
         )
         config_value = _fixed_optuna_config(requested) if backend == "optuna" else requested
     else:
-        # Formal HPO retains the official model-specific search domain and only
-        # overlays deterministic trainer/resource controls.
         official = get_default_config(
             model_name,
             h=config.h,
@@ -385,6 +462,24 @@ def build_auto_model(
             controls=controls,
         )
         requested = config_value
+
+    fixed_values = requested if isinstance(requested, dict) and (fixed_config is not None or smoke) else None
+    search_space_profile = _search_space_profile(
+        model_name=model_name,
+        backend=backend,
+        config_value=config_value,
+        fixed_values=fixed_values,
+    )
+    search_space_artifacts = _persist_search_space_profile(
+        trial_root=trial_root,
+        profile=search_space_profile,
+        model_name=model_name,
+        backend=backend,
+        alias=alias,
+        seed=seed,
+        num_samples=num_samples,
+        smoke=smoke,
+    )
 
     signature = inspect.signature(original_cls)
     proposed_kwargs, search_policy = _common_kwargs(
@@ -400,7 +495,6 @@ def build_auto_model(
             raise ValueError(f"{model_name} requires n_series")
         proposed_kwargs["n_series"] = n_series
 
-    # Keep model-specific loss defaults by not overriding loss/valid_loss.
     kwargs, ledger = _constructor_argument_decisions(
         original_cls,
         proposed_kwargs,
@@ -410,4 +504,12 @@ def build_auto_model(
     model.trial_artifact_root = str(trial_root)
     model.argument_coverage = ledger
     model.search_policy_decision = search_policy.model_dump(mode="json")
-    return model, requested, _artifact_kwargs(kwargs, ledger, search_policy)
+    model.search_space_profile = search_space_profile.model_dump(mode="json")
+    model.search_space_artifacts = search_space_artifacts
+    return model, requested, _artifact_kwargs(
+        kwargs,
+        ledger,
+        search_policy,
+        search_space_profile=search_space_profile,
+        search_space_artifacts=search_space_artifacts,
+    )
