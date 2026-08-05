@@ -1,0 +1,35 @@
+{
+  "schema_version": "change-scope-v1",
+  "scope_id": "neuralforecast-api-coverage-state",
+  "stacked_base_branch": "agent/p0-runtime-certification",
+  "stacked_base_sha": "dde70b5372d16651004d3a2a39f45935745250c6",
+  "dependency_pr": 43,
+  "in_scope": [
+    "static argument catalog and API result reconciliation",
+    "all-36-AutoModel constructor signature matrix",
+    "supported backend default-config probes",
+    "fail-closed coverage status validation",
+    "CSV, Parquet, JSON, manifest, and SHA256SUMS artifacts",
+    "unit and CPU contract tests"
+  ],
+  "out_of_scope": [
+    "GPU fit execution",
+    "GPU reload inference",
+    "GPU PID or VRAM certification",
+    "target-host CPU fallback rejection",
+    "accuracy evaluation",
+    "Holdout evaluation",
+    "Prospective prediction"
+  ],
+  "execution_boundaries": {
+    "cpu_ci": "REQUIRED",
+    "local_gpu": "EXECUTION_PENDING",
+    "merge": "USER_APPROVAL_REQUIRED"
+  },
+  "expected_changed_files": [
+    "docs/NEURALFORECAST_API_COVERAGE_CHANGE_SCOPE.json",
+    "docs/NEURALFORECAST_API_COVERAGE_STATE.md",
+    "src/loto/auto_campaign/coverage_state.py",
+    "tests/auto_campaign/test_coverage_state.py"
+  ]
+}
