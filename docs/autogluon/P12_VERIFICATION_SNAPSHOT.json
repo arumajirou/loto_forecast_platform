@@ -1,0 +1,39 @@
+{
+  "compileall": "PASS",
+  "files": {
+    "docs/autogluon/P12_OFFICIAL_API_COMPATIBILITY.md": {
+      "bytes": 2017,
+      "sha256": "fdf1172caf3ea3d2395cf6c002fc87694d08b45b40aa71714009dcf4e57ca40d"
+    },
+    "src/loto/adapters/autogluon/api_contract.py": {
+      "bytes": 3767,
+      "sha256": "9dc9ada222fb6aae9cad0ddc83d634d9925dd958f58a0a63d5a4f6aa5f2ba475"
+    },
+    "src/loto/adapters/autogluon/strict_provider.py": {
+      "bytes": 5629,
+      "sha256": "01af893dd910f0caefa765b0da38fa8d759400fc167e3019595591bef2199b56"
+    },
+    "tests/adapters/autogluon/test_api_contract.py": {
+      "bytes": 2255,
+      "sha256": "765401a7d09f81dcfbe8909fbdf9fd0ab27e9414a1447740b8214bccc1438ba7"
+    },
+    "tests/adapters/autogluon/test_strict_provider.py": {
+      "bytes": 4992,
+      "sha256": "dea5e0db0ec7fe4d73559274bd25c49810e82ef127354da8d1b941478bee992a"
+    }
+  },
+  "focused_tests": {
+    "failed": 0,
+    "passed": 63
+  },
+  "full_pytest": "NOT_RUN",
+  "github_ci": "CI_BLOCKED_PRE_RUN",
+  "line_length_over_100": 0,
+  "mypy": "NOT_RUN",
+  "official_api_version": "1.5.0",
+  "phase": "AUTOGLUON_P12_OFFICIAL_API_COMPATIBILITY",
+  "real_autogluon_runtime": "BLOCKED_RUNTIME",
+  "ruff": "NOT_AVAILABLE",
+  "schema_version": 1,
+  "status": "PARTIALLY_VERIFIED"
+}
