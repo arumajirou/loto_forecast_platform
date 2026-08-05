@@ -1,6 +1,6 @@
 # BasicTS isolated provider contract
 
-Status: `PARTIALLY_VERIFIED / LOCAL_FORMAL_P0_CONTRACT_PASS / REAL_RUNTIME_PENDING`
+Status: `PARTIALLY_VERIFIED / LOCAL_FORMAL_P0_EVIDENCE_VERIFIER_PASS / REAL_RUNTIME_PENDING`
 
 This directory documents the first BasicTS integration increment. It deliberately avoids the
 root dependency graph, shared workers, shared catalogs, Holdout, Prospective, GPU, and DDP paths.
@@ -10,15 +10,9 @@ root dependency graph, shared workers, shared catalogs, Holdout, Prospective, GP
 - repository: `GestaltCogTeam/BasicTS`
 - package version: `1.1.0`
 - revision: `c2bb6e31e591167e84459775a21a62e70a5893ce`
-- isolated lane: CPython 3.11
-- uv version: `0.12.0`
-- resolution cutoff: `2026-08-05T00:00:00Z`
+- isolated lane: Python 3.11
 
-The fixed upstream requirements include `easy-torch==1.3.3`, `numpy==1.24.4`,
-`setuptools==59.5.0`, and `transformers==4.40.1`. The isolated environment keeps those
-compatibility-sensitive versions separate from the root project.
-
-The provider must receive:
+The launcher must export:
 
 ```bash
 export BASICTS_UPSTREAM_REVISION=c2bb6e31e591167e84459775a21a62e70a5893ce
@@ -54,147 +48,66 @@ retained.
 
 ## Formal P0 target-host orchestration
 
-Run from a clean checkout of this Draft PR on a network-capable host with `git`, uv `0.12.0`, and
-Python available. Tracked changes must be committed before execution. Existing formal and staging
-directories are never overwritten.
+Use `docs/basicts/FORMAL_P0_RUNBOOK.md` from a clean checkout of Draft PR #56 on a
+network-capable host. The formal sequence fixes uv `0.12.0`, CPython 3.11, the BasicTS Git
+revision, dependency versions, the resolution cutoff, and seed `1`.
 
-```bash
-set -Eeuo pipefail
+The sequence performs:
 
-cd /mnt/e/env/ts/loto_forecast_platform || exit 1
+1. isolated environment-contract verification;
+2. one dependency lock and one explicit frozen synchronization;
+3. structured `uv workspace metadata --locked` auditing;
+4. Git and request provenance capture;
+5. identity and configuration allowlist checks;
+6. DLinear CPU fit, predict, save, strict load, and exact re-prediction;
+7. lock immutability checks;
+8. recursive manifests and portable SHA-256 evidence;
+9. atomic final publication only after dependency and runtime checks pass.
 
-uv --version
+Failed runs retain diagnostic evidence but never claim certification.
 
-RUN_ID="basicts-formal-p0-$(date -u +%Y%m%d-%H%M%S)"
+## Independent evidence verification
 
-PYTHONPATH="${PWD}/src" \
-python -m loto.basicts_campaign.formal_orchestration \
-  --repo-root "${PWD}" \
-  --artifacts-root "${PWD}/artifacts/basicts/formal-p0" \
-  --run-id "${RUN_ID}" \
-  --timeout-seconds 1800
-```
+`loto.basicts_campaign.formal_verification` performs a read-only verification after the formal run.
+Its report is written outside the source bundle so the original manifest and checksum set remain
+unchanged.
 
-The formal orchestrator first runs an immutable dependency-resolution preflight:
+It verifies:
 
-1. verifies the isolated `pyproject.toml` direct dependency contract;
-2. requires uv `0.12.0`;
-3. resolves with CPython 3.11 and the configured `exclude-newer` cutoff;
-4. runs `uv lock --check`;
-5. runs `uv sync --frozen`;
-6. captures `uv workspace metadata --locked` as JSON;
-7. rejects workspace conflicts and a non-CPython or non-3.11 environment;
-8. verifies the BasicTS Git repository, exact commit, and package version;
-9. verifies exact resolved versions for BasicTS, easy-torch, numpy, setuptools, torch, and
-   transformers;
-10. records the environment input SHA-256, lock SHA-256, metadata SHA-256, commands, and logs.
+- exact recursive file sets, manifests, sizes, and SHA-256 values;
+- absence of symbolic links and unsafe relative paths;
+- uv, Python, resolution cutoff, direct dependency, and resolved package evidence;
+- preflight and core command phase order plus retained logs;
+- frozen core commands and `FORMAL_PREFLIGHT_REUSE`;
+- formal, preflight, core, certificate, and lock SHA-256 cross-links;
+- provider identity, import allowlist, and DLinear evidence.
 
-Only after preflight PASS does it run the existing P0 sequence:
-
-1. records the exact Git commit and rejects tracked uncommitted changes;
-2. copies the three request files into a unique core run directory;
-3. replaces only each copied request's `output_dir`;
-4. records each request SHA-256 and seed;
-5. proves that the isolated interpreter is Python 3.11;
-6. executes `identity`, `validate_config`, and `dlinear_smoke` in order;
-7. verifies all provider manifests and portable checksums;
-8. writes a core P0 certificate only when every required check passes.
-
-The formal wrapper then verifies that `uv.lock` did not change between preflight and core P0. It
-publishes the staging directory atomically only when both parts pass. A failed formal run is also
-published as a diagnostic bundle, but it records `status=FAILED` and never claims certification.
-
-The provider entrypoint bootstraps the repository `src` directory itself. It therefore does not
-depend on an inherited `PYTHONPATH` after the isolated process starts.
-
-## Formal result verification
-
-The command prints `BASICTS_FORMAL_P0_STATUS=PASS` only after dependency and runtime certification.
-Use the emitted `RUN_DIR` for independent verification:
-
-```bash
-RUN_DIR="artifacts/basicts/formal-p0/<RUN_ID>"
-
-(
-  cd "${RUN_DIR}"
-  sha256sum -c SHA256SUMS
-  python -m json.tool FORMAL_P0_STATUS.json
-  python -m json.tool preflight/UV_RESOLUTION_AUDIT.json
-  python -m json.tool core/P0_RUN_STATUS.json
-  python -m json.tool core/P0_CERTIFICATION_REPORT.json
-)
-```
-
-A successful formal run creates at least:
-
-- `FORMAL_P0_STATUS.json`
-- `FORMAL_P0_MANIFEST.json`
-- `SHA256SUMS`
-- `preflight/UV_WORKSPACE_METADATA.json`
-- `preflight/UV_RESOLUTION_AUDIT.json`
-- `preflight/UV_RESOLUTION_AUDIT.json.sha256`
-- `preflight/logs/*.stdout.log`
-- `preflight/logs/*.stderr.log`
-- `core/P0_RUN_STATUS.json`
-- `core/P0_RUN_MANIFEST.json`
-- `core/P0_CERTIFICATION_REPORT.json`
-- `core/P0_CERTIFICATION_REPORT.json.sha256`
-- all three provider evidence bundles
-
-A failed phase returns exit code `2`, records `status=FAILED`, identifies `failed_phase`, retains
-available command return codes and logs, and does not create a successful formal certificate.
-
-## Formal P0 acceptance requirements
-
-Formal PASS requires all of the following:
-
-- exact isolated direct dependency inputs;
-- uv `0.12.0` and the fixed resolution cutoff;
-- an up-to-date, non-empty `uv.lock`;
-- structured workspace metadata with no conflicts;
-- BasicTS `1.1.0` from the exact frozen Git commit;
-- easy-torch `1.3.3`;
-- numpy `1.24.4`;
-- setuptools `59.5.0`;
-- torch `2.9.1`;
-- transformers `4.40.1`;
-- CPython 3.11 in the isolated environment;
-- exact BasicTS version and revision in every provider response;
-- portable `SHA256SUMS` verification with no missing, extra, or duplicate entries;
-- artifact manifest file-set, size, and SHA-256 agreement;
-- real allowlisted configuration imports;
-- DLinear CPU fit and predict with finite state and output;
-- save, strict load, and exact re-prediction equality;
-- no symbolic links inside the final formal evidence tree;
-- unchanged `uv.lock` between resolution audit and core runtime.
-
-After a successful target-host run, the generated isolated `uv.lock` still requires human review
-and a normal commit before this Draft PR can be considered for review. Runtime success alone does
-not imply merge readiness.
+The independent report certifies retained evidence only. It does not rerun installation, training,
+inference, or accuracy evaluation.
 
 ## Local contract verification
 
-This execution environment does not contain BasicTS and cannot access the external dependency
-sources. The current evidence is therefore limited to local contract batches:
+The current execution environment cannot install the real upstream BasicTS dependency. Evidence is
+therefore separated into local contract batches:
 
-- existing contract and certification batch: `16 passed`;
-- orchestration and entrypoint batch: `10 passed`;
-- structured lock audit and formal wrapper batch: `12 passed`;
-- optional real BasicTS smoke: `1 skipped`;
+- contract and certification: `16 passed`;
+- orchestration and entrypoint: `10 passed`;
+- structured lock audit and formal wrapper: `12 passed`;
+- independent formal evidence verifier: `7 passed`;
+- optional real BasicTS smoke: `1 skipped` and not counted as success;
 - compileall: `PASS`;
 - 100-character line audit: `PASS`.
 
-The skipped runtime test is not counted as success. The local batches were run separately and are
-not presented as a real BasicTS runtime result.
+No real target-host dependency resolution, reviewed `uv.lock`, BasicTS runtime certificate, or
+merge-readiness claim is made.
 
 ## Certification boundaries
 
 This increment does not claim:
 
-- successful target-host dependency resolution;
-- a reviewed or committed isolated `uv.lock`;
-- real BasicTS 1.1.0 runtime execution;
-- a target-host formal P0 certificate;
+- successful target-host dependency installation;
+- a reviewed or committed isolated lockfile;
+- a real formal P0 certificate;
 - BasicTS Launcher or Runner execution;
 - baseline or model inventory completeness;
 - TensorBoard, distributed, GPU, AMP, or DDP certification;
