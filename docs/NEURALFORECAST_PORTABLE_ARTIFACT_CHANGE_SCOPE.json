@@ -1,0 +1,47 @@
+{
+  "schema_version": "change-scope-v1.0.0",
+  "scope_id": "neuralforecast-portable-artifact-export",
+  "stacked_base_branch": "agent/p0-lineage-integrity",
+  "stacked_base_sha": "7c5aaa36648f7d216fa861a448a449171e9251e1",
+  "dependency_pr": 53,
+  "in_scope": [
+    "read-only export of a verified target run and its transitive lineage evidence",
+    "separate original-absolute-path to package-relative-path relocation manifest",
+    "unchanged source LINEAGE.json, manifests, verification reports, seals, and SHA manifests",
+    "deterministic atomic Zip64 archive generation with streaming I/O",
+    "portable manifest canonical self-hash and complete portable SHA256 listing",
+    "relocated verification of target and every transitive lineage-bearing dependency",
+    "source, predecessor, coverage, configuration, data contract, promotion gate, and runtime report hash checks",
+    "ZIP traversal, symlink, duplicate, case-fold collision, Windows drive and reserved-name rejection",
+    "CLI export-portable and verify-portable commands without campaign config loading",
+    "focused export, relocation, mutation, determinism, CLI, and path-policy tests",
+    "operator documentation"
+  ],
+  "out_of_scope": [
+    "rewriting existing lineage files to use relative paths",
+    "mutating or rehashing source run directories",
+    "GPU model execution",
+    "model training, evaluation, or accuracy improvement",
+    "digital signatures or an external timestamp authority",
+    "encryption or secret redaction",
+    "remote object storage upload",
+    "unbounded resource-exhaustion protection for arbitrary hostile archives",
+    "merge or main branch changes"
+  ],
+  "execution_boundaries": {
+    "local_synthetic_smoke": "PASS",
+    "repository_ruff_compileall_pytest": "REQUIRED",
+    "github_actions": "PENDING",
+    "local_gpu": "NOT_APPLICABLE",
+    "merge": "USER_APPROVAL_REQUIRED"
+  },
+  "expected_changed_files": [
+    "docs/NEURALFORECAST_PORTABLE_ARTIFACT.md",
+    "docs/NEURALFORECAST_PORTABLE_ARTIFACT_CHANGE_SCOPE.json",
+    "src/loto/auto_campaign/cli.py",
+    "src/loto/auto_campaign/portable_artifact.py",
+    "tests/auto_campaign/test_portable_artifact.py",
+    "tests/auto_campaign/test_portable_artifact_cli.py",
+    "tests/auto_campaign/test_portable_path_policy.py"
+  ]
+}
