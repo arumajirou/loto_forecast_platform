@@ -3,8 +3,11 @@ set -Eeuo pipefail
 
 LANE="compat"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RUN_ID="${RUN_ID:-gluonts-p4-${LANE}-$(date -u +%Y%m%dT%H%M%SZ)}"
+REPO_ROOT="$(cd "${ROOT}/../.." && pwd)"
+RUN_ID="${RUN_ID:-gluonts-p5-${LANE}-$(date -u +%Y%m%dT%H%M%SZ)}"
 OUT="${1:-${ROOT}/artifacts/${RUN_ID}}"
+PROVIDER_ARTIFACT_ROOT="${OUT}/provider-artifacts"
+PREDICTOR_ARTIFACT_DIR="${OUT}/predictor"
 
 command -v uv >/dev/null 2>&1 || {
   echo "BLOCKED: uv is required" >&2
@@ -19,60 +22,37 @@ uv sync --project "${ROOT}" --frozen
 uv run --project "${ROOT}" python -m loto_gluonts_provider --identity \
   > "${OUT}/identity.json"
 
-python - "${LANE}" "${RUN_ID}" "${OUT}/request.json" <<'PY'
-from __future__ import annotations
-
-import json
-import sys
-from pathlib import Path
-
-lane, run_id, destination = sys.argv[1:]
-payload = {
-    "schema_version": 1,
-    "request_id": f"{run_id}-deepar-cpu",
-    "run_id": run_id,
-    "lane": lane,
-    "operation": "runtime_certify",
-    "model_class": "DeepAREstimator",
-    "prediction_length": 1,
-    "context_length": 8,
-    "seed": 1,
-    "device": "cpu",
-    "arguments": {"run_deepar_cpu_smoke": True},
-    "resource_policy": {
-        "outer_workers": 8,
-        "max_gpu_jobs": 1,
-        "threads_per_job": 1,
-    },
-}
-Path(destination).write_text(
-    json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
-    encoding="utf-8",
-)
-PY
-
 set +e
-uv run --project "${ROOT}" python -m loto_gluonts_provider \
-  --request "${OUT}/request.json" \
-  --response "${OUT}/response.json" \
-  > "${OUT}/provider.stdout.log" \
-  2> "${OUT}/provider.stderr.log"
-PROVIDER_RC=$?
+PYTHONPATH="${REPO_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}" \
+  uv run --project "${ROOT}" python \
+  -m loto.adapters.gluonts.p5_cli \
+  --lane "${LANE}" \
+  --run-id "${RUN_ID}" \
+  --artifact-root "${PROVIDER_ARTIFACT_ROOT}" \
+  --predictor-artifact-dir "${PREDICTOR_ARTIFACT_DIR}" \
+  > "${OUT}/p5-lifecycle.stdout.log" \
+  2> "${OUT}/p5-lifecycle.stderr.log"
+LIFECYCLE_RC=$?
 set -e
 
-python - "${ROOT}" "${OUT}" "${PROVIDER_RC}" <<'PY'
+uv run --project "${ROOT}" python - \
+  "${ROOT}" "${OUT}" "${LIFECYCLE_RC}" "${LANE}" "${RUN_ID}" <<'PY'
 from __future__ import annotations
 
 import hashlib
 import importlib.metadata
 import json
+import os
 import platform
 import sys
+import tempfile
 from pathlib import Path
 
 root = Path(sys.argv[1])
 out = Path(sys.argv[2])
-provider_rc = int(sys.argv[3])
+lifecycle_rc = int(sys.argv[3])
+lane = sys.argv[4]
+run_id = sys.argv[5]
 
 
 def sha256(path: Path) -> str:
@@ -83,46 +63,36 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def label(path: Path) -> str:
-    try:
-        return str(path.relative_to(root))
-    except ValueError:
-        return str(path)
-
-
 def version(name: str) -> str | None:
     try:
         return importlib.metadata.version(name)
     except importlib.metadata.PackageNotFoundError:
         return None
 
-response_path = out / "response.json"
-if not response_path.exists():
-    raise SystemExit("FAILED: provider did not write response.json")
-response = json.loads(response_path.read_text(encoding="utf-8"))
-metadata = response.get("metadata", {})
-smoke = metadata.get("deep_ar_cpu_smoke", {})
-verified = (
-    provider_rc == 0
-    and response.get("status") == "PARTIALLY_VERIFIED"
-    and metadata.get("fit_predict_certified") is True
-    and metadata.get("device_certified") is True
-    and smoke.get("outcome") == "VERIFIED"
-)
 
-files = [
-    root / "pyproject.toml",
-    root / "uv.lock",
-    out / "identity.json",
-    out / "request.json",
-    out / "response.json",
-    out / "provider.stdout.log",
-    out / "provider.stderr.log",
-]
+stdout_path = out / "p5-lifecycle.stdout.log"
+lines = [line for line in stdout_path.read_text("utf-8").splitlines() if line.strip()]
+summary = json.loads(lines[-1]) if lines else {}
+verified = (
+    lifecycle_rc == 0
+    and summary.get("outcome") == "VERIFIED"
+    and summary.get("fit_process_id") is not None
+    and summary.get("load_process_id") is not None
+    and summary["fit_process_id"] != summary["load_process_id"]
+)
+files = sorted(
+    path
+    for path in out.rglob("*")
+    if path.is_file()
+    and path.name not in {"environment_provenance.json", "SHA256SUMS"}
+)
 manifest = {
     "schema_version": 1,
+    "phase": "P5_PREDICTOR_LIFECYCLE",
     "status": "VERIFIED" if verified else "FAILED",
-    "provider_return_code": provider_rc,
+    "lane": lane,
+    "run_id": run_id,
+    "lifecycle_return_code": lifecycle_rc,
     "python": platform.python_version(),
     "python_executable": sys.executable,
     "versions": {
@@ -130,32 +100,56 @@ manifest = {
         "torch": version("torch"),
         "lightning": version("lightning"),
         "pytorch_lightning": version("pytorch-lightning"),
+        "pydantic": version("pydantic"),
     },
-    "sha256": {label(path): sha256(path) for path in files},
+    "lifecycle_summary": summary,
+    "sha256": {
+        str(path.relative_to(out)): sha256(path)
+        for path in files
+    },
 }
-(out / "environment_provenance.json").write_text(
-    json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
-    encoding="utf-8",
+destination = out / "environment_provenance.json"
+content = (
+    json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+).encode("utf-8")
+descriptor, temporary_name = tempfile.mkstemp(
+    prefix=f".{destination.name}.",
+    dir=destination.parent,
 )
+temporary = Path(temporary_name)
+try:
+    with os.fdopen(descriptor, "wb") as handle:
+        handle.write(content)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temporary, destination)
+finally:
+    temporary.unlink(missing_ok=True)
+
 if not verified:
-    raise SystemExit("FAILED: DeepAR CPU smoke did not satisfy the P4 certification contract")
+    raise SystemExit(
+        "FAILED: Predictor serialize/restart/reload certification did not pass"
+    )
 PY
+PROVENANCE_RC=$?
 
 (
-  cd "${ROOT}"
-  sha256sum \
-    pyproject.toml \
-    uv.lock \
-    "${OUT}/identity.json" \
-    "${OUT}/request.json" \
-    "${OUT}/response.json" \
-    "${OUT}/provider.stdout.log" \
-    "${OUT}/provider.stderr.log" \
-    "${OUT}/environment_provenance.json" \
-    > "${OUT}/SHA256SUMS"
+  cd "${OUT}"
+  find . -type f ! -name SHA256SUMS -print0 \
+    | sort -z \
+    | xargs -0 sha256sum \
+    > SHA256SUMS
 )
 
-echo "P4_GLUONTS_DEEPAR_CPU=VERIFIED"
+if (( LIFECYCLE_RC != 0 || PROVENANCE_RC != 0 )); then
+  echo "P5_GLUONTS_PREDICTOR_LIFECYCLE=FAILED" >&2
+  echo "LANE=${LANE}" >&2
+  echo "RUN_ID=${RUN_ID}" >&2
+  echo "ARTIFACT_DIR=${OUT}" >&2
+  exit 1
+fi
+
+echo "P5_GLUONTS_PREDICTOR_LIFECYCLE=VERIFIED"
 echo "LANE=${LANE}"
 echo "RUN_ID=${RUN_ID}"
 echo "ARTIFACT_DIR=${OUT}"
