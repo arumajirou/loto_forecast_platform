@@ -29,9 +29,9 @@
     "merge or main branch changes"
   ],
   "execution_boundaries": {
-    "local_synthetic_smoke": "REQUIRED",
-    "repository_ruff_compileall_mypy_pytest": "REQUIRED",
-    "github_actions": "PENDING",
+    "local_synthetic_smoke": "EXECUTION_PENDING",
+    "repository_ruff_compileall_mypy_pytest": "EXECUTION_PENDING",
+    "github_actions": "CI_BLOCKED_PRE_RUN",
     "local_gpu": "EXECUTION_PENDING",
     "timestamp_authority": "LOCAL_SYSTEM_UTC_ONLY",
     "merge": "USER_APPROVAL_REQUIRED"
