@@ -10,8 +10,8 @@
       "sha256": "1b3c0fbe7e3abec2242da4a7a8a7cfa6cd6affcd82d45c7a19912ce0f23b9e8b"
     },
     "tests/autogluon_campaign/test_covariate_runtime_certification.py": {
-      "bytes": 9567,
-      "sha256": "f5af56a6f7395c994db5338d8b1236800abf164bc724e62dfe5793c2c4b9e3b7"
+      "bytes": 9557,
+      "sha256": "a3af5dbcedcf8daee326cac52748ec131e7e4f8d34baf6a4736cbf4afc22e539"
     }
   },
   "full_pytest": "NOT_RUN",
