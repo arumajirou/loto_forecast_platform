@@ -42,10 +42,22 @@ No GluonTS, Torch, Lightning, Predictor, or Dataset Python object crosses the pr
 - native Predictor subclass discovery,
 - extension module discovery without silently importing optional dependencies,
 - validated `runtime_inventory.json`,
-- `artifact_manifest.json` with request, response, log, and inventory hashes,
-- formal availability guard that prevents discovery-only classes from becoming `VERIFIED`.
+- formal availability guards that prevent discovery-only classes from becoming `VERIFIED`.
 
-See `GLUONTS_P3_VERIFICATION_REPORT.md` for the current verification boundary.
+### P4: bounded DeepAR CPU certification
+
+- lane-specific `uv lock` and `uv sync --frozen` bootstrap scripts,
+- exact GluonTS and Torch runtime-version checks,
+- one deterministic DeepAREstimator CPU fit/predict smoke,
+- StudentTOutput with one epoch and one batch per epoch,
+- output-shape and finite-value checks,
+- observed predictor parameter device checks,
+- `deepar_cpu_smoke.json` with canonical SHA-256,
+- retention of valid failed-smoke evidence,
+- artifact-manifest smoke hash,
+- promotion of only the certified DeepAREstimator inventory entry.
+
+See `GLUONTS_P4_VERIFICATION_REPORT.md` for the current verification boundary.
 
 ## Artifact layout
 
@@ -55,38 +67,50 @@ See `GLUONTS_P3_VERIFICATION_REPORT.md` for the current verification boundary.
 <artifact_root>/<run_id>/<request_id>/stdout.log
 <artifact_root>/<run_id>/<request_id>/stderr.log
 <artifact_root>/<run_id>/<request_id>/runtime_inventory.json
+<artifact_root>/<run_id>/<request_id>/deepar_cpu_smoke.json
 <artifact_root>/<run_id>/<request_id>/artifact_manifest.json
 ```
 
+## Target execution
+
+Run each lane independently from the repository root:
+
+```bash
+bash environments/gluonts-compat/bootstrap_and_certify.sh
+bash environments/gluonts-latest/bootstrap_and_certify.sh
+```
+
+Each script generates its lane lock, installs only inside that project, executes the real CPU smoke,
+records environment provenance, and writes `SHA256SUMS`. It exits unsuccessfully unless fit,
+prediction, shape, finite-value, and CPU-device checks all pass.
+
 ## Current verification
 
-- inventory contract tests: 4 passed,
-- inventory persistence and fail-closed runner tests: 2 passed,
-- provider runtime-certify smoke in both lanes: passed,
-- each unresolved lane inventory: 26 candidates and 0 formally verified,
+- DeepAR smoke contract tests: 5 passed,
+- smoke artifact runner tests: 3 passed,
+- fake-runtime constructor, fit, predict, shape, finite, and CPU-device path: passed,
 - Python compile checks: passed,
-- maximum changed Python line length: 98,
-- root, compatibility, and latest inventory source identity: passed.
+- bootstrap shell syntax: passed,
+- maximum changed Python line length: 98.
 
-The local smoke used an environment where GluonTS was unavailable. The observed result is therefore
-`EXECUTION_PENDING`, not runtime success.
+The local execution registry did not expose the pinned GluonTS packages. The observed real-runtime
+status is therefore `EXECUTION_PENDING`, with 0 formally verified models.
 
 ## Certification boundary
 
-The following remain `EXECUTION_PENDING`:
+The following remain `EXECUTION_PENDING` until the bootstrap scripts succeed on the target machine:
 
 - isolated `uv.lock` generation,
 - GluonTS installation in both target lanes,
-- real constructor execution,
-- DeepAR fit and predict,
-- output shape and finite-value certification,
+- real DeepAR construction, fit, and predict,
+- observed real output shape and finite values,
+- observed real CPU parameter devices,
 - serialize, process exit, deserialize, and re-predict,
-- GPU PID, VRAM, device, and CPU fallback evidence,
+- GPU PID, VRAM, CUDA device, and CPU fallback evidence,
 - chronological CV, OOF, HPO, and accuracy evaluation.
 
 ## Next phase
 
-P4 should install and lock the isolated environments in the target execution system, run the P3
-inventory against the real packages, then perform a bounded DeepAR CPU fit/predict smoke. A model is
-not formally available until constructor, input, fit, predict, output, finite-value, and device checks
-all pass.
+P5 serializes a P4-verified Predictor, exits the provider process, loads it in a new process, and
+repeats prediction. Serialization certification requires matching identity, shape, finite values,
+and device evidence after process restart.
