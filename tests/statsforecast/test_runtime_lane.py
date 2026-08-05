@@ -150,3 +150,88 @@ def test_offline_bundle_rejects_selected_sdist(tmp_path) -> None:
     report = verify_offline_bundle(tmp_path)
     assert report["status"] == "FAILED"
     assert any("not a wheel" in item for item in report["failures"])
+
+
+def test_target_host_runner_packages_pass_evidence(tmp_path) -> None:
+    from loto.statsforecast.runtime_lane import (
+        run_target_host_certification,
+        verify_target_host_package,
+    )
+    from loto.statsforecast.runtime_lane_artifacts import write_json, write_tree_sums
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+
+    def preflight(_repo, *, uv_executable):
+        return {
+            "status": "PASS",
+            "captured_at_utc": "2026-08-05T00:00:00+00:00",
+            "uv": {"returncode": 0, "stdout": uv_executable},
+        }
+
+    def execute(_repo, output_root, *, run_id, **_kwargs):
+        run_dir = output_root / run_id
+        run_dir.mkdir(parents=True)
+        write_json(run_dir / "RUNTIME_LANE_REPORT.json", {"status": "PASS"})
+        write_tree_sums(run_dir)
+        return run_dir
+
+    result = run_target_host_certification(
+        repo,
+        tmp_path / "out",
+        run_id="target-pass",
+        preflight_fn=preflight,
+        execute_fn=execute,
+    )
+    assert result.status == "PASS"
+    assert result.archive_path.is_file()
+    assert result.archive_sha256_path.is_file()
+    assert verify_target_host_package(result.archive_path)["status"] == "PASS"
+
+
+def test_target_host_runner_retains_failure_package(tmp_path) -> None:
+    from loto.statsforecast.runtime_lane import run_target_host_certification
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+
+    def preflight(_repo, *, uv_executable):
+        return {
+            "status": "PASS",
+            "captured_at_utc": "2026-08-05T00:00:00+00:00",
+            "uv": {"returncode": 0, "stdout": uv_executable},
+        }
+
+    def execute(*_args, **_kwargs):
+        raise RuntimeError("runtime blocked")
+
+    result = run_target_host_certification(
+        repo,
+        tmp_path / "out",
+        run_id="target-fail",
+        preflight_fn=preflight,
+        execute_fn=execute,
+    )
+    assert result.status == "FAILED"
+    report = json.loads(
+        (result.controller_dir / "TARGET_HOST_REPORT.json").read_text(encoding="utf-8")
+    )
+    assert report["error"]["type"] == "RuntimeError"
+    assert result.archive_path.is_file()
+
+
+def test_target_host_package_detects_archive_tampering(tmp_path) -> None:
+    from loto.statsforecast.runtime_lane import (
+        create_deterministic_zip,
+        verify_target_host_package,
+    )
+    from loto.statsforecast.runtime_lane_artifacts import write_tree_sums
+
+    run = tmp_path / "run"
+    run.mkdir()
+    (run / "result.json").write_text("{}\n", encoding="utf-8")
+    write_tree_sums(run)
+    archive = create_deterministic_zip(run)
+    assert verify_target_host_package(archive)["status"] == "PASS"
+    archive.write_bytes(archive.read_bytes() + b"tampered")
+    assert verify_target_host_package(archive)["status"] == "FAILED"
