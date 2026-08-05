@@ -10,6 +10,7 @@ from loto.statsforecast.runtime_lane import (
     fetch_release_artifact,
     inspect_target_host_archive,
     prepare_offline_bundle,
+    run_end_to_end_certification,
     run_target_host_certification,
     verify_target_host_package,
     write_admission_artifacts,
@@ -59,8 +60,38 @@ def main(argv: list[str] | None = None) -> int:
     admission_parser.add_argument("--expected-commit", required=True)
     admission_parser.add_argument("--expected-seed", type=int, default=1)
 
+    e2e_parser = subparsers.add_parser("end-to-end")
+    e2e_parser.add_argument("--output-root", type=Path, required=True)
+    e2e_parser.add_argument("--run-id")
+    e2e_parser.add_argument("--wheelhouse", type=Path)
+    e2e_parser.add_argument("--prepare-offline", action="store_true")
+    e2e_parser.add_argument("--offline", action="store_true")
+    e2e_parser.add_argument("--expected-commit")
+    e2e_parser.add_argument("--uv", default="uv")
+    e2e_parser.add_argument("--horizon", type=int, default=1)
+    e2e_parser.add_argument("--seed", type=int, default=1)
+
     args = parser.parse_args(argv)
 
+    if args.command == "end-to-end":
+        result = run_end_to_end_certification(
+            _repo_root(),
+            args.output_root,
+            wheelhouse=args.wheelhouse,
+            run_id=args.run_id,
+            prepare_offline=args.prepare_offline,
+            offline=args.offline,
+            expected_commit=args.expected_commit,
+            expected_seed=args.seed,
+            horizon=args.horizon,
+            uv_executable=args.uv,
+        )
+        print(f"END_TO_END_DIR={result.output_dir}")
+        print(f"END_TO_END_REPORT={result.report_path}")
+        print(f"TARGET_ARCHIVE={result.archive_path}")
+        print(f"ADMISSION_DIR={result.admission_dir}")
+        print(f"DECISION={result.decision}")
+        return 0 if result.formal_pass else 2
     if args.command == "admit-package":
         report = inspect_target_host_archive(
             args.archive,
