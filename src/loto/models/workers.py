@@ -574,12 +574,16 @@ class PositionSeriesWorker:
         accelerator = (
             "gpu" if (self.device in {"auto", "cuda"} and torch.cuda.is_available()) else "cpu"
         )
+        max_steps = max(1, int(self.params.get("max_steps", 1)))
+        requested_val_check_steps = int(self.params.get("val_check_steps", max_steps))
+        val_check_steps = max(1, min(requested_val_check_steps, max_steps))
         base_model_config = {
             "h": 1,
             "input_size": min(16, max(8, len(history) // 3)),
             "loss": loss,
             "valid_loss": loss,
-            "max_steps": int(self.params.get("max_steps", 1)),
+            "max_steps": max_steps,
+            "val_check_steps": val_check_steps,
             "batch_size": int(self.params.get("batch_size", 8)),
             "learning_rate": float(self.params.get("learning_rate", 0.001)),
             "random_seed": self.seed,
