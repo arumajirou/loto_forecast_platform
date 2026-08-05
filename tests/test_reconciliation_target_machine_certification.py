@@ -232,14 +232,28 @@ def test_run_target_certification_success(tmp_path: Path) -> None:
         stderr_path.write_text("", encoding="utf-8")
         if "-c" in command:
             stdout_path.write_text("1.5.1\n", encoding="utf-8")
-            return {"command": list(command), "cwd": str(cwd), "returncode": 0,
-                    "started_at": "s", "finished_at": "f", "duration_seconds": 0.1,
-                    "stdout_path": str(stdout_path), "stderr_path": str(stderr_path)}
+            return {
+                "command": list(command),
+                "cwd": str(cwd),
+                "returncode": 0,
+                "started_at": "s",
+                "finished_at": "f",
+                "duration_seconds": 0.1,
+                "stdout_path": str(stdout_path),
+                "stderr_path": str(stderr_path),
+            }
         payload = _make_success_bundle(output)
         stdout_path.write_text(json.dumps(payload), encoding="utf-8")
-        return {"command": list(command), "cwd": str(cwd), "returncode": 0,
-                "started_at": "s", "finished_at": "f", "duration_seconds": 0.1,
-                "stdout_path": str(stdout_path), "stderr_path": str(stderr_path)}
+        return {
+            "command": list(command),
+            "cwd": str(cwd),
+            "returncode": 0,
+            "started_at": "s",
+            "finished_at": "f",
+            "duration_seconds": 0.1,
+            "stdout_path": str(stdout_path),
+            "stderr_path": str(stderr_path),
+        }
 
     report, code = target.execute(
         repo,
@@ -269,9 +283,16 @@ def test_run_target_certification_version_mismatch_retains_evidence(tmp_path: Pa
         stdout_path.parent.mkdir(parents=True, exist_ok=True)
         stdout_path.write_text("1.5.0\n", encoding="utf-8")
         stderr_path.write_text("", encoding="utf-8")
-        return {"command": list(command), "cwd": str(cwd), "returncode": 0,
-                "started_at": "s", "finished_at": "f", "duration_seconds": 0.1,
-                "stdout_path": str(stdout_path), "stderr_path": str(stderr_path)}
+        return {
+            "command": list(command),
+            "cwd": str(cwd),
+            "returncode": 0,
+            "started_at": "s",
+            "finished_at": "f",
+            "duration_seconds": 0.1,
+            "stdout_path": str(stdout_path),
+            "stderr_path": str(stderr_path),
+        }
 
     report, code = target.execute(
         repo,
