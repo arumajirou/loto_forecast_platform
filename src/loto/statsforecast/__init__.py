@@ -16,6 +16,7 @@ from .inventory import MODEL_CONTRACTS, MODEL_NAMES, model_contract
 
 __all__ = [
     "ArgumentState",
+    "certify_installed_runtime",
     "CampaignConfig",
     "ExpectedStatus",
     "GameGeometry",
@@ -26,3 +27,11 @@ __all__ = [
     "TimeAxisMode",
     "model_contract",
 ]
+
+
+def certify_installed_runtime(*args, **kwargs):
+    """Load the runtime certifier lazily to keep ``python -m`` warning-free."""
+
+    from .certify import certify_installed_runtime as _certify
+
+    return _certify(*args, **kwargs)
