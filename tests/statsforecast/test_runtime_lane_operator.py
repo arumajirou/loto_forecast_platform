@@ -240,6 +240,65 @@ def test_missing_email_configuration_is_skipped() -> None:
     assert report["status"] == "SKIPPED"
 
 
+def test_notification_exception_is_evidence_only(tmp_path) -> None:
+    def raise_notification(*_args):
+        raise RuntimeError("notification transport failed")
+
+    result = run_target_host_operator(
+        tmp_path,
+        tmp_path / "out",
+        run_id="notify-exception",
+        expected_commit=COMMIT,
+        git_context_fn=clean_context,
+        end_to_end_runner=lambda *_args, **_kwargs: fake_e2e(
+            tmp_path,
+            passed=True,
+        ),
+        enable_tts=True,
+        enable_email=True,
+        tts_notifier=raise_notification,
+        email_notifier=raise_notification,
+    )
+
+    assert result.formal_pass is True
+    notification = json.loads(
+        result.notification_report_path.read_text(encoding="utf-8")
+    )
+    assert [row["status"] for row in notification["results"]] == [
+        "FAILED",
+        "FAILED",
+    ]
+
+
+def test_invalid_smtp_environment_is_evidence_only(tmp_path) -> None:
+    result = run_target_host_operator(
+        tmp_path,
+        tmp_path / "out",
+        run_id="invalid-smtp",
+        expected_commit=COMMIT,
+        git_context_fn=clean_context,
+        end_to_end_runner=lambda *_args, **_kwargs: fake_e2e(
+            tmp_path,
+            passed=True,
+        ),
+        enable_email=True,
+        environment={
+            "LOTO_NOTIFY_SMTP_HOST": "smtp.example.test",
+            "LOTO_NOTIFY_SMTP_PORT": "99999",
+            "LOTO_NOTIFY_EMAIL_FROM": "from@example.test",
+            "LOTO_NOTIFY_EMAIL_TO": "to@example.test",
+        },
+    )
+
+    assert result.formal_pass is True
+    notification = json.loads(
+        result.notification_report_path.read_text(encoding="utf-8")
+    )
+    email = next(row for row in notification["results"] if row["channel"] == "email")
+    assert email["status"] == "FAILED"
+    assert email["error_type"] == "ValueError"
+
+
 def test_invalid_execution_mode_is_rejected(tmp_path) -> None:
     with pytest.raises(ValueError, match="mutually exclusive"):
         run_target_host_operator(
