@@ -39,6 +39,7 @@ class CertificationScenario:
     enable_ensemble: bool = False
     time_limit_seconds: int = 120
     environment: dict[str, str] = field(default_factory=dict)
+    depends_on: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -123,6 +124,29 @@ def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
     temporary.replace(path)
 
 
+def _prepare_output_directory(path: Path) -> Path:
+    resolved = path.resolve()
+    if resolved.exists():
+        if not resolved.is_dir():
+            raise ValueError(f"output_dir must be a directory: {resolved}")
+        if any(resolved.iterdir()):
+            raise ValueError(
+                "output_dir must be absent or empty to prevent stale certification evidence: "
+                f"{resolved}"
+            )
+    else:
+        resolved.mkdir(parents=True, exist_ok=False)
+    return resolved
+
+
+def _path_is_within(path: Path, directory: Path) -> bool:
+    try:
+        path.resolve().relative_to(directory.resolve())
+    except ValueError:
+        return False
+    return True
+
+
 def _history(rows: int = 24) -> list[dict[str, Any]]:
     history: list[dict[str, Any]] = []
     for index in range(rows):
@@ -154,6 +178,7 @@ def default_scenarios() -> tuple[CertificationScenario, ...]:
             execution_mode="explicit_single_model",
             model_ids=("Naive",),
             artifact_key="naive",
+            depends_on="explicit-naive-fit",
         ),
         CertificationScenario(
             scenario_id="explicit-theta-fit",
@@ -267,12 +292,22 @@ def _validate_response(
     payload: dict[str, Any],
     *,
     artifact_dir: Path,
+    expected_run_id: str,
 ) -> tuple[list[str], ProviderResponseV2 | None]:
     errors: list[str] = []
     try:
         response = ProviderResponseV2.model_validate(payload)
     except ValidationError as exc:
         return [f"response schema validation failed: {exc}"], None
+    if response.run_id != expected_run_id:
+        errors.append(
+            f"response run_id mismatch: expected {expected_run_id}, got {response.run_id}"
+        )
+    if response.operation.value != scenario.operation:
+        errors.append(
+            f"response operation mismatch: expected {scenario.operation}, "
+            f"got {response.operation.value}"
+        )
     if response.status != "OK":
         errors.append(
             f"provider status is {response.status}: "
@@ -294,8 +329,20 @@ def _validate_response(
             f"expected {expected_models}, got {response.metadata.get('selected_model_ids')}"
         )
     evidence = response.runtime_evidence
-    if evidence is None or evidence.pid is None:
-        errors.append("runtime evidence must include provider PID")
+    if evidence is None or evidence.pid is None or evidence.pid <= 0:
+        errors.append("runtime evidence must include a positive provider PID")
+    if evidence is not None and evidence.requested_device.value != scenario.requested_device:
+        errors.append(
+            "runtime requested_device mismatch: "
+            f"expected {scenario.requested_device}, got {evidence.requested_device.value}"
+        )
+    if scenario.requested_device == "cpu" and evidence is not None:
+        if evidence.resolved_device != "cpu":
+            errors.append("CPU scenario did not resolve to CPU")
+        if evidence.cpu_fallback:
+            errors.append("CPU scenario must not be marked as CPU fallback")
+        if evidence.gpu_used:
+            errors.append("CPU scenario must not report GPU use")
     if scenario.scenario_id == "forced-cpu-fallback":
         if evidence is None or not evidence.cpu_fallback:
             errors.append("forced CPU fallback was not recorded")
@@ -309,8 +356,17 @@ def _validate_response(
         "timeline_mapping",
     ):
         path = response.artifacts.get(name)
-        if path is None or not Path(path).is_file():
+        if path is None:
             errors.append(f"missing persisted artifact: {name}")
+            continue
+        artifact_path = Path(path)
+        if not artifact_path.is_file():
+            errors.append(f"missing persisted artifact: {name}")
+            continue
+        if not _path_is_within(artifact_path, artifact_dir):
+            errors.append(
+                f"persisted artifact escapes artifact_dir: {name}={artifact_path}"
+            )
     return errors, response
 
 
@@ -327,8 +383,11 @@ def run_runtime_certification(
 ) -> RuntimeCertificationReport:
     started = datetime.now(timezone.utc)
     run_id = started.strftime("autogluon-p5-%Y%m%dT%H%M%SZ")
-    output_dir = config.output_dir.resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
+    if not config.provider_command:
+        raise ValueError("provider_command must not be empty")
+    if config.timeout_seconds <= 0:
+        raise ValueError("timeout_seconds must be positive")
+    output_dir = _prepare_output_directory(config.output_dir)
     scenarios = default_scenarios()
     if config.scenario_ids:
         requested = set(config.scenario_ids)
@@ -353,6 +412,37 @@ def run_runtime_certification(
             artifact_dir=artifact_dir,
         )
         _write_json_atomic(request_path, payload)
+        if scenario.depends_on is not None:
+            dependency = next(
+                (item for item in results if item.scenario_id == scenario.depends_on),
+                None,
+            )
+            if dependency is None or dependency.status != CertificationStatus.VERIFIED.value:
+                now = datetime.now(timezone.utc).isoformat()
+                message = f"scenario dependency not verified: {scenario.depends_on}"
+                stdout_path.write_text("", encoding="utf-8")
+                stderr_path.write_text(message + "\n", encoding="utf-8")
+                results.append(
+                    ScenarioResult(
+                        scenario_id=scenario.scenario_id,
+                        status=CertificationStatus.BLOCKED_RUNTIME.value,
+                        return_code=None,
+                        request_path=str(request_path),
+                        response_path=str(response_path),
+                        stdout_path=str(stdout_path),
+                        stderr_path=str(stderr_path),
+                        request_sha256=_sha256_file(request_path),
+                        response_sha256=None,
+                        response_status=None,
+                        prediction_count=None,
+                        finite=None,
+                        runtime_evidence=None,
+                        errors=(message,),
+                        started_at=now,
+                        finished_at=now,
+                    )
+                )
+                continue
         command = [
             *config.provider_command,
             "--request",
@@ -387,6 +477,7 @@ def run_runtime_certification(
                     scenario,
                     response_payload,
                     artifact_dir=artifact_dir,
+                    expected_run_id=payload["run_id"],
                 )
                 errors.extend(validation_errors)
             if return_code != 0:
