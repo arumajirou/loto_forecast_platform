@@ -19,6 +19,7 @@ from loto.sktime_campaign.inventory import (
     installed_sktime_version,
     summarize_inventory,
 )
+from loto.sktime_campaign.matrix import run_smoke_matrix
 from loto.sktime_campaign.protocol import (
     ProviderOperation,
     ProviderRequest,
@@ -248,6 +249,7 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
             response = ProviderResponse(
                 status=ProviderStatus.PASS,
                 operation=request.operation,
+                environment_lane=request.environment_lane,
                 expected_sktime_version=request.expected_sktime_version,
                 actual_sktime_version=actual_version,
                 inventory=summary,
@@ -263,10 +265,23 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
             response = ProviderResponse(
                 status=ProviderStatus.PASS,
                 operation=request.operation,
+                environment_lane=request.environment_lane,
                 expected_sktime_version=request.expected_sktime_version,
                 actual_sktime_version=actual_version,
                 smoke=smoke,
                 artifacts={"naive_smoke": "NAIVE_SMOKE.json"},
+            )
+        elif request.operation is ProviderOperation.SMOKE_MATRIX:
+            matrix = run_smoke_matrix(request, output_dir)
+            _write_json(output_dir / "SMOKE_MATRIX.json", matrix)
+            response = ProviderResponse(
+                status=ProviderStatus(matrix["status"]),
+                operation=request.operation,
+                environment_lane=request.environment_lane,
+                expected_sktime_version=request.expected_sktime_version,
+                actual_sktime_version=actual_version,
+                matrix=matrix,
+                artifacts={"smoke_matrix": "SMOKE_MATRIX.json"},
             )
         else:  # pragma: no cover - enum validation prevents this path
             raise RuntimeError(f"unsupported operation: {request.operation}")
@@ -277,6 +292,7 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
                 ProviderStatus.UNAVAILABLE if unavailable else ProviderStatus.FAILED
             ),
             operation=request.operation,
+            environment_lane=request.environment_lane,
             expected_sktime_version=request.expected_sktime_version,
             actual_sktime_version=actual_version,
             error={
