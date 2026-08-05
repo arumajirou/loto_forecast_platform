@@ -10,5 +10,11 @@ dependencies = [
   "sktime==1.0.1",
 ]
 
+[dependency-groups]
+dev = [
+  "pytest>=8,<9",
+  "ruff>=0.9,<1",
+]
+
 [tool.uv]
 package = false
