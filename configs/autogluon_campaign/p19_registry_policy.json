@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "backend": "file-json-cas-v1",
+  "compare_and_swap_required": true,
+  "append_only_consumption_ledger_required": true,
+  "one_time_authorization_required": true,
+  "same_directory_atomic_replace_required": true,
+  "fsync_required": true,
+  "external_registry_adapter_enabled": false,
+  "automatic_deployment": false,
+  "automatic_retraining": false,
+  "rollback_automatic": false
+}
