@@ -61,8 +61,9 @@ python -m loto.basicts_campaign.formal_orchestration \
 
 The formal preflight performs one dependency resolution and one explicit frozen synchronization.
 The nested core P0 validates the preflight lock SHA-256 and reuses that environment. It does not run
-another `uv lock` or explicit `uv sync`. Every `uv run` remains frozen so the lockfile cannot be
-updated silently.
+another `uv lock` or explicit `uv sync`. Every core `uv run` uses `--frozen`; uv may check or
+synchronize the already prepared environment, but it cannot update the lockfile silently. The core
+also verifies the lock SHA-256 again before certification.
 
 ## Expected PASS output
 
