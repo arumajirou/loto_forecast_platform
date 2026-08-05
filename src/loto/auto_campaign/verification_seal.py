@@ -92,12 +92,10 @@ def write_verification_seal(
     root: Path,
     result: Mapping[str, Any],
 ) -> dict[str, Any] | None:
-    """Write a PASS seal, or remove a stale seal after failed verification."""
+    """Write a PASS seal while preserving any prior seal after a failure."""
 
     target = root / "VERIFICATION_SEAL.json"
     if result.get("status") != "PASS":
-        if target.exists():
-            target.unlink()
         return None
 
     stable = _stable_payload(root, result)
