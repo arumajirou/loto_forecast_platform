@@ -7,8 +7,9 @@ from pathlib import Path
 
 from .api_coverage_pipeline import run_api_coverage_pipeline
 from .contracts import CampaignStage
-from .coverage_verification import verify_run_with_coverage
-from .promotion_gate import GATED_STAGES, run_stage_with_promotion_gate
+from .lineage_pipeline import run_stage_with_promotion_and_lineage
+from .lineage_verification import verify_run_with_lineage
+from .promotion_gate import GATED_STAGES
 from .runner import inventory, load_config, plan, run_stage
 
 
@@ -48,6 +49,15 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--output", type=Path, default=None)
     run.add_argument("--source-run", type=Path, default=None)
     run.add_argument(
+        "--predecessor-run",
+        type=Path,
+        default=None,
+        help=(
+            "immediately preceding verified run; required for holdout (OOF) "
+            "and prospective (holdout) lineage"
+        ),
+    )
+    run.add_argument(
         "--coverage-run",
         type=Path,
         default=None,
@@ -81,7 +91,7 @@ def main() -> None:
         }
     )
     if args.command == "verify":
-        result = verify_run_with_coverage(args.run.resolve())
+        result = verify_run_with_lineage(args.run.resolve())
     else:
         output = args.output
         if output is None:
@@ -97,6 +107,7 @@ def main() -> None:
         else:
             selected_stage = CampaignStage(args.stage)
             source_run = _resolve_optional_path(args.source_run, project)
+            predecessor_run = _resolve_optional_path(args.predecessor_run, project)
             coverage_run = _resolve_optional_path(args.coverage_run, project)
             runtime_run = _resolve_optional_path(args.runtime_run, project)
             if selected_stage == CampaignStage.API_COVERAGE:
@@ -107,13 +118,14 @@ def main() -> None:
                     resume=args.resume,
                 )
             elif selected_stage in GATED_STAGES:
-                result = run_stage_with_promotion_gate(
+                result = run_stage_with_promotion_and_lineage(
                     runner=run_stage,
                     project_root=project,
                     config=config,
                     run_root=output,
                     target_stage=selected_stage,
                     source_run=source_run,
+                    predecessor_run=predecessor_run,
                     coverage_run=coverage_run,
                     runtime_run=runtime_run,
                     resume=args.resume,
