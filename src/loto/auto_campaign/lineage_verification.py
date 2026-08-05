@@ -316,6 +316,9 @@ def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
     else:
         seal_result = existing_seal
     result["verification_seal"] = seal_result
+    if result["status"] == "PASS":
+        # Normalize first and repeated PASS reports to the same final seal state.
+        result["preexisting_verification_seal"] = seal_result
 
     write_json(run_root / "VERIFICATION_REPORT.json", result)
     write_sha256s(run_root)
