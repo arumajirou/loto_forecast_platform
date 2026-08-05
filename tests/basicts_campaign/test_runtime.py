@@ -9,6 +9,11 @@ import torch
 from torch import nn
 
 from loto.basicts_campaign import runtime
+from loto.basicts_campaign.basicts_module_closure import (
+    DECOMPOSITION_MODULE,
+    MODEL_CONFIG_MODULE,
+    RUNTIME_CRITICAL_MODULES,
+)
 from loto.basicts_campaign.dlinear_runtime_provenance import (
     DLINEAR_ARCH_MODULE,
     DLINEAR_CONFIG_MODULE,
@@ -104,8 +109,31 @@ def provenance() -> dict[str, object]:
     }
 
 
+def _closure_item(module_name: str, index: int) -> dict[str, object]:
+    root = "/venv/site-packages/"
+    entry = module_name.replace(".", "/")
+    is_package = module_name in {"basicts", "basicts.configs"}
+    entry = f"{entry}/__init__.py" if is_package else f"{entry}.py"
+    path = root + entry
+    return {
+        "module_name": module_name,
+        "distribution_entry": entry,
+        "distribution_path": path,
+        "import_spec_origin": path,
+        "loaded_module_file": path,
+        "record_status": "PASS",
+        "record_hash_mode": "sha256",
+        "record_hash_value": chr(67 + index) * 43,
+        "record_size_bytes": 200 + index,
+        "module_file_sha256": f"{index + 1:064x}",
+        "is_package": is_package,
+    }
+
+
 def dlinear_modules() -> dict[str, object]:
     root = "/venv/site-packages/"
+    closure_names = sorted(RUNTIME_CRITICAL_MODULES | {"basicts"})
+    expected_base = f"{MODEL_CONFIG_MODULE}.BasicTSModelConfig"
     return {
         "dlinear_module_provenance_status": "PASS",
         "dlinear_runtime_modules": [
@@ -127,7 +155,34 @@ def dlinear_modules() -> dict[str, object]:
             }
             for label, module_name, entry, symbol in DLINEAR_MODULE_CONTRACTS
         ],
+        "basicts_module_closure_status": "PASS",
+        "preloaded_basicts_modules": [],
+        "loaded_basicts_module_count": len(closure_names),
+        "loaded_basicts_modules": [
+            _closure_item(module_name, index)
+            for index, module_name in enumerate(closure_names)
+        ],
+        "dlinear_dependency_binding_status": "PASS",
+        "dlinear_dependency_bindings": {
+            "decomposition_symbol": (
+                f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"
+            ),
+            "config_base_symbol": expected_base,
+            "dlinear_config_direct_base": expected_base,
+            "arch_decomposition_object_identity": True,
+            "config_model_config_object_identity": True,
+            "configs_export_object_identity": True,
+            "dlinear_config_direct_base_identity": True,
+        },
     }
+
+
+def _prepare_dlinear(monkeypatch, evidence) -> None:
+    install_fake_basicts(monkeypatch)
+    monkeypatch.setattr(runtime, "installed_basicts_version", lambda: "1.1.0")
+    monkeypatch.setattr(runtime, "verify_installed_basicts_provenance", provenance)
+    monkeypatch.setattr(runtime, "verify_dlinear_import_closure", lambda: evidence)
+    monkeypatch.setenv(runtime.REVISION_ENV, expected_revision())
 
 
 def test_identity_and_manifest(monkeypatch, tmp_path) -> None:
@@ -200,11 +255,8 @@ def test_identity_rejects_import_origin_drift(monkeypatch, tmp_path) -> None:
 
 
 def test_dlinear_smoke_fit_save_load(monkeypatch, tmp_path) -> None:
-    install_fake_basicts(monkeypatch)
-    monkeypatch.setattr(runtime, "installed_basicts_version", lambda: "1.1.0")
-    monkeypatch.setattr(runtime, "verify_installed_basicts_provenance", provenance)
-    monkeypatch.setattr(runtime, "verify_dlinear_runtime_modules", dlinear_modules)
-    monkeypatch.setenv(runtime.REVISION_ENV, expected_revision())
+    evidence = dlinear_modules()
+    _prepare_dlinear(monkeypatch, evidence)
     request = ProviderRequest(
         operation=ProviderOperation.DLINEAR_SMOKE,
         output_dir=str(tmp_path),
@@ -220,18 +272,15 @@ def test_dlinear_smoke_fit_save_load(monkeypatch, tmp_path) -> None:
     assert response.evidence["save_load_exact_match"] is True
     assert response.evidence["cpu_fallback"] is False
     assert response.evidence["dlinear_module_provenance_status"] == "PASS"
-    assert len(response.evidence["dlinear_runtime_modules"]) == 2
+    assert response.evidence["basicts_module_closure_status"] == "PASS"
+    assert response.evidence["dlinear_dependency_binding_status"] == "PASS"
     assert_sha256sums(tmp_path)
 
 
 def test_dlinear_smoke_rejects_module_provenance_drift(monkeypatch, tmp_path) -> None:
-    install_fake_basicts(monkeypatch)
-    monkeypatch.setattr(runtime, "installed_basicts_version", lambda: "1.1.0")
-    monkeypatch.setattr(runtime, "verify_installed_basicts_provenance", provenance)
     bad = dlinear_modules()
     bad["dlinear_module_provenance_status"] = "FAILED"
-    monkeypatch.setattr(runtime, "verify_dlinear_runtime_modules", lambda: bad)
-    monkeypatch.setenv(runtime.REVISION_ENV, expected_revision())
+    _prepare_dlinear(monkeypatch, bad)
     request = ProviderRequest(
         operation=ProviderOperation.DLINEAR_SMOKE,
         output_dir=str(tmp_path),
@@ -241,3 +290,33 @@ def test_dlinear_smoke_rejects_module_provenance_drift(monkeypatch, tmp_path) ->
 
     assert response.status is ProviderStatus.FAILED
     assert "module provenance was not verified" in response.error["message"]
+
+
+def test_dlinear_smoke_rejects_closure_count_drift(monkeypatch, tmp_path) -> None:
+    bad = dlinear_modules()
+    bad["loaded_basicts_module_count"] += 1
+    _prepare_dlinear(monkeypatch, bad)
+    request = ProviderRequest(
+        operation=ProviderOperation.DLINEAR_SMOKE,
+        output_dir=str(tmp_path),
+    )
+
+    response = runtime.execute_request(request)
+
+    assert response.status is ProviderStatus.FAILED
+    assert "closure count is inconsistent" in response.error["message"]
+
+
+def test_dlinear_smoke_rejects_dependency_binding_drift(monkeypatch, tmp_path) -> None:
+    bad = dlinear_modules()
+    bad["dlinear_dependency_bindings"]["arch_decomposition_object_identity"] = False
+    _prepare_dlinear(monkeypatch, bad)
+    request = ProviderRequest(
+        operation=ProviderOperation.DLINEAR_SMOKE,
+        output_dir=str(tmp_path),
+    )
+
+    response = runtime.execute_request(request)
+
+    assert response.status is ProviderStatus.FAILED
+    assert "binding evidence is inconsistent" in response.error["message"]
