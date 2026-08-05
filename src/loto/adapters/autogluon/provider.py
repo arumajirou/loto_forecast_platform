@@ -16,6 +16,7 @@ from pydantic import ValidationError
 
 from .contracts import (
     DeviceRequest,
+    ExecutionMode,
     PredictionRecord,
     ProviderError,
     ProviderOperation,
@@ -25,6 +26,12 @@ from .contracts import (
 )
 from .execution import ExecutionPlan, ExecutionPlanError, build_execution_plan
 from .geometry import CompiledHistory, compile_regular_history
+from .search_spaces import (
+    SearchSpaceDescriptorError,
+    contains_search_space_descriptor,
+    materialize_search_spaces,
+    validate_search_space_descriptors,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -138,6 +145,24 @@ def _validate_p4_scope(request: ProviderRequestV2) -> None:
             "FUTURE_COVARIATES_NOT_IMPLEMENTED_P4",
             "covariates.future_known_covariates",
             "future known covariate execution is deferred; P4 rejects it instead of dropping it",
+        )
+    hyperparameters = request.fit.hyperparameters
+    try:
+        validate_search_space_descriptors(hyperparameters)
+    except SearchSpaceDescriptorError as exc:
+        raise ExecutionPlanError(
+            "INVALID_SEARCH_SPACE_DESCRIPTOR",
+            "fit.hyperparameters",
+            str(exc),
+        ) from exc
+    if (
+        contains_search_space_descriptor(hyperparameters)
+        and request.execution_mode is not ExecutionMode.HPO_SINGLE_MODEL
+    ):
+        raise ExecutionPlanError(
+            "SEARCH_SPACE_WITHOUT_HPO_MODE",
+            "fit.hyperparameters",
+            "search-space descriptors are only accepted in hpo_single_model mode",
         )
 
 
@@ -376,7 +401,16 @@ def run_provider_v2(
                     f"artifact_dir must be empty for fit_predict_save: {artifact_dir}"
                 )
             predictor = active_runtime.predictor_class(**plan.predictor_kwargs)
-            predictor.fit(time_series, **plan.fit_kwargs)
+            fit_kwargs = dict(plan.fit_kwargs)
+            hyperparameters = fit_kwargs.get("hyperparameters")
+            if contains_search_space_descriptor(hyperparameters):
+                from autogluon.common import space as autogluon_space
+
+                fit_kwargs["hyperparameters"] = materialize_search_spaces(
+                    hyperparameters,
+                    space_module=autogluon_space,
+                )
+            predictor.fit(time_series, **fit_kwargs)
         else:
             if not artifact_dir.exists() or not any(artifact_dir.iterdir()):
                 raise FileNotFoundError(
