@@ -197,8 +197,8 @@ def _verify_target_report(target: dict[str, object], git_sha: str) -> dict[str, 
     partition = certification.get("method_partition")
     if (
         not isinstance(partition, dict)
-        or partition.get("actual_execution_rows") != 24
-        or partition.get("grouped_rejection_rows") != 16
+        or partition.get("executed_cases") != 24
+        or partition.get("rejected_cases") != 16
     ):
         raise CertificationError("target method-partition evidence mismatch")
     return certification
