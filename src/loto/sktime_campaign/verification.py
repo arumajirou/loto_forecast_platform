@@ -63,6 +63,20 @@ def _safe_relative_path(root: Path, value: str) -> Path:
     return resolved
 
 
+def _is_recursive_evidence(root: Path, path: Path) -> bool:
+    if not path.is_file():
+        return False
+    relative = path.relative_to(root)
+    relative_name = relative.as_posix()
+    if relative_name == "SHA256SUMS":
+        return False
+    if path.suffix == ".log" or "logs" in relative.parts:
+        return False
+    if path.name == "exit_code.txt":
+        return False
+    return True
+
+
 def verify_sha256sums(directory: Path, *, recursive: bool = False) -> list[dict[str, Any]]:
     """Verify a portable SHA256SUMS file and reject missing or extra files."""
 
@@ -105,8 +119,11 @@ def verify_sha256sums(directory: Path, *, recursive: bool = False) -> list[dict[
     actual_files = {
         path.relative_to(directory).as_posix()
         for path in directory.glob(pattern)
-        if path.is_file()
-        and path.relative_to(directory).as_posix() != "SHA256SUMS"
+        if (
+            _is_recursive_evidence(directory, path)
+            if recursive
+            else path.is_file() and path.name != "SHA256SUMS"
+        )
     }
     if seen != actual_files:
         missing = sorted(actual_files - seen)
@@ -287,9 +304,7 @@ def verify_naive_bundle(directory: Path) -> dict[str, Any]:
 
 def _write_recursive_sha256sums(run_dir: Path) -> None:
     files = sorted(
-        path
-        for path in run_dir.rglob("*")
-        if path.is_file() and path.relative_to(run_dir).as_posix() != "SHA256SUMS"
+        path for path in run_dir.rglob("*") if _is_recursive_evidence(run_dir, path)
     )
     lines = [
         f"{_sha256(path)}  {path.relative_to(run_dir).as_posix()}"
@@ -324,9 +339,9 @@ def finalize_p0_run(run_dir: Path) -> dict[str, Any]:
     preexisting_files = sorted(
         path
         for path in run_dir.rglob("*")
-        if path.is_file()
+        if _is_recursive_evidence(run_dir, path)
         and path.relative_to(run_dir).as_posix()
-        not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS", "VERIFICATION_REPORT.json"}
+        not in {"ARTIFACT_MANIFEST.json", "VERIFICATION_REPORT.json"}
     )
     report["top_level_sha256_records"] = len(preexisting_files) + 2
     _write_json(run_dir / "VERIFICATION_REPORT.json", report)
@@ -334,14 +349,14 @@ def finalize_p0_run(run_dir: Path) -> dict[str, Any]:
     manifest_files = sorted(
         path
         for path in run_dir.rglob("*")
-        if path.is_file()
-        and path.relative_to(run_dir).as_posix()
-        not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if _is_recursive_evidence(run_dir, path)
+        and path.relative_to(run_dir).as_posix() != "ARTIFACT_MANIFEST.json"
     )
     manifest = {
         "schema_version": "1.0",
         "status": "PASS",
         "scope": "sktime-core-py313-p0",
+        "excluded_volatile": ["**/*.log", "logs/**", "exit_code.txt"],
         "files": [
             {
                 "path": path.relative_to(run_dir).as_posix(),
