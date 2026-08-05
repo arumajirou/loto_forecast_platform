@@ -1,0 +1,5 @@
+lane,package,device,status
+supported-py312,tirex-2==0.1.1,cpu,EXECUTION_PENDING
+supported-py312,tirex-2==0.1.1,cuda,EXECUTION_PENDING
+cuda128,tirex-2==0.1.1,cuda,EXECUTION_PENDING
+cpu-parity,tirex-2==0.1.1,cpu,EXECUTION_PENDING
