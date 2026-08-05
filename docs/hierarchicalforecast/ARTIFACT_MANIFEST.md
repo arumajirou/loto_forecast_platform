@@ -5,10 +5,9 @@
 - Component: HierarchicalForecast reconciliation runtime certification
 - Pull request: #48
 - Branch: `agent/hierarchicalforecast-runtime-certification`
-- State: `PARTIALLY_VERIFIED / PACKAGE_VERIFIER_TESTS_PASS / CI_BLOCKED_RUNNER_START`
+- State: `PARTIALLY_VERIFIED / PROMOTION_GATE_TESTS_PASS / CI_BLOCKED_RUNNER_START`
 
-This document inventories source and generated artifacts. Machine-generated manifests and checksum
-files remain the integrity roots for runtime evidence.
+Machine-generated manifests and checksum files remain the integrity roots for runtime evidence.
 
 ## Source implementation
 
@@ -25,8 +24,10 @@ files remain the integrity roots for runtime evidence.
 | `scripts/hierarchicalforecast_target/package_verification.py` | source, ZIP, sidecar, and manifest verification |
 | `scripts/hierarchicalforecast_target/operator.py` | target-machine orchestration |
 | `scripts/hierarchicalforecast_target/quality_gate.py` | Ruff, mypy, focused, full-suite, and JUnit gate |
+| `scripts/hierarchicalforecast_target/promotion_gate.py` | chained local gates and cross-root integrity |
 | `scripts/run_hierarchicalforecast_target_certification.py` | target runtime wrapper |
 | `scripts/run_hierarchicalforecast_quality_gate.py` | local quality wrapper |
+| `scripts/run_hierarchicalforecast_promotion_gate.py` | complete local promotion wrapper |
 | `pyproject.toml` | dependencies, tool configuration, and console targets |
 
 Public console targets:
@@ -51,19 +52,20 @@ loto-hierarchicalforecast-verify-package =
 | `tests/test_reconciliation_package_verifier.py` | 7 passed |
 | `tests/test_reconciliation_target_machine_certification.py` | 9 passed |
 | `tests/test_reconciliation_target_operator.py` | 6 passed |
+| `tests/test_reconciliation_promotion_gate.py` | 8 passed |
 | `tests/test_reconciliation_quality_gate.py` | 9 passed |
-| **Cumulative focused evidence** | **84 passed** |
+| **Cumulative focused evidence** | **92 passed** |
 
-The standalone verifier and console subsets were executed against exact published blobs:
+Promotion-gate files were executed against exact published Git blobs:
 
 ```text
-verifier 7 passed
-console 2 passed
+promotion tests 8 passed
 compileall PASS
 Python lines over 100 characters: 0
+wrapper --help PASS
 ```
 
-The total of 84 is from separate isolated runs. A formal combined invocation remains pending.
+The total of 92 is from separate isolated runs. A formal combined invocation remains pending.
 
 ## Documentation
 
@@ -80,6 +82,7 @@ All paths below are under `docs/hierarchicalforecast/`:
 - `PORTABLE_PACKAGE_PUBLICATION.md`
 - `PACKAGE_VERIFIER.md`
 - `QUALITY_GATE.md`
+- `PROMOTION_GATE.md`
 - `RUNBOOK.md`
 - `VERIFICATION_REPORT.md`
 - `HANDOFF.md`
@@ -96,10 +99,11 @@ All paths below are under `docs/hierarchicalforecast/`:
 | transfer ZIP | `<runtime-run-id>.zip.sha256` plus internal manifests |
 | target operator execution | operator `ARTIFACT_MANIFEST.json` and `SHA256SUMS` |
 | local quality execution | quality `ARTIFACT_MANIFEST.json` and `SHA256SUMS` |
+| local promotion execution | promotion `ARTIFACT_MANIFEST.json` and `SHA256SUMS` |
 
-Runtime, operator, and quality Run IDs are independent and must not be substituted for one another.
-The standalone verifier does not create a fourth evidence root; it validates the transferred ZIP
-and sidecar without changing them.
+Runtime, operator, quality, and promotion Run IDs are independent. The promotion report links and
+cross-checks the other roots but does not replace them. The standalone verifier validates the
+transferred ZIP and sidecar without creating another evidence root.
 
 ## Runtime evidence
 
@@ -115,39 +119,8 @@ artifacts/hierarchicalforecast-runtime/<runtime-run-id>.zip
 artifacts/hierarchicalforecast-runtime/<runtime-run-id>.zip.sha256
 ```
 
-The ZIP additionally contains canonical `PACKAGE_MANIFEST.json`.
-
-The package result records one publication method:
-
-```text
-hardlink
-exclusive_copy
-reused_existing
-```
-
-All methods preserve the no-overwrite contract. `exclusive_copy` uses `O_CREAT | O_EXCL`, flush,
-`fsync`, final SHA-256 verification, and partial-file cleanup.
-
-## Standalone transfer verification
-
-```bash
-uv run --locked loto-hierarchicalforecast-verify-package \
-  --zip artifacts/hierarchicalforecast-runtime/<runtime-run-id>.zip
-```
-
-Expected success evidence:
-
-```text
-exit                   = 0
-status                 = VERIFIED
-formal_success         = true
-zip_sha256             = sidecar digest
-zip_member_count       = 6
-package/internal hashes = PASS
-runtime identity       = PASS
-```
-
-The command is read-only and does not extract, repair, or overwrite the package.
+The ZIP additionally contains canonical `PACKAGE_MANIFEST.json`. The package result records
+`hardlink`, `exclusive_copy`, or `reused_existing` as its publication method.
 
 ## Target-operator evidence
 
@@ -173,15 +146,42 @@ artifacts/hierarchicalforecast-quality-runs/<quality-run-id>/
 └── SHA256SUMS
 ```
 
-Focused JUnit must record exactly 84 tests with zero failures and errors. Full-suite JUnit must
+Focused JUnit must record exactly 92 tests with zero failures and errors. Full-suite JUnit must
 record zero failures and errors.
+
+## Local-promotion evidence
+
+```text
+artifacts/hierarchicalforecast-promotion-runs/<promotion-run-id>/
+├── quality stdout/stderr logs
+├── target stdout/stderr logs
+├── package-verification stdout/stderr logs
+├── COMMANDS.json
+├── PROMOTION_REPORT.json
+├── ARTIFACT_MANIFEST.json
+└── SHA256SUMS
+```
+
+Successful local promotion records `LOCAL_GATES_VERIFIED`, `formal_success=true`,
+`ready_for_review=false`, and `ci_required=true`.
+
+## Formal command
+
+```bash
+cd /mnt/e/env/ts/loto_forecast_platform-pr48
+
+git fetch origin agent/hierarchicalforecast-runtime-certification
+EXPECTED_HEAD="$(git rev-parse origin/agent/hierarchicalforecast-runtime-certification)"
+
+python3 scripts/run_hierarchicalforecast_promotion_gate.py \
+  --expected-git-sha "${EXPECTED_HEAD}"
+```
 
 ## Verification commands
 
 ```bash
 cd artifacts/hierarchicalforecast-runtime
 sha256sum -c <runtime-run-id>.zip.sha256
-unzip -t <runtime-run-id>.zip
 
 uv run --locked loto-hierarchicalforecast-verify-package \
   --zip <runtime-run-id>.zip
@@ -194,24 +194,27 @@ sha256sum -c SHA256SUMS
 
 cd artifacts/hierarchicalforecast-quality-runs/<quality-run-id>
 sha256sum -c SHA256SUMS
+
+cd artifacts/hierarchicalforecast-promotion-runs/<promotion-run-id>
+sha256sum -c SHA256SUMS
 ```
 
 ## Pending formal artifacts
 
+- formal promotion evidence for the current reviewed head;
 - real installed `hierarchicalforecast==1.5.1` 40-case runtime bundle;
-- real target-operator evidence for the current reviewed head;
 - real mounted-drive publication evidence including `publication_method`;
 - standalone verification report for the real transferred ZIP;
-- formal quality evidence with Ruff, mypy, exact 84 focused tests, and full pytest;
+- formal quality evidence with Ruff, mypy, exact 92 focused tests, and full pytest;
 - GitHub Actions logs and results containing real workflow steps.
 
 Issue #61 tracks the GitHub Actions runner-start blocker.
 
 ## Handoff rule
 
-Record and transfer the exact Git commit, runtime/operator/quality Run IDs, installed version,
-40-case totals, focused/full JUnit totals, publication method, standalone-verifier JSON result, ZIP
-SHA-256, all three `SHA256SUMS` files, and GitHub Actions run/job IDs.
+Record and transfer the exact Git commit, runtime/operator/quality/promotion Run IDs, installed
+version, 40-case totals, focused/full JUnit totals, publication method, standalone-verifier JSON
+result, ZIP SHA-256, all four `SHA256SUMS` files, and GitHub Actions run/job IDs.
 
-Do not overwrite a runtime directory, operator directory, quality directory, mismatched ZIP, or
-mismatched sidecar. Preserve inconsistencies as incident evidence and create a new Run ID.
+Do not overwrite any evidence directory, mismatched ZIP, or mismatched sidecar. Preserve
+inconsistencies as incident evidence and create a new Run ID.
