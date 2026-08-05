@@ -36,6 +36,7 @@ MYPY_SCOPE = (
     "src/loto/reconciliation/hierarchy.py",
     "src/loto/reconciliation/runtime_certification.py",
     "src/loto/reconciliation/package_certification.py",
+    "src/loto/reconciliation/portable_package_certification.py",
     "scripts/hierarchicalforecast_target",
 )
 
