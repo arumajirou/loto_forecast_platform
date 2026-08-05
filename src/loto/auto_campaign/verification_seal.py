@@ -21,6 +21,8 @@ _MUTABLE_ROOT_FILES = {
 
 
 def _content_files(root: Path) -> list[Path]:
+    if not root.is_dir():
+        raise ValueError(f"verification seal root is not a directory: {root}")
     files: list[Path] = []
     for path in root.rglob("*"):
         relative = path.relative_to(root).as_posix()
@@ -156,8 +158,8 @@ def verify_verification_seal(root: Path) -> dict[str, Any]:
 
     try:
         current_sha256, current_count = content_fingerprint(root)
-    except ValueError as exc:
-        failures.append(str(exc))
+    except (OSError, ValueError) as exc:
+        failures.append(f"verification seal content unreadable: {type(exc).__name__}: {exc}")
         current_sha256, current_count = None, None
     if payload.get("content_sha256") != current_sha256:
         failures.append(
@@ -175,7 +177,13 @@ def verify_verification_seal(root: Path) -> dict[str, Any]:
         ("promotion_gate_sha256", "PROMOTION_GATE.json"),
         ("lineage_sha256", "LINEAGE.json"),
     ):
-        current = _optional_file_hash(root / filename)
+        try:
+            current = _optional_file_hash(root / filename)
+        except OSError as exc:
+            failures.append(
+                f"verification seal cannot hash {filename}: {type(exc).__name__}: {exc}"
+            )
+            current = None
         if payload.get(field) != current:
             failures.append(
                 f"verification seal {field} mismatch: "
