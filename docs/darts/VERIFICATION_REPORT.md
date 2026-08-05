@@ -61,7 +61,7 @@
 
 ## P7 Torch increment
 
-- focused Torch contract tests: 10 passed;
+- focused Torch contract tests: 11 passed;
 - ten required Torch identities: PASS;
 - shared chunk/epoch/batch/seed/Lightning trainer contract: PASS;
 - serialized `max_gpu_jobs=1` policy: PASS;
@@ -69,8 +69,8 @@
 - position-local and global-sequence fake-runtime execution: PASS;
 - CUDA parameter/prediction device evidence checks: PASS;
 - GPU PID and VRAM/CUDA-memory evidence requirements: PASS;
-- CPU fallback rejection with retained evidence: PASS;
-- per-model dependency/runtime failure isolation: PASS;
+- CPU fallback and requested/effective accelerator mismatch rejection: PASS;
+- package-level and per-model dependency/runtime failure retention: PASS;
 - prediction shape/finite and raw-frame immutability: PASS;
 - compileall, AST parse, YAML/JSON parse, and line-length checks: PASS.
 
