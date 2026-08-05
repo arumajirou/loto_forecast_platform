@@ -4,7 +4,14 @@
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
   "branch": "feat/darts-forecasting-contract-v1",
   "target_version": "darts==0.46.1",
-  "implemented_phases": ["P1_PARTIAL", "P2", "P3", "P4_MINIMUM"],
+  "implemented_phases": [
+    "P1_PARTIAL",
+    "P2",
+    "P3",
+    "P4_MINIMUM",
+    "P5_EVALUATION_AND_PERSISTENCE_CONTRACT",
+    "P6_OOF_MULTI_SEED_PROVENANCE_CONTRACT"
+  ],
   "owned_paths": [
     "environments/darts-notorch/**",
     "environments/darts-torch/**",
@@ -24,5 +31,6 @@
     "README.md"
   ],
   "runtime_status": "REAL_DARTS_RUNTIME_BLOCKED",
+  "ci_status": "BLOCKED_PRE_RUN",
   "merge": "USER_APPROVAL_REQUIRED"
 }
