@@ -1,14 +1,13 @@
 """Resolve static API plans into auditable execution and verification states.
 
-This module is intentionally CPU-safe. It combines the static argument catalog,
-API case results, and an all-AutoModel constructor contract matrix without
-claiming GPU runtime certification. GPU fit/load/inference remains a separate
-``EXECUTION_PENDING`` boundary until evidence is produced on the target host.
+The resolver is CPU-safe: it joins the static argument catalog, API case results,
+and an all-AutoModel constructor matrix without claiming GPU runtime success.
 """
 
 from __future__ import annotations
 
 import argparse
+import inspect
 import json
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping, Sequence
@@ -46,21 +45,20 @@ def _case_value(row: Mapping[str, Any], key: str) -> Any:
     if isinstance(nested, Mapping) and key in nested:
         return nested[key]
     dotted = f"case.{key}"
-    if dotted in row:
-        return row[dotted]
-    return row.get(key)
+    return row[dotted] if dotted in row else row.get(key)
 
 
 def _normalize_case_results(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     normalized: list[dict[str, Any]] = []
     seen_case_ids: set[str] = set()
-    for row in rows:
+    for source in rows:
+        row = dict(source)
         case_id = str(_case_value(row, "case_id") or "").strip()
         layer = str(_case_value(row, "layer") or "").strip()
         argument = str(_case_value(row, "argument") or "").strip()
         status = str(row.get("status") or "").strip()
         if not case_id or not layer or not argument or not status:
-            raise ValueError(f"malformed API coverage result: {dict(row)}")
+            raise ValueError(f"malformed API coverage result: {row}")
         if case_id in seen_case_ids:
             raise ValueError(f"duplicate API coverage case_id: {case_id}")
         seen_case_ids.add(case_id)
@@ -84,11 +82,9 @@ def build_constructor_contract_matrix(
     expected_model_count: int = 36,
     probe_default_configs: bool = True,
 ) -> list[dict[str, Any]]:
-    """Build one CPU-safe constructor contract row per registered AutoModel.
+    """Build one constructor/default-config contract row per AutoModel.
 
-    This verifies inventory identity, constructor signatures, backend declarations,
-    and optionally ``get_default_config`` for each supported backend. It does not
-    fit, predict, save, load, allocate CUDA memory, or certify GPU execution.
+    No model is fitted and no CUDA work is performed.
     """
 
     records = discover_auto_models()
@@ -100,11 +96,8 @@ def build_constructor_contract_matrix(
 
     rows: list[dict[str, Any]] = []
     for record in records:
-        cls = get_auto_class(record.name)
-        signature = __import__("inspect").signature(cls)
-        parameter_names = [
-            name for name in signature.parameters if name not in {"self", "cls"}
-        ]
+        signature = inspect.signature(get_auto_class(record.name))
+        parameters = [name for name in signature.parameters if name not in {"self", "cls"}]
         backend_results: dict[str, dict[str, Any]] = {}
         for backend in ("ray", "optuna"):
             if backend not in record.supported_backends:
@@ -112,66 +105,62 @@ def build_constructor_contract_matrix(
                     "status": "NOT_APPLICABLE",
                     "reason": record.unsupported_backend_reason,
                 }
-                continue
-            if not probe_default_configs:
+            elif not probe_default_configs:
                 backend_results[backend] = {
                     "status": "EXECUTION_PENDING",
                     "reason": "default-config probe disabled",
                 }
-                continue
-            try:
-                config = get_default_config(
-                    record.name,
-                    h=1,
-                    backend=backend,
-                    n_series=5 if record.requires_n_series else None,
-                )
-                if config is None and not record.is_hint:
-                    raise RuntimeError("get_default_config returned None")
-                backend_results[backend] = {
-                    "status": "VERIFIED",
-                    "config_type": type(config).__name__,
-                    "special_constructor": record.is_hint,
-                }
-            except Exception as exc:
-                backend_results[backend] = {
-                    "status": "FAILED",
-                    "error_type": type(exc).__name__,
-                    "error": str(exc),
-                }
+            else:
+                try:
+                    config = get_default_config(
+                        record.name,
+                        h=1,
+                        backend=backend,
+                        n_series=5 if record.requires_n_series else None,
+                    )
+                    if config is None and not record.is_hint:
+                        raise RuntimeError("get_default_config returned None")
+                    backend_results[backend] = {
+                        "status": "VERIFIED",
+                        "config_type": type(config).__name__,
+                        "special_constructor": record.is_hint,
+                    }
+                except Exception as exc:
+                    backend_results[backend] = {
+                        "status": "FAILED",
+                        "error_type": type(exc).__name__,
+                        "error": str(exc),
+                    }
 
-        required_signature_arguments = {"h", "config"}
-        missing_required = sorted(required_signature_arguments - set(parameter_names))
-        backend_failures = sorted(
-            backend
-            for backend, result in backend_results.items()
-            if result["status"] == "FAILED"
+        missing_required = sorted({"h", "config"} - set(parameters))
+        failed_backends = sorted(
+            name for name, result in backend_results.items() if result["status"] == "FAILED"
         )
         pending_backends = sorted(
-            backend
-            for backend, result in backend_results.items()
+            name
+            for name, result in backend_results.items()
             if result["status"] == "EXECUTION_PENDING"
         )
-        if missing_required or backend_failures:
-            overall = VerificationStatus.FAILED.value
+        if missing_required or failed_backends:
+            verification = VerificationStatus.FAILED.value
         elif pending_backends:
-            overall = VerificationStatus.PARTIALLY_VERIFIED.value
+            verification = VerificationStatus.PARTIALLY_VERIFIED.value
         else:
-            overall = VerificationStatus.VERIFIED.value
+            verification = VerificationStatus.VERIFIED.value
 
         rows.append(
             {
                 **asdict(record),
-                "constructor_parameters": parameter_names,
-                "constructor_has_h": "h" in parameter_names,
-                "constructor_has_config": "config" in parameter_names,
+                "constructor_parameters": parameters,
+                "constructor_has_h": "h" in parameters,
+                "constructor_has_config": "config" in parameters,
                 "missing_required_arguments": missing_required,
                 "ray_default_config_status": backend_results["ray"]["status"],
                 "optuna_default_config_status": backend_results["optuna"]["status"],
                 "backend_results": backend_results,
-                "failed_backends": backend_failures,
+                "failed_backends": failed_backends,
                 "pending_backends": pending_backends,
-                "verification_status": overall,
+                "verification_status": verification,
             }
         )
     return rows
@@ -182,11 +171,8 @@ def _constructor_evidence(
 ) -> dict[tuple[str, str], dict[str, Any]]:
     failed = [row for row in rows if row.get("verification_status") == "FAILED"]
     pending = [
-        row
-        for row in rows
-        if row.get("verification_status") == "PARTIALLY_VERIFIED"
+        row for row in rows if row.get("verification_status") == "PARTIALLY_VERIFIED"
     ]
-    model_names = sorted(str(row.get("name")) for row in rows)
     if failed:
         status = VerificationStatus.FAILED.value
     elif pending:
@@ -196,7 +182,7 @@ def _constructor_evidence(
     evidence = {
         "verification_status": status,
         "model_count": len(rows),
-        "models": model_names,
+        "models": sorted(str(row.get("name")) for row in rows),
         "failed_models": sorted(str(row.get("name")) for row in failed),
         "pending_models": sorted(str(row.get("name")) for row in pending),
         "evidence_type": "all-automodel-constructor-contract",
@@ -213,7 +199,7 @@ def resolve_argument_catalog(
     catalog: Sequence[Mapping[str, Any]] | None = None,
     constructor_matrix: Sequence[Mapping[str, Any]] = (),
 ) -> list[dict[str, Any]]:
-    """Merge static catalog rows with runtime case and constructor evidence."""
+    """Merge declared catalog rows with observed API and constructor evidence."""
 
     normalized = _normalize_case_results(case_results)
     by_key: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
@@ -226,16 +212,15 @@ def resolve_argument_catalog(
         row = dict(source)
         key = (str(row["layer"]), str(row["argument"]))
         cases = by_key.get(key, [])
-        constructor_result = constructor.get(key)
         statuses = [case["status"] for case in cases]
-        failed_cases = [case["case_id"] for case in cases if case["status"] == "FAILED"]
-        unrecognized = sorted(
+        failed_case_ids = [case["case_id"] for case in cases if case["status"] == "FAILED"]
+        unknown = sorted(
             status
             for status in statuses
             if status not in _TERMINAL_CASE_STATUSES and status != "FAILED"
         )
-
-        if failed_cases or unrecognized:
+        constructor_result = constructor.get(key)
+        if failed_case_ids or unknown:
             verification = VerificationStatus.FAILED.value
         elif cases and all(status in _TERMINAL_CASE_STATUSES for status in statuses):
             verification = VerificationStatus.VERIFIED.value
@@ -244,17 +229,16 @@ def resolve_argument_catalog(
         else:
             verification = VerificationStatus.EXECUTION_PENDING.value
 
-        observed_statuses = sorted(set(statuses))
         resolved.append(
             {
                 **row,
                 "declared_status": str(row.get("status")),
-                "observed_statuses": observed_statuses,
+                "observed_statuses": sorted(set(statuses)),
                 "verification_status": verification,
                 "case_count": len(cases),
                 "case_ids": [case["case_id"] for case in cases],
-                "failed_case_ids": failed_cases,
-                "unrecognized_case_statuses": unrecognized,
+                "failed_case_ids": failed_case_ids,
+                "unrecognized_case_statuses": unknown,
                 "constructor_evidence": constructor_result,
             }
         )
@@ -289,18 +273,37 @@ def summarize_resolved_catalog(rows: Sequence[Mapping[str, Any]]) -> dict[str, A
 def _load_results(path: Path | None) -> list[dict[str, Any]]:
     if path is None:
         return []
-    suffix = path.suffix.lower()
-    if suffix == ".parquet":
+    if path.suffix.lower() == ".parquet":
         return pd.read_parquet(path).to_dict(orient="records")
-    if suffix == ".csv":
+    if path.suffix.lower() == ".csv":
         return pd.read_csv(path).to_dict(orient="records")
-    if suffix == ".json":
+    if path.suffix.lower() == ".json":
         payload = json.loads(path.read_text(encoding="utf-8"))
         if isinstance(payload, list):
             return [dict(row) for row in payload]
         if isinstance(payload, dict) and isinstance(payload.get("results"), list):
             return [dict(row) for row in payload["results"]]
     raise ValueError(f"unsupported API coverage result format: {path}")
+
+
+def _tabular_frame(rows: Sequence[Mapping[str, Any]]) -> pd.DataFrame:
+    """Convert nested audit values to deterministic JSON strings for Parquet/CSV."""
+
+    normalized: list[dict[str, Any]] = []
+    for source in rows:
+        row: dict[str, Any] = {}
+        for key, value in source.items():
+            if isinstance(value, (dict, list, tuple, set)):
+                row[key] = json.dumps(
+                    value,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    default=repr,
+                )
+            else:
+                row[key] = value
+        normalized.append(row)
+    return pd.DataFrame(normalized)
 
 
 def write_coverage_state_bundle(
@@ -315,26 +318,19 @@ def write_coverage_state_bundle(
         expected_model_count=expected_model_count,
         probe_default_configs=probe_default_configs,
     )
-    resolved = resolve_argument_catalog(
-        api_results,
-        constructor_matrix=constructor_matrix,
-    )
+    resolved = resolve_argument_catalog(api_results, constructor_matrix=constructor_matrix)
     summary = summarize_resolved_catalog(resolved)
 
-    constructor_frame = pd.DataFrame(constructor_matrix)
-    constructor_frame.to_csv(
-        output_dir / "AUTO_CONSTRUCTOR_CONTRACT_MATRIX.csv",
-        index=False,
-    )
+    write_json(output_dir / "AUTO_CONSTRUCTOR_CONTRACT_MATRIX.json", constructor_matrix)
+    constructor_frame = _tabular_frame(constructor_matrix)
+    constructor_frame.to_csv(output_dir / "AUTO_CONSTRUCTOR_CONTRACT_MATRIX.csv", index=False)
     constructor_frame.to_parquet(
         output_dir / "AUTO_CONSTRUCTOR_CONTRACT_MATRIX.parquet",
         index=False,
     )
-    resolved_frame = pd.DataFrame(resolved)
-    resolved_frame.to_csv(
-        output_dir / "API_ARGUMENT_COVERAGE_RESOLVED.csv",
-        index=False,
-    )
+    write_json(output_dir / "API_ARGUMENT_COVERAGE_RESOLVED.json", resolved)
+    resolved_frame = _tabular_frame(resolved)
+    resolved_frame.to_csv(output_dir / "API_ARGUMENT_COVERAGE_RESOLVED.csv", index=False)
     resolved_frame.to_parquet(
         output_dir / "API_ARGUMENT_COVERAGE_RESOLVED.parquet",
         index=False,
@@ -369,11 +365,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--api-results", type=Path)
     parser.add_argument("--expected-model-count", type=int, default=36)
-    parser.add_argument(
-        "--skip-default-config-probes",
-        action="store_true",
-        help="Build the 36-model signature matrix without calling get_default_config.",
-    )
+    parser.add_argument("--skip-default-config-probes", action="store_true")
     return parser
 
 
