@@ -9,6 +9,7 @@ OUT="${OUT:-${ROOT}/artifacts/merlion-core-runtime/${RUN_ID}}"
 CONSOLE_LOG="${OUT}.console.log"
 EXIT_FILE="${OUT}.exit_code"
 EXPECTED_GIT_SHA="${EXPECTED_GIT_SHA:-$(git -C "${ROOT}" rev-parse HEAD)}"
+LOCK_COMMIT_REPORT="${MERLION_LOCK_COMMIT_REPORT:-}"
 mkdir -p "$(dirname "${OUT}")"
 
 finish() {
@@ -19,6 +20,8 @@ finish() {
 trap finish EXIT
 
 {
+  test -n "${LOCK_COMMIT_REPORT}"
+  test -f "${LOCK_COMMIT_REPORT}"
   test -f "${LOCK}"
   git -C "${ROOT}" diff --quiet
   git -C "${ROOT}" diff --cached --quiet
@@ -28,8 +31,18 @@ trap finish EXIT
   git -C "${ROOT}" ls-files --error-unmatch \
     "environments/merlion-core-py311/uv.lock" >/dev/null
 
+  export PYTHONPATH="${ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}"
+  python3 "${ROOT}/scripts/certify_merlion_lock_commit.py" verify \
+    --root "${ROOT}" \
+    --report "${LOCK_COMMIT_REPORT}" \
+    --expected-head "${EXPECTED_GIT_SHA}"
+
   LOCK_SHA256="$(sha256sum "${LOCK}" | awk '{print $1}')"
-  uv sync --project "${ENV_DIR}" --frozen --python 3.11
+  uv sync \
+    --project "${ENV_DIR}" \
+    --frozen \
+    --python 3.11 \
+    --no-sources
 
   PROVIDER_COMMAND_JSON="$(python - "${ROOT}" "${ENV_DIR}" <<'PY'
 import json
@@ -39,13 +52,12 @@ from pathlib import Path
 root = Path(sys.argv[1])
 env_dir = Path(sys.argv[2])
 print(json.dumps([
-    "uv", "run", "--project", str(env_dir), "--frozen", "python",
-    str(root / "scripts" / "run_merlion_provider.py"),
+    "uv", "run", "--project", str(env_dir), "--frozen", "--no-sources",
+    "python", str(root / "scripts" / "run_merlion_provider.py"),
 ]))
 PY
 )"
 
-  export PYTHONPATH="${ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}"
   uv run --project "${ROOT}" --frozen python \
     "${ROOT}/scripts/run_merlion_core_certification.py" run \
     --provider-command-json "${PROVIDER_COMMAND_JSON}" \
@@ -58,6 +70,7 @@ PY
     "${ROOT}/scripts/run_merlion_core_certification.py" verify \
     --run "${OUT}"
   echo "MERLION_CORE_CERTIFICATION=PASS"
+  echo "LOCK_COMMIT_REPORT=${LOCK_COMMIT_REPORT}"
   echo "RUN_DIR=${OUT}"
 } 2>&1 | tee "${CONSOLE_LOG}"
 

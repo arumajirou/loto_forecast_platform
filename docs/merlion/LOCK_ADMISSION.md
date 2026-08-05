@@ -49,4 +49,6 @@ PYTHONPATH="$PWD/src" python3 scripts/admit_merlion_core_lock.py \
   --decision artifacts/merlion-lock-admission/<RUN_ID>/LOCK_ADMISSION_DECISION.md
 ```
 
-Only `LOCK_ADMISSION_STATUS=ADMITTED` permits the separate lock-only commit step.
+Only `LOCK_ADMISSION_STATUS=ADMITTED` permits the separate lock-only commit step. Admission does
+not prove that the resulting commit preserved the exact lock. After committing, continue with
+`docs/merlion/LOCK_COMMIT_CERTIFICATION.md` and require `LOCK_COMMIT_CERTIFIED` before runtime.
