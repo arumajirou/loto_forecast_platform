@@ -1,9 +1,8 @@
-# GluonTS isolated provider foundation
+# GluonTS isolated provider integration
 
 Status: `PARTIALLY_VERIFIED`
 
-This directory documents the first implementation phase of the GluonTS integration. It does not
-claim model runtime success.
+This directory documents the isolated GluonTS integration. It does not claim model runtime success.
 
 ## Why two environments exist
 
@@ -16,29 +15,44 @@ would therefore violate the existing Torch contract.
 | `compat` | 0.16.3 | 2.9.1 | compatible implementation lane |
 | `latest` | 0.17.0 | >=2.10,<3 | current-upstream certification lane |
 
-Both lanes must communicate through the JSON-safe Pydantic contract in
+Both lanes communicate through the JSON-safe Pydantic contract in
 `src/loto/adapters/gluonts/protocol.py`. No GluonTS, Torch, Lightning, Predictor, or Dataset Python
 object may cross the process boundary.
 
-## Current phase contents
+## Implemented phases
+
+### P1: isolated provider foundation
 
 - version-isolated `pyproject.toml` files,
-- provider identity entry points,
+- provider identity declarations,
 - strict request and response models,
 - explicit draw-sequence versus calendar-time semantics,
 - outer-worker and GPU concurrency limits,
 - finite-value and fail-closed validation,
-- protocol schema SHA-256,
-- focused contract tests.
+- protocol schema SHA-256.
+
+### P2: provider protocol and artifact flow
+
+- all seven declared operations,
+- provider-local protocol copies with identical Git blob SHA,
+- `python -m loto_gluonts_provider` CLI in both lanes,
+- atomic canonical request and response JSON,
+- immutable stdout and stderr logs,
+- request and response SHA-256,
+- timeout, identity, lane, and schema-hash rejection,
+- import-only model and distribution discovery,
+- explicit `EXECUTION_PENDING` for later-phase operations.
+
+See `GLUONTS_P2_VERIFICATION_REPORT.md` for the verification boundary.
 
 ## Certification boundary
 
 The following remain `EXECUTION_PENDING`:
 
-- `uv.lock` generation on the target repository branch,
-- package installation,
-- all-nine Estimator discovery,
-- distribution discovery,
+- isolated `uv.lock` generation,
+- package installation in both lanes,
+- persisted runtime inventory from the target environments,
+- successful Estimator construction,
 - fit and predict,
 - serialize, process exit, deserialize, and re-predict,
 - GPU PID, VRAM, device, and CPU fallback evidence,
@@ -46,15 +60,16 @@ The following remain `EXECUTION_PENDING`:
 
 ## Local verification
 
-- protocol and environment tests: 9 passed,
+- focused protocol, runner, and CLI tests: 16 passed,
 - Python compileall: passed,
 - maximum Python line length 100: passed,
-- compatibility and latest provider identity imports: passed,
+- root, compatibility, and latest protocol source identity: passed,
 - Ruff: blocked because the execution registry did not expose the package,
 - isolated `uv.lock`: blocked because the execution registry did not expose GluonTS.
 
 ## Next phase
 
-Implement a provider CLI that reads one request JSON document from a file, executes exactly one
-bounded operation, atomically writes a response JSON document, and records package versions,
-protocol hash, artifact hashes, device evidence, and structured logs.
+P3 runs model and distribution discovery inside each resolved isolated environment and persists a
+runtime inventory that separates PyTorch Estimators, native Predictors, and extensions. Availability
+is not certified until loading, input construction, inference, output shape, finite values, and
+device evidence pass.
