@@ -49,6 +49,45 @@ def _clean_probe(commit: str = "a" * 40):
     }
 
 
+def _write_dependency_contract(repo: Path, version: str = "1.5.1") -> None:
+    (repo / "pyproject.toml").write_text(
+        """
+[project]
+name = "loto-forecast-platform"
+requires-python = ">=3.11,<3.14"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "pytest-cov>=5",
+  "ruff>=0.9",
+  "mypy>=1.13",
+  "pydantic[email]>=2.8,<3",
+]
+full = ["hierarchicalforecast>=1.0"]
+""".lstrip(),
+        encoding="utf-8",
+    )
+    (repo / "uv.lock").write_text(
+        f"""
+version = 1
+revision = 3
+requires-python = ">=3.11, <3.14"
+
+[[package]]
+name = "hierarchicalforecast"
+version = "{version}"
+
+[[package]]
+name = "loto-forecast-platform"
+
+[package.optional-dependencies]
+full = [{{ name = "hierarchicalforecast" }}]
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+
 def test_parse_junit_requires_exact_focused_count(tmp_path: Path) -> None:
     path = tmp_path / "focused.xml"
     _junit(path, quality_gate.EXPECTED_FOCUSED_TESTS - 1)
@@ -66,6 +105,15 @@ def test_parse_junit_rejects_failures(tmp_path: Path) -> None:
 def test_quality_gate_success_runs_full_suite_last(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()
+    _write_dependency_contract(repo)
+    contract = quality_gate.verify_dependency_contract(repo)
+    assert contract["locked_versions"] == ["1.5.1"]
+    assert contract["declaration_exact"] is False
+    _write_dependency_contract(repo, version="1.5.0")
+    with pytest.raises(quality_gate.CertificationError, match="must resolve only"):
+        quality_gate.verify_dependency_contract(repo)
+    _write_dependency_contract(repo)
+
     commands: list[list[str]] = []
 
     def runner(command, cwd, stdout_path, stderr_path):
@@ -90,6 +138,7 @@ def test_quality_gate_success_runs_full_suite_last(tmp_path: Path) -> None:
 
     assert code == 0
     assert report["status"] == "VERIFIED"
+    assert report["dependency_contract"]["status"] == "SKIPPED_TEST_MODE"
     assert report["focused_junit"]["tests"] == quality_gate.EXPECTED_FOCUSED_TESTS
     assert report["full_junit"]["tests"] == 120
     assert commands[-1][5] == "pytest"
