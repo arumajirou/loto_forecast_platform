@@ -1,0 +1,2 @@
+run_id,position,variant,seed,fold,hit_pm1,mae,mse,rmse,status
+UNEXECUTED,UNVERIFIED,UNVERIFIED,UNVERIFIED,UNVERIFIED,,,,,EXECUTION_PENDING
