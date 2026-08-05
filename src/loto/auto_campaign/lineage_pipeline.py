@@ -80,10 +80,10 @@ def run_stage_with_promotion_and_lineage(
     run_root: Path,
     target_stage: CampaignStage,
     source_run: Path | None,
-    predecessor_run: Path | None,
     coverage_run: Path | None,
     runtime_run: Path | None,
     resume: bool,
+    predecessor_run: Path | None = None,
 ) -> dict[str, Any]:
     """Block invalid chains, run the existing gate, then freeze lineage."""
 
