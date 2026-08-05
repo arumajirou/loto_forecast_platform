@@ -80,6 +80,12 @@ def _verify_identity(request: ProviderRequest) -> tuple[str, str, dict[str, Any]
         )
     if provenance.get("distribution_version") != version:
         raise RuntimeError("BasicTS version metadata and provenance metadata differ")
+    if provenance.get("import_origin_status") != "PASS":
+        raise RuntimeError("BasicTS import origin was not verified")
+    if provenance.get("import_spec_origin") != provenance.get(
+        "distribution_package_init"
+    ):
+        raise RuntimeError("BasicTS import origin differs from the installed distribution")
     if revision != request.expected_upstream_revision:
         raise RuntimeError(
             "BasicTS revision mismatch: "
