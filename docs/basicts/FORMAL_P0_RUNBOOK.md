@@ -20,6 +20,10 @@ the uv version and stores the complete metadata JSON, canonical audit JSON, comm
 SHA-256 values. Do not substitute a different uv version without updating and reviewing the schema
 contract and focused tests.
 
+Installed-distribution provenance is a separate required layer. See
+`docs/basicts/INSTALLED_PROVENANCE.md`. The environment revision marker and lockfile do not replace
+verification of the loaded distribution's `direct_url.json`.
+
 ## Preconditions
 
 Run from a clean checkout of Draft PR #56 on a network-capable Linux host.
@@ -64,6 +68,10 @@ The nested core P0 validates the preflight lock SHA-256 and reuses that environm
 another `uv lock` or explicit `uv sync`. Every core `uv run` uses `--frozen`; uv may check or
 synchronize the already prepared environment, but it cannot update the lockfile silently. The core
 also verifies the lock SHA-256 again before certification.
+
+Before identity, configuration, or DLinear can pass, the provider reads the installed `BasicTS`
+distribution metadata and requires exact non-editable Git provenance for the frozen repository and
+commit. Missing or changed `direct_url.json` evidence is a formal failure.
 
 The core status records one of these environment modes:
 
@@ -113,6 +121,7 @@ The verifier fails closed on:
 - missing command logs or an unexpected command phase order;
 - non-frozen core model commands;
 - formal, preflight, core, certificate, or lock SHA-256 cross-link disagreement;
+- installed distribution repository, VCS, commit, or requested-revision disagreement;
 - provider identity, allowlist, or DLinear evidence disagreement.
 
 The following shell checks remain useful as an independent implementation of the checksum review:
@@ -126,6 +135,7 @@ The following shell checks remain useful as an independent implementation of the
   python -m json.tool preflight/UV_RESOLUTION_AUDIT.json
   python -m json.tool core/P0_RUN_STATUS.json
   python -m json.tool core/P0_CERTIFICATION_REPORT.json
+  python -m json.tool core/identity/response.json
 )
 
 (
@@ -138,11 +148,20 @@ The following shell checks remain useful as an independent implementation of the
   sha256sum -c SHA256SUMS
   sha256sum -c P0_CERTIFICATION_REPORT.json.sha256
 )
+
+(
+  cd "${RUN_DIR}/core/identity"
+  sha256sum -c SHA256SUMS
+)
 ```
 
 PASS requires the verifier and all checksum commands to succeed. The verification report, formal
 status, dependency audit, core status, and core certificate must all report `PASS`. For a formal
 run, `core/P0_RUN_STATUS.json` must record `environment_mode=FORMAL_PREFLIGHT_REUSE`.
+
+The identity response must record `installed_provenance_status=PASS`, distribution `BasicTS`
+version `1.1.0`, repository `https://github.com/GestaltCogTeam/BasicTS`, VCS `git`, and the exact
+frozen commit as both `direct_url_commit_id` and `direct_url_requested_revision`.
 
 The verification report certifies the retained evidence only. It does not rerun installation,
 training, inference, or accuracy evaluation.
@@ -153,7 +172,9 @@ Review at least:
 
 - exact Git commit in the core status;
 - uv version and resolution cutoff;
-- BasicTS Git source, version, and revision;
+- BasicTS lock and workspace-metadata source, version, and revision;
+- installed BasicTS distribution name, version, repository, VCS, commit, and requested revision;
+- SHA-256 of the raw installed `direct_url.json` consumed by the provider;
 - resolved versions of easy-torch, numpy, setuptools, torch, and transformers;
 - CPython implementation and 3.11 version;
 - absence of workspace conflicts;
@@ -174,6 +195,6 @@ Use `FORMAL_P0_STATUS.json` and the recorded `failed_phase` first. Then inspect 
 under `preflight/logs/` or `core/logs/`. Do not repeatedly rerun an unchanged failure. Preserve the
 failed bundle for comparison with the next Run ID.
 
-A failure in dependency resolution, identity, import allowlisting, DLinear execution, persistence,
-re-prediction, finite-value checks, shape checks, or SHA-256 verification is a formal failure. It
-must not be converted to PASS manually.
+A failure in dependency resolution, installed provenance, identity, import allowlisting, DLinear
+execution, persistence, re-prediction, finite-value checks, shape checks, or SHA-256 verification is
+a formal failure. It must not be converted to PASS manually.
