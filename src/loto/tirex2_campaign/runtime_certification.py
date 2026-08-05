@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import subprocess
@@ -182,3 +183,29 @@ def certify_two_process_reload(
         encoding="utf-8",
     )
     return result
+
+
+def _read_request(path: Path) -> Tirex2Request:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise TypeError("request JSON must be an object")
+    return Tirex2Request.model_validate(payload)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Certify TiRex-2 two-process reload")
+    parser.add_argument("--request", required=True, type=Path)
+    parser.add_argument("--output-root", required=True, type=Path)
+    parser.add_argument("--provider-script", required=True, type=Path)
+    args = parser.parse_args()
+    result = certify_two_process_reload(
+        _read_request(args.request),
+        args.output_root,
+        args.provider_script.resolve(strict=True),
+    )
+    print(json.dumps(result.model_dump(mode="json"), ensure_ascii=False, sort_keys=True))
+    return 0 if result.status == "PASS" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
