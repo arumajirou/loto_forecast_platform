@@ -1,5 +1,5 @@
 {
-  "schema_version": "change-scope-v1.1.0",
+  "schema_version": "change-scope-v1.2.0",
   "scope_id": "neuralforecast-api-coverage-state",
   "stacked_base_branch": "agent/p0-runtime-certification",
   "stacked_base_sha": "dde70b5372d16651004d3a2a39f45935745250c6",
@@ -10,9 +10,15 @@
     "supported backend default-config probes",
     "fail-closed coverage status validation",
     "automatic integration into the existing api-coverage CLI stage",
+    "automatic integration into the existing verify CLI command",
+    "root and nested manifest consistency verification",
+    "root and nested portable SHA256 verification",
+    "required artifact, count, schema, and safe-path verification",
+    "explicit enforcement of the GPU EXECUTION_PENDING boundary",
     "resume-safe replacement of stale coverage-state artifacts",
+    "removal of partial coverage-state output after resolver failure",
     "structured resolver-failure evidence and non-PASS exit behavior",
-    "CSV, Parquet, JSON, manifest, and SHA256SUMS artifacts",
+    "CSV, Parquet, JSON, manifest, VERIFICATION_REPORT, and SHA256SUMS artifacts",
     "unit and CPU contract tests"
   ],
   "out_of_scope": [
@@ -35,7 +41,10 @@
     "src/loto/auto_campaign/api_coverage_pipeline.py",
     "src/loto/auto_campaign/cli.py",
     "src/loto/auto_campaign/coverage_state.py",
+    "src/loto/auto_campaign/coverage_verification.py",
     "tests/auto_campaign/test_api_coverage_pipeline.py",
-    "tests/auto_campaign/test_coverage_state.py"
+    "tests/auto_campaign/test_coverage_state.py",
+    "tests/auto_campaign/test_coverage_verification.py",
+    "tests/auto_campaign/test_coverage_verification_cli.py"
   ]
 }
