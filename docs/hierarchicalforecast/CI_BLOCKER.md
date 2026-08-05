@@ -4,6 +4,8 @@
 
 `BLOCKED_RUNNER_START`
 
+Tracking issue: `#61` — **CI blocker: GitHub Actions jobs fail before runner execution**
+
 This document records an external verification blocker for PR #48. It does not classify the
 branch code as failing, and it does not count as passing CI evidence.
 
@@ -75,6 +77,8 @@ In GitHub UI, inspect:
    - no platform incident
    - read any run-level banner or billing/policy message not exposed by the API
 
+Record findings and resolution evidence in issue #61.
+
 ## Required resolution evidence
 
 The blocker is resolved only when a run for the current branch head has:
@@ -90,6 +94,6 @@ Do not repeatedly rerun without changing the external condition or obtaining new
 
 ## PR #48 boundary
 
-PR #48 must remain Draft while this blocker is open. Even after runner startup is restored, the PR
+PR #48 must remain Draft while issue #61 is open. Even after runner startup is restored, the PR
 also requires the real installed `hierarchicalforecast==1.5.1` 40-case certification and verified
 evidence ZIP before it can be marked ready for review.
