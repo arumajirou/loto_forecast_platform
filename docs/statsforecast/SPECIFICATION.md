@@ -28,5 +28,12 @@ Holdout are split chronologically per series. Prospective predictions must carry
 ## Runtime boundary
 
 Formal success requires installed-version evidence, import, constructor argument ledger,
-fit or forecast, identity and shape checks, finite values, and lifecycle validation.
+fit or forecast, complete inventory evidence, per-series horizon identity checks, finite
+values, and lifecycle validation.
 Static inventory and fake-runtime tests are only local contract evidence.
+
+## Upstream inventory boundary
+
+The pinned inventory is an exact transcription of StatsForecast 2.1.1
+`statsforecast.models.__all__`. `ConformalSeasonalPool` is included. A separate project
+extension must not replace, masquerade as, or be required from the upstream module.
