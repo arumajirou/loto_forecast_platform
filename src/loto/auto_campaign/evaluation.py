@@ -110,8 +110,9 @@ def summarize_metrics(run_root: Path) -> dict[str, Any]:
     if frame.empty:
         return {"metric_rows": 0, "position_metric_rows": 0}
 
-    if "config_index" not in frame.columns:
-        frame["config_index"] = None
+    for identity_column in ("stage", "backend", "config_index"):
+        if identity_column not in frame.columns:
+            frame[identity_column] = None
 
     frame.to_parquet(run_root / "evaluation_metrics.parquet", index=False)
     frame.to_csv(run_root / "evaluation_metrics.csv", index=False)
@@ -132,9 +133,11 @@ def summarize_metrics(run_root: Path) -> dict[str, Any]:
         if column in frame.columns
     ]
     candidate_columns = [
+        "stage",
         "model_name",
         "track",
         "position",
+        "backend",
         "config_index",
         "variant",
     ]
