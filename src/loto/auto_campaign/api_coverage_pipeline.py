@@ -34,19 +34,23 @@ def _write_integrated_manifest(
     base_manifest: dict[str, Any],
     coverage_state: dict[str, Any],
 ) -> dict[str, Any]:
+    failed = coverage_state["status"] == VerificationStatus.FAILED.value
+    coverage_state_path = (
+        "coverage_state_failure.json" if failed else "coverage-state/manifest.json"
+    )
     manifest = {
         **base_manifest,
         "coverage_state_schema_version": coverage_state.get("schema_version"),
         "coverage_state_status": coverage_state["status"],
         "verification_status": coverage_state["status"],
-        "coverage_state_path": "coverage-state/manifest.json",
+        "coverage_state_path": coverage_state_path,
         "gpu_runtime_status": coverage_state.get(
             "gpu_runtime_status",
             VerificationStatus.EXECUTION_PENDING.value,
         ),
         "coverage_state": coverage_state,
     }
-    if coverage_state["status"] == VerificationStatus.FAILED.value:
+    if failed:
         manifest["status"] = "PARTIAL"
     write_json(run_root / "manifest.json", manifest)
     write_sha256s(run_root)
