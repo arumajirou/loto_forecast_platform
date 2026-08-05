@@ -75,6 +75,7 @@ def _combined_local_metrics(run_root: Path) -> pd.DataFrame:
         "fold",
         "origin",
         "backend",
+        "config_index",
     ]
     rows: list[dict[str, Any]] = []
     for key, group in predictions.groupby(group_keys, dropna=False):
@@ -89,7 +90,6 @@ def _combined_local_metrics(run_root: Path) -> pd.DataFrame:
                     **dict(zip(group_keys, key, strict=True)),
                     "track": "u_local_combined",
                     "position": None,
-                    "config_index": None,
                     "variant": variant,
                     **score_draw_matrix(
                         actual.reshape(1, -1),
