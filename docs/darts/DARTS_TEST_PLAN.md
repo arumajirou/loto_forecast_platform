@@ -84,6 +84,16 @@
 80. optional strict wrapper prediction parity and drift rejection.
 81. canonical-only champion selection with all seven baseline families.
 82. P12 provider failure retention, report SHA-256, and tamper sensitivity.
+83. exact 12-document final handoff membership and canonical order.
+84. missing and unexpected final-package document rejection.
+85. nested, absolute, backslash, and traversal path rejection.
+86. SHA256SUMS generation, ordering, parsing, and duplicate-entry rejection.
+87. source tamper and stale-checksum rejection before packaging.
+88. byte-identical deterministic ZIP output from identical source documents.
+89. fixed ZIP timestamps and normalized `0644` file modes.
+90. ZIP CRC, extraction, and byte-for-byte source comparison.
+91. output ZIP isolation from the source document directory.
+92. ZIP-level and content-manifest SHA-256 reporting.
 
 ## Pending runtime gates
 
@@ -107,4 +117,5 @@
 - certify deduplicated algorithm ranking and the complete baseline champion gate;
 - run real multi-seed OOF using identical cross-library conditions;
 - certify real save/load/checkpoint behavior;
+- regenerate the deterministic handoff package with final run IDs and verified hashes;
 - run repository Ruff and full pytest after a hosted runner starts normally.
