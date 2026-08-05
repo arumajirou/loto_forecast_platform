@@ -2,60 +2,60 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / FOUR_PINNED_CPU_MODELS_VERIFIED / ISOLATED_LOCK_BLOCKED`
+`PARTIALLY_VERIFIED / FIVE_PINNED_CPU_MODELS_VERIFIED / ISOLATED_LOCK_BLOCKED`
 
 ## Revisions
 
 - project base: `d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0`;
-- previous PR head: `4bf67c6d879d89d1ee089933ea8a541b9d98abbd`;
+- previous PR head: `5d83484a8f2cb2513bfda453921cc9bb4b3409fb`;
 - upstream revision: `4e938a1767106324dd753b2a44832bf870a0252e`.
 
 ## Existing certified models
 
-DLinear, TSMixer, and LightTS remain unchanged by this increment. Their operation names
-and request schemas remain accepted by the focused regression suite.
+DLinear, TSMixer, LightTS, and SegRNN remain certified. Their request schemas remain
+accepted by the focused regression suite.
 
-## SegRNN source identity
+## FreTS source identity
 
 Verified before fit and reload:
 
-- `models/SegRNN.py`: `afff1bc07dd14d227bbecdd36941d57f8aa8f63e`;
-- `layers/Autoformer_EncDec.py`: `6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a`.
+- `models/FreTS.py`: `ca4e0b648db42a1846b7a0a9a661a39177f47005`.
 
-A separately tampered Autoformer dependency was rejected with provider exit code 2.
+FreTS was selected over PAttn and WPMixer because it requires only PyTorch and NumPy,
+while the alternatives introduce transformer/einops or wavelet decomposition lanes.
 
-## SegRNN runtime
+## FreTS runtime
 
 - CPU construction: `PASS`;
 - three bounded fit steps: `PASS`;
-- segment geometry persisted: `PASS`;
-- prediction shape `[2, 6, 3]`: `PASS`;
+- losses remained finite and decreased from `0.5952046514` to `0.2215564847`;
+- prediction shape `[2, 2, 3]`: `PASS`;
 - finite prediction and state dictionary: `PASS`;
 - parameter/input/output device CPU checks: `PASS`;
-- parameter count `2713`: recorded;
-- fit and load process IDs differ: `PASS`;
+- parameter count `329090`: formula match;
+- fit PID `9182` and load PID `9206` differ: `PASS`;
 - strict state-dictionary reload: `PASS`;
 - prediction SHA-256 equality: `PASS`;
+- prediction SHA-256 `c192a26ecd44cf44b653d1dbf365a3afa5fb76092851e5187eb561e12b91e5cd`;
 - `rtol=1e-8`, `atol=1e-8`: `PASS`;
 - maximum absolute error `0.0`: `PASS`.
 
-Six real pinned-source geometry cases passed across 1, 3, 5, and 7 channels; segment
-lengths 1, 2, 3, 4, 6, and 8; and `d_model` values 16 through 32.
+Six pinned-source matrix cases passed with channel mixing enabled and disabled,
+1 through 7 channels, sequence lengths 4 through 24, and odd/even FFT geometries.
 
 ## Fail-closed checks
 
 - wrong model/operation combination rejected: `PASS`;
-- odd `d_model` rejected: `PASS`;
-- non-divisible input sequence rejected: `PASS`;
-- non-divisible horizon rejected: `PASS`;
+- invalid channel-independence literal rejected: `PASS`;
 - unverified source rejected: `PASS`;
+- parameter-count formula checked at construction: `PASS`;
 - tampered checkpoint geometry rejected: `PASS`;
 - fixture and pinned certification separated: `PASS`.
 
 ## Focused validation
 
 - Python compileall: `PASS`;
-- focused pytest: `14 passed`;
+- focused pytest: `21 passed` in split runs;
 - 100-character Python line policy: `PASS`;
 - Ruff: `NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT`.
 
