@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class InventoryCategory(StrEnum):
@@ -100,30 +100,37 @@ class RuntimeInventory(BaseModel):
     runtime_versions: dict[str, Any] = Field(default_factory=dict)
     entries: list[RuntimeInventoryEntry] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
+    summary: dict[str, Any] = Field(default_factory=dict)
 
-    @computed_field
-    @property
-    def summary(self) -> dict[str, Any]:
+    @model_validator(mode="after")
+    def validate_summary(self) -> RuntimeInventory:
         by_category = {category.value: 0 for category in InventoryCategory}
         by_availability = {state.value: 0 for state in FormalAvailability}
         for entry in self.entries:
             by_category[entry.category.value] += 1
             by_availability[entry.formal_availability.value] += 1
-        return {
+        computed = {
             "total": len(self.entries),
             "by_category": by_category,
             "by_availability": by_availability,
             "formally_verified": by_availability[FormalAvailability.VERIFIED.value],
         }
+        if self.summary and self.summary != computed:
+            raise ValueError("runtime inventory summary does not match entries")
+        object.__setattr__(self, "summary", computed)
+        return self
 
 
 def inventory_sha256(inventory: RuntimeInventory) -> str:
     """Hash canonical inventory JSON."""
 
-    canonical = json.dumps(
-        inventory.model_dump(mode="json"),
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
+    canonical = (
+        json.dumps(
+            inventory.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
