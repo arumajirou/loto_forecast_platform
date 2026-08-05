@@ -4,7 +4,7 @@ import importlib
 import tomllib
 from pathlib import Path
 
-from loto.reconciliation import runtime_certification as rc
+from loto.reconciliation import package_certification as pc
 
 
 def test_hierarchicalforecast_certification_console_script_is_registered() -> None:
@@ -13,13 +13,13 @@ def test_hierarchicalforecast_certification_console_script_is_registered() -> No
 
     target = payload["project"]["scripts"]["loto-hierarchicalforecast-certify"]
 
-    assert target == "loto.reconciliation.runtime_certification:main"
+    assert target == "loto.reconciliation.package_certification:main"
 
 
 def test_hierarchicalforecast_certification_console_target_resolves() -> None:
     module_name, attribute = (
-        "loto.reconciliation.runtime_certification:main".split(":", maxsplit=1)
+        "loto.reconciliation.package_certification:main".split(":", maxsplit=1)
     )
     callable_object = getattr(importlib.import_module(module_name), attribute)
 
-    assert callable_object is rc.main
+    assert callable_object is pc.main
