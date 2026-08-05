@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "model_family": "tabpfn-ts",
+  "package": {
+    "name": "tabpfn-time-series",
+    "version": "1.2.0",
+    "wheel_sha256": "3358d222a3056190dc7862d5a9e8a7e7a311d374a1f2d6bc1b3f342201bfbd8f",
+    "sdist_sha256": "c94d0f63c0f921be56e91b9c50724ef49e2b95df72fa22d960c4d52df1d3f2db",
+    "source_revision": "a756ae3fb3af82c903c39e1cd71864ff5252bc4d",
+    "code_license": "Apache-2.0"
+  },
+  "lanes": [
+    {
+      "lane": "v2_reg_legacy",
+      "execution_status": "READY",
+      "repo_id": "Prior-Labs/TabPFN-v2-reg",
+      "revision": "4972a65a1b30806315c6f92499959ffbfc69a673",
+      "filename": "tabpfn-v2-regressor.ckpt",
+      "sha256": "2ab5a07d5c41dfe6db9aa7ae106fc6de898326c2765be66505a07e2868c10736",
+      "weight_license": "Prior Labs License 1.1",
+      "attribution_required": true,
+      "production_champion_eligible": false,
+      "pretraining_data_overlap": "UNKNOWN"
+    },
+    {
+      "lane": "ts3_current",
+      "execution_status": "BLOCKED_PENDING_CHECKPOINT_HASH_AND_LICENSE_REVIEW",
+      "repo_id": null,
+      "revision": null,
+      "filename": "tabpfn-v3-regressor-v3_20260506_timeseries.ckpt",
+      "sha256": null,
+      "weight_license": null,
+      "attribution_required": null,
+      "production_champion_eligible": false,
+      "pretraining_data_overlap": "UNKNOWN"
+    }
+  ]
+}
