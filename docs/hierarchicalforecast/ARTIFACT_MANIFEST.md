@@ -5,10 +5,10 @@
 - Component: HierarchicalForecast reconciliation runtime certification
 - Pull request: #48
 - Branch: `agent/hierarchicalforecast-runtime-certification`
-- State: `PARTIALLY_VERIFIED / QUALITY_GATE_TESTS_PASS / CI_BLOCKED_RUNNER_START`
+- State: `PARTIALLY_VERIFIED / PORTABLE_PUBLICATION_TESTS_PASS / CI_BLOCKED_RUNNER_START`
 
-This document inventories source and generated artifacts. It does not replace machine-generated
-manifests or checksum files.
+This document inventories source and generated artifacts. Machine-generated manifests and checksum
+files remain the integrity roots for runtime evidence.
 
 ## Source implementation
 
@@ -16,16 +16,24 @@ manifests or checksum files.
 |---|---|
 | `src/loto/reconciliation/hierarchy.py` | upstream adapter, execution, and validation |
 | `src/loto/reconciliation/runtime_certification.py` | deterministic 40-case runtime certification |
-| `src/loto/reconciliation/package_certification.py` | runtime evidence verification and immutable ZIP |
-| `scripts/hierarchicalforecast_target/constants.py` | formal target constants and expected partition |
+| `src/loto/reconciliation/package_certification.py` | runtime evidence and deterministic ZIP verification |
+| `src/loto/reconciliation/portable_package_certification.py` | no-clobber hard-link or exclusive-copy publication |
+| `scripts/hierarchicalforecast_target/constants.py` | formal constants and expected partition |
 | `scripts/hierarchicalforecast_target/integrity.py` | filesystem, JSON, array, and SHA helpers |
 | `scripts/hierarchicalforecast_target/runtime_verification.py` | independent runtime and 40-row verification |
 | `scripts/hierarchicalforecast_target/package_verification.py` | source, ZIP, sidecar, and manifest verification |
-| `scripts/hierarchicalforecast_target/operator.py` | real target-machine orchestration |
+| `scripts/hierarchicalforecast_target/operator.py` | target-machine orchestration |
 | `scripts/hierarchicalforecast_target/quality_gate.py` | Ruff, mypy, focused, full-suite, and JUnit gate |
 | `scripts/run_hierarchicalforecast_target_certification.py` | target runtime wrapper |
 | `scripts/run_hierarchicalforecast_quality_gate.py` | local quality wrapper |
-| `pyproject.toml` | dependencies, tool configuration, and console entry point |
+| `pyproject.toml` | dependencies, tool configuration, and portable console target |
+
+The public console target is:
+
+```text
+loto-hierarchicalforecast-certify =
+  loto.reconciliation.portable_package_certification:main
+```
 
 ## Test artifacts
 
@@ -41,9 +49,19 @@ manifests or checksum files.
 | `tests/test_reconciliation_quality_gate.py` | 9 passed |
 | **Cumulative focused evidence** | **77 passed** |
 
-The total is from separate isolated runs. A formal combined 77-test invocation remains pending.
+The package and console subset was re-executed against exact published blobs:
+
+```text
+13 passed
+compileall PASS
+Python lines over 100 characters: 0
+```
+
+The total of 77 is from separate isolated runs. A formal combined invocation remains pending.
 
 ## Documentation
+
+All paths below are under `docs/hierarchicalforecast/`:
 
 - `README.md`
 - `REQUIREMENTS.md`
@@ -53,6 +71,7 @@ The total is from separate isolated runs. A formal combined 77-test invocation r
 - `TEST_PLAN.md`
 - `RUNTIME_CERTIFICATION.md`
 - `TARGET_MACHINE_CERTIFICATION.md`
+- `PORTABLE_PACKAGE_PUBLICATION.md`
 - `QUALITY_GATE.md`
 - `RUNBOOK.md`
 - `VERIFICATION_REPORT.md`
@@ -60,8 +79,6 @@ The total is from separate isolated runs. A formal combined 77-test invocation r
 - `CHANGELOG.md`
 - `CI_BLOCKER.md`
 - `ARTIFACT_MANIFEST.md`
-
-All paths above are under `docs/hierarchicalforecast/`.
 
 ## Integrity roots
 
@@ -73,8 +90,7 @@ All paths above are under `docs/hierarchicalforecast/`.
 | target operator execution | operator `ARTIFACT_MANIFEST.json` and `SHA256SUMS` |
 | local quality execution | quality `ARTIFACT_MANIFEST.json` and `SHA256SUMS` |
 
-The runtime, operator, and quality Run IDs are independent and must not be substituted for one
-another.
+Runtime, operator, and quality Run IDs are independent and must not be substituted for one another.
 
 ## Runtime evidence
 
@@ -91,6 +107,17 @@ artifacts/hierarchicalforecast-runtime/<runtime-run-id>.zip.sha256
 ```
 
 The ZIP additionally contains canonical `PACKAGE_MANIFEST.json`.
+
+The package result records one publication method:
+
+```text
+hardlink
+exclusive_copy
+reused_existing
+```
+
+All methods preserve the no-overwrite contract. `exclusive_copy` uses `O_CREAT | O_EXCL`, flush,
+`fsync`, final SHA-256 verification, and partial-file cleanup.
 
 ## Target-operator evidence
 
@@ -121,19 +148,13 @@ record zero failures and errors.
 
 ## Verification commands
 
-Runtime transfer package:
-
 ```bash
 cd artifacts/hierarchicalforecast-runtime
 sha256sum -c <runtime-run-id>.zip.sha256
 unzip -t <runtime-run-id>.zip
 cd <runtime-run-id>
 sha256sum -c SHA256SUMS
-```
 
-Operator and quality evidence:
-
-```bash
 cd artifacts/hierarchicalforecast-target-runs/<operator-run-id>
 sha256sum -c SHA256SUMS
 
@@ -145,23 +166,17 @@ sha256sum -c SHA256SUMS
 
 - real installed `hierarchicalforecast==1.5.1` 40-case runtime bundle;
 - real target-operator evidence for the current reviewed head;
-- formal local-quality evidence with Ruff, mypy, exact 77 focused tests, and full pytest;
+- real mounted-drive publication evidence including `publication_method`;
+- formal quality evidence with Ruff, mypy, exact 77 focused tests, and full pytest;
 - GitHub Actions logs and results containing real workflow steps.
 
 Issue #61 tracks the GitHub Actions runner-start blocker.
 
 ## Handoff rule
 
-Record and transfer:
+Record and transfer the exact Git commit, runtime/operator/quality Run IDs, installed version,
+40-case totals, focused/full JUnit totals, publication method, ZIP SHA-256, all three `SHA256SUMS`
+files, and GitHub Actions run/job IDs.
 
-- exact Git commit;
-- runtime, operator, and quality Run IDs;
-- exact installed HierarchicalForecast version;
-- 40-case totals and method partition;
-- focused and full JUnit totals;
-- ZIP SHA-256;
-- all three `SHA256SUMS` files;
-- GitHub Actions run and job IDs.
-
-Do not overwrite a source runtime directory, operator directory, quality directory, mismatched ZIP,
-or mismatched sidecar. Preserve inconsistencies as incident evidence and create a new Run ID.
+Do not overwrite a runtime directory, operator directory, quality directory, mismatched ZIP, or
+mismatched sidecar. Preserve inconsistencies as incident evidence and create a new Run ID.
