@@ -1,0 +1,63 @@
+{
+  "schema_version": "change-scope-v1.0.0",
+  "scope_id": "neuralforecast-prospective-experiment-registry",
+  "stacked_base_branch": "agent/p0-prospective-actual-scoring",
+  "stacked_base_sha": "51dd6d2465afd9a425d4e529fdee45ba6f244e55",
+  "dependency_pr": 64,
+  "in_scope": [
+    "read-only registration of a verified Prospective scoring artifact",
+    "formal PostgreSQL and MLflow dual-backend requirement",
+    "deterministic registry identity and canonical payload SHA-256",
+    "PostgreSQL prepare, MLflow record, and PostgreSQL finalize sequence",
+    "best-effort PostgreSQL BLOCKED transition after downstream failure",
+    "normalized run, candidate, per-seed, position, and artifact records",
+    "Hit@±1 priority with MAE, MSE, RMSE, all-position, and worst-seed evidence",
+    "no best-seed-only selection, automatic promotion, or automatic retraining",
+    "MLflow parent run and per-seed child runs",
+    "credential and token redaction from durable evidence",
+    "independent atomic registry receipt and complete SHA256SUMS",
+    "read-only relocated receipt verification without backend access",
+    "configless register-scoring and verify-scoring-registry CLI commands",
+    "focused core, backend-contract, security, idempotency, and CLI tests",
+    "operator documentation"
+  ],
+  "out_of_scope": [
+    "mutation of the source Prospective scoring artifact",
+    "distributed transactions across PostgreSQL and MLflow",
+    "automatic database or MLflow server provisioning",
+    "live target-host PostgreSQL or MLflow certification",
+    "cryptographic signing or external timestamp authority",
+    "model registry promotion or deployment",
+    "automatic retraining",
+    "accuracy or baseline-superiority claims",
+    "GPU execution",
+    "merge or main branch changes"
+  ],
+  "execution_boundaries": {
+    "dependency_minimal_tests": "PASS_15_TESTS",
+    "backend_execution": "INJECTED_DOUBLES_ONLY",
+    "parquet_backend": "PANDAS_PICKLE_STAND_IN_NOT_FORMAL_PARQUET_VALIDATION",
+    "python_compile": "PASS",
+    "ast_parse": "PASS",
+    "line_length_100": "PASS",
+    "repository_ruff_compileall_mypy_pytest": "EXECUTION_PENDING",
+    "live_postgres": "EXECUTION_PENDING",
+    "live_mlflow": "EXECUTION_PENDING",
+    "github_actions": "PENDING",
+    "merge": "USER_APPROVAL_REQUIRED"
+  },
+  "expected_changed_files": [
+    "docs/NEURALFORECAST_PROSPECTIVE_REGISTRY.md",
+    "docs/NEURALFORECAST_PROSPECTIVE_REGISTRY_CHANGE_SCOPE.json",
+    "src/loto/auto_campaign/cli.py",
+    "src/loto/auto_campaign/prospective_registry.py",
+    "src/loto/auto_campaign/prospective_registry_backends.py",
+    "src/loto/auto_campaign/prospective_registry_contract.py",
+    "src/loto/auto_campaign/prospective_registry_mlflow.py",
+    "src/loto/auto_campaign/prospective_registry_payload.py",
+    "src/loto/auto_campaign/prospective_registry_postgres.py",
+    "tests/auto_campaign/test_prospective_registry.py",
+    "tests/auto_campaign/test_prospective_registry_backends.py",
+    "tests/auto_campaign/test_prospective_registry_cli.py"
+  ]
+}

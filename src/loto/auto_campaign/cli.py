@@ -14,6 +14,11 @@ from .portable_prediction_verification import (
     verify_portable_bundle_with_prediction_lock,
 )
 from .promotion_gate import GATED_STAGES
+from .prospective_registry import (
+    RegistryOptions,
+    register_prospective_scoring,
+    verify_prospective_registry,
+)
 from .prospective_scoring import score_locked_prospective_run
 from .prospective_scoring_verification import verify_prospective_scoring
 from .runner import inventory, load_config, plan, run_stage
@@ -103,10 +108,31 @@ def build_parser() -> argparse.ArgumentParser:
     score.add_argument("--actual-published-at", default=None)
     scoring_verify = sub.add_parser("verify-scoring")
     scoring_verify.add_argument("--run", type=Path, required=True)
+    register = sub.add_parser("register-scoring")
+    register.add_argument("--run", type=Path, required=True)
+    register.add_argument("--output", type=Path, required=True)
+    register.add_argument("--registry-namespace", default="production")
+    register.add_argument("--postgres-dsn-env", default="LOTO_POSTGRES_DSN")
+    register.add_argument("--mlflow-uri", default=None)
+    register.add_argument("--mlflow-uri-env", default="MLFLOW_TRACKING_URI")
+    register.add_argument(
+        "--mlflow-experiment",
+        default="loto-neuralforecast-prospective",
+    )
+    register.add_argument(
+        "--artifact-mode",
+        choices=["metadata", "full"],
+        default="metadata",
+    )
+    registry_verify = sub.add_parser("verify-scoring-registry")
+    registry_verify.add_argument("--run", type=Path, required=True)
     return parser
 
 
-def _run_portable_command(args: argparse.Namespace, project: Path) -> dict[str, object] | None:
+def _run_portable_command(
+    args: argparse.Namespace,
+    project: Path,
+) -> dict[str, object] | None:
     if args.command == "export-portable":
         try:
             return export_portable_bundle(
@@ -142,6 +168,30 @@ def _run_portable_command(args: argparse.Namespace, project: Path) -> dict[str, 
             }
     if args.command == "verify-scoring":
         return verify_prospective_scoring(_resolve_path(args.run, project))
+    if args.command == "register-scoring":
+        try:
+            options = RegistryOptions(
+                registry_namespace=args.registry_namespace,
+                postgres_dsn_env=args.postgres_dsn_env,
+                mlflow_uri=args.mlflow_uri,
+                mlflow_uri_env=args.mlflow_uri_env,
+                mlflow_experiment=args.mlflow_experiment,
+                artifact_mode=args.artifact_mode,
+            )
+            return register_prospective_scoring(
+                scoring_root=_resolve_path(args.run, project),
+                output=_resolve_path(args.output, project),
+                options=options,
+            )
+        except (OSError, RuntimeError, ValueError) as exc:
+            return {
+                "status": "FAIL",
+                "command": args.command,
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+            }
+    if args.command == "verify-scoring-registry":
+        return verify_prospective_registry(_resolve_path(args.run, project))
     return None
 
 
@@ -154,7 +204,11 @@ def main() -> None:
     else:
         config_path = args.config if args.config.is_absolute() else project / args.config
         config = load_config(config_path)
-        data_path = config.data_path if config.data_path.is_absolute() else project / config.data_path
+        data_path = (
+            config.data_path
+            if config.data_path.is_absolute()
+            else project / config.data_path
+        )
         output_root = (
             config.output_root if config.output_root.is_absolute() else project / config.output_root
         )
