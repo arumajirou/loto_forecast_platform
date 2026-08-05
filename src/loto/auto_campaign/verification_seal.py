@@ -23,13 +23,13 @@ _MUTABLE_ROOT_FILES = {
 def _content_files(root: Path) -> list[Path]:
     files: list[Path] = []
     for path in root.rglob("*"):
+        relative = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            raise ValueError(f"verification seal does not allow symlinks: {relative}")
         if not path.is_file():
             continue
-        relative = path.relative_to(root).as_posix()
         if relative in _MUTABLE_ROOT_FILES:
             continue
-        if path.is_symlink():
-            raise ValueError(f"verification seal does not allow symlink files: {relative}")
         files.append(path)
     return sorted(files, key=lambda item: item.relative_to(root).as_posix())
 
