@@ -157,3 +157,39 @@ def test_build_receipt_rejects_invalid_expected_commit(tmp_path: Path) -> None:
 
     with pytest.raises(FormalReceiptError, match="expected Git commit is invalid"):
         build_formal_receipt(run_dir, expected_git_commit="main")
+
+
+def test_build_receipt_rejects_source_bundle_symlink(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run_dir = _bundle(tmp_path)
+    _patch(monkeypatch, run_dir)
+    link = tmp_path / "run-link"
+    try:
+        link.symlink_to(run_dir, target_is_directory=True)
+    except OSError:
+        pytest.skip("symbolic links are unavailable on this platform")
+
+    with pytest.raises(FormalReceiptError, match="source bundle path"):
+        build_formal_receipt(link, expected_git_commit=COMMIT)
+
+
+def test_verify_receipt_rejects_receipt_symlink(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run_dir = _bundle(tmp_path)
+    _patch(monkeypatch, run_dir)
+    receipt_path = tmp_path / "receipt.json"
+    write_formal_receipt(run_dir, receipt_path, expected_git_commit=COMMIT)
+    link = tmp_path / "receipt-link.json"
+    checksum_link = tmp_path / "receipt-link.json.sha256"
+    try:
+        link.symlink_to(receipt_path)
+        checksum_link.symlink_to(receipt_path.with_suffix(".json.sha256"))
+    except OSError:
+        pytest.skip("symbolic links are unavailable on this platform")
+
+    with pytest.raises(FormalReceiptError, match="symbolic link"):
+        verify_formal_receipt(run_dir, link, expected_git_commit=COMMIT)
