@@ -1,6 +1,6 @@
 # BasicTS isolated provider contract
 
-Status: `PARTIALLY_VERIFIED / LOCAL_INSTALLED_PROVENANCE_CONTRACT_PASS / REAL_RUNTIME_PENDING`
+Status: `PARTIALLY_VERIFIED / LOCAL_RECORD_INTEGRITY_CONTRACT_PASS / REAL_RUNTIME_PENDING`
 
 This directory documents the first BasicTS integration increment. It deliberately avoids the
 root dependency graph, shared workers, shared catalogs, Holdout, Prospective, GPU, and DDP paths.
@@ -12,28 +12,33 @@ root dependency graph, shared workers, shared catalogs, Holdout, Prospective, GP
 - revision: `c2bb6e31e591167e84459775a21a62e70a5893ce`
 - isolated lane: Python 3.11
 
-The launcher exports the expected revision marker, but the marker alone is not accepted as installed
-package provenance. Every provider operation also reads the installed `BasicTS` distribution's
-`direct_url.json` through `importlib.metadata`.
+The launcher must export:
 
-PASS requires:
+```bash
+export BASICTS_UPSTREAM_REVISION=c2bb6e31e591167e84459775a21a62e70a5893ce
+```
 
-- distribution name `BasicTS` and version `1.1.0`;
-- repository `https://github.com/GestaltCogTeam/BasicTS`;
-- VCS `git`;
-- exact `commit_id` and `requested_revision` equal to the frozen revision;
-- a non-editable VCS installation with no archive, local-directory, or subdirectory substitution.
-
-The identity bundle retains these fields plus a SHA-256 of the raw `direct_url.json` text. Missing,
-malformed, editable, non-Git, wrong-repository, wrong-version, or wrong-revision provenance fails
-closed before identity, configuration, or DLinear work can pass.
+A package version, launcher marker, or lockfile alone is not accepted as runtime identity evidence.
 
 ## Supported operations
 
-- `identity`: verify exact package version, revision marker, and installed Git provenance.
+- `identity`: verify version, revision, installed Git provenance, RECORD integrity, and import origin.
 - `validate_config`: resolve only explicitly allowed serialized imports.
 - `dlinear_smoke`: train the upstream DLinear module on CPU, check finite state and predictions,
   save the state dictionary, reload it, and require exact re-prediction equality.
+
+## Installed runtime identity
+
+Before every provider operation, the runtime requires all of these layers:
+
+1. exact package version and launcher revision marker;
+2. exact non-editable VCS provenance from `direct_url.json`;
+3. RECORD SHA-256 and byte-size agreement for `direct_url.json` and
+   `basicts/__init__.py`;
+4. actual `basicts` import origin bound to the verified distribution file.
+
+Missing RECORD values, file tampering, ambiguous provider mapping, shadow packages, symlinked
+origins, or commit drift fail closed. See `docs/basicts/INSTALLED_PROVENANCE.md`.
 
 ## Security boundary
 
@@ -66,39 +71,44 @@ The sequence performs:
 2. one dependency lock and one explicit frozen synchronization;
 3. structured `uv workspace metadata --locked` auditing;
 4. Git and request provenance capture;
-5. installed-distribution `direct_url.json` provenance verification;
-6. identity and configuration allowlist checks;
-7. DLinear CPU fit, predict, save, strict load, and exact re-prediction;
-8. lock immutability checks;
-9. recursive manifests and portable SHA-256 evidence;
-10. atomic final publication only after dependency and runtime checks pass.
+5. installed Git provenance, RECORD, import-origin, and configuration checks;
+6. DLinear CPU fit, predict, save, strict load, and exact re-prediction;
+7. lock immutability checks;
+8. recursive manifests and portable SHA-256 evidence;
+9. atomic final publication only after dependency and runtime checks pass.
 
 Failed runs retain diagnostic evidence but never claim certification.
 
-## Independent evidence and receipt verification
+## Independent evidence verification
 
 `loto.basicts_campaign.formal_verification` performs a read-only verification after the formal run.
-It verifies exact file sets, manifests, SHA-256, dependency metadata, command order, frozen model
-commands, lock cross-links, installed Git provenance, import allowlisting, and DLinear evidence.
+Its report is written outside the source bundle so the original manifest and checksum set remain
+unchanged.
 
-`loto.basicts_campaign.formal_receipt` then creates a deterministic receipt outside the source
-bundle. The receipt binds the complete checksum map and verification report to an explicitly
-captured Git commit and can be recomputed later to detect source or receipt drift.
+It verifies:
 
-These layers certify retained evidence only. They do not rerun installation, training, inference,
-or accuracy evaluation and are not cryptographic signing or an external timestamp authority.
+- exact recursive file sets, manifests, sizes, and SHA-256 values;
+- absence of symbolic links and unsafe relative paths;
+- uv, Python, resolution cutoff, direct dependency, and resolved package evidence;
+- preflight and core command phase order plus retained logs;
+- frozen core commands and `FORMAL_PREFLIGHT_REUSE`;
+- formal, preflight, core, certificate, and lock SHA-256 cross-links;
+- installed Git provenance, RECORD integrity, import origin, allowlist, and DLinear evidence.
+
+The independent report certifies retained evidence only. It does not rerun installation, training,
+inference, or accuracy evaluation.
 
 ## Local contract verification
 
-The current execution environment cannot install the real upstream BasicTS dependency. Evidence is
-therefore separated into focused batches:
+Completed as separate focused batches:
 
-- contract and certification: `16 passed` before the provenance increment;
+- contract and certification before provenance increments: `16 passed`;
 - orchestration and entrypoint: `10 passed`;
 - structured lock audit and formal wrapper: `12 passed`;
 - independent formal evidence verifier: `7 passed`;
 - deterministic formal receipt and symlink checks: `10 passed`;
-- installed provenance, runtime integration, and certification: `15 passed`;
+- import-origin/runtime/certification increment: `22 passed`;
+- current RECORD/runtime/certification exact-blob batch: `29 passed`;
 - optional real BasicTS smoke: `1 skipped` and not counted as success;
 - compileall: `PASS`;
 - 100-character line audit: `PASS`.
@@ -121,5 +131,4 @@ This increment does not claim:
 - live MLflow or PostgreSQL persistence;
 - shared worker or catalog integration;
 - GitHub Actions success;
-- cryptographic signing or external timestamping;
 - merge readiness.
