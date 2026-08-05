@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 
 from loto.auto_campaign.runtime import gpu_process_snapshot, torch_runtime_snapshot
+from loto.data.lineage import atomic_write_json
 
 
 def _point_column(prediction: pd.DataFrame, alias: str) -> str:
@@ -104,6 +105,18 @@ def _key_frames_match(
     return True
 
 
+def _finish_result(model_path: Path, result: dict[str, Any]) -> dict[str, Any]:
+    evidence_path = model_path.parent / "runtime_certification.json"
+    result["evidence_path"] = str(evidence_path)
+    atomic_write_json(evidence_path, result)
+    if result.get("status") != "PASS":
+        raise RuntimeError(
+            "NeuralForecast runtime certification failed; "
+            f"evidence={evidence_path}; failed_checks={result.get('failed_checks', [])}"
+        )
+    return result
+
+
 def certify_saved_runtime(
     *,
     neuralforecast: Any,
@@ -116,9 +129,9 @@ def certify_saved_runtime(
 ) -> dict[str, Any]:
     """Save, reload and verify a fitted NeuralForecast instance.
 
-    The function always returns structured evidence. A failed check or an
-    exception produces ``status=FAIL`` so the caller can persist the evidence
-    before failing the model task.
+    Structured evidence is atomically persisted for both PASS and FAIL outcomes.
+    Failed checks raise only after that evidence is durable, keeping execution
+    fail-closed without losing the root-cause record.
     """
 
     result: dict[str, Any] = {
@@ -154,7 +167,7 @@ def certify_saved_runtime(
         if missing_before:
             result["failed_checks"] = ["prediction_keys_before"]
             result["error"] = f"pre-save prediction is missing keys: {missing_before}"
-            return result
+            return _finish_result(model_path, result)
 
         before_point = _point_column(prediction_before, alias)
         result["point_column_before"] = before_point
@@ -186,7 +199,7 @@ def certify_saved_runtime(
         if pre_save_failures:
             result["failed_checks"] = pre_save_failures
             result["error"] = "pre-save runtime certification checks failed"
-            return result
+            return _finish_result(model_path, result)
 
         result["failed_phase"] = "save"
         neuralforecast.save(str(model_path), save_dataset=True, overwrite=True)
@@ -204,7 +217,7 @@ def certify_saved_runtime(
         if missing_after:
             result["failed_checks"] = ["prediction_keys_after"]
             result["error"] = f"post-load prediction is missing keys: {missing_after}"
-            return result
+            return _finish_result(model_path, result)
 
         after_point = _point_column(prediction_after, alias)
         result["point_column_after"] = after_point
@@ -272,7 +285,9 @@ def certify_saved_runtime(
                 "failed_checks": failed_checks,
             }
         )
-        return result
+        return _finish_result(model_path, result)
+    except RuntimeError:
+        raise
     except Exception as exc:
         result.update(
             {
@@ -281,4 +296,4 @@ def certify_saved_runtime(
                 "error": str(exc),
             }
         )
-        return result
+        return _finish_result(model_path, result)
