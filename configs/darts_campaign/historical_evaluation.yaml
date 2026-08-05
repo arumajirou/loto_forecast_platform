@@ -1,0 +1,37 @@
+schema_version: 1
+run_id: darts-p9-historical-evaluation
+series_layout: position_global_sequence
+positions: [N1, N2, N3, N4, N5, N6, N7]
+start: 256
+forecast_horizon: 1
+stride: 1
+retrain: 1
+train_length: null
+overlap_end: false
+last_points_only: true
+enable_optimization: true
+compare_optimization: true
+require_prefit_when_no_retrain: true
+metric_atol: 1.0e-12
+metric_rtol: 1.0e-9
+residual_atol: 1.0e-12
+residual_rtol: 1.0e-9
+metrics:
+  primary: hit_at_plus_minus_1
+  parity: [mae, mse, rmse]
+residuals:
+  sign: actual_minus_prediction
+  require_exact_alignment: true
+  diagnostics:
+    - mean
+    - std
+    - mae
+    - max_abs
+    - median
+    - lag1_autocorrelation
+    - positive_fraction
+    - negative_fraction
+provenance:
+  hash_algorithm: sha256
+  retain_historical_records: true
+  retain_api_argument_ledger: true
