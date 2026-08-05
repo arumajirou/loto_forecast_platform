@@ -11,8 +11,12 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 REPO_ID = "thuml/sundial-base-128m"
 REVISION = "3212e42564493f520593e5414af4367fc4b49226"
+REMOTE_CODE_REVIEW_PATH = (
+    PROJECT_ROOT / "audit" / "tsfm-runtime" / "sundial-base" / "remote-code-review.json"
+)
 DEFAULT_QUANTILE_LEVELS = (0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95)
 REQUIRED_REMOTE_CODE_FILES = {
     "configuration_sundial.py",
@@ -196,6 +200,52 @@ def _snapshot(
     return snapshot_path
 
 
+def _load_reviewed_remote_code_sha256(path: Path) -> dict[str, str]:
+    if not path.is_file():
+        raise SundialProviderRuntimeError(
+            "REMOTE_CODE_REVIEW_MISSING",
+            f"remote-code review does not exist: {path}",
+        )
+    try:
+        review = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SundialProviderRuntimeError(
+            "REMOTE_CODE_REVIEW_INVALID",
+            f"remote-code review is invalid: {exc}",
+        ) from exc
+    expected_identity = {
+        "model_id": "sundial-base",
+        "repo_id": REPO_ID,
+        "revision": REVISION,
+    }
+    for key, expected in expected_identity.items():
+        if review.get(key) != expected:
+            raise SundialProviderRuntimeError(
+                "REMOTE_CODE_REVIEW_INVALID",
+                f"remote-code review {key} mismatch",
+            )
+    if review.get("review_status") != "APPROVED":
+        raise SundialProviderRuntimeError(
+            "REMOTE_CODE_REVIEW_NOT_APPROVED",
+            "remote-code review is not APPROVED",
+        )
+    rows = review.get("files")
+    if not isinstance(rows, list) or not rows:
+        raise SundialProviderRuntimeError(
+            "REMOTE_CODE_REVIEW_INVALID",
+            "remote-code review files are missing",
+        )
+    approved: dict[str, str] = {}
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("name") or not row.get("sha256"):
+            raise SundialProviderRuntimeError(
+                "REMOTE_CODE_REVIEW_INVALID",
+                "remote-code review contains an invalid file row",
+            )
+        approved[Path(str(row["name"])).name] = str(row["sha256"]).lower()
+    return approved
+
+
 def _approved_remote_code_sha256(request: dict[str, Any]) -> dict[str, str]:
     raw = request.get("approved_remote_code_sha256")
     if not isinstance(raw, dict) or not raw:
@@ -265,6 +315,11 @@ def _validate_identity(request: dict[str, Any]) -> tuple[str, str]:
 
 def run_provider(request: dict[str, Any]) -> dict[str, Any]:
     repo_id, revision = _validate_identity(request)
+    if request.get("local_files_only", True) is not True:
+        raise SundialProviderRuntimeError(
+            "OFFLINE_MODE_REQUIRED",
+            "local_files_only must be true",
+        )
     requested_device = str(request.get("device", "cpu"))
     if requested_device not in {"cpu", "cuda"}:
         raise SundialProviderRuntimeError(
@@ -328,8 +383,16 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
             "MODEL_WEIGHTS_MISSING",
             f"no model weights found in {snapshot_path}",
         )
-    approved_remote_code = _approved_remote_code_sha256(request)
-    remote_code_sha256 = _verify_remote_code(snapshot_path, approved_remote_code)
+    reviewed_remote_code = _load_reviewed_remote_code_sha256(
+        REMOTE_CODE_REVIEW_PATH
+    )
+    requested_remote_code = _approved_remote_code_sha256(request)
+    if requested_remote_code != reviewed_remote_code:
+        raise SundialProviderRuntimeError(
+            "REMOTE_CODE_REVIEW_INVALID",
+            "request allowlist does not match the checked-in remote-code review",
+        )
+    remote_code_sha256 = _verify_remote_code(snapshot_path, reviewed_remote_code)
 
     model = AutoModelForCausalLM.from_pretrained(
         str(snapshot_path),
@@ -408,7 +471,7 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
             "trust_remote_code": True,
             "remote_code_revision": revision,
             "remote_code_sha256": remote_code_sha256,
-            "approved_remote_code_sha256": approved_remote_code,
+            "approved_remote_code_sha256": reviewed_remote_code,
             "loaded_from_resolved_snapshot": True,
             "offline_mode": True,
             "context_length": int(context.shape[1]),
