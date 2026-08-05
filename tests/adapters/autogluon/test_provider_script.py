@@ -18,13 +18,17 @@ def _load_script_module():
 
 def test_schema_v2_dispatches_to_contract_provider(monkeypatch) -> None:
     module = _load_script_module()
-    provider_module = ModuleType("loto.adapters.autogluon.provider")
-    provider_module.run_provider_v2 = lambda payload: {
+    provider_module = ModuleType("loto.adapters.autogluon.strict_provider")
+    provider_module.run_provider_v2_strict = lambda payload: {
         "schema_version": 2,
         "status": "OK",
         "run_id": payload["run_id"],
     }
-    monkeypatch.setitem(sys.modules, "loto.adapters.autogluon.provider", provider_module)
+    monkeypatch.setitem(
+        sys.modules,
+        "loto.adapters.autogluon.strict_provider",
+        provider_module,
+    )
 
     response = module.run_provider({"schema_version": 2, "run_id": "dispatch-test"})
     assert response == {
