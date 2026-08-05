@@ -1,5 +1,11 @@
-"""Isolated sktime discovery and runtime-certification provider."""
+"""Isolated sktime discovery, runtime, and evaluation provider."""
 
+from loto.sktime_campaign.benchmark import (
+    BaselineId,
+    ChronologicalSplit,
+    GameMatrix,
+    ValidationBenchmarkRequest,
+)
 from loto.sktime_campaign.protocol import (
     ProviderOperation,
     ProviderRequest,
@@ -9,9 +15,13 @@ from loto.sktime_campaign.protocol import (
 )
 
 __all__ = [
+    "BaselineId",
+    "ChronologicalSplit",
+    "GameMatrix",
     "ProviderOperation",
     "ProviderRequest",
     "ProviderResponse",
     "ProviderStatus",
     "SmokeModelId",
+    "ValidationBenchmarkRequest",
 ]
