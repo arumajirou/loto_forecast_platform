@@ -1,0 +1,14 @@
+schema_version: 1
+bootstrap_id: darts-notorch-bootstrap-v1
+profile_name: darts-notorch
+project_path: environments/darts-notorch
+runtime_profile_path: configs/darts_campaign/runtime_preflight_notorch.yaml
+lockfile_path: environments/darts-notorch/uv.lock
+python_version: "3.13"
+preflight_output_path: artifacts/darts-runtime/notorch/preflight.json
+bootstrap_report_path: artifacts/darts-runtime/notorch/bootstrap.json
+approval_path: artifacts/darts-runtime/notorch/CAMPAIGN_APPROVAL.json
+timeout_seconds: 1800
+uv_executable: uv
+allow_network_for_lock: true
+require_frozen_sync: true
