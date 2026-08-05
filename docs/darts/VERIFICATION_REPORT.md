@@ -41,7 +41,7 @@
 - Python compileall and AST parse for third-increment files: PASS;
 - lines over repository 100-character limit in third-increment files: 0;
 - YAML configuration parse: PASS;
-- latest GitHub Actions run 30980565162: BLOCKED_PRE_RUN with steps=null.
+- GitHub Actions remains classified `BLOCKED_PRE_RUN` when steps are not created.
 
 ## Blocked
 
