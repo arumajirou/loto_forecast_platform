@@ -736,9 +736,7 @@ def run_automodel_campaign(config: AutoModelCampaignConfig) -> dict[str, Any]:
     succeeded = [report for report in reports if report.get("status") == "SUCCEEDED"]
     failed = [report for report in reports if report.get("status") != "SUCCEEDED"]
     certified = [
-        report
-        for report in succeeded
-        if report.get("certification_status") == "RUNTIME_CERTIFIED"
+        report for report in succeeded if report.get("certification_status") == "RUNTIME_CERTIFIED"
     ]
     status = "SUCCEEDED" if not failed else "PARTIAL" if succeeded else "FAILED"
     if failed:
