@@ -29,6 +29,14 @@ PORTABLE_SUMS = "PORTABLE_SHA256SUMS"
 PORTABLE_MANIFEST = "PORTABLE_MANIFEST.json"
 PORTABLE_README = "PORTABLE_README.md"
 _VERIFIED_ROLES = {"target", "source", "predecessor", "coverage"}
+_WINDOWS_RESERVED = {
+    "CON",
+    "PRN",
+    "AUX",
+    "NUL",
+    *(f"COM{index}" for index in range(1, 10)),
+    *(f"LPT{index}" for index in range(1, 10)),
+}
 
 
 def _read_json(path: Path, failures: list[str], label: str) -> dict[str, Any]:
@@ -58,11 +66,20 @@ def _safe_relative(value: str, failures: list[str], label: str) -> Path | None:
         failures.append(f"{label} contains a backslash: {value}")
         return None
     pure = PurePosixPath(value)
+    unsafe_component = any(
+        not part
+        or ":" in part
+        or any(ord(character) < 32 for character in part)
+        or part.rstrip(" .") != part
+        or part.split(".", 1)[0].upper() in _WINDOWS_RESERVED
+        for part in pure.parts
+    )
     if (
         pure.is_absolute()
         or not pure.parts
         or ".." in pure.parts
         or "." in pure.parts
+        or unsafe_component
     ):
         failures.append(f"{label} is unsafe: {value}")
         return None
@@ -662,8 +679,16 @@ def _write_deterministic_zip(root: Path, target: Path) -> None:
             (item for item in root.rglob("*") if item.is_file()),
             key=lambda item: item.relative_to(root).as_posix(),
         )
+        folded_seen: set[str] = set()
         for path in paths:
             relative = path.relative_to(root).as_posix()
+            failures: list[str] = []
+            if _safe_relative(relative, failures, "archive member") is None:
+                raise ValueError("; ".join(failures))
+            folded = relative.casefold()
+            if folded in folded_seen:
+                raise ValueError(f"case-insensitive archive collision: {relative}")
+            folded_seen.add(folded)
             info = zipfile.ZipInfo(
                 relative,
                 date_time=(1980, 1, 1, 0, 0, 0),
