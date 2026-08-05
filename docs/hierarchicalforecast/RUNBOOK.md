@@ -2,121 +2,137 @@
 
 ## Purpose
 
-Use this runbook to execute, verify, retain, and transfer the formal HierarchicalForecast
-runtime evidence. This runbook certifies runtime behavior only. It does not certify forecast
+Use this runbook to execute the complete local HierarchicalForecast promotion gate on one exact Git
+commit, retain all evidence, and diagnose failures without overwriting prior runs.
+
+This runbook certifies runtime behavior and evidence integrity. It does not certify forecast
 accuracy or improve Hit@±1, MAE, MSE, RMSE, Holdout, or Prospective results.
 
-## Preconditions
+## Formal preconditions
 
-Run from the repository root on the intended execution commit.
+- target checkout: `/mnt/e/env/ts/loto_forecast_platform-pr48`;
+- branch: `agent/hierarchicalforecast-runtime-certification`;
+- clean working tree;
+- `uv` available;
+- network access sufficient for a locked sync when dependencies are not cached;
+- enough disk space for the full environment, pytest outputs, runtime evidence, and ZIP;
+- GitHub Actions is a separate external gate and may remain blocked by issue #61.
+
+Do not run the formal command from a dirty checkout or an unverified local branch tip.
+
+## Complete formal command
 
 ```bash
+cd /mnt/e/env/ts/loto_forecast_platform-pr48 || exit 1
+
+git fetch origin agent/hierarchicalforecast-runtime-certification
+EXPECTED_HEAD="$(git rev-parse origin/agent/hierarchicalforecast-runtime-certification)"
+
 git status --short
 git rev-parse HEAD
-uv --version
-python --version
+printf 'EXPECTED_HEAD=%s\n' "${EXPECTED_HEAD}"
+
+python3 scripts/run_hierarchicalforecast_promotion_gate.py \
+  --expected-git-sha "${EXPECTED_HEAD}"
 ```
 
-The working tree should be understood before execution. The certification records the resolved
-Git commit when available, but it does not silently clean or modify the working tree.
+The formal wrapper requires the checked-out commit to equal `EXPECTED_HEAD`. Production exposes no
+flag to skip sync, focused tests, or the full repository suite.
 
-Install the full optional dependency set:
-
-```bash
-uv sync --extra full
-```
-
-Confirm the exact upstream distribution before the formal run:
-
-```bash
-uv run python - <<'PY'
-from importlib.metadata import version
-print(version("hierarchicalforecast"))
-PY
-```
-
-The formal target is `1.5.1`. A different version is retained as evidence but returns
-`FAILED_VERSION_MISMATCH`.
-
-## Formal execution
-
-```bash
-uv run loto-hierarchicalforecast-certify
-```
-
-Expected formal matrix size:
+## Execution order
 
 ```text
-4 select-family games x 10 upstream reconcilers = 40 cases
+1. dependency-contract preflight
+2. clean expected Git preflight
+3. quality gate
+   3.1 uv sync --extra dev --extra full --locked
+   3.2 uv pip check
+   3.3 Ruff format --check
+   3.4 Ruff lint
+   3.5 compileall
+   3.6 mypy
+   3.7 focused pytest with exact 95/0/0 JUnit
+   3.8 repository-wide pytest with zero failures/errors
+   3.9 clean unchanged Git postflight
+4. target operator
+   4.1 locked full environment check
+   4.2 installed HierarchicalForecast version probe
+   4.3 40-case runtime certification
+   4.4 deterministic ZIP and sidecar publication
+   4.5 independent source/runtime/package verification
+5. standalone transferred-package verification
+6. clean unchanged Git promotion postflight
+7. promotion report, manifest, command logs, and SHA256SUMS
 ```
 
-The command always attempts to preserve evidence. A missing dependency or runtime failure still
-produces a ZIP when the written artifacts themselves pass integrity verification.
+## Dependency contract
 
-## Exit codes
+Before provisioning, the wrapper parses `pyproject.toml` and `uv.lock` with the Python standard
+library. Formal execution requires:
 
-| Exit | Interpretation | Operator action |
-|---:|---|---|
-| 0 | Runtime and package are formally verified | Retain and transfer the ZIP plus sidecar |
-| 2 | Dependency, version, or runtime certification did not pass | Inspect `RUNTIME_CERTIFICATION.json` and `METHOD_RESULTS.json`; do not promote |
-| 3 | Configuration, certification harness, packaging, or integrity verification failed | Preserve all available evidence and investigate the reported phase |
-
-Structured exit-3 statuses are:
-
-- `INVALID_CONFIGURATION` with `phase=configuration`
-- `FAILED_CERTIFICATION_HARNESS` with `phase=certification`
-- `FAILED_PACKAGING` with `phase=package`
-
-When packaging fails after certification, the JSON error retains the Run ID, run directory, and
-certification status so the operator can locate the unmodified runtime evidence.
-
-## Locate the latest result
-
-```bash
-ROOT="artifacts/hierarchicalforecast-runtime"
-find "$ROOT" -maxdepth 1 -type d -name 'hierarchicalforecast-runtime-*' \
-  -printf '%T@ %p\n' | sort -nr | head -n 1
-find "$ROOT" -maxdepth 1 -type f -name 'hierarchicalforecast-runtime-*.zip' \
-  -printf '%T@ %p\n' | sort -nr | head -n 1
+```text
+locked HierarchicalForecast versions = ["1.5.1"]
+Python project/lock range             = covers 3.13
+required dev tools                    = mypy, pydantic, pytest, pytest-cov, ruff
+full-extra declaration count          = 1
 ```
 
-Do not infer success from file existence alone. Read the recorded status:
+`pyproject.toml` currently declares `hierarchicalforecast>=1.0`. The validator records this range
+and does not misrepresent it as an exact declaration. Exact formal control comes from the committed
+lockfile and the installed-version probe.
 
-```bash
-RUN_DIR="<resolved-run-directory>"
-uv run python - "$RUN_DIR/RUNTIME_CERTIFICATION.json" <<'PY'
-import json
-import sys
-from pathlib import Path
-payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-print(json.dumps({
-    "run_id": payload["run_id"],
-    "status": payload["status"],
-    "formal_success": payload["formal_success"],
-    "summary": payload["summary"],
-}, indent=2, sort_keys=True))
-raise SystemExit(0 if payload["status"] == "VERIFIED" else 2)
-PY
+Dependency-contract failure occurs before promotion evidence is created and returns a nonzero exit.
+Do not bypass it by running an unlocked install.
+
+## Successful local result
+
+```text
+exit             = 0
+status           = LOCAL_GATES_VERIFIED
+formal_success   = true
+ready_for_review = false
+ci_required      = true
 ```
 
-## Integrity verification
+Required runtime summary:
 
-Verify the original run directory:
-
-```bash
-cd "$RUN_DIR"
-sha256sum -c SHA256SUMS
+```text
+installed version               = 1.5.1
+expected/executed/passed/failed = 40/40/40/0
+actual execution rows           = 24
+expected rejection rows         = 16
+standalone package verifier     = VERIFIED
 ```
 
-Verify the ZIP sidecar and archive structure:
+Local exit 0 does not mark the PR ready and does not replace GitHub Actions.
 
-```bash
-cd "$(dirname "$RUN_DIR")"
-sha256sum -c "$(basename "$RUN_DIR").zip.sha256"
-unzip -t "$(basename "$RUN_DIR").zip"
+## Evidence roots
+
+```text
+artifacts/hierarchicalforecast-quality-runs/<quality-run-id>/
+artifacts/hierarchicalforecast-runtime/<runtime-run-id>/
+artifacts/hierarchicalforecast-runtime/<runtime-run-id>.zip
+artifacts/hierarchicalforecast-runtime/<runtime-run-id>.zip.sha256
+artifacts/hierarchicalforecast-target-runs/<operator-run-id>/
+artifacts/hierarchicalforecast-promotion-runs/<promotion-run-id>/
 ```
 
-The archive must contain only one Run ID prefix with:
+Do not assume these independent Run IDs are identical. Use the parent reports to follow their
+recorded relationships.
+
+### Quality evidence
+
+```text
+COMMANDS.json
+QUALITY_REPORT.json
+ARTIFACT_MANIFEST.json
+SHA256SUMS
+focused.junit.xml
+full.junit.xml
+per-command stdout/stderr logs
+```
+
+### Runtime evidence
 
 ```text
 RUNTIME_CERTIFICATION.json
@@ -124,101 +140,210 @@ METHOD_RESULTS.json
 INPUT_EVIDENCE.json
 ARTIFACT_MANIFEST.json
 SHA256SUMS
-PACKAGE_MANIFEST.json
 ```
 
-## Immutable package behavior
+### Operator evidence
 
-The ZIP and sidecar are immutable outputs for one Run ID.
-
-- Re-running packaging with unchanged evidence reuses the existing verified ZIP.
-- If the ZIP exists but differs from deterministic package bytes, packaging fails.
-- If the sidecar exists but does not match the ZIP digest, packaging fails.
-- Neither a mismatched ZIP nor a mismatched sidecar is overwritten automatically.
-- A temporary ZIP is verified before publication; failed temporary packages are removed.
-
-Do not delete or replace a mismatched package merely to obtain a green rerun. Preserve it as
-incident evidence, compare timestamps and hashes, and create a new certification Run ID after the
-root cause is understood.
-
-## Failure diagnosis
-
-### `INVALID_CONFIGURATION`
-
-Inspect the structured error and correct the requested games, seed, horizon, in-sample size,
-expected version, or coherence tolerance. No formal runtime success is recorded for this attempt.
-
-### `FAILED_CERTIFICATION_HARNESS`
-
-The harness failed before returning a packageable certification object. Inspect the error,
-Python environment, source revision, and available partial output. Do not relabel it as a runtime
-or packaging pass.
-
-### `BLOCKED_DEPENDENCY`
-
-Inspect:
-
-```bash
-uv run python -c 'import hierarchicalforecast; print(hierarchicalforecast.__version__)'
-uv pip tree | grep -i -A3 -B3 hierarchicalforecast
+```text
+COMMANDS.json
+OPERATOR_REPORT.json
+ARTIFACT_MANIFEST.json
+SHA256SUMS
+per-command stdout/stderr logs
 ```
 
-Do not relabel this as a runtime pass. Resolve installation/import errors and create a new Run ID.
+### Promotion evidence
 
-### `FAILED_VERSION_MISMATCH`
+```text
+COMMANDS.json
+PROMOTION_REPORT.json
+ARTIFACT_MANIFEST.json
+SHA256SUMS
+quality, target, and package-verifier logs
+```
 
-Compare module and distribution evidence in `RUNTIME_CERTIFICATION.json`. Recreate the
-environment from the locked dependency state and rerun. Do not overwrite the prior run.
-
-### `FAILED_RUNTIME`
-
-Inspect failed cases:
+## Locate the latest promotion result
 
 ```bash
-uv run python - "$RUN_DIR/METHOD_RESULTS.json" <<'PY'
+ROOT="artifacts/hierarchicalforecast-promotion-runs"
+LATEST="$({
+  find "${ROOT}" -maxdepth 1 -type d \
+    -name 'hierarchicalforecast-promotion-*' \
+    -printf '%T@ %p\n'
+} | sort -nr | head -n 1 | cut -d' ' -f2-)"
+
+printf 'LATEST=%s\n' "${LATEST}"
+python3 - "${LATEST}/PROMOTION_REPORT.json" <<'PY'
 import json
 import sys
 from pathlib import Path
+
 payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-for row in payload["results"]:
-    if row["case_status"] != "PASS":
-        print(json.dumps(row, indent=2, sort_keys=True))
+print(json.dumps({
+    "promotion_run_id": payload.get("promotion_run_id"),
+    "status": payload.get("status"),
+    "formal_success": payload.get("formal_success"),
+    "ready_for_review": payload.get("ready_for_review"),
+    "git_commit": payload.get("git_commit"),
+    "error": payload.get("error"),
+}, indent=2, sort_keys=True))
 PY
 ```
 
-Separate expected grouped-hierarchy rejection from unexpected execution, shape, finite-value,
-coherence, and exception failures.
+Never infer success from the existence of a directory, ZIP, or report alone.
 
-### `FAILED_PACKAGING`
+## Integrity verification
 
-Use the retained `run_id`, `run_directory`, and `certification_status` from the structured error.
-Do not use an existing, partial, or mismatched ZIP. Verify the run directory manually and compare:
-
-- `SHA256SUMS` coverage and digests
-- `ARTIFACT_MANIFEST.json` byte counts and hashes
-- Run ID consistency across directory and JSON files
-- existing ZIP and sidecar digests
-- member timestamps, modes, paths, and storage method
-- absence of renamed, missing, duplicate, or extra path entries
-
-After correcting the root cause, run a new certification. Raw evidence and mismatched package
-artifacts are never overwritten as a substitute for a new formal run.
-
-## Evidence handoff
-
-Transfer both files together:
-
-```text
-<run-id>.zip
-<run-id>.zip.sha256
-```
-
-The receiver must run:
+Verify each produced evidence directory from inside that directory:
 
 ```bash
-sha256sum -c <run-id>.zip.sha256
-unzip -t <run-id>.zip
+sha256sum -c SHA256SUMS
 ```
 
-Record the ZIP SHA-256, Run ID, Git commit, installed HierarchicalForecast version, and final
-certification status in the handoff or verification report.
+Verify the runtime ZIP and sidecar:
+
+```bash
+RUNTIME_ROOT="artifacts/hierarchicalforecast-runtime"
+RUN_ID="<runtime-run-id>"
+
+(
+  cd "${RUNTIME_ROOT}"
+  sha256sum -c "${RUN_ID}.zip.sha256"
+  unzip -t "${RUN_ID}.zip"
+)
+```
+
+Use the checked-in standalone verifier rather than relying only on `unzip -t`:
+
+```bash
+uv run --locked python -m loto.reconciliation.package_verifier \
+  "${RUNTIME_ROOT}/${RUN_ID}.zip"
+```
+
+The verifier must reproduce the target Run ID, ZIP path, and ZIP SHA-256 recorded by the operator.
+
+## `/mnt/e` publication behavior
+
+The runtime ZIP is immutable for one Run ID.
+
+- hard-link publication is used when supported;
+- when hard links are unavailable, an `O_EXCL` no-clobber copy is used;
+- partial-copy failures remove the newly created partial ZIP;
+- identical existing packages are verified and reused;
+- differing ZIPs are preserved and rejected;
+- mismatched sidecars are preserved and rejected;
+- temporary ZIPs are verified before final publication.
+
+Do not delete a mismatched artifact simply to obtain a green rerun. Retain it as incident evidence
+and create a new runtime Run ID after diagnosis.
+
+## Failure diagnosis
+
+### `FAILED_DEPENDENCY_CONTRACT`
+
+Inspect the reported declaration, Python ranges, required dev tools, and lockfile package rows. The
+formal lock must contain only HierarchicalForecast 1.5.1. Do not use `uv sync` without `--locked` as
+a workaround.
+
+### `FAILED_SYNC`
+
+Inspect the sync stderr log. Distinguish unavailable network or registry access from a genuine lock
+resolution or wheel compatibility failure. The committed lock includes Python 3.13 artifacts, but
+the target machine must still be able to retrieve or use cached packages.
+
+### `FAILED_PIP_CHECK`
+
+The installed environment has unsatisfied or conflicting requirements. Preserve the quality Run ID
+and inspect `pip_check.stderr.log`. Do not continue to runtime certification.
+
+### `FAILED_RUFF_FORMAT` or `FAILED_RUFF_LINT`
+
+Use the retained command log to fix only the reported files. Re-run focused checks before the heavy
+full suite. Do not describe unexecuted later stages as passing.
+
+### `FAILED_MYPY`
+
+Inspect the exact target modules in `COMMANDS.json`. Resolve typing errors without weakening the
+formal runtime and evidence contracts.
+
+### `FAILED_FOCUSED_TESTS`
+
+Both command success and exact JUnit totals are required:
+
+```text
+tests=95 failures=0 errors=0
+```
+
+A changed test count is a contract failure even when pytest exits 0. Update the expected count only
+when the test inventory is intentionally reviewed and documented.
+
+### `FAILED_FULL_TESTS`
+
+The heavy repository suite runs last. Preserve JUnit and logs, classify whether the failure is
+caused by this branch, and do not promote merely because the 95 focused tests passed.
+
+### `BLOCKED_DEPENDENCY` or `FAILED_VERSION_MISMATCH`
+
+Inspect the operator version-probe and target logs. Formal runtime requires the installed
+distribution and imported module to resolve to 1.5.1.
+
+### `FAILED_RUNTIME`
+
+Inspect `METHOD_RESULTS.json`. Separate expected grouped-hierarchy rejection from unexpected
+construction, execution, shape, finite-value, coherence, or exception failures. All 40 rows must
+reach their expected outcome.
+
+### `FAILED_PACKAGING` or `FAILED_PACKAGE_VERIFICATION`
+
+Inspect:
+
+- runtime `SHA256SUMS` coverage;
+- `ARTIFACT_MANIFEST.json` sizes and hashes;
+- Run ID consistency;
+- ZIP member paths, duplicates, timestamps, Unix modes, and compression method;
+- sidecar filename and digest;
+- existing ZIP/sidecar state;
+- standalone verifier identity comparison.
+
+Do not overwrite or rename mismatched evidence to force success.
+
+### `FAILED_POSTFLIGHT_GIT_DRIFT`
+
+The checkout changed during the gate. Retain evidence, identify the modifying process or generated
+unignored file, return to a clean expected commit, and start a new formal run.
+
+### GitHub Actions `steps=null`
+
+Issue #61 tracks failures before runner steps are created. This is not Python test evidence. Check
+repository Actions permissions, runner availability, concurrency, billing/minutes/budget, and the
+GitHub status page. Avoid repeated manual reruns until an external condition changes.
+
+## Required handoff record
+
+Record all of the following before considering review readiness:
+
+- exact Git commit and clean pre/post states;
+- dependency-contract result and both dependency-file SHA-256 values;
+- quality Run ID and focused/full JUnit totals;
+- installed HierarchicalForecast version;
+- runtime Run ID and 40/40/40/0 summary;
+- 24/16 execution/rejection partition;
+- operator Run ID;
+- runtime ZIP path, byte size, publication method, and SHA-256;
+- sidecar verification;
+- standalone verifier result;
+- promotion Run ID and `SHA256SUMS` verification;
+- GitHub Actions run and job IDs with actual successful steps and logs.
+
+## Prohibited shortcuts
+
+- no unlocked dependency substitution;
+- no dirty-worktree formal run;
+- no best-method or best-seed-only certification;
+- no partial 40-case acceptance;
+- no evidence overwrite;
+- no deletion of incident evidence to obtain success;
+- no runtime-to-accuracy claim;
+- no direct push to `main`;
+- no force push;
+- no ready transition, auto-merge, or merge without explicit approval.
