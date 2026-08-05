@@ -1,0 +1,46 @@
+{
+  "compileall": "PASS",
+  "files": {
+    "docs/autogluon/P11_CHRONOLOGY_AND_EVIDENCE_INTEGRITY.md": {
+      "bytes": 2511,
+      "sha256": "9dd2f370b97fc38d134eabdd205499989f3d4d9b86aef6c3e857378c4867d4c7"
+    },
+    "scripts/run_autogluon_timeseries_provider.py": {
+      "bytes": 7705,
+      "sha256": "f80c137d977a9e604f6f937a13f0dcfc6b33f968a96e4e876ddf4a4b99f3b588"
+    },
+    "src/loto/adapters/autogluon/strict_provider.py": {
+      "bytes": 4684,
+      "sha256": "bb56e083e79b32a2004bf8b092c3501a70fc2a8f7b1664a5b3eba5f349b3a0fb"
+    },
+    "src/loto/autogluon_campaign/runtime_certification_guarded.py": {
+      "bytes": 9514,
+      "sha256": "dbec8f23203be813f2724146c0c90a98c7d942f12652d0526f6d573db04b6deb"
+    },
+    "tests/adapters/autogluon/test_provider_script.py": {
+      "bytes": 1574,
+      "sha256": "643d055052c6698c99ac7bc2953d76b10493b74f2188989d13c43372ca348783"
+    },
+    "tests/adapters/autogluon/test_strict_provider.py": {
+      "bytes": 3285,
+      "sha256": "1d3dea90df07457b67882ab50930644682b6b24ccb9385f5592b9e31f51ebb69"
+    },
+    "tests/autogluon_campaign/test_runtime_certification_guarded.py": {
+      "bytes": 5187,
+      "sha256": "d1dab3164b142d5aa44045362f6446e0167f8dd721fb6f72f4b16c58f1969706"
+    }
+  },
+  "focused_tests": {
+    "failed": 0,
+    "passed": 51
+  },
+  "full_pytest": "NOT_RUN",
+  "github_ci": "CI_BLOCKED_PRE_RUN",
+  "line_length_over_100": 0,
+  "mypy": "NOT_RUN",
+  "phase": "AUTOGLUON_P11_CHRONOLOGY_AND_EVIDENCE_INTEGRITY",
+  "real_autogluon_runtime": "BLOCKED_RUNTIME",
+  "ruff": "NOT_AVAILABLE",
+  "schema_version": 1,
+  "status": "PARTIALLY_VERIFIED"
+}
