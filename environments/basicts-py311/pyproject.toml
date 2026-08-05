@@ -1,0 +1,13 @@
+[project]
+name = "loto-basicts-provider"
+version = "0.1.0"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "BasicTS @ git+https://github.com/GestaltCogTeam/BasicTS.git@c2bb6e31e591167e84459775a21a62e70a5893ce",
+  "torch==2.9.1",
+  "numpy>=2.0,<3",
+  "pydantic>=2.10,<3",
+]
+
+[tool.uv]
+package = false
