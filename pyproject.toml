@@ -56,7 +56,9 @@ loto-integrity = "loto.verify.integrity:main"
 where = ["src"]
 
 [tool.pytest.ini_options]
-addopts = "-q"
+# Use importlib mode so test modules with the same basename in different
+# directories do not collide in sys.modules during collection.
+addopts = "--import-mode=importlib -q"
 testpaths = ["tests"]
 pythonpath = ["src"]
 
