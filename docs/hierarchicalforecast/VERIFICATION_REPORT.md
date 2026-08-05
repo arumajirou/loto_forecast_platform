@@ -24,6 +24,7 @@ This report covers:
 - deterministic runtime-certification orchestration
 - artifact manifests and SHA-256 verification
 - immutable deterministic ZIP packaging and sidecar verification
+- target-machine locked provisioning and independent evidence verification
 - structured failure statuses and exit codes
 - focused tests and static checks performed in the isolated review environment
 
@@ -93,6 +94,26 @@ configured tolerance.
 - differing existing ZIPs or sidecars are rejected without overwrite
 - failed temporary packages are removed
 
+### Target-machine operator contract
+
+`IMPLEMENTED / VERIFIED_WITH_SYNTHETIC_EVIDENCE`
+
+The target-machine runner:
+
+- requires a clean Git worktree and optionally an exact expected head SHA
+- provisions with `uv sync --extra full --locked`
+- queries the installed package through `uv run --locked`
+- executes the registered formal certifier through `uv run --locked`
+- independently reopens all runtime JSON artifacts and verifies their checksums
+- independently inspects all 40 method/game rows
+- requires 24 actual executions and 16 explicit grouped-hierarchy rejections
+- independently verifies ZIP paths, sidecar, members, metadata, manifest bytes, sizes, and hashes
+- writes separate operator logs, report, manifest, and portable `SHA256SUMS`
+- fails closed on dirty Git state, version drift, case evidence drift, or package tampering
+
+The operator runner is not yet evidence that the real installed 1.5.1 package passed. It is the
+reviewed mechanism for obtaining and independently validating that missing evidence.
+
 ### Focused tests
 
 The focused evidence is the sum of separate isolated runs, not one repository-wide pytest run.
@@ -104,7 +125,12 @@ The focused evidence is the sum of separate isolated runs, not one repository-wi
 | Runtime-certification tests | 9 passed |
 | Console-entry tests | 2 passed |
 | Immutable package-certification tests | 11 passed |
-| Total unique focused evidence | 53 passed |
+| Target-machine operator tests | 8 passed |
+| Total unique focused evidence | 61 passed |
+
+The eight target-machine tests cover successful independent verification, bad summary counts,
+sidecar drift, removed actual-execution evidence, checksum traversal, successful operator evidence
+publication, exact-version mismatch, and dirty-worktree rejection.
 
 ### Static checks
 
@@ -144,15 +170,19 @@ Source inspection is not a substitute for an installed-package runtime execution
 
 `BLOCKED_RUNNER_START`
 
-Repeated jobs fail before workflow steps are created. The latest confirmed audit job had:
+The latest inspected target-runner head produced:
 
+- head: `936c6f57f8a475bfda2e32f512d8690cae620339`
+- run: `30987420472` / run #1138
+- job: `92245315209`
 - conclusion: `failure`
 - `steps=null`
 - no checkout log
 - no dependency-installation log
 - no Ruff, compileall, or pytest log
 
-This is not accepted as a code-test failure, but it also does not provide CI verification.
+This is not accepted as a code-test failure, but it also does not provide CI verification. Issue
+#61 tracks the repository/account runner-start blocker.
 
 ## Promotion gates
 
@@ -162,39 +192,46 @@ This is not accepted as a code-test failure, but it also does not provide CI ver
 | Ten-class partition | PASS | Complete state-matrix tests |
 | Runtime orchestration | PASS_WITH_DOUBLES | 40-case deterministic harness tests |
 | Immutable evidence package | PASS | ZIP, manifest, sidecar, tamper tests |
+| Target-machine operator | PASS_WITH_SYNTHETIC_EVIDENCE | Eight focused operator tests |
 | Unresolved review threads | PASS | Zero unresolved threads |
 | Real package runtime | PENDING | Installed `hierarchicalforecast==1.5.1`, 40/40 expected cases |
-| Console installation | BLOCKED | Installed entry point executes in target environment |
+| Console installation | PENDING_TARGET_HOST | Installed entry point executes in locked target environment |
 | Repository CI | BLOCKED | Workflow creates steps and required checks pass |
 | Forecast accuracy | NOT_APPLICABLE | Separate time-ordered experiment required |
 
 ## Formal acceptance procedure
 
-Run on the intended target commit:
+Run on a clean checkout of the intended target commit:
 
 ```bash
-git status --short
-git rev-parse HEAD
-uv sync --extra full
-uv run python - <<'PY'
-from importlib.metadata import version
-print(version("hierarchicalforecast"))
-PY
-uv run loto-hierarchicalforecast-certify
+cd /mnt/e/env/ts/loto_forecast_platform-pr48
+
+git fetch origin agent/hierarchicalforecast-runtime-certification
+EXPECTED_HEAD="$(git rev-parse origin/agent/hierarchicalforecast-runtime-certification)"
+
+python3 scripts/run_hierarchicalforecast_target_certification.py \
+  --expected-git-sha "${EXPECTED_HEAD}"
 ```
+
+The target runner performs locked synchronization, exact-version verification, formal execution,
+and independent runtime/ZIP verification. It writes a separate operator evidence directory with
+`OPERATOR_REPORT.json`, logs, manifest, and `SHA256SUMS`.
 
 Promotion requires all of the following:
 
-1. installed distribution version is exactly `1.5.1`
-2. command exit code is `0`
-3. certification status is `VERIFIED`
+1. operator command exit code is `0`
+2. operator status is `VERIFIED` and `formal_success=true`
+3. installed distribution version is exactly `1.5.1`
 4. expected, executed, and passed cases are all `40`
 5. failed cases are `0`
-6. exact-version and module/distribution consistency checks are true
-7. `sha256sum -c <run-id>.zip.sha256` passes
-8. `unzip -t <run-id>.zip` passes
-9. `sha256sum -c <run-id>/SHA256SUMS` passes
-10. repository CI starts real steps and required checks pass
+6. 24 executable cases record `actual_execution=true`
+7. 16 grouped-hierarchy rejections record `actual_execution=false`
+8. exact-version and module/distribution consistency checks are true
+9. runtime `SHA256SUMS`, ZIP sidecar, ZIP structure, and package manifest pass independent checks
+10. operator `SHA256SUMS` passes
+11. repository Ruff and required static checks pass
+12. focused and repository-wide pytest pass
+13. repository CI starts real steps and required checks pass
 
 Do not overwrite or delete a mismatched ZIP or sidecar to manufacture a passing rerun. Preserve
 it as incident evidence and create a new certification Run ID after investigation.
