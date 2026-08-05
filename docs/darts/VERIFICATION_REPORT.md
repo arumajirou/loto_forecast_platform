@@ -64,8 +64,23 @@
 - source-frame immutability: PASS;
 - compileall, AST parse, YAML parse, and line-length inspection: PASS.
 
-Documented focused increment runs total 69 tests. They were not all executed together in
-one environment, so this is not a single 69-test certification run.
+## P10 Ensemble and conformal increment
+
+- focused tests: 12 passed;
+- four ensemble/conformal identities and stable identity SHA-256: PASS;
+- Train/calibration/evaluation partition order and non-overlap: PASS;
+- pre-fitted global-model, availability, shift, and likelihood rules: PASS;
+- scoped constructor/fit/predict no-silent-drop ledger: PASS;
+- naive arithmetic-mean parity and finite shape checks: PASS;
+- stacking key completeness, seed/fold coverage, and leakage rejection: PASS;
+- quantile validation, non-crossing, and base-median parity: PASS;
+- nominal/empirical coverage, interval width, position and all-position metrics: PASS;
+- matrix-level failure retention and raw-frame immutability: PASS;
+- canonical SHA-256 stability and tamper sensitivity: PASS;
+- compileall, AST parse, YAML parse, and line-length inspection: PASS.
+
+Documented focused increment runs total 81 tests. They were not all executed together in
+one environment, so this is not a single 81-test certification run.
 
 ## Blocked
 
@@ -73,6 +88,7 @@ one environment, so this is not a single 69-test certification run.
 - `darts==0.46.1` and optional dependencies were unavailable;
 - notorch and torch lockfiles could not be generated;
 - Chronos2 and TiRex revisions remain intentionally unresolved in example configs;
-- no real Foundation or P9 historical-evaluation runtime occurred;
+- no real Foundation, P9 historical, or P10 ensemble/conformal runtime occurred;
+- no real stacking, calibration, interval coverage, or interval-width result exists;
 - no real CUDA, persistence, accuracy, Holdout, or Prospective claim is made;
 - GitHub Actions jobs continue to fail before step creation and produce no logs.
