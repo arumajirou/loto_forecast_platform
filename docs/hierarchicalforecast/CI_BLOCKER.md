@@ -13,10 +13,10 @@ branch code as failing, and it does not count as passing CI evidence.
 
 - Workflow: `.github/workflows/ci.yml`
 - Workflow name: `ci`
-- Head: `616b3d330b063338382194d31b9780d955bd2ca6`
-- Run ID: `30985512951`
-- Run number: `1033`
-- Job ID: `92239226331`
+- Head: `bf786288d8fe2c9a0311d5c6a46791653a5c9197`
+- Run ID: `30987748836`
+- Run number: `1158`
+- Job ID: `92246362221`
 - Job name: `test`
 - Conclusion: `failure`
 - Job steps returned by GitHub API: empty
@@ -24,9 +24,10 @@ branch code as failing, and it does not count as passing CI evidence.
 - Workflow artifacts: none observed
 - Runner-execution evidence: absent
 
-The latest commit adds documentation only. The repeated zero-step result therefore adds evidence
-that the external runner-start blocker is independent of the HierarchicalForecast implementation
-code path.
+The latest head includes the target-machine operator, eight focused operator tests, and evidence
+documentation. The repeated zero-step result does not show any of those tests executing or failing.
+It adds evidence that the external runner-start blocker remains independent of the Python code
+path.
 
 ## Workflow definition check
 
@@ -100,4 +101,4 @@ Do not repeatedly rerun without changing the external condition or obtaining new
 
 PR #48 must remain Draft while issue #61 is open. Even after runner startup is restored, the PR
 also requires the real installed `hierarchicalforecast==1.5.1` 40-case certification and verified
-evidence ZIP before it can be marked ready for review.
+runtime and operator evidence before it can be marked ready for review.
