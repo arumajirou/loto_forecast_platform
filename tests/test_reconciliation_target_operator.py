@@ -31,6 +31,7 @@ def test_operator_success(tmp_path: Path) -> None:
     )
     assert code == 0
     assert report["status"] == "VERIFIED"
+    assert report["git_commit"] == "a" * 40
     assert report["git_postflight"]["clean"] is True
     operator_dir = Path(report["operator_directory"])
     assert (operator_dir / "OPERATOR_REPORT.json").is_file()
