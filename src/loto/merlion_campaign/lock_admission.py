@@ -11,7 +11,6 @@ from typing import Any, Callable, Mapping, Sequence
 
 from loto.merlion_campaign.bootstrap_evidence_verify import verify_bootstrap_evidence_zip
 from loto.merlion_campaign.git_provenance import (
-    parse_git_porcelain_z,
     probe_git_state,
     validate_git_provenance,
 )
