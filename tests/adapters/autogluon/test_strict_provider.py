@@ -90,3 +90,50 @@ def test_frequency_and_target_mismatches_fail_closed() -> None:
     target["predictor"]["target"] = "y"
     response = strict_provider.run_provider_v2_strict(target)
     assert response["error"]["code"] == "TARGET_COLUMN_NOT_IMPLEMENTED"
+
+
+def test_incomplete_hpo_dictionary_fails_before_runtime(monkeypatch) -> None:
+    payload = _payload()
+    payload["execution_mode"] = "hpo_single_model"
+    payload["model_ids"] = ["SeasonalNaive"]
+    payload["fit"]["hyperparameters"] = {
+        "SeasonalNaive": {
+            "seasonal_period": {"__space__": "categorical", "choices": [1, 2]}
+        }
+    }
+    payload["fit"]["hyperparameter_tune_kwargs"] = {"num_trials": 2}
+    called = False
+
+    def forbidden_provider(*args, **kwargs):
+        nonlocal called
+        called = True
+        raise AssertionError("runtime provider must not be called")
+
+    monkeypatch.setattr(strict_provider, "_run_provider_v2", forbidden_provider)
+    response = strict_provider.run_provider_v2_strict(payload)
+    assert response["status"] == "ERROR"
+    assert response["error"]["code"] == "AUTOGLUON_API_CONTRACT_MISMATCH"
+    assert called is False
+
+
+def test_documented_hpo_dictionary_reaches_provider(monkeypatch) -> None:
+    payload = _payload()
+    payload["execution_mode"] = "hpo_single_model"
+    payload["model_ids"] = ["SeasonalNaive"]
+    payload["fit"]["hyperparameters"] = {
+        "SeasonalNaive": {
+            "seasonal_period": {"__space__": "categorical", "choices": [1, 2]}
+        }
+    }
+    payload["fit"]["hyperparameter_tune_kwargs"] = {
+        "num_trials": 2,
+        "scheduler": "local",
+        "searcher": "random",
+    }
+    monkeypatch.setattr(
+        strict_provider,
+        "_run_provider_v2",
+        lambda request, runtime=None: {"status": "OK", "run_id": request["run_id"]},
+    )
+    response = strict_provider.run_provider_v2_strict(payload)
+    assert response == {"status": "OK", "run_id": "strict-preflight"}
