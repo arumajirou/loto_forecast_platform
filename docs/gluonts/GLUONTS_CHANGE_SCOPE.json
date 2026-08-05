@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "P1_ISOLATED_PROVIDER_FOUNDATION",
+  "phase": "P2_PROVIDER_PROTOCOL",
   "status": "PARTIALLY_VERIFIED",
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
   "branch": "feat/gluonts-probabilistic-contract-v1",
@@ -19,6 +19,15 @@
     "src/loto/models/catalog_full.py",
     ".github/workflows/**",
     "README.md"
+  ],
+  "implemented_operations": [
+    "fit_predict",
+    "load_predict",
+    "evaluate",
+    "backtest",
+    "model_discovery",
+    "distribution_discovery",
+    "runtime_certify"
   ],
   "runtime_claims": "EXECUTION_PENDING",
   "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
