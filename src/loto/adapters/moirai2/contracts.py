@@ -136,6 +136,8 @@ class Moirai2ProviderRequest(BaseModel):
                 )
         if self.timestamps and len(self.timestamps) != len(self.history):
             raise ValueError("timestamps must be empty or match history length")
+        if self.time_semantics is TimeSemantics.CALENDAR_TIME and not self.timestamps:
+            raise ValueError("calendar_time requires explicit timestamps")
         if self.timestamps:
             if self.time_semantics is TimeSemantics.DRAW_SEQUENCE:
                 if any(not isinstance(value, int) for value in self.timestamps):
@@ -146,15 +148,36 @@ class Moirai2ProviderRequest(BaseModel):
                     raise ValueError(
                         "draw_sequence timestamps must be unique, increasing, and gap-free"
                     )
-            elif any(not isinstance(value, datetime) for value in self.timestamps):
-                raise ValueError("calendar_time timestamps must be datetimes")
+            else:
+                if any(not isinstance(value, datetime) for value in self.timestamps):
+                    raise ValueError("calendar_time timestamps must be datetimes")
+                calendar_values = [
+                    value for value in self.timestamps if isinstance(value, datetime)
+                ]
+                if any(
+                    current >= following
+                    for current, following in zip(
+                        calendar_values,
+                        calendar_values[1:],
+                        strict=False,
+                    )
+                ):
+                    raise ValueError("calendar_time timestamps must be unique and increasing")
+
+        past_names = set(self.past_covariates)
+        future_names = set(self.future_covariates)
+        position_names = set(self.position_columns)
+        if past_names & future_names:
+            raise ValueError("past-only and known-future covariate names must be disjoint")
+        if (past_names | future_names) & position_names:
+            raise ValueError("covariate names must not overlap target position columns")
         for name, values in self.past_covariates.items():
             if len(values) != len(self.history):
                 raise ValueError(
                     f"past covariate {name!r} must contain exactly history length values"
                 )
         expected_known_future = len(self.history) + self.prediction_length
-        if set(self.future_covariates) != set(self.future_covariate_availability):
+        if future_names != set(self.future_covariate_availability):
             raise ValueError(
                 "future covariates require matching known-at-prediction-time evidence"
             )
@@ -163,10 +186,13 @@ class Moirai2ProviderRequest(BaseModel):
                 raise ValueError(
                     f"future covariate {name!r} must contain history+horizon values"
                 )
+
         from loto.moirai2_campaign.token_geometry import calculate_token_geometry
 
         calculate_token_geometry(
             target_dim=self.game_geometry.position_count,
+            feat_dynamic_real_dim=len(future_names),
+            past_feat_dynamic_real_dim=len(past_names),
             context_length=self.context_length,
             prediction_length=self.prediction_length,
         )
@@ -200,6 +226,27 @@ class GpuEvidence(BaseModel):
     cpu_fallback: bool
 
 
+class CovariateMatrixEvidence(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    names: list[str]
+    shape: tuple[StrictInt, StrictInt]
+    sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+
+
+class CovariateEvidence(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    past: CovariateMatrixEvidence
+    known_future: CovariateMatrixEvidence
+    known_future_tail_sha256: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    chronology_valid: Literal[True]
+    availability_verified: Literal[True]
+    actuals_used: Literal[False]
+
+
 class LicenseEvidence(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -229,6 +276,7 @@ class Moirai2ProviderResponse(BaseModel):
     prediction_index: list[int] = Field(default_factory=list)
     runtime_evidence: RuntimeEvidence | None = None
     gpu_evidence: GpuEvidence | None = None
+    covariate_evidence: CovariateEvidence | None = None
     artifact_reference: dict[str, Any] = Field(default_factory=dict)
     license_evidence: LicenseEvidence | None = None
     warnings: list[str] = Field(default_factory=list)
