@@ -1,0 +1,167 @@
+schema_version: 1
+run_id: darts-p12-cross-library-contract-fixture
+primary_metric: hit_at_plus_minus_1
+metrics:
+  - hit_at_plus_minus_1
+  - position_hit_at_plus_minus_1
+  - all_position_hit_at_plus_minus_1
+  - mae
+  - mse
+  - rmse
+baselines: [random, fixed, mean, median, last, frequency, statistical]
+allow_best_seed_only: false
+require_all_tracks: true
+require_wrapper_prediction_parity: false
+wrapper_prediction_atol: 1.0e-12
+wrapper_prediction_rtol: 0.0
+outer_workers: 8
+max_gpu_jobs: 1
+fairness:
+  raw_data_sha256: cd1d0e85a46e7d7f8150cf0e8147f337cc81123c49a2f68a08a4807a66169d01
+  comparison_data_sha256: 2a02e96a27b41370b0430b686ac8e742a4867f140b03a2556479d6725a9ff297
+  fold_contract_sha256: 55711369293dfd4f594e7e7b87e7b8e39eaae228c2fb32ddf142d6ac828f0509
+  feature_contract_sha256: a3e898de82e4101ea3b7be36e7f505e26cc01cd11e5ee0864ef7d1f2e7419cac
+  code_contract_sha256: ac902fefd82f7ba4c8e0e51a72f7995a63e2bd8c50b29d99ae96163fe1099de7
+  boundaries:
+    train_start: 0
+    train_end: 512
+    validation_start: 512
+    validation_end: 640
+    holdout_start: 640
+    holdout_end: 768
+    prospective_start: 768
+  positions: [N1, N2, N3, N4, N5, N6, N7]
+  target_columns: [N1, N2, N3, N4, N5, N6, N7]
+  series_layout: position_global_sequence
+  horizon: 1
+  seeds: [1, 7, 19]
+  fold_ids: [0, 1, 2]
+  target_lags: [-1, -2, -3]
+  past_covariate_lags: [-1]
+  future_covariate_lags: [-1, 0]
+  past_covariate_columns: [draw_gap]
+  future_covariate_columns: [calendar_index]
+  static_covariate_columns: [position_index]
+  scaler_fit_scope: train
+  encoder_fit_scope: train
+  feature_selection_scope: train
+  hpo_scope: train
+providers:
+  - provider_id: darts-native-arima
+    track: darts_native
+    execution_library: darts
+    execution_version: 0.46.1
+    algorithm:
+      algorithm_family: statistical
+      base_library: darts
+      base_model: ARIMA
+      base_revision: 0.46.1
+      estimator_id: null
+      model_config_sha256: de80409ca84a4be9ec3f730ba42e0e8ae9103dce1f40fa1df463dc59e5c091c3
+    canonical_for_algorithm: true
+    runtime: notorch
+    requested_device: cpu
+  - provider_id: darts-neuralforecast-nhits
+    track: darts_neuralforecast_wrapper
+    execution_library: darts
+    execution_version: 0.46.1
+    wrapper_library: darts
+    wrapper_version: 0.46.1
+    algorithm:
+      algorithm_family: torch
+      base_library: neuralforecast
+      base_model: NHITS
+      base_revision: 3.0.2
+      estimator_id: null
+      model_config_sha256: aac94c71991a3e8a690f4625f7327fef97dd3539f2338f15b87cd6575d670728
+    canonical_for_algorithm: false
+    runtime: torch
+    requested_device: gpu
+  - provider_id: darts-statsforecast-autoarima
+    track: darts_statsforecast_wrapper
+    execution_library: darts
+    execution_version: 0.46.1
+    wrapper_library: darts
+    wrapper_version: 0.46.1
+    algorithm:
+      algorithm_family: statistical
+      base_library: statsforecast
+      base_model: AutoARIMA
+      base_revision: 2.0.2
+      estimator_id: null
+      model_config_sha256: 018ba3877d5244448f10a9355e57c7f23e77571399c455d2a49d39b05113c282
+    canonical_for_algorithm: false
+    runtime: notorch
+    requested_device: cpu
+  - provider_id: neuralforecast-nhits
+    track: standalone_neuralforecast
+    execution_library: neuralforecast
+    execution_version: 3.0.2
+    algorithm:
+      algorithm_family: torch
+      base_library: neuralforecast
+      base_model: NHITS
+      base_revision: 3.0.2
+      estimator_id: null
+      model_config_sha256: aac94c71991a3e8a690f4625f7327fef97dd3539f2338f15b87cd6575d670728
+    canonical_for_algorithm: true
+    runtime: torch
+    requested_device: gpu
+  - provider_id: mlforecast-linear
+    track: standalone_mlforecast
+    execution_library: mlforecast
+    execution_version: 1.0.18
+    algorithm:
+      algorithm_family: regression
+      base_library: sklearn
+      base_model: LinearRegression
+      base_revision: 1.8.0
+      estimator_id: sklearn.linear_model.LinearRegression
+      model_config_sha256: d358264f2df87488d5f209fe694f658094b0a0350a270a1c99ca03ee5e96f146
+    canonical_for_algorithm: true
+    runtime: notorch
+    requested_device: cpu
+  - provider_id: statsforecast-autoarima
+    track: standalone_statsforecast
+    execution_library: statsforecast
+    execution_version: 2.0.2
+    algorithm:
+      algorithm_family: statistical
+      base_library: statsforecast
+      base_model: AutoARIMA
+      base_revision: 2.0.2
+      estimator_id: null
+      model_config_sha256: 018ba3877d5244448f10a9355e57c7f23e77571399c455d2a49d39b05113c282
+    canonical_for_algorithm: true
+    runtime: notorch
+    requested_device: cpu
+  - provider_id: autogluon-chronos2
+    track: autogluon
+    execution_library: autogluon
+    execution_version: 1.4.0
+    wrapper_library: autogluon
+    wrapper_version: 1.4.0
+    algorithm:
+      algorithm_family: foundation
+      base_library: amazon
+      base_model: Chronos2
+      base_revision: commit-abc123
+      estimator_id: null
+      model_config_sha256: 49043fe319dd837d07f16c2c09e432d7c392ffa899b8cd37e942e9922d29d20d
+    canonical_for_algorithm: false
+    runtime: torch
+    requested_device: gpu
+  - provider_id: chronos2-direct
+    track: foundation_direct
+    execution_library: transformers
+    execution_version: 5.0.0
+    algorithm:
+      algorithm_family: foundation
+      base_library: amazon
+      base_model: Chronos2
+      base_revision: commit-abc123
+      estimator_id: null
+      model_config_sha256: 49043fe319dd837d07f16c2c09e432d7c392ffa899b8cd37e942e9922d29d20d
+    canonical_for_algorithm: true
+    runtime: torch
+    requested_device: gpu

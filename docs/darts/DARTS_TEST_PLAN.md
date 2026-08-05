@@ -70,6 +70,20 @@
 66. CPU fallback rejection after CUDA request.
 67. save/load/checkpoint/weights argument no-silent-drop ledger.
 68. P11 matrix failure retention and evidence SHA-256.
+69. exact eight-track cross-library provider retention.
+70. Darts wrapper, standalone provider, and base-algorithm identity validation.
+71. pinned execution/base revisions and model-config SHA-256 requirements.
+72. common data, split, fold, seed, lag, covariate, and Train-only fit scopes.
+73. target/past-lag leakage and target-as-covariate rejection.
+74. exactly one canonical execution for every duplicated base algorithm.
+75. GPU effective-device, PID, and VRAM evidence with CPU-fallback rejection.
+76. complete seed/fold/target/position prediction-key parity across providers.
+77. Hit@±1, position Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE.
+78. per-seed mean, population variance, and worst-value retention.
+79. wrapper prediction/metric deltas without algorithm double counting.
+80. optional strict wrapper prediction parity and drift rejection.
+81. canonical-only champion selection with all seven baseline families.
+82. P12 provider failure retention, report SHA-256, and tamper sensitivity.
 
 ## Pending runtime gates
 
@@ -88,6 +102,9 @@
 - run real P11 manual, clean, checkpoint, weights, and cross-device paths;
 - certify real process restart, artifact SHA-256, and prediction replay;
 - certify real GPU PID, VRAM, CUDA allocation, and CPU fallback behavior;
+- run all eight P12 provider tracks on identical data, folds, seeds, and features;
+- certify real Darts wrapper versus standalone prediction and metric deltas;
+- certify deduplicated algorithm ranking and the complete baseline champion gate;
 - run real multi-seed OOF using identical cross-library conditions;
 - certify real save/load/checkpoint behavior;
 - run repository Ruff and full pytest after a hosted runner starts normally.
