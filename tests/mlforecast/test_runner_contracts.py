@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 
 from loto.mlforecast.contracts import MLForecastRunConfig
-from loto.mlforecast.runner import chronological_split, validate_panel
+from loto.mlforecast.runner import RunResult, chronological_split, validate_panel
 
 
 def panel() -> pd.DataFrame:
@@ -31,3 +31,10 @@ def test_duplicates_fail_closed() -> None:
     duplicated = pd.concat([panel(), panel().iloc[[0]]], ignore_index=True)
     with pytest.raises(ValueError, match="duplicate"):
         validate_panel(duplicated, config)
+
+
+def test_run_result_is_constructible(tmp_path) -> None:
+    metrics = pd.DataFrame({"hit_at_1": [1.0]})
+    result = RunResult(run_id="run-1", run_dir=tmp_path, status="EXECUTED", metrics=metrics)
+    assert result.run_id == "run-1"
+    assert result.metrics.equals(metrics)
