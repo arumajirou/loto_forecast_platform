@@ -7,7 +7,13 @@ from typing import Any, Sequence
 
 from . import GLUONTS_VERSION, LANE, PROVIDER_STATUS, TORCH_CONSTRAINT
 from .artifacts import atomic_write_json
-from .discovery import discover_distributions, discover_models, runtime_versions
+from .discovery import (
+    discover_distributions,
+    discover_models,
+    discover_runtime_inventory,
+    runtime_versions,
+)
+from .inventory import inventory_sha256
 from .protocol import (
     EnvironmentLane,
     GluonTSProviderRequest,
@@ -47,6 +53,25 @@ def _response(
     )
 
 
+def _inventory_metadata(
+    *,
+    include_models: bool,
+    include_distributions: bool,
+    include_extensions: bool,
+) -> dict[str, Any]:
+    inventory = discover_runtime_inventory(
+        LANE,
+        include_models=include_models,
+        include_distributions=include_distributions,
+        include_extensions=include_extensions,
+    )
+    return {
+        "runtime_inventory": inventory.model_dump(mode="json"),
+        "runtime_inventory_sha256": inventory_sha256(inventory),
+        "formal_runtime_verified": inventory.summary["formally_verified"],
+    }
+
+
 def execute_request(request: GluonTSProviderRequest) -> GluonTSProviderResponse:
     """Execute one protocol operation with fail-closed phase boundaries."""
 
@@ -60,19 +85,15 @@ def execute_request(request: GluonTSProviderRequest) -> GluonTSProviderResponse:
     base_metadata = {
         "provider_identity": identity_payload(),
         "operation": request.operation.value,
-        "phase": "P2_PROVIDER_PROTOCOL",
+        "phase": "P3_RUNTIME_INVENTORY",
     }
     if request.operation is ProviderOperation.MODEL_DISCOVERY:
         discovery = discover_models()
-        status = (
-            ProviderStatus.PARTIALLY_VERIFIED
-            if discovery["module_imported"]
-            else ProviderStatus.EXECUTION_PENDING
+        inventory = _inventory_metadata(
+            include_models=True,
+            include_distributions=False,
+            include_extensions=True,
         )
-        return _response(request, status, {**base_metadata, "model_discovery": discovery})
-
-    if request.operation is ProviderOperation.DISTRIBUTION_DISCOVERY:
-        discovery = discover_distributions()
         status = (
             ProviderStatus.PARTIALLY_VERIFIED
             if discovery["module_imported"]
@@ -81,11 +102,34 @@ def execute_request(request: GluonTSProviderRequest) -> GluonTSProviderResponse:
         return _response(
             request,
             status,
-            {**base_metadata, "distribution_discovery": discovery},
+            {**base_metadata, **inventory, "model_discovery": discovery},
+        )
+
+    if request.operation is ProviderOperation.DISTRIBUTION_DISCOVERY:
+        discovery = discover_distributions()
+        inventory = _inventory_metadata(
+            include_models=False,
+            include_distributions=True,
+            include_extensions=False,
+        )
+        status = (
+            ProviderStatus.PARTIALLY_VERIFIED
+            if discovery["module_imported"]
+            else ProviderStatus.EXECUTION_PENDING
+        )
+        return _response(
+            request,
+            status,
+            {**base_metadata, **inventory, "distribution_discovery": discovery},
         )
 
     if request.operation is ProviderOperation.RUNTIME_CERTIFY:
         versions = runtime_versions()
+        inventory = _inventory_metadata(
+            include_models=True,
+            include_distributions=True,
+            include_extensions=True,
+        )
         status = (
             ProviderStatus.PARTIALLY_VERIFIED
             if versions["gluonts"] is not None
@@ -96,8 +140,9 @@ def execute_request(request: GluonTSProviderRequest) -> GluonTSProviderResponse:
             status,
             {
                 **base_metadata,
+                **inventory,
                 "runtime_versions": versions,
-                "certification_scope": "IMPORT_AND_VERSION_ONLY",
+                "certification_scope": "INVENTORY_AND_SIGNATURE_ONLY",
                 "fit_predict_certified": False,
                 "device_certified": False,
             },
@@ -108,7 +153,7 @@ def execute_request(request: GluonTSProviderRequest) -> GluonTSProviderResponse:
         ProviderStatus.EXECUTION_PENDING,
         {
             **base_metadata,
-            "reason": "operation is declared by P2 but implemented in a later phase",
+            "reason": "operation is declared but implemented in a later phase",
             "runtime_execution_performed": False,
         },
     )
