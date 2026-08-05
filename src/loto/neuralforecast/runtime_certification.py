@@ -151,6 +151,8 @@ def certify_saved_runtime(
         "state_before_finite": False,
         "state_after_finite": False,
         "require_gpu": require_gpu,
+        "cuda_training_evidence": False,
+        "cuda_reload_inference_evidence": False,
         "cuda_execution_evidence": False,
         "cpu_fallback": require_gpu,
         "runtime_before": {},
@@ -248,13 +250,18 @@ def certify_saved_runtime(
             if key_match and shape_match and before_values.size
             else None
         )
-        cuda_execution_evidence = bool(
-            _runtime_has_cuda_evidence(runtime_before)
-            or _runtime_has_cuda_evidence(runtime_after)
-            or gpu_before.get("gpu_pid_verified")
-            or gpu_after.get("gpu_pid_verified")
+        cuda_training_evidence = bool(
+            _runtime_has_cuda_evidence(runtime_before) or gpu_before.get("gpu_pid_verified")
         )
-        cpu_fallback = bool(require_gpu and not cuda_execution_evidence)
+        cuda_reload_inference_evidence = bool(
+            _runtime_has_cuda_evidence(runtime_after) or gpu_after.get("gpu_pid_verified")
+        )
+        cuda_execution_evidence = bool(
+            cuda_training_evidence and cuda_reload_inference_evidence
+            if require_gpu
+            else cuda_training_evidence or cuda_reload_inference_evidence
+        )
+        cpu_fallback = bool(require_gpu and not cuda_reload_inference_evidence)
 
         failed_checks: list[str] = []
         if not shape_match:
@@ -269,8 +276,10 @@ def certify_saved_runtime(
             failed_checks.append("finite_state_dict_after")
         if result["duplicate_keys_after"]:
             failed_checks.append("unique_prediction_keys_after")
-        if cpu_fallback:
-            failed_checks.append("no_cpu_fallback")
+        if require_gpu and not cuda_training_evidence:
+            failed_checks.append("gpu_training_evidence")
+        if require_gpu and not cuda_reload_inference_evidence:
+            failed_checks.append("gpu_reload_inference_evidence")
 
         result.update(
             {
@@ -282,6 +291,8 @@ def certify_saved_runtime(
                 "prediction_match": prediction_match,
                 "max_abs_diff": max_abs_diff,
                 "state_after_finite": state_after_finite,
+                "cuda_training_evidence": cuda_training_evidence,
+                "cuda_reload_inference_evidence": cuda_reload_inference_evidence,
                 "cuda_execution_evidence": cuda_execution_evidence,
                 "cpu_fallback": cpu_fallback,
                 "runtime_after": runtime_after,
