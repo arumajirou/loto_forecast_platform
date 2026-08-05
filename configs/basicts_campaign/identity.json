@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "operation": "identity",
+  "output_dir": "artifacts/basicts/p0/identity",
+  "environment_lane": "basicts-py311",
+  "expected_basicts_version": "1.1.0",
+  "expected_upstream_revision": "c2bb6e31e591167e84459775a21a62e70a5893ce"
+}
