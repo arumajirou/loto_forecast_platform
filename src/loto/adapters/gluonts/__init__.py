@@ -74,6 +74,18 @@ from loto.adapters.gluonts.p7c_contract import (
     P7CRemediationPlan,
     P7CRerunScope,
 )
+from loto.adapters.gluonts.p7d_bundle import (
+    P7DBundleError,
+    create_evidence_bundle as create_p7d_evidence_bundle,
+    verify_and_extract_bundle as verify_and_extract_p7d_bundle,
+    verify_evidence_bundle as verify_p7d_evidence_bundle,
+)
+from loto.adapters.gluonts.p7d_contract import (
+    P7DBundleEntry,
+    P7DBundleManifest,
+    P7DVerificationReport,
+    P7DVerificationState,
+)
 from loto.adapters.gluonts.protocol import (
     ArgumentState,
     DatasetItem,
@@ -158,6 +170,11 @@ __all__ = [
     "P7CRemediationItem",
     "P7CRemediationPlan",
     "P7CRerunScope",
+    "P7DBundleEntry",
+    "P7DBundleError",
+    "P7DBundleManifest",
+    "P7DVerificationReport",
+    "P7DVerificationState",
     "P7CertificationStatus",
     "P7EvidenceState",
     "P7FailureCategory",
@@ -185,6 +202,7 @@ __all__ = [
     "build_p7c_remediation_plan",
     "build_target_audit",
     "certify_predictor_lifecycle",
+    "create_p7d_evidence_bundle",
     "fit_result_sha256",
     "get_p6_model_spec",
     "inventory_sha256",
@@ -202,8 +220,10 @@ __all__ = [
     "sha256_file",
     "sha256_json",
     "smoke_sha256",
+    "verify_and_extract_p7d_bundle",
     "verify_checksum_inventory",
     "verify_p7c_input",
+    "verify_p7d_evidence_bundle",
     "write_p7c_remediation_outputs",
     "write_target_audit",
 ]

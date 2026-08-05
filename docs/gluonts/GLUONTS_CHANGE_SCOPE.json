@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "P7C_RESULT_TRIAGE_AND_REMEDIATION",
+  "phase": "P7D_EVIDENCE_HANDOFF",
   "status": "PARTIALLY_VERIFIED",
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
   "branch": "feat/gluonts-probabilistic-contract-v1",
@@ -10,6 +10,7 @@
     "environments/gluonts-p7-target-machine.sh",
     "environments/gluonts-p7b-*.sh",
     "environments/gluonts-p7c-*.sh",
+    "environments/gluonts-p7d-*.sh",
     "environments/gluonts_p7b/**",
     "src/loto/adapters/gluonts/**",
     "src/loto/gluonts_campaign/**",
@@ -38,6 +39,9 @@
     "p7b_target_machine_supervision",
     "p7c_result_triage",
     "p7c_remediation_queue",
+    "p7d_evidence_bundle_export",
+    "p7d_evidence_bundle_verify",
+    "p7d_safe_bundle_extract",
     "p8_eligibility_gate"
   ],
   "model_count_per_lane": 9,
@@ -53,23 +57,28 @@
     "TRANSIENT_RETRY",
     "MANUAL_TRIAGE"
   ],
-  "p7c_required_inputs": [
-    "P7B_EXECUTION_COMPLETE",
-    "P7B_EXECUTION_SHA256SUMS",
-    "p7b_execution_manifest.json",
-    "p7b_execution_journal.json",
-    "audit/P7_SHA256SUMS",
-    "audit/p7_target_machine_audit.json",
-    "audit/p7_failure_matrix.json",
-    "audit/p7_artifact_manifest.json"
+  "p7d_bundle_members": [
+    "P7D_BUNDLE_MANIFEST.json",
+    "P7D_SHA256SUMS",
+    "P7D_BUNDLE_COMPLETE",
+    "run/**"
   ],
-  "p7c_artifacts": [
-    "p7c_remediation_plan.json",
-    "p7c_remediation_queue.tsv",
-    "p7c_remediation_report.md",
-    "p7c_artifact_manifest.json",
-    "P7C_SHA256SUMS",
-    "P7C_ORCHESTRATION_SHA256SUMS"
+  "p7d_sidecar": "<archive>.zip.sha256",
+  "p7d_verification_outputs": [
+    "p7d_verification_report.json",
+    "P7D_VERIFY_SHA256SUMS"
+  ],
+  "p7d_rejected_archive_features": [
+    "duplicate_member",
+    "absolute_path",
+    "path_traversal",
+    "backslash_path",
+    "symlink_member",
+    "encrypted_member",
+    "unsupported_compression",
+    "unsafe_expansion",
+    "checksum_mismatch",
+    "nested_identity_mismatch"
   ],
   "p8_gate": {
     "evidence_state": "VALID",
@@ -77,9 +86,10 @@
     "verified_model_lane_lifecycles": 18,
     "p8_eligible": true
   },
-  "p7c_focused_tests": 16,
+  "p7d_focused_and_public_api_tests": 13,
   "real_runtime_claims": "EXECUTION_PENDING",
+  "real_p7d_bundle": "EXECUTION_PENDING",
   "formally_verified_model_lane_lifecycles": 0,
-  "next_phase": "P7D_TARGET_MACHINE_EXECUTION_AND_EVIDENCE_BACKED_REMEDIATION",
+  "next_phase": "P7E_TARGET_MACHINE_EVIDENCE_INTAKE_AND_REMEDIATION",
   "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
 }

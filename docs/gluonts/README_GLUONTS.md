@@ -25,6 +25,7 @@ The root Torch contract is unchanged. GluonTS objects never cross the JSON proce
 - **P7:** cross-lane evidence audit and failure classification.
 - **P7B:** resumable target-machine supervision and immutable execution evidence.
 - **P7C:** read-only result triage, remediation queue generation, and the P8 gate.
+- **P7D:** portable ZIP evidence handoff, independent verification, and safe extraction.
 
 ## P6 models
 
@@ -94,9 +95,42 @@ MANUAL_TRIAGE
 The P7C output must be outside the immutable P7B directory. P7C writes a JSON plan, TSV queue,
 Markdown report, artifact manifest, and complete checksum inventory.
 
+## P7D portable evidence handoff
+
+Run P7B, P7C, packaging, and immediate ZIP verification together:
+
+```bash
+RUN_ID="gluonts-p7d-$(date -u +%Y%m%dT%H%M%SZ)"
+RUN_ROOT="/mnt/e/env/logs/${RUN_ID}"
+ARCHIVE="${RUN_ROOT}.zip"
+RUN_ID="${RUN_ID}" bash environments/gluonts-p7d-target-machine.sh \
+  "${RUN_ROOT}" \
+  "${ARCHIVE}"
+```
+
+Export an existing P7C orchestration root:
+
+```bash
+bash environments/gluonts-p7d-export.sh \
+  "${P7C_RUN_ROOT}" \
+  "${P7C_RUN_ROOT}.zip"
+```
+
+Verify and extract on another machine:
+
+```bash
+bash environments/gluonts-p7d-verify.sh \
+  "${P7C_RUN_ROOT}.zip" \
+  "${P7C_RUN_ROOT}-verified"
+```
+
+P7D preserves the complete orchestration tree, nested P7B/P7/P7C checksums, logs, return codes, run ID,
+commit SHA, evidence state, lifecycle count, and P8 state. It rejects duplicate or unsafe ZIP members,
+symlinks, encryption, unsafe expansion, stale inventories, and nested identity mismatch.
+
 ## P8 gate
 
-P8 remains blocked unless P7C reports all of the following:
+P8 remains blocked unless P7C and P7D report all of the following:
 
 ```text
 evidence_state=VALID
@@ -105,6 +139,8 @@ verified_model_lifecycles=18
 p8_eligible=true
 ```
 
+Packaging never changes a blocked, failed, or verified model classification.
+
 ## Current verification
 
 ```text
@@ -112,10 +148,12 @@ P6_FOCUSED_TESTS=21 passed
 P7_AUDIT_TESTS=9 passed
 P7B_FOCUSED_TESTS=15 passed
 P7C_FOCUSED_TESTS=16 passed
+P7D_FOCUSED_AND_PUBLIC_API_TESTS=13 passed
 COMPILEALL=PASS
-P7B_AND_P7C_BASH_SYNTAX=PASS
-MAX_P7C_PYTHON_LINE_LENGTH=98
+P7B_P7C_P7D_BASH_SYNTAX=PASS
+MAX_P7D_PYTHON_LINE_LENGTH=86
 REAL_GLUONTS_RUNTIME=EXECUTION_PENDING
+REAL_P7D_BUNDLE=EXECUTION_PENDING
 FORMALLY_VERIFIED_MODEL_LANE_LIFECYCLES=0
 ```
 
