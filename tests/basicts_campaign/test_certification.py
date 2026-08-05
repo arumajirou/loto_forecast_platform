@@ -22,7 +22,12 @@ def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def _write_bundle(directory: Path, operation: str) -> None:
+def _write_bundle(
+    directory: Path,
+    operation: str,
+    *,
+    identity_commit: str = EXPECTED_UPSTREAM_REVISION,
+) -> None:
     directory.mkdir(parents=True)
     if operation == "identity":
         evidence = {
@@ -30,6 +35,14 @@ def _write_bundle(directory: Path, operation: str) -> None:
             "python_process_boundary": True,
             "device": "cpu",
             "cpu_fallback": False,
+            "installed_provenance_status": "PASS",
+            "distribution_name": "BasicTS",
+            "distribution_version": "1.1.0",
+            "direct_url_repository": "https://github.com/GestaltCogTeam/BasicTS",
+            "direct_url_vcs": "git",
+            "direct_url_commit_id": identity_commit,
+            "direct_url_requested_revision": EXPECTED_UPSTREAM_REVISION,
+            "direct_url_sha256": "a" * 64,
         }
     elif operation == "validate_config":
         evidence = {
@@ -114,6 +127,7 @@ def test_certify_p0_accepts_complete_evidence(tmp_path: Path) -> None:
     )
 
     assert report["status"] == "PASS"
+    assert report["certified"]["installed_package_git_provenance"] is True
     assert [item["operation"] for item in report["bundles"]] == [
         "identity",
         "validate_config",
@@ -128,6 +142,14 @@ def test_verify_provider_bundle_rejects_tampering(tmp_path: Path) -> None:
     response.write_text(response.read_text(encoding="utf-8") + " ", encoding="utf-8")
 
     with pytest.raises(CertificationError, match="SHA-256 mismatch"):
+        verify_provider_bundle(directory, "identity")
+
+
+def test_identity_bundle_rejects_installed_commit_drift(tmp_path: Path) -> None:
+    directory = tmp_path / "identity"
+    _write_bundle(directory, "identity", identity_commit="b" * 40)
+
+    with pytest.raises(CertificationError, match="direct_url_commit_id"):
         verify_provider_bundle(directory, "identity")
 
 
