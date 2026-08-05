@@ -303,6 +303,20 @@ def _copy_exact(source: Path, target: Path) -> dict[str, Any]:
     }
 
 
+def _code_sha256(paths: list[Path]) -> str:
+    digest = hashlib.sha256()
+    unique = sorted({path.resolve() for path in paths}, key=str)
+    for path in unique:
+        _require_regular_file(path, "scoring code")
+        digest.update(path.name.encode("utf-8"))
+        digest.update(b"\0")
+        with path.open("rb") as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(block)
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
 def _copy_source_evidence(run_root: Path, output: Path) -> dict[str, Any]:
     records: dict[str, Any] = {}
     for name in (
