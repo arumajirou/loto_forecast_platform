@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from loto.auto_campaign.lineage_pipeline import _verified_run_failures
 from loto.auto_campaign.persistence import sha256_file, write_json, write_sha256s
 from loto.auto_campaign.verification_seal import (
@@ -105,3 +107,11 @@ def test_seal_payload_is_nonempty_json(tmp_path: Path) -> None:
     assert payload["status"] == "PASS"
     assert payload["schema_version"] == "all-auto-verification-seal-v1"
     assert payload["content_file_count"] >= 3
+
+
+def test_broken_symlink_is_rejected_before_sealing(tmp_path: Path) -> None:
+    root = _run_root(tmp_path)
+    (root / "broken-link").symlink_to(root / "missing-target")
+
+    with pytest.raises(ValueError, match="does not allow symlinks"):
+        write_verification_seal(root, _pass_result())
