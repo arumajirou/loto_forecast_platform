@@ -319,7 +319,7 @@ def discover_runtime_inventory(
                 subject=spec.class_name,
                 message=f"source-declared class {spec.class_name!r} is missing at runtime",
             )
-        elif runtime_aliases and not runtime_discovered:
+        elif registry is not None and not runtime_discovered:
             failure = InventoryFailure(
                 category=FailureCategory.RUNTIME_ALIAS_MISSING,
                 subject=spec.alias,
