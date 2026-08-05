@@ -157,3 +157,54 @@ def test_forecast_output_rejects_wrong_series_composition() -> None:
     )
     assert evidence["status"] is RuntimeStatus.VALIDATION_FAILED
     assert evidence["series_horizon_ok"] is False
+
+
+def test_ucm_uses_upstream_default_constructor() -> None:
+    class UCM:
+        def __init__(self, level: str = "local level") -> None:
+            self.level = level
+
+    adapter = StatsForecastRuntimeAdapter(
+        core_class=FakeCore,
+        models_module=SimpleNamespace(UCM=UCM),
+    )
+    model = adapter.build_model("UCM")
+    assert model.level == "local level"
+
+
+def test_multiseasonal_model_accepts_sequence_season_length() -> None:
+    class MSTL:
+        def __init__(self, season_length) -> None:
+            self.season_length = season_length
+
+    adapter = StatsForecastRuntimeAdapter(
+        core_class=FakeCore,
+        models_module=SimpleNamespace(MSTL=MSTL),
+    )
+    with pytest.raises(ValueError, match="at least 8 rows"):
+        adapter.forecast(
+            panel(),
+            model_name="MSTL",
+            freq=1,
+            horizon=1,
+            parameters={"season_length": [2, 4]},
+        )
+
+
+def test_conformal_seasonal_pool_does_not_require_two_seasons() -> None:
+    class ConformalSeasonalPool:
+        def __init__(self, season_length: int) -> None:
+            self.season_length = season_length
+
+    adapter = StatsForecastRuntimeAdapter(
+        core_class=FakeCore,
+        models_module=SimpleNamespace(ConformalSeasonalPool=ConformalSeasonalPool),
+    )
+    _, evidence = adapter.forecast(
+        panel(),
+        model_name="ConformalSeasonalPool",
+        freq=1,
+        horizon=1,
+        parameters={"season_length": 12},
+    )
+    assert evidence["status"] is RuntimeStatus.VERIFIED
