@@ -83,6 +83,8 @@ def build_formal_receipt(run_dir: Path, *, expected_git_commit: str) -> dict[str
     """Re-verify a formal bundle and build a deterministic external receipt."""
 
     expected_commit = _require_commit(expected_git_commit)
+    if run_dir.is_symlink():
+        raise FormalReceiptError("source bundle path must not be a symbolic link")
     root = run_dir.resolve()
     verification = verify_formal_bundle(root)
     actual_commit = verification.get("git_commit")
@@ -132,6 +134,10 @@ def _atomic_write_text(path: Path, text: str) -> None:
 
 
 def _receipt_output_path(run_dir: Path, output: Path) -> Path:
+    if run_dir.is_symlink():
+        raise FormalReceiptError("source bundle path must not be a symbolic link")
+    if output.is_symlink():
+        raise FormalReceiptError("receipt output path is a symbolic link")
     root = run_dir.resolve()
     candidate = output.resolve()
     checksum = candidate.with_suffix(candidate.suffix + ".sha256")
@@ -169,10 +175,11 @@ def write_formal_receipt(
 
 
 def _verify_receipt_checksum(receipt_path: Path) -> str:
+    checksum_input = receipt_path.with_suffix(receipt_path.suffix + ".sha256")
+    if receipt_path.is_symlink() or checksum_input.is_symlink():
+        raise FormalReceiptError("receipt or checksum path is a symbolic link")
     receipt = _required_regular_file(receipt_path.resolve())
-    checksum = _required_regular_file(
-        receipt.with_suffix(receipt.suffix + ".sha256")
-    )
+    checksum = _required_regular_file(checksum_input.resolve())
     lines = checksum.read_text(encoding="utf-8").splitlines()
     if len(lines) != 1:
         raise FormalReceiptError("receipt checksum must contain exactly one line")
