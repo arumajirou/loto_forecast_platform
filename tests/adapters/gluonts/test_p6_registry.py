@@ -17,11 +17,6 @@ def test_registry_contains_exactly_nine_expected_models() -> None:
 
 def test_registry_distribution_contracts_are_explicit() -> None:
     by_name = {spec.model_class: spec for spec in model_specs()}
-    assert by_name["TemporalFusionTransformerEstimator"].distribution_mode is (
-        DistributionMode.QUANTILE
-    )
-    assert by_name["DeepNPTSEstimator"].certified_distributions == ["INTRINSIC"]
-    assert by_name["WaveNetEstimator"].certified_distributions == ["INTRINSIC"]
     student_t = {
         name
         for name, spec in by_name.items()
@@ -29,8 +24,18 @@ def test_registry_distribution_contracts_are_explicit() -> None:
     }
     assert student_t == {
         "DeepAREstimator",
+        "TemporalFusionTransformerEstimator",
+    }
+    intrinsic = {
+        name
+        for name, spec in by_name.items()
+        if spec.distribution_mode is DistributionMode.INTRINSIC
+    }
+    assert intrinsic == {
+        "DeepNPTSEstimator",
         "TiDEEstimator",
         "SimpleFeedForwardEstimator",
+        "WaveNetEstimator",
         "DLinearEstimator",
         "PatchTSTEstimator",
         "LagTSTEstimator",
