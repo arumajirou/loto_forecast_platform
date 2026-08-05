@@ -42,7 +42,8 @@ The wrapper keeps the terminal open with `Enterキーで終了します...` and 
 - separate-process replay: two CUDA runs with `num_samples=20`, `seed=42`;
 - fixed context: 64 rows, seven position series, one-step horizon;
 - point strategy: sample median;
-- empirical quantiles: 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95.
+- empirical quantiles: 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95;
+- per-case timeout: 1800 seconds.
 
 ## Fail-closed requirements
 
@@ -58,10 +59,11 @@ Every CUDA case must prove all of the following:
 - internal peak VRAM greater than zero;
 - runner GPU PID equals the directly launched Python PID;
 - the same PID is observed externally by `nvidia-smi`;
-- external peak VRAM is greater than zero.
+- external peak VRAM is greater than zero;
+- the case completes before timeout.
 
-The replay verdict must be `EXACT` or `NUMERIC_CLOSE`. `DIVERGENT`, missing evidence, CPU
-fallback, or any failed case makes the overall certification fail.
+The replay verdict must be `EXACT` or `NUMERIC_CLOSE`. `DIVERGENT`, malformed response JSON,
+missing evidence, CPU fallback, timeout, or any failed case makes the overall certification fail.
 
 ## Artifacts
 
@@ -80,6 +82,9 @@ Important outputs:
 - `SHA256SUMS`;
 - `status.txt`;
 - per-case request, response, stdout, stderr, and external GPU-monitor evidence.
+
+The environment record includes the Git commit, branch, worktree status, exact snapshot hashes,
+remote-code review hash, Sundial lock hash, runner hash, and certification-harness hash.
 
 `artifacts/sundial-provider-v2/LATEST` points to the latest run directory.
 
