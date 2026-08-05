@@ -3,7 +3,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from loto.statsforecast.runtime_lane_remediation import execute_bounded_remediation
+from loto.statsforecast.runtime_lane_remediation_hardening import (
+    execute_bounded_remediation,
+)
 
 
 def main(argv: list[str] | None = None) -> int:
