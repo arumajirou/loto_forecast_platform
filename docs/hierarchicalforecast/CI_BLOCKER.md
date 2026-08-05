@@ -1,33 +1,37 @@
-# GitHub Actions runner-start blocker
+# GitHub Actions pre-run blocker
 
 ## Status
 
-`BLOCKED_RUNNER_START`
+`CI_BLOCKED_PRE_RUN / REPOSITORY_OR_ACCOUNT_INFRASTRUCTURE`
 
-Tracking issue: `#61` — **CI blocker: GitHub Actions jobs fail before runner execution**
+Canonical repository-wide issue: `#58` — **CI infrastructure: GitHub Actions jobs fail before step creation**
+
+PR #48 dependency tracker: `#61` — **PR #48 CI dependency: repository-wide pre-run blocker tracked in #58**
 
 This document records an external verification blocker for PR #48. It does not classify the
 branch code as failing, and it does not count as passing CI evidence.
 
-## Latest observed run
+## Latest PR #48 reproduction
 
+- Repository visibility: `private`
 - Workflow: `.github/workflows/ci.yml`
 - Workflow name: `ci`
-- Head: `bf786288d8fe2c9a0311d5c6a46791653a5c9197`
-- Run ID: `30987748836`
-- Run number: `1158`
-- Job ID: `92246362221`
+- Runner label: `ubuntu-latest`
+- Head: `a97b5f58367e423625678debf6c7b49d7eca6821`
+- Run ID: `31001553962`
+- Run number: `1869`
+- Job ID: `92291396321`
 - Job name: `test`
 - Conclusion: `failure`
+- Configured workflow steps: present
 - Job steps returned by GitHub API: empty
-- Downloadable job log: absent
-- Workflow artifacts: none observed
+- Job-log download: `404 BlobNotFound`
+- Workflow artifacts: none
+- Commit combined statuses: none
 - Runner-execution evidence: absent
 
-The latest head includes the target-machine operator, eight focused operator tests, and evidence
-documentation. The repeated zero-step result does not show any of those tests executing or failing.
-It adds evidence that the external runner-start blocker remains independent of the Python code
-path.
+Independent PRs #55, #56, and #57 reproduce the same zero-step pattern. The blocker is therefore
+not specific to PR #48, the reconciliation implementation, or a particular documentation head.
 
 ## Workflow definition check
 
@@ -43,62 +47,86 @@ The checked-in workflow is structurally populated and uses:
 - compileall
 - repository pytest
 
-The API returning no job steps therefore does not mean that the workflow file contains no
-steps. It means no configured step produced execution evidence for the observed job.
+An empty API step list does not mean the workflow file has no steps. It means no configured step
+produced runner-execution evidence for the observed job.
 
 ## Classification
 
-The available evidence supports only:
+The strongest supported classification is:
 
 `job failed before producing runner-execution evidence`
 
-The exact administrative cause is not observable through the current connector. Do not claim a
-specific root cause without checking repository/account settings.
+Because the repository is private and multiple independent PRs fail identically, the remaining
+administrative classes are:
 
-Possible external classes to inspect include:
+1. repository or account Actions disabled or restricted;
+2. private-repository Actions minutes, storage, budget, billing, or payment restriction;
+3. standard GitHub-hosted runners disabled by repository, organization, or account policy;
+4. unavailable runner group, concurrency, or queue restriction;
+5. GitHub-controlled repository/account disablement that normal settings cannot restore;
+6. platform incident not represented in the jobs API.
 
-1. repository or account Actions disabled or restricted
-2. standard GitHub-hosted runners disabled by policy
-3. private-repository Actions minutes, budget, billing, or payment restriction
-4. account or organization concurrency/queue restriction
-5. GitHub-hosted runner service incident or account-level disablement
+The current connector cannot identify which class applies. Do not claim a specific root cause
+without observing the repository/account UI or a GitHub Support response.
 
-## Owner checklist
+## Owner investigation order
 
 In GitHub UI, inspect:
 
 1. Repository **Settings → Actions → General**
-   - Actions enabled
-   - GitHub-authored actions permitted
-   - standard GitHub-hosted runners permitted
-2. Account or organization billing and Actions usage
-   - remaining included minutes
-   - Actions budget/spending limit
-   - valid payment method when required
-3. **Settings → Actions → Runners** and current jobs
-   - no policy requiring unavailable runner groups
-   - no concurrency saturation or persistent queue
-4. GitHub Status and repository Actions page
-   - no platform incident
-   - read any run-level banner or billing/policy message not exposed by the API
+   - Actions enabled;
+   - GitHub-authored actions permitted;
+   - standard GitHub-hosted runners permitted.
+2. Account **Billing & plans → Metered usage / Budgets and alerts**
+   - remaining Actions minutes and storage;
+   - Actions budget and any stop-usage limit;
+   - payment-method or billing restrictions.
+3. Repository **Settings → Actions → Runners**
+   - no unavailable runner-group requirement;
+   - no hosted-runner policy restriction;
+   - no persistent queue or concurrency restriction.
+4. Failed run page
+   - retain any billing, policy, account, or runner banner not exposed by the jobs API.
+5. GitHub Support
+   - required when the UI reports Actions disabled for the account or repository and normal
+     settings cannot restore it.
 
-Record findings and resolution evidence in issue #61.
+After GitHub CLI is installed and authenticated with `repo` and `workflow` scopes, retain:
+
+```bash
+gh run view 31001553962 \
+  --repo arumajirou/loto_forecast_platform
+
+gh api \
+  /repos/arumajirou/loto_forecast_platform/actions/jobs/92291396321
+```
+
+## Tracking policy
+
+- Issue #58 is the canonical repository-wide blocker.
+- Issue #61 records only PR #48's dependency on #58.
+- Do not append another comment for every unchanged zero-step branch head.
+- Add new evidence only after an external setting changes, GitHub exposes a new message, or a job
+  reaches real workflow steps.
+- Do not repeatedly rerun while steps and logs remain absent.
+- Do not modify feature code without a concrete workflow error.
 
 ## Required resolution evidence
 
-The blocker is resolved only when a run for the current branch head has:
+The repository-wide blocker is resolved only when a run has:
 
-- at least one real job step
-- checkout/install logs
-- Ruff and compileall results
-- pytest results
-- final required-check conclusion
+- at least one real workflow step;
+- checkout and Python-setup records;
+- accessible logs;
+- Ruff and compileall results;
+- pytest results;
+- a final required-check conclusion.
 
 A rerun that again returns zero steps, no log, and no artifacts does not add diagnostic value.
-Do not repeatedly rerun without changing the external condition or obtaining new evidence.
 
 ## PR #48 boundary
 
-PR #48 must remain Draft while issue #61 is open. Even after runner startup is restored, the PR
-also requires the real installed `hierarchicalforecast==1.5.1` 40-case certification and verified
-runtime and operator evidence before it can be marked ready for review.
+PR #48 remains Draft while it depends on issue #58. Restoring runner startup is necessary but not
+sufficient: the PR also requires the exact-head local promotion gate, lock validation, focused
+`95/0/0`, full pytest, installed `hierarchicalforecast==1.5.1`, runtime `40/40/40/0`, method
+partition `24/16`, verified package publication, standalone verification, and all SHA-256 roots.
