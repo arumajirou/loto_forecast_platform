@@ -58,6 +58,8 @@ def _json_object(path: Path, failures: list[str], label: str) -> dict[str, Any]:
     if not isinstance(payload, dict):
         failures.append(f"{label} must be a JSON object: {path}")
         return {}
+    if not payload:
+        failures.append(f"{label} must not be empty: {path}")
     return payload
 
 
@@ -73,6 +75,8 @@ def _json_list(path: Path, failures: list[str], label: str) -> list[Any]:
     if not isinstance(payload, list):
         failures.append(f"{label} must be a JSON list: {path}")
         return []
+    if not payload:
+        failures.append(f"{label} must not be empty: {path}")
     return payload
 
 
@@ -121,6 +125,186 @@ def _validate_count_map(
         failures.append(f"{label} total mismatch: expected={expected_total}, actual={total}")
 
 
+def _validate_failure_mode(
+    run_root: Path,
+    manifest: Mapping[str, Any],
+    embedded: Mapping[str, Any],
+    resolved_artifact: Path | None,
+    failures: list[str],
+) -> dict[str, Any]:
+    coverage_root = run_root / "coverage-state"
+    failure_path = run_root / "coverage_state_failure.json"
+    if manifest.get("status") != "PARTIAL":
+        failures.append("FAILED coverage state requires root status=PARTIAL")
+    if str(manifest.get("coverage_state_path")) != "coverage_state_failure.json":
+        failures.append("FAILED coverage state must point to coverage_state_failure.json")
+    if coverage_root.exists():
+        failures.append("partial coverage-state directory retained after resolver failure")
+
+    failure = _json_object(failure_path, failures, "coverage-state failure evidence")
+    if failure.get("status") != VerificationStatus.FAILED.value:
+        failures.append("coverage-state failure evidence status must be FAILED")
+    if failure.get("failed_phase") != "coverage_state_resolution":
+        failures.append("coverage-state failure evidence has invalid failed_phase")
+    if failure.get("gpu_runtime_status") != VerificationStatus.EXECUTION_PENDING.value:
+        failures.append("coverage-state failure evidence has invalid GPU boundary")
+    for field in ("error_type", "error", "traceback"):
+        if not str(failure.get(field) or "").strip():
+            failures.append(f"coverage-state failure evidence missing {field}")
+    if manifest.get("coverage_state_schema_version") != failure.get("schema_version"):
+        failures.append("root and failure-evidence schema versions differ")
+    if embedded and dict(embedded) != failure:
+        failures.append("embedded coverage_state differs from failure evidence")
+    if resolved_artifact is not None and resolved_artifact != failure_path.resolve():
+        failures.append("resolved failure artifact path mismatch")
+
+    return {
+        "applicable": True,
+        "status": "PASS" if not failures else "FAIL",
+        "coverage_state_status": VerificationStatus.FAILED.value,
+        "gpu_runtime_status": str(manifest.get("gpu_runtime_status") or ""),
+        "artifact_mode": "failure-evidence",
+        "failures": failures,
+    }
+
+
+def _validate_success_mode(
+    run_root: Path,
+    manifest: Mapping[str, Any],
+    embedded: Mapping[str, Any],
+    resolved_artifact: Path | None,
+    state: str,
+    gpu_state: str,
+    failures: list[str],
+) -> dict[str, Any]:
+    coverage_root = run_root / "coverage-state"
+    failure_path = run_root / "coverage_state_failure.json"
+    if state not in _NONFAILED_STATES:
+        failures.append(f"nonfailed coverage state is invalid: {state}")
+    if manifest.get("status") != "PASS":
+        failures.append(
+            "nonfailed coverage state requires root status=PASS: "
+            f"{manifest.get('status')}"
+        )
+    if str(manifest.get("coverage_state_path")) != "coverage-state/manifest.json":
+        failures.append("nonfailed coverage state must point to coverage-state/manifest.json")
+    if failure_path.exists():
+        failures.append("stale coverage_state_failure.json retained after successful resolution")
+    if not coverage_root.is_dir():
+        failures.append("coverage-state directory missing")
+    else:
+        _require_files(coverage_root, _COVERAGE_REQUIRED_FILES, failures, "coverage-state")
+        for failure in verify_sha256s(coverage_root):
+            failures.append(f"coverage-state SHA256: {failure}")
+
+    nested_manifest = _json_object(
+        coverage_root / "manifest.json",
+        failures,
+        "coverage-state manifest",
+    )
+    if nested_manifest.get("schema_version") != "all-auto-coverage-state-v1":
+        failures.append("coverage-state manifest schema_version mismatch")
+    if manifest.get("coverage_state_schema_version") != nested_manifest.get("schema_version"):
+        failures.append("root and nested coverage schema versions differ")
+    if nested_manifest.get("status") != state:
+        failures.append("root and nested coverage states differ")
+    if nested_manifest.get("gpu_runtime_status") != gpu_state:
+        failures.append("root and nested GPU states differ")
+    if embedded and dict(embedded) != nested_manifest:
+        failures.append("embedded coverage_state differs from nested manifest")
+    if nested_manifest.get("constructor_model_count") != 36:
+        failures.append(
+            "constructor model count mismatch: "
+            f"expected=36, actual={nested_manifest.get('constructor_model_count')}"
+        )
+
+    constructor_rows = _json_list(
+        coverage_root / "AUTO_CONSTRUCTOR_CONTRACT_MATRIX.json",
+        failures,
+        "constructor contract matrix",
+    )
+    names = [
+        str(row.get("name") or "")
+        for row in constructor_rows
+        if isinstance(row, Mapping)
+    ]
+    if len(constructor_rows) != 36:
+        failures.append(
+            f"constructor matrix row count mismatch: expected=36, actual={len(constructor_rows)}"
+        )
+    if len(names) != len(constructor_rows):
+        failures.append("constructor matrix contains a non-object row")
+    if len(set(names)) != len(names) or any(not name for name in names):
+        failures.append("constructor matrix model names are empty or duplicated")
+    _validate_count_map(
+        nested_manifest.get("constructor_status_counts"),
+        len(constructor_rows),
+        failures,
+        "constructor_status_counts",
+    )
+
+    resolved_rows = _json_list(
+        coverage_root / "API_ARGUMENT_COVERAGE_RESOLVED.json",
+        failures,
+        "resolved argument coverage",
+    )
+    if any(not isinstance(row, Mapping) for row in resolved_rows):
+        failures.append("resolved argument coverage contains a non-object row")
+    summary = _json_object(
+        coverage_root / "COVERAGE_SUMMARY.json",
+        failures,
+        "coverage summary",
+    )
+    argument_count = summary.get("argument_count")
+    if argument_count != len(resolved_rows):
+        failures.append(
+            "resolved argument count mismatch: "
+            f"summary={argument_count}, rows={len(resolved_rows)}"
+        )
+    if summary.get("overall_status") != state:
+        failures.append("coverage summary and root verification states differ")
+    _validate_count_map(
+        summary.get("verification_status_counts"),
+        len(resolved_rows),
+        failures,
+        "verification_status_counts",
+    )
+
+    result_rows: int | None = None
+    result_path = run_root / "API_ARGUMENT_COVERAGE_RESULT.parquet"
+    if result_path.is_file():
+        try:
+            result_rows = len(pd.read_parquet(result_path))
+        except Exception as exc:  # pragma: no cover - backend-specific message
+            failures.append(
+                "API coverage result parquet unreadable: "
+                f"{type(exc).__name__}: {exc}"
+            )
+    if result_rows == 0:
+        failures.append("API coverage result parquet must not be empty")
+    if result_rows is not None and nested_manifest.get("api_result_count") != result_rows:
+        failures.append(
+            "API result count mismatch: "
+            f"manifest={nested_manifest.get('api_result_count')}, rows={result_rows}"
+        )
+
+    expected_nested_path = coverage_root / "manifest.json"
+    if resolved_artifact is not None and resolved_artifact != expected_nested_path.resolve():
+        failures.append("resolved coverage-state artifact path mismatch")
+
+    return {
+        "applicable": True,
+        "status": "PASS" if not failures else "FAIL",
+        "coverage_state_status": state,
+        "gpu_runtime_status": gpu_state,
+        "artifact_mode": "coverage-state-bundle",
+        "constructor_model_count": len(constructor_rows),
+        "resolved_argument_count": len(resolved_rows),
+        "api_result_count": result_rows,
+        "failures": failures,
+    }
+
+
 def verify_coverage_state_artifacts(
     run_root: Path,
     manifest: Mapping[str, Any],
@@ -145,6 +329,8 @@ def verify_coverage_state_artifacts(
 
     failures: list[str] = []
     _require_files(run_root, _ROOT_REQUIRED_FILES, failures, "API coverage root")
+    if manifest.get("schema_version") != "all-auto-api-coverage-v1":
+        failures.append("integrated API coverage manifest schema_version mismatch")
 
     required_fields = {
         "coverage_state_schema_version",
@@ -154,8 +340,7 @@ def verify_coverage_state_artifacts(
         "gpu_runtime_status",
         "coverage_state",
     }
-    missing_fields = sorted(required_fields - set(manifest))
-    for field in missing_fields:
+    for field in sorted(required_fields - set(manifest)):
         failures.append(f"integrated manifest missing field: {field}")
 
     state = str(manifest.get("coverage_state_status") or "")
@@ -175,8 +360,8 @@ def verify_coverage_state_artifacts(
         )
 
     embedded = manifest.get("coverage_state")
-    if not isinstance(embedded, Mapping):
-        failures.append("integrated manifest coverage_state must be an object")
+    if not isinstance(embedded, Mapping) or not embedded:
+        failures.append("integrated manifest coverage_state must be a non-empty object")
         embedded = {}
 
     resolved_artifact = _safe_relative_path(
@@ -184,149 +369,23 @@ def verify_coverage_state_artifacts(
         manifest.get("coverage_state_path"),
         failures,
     )
-
     if state == VerificationStatus.FAILED.value:
-        if manifest.get("status") != "PARTIAL":
-            failures.append("FAILED coverage state requires root status=PARTIAL")
-        if str(manifest.get("coverage_state_path")) != "coverage_state_failure.json":
-            failures.append("FAILED coverage state must point to coverage_state_failure.json")
-        if coverage_root.exists():
-            failures.append("partial coverage-state directory retained after resolver failure")
-        failure = _json_object(failure_path, failures, "coverage-state failure evidence")
-        if failure.get("status") != VerificationStatus.FAILED.value:
-            failures.append("coverage-state failure evidence status must be FAILED")
-        if failure.get("failed_phase") != "coverage_state_resolution":
-            failures.append("coverage-state failure evidence has invalid failed_phase")
-        if failure.get("gpu_runtime_status") != VerificationStatus.EXECUTION_PENDING.value:
-            failures.append("coverage-state failure evidence has invalid GPU boundary")
-        if embedded and dict(embedded) != failure:
-            failures.append("embedded coverage_state differs from failure evidence")
-        if resolved_artifact is not None and resolved_artifact != failure_path.resolve():
-            failures.append("resolved failure artifact path mismatch")
-        return {
-            "applicable": True,
-            "status": "PASS" if not failures else "FAIL",
-            "coverage_state_status": state,
-            "gpu_runtime_status": gpu_state,
-            "artifact_mode": "failure-evidence",
-            "failures": failures,
-        }
-
-    if state not in _NONFAILED_STATES:
-        failures.append(f"nonfailed coverage state is invalid: {state}")
-    if manifest.get("status") != "PASS":
-        failures.append(f"nonfailed coverage state requires root status=PASS: {manifest.get('status')}")
-    if str(manifest.get("coverage_state_path")) != "coverage-state/manifest.json":
-        failures.append("nonfailed coverage state must point to coverage-state/manifest.json")
-    if failure_path.exists():
-        failures.append("stale coverage_state_failure.json retained after successful resolution")
-    if not coverage_root.is_dir():
-        failures.append("coverage-state directory missing")
-    else:
-        _require_files(coverage_root, _COVERAGE_REQUIRED_FILES, failures, "coverage-state")
-        for failure in verify_sha256s(coverage_root):
-            failures.append(f"coverage-state SHA256: {failure}")
-
-    nested_manifest = _json_object(
-        coverage_root / "manifest.json",
-        failures,
-        "coverage-state manifest",
-    )
-    if nested_manifest:
-        if nested_manifest.get("schema_version") != "all-auto-coverage-state-v1":
-            failures.append("coverage-state manifest schema_version mismatch")
-        if manifest.get("coverage_state_schema_version") != nested_manifest.get("schema_version"):
-            failures.append("root and nested coverage schema versions differ")
-        if nested_manifest.get("status") != state:
-            failures.append("root and nested coverage states differ")
-        if nested_manifest.get("gpu_runtime_status") != gpu_state:
-            failures.append("root and nested GPU states differ")
-        if embedded and dict(embedded) != nested_manifest:
-            failures.append("embedded coverage_state differs from nested manifest")
-        if nested_manifest.get("constructor_model_count") != 36:
-            failures.append(
-                "constructor model count mismatch: "
-                f"expected=36, actual={nested_manifest.get('constructor_model_count')}"
-            )
-
-    constructor_rows = _json_list(
-        coverage_root / "AUTO_CONSTRUCTOR_CONTRACT_MATRIX.json",
-        failures,
-        "constructor contract matrix",
-    )
-    if constructor_rows:
-        names = [str(row.get("name") or "") for row in constructor_rows if isinstance(row, Mapping)]
-        if len(constructor_rows) != 36:
-            failures.append(
-                f"constructor matrix row count mismatch: expected=36, actual={len(constructor_rows)}"
-            )
-        if len(set(names)) != len(names) or any(not name for name in names):
-            failures.append("constructor matrix model names are empty or duplicated")
-        _validate_count_map(
-            nested_manifest.get("constructor_status_counts"),
-            len(constructor_rows),
+        return _validate_failure_mode(
+            run_root,
+            manifest,
+            embedded,
+            resolved_artifact,
             failures,
-            "constructor_status_counts",
         )
-
-    resolved_rows = _json_list(
-        coverage_root / "API_ARGUMENT_COVERAGE_RESOLVED.json",
+    return _validate_success_mode(
+        run_root,
+        manifest,
+        embedded,
+        resolved_artifact,
+        state,
+        gpu_state,
         failures,
-        "resolved argument coverage",
     )
-    summary = _json_object(
-        coverage_root / "COVERAGE_SUMMARY.json",
-        failures,
-        "coverage summary",
-    )
-    if summary:
-        argument_count = summary.get("argument_count")
-        if argument_count != len(resolved_rows):
-            failures.append(
-                "resolved argument count mismatch: "
-                f"summary={argument_count}, rows={len(resolved_rows)}"
-            )
-        if summary.get("overall_status") != state:
-            failures.append("coverage summary and root verification states differ")
-        _validate_count_map(
-            summary.get("verification_status_counts"),
-            len(resolved_rows),
-            failures,
-            "verification_status_counts",
-        )
-
-    result_rows: int | None = None
-    result_path = run_root / "API_ARGUMENT_COVERAGE_RESULT.parquet"
-    if result_path.is_file():
-        try:
-            result_rows = len(pd.read_parquet(result_path))
-        except Exception as exc:  # pragma: no cover - backend-specific message
-            failures.append(
-                "API coverage result parquet unreadable: "
-                f"{type(exc).__name__}: {exc}"
-            )
-    if nested_manifest and result_rows is not None:
-        if nested_manifest.get("api_result_count") != result_rows:
-            failures.append(
-                "API result count mismatch: "
-                f"manifest={nested_manifest.get('api_result_count')}, rows={result_rows}"
-            )
-
-    expected_nested_path = coverage_root / "manifest.json"
-    if resolved_artifact is not None and resolved_artifact != expected_nested_path.resolve():
-        failures.append("resolved coverage-state artifact path mismatch")
-
-    return {
-        "applicable": True,
-        "status": "PASS" if not failures else "FAIL",
-        "coverage_state_status": state,
-        "gpu_runtime_status": gpu_state,
-        "artifact_mode": "coverage-state-bundle",
-        "constructor_model_count": len(constructor_rows),
-        "resolved_argument_count": len(resolved_rows),
-        "api_result_count": result_rows,
-        "failures": failures,
-    }
 
 
 def verify_run_with_coverage(run_root: Path) -> dict[str, Any]:
