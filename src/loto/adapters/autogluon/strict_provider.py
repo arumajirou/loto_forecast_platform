@@ -11,6 +11,7 @@ from .api_contract import (
     validate_public_api_kwargs,
 )
 from .contracts import ProviderRequestV2
+from .covariates import ProviderRequestV2Covariates, has_covariate_payload
 from .execution import ExecutionPlanError, build_execution_plan
 from .provider import ProviderRuntime, _error_response, run_provider_v2 as _run_provider_v2
 
@@ -113,10 +114,13 @@ def validate_autogluon_1_5_api_contract(request: ProviderRequestV2) -> None:
     try:
         validate_hpo_tune_kwargs(request.fit.hyperparameter_tune_kwargs)
         plan = build_execution_plan(request)
+        predict_kwargs: dict[str, Any] = {"random_seed": request.seed}
+        if request.predictor.known_covariates_names:
+            predict_kwargs["known_covariates"] = "<TimeSeriesDataFrame>"
         validate_public_api_kwargs(
             predictor_kwargs=plan.predictor_kwargs,
             fit_kwargs=plan.fit_kwargs,
-            predict_kwargs={"random_seed": request.seed},
+            predict_kwargs=predict_kwargs,
         )
     except ExecutionPlanError:
         raise
@@ -127,11 +131,37 @@ def validate_autogluon_1_5_api_contract(request: ProviderRequestV2) -> None:
         ) from exc
 
 
+def _strict_error(payload: dict[str, Any], exc: StrictPreflightError) -> dict[str, Any]:
+    return _error_response(
+        payload,
+        code=exc.code,
+        phase="strict_preflight",
+        message=str(exc),
+        error_type=type(exc).__name__,
+    )
+
+
 def run_provider_v2_strict(
     payload: dict[str, Any],
     *,
     runtime: ProviderRuntime | None = None,
 ) -> dict[str, Any]:
+    if has_covariate_payload(payload):
+        from .covariate_provider import run_provider_v2_covariates
+
+        try:
+            request = ProviderRequestV2Covariates.model_validate(payload)
+        except ValidationError:
+            return run_provider_v2_covariates(payload, runtime=runtime)
+        try:
+            validate_protocol_v2_preflight(request)
+            validate_autogluon_1_5_api_contract(request)
+        except ExecutionPlanError:
+            return run_provider_v2_covariates(payload, runtime=runtime)
+        except StrictPreflightError as exc:
+            return _strict_error(payload, exc)
+        return run_provider_v2_covariates(payload, runtime=runtime)
+
     try:
         request = ProviderRequestV2.model_validate(payload)
     except ValidationError:
@@ -142,11 +172,5 @@ def run_provider_v2_strict(
     except ExecutionPlanError:
         return _run_provider_v2(payload, runtime=runtime)
     except StrictPreflightError as exc:
-        return _error_response(
-            payload,
-            code=exc.code,
-            phase="strict_preflight",
-            message=str(exc),
-            error_type=type(exc).__name__,
-        )
+        return _strict_error(payload, exc)
     return _run_provider_v2(payload, runtime=runtime)
