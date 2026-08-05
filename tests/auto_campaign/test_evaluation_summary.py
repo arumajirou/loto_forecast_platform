@@ -106,3 +106,89 @@ def test_local_combined_metrics_preserve_config_index(tmp_path: Path) -> None:
     assert raw["config_index"].tolist() == [0, 1]
     assert raw["hit_pm1"].tolist() == [1.0, 0.0]
     assert raw["all_positions_hit_pm1"].tolist() == [1.0, 0.0]
+
+    summary_specs = [
+        ("per_seed_metrics.parquet", "hit_pm1", "all_positions_hit_pm1"),
+        ("per_fold_metrics.parquet", "hit_pm1", "all_positions_hit_pm1"),
+        ("seed_metric_summary.parquet", "hit_pm1_mean", "all_positions_hit_pm1_mean"),
+        ("model_ranking.parquet", "hit_pm1_mean", "all_positions_hit_pm1_mean"),
+    ]
+    for filename, hit_column, all_positions_column in summary_specs:
+        summary_frame = pd.read_parquet(tmp_path / filename)
+        local_raw = summary_frame[
+            summary_frame["track"].eq("u_local_combined") & summary_frame["variant"].eq("raw")
+        ].sort_values("config_index")
+
+        assert local_raw["config_index"].tolist() == [0, 1]
+        assert local_raw[hit_column].tolist() == [1.0, 0.0]
+        assert local_raw[all_positions_column].tolist() == [1.0, 0.0]
+
+
+def test_summary_preserves_stage_backend_and_config_identity(tmp_path: Path) -> None:
+    candidates = [
+        ("ray", 0, 1.0),
+        ("ray", 1, 0.5),
+        ("optuna", 0, 0.0),
+    ]
+    for index, (backend, config_index, hit_pm1) in enumerate(candidates):
+        task_root = tmp_path / "tasks" / f"candidate-{index}"
+        task_root.mkdir(parents=True)
+        error = 1.0 - hit_pm1
+        pd.DataFrame(
+            [
+                {
+                    "variant": "rounded",
+                    "hit_pm1": hit_pm1,
+                    "all_positions_hit_pm1": hit_pm1,
+                    "exact_hit": hit_pm1,
+                    "mae": error,
+                    "mse": error**2,
+                    "rmse": error,
+                }
+            ]
+        ).to_parquet(task_root / "metrics_by_variant.parquet", index=False)
+        (task_root / "manifest.json").write_text(
+            json.dumps(
+                {
+                    "task": {
+                        "stage": "oof",
+                        "model_name": "AutoMLP",
+                        "track": "u_shared",
+                        "position": None,
+                        "seed": 1,
+                        "fold": 1,
+                        "origin": 100 + index,
+                        "backend": backend,
+                        "config_index": config_index,
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    summarize_metrics(tmp_path)
+
+    summary_specs = [
+        ("per_seed_metrics.parquet", "hit_pm1"),
+        ("per_fold_metrics.parquet", "hit_pm1"),
+        ("seed_metric_summary.parquet", "hit_pm1_mean"),
+        ("model_ranking.parquet", "hit_pm1_mean"),
+    ]
+    expected_identity = [("optuna", 0), ("ray", 0), ("ray", 1)]
+    expected_hit_pm1 = [0.0, 1.0, 0.5]
+
+    for filename, hit_column in summary_specs:
+        frame = pd.read_parquet(tmp_path / filename).sort_values(
+            ["backend", "config_index"],
+            kind="stable",
+        )
+        identity = list(
+            zip(
+                frame["backend"],
+                frame["config_index"],
+                strict=True,
+            )
+        )
+        assert frame["stage"].tolist() == ["oof", "oof", "oof"]
+        assert identity == expected_identity
+        assert frame[hit_column].tolist() == expected_hit_pm1
