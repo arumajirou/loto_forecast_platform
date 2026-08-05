@@ -13,14 +13,21 @@ from .discovery import (
     discover_runtime_inventory,
     runtime_versions,
 )
-from .inventory import inventory_sha256
+from .inventory import RuntimeInventory, inventory_sha256
 from .protocol import (
+    DeviceRequest,
     EnvironmentLane,
     GluonTSProviderRequest,
     GluonTSProviderResponse,
     ProviderOperation,
     ProviderStatus,
     protocol_schema_sha256,
+)
+from .smoke import (
+    SmokeOutcome,
+    apply_deepar_smoke,
+    run_deepar_cpu_smoke,
+    smoke_sha256,
 )
 
 
@@ -53,6 +60,14 @@ def _response(
     )
 
 
+def _inventory_payload(inventory: RuntimeInventory) -> dict[str, Any]:
+    return {
+        "runtime_inventory": inventory.model_dump(mode="json"),
+        "runtime_inventory_sha256": inventory_sha256(inventory),
+        "formal_runtime_verified": inventory.summary["formally_verified"],
+    }
+
+
 def _inventory_metadata(
     *,
     include_models: bool,
@@ -65,11 +80,77 @@ def _inventory_metadata(
         include_distributions=include_distributions,
         include_extensions=include_extensions,
     )
-    return {
-        "runtime_inventory": inventory.model_dump(mode="json"),
-        "runtime_inventory_sha256": inventory_sha256(inventory),
-        "formal_runtime_verified": inventory.summary["formally_verified"],
+    return _inventory_payload(inventory)
+
+
+def _runtime_certify_response(
+    request: GluonTSProviderRequest,
+    base_metadata: dict[str, Any],
+) -> GluonTSProviderResponse:
+    versions = runtime_versions()
+    inventory = discover_runtime_inventory(
+        LANE,
+        include_models=True,
+        include_distributions=True,
+        include_extensions=True,
+    )
+    run_smoke = bool(request.arguments.get("run_deepar_cpu_smoke", False))
+    if not run_smoke:
+        status = (
+            ProviderStatus.PARTIALLY_VERIFIED
+            if versions["gluonts"] is not None
+            else ProviderStatus.EXECUTION_PENDING
+        )
+        return _response(
+            request,
+            status,
+            {
+                **base_metadata,
+                **_inventory_payload(inventory),
+                "runtime_versions": versions,
+                "certification_scope": "INVENTORY_AND_SIGNATURE_ONLY",
+                "fit_predict_certified": False,
+                "device_certified": False,
+            },
+        )
+
+    if request.model_class not in {"DeepAREstimator", "*"}:
+        return _response(
+            request,
+            ProviderStatus.FAILED,
+            {**base_metadata, **_inventory_payload(inventory)},
+            ["run_deepar_cpu_smoke requires model_class DeepAREstimator or *"],
+        )
+    if request.device not in {DeviceRequest.AUTO, DeviceRequest.CPU}:
+        return _response(
+            request,
+            ProviderStatus.FAILED,
+            {**base_metadata, **_inventory_payload(inventory)},
+            ["DeepAR CPU smoke requires device auto or cpu"],
+        )
+
+    smoke = run_deepar_cpu_smoke(
+        LANE,
+        seed=request.seed,
+        prediction_length=request.prediction_length,
+        context_length=request.context_length or 8,
+    )
+    inventory = apply_deepar_smoke(inventory, smoke)
+    metadata = {
+        **base_metadata,
+        **_inventory_payload(inventory),
+        "runtime_versions": versions,
+        "certification_scope": "DEEPAR_CPU_FIT_PREDICT",
+        "fit_predict_certified": smoke.outcome is SmokeOutcome.VERIFIED,
+        "device_certified": smoke.outcome is SmokeOutcome.VERIFIED,
+        "deep_ar_cpu_smoke": smoke.model_dump(mode="json"),
+        "deep_ar_cpu_smoke_sha256": smoke_sha256(smoke),
     }
+    if smoke.outcome is SmokeOutcome.VERIFIED:
+        return _response(request, ProviderStatus.PARTIALLY_VERIFIED, metadata)
+    if smoke.outcome is SmokeOutcome.BLOCKED:
+        return _response(request, ProviderStatus.EXECUTION_PENDING, metadata)
+    return _response(request, ProviderStatus.FAILED, metadata, smoke.errors)
 
 
 def execute_request(request: GluonTSProviderRequest) -> GluonTSProviderResponse:
@@ -85,7 +166,7 @@ def execute_request(request: GluonTSProviderRequest) -> GluonTSProviderResponse:
     base_metadata = {
         "provider_identity": identity_payload(),
         "operation": request.operation.value,
-        "phase": "P3_RUNTIME_INVENTORY",
+        "phase": "P4_DEEPAR_CPU_SMOKE",
     }
     if request.operation is ProviderOperation.MODEL_DISCOVERY:
         discovery = discover_models()
@@ -124,29 +205,7 @@ def execute_request(request: GluonTSProviderRequest) -> GluonTSProviderResponse:
         )
 
     if request.operation is ProviderOperation.RUNTIME_CERTIFY:
-        versions = runtime_versions()
-        inventory = _inventory_metadata(
-            include_models=True,
-            include_distributions=True,
-            include_extensions=True,
-        )
-        status = (
-            ProviderStatus.PARTIALLY_VERIFIED
-            if versions["gluonts"] is not None
-            else ProviderStatus.EXECUTION_PENDING
-        )
-        return _response(
-            request,
-            status,
-            {
-                **base_metadata,
-                **inventory,
-                "runtime_versions": versions,
-                "certification_scope": "INVENTORY_AND_SIGNATURE_ONLY",
-                "fit_predict_certified": False,
-                "device_certified": False,
-            },
-        )
+        return _runtime_certify_response(request, base_metadata)
 
     return _response(
         request,
