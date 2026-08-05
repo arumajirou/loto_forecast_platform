@@ -1,0 +1,8 @@
+argument,status,evidence
+schema_version,VERIFIED_HERMETIC,strict literal 2
+unknown_keys,VERIFIED_HERMETIC,Pydantic extra forbid
+game_geometry,VERIFIED_HERMETIC,position counts 1 3 4 5 6 7
+prediction_length,VERIFIED_HERMETIC,horizons 1 2 5
+quantile_levels,VERIFIED_HERMETIC,exact q0.1-q0.9
+local_files_only,VERIFIED_HERMETIC,literal true
+snapshot_path,PARTIALLY_VERIFIED,trusted-root and hash logic tested
