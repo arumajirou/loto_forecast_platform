@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "P4_DEEPAR_CPU_CERTIFICATION",
+  "phase": "P5_PREDICTOR_LIFECYCLE",
   "status": "PARTIALLY_VERIFIED",
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
   "branch": "feat/gluonts-probabilistic-contract-v1",
@@ -29,46 +29,43 @@
     "distribution_discovery",
     "runtime_certify"
   ],
-  "inventory_categories": [
-    "PYTORCH_ESTIMATOR",
-    "NATIVE_PREDICTOR",
-    "EXTENSION",
-    "DISTRIBUTION_OUTPUT"
-  ],
-  "inventory_checks": [
-    "import",
-    "export",
-    "class",
-    "signature",
-    "constructor",
-    "fit",
-    "predict",
-    "serialize",
-    "device"
-  ],
-  "p4_smoke_checks": [
-    "version",
-    "import",
-    "constructor",
-    "dataset",
-    "fit",
-    "predict",
-    "shape",
-    "finite",
-    "device"
-  ],
-  "p4_artifacts": [
-    "runtime_inventory.json",
-    "deepar_cpu_smoke.json",
-    "artifact_manifest.json",
+  "p5_required_checks": {
+    "fit_serialize": [
+      "version",
+      "import",
+      "constructor",
+      "dataset",
+      "fit",
+      "predict",
+      "shape",
+      "finite",
+      "device",
+      "serialize",
+      "artifact_integrity"
+    ],
+    "reload_predict": [
+      "manifest",
+      "artifact_integrity",
+      "process_restart",
+      "version",
+      "deserialize",
+      "dataset",
+      "predict",
+      "shape",
+      "finite",
+      "device",
+      "identity"
+    ]
+  },
+  "p5_artifacts": [
+    "predictor_artifact_manifest.json",
+    "certification_dataset.json",
+    "predictor_lifecycle.json",
+    "lifecycle_manifest.json",
     "environment_provenance.json",
     "SHA256SUMS"
   ],
-  "p4_bootstrap_scripts": [
-    "environments/gluonts-compat/bootstrap_and_certify.sh",
-    "environments/gluonts-latest/bootstrap_and_certify.sh"
-  ],
-  "formal_runtime_verified_models": 0,
   "real_runtime_claims": "EXECUTION_PENDING",
+  "formally_verified_lifecycles": 0,
   "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
 }
