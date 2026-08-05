@@ -110,6 +110,9 @@ def summarize_metrics(run_root: Path) -> dict[str, Any]:
     if frame.empty:
         return {"metric_rows": 0, "position_metric_rows": 0}
 
+    if "config_index" not in frame.columns:
+        frame["config_index"] = None
+
     frame.to_parquet(run_root / "evaluation_metrics.parquet", index=False)
     frame.to_csv(run_root / "evaluation_metrics.csv", index=False)
     if not positions.empty:
@@ -128,7 +131,14 @@ def summarize_metrics(run_root: Path) -> dict[str, Any]:
         )
         if column in frame.columns
     ]
-    group_columns = ["model_name", "track", "position", "variant", "seed"]
+    candidate_columns = [
+        "model_name",
+        "track",
+        "position",
+        "config_index",
+        "variant",
+    ]
+    group_columns = [*candidate_columns, "seed"]
     per_seed = frame.groupby(group_columns, dropna=False)[metrics].mean().reset_index()
     per_seed.to_parquet(run_root / "per_seed_metrics.parquet", index=False)
     per_seed.to_csv(run_root / "per_seed_metrics.csv", index=False)
@@ -136,32 +146,19 @@ def summarize_metrics(run_root: Path) -> dict[str, Any]:
     fold_frame = frame[frame["fold"].notna()].copy() if "fold" in frame.columns else pd.DataFrame()
     worst_fold = pd.DataFrame()
     if not fold_frame.empty:
-        fold_columns = [
-            "model_name",
-            "track",
-            "position",
-            "variant",
-            "seed",
-            "fold",
-        ]
+        fold_columns = [*candidate_columns, "seed", "fold"]
         per_fold = fold_frame.groupby(fold_columns, dropna=False)[metrics].mean().reset_index()
         per_fold.to_parquet(run_root / "per_fold_metrics.parquet", index=False)
         per_fold.to_csv(run_root / "per_fold_metrics.csv", index=False)
         worst_fold = (
-            per_fold.groupby(
-                ["model_name", "track", "position", "variant"],
-                dropna=False,
-            )["hit_pm1"]
+            per_fold.groupby(candidate_columns, dropna=False)["hit_pm1"]
             .min()
             .rename("worst_fold_hit_pm1")
             .reset_index()
         )
 
     aggregations = {metric: ["mean", "std", "min", "max"] for metric in metrics}
-    seed_summary = per_seed.groupby(
-        ["model_name", "track", "position", "variant"],
-        dropna=False,
-    ).agg(aggregations)
+    seed_summary = per_seed.groupby(candidate_columns, dropna=False).agg(aggregations)
     seed_summary.columns = [f"{metric}_{stat}" for metric, stat in seed_summary.columns]
     seed_summary = seed_summary.reset_index()
     if "hit_pm1_min" in seed_summary.columns:
@@ -169,7 +166,7 @@ def summarize_metrics(run_root: Path) -> dict[str, Any]:
     if not worst_fold.empty:
         seed_summary = seed_summary.merge(
             worst_fold,
-            on=["model_name", "track", "position", "variant"],
+            on=candidate_columns,
             how="left",
             validate="one_to_one",
         )
