@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib
+import json
 import os
 import traceback
 from dataclasses import dataclass
@@ -55,6 +56,16 @@ MODEL_SPECS: dict[SmokeModelId, SmokeModelSpec] = {
         required_distributions=("sktime", "statsmodels"),
     ),
 }
+
+
+def _canonical_sha256(payload: Any) -> str:
+    encoded = json.dumps(
+        payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def _sha256(path: Path) -> str:
@@ -410,6 +421,12 @@ def run_smoke_matrix(
     """Run every requested fixed model and continue after individual failures."""
 
     np.random.seed(request.seed)
+    input_contract = {
+        "series_rows": len(request.series),
+        "series_sha256": _canonical_sha256(request.series),
+        "forecast_horizon": request.forecast_horizon,
+        "forecast_horizon_sha256": _canonical_sha256(request.forecast_horizon),
+    }
     results = [
         run_model_smoke(
             model_id=model_id,
@@ -427,6 +444,7 @@ def run_smoke_matrix(
         "cpu_fallback": False,
         "pid": os.getpid(),
         "seed": request.seed,
+        "input_contract": input_contract,
         "thread_limits": {
             name: os.environ.get(name)
             for name in (
