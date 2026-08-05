@@ -1,0 +1,25 @@
+{
+  "schema_version": "merlion-change-scope-v1",
+  "owned_paths": [
+    "environments/merlion-core-py311/**",
+    "external/merlion/**",
+    "scripts/run_merlion_provider.py",
+    "src/loto/adapters/merlion/**",
+    "src/loto/merlion_campaign/**",
+    "tests/adapters/merlion/**",
+    "tests/merlion_campaign/**",
+    "configs/merlion_campaign/**",
+    "docs/merlion/**"
+  ],
+  "forbidden_paths": [
+    "pyproject.toml",
+    "uv.lock",
+    "src/loto/models/workers.py",
+    "src/loto/models/catalog_full.py",
+    "src/loto/cli.py",
+    "src/loto/cli_v3.py",
+    ".github/workflows/**",
+    "README.md"
+  ],
+  "shared_change_status": "BLOCKED_SHARED_SCOPE"
+}
