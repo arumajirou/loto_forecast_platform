@@ -252,11 +252,12 @@ def parse_request(payload: dict[str, Any]) -> Tirex2Request:
     return schema_v1_to_v2(payload)
 
 
-def main() -> None:
+def main() -> int:
     parser = argparse.ArgumentParser(description="Run the isolated TiRex-2 Contract v2 provider")
     parser.add_argument("--request", required=True, type=Path)
     parser.add_argument("--response", required=True, type=Path)
     args = parser.parse_args()
+    exit_code = 0
     try:
         response = run_provider(parse_request(_read_json(args.request))).model_dump(mode="json")
     except Exception as exc:
@@ -265,8 +266,10 @@ def main() -> None:
             "error_type": type(exc).__name__,
             "message": str(exc),
         }
+        exit_code = 1
     _write_json(args.response, response)
+    return exit_code
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
