@@ -1,0 +1,58 @@
+{
+  "schema_version": "change-scope-v1.0.0",
+  "scope_id": "neuralforecast-prospective-actual-scoring",
+  "stacked_base_branch": "agent/p0-prospective-prediction-lock",
+  "stacked_base_sha": "f524e1c7e093db38514139c0e61a526ea20dc890",
+  "dependency_pr": 63,
+  "in_scope": [
+    "read-only ingestion of actual values for a verified locked Prospective run",
+    "strict prediction-time Raw history SHA-256 matching",
+    "separate atomic scoring artifact outside the source Prospective run",
+    "Hit@±1 as the primary metric with all-position and position-level Hit@±1",
+    "MAE, MSE, RMSE, exact-hit, mean, variance, minimum, maximum, and worst-seed reporting",
+    "Random, fixed-center, mean, median, last, frequency, and statistical AR(1) baselines",
+    "history-only baseline fitting without actual-value access",
+    "raw, rounded, and reconciled complete-draw comparison under identical conditions",
+    "exact copies of locked prediction Parquet files and source evidence",
+    "ACTUALS_LOCK, SCORING_REPORT, ARTIFACT_MANIFEST, and complete SHA256SUMS",
+    "deterministic scoring ID and scoring-code SHA-256",
+    "read-only scoring artifact verification",
+    "configless score-prospective and verify-scoring CLI commands",
+    "focused baseline, metric, end-to-end, mutation, source immutability, and CLI tests",
+    "operator documentation"
+  ],
+  "out_of_scope": [
+    "mutation of the source Prospective run or PREDICTION_LOCK.json",
+    "automatic actual acquisition from an external website or database",
+    "external authentication of actual publication timestamps",
+    "trusted timestamp authority, digital signatures, or transparency-log publication",
+    "model retraining or automatic champion promotion",
+    "accuracy claims from synthetic fixtures",
+    "GPU Prospective execution",
+    "remote object-storage publication",
+    "merge or main branch changes"
+  ],
+  "execution_boundaries": {
+    "local_synthetic_smoke": "EXECUTION_PENDING",
+    "repository_ruff_compileall_mypy_pytest": "EXECUTION_PENDING",
+    "github_actions": "PENDING",
+    "real_locked_prospective_scoring": "EXECUTION_PENDING",
+    "local_gpu": "NOT_REQUIRED_FOR_SCORING_BUT_REQUIRED_FOR_SOURCE_CERTIFICATION",
+    "actual_publication_timestamp": "OPERATOR_ASSERTED_NOT_EXTERNALLY_VERIFIED",
+    "merge": "USER_APPROVAL_REQUIRED"
+  },
+  "expected_changed_files": [
+    "docs/NEURALFORECAST_PROSPECTIVE_SCORING.md",
+    "docs/NEURALFORECAST_PROSPECTIVE_SCORING_CHANGE_SCOPE.json",
+    "src/loto/auto_campaign/cli.py",
+    "src/loto/auto_campaign/prospective_baselines.py",
+    "src/loto/auto_campaign/prospective_scoring.py",
+    "src/loto/auto_campaign/prospective_scoring_metrics.py",
+    "src/loto/auto_campaign/prospective_scoring_support.py",
+    "src/loto/auto_campaign/prospective_scoring_verification.py",
+    "tests/auto_campaign/test_prospective_baselines.py",
+    "tests/auto_campaign/test_prospective_scoring.py",
+    "tests/auto_campaign/test_prospective_scoring_cli.py",
+    "tests/auto_campaign/test_prospective_scoring_metrics.py"
+  ]
+}
