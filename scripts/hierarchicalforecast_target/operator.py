@@ -134,6 +134,7 @@ def execute(
         "operator_directory": str(directory),
         "expected_version": TARGET_VERSION,
         "expected_git_sha": expected_git_sha,
+        "git_commit": None,
         "git_preflight": None,
         "git_postflight": None,
         "certification": None,
@@ -153,6 +154,7 @@ def execute(
         git_sha = str(state.get("commit", ""))
         if not git_sha or expected_git_sha and git_sha != expected_git_sha:
             raise CertificationError("git commit does not match the expected head")
+        report["git_commit"] = git_sha
         directory.mkdir(parents=True, exist_ok=False)
         output_root.mkdir(parents=True, exist_ok=True)
 
