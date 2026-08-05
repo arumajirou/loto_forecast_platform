@@ -1,16 +1,14 @@
 {
   "schema_version": 1,
-  "phase": "AUTOGLUON_P16_HOLDOUT_PROSPECTIVE",
-  "primary_metric": "Hit@±1",
-  "secondary_metrics": [
-    "MAE",
-    "MSE",
-    "RMSE",
-    "position_Hit@±1",
-    "all_position_Hit@±1",
-    "exact_hit_rate"
+  "primary_metric": "hit_at_1",
+  "required_metrics": [
+    "hit_at_1",
+    "position_hit_at_1",
+    "all_position_hit_at_1",
+    "mae",
+    "mse",
+    "rmse"
   ],
-  "model_seeds": [1, 2, 3],
   "required_baselines": [
     "baseline_random",
     "baseline_fixed",
@@ -20,15 +18,18 @@
     "baseline_frequency",
     "baseline_ar1"
   ],
-  "holdout_status": "HOLDOUT_SCORED_NOT_PROMOTED_PROSPECTIVE_REQUIRED",
-  "prospective_shadow_policy": "PRESERVE_OOF_SELECTED_CANDIDATE",
-  "automatic_promotion": false,
-  "automatic_retraining": false,
-  "drift": {
-    "hit_target": 0.9,
-    "warning_hit_drop": 0.05,
-    "critical_hit_drop": 0.1,
+  "model_seeds": [1, 2, 3],
+  "random_baseline_seeds": [1, 2, 3],
+  "outer_workers": 8,
+  "nested_autogluon_workers": 1,
+  "drift_policy": {
+    "hit_at_1_target": 0.9,
+    "warning_hit_at_1_drop": 0.05,
+    "critical_hit_at_1_drop": 0.1,
     "warning_mae_increase": 0.5,
     "critical_mae_increase": 1.0
-  }
+  },
+  "automatic_promotion": false,
+  "automatic_retraining": false,
+  "best_seed_selection": false
 }
