@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -8,6 +9,7 @@ import pandas as pd
 import pytest
 
 from loto.auto_campaign import api_coverage_pipeline as pipeline
+from loto.auto_campaign import cli
 
 
 def _fake_api_run(
@@ -155,3 +157,64 @@ def test_load_integrated_manifest_rejects_missing_contract_fields(tmp_path: Path
 
     with pytest.raises(ValueError, match="missing fields"):
         pipeline.load_integrated_manifest(run_root)
+
+
+def test_cli_routes_api_coverage_stage_through_pipeline(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    class FakeConfig:
+        data_path = Path("data.parquet")
+        output_root = Path("artifacts")
+        campaign_id_prefix = "test"
+
+        def model_copy(self, *, update: dict[str, Any]) -> FakeConfig:
+            self.data_path = update["data_path"]
+            self.output_root = update["output_root"]
+            return self
+
+    captured: dict[str, Any] = {}
+
+    def fake_integrated_run(
+        project_root: Path,
+        config: Any,
+        run_root: Path,
+        *,
+        resume: bool,
+    ) -> dict[str, Any]:
+        captured.update(
+            {
+                "project_root": project_root,
+                "config": config,
+                "run_root": run_root,
+                "resume": resume,
+            }
+        )
+        return {"status": "PASS"}
+
+    monkeypatch.setattr(cli, "load_config", lambda _path: FakeConfig())
+    monkeypatch.setattr(cli, "run_api_coverage_pipeline", fake_integrated_run)
+    output = tmp_path / "api-run"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "loto-auto-campaign",
+            "--project-root",
+            str(tmp_path),
+            "--config",
+            "campaign.yaml",
+            "run",
+            "--stage",
+            "api-coverage",
+            "--output",
+            str(output),
+            "--resume",
+        ],
+    )
+
+    cli.main()
+
+    assert captured["project_root"] == tmp_path.resolve()
+    assert captured["run_root"] == output.resolve()
+    assert captured["resume"] is True
