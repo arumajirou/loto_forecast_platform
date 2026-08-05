@@ -80,6 +80,12 @@ def _verify_identity(request: ProviderRequest) -> tuple[str, str, dict[str, Any]
         )
     if provenance.get("distribution_version") != version:
         raise RuntimeError("BasicTS version metadata and provenance metadata differ")
+    if provenance.get("installed_record_integrity_status") != "PASS":
+        raise RuntimeError("BasicTS installed RECORD integrity was not verified")
+    if provenance.get("direct_url_record_status") != "PASS":
+        raise RuntimeError("BasicTS direct_url.json RECORD integrity was not verified")
+    if provenance.get("package_init_record_status") != "PASS":
+        raise RuntimeError("BasicTS package __init__.py RECORD integrity was not verified")
     if provenance.get("import_origin_status") != "PASS":
         raise RuntimeError("BasicTS import origin was not verified")
     if provenance.get("import_spec_origin") != provenance.get(
