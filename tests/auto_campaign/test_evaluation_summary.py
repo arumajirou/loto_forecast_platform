@@ -116,8 +116,7 @@ def test_local_combined_metrics_preserve_config_index(tmp_path: Path) -> None:
     for filename, hit_column, all_positions_column in summary_specs:
         summary_frame = pd.read_parquet(tmp_path / filename)
         local_raw = summary_frame[
-            summary_frame["track"].eq("u_local_combined")
-            & summary_frame["variant"].eq("raw")
+            summary_frame["track"].eq("u_local_combined") & summary_frame["variant"].eq("raw")
         ].sort_values("config_index")
 
         assert local_raw["config_index"].tolist() == [0, 1]
