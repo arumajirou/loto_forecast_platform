@@ -116,7 +116,11 @@ def _install_fake_hierarchicalforecast(
     utils = types.ModuleType("hierarchicalforecast.utils")
     for name, cls in classes.items():
         setattr(methods, name, cls)
-    utils.is_strictly_hierarchical = lambda _s, _tags: strict
+
+    def fake_is_strictly_hierarchical(_s, _tags):
+        return strict
+
+    utils.is_strictly_hierarchical = fake_is_strictly_hierarchical
     package.methods = methods
     package.utils = utils
     monkeypatch.setitem(sys.modules, "hierarchicalforecast", package)
