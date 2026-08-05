@@ -23,6 +23,18 @@ def _dataset_item() -> DatasetItem:
     return DatasetItem(item_id="position-1", start="2000-01-01", target=[1.0, 2.0])
 
 
+def test_provider_operation_contract_contains_all_p2_operations() -> None:
+    assert {operation.value for operation in ProviderOperation} == {
+        "fit_predict",
+        "load_predict",
+        "evaluate",
+        "backtest",
+        "model_discovery",
+        "distribution_discovery",
+        "runtime_certify",
+    }
+
+
 def test_fit_predict_contract_defaults_are_reproducible() -> None:
     request = GluonTSProviderRequest(
         request_id="request-1",
@@ -41,13 +53,21 @@ def test_fit_predict_contract_defaults_are_reproducible() -> None:
     assert protocol_schema_sha256() == protocol_schema_sha256()
 
 
-def test_fit_predict_rejects_empty_dataset() -> None:
-    with pytest.raises(ValidationError, match="fit_predict requires"):
+@pytest.mark.parametrize(
+    "operation",
+    [
+        ProviderOperation.FIT_PREDICT,
+        ProviderOperation.EVALUATE,
+        ProviderOperation.BACKTEST,
+    ],
+)
+def test_data_operations_reject_empty_dataset(operation: ProviderOperation) -> None:
+    with pytest.raises(ValidationError, match=f"{operation.value} requires"):
         GluonTSProviderRequest(
             request_id="request-1",
             run_id="run-1",
             lane=EnvironmentLane.COMPAT,
-            operation=ProviderOperation.FIT_PREDICT,
+            operation=operation,
             model_class="DeepAREstimator",
         )
 
