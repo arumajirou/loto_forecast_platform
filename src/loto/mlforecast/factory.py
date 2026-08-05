@@ -190,11 +190,8 @@ def build_search_space(
     if not specs:
         return None
 
-    def config(trial: Any) -> dict[str, Any]:
-        return {
-            name: _suggest_parameter(trial, name, spec)
-            for name, spec in sorted(specs.items())
-        }
+    def config(trial: Any) -> dict{str, Any]:
+        return {name: _suggest_parameter(trial, name, spec) for name, spec in sorted(specs.items())}
 
     return config
 
