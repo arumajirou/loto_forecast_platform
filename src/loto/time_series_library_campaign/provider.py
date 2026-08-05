@@ -25,6 +25,10 @@ from .lightts_runtime import (
     load_predict as lightts_load_predict,
 )
 from .runtime import fit_save, load_predict, verify_prediction_files
+from .segrnn_runtime import (
+    fit_save as segrnn_fit_save,
+    load_predict as segrnn_load_predict,
+)
 from .tsmixer_runtime import (
     fit_save as tsmixer_fit_save,
     load_predict as tsmixer_load_predict,
@@ -64,6 +68,10 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
         return lightts_fit_save(request)
     if request.operation == Operation.LIGHTTS_LOAD_PREDICT:
         return lightts_load_predict(request)
+    if request.operation == Operation.SEGRNN_FIT_SAVE:
+        return segrnn_fit_save(request)
+    if request.operation == Operation.SEGRNN_LOAD_PREDICT:
+        return segrnn_load_predict(request)
     assert request.before_prediction_path is not None
     assert request.after_prediction_path is not None
     verification = verify_prediction_files(

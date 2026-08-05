@@ -1,0 +1,129 @@
+{
+  "boundaries": {
+    "ci": "BLOCKED_PRE_RUN",
+    "gpu_runtime": "EXECUTION_PENDING",
+    "holdout_prospective": "NOT_OPENED",
+    "isolated_uv_lock": "BLOCKED_OFFLINE_CACHE_MISS_EINOPS",
+    "real_data_metrics": "NOT_EXECUTED",
+    "target_torch_2_9_1_runtime": "EXECUTION_PENDING"
+  },
+  "dependency_tamper_rejection": {
+    "error": "ValueError: pinned source mismatch: layers/Autoformer_EncDec.py: expected 6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a, got a23da18abc17b6b1c73e4acb377b1afd4e494786",
+    "expected_exit_code": 2,
+    "provider_status": "FAILED",
+    "status": "PASS"
+  },
+  "executed_at_utc": "2026-08-05T08:54:00Z",
+  "fit_save": {
+    "checkpoint_sha256": "a3690e5af293c8fb6f6218eda3ac9bfd8fba8eddc79587072e9f9d6485dac027",
+    "effective_config": {
+      "d_model": 20,
+      "dropout": 0.0,
+      "enc_in": 3,
+      "num_class": 1,
+      "pred_len": 6,
+      "seg_len": 3,
+      "seq_len": 12,
+      "task_name": "long_term_forecast"
+    },
+    "finite_prediction": true,
+    "finite_state_dict": true,
+    "input_device": "cpu",
+    "input_sha256": "57a4f0fe693104651f98977715bf8cc4854bc98732945c5cd5f67d840a140b8f",
+    "model_class": "models.SegRNN.Model",
+    "output_device": "cpu",
+    "parameter_count": 2713,
+    "parameter_devices": [
+      "cpu"
+    ],
+    "prediction_sha256": "71f6ddedce83707a76a010bfcbf8fbb4b936f84c44bfbc8ea39fec913567f415",
+    "prediction_shape": [
+      2,
+      6,
+      3
+    ],
+    "segment_geometry": {
+      "channels": 3,
+      "d_model": 20,
+      "decoder_tokens_per_batch": 6,
+      "dropout": 0.0,
+      "half_width": 10,
+      "pred_len": 6,
+      "seg_len": 3,
+      "seg_num_x": 4,
+      "seg_num_y": 2,
+      "seq_len": 12
+    },
+    "status": "PASS",
+    "train_steps": 3
+  },
+  "load_predict": {
+    "finite_prediction": true,
+    "input_device": "cpu",
+    "output_device": "cpu",
+    "parameter_devices": [
+      "cpu"
+    ],
+    "prediction_sha256": "71f6ddedce83707a76a010bfcbf8fbb4b936f84c44bfbc8ea39fec913567f415",
+    "prediction_shape": [
+      2,
+      6,
+      3
+    ],
+    "status": "PASS",
+    "strict_state_load": true
+  },
+  "model_name": "SegRNN",
+  "roundtrip": {
+    "after_sha256": "71f6ddedce83707a76a010bfcbf8fbb4b936f84c44bfbc8ea39fec913567f415",
+    "after_shape": [
+      2,
+      6,
+      3
+    ],
+    "atol": 1e-08,
+    "before_sha256": "71f6ddedce83707a76a010bfcbf8fbb4b936f84c44bfbc8ea39fec913567f415",
+    "before_shape": [
+      2,
+      6,
+      3
+    ],
+    "equal_within_tolerance": true,
+    "finite": true,
+    "max_abs_error": 0.0,
+    "rtol": 1e-08,
+    "same_shape": true,
+    "status": "PASS"
+  },
+  "runtime": {
+    "cpu_fallback": false,
+    "cuda_available": false,
+    "device": "cpu",
+    "fit_process_id": 6751,
+    "load_process_id": 6771,
+    "processes_differ": true,
+    "python": "3.13.5",
+    "torch": "2.10.0+cpu"
+  },
+  "schema_version": "1.0",
+  "source_identity": {
+    "files": {
+      "layers/Autoformer_EncDec.py": {
+        "actual_git_blob_sha": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
+        "expected_git_blob_sha": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
+        "sha256": "48745b4bb647355e9845792a855df9c59fd7df7fcc664c765351fec390c4073e"
+      },
+      "models/SegRNN.py": {
+        "actual_git_blob_sha": "afff1bc07dd14d227bbecdd36941d57f8aa8f63e",
+        "expected_git_blob_sha": "afff1bc07dd14d227bbecdd36941d57f8aa8f63e",
+        "sha256": "764d4ad950ee65162c70746248754942cfb4ba661162d515caab0a4eedd12252"
+      }
+    },
+    "model_name": "SegRNN",
+    "policy": "pinned",
+    "status": "VERIFIED"
+  },
+  "status": "VERIFIED_CPU_PROVIDER",
+  "upstream_repository": "https://github.com/thuml/Time-Series-Library",
+  "upstream_revision": "4e938a1767106324dd753b2a44832bf870a0252e"
+}

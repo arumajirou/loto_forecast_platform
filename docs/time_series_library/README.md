@@ -2,7 +2,7 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / DLINEAR_TSMIXER_LIGHTTS_CPU_VERIFIED / FULL_MATRIX_PENDING`
+`PARTIALLY_VERIFIED / FOUR_PINNED_CPU_MODELS_VERIFIED / FULL_MATRIX_PENDING`
 
 This integration isolates `thuml/Time-Series-Library` at revision
 `4e938a1767106324dd753b2a44832bf870a0252e` from the root runtime.
@@ -18,7 +18,8 @@ contract tests and is never reported as upstream certification.
 
 - DLinear;
 - TSMixer;
-- LightTS.
+- LightTS;
+- SegRNN.
 
 Each passed construction, bounded fit, finite prediction/state checks, atomic artifact
 writes, process exit, strict reload in a separate process, and prediction equality at
@@ -33,28 +34,29 @@ writes, process exit, strict reload in a separate process, and prediction equali
 - `tsmixer_load_predict`;
 - `lightts_fit_save`;
 - `lightts_load_predict`;
+- `segrnn_fit_save`;
+- `segrnn_load_predict`;
 - `verify_roundtrip`.
 
-LightTS request with explicit padding:
+SegRNN request:
 
 ```json
 {
-  "operation": "lightts_fit_save",
-  "model_name": "LightTS",
+  "operation": "segrnn_fit_save",
+  "model_name": "SegRNN",
   "source_policy": "pinned",
-  "seq_len": 8,
-  "pred_len": 5,
+  "seq_len": 12,
+  "pred_len": 6,
   "channels": 3,
-  "d_model": 16,
+  "d_model": 20,
   "dropout": 0.0,
-  "lightts_chunk_size": 24,
-  "lightts_allow_padding": true
+  "segrnn_seg_len": 3
 }
 ```
 
-LightTS rejects `d_model < 16`, values not divisible by 4, and implicit padding. Its
-requested/effective chunk geometry is stored in the checkpoint and revalidated before
-strict reload.
+SegRNN rejects odd `d_model`, non-divisible sequence lengths, and non-divisible
+prediction horizons. Its segment geometry and embedding shapes are persisted and
+revalidated before strict reload.
 
 ## Leakage boundary
 

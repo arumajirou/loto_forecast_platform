@@ -22,48 +22,66 @@
       "path": "CI_PRE_RUN_BLOCK_REPORT.json",
       "sha256": "3808d1ab05ee58e19e2e6c3fecb7b4dfa0c99d0d693df511197d6c9e51fcf19c",
       "size_bytes": 698,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "LIGHTTS_CPU_CERTIFICATION.json",
       "sha256": "2ff0923f02ccae2db3b084cc575a2503a8df4e4a5b21f517074611a44b1d2986",
       "size_bytes": 3439,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "LIGHTTS_GEOMETRY_MATRIX.json",
       "sha256": "039a5b293f79e3fcaff09b76ef5492c342fd32041ca291fa9d43ea49b15ab489",
       "size_bytes": 5819,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "LIGHTTS_PARAMETER_CONTRACT.md",
       "sha256": "000b67733b762eac8d7076f3073249e95c9a900e0d5ed89052268d2ed4115f99",
       "size_bytes": 1860,
+      "status": "existing_remote"
+    },
+    {
+      "path": "SEGRNN_CPU_CERTIFICATION.json",
+      "sha256": "99618b8769f3d5fe47a67f2d0e11561a38689f47a77448fc2a4e9ce52257c016",
+      "size_bytes": 3733,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "SEGRNN_GEOMETRY_MATRIX.json",
+      "sha256": "76a4727f793f3d196d48618d15dee10b1fd4bee46105279101c680a29109b097",
+      "size_bytes": 3730,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "SEGRNN_PARAMETER_CONTRACT.md",
+      "sha256": "33e7f63c699da4624cd76922f2c7baab8c4b01685d0f2a5f29fb99509ed09972",
+      "size_bytes": 1422,
       "status": "generated_and_verified"
     },
     {
       "path": "LIGHTWEIGHT_MODEL_SELECTION.md",
-      "sha256": "2f37365b1dcd5978a4aa1d35f39acd3a22b4b757010df0b48eac944281cd5b33",
-      "size_bytes": 1126,
+      "sha256": "071becbaf7727567f0440c4eced56421bb4d1af51fa35d47ec0681c67829834a",
+      "size_bytes": 1132,
       "status": "generated_and_verified"
     },
     {
       "path": "MODEL_INVENTORY_PINNED_SEARCH.json",
-      "sha256": "a6e87ae5eb1ae29998da10f2be7cc8de5c889119df7e21c06db0583c3f0092cd",
-      "size_bytes": 4331,
+      "sha256": "57d75a7af118db11738be3fc714b26733f07c7b7d90f50d54bbfdf85a3e2e759",
+      "size_bytes": 4343,
       "status": "generated_and_verified"
     },
     {
       "path": "README.md",
-      "sha256": "18b8ef20c467b02268d33f2f7458b181d895e3776e4f877a48a7c7387be80500",
-      "size_bytes": 2203,
+      "sha256": "a02efc7948eca61ccc7f928b4b56b3d9b4400c764d112c340071a78edf79600a",
+      "size_bytes": 2201,
       "status": "generated_and_verified"
     },
     {
       "path": "VERIFICATION_REPORT.md",
-      "sha256": "a60d8f52f368689b30262ef7e1fb28ca98c3c0a46d2323ded8ddb01d6d9d56ca",
-      "size_bytes": 2930,
+      "sha256": "10bed6090318418c47eef188b1ec39ce1e7033055a794f44f351f70dd7083121",
+      "size_bytes": 2627,
       "status": "generated_and_verified"
     }
   ],
@@ -78,19 +96,10 @@
   "certified_models": [
     "DLinear",
     "TSMixer",
-    "LightTS"
+    "LightTS",
+    "SegRNN"
   ],
   "code_evidence": [
-    {
-      "path": "src/loto/time_series_library_campaign/contracts.py",
-      "sha256": "5edef8f6c0db908cd3c8df17880bc6b6d75ee6b411d81de4d563ce91ed128700",
-      "size_bytes": 5942
-    },
-    {
-      "path": "src/loto/time_series_library_campaign/provider.py",
-      "sha256": "fa97b009a29a66a075fe5061c793d2843e78d248c2ef7c524a9874ed188da527",
-      "size_bytes": 4189
-    },
     {
       "path": "src/loto/time_series_library_campaign/lightts_runtime.py",
       "sha256": "b95d29361c6ab3200a6be7fe69bdab182f9edc018d3d794892bcb70238c06df6",
@@ -107,21 +116,43 @@
       "size_bytes": 3767
     },
     {
+      "path": "src/loto/time_series_library_campaign/contracts.py",
+      "sha256": "10c39bc04ec66e1430f968dfc25cbafd3c1cd0d8bb9ce29718e040b64c461ba0",
+      "size_bytes": 6844
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/provider.py",
+      "sha256": "0d78a961902a7f3ec3a30e30eccb1bed77a7e97b544c9fb0707c287df78c5852",
+      "size_bytes": 4493
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/segrnn_runtime.py",
+      "sha256": "afe0d62ffb393e25a27df784493665bc60c7b4654a967bdbb4280643d1df32d4",
+      "size_bytes": 11611
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_segrnn_contract.py",
+      "sha256": "1ed4623d9120a8d8f1e505688cdd4eb456880a3353885dc4fbdec8ea14682b7e",
+      "size_bytes": 8153
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_segrnn_checkpoint_contract.py",
+      "sha256": "7c48cb76d7f569671ad4af080c99a7f5775227a49f7f1f1d0147a78df80a6365",
+      "size_bytes": 4047
+    },
+    {
       "path": "external/time-series-library/UPSTREAM_REVISION.json",
-      "sha256": "1ba766435881f2fad4f9518ab12e74cd985541f2395139c109fada74f718212d",
-      "size_bytes": 1108
+      "sha256": "ad0ce92451a3597bc3a723281fd6b20225458d65c0118d059f15d395c3c50735",
+      "size_bytes": 1116
     }
   ],
   "focused_validation": {
     "compileall": "PASS",
-    "coverage_gate": "NOT_APPLIED; subprocess aggregation parent run timed out",
     "line_length_100": "PASS",
-    "pytest": "16 passed",
-    "pytest_cov_direct_process": "41 percent",
-    "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT",
-    "subprocess_coverage_partial": "72 percent"
+    "pytest": "14 passed",
+    "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT"
   },
-  "parent_head": "c67f6b0ce10b06661427a1b00c85b9c1e4643439",
+  "parent_head": "4bf67c6d879d89d1ee089933ea8a541b9d98abbd",
   "project_pr": 54,
   "schema_version": "1.0",
   "status": "PARTIALLY_VERIFIED",

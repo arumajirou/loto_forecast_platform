@@ -2,7 +2,7 @@
   "repository": "https://github.com/thuml/Time-Series-Library",
   "retrieved_at_utc": "2026-08-05T06:14:00Z",
   "revision": "4e938a1767106324dd753b2a44832bf870a0252e",
-  "scope": "Pinned provider contract; DLinear, TSMixer, and LightTS CPU-certified; no Foundation Model or Mamba certification",
+  "scope": "Pinned provider contract; DLinear, TSMixer, LightTS, and SegRNN CPU-certified; no Foundation Model or Mamba certification",
   "tracked_blobs": {
     "data_provider/data_factory.py": "7fc458f69bc75032b799789b8b1581c80d98d46d",
     "data_provider/data_loader.py": "ea28fdccd272e5108c42aa079d7104d287be9745",

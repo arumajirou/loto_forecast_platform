@@ -30,6 +30,8 @@ class Operation(StrEnum):
     TSMIXER_LOAD_PREDICT = "tsmixer_load_predict"
     LIGHTTS_FIT_SAVE = "lightts_fit_save"
     LIGHTTS_LOAD_PREDICT = "lightts_load_predict"
+    SEGRNN_FIT_SAVE = "segrnn_fit_save"
+    SEGRNN_LOAD_PREDICT = "segrnn_load_predict"
     VERIFY_ROUNDTRIP = "verify_roundtrip"
 
 
@@ -91,6 +93,7 @@ class ProviderRequest(BaseModel):
     e_layers: int = Field(default=2, ge=1, le=32)
     lightts_chunk_size: int = Field(default=24, ge=1, le=4096)
     lightts_allow_padding: bool = False
+    segrnn_seg_len: int = Field(default=2, ge=1, le=4096)
     checkpoint_path: Path | None = None
     input_path: Path | None = None
     before_prediction_path: Path | None = None
@@ -112,10 +115,15 @@ class ProviderRequest(BaseModel):
             Operation.LIGHTTS_FIT_SAVE,
             Operation.LIGHTTS_LOAD_PREDICT,
         }
+        segrnn_ops = {
+            Operation.SEGRNN_FIT_SAVE,
+            Operation.SEGRNN_LOAD_PREDICT,
+        }
         load_ops = {
             Operation.DLINEAR_LOAD_PREDICT,
             Operation.TSMIXER_LOAD_PREDICT,
             Operation.LIGHTTS_LOAD_PREDICT,
+            Operation.SEGRNN_LOAD_PREDICT,
         }
         if self.operation in dlinear_ops and self.model_name != "DLinear":
             raise ValueError("DLinear operations require model_name=DLinear")
@@ -123,6 +131,8 @@ class ProviderRequest(BaseModel):
             raise ValueError("TSMixer operations require model_name=TSMixer")
         if self.operation in lightts_ops and self.model_name != "LightTS":
             raise ValueError("LightTS operations require model_name=LightTS")
+        if self.operation in segrnn_ops and self.model_name != "SegRNN":
+            raise ValueError("SegRNN operations require model_name=SegRNN")
         if self.operation in lightts_ops:
             if self.d_model < 16:
                 raise ValueError("LightTS requires d_model >= 16")
@@ -135,9 +145,16 @@ class ProviderRequest(BaseModel):
                     "LightTS padding requires lightts_allow_padding=true: "
                     f"padding_length={padding_length}"
                 )
+        if self.operation == Operation.SEGRNN_FIT_SAVE:
+            if self.d_model % 2 != 0:
+                raise ValueError("SegRNN requires even d_model")
+            if self.seq_len % self.segrnn_seg_len != 0:
+                raise ValueError("SegRNN requires seq_len divisible by segrnn_seg_len")
+            if self.pred_len % self.segrnn_seg_len != 0:
+                raise ValueError("SegRNN requires pred_len divisible by segrnn_seg_len")
         if self.operation in load_ops and (
             self.checkpoint_path is None or self.input_path is None
-        ):
+         ):
             raise ValueError("load/predict requires checkpoint_path and input_path")
         if self.operation == Operation.VERIFY_ROUNDTRIP and (
             self.before_prediction_path is None or self.after_prediction_path is None
