@@ -4,72 +4,89 @@ Status: `PARTIALLY_VERIFIED`
 
 This directory documents the isolated GluonTS integration. It does not claim model runtime success.
 
-## Why two environments exist
-
-The repository root pins `torch==2.9.1`. GluonTS 0.16.3 accepts Torch versions below 3, while
-GluonTS 0.17.0 requires Torch 2.10 or newer. Installing the latest release into the root environment
-would therefore violate the existing Torch contract.
+## Runtime lanes
 
 | Lane | GluonTS | Torch | Purpose |
 |---|---:|---:|---|
-| `compat` | 0.16.3 | 2.9.1 | compatible implementation lane |
+| `compat` | 0.16.3 | 2.9.1 | repository-compatible implementation lane |
 | `latest` | 0.17.0 | >=2.10,<3 | current-upstream certification lane |
 
-Both lanes communicate through the JSON-safe Pydantic contract in
-`src/loto/adapters/gluonts/protocol.py`. No GluonTS, Torch, Lightning, Predictor, or Dataset Python
-object may cross the process boundary.
+No GluonTS, Torch, Lightning, Predictor, or Dataset Python object crosses the process boundary.
 
 ## Implemented phases
 
 ### P1: isolated provider foundation
 
-- version-isolated `pyproject.toml` files,
-- provider identity declarations,
-- strict request and response models,
-- explicit draw-sequence versus calendar-time semantics,
-- outer-worker and GPU concurrency limits,
-- finite-value and fail-closed validation,
-- protocol schema SHA-256.
+- version-isolated dependency definitions,
+- strict JSON/Pydantic request and response contract,
+- timeline, device, seed, and concurrency policy,
+- finite-value and fail-closed validation.
 
-### P2: provider protocol and artifact flow
+### P2: provider CLI and atomic artifact flow
 
-- all seven declared operations,
-- provider-local protocol copies with identical Git blob SHA,
-- `python -m loto_gluonts_provider` CLI in both lanes,
-- atomic canonical request and response JSON,
-- immutable stdout and stderr logs,
-- request and response SHA-256,
-- timeout, identity, lane, and schema-hash rejection,
-- import-only model and distribution discovery,
-- explicit `EXECUTION_PENDING` for later-phase operations.
+- all seven declared provider operations,
+- provider CLIs in both lanes,
+- atomic request and response JSON,
+- stdout and stderr retention,
+- request, response, and protocol SHA-256,
+- timeout, identity, lane, and schema rejection.
 
-See `GLUONTS_P2_VERIFICATION_REPORT.md` for the verification boundary.
+### P3: runtime inventory
+
+- byte-identical inventory contracts in root, compatibility, and latest lanes,
+- separate categories for PyTorch Estimators, native Predictors, extensions, and distributions,
+- independent import, export, class, signature, constructor, fit, predict, serialization, and device
+  states,
+- constructor signature capture without instantiation,
+- nine expected PyTorch Estimators and fifteen expected distribution outputs,
+- native Predictor subclass discovery,
+- extension module discovery without silently importing optional dependencies,
+- validated `runtime_inventory.json`,
+- `artifact_manifest.json` with request, response, log, and inventory hashes,
+- formal availability guard that prevents discovery-only classes from becoming `VERIFIED`.
+
+See `GLUONTS_P3_VERIFICATION_REPORT.md` for the current verification boundary.
+
+## Artifact layout
+
+```text
+<artifact_root>/<run_id>/<request_id>/request.json
+<artifact_root>/<run_id>/<request_id>/response.json
+<artifact_root>/<run_id>/<request_id>/stdout.log
+<artifact_root>/<run_id>/<request_id>/stderr.log
+<artifact_root>/<run_id>/<request_id>/runtime_inventory.json
+<artifact_root>/<run_id>/<request_id>/artifact_manifest.json
+```
+
+## Current verification
+
+- inventory contract tests: 4 passed,
+- inventory persistence and fail-closed runner tests: 2 passed,
+- provider runtime-certify smoke in both lanes: passed,
+- each unresolved lane inventory: 26 candidates and 0 formally verified,
+- Python compile checks: passed,
+- maximum changed Python line length: 98,
+- root, compatibility, and latest inventory source identity: passed.
+
+The local smoke used an environment where GluonTS was unavailable. The observed result is therefore
+`EXECUTION_PENDING`, not runtime success.
 
 ## Certification boundary
 
 The following remain `EXECUTION_PENDING`:
 
 - isolated `uv.lock` generation,
-- package installation in both lanes,
-- persisted runtime inventory from the target environments,
-- successful Estimator construction,
-- fit and predict,
+- GluonTS installation in both target lanes,
+- real constructor execution,
+- DeepAR fit and predict,
+- output shape and finite-value certification,
 - serialize, process exit, deserialize, and re-predict,
 - GPU PID, VRAM, device, and CPU fallback evidence,
 - chronological CV, OOF, HPO, and accuracy evaluation.
 
-## Local verification
-
-- focused protocol, runner, and CLI tests: 16 passed,
-- Python compileall: passed,
-- maximum Python line length 100: passed,
-- root, compatibility, and latest protocol source identity: passed,
-- Ruff: blocked because the execution registry did not expose the package,
-- isolated `uv.lock`: blocked because the execution registry did not expose GluonTS.
-
 ## Next phase
 
-P3 runs model and distribution discovery inside each resolved isolated environment and persists a
-runtime inventory that separates PyTorch Estimators, native Predictors, and extensions. Availability
-is not certified until loading, input construction, inference, output shape, finite values, and
-device evidence pass.
+P4 should install and lock the isolated environments in the target execution system, run the P3
+inventory against the real packages, then perform a bounded DeepAR CPU fit/predict smoke. A model is
+not formally available until constructor, input, fit, predict, output, finite-value, and device checks
+all pass.
