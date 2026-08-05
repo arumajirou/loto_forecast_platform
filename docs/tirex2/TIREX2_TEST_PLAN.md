@@ -11,6 +11,7 @@
 9. CUDA fallback rejection in successful response schema.
 10. Legacy schema-v1 conversion isolated to seven-position compatibility.
 11. Two-process comparison: distinct PIDs, exact point/all-quantile identity, and drift rejection.
+12. Provider failures preserve structured JSON and return a non-zero process exit code.
 
 Actual package, CPU, GPU, and subprocess reload tests require the dedicated environment and
 trusted model snapshot and are not claimed by the hermetic focused suite.
