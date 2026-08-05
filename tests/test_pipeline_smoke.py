@@ -13,7 +13,8 @@ def test_trusted_vertical_slice_produces_sealed_forecast(tmp_path):
         rows.append(
             {
                 "draw_no": draw_no,
-                "draw_date": (pd.Timestamp("2026-01-01") + pd.Timedelta(days=7 * (draw_no - 1)))
+                "draw_date": (pd.Timestamp("2026-01-01")
+                    + pd.to_timedelta(7 * (draw_no - 1), unit="D"))
                 .date()
                 .isoformat(),
                 **{f"n{i + 1}": n for i, n in enumerate(nums)},
