@@ -65,6 +65,11 @@ another `uv lock` or explicit `uv sync`. Every core `uv run` uses `--frozen`; uv
 synchronize the already prepared environment, but it cannot update the lockfile silently. The core
 also verifies the lock SHA-256 again before certification.
 
+The core status records one of these environment modes:
+
+- `FORMAL_PREFLIGHT_REUSE`: dependency resolution came from the formal preflight;
+- `STANDALONE_RESOLUTION`: the core was executed directly and performed its own lock and sync.
+
 ## Expected PASS output
 
 The command must print both lines:
@@ -105,6 +110,8 @@ RUN_DIR="${ARTIFACTS_ROOT}/${RUN_ID}"
 ```
 
 PASS requires all checksum commands to succeed and all three status documents to report `PASS`.
+For a formal run, `core/P0_RUN_STATUS.json` must also record
+`environment_mode=FORMAL_PREFLIGHT_REUSE`.
 
 ## Mandatory review before promotion
 
