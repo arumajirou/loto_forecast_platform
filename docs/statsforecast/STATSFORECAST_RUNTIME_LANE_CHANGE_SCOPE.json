@@ -12,7 +12,9 @@
     "tests/statsforecast/test_runtime_lane.py",
     "configs/statsforecast/release_manifest.json",
     "docs/statsforecast/RUNTIME_LANE_RUNBOOK.md",
-    "docs/statsforecast/STATSFORECAST_RUNTIME_LANE_CHANGE_SCOPE.json"
+    "docs/statsforecast/STATSFORECAST_RUNTIME_LANE_CHANGE_SCOPE.json",
+    "src/loto/statsforecast/runtime_lane_target.py",
+    "docs/statsforecast/TARGET_HOST_EXECUTION.md"
   ],
   "forbidden_paths": [
     "pyproject.toml",
