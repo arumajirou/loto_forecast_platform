@@ -5,7 +5,13 @@ from typing import Any
 
 from pydantic import ValidationError
 
+from .api_contract import (
+    AutoGluonApiContractError,
+    validate_hpo_tune_kwargs,
+    validate_public_api_kwargs,
+)
 from .contracts import ProviderRequestV2
+from .execution import ExecutionPlanError, build_execution_plan
 from .provider import ProviderRuntime, _error_response, run_provider_v2 as _run_provider_v2
 
 
@@ -103,6 +109,24 @@ def validate_protocol_v2_preflight(request: ProviderRequestV2) -> None:
         previous_timestamp = timestamp
 
 
+def validate_autogluon_1_5_api_contract(request: ProviderRequestV2) -> None:
+    try:
+        validate_hpo_tune_kwargs(request.fit.hyperparameter_tune_kwargs)
+        plan = build_execution_plan(request)
+        validate_public_api_kwargs(
+            predictor_kwargs=plan.predictor_kwargs,
+            fit_kwargs=plan.fit_kwargs,
+            predict_kwargs={"random_seed": request.seed},
+        )
+    except ExecutionPlanError:
+        raise
+    except AutoGluonApiContractError as exc:
+        raise StrictPreflightError(
+            "AUTOGLUON_API_CONTRACT_MISMATCH",
+            str(exc),
+        ) from exc
+
+
 def run_provider_v2_strict(
     payload: dict[str, Any],
     *,
@@ -114,6 +138,9 @@ def run_provider_v2_strict(
         return _run_provider_v2(payload, runtime=runtime)
     try:
         validate_protocol_v2_preflight(request)
+        validate_autogluon_1_5_api_contract(request)
+    except ExecutionPlanError:
+        return _run_provider_v2(payload, runtime=runtime)
     except StrictPreflightError as exc:
         return _error_response(
             payload,
