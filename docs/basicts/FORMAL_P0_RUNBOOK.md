@@ -22,8 +22,7 @@ contract and focused tests.
 
 Installed-distribution provenance is a separate required layer. See
 `docs/basicts/INSTALLED_PROVENANCE.md`. The environment revision marker and lockfile do not replace
-verification of the installed distribution's `direct_url.json` or the actual `basicts` import
-origin selected by Python.
+verification of `direct_url.json`, selected RECORD hashes and sizes, or the actual import origin.
 
 ## Preconditions
 
@@ -71,9 +70,9 @@ synchronize the already prepared environment, but it cannot update the lockfile 
 also verifies the lock SHA-256 again before certification.
 
 Before identity, configuration, or DLinear can pass, the provider requires exact non-editable Git
-provenance for the installed `BasicTS` distribution. It also binds Python's actual `basicts` import
-spec to the distribution-located `basicts/__init__.py`, rejects ambiguous provider mappings and
-shadow packages, and retains the imported file SHA-256.
+provenance, RECORD SHA-256 and byte-size agreement for `direct_url.json` and
+`basicts/__init__.py`, and an import origin bound to the verified distribution. Missing RECORD
+values are a formal failure even though the general packaging format permits them to be omitted.
 
 The core status records one of these environment modes:
 
@@ -123,8 +122,7 @@ The verifier fails closed on:
 - missing command logs or an unexpected command phase order;
 - non-frozen core model commands;
 - formal, preflight, core, certificate, or lock SHA-256 cross-link disagreement;
-- installed distribution repository, VCS, commit, or requested-revision disagreement;
-- import-provider ambiguity, package-file drift, or import-origin shadowing;
+- installed repository, VCS, commit, requested revision, RECORD, or import-origin disagreement;
 - provider identity, allowlist, or DLinear evidence disagreement.
 
 The following shell checks remain useful as an independent implementation of the checksum review:
@@ -162,25 +160,24 @@ PASS requires the verifier and all checksum commands to succeed. The verificatio
 status, dependency audit, core status, and core certificate must all report `PASS`. For a formal
 run, `core/P0_RUN_STATUS.json` must record `environment_mode=FORMAL_PREFLIGHT_REUSE`.
 
-The identity response must record the exact direct Git provenance and these import-origin fields:
+The identity response must record:
+
+- `installed_provenance_status=PASS`;
+- `installed_record_integrity_status=PASS`;
+- `direct_url_record_status=PASS` and `package_init_record_status=PASS`;
+- RECORD hash mode `sha256`, 43-character URL-safe Base64 digest values, and positive byte sizes;
+- `import_origin_status=PASS` with import and distribution paths equal;
+- distribution `BasicTS==1.1.0`, the expected repository, VCS `git`, and frozen revision.
+
+The P0 certificate must record:
 
 ```text
-installed_provenance_status=PASS
-import_origin_status=PASS
-import_name=basicts
-import_provider_distributions=["BasicTS"]
-distribution_package_entry=basicts/__init__.py
-distribution_package_init=<absolute installed file>
-import_spec_origin=<same absolute installed file>
-import_submodule_search_locations=[<installed basicts package directory>]
-import_origin_sha256=<64 lowercase hexadecimal characters>
+certified.installed_package_git_provenance=true
+certified.installed_record_integrity=true
+certified.import_origin_bound_to_distribution=true
 ```
 
-`distribution_package_init` and `import_spec_origin` must be identical. The certificate must set
-both `certified.installed_package_git_provenance=true` and
-`certified.import_origin_bound_to_distribution=true`.
-
-The verification report certifies the retained evidence only. It does not rerun installation,
+The verification report certifies retained evidence only. It does not rerun installation,
 training, inference, or accuracy evaluation.
 
 ## Mandatory review before promotion
@@ -190,12 +187,9 @@ Review at least:
 - exact Git commit in the core status;
 - uv version and resolution cutoff;
 - BasicTS lock and workspace-metadata source, version, and revision;
-- installed BasicTS distribution name, version, repository, VCS, commit, and requested revision;
-- SHA-256 of the raw installed `direct_url.json` consumed by the provider;
-- exact import-to-distribution mapping for `basicts`;
-- equality of distribution package file, import spec origin, and package search location;
-- SHA-256 of the resolved `basicts/__init__.py`;
-- whether `basicts` was already loaded and, if so, the verified loaded module origin;
+- installed distribution repository, VCS, commit, and requested revision;
+- direct URL and package-init RECORD entries, SHA-256 digests, and byte sizes;
+- equality of the distribution package path and actual import origin;
 - resolved versions of easy-torch, numpy, setuptools, torch, and transformers;
 - CPython implementation and 3.11 version;
 - absence of workspace conflicts;
@@ -216,6 +210,7 @@ Use `FORMAL_P0_STATUS.json` and the recorded `failed_phase` first. Then inspect 
 under `preflight/logs/` or `core/logs/`. Do not repeatedly rerun an unchanged failure. Preserve the
 failed bundle for comparison with the next Run ID.
 
-A failure in dependency resolution, installed provenance, import-origin binding, identity, import
-allowlisting, DLinear execution, persistence, re-prediction, finite-value checks, shape checks, or
-SHA-256 verification is a formal failure. It must not be converted to PASS manually.
+A failure in dependency resolution, installed Git provenance, RECORD integrity, import origin,
+identity, import allowlisting, DLinear execution, persistence, re-prediction, finite-value checks,
+shape checks, or SHA-256 verification is a formal failure. It must not be converted to PASS
+manually.
