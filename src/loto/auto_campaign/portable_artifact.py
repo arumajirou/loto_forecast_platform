@@ -58,7 +58,12 @@ def _safe_relative(value: str, failures: list[str], label: str) -> Path | None:
         failures.append(f"{label} contains a backslash: {value}")
         return None
     pure = PurePosixPath(value)
-    if pure.is_absolute() or not pure.parts or ".." in pure.parts or "." in pure.parts:
+    if (
+        pure.is_absolute()
+        or not pure.parts
+        or ".." in pure.parts
+        or "." in pure.parts
+    ):
         failures.append(f"{label} is unsafe: {value}")
         return None
     return Path(*pure.parts)
@@ -109,7 +114,11 @@ def _verified_directory_failures(root: Path, label: str) -> list[str]:
         _reject_symlinks(root)
     except ValueError as exc:
         failures.append(str(exc))
-    report = _read_json(root / "VERIFICATION_REPORT.json", failures, f"{label} report")
+    report = _read_json(
+        root / "VERIFICATION_REPORT.json",
+        failures,
+        f"{label} report",
+    )
     if report and report.get("status") != "PASS":
         failures.append(f"{label} report status is not PASS: {report.get('status')}")
     seal = verify_verification_seal(root)
@@ -148,10 +157,11 @@ def _dependency_refs(root: Path) -> list[tuple[str, Path]]:
 
 
 def _collect_entries(run_root: Path) -> list[dict[str, Any]]:
-    queue: deque[tuple[str, Path]] = deque([("target", run_root.resolve())])
+    queue: deque[tuple[str, Path]] = deque([("target", run_root)])
     collected: dict[str, dict[str, Any]] = {}
     while queue:
         role, raw = queue.popleft()
+        _reject_symlinks(raw)
         path = raw.resolve()
         key = _path_key(path)
         record = collected.setdefault(key, {"path": path, "roles": set()})
@@ -170,7 +180,8 @@ def _collect_entries(run_root: Path) -> list[dict[str, Any]]:
         path = entry["path"]
         roles = entry["roles"]
         if path.is_dir() and roles & _VERIFIED_ROLES:
-            failures = _verified_directory_failures(path, "/".join(sorted(roles)))
+            label = "/".join(sorted(roles))
+            failures = _verified_directory_failures(path, label)
             if failures:
                 raise ValueError("; ".join(failures))
     return entries
@@ -194,7 +205,8 @@ def _write_portable_sums(root: Path) -> None:
         (
             path
             for path in root.rglob("*")
-            if path.is_file() and path.relative_to(root).as_posix() != PORTABLE_SUMS
+            if path.is_file()
+            and path.relative_to(root).as_posix() != PORTABLE_SUMS
         ),
         key=lambda path: path.relative_to(root).as_posix(),
     )
@@ -202,7 +214,8 @@ def _write_portable_sums(root: Path) -> None:
         f"{sha256_file(path)}  {path.relative_to(root).as_posix()}"
         for path in paths
     ]
-    (root / PORTABLE_SUMS).write_text("\n".join(lines) + "\n", encoding="utf-8")
+    target = root / PORTABLE_SUMS
+    target.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def _verify_portable_sums(root: Path) -> list[str]:
@@ -223,7 +236,11 @@ def _verify_portable_sums(root: Path) -> list[str]:
         except ValueError:
             failures.append(f"portable-sums malformed-line:{line_number}")
             continue
-        safe = _safe_relative(relative, failures, f"portable-sums line {line_number}")
+        safe = _safe_relative(
+            relative,
+            failures,
+            f"portable-sums line {line_number}",
+        )
         if safe is None:
             continue
         normalized = safe.as_posix()
@@ -239,11 +256,16 @@ def _verify_portable_sums(root: Path) -> list[str]:
     actual = {
         item.relative_to(root).as_posix()
         for item in root.rglob("*")
-        if item.is_file() and item.relative_to(root).as_posix() != PORTABLE_SUMS
+        if item.is_file()
+        and item.relative_to(root).as_posix() != PORTABLE_SUMS
     }
-    failures.extend(f"portable-sums unlisted:{item}" for item in sorted(actual - listed))
     failures.extend(
-        f"portable-sums listed-but-missing:{item}" for item in sorted(listed - actual)
+        f"portable-sums unlisted:{item}"
+        for item in sorted(actual - listed)
+    )
+    failures.extend(
+        f"portable-sums listed-but-missing:{item}"
+        for item in sorted(listed - actual)
     )
     return failures
 
@@ -259,6 +281,15 @@ def _canonical_sha256(payload: Mapping[str, Any]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def _manifest_content_sha256(manifest: Mapping[str, Any]) -> str:
+    payload = {
+        key: value
+        for key, value in manifest.items()
+        if key != "manifest_content_sha256"
+    }
+    return _canonical_sha256(payload)
+
+
 def _resolve_recorded_path(
     recorded: str,
     entries: list[Mapping[str, Any]],
@@ -272,13 +303,35 @@ def _resolve_recorded_path(
             continue
         if key == original:
             matches.append((len(original), entry, ""))
-        elif str(entry.get("kind")) == "directory" and key.startswith(original + "/"):
+        elif (
+            str(entry.get("kind")) == "directory"
+            and key.startswith(original + "/")
+        ):
             matches.append((len(original), entry, key[len(original) + 1 :]))
     if not matches:
         return None
     _, entry, tail = max(matches, key=lambda item: item[0])
-    relative = Path(*PurePosixPath(str(entry["relative_path"])).parts)
-    return package_root / relative / Path(*PurePosixPath(tail).parts) if tail else package_root / relative
+    failures: list[str] = []
+    relative = _safe_relative(
+        str(entry.get("relative_path") or ""),
+        failures,
+        "relocation entry",
+    )
+    if relative is None:
+        return None
+    base = package_root / relative
+    if not tail:
+        candidate = base
+    else:
+        tail_relative = _safe_relative(tail, failures, "relocation tail")
+        if tail_relative is None:
+            return None
+        candidate = base / tail_relative
+    base_resolved = base.resolve()
+    candidate_resolved = candidate.resolve()
+    if candidate_resolved != base_resolved and base_resolved not in candidate_resolved.parents:
+        return None
+    return candidate
 
 
 def _verify_recorded_file(
@@ -305,7 +358,9 @@ def _verify_recorded_file(
         return None
     actual = sha256_file(resolved)
     if actual != expected:
-        failures.append(f"{label} SHA256 mismatch: expected={expected}, actual={actual}")
+        failures.append(
+            f"{label} SHA256 mismatch: expected={expected}, actual={actual}"
+        )
     return resolved
 
 
@@ -324,14 +379,58 @@ def _verify_relocated_run(
     if relocated is None or not relocated.is_dir():
         failures.append(f"{label} relocated directory missing: {original}")
         return
-    _verify_recorded_file(evidence.get("manifest"), entries, package_root, failures, f"{label} manifest")
-    _verify_recorded_file(evidence.get("sha256s"), entries, package_root, failures, f"{label} SHA256SUMS")
+    _verify_recorded_file(
+        evidence.get("manifest"),
+        entries,
+        package_root,
+        failures,
+        f"{label} manifest",
+    )
+    _verify_recorded_file(
+        evidence.get("sha256s"),
+        entries,
+        package_root,
+        failures,
+        f"{label} SHA256SUMS",
+    )
     lineage = evidence.get("lineage")
     if lineage is not None:
-        _verify_recorded_file(lineage, entries, package_root, failures, f"{label} LINEAGE")
-    failures.extend(f"{label} current SHA256: {item}" for item in verify_sha256s(relocated))
+        _verify_recorded_file(
+            lineage,
+            entries,
+            package_root,
+            failures,
+            f"{label} LINEAGE",
+        )
+    failures.extend(
+        f"{label} current SHA256: {item}"
+        for item in verify_sha256s(relocated)
+    )
     seal = verify_verification_seal(relocated)
-    failures.extend(f"{label} seal: {item}" for item in seal.get("failures", []))
+    failures.extend(
+        f"{label} seal: {item}" for item in seal.get("failures", [])
+    )
+    current_failures: list[str] = []
+    current = _read_json(
+        relocated / "manifest.json",
+        current_failures,
+        f"{label} relocated manifest",
+    )
+    failures.extend(current_failures)
+    for field in (
+        "stage",
+        "status",
+        "code_sha256",
+        "data_sha256",
+        "lineage_status",
+    ):
+        if evidence.get(field) != current.get(field):
+            failures.append(
+                f"{label} {field} changed: "
+                f"recorded={evidence.get(field)}, current={current.get(field)}"
+            )
+    if evidence.get("verification_status") != "PASS":
+        failures.append(f"{label} recorded verification_status is not PASS")
 
 
 def _verify_relocated_lineage(
@@ -340,13 +439,26 @@ def _verify_relocated_lineage(
     package_root: Path,
 ) -> list[str]:
     failures: list[str] = []
-    manifest = _read_json(run_root / "manifest.json", failures, "relocated run manifest")
-    lineage = _read_json(run_root / "LINEAGE.json", failures, "relocated lineage")
+    manifest = _read_json(
+        run_root / "manifest.json",
+        failures,
+        "relocated run manifest",
+    )
+    lineage = _read_json(
+        run_root / "LINEAGE.json",
+        failures,
+        "relocated lineage",
+    )
     if not lineage:
         return failures
-    if manifest.get("lineage_sha256") != sha256_file(run_root / "LINEAGE.json"):
+    lineage_path = run_root / "LINEAGE.json"
+    if manifest.get("lineage_sha256") != sha256_file(lineage_path):
         failures.append("relocated LINEAGE.json hash differs from manifest")
-    core = {key: value for key, value in lineage.items() if key not in {"created_at", "chain_sha256"}}
+    core = {
+        key: value
+        for key, value in lineage.items()
+        if key not in {"created_at", "chain_sha256"}
+    }
     chain = _canonical_sha256(core)
     if lineage.get("chain_sha256") != chain:
         failures.append("relocated lineage chain_sha256 is invalid")
@@ -361,7 +473,13 @@ def _verify_relocated_lineage(
         ("data_contract", "data contract"),
         ("promotion_gate", "promotion gate"),
     ):
-        _verify_recorded_file(run_evidence.get(key), entries, package_root, failures, label)
+        _verify_recorded_file(
+            run_evidence.get(key),
+            entries,
+            package_root,
+            failures,
+            label,
+        )
     for key, label in (
         ("source_evidence", "source run"),
         ("predecessor_evidence", "predecessor run"),
@@ -369,7 +487,13 @@ def _verify_relocated_lineage(
     ):
         evidence = lineage.get(key)
         if evidence is not None:
-            _verify_relocated_run(evidence, entries, package_root, failures, label)
+            _verify_relocated_run(
+                evidence,
+                entries,
+                package_root,
+                failures,
+                label,
+            )
     runtime = lineage.get("runtime_evidence")
     if runtime is not None:
         if not isinstance(runtime, Mapping):
@@ -385,6 +509,37 @@ def _verify_relocated_lineage(
     return failures
 
 
+def _verify_manifest_identity(
+    manifest: Mapping[str, Any],
+    entries: list[Mapping[str, Any]],
+    target_entry: Mapping[str, Any] | None,
+    target_root: Path | None,
+    failures: list[str],
+) -> None:
+    expected = _manifest_content_sha256(manifest)
+    if manifest.get("manifest_content_sha256") != expected:
+        failures.append("portable manifest_content_sha256 mismatch")
+    if target_entry is None or target_root is None:
+        return
+    if manifest.get("target_original_path") != target_entry.get("original_path"):
+        failures.append("portable target_original_path mismatch")
+    if manifest.get("target_relative_path") != target_entry.get("relative_path"):
+        failures.append("portable target_relative_path mismatch")
+    seal_path = target_root / "VERIFICATION_SEAL.json"
+    if not seal_path.is_file():
+        failures.append("portable target verification seal missing")
+    elif manifest.get("target_verification_seal_sha256") != sha256_file(seal_path):
+        failures.append("portable target verification seal SHA256 mismatch")
+    expected_relocation = {
+        _path_key(str(entry.get("original_path") or "")): str(
+            entry.get("relative_path") or ""
+        )
+        for entry in entries
+    }
+    if manifest.get("relocation_map") != expected_relocation:
+        failures.append("portable relocation_map differs from entries")
+
+
 def _verify_portable_directory(root: Path) -> dict[str, Any]:
     failures: list[str] = []
     try:
@@ -392,7 +547,11 @@ def _verify_portable_directory(root: Path) -> dict[str, Any]:
     except ValueError as exc:
         failures.append(str(exc))
     failures.extend(_verify_portable_sums(root))
-    manifest = _read_json(root / PORTABLE_MANIFEST, failures, "portable manifest")
+    manifest = _read_json(
+        root / PORTABLE_MANIFEST,
+        failures,
+        "portable manifest",
+    )
     if manifest.get("schema_version") != PORTABLE_SCHEMA_VERSION:
         failures.append("portable manifest schema_version mismatch")
     raw_entries = manifest.get("entries")
@@ -405,18 +564,34 @@ def _verify_portable_directory(root: Path) -> dict[str, Any]:
     original_seen: set[str] = set()
     relative_seen: set[str] = set()
     target_root: Path | None = None
+    target_entry: Mapping[str, Any] | None = None
+    relocated_lineage_roots: list[Path] = []
     for index, entry in enumerate(entries):
         original = _path_key(str(entry.get("original_path") or ""))
         relative_text = str(entry.get("relative_path") or "")
-        safe = _safe_relative(relative_text, failures, f"entry {index} relative_path")
+        safe = _safe_relative(
+            relative_text,
+            failures,
+            f"entry {index} relative_path",
+        )
         if not original:
             failures.append(f"entry {index} original_path missing")
         if original in original_seen:
             failures.append(f"entry {index} duplicate original_path: {original}")
         original_seen.add(original)
+        roles = entry.get("roles")
+        if (
+            not isinstance(roles, list)
+            or not roles
+            or any(not isinstance(role, str) or not role for role in roles)
+        ):
+            failures.append(f"entry {index} roles must be non-empty strings")
+            roles = []
         if safe is None:
             continue
         relative = safe.as_posix()
+        if not relative.startswith("payload/"):
+            failures.append(f"entry {index} is outside payload/: {relative}")
         folded = relative.casefold()
         if folded in relative_seen:
             failures.append(f"entry {index} duplicate relative_path: {relative}")
@@ -436,26 +611,36 @@ def _verify_portable_directory(root: Path) -> dict[str, Any]:
             failures.append(f"entry {index} file_count mismatch")
         if entry.get("size_bytes") != size:
             failures.append(f"entry {index} size_bytes mismatch")
-        roles = entry.get("roles")
-        if isinstance(roles, list) and "target" in roles:
+        if "target" in roles:
             if target_root is not None:
                 failures.append("multiple target entries")
             target_root = path
-        if kind == "directory" and isinstance(roles, list) and set(roles) & _VERIFIED_ROLES:
+            target_entry = entry
+        if kind == "directory" and set(roles) & _VERIFIED_ROLES:
             seal = verify_verification_seal(path)
-            failures.extend(f"entry {index} seal: {item}" for item in seal.get("failures", []))
-            failures.extend(f"entry {index} SHA256: {item}" for item in verify_sha256s(path))
-    relocation = manifest.get("relocation_map")
-    expected_relocation = {
-        _path_key(str(entry.get("original_path") or "")): str(entry.get("relative_path") or "")
-        for entry in entries
-    }
-    if relocation != expected_relocation:
-        failures.append("portable relocation_map differs from entries")
+            failures.extend(
+                f"entry {index} seal: {item}"
+                for item in seal.get("failures", [])
+            )
+            failures.extend(
+                f"entry {index} SHA256: {item}"
+                for item in verify_sha256s(path)
+            )
+            if (path / "LINEAGE.json").is_file():
+                relocated_lineage_roots.append(path)
     if target_root is None or not target_root.is_dir():
         failures.append("portable target directory missing")
-    else:
-        failures.extend(_verify_relocated_lineage(target_root, entries, root))
+    _verify_manifest_identity(
+        manifest,
+        entries,
+        target_entry,
+        target_root,
+        failures,
+    )
+    for lineage_root in relocated_lineage_roots:
+        failures.extend(
+            _verify_relocated_lineage(lineage_root, entries, root)
+        )
     return {
         "status": "PASS" if not failures else "FAIL",
         "schema_version": PORTABLE_SCHEMA_VERSION,
@@ -466,18 +651,30 @@ def _verify_portable_directory(root: Path) -> dict[str, Any]:
 
 
 def _write_deterministic_zip(root: Path, target: Path) -> None:
-    with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-        for path in sorted(
+    with zipfile.ZipFile(
+        target,
+        "w",
+        compression=zipfile.ZIP_DEFLATED,
+        compresslevel=9,
+        allowZip64=True,
+    ) as archive:
+        paths = sorted(
             (item for item in root.rglob("*") if item.is_file()),
             key=lambda item: item.relative_to(root).as_posix(),
-        ):
+        )
+        for path in paths:
             relative = path.relative_to(root).as_posix()
-            info = zipfile.ZipInfo(relative, date_time=(1980, 1, 1, 0, 0, 0))
+            info = zipfile.ZipInfo(
+                relative,
+                date_time=(1980, 1, 1, 0, 0, 0),
+            )
             info.compress_type = zipfile.ZIP_DEFLATED
             info.create_system = 3
             info.external_attr = 0o100644 << 16
             info.flag_bits |= 0x800
-            archive.writestr(info, path.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+            with path.open("rb") as source:
+                with archive.open(info, "w", force_zip64=True) as destination:
+                    shutil.copyfileobj(source, destination, length=1024 * 1024)
 
 
 def _safe_extract_zip(bundle: Path, target: Path) -> None:
@@ -487,7 +684,11 @@ def _safe_extract_zip(bundle: Path, target: Path) -> None:
         for info in archive.infolist():
             name = info.filename
             failures: list[str] = []
-            safe = _safe_relative(name.rstrip("/"), failures, "ZIP member")
+            safe = _safe_relative(
+                name.rstrip("/"),
+                failures,
+                "ZIP member",
+            )
             if failures or safe is None:
                 raise ValueError("; ".join(failures))
             normalized = safe.as_posix()
@@ -499,17 +700,26 @@ def _safe_extract_zip(bundle: Path, target: Path) -> None:
             if stat.S_ISLNK(mode):
                 raise ValueError(f"ZIP symlink is not allowed: {normalized}")
             destination = target / safe
+            target_resolved = target.resolve()
+            destination_resolved = destination.resolve()
+            if (
+                destination_resolved != target_resolved
+                and target_resolved not in destination_resolved.parents
+            ):
+                raise ValueError(f"ZIP member escapes extraction root: {normalized}")
             if info.is_dir():
                 destination.mkdir(parents=True, exist_ok=True)
                 continue
             destination.parent.mkdir(parents=True, exist_ok=True)
-            with archive.open(info, "r") as source, destination.open("wb") as output:
-                shutil.copyfileobj(source, output)
+            with archive.open(info, "r") as source:
+                with destination.open("wb") as output:
+                    shutil.copyfileobj(source, output, length=1024 * 1024)
 
 
 def export_portable_bundle(run_root: Path, output: Path) -> dict[str, Any]:
     """Copy a verified lineage tree and create an atomic deterministic ZIP."""
 
+    _reject_symlinks(run_root)
     run_root = run_root.resolve()
     output = output.resolve()
     if output.suffix.lower() != ".zip":
@@ -521,13 +731,24 @@ def export_portable_bundle(run_root: Path, output: Path) -> dict[str, Any]:
     for entry in entries:
         source = entry["path"]
         if source.is_dir() and (output == source or source in output.parents):
-            raise ValueError(f"portable output must not be inside a source run: {source}")
+            raise ValueError(
+                f"portable output must not be inside a source run: {source}"
+            )
 
-    with tempfile.TemporaryDirectory(prefix="portable-artifact-", dir=output.parent) as temp_value:
+    with tempfile.TemporaryDirectory(
+        prefix="portable-artifact-",
+        dir=output.parent,
+    ) as temp_value:
         package_root = Path(temp_value) / "package"
         package_root.mkdir()
         manifest_entries: list[dict[str, Any]] = []
-        ordered = sorted(entries, key=lambda item: ("target" not in item["roles"], _path_key(item["path"])))
+        ordered = sorted(
+            entries,
+            key=lambda item: (
+                "target" not in item["roles"],
+                _path_key(item["path"]),
+            ),
+        )
         for entry in ordered:
             source: Path = entry["path"]
             roles: set[str] = entry["roles"]
@@ -535,7 +756,12 @@ def export_portable_bundle(run_root: Path, output: Path) -> dict[str, Any]:
             destination = package_root / Path(*PurePosixPath(relative).parts)
             destination.parent.mkdir(parents=True, exist_ok=True)
             if source.is_dir():
-                shutil.copytree(source, destination, copy_function=shutil.copy2, symlinks=False)
+                shutil.copytree(
+                    source,
+                    destination,
+                    copy_function=shutil.copy2,
+                    symlinks=False,
+                )
                 digest, count, size = _tree_fingerprint(destination)
                 kind = "directory"
             else:
@@ -554,31 +780,46 @@ def export_portable_bundle(run_root: Path, output: Path) -> dict[str, Any]:
                 }
             )
 
-        seal = _read_json(run_root / "VERIFICATION_SEAL.json", [], "target seal")
-        manifest = {
+        seal_failures: list[str] = []
+        seal = _read_json(
+            run_root / "VERIFICATION_SEAL.json",
+            seal_failures,
+            "target seal",
+        )
+        if seal_failures:
+            raise ValueError("; ".join(seal_failures))
+        manifest: dict[str, Any] = {
             "schema_version": PORTABLE_SCHEMA_VERSION,
             "exported_from_sealed_at": seal.get("sealed_at"),
             "target_original_path": _path_key(run_root),
             "target_relative_path": "payload/target",
-            "target_verification_seal_sha256": sha256_file(run_root / "VERIFICATION_SEAL.json"),
+            "target_verification_seal_sha256": sha256_file(
+                run_root / "VERIFICATION_SEAL.json"
+            ),
             "entries": manifest_entries,
             "relocation_map": {
-                entry["original_path"]: entry["relative_path"] for entry in manifest_entries
+                entry["original_path"]: entry["relative_path"]
+                for entry in manifest_entries
             },
         }
-        manifest["manifest_content_sha256"] = _canonical_sha256(manifest)
+        manifest["manifest_content_sha256"] = _manifest_content_sha256(manifest)
         write_json(package_root / PORTABLE_MANIFEST, manifest)
-        (package_root / PORTABLE_README).write_text(
+        readme = (
             "# Portable AutoModel artifact\n\n"
             "This bundle preserves original lineage files unchanged. "
-            "PORTABLE_MANIFEST.json maps recorded absolute paths to package-relative paths.\n"
-            "Verify with `loto-auto-campaign verify-portable --bundle <bundle.zip>`.\n",
-            encoding="utf-8",
+            "PORTABLE_MANIFEST.json maps recorded absolute paths to "
+            "package-relative paths.\n"
+            "Verify with `loto-auto-campaign verify-portable "
+            "--bundle <bundle.zip>`.\n"
         )
+        (package_root / PORTABLE_README).write_text(readme, encoding="utf-8")
         _write_portable_sums(package_root)
         verification = _verify_portable_directory(package_root)
         if verification["status"] != "PASS":
-            raise ValueError(f"portable staging verification failed: {verification['failures']}")
+            raise ValueError(
+                "portable staging verification failed: "
+                f"{verification['failures']}"
+            )
         partial = output.with_name(output.name + ".partial")
         if partial.exists():
             partial.unlink()
@@ -604,7 +845,11 @@ def verify_portable_bundle(bundle: Path) -> dict[str, Any]:
     bundle = bundle.resolve()
     if bundle.is_dir():
         result = _verify_portable_directory(bundle)
-        return {**result, "bundle": str(bundle), "bundle_sha256": None}
+        return {
+            **result,
+            "bundle": str(bundle),
+            "bundle_sha256": None,
+        }
     if not bundle.is_file():
         return {
             "status": "FAIL",
@@ -624,7 +869,9 @@ def verify_portable_bundle(bundle: Path) -> dict[str, Any]:
             "schema_version": PORTABLE_SCHEMA_VERSION,
             "entry_count": 0,
             "target_relative_path": None,
-            "failures": [f"portable bundle unreadable: {type(exc).__name__}: {exc}"],
+            "failures": [
+                f"portable bundle unreadable: {type(exc).__name__}: {exc}"
+            ],
         }
     return {
         **result,
