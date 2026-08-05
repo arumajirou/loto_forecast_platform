@@ -31,7 +31,7 @@
   "execution_boundaries": {
     "local_synthetic_smoke": "PASS",
     "repository_ruff_compileall_pytest": "REQUIRED",
-    "github_actions": "PENDING",
+    "github_actions": "CI_BLOCKED_PRE_RUN",
     "local_gpu": "NOT_APPLICABLE",
     "merge": "USER_APPROVAL_REQUIRED"
   },
