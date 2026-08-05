@@ -1,5 +1,5 @@
 {
-  "schema_version": "change-scope-v1",
+  "schema_version": "change-scope-v1.1.0",
   "scope_id": "neuralforecast-api-coverage-state",
   "stacked_base_branch": "agent/p0-runtime-certification",
   "stacked_base_sha": "dde70b5372d16651004d3a2a39f45935745250c6",
@@ -9,6 +9,9 @@
     "all-36-AutoModel constructor signature matrix",
     "supported backend default-config probes",
     "fail-closed coverage status validation",
+    "automatic integration into the existing api-coverage CLI stage",
+    "resume-safe replacement of stale coverage-state artifacts",
+    "structured resolver-failure evidence and non-PASS exit behavior",
     "CSV, Parquet, JSON, manifest, and SHA256SUMS artifacts",
     "unit and CPU contract tests"
   ],
@@ -29,7 +32,10 @@
   "expected_changed_files": [
     "docs/NEURALFORECAST_API_COVERAGE_CHANGE_SCOPE.json",
     "docs/NEURALFORECAST_API_COVERAGE_STATE.md",
+    "src/loto/auto_campaign/api_coverage_pipeline.py",
+    "src/loto/auto_campaign/cli.py",
     "src/loto/auto_campaign/coverage_state.py",
+    "tests/auto_campaign/test_api_coverage_pipeline.py",
     "tests/auto_campaign/test_coverage_state.py"
   ]
 }
