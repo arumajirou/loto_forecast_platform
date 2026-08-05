@@ -160,7 +160,7 @@ def verify_lineage_semantics(
 
     source = lineage.get("source_evidence")
     predecessor = lineage.get("predecessor_evidence")
-    if target_stage is not None:
+    if target_stage in GATED_STAGES:
         expected_source = _SEMANTIC_SOURCE_STAGE[target_stage]
         expected_predecessor = _SEMANTIC_PREDECESSOR_STAGE[target_stage]
         _evidence_stage(source, expected_source, failures, "source evidence")
