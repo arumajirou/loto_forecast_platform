@@ -1,0 +1,4 @@
+field,semantic,length_contract,availability_contract,status
+past_covariates,past-only,history,not_applicable,IMPLEMENTED_RUNTIME_PENDING
+future_covariates,known-future,history+prediction_length,known_at_prediction_time,IMPLEMENTED_RUNTIME_PENDING
+unknown_future_values,forbidden,n/a,missing_or_nonmatching_evidence,FAIL_CLOSED
