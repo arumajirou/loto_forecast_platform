@@ -25,6 +25,18 @@ Unknown descriptors, invalid bounds, and search spaces in non-HPO modes fail clo
 HPO without a custom search space remains accepted for backward compatibility but is not
 used by the bounded P5 certification scenario.
 
+## Fail-closed run isolation
+
+The output directory must be absent or empty. The harness refuses to reuse a directory
+that contains prior requests, responses, model artifacts, or reports, preventing stale
+evidence from being read as the result of a new provider execution.
+
+The `explicit-naive-load` scenario depends on `explicit-naive-fit` from the same run. If
+the fit scenario is not verified, the load scenario is recorded as `BLOCKED_RUNTIME` and
+is not executed. Response run ID, operation, requested/resolved device, positive PID, and
+artifact containment under the scenario model directory are validated before a scenario
+can be marked verified.
+
 ## Run
 
 ```bash
