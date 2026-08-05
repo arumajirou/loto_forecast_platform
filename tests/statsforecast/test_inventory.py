@@ -19,3 +19,8 @@ def test_nan_model_is_expected_negative_and_not_champion() -> None:
 def test_unknown_model_fails_closed() -> None:
     with pytest.raises(KeyError, match="unknown StatsForecast model"):
         model_contract("InventedModel")
+
+
+def test_inventory_matches_upstream_2_1_1_surface() -> None:
+    assert "ConformalSeasonalPool" in MODEL_NAMES
+    assert "CES" not in MODEL_NAMES
