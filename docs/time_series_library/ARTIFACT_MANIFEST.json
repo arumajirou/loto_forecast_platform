@@ -1,4 +1,16 @@
 {
+  "schema_version": "1.0",
+  "status": "PARTIALLY_VERIFIED",
+  "project_pr": 54,
+  "parent_head": "5d83484a8f2cb2513bfda453921cc9bb4b3409fb",
+  "upstream_revision": "4e938a1767106324dd753b2a44832bf870a0252e",
+  "certified_models": [
+    "DLinear",
+    "TSMixer",
+    "LightTS",
+    "SegRNN",
+    "FreTS"
+  ],
   "artifacts": [
     {
       "path": "LOCK_RESOLUTION_REPORT.json",
@@ -46,45 +58,101 @@
       "path": "SEGRNN_CPU_CERTIFICATION.json",
       "sha256": "99618b8769f3d5fe47a67f2d0e11561a38689f47a77448fc2a4e9ce52257c016",
       "size_bytes": 3733,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "SEGRNN_GEOMETRY_MATRIX.json",
       "sha256": "76a4727f793f3d196d48618d15dee10b1fd4bee46105279101c680a29109b097",
       "size_bytes": 3730,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "SEGRNN_PARAMETER_CONTRACT.md",
       "sha256": "33e7f63c699da4624cd76922f2c7baab8c4b01685d0f2a5f29fb99509ed09972",
       "size_bytes": 1422,
+      "status": "existing_remote"
+    },
+    {
+      "path": "FRETS_CPU_CERTIFICATION.json",
+      "sha256": "efdba3f710b56d9633fb38f528b5877b9cec1e67ab3932c58abd6724f3962a94",
+      "size_bytes": 4015,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "FRETS_GEOMETRY_MATRIX.json",
+      "sha256": "ca7844243394b4c6bd0fe921d2f0d1dd15b326893bbd5fece1c054c2fe74af94",
+      "size_bytes": 3784,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "FRETS_PARAMETER_CONTRACT.md",
+      "sha256": "062d238b0e101913dd9b24b7b0e3b7878d5afbc462f5d08f6e47b78ddfe5cb6b",
+      "size_bytes": 1653,
       "status": "generated_and_verified"
     },
     {
       "path": "LIGHTWEIGHT_MODEL_SELECTION.md",
-      "sha256": "071becbaf7727567f0440c4eced56421bb4d1af51fa35d47ec0681c67829834a",
-      "size_bytes": 1132,
+      "sha256": "5c762c6feb0c2c9d2fc8a8e4ec9ba46ed609dfcba38da443e08d7eecc57ef0af",
+      "size_bytes": 1591,
       "status": "generated_and_verified"
     },
     {
       "path": "MODEL_INVENTORY_PINNED_SEARCH.json",
-      "sha256": "57d75a7af118db11738be3fc714b26733f07c7b7d90f50d54bbfdf85a3e2e759",
-      "size_bytes": 4343,
+      "sha256": "902dd97d389387f38cc242876f2933b054c68dd1b6ad00f67ca2f6ae3a34e55f",
+      "size_bytes": 4345,
       "status": "generated_and_verified"
     },
     {
       "path": "README.md",
-      "sha256": "a02efc7948eca61ccc7f928b4b56b3d9b4400c764d112c340071a78edf79600a",
-      "size_bytes": 2201,
+      "sha256": "46fede150cb929fb2d8064b5e959415d8666a2dc18be2b5dbaeeb57166248e8e",
+      "size_bytes": 2253,
       "status": "generated_and_verified"
     },
     {
       "path": "VERIFICATION_REPORT.md",
-      "sha256": "10bed6090318418c47eef188b1ec39ce1e7033055a794f44f351f70dd7083121",
-      "size_bytes": 2627,
+      "sha256": "7791a57e61c23a5c5b15c77183e2de70df053f88f1f6bd3cee6500d442a255a5",
+      "size_bytes": 2765,
       "status": "generated_and_verified"
     }
   ],
+  "code_evidence": [
+    {
+      "path": "src/loto/time_series_library_campaign/contracts.py",
+      "sha256": "4a359912e9d63eb53d5dca4f0360bd6f5bb1a01f35b82d9657c0eb322cb0a529",
+      "size_bytes": 7283
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/provider.py",
+      "sha256": "e9e4d7d3a69376b6b05fe628a2aa2699fe8fd6195e3d8809510a1c6644b75d13",
+      "size_bytes": 4790
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/frets_runtime.py",
+      "sha256": "3a4fd67c7cbc0b539238b20161408a4619bd5cd79306ed523c180f6d31498bd9",
+      "size_bytes": 11810
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_frets_contract.py",
+      "sha256": "810953bcd568a8e828da96eee9c6cc39297368de09601814997b30e45896b2f0",
+      "size_bytes": 8346
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_frets_checkpoint_contract.py",
+      "sha256": "9377697002bfe66ef0bbd696570923f7664e532c49ad4a3aadd7635ac76f7416",
+      "size_bytes": 4601
+    },
+    {
+      "path": "external/time-series-library/UPSTREAM_REVISION.json",
+      "sha256": "785a1091e80df3738400dde0b7d45c1007d2395285fa83bfab3d64ee9e00e6ae",
+      "size_bytes": 1190
+    }
+  ],
+  "focused_validation": {
+    "compileall": "PASS",
+    "pytest": "21 passed in split focused runs",
+    "line_length_100": "PASS",
+    "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT"
+  },
   "boundaries": {
     "ci": "CI_BLOCKED_PRE_RUN",
     "gpu": "EXECUTION_PENDING",
@@ -92,69 +160,5 @@
     "isolated_uv_lock": "BLOCKED_OFFLINE_CACHE_MISS_EINOPS",
     "real_metrics": "NOT_EXECUTED",
     "target_torch_2_9_1": "EXECUTION_PENDING"
-  },
-  "certified_models": [
-    "DLinear",
-    "TSMixer",
-    "LightTS",
-    "SegRNN"
-  ],
-  "code_evidence": [
-    {
-      "path": "src/loto/time_series_library_campaign/lightts_runtime.py",
-      "sha256": "b95d29361c6ab3200a6be7fe69bdab182f9edc018d3d794892bcb70238c06df6",
-      "size_bytes": 11573
-    },
-    {
-      "path": "tests/time_series_library_campaign/test_lightts_contract.py",
-      "sha256": "85c884285d1c92af78d5d1e6ba15e6df7b3d73b00efd62f042aa3951cae16423",
-      "size_bytes": 7630
-    },
-    {
-      "path": "tests/time_series_library_campaign/test_lightts_checkpoint_contract.py",
-      "sha256": "93a914a9ba5ef9aecaf05479d3ad7035f275b86bd5f138605a7553c872a9dc97",
-      "size_bytes": 3767
-    },
-    {
-      "path": "src/loto/time_series_library_campaign/contracts.py",
-      "sha256": "10c39bc04ec66e1430f968dfc25cbafd3c1cd0d8bb9ce29718e040b64c461ba0",
-      "size_bytes": 6844
-    },
-    {
-      "path": "src/loto/time_series_library_campaign/provider.py",
-      "sha256": "0d78a961902a7f3ec3a30e30eccb1bed77a7e97b544c9fb0707c287df78c5852",
-      "size_bytes": 4493
-    },
-    {
-      "path": "src/loto/time_series_library_campaign/segrnn_runtime.py",
-      "sha256": "afe0d62ffb393e25a27df784493665bc60c7b4654a967bdbb4280643d1df32d4",
-      "size_bytes": 11611
-    },
-    {
-      "path": "tests/time_series_library_campaign/test_segrnn_contract.py",
-      "sha256": "1ed4623d9120a8d8f1e505688cdd4eb456880a3353885dc4fbdec8ea14682b7e",
-      "size_bytes": 8153
-    },
-    {
-      "path": "tests/time_series_library_campaign/test_segrnn_checkpoint_contract.py",
-      "sha256": "7c48cb76d7f569671ad4af080c99a7f5775227a49f7f1f1d0147a78df80a6365",
-      "size_bytes": 4047
-    },
-    {
-      "path": "external/time-series-library/UPSTREAM_REVISION.json",
-      "sha256": "ad0ce92451a3597bc3a723281fd6b20225458d65c0118d059f15d395c3c50735",
-      "size_bytes": 1116
-    }
-  ],
-  "focused_validation": {
-    "compileall": "PASS",
-    "line_length_100": "PASS",
-    "pytest": "14 passed",
-    "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT"
-  },
-  "parent_head": "4bf67c6d879d89d1ee089933ea8a541b9d98abbd",
-  "project_pr": 54,
-  "schema_version": "1.0",
-  "status": "PARTIALLY_VERIFIED",
-  "upstream_revision": "4e938a1767106324dd753b2a44832bf870a0252e"
+  }
 }

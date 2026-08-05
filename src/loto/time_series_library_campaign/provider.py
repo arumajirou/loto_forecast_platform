@@ -20,6 +20,10 @@ from .data import (
     materialize_training_bundle,
     validate_frame,
 )
+from .frets_runtime import (
+    fit_save as frets_fit_save,
+    load_predict as frets_load_predict,
+)
 from .lightts_runtime import (
     fit_save as lightts_fit_save,
     load_predict as lightts_load_predict,
@@ -72,6 +76,10 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
         return segrnn_fit_save(request)
     if request.operation == Operation.SEGRNN_LOAD_PREDICT:
         return segrnn_load_predict(request)
+    if request.operation == Operation.FRETS_FIT_SAVE:
+        return frets_fit_save(request)
+    if request.operation == Operation.FRETS_LOAD_PREDICT:
+        return frets_load_predict(request)
     assert request.before_prediction_path is not None
     assert request.after_prediction_path is not None
     verification = verify_prediction_files(

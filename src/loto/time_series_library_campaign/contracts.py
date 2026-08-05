@@ -32,6 +32,8 @@ class Operation(StrEnum):
     LIGHTTS_LOAD_PREDICT = "lightts_load_predict"
     SEGRNN_FIT_SAVE = "segrnn_fit_save"
     SEGRNN_LOAD_PREDICT = "segrnn_load_predict"
+    FRETS_FIT_SAVE = "frets_fit_save"
+    FRETS_LOAD_PREDICT = "frets_load_predict"
     VERIFY_ROUNDTRIP = "verify_roundtrip"
 
 
@@ -94,6 +96,7 @@ class ProviderRequest(BaseModel):
     lightts_chunk_size: int = Field(default=24, ge=1, le=4096)
     lightts_allow_padding: bool = False
     segrnn_seg_len: int = Field(default=2, ge=1, le=4096)
+    frets_channel_independence: Literal["0", "1"] = "1"
     checkpoint_path: Path | None = None
     input_path: Path | None = None
     before_prediction_path: Path | None = None
@@ -119,11 +122,16 @@ class ProviderRequest(BaseModel):
             Operation.SEGRNN_FIT_SAVE,
             Operation.SEGRNN_LOAD_PREDICT,
         }
+        frets_ops = {
+            Operation.FRETS_FIT_SAVE,
+            Operation.FRETS_LOAD_PREDICT,
+        }
         load_ops = {
             Operation.DLINEAR_LOAD_PREDICT,
             Operation.TSMIXER_LOAD_PREDICT,
             Operation.LIGHTTS_LOAD_PREDICT,
             Operation.SEGRNN_LOAD_PREDICT,
+            Operation.FRETS_LOAD_PREDICT,
         }
         if self.operation in dlinear_ops and self.model_name != "DLinear":
             raise ValueError("DLinear operations require model_name=DLinear")
@@ -133,6 +141,8 @@ class ProviderRequest(BaseModel):
             raise ValueError("LightTS operations require model_name=LightTS")
         if self.operation in segrnn_ops and self.model_name != "SegRNN":
             raise ValueError("SegRNN operations require model_name=SegRNN")
+        if self.operation in frets_ops and self.model_name != "FreTS":
+            raise ValueError("FreTS operations require model_name=FreTS")
         if self.operation in lightts_ops:
             if self.d_model < 16:
                 raise ValueError("LightTS requires d_model >= 16")
@@ -154,7 +164,7 @@ class ProviderRequest(BaseModel):
                 raise ValueError("SegRNN requires pred_len divisible by segrnn_seg_len")
         if self.operation in load_ops and (
             self.checkpoint_path is None or self.input_path is None
-         ):
+        ):
             raise ValueError("load/predict requires checkpoint_path and input_path")
         if self.operation == Operation.VERIFY_ROUNDTRIP and (
             self.before_prediction_path is None or self.after_prediction_path is None

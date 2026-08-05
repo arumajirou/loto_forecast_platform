@@ -2,7 +2,7 @@
   "repository": "https://github.com/thuml/Time-Series-Library",
   "retrieved_at_utc": "2026-08-05T06:14:00Z",
   "revision": "4e938a1767106324dd753b2a44832bf870a0252e",
-  "scope": "Pinned provider contract; DLinear, TSMixer, LightTS, and SegRNN CPU-certified; no Foundation Model or Mamba certification",
+  "scope": "Pinned provider contract; DLinear, TSMixer, LightTS, SegRNN, and FreTS CPU-certified; no Foundation Model or Mamba certification",
   "tracked_blobs": {
     "data_provider/data_factory.py": "7fc458f69bc75032b799789b8b1581c80d98d46d",
     "data_provider/data_loader.py": "ea28fdccd272e5108c42aa079d7104d287be9745",
@@ -10,6 +10,7 @@
     "exp/exp_long_term_forecasting.py": "5c1d282eb6feed27b8ca4034c7268462fe26ebfe",
     "layers/Autoformer_EncDec.py": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
     "models/DLinear.py": "3f4d666a9ffe7fb6f58627ba43f1a9d3d9804d78",
+    "models/FreTS.py": "ca4e0b648db42a1846b7a0a9a661a39177f47005",
     "models/LightTS.py": "a2051e44d864ec4ec5e72e59660b98c30c93a902",
     "models/SegRNN.py": "afff1bc07dd14d227bbecdd36941d57f8aa8f63e",
     "models/TSMixer.py": "76884d467f17d64aa87d8e22cc9f0aa6231914cf",
