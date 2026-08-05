@@ -65,7 +65,7 @@ def test_cli_routes_source_and_predecessor_separately(
     assert captured["run_root"] == output.resolve()
 
 
-def test_cli_verify_uses_lineage_aware_wrapper(
+def test_cli_verify_uses_lineage_aware_compatibility_wrapper(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -76,7 +76,7 @@ def test_cli_verify_uses_lineage_aware_wrapper(
         return {"status": "PASS"}
 
     monkeypatch.setattr(cli, "load_config", lambda _path: FakeConfig())
-    monkeypatch.setattr(cli, "verify_run_with_lineage", fake_verify)
+    monkeypatch.setattr(cli, "verify_run_with_coverage", fake_verify)
     run_root = tmp_path / "prospective"
     monkeypatch.setattr(
         sys,
