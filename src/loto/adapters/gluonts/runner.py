@@ -125,7 +125,7 @@ def _persist_smoke(
     run_dir: Path,
 ) -> tuple[GluonTSProviderResponse, Path | None, str | None]:
     raw_smoke = response.metadata.get("deep_ar_cpu_smoke")
-    if raw_smoke is None or response.status is ProviderStatus.FAILED:
+    if raw_smoke is None:
         return response, None, None
     try:
         smoke = DeepARCPUSmokeResult.model_validate(raw_smoke)
