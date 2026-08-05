@@ -2,7 +2,7 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / LOCAL_CONTRACT_VERIFIED / REAL_RUNTIME_BLOCKED`
+`PARTIALLY_VERIFIED / LOCAL_CONTRACT_AND_PACKAGE_VERIFIED / REAL_RUNTIME_BLOCKED`
 
 ## P1-P4 foundation
 
@@ -112,8 +112,22 @@
 - provider failure retention and report SHA-256 tamper sensitivity: PASS;
 - compileall, AST parse, YAML parse, and line-length inspection: PASS.
 
-Documented focused increment runs total 108 tests. They were not all executed together in
-one environment, so this is not a single 108-test certification run.
+## Final deterministic handoff package
+
+- focused tests: 10 passed;
+- exact 12-document membership, order, and no-extra-file rule: PASS;
+- safe flat paths and traversal rejection: PASS;
+- `SHA256SUMS` generation, parsing, ordering, and tamper detection: PASS;
+- stale-checksum rejection before packaging: PASS;
+- byte-identical deterministic ZIP output: PASS;
+- fixed ZIP timestamps and normalized `0644` modes: PASS;
+- ZIP CRC, extraction, and source byte parity: PASS;
+- ZIP-level SHA-256: `9d50e9a362c78858b0636351ad6c0bd82765f8831d02829c0f752d1c326db041`;
+- content-manifest SHA-256: `96fae720cd597222951a80b796de05eca7c028d530144b4c9f05038bbadec796`;
+- compileall, AST parse, YAML parse, and line-length inspection: PASS.
+
+Documented focused increment runs total 118 tests. They were not all executed together in
+one environment, so this is not a single 118-test certification run.
 
 ## Blocked
 
