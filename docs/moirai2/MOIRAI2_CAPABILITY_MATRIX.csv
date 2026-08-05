@@ -13,7 +13,13 @@ separate_process_snapshot_reload,IMPLEMENTED_EXECUTION_PENDING,two real provider
 prediction_sha256_comparison,IMPLEMENTED,exact point and nine-quantile identity
 external_gpu_pid_uuid_vram,IMPLEMENTED_EXECUTION_PENDING,real CUDA evidence pending
 post_exit_gpu_pid_release,IMPLEMENTED_EXECUTION_PENDING,real CUDA evidence pending
+reviewed_lock_preflight,IMPLEMENTED_EXECUTION_PENDING,missing or mismatched uv.lock fails closed
+frozen_import_device_probe,IMPLEMENTED_EXECUTION_PENDING,exact imported versions and CUDA availability
+six_case_runtime_campaign,IMPLEMENTED_EXECUTION_PENDING,draw and calendar across three covariate modes
+serial_gpu_evidence_isolation,IMPLEMENTED,parallel case execution forbidden
+formal_all_case_gate,IMPLEMENTED,all six cases required for formal runtime certification
 fine_tuning,UPSTREAM_PATH_UNVERIFIED,out of current scope
+oof,NOT_OPENED,blocked until real P8A campaign pass
 holdout,NOT_OPENED,out of current scope
 prospective,NOT_OPENED,out of current scope
 commercial_promotion,BLOCKED_BY_LICENSE,fail closed
