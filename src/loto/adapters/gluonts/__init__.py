@@ -60,6 +60,20 @@ from loto.adapters.gluonts.p7b_contract import (
     P7BStageRecord,
     P7BStageState,
 )
+from loto.adapters.gluonts.p7c_analysis import (
+    P7CInputError,
+    build_remediation_plan as build_p7c_remediation_plan,
+    verify_p7b_input as verify_p7c_input,
+    write_remediation_outputs as write_p7c_remediation_outputs,
+)
+from loto.adapters.gluonts.p7c_contract import (
+    P7CInputIdentity,
+    P7CPriority,
+    P7CRemediationClass,
+    P7CRemediationItem,
+    P7CRemediationPlan,
+    P7CRerunScope,
+)
 from loto.adapters.gluonts.protocol import (
     ArgumentState,
     DatasetItem,
@@ -137,6 +151,13 @@ __all__ = [
     "P7BStage",
     "P7BStageRecord",
     "P7BStageState",
+    "P7CInputError",
+    "P7CInputIdentity",
+    "P7CPriority",
+    "P7CRemediationClass",
+    "P7CRemediationItem",
+    "P7CRemediationPlan",
+    "P7CRerunScope",
     "P7CertificationStatus",
     "P7EvidenceState",
     "P7FailureCategory",
@@ -161,6 +182,7 @@ __all__ = [
     "atomic_write_bytes",
     "atomic_write_json",
     "audit_p7_lane",
+    "build_p7c_remediation_plan",
     "build_target_audit",
     "certify_predictor_lifecycle",
     "fit_result_sha256",
@@ -181,5 +203,7 @@ __all__ = [
     "sha256_json",
     "smoke_sha256",
     "verify_checksum_inventory",
+    "verify_p7c_input",
+    "write_p7c_remediation_outputs",
     "write_target_audit",
 ]

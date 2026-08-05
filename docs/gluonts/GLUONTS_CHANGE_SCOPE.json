@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "P7B_TARGET_MACHINE_SUPERVISION",
+  "phase": "P7C_RESULT_TRIAGE_AND_REMEDIATION",
   "status": "PARTIALLY_VERIFIED",
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
   "branch": "feat/gluonts-probabilistic-contract-v1",
@@ -8,8 +8,8 @@
     "environments/gluonts-compat/**",
     "environments/gluonts-latest/**",
     "environments/gluonts-p7-target-machine.sh",
-    "environments/gluonts-p7b-target-machine.sh",
-    "environments/gluonts-p7b-supervisor.py",
+    "environments/gluonts-p7b-*.sh",
+    "environments/gluonts-p7c-*.sh",
     "environments/gluonts_p7b/**",
     "src/loto/adapters/gluonts/**",
     "src/loto/gluonts_campaign/**",
@@ -35,62 +35,51 @@
     "runtime_certify",
     "p6_campaign",
     "p7_cross_lane_audit",
-    "p7b_supervised_target_execution"
+    "p7b_target_machine_supervision",
+    "p7c_result_triage",
+    "p7c_remediation_queue",
+    "p8_eligibility_gate"
   ],
   "model_count_per_lane": 9,
   "maximum_model_lane_lifecycles": 18,
   "outer_workers_per_lane": 8,
   "threads_per_job": 1,
   "certification_device": "cpu",
-  "p7b_stages": [
-    "preflight",
-    "compat_bootstrap",
-    "latest_bootstrap",
-    "audit",
-    "finalize"
+  "p7c_remediation_classes": [
+    "VERIFIED",
+    "EVIDENCE_REPAIR",
+    "ENVIRONMENT_REPAIR",
+    "IMPLEMENTATION_REPAIR",
+    "TRANSIENT_RETRY",
+    "MANUAL_TRIAGE"
   ],
-  "p7b_stage_states": [
-    "PENDING",
-    "RUNNING",
-    "COMPLETED",
-    "TIMED_OUT",
-    "INTERRUPTED",
-    "FAILED_TO_START",
-    "SKIPPED"
-  ],
-  "p7b_controls": [
-    "exclusive output flock",
-    "non-empty output refusal",
-    "clean tracked-worktree requirement",
-    "Git branch and commit identity",
-    "source SHA-256 identity",
-    "per-stage timeout",
-    "process-group termination",
-    "signal-safe interruption",
-    "atomic stage journal",
-    "resume without rerunning completed stages",
-    "partial evidence verification and archival",
-    "GPU PID process-name and VRAM JSONL monitor",
-    "final immutable SHA-256 inventory"
-  ],
-  "p7b_artifacts": [
-    "RUN_ID",
-    "p7b_preflight.json",
-    "p7b_execution_journal.json",
-    "p7b_execution_manifest.json",
+  "p7c_required_inputs": [
     "P7B_EXECUTION_COMPLETE",
     "P7B_EXECUTION_SHA256SUMS",
-    "P7B_PARTIAL_SHA256SUMS",
-    "gpu_process_monitor.jsonl",
-    "compat/**",
-    "latest/**",
-    "audit/**",
-    "history/**"
+    "p7b_execution_manifest.json",
+    "p7b_execution_journal.json",
+    "audit/P7_SHA256SUMS",
+    "audit/p7_target_machine_audit.json",
+    "audit/p7_failure_matrix.json",
+    "audit/p7_artifact_manifest.json"
   ],
-  "p7b_focused_tests": 15,
-  "fake_target_machine_end_to_end": "PASS",
+  "p7c_artifacts": [
+    "p7c_remediation_plan.json",
+    "p7c_remediation_queue.tsv",
+    "p7c_remediation_report.md",
+    "p7c_artifact_manifest.json",
+    "P7C_SHA256SUMS",
+    "P7C_ORCHESTRATION_SHA256SUMS"
+  ],
+  "p8_gate": {
+    "evidence_state": "VALID",
+    "certification_status": "VERIFIED",
+    "verified_model_lane_lifecycles": 18,
+    "p8_eligible": true
+  },
+  "p7c_focused_tests": 16,
   "real_runtime_claims": "EXECUTION_PENDING",
   "formally_verified_model_lane_lifecycles": 0,
-  "next_phase": "P7C_REAL_TARGET_MACHINE_EXECUTION_AND_EVIDENCE_BACKED_REMEDIATION",
+  "next_phase": "P7D_TARGET_MACHINE_EXECUTION_AND_EVIDENCE_BACKED_REMEDIATION",
   "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
 }
