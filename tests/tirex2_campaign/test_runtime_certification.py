@@ -99,3 +99,33 @@ def test_compare_responses_rejects_prediction_drift() -> None:
     assert result.status == "FAIL"
     assert "point_forecast_match" in result.blockers
     assert "all_quantiles_match" in result.blockers
+
+
+def test_provider_process_returns_nonzero_and_structured_error(tmp_path) -> None:
+    import json
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    repository_root = Path(__file__).resolve().parents[2]
+    request_path = tmp_path / "invalid-request.json"
+    response_path = tmp_path / "response.json"
+    request_path.write_text('{"schema_version": 2}\n', encoding="utf-8")
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(repository_root / "scripts" / "run_tirex2_provider.py"),
+            "--request",
+            str(request_path),
+            "--response",
+            str(response_path),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    payload = json.loads(response_path.read_text(encoding="utf-8"))
+    assert completed.returncode == 1
+    assert payload["status"] == "ERROR"
+    assert payload["error_type"] == "ValidationError"
