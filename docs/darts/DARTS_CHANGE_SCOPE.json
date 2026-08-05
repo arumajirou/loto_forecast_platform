@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "scope_id": "darts-forecasting-contract-v1",
+  "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "branch": "feat/darts-forecasting-contract-v1",
+  "target_version": "darts==0.46.1",
+  "implemented_phases": ["P1_PARTIAL", "P2", "P3", "P4_MINIMUM"],
+  "owned_paths": [
+    "environments/darts-notorch/**",
+    "environments/darts-torch/**",
+    "scripts/run_darts_provider.py",
+    "src/loto/darts_campaign/**",
+    "tests/darts_campaign/**",
+    "configs/darts_campaign/**",
+    "docs/darts/**"
+  ],
+  "forbidden_paths_unchanged": [
+    "pyproject.toml",
+    "uv.lock",
+    "src/loto/models/workers.py",
+    "src/loto/models/catalog.py",
+    "src/loto/models/catalog_full.py",
+    ".github/workflows/**",
+    "README.md"
+  ],
+  "runtime_status": "REAL_DARTS_RUNTIME_BLOCKED",
+  "merge": "USER_APPROVAL_REQUIRED"
+}
