@@ -5,6 +5,7 @@ from loto.sktime_campaign.protocol import (
     ProviderRequest,
     ProviderResponse,
     ProviderStatus,
+    SmokeModelId,
 )
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "ProviderRequest",
     "ProviderResponse",
     "ProviderStatus",
+    "SmokeModelId",
 ]
