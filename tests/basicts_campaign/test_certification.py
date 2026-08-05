@@ -12,6 +12,9 @@ from loto.basicts_campaign.certification import (
     certify_p0,
     verify_provider_bundle,
 )
+from loto.basicts_campaign.dlinear_runtime_provenance import (
+    DLINEAR_MODULE_CONTRACTS,
+)
 
 
 def _sha256(path: Path) -> str:
@@ -22,6 +25,37 @@ def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def _dlinear_module_evidence(*, bad_path: bool = False) -> dict[str, object]:
+    root = "/venv/site-packages/"
+    modules = []
+    for label, module_name, entry, symbol in DLINEAR_MODULE_CONTRACTS:
+        path = root + entry
+        if bad_path and label == "dlinear_arch":
+            path = "/shadow/dlinear_arch.py"
+        modules.append(
+            {
+                "label": label,
+                "module_name": module_name,
+                "required_symbol": symbol,
+                "symbol_module": module_name,
+                "distribution_entry": entry,
+                "distribution_path": path,
+                "import_spec_origin": path,
+                "loaded_module_file": path,
+                "record_status": "PASS",
+                "record_hash_mode": "sha256",
+                "record_hash_value": "C" * 43,
+                "record_size_bytes": 200,
+                "module_file_sha256": "d" * 64,
+                "module_already_loaded": False,
+            }
+        )
+    return {
+        "dlinear_module_provenance_status": "PASS",
+        "dlinear_runtime_modules": modules,
+    }
+
+
 def _write_bundle(
     directory: Path,
     operation: str,
@@ -29,6 +63,7 @@ def _write_bundle(
     identity_commit: str = EXPECTED_UPSTREAM_REVISION,
     import_origin: str = "/venv/site-packages/basicts/__init__.py",
     package_record_status: str = "PASS",
+    bad_dlinear_module_path: bool = False,
 ) -> None:
     directory.mkdir(parents=True)
     if operation == "identity":
@@ -83,6 +118,7 @@ def _write_bundle(
             "state_dict_finite": True,
             "save_load_exact_match": True,
             "prediction_shape": [1, 1, 3],
+            **_dlinear_module_evidence(bad_path=bad_dlinear_module_path),
         }
         (directory / "dlinear_state.pt").write_bytes(b"state")
 
@@ -154,6 +190,7 @@ def test_certify_p0_accepts_complete_evidence(tmp_path: Path) -> None:
     assert report["certified"]["installed_package_git_provenance"] is True
     assert report["certified"]["installed_record_integrity"] is True
     assert report["certified"]["import_origin_bound_to_distribution"] is True
+    assert report["certified"]["dlinear_module_origin_bound_to_distribution"] is True
 
 
 def test_verify_provider_bundle_rejects_tampering(tmp_path: Path) -> None:
@@ -196,6 +233,58 @@ def test_identity_bundle_rejects_record_integrity_drift(tmp_path: Path) -> None:
 
     with pytest.raises(CertificationError, match="package_init_record_status"):
         verify_provider_bundle(directory, "identity")
+
+
+def test_dlinear_bundle_rejects_module_path_drift(tmp_path: Path) -> None:
+    directory = tmp_path / "dlinear"
+    _write_bundle(
+        directory,
+        "dlinear_smoke",
+        bad_dlinear_module_path=True,
+    )
+
+    with pytest.raises(CertificationError, match="path suffix mismatch"):
+        verify_provider_bundle(directory, "dlinear_smoke")
+
+
+def test_dlinear_bundle_rejects_module_status_drift(tmp_path: Path) -> None:
+    directory = tmp_path / "dlinear"
+    _write_bundle(directory, "dlinear_smoke")
+    response_path = directory / "response.json"
+    response = json.loads(response_path.read_text(encoding="utf-8"))
+    response["evidence"]["dlinear_module_provenance_status"] = "FAILED"
+    _write_json(response_path, response)
+
+    evidence_files = sorted(
+        path
+        for path in directory.iterdir()
+        if path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+    )
+    manifest = {
+        "schema_version": "1.0",
+        "status": "PASS",
+        "operation": "dlinear_smoke",
+        "files": [
+            {
+                "path": path.name,
+                "size_bytes": path.stat().st_size,
+                "sha256": _sha256(path),
+            }
+            for path in evidence_files
+        ],
+    }
+    _write_json(directory / "ARTIFACT_MANIFEST.json", manifest)
+    (directory / "SHA256SUMS").write_text(
+        "".join(
+            f"{_sha256(path)}  {path.name}\n"
+            for path in sorted(directory.iterdir())
+            if path.name != "SHA256SUMS"
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(CertificationError, match="status is not PASS"):
+        verify_provider_bundle(directory, "dlinear_smoke")
 
 
 def test_certify_p0_rejects_lock_without_frozen_revision(tmp_path: Path) -> None:
