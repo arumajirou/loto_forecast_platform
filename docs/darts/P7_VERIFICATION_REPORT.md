@@ -12,10 +12,12 @@ Executed locally:
 - CUDA parameter and prediction-device checks;
 - GPU PID and VRAM/CUDA-memory evidence checks;
 - CPU fallback rejection with durable evidence;
+- requested/effective accelerator mismatch rejection;
+- package-level Darts import failure retained for every requested model;
 - per-model dependency and runtime failure isolation;
 - prediction position, horizon, and finite-value checks;
 - raw pandas frame immutability;
-- focused tests: 10 passed;
+- focused tests: 11 passed;
 - compileall, AST parse, YAML/JSON parse, and 100-character line inspection: PASS.
 
 Not executed:
