@@ -345,12 +345,15 @@ def _write_table(frame: pd.DataFrame, root: Path, stem: str) -> dict[str, Any]:
     }
 
 
-def _seed_summary(metrics: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+def _seed_summary(
+    metrics: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     primary = metrics[
         (metrics["complete_draw"] & metrics["variant"].eq("reconciled"))
         | (~metrics["complete_draw"] & metrics["variant"].eq("rounded"))
     ].copy()
     group_columns = ["source_type", "model_name", "baseline_name", "track"]
+    seed_columns = [*group_columns, "seed"]
     metric_columns = [
         "hit_pm1",
         "all_positions_hit_pm1",
@@ -358,10 +361,30 @@ def _seed_summary(metrics: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
         "mse",
         "rmse",
     ]
-    aggregations = {metric: ["mean", "std", "min", "max"] for metric in metric_columns}
-    summary = primary.groupby(group_columns, dropna=False).agg(aggregations)
+    per_seed = (
+        primary.groupby(seed_columns, dropna=False)[metric_columns]
+        .mean()
+        .reset_index()
+    )
+    aggregations = {
+        metric: ["mean", "std", "var", "min", "max"]
+        for metric in metric_columns
+    }
+    summary = per_seed.groupby(group_columns, dropna=False).agg(aggregations)
     summary.columns = [f"{metric}_{stat}" for metric, stat in summary.columns]
     summary = summary.reset_index()
+    seed_counts = (
+        per_seed.groupby(group_columns, dropna=False)
+        .size()
+        .rename("seed_count")
+        .reset_index()
+    )
+    summary = summary.merge(
+        seed_counts,
+        on=group_columns,
+        how="left",
+        validate="one_to_one",
+    )
     summary["worst_seed_hit_pm1"] = summary["hit_pm1_min"]
     complete = summary[summary["track"].ne("u_local")].copy()
     ranking = complete.sort_values(
@@ -376,7 +399,7 @@ def _seed_summary(metrics: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
         kind="stable",
     ).reset_index(drop=True)
     ranking.insert(0, "rank", np.arange(1, len(ranking) + 1))
-    return summary, ranking
+    return per_seed, summary, ranking
 
 
 def _baseline_comparison(ranking: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any] | None]:
