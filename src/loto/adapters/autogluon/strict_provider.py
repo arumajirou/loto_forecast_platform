@@ -147,20 +147,20 @@ def run_provider_v2_strict(
     runtime: ProviderRuntime | None = None,
 ) -> dict[str, Any]:
     if has_covariate_payload(payload):
-        from .covariate_provider import run_provider_v2_covariates
+        from .covariate_capability_provider import run_provider_v2_covariates_guarded
 
         try:
             request = ProviderRequestV2Covariates.model_validate(payload)
         except ValidationError:
-            return run_provider_v2_covariates(payload, runtime=runtime)
+            return run_provider_v2_covariates_guarded(payload, runtime=runtime)
         try:
             validate_protocol_v2_preflight(request)
             validate_autogluon_1_5_api_contract(request)
         except ExecutionPlanError:
-            return run_provider_v2_covariates(payload, runtime=runtime)
+            return run_provider_v2_covariates_guarded(payload, runtime=runtime)
         except StrictPreflightError as exc:
             return _strict_error(payload, exc)
-        return run_provider_v2_covariates(payload, runtime=runtime)
+        return run_provider_v2_covariates_guarded(payload, runtime=runtime)
 
     try:
         request = ProviderRequestV2.model_validate(payload)
