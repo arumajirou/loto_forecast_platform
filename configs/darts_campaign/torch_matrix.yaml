@@ -1,0 +1,38 @@
+schema_version: 1
+run_id: darts-p7-torch-contract
+series_layout: position_global_sequence
+horizon: 1
+models:
+  - public_name: NBEATSModel
+  - public_name: NHiTSModel
+  - public_name: TCNModel
+  - public_name: TFTModel
+  - public_name: DLinearModel
+  - public_name: NLinearModel
+  - public_name: TiDEModel
+  - public_name: TSMixerModel
+  - public_name: TransformerModel
+  - public_name: RNNModel
+    model_args:
+      model: RNN
+training:
+  input_chunk_length: 24
+  output_chunk_length: 1
+  output_chunk_shift: 0
+  n_epochs: 1
+  batch_size: 32
+  random_state: 1
+  save_checkpoints: true
+  force_reset: true
+device:
+  requested_accelerator: gpu
+  devices: [0]
+  allow_cpu_fallback: false
+  require_gpu_pid: true
+  require_vram_evidence: true
+parallel:
+  outer_workers: 8
+  max_gpu_jobs: 1
+  max_cpu_jobs: 7
+fit_args: {}
+predict_args: {}
