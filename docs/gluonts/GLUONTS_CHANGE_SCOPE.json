@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "P2_PROVIDER_PROTOCOL",
+  "phase": "P3_RUNTIME_INVENTORY",
   "status": "PARTIALLY_VERIFIED",
   "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
   "branch": "feat/gluonts-probabilistic-contract-v1",
@@ -28,6 +28,23 @@
     "model_discovery",
     "distribution_discovery",
     "runtime_certify"
+  ],
+  "inventory_categories": [
+    "PYTORCH_ESTIMATOR",
+    "NATIVE_PREDICTOR",
+    "EXTENSION",
+    "DISTRIBUTION_OUTPUT"
+  ],
+  "inventory_checks": [
+    "import",
+    "export",
+    "class",
+    "signature",
+    "constructor",
+    "fit",
+    "predict",
+    "serialize",
+    "device"
   ],
   "runtime_claims": "EXECUTION_PENDING",
   "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
