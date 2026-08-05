@@ -12,8 +12,8 @@ uv run loto-hierarchicalforecast-certify
 
 The console script resolves to
 `loto.reconciliation.package_certification:main`. It executes the runtime matrix, verifies the
-written evidence, creates a deterministic ZIP, reopens and verifies that ZIP, and writes a
-SHA-256 sidecar. The module-only form remains available for diagnostics:
+written evidence, creates a deterministic immutable ZIP, reopens and verifies that ZIP, and
+writes a SHA-256 sidecar. The module-only form remains available for diagnostics:
 
 ```bash
 uv run python -m loto.reconciliation.runtime_certification
@@ -58,8 +58,10 @@ tolerance.
 | `VERIFIED` | 0 | Exact version, every formal case, and ZIP verification passed |
 | `BLOCKED_DEPENDENCY` | 2 | The optional package could not be imported; evidence ZIP is still written |
 | `FAILED_VERSION_MISMATCH` | 2 | Distribution/module version evidence is inconsistent or differs from `1.5.1`; evidence ZIP is still written |
-| `FAILED_RUNTIME` | 2 | At least one method returned an unexpected status, shape, non-finite value, incoherence, or exception; evidence ZIP is still written |
-| `FAILED_PACKAGING` | 3 | Required files, hashes, manifest, safe paths, ZIP contents, or ZIP verification failed |
+| `FAILED_RUNTIME` | 2 | A method returned an unexpected status, shape, non-finite value, incoherence, or exception; evidence ZIP is still written |
+| `INVALID_CONFIGURATION` | 3 | The requested games, dimensions, seed, version, or tolerance failed configuration validation |
+| `FAILED_CERTIFICATION_HARNESS` | 3 | The certification harness failed before a packageable certification result was returned |
+| `FAILED_PACKAGING` | 3 | Required files, hashes, manifest, immutable output, safe paths, ZIP metadata, contents, or verification failed |
 
 A method exception does not terminate the matrix. The harness records the exception and
 traceback, continues the remaining cases, and returns `FAILED_RUNTIME`.
@@ -82,7 +84,16 @@ The package layer then creates sibling files:
 
 The ZIP contains the five run artifacts plus `PACKAGE_MANIFEST.json`. ZIP member paths are
 restricted to the Run ID prefix, duplicate members and path traversal are rejected, and every
-archived file is checked again against its recorded byte count and SHA-256.
+archived file is checked again against its recorded byte count and SHA-256. Member timestamps,
+Unix modes, creator system, and storage method are fixed and verified.
+
+A package is fully verified while it still has a temporary name. It is promoted only after that
+verification passes. Existing ZIP and sidecar files are immutable:
+
+- an identical existing ZIP is reused without replacement
+- a missing sidecar may be created for an identical verified ZIP
+- a different existing ZIP or sidecar is rejected and never overwritten
+- a failed temporary ZIP is removed and is never published as the final artifact
 
 The evidence records the run ID, UTC timestamps, validated configuration and hash, synthetic
 input data hash, Git commit, source-code hashes, package versions, process ID, CPU-only device
