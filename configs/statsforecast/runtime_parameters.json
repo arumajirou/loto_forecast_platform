@@ -1,0 +1,17 @@
+{
+  "ARIMA": {
+    "order": [1, 0, 0]
+  },
+  "AutoRegressive": {
+    "lags": 1
+  },
+  "ConformalSeasonalPool": {
+    "n_samples": 200,
+    "season_length": 4
+  },
+  "SklearnModel": {},
+  "TSB": {
+    "alpha_d": 0.3,
+    "alpha_p": 0.3
+  }
+}
