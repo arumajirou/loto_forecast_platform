@@ -39,8 +39,27 @@ def _preflight(*, python_found: bool, github: bool = True, index: bool = True) -
     return payload
 
 
+def _write_git_provenance(run_dir: Path) -> None:
+    payload: dict[str, object] = {
+        "schema_version": "merlion-bootstrap-git-provenance-v1",
+        "created_at_utc": "2026-08-05T00:00:00+00:00",
+        "status": "CLEAN",
+        "root": "/repo",
+        "head_sha": "a" * 40,
+        "branch": "feat/merlion-time-series-intelligence-v1",
+        "changes": [],
+        "blockers": [],
+    }
+    payload["report_sha256"] = _canonical_sha256(payload)
+    (run_dir / "GIT_PROVENANCE.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
 def _write_blocked_run(run_dir: Path, *, run_id: str) -> None:
     run_dir.mkdir(parents=True)
+    _write_git_provenance(run_dir)
     preflight = _preflight(python_found=False, github=False, index=False)
     plan = build_resume_plan(preflight, run_dir.parent, run_id=run_id)
     (run_dir / "PREFLIGHT.json").write_text(
@@ -89,6 +108,7 @@ def test_pass_evidence_requires_audited_lock_and_is_reproducible(tmp_path: Path)
     env_dir = tmp_path / "env"
     run_dir.mkdir()
     env_dir.mkdir()
+    _write_git_provenance(run_dir)
     preflight = _preflight(python_found=True)
     (run_dir / "PREFLIGHT.json").write_text(
         json.dumps(preflight, indent=2, sort_keys=True) + "\n",
