@@ -22,30 +22,45 @@ class FakeTimeSeriesDataFrame:
 class FakePredictor:
     instances: list["FakePredictor"] = []
     loaded_paths: list[str] = []
+    saved_model_names: dict[str, list[str]] = {}
     prediction_horizon = 2
     prediction_items = ("position-1", "position-2", "position-3")
     bad_shape = False
+    last_predict_seed: int | None = None
+    loaded_model_names_override: list[str] | None = None
 
     def __init__(self, **kwargs):
         self.init_kwargs = kwargs
         self.fit_kwargs = None
+        self._model_names = ["Naive"]
         self.model_best = "Naive"
         type(self).instances.append(self)
 
     @classmethod
     def load(cls, path: str):
         cls.loaded_paths.append(path)
-        return cls(path=path)
+        predictor = cls(path=path)
+        predictor._model_names = list(
+            cls.loaded_model_names_override
+            if cls.loaded_model_names_override is not None
+            else cls.saved_model_names[path]
+        )
+        predictor.model_best = predictor._model_names[0]
+        return predictor
 
     def fit(self, data, **kwargs):
         self.fit_data = data
         self.fit_kwargs = kwargs
-        Path(self.init_kwargs["path"]).joinpath("predictor.marker").write_text(
-            "saved\n", encoding="utf-8"
-        )
+        model_name = next(iter(kwargs["hyperparameters"]))
+        self._model_names = [model_name]
+        self.model_best = model_name
+        artifact = Path(self.init_kwargs["path"])
+        artifact.joinpath("predictor.marker").write_text("saved\n", encoding="utf-8")
+        type(self).saved_model_names[str(artifact)] = list(self._model_names)
         return self
 
-    def predict(self, data):
+    def predict(self, data, *, random_seed):
+        type(self).last_predict_seed = random_seed
         items = self.prediction_items
         horizon = self.prediction_horizon
         if self.bad_shape:
@@ -66,26 +81,31 @@ class FakePredictor:
         return pd.DataFrame(rows).set_index(["item_id", "timestamp"])
 
     def model_names(self):
-        return ["Naive"]
+        return list(self._model_names)
 
 
-def _runtime() -> ProviderRuntime:
+def _runtime(*, version: str = "1.5.0") -> ProviderRuntime:
     return ProviderRuntime(
         predictor_class=FakePredictor,
         time_series_data_frame_class=FakeTimeSeriesDataFrame,
         cuda_available=False,
-        library_version="1.5.0",
+        library_version=version,
     )
 
 
-def _payload(artifact_dir: Path, *, operation: str = "fit_predict_save") -> dict:
+def _payload(
+    artifact_dir: Path,
+    *,
+    operation: str = "fit_predict_save",
+    model_id: str = "Naive",
+) -> dict:
     return {
         "schema_version": 2,
         "provider_version": 2,
         "run_id": "p4-provider-test",
         "operation": operation,
         "execution_mode": "explicit_single_model",
-        "model_ids": ["Naive"],
+        "model_ids": [model_id],
         "artifact_dir": str(artifact_dir),
         "history": [
             {
@@ -158,9 +178,12 @@ def _payload(artifact_dir: Path, *, operation: str = "fit_predict_save") -> dict
 def setup_function() -> None:
     FakePredictor.instances.clear()
     FakePredictor.loaded_paths.clear()
+    FakePredictor.saved_model_names.clear()
     FakePredictor.prediction_horizon = 2
     FakePredictor.prediction_items = ("position-1", "position-2", "position-3")
     FakePredictor.bad_shape = False
+    FakePredictor.last_predict_seed = None
+    FakePredictor.loaded_model_names_override = None
 
 
 def test_fit_predict_save_executes_explicit_model_and_persists_contract(tmp_path) -> None:
@@ -178,7 +201,10 @@ def test_fit_predict_save_executes_explicit_model_and_persists_contract(tmp_path
     }
     assert response["metadata"]["prediction_shape"] == [3, 2]
     assert response["metadata"]["finite"] is True
+    assert response["metadata"]["model_identity_verified"] is True
+    assert response["metadata"]["prediction_random_seed"] == 1
     assert response["runtime_evidence"]["evidence_status"] == "PARTIAL"
+    assert FakePredictor.last_predict_seed == 1
 
     predictor = FakePredictor.instances[0]
     assert predictor.init_kwargs["prediction_length"] == 2
@@ -200,12 +226,17 @@ def test_fit_predict_save_executes_explicit_model_and_persists_contract(tmp_path
     assert len(context["request_sha256"]) == 64
     assert len(context["timeline_mapping_sha256"]) == 64
     assert len(context["geometry_sha256"]) == 64
+    assert context["runtime_snapshot"]["library_version"] == "1.5.0"
+    assert context["runtime_snapshot"]["model_identity"]["verified"] is True
 
 
-def test_load_predict_uses_saved_predictor(tmp_path) -> None:
+def test_load_predict_uses_saved_predictor_without_overwriting_context(tmp_path) -> None:
     artifact_dir = tmp_path / "artifact"
-    artifact_dir.mkdir()
-    (artifact_dir / "predictor.marker").write_text("saved\n", encoding="utf-8")
+    fit_response = run_provider_v2(_payload(artifact_dir), runtime=_runtime())
+    assert fit_response["status"] == "OK"
+    context_path = artifact_dir / "loto_provider_context_v2.json"
+    original_context = context_path.read_bytes()
+
     response = run_provider_v2(
         _payload(artifact_dir, operation="load_predict"),
         runtime=_runtime(),
@@ -213,6 +244,11 @@ def test_load_predict_uses_saved_predictor(tmp_path) -> None:
     assert response["status"] == "OK"
     assert FakePredictor.loaded_paths == [str(artifact_dir)]
     assert len(response["predictions"]) == 6
+    assert context_path.read_bytes() == original_context
+    assert (
+        response["metadata"]["saved_context_sha256"]
+        == fit_response["metadata"]["saved_context_sha256"]
+    )
 
 
 def test_nonempty_artifact_directory_is_rejected_for_fit(tmp_path) -> None:
@@ -250,11 +286,60 @@ def test_unknown_request_field_is_rejected_by_pydantic_contract(tmp_path) -> Non
 def test_quantile_column_mismatch_fails_closed(tmp_path, monkeypatch) -> None:
     original_predict = FakePredictor.predict
 
-    def predict_without_all_quantiles(self, data):
-        frame = original_predict(self, data).reset_index()
+    def predict_without_all_quantiles(self, data, *, random_seed):
+        frame = original_predict(self, data, random_seed=random_seed).reset_index()
         return frame.drop(columns=["0.9"]).set_index(["item_id", "timestamp"])
 
     monkeypatch.setattr(FakePredictor, "predict", predict_without_all_quantiles)
     response = run_provider_v2(_payload(tmp_path / "artifact"), runtime=_runtime())
     assert response["status"] == "ERROR"
     assert response["error"]["code"] == "PREDICTION_CONTRACT_FAILED"
+
+
+def test_load_rejects_different_requested_model_before_pickle_load(tmp_path) -> None:
+    artifact_dir = tmp_path / "artifact"
+    assert run_provider_v2(_payload(artifact_dir), runtime=_runtime())["status"] == "OK"
+    response = run_provider_v2(
+        _payload(artifact_dir, operation="load_predict", model_id="Theta"),
+        runtime=_runtime(),
+    )
+    assert response["status"] == "ERROR"
+    assert response["error"]["code"] == "ARTIFACT_MODEL_ID_MISMATCH"
+    assert FakePredictor.loaded_paths == []
+
+
+def test_load_rejects_tampered_plan_before_pickle_load(tmp_path) -> None:
+    artifact_dir = tmp_path / "artifact"
+    assert run_provider_v2(_payload(artifact_dir), runtime=_runtime())["status"] == "OK"
+    plan_path = artifact_dir / "loto_execution_plan_v2.json"
+    plan = json.loads(plan_path.read_text(encoding="utf-8"))
+    plan["selected_model_ids"] = ["Theta"]
+    plan_path.write_text(json.dumps(plan), encoding="utf-8")
+    response = run_provider_v2(
+        _payload(artifact_dir, operation="load_predict"),
+        runtime=_runtime(),
+    )
+    assert response["status"] == "ERROR"
+    assert response["error"]["code"] == "ARTIFACT_CONTEXT_PLAN_MISMATCH"
+    assert FakePredictor.loaded_paths == []
+
+
+def test_runtime_version_mismatch_fails_before_fit(tmp_path) -> None:
+    response = run_provider_v2(
+        _payload(tmp_path / "artifact"),
+        runtime=_runtime(version="1.4.0"),
+    )
+    assert response["status"] == "ERROR"
+    assert response["error"]["code"] == "RUNTIME_VERSION_MISMATCH"
+
+
+def test_loaded_model_names_must_match_saved_snapshot(tmp_path) -> None:
+    artifact_dir = tmp_path / "artifact"
+    assert run_provider_v2(_payload(artifact_dir), runtime=_runtime())["status"] == "OK"
+    FakePredictor.loaded_model_names_override = ["Theta"]
+    response = run_provider_v2(
+        _payload(artifact_dir, operation="load_predict"),
+        runtime=_runtime(),
+    )
+    assert response["status"] == "ERROR"
+    assert response["error"]["code"] == "MODEL_IDENTITY_NOT_VERIFIED"
