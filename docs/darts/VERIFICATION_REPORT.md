@@ -59,13 +59,29 @@
 - MLForecast parity SHA-256 stability and tamper sensitivity: PASS;
 - compileall, AST parse, YAML parse, and 100-character line inspection: PASS.
 
+## P7 Torch increment
+
+- focused Torch contract tests: 10 passed;
+- ten required Torch identities: PASS;
+- shared chunk/epoch/batch/seed/Lightning trainer contract: PASS;
+- serialized `max_gpu_jobs=1` policy: PASS;
+- runtime object identity resolver requirement: PASS;
+- position-local and global-sequence fake-runtime execution: PASS;
+- CUDA parameter/prediction device evidence checks: PASS;
+- GPU PID and VRAM/CUDA-memory evidence requirements: PASS;
+- CPU fallback rejection with retained evidence: PASS;
+- per-model dependency/runtime failure isolation: PASS;
+- prediction shape/finite and raw-frame immutability: PASS;
+- compileall, AST parse, YAML/JSON parse, and line-length checks: PASS.
+
 ## Blocked
 
 - Ruff executable was absent and the configured package registry did not expose Ruff;
 - `darts==0.46.1` was not available from the configured registry;
 - GitHub tag dependency resolution failed;
 - no environment `uv.lock` could be generated;
-- real Darts Local/Regression discovery, OOF, persistence, and GPU certification remain pending;
+- real Darts Local/Regression/Torch execution, OOF, persistence, and GPU certification
+  remain pending;
 - the latest GitHub Actions failure is not treated as a code failure without usable step logs.
 
 No real Darts runtime or accuracy claim is inferred from fake-runtime and contract tests.
