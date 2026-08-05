@@ -53,6 +53,7 @@ def fitted_auto_dlinear() -> dict[str, Any]:
             "input_size": 8,
             "max_steps": 2,
             "val_check_steps": 1,
+            "log_every_n_steps": 1,
             "hist_exog_list": [],
         }
 
