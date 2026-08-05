@@ -41,5 +41,6 @@ trap finish EXIT
     --snapshot "$SNAPSHOT" \
     --sample-counts 1,3,20,50,100 \
     --replay-samples 20 \
+    --case-timeout 1800 \
     --seed 42
 } 2>&1 | tee "$LOG"
