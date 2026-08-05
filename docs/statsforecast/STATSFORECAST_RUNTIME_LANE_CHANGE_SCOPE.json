@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN",
+  "stacked_base_branch": "feat/statsforecast-core-model-contract-v1",
+  "allowed_paths": [
+    "environments/statsforecast-py313/**",
+    "scripts/run_statsforecast_runtime_lane.py",
+    "src/loto/statsforecast/runtime_lane.py",
+    "src/loto/statsforecast/runtime_lane_admission.py",
+    "src/loto/statsforecast/runtime_lane_artifacts.py",
+    "src/loto/statsforecast/runtime_lane_execution.py",
+    "src/loto/statsforecast/runtime_lane_target.py",
+    "src/loto/statsforecast/runtime_lane_wheel_policy.py",
+    "tests/statsforecast/test_runtime_lane.py",
+    "tests/statsforecast/test_runtime_lane_admission.py",
+    "configs/statsforecast/release_manifest.json",
+    "docs/statsforecast/RUNTIME_LANE_RUNBOOK.md",
+    "docs/statsforecast/RUNTIME_ADMISSION.md",
+    "docs/statsforecast/TARGET_HOST_EXECUTION.md",
+    "docs/statsforecast/STATSFORECAST_RUNTIME_LANE_CHANGE_SCOPE.json",
+    "src/loto/statsforecast/runtime_lane_end_to_end.py",
+    "tests/statsforecast/test_runtime_lane_end_to_end.py",
+    "docs/statsforecast/RUNTIME_END_TO_END.md",
+    "src/loto/statsforecast/runtime_lane_triage.py",
+    "tests/statsforecast/test_runtime_lane_triage.py",
+    "docs/statsforecast/RUNTIME_TRIAGE.md"
+  ],
+  "forbidden_paths": [
+    "pyproject.toml",
+    "uv.lock",
+    ".github/workflows/**",
+    "src/loto/models/workers.py",
+    "src/loto/models/catalog_full.py",
+    "README.md"
+  ]
+}

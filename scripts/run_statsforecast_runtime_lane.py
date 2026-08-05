@@ -1,0 +1,177 @@
+from __future__ import annotations
+
+import argparse
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+from loto.statsforecast.runtime_lane import (
+    execute_runtime_lane,
+    fetch_release_artifact,
+    inspect_target_host_archive,
+    prepare_offline_bundle,
+    run_end_to_end_certification,
+    run_target_host_certification,
+    triage_end_to_end_run,
+    verify_target_host_package,
+    write_admission_artifacts,
+)
+
+
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Provision and run StatsForecast 2.1.1.")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    fetch_parser = subparsers.add_parser("fetch-release")
+    fetch_parser.add_argument("--wheelhouse", type=Path, required=True)
+
+    prepare_parser = subparsers.add_parser("prepare-offline")
+    prepare_parser.add_argument("--wheelhouse", type=Path, required=True)
+    prepare_parser.add_argument("--uv", default="uv")
+
+    run_parser = subparsers.add_parser("certify")
+    run_parser.add_argument("--output-root", type=Path, required=True)
+    run_parser.add_argument("--run-id")
+    run_parser.add_argument("--wheelhouse", type=Path)
+    run_parser.add_argument("--offline", action="store_true")
+    run_parser.add_argument("--uv", default="uv")
+    run_parser.add_argument("--horizon", type=int, default=1)
+    run_parser.add_argument("--seed", type=int, default=1)
+
+    target_parser = subparsers.add_parser("target-host")
+    target_parser.add_argument("--output-root", type=Path, required=True)
+    target_parser.add_argument("--run-id")
+    target_parser.add_argument("--wheelhouse", type=Path)
+    target_parser.add_argument("--prepare-offline", action="store_true")
+    target_parser.add_argument("--offline", action="store_true")
+    target_parser.add_argument("--uv", default="uv")
+    target_parser.add_argument("--horizon", type=int, default=1)
+    target_parser.add_argument("--seed", type=int, default=1)
+
+    verify_parser = subparsers.add_parser("verify-package")
+    verify_parser.add_argument("--archive", type=Path, required=True)
+
+    admission_parser = subparsers.add_parser("admit-package")
+    admission_parser.add_argument("--archive", type=Path, required=True)
+    admission_parser.add_argument("--output-dir", type=Path, required=True)
+    admission_parser.add_argument("--expected-commit", required=True)
+    admission_parser.add_argument("--expected-seed", type=int, default=1)
+
+    e2e_parser = subparsers.add_parser("end-to-end")
+    e2e_parser.add_argument("--output-root", type=Path, required=True)
+    e2e_parser.add_argument("--run-id")
+    e2e_parser.add_argument("--wheelhouse", type=Path)
+    e2e_parser.add_argument("--prepare-offline", action="store_true")
+    e2e_parser.add_argument("--offline", action="store_true")
+    e2e_parser.add_argument("--expected-commit")
+    e2e_parser.add_argument("--uv", default="uv")
+    e2e_parser.add_argument("--horizon", type=int, default=1)
+    e2e_parser.add_argument("--seed", type=int, default=1)
+
+    triage_parser = subparsers.add_parser("triage-run")
+    triage_parser.add_argument("--end-to-end-dir", type=Path, required=True)
+    triage_parser.add_argument("--output-dir", type=Path, required=True)
+
+    args = parser.parse_args(argv)
+
+    if args.command == "triage-run":
+        result = triage_end_to_end_run(
+            args.end_to_end_dir,
+            args.output_dir,
+        )
+        print(f"TRIAGE_DIR={result.output_dir}")
+        print(f"TRIAGE_STATUS={result.status}")
+        print(f"PRIMARY_CLASSIFICATION={result.primary_classification}")
+        print(f"PROGRESS_PERCENT={result.progress_percent}")
+        return 0 if result.status == "NO_FAILURE" else 2
+    if args.command == "end-to-end":
+        result = run_end_to_end_certification(
+            _repo_root(),
+            args.output_root,
+            wheelhouse=args.wheelhouse,
+            run_id=args.run_id,
+            prepare_offline=args.prepare_offline,
+            offline=args.offline,
+            expected_commit=args.expected_commit,
+            expected_seed=args.seed,
+            horizon=args.horizon,
+            uv_executable=args.uv,
+        )
+        print(f"END_TO_END_DIR={result.output_dir}")
+        print(f"END_TO_END_REPORT={result.report_path}")
+        print(f"TARGET_ARCHIVE={result.archive_path}")
+        print(f"ADMISSION_DIR={result.admission_dir}")
+        print(f"DECISION={result.decision}")
+        return 0 if result.formal_pass else 2
+    if args.command == "admit-package":
+        report = inspect_target_host_archive(
+            args.archive,
+            expected_commit=args.expected_commit,
+            expected_seed=args.expected_seed,
+        )
+        paths = write_admission_artifacts(report, args.output_dir)
+        print(f"ADMISSION_STATUS={report['status']}")
+        print(f"DECISION={report['decision']}")
+        print(f"ADMISSION_JSON={paths['json']}")
+        print(f"ADMISSION_MARKDOWN={paths['markdown']}")
+        print(f"ADMISSION_SHA256SUMS={paths['sha256sums']}")
+        return 0 if report["formal_pass"] else 2
+    if args.command == "verify-package":
+        report = verify_target_host_package(args.archive)
+        print(json.dumps(report, ensure_ascii=False, sort_keys=True))
+        return 0 if report["status"] == "PASS" else 2
+    if args.command == "target-host":
+        result = run_target_host_certification(
+            _repo_root(),
+            args.output_root,
+            run_id=args.run_id,
+            wheelhouse=args.wheelhouse,
+            prepare_offline=args.prepare_offline,
+            offline=args.offline,
+            uv_executable=args.uv,
+            horizon=args.horizon,
+            seed=args.seed,
+        )
+        print(f"CONTROLLER_DIR={result.controller_dir}")
+        print(f"ARCHIVE={result.archive_path}")
+        print(f"ARCHIVE_SHA256={result.archive_sha256_path}")
+        print(f"STATUS={result.status}")
+        return 0 if result.status == "PASS" else 2
+    if args.command == "fetch-release":
+        artifact = fetch_release_artifact(args.wheelhouse)
+        print(f"ARTIFACT={artifact}")
+        return 0
+    if args.command == "prepare-offline":
+        bundle = prepare_offline_bundle(
+            _repo_root(),
+            args.wheelhouse,
+            uv_executable=args.uv,
+        )
+        print(f"WHEELHOUSE={bundle}")
+        return 0
+
+    run_id = args.run_id or datetime.now(timezone.utc).strftime(
+        "statsforecast-lane-%Y%m%d-%H%M%S"
+    )
+    run_dir = execute_runtime_lane(
+        _repo_root(),
+        args.output_root,
+        run_id=run_id,
+        wheelhouse=args.wheelhouse,
+        offline=args.offline,
+        uv_executable=args.uv,
+        horizon=args.horizon,
+        seed=args.seed,
+    )
+    report = json.loads((run_dir / "RUNTIME_LANE_REPORT.json").read_text(encoding="utf-8"))
+    print(f"RUN_DIR={run_dir}")
+    print(f"STATUS={report['status']}")
+    return 0 if report["status"] == "PASS" else 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
