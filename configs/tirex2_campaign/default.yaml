@@ -1,0 +1,16 @@
+schema_version: 2
+model:
+  repo_id: NX-AI/TiRex-2
+  revision: 05e5b26db52bfb256f1ae1bdf785589850482de3
+  package: tirex-2==0.1.1
+  local_files_only: true
+runtime:
+  supported_horizons: [1, 2, 5]
+  quantile_levels: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+  point_method: native_q0.5
+  execution_mode: batch_recompute
+certification:
+  pretraining_overlap: UNKNOWN
+  streaming_status: UNVERIFIED
+  fine_tuning_status: PUBLIC_OPEN_PATH_NOT_VERIFIED
+  fail_on_cpu_fallback: true
