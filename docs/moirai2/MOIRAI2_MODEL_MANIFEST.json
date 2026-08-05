@@ -1,0 +1,15 @@
+{
+  "schema_version": "moirai2-model-manifest-v1",
+  "model_id": "moirai-2.0-r-small",
+  "repo_id": "Salesforce/moirai-2.0-R-small",
+  "model_revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+  "model_weight_sha256": "fb5652a3db8ea572606221b7cb1e77bb8962b168e4d4cc752cf31ceb04074669",
+  "model_config_sha256": "6b74b03c8ec199fabc352c0203465958142ca468183da68549652734836f853d",
+  "package": "uni2ts==2.0.0",
+  "wheel_sha256": "7bb185392885e3f0cb53773a5fb0b922d99bf56e93790332d23abb3a4fa01612",
+  "sdist_sha256": "184b386db71a92f94a8961c1010fbcc126814b873faabc6a76ed680579c8d4be",
+  "source_revision": "cfd46d4510ed8896f263116f32928eede05b0a75",
+  "code_license": "Apache-2.0",
+  "model_license": "CC-BY-NC-4.0",
+  "production_champion_eligible": false
+}
