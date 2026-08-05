@@ -1,32 +1,45 @@
 # MLForecast test plan
 
-## Local fast gates
+## Fast local gates
 
 1. `python -m compileall -q src tests`
-2. focused pytest under `tests/mlforecast`
-3. Ruff format and lint when the repository-pinned Ruff executable is available
+2. `python -m ruff format --check src tests`
+3. `python -m ruff check src tests`
+4. `pytest -q tests/mlforecast`
 
-## Unit coverage
+## Contract tests
 
-- strict config validation;
-- all eight AutoMLForecast model names;
-- declarative Optuna search-space conversion;
-- Hit@±1-first objective ordering;
-- position-wise and all-position metrics;
-- deterministic baseline generation;
-- duplicate rejection;
-- chronological Train/Holdout isolation.
+- exact version `1.0.31` accepted; other versions rejected;
+- all eight AutoModel names accepted;
+- unknown model and unknown fields rejected;
+- unsupported post-1.0.31 arguments rejected;
+- malformed search spaces rejected;
+- static and known-future feature sets are disjoint;
+- unclassified feature columns rejected;
+- changing static features rejected;
+- duplicate and out-of-order rows rejected;
+- future exogenous keys must exactly match the expected horizon;
+- Hit@±1 miss count dominates MAE tie-breaking;
+- baselines are deterministic at fixed seed.
 
-## Integration coverage
+## Runtime smoke gates
 
-GitHub CI must run the repository-wide Ruff checks, compileall, and full pytest suite. A runtime environment installed with `--extra mlforecast` must additionally execute:
+Using the verified wheel:
 
-- Core Ridge fit/predict/save/load/re-predict;
-- AutoRidge two-trial smoke;
-- finite output and exact shape checks;
-- optional future-exogenous smoke;
-- artifact manifest and SHA-256 verification.
+1. verify wheel SHA-256;
+2. verify `importlib.metadata.version("mlforecast") == "1.0.31"`;
+3. Core Ridge fit/predict;
+4. Core save/load/re-predict;
+5. AutoRidge with two Optuna trials;
+6. Auto save/load/re-predict;
+7. finite values and output shapes;
+8. CPU process and thread configuration evidence.
 
-## Formal campaign deferred gate
+## Formal campaign gates
 
-A later real-data campaign must use multiple seeds and report mean, variance, and worst seed for Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE. No best-seed-only promotion is permitted.
+- time-ordered Train/Validation/Holdout/Prospective;
+- multiple seeds with mean, variance, and worst value;
+- same folds and features for Core, Auto, NeuralForecast, statistical models, and baselines;
+- Hit@±1 primary plus MAE, MSE, RMSE, position-wise, and all-position metrics;
+- prediction sealing before actual disclosure;
+- no best-seed-only promotion.

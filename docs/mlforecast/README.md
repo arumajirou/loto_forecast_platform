@@ -1,35 +1,35 @@
 # MLForecast / AutoMLForecast integration
 
-**Implementation status:** `EXECUTED / LOCAL_UNIT_VERIFIED / GITHUB_CI_PENDING`
+**Status:** `IMPLEMENTED / LOCAL_CONTRACT_VERIFIED / REAL_RUNTIME_PENDING`
 
-This subsystem adds a separate, leakage-safe execution path for MLForecast 1.1.0. It does not modify the NeuralForecast runtime-certification work in PR #43.
+This subsystem adds a dedicated, leakage-safe MLForecast path. It is independent of PR #43 and changes only `src/loto/mlforecast`, `tests/mlforecast`, `configs/mlforecast`, and `docs/mlforecast`.
 
-## Scope
+## Frozen upstream contract
 
-- strict Pydantic configuration for the MLForecast constructor, `fit`, `predict`, and chronological cross-validation;
-- eight official AutoMLForecast models;
-- Optuna sampler selection with default `seed=1`;
-- a Hit@±1-first optimization objective;
-- chronological Train/Holdout separation;
-- overall and position-wise Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE;
-- random, fixed, mean, median, last-value, frequency, and seasonal-naive baselines;
-- model save, load, re-predict, finite-value and prediction-equality certification;
-- prospective prediction sealing with SHA-256 and an explicit `actual_known=false` contract;
-- CSV/Parquet input and optional future exogenous input;
-- artifact manifest and portable `SHA256SUMS`.
+| Field | Value |
+|---|---|
+| package | `mlforecast` |
+| required version | `1.0.31` |
+| tag | `v1.0.31` |
+| commit | `c8f8b6d25184dcbed2454e185a92f3f8ef2e17e8` |
+| wheel SHA-256 | `941c4623f3440e0c3fa63db9df0a9ad198045cdb04bd624c8188edd11c74a441` |
+
+Version `1.1.0` is not part of this contract. The runtime checks the installed distribution version and fails closed unless it is exactly `1.0.31`.
 
 ## Supported Core estimators
 
-| ID | Estimator |
-|---|---|
-| `linear_regression` | `sklearn.linear_model.LinearRegression` |
-| `ridge` | `sklearn.linear_model.Ridge` |
-| `lasso` | `sklearn.linear_model.Lasso` |
-| `elastic_net` | `sklearn.linear_model.ElasticNet` |
-| `random_forest` | `sklearn.ensemble.RandomForestRegressor` |
-| `lightgbm` | `lightgbm.LGBMRegressor` |
-| `xgboost` | `xgboost.XGBRegressor` |
-| `catboost` | `catboost.CatBoostRegressor` |
+- `linear_regression`
+- `ridge`
+- `lasso`
+- `elastic_net`
+- `random_forest`
+- `lightgbm`
+- `xgboost`
+- `catboost`
+
+The configuration maps to the frozen 1.0.31 constructor and fit/CV APIs: lags, lag transforms, date features, target transforms, static features, known-future exogenous features, prediction intervals, fitting options, cross-validation, update, save, and load.
+
+Arguments not present in 1.0.31, including `date_features_as_dummies`, `drop_auxiliary_columns`, and `cache_train_df`, are rejected by the strict Pydantic schema rather than silently ignored.
 
 ## Supported AutoMLForecast models
 
@@ -42,100 +42,81 @@ This subsystem adds a separate, leakage-safe execution path for MLForecast 1.1.0
 - `AutoElasticNet`
 - `AutoRandomForest`
 
-These are the eight classes exported by `mlforecast.auto` in MLForecast 1.1.0. AutoMLForecast uses Optuna; Ray is not presented as an AutoMLForecast backend.
+AutoMLForecast uses Optuna. The default sampler is multivariate TPE with `seed=1`. Random, QMC, and CMA-ES samplers and declarative integer, float, and categorical search spaces are supported.
 
-## Installation
+## Leakage-safe feature contract
 
-This dedicated PR intentionally does not modify the shared `pyproject.toml` or `uv.lock`.
-Run against the required runtime version explicitly:
+Every non-key input column must be classified as exactly one of:
 
-```bash
-uv run \
-  --with mlforecast==1.1.0 \
-  --with 'optuna>=4,<5' \
-  --with 'lightgbm>=4.5' \
-  --with 'xgboost>=2.1' \
-  --with 'catboost>=1.2' \
-  python -m loto.mlforecast.cli --help
-```
+- `static_features`: constant within each series;
+- `known_future_features`: values known for Holdout and Prospective timestamps;
+- `weight_col`: non-negative finite sample weight.
 
-Repository-wide dependency pinning is `BLOCKED_SHARED_SCOPE` in this PR and must be handled by a separate integration change after explicit approval.
+Unclassified columns, changing static values, missing future rows, duplicate keys, and out-of-order input fail closed. Passing `static_features=[]` is intentional: it prevents MLForecast from treating all extra columns as static by default.
+
+## Evaluation
+
+- chronological per-series Train/Holdout split;
+- Hit@±1 as the primary AutoML objective;
+- bounded MAE tie-breaker that cannot outweigh one fewer Hit@±1 miss;
+- Hit@±1, position-wise Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE;
+- Random, fixed, mean, median, last-value, frequency, and seasonal-naive baselines;
+- no best-seed-only promotion claim.
 
 ## Execution
 
-Core example:
+The PR intentionally does not edit shared dependency files. Run the dedicated module with the frozen version:
 
 ```bash
-uv run --with mlforecast==1.1.0 python -m loto.mlforecast.cli \
+uv run \
+  --with mlforecast==1.0.31 \
+  --with 'lightgbm>=4.6' \
+  --with xgboost \
+  --with catboost \
+  python -m loto.mlforecast.cli \
   --data /absolute/path/panel.csv \
   --config configs/mlforecast/core.yaml
 ```
 
-AutoMLForecast example:
+Auto mode:
 
 ```bash
-uv run --with mlforecast==1.1.0 --with 'optuna>=4,<5' python -m loto.mlforecast.cli \
+uv run \
+  --with mlforecast==1.0.31 \
+  --with 'lightgbm>=4.6' \
+  --with xgboost \
+  --with catboost \
+  python -m loto.mlforecast.cli \
   --data /absolute/path/panel.csv \
   --config configs/mlforecast/auto.yaml
 ```
 
-When historical data contains extra feature columns, holdout exogenous values are taken from the withheld rows. Prospective execution fails closed unless matching future exogenous rows are supplied:
+When `known_future_features` is non-empty, pass exact future keys and values:
 
 ```bash
-uv run --with mlforecast==1.1.0 --with 'optuna>=4,<5' python -m loto.mlforecast.cli \
-  --data /absolute/path/panel.parquet \
-  --config configs/mlforecast/auto.yaml \
-  --prospective-exogenous /absolute/path/future_exogenous.parquet
+--prospective-exogenous /absolute/path/future_exogenous.parquet
 ```
 
-## Data contract
+## Artifacts and certification
 
-Required columns:
+Each run stores the raw source copy, canonical input, Train/Holdout, configuration, CV or Optuna trials, predictions, metrics, model bundles, environment package versions, prospective seal, artifact manifest, and portable SHA-256 sums.
 
-- `unique_id`: series identifier;
-- `ds`: integer or timestamp index;
-- `y`: finite target value.
+Runtime certification requires:
 
-Duplicate `(unique_id, ds)` rows, missing required values, non-finite targets, invalid ordering, and insufficient history are rejected. Raw input is copied into the run directory and is never overwritten.
+1. exact `mlforecast==1.0.31`;
+2. model save;
+3. `MLForecast.load()`;
+4. repeated prediction with identical keys and columns;
+5. finite output;
+6. equality within `rtol=1e-8`, `atol=1e-8`.
 
-## Evaluation contract
+## Certification boundary
 
-The last `holdout_size` rows of every series are withheld. No scaler, feature transform, estimator, or AutoMLForecast trial is fitted on those rows. The default AutoMLForecast objective minimizes:
+This implementation does not claim real-data accuracy improvement, Holdout superiority, Prospective success, GPU acceleration, live MLflow/PostgreSQL persistence, or completion of a multiple-seed campaign. Those remain execution tasks.
 
-```text
-number_of_Hit@±1_misses + bounded_MAE_tiebreak
-```
+## Official sources
 
-The bounded MAE term is always below one, so one fewer miss always dominates any MAE improvement.
-
-## Artifacts
-
-Each run creates `artifacts/mlforecast/<run-id>/` containing:
-
-- `config.json`
-- `input_panel.csv`
-- `train.csv`
-- `holdout.csv`
-- `holdout_predictions.csv`
-- `core_cv_predictions.csv` or `optuna_trials_<model>.csv`
-- baseline prediction CSV files
-- `metrics.csv`
-- `position_metrics.csv`
-- `model/`
-- `prospective_predictions.csv`
-- `prospective_seal.json`
-- `run_report.json`
-- `ARTIFACT_MANIFEST.json`
-- `SHA256SUMS`
-
-## Certification boundaries
-
-This PR does not claim accuracy improvement, Holdout superiority, Prospective success, GPU acceleration, live MLflow/PostgreSQL persistence, or completion of a real-data eight-model campaign. Those claims require execution on the registered dataset and environment with multiple seeds.
-
-## Official references
-
-- MLForecast 1.1.0 release: https://pypi.org/project/mlforecast/1.1.0/
-- MLForecast API: https://nixtlaverse.nixtla.io/mlforecast/forecast.html
-- AutoMLForecast API: https://nixtlaverse.nixtla.io/mlforecast/auto.html
-- Hyperparameter optimization: https://nixtlaverse.nixtla.io/mlforecast/docs/how-to-guides/hyperparameter_optimization.html
-- Source repository: https://github.com/Nixtla/mlforecast
+- https://pypi.org/project/mlforecast/1.0.31/
+- https://github.com/Nixtla/mlforecast/tree/v1.0.31
+- https://nixtlaverse.nixtla.io/mlforecast/forecast.html
+- https://nixtlaverse.nixtla.io/mlforecast/auto.html

@@ -1,7 +1,10 @@
+required_mlforecast_version: "1.0.31"
 mode: core
 id_col: unique_id
 time_col: ds
 target_col: y
+static_features: []
+known_future_features: []
 h: 1
 holdout_size: 1
 prospective_h: 1
@@ -20,6 +23,7 @@ core:
       n_estimators: 300
       learning_rate: 0.03
       num_leaves: 31
+  models_fit_kwargs: {}
   freq: 1
   lags: [1, 2, 3, 5, 10, 20]
   lag_transforms:
@@ -36,12 +40,9 @@ core:
   target_transforms:
     - kind: local_standard_scaler
       params: {}
-  date_features_as_dummies: false
-  drop_auxiliary_columns: true
   dropna: true
   fitted: false
   as_numpy: false
   validate_data: true
-  cache_train_df: true
   cv_n_windows: 3
   cv_refit: true

@@ -61,6 +61,8 @@ class SearchParameter(BaseModel):
             raise ValueError("search parameter low must be smaller than high")
         if self.choices is not None:
             raise ValueError(f"{self.kind} search parameters cannot define choices")
+        if self.log and self.step is not None:
+            raise ValueError("logarithmic search parameters cannot define step")
         return self
 
 
@@ -105,22 +107,20 @@ class PredictionIntervalsConfig(BaseModel):
 
 
 class CoreConfig(BaseModel):
-    """Arguments mapped to MLForecast constructor, fit, predict and CV APIs."""
+    """Arguments mapped to the frozen MLForecast 1.0.31 APIs."""
 
     model_config = ConfigDict(extra="forbid")
 
     models: list[str] = Field(default_factory=lambda: ["ridge"])
     model_params: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    models_fit_kwargs: dict[str, dict[str, Any]] = Field(default_factory=dict)
     freq: int | str = 1
     lags: list[int] | None = Field(default_factory=lambda: [1, 2, 3, 5, 10, 20])
     lag_transforms: dict[int, list[LagTransformSpec]] = Field(default_factory=dict)
     date_features: list[str] = Field(default_factory=list)
     num_threads: int = Field(default=1, ge=1)
     target_transforms: list[TargetTransformSpec] = Field(default_factory=list)
-    date_features_as_dummies: bool = False
-    drop_auxiliary_columns: bool = True
 
-    static_features: list[str] | None = None
     dropna: bool = True
     keep_last_n: int | None = Field(default=None, ge=1)
     max_horizon: int | None = Field(default=None, ge=1)
@@ -129,7 +129,6 @@ class CoreConfig(BaseModel):
     as_numpy: bool = False
     weight_col: str | None = None
     validate_data: bool = True
-    cache_train_df: bool = True
     prediction_intervals: PredictionIntervalsConfig | None = None
 
     cv_n_windows: int = Field(default=3, ge=1)
@@ -169,9 +168,29 @@ class CoreConfig(BaseModel):
             raise ValueError("horizons must contain positive integers")
         return normalized
 
+    @field_validator("cv_refit")
+    @classmethod
+    def validate_cv_refit(cls, value: bool | int) -> bool | int:
+        if isinstance(value, int) and not isinstance(value, bool) and value < 0:
+            raise ValueError("cv_refit integer must be non-negative")
+        return value
+
+    @model_validator(mode="after")
+    def validate_model_options(self) -> CoreConfig:
+        for field_name, values in (
+            ("model_params", self.model_params),
+            ("models_fit_kwargs", self.models_fit_kwargs),
+        ):
+            unknown = sorted(set(values) - set(self.models))
+            if unknown:
+                raise ValueError(f"{field_name} reference unselected models: {unknown}")
+        if self.max_horizon is not None and self.horizons is not None:
+            raise ValueError("max_horizon and horizons are mutually exclusive")
+        return self
+
 
 class AutoConfig(BaseModel):
-    """Arguments mapped to AutoMLForecast constructor and fit APIs."""
+    """Arguments mapped to AutoMLForecast 1.0.31 constructor and fit APIs."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -187,8 +206,14 @@ class AutoConfig(BaseModel):
     step_size: int | None = Field(default=None, ge=1)
     input_size: int | None = Field(default=None, ge=1)
     refit: bool | int = False
+    dropna: bool = True
+    keep_last_n: int | None = Field(default=None, ge=1)
+    max_horizon: int | None = Field(default=None, ge=1)
+    horizons: list[int] | None = None
     fitted: bool = False
+    as_numpy: bool = False
     weight_col: str | None = None
+    validate_data: bool = True
     prediction_intervals: PredictionIntervalsConfig | None = None
 
     sampler: Literal["tpe", "random", "qmc", "cmaes"] = "tpe"
@@ -207,11 +232,30 @@ class AutoConfig(BaseModel):
             raise ValueError("AutoMLForecast model names must be unique")
         return values
 
+    @field_validator("horizons")
+    @classmethod
+    def validate_horizons(cls, values: list[int] | None) -> list[int] | None:
+        if values is None:
+            return None
+        normalized = sorted({int(value) for value in values})
+        if not normalized or normalized[0] < 1:
+            raise ValueError("horizons must contain positive integers")
+        return normalized
+
+    @field_validator("refit")
+    @classmethod
+    def validate_refit(cls, value: bool | int) -> bool | int:
+        if isinstance(value, int) and not isinstance(value, bool) and value < 0:
+            raise ValueError("refit integer must be non-negative")
+        return value
+
     @model_validator(mode="after")
-    def validate_search_spaces(self) -> AutoConfig:
+    def validate_options(self) -> AutoConfig:
         unknown = sorted(set(self.search_spaces) - set(self.models))
         if unknown:
             raise ValueError(f"search spaces reference unselected models: {unknown}")
+        if self.max_horizon is not None and self.horizons is not None:
+            raise ValueError("max_horizon and horizons are mutually exclusive")
         return self
 
 
@@ -220,10 +264,13 @@ class MLForecastRunConfig(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
+    required_mlforecast_version: Literal["1.0.31"] = "1.0.31"
     mode: RunMode = RunMode.CORE
     id_col: str = "unique_id"
     time_col: str = "ds"
     target_col: str = "y"
+    static_features: list[str] = Field(default_factory=list)
+    known_future_features: list[str] = Field(default_factory=list)
     h: int = Field(default=1, ge=1)
     holdout_size: int = Field(default=1, ge=1)
     prospective_h: int = Field(default=1, ge=1)
@@ -236,7 +283,17 @@ class MLForecastRunConfig(BaseModel):
     auto: AutoConfig = Field(default_factory=AutoConfig)
 
     @model_validator(mode="after")
-    def validate_horizon_contract(self) -> MLForecastRunConfig:
+    def validate_run_contract(self) -> MLForecastRunConfig:
         if self.h != self.holdout_size:
             raise ValueError("h must equal holdout_size for an exact holdout comparison")
+        reserved = {self.id_col, self.time_col, self.target_col}
+        declared = self.static_features + self.known_future_features
+        if len(declared) != len(set(declared)):
+            raise ValueError("static and known-future feature declarations must be unique")
+        invalid = sorted(reserved.intersection(declared))
+        if invalid:
+            raise ValueError(f"reserved columns cannot be declared as features: {invalid}")
+        weight_col = self.core.weight_col if self.mode is RunMode.CORE else self.auto.weight_col
+        if weight_col is not None and weight_col in declared:
+            raise ValueError("weight_col cannot also be static or known-future feature")
         return self

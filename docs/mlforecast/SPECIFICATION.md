@@ -1,48 +1,88 @@
 # MLForecast strengthening specification
 
+## Frozen provenance
+
+The implementation targets only MLForecast `1.0.31`, tag `v1.0.31`, commit `c8f8b6d25184dcbed2454e185a92f3f8ef2e17e8`. Runtime version mismatch is fatal.
+
 ## Requirements
 
-1. MLForecast must be fixed to a runtime-certified version before feature expansion.
-2. Core and Auto execution must use separate explicit modes.
-3. Every accepted configuration field must map to a documented MLForecast 1.1.0 argument or a local evaluation contract.
-4. Unknown configuration keys and model names must fail closed.
-5. Train and Holdout rows must be separated chronologically per series.
-6. Auto optimization must fit only on Train and use `seed=1` by default.
-7. Hit@±1 must dominate the optimization objective; MAE is only a tie-breaker.
-8. Candidate performance must be compared with deterministic baselines under identical Holdout rows.
-9. Saved models must be loaded and re-predicted before runtime certification.
-10. Prospective predictions must exclude actual values and be fixed with SHA-256 and UTC time.
+1. Core and Auto modes are explicit and separate.
+2. Unknown configuration fields and model names fail closed.
+3. Every additional input column is classified as static, known-future, or weight.
+4. Input rows must already be chronologically ordered within each series.
+5. Train/Holdout splitting is chronological and per-series.
+6. Feature transforms, models, and Optuna trials fit only on Train.
+7. Auto optimization defaults to `seed=1` and prioritizes Hit@±1.
+8. Baselines use identical Holdout keys.
+9. Model availability alone is not certification; save/load/re-predict must pass.
+10. Prospective predictions are sealed before actuals with UTC time and SHA-256.
+11. Raw input is copied without overwrite when execution starts from a file.
 
-## MLForecast Core mapping
+## Frozen Core API mapping
 
-`CoreConfig` maps to:
+Constructor:
 
-- constructor: `models`, `freq`, `lags`, `lag_transforms`, `date_features`, `num_threads`, `target_transforms`, `date_features_as_dummies`, `drop_auxiliary_columns`;
-- fit: `static_features`, `dropna`, `keep_last_n`, `max_horizon`, `horizons`, `prediction_intervals`, `fitted`, `as_numpy`, `weight_col`, `validate_data`, `cache_train_df`;
-- cross-validation: `n_windows`, `h`, `step_size`, `refit`, `input_size`, and the shared data arguments;
-- predict: `h`, `level`, and derived holdout `X_df`;
-- update: withheld actual rows after Holdout evaluation;
-- save/load: complete fitted pipeline round trip.
+- `models`
+- `freq`
+- `lags`
+- `lag_transforms`
+- `date_features`
+- `num_threads`
+- `target_transforms`
 
-## AutoMLForecast mapping
+Fit:
 
-`AutoConfig` maps to:
+- `static_features`
+- `dropna`
+- `keep_last_n`
+- `max_horizon` or `horizons`
+- `prediction_intervals`
+- `fitted`
+- `as_numpy`
+- `weight_col`
+- `models_fit_kwargs`
+- `validate_data`
 
-- constructor: `models`, `freq`, `season_length`, `num_threads`, `reuse_cv_splits`;
-- fit: `n_windows`, `h`, `num_samples`, `step_size`, `input_size`, `refit`, `loss`, `study_kwargs`, `optimize_kwargs`, `fitted`, `prediction_intervals`, `weight_col`;
-- predict: `h`, `X_df`, `level`;
-- save: one MLForecast bundle per optimized model.
+Cross-validation additionally maps `n_windows`, `h`, `step_size`, `refit`, `input_size`, and `level`.
 
-Custom search spaces are declarative. Supported parameter types are integer, float, and categorical. The schema rejects malformed ranges and search spaces attached to unselected models.
+The schema intentionally excludes arguments absent from 1.0.31.
+
+## Frozen Auto API mapping
+
+Constructor:
+
+- `models`
+- `freq`
+- `season_length`
+- `fit_config`
+- `num_threads`
+- `reuse_cv_splits`
+
+Fit:
+
+- `n_windows`
+- `h`
+- `num_samples`
+- `step_size`
+- `input_size`
+- `refit`
+- `loss`
+- key column names
+- `study_kwargs`
+- `optimize_kwargs`
+- `fitted`
+- `prediction_intervals`
+- `weight_col`
+
+`fit_config` supplies the explicit static-feature list and supported MLForecast fit arguments. The custom loss accepts the upstream keyword `train_df` and optional `weight_col`.
 
 ## Acceptance criteria
 
 - Ruff format and lint pass.
-- Python compilation passes.
-- Focused tests pass.
-- All eight official AutoModel names are accepted and unknown names are rejected.
-- Duplicate data and ordering violations are rejected.
-- Hit@±1 and all-position Hit@±1 are emitted.
-- Baseline predictions are deterministic for a fixed seed.
-- Model save/load predictions match within `rtol=1e-8`, `atol=1e-8` in an installed MLForecast 1.1.0 runtime.
+- Python compilation and focused tests pass.
+- Runtime imports exactly MLForecast 1.0.31.
+- All eight AutoModels construct.
+- Core Ridge and AutoRidge fit/predict/save/load smoke tests pass.
+- Holdout and Prospective known-future keys exactly match expected horizons.
+- Save/load predictions are finite and match within `rtol=1e-8`, `atol=1e-8`.
 - Prospective seal verification succeeds.

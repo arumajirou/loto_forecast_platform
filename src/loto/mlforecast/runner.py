@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -35,10 +36,48 @@ class RunResult:
     metrics: pd.DataFrame
 
 
+def _write_raw_input(
+    run_dir: Path,
+    frame: pd.DataFrame,
+    source_path: Path | None,
+) -> dict[str, Any]:
+    raw_dir = run_dir / "raw_input"
+    raw_dir.mkdir(parents=True, exist_ok=False)
+    if source_path is not None:
+        destination = raw_dir / source_path.name
+        shutil.copy2(source_path, destination)
+        return {
+            "kind": "source_file_copy",
+            "source_path": str(source_path.resolve()),
+            "artifact_path": destination.relative_to(run_dir).as_posix(),
+            "sha256": sha256_file(destination),
+        }
+    destination = raw_dir / "in_memory_input.csv"
+    frame.to_csv(destination, index=False)
+    return {
+        "kind": "canonicalized_in_memory_frame",
+        "source_path": None,
+        "artifact_path": destination.relative_to(run_dir).as_posix(),
+        "sha256": sha256_file(destination),
+    }
+
+
+def _known_future_frame(
+    holdout: pd.DataFrame,
+    config: MLForecastRunConfig,
+) -> pd.DataFrame | None:
+    if not config.known_future_features:
+        return None
+    columns = [config.id_col, config.time_col, *config.known_future_features]
+    return holdout[columns].copy()
+
+
 def run(
     frame: pd.DataFrame,
     config: MLForecastRunConfig,
     prospective_features: pd.DataFrame | None = None,
+    *,
+    raw_source_path: Path | None = None,
 ) -> RunResult:
     validated = validate_panel(frame, config)
     train, holdout = chronological_split(validated, config)
@@ -46,36 +85,17 @@ def run(
     run_dir = config.artifact_root / run_id
     run_dir.mkdir(parents=True, exist_ok=False)
 
-    config_path = run_dir / "config.json"
-    atomic_write_text(config_path, config.model_dump_json(indent=2) + "\n")
+    raw_input = _write_raw_input(run_dir, frame, raw_source_path)
+    atomic_write_text(run_dir / "config.json", config.model_dump_json(indent=2) + "\n")
     validated.to_csv(run_dir / "input_panel.csv", index=False)
     train.to_csv(run_dir / "train.csv", index=False)
     holdout.to_csv(run_dir / "holdout.csv", index=False)
 
-    feature_columns = [
-        column
-        for column in validated.columns
-        if column not in {config.id_col, config.time_col, config.target_col}
-    ]
-    holdout_features = (
-        holdout[[config.id_col, config.time_col, *feature_columns]].copy()
-        if feature_columns
-        else None
-    )
-    if prospective_features is not None:
-        required_future = {config.id_col, config.time_col, *feature_columns}
-        if missing := required_future - set(prospective_features.columns):
-            raise ValueError(f"prospective exogenous data is missing columns: {sorted(missing)}")
-        prospective_features = prospective_features[
-            [config.id_col, config.time_col, *feature_columns]
-        ].copy()
-    elif feature_columns:
-        raise ValueError(
-            "prospective exogenous data is required because dynamic/static features are present"
-        )
-
+    holdout_features = _known_future_frame(holdout, config)
     model, prediction, model_metadata, diagnostic_frames = _fit_predict(
-        train, holdout_features, config
+        train,
+        holdout_features,
+        config,
     )
     prediction.to_csv(run_dir / "holdout_predictions.csv", index=False)
     for name, diagnostic in diagnostic_frames.items():
@@ -83,7 +103,12 @@ def run(
 
     rows: list[dict[str, Any]] = []
     position_frames: list[pd.DataFrame] = []
-    for name in _prediction_columns(prediction, id_col=config.id_col, time_col=config.time_col):
+    prediction_columns = _prediction_columns(
+        prediction,
+        id_col=config.id_col,
+        time_col=config.time_col,
+    )
+    for name in prediction_columns:
         overall, positions = evaluate_prediction(
             holdout,
             prediction,
@@ -124,7 +149,8 @@ def run(
     metrics = pd.DataFrame(rows).sort_values(["hit_at_1", "mae"], ascending=[False, True])
     metrics.to_csv(run_dir / "metrics.csv", index=False)
     pd.concat(position_frames, ignore_index=True).to_csv(
-        run_dir / "position_metrics.csv", index=False
+        run_dir / "position_metrics.csv",
+        index=False,
     )
 
     certification = _save_and_certify(
@@ -149,13 +175,18 @@ def run(
     )
 
     report = {
-        "status": "VERIFIED" if certification["status"] == "RUNTIME_CERTIFIED" else "EXECUTED",
+        "status": (
+            "RUNTIME_CERTIFIED"
+            if certification["status"] == "RUNTIME_CERTIFIED"
+            else "EXECUTED"
+        ),
         "run_id": run_id,
         "started_from_data_sha256": _canonical_frame_hash(
             validated,
             id_col=config.id_col,
             time_col=config.time_col,
         ),
+        "raw_input": raw_input,
         "train_rows": len(train),
         "holdout_rows": len(holdout),
         "series": int(validated[config.id_col].nunique()),
@@ -169,7 +200,12 @@ def run(
         json.dumps(report, indent=2, sort_keys=True) + "\n",
     )
     _write_manifest(run_dir)
-    return RunResult(run_id=run_id, run_dir=run_dir, status=report["status"], metrics=metrics)
+    return RunResult(
+        run_id=run_id,
+        run_dir=run_dir,
+        status=report["status"],
+        metrics=metrics,
+    )
 
 
 def run_from_paths(
@@ -178,6 +214,13 @@ def run_from_paths(
     prospective_exogenous_path: Path | None = None,
 ) -> RunResult:
     prospective = (
-        load_frame(prospective_exogenous_path) if prospective_exogenous_path is not None else None
+        load_frame(prospective_exogenous_path)
+        if prospective_exogenous_path is not None
+        else None
     )
-    return run(load_frame(data_path), load_config(config_path), prospective)
+    return run(
+        load_frame(data_path),
+        load_config(config_path),
+        prospective,
+        raw_source_path=data_path,
+    )

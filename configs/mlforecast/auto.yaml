@@ -1,7 +1,10 @@
+required_mlforecast_version: "1.0.31"
 mode: auto
 id_col: unique_id
 time_col: ds
 target_col: y
+static_features: []
+known_future_features: []
 h: 1
 holdout_size: 1
 prospective_h: 1

@@ -5,9 +5,10 @@ import types
 
 import pandas as pd
 
-from loto.mlforecast.contracts import AutoConfig, SearchParameter
+from loto.mlforecast.contracts import AutoConfig, CoreConfig, SearchParameter
 from loto.mlforecast.factory import (
     build_auto_forecast,
+    build_core_forecast,
     build_search_space,
     hit_at_1_objective,
 )
@@ -54,12 +55,48 @@ def test_build_auto_forecast_supports_all_selected_models(monkeypatch) -> None:
     monkeypatch.setitem(sys.modules, "mlforecast", types.SimpleNamespace(auto=fake_auto))
 
     selected = ["AutoRidge", "AutoElasticNet", "AutoRandomForest"]
-    result = build_auto_forecast(AutoConfig(models=selected, season_length=1))
+    result = build_auto_forecast(
+        AutoConfig(models=selected, season_length=1),
+        static_features=["region"],
+    )
 
     assert isinstance(result, FakeAutoMLForecast)
     assert list(captured["models"]) == selected
     assert captured["freq"] == 1
     assert captured["reuse_cv_splits"] is True
+    assert captured["fit_config"](object())["static_features"] == ["region"]
+
+
+def test_core_constructor_uses_only_frozen_arguments(monkeypatch) -> None:
+    captured = {}
+
+    class FakeMLForecast:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+    monkeypatch.setitem(sys.modules, "mlforecast", types.SimpleNamespace(MLForecast=FakeMLForecast))
+    result = build_core_forecast(CoreConfig(models=["ridge"]), seed=1)
+
+    assert isinstance(result, FakeMLForecast)
+    assert set(captured) == {
+        "models",
+        "freq",
+        "lags",
+        "lag_transforms",
+        "date_features",
+        "num_threads",
+        "target_transforms",
+    }
+
+
+def test_hit_at_1_objective_accepts_upstream_keywords() -> None:
+    validation = pd.DataFrame({"y": [0.0, 0.0], "model": [1.01, 1.01]})
+    result = hit_at_1_objective(
+        validation,
+        train_df=validation,
+        weight_col="sample_weight",
+    )
+    assert 2.0 < result < 3.0
 
 
 def test_hit_at_1_objective_prioritizes_miss_count_over_mae() -> None:

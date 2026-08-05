@@ -1,0 +1,10 @@
+{
+  "package": "mlforecast",
+  "required_version": "1.0.31",
+  "upstream_tag": "v1.0.31",
+  "upstream_commit": "c8f8b6d25184dcbed2454e185a92f3f8ef2e17e8",
+  "wheel_filename": "mlforecast-1.0.31-py3-none-any.whl",
+  "wheel_sha256": "941c4623f3440e0c3fa63db9df0a9ad198045cdb04bd624c8188edd11c74a441",
+  "verified_on": "2026-08-05",
+  "status": "FACT_CHECKED"
+}

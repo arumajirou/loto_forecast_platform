@@ -133,7 +133,7 @@ def build_prediction_intervals(config: PredictionIntervalsConfig | None) -> Any 
 
 
 def build_core_forecast(config: CoreConfig, *, seed: int) -> Any:
-    """Map the strict local contract to the MLForecast 1.1.0 constructor."""
+    """Map the strict local contract to the MLForecast 1.0.31 constructor."""
     from mlforecast import MLForecast
 
     models = {
@@ -148,14 +148,11 @@ def build_core_forecast(config: CoreConfig, *, seed: int) -> Any:
         date_features=config.date_features or None,
         num_threads=config.num_threads,
         target_transforms=build_target_transforms(config.target_transforms),
-        date_features_as_dummies=config.date_features_as_dummies,
-        drop_auxiliary_columns=config.drop_auxiliary_columns,
     )
 
 
 def core_fit_kwargs(config: CoreConfig) -> dict[str, Any]:
     kwargs: dict[str, Any] = {
-        "static_features": config.static_features,
         "dropna": config.dropna,
         "keep_last_n": config.keep_last_n,
         "max_horizon": config.max_horizon,
@@ -164,8 +161,8 @@ def core_fit_kwargs(config: CoreConfig) -> dict[str, Any]:
         "fitted": config.fitted,
         "as_numpy": config.as_numpy,
         "weight_col": config.weight_col,
+        "models_fit_kwargs": config.models_fit_kwargs or None,
         "validate_data": config.validate_data,
-        "cache_train_df": config.cache_train_df,
     }
     return {key: value for key, value in kwargs.items() if value is not None}
 
@@ -190,24 +187,43 @@ def build_search_space(
     if not specs:
         return None
 
-    def config(trial: Any) -> dict{str, Any]:
+    def config(trial: Any) -> dict[str, Any]:
         return {name: _suggest_parameter(trial, name, spec) for name, spec in sorted(specs.items())}
 
     return config
 
 
-def build_auto_forecast(config: AutoConfig) -> Any:
-    """Build AutoMLForecast with any subset of the eight official AutoModels."""
+def _auto_mlf_fit_config(config: AutoConfig, static_features: list[str]) -> dict[str, Any]:
+    kwargs: dict[str, Any] = {
+        "static_features": list(static_features),
+        "dropna": config.dropna,
+        "keep_last_n": config.keep_last_n,
+        "max_horizon": config.max_horizon,
+        "horizons": config.horizons,
+        "as_numpy": config.as_numpy,
+        "validate_data": config.validate_data,
+    }
+    return {key: value for key, value in kwargs.items() if value is not None}
+
+
+def build_auto_forecast(config: AutoConfig, *, static_features: list[str]) -> Any:
+    """Build AutoMLForecast 1.0.31 with any subset of its eight AutoModels."""
     from mlforecast import auto as auto_module
 
     models: dict[str, Any] = {}
     for name in config.models:
         cls = getattr(auto_module, AUTO_CLASS_NAMES[name])
         models[name] = cls(config=build_search_space(config.search_spaces.get(name, {})))
+
+    def fit_config(trial: Any) -> dict[str, Any]:
+        del trial
+        return _auto_mlf_fit_config(config, static_features)
+
     return auto_module.AutoMLForecast(
         models=models,
         freq=config.freq,
         season_length=config.season_length,
+        fit_config=fit_config,
         num_threads=config.num_threads,
         reuse_cv_splits=config.reuse_cv_splits,
     )
@@ -248,17 +264,18 @@ def auto_fit_kwargs(config: AutoConfig, *, seed: int) -> dict[str, Any]:
 
 def hit_at_1_objective(
     validation: pd.DataFrame,
-    train: pd.DataFrame,
+    train_df: pd.DataFrame,
     *,
     target_col: str = "y",
     prediction_col: str = "model",
+    weight_col: str | None = None,
 ) -> float:
     """Lexicographically prioritize fewer Hit@±1 misses, then bounded MAE.
 
     AutoMLForecast minimizes this scalar. One fewer miss always dominates any MAE
     improvement because the tie-break term is strictly smaller than 1.
     """
-    del train
+    del train_df, weight_col
     actual = pd.to_numeric(validation[target_col], errors="raise").to_numpy(float)
     predicted = pd.to_numeric(validation[prediction_col], errors="raise").to_numpy(float)
     if actual.shape != predicted.shape or actual.size == 0:

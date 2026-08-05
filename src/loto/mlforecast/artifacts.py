@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata as metadata
 import json
 import os
 import platform
@@ -11,6 +12,8 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+
+from loto.mlforecast.provenance import upstream_contract
 
 
 def utc_now() -> str:
@@ -43,7 +46,30 @@ def _canonical_frame_hash(
     time_col: str,
 ) -> str:
     ordered = frame.sort_values([id_col, time_col]).reset_index(drop=True)
-    return sha256_bytes(ordered.to_csv(index=False, lineterminator="\n").encode())
+    payload = ordered.to_csv(index=False, lineterminator="\n").encode()
+    return sha256_bytes(payload)
+
+
+def _package_versions() -> dict[str, str | None]:
+    packages = (
+        "mlforecast",
+        "coreforecast",
+        "utilsforecast",
+        "optuna",
+        "scikit-learn",
+        "lightgbm",
+        "xgboost",
+        "catboost",
+        "pandas",
+        "numpy",
+    )
+    versions: dict[str, str | None] = {}
+    for package in packages:
+        try:
+            versions[package] = metadata.version(package)
+        except metadata.PackageNotFoundError:
+            versions[package] = None
+    return versions
 
 
 def _environment() -> dict[str, Any]:
@@ -62,6 +88,8 @@ def _environment() -> dict[str, Any]:
         "platform": platform.platform(),
         "pid": os.getpid(),
         "git_commit": git_commit,
+        "packages": _package_versions(),
+        "mlforecast_upstream": upstream_contract(),
     }
 
 
