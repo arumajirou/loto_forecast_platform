@@ -138,6 +138,8 @@ def verify_model(
     report = read_json_object(model_dir / "run_report.json", failures, "model run report")
     if report and report.get("model_id") != row.get("model_id"):
         failures.append("campaign/model run_report model_id mismatch")
+    if report and dict(row) != report:
+        failures.append("campaign row/model run_report mismatch")
     if row.get("status") != "SUCCEEDED":
         failures.append(f"model status is not SUCCEEDED: {row.get('status')}")
     if row.get("certification_status") != "RUNTIME_CERTIFIED":
@@ -169,11 +171,11 @@ def verify_model(
         failures,
         "runtime certification",
     )
-    embedded = row.get("runtime_certification")
+    embedded = report.get("runtime_certification") if report else None
     if not isinstance(embedded, Mapping):
-        failures.append("campaign row runtime_certification is missing")
+        failures.append("model run_report runtime_certification is missing")
     elif certification and dict(embedded) != certification:
-        failures.append("campaign row/runtime_certification.json mismatch")
+        failures.append("model run_report/runtime_certification.json mismatch")
     failed = runtime_failures(certification, require_gpu=require_gpu) if certification else []
     failures.extend(f"runtime check failed: {name}" for name in failed)
 

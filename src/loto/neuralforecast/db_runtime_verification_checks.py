@@ -70,6 +70,8 @@ def evaluate_database_runtime_run(
     resolved_require_gpu = bool(plan_gpu) if require_gpu is None else require_gpu
     if require_gpu is True and plan_gpu is not True:
         failures.append("verifier requires GPU but campaign plan does not require GPU execution")
+    if require_gpu is False and plan_gpu is True:
+        failures.append("verifier requires CPU but campaign plan requires GPU execution")
 
     for key, expected in (
         ("started_model_count", expected_model_count),
