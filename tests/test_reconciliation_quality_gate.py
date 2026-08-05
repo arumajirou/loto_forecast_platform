@@ -51,16 +51,16 @@ def _clean_probe(commit: str = "a" * 40):
 
 def test_parse_junit_requires_exact_focused_count(tmp_path: Path) -> None:
     path = tmp_path / "focused.xml"
-    _junit(path, 76)
+    _junit(path, quality_gate.EXPECTED_FOCUSED_TESTS - 1)
     with pytest.raises(quality_gate.CertificationError, match="count mismatch"):
-        quality_gate.parse_junit(path, expected_tests=77)
+        quality_gate.parse_junit(path, expected_tests=quality_gate.EXPECTED_FOCUSED_TESTS)
 
 
 def test_parse_junit_rejects_failures(tmp_path: Path) -> None:
     path = tmp_path / "focused.xml"
-    _junit(path, 77, failures=1)
+    _junit(path, quality_gate.EXPECTED_FOCUSED_TESTS, failures=1)
     with pytest.raises(quality_gate.CertificationError, match="failed tests"):
-        quality_gate.parse_junit(path, expected_tests=77)
+        quality_gate.parse_junit(path, expected_tests=quality_gate.EXPECTED_FOCUSED_TESTS)
 
 
 def test_quality_gate_success_runs_full_suite_last(tmp_path: Path) -> None:
@@ -73,7 +73,8 @@ def test_quality_gate_success_runs_full_suite_last(tmp_path: Path) -> None:
         for argument in command:
             if isinstance(argument, str) and argument.startswith("--junitxml="):
                 xml_path = Path(argument.split("=", 1)[1])
-                _junit(xml_path, 77 if "focused" in xml_path.name else 120, skipped=2)
+                count = quality_gate.EXPECTED_FOCUSED_TESTS if "focused" in xml_path.name else 120
+                _junit(xml_path, count, skipped=2)
         return _result(command, cwd, stdout_path, stderr_path)
 
     probes = iter([_clean_probe(), _clean_probe()])
@@ -89,7 +90,7 @@ def test_quality_gate_success_runs_full_suite_last(tmp_path: Path) -> None:
 
     assert code == 0
     assert report["status"] == "VERIFIED"
-    assert report["focused_junit"]["tests"] == 77
+    assert report["focused_junit"]["tests"] == quality_gate.EXPECTED_FOCUSED_TESTS
     assert report["full_junit"]["tests"] == 120
     assert commands[-1][5] == "pytest"
     assert Path(report["evidence_directory"], "SHA256SUMS").is_file()
@@ -128,7 +129,10 @@ def test_wrong_focused_count_fails_closed(tmp_path: Path) -> None:
     def runner(command, cwd, stdout_path, stderr_path):
         for argument in command:
             if isinstance(argument, str) and argument.startswith("--junitxml="):
-                _junit(Path(argument.split("=", 1)[1]), 76)
+                _junit(
+                    Path(argument.split("=", 1)[1]),
+                    quality_gate.EXPECTED_FOCUSED_TESTS - 1,
+                )
         return _result(command, cwd, stdout_path, stderr_path)
 
     report, code = quality_gate.execute(
@@ -154,7 +158,10 @@ def test_postflight_git_drift_fails(tmp_path: Path) -> None:
     def runner(command, cwd, stdout_path, stderr_path):
         for argument in command:
             if isinstance(argument, str) and argument.startswith("--junitxml="):
-                _junit(Path(argument.split("=", 1)[1]), 77)
+                _junit(
+                    Path(argument.split("=", 1)[1]),
+                    quality_gate.EXPECTED_FOCUSED_TESTS,
+                )
         return _result(command, cwd, stdout_path, stderr_path)
 
     probes = iter([_clean_probe(), _clean_probe("b" * 40)])
