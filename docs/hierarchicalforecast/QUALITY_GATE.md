@@ -2,13 +2,15 @@
 
 ## Status
 
-`IMPLEMENTED / ISOLATED_QUALITY_TESTS_PASS / FORMAL_84_AND_FULL_SUITE_PENDING`
+`IMPLEMENTED / ISOLATED_QUALITY_AND_PROMOTION_TESTS_PASS / FORMAL_92_AND_FULL_SUITE_PENDING`
 
-The quality gate runs the remaining local promotion checks in a fixed order and preserves command,
-JUnit, Git, and checksum evidence. It is separate from the real
-`hierarchicalforecast==1.5.1` runtime certification.
+The quality gate runs the remaining local code-quality checks in a fixed order and preserves
+command, JUnit, Git, and checksum evidence. The sealed promotion gate subsequently consumes and
+re-verifies this evidence before starting real runtime certification.
 
-## Formal command
+## Formal commands
+
+Run the quality gate directly:
 
 ```bash
 cd /mnt/e/env/ts/loto_forecast_platform-pr48
@@ -20,8 +22,14 @@ python3 scripts/run_hierarchicalforecast_quality_gate.py \
   --expected-git-sha "${EXPECTED_HEAD}"
 ```
 
-`--expected-git-sha` is mandatory. Production does not expose synchronization or full-suite
-bypasses.
+Or run the complete local sequence:
+
+```bash
+python3 scripts/run_hierarchicalforecast_promotion_gate.py \
+  --expected-git-sha "${EXPECTED_HEAD}"
+```
+
+Both commands require the expected Git SHA. Production does not expose phase bypasses.
 
 ## Execution order
 
@@ -43,8 +51,6 @@ The repository-wide pytest step runs only after every lighter check and the focu
 
 ## Focused-suite contract
 
-The focused suite contains:
-
 ```text
 tests/test_reconciliation.py
 tests/test_reconciliation_upstream_matrix.py
@@ -54,19 +60,21 @@ tests/test_reconciliation_package_certification.py
 tests/test_reconciliation_package_verifier.py
 tests/test_reconciliation_target_machine_certification.py
 tests/test_reconciliation_target_operator.py
+tests/test_reconciliation_promotion_gate.py
 tests/test_reconciliation_quality_gate.py
 ```
 
 Formal acceptance requires:
 
 ```text
-tests    = 84
+tests    = 92
 failures = 0
 errors   = 0
 ```
 
-The standalone transferred-package verifier contributes seven explicit tests. Console registration
-for both certification and verification commands remains covered by the existing two console tests.
+The standalone package verifier contributes seven tests. The sealed promotion gate contributes
+eight tests. Console registration for both package commands remains covered by the existing two
+console tests.
 
 ## mypy scope
 
@@ -79,7 +87,7 @@ src/loto/reconciliation/package_verifier.py
 scripts/hierarchicalforecast_target/
 ```
 
-The gate uses the checked-in `[tool.mypy]` configuration.
+The promotion-gate implementation is included through `scripts/hierarchicalforecast_target/`.
 
 ## Evidence directory
 
@@ -111,18 +119,16 @@ Structured statuses include `FAILED_SYNC`, `FAILED_PIP_CHECK`, `FAILED_RUFF_FORM
 
 ## Current evidence boundary
 
-The quality-gate implementation tests remain passing in isolation. The package verifier was tested
-against the exact published Git blobs:
-
 ```text
 standalone verifier tests = 7/7 PASS
-console entry tests       = 2/2 PASS
+promotion-gate tests      = 8/8 PASS
 compileall                = PASS
 Python lines over 100     = 0
+promotion wrapper --help  = PASS
 remote/local blob equality = PASS
 ```
 
-The branch now has 84 cumulative focused tests across separate isolated runs. A single formal
-84-test run, formal Ruff, formal mypy, and repository-wide pytest remain pending on the target
-machine. This runner does not replace real HierarchicalForecast 1.5.1 certification or GitHub
-Actions evidence.
+The branch now has 92 cumulative focused tests across separate isolated runs. A single formal
+92-test invocation, formal Ruff, formal mypy, and repository-wide pytest remain pending on the
+target machine. Neither the quality gate nor the promotion gate replaces real
+HierarchicalForecast 1.5.1 execution or GitHub Actions evidence.
