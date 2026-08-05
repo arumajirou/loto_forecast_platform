@@ -8,6 +8,10 @@ from loto.adapters.gluonts.inventory import (
     RuntimeInventoryEntry,
     inventory_sha256,
 )
+from loto.adapters.gluonts.lifecycle import (
+    LifecycleInvocation,
+    certify_predictor_lifecycle,
+)
 from loto.adapters.gluonts.protocol import (
     ArgumentState,
     DatasetItem,
@@ -29,16 +33,31 @@ from loto.adapters.gluonts.runner import (
     invoke_provider,
     sha256_file,
 )
+from loto.adapters.gluonts.serialization import (
+    ArtifactFile,
+    LifecycleCheckState,
+    LifecycleOutcome,
+    PredictorArtifactManifest,
+    PredictorFitSerializeResult,
+    PredictorLifecycleResult,
+    PredictorReloadResult,
+    artifact_tree_sha256,
+    fit_result_sha256,
+    lifecycle_result_sha256,
+    manifest_sha256,
+    prediction_sha256,
+    reload_result_sha256,
+    sha256_json,
+)
 from loto.adapters.gluonts.smoke import (
     DeepARCPUSmokeResult,
     SmokeOutcome,
-    apply_deepar_smoke,
-    run_deepar_cpu_smoke,
     smoke_sha256,
 )
 
 __all__ = [
     "ArgumentState",
+    "ArtifactFile",
     "CheckState",
     "DatasetItem",
     "DeepARCPUSmokeResult",
@@ -48,7 +67,14 @@ __all__ = [
     "GluonTSProviderRequest",
     "GluonTSProviderResponse",
     "InventoryCategory",
+    "LifecycleCheckState",
+    "LifecycleInvocation",
+    "LifecycleOutcome",
     "PredictionRow",
+    "PredictorArtifactManifest",
+    "PredictorFitSerializeResult",
+    "PredictorLifecycleResult",
+    "PredictorReloadResult",
     "ProviderInvocation",
     "ProviderOperation",
     "ProviderStatus",
@@ -57,13 +83,19 @@ __all__ = [
     "RuntimeInventoryEntry",
     "SmokeOutcome",
     "TimelineTrack",
-    "apply_deepar_smoke",
+    "artifact_tree_sha256",
     "atomic_write_bytes",
     "atomic_write_json",
+    "certify_predictor_lifecycle",
+    "fit_result_sha256",
     "inventory_sha256",
     "invoke_provider",
+    "lifecycle_result_sha256",
+    "manifest_sha256",
+    "prediction_sha256",
     "protocol_schema_sha256",
-    "run_deepar_cpu_smoke",
+    "reload_result_sha256",
     "sha256_file",
+    "sha256_json",
     "smoke_sha256",
 ]
