@@ -15,6 +15,7 @@ from .contracts import (
     RuntimeEvidence,
     TimelinePolicy,
 )
+from .execution import ExecutionPlan, ExecutionPlanError, build_execution_plan
 from .geometry import CompiledHistory, TimelineMappingRow, compile_regular_history
 from .inventory import (
     AutoGluonRuntimeInventory,
@@ -31,6 +32,7 @@ from .inventory import (
     discover_runtime_inventory,
     write_runtime_inventory,
 )
+from .provider import ProviderRuntime, run_provider_v2
 
 __all__ = [
     "ArgumentLedgerEntry",
@@ -41,6 +43,8 @@ __all__ = [
     "DeviceRequest",
     "EnsembleInventoryEntry",
     "ExecutionMode",
+    "ExecutionPlan",
+    "ExecutionPlanError",
     "FailureCategory",
     "FitConfig",
     "GameGeometry",
@@ -53,6 +57,7 @@ __all__ = [
     "ProviderOperation",
     "ProviderRequestV2",
     "ProviderResponseV2",
+    "ProviderRuntime",
     "RuntimeEvidence",
     "SOURCE_ENSEMBLE_SPECS",
     "SOURCE_MODEL_SPECS",
@@ -61,7 +66,9 @@ __all__ = [
     "TARGET_AUTOGLUON_VERSION",
     "TimelineMappingRow",
     "TimelinePolicy",
+    "build_execution_plan",
     "compile_regular_history",
     "discover_runtime_inventory",
+    "run_provider_v2",
     "write_runtime_inventory",
 ]
