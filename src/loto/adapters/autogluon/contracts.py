@@ -178,6 +178,13 @@ class ProviderRequestV2(StrictModel):
     seed: int = 1
     requested_device: DeviceRequest = DeviceRequest.AUTO
 
+    @field_validator("model_ids")
+    @classmethod
+    def require_unique_model_ids(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        if len(set(value)) != len(value):
+            raise ValueError("model_ids must be unique")
+        return value
+
     @model_validator(mode="after")
     def validate_operation_contract(self) -> ProviderRequestV2:
         needs_history = self.operation in {
@@ -263,6 +270,7 @@ class ProviderResponseV2(StrictModel):
     ensemble_inventory: tuple[dict[str, Any], ...] = ()
     argument_ledger: tuple[ArgumentLedgerEntry, ...] = ()
     artifacts: dict[str, str] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
     runtime_evidence: RuntimeEvidence | None = None
     error: ProviderError | None = None
 
