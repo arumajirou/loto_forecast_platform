@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import base64
+import hashlib
 import importlib.util
 import json
 import sys
 import types
 from dataclasses import dataclass
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -18,25 +20,39 @@ from loto.basicts_campaign.installed_provenance import (
 )
 
 
+@dataclass(frozen=True)
+class FakeFileHash:
+    mode: str
+    value: str
+
+
+@dataclass(frozen=True)
+class FakePackagePath:
+    path: str
+    hash: FakeFileHash | None
+    size: int | None
+
+    def __str__(self) -> str:
+        return self.path
+
+
 @dataclass
 class FakeDistribution:
     direct_url: str | None
     root: Path
+    entries: list[FakePackagePath] | None
     name: str = "BasicTS"
     version: str = "1.1.0"
-    include_files: bool = True
 
     @property
     def metadata(self) -> dict[str, str]:
         return {"Name": self.name}
 
     @property
-    def files(self) -> list[PurePosixPath] | None:
-        if not self.include_files:
-            return None
-        return [PurePosixPath("basicts/__init__.py")]
+    def files(self) -> list[FakePackagePath] | None:
+        return self.entries
 
-    def locate_file(self, path: PurePosixPath) -> Path:
+    def locate_file(self, path: FakePackagePath) -> Path:
         return self.root / Path(str(path))
 
     def read_text(self, filename: str) -> str | None:
@@ -57,6 +73,17 @@ def _payload(**updates: Any) -> str:
     return json.dumps(payload)
 
 
+def _record_hash(path: Path) -> FakeFileHash:
+    digest = hashlib.sha256(path.read_bytes()).digest()
+    value = base64.urlsafe_b64encode(digest).rstrip(b"=").decode("ascii")
+    return FakeFileHash("sha256", value)
+
+
+def _entry(path: Path, root: Path) -> FakePackagePath:
+    relative = path.relative_to(root).as_posix()
+    return FakePackagePath(relative, _record_hash(path), path.stat().st_size)
+
+
 def _install(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -66,16 +93,35 @@ def _install(
     include_files: bool = True,
     origin: Path | None = None,
     providers: list[str] | None = None,
-) -> Path:
-    package = tmp_path / "site-packages" / "basicts"
+    mutate_entries: Any = None,
+) -> tuple[Path, Path, FakeDistribution]:
+    root = tmp_path / "site-packages"
+    package = root / "basicts"
     package.mkdir(parents=True)
     package_init = package / "__init__.py"
     package_init.write_text("__version__ = '1.1.0'\n", encoding="utf-8")
+
+    dist_info = root / "BasicTS-1.1.0.dist-info"
+    dist_info.mkdir()
+    direct_url_path = dist_info / "direct_url.json"
+    if direct_url is not None:
+        direct_url_path.write_text(direct_url, encoding="utf-8")
+
+    entries: list[FakePackagePath] | None
+    if include_files:
+        entries = [_entry(package_init, root)]
+        if direct_url is not None:
+            entries.append(_entry(direct_url_path, root))
+        if mutate_entries is not None:
+            entries = mutate_entries(entries, package_init, direct_url_path)
+    else:
+        entries = None
+
     distribution = FakeDistribution(
         direct_url,
-        tmp_path / "site-packages",
+        root,
+        entries,
         version=version,
-        include_files=include_files,
     )
     monkeypatch.setattr(
         installed_provenance.importlib.metadata,
@@ -99,21 +145,25 @@ def _install(
         lambda name: spec,
     )
     monkeypatch.delitem(sys.modules, "basicts", raising=False)
-    return package_init
+    return package_init, direct_url_path, distribution
 
 
-def test_accepts_exact_git_provenance_and_import_origin(
+def test_accepts_exact_git_provenance_record_and_import_origin(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    package_init = _install(monkeypatch, tmp_path, _payload())
+    package_init, direct_url_path, _ = _install(monkeypatch, tmp_path, _payload())
 
     evidence = verify_installed_basicts_provenance()
 
     assert evidence["installed_provenance_status"] == "PASS"
+    assert evidence["installed_record_integrity_status"] == "PASS"
     assert evidence["import_origin_status"] == "PASS"
+    assert evidence["direct_url_record_status"] == "PASS"
+    assert evidence["package_init_record_status"] == "PASS"
     assert evidence["direct_url_commit_id"] == EXPECTED_UPSTREAM_REVISION
     assert evidence["import_spec_origin"] == str(package_init.resolve())
+    assert evidence["direct_url_record_path"] == str(direct_url_path.resolve())
     assert evidence["import_provider_distributions"] == ["BasicTS"]
     assert len(evidence["import_origin_sha256"]) == 64
 
@@ -259,4 +309,71 @@ def test_rejects_preloaded_shadow_module(
     monkeypatch.setitem(sys.modules, "basicts", module)
 
     with pytest.raises(InstalledProvenanceError, match="loaded BasicTS module is shadowed"):
+        verify_installed_basicts_provenance()
+
+
+def test_rejects_package_init_record_hash_drift(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    package_init, _, _ = _install(monkeypatch, tmp_path, _payload())
+    package_init.write_text("tampered = True\n", encoding="utf-8")
+
+    with pytest.raises(InstalledProvenanceError, match="package_init RECORD SHA-256 mismatch"):
+        verify_installed_basicts_provenance()
+
+
+def test_rejects_direct_url_record_hash_drift(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    _, direct_url_path, distribution = _install(monkeypatch, tmp_path, _payload())
+    changed = _payload(extra="tampered")
+    direct_url_path.write_text(changed, encoding="utf-8")
+    distribution.direct_url = changed
+
+    with pytest.raises(InstalledProvenanceError, match="direct_url RECORD SHA-256 mismatch"):
+        verify_installed_basicts_provenance()
+
+
+def test_rejects_missing_record_hash(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def mutate(entries, package_init, direct_url_path):
+        first = entries[0]
+        entries[0] = FakePackagePath(first.path, None, first.size)
+        return entries
+
+    _install(monkeypatch, tmp_path, _payload(), mutate_entries=mutate)
+
+    with pytest.raises(InstalledProvenanceError, match="RECORD SHA-256 is missing"):
+        verify_installed_basicts_provenance()
+
+
+def test_rejects_record_size_drift(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def mutate(entries, package_init, direct_url_path):
+        first = entries[0]
+        entries[0] = FakePackagePath(first.path, first.hash, first.size + 1)
+        return entries
+
+    _install(monkeypatch, tmp_path, _payload(), mutate_entries=mutate)
+
+    with pytest.raises(InstalledProvenanceError, match="RECORD size mismatch"):
+        verify_installed_basicts_provenance()
+
+
+def test_rejects_missing_direct_url_record_entry(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def mutate(entries, package_init, direct_url_path):
+        return [entry for entry in entries if not entry.path.endswith("direct_url.json")]
+
+    _install(monkeypatch, tmp_path, _payload(), mutate_entries=mutate)
+
+    with pytest.raises(InstalledProvenanceError, match="RECORD entry mismatch"):
         verify_installed_basicts_provenance()
