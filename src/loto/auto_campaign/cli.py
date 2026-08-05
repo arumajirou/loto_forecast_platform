@@ -12,9 +12,10 @@ from .lineage_verification import verify_run_with_lineage
 from .promotion_gate import GATED_STAGES
 from .runner import inventory, load_config, plan, run_stage
 
-# Compatibility patch point retained for existing callers and PR #50 tests.
-# The implementation now includes both promotion and lineage enforcement.
+# Compatibility patch points retained for existing callers and stacked-PR tests.
+# Their implementations now include lineage and verification-seal enforcement.
 run_stage_with_promotion_gate = run_stage_with_promotion_and_lineage
+verify_run_with_coverage = verify_run_with_lineage
 
 
 def _run_id(prefix: str, stage: str) -> str:
@@ -95,7 +96,7 @@ def main() -> None:
         }
     )
     if args.command == "verify":
-        result = verify_run_with_lineage(args.run.resolve())
+        result = verify_run_with_coverage(args.run.resolve())
     else:
         output = args.output
         if output is None:
