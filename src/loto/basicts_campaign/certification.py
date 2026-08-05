@@ -20,6 +20,7 @@ EXPECTED_BASICTS_VERSION = "1.1.0"
 EXPECTED_UPSTREAM_REVISION = "c2bb6e31e591167e84459775a21a62e70a5893ce"
 SHA256_LINE = re.compile(r"^(?P<digest>[0-9a-f]{64})  (?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)$")
 DIGEST_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+RECORD_DIGEST_PATTERN = re.compile(r"^[A-Za-z0-9_-]{43}$")
 
 
 class CertificationError(RuntimeError):
@@ -181,18 +182,33 @@ def _require_digest(value: Any, field: str) -> None:
         raise CertificationError(f"identity {field} is invalid")
 
 
+def _require_record_digest(value: Any, field: str) -> None:
+    if not isinstance(value, str) or RECORD_DIGEST_PATTERN.fullmatch(value) is None:
+        raise CertificationError(f"identity {field} is invalid")
+
+
+def _require_record_size(value: Any, field: str) -> None:
+    if not isinstance(value, int) or value < 1:
+        raise CertificationError(f"identity {field} is invalid")
+
+
 def _verify_identity_provenance(evidence: dict[str, Any]) -> None:
     required = {
         "installed_provenance_status": "PASS",
+        "installed_record_integrity_status": "PASS",
         "distribution_name": EXPECTED_DISTRIBUTION_NAME,
         "distribution_version": EXPECTED_BASICTS_VERSION,
         "direct_url_repository": EXPECTED_REPOSITORY_URL,
         "direct_url_vcs": "git",
         "direct_url_commit_id": EXPECTED_UPSTREAM_REVISION,
         "direct_url_requested_revision": EXPECTED_UPSTREAM_REVISION,
+        "direct_url_record_status": "PASS",
+        "direct_url_record_hash_mode": "sha256",
         "import_origin_status": "PASS",
         "import_name": EXPECTED_IMPORT_NAME,
         "distribution_package_entry": EXPECTED_PACKAGE_INIT,
+        "package_init_record_status": "PASS",
+        "package_init_record_hash_mode": "sha256",
     }
     for field, expected in required.items():
         if evidence.get(field) != expected:
@@ -212,6 +228,17 @@ def _verify_identity_provenance(evidence: dict[str, Any]) -> None:
     if not Path(package_init).as_posix().endswith(f"/{EXPECTED_PACKAGE_INIT}"):
         raise CertificationError("identity distribution package path has an unexpected suffix")
 
+    direct_url_entry = evidence.get("direct_url_record_entry")
+    direct_url_path = evidence.get("direct_url_record_path")
+    if not isinstance(direct_url_entry, str) or not direct_url_entry.endswith(
+        ".dist-info/direct_url.json"
+    ):
+        raise CertificationError("identity direct_url_record_entry is invalid")
+    if not isinstance(direct_url_path, str) or not Path(direct_url_path).is_absolute():
+        raise CertificationError("identity direct_url_record_path is invalid")
+    if Path(direct_url_path).name != "direct_url.json":
+        raise CertificationError("identity direct_url_record_path has an unexpected suffix")
+
     locations = evidence.get("import_submodule_search_locations")
     expected_location = str(Path(package_init).parent)
     if locations != [expected_location]:
@@ -220,6 +247,22 @@ def _verify_identity_provenance(evidence: dict[str, Any]) -> None:
         raise CertificationError("identity module_already_loaded is invalid")
     _require_digest(evidence.get("direct_url_sha256"), "direct_url_sha256")
     _require_digest(evidence.get("import_origin_sha256"), "import_origin_sha256")
+    _require_record_digest(
+        evidence.get("direct_url_record_hash_value"),
+        "direct_url_record_hash_value",
+    )
+    _require_record_digest(
+        evidence.get("package_init_record_hash_value"),
+        "package_init_record_hash_value",
+    )
+    _require_record_size(
+        evidence.get("direct_url_record_size_bytes"),
+        "direct_url_record_size_bytes",
+    )
+    _require_record_size(
+        evidence.get("package_init_record_size_bytes"),
+        "package_init_record_size_bytes",
+    )
 
 
 def verify_provider_bundle(directory: Path, operation: str) -> dict[str, Any]:
@@ -321,6 +364,7 @@ def certify_p0(
             "isolated_python_lane": "3.11",
             "identity": True,
             "installed_package_git_provenance": True,
+            "installed_record_integrity": True,
             "import_origin_bound_to_distribution": True,
             "config_import_allowlist": True,
             "dlinear_cpu_fit_predict": True,
