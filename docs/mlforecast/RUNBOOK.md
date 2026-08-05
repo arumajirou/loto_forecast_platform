@@ -79,25 +79,41 @@ Do not extract an unverified ZIP.
 
 ## 6. Build the source handoff ZIP
 
-The MLForecast scope must be committed and clean.
+The MLForecast scope and the shared `pyproject.toml` / `uv.lock` snapshots must be committed and clean.
 
 ```bash
 bash docs/mlforecast/build_handoff_bundle.sh
 ```
 
-The builder fails if `configs/mlforecast`, `docs/mlforecast`, `src/loto/mlforecast`, or `tests/mlforecast` contains uncommitted changes.
+The script routes both construction and verification through `loto.mlforecast.handoff_guard`. It records the repository commit, branch, and commit timestamp before construction, repeats the check after construction, and deletes the newly created ZIP and sidecar if the repository state changed during the build.
+
+The guard rejects:
+
+- dirty MLForecast paths or dirty shared environment snapshots;
+- detached HEAD or malformed commit metadata;
+- symlinked repository, ZIP, or sidecar inputs;
+- unsafe or non-portable archive paths;
+- duplicate, encrypted, non-regular, or CRC-invalid ZIP members;
+- excessive member counts or total uncompressed size;
+- missing required documentation, source, configuration, tests, or environment snapshots;
+- extra members not represented by `ARTIFACT_MANIFEST.json`;
+- disagreement among manifest, `SHA256SUMS`, `SOURCE_PROVENANCE.json`, `VERSION`, `FROZEN_BASE_SHA`, and `FROZEN_UPSTREAM.json`.
 
 ## 7. Verify a received source handoff ZIP
 
+Use the strict guard, not the compatibility verifier in `handoff.py`:
+
 ```bash
 uv run --frozen -- \
-  python -m loto.mlforecast.handoff \
+  python -m loto.mlforecast.handoff_guard \
   --verify \
   --zip /absolute/path/mlforecast-handoff-<SHA>.zip \
   --sha256 /absolute/path/mlforecast-handoff-<SHA>.zip.sha256
 ```
 
 Expected status: `HANDOFF_VERIFIED`.
+
+This is an integrity and completeness check for the source package. It does not authenticate the publisher and does not replace `RUNTIME_CERTIFIED`.
 
 ## 8. Operational monitoring
 
@@ -121,6 +137,7 @@ GPU use is not required for Ridge or AutoRidge certification. Record GPU state o
 - Record the exact exit code and terminal output.
 - Verify failure bundles before sharing them.
 - Do not reinterpret `BUNDLE_VERIFIED` as runtime success.
+- Do not reinterpret `HANDOFF_VERIFIED` as publisher authentication or runtime success.
 - Do not continue to formal campaigns after any runtime lifecycle failure.
 
 ## 10. Final integration boundary
