@@ -131,8 +131,7 @@ def certify_saved_runtime(
     shape_match = before_values.shape == after_values.shape
     finite = bool(np.isfinite(after_values).all())
     prediction_match = bool(
-        shape_match
-        and np.allclose(before_values, after_values, rtol=1e-6, atol=1e-6)
+        shape_match and np.allclose(before_values, after_values, rtol=1e-6, atol=1e-6)
     )
     max_abs_diff = (
         float(np.max(np.abs(before_values - after_values)))
