@@ -19,6 +19,11 @@ from .prospective_registry import (
     register_prospective_scoring,
     verify_prospective_registry,
 )
+from .prospective_registry_reconciliation import (
+    ReconciliationOptions,
+    reconcile_prospective_registry,
+    verify_registry_reconciliation,
+)
 from .prospective_scoring import score_locked_prospective_run
 from .prospective_scoring_verification import verify_prospective_scoring
 from .runner import inventory, load_config, plan, run_stage
@@ -47,7 +52,11 @@ def _resolve_path(value: Path, project: Path) -> Path:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="loto-auto-campaign")
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
-    parser.add_argument("--config", type=Path, default=Path("configs/auto_campaign/campaign.yaml"))
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=Path("configs/auto_campaign/campaign.yaml"),
+    )
     sub = parser.add_subparsers(dest="command", required=True)
     for command in ("inventory", "plan"):
         child = sub.add_parser(command)
@@ -126,6 +135,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     registry_verify = sub.add_parser("verify-scoring-registry")
     registry_verify.add_argument("--run", type=Path, required=True)
+    reconcile = sub.add_parser("reconcile-scoring-registry")
+    reconcile.add_argument("--run", type=Path, required=True)
+    reconcile.add_argument("--output", type=Path, required=True)
+    reconcile.add_argument("--postgres-dsn-env", default=None)
+    reconcile.add_argument("--mlflow-uri", default=None)
+    reconcile.add_argument("--mlflow-uri-env", default=None)
+    reconcile.add_argument("--float-tolerance", type=float, default=1e-12)
+    reconcile.add_argument(
+        "--skip-remote-artifact-check",
+        action="store_true",
+        help="diagnostic only; formal reconciliation checks remote artifacts",
+    )
+    reconciliation_verify = sub.add_parser("verify-registry-reconciliation")
+    reconciliation_verify.add_argument("--run", type=Path, required=True)
     return parser
 
 
@@ -192,6 +215,31 @@ def _run_portable_command(
             }
     if args.command == "verify-scoring-registry":
         return verify_prospective_registry(_resolve_path(args.run, project))
+    if args.command == "reconcile-scoring-registry":
+        try:
+            options = ReconciliationOptions(
+                postgres_dsn_env=args.postgres_dsn_env,
+                mlflow_uri=args.mlflow_uri,
+                mlflow_uri_env=args.mlflow_uri_env,
+                float_tolerance=args.float_tolerance,
+                require_remote_artifacts=(
+                    not args.skip_remote_artifact_check
+                ),
+            )
+            return reconcile_prospective_registry(
+                receipt_root=_resolve_path(args.run, project),
+                output=_resolve_path(args.output, project),
+                options=options,
+            )
+        except (OSError, RuntimeError, ValueError) as exc:
+            return {
+                "status": "FAIL",
+                "command": args.command,
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+            }
+    if args.command == "verify-registry-reconciliation":
+        return verify_registry_reconciliation(_resolve_path(args.run, project))
     return None
 
 
@@ -202,7 +250,11 @@ def main() -> None:
     if portable_result is not None:
         result = portable_result
     else:
-        config_path = args.config if args.config.is_absolute() else project / args.config
+        config_path = (
+            args.config
+            if args.config.is_absolute()
+            else project / args.config
+        )
         config = load_config(config_path)
         data_path = (
             config.data_path
@@ -210,7 +262,9 @@ def main() -> None:
             else project / config.data_path
         )
         output_root = (
-            config.output_root if config.output_root.is_absolute() else project / config.output_root
+            config.output_root
+            if config.output_root.is_absolute()
+            else project / config.output_root
         )
         config = config.model_copy(
             update={
@@ -224,7 +278,10 @@ def main() -> None:
             output = args.output
             if output is None:
                 stage = args.command if args.command != "run" else args.stage
-                output = config.output_root / _run_id(config.campaign_id_prefix, stage)
+                output = config.output_root / _run_id(
+                    config.campaign_id_prefix,
+                    stage,
+                )
             else:
                 output = output if output.is_absolute() else project / output
             output = output.resolve()
@@ -235,7 +292,10 @@ def main() -> None:
             else:
                 selected_stage = CampaignStage(args.stage)
                 source_run = _resolve_optional_path(args.source_run, project)
-                predecessor_run = _resolve_optional_path(args.predecessor_run, project)
+                predecessor_run = _resolve_optional_path(
+                    args.predecessor_run,
+                    project,
+                )
                 coverage_run = _resolve_optional_path(args.coverage_run, project)
                 runtime_run = _resolve_optional_path(args.runtime_run, project)
                 if selected_stage == CampaignStage.API_COVERAGE:
