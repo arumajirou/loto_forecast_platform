@@ -35,6 +35,22 @@ from loto.adapters.gluonts.p6_registry import (
     model_specs as p6_model_specs,
     registry_sha256 as p6_registry_sha256,
 )
+from loto.adapters.gluonts.p7_audit import (
+    EXPECTED_MODELS as P7_EXPECTED_MODELS,
+    audit_lane as audit_p7_lane,
+    build_target_audit,
+    parse_checksum_file,
+    verify_checksum_inventory,
+    write_target_audit,
+)
+from loto.adapters.gluonts.p7_contract import (
+    CertificationStatus as P7CertificationStatus,
+    EvidenceState as P7EvidenceState,
+    P7FailureCategory,
+    P7LaneAudit,
+    P7ModelClassification,
+    P7TargetMachineAudit,
+)
 from loto.adapters.gluonts.protocol import (
     ArgumentState,
     DatasetItem,
@@ -105,6 +121,13 @@ __all__ = [
     "P6StageInvocation",
     "P6Status",
     "P6_EXPECTED_MODELS",
+    "P7CertificationStatus",
+    "P7EvidenceState",
+    "P7FailureCategory",
+    "P7LaneAudit",
+    "P7ModelClassification",
+    "P7TargetMachineAudit",
+    "P7_EXPECTED_MODELS",
     "PredictionRow",
     "PredictorArtifactManifest",
     "PredictorFitSerializeResult",
@@ -121,6 +144,8 @@ __all__ = [
     "artifact_tree_sha256",
     "atomic_write_bytes",
     "atomic_write_json",
+    "audit_p7_lane",
+    "build_target_audit",
     "certify_predictor_lifecycle",
     "fit_result_sha256",
     "get_p6_model_spec",
@@ -131,6 +156,7 @@ __all__ = [
     "manifest_sha256",
     "p6_model_specs",
     "p6_registry_sha256",
+    "parse_checksum_file",
     "prediction_sha256",
     "protocol_schema_sha256",
     "reload_result_sha256",
@@ -138,4 +164,6 @@ __all__ = [
     "sha256_file",
     "sha256_json",
     "smoke_sha256",
+    "verify_checksum_inventory",
+    "write_target_audit",
 ]
