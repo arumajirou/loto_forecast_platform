@@ -29,11 +29,19 @@ from loto.adapters.gluonts.runner import (
     invoke_provider,
     sha256_file,
 )
+from loto.adapters.gluonts.smoke import (
+    DeepARCPUSmokeResult,
+    SmokeOutcome,
+    apply_deepar_smoke,
+    run_deepar_cpu_smoke,
+    smoke_sha256,
+)
 
 __all__ = [
     "ArgumentState",
     "CheckState",
     "DatasetItem",
+    "DeepARCPUSmokeResult",
     "DeviceRequest",
     "EnvironmentLane",
     "FormalAvailability",
@@ -47,11 +55,15 @@ __all__ = [
     "ResourcePolicy",
     "RuntimeInventory",
     "RuntimeInventoryEntry",
+    "SmokeOutcome",
     "TimelineTrack",
+    "apply_deepar_smoke",
     "atomic_write_bytes",
     "atomic_write_json",
     "inventory_sha256",
     "invoke_provider",
     "protocol_schema_sha256",
+    "run_deepar_cpu_smoke",
     "sha256_file",
+    "smoke_sha256",
 ]
