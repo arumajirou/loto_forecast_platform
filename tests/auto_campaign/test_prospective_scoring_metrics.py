@@ -108,12 +108,15 @@ def test_seed_ranking_prioritizes_hit_pm1_then_all_positions() -> None:
         expected_ds=[4],
     )
 
-    summary, ranking = _seed_summary(
+    per_seed, summary, ranking = _seed_summary(
         pd.concat([model_metrics, baseline_metrics], ignore_index=True)
     )
     comparison, champion = _baseline_comparison(ranking)
 
+    assert not per_seed.empty
     assert not summary.empty
+    assert "hit_pm1_var" in summary.columns
+    assert "worst_seed_hit_pm1" in summary.columns
     assert ranking.iloc[0]["source_type"] == "model"
     assert champion is not None
     assert champion["model_name"] == "AutoTFT"
