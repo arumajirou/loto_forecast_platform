@@ -18,6 +18,10 @@ from loto.auto_campaign.runtime import gpu_process_snapshot, torch_runtime_snaps
 from loto.data.lineage import atomic_write_json
 
 
+class RuntimeCertificationFailure(RuntimeError):
+    """Raised only after structured runtime-certification evidence is durable."""
+
+
 def _point_column(prediction: pd.DataFrame, alias: str) -> str:
     ignored = {"unique_id", "ds", "cutoff"}
     candidates = [column for column in prediction.columns if column not in ignored]
@@ -110,7 +114,7 @@ def _finish_result(model_path: Path, result: dict[str, Any]) -> dict[str, Any]:
     result["evidence_path"] = str(evidence_path)
     atomic_write_json(evidence_path, result)
     if result.get("status") != "PASS":
-        raise RuntimeError(
+        raise RuntimeCertificationFailure(
             "NeuralForecast runtime certification failed; "
             f"evidence={evidence_path}; failed_checks={result.get('failed_checks', [])}"
         )
@@ -286,7 +290,7 @@ def certify_saved_runtime(
             }
         )
         return _finish_result(model_path, result)
-    except RuntimeError:
+    except RuntimeCertificationFailure:
         raise
     except Exception as exc:
         result.update(
