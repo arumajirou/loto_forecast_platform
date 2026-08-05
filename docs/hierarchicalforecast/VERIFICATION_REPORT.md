@@ -4,7 +4,7 @@
 
 - Pull request: #48
 - Branch: `agent/hierarchicalforecast-runtime-certification`
-- State: `PARTIALLY_VERIFIED / HARDENED_PROMOTION_TESTS_PASS / CI_BLOCKED_RUNNER_START`
+- State: `PARTIALLY_VERIFIED / LOCK_CONTRACT_TESTS_PASS / CI_BLOCKED_RUNNER_START`
 - Promotion verdict: `NOT_READY_FOR_REVIEW`
 
 The PR remains Draft until the formal promotion gate succeeds on the exact current clean head and
@@ -21,9 +21,41 @@ GitHub Actions produces real passing steps and logs.
 - read-only standalone transferred-package verification;
 - target-machine locked provisioning and independent runtime/source/package checks;
 - sealed quality and promotion gates with Git pre/post checks;
+- TOML-based dependency and lock validation before provisioning;
 - fail-fast chaining and independent child-evidence validation.
 
 No Hit@±1, MAE, MSE, RMSE, Holdout, or Prospective accuracy claim is made.
+
+## Locked dependency audit
+
+Source inspection confirms:
+
+```text
+project requires-python = >=3.11,<3.14
+uv.lock requires-python = >=3.11, <3.14
+full declaration         = hierarchicalforecast>=1.0
+locked package version   = 1.5.1
+Python 3.13 wheel         = present in uv.lock
+dev tools                = pytest, pytest-cov, Ruff, mypy, Pydantic
+.gitignore                = .venv/ and /artifacts/ ignored
+```
+
+The broad declaration is not presented as an exact pin. Formal success depends on `uv sync
+--locked` and a new standard-library validator requiring the lock to resolve only version 1.5.1.
+The validator records SHA-256 values for both `pyproject.toml` and `uv.lock`.
+
+Isolated verification:
+
+```text
+lock 1.5.1 accepted
+lock 1.5.0 mutation rejected
+quality-gate tests 9/9 passed
+compileall PASS
+Python lines over 100 = 0
+published Git blobs match tested inputs
+```
+
+A formal validator execution against the actual target checkout remains pending.
 
 ## Focused evidence
 
@@ -38,30 +70,10 @@ No Hit@±1, MAE, MSE, RMSE, Holdout, or Prospective accuracy claim is made.
 | target verification | 9 passed |
 | target operator | 6 passed |
 | hardened promotion gate | 11 passed |
-| quality gate | 9 passed |
+| quality gate, including dependency drift rejection | 9 passed |
 | **Cumulative total** | **95 passed** |
 
 These are cumulative isolated results, not yet one formal 95-test invocation.
-
-## Security and integrity audit findings
-
-The initial promotion gate verified child status and hashes but did not independently re-check all
-semantic claims. The hardened implementation now verifies:
-
-- child expected Git SHA and explicit top-level Git commit;
-- clean child preflight and postflight states on the same commit;
-- exact quality JUnit `95/0/0` and full-suite zero failures/errors;
-- exact installed target version `1.5.1`;
-- runtime summary `40/40/40/0`;
-- verified method partition `executed_cases=24`, `rejected_cases=16`;
-- canonical child report and manifest bytes;
-- report and manifest Run ID equal to the evidence-directory name;
-- exact manifest and checksum coverage, uniqueness, path safety, sizes, and hashes;
-- no symbolic-link components in evidence and runtime ZIP paths;
-- standalone verifier identity matching target Run ID, path, and SHA-256.
-
-The target operator now explicitly persists `git_commit` in `OPERATOR_REPORT.json` and its existing
-success test asserts that value.
 
 ## Formal local command
 
@@ -75,6 +87,10 @@ python3 scripts/run_hierarchicalforecast_promotion_gate.py \
   --expected-git-sha "${EXPECTED_HEAD}"
 ```
 
+The formal wrapper first validates the lock contract. The quality child validates it again and
+seals the dependency result. Target certification then independently checks the installed
+distribution version.
+
 Required local success:
 
 ```text
@@ -83,6 +99,7 @@ promotion status                   LOCAL_GATES_VERIFIED
 formal_success                     true
 ready_for_review                   false
 ci_required                        true
+dependency locked version          1.5.1
 quality focused                    95/0/0
 quality full failures/errors       0/0
 installed version                  1.5.1
@@ -112,7 +129,9 @@ other roots but does not replace them.
 
 | Gate | State |
 |---|---|
+| dependency validator isolated mutation test | passed |
 | cumulative isolated focused evidence | 95 passed |
+| formal dependency validation on target checkout | pending |
 | one combined 95-test run | pending |
 | Ruff format/lint | pending formal run |
 | supported mypy scope | pending formal run |
@@ -126,8 +145,8 @@ other roots but does not replace them.
 
 ## CI blocker
 
-The current failure class remains `BLOCKED_RUNNER_START`: jobs finish with `steps=null` and no logs.
-This is not Python test-failure evidence and provides no CI verification. Issue #61 remains open.
+The failure class remains `BLOCKED_RUNNER_START`: jobs finish with `steps=null` and no logs. This is
+not Python test-failure evidence and provides no CI verification. Issue #61 remains open.
 
 ## Verdict
 
