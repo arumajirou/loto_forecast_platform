@@ -1,0 +1,31 @@
+schema_version: 1
+run_id: darts-oof-multiseed
+primary_metric: hit_at_1
+split:
+  strategy: expanding_window
+  min_train_size: 256
+  horizon: 1
+  step: 1
+  max_folds: 100
+seeds: [1, 7, 19]
+retain:
+  per_fold: true
+  per_seed: true
+  mean: true
+  variance: true
+  worst: true
+baseline_gate:
+  require_mean_hit_improvement: true
+  require_no_worst_seed_hit_regression: true
+candidate_selection:
+  allow_best_seed_only: false
+  tie_breakers:
+    - worst_hit_at_1
+    - all_positions_hit_at_1
+    - mae
+provenance:
+  hash_algorithm: sha256
+  require_data_hash: true
+  require_config_hash: true
+  require_code_hash: true
+  require_git_commit: true
