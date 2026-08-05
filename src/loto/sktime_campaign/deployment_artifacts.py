@@ -9,6 +9,7 @@ from typing import Any
 
 from loto.sktime_campaign.deployment_canary import (
     CanaryActivationRequest,
+    DeploymentState,
     activate_shadow_canary,
     canonical_sha256,
 )
@@ -244,6 +245,11 @@ def verify_p9(output_dir: Path, request: CanaryActivationRequest) -> dict[str, A
         raise P9VerificationError("runtime probe mismatch")
     pre_state = _load_json(output_dir / "PRE_DEPLOYMENT_STATE.json")
     post_state = _load_json(output_dir / "POST_DEPLOYMENT_STATE.json")
+    try:
+        DeploymentState.model_validate(pre_state)
+        DeploymentState.model_validate(post_state)
+    except ValueError as exc:
+        raise P9VerificationError(f"deployment state seal mismatch: {exc}") from exc
     if pre_state["primary_binding"] != post_state["primary_binding"]:
         raise P9VerificationError("primary binding changed")
     if post_state["canary_binding"] is None:
