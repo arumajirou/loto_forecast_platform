@@ -7,6 +7,8 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+import pandas as pd
+
 from .persistence import sha256_file, verify_sha256s
 from .prediction_lock import PREDICTION_LOCK_PATH, verify_prediction_lock
 from .prospective_scoring_support import (
@@ -16,6 +18,7 @@ from .prospective_scoring_support import (
     SCORING_REPORT,
     SCORING_SCHEMA_VERSION,
     _canonical_sha256,
+    _file_inventory,
     _read_json,
     _reject_symlinks,
     _safe_relative,
@@ -59,6 +62,21 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
         failures.append("actuals lock status must be LOCKED")
     if actuals_lock.get("actual_known") is not True:
         failures.append("actuals lock actual_known must be true")
+    scoring_ids = {
+        str(value)
+        for value in (
+            manifest.get("scoring_id"),
+            report.get("scoring_id"),
+            actuals_lock.get("scoring_id"),
+        )
+        if str(value or "").strip()
+    }
+    if len(scoring_ids) != 1:
+        failures.append("scoring_id is missing or inconsistent across artifacts")
+    if manifest.get("scoring_code_sha256") != report.get("scoring_code_sha256"):
+        failures.append("scoring code SHA differs between manifest and report")
+    if report.get("priority_metric") != "hit_pm1":
+        failures.append("scoring report priority_metric must be hit_pm1")
     if actuals_lock:
         core = {key: value for key, value in actuals_lock.items() if key != "lock_sha256"}
         if actuals_lock.get("lock_sha256") != _canonical_sha256(core):
@@ -75,6 +93,68 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
             sha256_file(root / SCORING_REPORT) if (root / SCORING_REPORT).is_file() else None
         ):
             failures.append("artifact manifest scoring report hash mismatch")
+        if manifest.get("files") != _file_inventory(root):
+            failures.append("artifact manifest file inventory differs from current files")
+
+    source_evidence = manifest.get("source_evidence")
+    if not isinstance(source_evidence, Mapping):
+        failures.append("artifact manifest source_evidence must be an object")
+        source_evidence = {}
+    for name in (
+        "manifest.json",
+        PREDICTION_LOCK_PATH,
+        "VERIFICATION_SEAL.json",
+        "VERIFICATION_REPORT.json",
+        "SHA256SUMS",
+    ):
+        record = source_evidence.get(name)
+        if not isinstance(record, Mapping):
+            failures.append(f"source evidence record missing: {name}")
+            continue
+        relative_failures: list[str] = []
+        relative = _safe_relative(
+            str(record.get("path") or ""),
+            relative_failures,
+            f"source evidence {name}",
+        )
+        failures.extend(relative_failures)
+        if relative is None:
+            continue
+        path = root / relative
+        if path.is_symlink() or not path.is_file():
+            failures.append(f"source evidence file missing: {name}")
+            continue
+        if record.get("sha256") != sha256_file(path):
+            failures.append(f"source evidence SHA mismatch: {name}")
+        if record.get("size_bytes") != path.stat().st_size:
+            failures.append(f"source evidence size mismatch: {name}")
+
+    for field in ("history_input", "actuals_input"):
+        record = actuals_lock.get(field)
+        if not isinstance(record, Mapping):
+            failures.append(f"actuals lock {field} missing")
+            continue
+        relative_failures = []
+        relative = _safe_relative(
+            str(record.get("path") or ""),
+            relative_failures,
+            f"actuals lock {field}",
+        )
+        failures.extend(relative_failures)
+        if relative is None:
+            continue
+        path = root / relative
+        if path.is_symlink() or not path.is_file():
+            failures.append(f"actuals lock input missing: {field}")
+        elif record.get("sha256") != sha256_file(path):
+            failures.append(f"actuals lock input SHA mismatch: {field}")
+    normalized_actuals = root / "ACTUALS_NORMALIZED.parquet"
+    if normalized_actuals.is_file() and actuals_lock.get("actuals_normalized_sha256") != (
+        sha256_file(normalized_actuals)
+    ):
+        failures.append("actuals lock normalized actuals SHA mismatch")
+    if actuals_lock.get("draw_indices") != report.get("draw_indices"):
+        failures.append("actuals lock draw indices differ from scoring report")
 
     evidence_lock = root / "source_evidence" / PREDICTION_LOCK_PATH
     evidence_seal = root / "source_evidence" / "VERIFICATION_SEAL.json"
@@ -160,6 +240,44 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
     for name in required_tables:
         if not (root / name).is_file():
             failures.append(f"required scoring table missing: {name}")
+    try:
+        metrics = pd.read_parquet(root / "METRICS.parquet")
+        positions = pd.read_parquet(root / "POSITION_METRICS.parquet")
+        ranking = pd.read_parquet(root / "RANKING.parquet")
+        baselines = pd.read_parquet(root / "BASELINE_PREDICTIONS.parquet")
+    except (OSError, ValueError) as exc:
+        failures.append(f"scoring tables unreadable: {type(exc).__name__}: {exc}")
+    else:
+        required_metric_columns = {
+            "hit_pm1",
+            "all_positions_hit_pm1",
+            "mae",
+            "mse",
+            "rmse",
+            "variant",
+            "source_type",
+        }
+        if metrics.empty or not required_metric_columns.issubset(metrics.columns):
+            failures.append("METRICS.parquet is empty or missing required metrics")
+        if positions.empty or "unique_id" not in positions.columns:
+            failures.append("POSITION_METRICS.parquet is empty or missing unique_id")
+        if ranking.empty or "rank" not in ranking.columns:
+            failures.append("RANKING.parquet is empty or missing rank")
+        expected_baselines = {
+            "random_uniform",
+            "fixed_center",
+            "mean",
+            "median",
+            "last",
+            "frequency",
+            "statistical_ar1",
+        }
+        actual_baselines = set(baselines.get("baseline_name", pd.Series(dtype=str)).dropna())
+        if actual_baselines != expected_baselines:
+            failures.append(
+                "baseline set mismatch: "
+                f"expected={sorted(expected_baselines)}, actual={sorted(actual_baselines)}"
+            )
 
     source_text = str(manifest.get("source_run") or "").strip()
     original_source = Path(source_text) if source_text else None
