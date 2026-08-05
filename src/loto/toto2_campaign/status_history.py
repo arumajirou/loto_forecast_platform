@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterable
 
 
 @dataclass(frozen=True)
@@ -21,10 +21,10 @@ def current_status(events: Iterable[StatusEvent]) -> StatusEvent:
     for event in ordered:
         if event.evidence in seen:
             raise ValueError(f"duplicate status evidence: {event.evidence}")
-        seen.add(event.evidence)
         unknown = set(event.supersedes) - seen
         if unknown:
             raise ValueError(f"status event supersedes unknown evidence: {sorted(unknown)}")
+        seen.add(event.evidence)
     return ordered[-1]
 
 

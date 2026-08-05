@@ -5,8 +5,15 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, field_validator
-from pydantic import model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StrictFloat,
+    StrictInt,
+    field_validator,
+    model_validator,
+)
 
 from loto.toto2_campaign.model_manifest import (
     MODEL_ID,
