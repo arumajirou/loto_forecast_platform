@@ -21,7 +21,10 @@ class ConfigImportRejected(ValueError):
 def module_is_allowed(module: str) -> bool:
     """Return whether a module is inside an explicit BasicTS config allowlist."""
 
-    return any(module == prefix or module.startswith(f"{prefix}.") for prefix in ALLOWED_MODULE_PREFIXES)
+    return any(
+        module == prefix or module.startswith(f"{prefix}.")
+        for prefix in ALLOWED_MODULE_PREFIXES
+    )
 
 
 def validate_import_reference(reference: ImportReference) -> None:
