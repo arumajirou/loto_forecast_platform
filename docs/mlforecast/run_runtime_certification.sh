@@ -136,6 +136,9 @@ if [[ ! "$RUN_ID" =~ ^mlforecast-runtime-[0-9]{8}-[0-9]{6}-[0-9]{6}$ ]]; then
   exit 4
 fi
 RUN_DIR="$OUTPUT_ROOT/$RUN_ID"
+ZIP_PATH="$BUNDLE_ROOT/$RUN_ID.zip"
+ZIP_SHA256_PATH="$BUNDLE_ROOT/$RUN_ID.zip.sha256"
+VERIFICATION_REPORT="$BUNDLE_ROOT/$RUN_ID.verification.json"
 
 set +e
 uv run \
@@ -151,8 +154,25 @@ if [[ "$BUNDLE_STATUS" -ne 0 ]]; then
   exit 5
 fi
 
+set +e
+uv run \
+  --frozen \
+  -- \
+  python -m loto.mlforecast.bundle \
+  --verify-zip "$ZIP_PATH" \
+  --sha256-file "$ZIP_SHA256_PATH" \
+  --report "$VERIFICATION_REPORT"
+VERIFY_STATUS=$?
+set -e
+if [[ "$VERIFY_STATUS" -ne 0 ]]; then
+  printf 'FAILED: independent runtime bundle verification failed for %s\n' \
+    "$RUN_ID" >&2
+  exit 6
+fi
+
 printf 'RUN_ID=%s\n' "$RUN_ID"
 printf 'RUN_DIR=%s\n' "$RUN_DIR"
-printf 'BUNDLE=%s/%s.zip\n' "$BUNDLE_ROOT" "$RUN_ID"
-printf 'BUNDLE_SHA256=%s/%s.zip.sha256\n' "$BUNDLE_ROOT" "$RUN_ID"
+printf 'BUNDLE=%s\n' "$ZIP_PATH"
+printf 'BUNDLE_SHA256=%s\n' "$ZIP_SHA256_PATH"
+printf 'BUNDLE_VERIFICATION_REPORT=%s\n' "$VERIFICATION_REPORT"
 exit "$CERTIFICATION_STATUS"
