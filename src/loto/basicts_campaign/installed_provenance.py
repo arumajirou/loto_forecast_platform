@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import hashlib
 import importlib.metadata
 import importlib.util
@@ -31,6 +32,11 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _sha256_record_value(path: Path) -> str:
+    digest = hashlib.sha256(path.read_bytes()).digest()
+    return base64.urlsafe_b64encode(digest).rstrip(b"=").decode("ascii")
+
+
 def _normalise_distribution_name(value: str) -> str:
     return re.sub(r"[-_.]+", "-", value).lower()
 
@@ -55,6 +61,45 @@ def _normalise_repository_url(value: Any) -> str:
     return normalised
 
 
+def _distribution_files(
+    distribution: importlib.metadata.Distribution,
+) -> list[Any]:
+    files = distribution.files
+    if files is None:
+        raise InstalledProvenanceError("BasicTS distribution file manifest is missing")
+    return list(files)
+
+
+def _record_integrity(
+    entry: Any,
+    path: Path,
+    *,
+    label: str,
+) -> dict[str, Any]:
+    record_hash = getattr(entry, "hash", None)
+    mode = getattr(record_hash, "mode", None)
+    value = getattr(record_hash, "value", None)
+    if mode != "sha256" or not isinstance(value, str) or not value:
+        raise InstalledProvenanceError(f"{label} RECORD SHA-256 is missing or unsupported")
+    actual_value = _sha256_record_value(path)
+    if value != actual_value:
+        raise InstalledProvenanceError(f"{label} RECORD SHA-256 mismatch")
+
+    recorded_size = getattr(entry, "size", None)
+    if not isinstance(recorded_size, int) or recorded_size < 0:
+        raise InstalledProvenanceError(f"{label} RECORD size is missing or invalid")
+    actual_size = path.stat().st_size
+    if recorded_size != actual_size:
+        raise InstalledProvenanceError(f"{label} RECORD size mismatch")
+
+    return {
+        f"{label}_record_status": "PASS",
+        f"{label}_record_hash_mode": mode,
+        f"{label}_record_hash_value": value,
+        f"{label}_record_size_bytes": recorded_size,
+    }
+
+
 def _load_direct_url(
     distribution: importlib.metadata.Distribution,
 ) -> tuple[dict[str, Any], str]:
@@ -70,28 +115,63 @@ def _load_direct_url(
     return payload, raw
 
 
+def _distribution_direct_url(
+    distribution: importlib.metadata.Distribution,
+    raw: str,
+) -> dict[str, Any]:
+    candidates = [
+        entry
+        for entry in _distribution_files(distribution)
+        if str(entry).replace("\\", "/").endswith(".dist-info/direct_url.json")
+    ]
+    if len(candidates) != 1:
+        raise InstalledProvenanceError(
+            "BasicTS direct_url.json RECORD entry mismatch: "
+            f"expected one, got {len(candidates)}"
+        )
+    entry = candidates[0]
+    direct_url_path = Path(distribution.locate_file(entry))
+    if direct_url_path.is_symlink() or direct_url_path.parent.is_symlink():
+        raise InstalledProvenanceError("BasicTS direct_url.json path is a symbolic link")
+    if not direct_url_path.is_file():
+        raise InstalledProvenanceError("BasicTS direct_url.json file is missing")
+    resolved = direct_url_path.resolve(strict=True)
+    if resolved.read_text(encoding="utf-8") != raw:
+        raise InstalledProvenanceError(
+            "BasicTS direct_url.json metadata text differs from the RECORD file"
+        )
+    return {
+        "direct_url_record_entry": str(entry).replace("\\", "/"),
+        "direct_url_record_path": str(resolved),
+        **_record_integrity(entry, resolved, label="direct_url"),
+    }
+
+
 def _distribution_package_init(
     distribution: importlib.metadata.Distribution,
-) -> tuple[Path, str]:
-    files = distribution.files
-    if files is None:
-        raise InstalledProvenanceError("BasicTS distribution file manifest is missing")
+) -> tuple[Path, str, dict[str, Any]]:
     candidates = [
-        file
-        for file in files
-        if str(file).replace("\\", "/") == EXPECTED_PACKAGE_INIT
+        entry
+        for entry in _distribution_files(distribution)
+        if str(entry).replace("\\", "/") == EXPECTED_PACKAGE_INIT
     ]
     if len(candidates) != 1:
         raise InstalledProvenanceError(
             "BasicTS distribution package entry mismatch: "
             f"expected one {EXPECTED_PACKAGE_INIT}, got {len(candidates)}"
         )
-    package_init = Path(distribution.locate_file(candidates[0]))
+    entry = candidates[0]
+    package_init = Path(distribution.locate_file(entry))
     if package_init.is_symlink() or package_init.parent.is_symlink():
         raise InstalledProvenanceError("BasicTS distribution package path is a symbolic link")
     if not package_init.is_file():
         raise InstalledProvenanceError("BasicTS distribution package __init__.py is missing")
-    return package_init.resolve(strict=True), EXPECTED_PACKAGE_INIT
+    resolved = package_init.resolve(strict=True)
+    return (
+        resolved,
+        EXPECTED_PACKAGE_INIT,
+        _record_integrity(entry, resolved, label="package_init"),
+    )
 
 
 def _provider_distributions() -> list[str]:
@@ -114,7 +194,7 @@ def _provider_distributions() -> list[str]:
 def _verify_import_origin(
     distribution: importlib.metadata.Distribution,
 ) -> dict[str, Any]:
-    package_init, package_entry = _distribution_package_init(distribution)
+    package_init, package_entry, record = _distribution_package_init(distribution)
     providers = _provider_distributions()
     try:
         spec = importlib.util.find_spec(EXPECTED_IMPORT_NAME)
@@ -178,11 +258,12 @@ def _verify_import_origin(
         ],
         "import_origin_sha256": _sha256(package_init),
         "module_already_loaded": loaded is not None,
+        **record,
     }
 
 
 def verify_installed_basicts_provenance() -> dict[str, Any]:
-    """Verify installed BasicTS Git provenance and import-origin binding."""
+    """Verify installed BasicTS Git provenance, RECORD integrity, and import origin."""
 
     try:
         distribution = importlib.metadata.distribution(EXPECTED_DISTRIBUTION_NAME)
@@ -233,6 +314,7 @@ def verify_installed_basicts_provenance() -> dict[str, Any]:
 
     return {
         "installed_provenance_status": "PASS",
+        "installed_record_integrity_status": "PASS",
         "distribution_name": distribution_name,
         "distribution_version": distribution.version,
         "direct_url_repository": repository,
@@ -240,5 +322,6 @@ def verify_installed_basicts_provenance() -> dict[str, Any]:
         "direct_url_commit_id": commit_id,
         "direct_url_requested_revision": requested_revision,
         "direct_url_sha256": hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+        **_distribution_direct_url(distribution, raw),
         **_verify_import_origin(distribution),
     }
