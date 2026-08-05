@@ -10,12 +10,14 @@ from loto.merlion_campaign.bootstrap_resume import (
     PREFLIGHT_SCHEMA,
     _validate_hash_bound_payload,
 )
+from loto.merlion_campaign.git_provenance import validate_git_provenance
 
 EVIDENCE_SCHEMA = "merlion-bootstrap-evidence-v1"
 MANIFEST_NAME = "BOOTSTRAP_EVIDENCE_MANIFEST.json"
 SHA256SUMS_NAME = "SHA256SUMS"
 RUN_ALLOWLIST = (
     "PREFLIGHT.json",
+    "GIT_PROVENANCE.json",
     "BOOTSTRAP_PLAN.json",
     "PYTHON_PROVISION.log",
     "PYTHON_PATH.txt",
@@ -82,6 +84,12 @@ def validate_run_evidence(
     preflight = validate_json_mapping(files["run/PREFLIGHT.json"], label="PREFLIGHT.json")
     if preflight.get("schema_version") == PREFLIGHT_SCHEMA:
         _validate_hash_bound_payload(preflight, hash_field="report_sha256")
+
+    provenance = validate_json_mapping(
+        files["run/GIT_PROVENANCE.json"],
+        label="GIT_PROVENANCE.json",
+    )
+    validate_git_provenance(provenance, require_clean=exit_code == 0)
 
     plan_data = files.get("run/BOOTSTRAP_PLAN.json")
     if plan_data is not None:
