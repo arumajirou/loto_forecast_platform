@@ -11,6 +11,12 @@ from typing import Any
 
 import numpy as np
 
+from loto.basicts_campaign.dlinear_runtime_provenance import (
+    DLINEAR_ARCH_MODULE,
+    DLINEAR_CONFIG_MODULE,
+    DLINEAR_MODULE_CONTRACTS,
+    verify_dlinear_runtime_modules,
+)
 from loto.basicts_campaign.installed_provenance import (
     verify_installed_basicts_provenance,
 )
@@ -115,12 +121,32 @@ def _window_tensors(request: ProviderRequest) -> tuple[Any, Any]:
     return torch.from_numpy(np.stack(inputs)), torch.from_numpy(np.stack(targets))
 
 
+def _verify_dlinear_module_evidence(evidence: dict[str, Any]) -> None:
+    if evidence.get("dlinear_module_provenance_status") != "PASS":
+        raise RuntimeError("DLinear module provenance was not verified")
+    modules = evidence.get("dlinear_runtime_modules")
+    if not isinstance(modules, list) or len(modules) != len(DLINEAR_MODULE_CONTRACTS):
+        raise RuntimeError("DLinear module provenance evidence is incomplete")
+    actual_names = {item.get("module_name") for item in modules if isinstance(item, dict)}
+    expected_names = {contract[1] for contract in DLINEAR_MODULE_CONTRACTS}
+    if actual_names != expected_names:
+        raise RuntimeError("DLinear module provenance names are inconsistent")
+
+
 def run_dlinear_smoke(request: ProviderRequest, output_dir: Path) -> dict[str, Any]:
     """Train the upstream BasicTS DLinear module and verify persistence on CPU."""
+
+    module_provenance = verify_dlinear_runtime_modules()
+    _verify_dlinear_module_evidence(module_provenance)
 
     import torch
     from basicts.models.DLinear.arch.dlinear_arch import DLinear
     from basicts.models.DLinear.config.dlinear_config import DLinearConfig
+
+    if DLinear.__module__ != DLINEAR_ARCH_MODULE:
+        raise RuntimeError("DLinear class was imported from an unexpected module")
+    if DLinearConfig.__module__ != DLINEAR_CONFIG_MODULE:
+        raise RuntimeError("DLinearConfig class was imported from an unexpected module")
 
     torch.manual_seed(request.seed)
     np.random.seed(request.seed)
@@ -195,6 +221,7 @@ def run_dlinear_smoke(request: ProviderRequest, output_dir: Path) -> dict[str, A
     return {
         "model_name": "DLinear",
         "model_class": f"{DLinear.__module__}.{DLinear.__name__}",
+        "config_class": f"{DLinearConfig.__module__}.{DLinearConfig.__name__}",
         "device": "cpu",
         "cpu_fallback": False,
         "seed": request.seed,
@@ -210,6 +237,7 @@ def run_dlinear_smoke(request: ProviderRequest, output_dir: Path) -> dict[str, A
         "save_load_exact_match": exact_match,
         "model_artifact_sha256": _sha256(model_path),
         "config_artifact_sha256": _sha256(config_path),
+        **module_provenance,
     }
 
 
