@@ -66,6 +66,8 @@ class TorchDeviceContract(BaseModel):
             raise ValueError("GPU execution requires exactly one device")
         if self.requested_accelerator == "cpu" and self.devices:
             raise ValueError("CPU execution must not declare CUDA devices")
+        if self.allow_cpu_fallback:
+            raise ValueError("P7 forbids CPU fallback")
         return self
 
     def trainer_kwargs(self) -> dict[str, Any]:
@@ -243,6 +245,7 @@ def certify_device_use(
     evidence = observation.model_dump(mode="json")
     failure: tuple[str, str] | None = None
     if observation.requested_accelerator != contract.requested_accelerator:
+        status = "RUNTIME_EVIDENCE_MISMATCH"
         failure = ("RUNTIME_EVIDENCE_MISMATCH", "requested accelerator mismatch")
     elif contract.requested_accelerator == "cpu":
         used = observation.effective_accelerator == "cpu"
@@ -394,7 +397,23 @@ def run_torch_matrix(
     if len(frame) < config.training.input_chunk_length + config.horizon:
         raise ValueError("training history is shorter than input chunk plus horizon")
     series = to_darts_local(payload, timeseries_cls)
-    module = models_module or importlib.import_module("darts.models")
+    try:
+        module = models_module or importlib.import_module("darts.models")
+    except (ImportError, ModuleNotFoundError) as exc:
+        message = f"{type(exc).__name__}: {exc}"
+        return tuple(
+            TorchModelResult(
+                item.public_name,
+                "FAILED",
+                None,
+                "DEPENDENCY_MISSING",
+                message,
+                (),
+                (),
+                {"series_layout": config.series_layout},
+            )
+            for item in config.models
+        )
     base = config.training.constructor_args(config.device, object_resolver)
     results: list[TorchModelResult] = []
     for item in config.models:
