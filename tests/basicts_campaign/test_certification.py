@@ -28,6 +28,7 @@ def _write_bundle(
     *,
     identity_commit: str = EXPECTED_UPSTREAM_REVISION,
     import_origin: str = "/venv/site-packages/basicts/__init__.py",
+    package_record_status: str = "PASS",
 ) -> None:
     directory.mkdir(parents=True)
     if operation == "identity":
@@ -37,6 +38,7 @@ def _write_bundle(
             "device": "cpu",
             "cpu_fallback": False,
             "installed_provenance_status": "PASS",
+            "installed_record_integrity_status": "PASS",
             "distribution_name": "BasicTS",
             "distribution_version": "1.1.0",
             "direct_url_repository": "https://github.com/GestaltCogTeam/BasicTS",
@@ -44,6 +46,14 @@ def _write_bundle(
             "direct_url_commit_id": identity_commit,
             "direct_url_requested_revision": EXPECTED_UPSTREAM_REVISION,
             "direct_url_sha256": "a" * 64,
+            "direct_url_record_entry": "BasicTS-1.1.0.dist-info/direct_url.json",
+            "direct_url_record_path": (
+                "/venv/site-packages/BasicTS-1.1.0.dist-info/direct_url.json"
+            ),
+            "direct_url_record_status": "PASS",
+            "direct_url_record_hash_mode": "sha256",
+            "direct_url_record_hash_value": "A" * 43,
+            "direct_url_record_size_bytes": 200,
             "import_origin_status": "PASS",
             "import_name": "basicts",
             "import_provider_distributions": ["BasicTS"],
@@ -53,6 +63,10 @@ def _write_bundle(
             "import_submodule_search_locations": ["/venv/site-packages/basicts"],
             "import_origin_sha256": "b" * 64,
             "module_already_loaded": False,
+            "package_init_record_status": package_record_status,
+            "package_init_record_hash_mode": "sha256",
+            "package_init_record_hash_value": "B" * 43,
+            "package_init_record_size_bytes": 120,
         }
     elif operation == "validate_config":
         evidence = {
@@ -138,6 +152,7 @@ def test_certify_p0_accepts_complete_evidence(tmp_path: Path) -> None:
 
     assert report["status"] == "PASS"
     assert report["certified"]["installed_package_git_provenance"] is True
+    assert report["certified"]["installed_record_integrity"] is True
     assert report["certified"]["import_origin_bound_to_distribution"] is True
 
 
@@ -168,6 +183,18 @@ def test_identity_bundle_rejects_import_origin_drift(tmp_path: Path) -> None:
     )
 
     with pytest.raises(CertificationError, match="import origin differs"):
+        verify_provider_bundle(directory, "identity")
+
+
+def test_identity_bundle_rejects_record_integrity_drift(tmp_path: Path) -> None:
+    directory = tmp_path / "identity"
+    _write_bundle(
+        directory,
+        "identity",
+        package_record_status="FAILED",
+    )
+
+    with pytest.raises(CertificationError, match="package_init_record_status"):
         verify_provider_bundle(directory, "identity")
 
 
