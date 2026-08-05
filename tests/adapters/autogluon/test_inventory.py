@@ -160,3 +160,25 @@ def test_inventory_write_is_atomic_and_round_trips(tmp_path) -> None:
     assert payload["inventory_sha256"] == inventory.inventory_sha256
     assert payload["source_model_count"] == 29
     assert not (tmp_path / ".inventory.json.tmp").exists()
+
+
+def test_empty_runtime_registry_marks_all_source_aliases_missing() -> None:
+    models_module, ensemble_module = _fake_runtime()
+
+    class EmptyRegistry:
+        @classmethod
+        def available_aliases(cls):
+            return []
+
+    models_module.ModelRegistry = EmptyRegistry
+    inventory = discover_runtime_inventory(
+        models_module=models_module,
+        ensemble_module=ensemble_module,
+        installed_version="1.5.0",
+    )
+    assert inventory.status is InventoryStatus.PARTIAL
+    assert inventory.runtime_discovered_model_count == 0
+    assert sum(
+        failure.category is FailureCategory.RUNTIME_ALIAS_MISSING
+        for failure in inventory.failures
+    ) == 29
