@@ -13,6 +13,10 @@ from loto.sktime_campaign.protocol import (
     ProviderStatus,
     SmokeModelId,
 )
+from loto.sktime_campaign.rolling_origin import (
+    RollingOriginRequest,
+    RollingOriginSpec,
+)
 
 __all__ = [
     "BaselineId",
@@ -22,6 +26,8 @@ __all__ = [
     "ProviderRequest",
     "ProviderResponse",
     "ProviderStatus",
+    "RollingOriginRequest",
+    "RollingOriginSpec",
     "SmokeModelId",
     "ValidationBenchmarkRequest",
 ]
