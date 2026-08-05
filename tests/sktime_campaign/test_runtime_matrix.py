@@ -11,6 +11,7 @@ def test_execute_matrix_persists_partial_without_promoting_pass(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
+    monkeypatch.setattr(runtime, "installed_sktime_version", lambda: "1.0.1")
     monkeypatch.setattr(
         runtime,
         "run_smoke_matrix",
