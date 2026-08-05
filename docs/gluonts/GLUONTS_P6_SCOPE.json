@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "phase": "P6A_NINE_ESTIMATOR_CONSTRUCTOR_MATRIX",
+  "status": "PARTIALLY_VERIFIED",
+  "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "branch": "feat/gluonts-probabilistic-contract-v1",
+  "model_count": 9,
+  "models": [
+    "DeepNPTSEstimator",
+    "DeepAREstimator",
+    "TiDEEstimator",
+    "SimpleFeedForwardEstimator",
+    "TemporalFusionTransformerEstimator",
+    "WaveNetEstimator",
+    "DLinearEstimator",
+    "PatchTSTEstimator",
+    "LagTSTEstimator"
+  ],
+  "formal_states": [
+    "EXECUTION_PENDING",
+    "DISCOVERED_ONLY",
+    "CONSTRUCTED_ONLY",
+    "FAILED"
+  ],
+  "formal_runtime_verified_models": 0,
+  "next_phase": "P6B_BOUNDED_FIT_PREDICT_SERIALIZE_RELOAD",
+  "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
+}
