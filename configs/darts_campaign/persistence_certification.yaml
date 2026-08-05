@@ -1,0 +1,58 @@
+schema_version: 1
+run_id: darts-p11-persistence-gpu
+outer_workers: 8
+max_gpu_jobs: 1
+specs:
+  - model_id: local-naive
+    family: local
+    public_name: NaiveDrift
+    methods: [manual]
+  - model_id: regression-linear
+    family: regression
+    public_name: LinearRegressionModel
+    supports_clean: true
+    methods: [manual, manual_clean]
+  - model_id: torch-tft
+    family: torch
+    public_name: TFTModel
+    torch_backed: true
+    supports_clean: true
+    supports_checkpoint: true
+    supports_weights: true
+    requested_accelerator: gpu
+    device_index: 0
+    methods:
+      - manual
+      - manual_clean
+      - checkpoint_best
+      - checkpoint_last
+      - weights
+      - cross_device_cpu
+      - cross_device_cuda
+  - model_id: foundation-chronos2
+    family: foundation
+    public_name: Chronos2Model
+    torch_backed: true
+    supports_clean: true
+    supports_checkpoint: true
+    supports_weights: true
+    requested_accelerator: gpu
+    device_index: 0
+    methods:
+      - manual
+      - manual_clean
+      - checkpoint_best
+      - checkpoint_last
+      - weights
+      - cross_device_cpu
+      - cross_device_cuda
+  - model_id: ensemble-regression
+    family: ensemble
+    public_name: RegressionEnsembleModel
+    supports_clean: true
+    methods: [manual, manual_clean]
+  - model_id: conformal-naive
+    family: conformal
+    public_name: ConformalNaiveModel
+    supports_clean: true
+    methods: [manual, manual_clean]
