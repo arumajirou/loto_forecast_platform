@@ -1,0 +1,55 @@
+# PROPOSED systemd --user unit (Phase 7 proposal, NOT installed/enabled/started).
+# Fixes vs. the real deploy/systemd/user/loto-harness-gateway.service (SVC-1/SVC-2):
+#   - WorkingDirectory pointed at the old non-worktree path
+#     (/mnt/e/env/ts/loto_forecast_platform) instead of this run's worktree.
+#   - ExecStart's positional arg to run_gateway.sh pointed at the same old path.
+#   - EnvironmentFile pointed at the old non-worktree .env.harness path.
+#   - ReadWritePaths pointed at the old non-worktree artifacts dir.
+#   - LOTO_HARNESS_CONFIG now points at PROPOSED_GATEWAY_CONFIG.yaml's intended
+#     install location (configs/harness/gateway.yaml, absolute path), which fixes
+#     the port-17200 conflict with the pre-existing beellama_manager process
+#     (SVC-2) by changing only the `port:` field to 18471 -- see
+#     PROPOSED_GATEWAY_CONFIG.yaml. This unit does NOT work until that config
+#     change is also approved and applied; this is called out again in
+#     HANDOFF.md / the HUMAN_APPROVAL_REQUIRED block.
+#   - Added an explicit PATH= so the wrapper script's unqualified `uv run` call
+#     resolves without relying on shell-login files (systemd --user does not
+#     source ~/.bashrc / ~/.profile).
+#   - Added StartLimitIntervalSec/StartLimitBurst (crash-loop cap),
+#     TimeoutStartSec, and explicit StandardOutput/StandardError=journal.
+# Host/port: 127.0.0.1:18471 (never 0.0.0.0). Port 18471 was selected in Phase 1's
+# PORT_AUDIT.json, was bound and released cleanly during Phase 6's gateway temp
+# E2E (GATEWAY_E2E.json), and was re-confirmed free again at Phase 7 drafting
+# time. Port 17200 and port 8000 are never referenced by this unit.
+# scripts/harness/run_gateway.sh itself is UNCHANGED by this proposal (only its
+# argument and the surrounding unit's paths are fixed) -- if approved, no script
+# edit is required.
+
+[Unit]
+Description=Loto Harness Gateway
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+WorkingDirectory=/mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725
+Environment=PATH=/home/az/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=LOTO_HARNESS_CONFIG=/mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725/configs/harness/gateway.yaml
+EnvironmentFile=-/mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725/.env.harness
+ExecStart=/bin/bash /mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725/scripts/harness/run_gateway.sh /mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=30
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725/artifacts
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

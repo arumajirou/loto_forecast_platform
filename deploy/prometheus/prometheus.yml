@@ -1,9 +1,10 @@
 global:
-  scrape_interval: 15s
+  scrape_interval: 5s
+  evaluation_interval: 15s
 scrape_configs:
-  - job_name: loto-api
+  - job_name: loto-harness
     static_configs:
-      - targets: ["api:8080"]
+      - targets: [host.docker.internal:17200]
   - job_name: node
     static_configs:
-      - targets: ["host.docker.internal:9100"]
+      - targets: [host.docker.internal:9100]

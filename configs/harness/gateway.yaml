@@ -1,0 +1,374 @@
+host: 127.0.0.1
+port: 18471
+artifact_root: artifacts/harness
+memory_database_url: sqlite:///artifacts/harness/memory.sqlite3
+context:
+  total_tokens: 65536
+  exact_source_tokens: 32768
+  retrieved_memory_tokens: 8192
+  conversation_summary_tokens: 8192
+  tool_result_tokens: 4096
+  output_reserve_tokens: 8192
+  safety_reserve_tokens: 4096
+  emergency_threshold: 0.85
+  uncertified_native_cap_tokens: 32768
+security:
+  allowed_roots:
+  - /mnt/e/env/ts/loto_forecast_platform
+  - /mnt/e/env/ts/loto_forecast_platform-harness
+  command_timeout_seconds: 300
+  max_request_bytes: 16777216
+  max_context_items: 128
+  max_context_item_chars: 500000
+  max_context_total_chars: 4000000
+models:
+- key: qwen3-coder-30b-a3b-instruct
+  display_name: Qwen3 Coder 30B A3B
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  provider: local
+  profile_id: qwen3
+  capabilities:
+  - chat
+  - tools
+  - json_schema
+  declared_context: 65536
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - coder
+  - repair
+  status: DISCOVERED
+- key: kwaipilot_kat-coder-v2.5-dev
+  display_name: KAT Coder V2.5 Dev
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  provider: local
+  profile_id: kat-coder-v2.5
+  architecture: qwen35moe
+  capabilities:
+  - chat
+  - tools
+  - json_schema
+  - reasoning
+  declared_context: 262144
+  certified_context: 0
+  virtual_context: 262144
+  roles:
+  - coder
+  - reviewer
+  - candidate
+  status: DISCOVERED
+- key: ornith-1.0-9b-mtp
+  display_name: Ornith 1.0 9B MTP
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  - json_schema
+  declared_context: 65536
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - router
+  status: DISCOVERED
+- key: gemma-4-31b-it
+  display_name: Gemma 4 31B IT
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  - json_schema
+  declared_context: 65536
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - reviewer
+  status: DISCOVERED
+- key: gpt-oss-120b
+  display_name: GPT OSS 120B
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  - tools
+  - json_schema
+  - reasoning
+  declared_context: 65536
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - judge
+  status: DISCOVERED
+- key: text-embedding-nomic-embed-text-v1.5
+  display_name: Nomic Embed Text v1.5
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - embedding
+  declared_context: 2048
+  certified_context: 0
+  virtual_context: 2048
+  roles:
+  - embedding
+  status: DISCOVERED
+- key: agents-a1
+  display_name: agents-a1
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: deepseek-v4-flash
+  display_name: deepseek-v4-flash
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: fara1.5-27b@q3_k_m
+  display_name: fara1.5-27b@q3_k_m
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: fara1.5-27b@q4_k_s
+  display_name: fara1.5-27b@q4_k_s
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: hy3-1m
+  display_name: hy3-1m
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: laguna-s-2.1-ud-k-m
+  display_name: laguna-s-2.1-ud-k-m
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: false
+  status: BLOCKED
+- key: mellum2-12b-a2.5b-thinking
+  display_name: mellum2-12b-a2.5b-thinking
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: mistral-medium-3.5-128b
+  display_name: mistral-medium-3.5-128b
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: nvidia-qwen3.6-27b-nvfp4
+  display_name: nvidia-qwen3.6-27b-nvfp4
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: ornith-1.0-35b
+  display_name: ornith-1.0-35b
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: ornith-1.0-35b-mtp-apex
+  display_name: ornith-1.0-35b-mtp-apex
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: ornith-397b-iq1s
+  display_name: ornith-397b-iq1s
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: ornith-397b-iq2ks
+  display_name: ornith-397b-iq2ks
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: ornith-397b-unsloth-ud-s
+  display_name: ornith-397b-unsloth-ud-s
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: qwen-agentworld-35b-a3b
+  display_name: qwen-agentworld-35b-a3b
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: qwen3.6-27b-mtp
+  display_name: qwen3.6-27b-mtp
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: qwen3.6-35b-a3b-mtp
+  display_name: qwen3.6-35b-a3b-mtp
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: qwopus3.6-27b-coder-mtp
+  display_name: qwopus3.6-27b-coder-mtp
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: thinkingcap-qwen3.6-27b-mtp@q3_k_m
+  display_name: thinkingcap-qwen3.6-27b-mtp@q3_k_m
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED
+- key: thinkingcap-qwen3.6-27b-mtp@q4_k_m
+  display_name: thinkingcap-qwen3.6-27b-mtp@q4_k_m
+  engine: lmstudio
+  endpoint: http://127.0.0.1:1234
+  capabilities:
+  - chat
+  declared_context: 32768
+  certified_context: 0
+  virtual_context: 65536
+  roles:
+  - candidate
+  enabled: true
+  status: DISCOVERED

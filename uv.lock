@@ -1216,6 +1216,15 @@ wheels = [
 ]
 
 [[package]]
+name = "httpx-sse"
+version = "0.4.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0f/4c/751061ffa58615a32c31b2d82e8482be8dd4a89154f003147acee90f2be9/httpx_sse-0.4.3.tar.gz", hash = "sha256:9b1ed0127459a66014aec3c56bebd93da3c1bc8bb6618c8082039a44889a755d", size = 15943, upload-time = "2025-10-10T21:48:22.271Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d2/fd/6668e5aec43ab844de6fc74927e155a3b37bf40d7c3790e49fc0406b6578/httpx_sse-0.4.3-py3-none-any.whl", hash = "sha256:0ac1c9fe3c0afad2e0ebb25a934a59f4c7823b60792691f779fad2c5568830fc", size = 8960, upload-time = "2025-10-10T21:48:21.158Z" },
+]
+
+[[package]]
 name = "huey"
 version = "3.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1658,6 +1667,20 @@ full = [
     { name = "xgboost", version = "3.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "xgboost", version = "3.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
+harness = [
+    { name = "alembic" },
+    { name = "fastapi" },
+    { name = "httpx" },
+    { name = "mcp" },
+    { name = "opentelemetry-exporter-otlp" },
+    { name = "opentelemetry-sdk" },
+    { name = "pgvector" },
+    { name = "psutil" },
+    { name = "psycopg", extra = ["binary"] },
+    { name = "sqlalchemy" },
+    { name = "structlog" },
+    { name = "uvicorn" },
+]
 mlflow = [
     { name = "mlflow" },
 ]
@@ -1680,20 +1703,24 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "accelerate", marker = "extra == 'tsfm'", specifier = ">=1.5" },
+    { name = "alembic", marker = "extra == 'harness'", specifier = ">=1,<2" },
     { name = "catboost", marker = "extra == 'full'", specifier = ">=1.2" },
     { name = "chronos-forecasting", marker = "extra == 'tsfm'", specifier = ">=2.0" },
     { name = "fastapi", marker = "extra == 'api'", specifier = ">=0.115,<0.120" },
     { name = "fastapi", marker = "extra == 'dev'", specifier = ">=0.115,<0.120" },
     { name = "fastapi", marker = "extra == 'full'", specifier = ">=0.115,<0.120" },
+    { name = "fastapi", marker = "extra == 'harness'", specifier = ">=0.115,<1" },
     { name = "gluonts", marker = "extra == 'frameworks'", specifier = ">=0.16" },
     { name = "hierarchicalforecast", marker = "extra == 'full'", specifier = ">=1.0" },
     { name = "httpx", marker = "extra == 'api'", specifier = ">=0.27,<1" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27,<1" },
     { name = "httpx", marker = "extra == 'full'", specifier = ">=0.27,<1" },
+    { name = "httpx", marker = "extra == 'harness'", specifier = ">=0.27,<1" },
     { name = "huggingface-hub", specifier = "==0.36.2" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6" },
     { name = "lightgbm", marker = "extra == 'full'", specifier = ">=4.5" },
     { name = "lightning", marker = "extra == 'frameworks'", specifier = ">=2" },
+    { name = "mcp", marker = "extra == 'harness'", specifier = ">=1.28,<2" },
     { name = "mlflow", marker = "extra == 'full'", specifier = ">=3.0" },
     { name = "mlflow", marker = "extra == 'mlflow'", specifier = ">=3.0" },
     { name = "mlforecast", marker = "extra == 'full'", specifier = ">=1.0" },
@@ -1703,17 +1730,22 @@ requires-dist = [
     { name = "neuralforecast", marker = "extra == 'full'", specifier = ">=3.0" },
     { name = "numpy", specifier = ">=2.0" },
     { name = "opentelemetry-exporter-otlp", marker = "extra == 'full'", specifier = ">=1.30" },
+    { name = "opentelemetry-exporter-otlp", marker = "extra == 'harness'", specifier = ">=1.30,<2" },
     { name = "opentelemetry-sdk", marker = "extra == 'full'", specifier = ">=1.30" },
+    { name = "opentelemetry-sdk", marker = "extra == 'harness'", specifier = ">=1.30,<2" },
     { name = "optuna", marker = "extra == 'auto-campaign'", specifier = ">=4,<5" },
     { name = "optuna", marker = "extra == 'dev'", specifier = ">=4.0" },
     { name = "optuna", marker = "extra == 'full'", specifier = ">=4.0" },
     { name = "optuna-dashboard", specifier = ">=0.20.0,<0.21" },
     { name = "pandas", specifier = ">=2.2" },
+    { name = "pgvector", marker = "extra == 'harness'", specifier = ">=0.3,<1" },
     { name = "plotly", marker = "extra == 'full'", specifier = ">=6" },
     { name = "prometheus-client", specifier = ">=0.21" },
     { name = "psutil", marker = "extra == 'auto-campaign'", specifier = ">=6,<8" },
     { name = "psutil", marker = "extra == 'full'", specifier = ">=6" },
+    { name = "psutil", marker = "extra == 'harness'", specifier = ">=6,<8" },
     { name = "psycopg", extras = ["binary"], marker = "extra == 'full'", specifier = ">=3.2" },
+    { name = "psycopg", extras = ["binary"], marker = "extra == 'harness'", specifier = ">=3.2,<4" },
     { name = "psycopg", extras = ["binary"], marker = "extra == 'postgres'", specifier = ">=3.2" },
     { name = "pyarrow", specifier = ">=24.0.0,<25" },
     { name = "pyarrow", marker = "extra == 'full'", specifier = ">=18" },
@@ -1729,6 +1761,7 @@ requires-dist = [
     { name = "skforecast", marker = "extra == 'frameworks'", specifier = ">=0.17" },
     { name = "sktime", marker = "extra == 'frameworks'", specifier = ">=0.37" },
     { name = "sqlalchemy", marker = "extra == 'full'", specifier = ">=2.0" },
+    { name = "sqlalchemy", marker = "extra == 'harness'", specifier = ">=2,<3" },
     { name = "sqlalchemy", marker = "extra == 'postgres'", specifier = ">=2.0" },
     { name = "starlette", marker = "extra == 'api'", specifier = "<0.49" },
     { name = "starlette", marker = "extra == 'dev'", specifier = "<0.49" },
@@ -1736,6 +1769,7 @@ requires-dist = [
     { name = "statsforecast", marker = "extra == 'auto-campaign'", specifier = ">=2,<3" },
     { name = "statsforecast", marker = "extra == 'full'", specifier = ">=2.0" },
     { name = "structlog", marker = "extra == 'full'", specifier = ">=25" },
+    { name = "structlog", marker = "extra == 'harness'", specifier = ">=25,<26" },
     { name = "tabulate", specifier = ">=0.10.0,<0.11" },
     { name = "torch", specifier = "==2.9.1" },
     { name = "torch", marker = "extra == 'dev'", specifier = ">=2.4" },
@@ -1746,9 +1780,10 @@ requires-dist = [
     { name = "uvicorn", marker = "extra == 'api'", specifier = ">=0.34" },
     { name = "uvicorn", marker = "extra == 'dev'", specifier = ">=0.34" },
     { name = "uvicorn", marker = "extra == 'full'", specifier = ">=0.34" },
+    { name = "uvicorn", marker = "extra == 'harness'", specifier = ">=0.34,<1" },
     { name = "xgboost", marker = "extra == 'full'", specifier = ">=2.1" },
 ]
-provides-extras = ["auto-campaign", "api", "mlflow", "dev", "postgres", "full", "frameworks", "tsfm"]
+provides-extras = ["auto-campaign", "api", "mlflow", "dev", "postgres", "harness", "full", "frameworks", "tsfm"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1880,6 +1915,31 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ee/38/ceb1d637c4db6d06141f3739e93af3321e7caaabe69b57ae48ffe3ee95b1/matplotlib-3.11.1-pp311-pypy311_pp73-macosx_10_15_x86_64.whl", hash = "sha256:427258425f9a3fc4ed79a91f9e9b9aaf5a82cb6571e85dc14063cc6fbb993741", size = 9438045, upload-time = "2026-07-18T03:39:39.491Z" },
     { url = "https://files.pythonhosted.org/packages/89/25/72ad8b58602d3a6ef1dfc4b65ecd01634ab65a2bdf494c9fe0e966dbf081/matplotlib-3.11.1-pp311-pypy311_pp73-macosx_11_0_arm64.whl", hash = "sha256:1ac697e591c11b6ad04679a73c2d2f9980fe9d9f0311fb414a2e329706343dfb", size = 9266127, upload-time = "2026-07-18T03:39:41.597Z" },
     { url = "https://files.pythonhosted.org/packages/8a/6d/69552382fcc8e93d1f2763ef2665980a900a48b7f3a4c57ed290726d1cbc/matplotlib-3.11.1-pp311-pypy311_pp73-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:e4b9ac2f1f607ecda2af90a5232beee2af7582fce1cc30c4b6a1b012dc21ee99", size = 10019439, upload-time = "2026-07-18T03:39:43.78Z" },
+]
+
+[[package]]
+name = "mcp"
+version = "1.29.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "httpx" },
+    { name = "httpx-sse" },
+    { name = "jsonschema" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "pyjwt", extra = ["crypto"] },
+    { name = "python-multipart" },
+    { name = "pywin32", marker = "sys_platform == 'win32'" },
+    { name = "sse-starlette" },
+    { name = "starlette" },
+    { name = "typing-extensions" },
+    { name = "typing-inspection" },
+    { name = "uvicorn", marker = "sys_platform != 'emscripten'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/30/d3/f9acc21dfc886e4f78e2add1a47db46ce16884346afde53f8a064c02c891/mcp-1.29.0.tar.gz", hash = "sha256:52d01f334de1868cc3bb2d6604931126a67631f99a6c5d3b82ba47290315ec36", size = 643148, upload-time = "2026-07-28T13:41:41.939Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/01/c8/248b201f6d753d69fd5d6506011abbb35a946d9142b2ae311a948fd0be3d/mcp-1.29.0-py3-none-any.whl", hash = "sha256:f5a075bb611f23d6f4d080c6a1699fa62772eebc562ba9e66b306ddde1c755f7", size = 223436, upload-time = "2026-07-28T13:41:40.337Z" },
 ]
 
 [[package]]
@@ -2668,6 +2728,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pgvector"
+version = "0.5.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a7/ec/6eb80aebc728200f95229219882994c1b0585b956ca47da5edb9d062627a/pgvector-0.5.0.tar.gz", hash = "sha256:07a9dcf735696879406983afc6eba9a787cef7c0cf6c367ca1a5779f036dee74", size = 35170, upload-time = "2026-07-06T18:27:27.767Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5c/e4/a5573f2c579ca9ad133293bfb624148ba0893674ca4a6eeec85ced9a6a09/pgvector-0.5.0-py3-none-any.whl", hash = "sha256:fedc9800894e6da2be51358d7b7c574bf34f247ca741a5a09513622135f5964f", size = 30958, upload-time = "2026-07-06T18:27:26.797Z" },
+]
+
+[[package]]
 name = "pillow"
 version = "12.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3079,12 +3148,40 @@ wheels = [
 ]
 
 [[package]]
+name = "pydantic-settings"
+version = "2.14.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "python-dotenv" },
+    { name = "typing-inspection" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5c/b5/8f48e906c3e0205276e8bd8cb7512217a87b2685304d64be27cad5b3019f/pydantic_settings-2.14.2.tar.gz", hash = "sha256:c19dd64b19097f1de80184f0cc7b0272a13ae6e170cbf240a3e27e381ed14a5f", size = 237700, upload-time = "2026-06-19T13:44:56.324Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/c1/6e422f34e569cf8e18df68d1939c81c099d2b61e4f7d9621c8a77560799c/pydantic_settings-2.14.2-py3-none-any.whl", hash = "sha256:a20c97b37910b6550d5ea50fbcc2d4187defe58cd57070b73863d069419c9440", size = 61715, upload-time = "2026-06-19T13:44:55.02Z" },
+]
+
+[[package]]
 name = "pygments"
 version = "2.20.0"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/c3/b2/bc9c9196916376152d655522fdcebac55e66de6603a76a02bca1b6414f6c/pygments-2.20.0.tar.gz", hash = "sha256:6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f", size = 4955991, upload-time = "2026-03-29T13:29:33.898Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f4/7e/a72dd26f3b0f4f2bf1dd8923c85f7ceb43172af56d63c7383eb62b332364/pygments-2.20.0-py3-none-any.whl", hash = "sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176", size = 1231151, upload-time = "2026-03-29T13:29:30.038Z" },
+]
+
+[[package]]
+name = "pyjwt"
+version = "2.13.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz", hash = "sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423", size = 107515, upload-time = "2026-05-21T19:54:36.618Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/5e/ecf12fdb62546d64385c158514e9b2b671f7832108ef2ecd2020ce0af2d1/pyjwt-2.13.0-py3-none-any.whl", hash = "sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728", size = 31274, upload-time = "2026-05-21T19:54:35.362Z" },
+]
+
+[package.optional-dependencies]
+crypto = [
+    { name = "cryptography" },
 ]
 
 [[package]]
@@ -3163,6 +3260,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/82/ed/0301aeeac3e5353ef3d94b6ec08bbcabd04a72018415dcb29e588514bba8/python_dotenv-1.2.2.tar.gz", hash = "sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3", size = 50135, upload-time = "2026-03-01T16:00:26.196Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0b/d7/1959b9648791274998a9c3526f6d0ec8fd2233e4d4acce81bbae76b44b2a/python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a", size = 22101, upload-time = "2026-03-01T16:00:25.09Z" },
+]
+
+[[package]]
+name = "python-multipart"
+version = "0.0.32"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5b/42/55c32bb9b12693c092ad250a0e82edb5b31ddeda6eb772de5f308b3804ad/python_multipart-0.0.32.tar.gz", hash = "sha256:be54b7f3fa167bb83e4fcd936b887b708f4e57fe75911c02aebf53efaf8d938e", size = 46881, upload-time = "2026-06-04T16:18:58.647Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/04/e8135ebd1ad02c56ec633277529b2602ff99ff634be76cdba5744cf554fd/python_multipart-0.0.32-py3-none-any.whl", hash = "sha256:ff6d3f776f16878c894e52e107296ffc890e913c611b1a4ec6c44e2821fe2e23", size = 30042, upload-time = "2026-06-04T16:18:57.319Z" },
 ]
 
 [[package]]
@@ -3921,6 +4027,18 @@ wheels = [
 ]
 
 [[package]]
+name = "sse-starlette"
+version = "3.0.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/db/3c/fa6517610dc641262b77cc7bf994ecd17465812c1b0585fe33e11be758ab/sse_starlette-3.0.3.tar.gz", hash = "sha256:88cfb08747e16200ea990c8ca876b03910a23b547ab3bd764c0d8eb81019b971", size = 21943, upload-time = "2025-10-30T18:44:20.117Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/23/a0/984525d19ca5c8a6c33911a0c164b11490dd0f90ff7fd689f704f84e9a11/sse_starlette-3.0.3-py3-none-any.whl", hash = "sha256:af5bf5a6f3933df1d9c7f8539633dc8444ca6a97ab2e2a7cd3b6e431ac03a431", size = 11765, upload-time = "2025-10-30T18:44:18.834Z" },
+]
+
+[[package]]
 name = "starlette"
 version = "0.48.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4005,11 +4123,11 @@ wheels = [
 
 [[package]]
 name = "structlog"
-version = "26.1.0"
+version = "25.5.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/5e/89/b4a0bcfdf4f71a3dea31379f095929613d7e4528a0996bca6aa964cd0dca/structlog-26.1.0.tar.gz", hash = "sha256:f63a716cbd1b1291cf7661de7794b455acfa4c43c5bcf1630e6ad5ddc1adb3b7", size = 1459881, upload-time = "2026-06-06T07:33:39.348Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/52/9ba0f43b686e7f3ddfeaa78ac3af750292662284b3661e91ad5494f21dbc/structlog-25.5.0.tar.gz", hash = "sha256:098522a3bebed9153d4570c6d0288abf80a031dfdb2048d59a49e9dc2190fc98", size = 1460830, upload-time = "2025-10-27T08:28:23.028Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a9/18/489c97b834dfff9cf2fc2507cede4bcd4b11e67f84bc462acd1992496f86/structlog-26.1.0-py3-none-any.whl", hash = "sha256:e081a26d6c373e6d201eca24eede26d8ffab07f88f477822e679183428d3d91e", size = 73764, upload-time = "2026-06-06T07:33:38.046Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/45/a132b9074aa18e799b891b91ad72133c98d8042c70f6240e4c5f9dabee2f/structlog-25.5.0-py3-none-any.whl", hash = "sha256:a8453e9b9e636ec59bd9e79bbd4a72f025981b3ba0f5837aebf48f02f37a7f9f", size = 72510, upload-time = "2025-10-27T08:28:21.535Z" },
 ]
 
 [[package]]
