@@ -4,6 +4,11 @@ The end-to-end command joins target-host execution and package admission into on
 operation. It returns success only when the real StatsForecast 2.1.1 package passes all 41
 model runtime contracts and the returned ZIP is admitted against the current clean commit.
 
+The public API and CLI always inject the hardened admission inspector. The inspector first
+runs the original package, commit, inventory, lifecycle, and checksum gate, then requires
+point-mode CPU evidence for every model. Direct use of the unhardened base inspector is not a
+formal End-to-End path.
+
 ```bash
 PYTHONPATH=src uv run python scripts/run_statsforecast_runtime_lane.py end-to-end \
   --output-root artifacts/statsforecast-end-to-end \
