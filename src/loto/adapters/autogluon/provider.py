@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import hashlib
 import importlib.metadata
-import json
 import math
 import os
 from dataclasses import dataclass
@@ -26,6 +24,15 @@ from .contracts import (
 )
 from .execution import ExecutionPlan, ExecutionPlanError, build_execution_plan
 from .geometry import CompiledHistory, compile_regular_history
+from .inventory import TARGET_AUTOGLUON_VERSION
+from .provenance import (
+    ArtifactContextError,
+    build_fit_context,
+    canonical_sha256,
+    model_identity_evidence,
+    persist_fit_context,
+    validate_saved_artifact_context,
+)
 from .search_spaces import (
     SearchSpaceDescriptorError,
     contains_search_space_descriptor,
@@ -40,28 +47,6 @@ class ProviderRuntime:
     time_series_data_frame_class: Any
     cuda_available: bool
     library_version: str | None
-
-
-def _canonical_sha256(value: Any) -> str:
-    payload = json.dumps(
-        value,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        default=str,
-    ).encode("utf-8")
-    return hashlib.sha256(payload).hexdigest()
-
-
-def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(f".{path.name}.tmp")
-    temporary.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True, default=str)
-        + "\n",
-        encoding="utf-8",
-    )
-    temporary.replace(path)
 
 
 def _default_runtime(requested_device: DeviceRequest) -> ProviderRuntime:
@@ -272,12 +257,13 @@ def _runtime_evidence(
     runtime: ProviderRuntime,
 ) -> RuntimeEvidence:
     requested = request.requested_device
-    resolved = "cpu"
+    resolved = "unknown"
     cpu_fallback = False
-    if requested in {DeviceRequest.AUTO, DeviceRequest.CUDA} and runtime.cuda_available:
-        resolved = "cuda"
-    elif requested is DeviceRequest.CUDA and not runtime.cuda_available:
-        cpu_fallback = True
+    if requested is DeviceRequest.CPU:
+        resolved = "cpu"
+    elif not runtime.cuda_available:
+        resolved = "cpu"
+        cpu_fallback = requested is DeviceRequest.CUDA
     return RuntimeEvidence(
         requested_device=requested,
         resolved_device=resolved,
@@ -289,53 +275,27 @@ def _runtime_evidence(
     )
 
 
-def _context_payload(
-    request: ProviderRequestV2,
+def _validate_library_version(runtime: ProviderRuntime) -> None:
+    if runtime.library_version != TARGET_AUTOGLUON_VERSION:
+        raise ArtifactContextError(
+            "RUNTIME_VERSION_MISMATCH",
+            "AutoGluon TimeSeries runtime version mismatch: "
+            f"expected={TARGET_AUTOGLUON_VERSION} actual={runtime.library_version}",
+        )
+
+
+def _validate_observed_model_identity(
     plan: ExecutionPlan,
-    compiled: CompiledHistory,
+    observed_model_names: list[str],
 ) -> dict[str, Any]:
-    request_payload = request.model_dump(mode="json")
-    return {
-        "schema_version": 1,
-        "run_id": request.run_id,
-        "request_sha256": _canonical_sha256(request_payload),
-        "execution_plan": plan.to_dict(),
-        "timeline_mapping": [
-            row.model_dump(mode="json") for row in compiled.timeline_mapping
-        ],
-        "source_order_sha256": compiled.source_order_sha256,
-        "timeline_mapping_sha256": compiled.mapping_sha256,
-        "geometry_sha256": compiled.geometry_sha256,
-    }
-
-
-def _persist_context(
-    artifact_dir: Path,
-    request: ProviderRequestV2,
-    plan: ExecutionPlan,
-    compiled: CompiledHistory,
-) -> dict[str, str]:
-    context_path = artifact_dir / "loto_provider_context_v2.json"
-    plan_path = artifact_dir / "loto_execution_plan_v2.json"
-    mapping_path = artifact_dir / "loto_timeline_mapping_v2.json"
-    context = _context_payload(request, plan, compiled)
-    _write_json_atomic(context_path, context)
-    _write_json_atomic(plan_path, plan.to_dict())
-    _write_json_atomic(
-        mapping_path,
-        {
-            "mapping": context["timeline_mapping"],
-            "source_order_sha256": compiled.source_order_sha256,
-            "timeline_mapping_sha256": compiled.mapping_sha256,
-            "geometry_sha256": compiled.geometry_sha256,
-        },
-    )
-    return {
-        "artifact_dir": str(artifact_dir),
-        "provider_context": str(context_path),
-        "execution_plan": str(plan_path),
-        "timeline_mapping": str(mapping_path),
-    }
+    identity = model_identity_evidence(plan.selected_model_ids, observed_model_names)
+    if identity["verified"] is not True:
+        raise ArtifactContextError(
+            "MODEL_IDENTITY_NOT_VERIFIED",
+            "runtime model names do not prove every requested model identity: "
+            f"missing={identity['missing_model_ids']} observed={observed_model_names}",
+        )
+    return identity
 
 
 def run_provider_v2(
@@ -382,6 +342,19 @@ def run_provider_v2(
 
     try:
         active_runtime = runtime or _default_runtime(request.requested_device)
+        _validate_library_version(active_runtime)
+    except ArtifactContextError as exc:
+        return _error_response(
+            payload,
+            code=exc.code,
+            phase="runtime_import",
+            message=str(exc),
+            error_type=type(exc).__name__,
+            metadata={
+                "expected_library_version": TARGET_AUTOGLUON_VERSION,
+                "actual_library_version": getattr(active_runtime, "library_version", None),
+            },
+        )
     except Exception as exc:
         return _error_response(
             payload,
@@ -392,6 +365,7 @@ def run_provider_v2(
         )
 
     artifact_dir = Path(request.artifact_dir)
+    saved_context = None
     try:
         time_series = _to_time_series_data_frame(compiled, active_runtime)
         if request.operation is ProviderOperation.FIT_PREDICT_SAVE:
@@ -416,9 +390,15 @@ def run_provider_v2(
                 raise FileNotFoundError(
                     f"artifact_dir not found or empty for load_predict: {artifact_dir}"
                 )
+            saved_context = validate_saved_artifact_context(
+                artifact_dir,
+                current_execution_plan=plan.to_dict(),
+                current_geometry_sha256=compiled.geometry_sha256,
+                expected_library_version=TARGET_AUTOGLUON_VERSION,
+            )
             predictor = active_runtime.predictor_class.load(str(artifact_dir))
 
-        prediction = predictor.predict(time_series)
+        prediction = predictor.predict(time_series, random_seed=request.seed)
         expected_items = tuple(
             f"position-{index}"
             for index in range(1, request.geometry.selection_count + 1)
@@ -429,12 +409,44 @@ def run_provider_v2(
             horizon=request.geometry.horizon,
             expected_quantile_levels=request.predictor.quantile_levels,
         )
-        artifacts = _persist_context(artifact_dir, request, plan, compiled)
+        model_names = _safe_model_names(predictor)
+        model_best = _safe_model_best(predictor)
+        identity = _validate_observed_model_identity(plan, model_names)
+
+        if request.operation is ProviderOperation.FIT_PREDICT_SAVE:
+            context = build_fit_context(
+                run_id=request.run_id,
+                request_payload=request.model_dump(mode="json"),
+                execution_plan=plan.to_dict(),
+                timeline_mapping=[
+                    row.model_dump(mode="json") for row in compiled.timeline_mapping
+                ],
+                source_order_sha256=compiled.source_order_sha256,
+                timeline_mapping_sha256=compiled.mapping_sha256,
+                geometry_sha256=compiled.geometry_sha256,
+                library_version=TARGET_AUTOGLUON_VERSION,
+                model_names=model_names,
+                model_best=model_best,
+            )
+            artifacts = persist_fit_context(artifact_dir, context=context)
+            saved_context_sha256 = canonical_sha256(context)
+        else:
+            assert saved_context is not None
+            saved_names = saved_context.context["runtime_snapshot"]["model_names"]
+            if sorted(model_names) != sorted(str(name) for name in saved_names):
+                raise ArtifactContextError(
+                    "LOADED_MODEL_SET_MISMATCH",
+                    "loaded predictor model names differ from the saved runtime snapshot",
+                )
+            artifacts = saved_context.artifacts
+            saved_context_sha256 = canonical_sha256(saved_context.context)
     except Exception as exc:
         message = str(exc)
         lower = message.lower()
         code = "PROVIDER_EXECUTION_FAILED"
-        if "license" in lower or "gated" in lower:
+        if isinstance(exc, ArtifactContextError):
+            code = exc.code
+        elif "license" in lower or "gated" in lower:
             code = "LICENSE_RESTRICTED"
         elif isinstance(exc, FileNotFoundError):
             code = "ARTIFACT_MISSING"
@@ -457,14 +469,19 @@ def run_provider_v2(
         "library_version": active_runtime.library_version,
         "execution_mode": request.execution_mode.value,
         "selected_model_ids": list(plan.selected_model_ids),
+        "observed_model_names": model_names,
+        "model_identity": identity,
+        "model_identity_verified": identity["verified"],
         "plan_sha256": plan.plan_sha256,
-        "request_sha256": _canonical_sha256(request_payload),
+        "request_sha256": canonical_sha256(request_payload),
+        "saved_context_sha256": saved_context_sha256,
         "source_order_sha256": compiled.source_order_sha256,
         "timeline_mapping_sha256": compiled.mapping_sha256,
         "geometry_sha256": compiled.geometry_sha256,
         "prediction_shape": [request.geometry.selection_count, request.geometry.horizon],
-        "model_best": _safe_model_best(predictor),
-        "model_names": _safe_model_names(predictor),
+        "prediction_random_seed": request.seed,
+        "model_best": model_best,
+        "model_names": model_names,
         "finite": bool(
             np.isfinite(np.asarray([record.mean for record in records], dtype=float)).all()
         ),
