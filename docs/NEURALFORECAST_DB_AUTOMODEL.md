@@ -21,11 +21,17 @@ every selected model:
 3. the complete `NeuralForecast` bundle is saved with its dataset;
 4. the bundle is reloaded through `NeuralForecast.load()`;
 5. post-load inference succeeds;
-6. pre-save and post-load prediction shapes match;
-7. post-load predictions are finite and match within `rtol=1e-6`, `atol=1e-6`;
-8. CPU/GPU runtime and `nvidia-smi` PID evidence are recorded;
-9. when GPU execution was requested, absence of CUDA evidence is treated as CPU fallback
-   and fails certification.
+6. pre-save and post-load rows have the same unique `(unique_id, ds)` identities;
+7. prediction shapes match and point values match within `rtol=1e-6`, `atol=1e-6`;
+8. post-load predictions and the loaded state dictionary are finite;
+9. CPU/GPU runtime and `nvidia-smi` PID evidence are recorded independently before
+   saving and after reload inference;
+10. when GPU execution is required, both the original trained model and the reloaded
+    inference must have CUDA evidence. A CPU-only reload inference fails certification.
+
+Prediction frames are sorted by `(unique_id, ds)` before value comparison. This accepts
+harmless row-order changes while rejecting missing, duplicated, or reassigned forecast
+rows.
 
 The legacy-compatible top-level `status` remains `SUCCEEDED`, `PARTIAL`, or `FAILED`.
 Use `certification_status` for formal interpretation:
@@ -136,11 +142,12 @@ uses a 5 by 4 summing matrix.
 - `models/<model-id>/run_report.json`: per-model training and certification status;
 - `models/<model-id>/predictions.csv`: raw and legal decoded predictions;
 - `models/<model-id>/prediction_after_load.csv`: prediction frame produced after reload;
-- `models/<model-id>/runtime_certification.json`: finite/state/device/PID and prediction
-  comparison evidence;
+- `models/<model-id>/runtime_certification.json`: identity, finite-state, device/PID,
+  failure phase, failed checks, and prediction-comparison evidence. This file is written
+  for both PASS and FAIL outcomes before the task returns or raises;
 - `models/<model-id>/neuralforecast/`: retained model bundle when `--save-models` is
-  enabled. The bundle may be removed after successful verification when retention is
-  disabled, while certification evidence remains.
+  enabled. After a successful verification the bundle may be removed when retention is
+  disabled. Failed certifications retain any bundle already written for diagnosis.
 
 ## Resilient run script
 
