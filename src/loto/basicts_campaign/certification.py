@@ -9,9 +9,15 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from loto.basicts_campaign.installed_provenance import (
+    EXPECTED_DISTRIBUTION_NAME,
+    EXPECTED_REPOSITORY_URL,
+)
+
 EXPECTED_BASICTS_VERSION = "1.1.0"
 EXPECTED_UPSTREAM_REVISION = "c2bb6e31e591167e84459775a21a62e70a5893ce"
 SHA256_LINE = re.compile(r"^(?P<digest>[0-9a-f]{64})  (?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)$")
+DIGEST_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
 
 class CertificationError(RuntimeError):
@@ -168,6 +174,29 @@ def _verify_response(directory: Path, operation: str) -> dict[str, Any]:
     return response
 
 
+def _verify_identity_provenance(evidence: dict[str, Any]) -> None:
+    required = {
+        "installed_provenance_status": "PASS",
+        "distribution_name": EXPECTED_DISTRIBUTION_NAME,
+        "distribution_version": EXPECTED_BASICTS_VERSION,
+        "direct_url_repository": EXPECTED_REPOSITORY_URL,
+        "direct_url_vcs": "git",
+        "direct_url_commit_id": EXPECTED_UPSTREAM_REVISION,
+        "direct_url_requested_revision": EXPECTED_UPSTREAM_REVISION,
+    }
+    for field, expected in required.items():
+        if evidence.get(field) != expected:
+            raise CertificationError(
+                f"identity provenance mismatch for {field}: "
+                f"expected {expected!r}, got {evidence.get(field)!r}"
+            )
+    direct_url_sha256 = evidence.get("direct_url_sha256")
+    if not isinstance(direct_url_sha256, str) or DIGEST_PATTERN.fullmatch(
+        direct_url_sha256
+    ) is None:
+        raise CertificationError("identity direct_url_sha256 is invalid")
+
+
 def verify_provider_bundle(directory: Path, operation: str) -> dict[str, Any]:
     """Verify one provider response bundle and operation-specific PASS evidence."""
 
@@ -181,6 +210,7 @@ def verify_provider_bundle(directory: Path, operation: str) -> dict[str, Any]:
             raise CertificationError("identity operation did not record PASS")
         if evidence.get("python_process_boundary") is not True:
             raise CertificationError("identity process boundary was not verified")
+        _verify_identity_provenance(evidence)
     elif operation == "validate_config":
         if evidence.get("config_import_policy") != "ALLOWLIST":
             raise CertificationError("config import policy is not ALLOWLIST")
@@ -265,6 +295,7 @@ def certify_p0(
         "certified": {
             "isolated_python_lane": "3.11",
             "identity": True,
+            "installed_package_git_provenance": True,
             "config_import_allowlist": True,
             "dlinear_cpu_fit_predict": True,
             "save_load_repredict_exact": True,
