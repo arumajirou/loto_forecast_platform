@@ -12,6 +12,7 @@ from loto.statsforecast.runtime_lane import (
     prepare_offline_bundle,
     run_end_to_end_certification,
     run_target_host_certification,
+    triage_end_to_end_run,
     verify_target_host_package,
     write_admission_artifacts,
 )
@@ -71,8 +72,22 @@ def main(argv: list[str] | None = None) -> int:
     e2e_parser.add_argument("--horizon", type=int, default=1)
     e2e_parser.add_argument("--seed", type=int, default=1)
 
+    triage_parser = subparsers.add_parser("triage-run")
+    triage_parser.add_argument("--end-to-end-dir", type=Path, required=True)
+    triage_parser.add_argument("--output-dir", type=Path, required=True)
+
     args = parser.parse_args(argv)
 
+    if args.command == "triage-run":
+        result = triage_end_to_end_run(
+            args.end_to_end_dir,
+            args.output_dir,
+        )
+        print(f"TRIAGE_DIR={result.output_dir}")
+        print(f"TRIAGE_STATUS={result.status}")
+        print(f"PRIMARY_CLASSIFICATION={result.primary_classification}")
+        print(f"PROGRESS_PERCENT={result.progress_percent}")
+        return 0 if result.status == "NO_FAILURE" else 2
     if args.command == "end-to-end":
         result = run_end_to_end_certification(
             _repo_root(),
