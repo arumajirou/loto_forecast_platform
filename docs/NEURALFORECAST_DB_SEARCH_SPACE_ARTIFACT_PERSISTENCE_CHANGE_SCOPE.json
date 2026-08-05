@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0.0",
+  "status": "DB_CAMPAIGN_SEARCH_SPACE_PERSISTENCE_IMPLEMENTED",
+  "base_branch": "agent/neuralforecast-search-space-artifact-persistence",
+  "base_pr": 85,
+  "scope": {
+    "included": [
+      "stable db_automodel module and class identity preservation",
+      "explicit idempotent package-level persistence installer",
+      "temporary planning and construction interceptors with hook restoration",
+      "thread-safe same-process interception and process-worker installation",
+      "database AutoModel pre-constructor search-space persistence",
+      "database model-directory four-file profile contract",
+      "planning and runtime-resolved profile phases",
+      "AutoHINT pre-import unavailable evidence",
+      "AutoHINT Ray-domain persistence before constructor",
+      "read-after-write fail-closed verification",
+      "model run-report profile evidence",
+      "campaign-report profile aggregation",
+      "worker-bootstrap missing-evidence classification",
+      "dry-run artifact contract declaration",
+      "focused installer, success, failure, AutoHINT and aggregation tests"
+    ],
+    "excluded": [
+      "automatic sampler switching",
+      "ASHA or other scheduler activation",
+      "multi-objective optimization",
+      "accuracy-improvement claims",
+      "all-36 real NeuralForecast execution",
+      "RTX 5070 Ti runtime certification",
+      "Holdout or Prospective model selection",
+      "raw-data modification",
+      "prediction-lock modification",
+      "merge or release"
+    ]
+  },
+  "safety": {
+    "direct_main_write": false,
+    "force_push": false,
+    "auto_merge": false,
+    "raw_data_changed": false,
+    "prediction_lock_changed": false
+  }
+}
