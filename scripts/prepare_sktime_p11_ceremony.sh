@@ -3,25 +3,19 @@ set -Eeuo pipefail
 
 ROOT="${ROOT:-/mnt/e/env/ts/loto_forecast_platform}"
 ENV_DIR="${ROOT}/environments/sktime-classic-py312"
-POLICY="${
-    SKTIME_P11_POLICY_CONFIG:-
-    ${ROOT}/configs/sktime_campaign/primary_promotion_authorization_policy.json
-}"
+DEFAULT_POLICY="${ROOT}/configs/sktime_campaign/primary_promotion_authorization_policy.json"
+POLICY="${SKTIME_P11_POLICY_CONFIG:-${DEFAULT_POLICY}}"
 RUN_ID="${SKTIME_RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
-CEREMONY_DIR="${
-    SKTIME_P11_CEREMONY_DIR:-
-    ${ROOT}/artifacts/sktime-p11-ceremony/${RUN_ID}
-}"
+DEFAULT_CEREMONY_DIR="${ROOT}/artifacts/sktime-p11-ceremony/${RUN_ID}"
+CEREMONY_DIR="${SKTIME_P11_CEREMONY_DIR:-${DEFAULT_CEREMONY_DIR}}"
 INTENT_DIR="${CEREMONY_DIR}/intent"
 REQUESTED_AT_UTC="${SKTIME_P11_REQUESTED_AT_UTC:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
-EXPIRES_AT_UTC="${
-    SKTIME_P11_EXPIRES_AT_UTC:-
-    $(date -u -d "${REQUESTED_AT_UTC} + 30 minutes" +%Y-%m-%dT%H:%M:%SZ)
-}"
-AUTHORIZATION_NONCE="${
-    SKTIME_P11_AUTHORIZATION_NONCE:-
-    $(openssl rand -hex 32)
-}"
+DEFAULT_EXPIRES_AT_UTC="$(
+    date -u -d "${REQUESTED_AT_UTC} + 30 minutes" +%Y-%m-%dT%H:%M:%SZ
+)"
+EXPIRES_AT_UTC="${SKTIME_P11_EXPIRES_AT_UTC:-${DEFAULT_EXPIRES_AT_UTC}}"
+DEFAULT_AUTHORIZATION_NONCE="$(openssl rand -hex 32)"
+AUTHORIZATION_NONCE="${SKTIME_P11_AUTHORIZATION_NONCE:-${DEFAULT_AUTHORIZATION_NONCE}}"
 
 required=(
     SKTIME_P11_P10_EVIDENCE_DIR
