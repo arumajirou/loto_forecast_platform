@@ -1,8 +1,8 @@
-"""Identity entry point for the GluonTS 0.16.3 compatibility provider."""
+"""Identity and CLI entry point for the GluonTS 0.16.3 compatibility provider."""
 
 from __future__ import annotations
 
-import json
+from typing import Sequence
 
 LANE = "compat"
 GLUONTS_VERSION = "0.16.3"
@@ -10,17 +10,18 @@ TORCH_CONSTRAINT = "==2.9.1"
 PROVIDER_STATUS = "EXECUTION_PENDING"
 
 
-def main() -> None:
-    """Print machine-readable provider identity without importing GluonTS."""
+def main(argv: Sequence[str] | None = None) -> int:
+    """Load the CLI lazily so importing provider identity does not import GluonTS."""
 
-    print(
-        json.dumps(
-            {
-                "lane": LANE,
-                "gluonts_version": GLUONTS_VERSION,
-                "torch_constraint": TORCH_CONSTRAINT,
-                "status": PROVIDER_STATUS,
-            },
-            sort_keys=True,
-        )
-    )
+    from .cli import main as cli_main
+
+    return cli_main(argv)
+
+
+__all__ = [
+    "GLUONTS_VERSION",
+    "LANE",
+    "PROVIDER_STATUS",
+    "TORCH_CONSTRAINT",
+    "main",
+]
