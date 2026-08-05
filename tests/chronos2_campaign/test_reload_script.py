@@ -20,3 +20,8 @@ def test_response_writer_emits_real_json(tmp_path: Path) -> None:
     output = tmp_path / "response.json"
     module._write_response(output, {"status": "OK"})
     assert json.loads(output.read_text(encoding="utf-8")) == {"status": "OK"}
+
+
+def test_script_adds_repository_src_to_import_path() -> None:
+    module = load_script()
+    assert str(module.SRC) in module.sys.path

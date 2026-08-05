@@ -63,6 +63,11 @@ def test_multivariate_compiles_wide_targets() -> None:
 
 def test_future_covariates_are_known_future_only() -> None:
     payload = make_payload("numbers3")
+    payload["past_covariates"] = [
+        {"weekday": 1, "month": 1},
+        {"weekday": 2, "month": 1},
+        {"weekday": 3, "month": 1},
+    ]
     payload["future_covariates"] = [
         {"weekday": 1, "month": 2},
         {"weekday": 2, "month": 2},

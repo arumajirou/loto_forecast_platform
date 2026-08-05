@@ -3,8 +3,11 @@
 ## Executed
 
 - `python3 -m compileall -q src scripts tests`: PASS
-- focused pytest for Chronos-2 adapters/campaign: 38 PASS
+- focused pytest for Chronos-2 adapters/campaign: 42 PASS
 - schema-v1 adapter: PASS
+- standalone runner source-path bootstrap: PASS
+- provider example request parse: PASS
+- covariate reserved-key/schema guards: PASS
 - horizons 1/2/5: PASS
 - game position counts 3/4/5/6/7/8: PASS
 - local/panel/multivariate mock inference: PASS

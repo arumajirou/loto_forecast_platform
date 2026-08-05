@@ -10,7 +10,12 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from loto.chronos2_campaign.provider import execute_request
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from loto.chronos2_campaign.provider import execute_request  # noqa: E402
 
 
 def _write_response(path: Path, payload: dict[str, Any]) -> None:

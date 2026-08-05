@@ -97,3 +97,32 @@ def test_revision_requires_full_commit() -> None:
     payload["revision"] = "29ec376"
     with pytest.raises(ValidationError, match="40-character"):
         Chronos2RequestV2.model_validate(payload)
+
+
+def test_reserved_covariate_key_is_rejected() -> None:
+    payload = request_payload()
+    payload["past_covariates"] = [
+        {"target": 1},
+        {"target": 2},
+        {"target": 3},
+    ]
+    with pytest.raises(ValidationError, match="reserved keys"):
+        Chronos2RequestV2.model_validate(payload)
+
+
+def test_future_covariates_require_past_schema() -> None:
+    payload = request_payload(horizon=2)
+    payload["future_covariates"] = [{"weekday": 1}, {"weekday": 2}]
+    with pytest.raises(ValidationError, match="require matching past_covariates"):
+        Chronos2RequestV2.model_validate(payload)
+
+
+def test_covariate_rows_require_one_schema() -> None:
+    payload = request_payload()
+    payload["past_covariates"] = [
+        {"weekday": 1},
+        {"weekday": 2, "month": 1},
+        {"weekday": 3},
+    ]
+    with pytest.raises(ValidationError, match="schema differs"):
+        Chronos2RequestV2.model_validate(payload)

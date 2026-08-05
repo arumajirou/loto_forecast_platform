@@ -12,3 +12,6 @@
 - Added schema-v1 Loto7 compatibility adapter.
 - Added separate-process reference reload runner path.
 - Added CPU mock tests and GPU evidence schema.
+- Added standalone runner `src` path bootstrap for the isolated environment.
+- Added reserved-key and stable-schema guards for past/future covariates.
+- Made the checked-in provider example contract-valid with three history rows.

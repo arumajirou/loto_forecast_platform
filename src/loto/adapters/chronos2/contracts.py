@@ -214,7 +214,58 @@ class Chronos2RequestV2(StrictModel):
             raise ValueError("position_multivariate requires cross_learning=false in provider v2")
         if self.operation is Operation.REFERENCE_RELOAD and not self.reference_manifest_path:
             raise ValueError("reference_reload requires reference_manifest_path")
+
+        reserved_covariate_names = {
+            "item_id",
+            "timestamp",
+            "target",
+            "draw_no",
+            "draw_date",
+            *self.position_columns,
+        }
+        past_schema = self._validate_covariate_schema(
+            "past_covariates",
+            self.past_covariates,
+            reserved_covariate_names,
+        )
+        future_schema = self._validate_covariate_schema(
+            "future_covariates",
+            self.future_covariates,
+            reserved_covariate_names,
+        )
+        if future_schema and not past_schema:
+            raise ValueError("future_covariates require matching past_covariates")
+        if not future_schema.issubset(past_schema):
+            missing = sorted(future_schema - past_schema)
+            raise ValueError(
+                "future_covariates keys must be a subset of past_covariates keys: "
+                f"{missing}"
+            )
         return self
+
+    @staticmethod
+    def _validate_covariate_schema(
+        label: str,
+        rows: tuple[dict[str, Any], ...],
+        reserved_names: set[str],
+    ) -> set[str]:
+        if not rows:
+            return set()
+        schema = set(rows[0])
+        overlap = sorted(schema & reserved_names)
+        if overlap:
+            raise ValueError(f"{label} contains reserved keys: {overlap}")
+        for index, row in enumerate(rows[1:], start=1):
+            row_schema = set(row)
+            if row_schema != schema:
+                raise ValueError(
+                    f"{label} row {index} schema differs from row 0: "
+                    f"expected={sorted(schema)}, actual={sorted(row_schema)}"
+                )
+            overlap = sorted(row_schema & reserved_names)
+            if overlap:
+                raise ValueError(f"{label} contains reserved keys: {overlap}")
+        return schema
 
 
 Matrix = tuple[tuple[float, ...], ...]
