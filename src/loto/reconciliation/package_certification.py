@@ -22,10 +22,21 @@ PRIMARY_ARTIFACTS = (
 REQUIRED_ARTIFACTS = (*PRIMARY_ARTIFACTS, "SHA256SUMS")
 PACKAGE_MANIFEST = "PACKAGE_MANIFEST.json"
 _FIXED_ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
+_ZIP_COMPRESSION = zipfile.ZIP_STORED
+_REGULAR_FILE_MODE = 0o100644
 
 
 class PackageIntegrityError(RuntimeError):
     """Raised when runtime evidence cannot be packaged without losing integrity."""
+
+
+class CertificationPackagingError(RuntimeError):
+    """Retain certification context when its evidence cannot be packaged."""
+
+    def __init__(self, certification: dict[str, object], cause: Exception) -> None:
+        self.certification = certification
+        self.cause = cause
+        super().__init__(f"{type(cause).__name__}: {cause}")
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -202,9 +213,9 @@ def verify_run_directory(run_dir: Path, *, certification_status: str) -> dict[st
 
 def _zip_info(member_name: str) -> zipfile.ZipInfo:
     info = zipfile.ZipInfo(member_name, date_time=_FIXED_ZIP_TIMESTAMP)
-    info.compress_type = zipfile.ZIP_DEFLATED
+    info.compress_type = _ZIP_COMPRESSION
     info.create_system = 3
-    info.external_attr = 0o100644 << 16
+    info.external_attr = _REGULAR_FILE_MODE << 16
     return info
 
 
@@ -214,6 +225,22 @@ def _validate_member_name(name: str, *, run_id: str) -> None:
         raise PackageIntegrityError(f"unsafe ZIP member: {name!r}")
     if len(path.parts) != 2 or path.parts[0] != run_id:
         raise PackageIntegrityError(f"ZIP member is outside expected run prefix: {name!r}")
+
+
+def _verify_member_metadata(info: zipfile.ZipInfo) -> None:
+    if info.is_dir():
+        raise PackageIntegrityError(f"ZIP contains directory member: {info.filename!r}")
+    if info.flag_bits & 0x1:
+        raise PackageIntegrityError(f"ZIP contains encrypted member: {info.filename!r}")
+    if info.compress_type != _ZIP_COMPRESSION:
+        raise PackageIntegrityError(f"ZIP compression mismatch: {info.filename!r}")
+    if info.date_time != _FIXED_ZIP_TIMESTAMP:
+        raise PackageIntegrityError(f"ZIP timestamp mismatch: {info.filename!r}")
+    if info.create_system != 3:
+        raise PackageIntegrityError(f"ZIP creator system mismatch: {info.filename!r}")
+    mode = (info.external_attr >> 16) & 0xFFFF
+    if mode != _REGULAR_FILE_MODE:
+        raise PackageIntegrityError(f"ZIP member mode mismatch: {info.filename!r}")
 
 
 def _verify_zip(
@@ -228,21 +255,22 @@ def _verify_zip(
     }
     try:
         with zipfile.ZipFile(zip_path, "r") as archive:
-            names = archive.namelist()
+            infos = archive.infolist()
+            names = [info.filename for info in infos]
             if len(names) != len(set(names)):
                 raise PackageIntegrityError("ZIP contains duplicate member names")
-            for name in names:
-                _validate_member_name(name, run_id=run_id)
+            for info in infos:
+                _validate_member_name(info.filename, run_id=run_id)
+                _verify_member_metadata(info)
             if set(names) != expected_names:
                 raise PackageIntegrityError(
                     "ZIP coverage mismatch: "
                     f"expected={sorted(expected_names)} actual={sorted(names)}"
                 )
-            archived_manifest = json.loads(
-                archive.read(f"{run_id}/{PACKAGE_MANIFEST}").decode("utf-8")
-            )
-            if archived_manifest != package_manifest:
-                raise PackageIntegrityError("archived PACKAGE_MANIFEST does not match source")
+            manifest_name = f"{run_id}/{PACKAGE_MANIFEST}"
+            archived_manifest_bytes = archive.read(manifest_name)
+            if archived_manifest_bytes != _canonical_json_bytes(package_manifest):
+                raise PackageIntegrityError("archived PACKAGE_MANIFEST bytes do not match source")
             for row in package_manifest["files"]:
                 name = str(row["path"])
                 payload = archive.read(f"{run_id}/{name}")
@@ -250,8 +278,53 @@ def _verify_zip(
                     raise PackageIntegrityError(f"ZIP byte count mismatch: {name}")
                 if _sha256_bytes(payload) != row["sha256"]:
                     raise PackageIntegrityError(f"ZIP hash mismatch: {name}")
-    except (OSError, zipfile.BadZipFile, KeyError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+    except (OSError, zipfile.BadZipFile, KeyError, UnicodeDecodeError) as exc:
         raise PackageIntegrityError(f"ZIP verification failed: {exc}") from exc
+
+
+def _sidecar_path(zip_path: Path) -> Path:
+    return Path(f"{zip_path}.sha256")
+
+
+def _expected_sidecar(zip_path: Path, digest: str) -> str:
+    return f"{digest}  {zip_path.name}\n"
+
+
+def _verify_existing_output(
+    zip_path: Path,
+    sidecar: Path,
+    *,
+    expected_digest: str,
+    package_manifest: dict[str, object],
+) -> bool:
+    """Return true when immutable outputs already exist and match exactly."""
+    if not zip_path.exists() and not sidecar.exists():
+        return False
+    if not zip_path.is_file():
+        raise PackageIntegrityError(f"existing ZIP path is not a regular file: {zip_path}")
+    if _sha256_file(zip_path) != expected_digest:
+        raise PackageIntegrityError("existing ZIP differs from deterministic package bytes")
+    _verify_zip(zip_path, package_manifest=package_manifest)
+
+    expected_sidecar = _expected_sidecar(zip_path, expected_digest)
+    if sidecar.exists():
+        if not sidecar.is_file():
+            raise PackageIntegrityError(f"existing sidecar is not a regular file: {sidecar}")
+        if sidecar.read_text(encoding="utf-8") != expected_sidecar:
+            raise PackageIntegrityError("existing ZIP sidecar does not match package digest")
+    else:
+        _atomic_write_text(sidecar, expected_sidecar)
+    return True
+
+
+def _promote_new_zip(temporary_path: Path, zip_path: Path) -> None:
+    """Publish without replacing a pre-existing artifact."""
+    try:
+        os.link(temporary_path, zip_path)
+    except FileExistsError as exc:
+        raise PackageIntegrityError(f"ZIP appeared concurrently: {zip_path}") from exc
+    except OSError as exc:
+        raise PackageIntegrityError(f"cannot publish immutable ZIP: {exc}") from exc
 
 
 def package_run(run_dir: Path, *, certification_status: str) -> dict[str, object]:
@@ -263,6 +336,7 @@ def package_run(run_dir: Path, *, certification_status: str) -> dict[str, object
     )
     manifest_bytes = _canonical_json_bytes(package_manifest)
     zip_path = run_dir.with_suffix(".zip")
+    sidecar = _sidecar_path(zip_path)
 
     descriptor, temporary_name = tempfile.mkstemp(
         dir=zip_path.parent,
@@ -271,12 +345,12 @@ def package_run(run_dir: Path, *, certification_status: str) -> dict[str, object
     )
     os.close(descriptor)
     temporary_path = Path(temporary_name)
+    reused_existing = False
     try:
         with zipfile.ZipFile(
             temporary_path,
             "w",
-            compression=zipfile.ZIP_DEFLATED,
-            compresslevel=9,
+            compression=_ZIP_COMPRESSION,
             strict_timestamps=True,
         ) as archive:
             run_id = run_dir.name
@@ -284,23 +358,28 @@ def package_run(run_dir: Path, *, certification_status: str) -> dict[str, object
                 archive.writestr(
                     _zip_info(f"{run_id}/{filename}"),
                     (run_dir / filename).read_bytes(),
-                    compress_type=zipfile.ZIP_DEFLATED,
-                    compresslevel=9,
+                    compress_type=_ZIP_COMPRESSION,
                 )
             archive.writestr(
                 _zip_info(f"{run_id}/{PACKAGE_MANIFEST}"),
                 manifest_bytes,
-                compress_type=zipfile.ZIP_DEFLATED,
-                compresslevel=9,
+                compress_type=_ZIP_COMPRESSION,
             )
-        os.replace(temporary_path, zip_path)
+        _verify_zip(temporary_path, package_manifest=package_manifest)
+        digest = _sha256_file(temporary_path)
+        reused_existing = _verify_existing_output(
+            zip_path,
+            sidecar,
+            expected_digest=digest,
+            package_manifest=package_manifest,
+        )
+        if not reused_existing:
+            _promote_new_zip(temporary_path, zip_path)
+            _verify_zip(zip_path, package_manifest=package_manifest)
+            _atomic_write_text(sidecar, _expected_sidecar(zip_path, digest))
     finally:
         temporary_path.unlink(missing_ok=True)
 
-    _verify_zip(zip_path, package_manifest=package_manifest)
-    digest = _sha256_file(zip_path)
-    sidecar = Path(f"{zip_path}.sha256")
-    _atomic_write_text(sidecar, f"{digest}  {zip_path.name}\n")
     return {
         "status": "VERIFIED",
         "path": str(zip_path),
@@ -311,6 +390,7 @@ def package_run(run_dir: Path, *, certification_status: str) -> dict[str, object
         "run_id": run_dir.name,
         "certification_status": certification_status,
         "content_set_sha256": package_manifest["content_set_sha256"],
+        "reused_existing": reused_existing,
     }
 
 
@@ -320,10 +400,13 @@ def run_packaged_certification(
     """Run certification, then package evidence regardless of formal certification status."""
     certification = runtime.run_certification(config)
     run_directory = Path(str(certification["run_directory"]))
-    package = package_run(
-        run_directory,
-        certification_status=str(certification["status"]),
-    )
+    try:
+        package = package_run(
+            run_directory,
+            certification_status=str(certification["status"]),
+        )
+    except Exception as exc:
+        raise CertificationPackagingError(certification, exc) from exc
     return {"certification": certification, "package": package}
 
 
@@ -353,23 +436,58 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _packaging_error_payload(exc: CertificationPackagingError) -> dict[str, object]:
+    certification = exc.certification
+    return {
+        "status": "FAILED_PACKAGING",
+        "formal_success": False,
+        "phase": "package",
+        "error": f"{type(exc.cause).__name__}: {exc.cause}",
+        "run_id": certification.get("run_id"),
+        "run_directory": certification.get("run_directory"),
+        "certification_status": certification.get("status"),
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    config = runtime.RuntimeCertificationConfig(
-        output_root=args.output_root,
-        games=_parse_games(args.games),
-        expected_version=args.expected_version,
-        seed=args.seed,
-        horizon=args.horizon,
-        insample_size=args.insample_size,
-        coherence_tolerance=args.coherence_tolerance,
-    )
     try:
-        result = run_packaged_certification(config)
+        config = runtime.RuntimeCertificationConfig(
+            output_root=args.output_root,
+            games=_parse_games(args.games),
+            expected_version=args.expected_version,
+            seed=args.seed,
+            horizon=args.horizon,
+            insample_size=args.insample_size,
+            coherence_tolerance=args.coherence_tolerance,
+        )
     except Exception as exc:
         error = {
-            "status": "FAILED_PACKAGING",
+            "status": "INVALID_CONFIGURATION",
             "formal_success": False,
+            "phase": "configuration",
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+        print(json.dumps(error, ensure_ascii=False, indent=2, sort_keys=True))
+        return 3
+
+    try:
+        result = run_packaged_certification(config)
+    except CertificationPackagingError as exc:
+        print(
+            json.dumps(
+                _packaging_error_payload(exc),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 3
+    except Exception as exc:
+        error = {
+            "status": "FAILED_CERTIFICATION_HARNESS",
+            "formal_success": False,
+            "phase": "certification",
             "error": f"{type(exc).__name__}: {exc}",
         }
         print(json.dumps(error, ensure_ascii=False, indent=2, sort_keys=True))
