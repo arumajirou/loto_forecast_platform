@@ -11,6 +11,9 @@ from typing import Any
 
 import numpy as np
 
+from loto.basicts_campaign.installed_provenance import (
+    verify_installed_basicts_provenance,
+)
 from loto.basicts_campaign.protocol import (
     ProviderOperation,
     ProviderRequest,
@@ -67,19 +70,24 @@ def actual_upstream_revision() -> str:
     return revision
 
 
-def _verify_identity(request: ProviderRequest) -> tuple[str, str]:
+def _verify_identity(request: ProviderRequest) -> tuple[str, str, dict[str, Any]]:
     version = installed_basicts_version()
     revision = actual_upstream_revision()
+    provenance = verify_installed_basicts_provenance()
     if version != request.expected_basicts_version:
         raise RuntimeError(
             f"BasicTS version mismatch: expected {request.expected_basicts_version}, got {version}"
         )
+    if provenance.get("distribution_version") != version:
+        raise RuntimeError("BasicTS version metadata and provenance metadata differ")
     if revision != request.expected_upstream_revision:
         raise RuntimeError(
             "BasicTS revision mismatch: "
             f"expected {request.expected_upstream_revision}, got {revision}"
         )
-    return version, revision
+    if provenance.get("direct_url_commit_id") != request.expected_upstream_revision:
+        raise RuntimeError("BasicTS installed commit differs from the request contract")
+    return version, revision, provenance
 
 
 def _window_tensors(request: ProviderRequest) -> tuple[Any, Any]:
@@ -234,14 +242,16 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
     output_dir.mkdir(parents=True, exist_ok=True)
     version: str | None = None
     revision: str | None = None
+    provenance: dict[str, Any] | None = None
     try:
-        version, revision = _verify_identity(request)
+        version, revision, provenance = _verify_identity(request)
         if request.operation is ProviderOperation.IDENTITY:
             evidence = {
                 "identity_status": "PASS",
                 "python_process_boundary": True,
                 "device": "cpu",
                 "cpu_fallback": False,
+                **provenance,
             }
         elif request.operation is ProviderOperation.VALIDATE_CONFIG:
             resolved = [
