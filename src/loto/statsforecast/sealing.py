@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Any
 
@@ -19,7 +20,7 @@ def canonical_json(payload: Any) -> bytes:
 def seal_prospective_prediction(payload: dict[str, Any]) -> dict[str, Any]:
     if payload.get("actual_known") is not False:
         raise ValueError("prospective prediction requires actual_known=false")
-    stamped = dict(payload)
+    stamped = deepcopy(payload)
     stamped["sealed_at_utc"] = datetime.now(timezone.utc).isoformat()
     stamped["sha256"] = hashlib.sha256(canonical_json(stamped)).hexdigest()
     return stamped

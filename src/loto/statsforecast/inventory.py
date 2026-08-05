@@ -87,7 +87,8 @@ def _contract(name: str) -> ModelContract:
             name=name,
             expected_status=ExpectedStatus.EXPECTED_DATA_PRECONDITION,
             champion_eligible=True,
-            required_parameters=("model_specific_configuration",),
+            requires_explicit_configuration=True,
+            notes="An explicit upstream constructor configuration is required.",
         )
     if name in _SEASONAL:
         return ModelContract(
@@ -95,7 +96,8 @@ def _contract(name: str) -> ModelContract:
             expected_status=ExpectedStatus.EXPECTED_DATA_PRECONDITION,
             source="PROJECT_EXTENSION" if name == "CES" else "UPSTREAM_EXPORT",
             champion_eligible=name not in _NON_CHAMPION,
-            required_parameters=("season_length", "minimum_two_seasons"),
+            required_parameters=("season_length",),
+            minimum_seasons=2,
             capabilities=("seasonal",),
         )
     capabilities: tuple[str, ...] = ()

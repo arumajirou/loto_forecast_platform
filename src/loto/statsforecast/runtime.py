@@ -26,16 +26,20 @@ def discover_runtime_inventory(models_module: Any | None = None) -> dict[str, An
                 "runtime_exports": [],
                 "missing": list(MODEL_NAMES),
                 "extra": [],
+                "complete": False,
             }
     exports = tuple(str(name) for name in getattr(models_module, "__all__", ()))
     available = {name for name in MODEL_NAMES if hasattr(models_module, name)}
+    missing = sorted(set(MODEL_NAMES).difference(available))
     return {
-        "status": RuntimeStatus.VERIFIED if available else RuntimeStatus.VALIDATION_FAILED,
+        "status": RuntimeStatus.VERIFIED if not missing else RuntimeStatus.INVENTORY_MISMATCH,
         "pinned_count": len(MODEL_NAMES),
         "runtime_export_count": len(exports),
         "runtime_exports": list(exports),
-        "missing": sorted(set(MODEL_NAMES).difference(available)),
+        "available_count": len(available),
+        "missing": missing,
         "extra": sorted(set(exports).difference(MODEL_NAMES)),
+        "complete": not missing,
     }
 
 
@@ -66,20 +70,38 @@ def validate_forecast_output(
     *,
     model_name: str,
     expected_rows: int,
+    expected_unique_ids: set[str] | None = None,
+    horizon: int | None = None,
 ) -> dict[str, Any]:
     contract = model_contract(model_name)
-    value_columns = [column for column in prediction.columns if column not in {"unique_id", "ds"}]
+    ignored = {"unique_id", "ds", "cutoff"}
+    value_columns = [column for column in prediction.columns if column not in ignored]
     identity_ok = {"unique_id", "ds"}.issubset(prediction.columns)
     shape_ok = len(prediction) == expected_rows and bool(value_columns)
-    duplicate_keys = bool(
-        identity_ok and prediction.duplicated(["unique_id", "ds"]).any()
-    )
+    duplicate_keys = bool(identity_ok and prediction.duplicated(["unique_id", "ds"]).any())
     finite = bool(
         value_columns
         and np.isfinite(prediction[value_columns].to_numpy(dtype=float)).all()
     )
+
+    series_horizon_ok = True
+    if expected_unique_ids is not None or horizon is not None:
+        if not identity_ok or expected_unique_ids is None or horizon is None:
+            series_horizon_ok = False
+        else:
+            observed_ids = {str(value) for value in prediction["unique_id"].unique()}
+            expected_ids = {str(value) for value in expected_unique_ids}
+            counts = prediction.groupby("unique_id", sort=False).size()
+            series_horizon_ok = observed_ids == expected_ids and bool((counts == horizon).all())
+
     if contract.expected_status is ExpectedStatus.EXPECTED_NEGATIVE_PASS:
-        passed = identity_ok and shape_ok and not finite
+        passed = (
+            identity_ok
+            and shape_ok
+            and not finite
+            and not duplicate_keys
+            and series_horizon_ok
+        )
         return {
             "status": (
                 RuntimeStatus.EXPECTED_NEGATIVE_PASS
@@ -89,18 +111,46 @@ def validate_forecast_output(
             "finite": finite,
             "shape_ok": shape_ok,
             "identity_ok": identity_ok,
+            "series_horizon_ok": series_horizon_ok,
             "duplicate_keys": duplicate_keys,
             "champion_eligible": False,
         }
-    passed = identity_ok and shape_ok and finite and not duplicate_keys
+    passed = identity_ok and shape_ok and finite and not duplicate_keys and series_horizon_ok
     return {
         "status": RuntimeStatus.VERIFIED if passed else RuntimeStatus.VALIDATION_FAILED,
         "finite": finite,
         "shape_ok": shape_ok,
         "identity_ok": identity_ok,
+        "series_horizon_ok": series_horizon_ok,
         "duplicate_keys": duplicate_keys,
         "champion_eligible": contract.champion_eligible,
     }
+
+
+def _validate_model_data_preconditions(
+    panel: pd.DataFrame,
+    *,
+    model_name: str,
+    parameters: dict[str, Any],
+) -> None:
+    contract = model_contract(model_name)
+    if contract.minimum_seasons is None:
+        return
+    season_length = parameters.get("season_length")
+    if not isinstance(season_length, int) or isinstance(season_length, bool):
+        raise ValueError(f"model {model_name} requires integer season_length")
+    if season_length < 1:
+        raise ValueError("season_length must be positive")
+    required_rows = contract.minimum_seasons * season_length
+    too_short = {
+        str(unique_id): len(group)
+        for unique_id, group in panel.groupby("unique_id", sort=False)
+        if len(group) < required_rows
+    }
+    if too_short:
+        raise ValueError(
+            f"model {model_name} requires at least {required_rows} rows per series: {too_short}"
+        )
 
 
 class StatsForecastRuntimeAdapter:
@@ -114,8 +164,10 @@ class StatsForecastRuntimeAdapter:
         contract = model_contract(name)
         parameters = dict(parameters or {})
         missing = [item for item in contract.required_parameters if item not in parameters]
-        if missing and "minimum_two_seasons" not in missing:
+        if missing:
             raise ValueError(f"model {name} requires parameters: {missing}")
+        if contract.requires_explicit_configuration and not parameters:
+            raise ValueError(f"model {name} requires explicit constructor configuration")
         try:
             model_class = getattr(self.models_module, name)
         except AttributeError as exc:
@@ -134,13 +186,24 @@ class StatsForecastRuntimeAdapter:
         levels: tuple[int, ...] = (80, 90),
     ) -> tuple[pd.DataFrame, dict[str, Any]]:
         validate_long_panel(panel)
-        model = self.build_model(model_name, parameters)
+        if horizon < 1:
+            raise ValueError("horizon must be positive")
+        resolved_parameters = dict(parameters or {})
+        _validate_model_data_preconditions(
+            panel,
+            model_name=model_name,
+            parameters=resolved_parameters,
+        )
+        model = self.build_model(model_name, resolved_parameters)
         engine = self.core_class(models=[model], freq=freq, n_jobs=1)
         prediction = engine.forecast(df=panel.copy(deep=True), h=horizon, level=list(levels))
-        expected_rows = panel["unique_id"].nunique() * horizon
+        unique_ids = {str(value) for value in panel["unique_id"].unique()}
+        expected_rows = len(unique_ids) * horizon
         evidence = validate_forecast_output(
             prediction,
             model_name=model_name,
             expected_rows=expected_rows,
+            expected_unique_ids=unique_ids,
+            horizon=horizon,
         )
         return prediction, evidence

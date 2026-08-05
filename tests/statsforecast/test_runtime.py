@@ -82,3 +82,78 @@ def test_missing_dependency_is_retained_as_evidence(monkeypatch) -> None:
     result = discover_runtime_inventory()
     assert result["status"] is RuntimeStatus.DEPENDENCY_MISSING
     assert result["pinned_count"] == 41
+
+
+def test_partial_runtime_inventory_is_not_verified() -> None:
+    result = discover_runtime_inventory(SimpleNamespace(__all__=("Naive",), Naive=Naive))
+    assert result["status"] is RuntimeStatus.INVENTORY_MISMATCH
+    assert result["complete"] is False
+    assert result["available_count"] == 1
+    assert "AutoARIMA" in result["missing"]
+
+
+def test_runtime_inventory_requires_every_project_model() -> None:
+    namespace = SimpleNamespace(__all__=())
+    inventory = __import__("loto.statsforecast.inventory", fromlist=["MODEL_NAMES"])
+    for name in inventory.MODEL_NAMES:
+        setattr(namespace, name, type(name, (), {}))
+    result = discover_runtime_inventory(namespace)
+    assert result["status"] is RuntimeStatus.VERIFIED
+    assert result["complete"] is True
+    assert result["missing"] == []
+
+
+def test_seasonal_model_requires_season_length() -> None:
+    class SeasonalNaive:
+        def __init__(self, season_length: int) -> None:
+            self.season_length = season_length
+
+    adapter = StatsForecastRuntimeAdapter(
+        core_class=FakeCore,
+        models_module=SimpleNamespace(SeasonalNaive=SeasonalNaive),
+    )
+    with pytest.raises(ValueError, match="season_length"):
+        adapter.forecast(
+            panel(),
+            model_name="SeasonalNaive",
+            freq=1,
+            horizon=1,
+        )
+
+
+def test_seasonal_model_requires_two_full_seasons() -> None:
+    class SeasonalNaive:
+        def __init__(self, season_length: int) -> None:
+            self.season_length = season_length
+
+    adapter = StatsForecastRuntimeAdapter(
+        core_class=FakeCore,
+        models_module=SimpleNamespace(SeasonalNaive=SeasonalNaive),
+    )
+    with pytest.raises(ValueError, match="at least 4 rows"):
+        adapter.forecast(
+            panel(),
+            model_name="SeasonalNaive",
+            freq=1,
+            horizon=1,
+            parameters={"season_length": 2},
+        )
+
+
+def test_forecast_output_rejects_wrong_series_composition() -> None:
+    prediction = pd.DataFrame(
+        {
+            "unique_id": ["d1", "d3"],
+            "ds": [4, 4],
+            "Naive": [1.0, 2.0],
+        }
+    )
+    evidence = validate_forecast_output(
+        prediction,
+        model_name="Naive",
+        expected_rows=2,
+        expected_unique_ids={"d1", "d2"},
+        horizon=1,
+    )
+    assert evidence["status"] is RuntimeStatus.VALIDATION_FAILED
+    assert evidence["series_horizon_ok"] is False

@@ -23,6 +23,7 @@ class ExpectedStatus(StrEnum):
 class RuntimeStatus(StrEnum):
     VERIFIED = "VERIFIED"
     EXPECTED_NEGATIVE_PASS = "EXPECTED_NEGATIVE_PASS"
+    INVENTORY_MISMATCH = "INVENTORY_MISMATCH"
     DATA_PRECONDITION_FAILED = "DATA_PRECONDITION_FAILED"
     DEPENDENCY_MISSING = "DEPENDENCY_MISSING"
     CONFIGURATION_ERROR = "CONFIGURATION_ERROR"
@@ -87,6 +88,8 @@ class ModelContract(StrictModel):
     source: Literal["UPSTREAM_EXPORT", "PROJECT_EXTENSION"] = "UPSTREAM_EXPORT"
     champion_eligible: bool = True
     required_parameters: tuple[str, ...] = ()
+    requires_explicit_configuration: bool = False
+    minimum_seasons: int | None = Field(default=None, ge=1)
     capabilities: tuple[str, ...] = ()
     notes: str = ""
 
