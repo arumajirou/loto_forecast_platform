@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-05T01:05:00Z",
+  "repository": "arumajirou/loto_forecast_platform",
+  "main_sha_at_start": "3dfc6481a0d83eb578f5c0ec4c776e324f7aef1d",
+  "integration_branch": "integration/consolidate-open-prs-20260805",
+  "source_pr35_head_sha": "03473ea869e91ea7253832e2900b0738bc769c71",
+  "integration_fix_sha": "5af130e63c8f863e2cc79d53f5c9b890114f8cc5",
+  "pull_requests": [
+    {
+      "number": 13,
+      "title": "feat: certify Granite TTM GPU runtime",
+      "head_sha": "2784781934900bc3a08bca49814d736514cea4ac",
+      "decision": "SUPERSEDED_BY_MAIN_TSFMRUNTIME_CHAIN",
+      "confidence": "high",
+      "evidence": [
+        "scripts/tsfm/run_granite_ttm_runtime_probe.py blob ef862e47b5b4c368c289ec95b10a428538a459b1 is identical on PR #13 and main",
+        "environments/granite-ttm/pyproject.toml blob e6b0680726134ba2295f25fa60df05ddec4fe604 is identical",
+        "environments/granite-ttm/run-python.sh blob 1f540519c9149a4cfcf7b6fc45842218016d2714 is identical",
+        "environments/granite-ttm/uv.lock blob 91e7c50af5cd68f5232a07f1e8146ea24debfff9 is identical",
+        "tests/test_granite_ttm_runtime_probe.py blob ae331824eab0d06ce6e5d99cc791f9d98b544100 is identical",
+        "PR #15 and PR #16 subsequently integrated the complete TSFM certification ledger and evidence"
+      ],
+      "integration_action": "do_not_cherry_pick"
+    },
+    {
+      "number": 20,
+      "title": "style: apply Ruff formatting across Python sources",
+      "head_sha": "fcaabd0993511f08bd92e9a54605eea426090808",
+      "decision": "OBSOLETE_FORMATTING_PR",
+      "confidence": "high",
+      "evidence": [
+        "PR is based on main 78a7fc41dae0d1c9a1ff6154e3a7991a5ea2ca08 and is not mergeable with current main",
+        "Current PR #35 CI passed Ruff format and Ruff lint before failing at pytest collection",
+        "PR #34 also passed repository-wide Ruff and full pytest on current main"
+      ],
+      "integration_action": "do_not_cherry_pick"
+    },
+    {
+      "number": 21,
+      "title": "feat(numbers3): add reproducible TCN experiment framework",
+      "head_sha": "f834a3d6a9f396d0f2dbe06031640615fc26e263",
+      "decision": "SUPERSEDED_BY_PR_34",
+      "confidence": "verified",
+      "evidence": [
+        "PR #34 explicitly states that it ports PR #21 onto current main",
+        "PR #34 merged as main commit 3dfc6481a0d83eb578f5c0ec4c776e324f7aef1d",
+        "PR #34 validation included focused tests, repository-wide Ruff, compileall, full pytest, secret scan and diff integrity"
+      ],
+      "integration_action": "do_not_cherry_pick"
+    },
+    {
+      "number": 35,
+      "title": "feat(numbers4): add NeuralForecast DB AutoModel workflow",
+      "head_sha": "03473ea869e91ea7253832e2900b0738bc769c71",
+      "decision": "INTEGRATE_WITH_COLLECTION_FIX",
+      "confidence": "verified",
+      "evidence": [
+        "PR #35 is based on current main 3dfc6481a0d83eb578f5c0ec4c776e324f7aef1d",
+        "Ruff format, Ruff lint and compileall passed in GitHub Actions",
+        "pytest failed during collection because test_contracts.py, test_metrics.py and test_registry.py basenames occur in both tests/auto_campaign and tests/",
+        "Integration branch sets pytest import mode to importlib so modules are imported by full path without basename collision"
+      ],
+      "integration_action": "integrate"
+    }
+  ],
+  "merge_policy": {
+    "main_direct_push": false,
+    "force_push": false,
+    "auto_merge": false,
+    "merge_before_ci_success": false,
+    "source_branch_deletion": false
+  }
+}
