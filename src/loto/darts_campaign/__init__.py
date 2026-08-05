@@ -1,12 +1,14 @@
-"""Isolated Darts 0.46.1 discovery and provider contracts."""
+"""Isolated Darts 0.46.1 discovery, evaluation, and certification contracts."""
 
-from .discovery import PUBLIC_FORECASTING_EXPORTS_0_46_1, discover_models
+from .artifacts import seal_predictions, verify_prediction_seal
+from .evaluation import evaluate_predictions
 from .protocol import DartsRequest, DartsResponse, GameGeometry
 
 __all__ = [
     "DartsRequest",
     "DartsResponse",
     "GameGeometry",
-    "PUBLIC_FORECASTING_EXPORTS_0_46_1",
-    "discover_models",
+    "evaluate_predictions",
+    "seal_predictions",
+    "verify_prediction_seal",
 ]

@@ -22,6 +22,8 @@ class FailureClass(StrEnum):
     FIT_FAILED = "FIT_FAILED"
     PREDICT_FAILED = "PREDICT_FAILED"
     PERSISTENCE_FAILED = "PERSISTENCE_FAILED"
+    EVALUATION_FAILED = "EVALUATION_FAILED"
+    ARTIFACT_FAILED = "ARTIFACT_FAILED"
     TIMEOUT = "TIMEOUT"
 
 
@@ -91,6 +93,58 @@ class ArgumentDecision(BaseModel):
     value_repr: str
 
 
+BaselineName = Literal[
+    "random",
+    "fixed",
+    "mean",
+    "median",
+    "last",
+    "frequency",
+    "seasonal_naive",
+]
+
+
+class EvaluationPolicy(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    enabled: bool = False
+    holdout_size: int = Field(default=1, ge=1, le=512)
+    tolerance: float = Field(default=1.0, ge=0.0)
+    season_length: int = Field(default=1, ge=1)
+    fixed_value: float | None = None
+    baselines: tuple[BaselineName, ...] = (
+        "random",
+        "fixed",
+        "mean",
+        "median",
+        "last",
+        "frequency",
+        "seasonal_naive",
+    )
+
+
+class PersistencePolicy(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    save_model: bool = False
+    verify_save_load: bool = False
+    rtol: float = Field(default=1e-8, ge=0.0)
+    atol: float = Field(default=1e-8, ge=0.0)
+
+    @model_validator(mode="after")
+    def validate_save_contract(self) -> PersistencePolicy:
+        if self.verify_save_load and not self.save_model:
+            raise ValueError("verify_save_load requires save_model=true")
+        return self
+
+
+class ProspectivePolicy(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    seal_predictions: bool = False
+    actual_known: Literal[False] = False
+
+
 class DartsRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -110,6 +164,9 @@ class DartsRequest(BaseModel):
     seed: int = 1
     timeout_seconds: int = Field(default=900, ge=1, le=86400)
     artifact_dir: Path
+    evaluation: EvaluationPolicy = Field(default_factory=EvaluationPolicy)
+    persistence: PersistencePolicy = Field(default_factory=PersistencePolicy)
+    prospective: ProspectivePolicy = Field(default_factory=ProspectivePolicy)
 
     @model_validator(mode="after")
     def validate_mode_contract(self) -> DartsRequest:
@@ -119,6 +176,10 @@ class DartsRequest(BaseModel):
             raise ValueError("discover must not include a model identity")
         if self.runtime == RuntimeKind.NOTORCH and self.device != DevicePolicy.CPU:
             raise ValueError("notorch runtime only supports device=cpu")
+        if self.evaluation.enabled and self.horizon != self.evaluation.holdout_size:
+            raise ValueError("evaluation requires horizon == holdout_size")
+        if self.evaluation.enabled and self.prospective.seal_predictions:
+            raise ValueError("evaluation and prospective sealing are mutually exclusive")
         return self
 
 
@@ -133,4 +194,8 @@ class DartsResponse(BaseModel):
     predictions: list[list[float]] | None = None
     model_inventory: list[dict[str, Any]] | None = None
     argument_ledger: list[ArgumentDecision] = Field(default_factory=list)
+    metrics: dict[str, Any] | None = None
+    baseline_metrics: dict[str, dict[str, Any]] | None = None
+    runtime_certification: list[dict[str, Any]] | None = None
+    prospective_seal: dict[str, Any] | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
