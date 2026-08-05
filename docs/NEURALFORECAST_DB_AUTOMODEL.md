@@ -10,6 +10,34 @@ For Numbers4, `normalized_draws.d1` through `d4` become four independent series 
 `draw_no` becomes the integer time index. This uses `freq=1`; it does not invent
 calendar observations for weekends or holidays.
 
+## Status and certification contract
+
+A model is not runtime-certified merely because `fit()` and the first `predict()`
+returned successfully. By default the database campaign performs these checks for
+every selected model:
+
+1. initial prediction values are finite;
+2. the fitted state dictionary is present and finite;
+3. the complete `NeuralForecast` bundle is saved with its dataset;
+4. the bundle is reloaded through `NeuralForecast.load()`;
+5. post-load inference succeeds;
+6. pre-save and post-load prediction shapes match;
+7. post-load predictions are finite and match within `rtol=1e-6`, `atol=1e-6`;
+8. CPU/GPU runtime and `nvidia-smi` PID evidence are recorded;
+9. when GPU execution was requested, absence of CUDA evidence is treated as CPU fallback
+   and fails certification.
+
+The legacy-compatible top-level `status` remains `SUCCEEDED`, `PARTIAL`, or `FAILED`.
+Use `certification_status` for formal interpretation:
+
+- `RUNTIME_CERTIFIED`: every successful model passed save/load/re-predict certification;
+- `TRAIN_ONLY`: training succeeded but certification was explicitly disabled;
+- `PARTIAL`: at least one model was certified and at least one model failed;
+- `FAILED`: no model achieved certification.
+
+The default random seed for this command is `1`. Formal comparisons still require
+multiple model seeds in the all-AutoModel campaign.
+
 ## Dry run
 
 ```bash
@@ -27,7 +55,8 @@ uv run loto neuralforecast automodel-run \
 ```
 
 The command validates the table and all model selections without importing or
-training NeuralForecast models.
+training NeuralForecast models. The generated plan includes the runtime-certification
+policy and required evidence.
 
 ## Small runtime smoke
 
@@ -52,7 +81,9 @@ uv run loto neuralforecast automodel-run \
 ```
 
 With a GPU campaign, requested workers remain visible in the plan while
-`max_gpu_jobs` bounds simultaneous GPU training. Remaining models wait in the queue.
+`max_gpu_jobs` bounds simultaneous model training. Remaining models wait in the queue.
+Nested GPU trial parallelism is fail-closed: `parallel_trials` must be `1` whenever
+`gpus > 0`. Increase outer concurrency only through `workers` and `max_gpu_jobs`.
 
 ## Full campaign
 
@@ -88,7 +119,8 @@ uv run loto neuralforecast automodel-run \
   --num-samples 10 \
   --val-size 50 \
   --cpus 8 \
-  --gpus 1
+  --gpus 1 \
+  --save-models
 ```
 
 The runner creates a digit-sum parent series plus four bottom position series and
@@ -96,12 +128,19 @@ uses a 5 by 4 summing matrix.
 
 ## Artifacts
 
-- `input_panel.csv`: exact model input
-- `campaign_plan.json`: database, panel hash, Core/Fit arguments and queue policy
-- `campaign_report.json`: campaign outcome
-- `models/<model-id>/run_report.json`: per-model status and error traceback
-- `models/<model-id>/predictions.csv`: raw and legal decoded predictions
-- `models/<model-id>/neuralforecast/`: saved model when `--save-models` is enabled
+- `input_panel.csv`: exact model input;
+- `campaign_plan.json`: database, panel hash, Core/Fit arguments, queue policy, and
+  certification contract;
+- `campaign_report.json`: campaign outcome plus `certification_status` and certified
+  model count;
+- `models/<model-id>/run_report.json`: per-model training and certification status;
+- `models/<model-id>/predictions.csv`: raw and legal decoded predictions;
+- `models/<model-id>/prediction_after_load.csv`: prediction frame produced after reload;
+- `models/<model-id>/runtime_certification.json`: finite/state/device/PID and prediction
+  comparison evidence;
+- `models/<model-id>/neuralforecast/`: retained model bundle when `--save-models` is
+  enabled. The bundle may be removed after successful verification when retention is
+  disabled, while certification evidence remains.
 
 ## Resilient run script
 
