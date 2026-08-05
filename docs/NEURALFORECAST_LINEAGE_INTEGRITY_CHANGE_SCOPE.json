@@ -1,5 +1,5 @@
 {
-  "schema_version": "change-scope-v1.0.0",
+  "schema_version": "change-scope-v1.2.0",
   "scope_id": "neuralforecast-lineage-integrity",
   "stacked_base_branch": "agent/p0-promotion-gate",
   "stacked_base_sha": "13fb5f9359e119ed3479d2f03fcaf88c29ce7b37",
@@ -7,14 +7,18 @@
   "in_scope": [
     "chronological HPO to validation to OOF to holdout to prospective lineage",
     "separation of selected-config source run from chronological predecessor run",
-    "pre-execution source and predecessor verification report requirements",
+    "pre-execution source, predecessor, and API coverage verification requirements",
     "campaign configuration, data contract, promotion gate, code, and data hashes",
     "source, predecessor, API coverage, and runtime evidence hashes",
     "canonical LINEAGE.json chain SHA-256",
+    "independent lineage stage-semantic validation",
     "standard verify integration for promotion gate and lineage artifacts",
-    "detection of external run mutation even after external SHA256SUMS regeneration",
+    "deterministic VERIFICATION_SEAL.json bound to immutable run contents",
+    "rejection of stale PASS reports after content mutation and SHA256SUMS regeneration",
+    "preservation of an invalidated prior verification seal as audit evidence",
+    "idempotent resealing of unchanged verified content",
     "blocked sidecar without starting the requested stage",
-    "focused unit and CLI routing tests",
+    "focused unit, integrity, seal, semantic, and CLI routing tests",
     "operator documentation"
   ],
   "out_of_scope": [
@@ -25,12 +29,14 @@
     "champion model selection",
     "portable path rebinding after artifact relocation",
     "cryptographic signing or external timestamp authority",
+    "prevention of an authorized operator deleting every local seal and creating a new evidence tree",
     "merge or main branch changes"
   ],
   "execution_boundaries": {
     "cpu_ci": "REQUIRED",
     "local_gpu": "EXECUTION_PENDING",
     "portable_rebinding": "NOT_IMPLEMENTED",
+    "external_authenticity": "NOT_PROVIDED",
     "merge": "USER_APPROVAL_REQUIRED"
   },
   "expected_changed_files": [
@@ -40,9 +46,12 @@
     "src/loto/auto_campaign/lineage_integrity.py",
     "src/loto/auto_campaign/lineage_pipeline.py",
     "src/loto/auto_campaign/lineage_verification.py",
+    "src/loto/auto_campaign/verification_seal.py",
     "tests/auto_campaign/test_lineage_cli.py",
     "tests/auto_campaign/test_lineage_integrity.py",
     "tests/auto_campaign/test_lineage_pipeline.py",
-    "tests/auto_campaign/test_lineage_verification.py"
+    "tests/auto_campaign/test_lineage_semantics.py",
+    "tests/auto_campaign/test_lineage_verification.py",
+    "tests/auto_campaign/test_verification_seal.py"
   ]
 }
