@@ -43,7 +43,8 @@
     "repository_ruff_compileall_mypy_pytest": "EXECUTION_PENDING",
     "live_postgres": "EXECUTION_PENDING",
     "live_mlflow": "EXECUTION_PENDING",
-    "github_actions": "PENDING",
+    "github_actions": "CI_BLOCKED_PRE_RUN_STEPS_NULL_REPRODUCED",
+    "github_actions_latest_ids": "RECORDED_IN_PULL_REQUEST_BODY",
     "merge": "USER_APPROVAL_REQUIRED"
   },
   "expected_changed_files": [
