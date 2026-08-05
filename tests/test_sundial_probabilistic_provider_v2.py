@@ -165,6 +165,25 @@ def test_remote_code_allowlist_rejects_unreviewed_or_changed_files(tmp_path: Pat
         RUNNER._verify_remote_code(tmp_path, approved)
 
 
+def test_runner_requires_checked_in_review_to_match_request(tmp_path: Path) -> None:
+    review = {
+        "model_id": "sundial-base",
+        "repo_id": RUNNER.REPO_ID,
+        "revision": RUNNER.REVISION,
+        "review_status": "APPROVED",
+        "files": [{"name": "modeling_sundial.py", "sha256": "a" * 64}],
+    }
+    path = tmp_path / "remote-code-review.json"
+    path.write_text(json.dumps(review), encoding="utf-8")
+    assert RUNNER._load_reviewed_remote_code_sha256(path) == {
+        "modeling_sundial.py": "a" * 64
+    }
+    review["revision"] = "wrong"
+    path.write_text(json.dumps(review), encoding="utf-8")
+    with pytest.raises(RUNNER.SundialProviderRuntimeError):
+        RUNNER._load_reviewed_remote_code_sha256(path)
+
+
 def test_remote_code_review_loader_requires_approved_identity(tmp_path: Path) -> None:
     review = {
         "model_id": "sundial-base",
