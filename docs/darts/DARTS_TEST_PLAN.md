@@ -57,21 +57,27 @@
 53. conformal quantile non-crossing and base-median parity.
 54. nominal/empirical interval coverage, width, and all-position metrics.
 55. P10 matrix failure isolation, SHA-256 tamper sensitivity, and immutability.
+56. exact Local/Regression/Torch/Foundation/Ensemble/Conformal coverage.
+57. manual save, terminated-process load, and disk-reload evidence.
+58. model ID, class path, parameter hash, shape, finite, and allclose replay.
+59. artifact size and SHA-256 stability between save and load.
+60. global clean-save training and covariate state removal.
+61. Torch manual companion `.ckpt` requirement.
+62. best and last checkpoint selection and training-state restore.
+63. initialized-model weights and encoder restoration.
+64. `map_location=cpu` and CPU device certification.
+65. `map_location=cuda` and full GPU PID/VRAM certification.
+66. CPU fallback rejection after CUDA request.
+67. save/load/checkpoint/weights argument no-silent-drop ledger.
+68. P11 matrix failure retention and evidence SHA-256.
 
 ## Pending runtime gates
 
 - resolve `darts[notorch]==0.46.1` and `darts[torch]==0.46.1` locks;
 - discover the real executable model count;
-- run the real P5 Local statistical and P6 Regression matrices;
-- run real P7 Torch models with device, PID, and memory evidence;
-- pin unresolved Chronos2 and TiRex Hugging Face revisions;
-- generate and verify portable local Foundation model manifests;
-- run P8 zero-shot and fine-tuning tracks with real models;
-- verify real Foundation covariate and probabilistic behavior;
-- run real P9 `historical_forecasts`, `backtest`, and `residuals` calls;
-- certify real optimized/general parity and exact retraining counts;
-- run real P10 ensemble and conformal models on identical OOF folds and seeds;
-- certify real stacking separation, interval coverage, and interval width;
+- run the real P5-P10 model and evaluation contracts;
+- run real P11 manual, clean, checkpoint, weights, and cross-device paths;
+- certify real process restart, artifact SHA-256, and prediction replay;
+- certify real GPU PID, VRAM, CUDA allocation, and CPU fallback behavior;
 - run real multi-seed OOF using identical cross-library conditions;
-- certify real save/load/checkpoint behavior;
 - run repository Ruff and full pytest after a hosted runner starts normally.
