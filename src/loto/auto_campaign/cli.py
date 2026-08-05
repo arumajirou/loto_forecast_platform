@@ -7,7 +7,8 @@ from pathlib import Path
 
 from .api_coverage_pipeline import run_api_coverage_pipeline
 from .contracts import CampaignStage
-from .runner import inventory, load_config, plan, run_stage, verify_run
+from .coverage_verification import verify_run_with_coverage
+from .runner import inventory, load_config, plan, run_stage
 
 
 def _run_id(prefix: str, stage: str) -> str:
@@ -61,7 +62,7 @@ def main() -> None:
         }
     )
     if args.command == "verify":
-        result = verify_run(args.run.resolve())
+        result = verify_run_with_coverage(args.run.resolve())
     else:
         output = args.output
         if output is None:
