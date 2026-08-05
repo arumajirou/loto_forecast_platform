@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .contracts import ExpectedStatus, ModelContract
 
-# StatsForecast 2.1.1 public model exports plus the repository's existing CES extension.
+# Exact StatsForecast 2.1.1 ``statsforecast.models.__all__`` transcription.
 # Runtime discovery must compare this fixture with the installed distribution before use.
 MODEL_NAMES: tuple[str, ...] = (
     "AutoARIMA",
@@ -23,6 +23,7 @@ MODEL_NAMES: tuple[str, ...] = (
     "Naive",
     "RandomWalkWithDrift",
     "SeasonalNaive",
+    "ConformalSeasonalPool",
     "WindowAverage",
     "SeasonalWindowAverage",
     "ADIDA",
@@ -45,7 +46,6 @@ MODEL_NAMES: tuple[str, ...] = (
     "ZeroModel",
     "NaNModel",
     "UCM",
-    "CES",
 )
 
 _SEASONAL = {
@@ -56,10 +56,10 @@ _SEASONAL = {
     "SeasonalExponentialSmoothingOptimized",
     "HoltWinters",
     "SeasonalNaive",
+    "ConformalSeasonalPool",
     "SeasonalWindowAverage",
     "MSTL",
     "TBATS",
-    "CES",
 }
 
 _NON_CHAMPION = {"ARCH", "GARCH", "NaNModel", "ConstantModel", "ZeroModel"}
@@ -82,7 +82,7 @@ def _contract(name: str) -> ModelContract:
             required_parameters=("model",),
             capabilities=("external_estimator", "exogenous"),
         )
-    if name in {"ARIMA", "UCM"}:
+    if name == "ARIMA":
         return ModelContract(
             name=name,
             expected_status=ExpectedStatus.EXPECTED_DATA_PRECONDITION,
@@ -90,11 +90,19 @@ def _contract(name: str) -> ModelContract:
             requires_explicit_configuration=True,
             notes="An explicit upstream constructor configuration is required.",
         )
+    if name == "ConformalSeasonalPool":
+        return ModelContract(
+            name=name,
+            expected_status=ExpectedStatus.EXPECTED_DATA_PRECONDITION,
+            champion_eligible=True,
+            required_parameters=("season_length",),
+            capabilities=("seasonal", "native_intervals", "simulation"),
+            notes="Supports short histories; no two-season minimum is imposed.",
+        )
     if name in _SEASONAL:
         return ModelContract(
             name=name,
             expected_status=ExpectedStatus.EXPECTED_DATA_PRECONDITION,
-            source="PROJECT_EXTENSION" if name == "CES" else "UPSTREAM_EXPORT",
             champion_eligible=name not in _NON_CHAMPION,
             required_parameters=("season_length",),
             minimum_seasons=2,
@@ -109,7 +117,6 @@ def _contract(name: str) -> ModelContract:
         capabilities = ("volatility",)
     return ModelContract(
         name=name,
-        source="PROJECT_EXTENSION" if name == "CES" else "UPSTREAM_EXPORT",
         champion_eligible=name not in _NON_CHAMPION,
         capabilities=capabilities,
     )
