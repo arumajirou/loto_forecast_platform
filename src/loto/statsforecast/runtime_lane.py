@@ -1,5 +1,10 @@
 """StatsForecast 2.1.1 isolated environment and evidence helpers."""
 
+from .runtime_lane_admission import (
+    inspect_target_host_archive,
+    render_admission_markdown,
+    write_admission_artifacts,
+)
 from .runtime_lane_artifacts import (
     PYPI_JSON_URL,
     TARGET_PACKAGE,
@@ -33,11 +38,14 @@ __all__ = [
     "execute_runtime_lane",
     "fetch_release_artifact",
     "fetch_release_metadata",
+    "inspect_target_host_archive",
     "prepare_offline_bundle",
+    "render_admission_markdown",
     "run_target_host_certification",
     "select_compatible_release_file",
     "sha256_file",
     "verify_offline_bundle",
-    "verify_target_host_package",
     "verify_portable_sha256sums",
+    "verify_target_host_package",
+    "write_admission_artifacts",
 ]
