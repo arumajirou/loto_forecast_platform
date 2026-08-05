@@ -26,17 +26,19 @@ FOCUSED_TESTS = (
     "tests/test_reconciliation_runtime_certification.py",
     "tests/test_reconciliation_console_script.py",
     "tests/test_reconciliation_package_certification.py",
+    "tests/test_reconciliation_package_verifier.py",
     "tests/test_reconciliation_target_machine_certification.py",
     "tests/test_reconciliation_target_operator.py",
     "tests/test_reconciliation_quality_gate.py",
 )
-EXPECTED_FOCUSED_TESTS = 77
+EXPECTED_FOCUSED_TESTS = 84
 RUFF_SCOPE = ("src", "scripts", "tests")
 MYPY_SCOPE = (
     "src/loto/reconciliation/hierarchy.py",
     "src/loto/reconciliation/runtime_certification.py",
     "src/loto/reconciliation/package_certification.py",
     "src/loto/reconciliation/portable_package_certification.py",
+    "src/loto/reconciliation/package_verifier.py",
     "scripts/hierarchicalforecast_target",
 )
 
@@ -262,7 +264,7 @@ def execute(
             "ruff_lint": True,
             "compileall": True,
             "mypy": True,
-            "focused_77": True,
+            "focused_84": True,
             "full_pytest": not skip_full_suite,
         }
         exit_code = 0
