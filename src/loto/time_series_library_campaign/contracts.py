@@ -34,6 +34,8 @@ class Operation(StrEnum):
     SEGRNN_LOAD_PREDICT = "segrnn_load_predict"
     FRETS_FIT_SAVE = "frets_fit_save"
     FRETS_LOAD_PREDICT = "frets_load_predict"
+    SCINET_FIT_SAVE = "scinet_fit_save"
+    SCINET_LOAD_PREDICT = "scinet_load_predict"
     VERIFY_ROUNDTRIP = "verify_roundtrip"
 
 
@@ -97,6 +99,7 @@ class ProviderRequest(BaseModel):
     lightts_allow_padding: bool = False
     segrnn_seg_len: int = Field(default=2, ge=1, le=4096)
     frets_channel_independence: Literal["0", "1"] = "1"
+    scinet_stacks: Literal[1, 2] = 1
     checkpoint_path: Path | None = None
     input_path: Path | None = None
     before_prediction_path: Path | None = None
@@ -126,12 +129,17 @@ class ProviderRequest(BaseModel):
             Operation.FRETS_FIT_SAVE,
             Operation.FRETS_LOAD_PREDICT,
         }
+        scinet_ops = {
+            Operation.SCINET_FIT_SAVE,
+            Operation.SCINET_LOAD_PREDICT,
+        }
         load_ops = {
             Operation.DLINEAR_LOAD_PREDICT,
             Operation.TSMIXER_LOAD_PREDICT,
             Operation.LIGHTTS_LOAD_PREDICT,
             Operation.SEGRNN_LOAD_PREDICT,
             Operation.FRETS_LOAD_PREDICT,
+            Operation.SCINET_LOAD_PREDICT,
         }
         if self.operation in dlinear_ops and self.model_name != "DLinear":
             raise ValueError("DLinear operations require model_name=DLinear")
@@ -143,6 +151,8 @@ class ProviderRequest(BaseModel):
             raise ValueError("SegRNN operations require model_name=SegRNN")
         if self.operation in frets_ops and self.model_name != "FreTS":
             raise ValueError("FreTS operations require model_name=FreTS")
+        if self.operation in scinet_ops and self.model_name != "SCINet":
+            raise ValueError("SCINet operations require model_name=SCINet")
         if self.operation in lightts_ops:
             if self.d_model < 16:
                 raise ValueError("LightTS requires d_model >= 16")
@@ -162,6 +172,11 @@ class ProviderRequest(BaseModel):
                 raise ValueError("SegRNN requires seq_len divisible by segrnn_seg_len")
             if self.pred_len % self.segrnn_seg_len != 0:
                 raise ValueError("SegRNN requires pred_len divisible by segrnn_seg_len")
+        if self.operation == Operation.SCINET_FIT_SAVE:
+            if self.seq_len < 8:
+                raise ValueError("SCINet requires seq_len >= 8 for tree level 3")
+            if self.dropout != 0.0:
+                raise ValueError("SCINet requires dropout=0.0 because upstream ignores it")
         if self.operation in load_ops and (
             self.checkpoint_path is None or self.input_path is None
         ):

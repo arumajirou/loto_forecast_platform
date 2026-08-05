@@ -2,7 +2,7 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / FIVE_PINNED_CPU_MODELS_VERIFIED / FULL_MATRIX_PENDING`
+`PARTIALLY_VERIFIED / SIX_PINNED_CPU_MODELS_VERIFIED / FULL_MATRIX_PENDING`
 
 This integration isolates `thuml/Time-Series-Library` at revision
 `4e938a1767106324dd753b2a44832bf870a0252e` from the root runtime.
@@ -20,7 +20,8 @@ contract tests and is never reported as upstream certification.
 - TSMixer;
 - LightTS;
 - SegRNN;
-- FreTS.
+- FreTS;
+- SCINet.
 
 Each passed construction, bounded fit, finite prediction/state checks, atomic artifact
 writes, process exit, strict reload in a separate process, and prediction equality at
@@ -29,35 +30,33 @@ writes, process exit, strict reload in a separate process, and prediction equali
 ## Provider operations
 
 - `discover`;
-- `dlinear_fit_save`;
-- `dlinear_load_predict`;
-- `tsmixer_fit_save`;
-- `tsmixer_load_predict`;
-- `lightts_fit_save`;
-- `lightts_load_predict`;
-- `segrnn_fit_save`;
-- `segrnn_load_predict`;
-- `frets_fit_save`;
-- `frets_load_predict`;
+- `dlinear_fit_save` and `dlinear_load_predict`;
+- `tsmixer_fit_save` and `tsmixer_load_predict`;
+- `lightts_fit_save` and `lightts_load_predict`;
+- `segrnn_fit_save` and `segrnn_load_predict`;
+- `frets_fit_save` and `frets_load_predict`;
+- `scinet_fit_save` and `scinet_load_predict`;
 - `verify_roundtrip`.
 
-FreTS request with channel-frequency mixing enabled:
+SCINet request:
 
 ```json
 {
-  "operation": "frets_fit_save",
-  "model_name": "FreTS",
+  "operation": "scinet_fit_save",
+  "model_name": "SCINet",
   "source_policy": "pinned",
-  "seq_len": 8,
-  "pred_len": 2,
+  "seq_len": 12,
+  "pred_len": 4,
   "channels": 3,
-  "train_steps": 3,
-  "frets_channel_independence": "0"
+  "scinet_stacks": 2,
+  "dropout": 0.0,
+  "train_steps": 3
 }
 ```
 
-FreTS persists its channel-frequency mode, FFT-bin geometry, fixed architecture widths,
-and expected parameter count. These are recomputed before strict reload.
+SCINet rejects sequences shorter than eight, stack counts outside one or two, and
+non-zero dropout that the upstream implementation would silently ignore. The provider
+records the full upstream output and emits only its final forecast horizon.
 
 ## Leakage boundary
 

@@ -29,6 +29,10 @@ from .lightts_runtime import (
     load_predict as lightts_load_predict,
 )
 from .runtime import fit_save, load_predict, verify_prediction_files
+from .scinet_runtime import (
+    fit_save as scinet_fit_save,
+    load_predict as scinet_load_predict,
+)
 from .segrnn_runtime import (
     fit_save as segrnn_fit_save,
     load_predict as segrnn_load_predict,
@@ -80,6 +84,10 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
         return frets_fit_save(request)
     if request.operation == Operation.FRETS_LOAD_PREDICT:
         return frets_load_predict(request)
+    if request.operation == Operation.SCINET_FIT_SAVE:
+        return scinet_fit_save(request)
+    if request.operation == Operation.SCINET_LOAD_PREDICT:
+        return scinet_load_predict(request)
     assert request.before_prediction_path is not None
     assert request.after_prediction_path is not None
     verification = verify_prediction_files(
