@@ -1,7 +1,7 @@
 """Runtime certification for saved NeuralForecast model bundles.
 
 A training call is not considered runtime-certified merely because ``fit`` and
-``predict`` returned.  Certification saves the fitted bundle, reloads it,
+``predict`` returned. Certification saves the fitted bundle, reloads it,
 repeats inference, checks finite values and prediction stability, and records
 CPU/GPU execution evidence.
 """
@@ -62,6 +62,19 @@ def _fitted_inner_model(neuralforecast: Any) -> Any | None:
     return getattr(models[0], "model", models[0])
 
 
+def _safe_gpu_process_snapshot() -> dict[str, Any]:
+    try:
+        return gpu_process_snapshot()
+    except FileNotFoundError:
+        return {
+            "pid": None,
+            "returncode": 127,
+            "gpu_pid_verified": False,
+            "rows": [],
+            "error": "nvidia-smi not found",
+        }
+
+
 def certify_saved_runtime(
     *,
     neuralforecast: Any,
@@ -102,7 +115,7 @@ def certify_saved_runtime(
         raise RuntimeError("pre-save fitted state_dict is missing or non-finite")
 
     runtime_before = torch_runtime_snapshot(fitted_model)
-    gpu_before = gpu_process_snapshot()
+    gpu_before = _safe_gpu_process_snapshot()
 
     neuralforecast.save(str(model_path), save_dataset=True, overwrite=True)
     loaded = neuralforecast_class.load(str(model_path))
@@ -113,7 +126,7 @@ def certify_saved_runtime(
     loaded_model = _fitted_inner_model(loaded)
     state_after_finite = _state_dict_finite(loaded_model)
     runtime_after = torch_runtime_snapshot(loaded_model)
-    gpu_after = gpu_process_snapshot()
+    gpu_after = _safe_gpu_process_snapshot()
 
     shape_match = before_values.shape == after_values.shape
     finite = bool(np.isfinite(after_values).all())
