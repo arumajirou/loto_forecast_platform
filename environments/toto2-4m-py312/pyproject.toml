@@ -1,0 +1,19 @@
+[project]
+name = "loto-toto2-4m-runtime"
+version = "0.1.0"
+description = "Isolated Toto 2.0 4M runtime lane"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy>=2.0,<3",
+  "pydantic>=2.10,<3",
+  "toto-models==1.0.0",
+  "toto2==2.0.0",
+  "torch==2.13.0",
+]
+
+[tool.uv]
+package = false
+
+# A reviewed uv.lock is intentionally not committed by P0-P2. Generate it on the
+# target host, inspect all sources, hashes, licenses, and transitive dependencies,
+# then add it in a separate evidence-gated change.

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "model_id": "toto-2.0-4m",
+  "events": [
+    {
+      "recorded_at": "2026-08-01T11:44:00+00:00",
+      "status": "BLOCKED",
+      "evidence": "audit/tsfm-runtime/toto-2.0-4m/blocked-reason.json",
+      "reason": "RUNTIME_DEPENDENCY_MISSING"
+    },
+    {
+      "recorded_at": "2026-08-01T12:29:10.660732+00:00",
+      "status": "CERTIFIED",
+      "evidence": "audit/tsfm-runtime/toto-2.0-4m/runtime-certification.json",
+      "supersedes": [
+        "audit/tsfm-runtime/toto-2.0-4m/blocked-reason.json",
+        "audit/tsfm-runtime/toto-2.0-4m/dependency-probe.json"
+      ]
+    }
+  ],
+  "current_status": "CERTIFIED",
+  "historical_failure_files_retained": true
+}
