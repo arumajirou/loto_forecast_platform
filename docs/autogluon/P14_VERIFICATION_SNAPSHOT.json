@@ -1,0 +1,47 @@
+{
+  "compileall": "PASS",
+  "files": {
+    "docs/autogluon/P14_MODEL_COVARIATE_CAPABILITIES.md": {
+      "bytes": 3623,
+      "sha256": "7ddad3104d95016302e5f41c6989b5319f63fa1b45641531b5821f629edd542e"
+    },
+    "src/loto/adapters/autogluon/covariate_capabilities.py": {
+      "bytes": 8718,
+      "sha256": "6cb4bb9eaa4402658e6e99ae3d5e3c4c1f5454a778b3f5d72574cf334a542430"
+    },
+    "src/loto/adapters/autogluon/covariate_capability_provider.py": {
+      "bytes": 6493,
+      "sha256": "cf235f2a9656d86f63d499e293fef1ab1df090f49b02cfbe13480fd6dbfe7207"
+    },
+    "src/loto/adapters/autogluon/strict_provider.py": {
+      "bytes": 6722,
+      "sha256": "ab9f1dba6a336eecb49cd66bfc6929005b2e42c1e58478856222602a5989a3ba"
+    },
+    "tests/adapters/autogluon/test_covariate_capabilities.py": {
+      "bytes": 5290,
+      "sha256": "14c8154f5a528333a082f4b5a8a8e96ad0284ab18e215f3c8df2bb1c7c7fabc1"
+    },
+    "tests/adapters/autogluon/test_covariate_capability_provider.py": {
+      "bytes": 4726,
+      "sha256": "0af875d94ed1fbbe5fd7a213a0d783402cbf57725832c3a46e301db5212d978d"
+    }
+  },
+  "full_pytest": "NOT_RUN",
+  "github_ci": "CI_BLOCKED_PRE_RUN",
+  "line_length_over_100": 0,
+  "mypy": "NOT_RUN",
+  "official_api_version": "1.5.0",
+  "p13_p14_regression_tests": {
+    "failed": 0,
+    "passed": 43
+  },
+  "p14_focused_tests": {
+    "failed": 0,
+    "passed": 28
+  },
+  "phase": "AUTOGLUON_P14_MODEL_COVARIATE_CAPABILITIES",
+  "real_autogluon_runtime": "BLOCKED_RUNTIME",
+  "ruff": "NOT_AVAILABLE",
+  "schema_version": 1,
+  "status": "PARTIALLY_VERIFIED"
+}
