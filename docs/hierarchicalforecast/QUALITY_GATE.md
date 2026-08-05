@@ -2,7 +2,7 @@
 
 ## Status
 
-`IMPLEMENTED / ISOLATED_QUALITY_TESTS_PASS / FORMAL_77_AND_FULL_SUITE_PENDING`
+`IMPLEMENTED / ISOLATED_QUALITY_TESTS_PASS / FORMAL_84_AND_FULL_SUITE_PENDING`
 
 The quality gate runs the remaining local promotion checks in a fixed order and preserves command,
 JUnit, Git, and checksum evidence. It is separate from the real
@@ -51,6 +51,7 @@ tests/test_reconciliation_upstream_matrix.py
 tests/test_reconciliation_runtime_certification.py
 tests/test_reconciliation_console_script.py
 tests/test_reconciliation_package_certification.py
+tests/test_reconciliation_package_verifier.py
 tests/test_reconciliation_target_machine_certification.py
 tests/test_reconciliation_target_operator.py
 tests/test_reconciliation_quality_gate.py
@@ -59,13 +60,13 @@ tests/test_reconciliation_quality_gate.py
 Formal acceptance requires:
 
 ```text
-tests    = 77
+tests    = 84
 failures = 0
 errors   = 0
 ```
 
-The package-test count remains eleven after portable-publication strengthening, so the exact focused
-contract remains 77.
+The standalone transferred-package verifier contributes seven explicit tests. Console registration
+for both certification and verification commands remains covered by the existing two console tests.
 
 ## mypy scope
 
@@ -74,6 +75,7 @@ src/loto/reconciliation/hierarchy.py
 src/loto/reconciliation/runtime_certification.py
 src/loto/reconciliation/package_certification.py
 src/loto/reconciliation/portable_package_certification.py
+src/loto/reconciliation/package_verifier.py
 scripts/hierarchicalforecast_target/
 ```
 
@@ -109,10 +111,18 @@ Structured statuses include `FAILED_SYNC`, `FAILED_PIP_CHECK`, `FAILED_RUFF_FORM
 
 ## Current evidence boundary
 
-The quality-gate implementation tests remain passing in isolation. The portable publication module
-is included in Ruff, compileall, mypy, and package tests. The exact package and console subset
-produced 13 passing tests with compileall PASS and no Python line over 100 characters.
+The quality-gate implementation tests remain passing in isolation. The package verifier was tested
+against the exact published Git blobs:
 
-A single formal 77-test run, formal Ruff, formal mypy, and repository-wide pytest remain pending on
-the target machine. This runner does not replace real HierarchicalForecast 1.5.1 certification or
-GitHub Actions evidence.
+```text
+standalone verifier tests = 7/7 PASS
+console entry tests       = 2/2 PASS
+compileall                = PASS
+Python lines over 100     = 0
+remote/local blob equality = PASS
+```
+
+The branch now has 84 cumulative focused tests across separate isolated runs. A single formal
+84-test run, formal Ruff, formal mypy, and repository-wide pytest remain pending on the target
+machine. This runner does not replace real HierarchicalForecast 1.5.1 certification or GitHub
+Actions evidence.
