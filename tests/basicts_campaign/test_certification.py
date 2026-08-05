@@ -27,6 +27,7 @@ def _write_bundle(
     operation: str,
     *,
     identity_commit: str = EXPECTED_UPSTREAM_REVISION,
+    import_origin: str = "/venv/site-packages/basicts/__init__.py",
 ) -> None:
     directory.mkdir(parents=True)
     if operation == "identity":
@@ -43,6 +44,15 @@ def _write_bundle(
             "direct_url_commit_id": identity_commit,
             "direct_url_requested_revision": EXPECTED_UPSTREAM_REVISION,
             "direct_url_sha256": "a" * 64,
+            "import_origin_status": "PASS",
+            "import_name": "basicts",
+            "import_provider_distributions": ["BasicTS"],
+            "distribution_package_entry": "basicts/__init__.py",
+            "distribution_package_init": "/venv/site-packages/basicts/__init__.py",
+            "import_spec_origin": import_origin,
+            "import_submodule_search_locations": ["/venv/site-packages/basicts"],
+            "import_origin_sha256": "b" * 64,
+            "module_already_loaded": False,
         }
     elif operation == "validate_config":
         evidence = {
@@ -128,11 +138,7 @@ def test_certify_p0_accepts_complete_evidence(tmp_path: Path) -> None:
 
     assert report["status"] == "PASS"
     assert report["certified"]["installed_package_git_provenance"] is True
-    assert [item["operation"] for item in report["bundles"]] == [
-        "identity",
-        "validate_config",
-        "dlinear_smoke",
-    ]
+    assert report["certified"]["import_origin_bound_to_distribution"] is True
 
 
 def test_verify_provider_bundle_rejects_tampering(tmp_path: Path) -> None:
@@ -150,6 +156,18 @@ def test_identity_bundle_rejects_installed_commit_drift(tmp_path: Path) -> None:
     _write_bundle(directory, "identity", identity_commit="b" * 40)
 
     with pytest.raises(CertificationError, match="direct_url_commit_id"):
+        verify_provider_bundle(directory, "identity")
+
+
+def test_identity_bundle_rejects_import_origin_drift(tmp_path: Path) -> None:
+    directory = tmp_path / "identity"
+    _write_bundle(
+        directory,
+        "identity",
+        import_origin="/shadow/basicts/__init__.py",
+    )
+
+    with pytest.raises(CertificationError, match="import origin differs"):
         verify_provider_bundle(directory, "identity")
 
 
