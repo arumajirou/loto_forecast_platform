@@ -93,6 +93,8 @@ def score_locked_prospective_run(
         "actuals_sha256": sha256_file(actuals_path),
         "scoring_code_sha256": scoring_code_sha256,
         "random_seed": options.random_seed,
+        "actual_source_label": options.actual_source_label,
+        "actual_published_at": options.actual_published_at,
     }
     scoring_id = f"prospective-score-{_canonical_sha256(scoring_identity)[:20]}"
     if sha256_file(history_path) != source_manifest.get("data_sha256"):
@@ -270,7 +272,8 @@ def score_locked_prospective_run(
             "actual_published_at": (
                 published_at.isoformat() if published_at is not None else None
             ),
-            "actual_publication_time_verified": published_at is not None,
+            "actual_publication_time_provided": published_at is not None,
+            "actual_publication_time_verified": False,
             "prediction_locked_at": prediction_lock.get("locked_at"),
             "prediction_lock_sha256": source_evidence[PREDICTION_LOCK_PATH]["sha256"],
             "verification_seal_sha256": source_evidence["VERIFICATION_SEAL.json"]["sha256"],
@@ -314,7 +317,8 @@ def score_locked_prospective_run(
             "position_metric_rows": len(position_metrics),
             "champion": champion,
             "baseline_names": sorted(baseline_predictions["baseline_name"].unique()),
-            "actual_publication_time_verified": published_at is not None,
+            "actual_publication_time_provided": published_at is not None,
+            "actual_publication_time_verified": False,
             "claim_boundary": (
                 "The scoring artifact proves file hashes and ordering relative to the local "
                 "prediction lock. It does not independently prove the official publication "
@@ -352,6 +356,7 @@ def score_locked_prospective_run(
         source_after = _source_fingerprint(run_root)
         if source_after != source_before:
             raise RuntimeError("source prospective run changed during scoring")
+        _source_verification(run_root)
         os.replace(work, output)
 
     return {
