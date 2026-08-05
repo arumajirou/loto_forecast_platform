@@ -12,6 +12,15 @@ from .campaign import (
     select_champion,
 )
 from .evaluation import evaluate_predictions
+from .foundation_models import (
+    FOUNDATION_CAPABILITIES,
+    FOUNDATION_MODEL_IDENTITIES,
+    FoundationCampaignConfig,
+    FoundationModelConfig,
+    FoundationSourceConfig,
+    capability_matrix_sha256,
+    run_foundation_matrix,
+)
 from .protocol import DartsRequest, DartsResponse, GameGeometry
 from .provenance import RunProvenance, build_run_provenance
 from .regression_models import (
@@ -40,15 +49,20 @@ __all__ = [
     "ChampionDecision",
     "DartsRequest",
     "DartsResponse",
+    "FOUNDATION_CAPABILITIES",
+    "FOUNDATION_MODEL_IDENTITIES",
+    "FoundationCampaignConfig",
+    "FoundationModelConfig",
+    "FoundationSourceConfig",
     "GameGeometry",
     "MetricVector",
     "OOFConfig",
     "REGRESSION_MODEL_IDENTITIES",
-    "TORCH_MODEL_IDENTITIES",
     "RegressionCampaignConfig",
     "RegressionLagContract",
     "RegressionModelConfig",
     "RunProvenance",
+    "TORCH_MODEL_IDENTITIES",
     "TorchCampaignConfig",
     "TorchDeviceContract",
     "TorchModelConfig",
@@ -60,8 +74,10 @@ __all__ = [
     "build_mlforecast_parity_payload",
     "build_parallel_plan",
     "build_run_provenance",
+    "capability_matrix_sha256",
     "certify_device_use",
     "evaluate_predictions",
+    "run_foundation_matrix",
     "run_oof",
     "run_regression_matrix",
     "run_torch_matrix",
