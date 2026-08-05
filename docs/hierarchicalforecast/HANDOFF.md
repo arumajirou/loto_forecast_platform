@@ -2,236 +2,191 @@
 
 ## Current state
 
-- Pull request: `#48`
-- Branch: `agent/hierarchicalforecast-runtime-certification`
-- Base: `main`
-- Status: `PARTIALLY_VERIFIED / CI_BLOCKED_RUNNER_START`
-- Draft: retained
-- Merge authorization: none
+- Pull request: `#48`;
+- branch: `agent/hierarchicalforecast-runtime-certification`;
+- base: `main`;
+- status: `PARTIALLY_VERIFIED / LOCK_CONTRACT_TESTS_PASS / CI_BLOCKED_RUNNER_START`;
+- Draft: retained;
+- review-ready authorization: none;
+- merge authorization: none.
 
-Resolve the exact branch head at handoff time with:
-
-```bash
-git rev-parse HEAD
-```
-
-The head SHA is intentionally not hardcoded because this document is itself part of the branch.
-
-## What is implemented
-
-### Reconciliation adapter
-
-The adapter now executes upstream `fit_predict()` rather than reporting constructor availability.
-It supports all ten registered HierarchicalForecast classes and records fail-closed statuses for
-unavailable dependencies, unsupported grouped hierarchies, invalid options, missing in-sample
-evidence, execution failures, validation failures, and verified results.
-
-Successful executable methods must produce the expected shape, finite values, and a coherent
-result within the configured tolerance.
-
-### Runtime certification
-
-The formal runtime harness evaluates four select-family games and ten methods for 40 cases.
-Inputs are deterministic and shared fairly across methods within each game. Seed `1` is the
-formal default.
-
-### Evidence packaging
-
-The operational console command runs certification, verifies the written artifacts, creates an
-immutable deterministic ZIP, verifies the ZIP before publication, and writes a SHA-256 sidecar.
-Existing packages for the same Run ID are never silently replaced.
-
-### Documentation
-
-- `RUNTIME_CERTIFICATION.md`: command and certification contract
-- `RUNBOOK.md`: target-machine execution and failure diagnosis
-- `VERIFICATION_REPORT.md`: evidence, gates, and readiness verdict
-- `HANDOFF.md`: continuation instructions
-- `CHANGELOG.md`: branch change summary
-
-## Formal command
+Resolve the branch head at handoff time:
 
 ```bash
-uv sync --extra full
-uv run loto-hierarchicalforecast-certify
+git fetch origin agent/hierarchicalforecast-runtime-certification
+git rev-parse origin/agent/hierarchicalforecast-runtime-certification
 ```
 
-Diagnostic module command:
+The SHA is intentionally not hardcoded because this document is part of the moving branch.
+
+## Implemented scope
+
+- actual upstream `fit_predict()` execution for all ten registered reconcilers;
+- grouped-hierarchy compatibility and strict-tree rejection;
+- paired in-sample evidence for methods that require it;
+- output shape, finite-value, and coherence validation;
+- deterministic four-game × ten-method runtime certification;
+- exact distribution/module version checks;
+- immutable runtime artifacts and portable `SHA256SUMS`;
+- deterministic ZIP and SHA-256 sidecar;
+- hardlink plus `O_EXCL` no-clobber fallback for `/mnt/e` publication;
+- standalone transferred-package verifier;
+- target-machine operator with clean Git pre/post evidence;
+- locked quality gate with Ruff, mypy, exact focused JUnit, and full pytest;
+- promotion gate that verifies all child evidence on one Git commit;
+- standard-library dependency-contract validation before provisioning.
+
+## Formal continuation command
 
 ```bash
-uv run python -m loto.reconciliation.runtime_certification
+cd /mnt/e/env/ts/loto_forecast_platform-pr48 || exit 1
+
+git fetch origin agent/hierarchicalforecast-runtime-certification
+EXPECTED_HEAD="$(git rev-parse origin/agent/hierarchicalforecast-runtime-certification)"
+
+python3 scripts/run_hierarchicalforecast_promotion_gate.py \
+  --expected-git-sha "${EXPECTED_HEAD}"
 ```
 
-## Expected outputs
+Do not substitute the legacy direct console command for this promotion gate. The complete command
+runs dependency validation, locked provisioning, quality checks, runtime certification, package
+verification, and Git postflight in the required order.
+
+## Formal acceptance
 
 ```text
-artifacts/hierarchicalforecast-runtime/
-├── <run-id>/
-│   ├── RUNTIME_CERTIFICATION.json
-│   ├── METHOD_RESULTS.json
-│   ├── INPUT_EVIDENCE.json
-│   ├── ARTIFACT_MANIFEST.json
-│   └── SHA256SUMS
-├── <run-id>.zip
-└── <run-id>.zip.sha256
+promotion status                  = LOCAL_GATES_VERIFIED
+formal_success                    = true
+ready_for_review                  = false
+ci_required                       = true
+locked version                    = 1.5.1
+installed version                 = 1.5.1
+focused JUnit                     = 95/0/0
+full JUnit failures/errors        = 0/0
+runtime expected/executed/passed  = 40/40/40
+runtime failed                    = 0
+actual execution/rejection rows   = 24/16
+standalone package verifier       = VERIFIED
+Git pre/post commit               = identical and clean
 ```
 
-A verified ZIP contains the five run artifacts plus `PACKAGE_MANIFEST.json` under one Run ID
-prefix.
+Local acceptance still does not replace GitHub Actions.
 
-## Exit codes
+## Evidence roots
 
-| Exit | Status class | Meaning |
-|---:|---|---|
-| 0 | `VERIFIED` | Runtime and package both passed |
-| 2 | Runtime result | Dependency, version, or method matrix did not pass |
-| 3 | Harness/package result | Configuration, harness, packaging, or integrity failure |
+```text
+artifacts/hierarchicalforecast-quality-runs/<quality-run-id>/
+artifacts/hierarchicalforecast-runtime/<runtime-run-id>/
+artifacts/hierarchicalforecast-runtime/<runtime-run-id>.zip
+artifacts/hierarchicalforecast-runtime/<runtime-run-id>.zip.sha256
+artifacts/hierarchicalforecast-target-runs/<operator-run-id>/
+artifacts/hierarchicalforecast-promotion-runs/<promotion-run-id>/
+```
 
-Exit-3 status values are:
+Run IDs are independent. Read the parent reports rather than assuming matching names.
 
-- `INVALID_CONFIGURATION`
-- `FAILED_CERTIFICATION_HARNESS`
-- `FAILED_PACKAGING`
+## Current isolated verification
 
-## Verified evidence
+The following is cumulative evidence from separate isolated runs:
 
-Focused verification currently totals 53 passed tests across separate isolated runs:
+| Group | Result |
+|---|---:|
+| existing reconciliation | 19 passed |
+| ten-class matrix | 12 passed |
+| runtime certification | 9 passed |
+| console entries | 2 passed |
+| immutable/portable package | 11 passed |
+| standalone package verifier | 7 passed |
+| target verification | 9 passed |
+| target operator | 6 passed |
+| hardened promotion gate | 11 passed |
+| quality gate and lock drift | 9 passed |
+| **Total** | **95 passed** |
 
-- existing reconciliation: 19
-- all-method matrix: 12
-- runtime certification: 9
-- console entry: 2
-- immutable packaging: 11
+Additional isolated checks:
 
-Additional checks:
+- compileall: PASS;
+- Python lines over 100 characters: 0;
+- lock 1.5.1 accepted;
+- lock 1.5.0 mutation rejected;
+- remote/local blob equality: PASS;
+- unresolved inline review threads: 0.
 
-- compileall: PASS
-- Python maximum line length 100: PASS
-- simple secret-pattern scan: PASS
-- remote/local blob equality: PASS
-- unresolved PR review threads: 0
+Do not describe these as one exact-head combined run.
 
-Do not describe these results as one full repository pytest run.
+## Dependency boundary
+
+`pyproject.toml` declares `hierarchicalforecast>=1.0`; formal exactness comes from the committed
+`uv.lock`, which must resolve only 1.5.1, plus the target installed-version probe.
+
+The dependency validator records:
+
+- declared requirement and whether it is exact;
+- lock package versions;
+- project and lock Python ranges;
+- required dev tools;
+- `pyproject.toml` SHA-256;
+- `uv.lock` SHA-256.
+
+A formal run must stop rather than install an unlocked substitute.
 
 ## Remaining blockers
 
-### Real package execution
+1. Run the complete promotion gate on the exact current branch head.
+2. Obtain one combined focused JUnit result of exactly `95/0/0`.
+3. Obtain formal Ruff and mypy success.
+4. Obtain a repository-wide pytest result with zero failures/errors.
+5. Execute real installed HierarchicalForecast 1.5.1 for all 40 cases.
+6. Publish and independently verify the real `/mnt/e` ZIP and sidecar.
+7. Record all quality/runtime/operator/promotion Run IDs and hashes.
+8. Resolve issue #61 with an Actions run containing real successful steps and logs.
 
-The isolated environment could not install or load the formal target runtime. The following is
-still required on the target machine:
+Current GitHub Actions failures occur before step creation (`steps=null`, no job log). They are not
+Python test-failure evidence. Do not repeatedly rerun until an external condition changes.
 
-- `hierarchicalforecast==1.5.1`
-- installed console entry point
-- all 40 expected cases
-- command exit code 0
-- verified ZIP and sidecar
+## Evidence to return after execution
 
-### GitHub Actions
+Return or record:
 
-Repository CI repeatedly fails before any workflow step is created. Jobs report `steps=null` and
-produce no checkout, installation, lint, compile, or pytest logs. Recheck the current head after
-the runner issue is resolved.
+- exact Git SHA;
+- `git status --short` before and after;
+- promotion command exit code;
+- promotion Run ID and report path;
+- dependency-contract result and both dependency-file SHA-256 values;
+- quality Run ID;
+- focused and full JUnit totals;
+- Ruff, compileall, mypy, and pip-check statuses;
+- installed HierarchicalForecast version;
+- runtime Run ID;
+- 40/40/40/0 summary and 24/16 partition;
+- operator Run ID;
+- ZIP path, byte size, publication method, and SHA-256;
+- sidecar verification result;
+- standalone verifier result;
+- all evidence-directory `SHA256SUMS` results;
+- GitHub Actions run/job IDs with actual step logs.
 
-### Static tools
+## Accuracy boundary
 
-No local Ruff or mypy success is claimed. Run them after the environment is available, before
-changing the PR from Draft.
-
-## Target-machine procedure
-
-```bash
-cd /mnt/e/env/ts/loto_forecast_platform || exit 1
-
-git status --short
-git fetch origin
-git switch agent/hierarchicalforecast-runtime-certification
-git pull --ff-only
-
-git rev-parse HEAD
-uv sync --extra full
-
-uv run python - <<'PY'
-from importlib.metadata import version
-resolved = version("hierarchicalforecast")
-print(resolved)
-raise SystemExit(0 if resolved == "1.5.1" else 2)
-PY
-
-uv run loto-hierarchicalforecast-certify
-```
-
-After a successful run:
-
-```bash
-ROOT="artifacts/hierarchicalforecast-runtime"
-RUN_DIR="$(find "$ROOT" -maxdepth 1 -type d \
-  -name 'hierarchicalforecast-runtime-*' -printf '%T@ %p\n' \
-  | sort -nr | head -n 1 | cut -d' ' -f2-)"
-RUN_ID="$(basename "$RUN_DIR")"
-
-(
-  cd "$RUN_DIR"
-  sha256sum -c SHA256SUMS
-)
-
-(
-  cd "$ROOT"
-  sha256sum -c "$RUN_ID.zip.sha256"
-  unzip -t "$RUN_ID.zip"
-)
-```
-
-Read the formal summary rather than inferring success from file existence:
-
-```bash
-uv run python - "$RUN_DIR/RUNTIME_CERTIFICATION.json" <<'PY'
-import json
-import sys
-from pathlib import Path
-
-payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-print(json.dumps({
-    "run_id": payload["run_id"],
-    "status": payload["status"],
-    "formal_success": payload["formal_success"],
-    "summary": payload["summary"],
-}, indent=2, sort_keys=True))
-PY
-```
-
-## Required acceptance evidence
-
-Before marking ready for review, retain:
-
-- exact Git commit
-- installed HierarchicalForecast version
-- runtime Run ID
-- `RUNTIME_CERTIFICATION.json`
-- `METHOD_RESULTS.json`
-- ZIP path and SHA-256
-- passing sidecar verification
-- passing archive test
-- passing internal `SHA256SUMS`
-- Ruff result
-- mypy result where required by repository policy
-- focused pytest result
-- repository-wide pytest result
-- GitHub Actions run with actual steps and logs
+No Hit@±1, MAE, MSE, RMSE, position-level Hit@±1, all-position Hit@±1, Holdout, or Prospective
+claim is supported by this runtime certification work.
 
 ## Prohibited shortcuts
 
-- do not mark package availability as runtime success
-- do not select only the best method or successful subset
-- do not relabel expected strict-tree rejection as executable success
-- do not overwrite raw runtime artifacts
-- do not overwrite mismatched ZIPs or sidecars
-- do not delete incident evidence to obtain a green rerun
-- do not claim Hit@±1 or error-metric improvement from runtime certification
-- do not force push solely to reduce the GitHub Contents API commit count
-- do not merge or enable auto-merge without explicit approval
+- do not report constructor availability as runtime success;
+- do not accept only a successful subset of the 40 cases;
+- do not use an unlocked environment;
+- do not run formally from a dirty or mismatched commit;
+- do not overwrite raw evidence, ZIPs, sidecars, or manifests;
+- do not delete incident evidence to obtain a green rerun;
+- do not reinterpret strict-tree rejection as actual execution;
+- do not claim forecast-accuracy improvement;
+- do not force push to reduce the Contents API commit count;
+- do not push directly to `main`;
+- do not mark ready, merge, or enable auto-merge without explicit approval.
 
 ## Recommended next action
 
-Run the target-machine procedure on the exact branch head. If and only if the real 40-case matrix,
-artifact verification, local quality checks, and functioning GitHub CI pass, update
-`VERIFICATION_REPORT.md` with the new evidence and consider marking the PR ready for review.
+Run the exact formal continuation command above on the target machine. Keep the PR Draft unless the
+entire local promotion gate and a real-step GitHub Actions run both pass and the verification report
+is updated with every required identifier and hash.
