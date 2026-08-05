@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Callable, Sequence
 
 from .constants import CertificationError
+from .dependency_contract import verify_dependency_contract
 from .integrity import (
     atomic_write,
     canonical,
@@ -133,6 +134,7 @@ def execute(
         "git_commit": None,
         "git_preflight": None,
         "git_postflight": None,
+        "dependency_contract": None,
         "focused_junit": None,
         "full_junit": None,
         "error": None,
@@ -158,6 +160,15 @@ def execute(
 
         directory.mkdir(parents=True, exist_ok=False)
         directory_created = True
+
+        report["phase"] = "dependency_contract"
+        if test_mode:
+            report["dependency_contract"] = {
+                "status": "SKIPPED_TEST_MODE",
+                "formal_success": False,
+            }
+        else:
+            report["dependency_contract"] = verify_dependency_contract(root)
 
         def command(name: str, args: list[str], status: str) -> dict[str, object]:
             report["phase"] = name
@@ -269,6 +280,7 @@ def execute(
             "clean_git_preflight": True,
             "clean_git_postflight": True,
             "unchanged_git_commit": True,
+            "dependency_contract": not test_mode,
             "locked_sync": not skip_sync,
             "pip_check": True,
             "ruff_format": True,
@@ -284,6 +296,7 @@ def execute(
         if report["status"] == "FAILED_PREFLIGHT":
             report["status"] = {
                 "preflight": "FAILED_PREFLIGHT",
+                "dependency_contract": "FAILED_DEPENDENCY_CONTRACT",
                 "sync": "FAILED_SYNC",
                 "pip_check": "FAILED_PIP_CHECK",
                 "ruff_format": "FAILED_RUFF_FORMAT",
