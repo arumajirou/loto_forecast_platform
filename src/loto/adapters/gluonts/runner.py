@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Sequence
 
+from loto.adapters.gluonts.inventory import RuntimeInventory, inventory_sha256
 from loto.adapters.gluonts.protocol import (
     GluonTSProviderRequest,
     GluonTSProviderResponse,
@@ -30,6 +31,10 @@ class ProviderInvocation:
     request_sha256: str
     response_sha256: str
     return_code: int
+    inventory_path: Path | None = None
+    inventory_sha256: str | None = None
+    manifest_path: Path | None = None
+    manifest_sha256: str | None = None
 
 
 def _canonical_json_bytes(payload: Any) -> bytes:
@@ -80,6 +85,55 @@ def _failed_response(request: GluonTSProviderRequest, error: str) -> GluonTSProv
         status=ProviderStatus.FAILED,
         errors=[error],
     )
+
+
+def _persist_inventory(
+    request: GluonTSProviderRequest,
+    response: GluonTSProviderResponse,
+    run_dir: Path,
+) -> tuple[GluonTSProviderResponse, Path | None, str | None]:
+    raw_inventory = response.metadata.get("runtime_inventory")
+    if raw_inventory is None or response.status is ProviderStatus.FAILED:
+        return response, None, None
+    try:
+        inventory = RuntimeInventory.model_validate(raw_inventory)
+    except Exception as exc:
+        return (
+            _failed_response(request, f"invalid runtime inventory: {type(exc).__name__}: {exc}"),
+            None,
+            None,
+        )
+    if inventory.lane != request.lane.value:
+        return _failed_response(request, "runtime inventory lane mismatch"), None, None
+    calculated_sha = inventory_sha256(inventory)
+    declared_sha = response.metadata.get("runtime_inventory_sha256")
+    if declared_sha != calculated_sha:
+        return _failed_response(request, "runtime inventory SHA-256 mismatch"), None, None
+    inventory_path = run_dir / "runtime_inventory.json"
+    persisted_sha = atomic_write_json(inventory_path, inventory.model_dump(mode="json"))
+    if persisted_sha != calculated_sha:
+        return _failed_response(request, "persisted runtime inventory hash mismatch"), None, None
+    return response, inventory_path, persisted_sha
+
+
+def _artifact_manifest(
+    *,
+    request_sha256: str,
+    response_sha256: str,
+    stdout_path: Path,
+    stderr_path: Path,
+    inventory_sha: str | None,
+    return_code: int,
+) -> dict[str, Any]:
+    return {
+        "schema_version": 1,
+        "request_sha256": request_sha256,
+        "response_sha256": response_sha256,
+        "stdout_sha256": sha256_file(stdout_path),
+        "stderr_sha256": sha256_file(stderr_path),
+        "runtime_inventory_sha256": inventory_sha,
+        "return_code": return_code,
+    }
 
 
 def invoke_provider(
@@ -170,6 +224,21 @@ def invoke_provider(
             response = _failed_response(request, "provider protocol schema hash mismatch")
             response_sha256 = atomic_write_json(response_path, response.model_dump(mode="json"))
 
+    response, inventory_path, inventory_sha = _persist_inventory(request, response, run_dir)
+    response_sha256 = atomic_write_json(response_path, response.model_dump(mode="json"))
+    manifest_path = run_dir / "artifact_manifest.json"
+    manifest_sha = atomic_write_json(
+        manifest_path,
+        _artifact_manifest(
+            request_sha256=request_sha256,
+            response_sha256=response_sha256,
+            stdout_path=stdout_path,
+            stderr_path=stderr_path,
+            inventory_sha=inventory_sha,
+            return_code=completed.returncode,
+        ),
+    )
+
     return ProviderInvocation(
         response=response,
         run_dir=run_dir,
@@ -180,4 +249,8 @@ def invoke_provider(
         request_sha256=request_sha256,
         response_sha256=response_sha256,
         return_code=completed.returncode,
+        inventory_path=inventory_path,
+        inventory_sha256=inventory_sha,
+        manifest_path=manifest_path,
+        manifest_sha256=manifest_sha,
     )
