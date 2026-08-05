@@ -11,22 +11,33 @@ from .contracts import CampaignConfig, CampaignStage
 from .lineage_integrity import evaluate_lineage_inputs, write_run_lineage
 from .persistence import verify_sha256s, write_json
 from .promotion_gate import evaluate_promotion_gate, run_stage_with_promotion_gate
+from .verification_seal import verify_verification_seal
 
 
 def _verified_run_failures(path: Path, label: str) -> list[str]:
     failures: list[str] = []
     report_path = path / "VERIFICATION_REPORT.json"
     if not report_path.is_file():
-        return [f"{label} VERIFICATION_REPORT.json missing"]
-    try:
-        report = json.loads(report_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        return [f"{label} verification report unreadable: {type(exc).__name__}: {exc}"]
-    if not isinstance(report, dict) or report.get("status") != "PASS":
-        failures.append(
-            f"{label} verification report status is not PASS: "
-            f"{report.get('status') if isinstance(report, dict) else None}"
-        )
+        failures.append(f"{label} VERIFICATION_REPORT.json missing")
+    else:
+        try:
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            failures.append(
+                f"{label} verification report unreadable: {type(exc).__name__}: {exc}"
+            )
+        else:
+            if not isinstance(report, dict) or report.get("status") != "PASS":
+                failures.append(
+                    f"{label} verification report status is not PASS: "
+                    f"{report.get('status') if isinstance(report, dict) else None}"
+                )
+
+    seal = verify_verification_seal(path)
+    failures.extend(
+        f"{label} verification seal: {failure}"
+        for failure in seal.get("failures", [])
+    )
     for failure in verify_sha256s(path):
         failures.append(f"{label} SHA256: {failure}")
     return failures
@@ -37,12 +48,14 @@ def _input_verification_failures(
     target_stage: CampaignStage,
     source_run: Path | None,
     predecessor_run: Path | None,
+    coverage_run: Path | None,
 ) -> list[str]:
     failures: list[str] = []
     checked: set[Path] = set()
     for path, label in (
         (source_run, "source run"),
         (predecessor_run, "predecessor run"),
+        (coverage_run, "coverage run"),
     ):
         if path is None:
             continue
@@ -52,7 +65,9 @@ def _input_verification_failures(
         checked.add(resolved)
         failures.extend(_verified_run_failures(resolved, label))
 
-    if target_stage == CampaignStage.HPO and checked:
+    if target_stage == CampaignStage.HPO and any(
+        path is not None for path in (source_run, predecessor_run)
+    ):
         failures.append("hpo must not receive source or predecessor runs")
     return failures
 
@@ -81,6 +96,7 @@ def run_stage_with_promotion_and_lineage(
         target_stage=target_stage,
         source_run=source_run,
         predecessor_run=predecessor_run,
+        coverage_run=coverage_run,
     )
     gate_decision = evaluate_promotion_gate(
         config=config,
