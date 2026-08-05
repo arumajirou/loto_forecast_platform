@@ -90,6 +90,8 @@ def run_api_coverage_pipeline(
             api_results=api_results,
         )
     except Exception as exc:
+        if coverage_root.exists():
+            shutil.rmtree(coverage_root)
         failure = {
             "schema_version": "all-auto-coverage-state-failure-v1",
             "created_at": datetime.now(UTC).isoformat(),
