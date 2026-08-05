@@ -12,6 +12,10 @@ from .lineage_verification import verify_run_with_lineage
 from .promotion_gate import GATED_STAGES
 from .runner import inventory, load_config, plan, run_stage
 
+# Compatibility patch point retained for existing callers and PR #50 tests.
+# The implementation now includes both promotion and lineage enforcement.
+run_stage_with_promotion_gate = run_stage_with_promotion_and_lineage
+
 
 def _run_id(prefix: str, stage: str) -> str:
     return f"{prefix}-{stage}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
@@ -118,7 +122,7 @@ def main() -> None:
                     resume=args.resume,
                 )
             elif selected_stage in GATED_STAGES:
-                result = run_stage_with_promotion_and_lineage(
+                result = run_stage_with_promotion_gate(
                     runner=run_stage,
                     project_root=project,
                     config=config,
