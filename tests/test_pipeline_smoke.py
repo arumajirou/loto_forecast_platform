@@ -13,6 +13,7 @@ def test_trusted_vertical_slice_produces_sealed_forecast(tmp_path):
         rows.append(
             {
                 "draw_no": draw_no,
+                # Keep the unit explicit to avoid NumPy generic-timedelta deprecation warnings.
                 "draw_date": (
                     pd.Timestamp("2026-01-01") + pd.to_timedelta(7 * (draw_no - 1), unit="D")
                 )
