@@ -59,7 +59,16 @@ produces a ZIP when the written artifacts themselves pass integrity verification
 |---:|---|---|
 | 0 | Runtime and package are formally verified | Retain and transfer the ZIP plus sidecar |
 | 2 | Dependency, version, or runtime certification did not pass | Inspect `RUNTIME_CERTIFICATION.json` and `METHOD_RESULTS.json`; do not promote |
-| 3 | Evidence packaging or integrity verification failed | Treat the package as invalid; preserve the run directory and investigate hashes/manifests |
+| 3 | Configuration, certification harness, packaging, or integrity verification failed | Preserve all available evidence and investigate the reported phase |
+
+Structured exit-3 statuses are:
+
+- `INVALID_CONFIGURATION` with `phase=configuration`
+- `FAILED_CERTIFICATION_HARNESS` with `phase=certification`
+- `FAILED_PACKAGING` with `phase=package`
+
+When packaging fails after certification, the JSON error retains the Run ID, run directory, and
+certification status so the operator can locate the unmodified runtime evidence.
 
 ## Locate the latest result
 
@@ -118,7 +127,32 @@ SHA256SUMS
 PACKAGE_MANIFEST.json
 ```
 
+## Immutable package behavior
+
+The ZIP and sidecar are immutable outputs for one Run ID.
+
+- Re-running packaging with unchanged evidence reuses the existing verified ZIP.
+- If the ZIP exists but differs from deterministic package bytes, packaging fails.
+- If the sidecar exists but does not match the ZIP digest, packaging fails.
+- Neither a mismatched ZIP nor a mismatched sidecar is overwritten automatically.
+- A temporary ZIP is verified before publication; failed temporary packages are removed.
+
+Do not delete or replace a mismatched package merely to obtain a green rerun. Preserve it as
+incident evidence, compare timestamps and hashes, and create a new certification Run ID after the
+root cause is understood.
+
 ## Failure diagnosis
+
+### `INVALID_CONFIGURATION`
+
+Inspect the structured error and correct the requested games, seed, horizon, in-sample size,
+expected version, or coherence tolerance. No formal runtime success is recorded for this attempt.
+
+### `FAILED_CERTIFICATION_HARNESS`
+
+The harness failed before returning a packageable certification object. Inspect the error,
+Python environment, source revision, and available partial output. Do not relabel it as a runtime
+or packaging pass.
 
 ### `BLOCKED_DEPENDENCY`
 
@@ -157,15 +191,18 @@ coherence, and exception failures.
 
 ### `FAILED_PACKAGING`
 
-Do not use an existing or partial ZIP. Verify the run directory manually and compare:
+Use the retained `run_id`, `run_directory`, and `certification_status` from the structured error.
+Do not use an existing, partial, or mismatched ZIP. Verify the run directory manually and compare:
 
 - `SHA256SUMS` coverage and digests
 - `ARTIFACT_MANIFEST.json` byte counts and hashes
 - Run ID consistency across directory and JSON files
+- existing ZIP and sidecar digests
+- member timestamps, modes, paths, and storage method
 - absence of renamed, missing, duplicate, or extra path entries
 
-After correcting the root cause, run a new certification. Raw evidence is never overwritten as a
-substitute for a new formal run.
+After correcting the root cause, run a new certification. Raw evidence and mismatched package
+artifacts are never overwritten as a substitute for a new formal run.
 
 ## Evidence handoff
 
