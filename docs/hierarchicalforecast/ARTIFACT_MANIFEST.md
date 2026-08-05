@@ -4,7 +4,9 @@
 
 - Pull request: #48
 - Branch: `agent/hierarchicalforecast-runtime-certification`
-- State: `PARTIALLY_VERIFIED / LOCK_CONTRACT_TESTS_PASS / CI_BLOCKED_RUNNER_START`
+- State: `PARTIALLY_VERIFIED / LOCK_CONTRACT_TESTS_PASS / CI_BLOCKED_PRE_RUN`
+- Canonical repository CI blocker: issue #58
+- PR-specific CI dependency: issue #61
 
 Machine-generated manifests and checksum files are the integrity roots. Documentation describes
 them but does not replace them.
@@ -155,5 +157,6 @@ python3 scripts/run_hierarchicalforecast_promotion_gate.py \
 - real `/mnt/e` publication and standalone re-verification;
 - GitHub Actions logs with real passing steps.
 
-Issue #61 tracks the CI runner-start blocker. Never overwrite evidence directories, mismatched ZIPs,
-or mismatched sidecars; preserve them and create a new Run ID.
+Issue #58 is the canonical repository-wide CI blocker. Issue #61 records PR #48's dependency on
+that blocker. Never overwrite evidence directories, mismatched ZIPs, or mismatched sidecars;
+preserve them and create a new Run ID.
