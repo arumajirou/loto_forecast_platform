@@ -10,15 +10,18 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Callable, Sequence
 
-from .constants import CertificationError
+from .constants import CertificationError, TARGET_VERSION
 from .integrity import (
     atomic_write,
     canonical,
+    inside,
+    require_directory,
     require_regular_file,
     resolve_requested_root,
     sha_file,
 )
 from .operator import git_state, run_command
+from .quality_gate import EXPECTED_FOCUSED_TESTS
 
 
 def utc_now() -> str:
@@ -37,17 +40,6 @@ def _safe_name(value: str) -> str:
     ):
         raise CertificationError(f"unsafe checksum filename: {value!r}")
     return value
-
-
-def _inside(path: Path, root: Path, label: str) -> Path:
-    if path.is_symlink():
-        raise CertificationError(f"{label} must not be a symbolic link: {path}")
-    resolved = path.resolve()
-    try:
-        resolved.relative_to(root)
-    except ValueError as exc:
-        raise CertificationError(f"{label} is outside its evidence root: {resolved}") from exc
-    return resolved
 
 
 def _load_command_json(command: dict[str, object], label: str) -> dict[str, object]:
@@ -85,10 +77,11 @@ def verify_evidence_directory(
     directory: Path,
     root: Path,
     report_name: str,
+    *,
+    identity_field: str,
 ) -> dict[str, object]:
-    directory = _inside(directory, root, "evidence directory")
-    if not directory.is_dir():
-        raise CertificationError(f"evidence directory is missing: {directory}")
+    directory = inside(directory, root, "evidence directory")
+    require_directory(directory, "evidence directory")
     entries = list(directory.iterdir())
     if any(entry.is_symlink() for entry in entries):
         raise CertificationError("evidence directory contains a symbolic link")
@@ -113,6 +106,11 @@ def verify_evidence_directory(
         raise CertificationError(f"invalid evidence artifact manifest: {exc}") from exc
     if not isinstance(manifest, dict) or not isinstance(manifest.get("files"), list):
         raise CertificationError("evidence artifact manifest has an invalid shape")
+    if manifest_path.read_bytes() != canonical(manifest):
+        raise CertificationError("evidence artifact manifest is not canonical")
+    if manifest.get(identity_field) != directory.name:
+        raise CertificationError("evidence artifact manifest identity mismatch")
+
     expected_manifest_names = set(regular) - {"ARTIFACT_MANIFEST.json"}
     observed: set[str] = set()
     for row in manifest["files"]:
@@ -137,7 +135,73 @@ def verify_evidence_directory(
         raise CertificationError(f"invalid persisted evidence report: {exc}") from exc
     if not isinstance(report, dict):
         raise CertificationError("persisted evidence report must be an object")
+    if report_path.read_bytes() != canonical(report):
+        raise CertificationError("persisted evidence report is not canonical")
+    if report.get(identity_field) != directory.name:
+        raise CertificationError("persisted evidence report identity mismatch")
     return report
+
+
+def _verify_git_evidence(payload: dict[str, object], git_sha: str, label: str) -> None:
+    if payload.get("expected_git_sha") != git_sha or payload.get("git_commit") != git_sha:
+        raise CertificationError(f"{label} Git identity mismatch")
+    for field in ("git_preflight", "git_postflight"):
+        state = payload.get(field)
+        if (
+            not isinstance(state, dict)
+            or state.get("clean") is not True
+            or state.get("commit") != git_sha
+        ):
+            raise CertificationError(f"{label} {field} evidence mismatch")
+
+
+def _verify_quality_report(quality: dict[str, object], git_sha: str) -> None:
+    if quality.get("status") != "VERIFIED" or quality.get("formal_success") is not True:
+        raise CertificationError("formal quality gate did not verify")
+    _verify_git_evidence(quality, git_sha, "quality")
+    focused = quality.get("focused_junit")
+    if (
+        not isinstance(focused, dict)
+        or focused.get("tests") != EXPECTED_FOCUSED_TESTS
+        or focused.get("failures") != 0
+        or focused.get("errors") != 0
+    ):
+        raise CertificationError("quality focused JUnit evidence mismatch")
+    full = quality.get("full_junit")
+    if (
+        not isinstance(full, dict)
+        or full.get("failures") != 0
+        or full.get("errors") != 0
+    ):
+        raise CertificationError("quality full-suite JUnit evidence mismatch")
+
+
+def _verify_target_report(target: dict[str, object], git_sha: str) -> dict[str, object]:
+    if target.get("status") != "VERIFIED" or target.get("formal_success") is not True:
+        raise CertificationError("formal target certification did not verify")
+    _verify_git_evidence(target, git_sha, "target")
+    if target.get("installed_version") != TARGET_VERSION:
+        raise CertificationError("target installed-version evidence mismatch")
+    certification = target.get("certification")
+    if not isinstance(certification, dict):
+        raise CertificationError("target report lacks certification evidence")
+    summary = certification.get("summary")
+    if (
+        not isinstance(summary, dict)
+        or summary.get("expected_cases") != 40
+        or summary.get("executed_cases") != 40
+        or summary.get("passed_cases") != 40
+        or summary.get("failed_cases") != 0
+    ):
+        raise CertificationError("target 40-case summary mismatch")
+    partition = certification.get("method_partition")
+    if (
+        not isinstance(partition, dict)
+        or partition.get("actual_execution_rows") != 24
+        or partition.get("grouped_rejection_rows") != 16
+    ):
+        raise CertificationError("target method-partition evidence mismatch")
+    return certification
 
 
 def finalize(
@@ -256,23 +320,23 @@ def execute(
         )
         quality = _load_command_json(quality_command, "quality gate")
         report["quality"] = quality
-        if (
-            quality_command.get("returncode") != 0
-            or quality.get("status") != "VERIFIED"
-            or quality.get("formal_success") is not True
-        ):
+        if quality_command.get("returncode") != 0:
             report["status"] = "FAILED_QUALITY_GATE"
             exit_code = 2 if quality_command.get("returncode") == 2 else 3
-            raise CertificationError("formal quality gate did not verify")
-        quality_directory = _inside(
+            raise CertificationError("formal quality gate command failed")
+        _verify_quality_report(quality, git_sha)
+        quality_directory = inside(
             Path(str(quality.get("evidence_directory", ""))),
             quality_root,
             "quality evidence directory",
         )
+        if quality.get("quality_run_id") != quality_directory.name:
+            raise CertificationError("quality report directory identity mismatch")
         persisted_quality = verify_evidence_directory(
             quality_directory,
             quality_root,
             "QUALITY_REPORT.json",
+            identity_field="quality_run_id",
         )
         if persisted_quality != quality:
             raise CertificationError("quality stdout and persisted report differ")
@@ -295,30 +359,27 @@ def execute(
         )
         target = _load_command_json(target_command, "target certification")
         report["target"] = target
-        if (
-            target_command.get("returncode") != 0
-            or target.get("status") != "VERIFIED"
-            or target.get("formal_success") is not True
-        ):
+        if target_command.get("returncode") != 0:
             report["status"] = "FAILED_TARGET_CERTIFICATION"
             exit_code = 2 if target_command.get("returncode") == 2 else 3
-            raise CertificationError("formal target certification did not verify")
-        operator_directory = _inside(
+            raise CertificationError("formal target certification command failed")
+        certification = _verify_target_report(target, git_sha)
+        operator_directory = inside(
             Path(str(target.get("operator_directory", ""))),
             operator_root,
             "operator evidence directory",
         )
+        if target.get("operator_run_id") != operator_directory.name:
+            raise CertificationError("target report directory identity mismatch")
         persisted_target = verify_evidence_directory(
             operator_directory,
             operator_root,
             "OPERATOR_REPORT.json",
+            identity_field="operator_run_id",
         )
         if persisted_target != target:
             raise CertificationError("target stdout and persisted report differ")
-        certification = target.get("certification")
-        if not isinstance(certification, dict):
-            raise CertificationError("target report lacks certification evidence")
-        zip_path = _inside(
+        zip_path = inside(
             Path(str(certification.get("zip_path", ""))),
             runtime_root,
             "runtime ZIP",
@@ -347,10 +408,15 @@ def execute(
             report["status"] = "FAILED_PACKAGE_VERIFICATION"
             exit_code = 2 if verifier_command.get("returncode") == 2 else 3
             raise CertificationError("standalone package verification did not verify")
+        package_zip = inside(
+            Path(str(package.get("zip_path", ""))),
+            runtime_root,
+            "verified runtime ZIP",
+        )
         if (
             package.get("run_id") != certification.get("run_id")
             or package.get("zip_sha256") != certification.get("zip_sha256")
-            or Path(str(package.get("zip_path", ""))).resolve() != zip_path
+            or package_zip != zip_path
         ):
             raise CertificationError("standalone package result does not match target evidence")
 
@@ -367,8 +433,15 @@ def execute(
         report["checks"] = {
             "clean_git_preflight": True,
             "quality_gate": True,
+            "quality_git_identity": True,
+            "quality_focused_count": True,
+            "quality_full_suite": True,
             "quality_evidence_hashes": True,
             "target_certification": True,
+            "target_git_identity": True,
+            "target_exact_version": True,
+            "target_40_cases": True,
+            "target_method_partition": True,
             "operator_evidence_hashes": True,
             "standalone_package_verification": True,
             "same_runtime_run_id": True,
