@@ -62,11 +62,11 @@ def evaluate_database_runtime_run(
         )
     if expected_model_count < 1:
         failures.append("expected_model_count must be >= 1")
-    plan_gpu = (
-        (plan.get("runtime_certification") or {}).get("require_gpu_execution")
-        if isinstance(plan, Mapping)
-        else None
-    )
+    runtime_contract = plan.get("runtime_certification") if isinstance(plan, Mapping) else None
+    if not isinstance(runtime_contract, Mapping):
+        failures.append("campaign plan runtime_certification must be an object")
+        runtime_contract = {}
+    plan_gpu = runtime_contract.get("require_gpu_execution")
     resolved_require_gpu = bool(plan_gpu) if require_gpu is None else require_gpu
     if require_gpu is True and plan_gpu is not True:
         failures.append("verifier requires GPU but campaign plan does not require GPU execution")
@@ -97,6 +97,9 @@ def evaluate_database_runtime_run(
             f"{campaign.get('search_space_artifact_status')}"
         )
 
+    invalid_rows = [index for index, row in enumerate(rows) if not isinstance(row, Mapping)]
+    if invalid_rows:
+        failures.append(f"campaign report rows are not objects: {invalid_rows}")
     model_results = tuple(
         verify_model(
             run_dir,

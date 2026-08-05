@@ -303,3 +303,33 @@ def test_campaign_row_and_model_report_must_match(tmp_path: Path) -> None:
         "campaign row/model run_report mismatch" in failure
         for failure in report.model_results[0].failures
     )
+
+
+def test_non_object_campaign_row_is_fail_closed(tmp_path: Path) -> None:
+    run = make_run(tmp_path, model_count=1)
+    campaign_path = run / "campaign_report.json"
+    campaign = json.loads(campaign_path.read_text(encoding="utf-8"))
+    campaign["reports"][0] = "invalid"
+    write_json(campaign_path, campaign)
+
+    report = evaluate_database_runtime_run(run, expected_model_count=1, require_gpu=False)
+
+    assert report.status == "FAIL"
+    assert any("rows are not objects" in failure for failure in report.failures)
+
+
+def test_checksum_verifier_rejects_path_traversal(tmp_path: Path) -> None:
+    run = make_run(tmp_path, model_count=1)
+    report = write_database_runtime_verification(run, expected_model_count=1, require_gpu=False)
+    assert report.status == "PASS"
+    outside = tmp_path / "outside.txt"
+    outside.write_text("outside\n", encoding="utf-8")
+    checksum = run / "SHA256SUMS"
+    checksum.write_text(
+        f"{__import__('hashlib').sha256(outside.read_bytes()).hexdigest()}  ../outside.txt\n",
+        encoding="utf-8",
+    )
+
+    failures = verify_sha256s(run)
+
+    assert any("unsafe checksum target" in failure for failure in failures)

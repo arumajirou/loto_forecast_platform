@@ -148,7 +148,16 @@ def verify_sha256s(run_directory: str | Path) -> list[str]:
             failures.append(f"invalid SHA256SUMS line {line_number}")
             continue
         expected, relative = fields
-        path = run_dir / relative.strip()
+        relative_path = Path(relative.strip())
+        if relative_path.is_absolute():
+            failures.append(f"unsafe checksum target: {relative}")
+            continue
+        path = (run_dir / relative_path).resolve()
+        try:
+            path.relative_to(run_dir)
+        except ValueError:
+            failures.append(f"unsafe checksum target: {relative}")
+            continue
         if not path.is_file():
             failures.append(f"missing checksum target: {relative}")
         elif sha256_file(path) != expected:
