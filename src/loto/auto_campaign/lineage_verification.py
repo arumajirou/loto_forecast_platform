@@ -7,9 +7,30 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+from .contracts import CampaignStage
 from .lineage_integrity import verify_lineage_artifacts
 from .persistence import write_json, write_sha256s
 from .promotion_gate import GATED_STAGES
+from .verification_seal import (
+    verify_verification_seal,
+    write_verification_seal,
+)
+
+_SEMANTIC_SOURCE_STAGE = {
+    CampaignStage.HPO: None,
+    CampaignStage.VALIDATE_TRIALS: CampaignStage.HPO,
+    CampaignStage.OOF: CampaignStage.VALIDATE_TRIALS,
+    CampaignStage.HOLDOUT: CampaignStage.VALIDATE_TRIALS,
+    CampaignStage.PROSPECTIVE: CampaignStage.VALIDATE_TRIALS,
+}
+
+_SEMANTIC_PREDECESSOR_STAGE = {
+    CampaignStage.HPO: None,
+    CampaignStage.VALIDATE_TRIALS: CampaignStage.HPO,
+    CampaignStage.OOF: CampaignStage.VALIDATE_TRIALS,
+    CampaignStage.HOLDOUT: CampaignStage.OOF,
+    CampaignStage.PROSPECTIVE: CampaignStage.HOLDOUT,
+}
 
 
 def _read_json(path: Path, failures: list[str], label: str) -> dict[str, Any]:
@@ -90,16 +111,145 @@ def verify_promotion_gate_artifacts(
     }
 
 
+def _evidence_stage(
+    evidence: Any,
+    expected: CampaignStage | None,
+    failures: list[str],
+    label: str,
+) -> None:
+    if expected is None:
+        if evidence is not None:
+            failures.append(f"{label} must be absent")
+        return
+    if not isinstance(evidence, Mapping):
+        failures.append(f"{label} must be a non-empty object")
+        return
+    if evidence.get("stage") != expected.value:
+        failures.append(
+            f"{label} stage mismatch: expected={expected.value}, "
+            f"actual={evidence.get('stage')}"
+        )
+    if evidence.get("verification_status") != "PASS":
+        failures.append(f"{label} verification_status must be PASS")
+    if not str(evidence.get("path") or "").strip():
+        failures.append(f"{label} path missing")
+
+
+def verify_lineage_semantics(
+    run_root: Path,
+    manifest: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Validate stage ordering independently of recorded hashes."""
+
+    lineage_path = run_root / "LINEAGE.json"
+    if not lineage_path.is_file():
+        return {"status": "NOT_APPLICABLE", "failures": []}
+    failures: list[str] = []
+    lineage = _read_json(lineage_path, failures, "lineage")
+    raw_stage = str(lineage.get("target_stage") or "")
+    try:
+        target_stage = CampaignStage(raw_stage)
+    except ValueError:
+        failures.append(f"lineage target_stage is unknown: {raw_stage}")
+        target_stage = None
+
+    if target_stage not in GATED_STAGES:
+        failures.append(f"lineage target stage is not gated: {raw_stage}")
+    if raw_stage != str(manifest.get("stage") or ""):
+        failures.append("lineage target stage differs from run manifest")
+
+    source = lineage.get("source_evidence")
+    predecessor = lineage.get("predecessor_evidence")
+    if target_stage is not None:
+        expected_source = _SEMANTIC_SOURCE_STAGE[target_stage]
+        expected_predecessor = _SEMANTIC_PREDECESSOR_STAGE[target_stage]
+        _evidence_stage(source, expected_source, failures, "source evidence")
+        _evidence_stage(
+            predecessor,
+            expected_predecessor,
+            failures,
+            "predecessor evidence",
+        )
+        if target_stage in {CampaignStage.VALIDATE_TRIALS, CampaignStage.OOF}:
+            if isinstance(source, Mapping) and isinstance(predecessor, Mapping):
+                if source.get("path") != predecessor.get("path"):
+                    failures.append(
+                        f"{target_stage.value} source and predecessor paths must match"
+                    )
+        if target_stage in {CampaignStage.HOLDOUT, CampaignStage.PROSPECTIVE}:
+            if isinstance(source, Mapping) and isinstance(predecessor, Mapping):
+                if source.get("path") == predecessor.get("path"):
+                    failures.append(
+                        f"{target_stage.value} predecessor must differ from config source"
+                    )
+
+    run_evidence = lineage.get("run")
+    if not isinstance(run_evidence, Mapping):
+        failures.append("lineage run evidence must be an object")
+    else:
+        if not str(run_evidence.get("manifest_code_sha256") or "").strip():
+            failures.append("lineage run code SHA-256 missing")
+        if not str(run_evidence.get("manifest_data_sha256") or "").strip():
+            failures.append("lineage run data SHA-256 missing")
+
+    coverage = lineage.get("coverage_evidence")
+    if not isinstance(coverage, Mapping):
+        failures.append("coverage evidence must be an object")
+    elif coverage.get("verification_status") != "PASS":
+        failures.append("coverage evidence verification_status must be PASS")
+
+    gate_failures: list[str] = []
+    gate = _read_json(run_root / "PROMOTION_GATE.json", gate_failures, "promotion gate")
+    failures.extend(gate_failures)
+    runtime = lineage.get("runtime_evidence")
+    if gate.get("requires_gpu_runtime") is True:
+        if not isinstance(runtime, Mapping):
+            failures.append("GPU lineage requires runtime evidence")
+        elif runtime.get("verification_status") != "PASS":
+            failures.append("GPU runtime evidence verification_status must be PASS")
+    elif isinstance(runtime, Mapping) and runtime.get("verification_status") != "PASS":
+        failures.append("optional runtime evidence verification_status must be PASS")
+
+    return {
+        "status": "PASS" if not failures else "FAIL",
+        "target_stage": raw_stage or None,
+        "failures": failures,
+    }
+
+
+def _existing_seal_result(run_root: Path) -> dict[str, Any]:
+    if not (run_root / "VERIFICATION_SEAL.json").is_file():
+        return {"status": "NOT_APPLICABLE", "failures": []}
+    return verify_verification_seal(run_root)
+
+
 def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
-    """Run legacy, coverage, promotion-gate, and lineage checks in order."""
+    """Run legacy, coverage, promotion-gate, lineage, and seal checks."""
 
     from .coverage_verification import verify_run_with_coverage
 
+    existing_seal = _existing_seal_result(run_root)
     base_result = verify_run_with_coverage(run_root)
     manifest_failures: list[str] = []
     manifest = _read_json(run_root / "manifest.json", manifest_failures, "run manifest")
     promotion_result = verify_promotion_gate_artifacts(run_root, manifest)
     lineage_result = verify_lineage_artifacts(run_root, manifest)
+    semantic_result = verify_lineage_semantics(run_root, manifest)
+
+    if semantic_result.get("status") == "FAIL":
+        lineage_failures = list(lineage_result.get("failures") or [])
+        lineage_failures.extend(semantic_result.get("failures") or [])
+        lineage_result = {
+            **lineage_result,
+            "status": "FAIL",
+            "semantic_verification": semantic_result,
+            "failures": lineage_failures,
+        }
+    else:
+        lineage_result = {
+            **lineage_result,
+            "semantic_verification": semantic_result,
+        }
 
     stage = str(manifest.get("stage") or "")
     gated_values = {item.value for item in GATED_STAGES}
@@ -109,6 +259,7 @@ def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
             "status": "FAIL",
             "target_stage": stage,
             "chain_sha256": None,
+            "semantic_verification": semantic_result,
             "failures": ["gated run is missing LINEAGE.json and lineage manifest fields"],
         }
 
@@ -122,8 +273,13 @@ def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
         f"lineage:{failure}"
         for failure in lineage_result.get("failures", [])
     )
+    if existing_seal.get("status") == "FAIL":
+        failures.extend(
+            f"verification-seal:{failure}"
+            for failure in existing_seal.get("failures", [])
+        )
 
-    result = {
+    result: dict[str, Any] = {
         **base_result,
         "status": (
             "PASS"
@@ -135,8 +291,32 @@ def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
         ),
         "promotion_gate_verification": promotion_result,
         "lineage_verification": lineage_result,
+        "preexisting_verification_seal": existing_seal,
         "failures": failures,
     }
+
+    seal_payload = None
+    if result["status"] == "PASS":
+        try:
+            seal_payload = write_verification_seal(run_root, result)
+        except (OSError, ValueError) as exc:
+            failures.append(f"verification-seal:create:{type(exc).__name__}: {exc}")
+            result["status"] = "FAIL"
+            result["failures"] = failures
+
+    if seal_payload is not None:
+        seal_result = verify_verification_seal(run_root)
+        if seal_result.get("status") != "PASS":
+            failures.extend(
+                f"verification-seal:{failure}"
+                for failure in seal_result.get("failures", [])
+            )
+            result["status"] = "FAIL"
+            result["failures"] = failures
+    else:
+        seal_result = existing_seal
+    result["verification_seal"] = seal_result
+
     write_json(run_root / "VERIFICATION_REPORT.json", result)
     write_sha256s(run_root)
     return result
