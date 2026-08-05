@@ -165,9 +165,9 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
     if request.get("schema_version") == 2:
         if str(SRC) not in sys.path:
             sys.path.insert(0, str(SRC))
-        from loto.adapters.autogluon.provider import run_provider_v2
+        from loto.adapters.autogluon.strict_provider import run_provider_v2_strict
 
-        return run_provider_v2(request)
+        return run_provider_v2_strict(request)
     return _run_provider_v1(request)
 
 
