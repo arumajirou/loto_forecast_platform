@@ -106,3 +106,20 @@ def test_local_combined_metrics_preserve_config_index(tmp_path: Path) -> None:
     assert raw["config_index"].tolist() == [0, 1]
     assert raw["hit_pm1"].tolist() == [1.0, 0.0]
     assert raw["all_positions_hit_pm1"].tolist() == [1.0, 0.0]
+
+    summary_specs = [
+        ("per_seed_metrics.parquet", "hit_pm1", "all_positions_hit_pm1"),
+        ("per_fold_metrics.parquet", "hit_pm1", "all_positions_hit_pm1"),
+        ("seed_metric_summary.parquet", "hit_pm1_mean", "all_positions_hit_pm1_mean"),
+        ("model_ranking.parquet", "hit_pm1_mean", "all_positions_hit_pm1_mean"),
+    ]
+    for filename, hit_column, all_positions_column in summary_specs:
+        summary_frame = pd.read_parquet(tmp_path / filename)
+        local_raw = summary_frame[
+            summary_frame["track"].eq("u_local_combined")
+            & summary_frame["variant"].eq("raw")
+        ].sort_values("config_index")
+
+        assert local_raw["config_index"].tolist() == [0, 1]
+        assert local_raw[hit_column].tolist() == [1.0, 0.0]
+        assert local_raw[all_positions_column].tolist() == [1.0, 0.0]
