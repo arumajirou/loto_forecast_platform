@@ -145,8 +145,8 @@ def _runner_factory(
                         "failed_cases": 0,
                     },
                     "method_partition": {
-                        "actual_execution_rows": 24,
-                        "grouped_rejection_rows": 16,
+                        "executed_cases": 24,
+                        "rejected_cases": 16,
                     },
                 },
             }
