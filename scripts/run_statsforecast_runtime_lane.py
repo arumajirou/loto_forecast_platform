@@ -8,6 +8,7 @@ from pathlib import Path
 from loto.statsforecast.runtime_lane import (
     execute_runtime_lane,
     fetch_release_artifact,
+    prepare_offline_bundle,
 )
 
 
@@ -16,21 +17,17 @@ def _repo_root() -> Path:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        description="Provision and run StatsForecast 2.1.1."
-    )
+    parser = argparse.ArgumentParser(description="Provision and run StatsForecast 2.1.1.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    fetch_parser = subparsers.add_parser(
-        "fetch",
-        help="Download and SHA-256 verify a wheel.",
-    )
+    fetch_parser = subparsers.add_parser("fetch-release")
     fetch_parser.add_argument("--wheelhouse", type=Path, required=True)
 
-    run_parser = subparsers.add_parser(
-        "certify",
-        help="Resolve, sync, and certify the lane.",
-    )
+    prepare_parser = subparsers.add_parser("prepare-offline")
+    prepare_parser.add_argument("--wheelhouse", type=Path, required=True)
+    prepare_parser.add_argument("--uv", default="uv")
+
+    run_parser = subparsers.add_parser("certify")
     run_parser.add_argument("--output-root", type=Path, required=True)
     run_parser.add_argument("--run-id")
     run_parser.add_argument("--wheelhouse", type=Path)
@@ -40,9 +37,17 @@ def main(argv: list[str] | None = None) -> int:
     run_parser.add_argument("--seed", type=int, default=1)
 
     args = parser.parse_args(argv)
-    if args.command == "fetch":
+    if args.command == "fetch-release":
         artifact = fetch_release_artifact(args.wheelhouse)
         print(f"ARTIFACT={artifact}")
+        return 0
+    if args.command == "prepare-offline":
+        bundle = prepare_offline_bundle(
+            _repo_root(),
+            args.wheelhouse,
+            uv_executable=args.uv,
+        )
+        print(f"WHEELHOUSE={bundle}")
         return 0
 
     run_id = args.run_id or datetime.now(timezone.utc).strftime(
@@ -58,9 +63,7 @@ def main(argv: list[str] | None = None) -> int:
         horizon=args.horizon,
         seed=args.seed,
     )
-    report = json.loads(
-        (run_dir / "RUNTIME_LANE_REPORT.json").read_text(encoding="utf-8")
-    )
+    report = json.loads((run_dir / "RUNTIME_LANE_REPORT.json").read_text(encoding="utf-8"))
     print(f"RUN_DIR={run_dir}")
     print(f"STATUS={report['status']}")
     return 0 if report["status"] == "PASS" else 2

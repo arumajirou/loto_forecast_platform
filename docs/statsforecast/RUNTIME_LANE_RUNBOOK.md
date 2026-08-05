@@ -6,32 +6,36 @@ without changing the root project lock or installing StatsForecast into the root
 ## Online execution
 
 ```bash
-PYTHONPATH=src python scripts/run_statsforecast_runtime_lane.py fetch \
-  --wheelhouse artifacts/statsforecast-wheelhouse
-
 PYTHONPATH=src python scripts/run_statsforecast_runtime_lane.py certify \
-  --output-root artifacts/statsforecast-runtime-lane \
-  --wheelhouse artifacts/statsforecast-wheelhouse
+  --output-root artifacts/statsforecast-runtime-lane
+```
+
+## Prepare a complete offline bundle
+
+The preparation command resolves a fresh `uv.lock`, exports hash-pinned requirements, and
+uses `pip download --require-hashes` to collect StatsForecast and every transitive dependency.
+It then checks the selected StatsForecast wheel against the SHA-256 published in PyPI JSON.
+
+```bash
+PYTHONPATH=src python scripts/run_statsforecast_runtime_lane.py prepare-offline \
+  --wheelhouse artifacts/statsforecast-offline-bundle
+
+sha256sum -c artifacts/statsforecast-offline-bundle/SHA256SUMS
 ```
 
 ## Offline execution
 
-Copy the complete wheelhouse, including `PYPI_RELEASE_SELECTION.json` and `SHA256SUMS`, to the
-target host. Verify it before use, then run:
-
 ```bash
-sha256sum -c artifacts/statsforecast-wheelhouse/SHA256SUMS
-
 PYTHONPATH=src python scripts/run_statsforecast_runtime_lane.py certify \
   --output-root artifacts/statsforecast-runtime-lane \
-  --wheelhouse artifacts/statsforecast-wheelhouse \
+  --wheelhouse artifacts/statsforecast-offline-bundle \
   --offline
 ```
 
-The runner copies the isolated `pyproject.toml` into the run directory, resolves `uv.lock`,
-syncs with `--locked`, executes all 41 runtime checks from PR #51, and verifies the nested
-portable `SHA256SUMS`. Holdout and Prospective actual values are never opened.
+The offline runner verifies the bundle before use, copies the frozen `pyproject.toml` and
+`uv.lock` into the run directory, performs `uv sync --locked` with indexes disabled, executes
+all 41 checks from PR #51, and verifies the nested portable `SHA256SUMS`.
 
-A PASS requires environment lock and sync success, certifier exit code 0, and nested checksum
-verification PASS. Network, resolver, package, model, lifecycle, or checksum failures return
-exit code 2 and preserve logs and a `RUNTIME_LANE_REPORT.json` file.
+A PASS requires environment sync success, certifier exit code 0, and nested checksum PASS.
+Network, resolver, package, model, lifecycle, bundle, or checksum failures return exit code 2
+and preserve logs and `RUNTIME_LANE_REPORT.json`.
