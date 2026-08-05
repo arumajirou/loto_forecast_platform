@@ -170,6 +170,30 @@ def test_version_mismatch_fails_even_when_all_cases_pass(
     assert result["summary"]["exact_version_match"] is False
 
 
+def test_module_distribution_version_inconsistency_fails_closed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        rc,
+        "_dependency_state",
+        lambda: rc.DependencyState(
+            import_status="PASS",
+            installed_version=rc.TARGET_VERSION,
+            module_version="1.5.0",
+            distribution_version=rc.TARGET_VERSION,
+            version_consistent=False,
+        ),
+    )
+    monkeypatch.setattr(rc, "reconcile_with_hierarchicalforecast", _fake_reconcile)
+
+    result = rc.run_certification(rc.RuntimeCertificationConfig(output_root=tmp_path))
+
+    assert result["status"] == "FAILED_VERSION_MISMATCH"
+    assert result["summary"]["exact_version_match"] is True
+    assert result["summary"]["module_distribution_version_consistent"] is False
+
+
 def test_incoherent_runtime_result_fails_closed(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
