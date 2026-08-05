@@ -28,4 +28,8 @@ def judge_gpu_certification(
         reasons.append("VRAM_PEAK_NOT_OBSERVED")
     if not runtime.model_parameter_device.startswith("cuda"):
         reasons.append("MODEL_PARAMETER_NOT_CUDA")
+    if not runtime.mean_output_device.startswith("cuda"):
+        reasons.append("MEAN_OUTPUT_NOT_CUDA")
+    if not runtime.quantile_output_device.startswith("cuda"):
+        reasons.append("QUANTILE_OUTPUT_NOT_CUDA")
     return CertificationVerdict("PASS" if not reasons else "FAIL", tuple(reasons))

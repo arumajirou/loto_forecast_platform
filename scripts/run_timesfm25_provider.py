@@ -145,7 +145,10 @@ def _run_native(request: TimesFM25Request) -> TimesFM25Response:
     vram_after = torch.cuda.memory_allocated() if requested_cuda else 0
     gpu_used = requested_cuda and model_device.startswith("cuda") and vram_peak > 0
     cpu_fallback = requested_cuda and not gpu_used
-    gpu_status = "PASS" if gpu_used and external.external_pid_match else "PARTIAL"
+    # The native API returns NumPy arrays. Even when model execution is observed on CUDA,
+    # the strict certification contract requires mean and quantile outputs to remain on CUDA.
+    # Therefore the native lane is PARTIAL until an output-tensor evidence path exists.
+    gpu_status = "PARTIAL"
     if cpu_fallback:
         gpu_status = "FAIL"
 
@@ -197,9 +200,14 @@ def _run_native(request: TimesFM25Request) -> TimesFM25Response:
             cpu_fallback=cpu_fallback,
             certification_status=("NOT_REQUESTED" if not requested_cuda else gpu_status),
             failure_reason=(
-                "GPU execution was not fully observed"
-                if requested_cuda and gpu_status != "PASS"
-                else None
+                "Native TimesFM returns CPU NumPy outputs, so strict CUDA output-device "
+                "certification is not satisfied."
+                if requested_cuda and gpu_used and external.external_pid_match
+                else (
+                    "GPU execution was not fully observed"
+                    if requested_cuda and gpu_status != "PASS"
+                    else None
+                )
             ),
         ),
         artifact_reference=ArtifactReference(

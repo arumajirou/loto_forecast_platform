@@ -1,3 +1,3 @@
 backend,status,reason
-pytorch_native,not_executed,requires pinned local snapshot and GPU
+pytorch_native,not_executed,native API CPU NumPy outputs prevent strict CUDA output-device PASS
 transformers,blocked,GitHub evidence reports FIXED_SNAPSHOT_MISSING
