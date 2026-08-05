@@ -2,7 +2,7 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / LOCK_CONTRACT_TESTS_PASS / CI_BLOCKED_RUNNER_START / NOT_READY_FOR_REVIEW`
+`PARTIALLY_VERIFIED / LOCK_CONTRACT_TESTS_PASS / CI_BLOCKED_PRE_RUN / NOT_READY_FOR_REVIEW`
 
 PR #48 replaces constructor-only availability reporting with actual upstream execution,
 fail-closed validation, deterministic runtime certification, immutable evidence, and a sealed local
@@ -169,9 +169,14 @@ Not yet claimed:
 
 ## GitHub Actions boundary
 
-Issue #61 tracks repeated failures before runner steps are created. Current failures with
-`steps=null` and no job logs are not Python test-failure evidence. Do not repeatedly rerun until an
-external runner, billing, concurrency, or repository Actions condition changes.
+Issue #58 is the canonical repository-wide pre-run blocker. Issue #61 records only PR #48's
+dependency on that blocker. Independent PRs reproduce jobs with an empty API step list, no job-log
+blob, no artifacts, and no commit statuses despite a populated `ubuntu-latest` workflow. This is
+not Python test-failure evidence.
+
+Do not repeatedly rerun or append a comment for every unchanged branch head. New CI evidence is
+meaningful only after an external Actions, billing, policy, runner, or account condition changes,
+or after a job reaches real steps.
 
 ## Accuracy boundary
 
@@ -198,7 +203,7 @@ Hit@±1, Holdout, or Prospective performance.
 | `HANDOFF.md` | continuation procedure |
 | `ARTIFACT_MANIFEST.md` | source, test, and evidence inventory |
 | `CHANGELOG.md` | branch-level change history |
-| `CI_BLOCKER.md` | issue #61 evidence and owner checklist |
+| `CI_BLOCKER.md` | canonical issue #58 evidence and owner checklist |
 
 ## Safety
 
