@@ -17,7 +17,10 @@
     "docs/statsforecast/RUNTIME_LANE_RUNBOOK.md",
     "docs/statsforecast/RUNTIME_ADMISSION.md",
     "docs/statsforecast/TARGET_HOST_EXECUTION.md",
-    "docs/statsforecast/STATSFORECAST_RUNTIME_LANE_CHANGE_SCOPE.json"
+    "docs/statsforecast/STATSFORECAST_RUNTIME_LANE_CHANGE_SCOPE.json",
+    "src/loto/statsforecast/runtime_lane_end_to_end.py",
+    "tests/statsforecast/test_runtime_lane_end_to_end.py",
+    "docs/statsforecast/RUNTIME_END_TO_END.md"
   ],
   "forbidden_paths": [
     "pyproject.toml",
