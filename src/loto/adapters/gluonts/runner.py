@@ -16,6 +16,7 @@ from loto.adapters.gluonts.protocol import (
     ProviderStatus,
     protocol_schema_sha256,
 )
+from loto.adapters.gluonts.smoke import DeepARCPUSmokeResult, smoke_sha256
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,8 @@ class ProviderInvocation:
     return_code: int
     inventory_path: Path | None = None
     inventory_sha256: str | None = None
+    smoke_path: Path | None = None
+    smoke_sha256: str | None = None
     manifest_path: Path | None = None
     manifest_sha256: str | None = None
 
@@ -116,6 +119,35 @@ def _persist_inventory(
     return response, inventory_path, persisted_sha
 
 
+def _persist_smoke(
+    request: GluonTSProviderRequest,
+    response: GluonTSProviderResponse,
+    run_dir: Path,
+) -> tuple[GluonTSProviderResponse, Path | None, str | None]:
+    raw_smoke = response.metadata.get("deep_ar_cpu_smoke")
+    if raw_smoke is None or response.status is ProviderStatus.FAILED:
+        return response, None, None
+    try:
+        smoke = DeepARCPUSmokeResult.model_validate(raw_smoke)
+    except Exception as exc:
+        return (
+            _failed_response(request, f"invalid DeepAR CPU smoke: {type(exc).__name__}: {exc}"),
+            None,
+            None,
+        )
+    if smoke.lane != request.lane.value:
+        return _failed_response(request, "DeepAR CPU smoke lane mismatch"), None, None
+    calculated_sha = smoke_sha256(smoke)
+    declared_sha = response.metadata.get("deep_ar_cpu_smoke_sha256")
+    if declared_sha != calculated_sha:
+        return _failed_response(request, "DeepAR CPU smoke SHA-256 mismatch"), None, None
+    smoke_path = run_dir / "deepar_cpu_smoke.json"
+    persisted_sha = atomic_write_json(smoke_path, smoke.model_dump(mode="json"))
+    if persisted_sha != calculated_sha:
+        return _failed_response(request, "persisted DeepAR CPU smoke hash mismatch"), None, None
+    return response, smoke_path, persisted_sha
+
+
 def _artifact_manifest(
     *,
     request_sha256: str,
@@ -123,6 +155,7 @@ def _artifact_manifest(
     stdout_path: Path,
     stderr_path: Path,
     inventory_sha: str | None,
+    smoke_sha: str | None,
     return_code: int,
 ) -> dict[str, Any]:
     return {
@@ -132,6 +165,7 @@ def _artifact_manifest(
         "stdout_sha256": sha256_file(stdout_path),
         "stderr_sha256": sha256_file(stderr_path),
         "runtime_inventory_sha256": inventory_sha,
+        "deep_ar_cpu_smoke_sha256": smoke_sha,
         "return_code": return_code,
     }
 
@@ -225,6 +259,7 @@ def invoke_provider(
             response_sha256 = atomic_write_json(response_path, response.model_dump(mode="json"))
 
     response, inventory_path, inventory_sha = _persist_inventory(request, response, run_dir)
+    response, smoke_path, smoke_sha = _persist_smoke(request, response, run_dir)
     response_sha256 = atomic_write_json(response_path, response.model_dump(mode="json"))
     manifest_path = run_dir / "artifact_manifest.json"
     manifest_sha = atomic_write_json(
@@ -235,6 +270,7 @@ def invoke_provider(
             stdout_path=stdout_path,
             stderr_path=stderr_path,
             inventory_sha=inventory_sha,
+            smoke_sha=smoke_sha,
             return_code=completed.returncode,
         ),
     )
@@ -251,6 +287,8 @@ def invoke_provider(
         return_code=completed.returncode,
         inventory_path=inventory_path,
         inventory_sha256=inventory_sha,
+        smoke_path=smoke_path,
+        smoke_sha256=smoke_sha,
         manifest_path=manifest_path,
         manifest_sha256=manifest_sha,
     )
