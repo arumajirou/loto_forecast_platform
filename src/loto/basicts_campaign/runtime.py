@@ -11,11 +11,16 @@ from typing import Any
 
 import numpy as np
 
+from loto.basicts_campaign.basicts_module_closure import (
+    DECOMPOSITION_MODULE,
+    MODEL_CONFIG_MODULE,
+    RUNTIME_CRITICAL_MODULES,
+    verify_dlinear_import_closure,
+)
 from loto.basicts_campaign.dlinear_runtime_provenance import (
     DLINEAR_ARCH_MODULE,
     DLINEAR_CONFIG_MODULE,
     DLINEAR_MODULE_CONTRACTS,
-    verify_dlinear_runtime_modules,
 )
 from loto.basicts_campaign.installed_provenance import (
     verify_installed_basicts_provenance,
@@ -132,11 +137,68 @@ def _verify_dlinear_module_evidence(evidence: dict[str, Any]) -> None:
     if actual_names != expected_names:
         raise RuntimeError("DLinear module provenance names are inconsistent")
 
+    if evidence.get("basicts_module_closure_status") != "PASS":
+        raise RuntimeError("BasicTS loaded module closure was not verified")
+    if evidence.get("preloaded_basicts_modules") != []:
+        raise RuntimeError("BasicTS modules were preloaded before closure verification")
+    closure = evidence.get("loaded_basicts_modules")
+    count = evidence.get("loaded_basicts_module_count")
+    if not isinstance(closure, list) or not isinstance(count, int) or count != len(closure):
+        raise RuntimeError("BasicTS loaded module closure count is inconsistent")
+    if count < len(RUNTIME_CRITICAL_MODULES):
+        raise RuntimeError("BasicTS loaded module closure is unexpectedly small")
+
+    closure_names: set[str] = set()
+    for item in closure:
+        if not isinstance(item, dict):
+            raise RuntimeError("BasicTS loaded module closure entry is invalid")
+        module_name = item.get("module_name")
+        if (
+            not isinstance(module_name, str)
+            or not module_name
+            or not (module_name == "basicts" or module_name.startswith("basicts."))
+            or module_name in closure_names
+        ):
+            raise RuntimeError("BasicTS loaded module closure names are invalid")
+        closure_names.add(module_name)
+        if item.get("record_status") != "PASS":
+            raise RuntimeError(f"BasicTS loaded module RECORD failed: {module_name}")
+        if item.get("record_hash_mode") != "sha256":
+            raise RuntimeError(f"BasicTS loaded module hash mode is invalid: {module_name}")
+        path = item.get("distribution_path")
+        if (
+            not isinstance(path, str)
+            or path != item.get("import_spec_origin")
+            or path != item.get("loaded_module_file")
+        ):
+            raise RuntimeError(f"BasicTS loaded module path mismatch: {module_name}")
+        if not isinstance(item.get("is_package"), bool):
+            raise RuntimeError(f"BasicTS loaded module package flag is invalid: {module_name}")
+    if not RUNTIME_CRITICAL_MODULES.issubset(closure_names):
+        raise RuntimeError("DLinear critical modules are missing from the loaded closure")
+
+    if evidence.get("dlinear_dependency_binding_status") != "PASS":
+        raise RuntimeError("DLinear dependency object bindings were not verified")
+    expected_base = f"{MODEL_CONFIG_MODULE}.BasicTSModelConfig"
+    expected_bindings = {
+        "decomposition_symbol": (
+            f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"
+        ),
+        "config_base_symbol": expected_base,
+        "dlinear_config_direct_base": expected_base,
+        "arch_decomposition_object_identity": True,
+        "config_model_config_object_identity": True,
+        "configs_export_object_identity": True,
+        "dlinear_config_direct_base_identity": True,
+    }
+    if evidence.get("dlinear_dependency_bindings") != expected_bindings:
+        raise RuntimeError("DLinear dependency object binding evidence is inconsistent")
+
 
 def run_dlinear_smoke(request: ProviderRequest, output_dir: Path) -> dict[str, Any]:
     """Train the upstream BasicTS DLinear module and verify persistence on CPU."""
 
-    module_provenance = verify_dlinear_runtime_modules()
+    module_provenance = verify_dlinear_import_closure()
     _verify_dlinear_module_evidence(module_provenance)
 
     import torch
