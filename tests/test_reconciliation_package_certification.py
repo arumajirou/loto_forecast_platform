@@ -1,21 +1,28 @@
 from __future__ import annotations
 
+import errno
 import hashlib
 import json
+import os
 import zipfile
 from pathlib import Path
 
 import pytest
 
-from loto.reconciliation import package_certification as pc
+from loto.reconciliation import portable_package_certification as pc
 
 
 def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _make_run(tmp_path: Path, *, status: str = "VERIFIED") -> Path:
-    run_dir = tmp_path / "hierarchicalforecast-runtime-test-1"
+def _make_run(
+    tmp_path: Path,
+    *,
+    status: str = "VERIFIED",
+    name: str = "hierarchicalforecast-runtime-test-1",
+) -> Path:
+    run_dir = tmp_path / name
     run_dir.mkdir()
     certification = {
         "schema_version": 1,
@@ -45,9 +52,16 @@ def _make_run(tmp_path: Path, *, status: str = "VERIFIED") -> Path:
     return run_dir
 
 
-def test_package_run_creates_verified_zip_and_sidecar(tmp_path: Path) -> None:
+def test_package_run_creates_verified_zip_and_sidecar(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     run_dir = _make_run(tmp_path)
 
+    def unsupported_link(_source, _destination):
+        raise OSError(errno.EPERM, "hard links unavailable")
+
+    monkeypatch.setattr(pc.os, "link", unsupported_link)
     result = pc.package_run(run_dir, certification_status="VERIFIED")
 
     zip_path = Path(result["path"])
@@ -55,6 +69,7 @@ def test_package_run_creates_verified_zip_and_sidecar(tmp_path: Path) -> None:
     assert result["status"] == "VERIFIED"
     assert result["member_count"] == 6
     assert result["reused_existing"] is False
+    assert result["publication_method"] == "exclusive_copy"
     assert result["sha256"] == _sha(zip_path)
     assert sidecar.read_text(encoding="utf-8") == f"{_sha(zip_path)}  {zip_path.name}\n"
     with zipfile.ZipFile(zip_path) as archive:
@@ -86,6 +101,7 @@ def test_package_zip_is_reused_without_overwrite_for_unchanged_evidence(tmp_path
     assert second["sha256"] == first["sha256"]
     assert first["reused_existing"] is False
     assert second["reused_existing"] is True
+    assert second["publication_method"] == "reused_existing"
 
 
 def test_existing_different_zip_is_rejected_without_overwrite(tmp_path: Path) -> None:
@@ -115,22 +131,39 @@ def test_existing_sidecar_mismatch_is_not_overwritten(tmp_path: Path) -> None:
     assert sidecar.read_text(encoding="utf-8") == "wrong sidecar\n"
 
 
-def test_verification_failure_does_not_publish_new_zip(
+def test_verification_failure_and_partial_copy_publish_nothing(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    run_dir = _make_run(tmp_path)
+    first_run = _make_run(tmp_path, name="hierarchicalforecast-runtime-test-preverify")
 
     def reject_zip(_zip_path, *, package_manifest):
         raise pc.PackageIntegrityError(f"rejected {package_manifest['run_id']}")
 
+    original_verify = pc._verify_zip
     monkeypatch.setattr(pc, "_verify_zip", reject_zip)
-
     with pytest.raises(pc.PackageIntegrityError, match="rejected"):
-        pc.package_run(run_dir, certification_status="VERIFIED")
+        pc.package_run(first_run, certification_status="VERIFIED")
+    assert not first_run.with_suffix(".zip").exists()
+    assert not Path(f"{first_run.with_suffix('.zip')}.sha256").exists()
 
-    assert not run_dir.with_suffix(".zip").exists()
-    assert not Path(f"{run_dir.with_suffix('.zip')}.sha256").exists()
+    monkeypatch.setattr(pc, "_verify_zip", original_verify)
+    second_run = _make_run(tmp_path, name="hierarchicalforecast-runtime-test-copy")
+    monkeypatch.setattr(
+        pc.os,
+        "link",
+        lambda *_args: (_ for _ in ()).throw(OSError(errno.EPERM, "unsupported")),
+    )
+
+    def fail_copy(source, destination):
+        destination.write(source.read(16))
+        raise OSError("simulated copy failure")
+
+    monkeypatch.setattr(pc, "_copy_stream", fail_copy)
+    with pytest.raises(pc.PackageIntegrityError, match="cannot publish immutable ZIP by copy"):
+        pc.package_run(second_run, certification_status="VERIFIED")
+    assert not second_run.with_suffix(".zip").exists()
+    assert not Path(f"{second_run.with_suffix('.zip')}.sha256").exists()
 
 
 def test_corrupted_artifact_is_rejected_before_zip_creation(tmp_path: Path) -> None:
