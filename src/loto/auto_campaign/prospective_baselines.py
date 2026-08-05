@@ -30,6 +30,18 @@ def _reconcile_rows(values: np.ndarray, *, lower: int, upper: int) -> np.ndarray
     )
 
 
+def _fixed_center_vector(
+    position_count: int,
+    *,
+    lower: int,
+    upper: int,
+) -> np.ndarray:
+    """Return a history-independent fixed sequence across the allowed domain."""
+
+    anchors = np.linspace(lower, upper, position_count + 2, dtype=float)[1:-1]
+    return nearest_unique_sorted(anchors, lower=lower, upper=upper)
+
+
 def _frequency_vector(history: np.ndarray, *, lower: int, upper: int) -> np.ndarray:
     flattened = np.asarray(history, dtype=int).reshape(-1)
     counts = {value: 0 for value in range(lower, upper + 1)}
@@ -68,10 +80,11 @@ def generate_prospective_baselines(
     upper: int = 31,
     random_seed: int = 1,
 ) -> tuple[dict[str, np.ndarray], dict[str, Any]]:
-    """Generate baselines using history only.
+    """Generate baselines using prediction-time history only.
 
     Every returned matrix has shape ``(horizon, n_positions)``. Actual values are
     intentionally absent from the API so baseline fitting cannot consume them.
+    The ``fixed_center`` baseline is independent of both history and actuals.
     """
 
     matrix = np.asarray(history, dtype=float)
@@ -98,7 +111,11 @@ def generate_prospective_baselines(
         ]
     )
 
-    fixed_center = (matrix.min(axis=0) + matrix.max(axis=0)) / 2.0
+    fixed_center = _fixed_center_vector(
+        matrix.shape[1],
+        lower=lower,
+        upper=upper,
+    )
     mean = matrix.mean(axis=0)
     median = np.median(matrix, axis=0)
     last = matrix[-1]
@@ -137,6 +154,11 @@ def generate_prospective_baselines(
         "lower": lower,
         "upper": upper,
         "random_seed": random_seed,
+        "fixed_value_definition": (
+            "history-independent evenly spaced domain centers reconciled to "
+            "strictly increasing integers"
+        ),
+        "fixed_value_vector": fixed_center.tolist(),
         "statistical_model": "per-position AR(1) with intercept fitted by least squares",
         "statistical_fallback": "last value when AR(1) is underidentified or non-finite",
         "statistical_fallback_positions": fallback_positions,
