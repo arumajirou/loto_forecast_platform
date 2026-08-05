@@ -1,0 +1,34 @@
+schema_version: 1
+run_id: darts-p5-local-statistical
+runtime: notorch
+device: cpu
+series_layout: position_local
+horizon: 1
+seed: 1
+models:
+  - NaiveMean
+  - NaiveSeasonal
+  - NaiveDrift
+  - NaiveMovingAverage
+  - ARIMA
+  - AutoARIMA
+  - ExponentialSmoothing
+  - Theta
+  - Croston
+model_args:
+  NaiveMean: {}
+  NaiveSeasonal: {}
+  NaiveDrift: {}
+  NaiveMovingAverage: {}
+  ARIMA: {}
+  AutoARIMA: {}
+  ExponentialSmoothing: {}
+  Theta: {}
+  Croston: {}
+validation:
+  retain_missing_dependencies: true
+  reject_unknown_arguments: true
+  require_finite_predictions: true
+  require_shape_match: true
+  compare_on_identical_oof_folds: true
+  primary_metric: hit_at_1
