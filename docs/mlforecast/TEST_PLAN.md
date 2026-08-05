@@ -43,3 +43,16 @@ Using the verified wheel:
 - Hit@±1 primary plus MAE, MSE, RMSE, position-wise, and all-position metrics;
 - prediction sealing before actual disclosure;
 - no best-seed-only promotion.
+
+## Installed runtime certification gate
+
+1. Download `mlforecast-1.1.0-py3-none-any.whl` from official PyPI.
+2. Verify SHA-256 equals
+   `0043190f540510979c7709bb69267caa9ac325a11fa49298cf3425307200e748`.
+3. Verify wheel `METADATA` has `Name: mlforecast` and `Version: 1.1.0`.
+4. Verify the installed distribution reports version 1.1.0.
+5. Fit/predict/save/load Core Ridge and require finite two-series output.
+6. Run seeded AutoRidge with two Optuna trials and at least one complete trial.
+7. Require predictions before and after load to match at `rtol=atol=1e-8`.
+8. Persist process/CPU/thread information, predictions, trials, manifest, and sums.
+9. Treat skipped, partial, missing-wheel, version-mismatch, or non-finite results as failure.

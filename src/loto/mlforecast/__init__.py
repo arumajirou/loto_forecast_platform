@@ -1,3 +1,4 @@
+from loto.mlforecast.certify import CertificationResult, run_certification
 from loto.mlforecast.contracts import (
     AUTO_MODEL_NAMES,
     CORE_MODEL_NAMES,
@@ -21,11 +22,13 @@ __all__ = [
     "MLFORECAST_UPSTREAM_COMMIT",
     "MLFORECAST_UPSTREAM_TAG",
     "MLFORECAST_WHEEL_SHA256",
+    "CertificationResult",
     "AutoConfig",
     "CoreConfig",
     "MLForecastRunConfig",
     "RunMode",
     "RunResult",
     "run",
+    "run_certification",
     "run_from_paths",
 ]

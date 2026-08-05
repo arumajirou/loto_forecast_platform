@@ -7,6 +7,7 @@ import pytest
 from loto.mlforecast.provenance import (
     MLFORECAST_REQUIRED_VERSION,
     MLFORECAST_UPSTREAM_COMMIT,
+    MLFORECAST_WHEEL_SHA256,
     verify_mlforecast_runtime,
 )
 
@@ -16,6 +17,7 @@ def test_runtime_version_exact_match(monkeypatch) -> None:
     result = verify_mlforecast_runtime()
     assert result["installed_version"] == MLFORECAST_REQUIRED_VERSION
     assert result["upstream_commit"] == MLFORECAST_UPSTREAM_COMMIT
+    assert result["wheel_sha256"] == MLFORECAST_WHEEL_SHA256
 
 
 def test_runtime_version_mismatch_fails_closed(monkeypatch) -> None:

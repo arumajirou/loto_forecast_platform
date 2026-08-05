@@ -1,6 +1,6 @@
 # MLForecast / AutoMLForecast integration
 
-**Status:** `IMPLEMENTED / LOCAL_CONTRACT_VERIFIED / REAL_RUNTIME_PENDING`
+**Status:** `PYPI_DIGEST_VERIFIED / LOCAL_CONTRACT_VERIFIED / INSTALLED_RUNTIME_PENDING`
 
 This subsystem adds a dedicated, leakage-safe MLForecast path. It is independent of PR #43 and changes only `src/loto/mlforecast`, `tests/mlforecast`, `configs/mlforecast`, and `docs/mlforecast`.
 
@@ -12,7 +12,7 @@ This subsystem adds a dedicated, leakage-safe MLForecast path. It is independent
 | required version | `1.1.0` |
 | tag | `v1.1.0` |
 | commit | `a1609efddf8cf1a83510a50cd5487b66f32271c6` |
-| wheel SHA-256 | `PENDING_DOWNLOAD_VERIFICATION` |
+| wheel SHA-256 | `0043190f540510979c7709bb69267caa9ac325a11fa49298cf3425307200e748` |
 
 Version `1.1.0` is the verified target. The runtime checks the installed distribution version and fails closed on any other version.
 
@@ -120,3 +120,40 @@ This implementation does not claim real-data accuracy improvement, Holdout super
 - https://github.com/Nixtla/mlforecast/tree/v1.1.0
 - https://nixtlaverse.nixtla.io/mlforecast/forecast.html
 - https://nixtlaverse.nixtla.io/mlforecast/auto.html
+
+## Formal runtime certification
+
+The certification command verifies the exact official wheel bytes, embedded
+`METADATA`, installed version, Core Ridge and AutoRidge fit/predict lifecycles,
+save/load prediction equality, finite outputs, Optuna trials, process/CPU
+metadata, and artifact SHA-256 values.
+
+Download the exact frozen wheel without changing the project lock file:
+
+```bash
+mkdir -p artifacts/mlforecast-wheel
+uv run --with pip python -m pip download \
+  --no-deps \
+  --only-binary=:all: \
+  --dest artifacts/mlforecast-wheel \
+  mlforecast==1.1.0
+```
+
+Run the certification in an environment where MLForecast 1.1.0 and its runtime
+dependencies are installed:
+
+```bash
+OMP_NUM_THREADS=1 \
+MKL_NUM_THREADS=1 \
+OPENBLAS_NUM_THREADS=1 \
+NUMEXPR_NUM_THREADS=1 \
+uv run --no-sync python -m loto.mlforecast.certify \
+  --wheel artifacts/mlforecast-wheel/mlforecast-1.1.0-py3-none-any.whl \
+  --output-root artifacts/mlforecast-runtime-certification \
+  --seed 1 \
+  --auto-trials 2
+```
+
+Formal success requires the printed status to be `RUNTIME_CERTIFIED`. The run
+directory contains `RUNTIME_CERTIFICATION.json`, prediction CSVs, Optuna trial
+records, saved model bundles, `ARTIFACT_MANIFEST.json`, and `SHA256SUMS`.
