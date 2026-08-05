@@ -105,7 +105,8 @@ def verify_sha256sums(directory: Path, *, recursive: bool = False) -> list[dict[
     actual_files = {
         path.relative_to(directory).as_posix()
         for path in directory.glob(pattern)
-        if path.is_file() and path.name != "SHA256SUMS"
+        if path.is_file()
+        and path.relative_to(directory).as_posix() != "SHA256SUMS"
     }
     if seen != actual_files:
         missing = sorted(actual_files - seen)
@@ -320,6 +321,14 @@ def finalize_p0_run(run_dir: Path) -> dict[str, Any]:
             "accuracy_improvement": "NOT_CLAIMED",
         },
     }
+    preexisting_files = sorted(
+        path
+        for path in run_dir.rglob("*")
+        if path.is_file()
+        and path.relative_to(run_dir).as_posix()
+        not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS", "VERIFICATION_REPORT.json"}
+    )
+    report["top_level_sha256_records"] = len(preexisting_files) + 2
     _write_json(run_dir / "VERIFICATION_REPORT.json", report)
 
     manifest_files = sorted(
@@ -345,5 +354,6 @@ def finalize_p0_run(run_dir: Path) -> dict[str, Any]:
     _write_json(run_dir / "ARTIFACT_MANIFEST.json", manifest)
     _write_recursive_sha256sums(run_dir)
     top_level_records = verify_sha256sums(run_dir, recursive=True)
-    report["top_level_sha256_records"] = len(top_level_records)
+    if len(top_level_records) != report["top_level_sha256_records"]:
+        raise VerificationError("top-level SHA256SUMS record count mismatch")
     return report
