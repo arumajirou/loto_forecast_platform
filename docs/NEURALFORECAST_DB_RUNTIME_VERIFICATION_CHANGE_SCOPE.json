@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0.0",
+  "status": "RUNTIME_VERIFIER_IMPLEMENTED_REAL_EXECUTION_PENDING",
+  "base_branch": "agent/neuralforecast-db-search-space-artifact-persistence",
+  "base_pr": 88,
+  "scope": {
+    "included": [
+      "read-only completed database campaign verification",
+      "CPU and GPU verification modes",
+      "two-model smoke and 36-model full count contracts",
+      "campaign and model report consistency checks",
+      "runtime save-load-inference verification",
+      "shape and unique key identity verification",
+      "finite prediction and state verification",
+      "deterministic and stochastic artifact verification",
+      "formal GPU training-worker evidence checks",
+      "CUDA device, VRAM and GPU PID checks",
+      "CPU fallback rejection when GPU is required",
+      "four-file search-space artifact verification",
+      "critical artifact manifest and SHA256SUMS",
+      "verifier-host environment snapshot",
+      "reproducible Numbers4 CPU smoke, GPU smoke and GPU full wrapper",
+      "focused synthetic runtime-verification tests"
+    ],
+    "excluded": [
+      "claim of real NeuralForecast 3.2.0 smoke success",
+      "claim of RTX 5070 Ti certification",
+      "real all-36 AutoModel execution in the connector environment",
+      "automatic sampler switching",
+      "ASHA or other scheduler activation",
+      "accuracy-improvement claims",
+      "Holdout or Prospective model selection",
+      "raw-data modification",
+      "prediction-lock modification",
+      "merge or release"
+    ]
+  },
+  "safety": {
+    "direct_main_write": false,
+    "force_push": false,
+    "auto_merge": false,
+    "raw_data_changed": false,
+    "prediction_lock_changed": false
+  }
+}
