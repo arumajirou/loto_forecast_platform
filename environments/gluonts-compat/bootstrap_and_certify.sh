@@ -83,6 +83,13 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def label(path: Path) -> str:
+    try:
+        return str(path.relative_to(root))
+    except ValueError:
+        return str(path)
+
+
 def version(name: str) -> str | None:
     try:
         return importlib.metadata.version(name)
@@ -124,7 +131,7 @@ manifest = {
         "lightning": version("lightning"),
         "pytorch_lightning": version("pytorch-lightning"),
     },
-    "sha256": {str(path.relative_to(root)): sha256(path) for path in files},
+    "sha256": {label(path): sha256(path) for path in files},
 }
 (out / "environment_provenance.json").write_text(
     json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
