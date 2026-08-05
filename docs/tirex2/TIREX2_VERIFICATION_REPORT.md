@@ -6,7 +6,7 @@
 
 ## Executed in the authoring environment
 
-- focused pytest: `37 passed`;
+- focused pytest: `38 passed`;
 - Python compileall over `src`, `scripts`, and `tests`: `PASS`;
 - configured 100-character scan over changed Python/docs/config/CSV files: `PASS`;
 - artifact inventory and SHA-256 regeneration: `PASS`.
