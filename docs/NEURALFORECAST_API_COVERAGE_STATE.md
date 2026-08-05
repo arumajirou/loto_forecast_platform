@@ -13,7 +13,7 @@ always written as `EXECUTION_PENDING`.
 
 ## Integrated execution
 
-The standard API coverage stage now executes the state resolver automatically:
+The standard API coverage stage executes the state resolver automatically:
 
 ```bash
 uv run loto-auto-campaign \
@@ -45,13 +45,52 @@ gpu_runtime_status
 coverage_state
 ```
 
-A resolver failure does not delete completed API case results. It writes
-`coverage_state_failure.json`, changes the root status to `PARTIAL`, records
-`verification_status=FAILED`, regenerates `SHA256SUMS`, and causes the existing CLI
-non-PASS exit contract to return exit code 2.
+A resolver failure does not delete completed API case results. It removes any partial
+`coverage-state` directory, writes `coverage_state_failure.json`, changes the root status
+to `PARTIAL`, records `verification_status=FAILED`, regenerates `SHA256SUMS`, and causes
+the existing CLI non-PASS exit contract to return exit code 2.
 
 A successful `--resume` execution replaces the prior `coverage-state` directory and
 removes stale `coverage_state_failure.json` evidence.
+
+## Integrated verification
+
+The existing verify command now applies the legacy campaign checks first and then the
+coverage-state contract:
+
+```bash
+uv run loto-auto-campaign \
+  --config configs/auto_campaign/campaign.yaml \
+  verify \
+  --run artifacts/<run>
+```
+
+For non-API campaign runs, coverage verification returns `NOT_APPLICABLE` and preserves
+the previous verification behavior. For an integrated API coverage run, verification is
+fail-closed and checks:
+
+- required root API coverage artifacts;
+- root `SHA256SUMS` through the legacy verifier;
+- safe, run-relative `coverage_state_path` without `..` or absolute paths;
+- root, embedded, and nested manifest state/schema equality;
+- nested `coverage-state/SHA256SUMS` completeness and file digests;
+- exactly 36 unique constructor matrix model names;
+- constructor status-count totals;
+- non-empty resolved argument evidence;
+- resolved argument counts and verification-state totals;
+- API result Parquet readability and row-count agreement;
+- absence of stale failure evidence after success;
+- absence of partial `coverage-state` output after failure;
+- structured resolver failure phase, exception, traceback, and GPU boundary;
+- `gpu_runtime_status=EXECUTION_PENDING` while target-host runtime evidence is absent.
+
+The result is embedded in `VERIFICATION_REPORT.json` as
+`coverage_state_verification`. The root `SHA256SUMS` is regenerated after the final
+report is written.
+
+An internally consistent resolver failure can pass the artifact-consistency sub-check,
+but the complete run remains `FAIL` because its root manifest status is `PARTIAL` and
+its coverage state is `FAILED`.
 
 ## State model
 
@@ -114,6 +153,7 @@ API_ARGUMENT_COVERAGE_RESULT.csv
 API_ARGUMENT_COVERAGE_RESULT.parquet
 failures.json
 manifest.json
+VERIFICATION_REPORT.json  # after verify
 SHA256SUMS
 coverage_state_failure.json  # only on resolver failure
 ```
@@ -140,13 +180,20 @@ types.
 
 The command fails or records `FAILED` when any of these occur:
 
-- the API result Parquet is missing;
+- the API result Parquet is missing, unreadable, or empty;
 - discovered AutoModel count differs from 36;
+- constructor model names are empty or duplicated;
 - a registered constructor lacks `h` or `config`;
 - a supported backend default-config probe raises;
 - an API result is malformed;
 - duplicate `case_id` values are present;
-- an API case has `FAILED` or an unknown status.
+- an API case has `FAILED` or an unknown status;
+- a required root or nested artifact is missing;
+- a root or nested manifest disagrees with embedded evidence;
+- a nested SHA-256 digest is invalid or incomplete;
+- an evidence JSON object or list is empty;
+- an artifact path escapes the run directory;
+- GPU status is promoted without target-host runtime evidence.
 
 ## Certification boundary
 
