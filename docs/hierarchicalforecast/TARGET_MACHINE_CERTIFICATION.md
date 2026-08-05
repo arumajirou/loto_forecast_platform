@@ -2,17 +2,18 @@
 
 ## Status
 
-`IMPLEMENTED / ISOLATED_TESTS_PASS / REAL_1.5.1_EXECUTION_PENDING`
+`HARDENED_OPERATOR_IMPLEMENTED / ISOLATED_15_TESTS_PASS / REAL_1.5.1_EXECUTION_PENDING`
 
-This procedure provisions the locked project environment, executes the formal
-HierarchicalForecast runtime certifier, and independently re-verifies the resulting runtime
-artifacts and immutable ZIP.
+This procedure provisions the reviewed locked environment, executes the formal
+HierarchicalForecast runtime certifier, and independently verifies every promoted runtime and
+package claim. It uses the Python standard library before the project environment is assumed to be
+usable.
 
-It does not replace repository-wide Ruff, mypy, pytest, or GitHub Actions evidence.
+It does not replace Ruff, mypy, repository-wide pytest, or GitHub Actions evidence.
 
 ## Formal command
 
-From a clean checkout of the PR branch:
+Run from a clean checkout of the PR branch:
 
 ```bash
 cd /mnt/e/env/ts/loto_forecast_platform-pr48
@@ -24,56 +25,148 @@ python3 scripts/run_hierarchicalforecast_target_certification.py \
   --expected-git-sha "${EXPECTED_HEAD}"
 ```
 
-The script intentionally runs before the project environment is assumed to be usable. It uses only
-the Python standard library for orchestration and evidence verification.
+`--expected-git-sha` is mandatory. The production CLI does not expose a sync-bypass option.
 
-## Locked environment policy
+## Module layout
 
-The runner executes:
+```text
+scripts/run_hierarchicalforecast_target_certification.py
+scripts/hierarchicalforecast_target/
+├── constants.py
+├── integrity.py
+├── runtime_verification.py
+├── package_verification.py
+└── operator.py
+```
+
+Responsibilities are separated so filesystem integrity, forty-case verification, ZIP
+verification, and process orchestration can be reviewed and tested independently.
+
+## Locked execution policy
+
+The operator executes:
 
 ```text
 uv sync --extra full --locked
-uv run --locked python -c <installed-version check>
+uv run --locked python -c <installed-version probe>
 uv run --locked loto-hierarchicalforecast-certify ...
 ```
 
-`--locked` prevents the operator command from silently updating `uv.lock`. A stale or incompatible
-lock fails the run rather than changing the reviewed dependency resolution.
+`--locked` prevents silent `uv.lock` changes. A stale lock, dependency conflict, or unavailable
+package fails rather than changing the reviewed resolution.
 
-Formal execution also requires a clean Git worktree. Untracked or modified files outside ignored
-runtime directories produce `FAILED_PREFLIGHT`.
+The formal CLI cannot skip synchronization. The internal `skip_sync` path exists only for isolated
+tests and requires `test_mode=True`.
 
-## Independent checks
+## Git and source integrity
 
-The operator runner does not accept the console command's summary alone. It independently checks:
+Formal success requires:
 
-1. the checked-out Git commit and optional expected head SHA;
-2. installed `hierarchicalforecast` version exactly `1.5.1`;
-3. certification command exit code zero;
-4. overall status `VERIFIED` and `formal_success=true`;
-5. summary counts `expected=40`, `executed=40`, `passed=40`, `failed=0`;
-6. exact-version and module/distribution consistency flags;
-7. persisted runtime certification equals the CLI certification object;
-8. `SHA256SUMS` coverage and every runtime artifact digest;
-9. runtime artifact-manifest file coverage, byte counts, and SHA-256 values;
-10. all 40 unique game/method rows in `METHOD_RESULTS.json`;
-11. 24 executable cases with `actual_execution=true`;
-12. 16 grouped-hierarchy rejections with `actual_execution=false`;
-13. all per-case checks true and expected/observed statuses equal;
-14. all four games present in `INPUT_EVIDENCE.json`;
-15. ZIP path and sidecar relationship;
-16. ZIP sidecar digest against the final archive bytes;
-17. exact ZIP member coverage and no duplicates or traversal;
-18. fixed ZIP timestamp, Unix file mode, creator system, and `ZIP_STORED` method;
-19. canonical `PACKAGE_MANIFEST.json` bytes;
-20. every archived member's byte count and SHA-256;
-21. package content-set SHA-256 and CLI package evidence.
+1. clean worktree before synchronization;
+2. checked-out commit equal to `--expected-git-sha`;
+3. unchanged commit and clean worktree after runtime and package verification;
+4. runtime-recorded SHA-256 for:
+   - `src/loto/reconciliation/runtime_certification.py`;
+   - `src/loto/reconciliation/hierarchy.py`;
+5. recomputed source hashes equal the recorded hashes;
+6. recomputed code-set SHA-256 equal the runtime record.
 
-Any mismatch fails closed and is not promoted to formal success.
+A postflight change produces `FAILED_POSTFLIGHT_GIT_DRIFT` and cannot be promoted.
+
+## Filesystem and path policy
+
+The operator rejects:
+
+- a symbolic-link repository root;
+- symbolic-link output roots;
+- symbolic-link path components inside runtime, ZIP, or sidecar paths;
+- symbolic-link runtime artifacts;
+- symbolic-link operator artifacts;
+- paths escaping the configured evidence root;
+- unsafe checksum names, parent traversal, backslashes, and duplicate checksum entries;
+- unexpected runtime-directory files;
+- non-regular required files.
+
+Existing runtime evidence remains owned by the certifier's immutable Run ID policy. The operator
+creates a separate Run ID and never treats a mismatched package or sidecar as success.
+
+## Independent runtime checks
+
+The operator does not trust the console summary alone. It independently verifies:
+
+1. certification status `VERIFIED` and `formal_success=true`;
+2. formal configuration:
+   - games `mini`, `loto6`, `loto7`, `bingo5`;
+   - seed `1`;
+   - horizon `4`;
+   - in-sample size `32`;
+   - tolerance `1e-8`;
+   - expected version `1.5.1`;
+3. summary `expected=40`, `executed=40`, `passed=40`, `failed=0`;
+4. dependency import PASS, distribution version `1.5.1`, and version consistency;
+5. CPU-only device evidence and package version evidence;
+6. exact runtime directory file coverage;
+7. runtime `SHA256SUMS` coverage and every digest;
+8. runtime artifact-manifest row count, uniqueness, coverage, byte counts, and hashes;
+9. persisted certification equality with CLI output.
+
+## Independent forty-case checks
+
+The formal matrix must contain exactly one row for every game/method pair:
+
+```text
+4 games × 10 methods = 40 rows
+```
+
+For the 24 executable rows, the operator independently verifies:
+
+- method identity;
+- `actual_execution=true`;
+- upstream version `1.5.1`;
+- finite output evidence;
+- exact output shape;
+- finite non-negative coherence error no greater than `1e-8`;
+- recorded tolerance exactly `1e-8`;
+- bottom and reconciled array evidence:
+  - expected shape;
+  - `float64-le`;
+  - finite values;
+  - valid SHA-256.
+
+For the 16 strict-tree rejections, it verifies:
+
+- expected method identity;
+- `UNSUPPORTED_HIERARCHY`;
+- `actual_execution=false`;
+- `hierarchy_is_strict=false`;
+- non-empty rejection evidence.
+
+It also checks that hierarchy dimensions are stable within each game and that input evidence covers
+all four games with exact base, in-sample, and summing-matrix shapes.
+
+## Independent ZIP checks
+
+The operator verifies:
+
+- ZIP and sidecar are regular files, not symlinks;
+- exact path relationship to the runtime Run ID;
+- sidecar SHA-256 equals final ZIP bytes;
+- exact member coverage;
+- no duplicate, traversal, encrypted, directory, or off-prefix member;
+- fixed timestamp `(1980, 1, 1, 0, 0, 0)`;
+- Unix regular-file mode `0644`;
+- creator system `3`;
+- compression method `ZIP_STORED`;
+- CRC validation;
+- canonical `PACKAGE_MANIFEST.json` bytes;
+- exact manifest row count and uniqueness;
+- every archived byte count and SHA-256;
+- package content-set SHA-256;
+- equality with CLI package evidence.
 
 ## Operator evidence
 
-Every invocation writes a separate operator run directory:
+Every attempt writes a separate operator evidence directory:
 
 ```text
 artifacts/hierarchicalforecast-target-runs/<operator-run-id>/
@@ -89,117 +182,68 @@ artifacts/hierarchicalforecast-target-runs/<operator-run-id>/
 └── SHA256SUMS
 ```
 
-When execution stops before a command, only the evidence available up to that phase is included.
-The operator directory is still created and receives a structured failure report when filesystem
-publication remains possible.
-
-The existing runtime certifier separately creates:
-
-```text
-artifacts/hierarchicalforecast-runtime/<run-id>/
-artifacts/hierarchicalforecast-runtime/<run-id>.zip
-artifacts/hierarchicalforecast-runtime/<run-id>.zip.sha256
-```
-
-Operator evidence and runtime evidence have separate Run IDs and checksum roots.
+Failure attempts retain available logs and a structured status. Runtime evidence remains under its
+own Run ID in `artifacts/hierarchicalforecast-runtime/`.
 
 ## Exit policy
 
 | Exit | Meaning |
 |---:|---|
-| `0` | target-machine runner and formal runtime/package verification passed |
-| `2` | dependency, exact-version, or formal runtime certification did not pass |
-| `3` | preflight, locked sync, command-output, or independent integrity verification failed |
+| 0 | locked provisioning, real runtime, postflight Git, and independent integrity checks passed |
+| 2 | exact dependency version or formal runtime certification did not pass |
+| 3 | preflight, sync, parsing, postflight Git, filesystem, source, runtime, or ZIP verification failed |
 
-Use `OPERATOR_REPORT.json` as the primary operator verdict. Do not infer success only from the
-presence of a ZIP.
+Representative operator statuses include:
 
-## Expected success report
+- `VERIFIED`
+- `FAILED_PREFLIGHT`
+- `FAILED_SYNC`
+- `FAILED_VERSION_MISMATCH`
+- `FAILED_VERSION_PROBE`
+- `FAILED_CERTIFICATION_OUTPUT`
+- `FAILED_OPERATOR_VERIFICATION`
+- `FAILED_POSTFLIGHT_GIT_DRIFT`
+- `FAILED_OPERATOR_BOOTSTRAP`
 
-A formal success contains at least:
+## Isolated verification
 
-```text
-status = VERIFIED
-formal_success = true
-installed_version = 1.5.1
-summary.expected_cases = 40
-summary.executed_cases = 40
-summary.passed_cases = 40
-summary.failed_cases = 0
-method_partition.executed_cases = 24
-method_partition.rejected_cases = 16
-```
+The hardened target layer has 15 isolated tests:
 
-## Verification of operator evidence
+- nine runtime/package verification tests;
+- six operator-control tests.
 
-```bash
-OPERATOR_DIR="$(find artifacts/hierarchicalforecast-target-runs \
-  -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
-  | sort -n \
-  | tail -1 \
-  | cut -d' ' -f2-)"
+They cover complete success, bad summary counts, sidecar drift, missing execution evidence, shape
+drift, duplicate runtime-manifest rows, symbolic-link runtime artifacts, checksum traversal, source
+hash drift, version mismatch, dirty preflight, postflight Git drift, forbidden sync bypass, and
+missing expected Git SHA.
 
-(
-  cd "${OPERATOR_DIR}"
-  sha256sum -c SHA256SUMS
-)
-
-python3 - "${OPERATOR_DIR}/OPERATOR_REPORT.json" <<'PY'
-import json
-import sys
-from pathlib import Path
-
-report = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
-assert report["status"] == "VERIFIED", report
-assert report["formal_success"] is True, report
-PY
-```
-
-## Diagnostic options
-
-Skip environment synchronization only when the reviewed locked environment has already been
-provisioned:
-
-```bash
-python3 scripts/run_hierarchicalforecast_target_certification.py \
-  --expected-git-sha "$(git rev-parse HEAD)" \
-  --skip-sync
-```
-
-`--skip-sync` still uses `uv run --locked`, checks the exact installed version, and performs all
-runtime and package verification. It does not permit a dirty worktree.
-
-Alternative output roots may be supplied with:
+Current evidence:
 
 ```text
---output-root
---operator-root
+15 passed
+compileall PASS
+Python lines over 100 characters: 0
+wrapper --help PASS
+Ruff NOT_RUN
+real HierarchicalForecast 1.5.1 execution PENDING
 ```
 
-## Local isolated verification
+## Formal success boundary
 
-The target-machine runner test file covers:
+Do not mark PR #48 ready for review until the exact current clean head produces:
 
-- complete successful runtime and ZIP bundle;
-- incorrect 40-case count;
-- ZIP sidecar mismatch;
-- removed actual-execution evidence;
-- checksum path traversal;
-- successful operator orchestration and evidence publication;
-- exact-version mismatch with retained evidence;
-- dirty-worktree preflight failure.
+```text
+operator exit             = 0
+operator status           = VERIFIED
+runtime status            = VERIFIED
+expected/executed/passed  = 40/40/40
+failed                     = 0
+actual executions          = 24
+grouped rejections         = 16
+runtime SHA256SUMS         = PASS
+operator SHA256SUMS        = PASS
+ZIP sidecar and structure  = PASS
+postflight Git             = unchanged and clean
+```
 
-Result: **8 passed**.
-
-Remote/local Git blob equality was verified for the runner and its tests before this document was
-published. Python compileall passed, and both files contain no lines longer than 100 characters.
-
-## Promotion boundary
-
-Passing this target-machine command resolves the real HierarchicalForecast 1.5.1 runtime gate only.
-PR #48 must remain Draft until issue #61 is also resolved with a GitHub Actions run that contains
-real checkout, install, Ruff, compileall, and pytest steps and passing required checks.
-
-Do not overwrite mismatched evidence, force-push the branch, mark the PR ready, or merge solely
-because the operator command created artifacts.
+The current isolated environment has not performed that real installed-package run.
