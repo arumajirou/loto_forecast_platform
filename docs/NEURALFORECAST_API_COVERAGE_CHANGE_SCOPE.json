@@ -1,8 +1,13 @@
 {
-  "schema_version": "change-scope-v1.2.0",
+  "schema_version": "change-scope-v1.2.1",
   "scope_id": "neuralforecast-api-coverage-state",
   "stacked_base_branch": "agent/p0-runtime-certification",
   "stacked_base_sha": "dde70b5372d16651004d3a2a39f45935745250c6",
+  "stacked_base_sha_at_branch_creation": "dde70b5372d16651004d3a2a39f45935745250c6",
+  "current_stacked_base_head_sha": "2326b70fe0b0b46fb91324240c6843eb3dd31b83",
+  "stacked_history_status": "BEHIND_1_NONOVERLAPPING_BASE_COMMIT",
+  "stacked_branch_behind_by": 1,
+  "base_change_overlap_with_expected_files": false,
   "dependency_pr": 43,
   "in_scope": [
     "static argument catalog and API result reconciliation",
@@ -33,6 +38,7 @@
   "execution_boundaries": {
     "cpu_ci": "REQUIRED",
     "local_gpu": "EXECUTION_PENDING",
+    "stacked_base_sync": "EXECUTION_PENDING",
     "merge": "USER_APPROVAL_REQUIRED"
   },
   "expected_changed_files": [
