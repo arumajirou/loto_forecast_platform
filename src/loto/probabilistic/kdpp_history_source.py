@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 
-from loto.probabilistic.kdpp_certification_gate import sha256_file, validate_sha256
+from loto.probabilistic.kdpp_certification_gate import sha256_file
 from loto.probabilistic.kdpp_history_contracts import (
     RAW_SOURCE_FILES,
     _GAME_SPECS,
