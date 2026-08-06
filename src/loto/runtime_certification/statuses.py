@@ -1,0 +1,54 @@
+"""Shared runtime-certification status vocabulary.
+
+Runtime success, evidence provenance, and forecasting accuracy are deliberately separate axes.
+"""
+
+from __future__ import annotations
+
+from enum import StrEnum
+
+
+class CertificationProfile(StrEnum):
+    CPU_SMOKE = "CPU_SMOKE"
+    GPU_FORMAL = "GPU_FORMAL"
+
+
+class EvidenceOrigin(StrEnum):
+    REAL = "REAL"
+    SYNTHETIC = "SYNTHETIC"
+    INJECTED_FAKE = "INJECTED_FAKE"
+
+
+class RuntimeStatus(StrEnum):
+    EXECUTION_PENDING = "EXECUTION_PENDING"
+    PARTIALLY_VERIFIED = "PARTIALLY_VERIFIED"
+    RUNTIME_CERTIFIED = "RUNTIME_CERTIFIED"
+    BLOCKED = "BLOCKED"
+    FAILED = "FAILED"
+
+
+class AccuracyStatus(StrEnum):
+    NOT_EVALUATED = "NOT_EVALUATED"
+    EVALUATION_PENDING = "EVALUATION_PENDING"
+    EVALUATED_NO_GAIN = "EVALUATED_NO_GAIN"
+    EVALUATED_GAIN = "EVALUATED_GAIN"
+
+
+class FailurePhase(StrEnum):
+    REQUEST_IDENTITY = "REQUEST_IDENTITY"
+    PACKAGE_IDENTITY = "PACKAGE_IDENTITY"
+    MODEL_IDENTITY = "MODEL_IDENTITY"
+    SNAPSHOT_CONTAINMENT = "SNAPSHOT_CONTAINMENT"
+    ARTIFACT_HASH = "ARTIFACT_HASH"
+    SUBPROCESS_START = "SUBPROCESS_START"
+    SUBPROCESS_TIMEOUT = "SUBPROCESS_TIMEOUT"
+    PROCESS_EXIT = "PROCESS_EXIT"
+    LOAD = "LOAD"
+    INPUT_VALIDATION = "INPUT_VALIDATION"
+    INFERENCE = "INFERENCE"
+    OUTPUT_VALIDATION = "OUTPUT_VALIDATION"
+    DEVICE_EVIDENCE = "DEVICE_EVIDENCE"
+    SAVE_RELOAD = "SAVE_RELOAD"
+    REPLAY = "REPLAY"
+    ARTIFACT_SEAL = "ARTIFACT_SEAL"
+    EVIDENCE_ZIP = "EVIDENCE_ZIP"
