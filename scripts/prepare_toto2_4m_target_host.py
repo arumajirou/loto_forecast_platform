@@ -16,6 +16,9 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from loto.toto2_campaign.certification_bundle import sha256_file  # noqa: E402
+from loto.toto2_campaign.history_handoff import (  # noqa: E402
+    materialize_approved_histories,
+)
 from loto.toto2_campaign.model_manifest import (  # noqa: E402
     ARTIFACT_SHA256,
     ARTIFACT_SIZE_BYTES,
@@ -169,8 +172,15 @@ def prepare(args: argparse.Namespace) -> dict[str, Any]:
     runtime = _verify_isolated_runtime(args.isolated_python)
     gpu_inventory = _query_gpu_inventory()
 
+    approved_history_root = args.output_root / "approved-history"
+    history_handoff = materialize_approved_histories(
+        args.history_export_root,
+        args.history_verification,
+        args.history_approval,
+        approved_history_root,
+    )
     histories = {
-        game: load_history_export(args.history_root / f"{game}.json")
+        game: load_history_export(approved_history_root / f"{game}.json")
         for game in FORMAL_GAMES
     }
     requests_root = args.output_root / "requests"
@@ -207,6 +217,16 @@ def prepare(args: argparse.Namespace) -> dict[str, Any]:
             (requests_root / "REQUEST_MANIFEST.json").resolve()
         ),
         "request_count": request_manifest["request_count"],
+        "history_handoff_path": str(
+            (approved_history_root / "HISTORY_HANDOFF.json").resolve()
+        ),
+        "history_approval_sha256": history_handoff["approval_sha256"],
+        "history_verification_sha256": history_handoff["verification_sha256"],
+        "history_export_manifest_sha256": history_handoff[
+            "export_manifest_sha256"
+        ],
+        "history_reviewer": history_handoff["reviewer"],
+        "history_reviewed_at": history_handoff["reviewed_at"],
         "lock_review_path": str(lock_review_path.resolve()),
         "matrix_execution_started": False,
     }
@@ -218,7 +238,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Prepare Toto 2.0 4M target-host certification inputs"
     )
-    parser.add_argument("--history-root", type=Path, required=True)
+    parser.add_argument("--history-export-root", type=Path, required=True)
+    parser.add_argument("--history-verification", type=Path, required=True)
+    parser.add_argument("--history-approval", type=Path, required=True)
     parser.add_argument("--snapshot", type=Path, required=True)
     parser.add_argument("--isolated-python", type=Path, required=True)
     parser.add_argument("--expected-head", required=True)
