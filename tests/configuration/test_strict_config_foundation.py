@@ -92,8 +92,35 @@ def test_environment_override_provenance_and_secret_redaction() -> None:
     assert len(resolved.overrides) == 5
     assert all(record.source == "environment" for record in resolved.overrides)
     assert secret not in serialized
+    assert secret not in repr(resolved)
     assert REDACTED_VALUE in serialized
     assert secret not in resolved.config_sha256
+
+
+def test_exact_neuralforecast_mlflow_environment_key_is_supported() -> None:
+    resolved = resolve_payload(
+        _payload(),
+        environ={
+            "NEURALFORECAST_MLFLOW_TRACKING_URI": "https://mlflow.example.invalid",
+        },
+    )
+
+    assert resolved.config.observability.mlflow.tracking_uri == (
+        "https://mlflow.example.invalid"
+    )
+    assert resolved.overrides[0].env_var == "NEURALFORECAST_MLFLOW_TRACKING_URI"
+    assert resolved.overrides[0].target == "observability.mlflow.tracking_uri"
+
+
+def test_duplicate_environment_targets_are_rejected() -> None:
+    with pytest.raises(ValueError, match="multiple environment variables target"):
+        resolve_payload(
+            _payload(),
+            environ={
+                "LOTO_CONFIG_MLFLOW_TRACKING_URI": "https://one.example.invalid",
+                "NEURALFORECAST_MLFLOW_TRACKING_URI": "https://two.example.invalid",
+            },
+        )
 
 
 def test_override_provenance_is_bound_to_resolved_config_hash() -> None:
