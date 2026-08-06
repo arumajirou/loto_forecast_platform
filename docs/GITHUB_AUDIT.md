@@ -20,7 +20,7 @@ JSON・CSV・Markdown・HTML・SHA-256・ZIPとして固定する運用監査機
 変更ファイル・check・workflow、指定件数のActions jobを追加取得します。
 
 GitHubへ書き込みません。権限不足や機能未設定は、空配列として成功扱いせず、
-`BLOCKED`、`NOT_AVAILABLE`、`RATE_LIMITED`、`FAILED`として記録します。
+`BLOCKED`、`NOT_APPLICABLE`、`NOT_AVAILABLE`、`RATE_LIMITED`、`FAILED`として記録します。
 
 Secret値、Actions Variable値、Webhook callback URL、Deploy key materialは出力しません。
 

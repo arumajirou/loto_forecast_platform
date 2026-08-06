@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -125,9 +126,7 @@ def test_finalize_report_writes_verified_archive(tmp_path: Path) -> None:
     assert (run_dir / "SHA256SUMS").is_file()
     assert Path(summary["zip"]).is_file()
     assert len(summary["zip_sha256"]) == 64
-    stored_summary = json.loads(
-        (run_dir / "SUMMARY.json").read_text(encoding="utf-8")
-    )
+    stored_summary = json.loads((run_dir / "SUMMARY.json").read_text(encoding="utf-8"))
     assert stored_summary["zip"] == summary["zip"]
     assert stored_summary["exit_code"] == 0
 
@@ -159,3 +158,162 @@ def test_non_core_gap_is_not_reported_as_fully_verified(tmp_path: Path) -> None:
     assert summary["exit_code"] == 0
     report = (run_dir / "REPORT.md").read_text(encoding="utf-8")
     assert "| `secret_scanning_alerts_open` | `BLOCKED` | UNKNOWN |" in report
+
+
+def test_run_command_normalizes_timeout_bytes(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def raise_timeout(*args: object, **kwargs: object) -> None:
+        raise subprocess.TimeoutExpired(
+            cmd=["gh", "api", "repos/owner/repo"],
+            timeout=1,
+            output=b"partial output",
+        )
+
+    monkeypatch.setattr(subprocess, "run", raise_timeout)
+
+    client = GhClient(repo="owner/repo", run_dir=tmp_path / "timeout")
+    completed = client.run_command(
+        ["gh", "api", "repos/owner/repo"],
+        timeout=1,
+    )
+
+    assert completed.returncode == 124
+    assert completed.stdout == "partial output"
+    assert isinstance(completed.stderr, str)
+    assert "TIMEOUT" in completed.stderr
+
+
+def test_get_list_rejects_non_mapping_payload_for_item_key(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    client = GhClient(repo="owner/repo", run_dir=tmp_path / "payload")
+
+    completed = subprocess.CompletedProcess(
+        args=["gh", "api", "repos/owner/repo/items"],
+        returncode=0,
+        stdout='["unexpected-list"]',
+        stderr="",
+    )
+
+    monkeypatch.setattr(
+        client,
+        "run_command",
+        lambda *args, **kwargs: completed,
+    )
+
+    result = client.get_list(
+        "items",
+        "repos/owner/repo/items",
+        item_key="items",
+    )
+
+    assert result is None
+    assert client.records[-1].status == "FAILED"
+    assert client.records[-1].error is not None
+    assert "Expected object" in client.records[-1].error
+
+
+def test_actions_selected_configuration_is_not_requested(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    runner = AuditRunner(
+        AuditConfig(
+            repo="owner/repo",
+            output_root=tmp_path,
+        )
+    )
+    get_names: list[str] = []
+
+    def fake_get(
+        name: str,
+        endpoint: str,
+        **kwargs: object,
+    ) -> object:
+        get_names.append(name)
+        if name == "actions_permissions":
+            return {
+                "enabled": True,
+                "allowed_actions": "all",
+            }
+        return {}
+
+    def fake_get_list(
+        name: str,
+        endpoint: str,
+        **kwargs: object,
+    ) -> list[object]:
+        return []
+
+    monkeypatch.setattr(runner.client, "get", fake_get)
+    monkeypatch.setattr(runner.client, "get_list", fake_get_list)
+
+    runner._collect_actions()
+
+    assert "actions_selected_actions" not in get_names
+
+    record = next(item for item in runner.client.records if item.name == "actions_selected_actions")
+    assert record.status == "NOT_APPLICABLE"
+    assert record.ok is True
+    assert record.returncode == 0
+
+    raw_path = runner.run_dir / "raw" / "actions_selected_actions.json"
+    payload = json.loads(raw_path.read_text(encoding="utf-8"))
+
+    assert payload["_audit"]["status"] == "NOT_APPLICABLE"
+    assert payload["_audit"]["returncode"] == 0
+    assert payload["_audit"]["error"] is None
+    assert "allowed_actions='selected'" in payload["data"]["reason"]
+
+
+def test_actions_selected_configuration_is_requested_when_enabled(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    runner = AuditRunner(
+        AuditConfig(
+            repo="owner/repo",
+            output_root=tmp_path,
+        )
+    )
+    get_names: list[str] = []
+
+    def fake_get(
+        name: str,
+        endpoint: str,
+        **kwargs: object,
+    ) -> object:
+        get_names.append(name)
+        if name == "actions_permissions":
+            return {
+                "enabled": True,
+                "allowed_actions": "selected",
+            }
+        if name == "actions_selected_actions":
+            return {
+                "github_owned_allowed": True,
+                "verified_allowed": True,
+                "patterns_allowed": [],
+            }
+        return {}
+
+    def fake_get_list(
+        name: str,
+        endpoint: str,
+        **kwargs: object,
+    ) -> list[object]:
+        return []
+
+    monkeypatch.setattr(runner.client, "get", fake_get)
+    monkeypatch.setattr(runner.client, "get_list", fake_get_list)
+
+    runner._collect_actions()
+
+    assert "actions_selected_actions" in get_names
+    assert not any(
+        item.name == "actions_selected_actions" and item.status == "NOT_APPLICABLE"
+        for item in runner.client.records
+    )

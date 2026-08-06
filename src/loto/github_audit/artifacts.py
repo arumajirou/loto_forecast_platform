@@ -51,9 +51,7 @@ def package(run_dir: Path, summary: dict[str, Any]) -> str:
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(run_dir.rglob("*")):
             if path.is_file():
-                arcname = str(
-                    Path(run_dir.name) / path.relative_to(run_dir)
-                ).replace("\\", "/")
+                arcname = str(Path(run_dir.name) / path.relative_to(run_dir)).replace("\\", "/")
                 archive.write(path, arcname)
     with zipfile.ZipFile(zip_path) as archive:
         bad = archive.testzip()

@@ -235,15 +235,34 @@ class AuditRunner:
             max_items=self.config.max_action_runs,
         )
         self._core("workflow_runs", runs)
-        self.client.get("actions_permissions", f"repos/{repo}/actions/permissions")
+        actions_permissions = self.client.get(
+            "actions_permissions",
+            f"repos/{repo}/actions/permissions",
+        )
         self.client.get(
             "actions_workflow_permissions",
             f"repos/{repo}/actions/permissions/workflow",
         )
-        self.client.get(
-            "actions_selected_actions",
-            f"repos/{repo}/actions/permissions/selected-actions",
-        )
+
+        selected_actions_endpoint = f"repos/{repo}/actions/permissions/selected-actions"
+        if (
+            isinstance(actions_permissions, dict)
+            and actions_permissions.get("allowed_actions") != "selected"
+        ):
+            allowed_actions = actions_permissions.get("allowed_actions")
+            self.client.record_not_applicable(
+                "actions_selected_actions",
+                selected_actions_endpoint,
+                reason=(
+                    "selected-actions configuration applies only when "
+                    f"allowed_actions='selected'; actual={allowed_actions!r}"
+                ),
+            )
+        else:
+            self.client.get(
+                "actions_selected_actions",
+                selected_actions_endpoint,
+            )
         self.client.get_list(
             "actions_runners",
             f"repos/{repo}/actions/runners",

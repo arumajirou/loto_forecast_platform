@@ -160,9 +160,7 @@ class GhClient:
         self.datasets: dict[str, Any] = {}
         self.api_calls = 0
         self.env = os.environ.copy()
-        self.env.update(
-            {"GH_REPO": repo, "GH_PAGER": "cat", "PAGER": "cat", "NO_COLOR": "1"}
-        )
+        self.env.update({"GH_REPO": repo, "GH_PAGER": "cat", "PAGER": "cat", "NO_COLOR": "1"})
         self.raw_dir.mkdir(parents=True, exist_ok=True)
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -195,10 +193,17 @@ class GhClient:
                 stderr=f"COMMAND_NOT_FOUND: {exc}",
             )
         except subprocess.TimeoutExpired as exc:
-            completed = subprocess.CompletedProcess(
+            raw_stdout = exc.stdout
+            if isinstance(raw_stdout, bytes):
+                stdout_text = raw_stdout.decode(errors="replace")
+            elif isinstance(raw_stdout, str):
+                stdout_text = raw_stdout
+            else:
+                stdout_text = ""
+            completed = subprocess.CompletedProcess[str](
                 command,
                 124,
-                stdout=exc.stdout or "",
+                stdout=stdout_text,
                 stderr=f"TIMEOUT after {timeout or self.timeout}s: {exc}",
             )
         self.log(
@@ -228,8 +233,7 @@ class GhClient:
             raise RuntimeError("GitHub CLI `gh` was not found in PATH")
         if auth.returncode != 0:
             raise RuntimeError(
-                "gh authentication is unavailable; run "
-                "`gh auth login --hostname github.com`"
+                "gh authentication is unavailable; run `gh auth login --hostname github.com`"
             )
 
     def _command(self, endpoint: str, params: dict[str, Any] | None = None) -> list[str]:
@@ -279,6 +283,48 @@ class GhClient:
         )
         self.records.append(record)
         self.log("INFO" if ok else "WARNING", "endpoint_complete", **record.to_dict())
+
+    def record_not_applicable(
+        self,
+        name: str,
+        endpoint: str,
+        *,
+        reason: str,
+        raw_path: Path | None = None,
+    ) -> None:
+        """Record an endpoint that does not apply to the current configuration."""
+        path = raw_path or self.raw_dir / f"{safe_slug(name)}.json"
+        data = {"reason": reason}
+
+        write_json(
+            path,
+            {
+                "_audit": {
+                    "name": name,
+                    "endpoint": endpoint,
+                    "status": "NOT_APPLICABLE",
+                    "fetched_at": iso_now(),
+                    "duration_ms": 0,
+                    "returncode": 0,
+                    "error": None,
+                    "reason": reason,
+                },
+                "data": data,
+            },
+        )
+
+        self.datasets[name] = data
+        self._record(
+            name=name,
+            endpoint=endpoint,
+            status="NOT_APPLICABLE",
+            ok=True,
+            count=None,
+            duration_ms=0,
+            returncode=0,
+            error=None,
+            raw_path=path,
+        )
 
     def get(
         self,
@@ -381,7 +427,14 @@ class GhClient:
                 status = "FAILED"
                 error = f"Invalid JSON page {page}: {exc}"
                 break
-            page_items = payload if item_key is None else payload.get(item_key, [])
+            if item_key is None:
+                page_items = payload
+            elif isinstance(payload, dict):
+                page_items = payload.get(item_key, [])
+            else:
+                status = "FAILED"
+                error = f"Expected object for item_key={item_key!r}, page={page}"
+                break
             if not isinstance(page_items, list):
                 status = "FAILED"
                 error = f"Expected list at item_key={item_key!r}, page={page}"

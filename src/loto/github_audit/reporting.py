@@ -88,12 +88,9 @@ def _summary(
             "open": len(open_prs),
             "open_draft": sum(bool(x.get("draft")) for x in open_prs),
             "open_ready": sum(not bool(x.get("draft")) for x in open_prs),
-            "open_stacked": sum(
-                bool(x.get("stacked_on_non_default")) for x in open_prs
-            ),
+            "open_stacked": sum(bool(x.get("stacked_on_non_default")) for x in open_prs),
             "open_stale_30d": sum(
-                isinstance(x.get("age_since_update_days"), int)
-                and x["age_since_update_days"] >= 30
+                isinstance(x.get("age_since_update_days"), int) and x["age_since_update_days"] >= 30
                 for x in open_prs
             ),
             "merged": sum(bool(x.get("merged_at")) for x in prs),
@@ -102,24 +99,17 @@ def _summary(
             "workflow_count": len(tables["workflows"]),
             "run_count_exported": len(runs),
             "status_counts": dict(Counter(str(x.get("status")) for x in runs)),
-            "conclusion_counts": dict(
-                Counter(str(x.get("conclusion")) for x in runs)
-            ),
+            "conclusion_counts": dict(Counter(str(x.get("conclusion")) for x in runs)),
             "job_runs_inspected": len(jobs),
-            "zero_job_runs_inspected": sum(
-                bool(x.get("zero_jobs")) for x in jobs
-            ),
+            "zero_job_runs_inspected": sum(bool(x.get("zero_jobs")) for x in jobs),
         },
         "security": {
             "dependabot_open": _count(client, "dependabot_alerts_open"),
             "code_scanning_open": _count(client, "code_scanning_alerts_open"),
             "secret_scanning_open": _count(client, "secret_scanning_alerts_open"),
-            "sbom_status": client.status_for("dependency_graph_sbom")
-            or "NOT_REQUESTED",
+            "sbom_status": client.status_for("dependency_graph_sbom") or "NOT_REQUESTED",
         },
-        "endpoint_status_counts": dict(
-            Counter(x.status for x in client.records)
-        ),
+        "endpoint_status_counts": dict(Counter(x.status for x in client.records)),
     }
 
 
@@ -142,8 +132,7 @@ def _markdown(summary: dict[str, Any], client: GhClient) -> str:
         f"- Visibility: `{repo.get('visibility')}`",
         f"- Default branch: `{repo.get('default_branch')}`",
         f"- Default branch HEAD: `{summary['head'].get('sha') or 'UNKNOWN'}`",
-        f"- Combined commit status: "
-        f"`{summary['head'].get('combined_status') or 'UNKNOWN'}`",
+        f"- Combined commit status: `{summary['head'].get('combined_status') or 'UNKNOWN'}`",
         f"- Open issues: `{summary['issues']['open']}`",
         f"- Open PRs: `{prs['open']}`",
         f"- Draft PRs: `{prs['open_draft']}`",
@@ -174,9 +163,7 @@ def _markdown(summary: dict[str, Any], client: GhClient) -> str:
     for record in client.records:
         count = str(record.count) if record.count is not None else "UNKNOWN"
         error = (record.error or "-").replace("\n", " ")[:180]
-        lines.append(
-            f"| `{record.name}` | `{record.status}` | {count} | {error} |"
-        )
+        lines.append(f"| `{record.name}` | `{record.status}` | {count} | {error} |")
     lines.extend(
         [
             "",
@@ -189,8 +176,7 @@ def _markdown(summary: dict[str, Any], client: GhClient) -> str:
             "",
             "## Evidence",
             "",
-            "See `SUMMARY.json`, `tables/`, `raw/`, "
-            "`ARTIFACT_MANIFEST.json`, and `SHA256SUMS`.",
+            "See `SUMMARY.json`, `tables/`, `raw/`, `ARTIFACT_MANIFEST.json`, and `SHA256SUMS`.",
             "",
         ]
     )

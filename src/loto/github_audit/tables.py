@@ -121,9 +121,7 @@ def run_rows(client: GhClient) -> list[dict[str, Any]]:
                 "created_at": x.get("created_at"),
                 "updated_at": x.get("updated_at"),
                 "duration_seconds": (
-                    round((updated - created).total_seconds(), 3)
-                    if created and updated
-                    else None
+                    round((updated - created).total_seconds(), 3) if created and updated else None
                 ),
                 "actor": (x.get("actor") or {}).get("login"),
                 "html_url": x.get("html_url"),
@@ -161,9 +159,7 @@ def security_rows(client: GhClient) -> list[dict[str, Any]]:
 def duplicate_rows(rows: list[dict[str, Any]], threshold: float) -> list[dict[str, Any]]:
     def normal(title: Any) -> str:
         text = re.sub(r"#\d+", "", str(title or "").lower())
-        return " ".join(
-            re.sub(r"[^a-z0-9\u3040-\u30ff\u3400-\u9fff]+", " ", text).split()
-        )
+        return " ".join(re.sub(r"[^a-z0-9\u3040-\u30ff\u3400-\u9fff]+", " ", text).split())
 
     opened = [x for x in rows if x.get("state") == "open"]
     result = []
@@ -324,9 +320,7 @@ def build_tables(client: GhClient, run_dir: Path, threshold: float) -> dict[str,
         for x in client.datasets.get("branches") or []
     ]
     _csv(root / "branches.csv", branches, ("name", "protected", "sha"))
-    default = str(
-        (client.datasets.get("repository") or {}).get("default_branch") or "main"
-    )
+    default = str((client.datasets.get("repository") or {}).get("default_branch") or "main")
     _write_stack(root / "pr_stack.dot", prs, default)
     return {
         "issues": issues,
@@ -355,7 +349,7 @@ def _write_stack(path: Path, rows: list[dict[str, Any]], default: str) -> None:
             continue
         number = row.get("number")
         base = str(row.get("base_ref") or default)
-        title = str(row.get("title") or "").replace('"', r'\"')[:80]
+        title = str(row.get("title") or "").replace('"', r"\"")[:80]
         state = "Draft" if row.get("draft") else "Ready"
         parent = f"PR#{heads[base]}" if base in heads else base
         lines.extend(

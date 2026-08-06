@@ -100,6 +100,7 @@ The smoke is intentionally bounded and does not enable `--deep`.
 - `VERIFIED_WITH_GAPS`: optional endpoints were unavailable
 - `PARTIALLY_VERIFIED`: at least one core endpoint was unavailable
 - `BLOCKED`: authentication or permission prevented access
+- `NOT_APPLICABLE`: current repository configuration does not use the endpoint
 - `NOT_AVAILABLE`: feature disabled, absent, unsupported, or returned 404
 - `RATE_LIMITED`: GitHub API rate limit prevented collection
 - `FAILED`: unclassified acquisition or artifact failure
