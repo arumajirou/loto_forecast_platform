@@ -38,9 +38,6 @@ jobs:
     env:
       PYTHONUNBUFFERED: "1"
       CUDA_VISIBLE_DEVICES: "0"
-      HF_HOME: ${{ runner.temp }}/huggingface
-      TORCH_HOME: ${{ runner.temp }}/torch
-      UV_CACHE_DIR: ${{ runner.temp }}/uv-cache
       EVIDENCE_DIR: artifacts/self-hosted
 
     steps:
@@ -50,6 +47,17 @@ jobs:
           clean: true
           fetch-depth: 1
           persist-credentials: false
+
+      - name: Configure runner-scoped paths
+        run: |
+          set -Eeuo pipefail
+          printf 'HF_HOME=%s\n' "$RUNNER_TEMP/huggingface" >> "$GITHUB_ENV"
+          printf 'TORCH_HOME=%s\n' "$RUNNER_TEMP/torch" >> "$GITHUB_ENV"
+          printf 'UV_CACHE_DIR=%s\n' "$RUNNER_TEMP/uv-cache" >> "$GITHUB_ENV"
+          mkdir -p \
+            "$RUNNER_TEMP/huggingface" \
+            "$RUNNER_TEMP/torch" \
+            "$RUNNER_TEMP/uv-cache"
 
       - name: Prepare evidence directory
         run: |
@@ -159,4 +167,7 @@ jobs:
         if: ${{ always() }}
         run: |
           set -Eeuo pipefail
-          rm -rf -- "$HF_HOME" "$TORCH_HOME" "$UV_CACHE_DIR"
+          rm -rf -- \
+            "$RUNNER_TEMP/huggingface" \
+            "$RUNNER_TEMP/torch" \
+            "$RUNNER_TEMP/uv-cache"
