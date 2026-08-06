@@ -75,3 +75,19 @@ def test_calendar_schedule_gap_rejected() -> None:
             actuals_used=False,
         )
     assert thursday.weekday() == 3
+
+
+def test_calendar_draw_number_gap_rejected() -> None:
+    monday = date(2026, 1, 5)
+    thursday = monday + timedelta(days=3)
+    next_monday = monday + timedelta(days=7)
+    with pytest.raises(ChronologyError, match="gap-free"):
+        validate_chronology(
+            game=Game.LOTO6,
+            time_axis=TimeAxis.CALENDAR_TIME,
+            draw_numbers=(1, 3, 4),
+            dates=(monday, thursday, next_monday),
+            cutoff_draw_no=4,
+            cutoff_date=next_monday,
+            actuals_used=False,
+        )
