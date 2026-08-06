@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluation Methodology | Loto Forecast Platform</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header>
+<h1>Evaluation Methodology</h1>
+<nav aria-label="Primary">
+<a href="index.html">Home</a>
+<a href="architecture.html">Architecture</a>
+<a href="evaluation.html">Evaluation</a>
+<a href="security.html">Security</a>
+</nav>
+</header>
+<main>
+<section>
+<h2>Primary and secondary metrics</h2>
+<p>The primary metric is Hit@±1: the share of predictions whose absolute error is at most one.
+Supporting metrics include position-level Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE.</p>
+</section>
+<section>
+<h2>Baselines</h2>
+<p>Model results are compared under the same chronological conditions with Random, fixed value,
+mean, median, last value, frequency, and an approved statistical baseline.</p>
+</section>
+<section>
+<h2>Evaluation discipline</h2>
+<ul>
+<li>Train, Validation, Holdout, and Prospective are separated in time order.</li>
+<li>Scalers, encoders, feature selection, and hyperparameter tuning fit only within Train.</li>
+<li>Multiple seeds retain mean, variance, and worst-seed results.</li>
+<li>Prospective predictions are sealed before corresponding actual values are known.</li>
+</ul>
+<p>This page describes policy only and publishes no private result, protected actual,
+or prediction.</p>
+</section>
+</main>
+<footer>
+<p>Public documentation only. No prediction, registry, or production authority is granted here.</p>
+</footer>
+</body>
+</html>
