@@ -1,0 +1,15 @@
+{
+  "model_id": "timer-s1",
+  "canonical_repo": "bytedance-research/Timer-S1",
+  "mirror_repo": "thuml/Timer-S1",
+  "arxiv_id": "2603.04791",
+  "license": "Apache-2.0",
+  "gated": false,
+  "trust_remote_code": true,
+  "formal_model_revision": "UNPINNED",
+  "formal_source_revision": "UNPINNED",
+  "observed_model_revision": "8911430cc7f32add5c8913afe12e3b05742f5bb2",
+  "observed_source_revision": "0d35f1fe891243453ca1bfa903b5271cf9eb85cb",
+  "formal_runtime_certified": false,
+  "mirror_fallback_enabled": false
+}
