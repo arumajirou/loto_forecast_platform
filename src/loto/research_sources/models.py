@@ -91,7 +91,9 @@ def _validate_identifier(value: str, field_name: str) -> str:
 
 
 def _validate_concrete_https_url(value: str) -> str:
-    if value != value.strip() or any(ord(character) < 32 for character in value):
+    if value != value.strip() or any(
+        character.isspace() or ord(character) < 32 for character in value
+    ):
         raise ValueError("URL must not contain whitespace or control characters")
     parsed = urlsplit(value)
     if parsed.scheme != "https" or not parsed.netloc:
@@ -239,7 +241,7 @@ class RuntimeCompatibilityDeclaration(BaseModel):
     @field_validator("python", "torch", "transformers")
     @classmethod
     def explicit_compatibility(cls, value: str, info: ValidationInfo) -> str:
-        field_name = info.field_name
+        field_name = info.field_name or "compatibility"
         return _validate_nonempty_declaration(value, field_name)
 
 
@@ -368,6 +370,13 @@ class ResearchSourceRecord(BaseModel):
     def valid_model_id(cls, value: str) -> str:
         return _validate_identifier(value, "logical_model_id")
 
+    @field_validator("paper_title", "paper_identifier")
+    @classmethod
+    def nonempty_paper_identity(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("paper identity fields must be non-empty")
+        return value
+
     @field_validator("paper_published_on")
     @classmethod
     def valid_date(cls, value: str) -> str:
@@ -401,13 +410,30 @@ class ResearchSourceRecord(BaseModel):
         if self.verification.status == IntakeStatus.VERIFIED_FOR_INTAKE:
             if self.release_status != ReleaseStatus.AVAILABLE:
                 raise ValueError("verified intake requires release_status=AVAILABLE")
+            if self.official_paper_url in _SENTINELS or self.paper_published_on in {
+                "UNKNOWN",
+                "NOT_RELEASED",
+            }:
+                raise ValueError("verified intake requires concrete paper identity")
             if not isinstance(self.official_source_repository, RepositoryIdentity):
                 raise ValueError("verified formal source requires a concrete source repository")
+            if not (
+                self.official_source_repository.official
+                and self.official_source_repository.canonical
+                and not self.official_source_repository.mirror
+            ):
+                raise ValueError("verified source repository must be canonical and official")
             if self.source_revision in _SENTINELS:
                 raise ValueError("verified formal source must pin source_revision")
             if self.source_kind == SourceKind.MODEL:
                 if not isinstance(self.official_model_repository, RepositoryIdentity):
                     raise ValueError("verified model intake requires a concrete model repository")
+                if not (
+                    self.official_model_repository.official
+                    and self.official_model_repository.canonical
+                    and not self.official_model_repository.mirror
+                ):
+                    raise ValueError("verified model repository must be canonical and official")
                 if self.model_revision in _SENTINELS:
                     raise ValueError("verified model intake must pin model_revision")
                 required_artifacts = [
