@@ -20,6 +20,13 @@ The provider now retains:
 - a compatible one-step point prediction selected by `point_strategy`;
 - exact snapshot, config, weight, and reviewed remote-code SHA-256 evidence.
 
+## Request contract
+
+`num_samples` must represent an integer in the inclusive range 1 through 100. Integer objects,
+integral floating-point values such as `3.0`, and integer strings such as `"3"` are accepted.
+Fractional values such as `1.5` or `"1.5"`, booleans, non-finite values, and unsupported objects are
+rejected as `INVALID_REQUEST` by both the adapter and isolated runner.
+
 ## Fail-closed controls
 
 - only `thuml/sundial-base-128m` at the pinned revision is accepted;
@@ -54,5 +61,5 @@ Formal provider-v2 GPU success is granted only when the harness prints
 
 Dependency-light focused tests exercise the contracts without downloading or loading the model.
 Formal success still requires the pinned snapshot, isolated lock, real CPU smoke, real CUDA
-execution, GPU PID and VRAM evidence, separate-process replay, Ruff, mypy, focused tests, full
-pytest, and an actionable CI run.
+execution, GPU PID and VRAM evidence, separate-process replay, semantic verification, evidence ZIP
+verification, Ruff, mypy, focused tests, full pytest, and an actionable CI run.
