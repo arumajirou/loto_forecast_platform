@@ -2,6 +2,25 @@
 
 All notable changes to this design package are documented here.
 
+## 0.1.1 — 2026-08-06
+
+### Changed
+
+- Replaced the compact reusable prompt with an authoritative, evidence-first execution prompt for one feature increment at a time.
+- Added explicit handling for an unmerged or Draft design PR: implementation must use merged `main` documentation or explicit `owner-authorized-draft` approval, and must never branch from the documentation branch.
+- Added feature-specific entry gates for Dependabot, Projects, Pages, webhook foundation, webhook adapters, OSS security fallback, and CodeQL.
+- Added a precise GitHub Actions classification for verified execution, pre-run blocking, actionable failure, and unknown evidence.
+- Added owned-path allowlisting, duplicate detection, current-main re-audit, status taxonomy, stop conditions, rollback requirements, pre-push audit, Draft PR body requirements, and a fixed final-report schema.
+- Added explicit owner-action handling when GitHub Projects, Pages, plan, billing, GitHub Code Security, or other settings cannot be changed or proven through the available connector/API.
+- Preserved all authority boundaries around registry, promotion, approval, production binding, evaluation, prediction locks, Holdout, Prospective, secrets, and callback URLs.
+
+### Verification status
+
+- Remote file update: `EXECUTED`.
+- Semantic alignment with the existing requirements, implementation plan, execution schedule, and test plan: `PARTIALLY_VERIFIED`.
+- Local Markdown lint, link check, secret scan, portable export, and SHA-256 package: `EXECUTION_PENDING`.
+- Feature implementation and runtime verification: `NOT_IN_SCOPE`.
+
 ## 0.1.0 — 2026-08-06
 
 ### Added
