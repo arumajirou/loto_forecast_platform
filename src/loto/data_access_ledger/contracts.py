@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import PurePosixPath
 from typing import Literal
@@ -63,6 +63,14 @@ class LedgerStatus(StrEnum):
     FAIL = "FAIL"
 
 
+def _normalize_utc(value: datetime | None) -> datetime | None:
+    if value is None:
+        return None
+    if value.tzinfo is None or value.utcoffset() is None:
+        raise ValueError("datetime values must be timezone-aware")
+    return value.astimezone(UTC)
+
+
 class TimeBoundary(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -71,6 +79,11 @@ class TimeBoundary(BaseModel):
     prediction_cutoff: datetime | None = None
     available_at: datetime | None = None
     inclusive_end: bool = True
+
+    @field_validator("start", "end", "prediction_cutoff", "available_at")
+    @classmethod
+    def require_timezone_aware_utc(cls, value: datetime | None) -> datetime | None:
+        return _normalize_utc(value)
 
     @model_validator(mode="after")
     def validate_order(self) -> TimeBoundary:
@@ -95,6 +108,11 @@ class ColumnAccess(BaseModel):
         if value is not None and not value.strip():
             raise ValueError("column names must not be blank")
         return value
+
+    @field_validator("known_at")
+    @classmethod
+    def require_timezone_aware_utc(cls, value: datetime | None) -> datetime | None:
+        return _normalize_utc(value)
 
 
 class CodeLocation(BaseModel):
@@ -175,6 +193,13 @@ class DataAccessLedger(BaseModel):
     generated_at: datetime
     code_revision: str = Field(pattern=r"^(?:[0-9a-f]{40}|UNCOMMITTED)$")
     events: list[DataAccessEvent] = Field(min_length=1)
+
+    @field_validator("generated_at")
+    @classmethod
+    def require_timezone_aware_utc(cls, value: datetime) -> datetime:
+        normalized = _normalize_utc(value)
+        assert normalized is not None
+        return normalized
 
     @model_validator(mode="after")
     def validate_event_identity(self) -> DataAccessLedger:
