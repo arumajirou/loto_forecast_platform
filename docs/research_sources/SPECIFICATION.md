@@ -12,9 +12,11 @@ The allowed intake statuses are:
 - `NOT_RELEASED`;
 - `BLOCKED`.
 
-`VERIFIED_FOR_INTAKE` is a source-intake state only. For a model record it requires pinned source
-and model revisions, but it still does not claim artifact download, dependency resolution, load,
-inference, evaluation, or production registration.
+`VERIFIED_FOR_INTAKE` is a source-intake state only. It requires an available release, concrete
+canonical repositories, pinned source/model revisions, resolved license evidence, resolved commercial
+eligibility, no unresolved blockers, and pinned size/SHA-256 for every required model artifact. It
+still does not claim artifact download, dependency resolution, load, inference, evaluation, or
+production registration.
 
 ## Revision rules
 
@@ -36,6 +38,7 @@ repository must be official and non-mirror. Mirrors can be retained only as non-
 ## Status gates
 
 - remote code without reviewed bytes: `REMOTE_CODE_REVIEW_REQUIRED` or stronger blocking state;
+- reviewed remote code: non-empty safe allowlist, inventory membership, exact size, and SHA-256;
 - unknown code or weight license: `LICENSE_REVIEW_REQUIRED`, `CONDITIONAL`, or `BLOCKED`;
 - released repository with unverified checkpoint bytes: `CHECKPOINT_REVIEW_REQUIRED`;
 - no released required checkpoint: `NOT_RELEASED` or `BLOCKED`;
@@ -45,5 +48,4 @@ repository must be official and non-mirror. Mirrors can be retained only as non-
 
 The registry digest is SHA-256 over deterministic JSON with sorted keys, compact separators,
 UTF-8, finite values only, and the complete validated registry payload.
-
 Registry storage uses `registry.v1.json` as a strict index and `records/*.json` as one immutable source record per file. The loader validates containment and composes the records before applying the Registry contract.
