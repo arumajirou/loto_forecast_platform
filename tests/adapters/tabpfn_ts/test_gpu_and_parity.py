@@ -11,7 +11,7 @@ from loto.adapters.tabpfn_ts import (
     require_strict_gpu_success,
     validate_local_batch_parity,
 )
-from tests.adapters.tabpfn_ts.conftest import build_position_response
+from .conftest import build_position_response
 
 
 def test_successful_cuda_response_requires_measured_devices() -> None:
