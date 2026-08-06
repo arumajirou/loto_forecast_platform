@@ -5,10 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from collections.abc import Callable, Mapping
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any
 
 import yaml
 from pydantic import SecretStr
@@ -32,7 +33,7 @@ class OverrideRecord:
     target: str
     source: str
     sensitive: bool
-    value: object
+    value: object = field(repr=False)
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -40,6 +41,7 @@ class OverrideRecord:
             "target": self.target,
             "source": self.source,
             "sensitive": self.sensitive,
+            "redacted": self.sensitive,
             "value": REDACTED_VALUE if self.sensitive else self.value,
         }
 
@@ -99,6 +101,9 @@ ENVIRONMENT_OVERRIDES: dict[str, OverrideSpec] = {
         ("observability", "mlflow", "enabled"), _parse_bool
     ),
     "LOTO_CONFIG_MLFLOW_TRACKING_URI": OverrideSpec(
+        ("observability", "mlflow", "tracking_uri"), _parse_string
+    ),
+    "NEURALFORECAST_MLFLOW_TRACKING_URI": OverrideSpec(
         ("observability", "mlflow", "tracking_uri"), _parse_string
     ),
     "LOTO_CONFIG_MLFLOW_EXPERIMENT_NAME": OverrideSpec(
@@ -188,10 +193,18 @@ def resolve_payload(
     resolved_payload = deepcopy(migrated)
     environment = os.environ if environ is None else environ
     records: list[OverrideRecord] = []
+    seen_targets: dict[tuple[str, ...], str] = {}
     for env_var, spec in ENVIRONMENT_OVERRIDES.items():
         if env_var not in environment:
             continue
+        previous_env_var = seen_targets.get(spec.target)
+        if previous_env_var is not None:
+            raise ValueError(
+                "multiple environment variables target the same field: "
+                f"{previous_env_var}, {env_var} -> {'.'.join(spec.target)}"
+            )
         parsed = spec.parser(environment[env_var])
+        seen_targets[spec.target] = env_var
         _set_nested(resolved_payload, spec.target, parsed)
         records.append(
             OverrideRecord(
@@ -199,7 +212,7 @@ def resolve_payload(
                 target=".".join(spec.target),
                 source="environment",
                 sensitive=spec.sensitive,
-                value=parsed,
+                value=REDACTED_VALUE if spec.sensitive else parsed,
             )
         )
     config = StrictFoundationConfig.model_validate(resolved_payload)
@@ -232,7 +245,7 @@ def load_config(
 
 
 def write_resolved_config(resolved: ResolvedConfig, output: str | Path) -> tuple[Path, Path]:
-    """Atomically write redacted resolved JSON and a config-hash sidecar."""
+    """Atomically write redacted resolved JSON and an artifact-hash sidecar."""
 
     target = Path(output)
     target.parent.mkdir(parents=True, exist_ok=True)
