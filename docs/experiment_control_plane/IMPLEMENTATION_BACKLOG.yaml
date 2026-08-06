@@ -1,0 +1,64 @@
+schema_version: "1.0.0"
+repository: "arumajirou/loto_forecast_platform"
+design_path: "docs/experiment_control_plane"
+base_policy: "fresh-main-per-stage"
+pr_mode: "draft"
+stages:
+  - id: PR-1
+    target_stage: plan-contract
+    branch: feat/experiment-plan-contract-v1
+    depends_on: []
+    side_effects_allowed: false
+  - id: PR-2
+    target_stage: approval-ledger
+    branch: feat/experiment-approval-ledger-v1
+    depends_on: [PR-1]
+    side_effects_allowed: false
+  - id: PR-3
+    target_stage: evidence-index
+    branch: feat/experiment-evidence-index-v1
+    depends_on: [PR-1]
+    side_effects_allowed: false
+  - id: PR-4
+    target_stage: control-service
+    branch: feat/experiment-control-service-v1
+    depends_on: [PR-1, PR-2, PR-3]
+    side_effects_allowed: "local-test-only"
+  - id: PR-5
+    target_stage: agent-protocol
+    branch: feat/local-experiment-agent-protocol-v1
+    depends_on: [PR-4]
+    side_effects_allowed: "synthetic-local-cpu-only"
+  - id: PR-6
+    target_stage: execution-lanes
+    branch: feat/experiment-execution-lanes-v1
+    depends_on: [PR-5]
+    side_effects_allowed: "owner-authorized-test-lanes-only"
+  - id: PR-7
+    target_stage: github-projections
+    branch: feat/experiment-github-projections-v1
+    depends_on: [PR-4]
+    side_effects_allowed: "test-repository-or-dry-run-until-approved"
+  - id: PR-8
+    target_stage: control-workflows
+    branch: feat/experiment-control-workflows-v1
+    depends_on: [PR-4, PR-7]
+    side_effects_allowed: "manual-control-only"
+  - id: PR-9
+    target_stage: evidence-adapters
+    branch: feat/experiment-evidence-adapters-v1
+    depends_on: [PR-3, PR-4, PR-5]
+    side_effects_allowed: "test-services-only-until-certified"
+  - id: PR-10
+    target_stage: operational-certification
+    branch: certify/experiment-control-plane-v1
+    depends_on: [PR-6, PR-7, PR-8, PR-9]
+    side_effects_allowed: "synthetic-certification-only"
+stop_on:
+  - duplicate_found
+  - ownership_conflict
+  - canonical_authority_ambiguous
+  - secret_or_protected_data_required
+  - unapproved_holdout_or_prospective_access
+  - production_mutation_required
+  - unsafe_git_operation_required
