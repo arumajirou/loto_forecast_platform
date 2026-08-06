@@ -13,7 +13,7 @@ from loto.adapters.tabpfn_ts.manifests import (
     V2_REVISION,
     V2_WEIGHT_FILENAME,
 )
-from tests.adapters.tabpfn_ts.conftest import build_candidate_response
+from .conftest import build_candidate_response
 
 
 def _legacy_request() -> dict[str, object]:
