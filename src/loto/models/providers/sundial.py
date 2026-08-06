@@ -102,13 +102,25 @@ def _normalize_quantile_levels(value: Any) -> tuple[float, ...]:
 def _normalize_num_samples(value: Any) -> int:
     if isinstance(value, bool):
         raise FoundationProviderError("INVALID_REQUEST", "num_samples must be an integer")
-    try:
-        num_samples = int(value)
-    except (TypeError, ValueError) as exc:
+    if isinstance(value, (float, np.floating)):
+        if not np.isfinite(value) or not float(value).is_integer():
+            raise FoundationProviderError(
+                "INVALID_REQUEST",
+                "num_samples must be an integer",
+            )
+    elif isinstance(value, str):
+        value = value.strip()
+        if not value or not value.lstrip("+-").isdigit():
+            raise FoundationProviderError(
+                "INVALID_REQUEST",
+                "num_samples must be an integer",
+            )
+    elif not isinstance(value, (int, np.integer)):
         raise FoundationProviderError(
             "INVALID_REQUEST",
             "num_samples must be an integer",
-        ) from exc
+        )
+    num_samples = int(value)
     if not 1 <= num_samples <= 100:
         raise FoundationProviderError(
             "INVALID_REQUEST",
