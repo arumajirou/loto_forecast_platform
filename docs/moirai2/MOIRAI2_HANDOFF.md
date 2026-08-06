@@ -1,87 +1,50 @@
 # Moirai 2.0 Handoff
 
-PR #83 is the P0-P6 base, PR #86 is P7, PR #87 is the P8 certifier, PR #89 is P8A, PR #91 is
-P8B, and P8C continues only on `feat/moirai2-runtime-evidence-gate-v1`. Do not retarget or write to
-any parent branch.
+The current stack is PR #83, #86, #87, #89, #91, #98, followed by P8D. Keep every PR Draft.
+Do not merge, retarget, force-push, delete branches, or open OOF before the target-host sequence passes.
 
-## 1. Complete the P8B reviewed-lock workflow
+## Prepare the control workspace
 
-Generate a new candidate outside the runtime lane, inspect the dependency graph, sources, hashes,
-licenses, and warnings, dry-run installation, and apply only after explicit human approval.
-
-```bash
-uv run python scripts/generate_moirai2_lock_candidate.py \
-  --runtime-lane supported-py311 \
-  --python 3.11 \
-  --output-dir artifacts/moirai2/lock-candidate/<RUN_ID>
-```
-
-Install the exact approved candidate using `scripts/install_reviewed_moirai2_lock.py`. Preserve the
-candidate, dry-run, apply, backup, review, approval, manifest, and SHA evidence. Repeat independently
-for `cuda13-experimental`.
-
-## 2. Run the supported campaign through the P8C wrapper
-
-The repository worktree must be clean. The wrapper captures the source commit, source tree, and
-principal file hashes before running the existing P8A campaign. Use a new immutable output directory.
+Use the same clean source commit and one pinned local snapshot for both lanes. The workspace must be
+outside the repository so P8C can still prove a clean worktree.
 
 ```bash
-uv run python scripts/run_moirai2_runtime_campaign_p8c.py \
-  --campaign-id <CPU_RUN_ID> \
-  --runtime-lane supported-py311 \
-  --device cpu \
-  --snapshot-path /absolute/path/to/pinned/snapshot \
-  --output-dir artifacts/moirai2/runtime-campaign/<CPU_RUN_ID>
+RUN_ID="moirai2-p8d-$(date +%Y%m%d-%H%M%S)"
+WORKSPACE="/mnt/e/env/logs/moirai2-target/${RUN_ID}"
+SNAPSHOT="/absolute/path/to/Salesforce-moirai-2.0-R-small"
+
+uv run python scripts/prepare_moirai2_target_execution.py \
+  --run-id "$RUN_ID" \
+  --snapshot-path "$SNAPSHOT" \
+  --workspace-dir "$WORKSPACE"
+
+cat "$WORKSPACE/control/P8D_OPERATOR_COMMANDS.md"
 ```
 
-Do not invoke `run_moirai2_runtime_campaign.py` directly for formal evidence. Direct P8A outputs do
-not contain the P8C source and launch seal required by the independent verifier.
+## Execute only the next recorded stage
 
-## 3. Run the CUDA13 campaign through the same wrapper
+Follow the generated commands in order. Inspect each lock candidate and dry-run manually. Replace the
+reviewer and timezone-aware review time placeholders only after reviewing the complete graph,
+sources, artifact hashes, warnings, and licenses.
 
-Use the same source commit and pinned model snapshot. Cases remain strictly serial.
+After every external artifact is produced, run the corresponding `record-*` command. The command
+revalidates the evidence and refuses skipped or repeated stages.
 
-```bash
-uv run python scripts/run_moirai2_runtime_campaign_p8c.py \
-  --campaign-id <CUDA_RUN_ID> \
-  --runtime-lane cuda13-experimental \
-  --device cuda \
-  --snapshot-path /absolute/path/to/pinned/snapshot \
-  --output-dir artifacts/moirai2/runtime-campaign/<CUDA_RUN_ID>
-```
+## Completion gate
 
-Preserve all requests, responses, run evidence, GPU monitor samples, stdout/stderr, exit codes,
-source identity, launch evidence, artifact manifests, and SHA256SUMS.
-
-## 4. Independently verify the paired evidence
-
-Run the verifier into a third new directory. Pin the expected source commit explicitly.
-
-```bash
-uv run python scripts/verify_moirai2_runtime_evidence.py \
-  --supported-campaign-dir artifacts/moirai2/runtime-campaign/<CPU_RUN_ID> \
-  --cuda-campaign-dir artifacts/moirai2/runtime-campaign/<CUDA_RUN_ID> \
-  --expected-source-commit "$(git rev-parse HEAD)" \
-  --output-dir artifacts/moirai2/runtime-evidence-gate/<VERIFY_RUN_ID>
-```
-
-Review `P8C_RUNTIME_EVIDENCE_REPORT.json` and `SHA256SUMS`. P9 may be opened only when:
+The final state must contain:
 
 ```text
-status=PASS
+stage=PAIR_VERIFIED
 p9_oof_gate_open=true
-formal_campaign_count=2
-formal_case_count=12
-provider_process_evidence_count=24
-same_source_across_lanes=true
-same_model_artifact_across_lanes=true
-all_manifests_verified=true
-all_native_quantiles_verified=true
-all_reload_pairs_verified=true
-all_cuda_external_gpu_evidence_verified=true
+event_count=7
+supported_campaign.case_count=6
+cuda_campaign.case_count=6
+pair_verification.formal_case_count=12
+pair_verification.provider_process_evidence_count=24
 ```
 
-CPU-versus-CUDA exact prediction equality is recorded but is not a formal gate. Do not claim model
-accuracy, open OOF, Holdout, or Prospective, or promote the model based only on runtime evidence.
-Keep all stacked PRs Draft until real evidence, Ruff, mypy, focused tests, one final full pytest, and
-one actionable GitHub Actions run pass.
+Then run Ruff, mypy, focused tests, and one final full pytest. Inspect one actionable GitHub Actions
+run. P9 OOF may be opened only after all target-host and local gates pass. Accuracy remains unclaimed
+until OOF, Holdout, and Prospective evaluation compare Hit@±1, MAE, MSE, RMSE, positional metrics,
+and all required baselines.

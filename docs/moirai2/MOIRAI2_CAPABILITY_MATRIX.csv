@@ -27,9 +27,14 @@ strict_artifact_reverification,IMPLEMENTED_LOCAL_VERIFIED,manifest and every SHA
 quantile_evidence_reverification,IMPLEMENTED_LOCAL_VERIFIED,nine finite monotonic quantiles and q0.5 parity
 external_gpu_monitor_rederivation,IMPLEMENTED_LOCAL_VERIFIED,PID UUID VRAM and release rederived from samples
 cross_lane_model_identity_gate,IMPLEMENTED_LOCAL_VERIFIED,CPU and CUDA must share source and model artifact
-p9_oof_gate,IMPLEMENTED_EXECUTION_PENDING,opens only after real CPU and CUDA evidence pair passes
+target_execution_plan,IMPLEMENTED_LOCAL_VERIFIED,one Run ID and external control workspace
+target_execution_state_machine,IMPLEMENTED_LOCAL_VERIFIED,strict seven-stage transition order
+target_execution_hash_chain,IMPLEMENTED_LOCAL_VERIFIED,event and artifact tree SHA-256 evidence
+target_execution_human_gate,IMPLEMENTED_LOCAL_VERIFIED,no automatic approval or installation
+target_execution_concurrency_guard,IMPLEMENTED_LOCAL_VERIFIED,simultaneous recording fails closed
+p9_oof_gate,IMPLEMENTED_EXECUTION_PENDING,opens only after real P8C pair and P8D sequence pass
 fine_tuning,UPSTREAM_PATH_UNVERIFIED,out of current scope
-oof,NOT_OPENED,blocked until real P8C evidence pair pass
+oof,NOT_OPENED,blocked until real P8D sequence pass
 holdout,NOT_OPENED,out of current scope
 prospective,NOT_OPENED,out of current scope
 commercial_promotion,BLOCKED_BY_LICENSE,fail closed
