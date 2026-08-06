@@ -169,7 +169,11 @@ def offline_huggingface() -> Iterator[None]:
                 os.environ[name] = value
 
 
-def _resolve_device(request: Toto2ProviderRequest, torch: Any, versions: dict[str, str | None]) -> Any:
+def _resolve_device(
+    request: Toto2ProviderRequest,
+    torch: Any,
+    versions: dict[str, str | None],
+) -> Any:
     if request.device == "cuda":
         if not torch.cuda.is_available():
             raise RuntimeExecutionError("CUDA requested but torch.cuda.is_available() is false")
