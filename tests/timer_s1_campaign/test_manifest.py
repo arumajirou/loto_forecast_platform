@@ -29,3 +29,19 @@ def test_manifest_covers_expected_remote_code_and_four_weight_shards() -> None:
     assert {
         f"model-{index:05d}-of-00004.safetensors" for index in range(1, 5)
     }.issubset(paths)
+
+
+def test_manifest_rejects_unsafe_artifact_path() -> None:
+    import pytest
+    from pydantic import ValidationError
+
+    from loto.timer_s1_campaign.model_manifest import ArtifactRecord
+
+    with pytest.raises(ValidationError, match="snapshot root"):
+        ArtifactRecord(
+            path="../escape.bin",
+            size_bytes=1,
+            sha256="a" * 64,
+            required=True,
+            kind="weight",
+        )
