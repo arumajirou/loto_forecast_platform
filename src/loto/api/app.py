@@ -17,6 +17,7 @@ from loto.models.neuralforecast_adapter import AutoModelRequest, resolve_auto_mo
 from loto.registry.full import PlatformRegistry
 from loto.sealing.manifest import verify_seal
 from loto.security import Identity, authenticate, parse_tokens, require_role
+from loto.version import __version__
 
 
 class ScoreRequest(BaseModel):
@@ -57,7 +58,7 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
         registry_url or os.environ.get("LOTO_REGISTRY_URL", root / "platform.sqlite3")
     )
     token_map = parse_tokens()
-    app = FastAPI(title="Loto Forecast Platform API", version="2.1.0")
+    app = FastAPI(title="Loto Forecast Platform API", version=__version__)
 
     def current_identity(authorization: Annotated[str | None, Header()] = None) -> Identity:
         if not token_map and os.environ.get("LOTO_AUTH_DISABLED", "0") == "1":
@@ -81,12 +82,13 @@ def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None)
 
     @app.get("/", response_class=HTMLResponse)
     def dashboard() -> str:
-        return """<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Loto Forecast Platform v2.1</title>
+        template = """<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Loto Forecast Platform v__LOTO_VERSION__</title>
 <style>:root{color-scheme:light dark;--bg:#0b1020;--card:#151c31;--line:#33405f;--ok:#22c55e;--warn:#f59e0b}*{box-sizing:border-box}body{font-family:system-ui,sans-serif;max-width:1280px;margin:0 auto;padding:1.4rem;background:var(--bg);color:#e8eefc}.head{display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}.card{border:1px solid var(--line);padding:1rem;border-radius:.9rem;background:var(--card)}a{color:#93c5fd;font-weight:650}.status{display:inline-block;padding:.2rem .6rem;border-radius:99px;background:#166534}.metric{font-size:1.7rem;font-weight:700}.muted{opacity:.72}table{width:100%;border-collapse:collapse}td,th{padding:.5rem;border-bottom:1px solid var(--line);text-align:left;font-size:.9rem}code{word-break:break-all}</style></head><body>
-<div class='head'><div><h1>Loto Forecast Platform <small>v2.1</small></h1><p class='muted'>Loto Trusted Vertical Slice compatible</p></div><span class='status' id='health'>loading</span></div>
+<div class='head'><div><h1>Loto Forecast Platform <small>v__LOTO_VERSION__</small></h1><p class='muted'>Loto Trusted Vertical Slice compatible</p></div><span class='status' id='health'>loading</span></div>
 <div class='grid'><div class='card'><div class='muted'>Models</div><div class='metric' id='models'>-</div><a href='/api/v2/models'>Registry</a></div><div class='card'><div class='muted'>Runs</div><div class='metric' id='runs'>-</div><a href='/api/v2/runs'>Run index</a></div><div class='card'><div class='muted'>Games</div><div class='metric' id='games'>-</div><a href='/api/v2/data/games'>Data sources</a></div><div class='card'><div class='muted'>Observability</div><a href='/metrics'>Prometheus</a> / <a href='/docs'>OpenAPI</a><p>events, resources, artifact status</p></div></div>
 <h2>Model Parameter Lab</h2><div class='card'><div class='grid'><label>AutoModel<select id='lab-model'></select></label><label>Backend<select id='lab-backend'><option>optuna</option><option>ray</option></select></label><label>Horizon<input id='lab-h' type='number' min='1' value='1'></label><label>Trials<input id='lab-trials' type='number' min='1' value='10'></label></div><p><button id='lab-plan' type='button'>Resolve plan</button></p><pre id='lab-output' class='muted'>Select a model and resolve a non-executing plan.</pre></div><h2>Latest leaderboard</h2><div class='card'><table><thead><tr><th>Rank</th><th>Model</th><th>Score</th><th>±1</th><th>MAE</th></tr></thead><tbody id='leaderboard'><tr><td colspan='5'>No result</td></tr></tbody></table></div>
 <script>const el=id=>document.getElementById(id);async function j(u,o){const r=await fetch(u,o);if(!r.ok)throw Error(r.status);return r.json()}Promise.allSettled([j('/health'),j('/api/v2/models'),j('/api/v2/runs'),j('/api/v2/data/games'),j('/api/v2/leaderboard')]).then(x=>{if(x[0].status==='fulfilled'){el('health').textContent=x[0].value.status;el('health').style.background='#166534'}el('models').textContent=x[1].status==='fulfilled'?x[1].value.length:'-';el('runs').textContent=x[2].status==='fulfilled'?x[2].value.length:'-';el('games').textContent=x[3].status==='fulfilled'?x[3].value.length:'-';if(x[1].status==='fulfilled'){el('lab-model').innerHTML=x[1].value.filter(m=>m.library==='neuralforecast_auto').map(m=>`<option value='${m.class_name}'>${m.class_name}</option>`).join('')}if(x[4].status==='fulfilled'){el('leaderboard').innerHTML=x[4].value.slice(0,10).map(r=>`<tr><td>${r.rank??''}</td><td>${r.model_id??''}</td><td>${Number(r.composite_score??0).toFixed(4)}</td><td>${Number(r.mean_within_1??0).toFixed(3)}</td><td>${Number(r.position_mae??0).toFixed(3)}</td></tr>`).join('')}});el('lab-plan').addEventListener('click',async()=>{try{const body={model_name:el('lab-model').value,backend:el('lab-backend').value,h:Number(el('lab-h').value),num_samples:Number(el('lab-trials').value)};el('lab-output').textContent=JSON.stringify(await j('/api/v2/model-plan',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}),null,2)}catch(e){el('lab-output').textContent='Plan unavailable: '+e}})</script></body></html>"""
+        return template.replace("__LOTO_VERSION__", __version__)
 
     @app.get("/api/v2/models")
     def models(
