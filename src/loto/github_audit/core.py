@@ -9,13 +9,12 @@ import os
 import re
 import subprocess
 import time
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
-UTC = dt.timezone.utc
 DEFAULT_API_VERSION = "2026-03-10"
-
 BLOCKED_PATTERNS = (
     "http 401",
     "http 403",
@@ -50,7 +49,7 @@ SENSITIVE_KEYS = {
 
 
 def iso_now() -> str:
-    return dt.datetime.now(UTC).isoformat(timespec="seconds")
+    return dt.datetime.now(dt.UTC).isoformat(timespec="seconds")
 
 
 def safe_slug(value: str) -> str:
@@ -96,17 +95,19 @@ def redact_variable_values(value: Any) -> Any:
     variables = value.get("variables", [])
     safe_variables = []
     for item in variables if isinstance(variables, list) else []:
-        if not isinstance(item, dict):
-            continue
-        safe_variables.append(
-            {
-                "name": item.get("name"),
-                "created_at": item.get("created_at"),
-                "updated_at": item.get("updated_at"),
-                "value": "<REDACTED>",
-            }
-        )
-    return {"total_count": value.get("total_count", len(safe_variables)), "variables": safe_variables}
+        if isinstance(item, dict):
+            safe_variables.append(
+                {
+                    "name": item.get("name"),
+                    "created_at": item.get("created_at"),
+                    "updated_at": item.get("updated_at"),
+                    "value": "<REDACTED>",
+                }
+            )
+    return {
+        "total_count": value.get("total_count", len(safe_variables)),
+        "variables": safe_variables,
+    }
 
 
 def write_json(path: Path, value: Any) -> None:
@@ -135,11 +136,7 @@ class EndpointRecord:
 
 
 class GhClient:
-    """Small authenticated wrapper around ``gh api``.
-
-    Every call is GET-only. Failures are recorded as audit evidence instead of being
-    silently treated as empty successful responses.
-    """
+    """Authenticated GET-only wrapper around ``gh api``."""
 
     def __init__(
         self,
@@ -163,7 +160,9 @@ class GhClient:
         self.datasets: dict[str, Any] = {}
         self.api_calls = 0
         self.env = os.environ.copy()
-        self.env.update({"GH_REPO": repo, "GH_PAGER": "cat", "PAGER": "cat", "NO_COLOR": "1"})
+        self.env.update(
+            {"GH_REPO": repo, "GH_PAGER": "cat", "PAGER": "cat", "NO_COLOR": "1"}
+        )
         self.raw_dir.mkdir(parents=True, exist_ok=True)
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -172,7 +171,12 @@ class GhClient:
         with self.log_path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(payload, ensure_ascii=False, sort_keys=True) + "\n")
 
-    def run_command(self, command: list[str], *, timeout: int | None = None) -> subprocess.CompletedProcess[str]:
+    def run_command(
+        self,
+        command: list[str],
+        *,
+        timeout: int | None = None,
+    ) -> subprocess.CompletedProcess[str]:
         self.log("DEBUG", "command_start", argv=command)
         try:
             completed = subprocess.run(
@@ -182,6 +186,13 @@ class GhClient:
                 capture_output=True,
                 timeout=timeout or self.timeout,
                 check=False,
+            )
+        except FileNotFoundError as exc:
+            completed = subprocess.CompletedProcess(
+                command,
+                127,
+                stdout="",
+                stderr=f"COMMAND_NOT_FOUND: {exc}",
             )
         except subprocess.TimeoutExpired as exc:
             completed = subprocess.CompletedProcess(
@@ -201,18 +212,24 @@ class GhClient:
 
     def verify_prerequisites(self) -> None:
         version = self.run_command(["gh", "--version"], timeout=30)
-        if version.returncode != 0:
-            raise RuntimeError("GitHub CLI `gh` was not found in PATH")
-        auth = self.run_command(["gh", "auth", "status", "--hostname", "github.com"], timeout=60)
+        auth = self.run_command(
+            ["gh", "auth", "status", "--hostname", "github.com"],
+            timeout=60,
+        )
         (self.run_dir / "logs" / "gh-version.txt").write_text(
-            version.stdout + version.stderr, encoding="utf-8"
+            version.stdout + version.stderr,
+            encoding="utf-8",
         )
         (self.run_dir / "logs" / "gh-auth-status.txt").write_text(
-            auth.stdout + auth.stderr, encoding="utf-8"
+            auth.stdout + auth.stderr,
+            encoding="utf-8",
         )
+        if version.returncode != 0:
+            raise RuntimeError("GitHub CLI `gh` was not found in PATH")
         if auth.returncode != 0:
             raise RuntimeError(
-                "gh authentication is unavailable; run `gh auth login --hostname github.com`"
+                "gh authentication is unavailable; run "
+                "`gh auth login --hostname github.com`"
             )
 
     def _command(self, endpoint: str, params: dict[str, Any] | None = None) -> list[str]:
@@ -285,9 +302,9 @@ class GhClient:
                 data = redact(data)
                 if postprocess:
                     data = postprocess(data)
-            except json.JSONDecodeError as exc:
+            except (json.JSONDecodeError, TypeError, ValueError) as exc:
                 status = "FAILED"
-                error = f"Invalid JSON: {exc}"
+                error = f"Invalid response: {exc}"
         else:
             status = classify_error(completed.stderr, completed.returncode)
             error = completed.stderr.strip()[-4000:] or f"gh api exit={completed.returncode}"
@@ -337,6 +354,7 @@ class GhClient:
         params: dict[str, Any] | None = None,
         item_key: str | None = None,
         max_items: int | None = None,
+        postprocess: Callable[[Any], Any] | None = None,
         raw_path: Path | None = None,
     ) -> list[Any] | None:
         started = time.monotonic()
@@ -379,6 +397,8 @@ class GhClient:
         duration_ms = round((time.monotonic() - started) * 1000)
         ok = status.startswith("VERIFIED")
         safe_items = redact(items)
+        if ok and postprocess:
+            safe_items = postprocess(safe_items)
         path = raw_path or self.raw_dir / f"{safe_slug(name)}.json"
         write_json(
             path,
@@ -411,6 +431,104 @@ class GhClient:
         if ok:
             self.datasets[name] = safe_items
             return safe_items
+        return None
+
+    def graphql_review_threads(
+        self,
+        *,
+        owner: str,
+        repo_name: str,
+        number: int,
+        raw_path: Path,
+    ) -> list[Any] | None:
+        query = """
+query($owner:String!, $name:String!, $number:Int!, $endCursor:String) {
+  repository(owner:$owner, name:$name) {
+    pullRequest(number:$number) {
+      reviewThreads(first:100, after:$endCursor) {
+        nodes {
+          id isResolved isOutdated path line originalLine
+          comments(first:100) {
+            nodes { id body createdAt updatedAt url path line originalLine author { login } }
+          }
+        }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  }
+}
+"""
+        command = [
+            "gh",
+            "api",
+            "graphql",
+            "--paginate",
+            "--slurp",
+            "-f",
+            f"query={query}",
+            "-F",
+            f"owner={owner}",
+            "-F",
+            f"name={repo_name}",
+            "-F",
+            f"number={number}",
+        ]
+        started = time.monotonic()
+        self.api_calls += 1
+        completed = self.run_command(command)
+        duration_ms = round((time.monotonic() - started) * 1000)
+        status = "VERIFIED"
+        error = None
+        threads: list[Any] = []
+        if completed.returncode == 0:
+            try:
+                pages = json.loads(completed.stdout) if completed.stdout.strip() else []
+                for page in pages if isinstance(pages, list) else [pages]:
+                    connection = (
+                        (page.get("data") or {})
+                        .get("repository", {})
+                        .get("pullRequest", {})
+                        .get("reviewThreads", {})
+                    )
+                    nodes = connection.get("nodes", [])
+                    if isinstance(nodes, list):
+                        threads.extend(nodes)
+                threads = redact(threads)
+            except (json.JSONDecodeError, AttributeError) as exc:
+                status = "FAILED"
+                error = f"Invalid GraphQL response: {exc}"
+        else:
+            status = classify_error(completed.stderr, completed.returncode)
+            error = completed.stderr.strip()[-4000:]
+        ok = status == "VERIFIED"
+        write_json(
+            raw_path,
+            {
+                "_audit": {
+                    "name": f"pr_{number}_review_threads",
+                    "endpoint": "graphql PullRequest.reviewThreads",
+                    "status": status,
+                    "fetched_at": iso_now(),
+                    "duration_ms": duration_ms,
+                    "returncode": completed.returncode,
+                    "error": error,
+                },
+                "data": threads if ok else None,
+            },
+        )
+        self._record(
+            name=f"pr_{number}_review_threads",
+            endpoint="graphql PullRequest.reviewThreads",
+            status=status,
+            ok=ok,
+            count=len(threads) if ok else None,
+            duration_ms=duration_ms,
+            returncode=completed.returncode,
+            error=error,
+            raw_path=raw_path,
+        )
+        if ok:
+            return threads
         return None
 
     def status_for(self, name: str) -> str | None:
