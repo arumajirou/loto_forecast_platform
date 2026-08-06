@@ -73,9 +73,9 @@ A requested device and CPU fallback policy are separate fields:
 MLflow is disabled by default. Enabling it requires a non-empty tracking URI. Tokens use Pydantic
 `SecretStr` and are always emitted as `<redacted>` in resolved artifacts and override provenance.
 
-The resolved-config SHA-256 covers the canonical redacted configuration. Secret bytes are not
-persisted and are deliberately excluded from the digest. This means the digest identifies the
-non-secret execution policy, not credential identity.
+The resolved-config SHA-256 covers the canonical redacted configuration and redacted override
+provenance. Secret bytes are not persisted and are deliberately excluded from the digest. The digest
+therefore identifies non-secret execution policy and value origin, not credential identity.
 
 ## Git metadata policy
 
@@ -121,7 +121,8 @@ resolved.json.sha256
 ```
 
 The JSON contains the schema version, redacted resolved config, environment override provenance, and
-resolved-config SHA-256. Writes use temporary sibling files followed by atomic replacement.
+resolved-config SHA-256. The sidecar contains the SHA-256 of the exact JSON artifact bytes. Writes use
+fsynced temporary sibling files followed by atomic replacement.
 
 ## Scope boundary
 
