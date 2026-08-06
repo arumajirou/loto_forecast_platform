@@ -11,6 +11,7 @@ SHA256_PASS
 RUFF_BLOCKED_TOOL_UNAVAILABLE
 MYPY_BLOCKED_TOOL_UNAVAILABLE
 FULL_PYTEST_NOT_STARTED
+CI_BLOCKED_RUNNER_START
 ```
 
 ## Repository and duplicate audit
@@ -118,8 +119,25 @@ Ruff=BLOCKED_TOOL_UNAVAILABLE
 mypy=BLOCKED_TOOL_UNAVAILABLE
 existing observability/API regression=PENDING_COMPLETE_PRIVATE_CHECKOUT
 full pytest=NOT_STARTED
-GitHub Actions=PENDING_FINAL_HEAD
 ```
+
+GitHub Actions evidence on implementation head `3c26da2d20db65aa89c6544c18821c1adb47bae8`:
+
+```text
+workflow=ci
+run_id=31084353819
+run_number=2966
+job=test
+job_id=92560204195
+conclusion=failure
+recorded_steps=0
+steps=[]
+logs_url=null
+classification=CI_BLOCKED_RUNNER_START
+code_test_failure=NOT_DEMONSTRATED
+```
+
+Checkout, Python setup, dependency installation, Ruff, compileall, mypy and pytest did not start.
 
 Property invariants are covered by deterministic generated loops because Hypothesis is unavailable in
 the authoring environment. This is not represented as Hypothesis execution.
