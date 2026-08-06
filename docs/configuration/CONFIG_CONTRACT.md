@@ -96,12 +96,15 @@ Environment overrides are allowlisted. The v1 allowlist is:
 | `LOTO_CONFIG_SEEDS` | `evaluation.seed_policy.seeds` | no |
 | `LOTO_CONFIG_MLFLOW_ENABLED` | `observability.mlflow.enabled` | no |
 | `LOTO_CONFIG_MLFLOW_TRACKING_URI` | `observability.mlflow.tracking_uri` | no |
+| `NEURALFORECAST_MLFLOW_TRACKING_URI` | `observability.mlflow.tracking_uri` | no |
 | `LOTO_CONFIG_MLFLOW_EXPERIMENT_NAME` | `observability.mlflow.experiment_name` | no |
 | `LOTO_CONFIG_MLFLOW_TOKEN` | `observability.mlflow.token` | yes |
 | `LOTO_CONFIG_GIT_REQUIRE_CLEAN` | `git_metadata.require_clean_worktree` | no |
 
-Each applied override records `env_var`, dotted target, `source=environment`, sensitivity, and a safe
-value representation. Unknown environment variables are ignored rather than interpreted dynamically.
+Each applied override records `env_var`, dotted target, `source=environment`, sensitivity,
+`redacted=true` for secrets, and a safe value representation. Unknown environment variables are
+ignored rather than interpreted dynamically. Setting two allowlisted keys for the same target fails
+closed instead of applying last-one-wins precedence.
 
 ## Resolved artifact
 
