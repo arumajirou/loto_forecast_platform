@@ -124,3 +124,76 @@ def test_task_formulation_is_not_silently_reinterpreted() -> None:
     payload["task_formulation"] = TaskFormulation.POSITION_BATCH.value
     with pytest.raises(ValidationError):
         TabPFNTSResponseV2.model_validate(payload)
+
+
+def test_status_ok_rejects_blocked_ts3_lane() -> None:
+    payload = build_position_response().model_dump(mode="json")
+    payload["model_identity"].update(
+        {
+            "checkpoint_lane": "ts3_current",
+            "repo_id": None,
+            "revision": None,
+            "checkpoint_filename": "tabpfn-v3-regressor-v3_20260506_timeseries.ckpt",
+            "checkpoint_sha256": None,
+        }
+    )
+    payload["artifact_reference"]["weight_sha256"] = None
+    payload["license_evidence"].update(
+        {
+            "weight_license": None,
+            "attribution_required": None,
+            "license_accepted": False,
+        }
+    )
+    with pytest.raises(ValidationError, match="checkpoint lane is not executable"):
+        TabPFNTSResponseV2.model_validate(payload)
+
+
+def test_status_ok_requires_exact_v2_checkpoint_identity() -> None:
+    payload = build_position_response().model_dump(mode="json")
+    payload["model_identity"]["checkpoint_sha256"] = "0" * 64
+    with pytest.raises(ValidationError, match="executable lane manifest"):
+        TabPFNTSResponseV2.model_validate(payload)
+
+
+def test_status_ok_requires_checkpoint_license_acceptance() -> None:
+    payload = build_position_response().model_dump(mode="json")
+    payload["license_evidence"]["license_accepted"] = False
+    with pytest.raises(ValidationError, match="license acceptance is required"):
+        TabPFNTSResponseV2.model_validate(payload)
+
+
+def test_runtime_and_gpu_provider_pid_must_match() -> None:
+    payload = build_position_response().model_dump(mode="json")
+    payload["runtime_evidence"]["provider_pid"] = 456
+    with pytest.raises(ValidationError, match="provider PID differs"):
+        TabPFNTSResponseV2.model_validate(payload)
+
+
+def test_feature_manifest_identity_must_match_effective_arguments() -> None:
+    payload = build_position_response().model_dump(mode="json")
+    payload["feature_manifest"]["feature_set_id"] = "different-feature-set"
+    with pytest.raises(ValidationError, match="feature_set_id differs"):
+        TabPFNTSResponseV2.model_validate(payload)
+
+
+def test_point_forecast_rejects_duplicate_series_horizon_pair() -> None:
+    payload = build_position_response().model_dump(mode="json")
+    payload["point_forecast"].append(dict(payload["point_forecast"][0]))
+    with pytest.raises(ValidationError, match="exactly once"):
+        TabPFNTSResponseV2.model_validate(payload)
+
+
+def test_quantile_forecast_rejects_duplicate_series_horizon_pair() -> None:
+    payload = build_position_response().model_dump(mode="json")
+    payload["quantiles"][0]["values"].append(dict(payload["quantiles"][0]["values"][0]))
+    with pytest.raises(ValidationError, match="exactly once"):
+        TabPFNTSResponseV2.model_validate(payload)
+
+
+def test_candidate_response_is_explicitly_one_step() -> None:
+    payload = build_candidate_response().model_dump(mode="json")
+    payload["effective_arguments"]["prediction_length"] = 2
+    payload["prediction_index"] = [1, 2]
+    with pytest.raises(ValidationError, match="prediction_length=1 only"):
+        TabPFNTSResponseV2.model_validate(payload)
