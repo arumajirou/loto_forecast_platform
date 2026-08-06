@@ -1,0 +1,91 @@
+{
+  "artifact_set": "auto-frets-runtime-certification-adapter-v1",
+  "artifacts": [
+    {
+      "path": "docs/neuralforecast/auto_frets/RUNTIME_CERTIFICATION.md",
+      "sha256": "217178bcec223f5d8ca37995216498b5bff89c3e726bda8f665f2209fc1b5c00",
+      "size_bytes": 5784,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "docs/neuralforecast/auto_frets/RUNTIME_TEST_PLAN.md",
+      "sha256": "61205ed6341deed017550e3b2b8c91736dd10b712796773156fec520082b6a66",
+      "size_bytes": 2805,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "docs/neuralforecast/auto_frets/RUNTIME_VERIFICATION_REPORT.md",
+      "sha256": "ce821819b49e197194cd1853bc5eddd21cf309d2f30169d0983a3f06c290ca05",
+      "size_bytes": 1718,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "scripts/run_auto_frets_runtime_certification.sh",
+      "sha256": "4492b2f59c2154e0ac4befbbfda3a8f4b04453843d3f4677d2c384a25674568e",
+      "size_bytes": 810,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_frets/certify.py",
+      "sha256": "2d28fbd93f2a6c1f6ffc12b0c14b63493d4933e1616a6b004f16c7333178fad6",
+      "size_bytes": 2618,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_frets/runtime_certification.py",
+      "sha256": "e09cecfbf205d05c2f7f77595d3ae15004ec9ba3ad18dccba9c4a573d582af1e",
+      "size_bytes": 16560,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_frets/runtime_contracts.py",
+      "sha256": "1ee77a4ad425e565601e520a44309ad13b0fe026ee43ca737734eba9a3ae839b",
+      "size_bytes": 12182,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_frets/runtime_source.py",
+      "sha256": "f1f55a64cbf99365b91e530b411c3db3bb39645fa3ee7e0dec9bbee5cface586",
+      "size_bytes": 7786,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_frets/runtime_worker.py",
+      "sha256": "5b2da41772ada394569c93e3b3d82446bc2dbd078615e8bac4349adc590796d3",
+      "size_bytes": 16496,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "tests/neuralforecast/auto_frets/test_runtime_certification_adapter.py",
+      "sha256": "bf69b30507fedb7b726a569a82185fbc2d442e9e8530354ccdaaec172fe7eb55",
+      "size_bytes": 5635,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "tests/neuralforecast/auto_frets/test_runtime_contracts_v2.py",
+      "sha256": "36728bd0c5f2ca868c51e85c90fedc8ab74cb0a72676153c6c69c81b8c357034",
+      "size_bytes": 3166,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "tests/neuralforecast/auto_frets/test_runtime_source.py",
+      "sha256": "63c7196749cde30673a361252fcab5633da1328c83a7463f942ffb5259c6d871",
+      "size_bytes": 3507,
+      "status": "generated_and_verified"
+    }
+  ],
+  "boundaries": {
+    "accuracy": "NOT_EVALUATED",
+    "holdout": "NOT_OPENED",
+    "prospective": "NOT_OPENED",
+    "real_runtime": "NOT_EXECUTED",
+    "registration": "NOT_IMPLEMENTED"
+  },
+  "dependencies": {
+    "foundation_pr": 149,
+    "native_provenance_pr": 54,
+    "runtime_sdk_pr": 123
+  },
+  "schema_version": "1.0.0",
+  "status": "PARTIALLY_VERIFIED"
+}
