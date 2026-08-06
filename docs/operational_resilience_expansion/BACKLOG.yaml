@@ -1,0 +1,54 @@
+schema_version: "1.0.0"
+program_id: operational-resilience-expansion-v1
+status: DOCUMENTATION_ONLY
+waves:
+  - wave: 1
+    items:
+      - id: OR-001
+        title: Durable Run Lifecycle Contract v1
+        branch: feat/durable-run-lifecycle-contract-v1
+        priority: P0
+        dependencies: []
+        root_dependency_change: false
+      - id: OR-002
+        title: Clock Health Gate v1
+        branch: feat/clock-health-gate-v1
+        priority: P0
+        dependencies: []
+        root_dependency_change: false
+      - id: OR-003
+        title: Untrusted Provider Sandbox Contract v1
+        branch: feat/untrusted-provider-sandbox-contract-v1
+        priority: P0
+        dependencies: []
+        root_dependency_change: false
+  - wave: 2
+    items:
+      - id: OR-004
+        title: Database Migration Foundation v1
+        branch: feat/database-migration-foundation-v1
+        priority: P0
+        dependencies: []
+        root_dependency_change: true
+      - id: OR-005
+        title: Persistence Outbox and Reconciliation v1
+        branch: feat/persistence-outbox-reconciliation-v1
+        priority: P0
+        dependencies: [OR-001, OR-004]
+        root_dependency_change: false
+  - wave: 3
+    items:
+      - id: OR-006
+        title: Target-host Integration Fault Harness v1
+        branch: test/target-host-fault-harness-v1
+        priority: P0
+        dependencies: [OR-001, OR-005]
+        root_dependency_change: true
+later:
+  - pgBackRest backup and restore certification
+  - object-store versioning and immutability
+  - SBOM and supply-chain attestation
+  - SOPS and age secret workflow
+  - SLO and synthetic monitoring
+  - point-in-time feature join
+  - model confidence set and SPA
