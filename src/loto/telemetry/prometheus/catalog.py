@@ -215,8 +215,9 @@ class PlatformMetricCatalog:
         if not definition.label_allowlist:
             label_product = 1
         if definition.kind is MetricKind.COUNTER:
-            multiplier = 2
+            multiplier = 2  # value plus the Python client's created timestamp
         elif definition.kind is MetricKind.HISTOGRAM:
+            # Reviewed buckets, +Inf, count, sum, and created timestamp.
             multiplier = len(definition.buckets) + 4
         else:
             multiplier = 1
