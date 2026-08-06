@@ -5,11 +5,13 @@
 - Repository: `arumajirou/loto_forecast_platform`
 - Pull request: `#133`
 - Branch: `agent/github-repository-audit-cli`
-- Current head SHA: `ff02e786a39f26ac8edc406aac55da0c46a2d2b4`
 - Base branch: `main`
 - Base SHA at PR creation: `d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0`
-- Branch relation: `ahead 24 / behind 0`
 - Status: `DRAFT / NOT MERGED`
+
+Dynamic head SHA, ahead/behind counts, and workflow state must be read from GitHub at
+review time. They are intentionally not embedded here because updating this report
+creates a new head commit.
 
 ## 2. Implemented surface
 
@@ -58,7 +60,7 @@ Observed workflow runs for this PR failed before repository steps executed.
 - Job name: `test`
 - Job steps: `0`
 
-### Latest observed run
+### Latest observed run at report refresh
 
 - Run ID: `31091437576`
 - Job ID: `92583137466`
@@ -72,7 +74,7 @@ installation, Ruff, compileall, and pytest steps were never materialized.
 
 ## 5. Review evidence
 
-- Pull request is mergeable according to GitHub metadata.
+- Pull request was mergeable according to GitHub metadata at report refresh time.
 - No inline review threads were present at report refresh time.
 - The only submitted review was a Sourcery private-repository subscription notice;
   it did not contain an implementation change request.
