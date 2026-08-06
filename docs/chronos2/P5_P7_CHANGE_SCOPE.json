@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "base_branch": "feat/chronos2-provider-contract-v2",
+  "base_sha": "8fe755ed57c7da75e4c2cf772a8a64f9847fc05c",
+  "phase": "P5-P7",
+  "owned_paths": [
+    "configs/chronos2_campaign/**",
+    "src/loto/chronos2_campaign/**",
+    "scripts/run_chronos2_*.py",
+    "tests/chronos2_campaign/**",
+    "docs/chronos2/**"
+  ],
+  "forbidden_paths": [
+    "pyproject.toml",
+    "uv.lock",
+    ".github/workflows/**",
+    "src/loto/models/workers.py",
+    "src/loto/models/catalog.py",
+    "src/loto/models/catalog_full.py",
+    "README.md"
+  ],
+  "holdout_opened": false,
+  "prospective_opened": false,
+  "automatic_promotion": false,
+  "automatic_retraining": false
+}
