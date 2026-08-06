@@ -24,9 +24,18 @@
 | `MIGRATION_PLAN.md` | additive migration and rollback | CREATED |
 | `RISK_REGISTER.md` | identified risks and mitigations | CREATED |
 | `RUNBOOK.md` | cross-platform operations and incident procedures | CREATED |
-| `IMPLEMENTATION_PROMPT.md` | reusable implementation instruction | CREATED |
-| `CHANGELOG.md` | package change history | CREATED |
-| `HANDOFF.md` | implementation handoff and remaining gates | CREATED after this manifest |
+| `IMPLEMENTATION_PROMPT.md` | authoritative one-feature execution instruction with approval, eligibility, evidence, stop, rollback, PR, and final-report gates | UPDATED 2026-08-06 |
+| `CHANGELOG.md` | package change history | UPDATED 2026-08-06 |
+| `HANDOFF.md` | implementation handoff and remaining gates | CREATED |
+| `WEBHOOK_DATA_CONTRACT.md` | normalized webhook persistence and processing contract | CREATED |
+| `VERIFICATION_REPORT.md` | performed and pending verification claims | CREATED |
+
+## Prompt revision evidence
+
+- `IMPLEMENTATION_PROMPT.md` update commit: `efba9502f5855dd31c81f1811b7ea05db199d466`
+- updated content blob: `537469d2545d780b7e38810a6a7469996f77fc5f`
+- `CHANGELOG.md` update commit: `b8f75d33ecbc89ea56f2d1184d5ca95f18b50041`
+- prompt revision status: `EXECUTED_REMOTE_WRITE / SEMANTIC_REVIEW_PARTIAL / LOCAL_LINT_PENDING`
 
 ## Excluded artifacts
 
@@ -49,6 +58,8 @@ GitHub commit and blob identities are retained by the repository and the Draft P
 
 - Repository/branch creation: `EXECUTED`
 - Files pushed to remote branch: `EXECUTED`
+- Authoritative prompt remote update: `EXECUTED`
+- Prompt cross-check against REQUIREMENTS, IMPLEMENTATION_PLAN, EXECUTION_SCHEDULE, and TEST_PLAN: `PARTIALLY_VERIFIED`
 - Markdown semantic review: `PARTIALLY_VERIFIED`
 - Local Markdown lint/link check: `EXECUTION_PENDING`
 - Secret scan: `EXECUTION_PENDING`
@@ -58,8 +69,9 @@ GitHub commit and blob identities are retained by the repository and the Draft P
 
 ## Verification instructions
 
-1. Review the Draft PR changed-file list.
+1. Review the Draft PR changed-file list and latest commits.
 2. Confirm all paths remain under `docs/github_platform_features/`.
-3. Run Markdown lint, link check, secret scan, and repository diff review locally.
-4. Generate a portable export and SHA-256 manifest only if a downloadable handoff package is required.
-5. Keep the PR Draft until review and actionable CI evidence are available.
+3. Compare `IMPLEMENTATION_PROMPT.md` with REQUIREMENTS, IMPLEMENTATION_PLAN, EXECUTION_SCHEDULE, TEST_PLAN, RISK_REGISTER, RUNBOOK, and HANDOFF.
+4. Run Markdown lint, link check, secret scan, and repository diff review locally.
+5. Generate a portable export and SHA-256 manifest only if a downloadable handoff package is required.
+6. Keep the PR Draft until review and actionable CI evidence are available.
