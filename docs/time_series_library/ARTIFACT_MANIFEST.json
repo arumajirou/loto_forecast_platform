@@ -43,34 +43,16 @@
       "status": "existing_remote"
     },
     {
-      "path": "LIGHTWEIGHT_MODEL_SELECTION.md",
-      "sha256": "fd50f0daa6d56d1c5a18f6b4b4730e5186864a813187f03ae9f0f356654d7db8",
-      "size_bytes": 1385,
-      "status": "generated_and_verified"
-    },
-    {
       "path": "LOCK_RESOLUTION_REPORT.json",
       "sha256": "4fcc4dd5941bc2c1701b4e950bfdfa0fb8a900e874980019259827cd9c882051",
       "size_bytes": 442,
       "status": "existing_remote"
     },
     {
-      "path": "MODEL_INVENTORY_PINNED_SEARCH.json",
-      "sha256": "fd13532807b05840415f11fea88427013e1570625a5114a9bbd93f32c1209356",
-      "size_bytes": 4373,
-      "status": "generated_and_verified"
-    },
-    {
       "path": "PINNED_SOURCE_PROVIDER_CERTIFICATION.json",
       "sha256": "4095a101d67e177f7c10a86e8fd803957c71e0be4687b9554c5e536f6d9d15ee",
       "size_bytes": 3640,
       "status": "existing_remote"
-    },
-    {
-      "path": "README.md",
-      "sha256": "e658250beccc77151f765505a998a4adf672c3bfa93166169ad749ea65d8e055",
-      "size_bytes": 1924,
-      "status": "generated_and_verified"
     },
     {
       "path": "SCINET_CPU_CERTIFICATION.json",
@@ -112,19 +94,19 @@
       "path": "TIMEFILTER_CPU_CERTIFICATION.json",
       "sha256": "4bf63c671e078ee57b0a549f8ad4b98e784a74820453a455d8a06611d63fcba4",
       "size_bytes": 5738,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "TIMEFILTER_GEOMETRY_MATRIX.json",
       "sha256": "039c84f3c9a770b587195d51250621ccdb846120e8eb41bbbdc782115bfb7d3b",
       "size_bytes": 9867,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "TIMEFILTER_PARAMETER_CONTRACT.md",
       "sha256": "cbc3eb4ed44db7f77b103c8c357771c071d07986c852a252d2a2ee3a8180b76a",
       "size_bytes": 2129,
-      "status": "generated_and_verified"
+      "status": "existing_remote"
     },
     {
       "path": "TSMIXER_CPU_CERTIFICATION.json",
@@ -133,9 +115,45 @@
       "status": "existing_remote"
     },
     {
+      "path": "LIGHTWEIGHT_MODEL_SELECTION.md",
+      "sha256": "473765e01cfd79e41116583c9a9517ee3c8366622ddefa86b68ba6726d58e11b",
+      "size_bytes": 1940,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "MODEL_INVENTORY_PINNED_SEARCH.json",
+      "sha256": "759cece3373c76e8258b8443794d053c0c098eb3c4a8557ee4ae647429f686e7",
+      "size_bytes": 4365,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "README.md",
+      "sha256": "c3e45816b18456b4810b59b8e2dff61c7e913eccc2f5072f18464462d6faba4a",
+      "size_bytes": 2009,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "TIDE_CPU_CERTIFICATION.json",
+      "sha256": "0680663b601115e9477f6e976513fab8252b41ec7a0b673d3aa4b7480dba1df0",
+      "size_bytes": 4143,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "TIDE_GEOMETRY_MATRIX.json",
+      "sha256": "c0f4e402cb21e8900e0ae8fe07662f2b2516e8eb6086c366f09d6bea468a0ccb",
+      "size_bytes": 7479,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "TIDE_PARAMETER_CONTRACT.md",
+      "sha256": "9673e7b7452ae96b360cfbb8236ee59bb3520d3f1eea62f0f55990df76099b2c",
+      "size_bytes": 2010,
+      "status": "generated_and_verified"
+    },
+    {
       "path": "VERIFICATION_REPORT.md",
-      "sha256": "e0d2000cd49c0e465a7229ccb0c24a7977d1329f6619051a9fa531e0835dda88",
-      "size_bytes": 2571,
+      "sha256": "f4d4a3f4da2e2ffbe556e7ce4c32c755b89d444f1c56575bae362bc857b12429",
+      "size_bytes": 3014,
       "status": "generated_and_verified"
     }
   ],
@@ -143,7 +161,8 @@
     "ci": "BLOCKED_PRE_RUN",
     "gpu_runtime": "EXECUTION_PENDING",
     "holdout_prospective": "NOT_OPENED",
-    "isolated_uv_lock": "BLOCKED_OFFLINE_CACHE_MISS_EINOPS",
+    "isolated_uv_lock": "BLOCKED_OFFLINE_CACHE_MISS",
+    "koopa": "DEFERRED_REQUIRES_DATA_PROVIDER_CONSTRUCTION",
     "pattn": "BLOCKED_MISSING_REFORMER_PYTORCH",
     "real_data_metrics": "NOT_EXECUTED",
     "target_torch_2_9_1_runtime": "EXECUTION_PENDING",
@@ -156,53 +175,130 @@
     "SegRNN",
     "FreTS",
     "SCINet",
-    "TimeFilter"
+    "TimeFilter",
+    "TiDE"
   ],
   "code_evidence": [
     {
-      "path": "src/loto/time_series_library_campaign/contracts.py",
-      "sha256": "916f3ef45be8a783eb3ebdc2a2d6ce5fbe4ea0c9d9cc18bb4d7d5abc97e96e11",
-      "size_bytes": 9637
+      "path": "src/loto/time_series_library_campaign/frets_runtime.py",
+      "sha256": "3a4fd67c7cbc0b539238b20161408a4619bd5cd79306ed523c180f6d31498bd9",
+      "status": "existing_remote"
     },
     {
-      "path": "src/loto/time_series_library_campaign/provider.py",
-      "sha256": "f61d479db0ed16e3cb4f40ce12ca4f7ece675946bb8ab649bdd6ae3fface71b6",
-      "size_bytes": 5426
+      "path": "src/loto/time_series_library_campaign/lightts_runtime.py",
+      "sha256": "b95d29361c6ab3200a6be7fe69bdab182f9edc018d3d794892bcb70238c06df6",
+      "status": "existing_remote"
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/scinet_runtime.py",
+      "sha256": "93a27bb6d462e86eb6dc43825ab7804f197e33a1f1a212ea4212958e83af04a0",
+      "status": "existing_remote"
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/segrnn_runtime.py",
+      "sha256": "afe0d62ffb393e25a27df784493665bc60c7b4654a967bdbb4280643d1df32d4",
+      "status": "existing_remote"
     },
     {
       "path": "src/loto/time_series_library_campaign/timefilter_runtime.py",
       "sha256": "1fc753b563f59dfa330c2a2f8e4e34b9a1bd468adf19db57569d637036f4ec76",
-      "size_bytes": 16255
+      "status": "existing_remote"
     },
     {
-      "path": "tests/time_series_library_campaign/test_timefilter_contract.py",
-      "sha256": "f6ae8e59a3b2263a7eda257c5949ed863864f9bab22095fc0ebb5b07e5064a80",
-      "size_bytes": 7141
+      "path": "tests/time_series_library_campaign/test_frets_checkpoint_contract.py",
+      "sha256": "9377697002bfe66ef0bbd696570923f7664e532c49ad4a3aadd7635ac76f7416",
+      "status": "existing_remote"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_frets_contract.py",
+      "sha256": "810953bcd568a8e828da96eee9c6cc39297368de09601814997b30e45896b2f0",
+      "status": "existing_remote"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_lightts_checkpoint_contract.py",
+      "sha256": "93a914a9ba5ef9aecaf05479d3ad7035f275b86bd5f138605a7553c872a9dc97",
+      "status": "existing_remote"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_lightts_contract.py",
+      "sha256": "85c884285d1c92af78d5d1e6ba15e6df7b3d73b00efd62f042aa3951cae16423",
+      "status": "existing_remote"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_scinet_checkpoint_contract.py",
+      "sha256": "600ef9f4b68b9161d0bc0212d841948dbd3e262c7a7bd1c8026400ab154f45ae",
+      "status": "existing_remote"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_scinet_contract.py",
+      "sha256": "04ba67bf20fbf38b71432961804fbba8b5578324035f8180270d6108df64eafe",
+      "status": "existing_remote"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_segrnn_checkpoint_contract.py",
+      "sha256": "7c48cb76d7f569671ad4af080c99a7f5775227a49f7f1f1d0147a78df80a6365",
+      "status": "existing_remote"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_segrnn_contract.py",
+      "sha256": "1ed4623d9120a8d8f1e505688cdd4eb456880a3353885dc4fbdec8ea14682b7e",
+      "status": "existing_remote"
     },
     {
       "path": "tests/time_series_library_campaign/test_timefilter_checkpoint_contract.py",
       "sha256": "e795c36bab2873c2eaf6b421654cd09b5b7da8d1af4576d66199489549a72458",
-      "size_bytes": 3665
+      "status": "existing_remote"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_timefilter_contract.py",
+      "sha256": "f6ae8e59a3b2263a7eda257c5949ed863864f9bab22095fc0ebb5b07e5064a80",
+      "status": "existing_remote"
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/contracts.py",
+      "sha256": "32993219b28f4203a4d3d6c0d9533cb1a39289e3684d657b29f97826543be084",
+      "size_bytes": 10512,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/provider.py",
+      "sha256": "17fc673ce37662cf974ebe24f77d97e074e70f57dffc760c48dbcf89406dabef",
+      "size_bytes": 5716,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/tide_runtime.py",
+      "sha256": "8c82d6b51bad1edccbbe07f6556921e166f5958295c37d7c0568283cce76df7b",
+      "size_bytes": 12773,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_tide_contract.py",
+      "sha256": "cf46deb7d3954078d41b3f0d74242583e191413806ead55230927df0b064722e",
+      "size_bytes": 6827,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_tide_checkpoint_contract.py",
+      "sha256": "58034dff41432ce499fb495cb2e4463a28f3d2a7e49e1e4e88c3377f5c6a125b",
+      "size_bytes": 3051,
+      "status": "generated_and_verified"
     },
     {
       "path": "external/time-series-library/UPSTREAM_REVISION.json",
-      "sha256": "23d00f6ad88bfba423727ac91d0f54cf9875a61ea219d198e6f7776e568be634",
-      "size_bytes": 1570
+      "sha256": "3b9a81c3ce978f84ea2c5d1a834bf45333ddbe98feab71bcec6d8ce96e88bef2",
+      "size_bytes": 1159,
+      "status": "generated_and_verified"
     }
   ],
   "focused_validation": {
     "compileall": "PASS",
-    "frets_contract": "7 passed",
     "line_length_100": "PASS",
-    "provider_contract": "6 passed",
+    "previous_split_total": "35 passed retained; not rerun in this stage",
     "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT",
-    "scinet_contract": "7 passed",
-    "segrnn_contract": "8 passed",
-    "split_total": "35 passed",
-    "timefilter_contract": "7 passed",
-    "tsmixer_lightts_dedicated_tests": "NOT_PRESENT_IN_LOCAL_STAGE"
+    "tide_contract": "7 passed"
   },
-  "parent_head": "c5145e49e220ee11a88bbdd03ceafcf07756e9d2",
+  "parent_head": "edc0e2e84182fd3487a0b170af26dfe6ef848466",
   "project_pr": 54,
   "schema_version": "1.0",
   "status": "PARTIALLY_VERIFIED",

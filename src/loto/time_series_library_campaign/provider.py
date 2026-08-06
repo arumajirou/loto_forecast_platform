@@ -37,6 +37,10 @@ from .segrnn_runtime import (
     fit_save as segrnn_fit_save,
     load_predict as segrnn_load_predict,
 )
+from .tide_runtime import (
+    fit_save as tide_fit_save,
+    load_predict as tide_load_predict,
+)
 from .timefilter_runtime import (
     fit_save as timefilter_fit_save,
     load_predict as timefilter_load_predict,
@@ -96,6 +100,10 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
         return timefilter_fit_save(request)
     if request.operation == Operation.TIMEFILTER_LOAD_PREDICT:
         return timefilter_load_predict(request)
+    if request.operation == Operation.TIDE_FIT_SAVE:
+        return tide_fit_save(request)
+    if request.operation == Operation.TIDE_LOAD_PREDICT:
+        return tide_load_predict(request)
     assert request.before_prediction_path is not None
     assert request.after_prediction_path is not None
     verification = verify_prediction_files(

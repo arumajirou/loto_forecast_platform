@@ -38,6 +38,8 @@ class Operation(StrEnum):
     SCINET_LOAD_PREDICT = "scinet_load_predict"
     TIMEFILTER_FIT_SAVE = "timefilter_fit_save"
     TIMEFILTER_LOAD_PREDICT = "timefilter_load_predict"
+    TIDE_FIT_SAVE = "tide_fit_save"
+    TIDE_LOAD_PREDICT = "tide_load_predict"
     VERIFY_ROUNDTRIP = "verify_roundtrip"
 
 
@@ -108,6 +110,9 @@ class ProviderRequest(BaseModel):
     timefilter_alpha: float = Field(default=0.1, ge=0.0, le=1.0)
     timefilter_top_p: float = Field(default=0.5, ge=0.0, le=1.0)
     timefilter_pos: bool = True
+    tide_d_layers: int = Field(default=1, ge=1, le=32)
+    tide_d_ff: int = Field(default=32, ge=1, le=65536)
+    tide_freq: Literal["h", "t", "s", "m", "a", "w", "d", "b"] = "h"
     checkpoint_path: Path | None = None
     input_path: Path | None = None
     before_prediction_path: Path | None = None
@@ -145,6 +150,10 @@ class ProviderRequest(BaseModel):
             Operation.TIMEFILTER_FIT_SAVE,
             Operation.TIMEFILTER_LOAD_PREDICT,
         }
+        tide_ops = {
+            Operation.TIDE_FIT_SAVE,
+            Operation.TIDE_LOAD_PREDICT,
+        }
         load_ops = {
             Operation.DLINEAR_LOAD_PREDICT,
             Operation.TSMIXER_LOAD_PREDICT,
@@ -153,6 +162,7 @@ class ProviderRequest(BaseModel):
             Operation.FRETS_LOAD_PREDICT,
             Operation.SCINET_LOAD_PREDICT,
             Operation.TIMEFILTER_LOAD_PREDICT,
+            Operation.TIDE_LOAD_PREDICT,
         }
         if self.operation in dlinear_ops and self.model_name != "DLinear":
             raise ValueError("DLinear operations require model_name=DLinear")
@@ -168,6 +178,8 @@ class ProviderRequest(BaseModel):
             raise ValueError("SCINet operations require model_name=SCINet")
         if self.operation in timefilter_ops and self.model_name != "TimeFilter":
             raise ValueError("TimeFilter operations require model_name=TimeFilter")
+        if self.operation in tide_ops and self.model_name != "TiDE":
+            raise ValueError("TiDE operations require model_name=TiDE")
         if self.operation in lightts_ops:
             if self.d_model < 16:
                 raise ValueError("LightTS requires d_model >= 16")
@@ -204,6 +216,11 @@ class ProviderRequest(BaseModel):
             token_count = self.channels * (self.seq_len // self.timefilter_patch_len)
             if token_count > 10000:
                 raise ValueError("TimeFilter token count exceeds positional limit 10000")
+        if self.operation == Operation.TIDE_FIT_SAVE:
+            if self.e_layers != 1 or self.tide_d_layers != 1:
+                raise ValueError("TiDE certified lane requires e_layers=1 and tide_d_layers=1")
+            if self.dropout != 0.0:
+                raise ValueError("TiDE certified lane requires dropout=0.0")
         if self.operation in load_ops and (
             self.checkpoint_path is None or self.input_path is None
         ):

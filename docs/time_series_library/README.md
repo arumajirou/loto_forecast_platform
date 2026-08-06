@@ -2,7 +2,7 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / SEVEN_PINNED_CPU_MODELS_VERIFIED / FULL_MATRIX_PENDING`
+`PARTIALLY_VERIFIED / EIGHT_PINNED_CPU_MODELS_VERIFIED / FULL_MATRIX_PENDING`
 
 This integration isolates `thuml/Time-Series-Library` at revision
 `4e938a1767106324dd753b2a44832bf870a0252e` from the root runtime.
@@ -22,40 +22,41 @@ upstream certification.
 - SegRNN;
 - FreTS;
 - SCINet;
-- TimeFilter.
+- TimeFilter;
+- TiDE.
 
 Each lane has bounded fit, finite prediction/state checks, atomic artifact writes,
 process exit, strict reload in a separate process, and prediction equality evidence.
 
-## TimeFilter operations
+## TiDE operations
 
-- `timefilter_fit_save`;
-- `timefilter_load_predict`.
+- `tide_fit_save`;
+- `tide_load_predict`.
 
 Example:
 
 ```json
 {
-  "operation": "timefilter_fit_save",
-  "model_name": "TimeFilter",
+  "operation": "tide_fit_save",
+  "model_name": "TiDE",
   "source_policy": "pinned",
   "seq_len": 8,
   "pred_len": 2,
   "channels": 3,
   "d_model": 8,
-  "timefilter_patch_len": 2,
-  "timefilter_n_heads": 2,
-  "timefilter_d_ff": 16,
-  "timefilter_alpha": 0.1,
-  "timefilter_top_p": 0.5,
   "e_layers": 1,
+  "tide_d_layers": 1,
+  "tide_d_ff": 16,
+  "tide_freq": "h",
   "dropout": 0.0,
   "train_steps": 3
 }
 ```
 
-TimeFilter rejects non-divisible patches, odd positional widths, incompatible head
-counts, excessive positional token counts, and modified checkpoint graph geometry.
+The certified TiDE lane rejects encoder or decoder depths above one because the pinned
+source constructs repeated blocks through list multiplication and therefore aliases the
+same module instance. It also rejects non-zero dropout. Time marks are generated as
+internal zero features; external covariate semantics remain outside this certification.
 
 ## Leakage boundary
 
