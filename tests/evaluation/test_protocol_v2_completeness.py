@@ -10,6 +10,7 @@ from pydantic import ValidationError
 from loto.evaluation.metric_registry import (
     PRIMARY_METRIC_ID,
     REQUIRED_BASELINE_IDS,
+    REQUIRED_POINT_METRICS,
     resolve_metric_id,
 )
 from loto.evaluation.protocol_diff import ProtocolComparisonRefused
@@ -74,6 +75,47 @@ def _protocol(**updates: object) -> EvaluationProtocolV2:
     }
     payload.update(updates)
     return EvaluationProtocolV2.model_validate(payload)
+
+
+def test_canonical_metric_inventory_is_complete() -> None:
+    assert REQUIRED_POINT_METRICS == (
+        "hit_at_1",
+        "position_hit_at_1",
+        "all_positions_hit_at_1",
+        "mae",
+        "mse",
+        "rmse",
+    )
+
+
+def test_protocol_v2_required_field_inventory_is_complete() -> None:
+    required = {
+        "schema_version",
+        "game_geometry",
+        "data_snapshot",
+        "split_manifest",
+        "feature_manifest",
+        "metric_manifest",
+        "baseline_manifest",
+        "alpha",
+        "multiplicity_correction",
+        "bootstrap_method",
+        "bootstrap_repetitions",
+        "conformal_method",
+        "conformal_alpha",
+        "sentinel_inventory",
+        "sentinel_repetitions",
+        "post_processing_identity",
+        "reconciliation_identity",
+        "seed_inventory",
+        "seed_aggregation_policy",
+        "search_space_identity",
+        "resource_budget",
+        "package_versions",
+        "code_hash",
+        "git_commit",
+    }
+    assert required == set(EvaluationProtocolV2.model_fields)
 
 
 def test_hit_at_1_is_primary() -> None:
@@ -161,6 +203,16 @@ def test_all_seed_mean_variance_and_worst_are_population_values() -> None:
     assert summary.standard_deviation == pytest.approx(math.sqrt(0.02666666666666667))
     assert summary.worst_value == pytest.approx(0.5)
     assert summary.worst_seed == 1
+
+
+def test_worst_seed_respects_minimize_direction() -> None:
+    summary = summarize_seed_metric(
+        "mae",
+        [SeedMetricValue(1, 0.5), SeedMetricValue(42, 1.2), SeedMetricValue(2026, 0.8)],
+        expected_seeds=(1, 42, 2026),
+    )
+    assert summary.worst_value == pytest.approx(1.2)
+    assert summary.worst_seed == 42
 
 
 def test_best_seed_only_aggregation_is_rejected() -> None:
