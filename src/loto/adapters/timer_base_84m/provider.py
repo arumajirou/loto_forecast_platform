@@ -68,8 +68,8 @@ class TimerBase84MProvider:
     def resolve_snapshot_manifest(self) -> dict[str, Any]:
         if not self.review_path.is_file():
             raise TimerProviderError("REMOTE_CODE_REVIEW_REQUIRED", "remote-code review is missing")
-        review = load_review(self.review_path)
         try:
+            review = load_review(self.review_path)
             validate_remote_code_review(review)
         except ValueError as exc:
             raise TimerProviderError("REMOTE_CODE_REVIEW_REQUIRED", str(exc)) from exc
