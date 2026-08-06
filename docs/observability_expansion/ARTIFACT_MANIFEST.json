@@ -1,0 +1,89 @@
+{
+  "base_commit": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "document_set": "observability-evaluation-oss-expansion-blueprint-v1",
+  "generated_at": "2026-08-06T16:04:00+09:00",
+  "record_count": 16,
+  "records": [
+    {
+      "path": "ARCHITECTURE.md",
+      "sha256": "c13511a4baec5abe8636ea6e999e3b42b5ec5affb8eac0d0383d593df75318ae",
+      "size_bytes": 2555
+    },
+    {
+      "path": "BASIC_DESIGN.md",
+      "sha256": "73bdf0d5e26f8b02300bbe00439576de2950c4e26957870f7a9d0f93018d604a",
+      "size_bytes": 2963
+    },
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "fd190f3be94f40dd149b8c58c6bd75683f096de1fb119f17332b83a4326a2ad2",
+      "size_bytes": 692
+    },
+    {
+      "path": "DETAILED_DESIGN.md",
+      "sha256": "1c4875ed79854ebc9d93d7543069d6c6a727b7a7023b76306263ff0bd805e7fc",
+      "size_bytes": 5509
+    },
+    {
+      "path": "EXECUTION_SCHEDULE.md",
+      "sha256": "7064070510ce461cccc7d80e6b23627cd3deabf6831e63c5494aacbb79d7abe6",
+      "size_bytes": 2451
+    },
+    {
+      "path": "FUNCTIONAL_SPECIFICATION.md",
+      "sha256": "a497bb674c8e734e6453408d39dc71170d67b3f0811eb86fcd7d0755d0191544",
+      "size_bytes": 5209
+    },
+    {
+      "path": "HANDOFF.md",
+      "sha256": "a803013b44be657476e8064f8383174f92fd6b12c778ff2819fbde81b60729b7",
+      "size_bytes": 1522
+    },
+    {
+      "path": "IMPLEMENTATION_PLAN.md",
+      "sha256": "88f148a95cdbc9cc2b64a3718cab425c4f35b7f83bf75d83b5c6a54aabf50562",
+      "size_bytes": 3526
+    },
+    {
+      "path": "MIGRATION_PLAN.md",
+      "sha256": "779bb8ff21717e4d6b03b3a475bf0de2556b7ccb0abdb386aa9f0f0aaa4171f7",
+      "size_bytes": 2005
+    },
+    {
+      "path": "OSS_SELECTION.md",
+      "sha256": "ada9a9bc6ebeccc6a380d3bd0d628fe7d2234d6595e85901aab2edfc7d92a701",
+      "size_bytes": 2362
+    },
+    {
+      "path": "PROMPTS.md",
+      "sha256": "7e42fbfcbce02f1f6067470ce0e9522a374f332a0560709a688a00ae0f48ce8b",
+      "size_bytes": 7432
+    },
+    {
+      "path": "README.md",
+      "sha256": "2579aa19c54edbefd532d80b9959a5f616193e13d3eb783a55390b85082e12e3",
+      "size_bytes": 2643
+    },
+    {
+      "path": "REQUIREMENTS.md",
+      "sha256": "c29e72047907b043d81df490aeba5654730f8e69d1fe04e6d477022527cbf29d",
+      "size_bytes": 5211
+    },
+    {
+      "path": "RISK_REGISTER.md",
+      "sha256": "143724b30d9b2a7a13f4fc37debf754d9f4b62b3133f83c759df17a0b97f25a2",
+      "size_bytes": 2328
+    },
+    {
+      "path": "TEST_PLAN.md",
+      "sha256": "cabb3520af708e48110cd7190b8cb676d83e17766dfb75558c3aa6ecaee5f11a",
+      "size_bytes": 3455
+    },
+    {
+      "path": "TRACEABILITY_MATRIX.md",
+      "sha256": "109e19a24a655904bdec67fa115d5aaf5d6d1bc2f4aeacfb8f2263f17b13a938",
+      "size_bytes": 951
+    }
+  ],
+  "schema_version": "1.0"
+}
