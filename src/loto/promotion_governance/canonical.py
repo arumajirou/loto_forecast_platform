@@ -13,7 +13,7 @@ from pydantic import BaseModel
 
 def _canonical_value(value: Any) -> Any:
     if isinstance(value, BaseModel):
-        return _canonical_value(value.model_dump(mode="json"))
+        return _canonical_value(value.model_dump(mode="python"))
     if isinstance(value, datetime):
         if value.tzinfo is None or value.utcoffset() is None:
             raise ValueError("canonical datetime must be timezone-aware")
