@@ -62,11 +62,10 @@ def validate_chronology(
         raise ChronologyError("dates must be strictly increasing")
     if draw_numbers[-1] > cutoff_draw_no or dates[-1] > cutoff_date:
         raise ChronologyError("chronology extends beyond prediction cutoff")
-    if time_axis is TimeAxis.DRAW_SEQUENCE:
-        expected = tuple(range(draw_numbers[0], draw_numbers[-1] + 1))
-        if draw_numbers != expected:
-            raise ChronologyError("draw_sequence evidence must be gap-free")
-    else:
+    expected_draw_numbers = tuple(range(draw_numbers[0], draw_numbers[-1] + 1))
+    if draw_numbers != expected_draw_numbers:
+        raise ChronologyError("draw number evidence must be gap-free")
+    if time_axis is TimeAxis.CALENDAR_TIME:
         weekdays = geometry_for(game).draw_weekdays
         expected_dates = _scheduled_dates(dates[0], dates[-1], weekdays)
         if dates != expected_dates:
