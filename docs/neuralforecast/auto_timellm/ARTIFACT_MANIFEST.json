@@ -1,0 +1,54 @@
+{
+  "base_branch": "main",
+  "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "files": [
+    {
+      "path": "docs/neuralforecast/auto_timellm/README.md",
+      "sha256": "c388e53995bca879c3fdcd2231079aee6c6c116f36dfc706f4b65ce3585b37b1",
+      "size_bytes": 6915
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_timellm/__init__.py",
+      "sha256": "cf2ab5a3706bcedf154646d0e7600ec27c880702f3f226e167f4b060154b9847",
+      "size_bytes": 962
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_timellm/contracts.py",
+      "sha256": "8b1eee80168229375a782a7b2868b012a3c08e7da92b171661468b79aaa1b421",
+      "size_bytes": 12758
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_timellm/runtime.py",
+      "sha256": "24b70c326c6a33c94062220d7a8ec376c6097f1ac96a62319f94fa17655d8c04",
+      "size_bytes": 13629
+    },
+    {
+      "path": "tests/neuralforecast/auto_timellm/test_contracts.py",
+      "sha256": "c3cec09ac538320f3c242b12488edc8c2c94b1cb3197df425ff62e0fdd76d24b",
+      "size_bytes": 4001
+    },
+    {
+      "path": "tests/neuralforecast/auto_timellm/test_runtime_factory.py",
+      "sha256": "683120a7bd28fa8dfa6cd9b3fba6f235d110d56b07181662bf4531dc6e7f9ab6",
+      "size_bytes": 6675
+    }
+  ],
+  "model_id": "nf-local-auto-timellm",
+  "schema_version": "1.0.0",
+  "scope": {
+    "add_only": true,
+    "holdout_opened": false,
+    "prospective_opened": false,
+    "root_dependencies_changed": false,
+    "shared_registry_changed": false
+  },
+  "status": "GENERATED_BEFORE_PUBLICATION",
+  "validation": {
+    "ast_parse": "PASS",
+    "compileall": "PASS",
+    "focused_pytest": "10 passed in 0.10s",
+    "line_length_100": "PASS",
+    "real_runtime": "NOT_EXECUTED",
+    "sha256sums": "PASS"
+  }
+}
