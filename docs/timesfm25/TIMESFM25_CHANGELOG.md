@@ -13,4 +13,8 @@
   CUDA availability, and offline execution.
 - Added a schema-v2 runtime request example and explicit lock-generation command.
 - Added a provider execution gate that blocks model loading after failed preflight.
+- Added a target-host operator CLI for preflight, tmux launch, status inspection,
+  deterministic ZIP finalization, and archive SHA-256 sidecars.
+- Added fail-closed operator states for running, partial, failed, incomplete, and
+  corrupt runtime bundles.
 - Added focused tests and phased verification documentation.

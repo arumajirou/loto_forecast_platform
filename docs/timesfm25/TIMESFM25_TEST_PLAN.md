@@ -14,6 +14,11 @@ missing or malformed `uv.lock`, wrong locked versions, multiple weight files, CU
 unavailability, offline variable enforcement, absolute snapshot paths, manifest
 identity mismatch, and blocking provider execution after a failed preflight.
 
+Operator-workflow tests cover stable Run IDs, tmux-safe session names, request
+materialization, absolute snapshot enforcement, offline runner generation, argument
+vector construction, running and partial states, deterministic ZIP bytes, tamper
+rejection, archive placement, CLI subcommands, and explicit lock generation.
+
 Pending execution tests are real target-host lock generation, model byte hashing,
 GPU load/inference/PID/VRAM evidence, separate-process snapshot reload with real
 weights, native/Transformers numeric parity, full pytest, and functional GitHub

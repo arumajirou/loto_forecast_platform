@@ -7,7 +7,7 @@ cd /absolute/path/to/loto_forecast_platform || exit 1
 set -Eeuo pipefail
 
 RUN_ID="timesfm25-tests-$(date +%Y%m%d-%H%M%S)"
-LOG_ROOT="/absolute/path/to/logs/timesfm25"
+LOG_ROOT="$HOME/Downloads/timesfm25-tests"
 RUN_DIR="${LOG_ROOT}/${RUN_ID}"
 mkdir -p "$RUN_DIR"
 LOG="${RUN_DIR}/run.log"
@@ -29,10 +29,100 @@ uv run pytest \
   2>&1 | tee "$LOG"
 ```
 
-## Create the target-host request
+## Recommended target-host operator workflow
 
-Copy the example, replace the timestamp-like placeholder with a unique Run ID, and
-set `snapshot_path` to the absolute pinned snapshot directory.
+The operator command performs request creation, preflight, tmux launch, status
+inspection, bundle verification, and deterministic ZIP finalization. Use a new Run
+ID for every attempt.
+
+```bash
+cd /mnt/e/env/ts/loto_forecast_platform || exit 1
+set -Eeuo pipefail
+
+RUN_ID="timesfm25-native-$(date -u +%Y%m%dT%H%M%SZ)"
+SNAPSHOT="/absolute/path/to/pinned/google-timesfm-2.5-200m-pytorch-snapshot"
+
+uv run python scripts/run_timesfm25_target_host.py launch \
+  --run-id "$RUN_ID" \
+  --snapshot "$SNAPSHOT" \
+  --generate-lock \
+  --preflight-timeout 600 \
+  --timeout 3600
+
+printf 'RUN_ID=%s\n' "$RUN_ID"
+printf 'STATUS_COMMAND=uv run python scripts/run_timesfm25_target_host.py status --run-id %s\n' \
+  "$RUN_ID"
+printf 'Enterキーで終了します...'
+read -r _
+```
+
+Use `--generate-lock` only when creating or intentionally refreshing the isolated
+`environments/timesfm25-pytorch/uv.lock`. Omit it on later runs so the existing lock
+must pass the offline consistency checks.
+
+Check progress without modifying the runtime bundle:
+
+```bash
+cd /mnt/e/env/ts/loto_forecast_platform || exit 1
+RUN_ID="<the same run id>"
+
+uv run python scripts/run_timesfm25_target_host.py status \
+  --run-id "$RUN_ID"
+
+printf 'ATTACH_COMMAND=tmux attach -t tfm25-%s\n' \
+  "${RUN_ID//_/-}"
+printf 'Enterキーで終了します...'
+read -r _
+```
+
+After the tmux session finishes, verify and archive the sealed evidence:
+
+```bash
+cd /mnt/e/env/ts/loto_forecast_platform || exit 1
+RUN_ID="<the same run id>"
+
+uv run python scripts/run_timesfm25_target_host.py finalize \
+  --run-id "$RUN_ID"
+
+printf 'Enterキーで終了します...'
+read -r _
+```
+
+Finalization exit codes:
+
+```text
+0 = COMPLETED; verified CPU or strict verified GPU bundle archived
+2 = PARTIAL; partial GPU evidence bundle archived
+3 = RUNNING; tmux session is still active and no archive was created
+1 = failed, corrupt, incomplete, unsealed, or invalid bundle
+```
+
+The operator creates control files under:
+
+```text
+artifacts/timesfm25/operator/<run_id>/
+```
+
+The immutable runtime evidence remains under:
+
+```text
+artifacts/timesfm25/runtime-certification/<run_id>/
+```
+
+Verified archives and SHA-256 sidecars are written outside the sealed runtime bundle:
+
+```text
+artifacts/timesfm25/runtime-archives/<run_id>.zip
+artifacts/timesfm25/runtime-archives/<run_id>.zip.sha256
+```
+
+`--foreground` is available for diagnosis when tmux cannot be used. Detached tmux is
+the normal target-host mode.
+
+## Manual target-host request and preflight
+
+Copy the example, replace the placeholder with a unique Run ID, and set
+`snapshot_path` to the absolute pinned snapshot directory.
 
 ```bash
 cd /absolute/path/to/loto_forecast_platform || exit 1
@@ -50,10 +140,6 @@ read -r _
 The preflight requires an absolute snapshot path containing exactly one
 `model.safetensors` plus a valid `config.json`. The weight SHA-256 must match the
 backend manifest.
-
-## Generate and verify the isolated lockfile
-
-When `environments/timesfm25-pytorch/uv.lock` does not exist, create it explicitly:
 
 ```bash
 cd /absolute/path/to/loto_forecast_platform || exit 1
@@ -75,37 +161,15 @@ printf 'Enterキーで終了します...'
 read -r _
 ```
 
-`--generate-lock` is the only preparation step permitted to resolve packages. The
-subsequent checks use `uv lock --check --offline` and
-`uv run --locked --offline`. When a lockfile already exists, omit
-`--generate-lock`; the script fails if the lockfile is missing, stale, malformed,
-or contains different pinned versions.
-
-The preflight also verifies:
-
-```text
-repo_id and revision match the backend manifest
-pyproject.toml exact TimesFM/Torch/Hugging Face Hub pins
-uv.lock exact locked versions
-absolute local snapshot path
-valid config.json
-exactly one model.safetensors
-model.safetensors SHA-256
-runtime import versions
-PyTorch CUDA availability and device count
-nvidia-smi availability and query success
-offline environment enforcement
-```
-
 Do not continue unless the generated report contains `"status": "PASS"`.
 
-## Runtime certification
+## Manual runtime certification
 
-For a long GPU run, use `tmux` so the process and evidence survive terminal closure:
+The operator CLI is preferred. The lower-level launcher remains available:
 
 ```bash
 cd /absolute/path/to/loto_forecast_platform || exit 1
-set -Eeuo pipefail
+set -EEo pipefail
 
 REQUEST="$HOME/Downloads/timesfm25-provider-request.json"
 SESSION="timesfm25-cert-$(date +%Y%m%d-%H%M%S)"
@@ -121,69 +185,24 @@ tmux new-session -d -s "$SESSION" \
      --output-root artifacts/timesfm25/runtime-certification \
      --preflight-timeout 600 \
      --timeout 3600 \
-     2>&1 | tee '$CONSOLE_LOG'; \
-   rc=\${PIPESTATUS[0]}; \
-   printf 'EXIT_CODE=%s\n' \"\$rc\" | tee -a '$CONSOLE_LOG'; \
-   printf 'Enterキーで終了します...'; read -r _"
+     2>&1 | tee '$CONSOLE_LOG'"
 
 printf 'TMUX_SESSION=%s\n' "$SESSION"
 printf 'CONSOLE_LOG=%s\n' "$CONSOLE_LOG"
 printf 'ATTACH_COMMAND=tmux attach -t %s\n' "$SESSION"
 ```
 
-The launcher independently repeats the preflight before starting the provider. A
-failed preflight creates and seals a failure bundle but does not start model loading
-or inference.
+The launcher independently repeats preflight before starting the provider. A
+failed preflight creates and seals a failure bundle but does not start model loading or
+inference.
 
-The immutable run directory records:
-
-```text
-provider_request.json
-preflight.json
-provider_response.json
-command.json
-environment.json
-provider.stdout.log
-provider.stderr.log
-provider_exit_code.txt
-nvidia_process_samples.csv
-nvidia_process_monitor.stderr.log
-runtime_certification.json
-status.txt
-SHA256SUMS
-```
-
-Exit codes:
+Runtime exit codes:
 
 ```text
-0 = VERIFIED_CPU or VERIFIED_GPU
+0 = VERIFIED_CPE or VERIFIED_GPU
 2 = PARTIALLY_VERIFIED_GPU
 1 = preflight, provider, request, bundle, or orchestration failure
 ```
 
 `PARTIALLY_VERIFIED_GPU` is expected for the native API while mean and quantile
 outputs are CPU NumPy arrays. It must not be reported as strict GPU certification.
-
-## Verify a completed evidence directory
-
-```bash
-cd /absolute/path/to/loto_forecast_platform || exit 1
-RUN_DIR="/absolute/path/to/artifacts/timesfm25/runtime-certification/<run_id>"
-
-uv run python - "$RUN_DIR" <<'PY'
-from pathlib import Path
-import sys
-
-from loto.timesfm25_campaign.certification_bundle import verify_sha256_manifest
-
-run_dir = Path(sys.argv[1])
-ok, failures = verify_sha256_manifest(run_dir)
-print(f"SHA256_VERIFY={'PASS' if ok else 'FAIL'}")
-for failure in failures:
-    print(f"FAILURE={failure}")
-raise SystemExit(0 if ok else 1)
-PY
-
-printf 'Enterキーで終了します...'
-read -r _
-```
