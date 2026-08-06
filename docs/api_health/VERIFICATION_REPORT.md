@@ -2,7 +2,7 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / FOCUSED_FAKE_PROBE_TESTS_PASS / LIVE_BACKENDS_NOT_PROBED`
+`PARTIALLY_VERIFIED / FOCUSED_FAKE_PROBE_TESTS_PASS / LIVE_BACKENDS_NOT_PROBED / CI_BLOCKED_PRE_RUN`
 
 ## Repository audit
 
@@ -60,6 +60,16 @@ The dependency stubs were used only because the validation environment did not c
 private checkout. They do not prove integration with a real registry, PostgreSQL, MLflow, artifact
 store, prediction-lock verifier, data source, GPU service, or job queue.
 
+## GitHub Actions
+
+The implementation head triggered workflow run `31078532756`, run number `2703`, job
+`92541788720`. It completed with `conclusion=failure`, but `steps=null` and `logs_url=null`.
+Checkout, Python setup, dependency installation, Ruff, compileall, mypy, focused pytest, and full
+pytest did not start.
+
+Classification: `CI_BLOCKED_PRE_RUN`, not a demonstrated implementation or test failure. No rerun was
+requested.
+
 ## Pending
 
 ```text
@@ -69,7 +79,6 @@ full repository compileall=PENDING
 full repository pytest=PENDING
 Ruff=PENDING_TOOL_UNAVAILABLE
 mypy=PENDING_TOOL_UNAVAILABLE
-GitHub Actions=PENDING
 ```
 
 ## Explicit non-claims
