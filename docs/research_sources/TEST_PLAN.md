@@ -2,6 +2,9 @@
 
 ## Focused contract tests
 
+Tests are split into core schema, first-stage hardening, and final governance files so each
+fail-closed layer can be reviewed independently while retaining one shared contract surface.
+
 - valid initial registry and exact initial source IDs;
 - duplicate source ID and logical model ID rejection;
 - malformed, uppercase, shortened, and unpinned formal revision rejection;
@@ -11,7 +14,12 @@
 - remote-code policy, safe/unique allowlist, and reviewed-file inventory binding;
 - release-state/status consistency, paper identity, and verified-intake completeness;
 - concrete HTTPS repository identity and mirror-flag consistency;
-- floating package-version rejection;
+- floating/ranged package-version and normalized duplicate-package rejection;
+- verified runtime-compatibility and package-source completeness;
+- contamination disclosure/risk evidence consistency;
+- complete official URL verification evidence;
+- repository-type consistency for source and model repositories;
+- remote-status/release-status cross-state consistency;
 - nonofficial mirror canonical rejection;
 - supersession reference and cycle rejection;
 - unknown-field rejection;

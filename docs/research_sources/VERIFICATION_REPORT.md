@@ -35,22 +35,22 @@ passing.
 
 | Gate | Result | Evidence boundary |
 |---|---|---|
-| focused pytest | PASS: 42 passed | isolated exact proposed source/config/tests |
+| focused pytest | PASS: 54 passed | isolated exact proposed source/config/tests |
 | compileall | PASS | `src/loto/research_sources` and `tests/research_sources` |
 | Python AST parse | PASS | every changed Python file |
 | JSON parse | PASS | registry index and 11 record JSON files |
 | YAML parse | NOT_APPLICABLE | no YAML artifact is introduced |
 | line-length scan | PASS: 0 over 100 | changed Python source and tests |
 | secret-pattern scan | PASS: 0 findings | all proposed text artifacts |
-| changed-path ownership | PASS | 30 pre-manifest files, all in allowed paths |
-| artifact manifest | PASS | regenerated after this report and verified |
-| SHA256SUMS | PASS | regenerated after this report and verified |
+| changed-path ownership | PASS | 37 managed files, all in allowed paths |
+| artifact manifest | PASS: 37 managed artifacts | regenerated after this report and verified |
+| SHA256SUMS | PASS: 38 entries including manifest | regenerated after this report and verified |
 | Ruff | BLOCKED_TOOL_UNAVAILABLE | `python -m ruff`: module not installed |
 | mypy | BLOCKED_TOOL_UNAVAILABLE | `python -m mypy`: module not installed |
 | related catalog regression | PASS | active catalogs were not imported or modified |
-| local artifact full pytest | PASS: 42 passed | all tests present in isolated artifact mirror |
+| local artifact full pytest | PASS: 54 passed | all tests present in isolated artifact mirror |
 | full repository pytest | BLOCKED_NO_FULL_CHECKOUT | private full checkout unavailable here |
-| GitHub Actions | BLOCKED_NO_ACTIONABLE_LOG | run #2800 had no steps; logs returned BlobNotFound |
+| GitHub Actions | BLOCKED_NO_ACTIONABLE_LOG | run #2903 had no steps; logs returned BlobNotFound |
 
 ## Verification classification
 
@@ -69,5 +69,9 @@ The post-publication review identified and closed fail-open boundaries where a r
 `VERIFIED_FOR_INTAKE` while paper identity, canonical repository identity, release state, required
 artifact sizes/hashes, license sources, or commercial eligibility remained unresolved. It also
 corrected the remote-code state machine so a completed review can reach intake only with a safe
-non-empty allowlist whose files are present and pinned in the artifact inventory. Fifteen regression
-tests were added; the final focused result is `42 passed`.
+non-empty allowlist whose files are required and pinned in the artifact inventory. A second
+independent pass then closed unresolved paper title/identifier, runtime compatibility, exact and
+non-duplicate package identity, contamination evidence, repository-type, official-URL evidence, and
+cross-state status gaps. Twenty-seven post-publication regression tests were added in total; the
+final focused result is `54 passed`. The implementation and tests were then split into narrow
+modules without changing the public contract names; the same 54 tests passed after the split.

@@ -20,7 +20,12 @@ configs/research_sources/registry.v1.json
 
 ## Modules
 
-- `models.py`: contracts, enums, field validation, cross-record validation, and non-claims.
+- `common.py`: strict configuration, enums, sentinels, and primitive validators.
+- `contracts.py`: repository, artifact, package, license, compatibility, remote-code,
+  contamination, verification-report, and non-claim contracts.
+- `records.py`: source-record fields and fail-closed intake-state validation.
+- `registry_model.py`: cross-record identity, supersession-reference, and cycle validation.
+- `models.py`: compatibility facade that preserves the original public import surface.
 - `registry.py`: duplicate-key-safe loading, canonical serialization, SHA-256, and reports.
 - `cli.py`: validation entrypoint and atomic report output.
 - `__init__.py`: narrow public API.
@@ -40,5 +45,4 @@ The package imports none of the following:
 A later model intake PR reads one accepted source record and performs its own package, snapshot,
 remote-code, runtime, OOF, Holdout, Prospective, and production gates. This PR does not connect
 those stages.
-
 Registry storage uses `registry.v1.json` as a strict index and `records/*.json` as one immutable source record per file. The loader validates containment and composes the records before applying the Registry contract.

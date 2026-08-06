@@ -13,10 +13,12 @@ The allowed intake statuses are:
 - `BLOCKED`.
 
 `VERIFIED_FOR_INTAKE` is a source-intake state only. It requires an available release, concrete
-canonical repositories, pinned source/model revisions, resolved license evidence, resolved commercial
-eligibility, no unresolved blockers, and pinned size/SHA-256 for every required model artifact. It
-still does not claim artifact download, dependency resolution, load, inference, evaluation, or
-production registration.
+paper title/identifier/date/URL, type-correct canonical repositories, pinned source/model revisions,
+verified runtime compatibility with exact package identities, resolved contamination evidence,
+resolved license evidence and commercial eligibility, complete official-URL review evidence, no
+unresolved blockers, and pinned size/SHA-256 for every required model artifact. It still does not
+claim artifact download, dependency resolution, load, inference, evaluation, or production
+registration.
 
 ## Revision rules
 
@@ -38,10 +40,14 @@ repository must be official and non-mirror. Mirrors can be retained only as non-
 ## Status gates
 
 - remote code without reviewed bytes: `REMOTE_CODE_REVIEW_REQUIRED` or stronger blocking state;
-- reviewed remote code: non-empty safe allowlist, inventory membership, exact size, and SHA-256;
+- reviewed remote code: non-empty safe allowlist, required-artifact membership, exact size, and
+  SHA-256;
 - unknown code or weight license: `LICENSE_REVIEW_REQUIRED`, `CONDITIONAL`, or `BLOCKED`;
 - released repository with unverified checkpoint bytes: `CHECKPOINT_REVIEW_REQUIRED`;
 - no released required checkpoint: `NOT_RELEASED` or `BLOCKED`;
+- unresolved runtime compatibility or package identity: a non-verified intake status;
+- unresolved pretraining disclosure or contamination risk: a non-verified intake status;
+- incomplete official URL verification evidence: a non-verified intake status;
 - retrieval methods with unresolved leakage controls: `CONDITIONAL` or `BLOCKED`.
 
 ## Canonical identity

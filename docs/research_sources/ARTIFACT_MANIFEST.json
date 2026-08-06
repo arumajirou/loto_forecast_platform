@@ -1,5 +1,5 @@
 {
-  "artifact_count": 30,
+  "artifact_count": 37,
   "artifacts": [
     {
       "path": "configs/research_sources/records/granite-flowstate.json",
@@ -62,19 +62,94 @@
       "size_bytes": 464
     },
     {
+      "path": "src/loto/research_sources/__init__.py",
+      "sha256": "202dee9a1a93aaab5aeff1ab3923030e421d3f9cc171a41debb4c8443aaf990d",
+      "size_bytes": 666
+    },
+    {
+      "path": "src/loto/research_sources/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "size_bytes": 48
+    },
+    {
+      "path": "src/loto/research_sources/cli.py",
+      "sha256": "d0514c6942c6ee7d6b10eee4be7a18025a16b041727501be6d05d0ac41a2e438",
+      "size_bytes": 2091
+    },
+    {
+      "path": "src/loto/research_sources/common.py",
+      "sha256": "94b715de490db93a2e0f9694f55619b70415f8584b952e5a26cb4d1e0d799839",
+      "size_bytes": 3638
+    },
+    {
+      "path": "src/loto/research_sources/contracts.py",
+      "sha256": "7ccc266d556861b51113e99e37a8e32d42b28b39fdbbdb9fe398b5fade8d485b",
+      "size_bytes": 11224
+    },
+    {
+      "path": "src/loto/research_sources/index.py",
+      "sha256": "be4d592517b5a843b4677f84c977bbe1ad5d7aa6fe732826df53365e77fd6091",
+      "size_bytes": 1007
+    },
+    {
+      "path": "src/loto/research_sources/models.py",
+      "sha256": "891af3b137e8c8c1d0dc12399aa55aa7bcba3c5f0306bb00e94ed251e69c0eb0",
+      "size_bytes": 973
+    },
+    {
+      "path": "src/loto/research_sources/records.py",
+      "sha256": "b6d4db20e7ffe1e9ce9fa815396f9fadff2e2118cfa7ec6ca5f7ab57655eba85",
+      "size_bytes": 12485
+    },
+    {
+      "path": "src/loto/research_sources/registry.py",
+      "sha256": "f80d7e1ef06796b5d71c43e7ecd0ba3401c4e5aea0baa749208beba324201bde",
+      "size_bytes": 3733
+    },
+    {
+      "path": "src/loto/research_sources/registry_model.py",
+      "sha256": "d79aaa1635e81b3932f8961fe714632048c536f0070467bd2d8045422366d80b",
+      "size_bytes": 1537
+    },
+    {
+      "path": "tests/research_sources/test_contracts.py",
+      "sha256": "1c165594cf84ba63bfa6ae7a7d4d3dfba1d6c1d24f8081abc271931374d9cd54",
+      "size_bytes": 70
+    },
+    {
+      "path": "tests/research_sources/test_contracts_core.py",
+      "sha256": "bc1bb60489a6ca9a52a5f13dac0d66120843d88d8cb72e78a5aab14f8b639ccc",
+      "size_bytes": 7155
+    },
+    {
+      "path": "tests/research_sources/test_contracts_governance.py",
+      "sha256": "18a891a4d757e381e7bec35874fe4f87abac6a611e5e16d022e4910c942bfc89",
+      "size_bytes": 6347
+    },
+    {
+      "path": "tests/research_sources/test_contracts_hardening.py",
+      "sha256": "edb3578f091511f75cd89fc83b5a498ffafd87a5b2122d857db11e4fa68c2690",
+      "size_bytes": 6886
+    },
+    {
+      "path": "tests/research_sources/test_registry.py",
+      "sha256": "f1a4bed9d3ab2cf3472acd2518c500b029aa8c569ca7dd105d949b0f5c4dc108",
+      "size_bytes": 2737
+    },
+    {
       "path": "docs/research_sources/ARCHITECTURE.md",
-      "sha256": "1d585a6df5cdaa62ecf103f4166b2cf14ac4bc67377cdc8019a62eeecf2d96f0",
-      "size_bytes": 1463
+      "sha256": "b77933a0f3bbd27eb5a784246c2f67b4f1f52b50cb35e47d47fbe094fec9300f",
+      "size_bytes": 1857
     },
     {
       "path": "docs/research_sources/CHANGELOG.md",
-      "sha256": "1f10d3e4dcd717e42cf63b1b4f39f8e4a7dbe834158919571629c3b36b8dfe72",
-      "size_bytes": 595
+      "sha256": "5f007cee22b4ae84c7e98642a0344dfec2509bae7650138eb7d2374489b5160e",
+      "size_bytes": 1025
     },
     {
       "path": "docs/research_sources/DATA_CONTRACT.md",
-      "sha256": "55864a52657ec984fd69505c9ca607bb7f739cfbf49a74831f7a499b7fb2833b",
-      "size_bytes": 2661
+      "sha256": "a520010a3635958a6760bafebad2f3ac50ff981f074f877bda8b953fdfc03c7e",
+      "size_bytes": 3390
     },
     {
       "path": "docs/research_sources/HANDOFF.md",
@@ -98,58 +173,18 @@
     },
     {
       "path": "docs/research_sources/SPECIFICATION.md",
-      "sha256": "438603233ae7af6f020bf9bd492c30712a92dab42c0662cd051c0b3e11052b48",
-      "size_bytes": 2295
+      "sha256": "ef1083e5792fcbf06f4f9175de034a4d6b9fa993bac5d59e1a97e3af833a3381",
+      "size_bytes": 2733
     },
     {
       "path": "docs/research_sources/TEST_PLAN.md",
-      "sha256": "ea063b3b2c97fd55dfe0bbf9b83e558ce3fee508730842e77e93a3e059b5f982",
-      "size_bytes": 1384
+      "sha256": "7ed36daa2f807c0b3e1bf3d38c5f65de5ee5d1fdd38565076e5865f1ab677d53",
+      "size_bytes": 1898
     },
     {
       "path": "docs/research_sources/VERIFICATION_REPORT.md",
-      "sha256": "0881e13140a168656ce30be5ba2935791523a96d45904126884c14cce28abff1",
-      "size_bytes": 3279
-    },
-    {
-      "path": "src/loto/research_sources/__init__.py",
-      "sha256": "202dee9a1a93aaab5aeff1ab3923030e421d3f9cc171a41debb4c8443aaf990d",
-      "size_bytes": 666
-    },
-    {
-      "path": "src/loto/research_sources/__main__.py",
-      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
-      "size_bytes": 48
-    },
-    {
-      "path": "src/loto/research_sources/cli.py",
-      "sha256": "d0514c6942c6ee7d6b10eee4be7a18025a16b041727501be6d05d0ac41a2e438",
-      "size_bytes": 2091
-    },
-    {
-      "path": "src/loto/research_sources/index.py",
-      "sha256": "be4d592517b5a843b4677f84c977bbe1ad5d7aa6fe732826df53365e77fd6091",
-      "size_bytes": 1007
-    },
-    {
-      "path": "src/loto/research_sources/models.py",
-      "sha256": "ba5538fc921655039e4fa562020c70ad4b827ce9dccd091d309e2ab8f4aed821",
-      "size_bytes": 19959
-    },
-    {
-      "path": "src/loto/research_sources/registry.py",
-      "sha256": "f80d7e1ef06796b5d71c43e7ecd0ba3401c4e5aea0baa749208beba324201bde",
-      "size_bytes": 3733
-    },
-    {
-      "path": "tests/research_sources/test_contracts.py",
-      "sha256": "69e6d093d48f484dc847d55f35ba7c2352ce3e37c6e4f1d1cb389c960df56397",
-      "size_bytes": 12195
-    },
-    {
-      "path": "tests/research_sources/test_registry.py",
-      "sha256": "f1a4bed9d3ab2cf3472acd2518c500b029aa8c569ca7dd105d949b0f5c4dc108",
-      "size_bytes": 2737
+      "sha256": "b391347f72ebabed41d699eb27ea95e0872a23580507ee5706001681e237a8d3",
+      "size_bytes": 3741
     }
   ],
   "schema_version": "1.0.0"
