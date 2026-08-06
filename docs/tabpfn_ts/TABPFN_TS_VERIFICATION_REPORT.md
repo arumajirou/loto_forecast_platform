@@ -31,6 +31,7 @@ license are verified.
 |---|---|
 | Base branch | `main` |
 | Feature branch | `feat/tabpfn-ts-provider-contract-v2` |
+| Draft pull request | `#97` |
 | Existing provider modified | NO |
 | Root `pyproject.toml` or `uv.lock` modified | NO |
 | Merge or auto-merge | NOT PERFORMED |
@@ -38,11 +39,25 @@ license are verified.
 The connected GitHub contents API creates one commit per added file. This branch is therefore
 intended for **squash merge only** after CI and review.
 
+## GitHub Actions evidence
+
+| Attempt | Workflow run | Job | Result | Step metadata | Log retrieval |
+|---:|---:|---:|---|---|---|
+| 1 | `31057547953` | `92478220826` | FAILURE | unavailable | `BlobNotFound` |
+| 2 | `31057547953` | `92480636445` | FAILURE | empty | `BlobNotFound` |
+
+The failed-job rerun request was accepted. Both attempts completed without retrievable step
+metadata or logs. Therefore the root cause remains `UNVERIFIED`; these results must not be
+reported as a confirmed Ruff, pytest, dependency-installation, or source-code failure.
+
+A fresh workflow run is triggered by this evidence-only documentation update to distinguish a
+run-storage or runner-startup failure from a branch-content failure.
+
 ## Pending gates
 
 | Gate | Status | Reason |
 |---|---|---|
-| Repository CI | EXECUTION_PENDING | Draft PR checks must run after publication |
+| Repository CI | FAILED_ROOT_CAUSE_UNVERIFIED | Two attempts lack steps and logs |
 | Full pytest | EXECUTION_PENDING | Final integration gate |
 | Ruff and mypy in repository environment | EXECUTION_PENDING | Must use repository toolchain |
 | V2 real checkpoint load | EXECUTION_PENDING | Requires trusted checkpoint mount |
