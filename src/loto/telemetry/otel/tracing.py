@@ -29,6 +29,7 @@ from loto.telemetry.redaction import (
 _ATTRIBUTE_KEY_RE = re.compile(r"^[a-z][a-z0-9_.-]{0,127}$")
 MAX_SPAN_ATTRIBUTES = 32
 MAX_SPAN_STRING = 256
+FORECAST_RUN_SPAN_NAME = "loto.forecast.run"
 
 SPAN_NAME_BY_STAGE: dict[Stage, str] = {
     Stage.RECEIVE: "loto.api.request",
@@ -225,24 +226,23 @@ def configure_tracing(
 
 
 @contextmanager
-def domain_span(
+def _correlated_span(
     runtime: TracingRuntime,
-    stage: Stage,
+    span_name: str,
     *,
-    platform_status: EventStatus = EventStatus.PASS,
-    attributes: Mapping[str, Any] | None = None,
+    platform_stage: str,
+    platform_status: EventStatus,
+    attributes: Mapping[str, Any] | None,
 ) -> Iterator[trace.Span]:
-    """Start a required domain span and correlate it with the telemetry context."""
-
     base_attributes = sanitize_span_attributes(attributes)
     context = current_telemetry_context()
     for key, value in context.as_dict().items():
         if key not in {"trace_id", "span_id"}:
             base_attributes[f"loto.{key}"] = value
-    base_attributes["loto.stage"] = stage.value
+    base_attributes["loto.stage"] = platform_stage
     base_attributes["loto.status"] = platform_status.value
     with runtime.tracer.start_as_current_span(
-        SPAN_NAME_BY_STAGE[stage],
+        span_name,
         kind=SpanKind.INTERNAL,
         attributes=base_attributes,
     ) as span:
@@ -266,3 +266,42 @@ def domain_span(
                     span.set_status(Status(StatusCode.ERROR))
                 else:
                     span.set_status(Status(StatusCode.OK))
+
+
+@contextmanager
+def forecast_run_span(
+    runtime: TracingRuntime,
+    *,
+    platform_status: EventStatus = EventStatus.PASS,
+    attributes: Mapping[str, Any] | None = None,
+) -> Iterator[trace.Span]:
+    """Start the required top-level forecast-run span."""
+
+    with _correlated_span(
+        runtime,
+        FORECAST_RUN_SPAN_NAME,
+        platform_stage="FORECAST_RUN",
+        platform_status=platform_status,
+        attributes=attributes,
+    ) as span:
+        yield span
+
+
+@contextmanager
+def domain_span(
+    runtime: TracingRuntime,
+    stage: Stage,
+    *,
+    platform_status: EventStatus = EventStatus.PASS,
+    attributes: Mapping[str, Any] | None = None,
+) -> Iterator[trace.Span]:
+    """Start a required stage span and correlate it with the telemetry context."""
+
+    with _correlated_span(
+        runtime,
+        SPAN_NAME_BY_STAGE[stage],
+        platform_stage=stage.value,
+        platform_status=platform_status,
+        attributes=attributes,
+    ) as span:
+        yield span
