@@ -55,3 +55,9 @@ artifacts/sundial-provider-v2-final-gate/<GATE_ID>/
 
 The evidence ZIP remains under `artifacts/sundial-provider-v2-verified/` and is accompanied by a
 SHA-256 file. The PR must remain Draft until target-host results and actionable CI are reviewed.
+
+## Focused self-test
+
+The final-gate test verifies shell syntax, mandatory stage order, fixed identity checks, evidence
+ZIP requirements, and that full pytest cannot be skipped. The dependency-light self-test result is
+`3 passed`.
