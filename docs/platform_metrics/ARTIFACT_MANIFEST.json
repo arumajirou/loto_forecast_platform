@@ -1,0 +1,86 @@
+{
+  "artifact_count": 11,
+  "artifact_set": "platform-metrics-v1",
+  "base_branch": "feat/otel-instrumentation-v1",
+  "base_sha": "2c3e8226d71eb26e923533ad33a26fc0a6e165a7",
+  "hash_entries": [
+    {
+      "path": "src/loto/telemetry/prometheus/__init__.py",
+      "sha256": "2e4ab714f3a0f5c4b9b6baa355fea011c13003bc2b130f0b2482a836da7c1f3a",
+      "size_bytes": 785
+    },
+    {
+      "path": "src/loto/telemetry/prometheus/catalog.py",
+      "sha256": "f8a00c9884c460bfda4e0b0e7ffdc27963e57e48d68dd0a5b2d6d31b21c44d50",
+      "size_bytes": 15863
+    },
+    {
+      "path": "src/loto/telemetry/prometheus/registry.py",
+      "sha256": "967a6a2f156d71edb4316af9ed03cdfc7c01957ff6b26dcece155d451129ff4f",
+      "size_bytes": 6318
+    },
+    {
+      "path": "tests/telemetry/test_platform_metrics_v1.py",
+      "sha256": "3e8e26b41f14befa41d7e752cbe2d757aadbcf32fcc457d701c2fea259b40842",
+      "size_bytes": 10391
+    },
+    {
+      "path": "docs/platform_metrics/METRICS_CONTRACT.md",
+      "sha256": "53de31c04823ed477203d6d58a0846e5b0dde9002709d32c4f421bad828549f5",
+      "size_bytes": 4538
+    },
+    {
+      "path": "docs/platform_metrics/CARDINALITY_BUDGET.md",
+      "sha256": "105c3210ba3489daa70a908d8c33bde8b04884ef7f045ebbb0fa617bcf373fd1",
+      "size_bytes": 1898
+    },
+    {
+      "path": "docs/platform_metrics/TEST_PLAN.md",
+      "sha256": "b5bfb36cfc4c57d958ee0c1f5b7102b67facde8ae942c28c61039ce6d0fde0ec",
+      "size_bytes": 2087
+    },
+    {
+      "path": "docs/platform_metrics/RUNBOOK.md",
+      "sha256": "e1408d0bb787b887f84da1b1fc8e6233a5446bc35333d62a7492685888e4c173",
+      "size_bytes": 2116
+    },
+    {
+      "path": "docs/platform_metrics/VERIFICATION_REPORT.md",
+      "sha256": "2c321975cd540645b1d729b90234e4fe234140c50e446aa74f262d83ea67862e",
+      "size_bytes": 5151
+    }
+  ],
+  "head_branch": "feat/platform-metrics-v1",
+  "non_claims": [
+    "PR_141_MERGED",
+    "PR_147_MERGED",
+    "APPLICATION_WIRING",
+    "LIVE_PROMETHEUS_CERTIFICATION",
+    "GRAFANA_CERTIFICATION",
+    "PRODUCTION_DEPLOYMENT",
+    "MERGE_READINESS"
+  ],
+  "repository": "arumajirou/loto_forecast_platform",
+  "schema_version": "1.0.0",
+  "status": "PARTIALLY_VERIFIED",
+  "unhashed_inventory_files": [
+    "docs/platform_metrics/ARTIFACT_MANIFEST.json",
+    "docs/platform_metrics/SHA256SUMS"
+  ],
+  "validation": {
+    "application_wiring": "DEFERRED",
+    "ast_parse": "PASS",
+    "catalog_series_upper_bound": 10412,
+    "compileall": "PASS",
+    "focused_pytest": "14 passed",
+    "full_pytest": "NOT_STARTED",
+    "grafana": "NOT_PROBED",
+    "line_length_gt_100": 0,
+    "live_prometheus": "NOT_PROBED",
+    "maximum_family_series_upper_bound": 4680,
+    "metric_family_count": 29,
+    "mypy": "BLOCKED_TOOL_UNAVAILABLE",
+    "production_secret_scan": "PASS",
+    "ruff": "BLOCKED_TOOL_UNAVAILABLE"
+  }
+}
