@@ -9,6 +9,7 @@ EXPECTED_COMMIT="${3:-}"
 EXPECTED_BRANCH="${EXPECTED_BRANCH:-feat/sundial-probabilistic-provider-v2}"
 CASE_TIMEOUT="${CASE_TIMEOUT:-1800}"
 PAUSE_ON_EXIT="${PAUSE_ON_EXIT:-1}"
+export UV_FROZEN=1
 
 cd "$ROOT" || exit 1
 
@@ -79,16 +80,19 @@ run_logged() {
 PYTHON_FILES=(
   scripts/run_sundial_provider.py
   scripts/certify_sundial_provider_v2.py
+  scripts/verify_sundial_provider_v2_semantics.py
   scripts/verify_sundial_provider_v2_evidence.py
   src/loto/models/providers/sundial.py
   tests/test_sundial_probabilistic_provider_v2.py
   tests/test_sundial_provider_v2_certification.py
+  tests/test_sundial_provider_v2_semantic_verifier.py
   tests/test_sundial_provider_v2_evidence_verifier.py
   tests/test_sundial_provider_v2_final_gate.py
 )
 FOCUSED_TESTS=(
   tests/test_sundial_probabilistic_provider_v2.py
   tests/test_sundial_provider_v2_certification.py
+  tests/test_sundial_provider_v2_semantic_verifier.py
   tests/test_sundial_provider_v2_evidence_verifier.py
   tests/test_sundial_provider_v2_final_gate.py
 )
@@ -100,6 +104,7 @@ FOCUSED_TESTS=(
   printf 'EXPECTED_COMMIT=%s\n' "$EXPECTED_COMMIT"
   printf 'EXPECTED_BRANCH=%s\n' "$EXPECTED_BRANCH"
   printf 'CASE_TIMEOUT=%s\n' "$CASE_TIMEOUT"
+  printf 'UV_FROZEN=%s\n' "$UV_FROZEN"
 } | tee "$CONSOLE_LOG"
 
 run_logged ruff \
@@ -108,10 +113,18 @@ run_logged mypy \
   uv run --frozen --extra dev mypy \
   scripts/run_sundial_provider.py \
   scripts/certify_sundial_provider_v2.py \
+  scripts/verify_sundial_provider_v2_semantics.py \
   scripts/verify_sundial_provider_v2_evidence.py \
   src/loto/models/providers/sundial.py
 run_logged focused-pytest \
   uv run --frozen --extra dev pytest "${FOCUSED_TESTS[@]}"
+
+run_logged semantic-snapshot-preflight \
+  uv run --frozen --extra dev python \
+  scripts/verify_sundial_provider_v2_semantics.py \
+  --repo-root "$ROOT" \
+  --snapshot "$SNAPSHOT" \
+  --snapshot-only
 
 run_logged certification \
   uv run --frozen --extra dev python \
@@ -127,6 +140,13 @@ RUN_DIR="$(cat artifacts/sundial-provider-v2/LATEST)"
 test -d "$RUN_DIR"
 grep -Fx 'SUNDIAL_PROVIDER_V2_CERTIFICATION=PASS' "$RUN_DIR/status.txt"
 
+run_logged semantic-output-verification \
+  uv run --frozen --extra dev python \
+  scripts/verify_sundial_provider_v2_semantics.py \
+  --repo-root "$ROOT" \
+  --snapshot "$SNAPSHOT" \
+  --run-dir "$RUN_DIR"
+
 run_logged evidence-verification \
   uv run --frozen --extra dev python \
   scripts/verify_sundial_provider_v2_evidence.py \
@@ -137,8 +157,10 @@ run_logged evidence-verification \
   --archive
 
 RUN_ID="$(basename "$RUN_DIR")"
+SEMANTIC_REPORT="artifacts/sundial-provider-v2-semantic-verification/$RUN_ID.json"
 VERIFICATION_DIR="artifacts/sundial-provider-v2-verified/$RUN_ID"
 ARCHIVE="artifacts/sundial-provider-v2-verified/${RUN_ID}-evidence.zip"
+test -f "$SEMANTIC_REPORT"
 test -f "$VERIFICATION_DIR/VERIFICATION_REPORT.json"
 test -f "$VERIFICATION_DIR/PR_COMMENT.md"
 test -f "$ARCHIVE"
@@ -148,6 +170,7 @@ run_logged full-pytest uv run --frozen --extra dev pytest
 
 {
   printf 'RUN_DIR=%s\n' "$RUN_DIR"
+  printf 'SEMANTIC_REPORT=%s\n' "$SEMANTIC_REPORT"
   printf 'VERIFICATION_DIR=%s\n' "$VERIFICATION_DIR"
   printf 'ARCHIVE=%s\n' "$ARCHIVE"
   printf 'ARCHIVE_SHA256_FILE=%s\n' "$ARCHIVE.sha256"
