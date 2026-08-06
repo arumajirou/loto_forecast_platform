@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0.0",
+  "phase_order": [
+    "PLAN",
+    "DATA",
+    "TRAIN",
+    "PREDICT",
+    "LOCK",
+    "WAIT_ACTUAL",
+    "READ_ACTUAL",
+    "SCORE",
+    "PERSIST",
+    "PROMOTE",
+    "COMPLETE"
+  ],
+  "templates": {
+    "start": {
+      "command_type": "START",
+      "from_status": "PENDING",
+      "to_status": "RUNNING",
+      "phase_scope": "NON_TERMINAL",
+      "target_phase": "SAME",
+      "rule_id_pattern": "start-{phase}",
+      "description": "Start pending phase execution."
+    },
+    "succeed": {
+      "command_type": "MARK_SUCCEEDED",
+      "from_status": "RUNNING",
+      "to_status": "PENDING",
+      "phase_scope": "NON_TERMINAL",
+      "target_phase": "NEXT",
+      "terminal_override": {
+        "from_phase": "PROMOTE",
+        "to_phase": "COMPLETE",
+        "to_status": "SUCCEEDED"
+      },
+      "rule_id_pattern": "succeed-{phase}",
+      "description": "Finish the current phase and advance deterministically."
+    },
+    "execution_outcomes": [
+      {
+        "command_type": "MARK_RETRYABLE_FAILURE",
+        "from_status": "RUNNING",
+        "to_status": "RETRYABLE_FAILURE"
+      },
+      {
+        "command_type": "MARK_BLOCKED",
+        "from_status": "RUNNING",
+        "to_status": "BLOCKED"
+      },
+      {
+        "command_type": "MARK_TIMED_OUT",
+        "from_status": "RUNNING",
+        "to_status": "TIMED_OUT"
+      },
+      {
+        "command_type": "MARK_TERMINAL_FAILURE",
+        "from_status": "RUNNING",
+        "to_status": "TERMINAL_FAILURE"
+      }
+    ],
+    "execution_outcome_rule_id_pattern": "{command}-{phase}",
+    "execution_outcome_description": "Record explicit phase execution outcome.",
+    "recoveries": [
+      {
+        "command_type": "RETRY",
+        "from_status": "RETRYABLE_FAILURE",
+        "to_status": "RUNNING",
+        "rule_id_pattern": "retry-{phase}",
+        "description": "Retry a retryable failure."
+      },
+      {
+        "command_type": "RESUME",
+        "from_status": "BLOCKED",
+        "to_status": "RUNNING",
+        "rule_id_pattern": "resume-blocked-{phase}",
+        "description": "Resume an explicitly unblocked phase."
+      },
+      {
+        "command_type": "RESUME",
+        "from_status": "TIMED_OUT",
+        "to_status": "RUNNING",
+        "rule_id_pattern": "resume-timeout-{phase}",
+        "description": "Resume a timed-out phase after operator review."
+      }
+    ],
+    "cancel": {
+      "command_type": "CANCEL",
+      "from_statuses": [
+        "PENDING",
+        "RUNNING",
+        "RETRYABLE_FAILURE",
+        "BLOCKED",
+        "TIMED_OUT"
+      ],
+      "to_status": "CANCELLED",
+      "phase_scope": "NON_TERMINAL",
+      "target_phase": "SAME",
+      "rule_id_pattern": "cancel-{phase}-{status}",
+      "description": "Cancel only through an explicit cancellation command."
+    }
+  },
+  "terminal_states": [
+    {"phase": "*", "status": "CANCELLED"},
+    {"phase": "*", "status": "TERMINAL_FAILURE"},
+    {"phase": "COMPLETE", "status": "SUCCEEDED"}
+  ],
+  "unknown_transition_policy": "FAIL_CLOSED"
+}

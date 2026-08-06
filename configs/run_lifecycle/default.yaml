@@ -1,0 +1,25 @@
+schema_version: 1.0.0
+foundation_only: true
+repository:
+  backend: in_memory
+  production_durability_proven: false
+clock:
+  injection_required: true
+  direct_wall_clock_in_core: false
+lease:
+  default_ttl_seconds: 60
+  heartbeat_interval_seconds: 15
+  require_fencing_for_worker_mutations: true
+idempotency:
+  canonical_json: true
+  hash_algorithm: sha256
+  duplicate_handler_execution: false
+transitions:
+  matrix_path: configs/run_lifecycle/transition_matrix.v1.json
+  unknown_transition_policy: fail_closed
+events:
+  append_only: true
+  sequence_origin: 1
+  gap_free: true
+  hash_excluded_fields:
+    - event_sha256

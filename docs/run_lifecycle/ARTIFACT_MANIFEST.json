@@ -1,0 +1,206 @@
+{
+  "artifact_set": "durable-run-lifecycle-contract-v1",
+  "artifacts": [
+    {
+      "path": "configs/run_lifecycle/default.yaml",
+      "sha256": "0a0e547ba654eb83e69664493a9f2dda8c65a568aa3af6330e0154ee11d1cacd",
+      "size_bytes": 619
+    },
+    {
+      "path": "configs/run_lifecycle/example_commands.json",
+      "sha256": "a68c446506610cccffe918f4a5e71512126a90934856d4d075512df3936858aa",
+      "size_bytes": 532
+    },
+    {
+      "path": "configs/run_lifecycle/transition_matrix.v1.json",
+      "sha256": "487198ee760cecaace6f92854b389500f0e50c5805ea4ed545fc9da3997dbdc7",
+      "size_bytes": 3039
+    },
+    {
+      "path": "docs/run_lifecycle/ARCHITECTURE.md",
+      "sha256": "ca1915211ec1041f5edd656afc3b8621e71d69ad77e68475f6b14dc616288435",
+      "size_bytes": 1543
+    },
+    {
+      "path": "docs/run_lifecycle/CHANGELOG.md",
+      "sha256": "09ed5baa8b647adb3fa3c1d03a07ba973a393a2b7b22edc2e2c7a79e90fdde3a",
+      "size_bytes": 545
+    },
+    {
+      "path": "docs/run_lifecycle/DATA_CONTRACT.md",
+      "sha256": "9ec858c70752a8de6e08497279e82ff26ed15b37a52a65e6f3eababda24787b9",
+      "size_bytes": 1724
+    },
+    {
+      "path": "docs/run_lifecycle/HANDOFF.md",
+      "sha256": "468bd574a88d1f3b89e190716ad69986701853fc092914b9bffbb713dbbe7d5e",
+      "size_bytes": 1060
+    },
+    {
+      "path": "docs/run_lifecycle/MIGRATION_NOTES.md",
+      "sha256": "cb4ecf5d0d29653f375fd055f2c90fa673a510506346890228c59659605b7489",
+      "size_bytes": 738
+    },
+    {
+      "path": "docs/run_lifecycle/README.md",
+      "sha256": "b36b2438e9ee7aad603d6140042553513a7f1c9abc082ce72ce01d88e9e6d046",
+      "size_bytes": 2764
+    },
+    {
+      "path": "docs/run_lifecycle/REQUIREMENTS.md",
+      "sha256": "226527c687ba274c694f0a65c6ba32c530c48796f72e5c526f8d1da38a300b66",
+      "size_bytes": 2382
+    },
+    {
+      "path": "docs/run_lifecycle/RUNBOOK.md",
+      "sha256": "18f27428a632bf9d86bd2c692882a00e921edca73687c0411de92f57e1dcafc3",
+      "size_bytes": 1427
+    },
+    {
+      "path": "docs/run_lifecycle/SECURITY_NOTES.md",
+      "sha256": "e837c4289594b240420fc3ad1c6643d9f2e94db2d3754348b56344cee17196d3",
+      "size_bytes": 664
+    },
+    {
+      "path": "docs/run_lifecycle/SPECIFICATION.md",
+      "sha256": "4d1a650f3e55aef2d23f29276aba1eafa558730484029216c0a6df9205339ef9",
+      "size_bytes": 2316
+    },
+    {
+      "path": "docs/run_lifecycle/TEST_PLAN.md",
+      "sha256": "b021c85517df63b1186e7d9b89a2cb41bd7f23f56138f5e3604b1e444dde44c7",
+      "size_bytes": 1450
+    },
+    {
+      "path": "docs/run_lifecycle/VERIFICATION_REPORT.md",
+      "sha256": "f466021192fce75f6b3e3be2251bb6c1c94f917a928f79129c638c9f0f7ce5d5",
+      "size_bytes": 1463
+    },
+    {
+      "path": "src/loto/run_lifecycle/__init__.py",
+      "sha256": "1a4e19ae7d9ef31516863b54068ff8777b60a4e683919bf96b8b1dfa25baf6c0",
+      "size_bytes": 2844
+    },
+    {
+      "path": "src/loto/run_lifecycle/canonical.py",
+      "sha256": "035b725a94b3518bb1fbecc51adaa80073aba25dd0fc063f172f0cd9c26bbcfe",
+      "size_bytes": 3380
+    },
+    {
+      "path": "src/loto/run_lifecycle/clock.py",
+      "sha256": "dfb9f8a1c6e2740ffcda2e71479115f91d5831191306f2eb386455a5f71e030f",
+      "size_bytes": 1298
+    },
+    {
+      "path": "src/loto/run_lifecycle/events.py",
+      "sha256": "6a8c35ca8bb556ef28be4d52ced22d0731bb3f9d96efe7b84b3d69446304d305",
+      "size_bytes": 4205
+    },
+    {
+      "path": "src/loto/run_lifecycle/exceptions.py",
+      "sha256": "fc740a38bab8d712ae0997963abce58df93a3b15aac8686efe3f5c52cc7dafa0",
+      "size_bytes": 1315
+    },
+    {
+      "path": "src/loto/run_lifecycle/idempotency.py",
+      "sha256": "e69a42ca3270814b6c6137accf62e483a0db6108f0ba355ef1e2d28987ec1409",
+      "size_bytes": 1322
+    },
+    {
+      "path": "src/loto/run_lifecycle/lease.py",
+      "sha256": "116476451e21a41eeea81440cdd6ccfac91502c782d5b57862ec3dbb735cc7a5",
+      "size_bytes": 3358
+    },
+    {
+      "path": "src/loto/run_lifecycle/models.py",
+      "sha256": "4f168083bf923cd8b1e9b6eeeaf46e46ddb9b024043d643dcc9978192e6d7887",
+      "size_bytes": 12846
+    },
+    {
+      "path": "src/loto/run_lifecycle/py.typed",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "src/loto/run_lifecycle/replay.py",
+      "sha256": "69c6d6659b86687fb13ee7f81f67b2c6867ce8cc7abc0f30055f401787e2cabe",
+      "size_bytes": 1289
+    },
+    {
+      "path": "src/loto/run_lifecycle/repository.py",
+      "sha256": "625a9ec1d8245dddc6a8d20ef6ae686d35ef6cd8b3ed08cf90ad655f0f886112",
+      "size_bytes": 5093
+    },
+    {
+      "path": "src/loto/run_lifecycle/service.py",
+      "sha256": "3fdee6712611d15038d0db7448d853a4c8a10de6c2bc24c98ecfc33847a11f72",
+      "size_bytes": 8910
+    },
+    {
+      "path": "src/loto/run_lifecycle/transitions.py",
+      "sha256": "2e05416899380db9c47b6457f206408660e687519a900d7f60345b15f77bb59f",
+      "size_bytes": 8628
+    },
+    {
+      "path": "src/loto/run_lifecycle/validation.py",
+      "sha256": "a3ef07414db65c08bba318f48d247411749f8a472422579c158aacc9fc4a030a",
+      "size_bytes": 1368
+    },
+    {
+      "path": "tests/run_lifecycle/conftest.py",
+      "sha256": "abc20c8867fbb418581d4861754f441f8fa85d3ea623259255b9483206ded914",
+      "size_bytes": 1751
+    },
+    {
+      "path": "tests/run_lifecycle/test_config_parity.py",
+      "sha256": "b2b04fbfa67bb21ff40d2f30a9c8a61ec7a58a763b5b7d7c997cffeadc46ba4e",
+      "size_bytes": 4570
+    },
+    {
+      "path": "tests/run_lifecycle/test_events_replay.py",
+      "sha256": "12558757d012865fb4bdf3abe8f22504076501a50adf30b310328ac538010f9e",
+      "size_bytes": 3107
+    },
+    {
+      "path": "tests/run_lifecycle/test_full_lifecycle.py",
+      "sha256": "daf9a4d0034fe17067dc0b1ba56ee4503b0b5120aadfe842303a3930ffaef7f1",
+      "size_bytes": 1696
+    },
+    {
+      "path": "tests/run_lifecycle/test_hypothesis_properties.py",
+      "sha256": "14d5dd4d2a884b881ac90e540af6f588614683e0d1631426e80f90548a101909",
+      "size_bytes": 944
+    },
+    {
+      "path": "tests/run_lifecycle/test_idempotency_service.py",
+      "sha256": "7182cf63fda0f71137ea6d145986966afb00ba3cc808289d8920bfd317ec78de",
+      "size_bytes": 4459
+    },
+    {
+      "path": "tests/run_lifecycle/test_lease.py",
+      "sha256": "f0c2e803da6399ad79d19507ad30a897d4f75368d083d8569cf8b4e3027a2985",
+      "size_bytes": 2650
+    },
+    {
+      "path": "tests/run_lifecycle/test_models.py",
+      "sha256": "70dd3d57a3a5fbdccc74bb3274f1449b04554cefa75cda86e276c85f91619d8e",
+      "size_bytes": 2313
+    },
+    {
+      "path": "tests/run_lifecycle/test_static_import.py",
+      "sha256": "4595e654caa667d0aa50376e323437a26bffe83e33d1a4bd544f94418f73698e",
+      "size_bytes": 309
+    },
+    {
+      "path": "tests/run_lifecycle/test_transitions.py",
+      "sha256": "0efd965cd82310787220b858329ae0b3f43248876e809d0a06549ce92df68476",
+      "size_bytes": 3140
+    }
+  ],
+  "design_head": "1ae5b0736a3d740a4c787e77f918d77ea35fe7a1",
+  "design_pr": 140,
+  "implementation_base": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "implementation_branch": "feat/durable-run-lifecycle-contract-v1",
+  "managed_artifact_count": 39,
+  "schema_version": "1.0.0"
+}

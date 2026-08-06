@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "examples": [
+    {
+      "command_id": "cmd-start-plan-001",
+      "run_id": "run-example-001",
+      "command_type": "START",
+      "phase": "PLAN",
+      "expected_revision": 0,
+      "subject_hashes": [],
+      "semantic_parameters": {"text": "{}"},
+      "requested_output_names": [],
+      "declared_idempotency_key": null,
+      "issued_at": "2026-08-06T08:00:00Z",
+      "actor_id": "operator-1",
+      "lease_id": null,
+      "lease_owner_id": null,
+      "fencing_token": null
+    }
+  ]
+}
