@@ -318,7 +318,7 @@ def read_protocol_artifact(path: str | Path) -> EvaluationProtocolV2 | LegacyPro
         raise ValueError("protocol artifact must contain a JSON object")
     candidate = payload.get("protocol", payload)
     if isinstance(candidate, dict) and candidate.get("schema_version") == "2.0.0":
-        return EvaluationProtocolV2.model_validate(candidate)
+        return EvaluationProtocolV2.model_validate_json(canonical_json_bytes(candidate))
     return _legacy_from_payload(payload)
 
 
