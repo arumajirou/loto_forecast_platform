@@ -19,6 +19,10 @@ def rank_candidate_scores(
 ) -> tuple[list[int], list[int]]:
     """Return score-ranked candidates and their sorted position representation."""
 
+    if not geometry.strictly_increasing:
+        raise ValueError(
+            "candidate-score ranking requires a strictly increasing unique-selection game"
+        )
     score_list = list(scores)
     expected = set(range(geometry.candidate_min, geometry.candidate_max + 1))
     actual = {item.candidate for item in score_list}
