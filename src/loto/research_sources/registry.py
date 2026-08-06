@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .index import ResearchSourceRegistryIndex
 from .models import ResearchSourceRegistry
 
 
@@ -31,6 +32,31 @@ def load_registry(path: str | Path) -> ResearchSourceRegistry:
             ValueError(f"non-finite JSON constant rejected: {value}")
         ),
     )
+    if isinstance(payload, dict) and "record_files" in payload:
+        index = ResearchSourceRegistryIndex.model_validate_json(
+            json.dumps(payload, ensure_ascii=False, allow_nan=False)
+        )
+        root = registry_path.resolve().parent
+        records: list[dict[str, Any]] = []
+        for relative_name in index.record_files:
+            record_path = (root / relative_name).resolve()
+            if root not in record_path.parents:
+                raise ValueError(f"record file escapes registry directory: {relative_name}")
+            record_payload = json.loads(
+                record_path.read_text(encoding="utf-8"),
+                object_pairs_hook=_reject_duplicate_keys,
+                parse_constant=lambda value: (_ for _ in ()).throw(
+                    ValueError(f"non-finite JSON constant rejected: {value}")
+                ),
+            )
+            if not isinstance(record_payload, dict):
+                raise ValueError(f"record file must contain a JSON object: {relative_name}")
+            records.append(record_payload)
+        payload = {
+            "schema_version": index.schema_version,
+            "generated_at": index.generated_at.isoformat(),
+            "records": records,
+        }
     normalized = json.dumps(payload, ensure_ascii=False, allow_nan=False)
     return ResearchSourceRegistry.model_validate_json(normalized)
 
