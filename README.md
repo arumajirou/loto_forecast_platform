@@ -1,7 +1,11 @@
-# Loto Forecast Platform v3.0.0
+# Loto Forecast Platform
 
 6ゲーム（ミニロト / ロト6 / ロト7 / ビンゴ5 / ナンバーズ3 / ナンバーズ4）を対象に、統計・機械学習・
 深層学習・時系列基盤モデルを **統計的に正当な手続きで** 比較する研究＋運用基盤です。
+
+> 現在のpackage versionはREADMEへ手書きしません。`src/loto/version.py`を正本とし、
+> `uv run loto --version`、`uv run loto3 --version`、またはpackage metadataで確認します。
+> 以下のversion番号は過去releaseとの比較や履歴見出しです。
 
 v2.1.0 の独立監査で検出された10件の構造的欠陥を修正し、spec-kit の SDD サイクル
 （constitution → specify → plan → tasks → implement）で再構築しました。
@@ -32,6 +36,7 @@ v2.1.0 の独立監査で検出された10件の構造的欠陥を修正し、sp
 ```bash
 uv sync --extra dev
 uv run pytest -q                      # 313 passed
+uv run loto --version                 # package version
 uv run loto3 games                    # 6ゲームの幾何
 uv run loto3 theory --game loto7      # 厳密理論限界（MAE下限 3.8337）
 uv run loto3 catalog --counts         # モデル件数（計算値）
