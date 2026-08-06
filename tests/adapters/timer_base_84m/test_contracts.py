@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import runpy
+import subprocess
+import sys
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
@@ -173,3 +175,86 @@ def test_runner_rejects_unknown_command_field() -> None:
         runner["run"](
             {"operation": "validate_request", "request": payload, "unexpected": True}
         )
+
+
+def test_runner_rejects_unknown_operation() -> None:
+    root = Path(__file__).resolve().parents[3]
+    runner = runpy.run_path(str(root / "scripts" / "run_timer_base_84m_provider.py"))
+    with pytest.raises(ValueError, match="unsupported operation"):
+        runner["run"]({"operation": "typo"})
+
+
+def test_runner_rejects_null_request_on_requestless_operation() -> None:
+    root = Path(__file__).resolve().parents[3]
+    runner = runpy.run_path(str(root / "scripts" / "run_timer_base_84m_provider.py"))
+    with pytest.raises(ValueError, match="must not include a request field"):
+        runner["run"]({"operation": "identity", "request": None})
+
+
+def _run_cli(
+    tmp_path: Path,
+    payload: dict[str, Any],
+) -> tuple[subprocess.CompletedProcess[str], Path]:
+    root = Path(__file__).resolve().parents[3]
+    request_path = tmp_path / "request.json"
+    response_path = tmp_path / "response.json"
+    request_path.write_text(json.dumps(payload), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts" / "run_timer_base_84m_provider.py"),
+            "--request",
+            str(request_path),
+            "--response",
+            str(response_path),
+        ],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    return result, response_path
+
+
+def test_cli_success_returns_zero(tmp_path: Path) -> None:
+    result, response_path = _run_cli(tmp_path, {"operation": "identity"})
+    assert result.returncode == 0
+    assert json.loads(response_path.read_text(encoding="utf-8"))["status"] == "IDENTITY"
+
+
+def test_cli_pending_returns_two(tmp_path: Path) -> None:
+    result, response_path = _run_cli(tmp_path, {"operation": "load"})
+    assert result.returncode == 2
+    assert json.loads(response_path.read_text(encoding="utf-8"))["status"] == (
+        "CHECKPOINT_LOAD_PENDING"
+    )
+
+
+def test_cli_invalid_returns_one(tmp_path: Path) -> None:
+    result, response_path = _run_cli(tmp_path, {"operation": "typo"})
+    assert result.returncode == 1
+    assert json.loads(response_path.read_text(encoding="utf-8"))["status"] == "REQUEST_INVALID"
+
+
+def test_cli_does_not_overwrite_request(tmp_path: Path) -> None:
+    root = Path(__file__).resolve().parents[3]
+    request_path = tmp_path / "request.json"
+    original = '{"operation":"identity"}\n'
+    request_path.write_text(original, encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts" / "run_timer_base_84m_provider.py"),
+            "--request",
+            str(request_path),
+            "--response",
+            str(request_path),
+        ],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 1
+    assert request_path.read_text(encoding="utf-8") == original
+    assert "must not overwrite" in result.stderr
