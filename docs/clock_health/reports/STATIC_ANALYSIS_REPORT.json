@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "compileall": "PASS",
+  "ast_parse": "PASS",
+  "json_parse": "PASS",
+  "python_lines_over_100": 0,
+  "core_subprocess_import_scan": "PASS",
+  "fixed_argv_scan": "PASS",
+  "ruff": "BLOCKED_TOOL_UNAVAILABLE",
+  "mypy": "BLOCKED_TOOL_UNAVAILABLE",
+  "full_repository_pytest": "NOT_EXECUTED_NO_COMPLETE_CHECKOUT"
+}

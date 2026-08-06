@@ -1,0 +1,170 @@
+{
+  "artifact_set": "clock-health-gate-v1",
+  "artifacts": [
+    {
+      "path": "configs/clock_health/default_policy.json",
+      "sha256": "f95471c37d741c96b01e37bf801618865c382303079419e6bda2c14d03b44bb7",
+      "size_bytes": 973
+    },
+    {
+      "path": "docs/clock_health/ARCHITECTURE.md",
+      "sha256": "a9043c7853927aeeef9cf24097cb843c327ea7cd7d9b32a626749ebeb77b216a",
+      "size_bytes": 1041
+    },
+    {
+      "path": "docs/clock_health/CHANGELOG.md",
+      "sha256": "afbd9acd9def863f328d0e73295662baeecfeaa00916e6d9e87c4c14f05e0c12",
+      "size_bytes": 468
+    },
+    {
+      "path": "docs/clock_health/DATA_CONTRACT.md",
+      "sha256": "3785a6b025167bac46d04c281749d7e52eb12d7d179ec499f106a6333dd93f49",
+      "size_bytes": 1705
+    },
+    {
+      "path": "docs/clock_health/HANDOFF.md",
+      "sha256": "14c9cfa2dc3d78ba5e051d16ea921aa413df9bcfdd9d4d0c03168640175cff38",
+      "size_bytes": 872
+    },
+    {
+      "path": "docs/clock_health/README.md",
+      "sha256": "80aba887deda2d9da73585c907cc57fab3d6dc7a7b91960b378765c4f295476e",
+      "size_bytes": 2085
+    },
+    {
+      "path": "docs/clock_health/REQUIREMENTS.md",
+      "sha256": "2f07b6737fcd2a61245d63f296f857d70800d57e2da9bcf3ad5b00aa8661513d",
+      "size_bytes": 1437
+    },
+    {
+      "path": "docs/clock_health/RUNBOOK.md",
+      "sha256": "caccd0cd596f539bdf6b13972f66981ef17e70b4878a3ef349588e71109813b6",
+      "size_bytes": 1329
+    },
+    {
+      "path": "docs/clock_health/SECURITY_NOTES.md",
+      "sha256": "09813ec773e8912acbe0be62035d13ba52cfa9277586a8c989a77e87184ba9c3",
+      "size_bytes": 525
+    },
+    {
+      "path": "docs/clock_health/SPECIFICATION.md",
+      "sha256": "a7f774861328f31253588a6dab2e74c3e9948ccaead12704b20f94b3ca6fec88",
+      "size_bytes": 1809
+    },
+    {
+      "path": "docs/clock_health/TEST_PLAN.md",
+      "sha256": "8656a7fa6e647ecb4d7403ee53316039bda7bca496d8efe07d1591c5b5a46490",
+      "size_bytes": 1043
+    },
+    {
+      "path": "docs/clock_health/VERIFICATION_REPORT.md",
+      "sha256": "38e9436ab77716e6d34e4d00eab33d2dac2085faac4ad3a9aaf3c0ef2832a4d6",
+      "size_bytes": 1480
+    },
+    {
+      "path": "docs/clock_health/reports/FOCUSED_TEST_REPORT.json",
+      "sha256": "c99ff76521b37184880f607fd1326b8b3e0ef4b7b1a809d8d4302b3ecb687529",
+      "size_bytes": 316
+    },
+    {
+      "path": "docs/clock_health/reports/SMOKE_REPORT.json",
+      "sha256": "0291b53be47ab340cba27e8fa5123026ff207701e5bcd9ff34d3d6bbd5fd297c",
+      "size_bytes": 251
+    },
+    {
+      "path": "docs/clock_health/reports/STATIC_ANALYSIS_REPORT.json",
+      "sha256": "e22c0296006b6b1ae9032d09fc2d6fcd44c72757cbba29a7a3b4c2993fb9ca1c",
+      "size_bytes": 344
+    },
+    {
+      "path": "scripts/run_clock_health_check.py",
+      "sha256": "951f9c2dce01d1a50cc0e641c6369509e2534926571285f319310e512690edee",
+      "size_bytes": 5699
+    },
+    {
+      "path": "src/loto/clock_health/__init__.py",
+      "sha256": "847ef961036dcc79b14a21e1397efcaa85eafec00190ea6528f74eb8b8e6f8c7",
+      "size_bytes": 1630
+    },
+    {
+      "path": "src/loto/clock_health/canonical.py",
+      "sha256": "a7435d18228202e33441eb54351c8ccf42e543c537d356067ea620270be88b65",
+      "size_bytes": 3148
+    },
+    {
+      "path": "src/loto/clock_health/chronyc.py",
+      "sha256": "9c090779ec0a26b486412f219f31a9365f79808238e39353c8ec2a371543de46",
+      "size_bytes": 15815
+    },
+    {
+      "path": "src/loto/clock_health/contracts.py",
+      "sha256": "3a026b1c134e2a2e4549f36cf5ddb648e01dab3c88de5bd9e36a884e4dc5664e",
+      "size_bytes": 17886
+    },
+    {
+      "path": "src/loto/clock_health/evaluator.py",
+      "sha256": "aee28e2c45df0b12de6680e728d907b1d8a9df6660ef3821b24c7c666e592cf8",
+      "size_bytes": 9016
+    },
+    {
+      "path": "src/loto/clock_health/io.py",
+      "sha256": "938f32f7b4605d0b3f952aa0869022eb5b37b9e5609e9da281e1074e8f8243eb",
+      "size_bytes": 8017
+    },
+    {
+      "path": "src/loto/clock_health/py.typed",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "tests/clock_health/conftest.py",
+      "sha256": "9dea1bb045ddc0a834c2e23474415daa90bba37372f093b3557225595d7ef424",
+      "size_bytes": 1770
+    },
+    {
+      "path": "tests/clock_health/fixtures/healthy_sources.txt",
+      "sha256": "8d89bbe4b60666377ad6dc84fe0de575c0494903558f9d2afeff5bdb8bee1812",
+      "size_bytes": 299
+    },
+    {
+      "path": "tests/clock_health/fixtures/healthy_tracking.txt",
+      "sha256": "a1002186167198a2390204092d3de118b4b922b0a2b8b9ca2ec00c572c0332c8",
+      "size_bytes": 447
+    },
+    {
+      "path": "tests/clock_health/test_chronyc.py",
+      "sha256": "317d0cb8d7c23e088945e39484475f90a96155f0d8f9c362bf76653b233ed236",
+      "size_bytes": 4551
+    },
+    {
+      "path": "tests/clock_health/test_contracts.py",
+      "sha256": "00cabad0868a7aebff4baacbdfca77fb47ab676b2dc338a5017abc71e9f6d952",
+      "size_bytes": 3039
+    },
+    {
+      "path": "tests/clock_health/test_evaluator.py",
+      "sha256": "b363555a72dd179644eb9423d4939272085fc48f0a0c315af1901e36a542dfd0",
+      "size_bytes": 3866
+    },
+    {
+      "path": "tests/clock_health/test_io_and_cli.py",
+      "sha256": "80e125fb19911aeab9af5a56e806b8d8175c73dedb45c6daf7b22e6119249b46",
+      "size_bytes": 5013
+    },
+    {
+      "path": "tests/clock_health/test_static_boundaries.py",
+      "sha256": "4a7afb8502a24801dff32d7ea0639f0b526a454553415ea973b8a356ec2f9408",
+      "size_bytes": 778
+    }
+  ],
+  "design_head": "1ae5b0736a3d740a4c787e77f918d77ea35fe7a1",
+  "design_pr": 140,
+  "external_trust_established": false,
+  "holdout_opened": false,
+  "implementation_base": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "implementation_branch": "feat/clock-health-gate-v1",
+  "managed_artifact_count": 31,
+  "prospective_opened": false,
+  "real_host_clock_tested": false,
+  "schema_version": "1.0.0"
+}
