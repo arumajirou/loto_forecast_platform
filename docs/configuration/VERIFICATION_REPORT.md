@@ -68,17 +68,20 @@ Executed against the exact proposed foundation files in a dependency-light Pytho
 ```text
 pydantic=2.13.4
 yaml=6.0.3
-focused pytest=10 passed
+focused pytest=12 passed
 python compileall=PASS
 example CLI validation=PASS
 resolved artifact write=PASS
 resolved semantic SHA-256 and artifact sidecar=PASS
 secret redaction=PASS
+secret absent from resolved object representation=PASS
 unknown-key rejection=PASS
 strict-type rejection=PASS
 range rejection=PASS
 protected-stage rejection=PASS
 explicit migration-required behavior=PASS
+exact NEURALFORECAST_MLFLOW_TRACKING_URI mapping=PASS
+duplicate environment target rejection=PASS
 override provenance changes semantic hash=PASS
 Python lines over 100=0
 ```
@@ -97,9 +100,9 @@ The following are not represented as PASS:
 | Full repository compileall | PENDING | Full private checkout unavailable locally |
 | Existing config tests | PENDING | Full private checkout unavailable locally |
 | Full pytest | PENDING | Not appropriate before focused integration validation |
-| Ruff | PENDING | Tool unavailable in validation environment |
-| mypy | PENDING | Tool unavailable in validation environment |
-| GitHub Actions | PENDING | Inspect automatically triggered run; do not infer code failure from zero steps |
+| Ruff | PENDING | Tool availability to be checked after publication |
+| mypy | PENDING | Tool availability to be checked after publication |
+| GitHub Actions | PENDING | Inspect automatically triggered run; do not claim pre-step failure as code failure |
 
 ## Non-claims
 
