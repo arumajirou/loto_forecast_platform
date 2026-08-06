@@ -8,3 +8,5 @@
 - Added 11 conservatively classified initial source records.
 - Added deterministic registry hashing and a validation CLI.
 - Added focused tests and the complete governance documentation set.
+- Hardened verified-intake completeness, repository URL identity, package-version pinning, and
+  reviewed remote-code allowlist/artifact binding after substantive self-review.
