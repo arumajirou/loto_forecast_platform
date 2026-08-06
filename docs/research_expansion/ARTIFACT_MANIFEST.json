@@ -1,0 +1,122 @@
+{
+  "artifact_set": "research-expansion-full-implementation-blueprint-v1",
+  "base_main_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "documentation_only": true,
+  "record_count": 16,
+  "records": [
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/ARCHITECTURE.md",
+      "role": "design_document",
+      "sha256": "355631aad1c5176471c6ed6b4745c8149381a7e572869644b713cd14bbc70365",
+      "size_bytes": 2556
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/BASIC_DESIGN.md",
+      "role": "design_document",
+      "sha256": "0f38fbdcf105be077352f842382a13aeda0b45017043a303b11a71c1ea4ff108",
+      "size_bytes": 2548
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/CHANGELOG.md",
+      "role": "design_document",
+      "sha256": "26565104fa24a006f6ccb192398265513dff620cb126acf26d21d3cc1c70e777",
+      "size_bytes": 541
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/DETAILED_DESIGN.md",
+      "role": "design_document",
+      "sha256": "acffa23fbd8581e224dcdc203d4c33b71ec80cf310a6f6089dfa7f62fac18193",
+      "size_bytes": 5332
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/EXECUTION_SCHEDULE.md",
+      "role": "design_document",
+      "sha256": "b5ec51f595d98661d626e1834fe740ec48a347913d2b615df150ac9df2f96899",
+      "size_bytes": 2045
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/HANDOFF.md",
+      "role": "design_document",
+      "sha256": "1a388430c04466f2b5c5461dce26e31899591b5ccedcc061abb615d6791002d3",
+      "size_bytes": 1480
+    },
+    {
+      "media_type": "application/yaml",
+      "path": "docs/research_expansion/IMPLEMENTATION_BACKLOG.yaml",
+      "role": "implementation_backlog",
+      "sha256": "b8aae52db85fe29149430282e542b4662b22ffb85da37348791624cb261f755d",
+      "size_bytes": 2230
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/IMPLEMENTATION_PLAN.md",
+      "role": "design_document",
+      "sha256": "3b0467ede8308e1d78abedf98a79f889cdf56fdf23e905aaee6eb525a366e4f3",
+      "size_bytes": 3130
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/PROMPTS.md",
+      "role": "design_document",
+      "sha256": "cb04bab541386a7ffeeab2af20fe2e0a2c7c53eb6ea96ec375037cdcafe1fd88",
+      "size_bytes": 5239
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/PR_ROADMAP.md",
+      "role": "design_document",
+      "sha256": "fcd6643f55a1816f3ec31b53e09d68e699415ce601ba28dc19abe99a74adcfbb",
+      "size_bytes": 2298
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/README.md",
+      "role": "design_document",
+      "sha256": "6699665edb8b9dc4ea6a3bd80f5dbf756743e9b6791e49aa4dff3835fb098d96",
+      "size_bytes": 3156
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/REQUIREMENTS.md",
+      "role": "design_document",
+      "sha256": "2b4db42eecf8b45429d315e373952f8f89d304b184fe980e78613695a29c295d",
+      "size_bytes": 3510
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/RISK_REGISTER.md",
+      "role": "design_document",
+      "sha256": "88a957b2237cbfcc8bc99c81eb48a54f8d022534dece02b7f2901b0e33aa68cc",
+      "size_bytes": 1782
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/SOURCE_REGISTER.md",
+      "role": "design_document",
+      "sha256": "13884293396276c6289aae1d31dc6f62aef236f3e35adfefa853ccd798ea8ac1",
+      "size_bytes": 3625
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/TEST_AND_VERIFICATION_PLAN.md",
+      "role": "design_document",
+      "sha256": "982afafc402f7e111bc515e1e3065b15cb06a7d6a7fcb1d01369aecd727e7924",
+      "size_bytes": 2820
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "docs/research_expansion/TRACEABILITY_MATRIX.md",
+      "role": "design_document",
+      "sha256": "4222d392008b00f4d11bf8b29265a9ffa007afef4a107fd54165a3d5492503e9",
+      "size_bytes": 1250
+    }
+  ],
+  "schema_version": "1.0.0",
+  "total_bytes": 43542
+}
