@@ -5,7 +5,7 @@ import os
 from contextlib import contextmanager
 from pathlib import Path
 from threading import RLock
-from typing import Any, Callable, Iterator
+from typing import Any, Iterator
 
 from .contracts import (
     ArchitectureProfile,

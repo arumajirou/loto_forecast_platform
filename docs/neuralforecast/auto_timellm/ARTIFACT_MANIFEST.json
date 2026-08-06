@@ -19,8 +19,8 @@
     },
     {
       "path": "src/loto/neuralforecast/auto_timellm/runtime.py",
-      "sha256": "24b70c326c6a33c94062220d7a8ec376c6097f1ac96a62319f94fa17655d8c04",
-      "size_bytes": 13629
+      "sha256": "d1af5b64d77c8b9d86a7320ec540c08fd83a1f110cb027d4ba9d4dc9251e35ed",
+      "size_bytes": 13619
     },
     {
       "path": "tests/neuralforecast/auto_timellm/test_contracts.py",
