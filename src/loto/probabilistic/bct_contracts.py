@@ -327,11 +327,15 @@ class BayesianContextTreeStateManifestV1(_BayesianContextTreeIdentityV1):
     @field_validator("artifact_paths")
     @classmethod
     def validate_state_artifact_paths(cls, value: list[str]) -> list[str]:
-        if not value:
-            raise ValueError("state artifact_paths must not be empty")
+        if len(value) != 2:
+            raise ValueError("json+npz state requires exactly two artifact paths")
         if len(value) != len(set(value)):
             raise ValueError("state artifact_paths must not contain duplicates")
-        return [_validate_relative_artifact_path(path) for path in value]
+        validated = [_validate_relative_artifact_path(path) for path in value]
+        suffixes = {PurePosixPath(path).suffix for path in validated}
+        if suffixes != {".json", ".npz"}:
+            raise ValueError("json+npz state requires one .json and one .npz artifact")
+        return validated
 
     @model_validator(mode="after")
     def validate_persistence_chronology(self) -> BayesianContextTreeStateManifestV1:

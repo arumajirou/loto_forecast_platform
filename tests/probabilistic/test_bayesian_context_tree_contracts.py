@@ -123,6 +123,33 @@ def test_state_manifest_roundtrip() -> None:
     assert BayesianContextTreeStateManifestV1.model_validate_json(state.model_dump_json()) == state
 
 
+@pytest.mark.parametrize(
+    "artifact_paths",
+    [
+        ["artifacts/bct/state.txt"],
+        ["artifacts/bct/state.json"],
+        ["artifacts/bct/state.json", "artifacts/bct/other.json"],
+        [
+            "artifacts/bct/state.json",
+            "artifacts/bct/state.npz",
+            "artifacts/bct/extra.txt",
+        ],
+    ],
+)
+def test_state_manifest_requires_exact_json_and_npz_artifacts(
+    artifact_paths: list[str],
+) -> None:
+    payload = {
+        **_identity(),
+        "implementation_status": "CONTRACT_ONLY",
+        "state_sha256": "d" * 64,
+        "persisted_at": datetime(2026, 8, 6, 2, 31, tzinfo=UTC),
+        "artifact_paths": artifact_paths,
+    }
+    with pytest.raises(ValidationError):
+        BayesianContextTreeStateManifestV1.model_validate(payload)
+
+
 def test_prediction_timestamp_must_be_timezone_aware_utc() -> None:
     with pytest.raises(ValidationError):
         _chronology(prediction_created_at=datetime(2026, 8, 6, 2, 30))
