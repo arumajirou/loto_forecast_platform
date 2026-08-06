@@ -1,0 +1,118 @@
+name: loto-observability
+
+x-common: &common
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "3"
+
+services:
+  grafana:
+    <<: *common
+    image: ${GRAFANA_IMAGE:?resolve immutable image digests first}
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_SECURITY_ADMIN_USER__FILE: /run/secrets/grafana_admin_user
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SERVER_ROOT_URL: http://127.0.0.1:${GRAFANA_PORT:-3000}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./secrets/grafana_admin_user:/run/secrets/grafana_admin_user:ro
+      - ./secrets/grafana_admin_password:/run/secrets/grafana_admin_password:ro
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+
+  prometheus:
+    <<: *common
+    image: ${PROMETHEUS_IMAGE:?resolve immutable image digests first}
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME:-15d}
+      - --storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE:-20GB}
+      - --web.enable-lifecycle
+      - --web.enable-remote-write-receiver
+      - --web.external-url=http://127.0.0.1:${PROMETHEUS_PORT:-9090}
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+
+  loki:
+    <<: *common
+    image: ${LOKI_IMAGE:?resolve immutable image digests first}
+    ports:
+      - "127.0.0.1:${LOKI_PORT:-3100}:3100"
+    command:
+      - -config.file=/etc/loki/config.yml
+      - -config.expand-env=true
+    environment:
+      LOKI_RETENTION_PERIOD: ${LOKI_RETENTION_PERIOD:-168h}
+    volumes:
+      - loki_data:/loki
+      - ./loki/config.yml:/etc/loki/config.yml:ro
+
+  tempo:
+    <<: *common
+    image: ${TEMPO_IMAGE:?resolve immutable image digests first}
+    ports:
+      - "127.0.0.1:${TEMPO_PORT:-3200}:3200"
+    command:
+      - -config.file=/etc/tempo/config.yml
+    volumes:
+      - tempo_data:/var/tempo
+      - ./tempo/config.yml:/etc/tempo/config.yml:ro
+    healthcheck:
+      test: ["CMD", "/tempo", "-health"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  alloy:
+    <<: *common
+    image: ${ALLOY_IMAGE:?resolve immutable image digests first}
+    ports:
+      - "127.0.0.1:${ALLOY_PORT:-12345}:12345"
+      - "127.0.0.1:${OTLP_GRPC_PORT:-4317}:4317"
+      - "127.0.0.1:${OTLP_HTTP_PORT:-4318}:4318"
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - --disable-reporting
+      - /etc/alloy/config.alloy
+    environment:
+      LOTO_METRICS_TARGET: ${LOTO_METRICS_TARGET:-host.docker.internal:8000}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - alloy_data:/var/lib/alloy/data
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - ${LOTO_JSONL_LOG_DIR:-../../runs}:/var/log/loto:ro
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+
+volumes:
+  grafana_data:
+  prometheus_data:
+  loki_data:
+  tempo_data:
+  alloy_data:
