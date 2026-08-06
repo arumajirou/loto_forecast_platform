@@ -1,16 +1,21 @@
 from __future__ import annotations
 
+import json
+import runpy
 from datetime import date, timedelta
+from pathlib import Path
+from typing import Any
 
 import pytest
 from pydantic import ValidationError
 
 from loto.adapters.timer_base_84m.contracts import TimerRequest
+from loto.adapters.timer_base_84m.provider import TimerBase84MProvider
 from loto.timer_base_84m_campaign.chronology import TimeAxis, validate_chronology
 from loto.timer_base_84m_campaign.geometry import Game, geometry_for
 
 
-def request_payload(*, game: Game = Game.NUMBERS3, context: int = 96) -> dict:
+def request_payload(*, game: Game = Game.NUMBERS3, context: int = 96) -> dict[str, Any]:
     geometry = geometry_for(game)
     draws = tuple(range(1000, 1000 + context))
     dates = tuple(date(2025, 1, 1) + timedelta(days=index) for index in range(context))
@@ -30,7 +35,8 @@ def request_payload(*, game: Game = Game.NUMBERS3, context: int = 96) -> dict:
         "model_id": "timer-base-84m",
         "repo_id": "thuml/timer-base-84m",
         "package_version": "4.40.1",
-        "source_revision": "1ff8d1afc073182e6d46022069ff32470ab47945",
+        "source_revision": "UNPINNED",
+        "observed_source_head": "1ff8d1afc073182e6d46022069ff32470ab47945",
         "model_revision": "70077a71acce1b4c00d98332fcaabc694255d8e5",
         "config_sha256": "UNVERIFIED",
         "weight_sha256": "9c3d18f12ffe1ea7d4fa70eb3304b26e3841164a6a265fbae4f7a05cd213aa3d",
@@ -70,6 +76,10 @@ def request_payload(*, game: Game = Game.NUMBERS3, context: int = 96) -> dict:
     }
 
 
+def json_payload(payload: dict[str, Any]) -> str:
+    return json.dumps(payload, default=lambda value: value.isoformat())
+
+
 def reject(field: str, value: object) -> None:
     payload = request_payload()
     payload[field] = value
@@ -80,6 +90,12 @@ def reject(field: str, value: object) -> None:
 def test_valid_contract() -> None:
     request = TimerRequest.model_validate(request_payload())
     assert request.input_shape == (3, 96)
+
+
+def test_strict_json_contract_accepts_canonical_json() -> None:
+    request = TimerRequest.model_validate_json(json_payload(request_payload()))
+    assert request.game is Game.NUMBERS3
+    assert request.chronology_evidence.time_axis is TimeAxis.DRAW_SEQUENCE
 
 
 def test_unknown_field_rejected() -> None:
@@ -93,6 +109,7 @@ def test_unknown_field_rejected() -> None:
     ("field", "value"),
     [
         ("model_id", "timer"),
+        ("source_revision", "1ff8d1afc073182e6d46022069ff32470ab47945"),
         ("model_revision", "0" * 40),
         ("weight_sha256", "0" * 64),
         ("license", "MIT"),
@@ -125,8 +142,34 @@ def test_non_finite_input_rejected() -> None:
         TimerRequest.model_validate(payload)
 
 
-def test_artifact_path_traversal_rejected() -> None:
+@pytest.mark.parametrize("unsafe", ["../weights", ".", "a//b", "a\\b", "./a"])
+def test_artifact_path_traversal_rejected(unsafe: str) -> None:
     payload = request_payload()
-    payload["artifact_paths"]["snapshot_path"] = "../weights"
+    payload["artifact_paths"]["snapshot_path"] = unsafe
     with pytest.raises(ValidationError):
         TimerRequest.model_validate(payload)
+
+
+def test_provider_validates_json_without_relaxing_strict_contract(tmp_path) -> None:
+    provider = TimerBase84MProvider(tmp_path, tmp_path / "review.json")
+    request = provider.validate_request_json(json_payload(request_payload()))
+    assert request.source_revision == "UNPINNED"
+
+
+def test_runner_rejects_operation_mismatch() -> None:
+    root = Path(__file__).resolve().parents[3]
+    runner = runpy.run_path(str(root / "scripts" / "run_timer_base_84m_provider.py"))
+    payload = json.loads(json_payload(request_payload()))
+    payload["operation"] = "predict"
+    with pytest.raises(ValueError, match="operation mismatch"):
+        runner["run"]({"operation": "validate_request", "request": payload})
+
+
+def test_runner_rejects_unknown_command_field() -> None:
+    root = Path(__file__).resolve().parents[3]
+    runner = runpy.run_path(str(root / "scripts" / "run_timer_base_84m_provider.py"))
+    payload = json.loads(json_payload(request_payload()))
+    with pytest.raises(ValueError, match="unknown command fields"):
+        runner["run"](
+            {"operation": "validate_request", "request": payload, "unexpected": True}
+        )

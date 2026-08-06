@@ -5,16 +5,13 @@
   "repo_id": "thuml/timer-base-84m",
   "model_revision": "70077a71acce1b4c00d98332fcaabc694255d8e5",
   "source_repository": "https://github.com/thuml/Large-Time-Series-Model",
-  "source_revision": "1ff8d1afc073182e6d46022069ff32470ab47945",
+  "source_revision": "UNPINNED",
+  "observed_source_head": "1ff8d1afc073182e6d46022069ff32470ab47945",
   "transformers_version": "4.40.1",
   "python_lane": ">=3.10,<3.11",
   "torch_version": "UNPINNED",
   "license": "Apache-2.0",
-  "allowed_horizons": [
-    1,
-    2,
-    5
-  ],
+  "allowed_horizons": [1, 2, 5],
   "context": {
     "minimum": 96,
     "maximum": 2880,
@@ -24,10 +21,7 @@
     "position_univariate",
     "position_panel_batched_univariate"
   ],
-  "time_axes": [
-    "draw_sequence",
-    "calendar_time"
-  ],
+  "time_axes": ["draw_sequence", "calendar_time"],
   "runtime_claims": {
     "checkpoint_load": false,
     "cpu_inference": false,

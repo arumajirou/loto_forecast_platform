@@ -10,9 +10,11 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from loto.timer_base_84m_campaign.chronology import TimeAxis, validate_chronology
 from loto.timer_base_84m_campaign.geometry import Game, geometry_for
 from loto.timer_base_84m_campaign.provenance import (
+    CONFIG_SHA256,
     LICENSE,
     MODEL_ID,
     MODEL_REVISION,
+    OBSERVED_SOURCE_HEAD,
     REPO_ID,
     SOURCE_REVISION,
     TRANSFORMERS_VERSION,
@@ -38,9 +40,13 @@ class ArtifactPaths(StrictModel):
     @field_validator("request_path", "response_path", "snapshot_path", "manifest_path")
     @classmethod
     def validate_safe_relative_path(cls, value: str) -> str:
+        if not value or value.strip() != value or "\\" in value or "\x00" in value:
+            raise ValueError("artifact paths must be canonical relative POSIX paths")
         path = PurePosixPath(value)
-        if path.is_absolute() or ".." in path.parts or value.strip() != value or not value:
-            raise ValueError("artifact paths must be non-empty safe relative POSIX paths")
+        if path.is_absolute() or not path.parts or ".." in path.parts or str(path) != value:
+            raise ValueError("artifact paths must be canonical relative POSIX paths")
+        if any(part in {"", ".", ".."} for part in path.parts):
+            raise ValueError("artifact paths must be canonical relative POSIX paths")
         return value
 
 
@@ -50,7 +56,7 @@ class ChronologyEvidence(StrictModel):
     cutoff_date: date
     draw_numbers: tuple[int, ...]
     dates: tuple[date, ...]
-    mapping_sha256: str
+    mapping_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     future_actuals_present: Literal[False]
     duplicate_free: Literal[True]
     strictly_increasing: Literal[True]
@@ -73,8 +79,9 @@ class TimerRequest(StrictModel):
     repo_id: Literal[REPO_ID]
     package_version: Literal[TRANSFORMERS_VERSION]
     source_revision: Literal[SOURCE_REVISION]
+    observed_source_head: Literal[OBSERVED_SOURCE_HEAD]
     model_revision: Literal[MODEL_REVISION]
-    config_sha256: Literal["UNVERIFIED"]
+    config_sha256: Literal[CONFIG_SHA256]
     weight_sha256: Literal[WEIGHT_SHA256]
     license: Literal[LICENSE]
     game: Game
@@ -126,19 +133,25 @@ class TimerRequest(StrictModel):
 
 class TimerResponse(StrictModel):
     schema_version: Literal["timer-base-84m.response.v1"]
-    run_id: str
+    run_id: str = Field(min_length=8, max_length=128, pattern=r"^[A-Za-z0-9._-]+$")
     status: Literal[
         "IDENTITY",
         "VALIDATED",
         "ENVIRONMENT_VALIDATED",
         "SNAPSHOT_MANIFEST_VALIDATED",
         "EXECUTION_PENDING",
+        "RUNTIME_NOT_CERTIFIED",
+        "CHECKPOINT_LOAD_PENDING",
+        "DEPENDENCY_LOCK_PENDING",
+        "REMOTE_CODE_REVIEW_REQUIRED",
     ]
     model_id: Literal[MODEL_ID]
+    repo_id: Literal[REPO_ID]
     package_version: Literal[TRANSFORMERS_VERSION]
     source_revision: Literal[SOURCE_REVISION]
+    observed_source_head: Literal[OBSERVED_SOURCE_HEAD]
     model_revision: Literal[MODEL_REVISION]
-    config_sha256: Literal["UNVERIFIED"]
+    config_sha256: Literal[CONFIG_SHA256]
     weight_sha256: Literal[WEIGHT_SHA256]
     license: Literal[LICENSE]
     game: Game

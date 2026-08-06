@@ -26,10 +26,24 @@ def test_pending_review_fails_closed() -> None:
         validate_remote_code_review(review())
 
 
+def test_source_revision_is_explicitly_unpinned() -> None:
+    payload = review()
+    payload["source_revision"] = payload["observed_source_head"]
+    with pytest.raises(ProvenanceError, match="source_revision"):
+        validate_remote_code_review(payload)
+
+
 def test_remote_code_file_set_mismatch_rejected() -> None:
     payload = review()
     payload["files"].pop("modeling_timer.py")
-    with pytest.raises(ProvenanceError, match="allowlist"):
+    with pytest.raises(ProvenanceError, match="snapshot file allowlist"):
+        validate_remote_code_review(payload)
+
+
+def test_remote_code_execution_allowlist_mismatch_rejected() -> None:
+    payload = review()
+    payload["remote_code_files"].append("README.md")
+    with pytest.raises(ProvenanceError, match="execution allowlist"):
         validate_remote_code_review(payload)
 
 

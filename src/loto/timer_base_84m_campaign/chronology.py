@@ -3,12 +3,12 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import date, timedelta
-from enum import StrEnum
+from enum import Enum
 
 from loto.timer_base_84m_campaign.geometry import Game, geometry_for
 
 
-class TimeAxis(StrEnum):
+class TimeAxis(str, Enum):
     DRAW_SEQUENCE = "draw_sequence"
     CALENDAR_TIME = "calendar_time"
 

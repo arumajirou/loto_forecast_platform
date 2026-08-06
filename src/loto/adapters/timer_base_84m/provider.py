@@ -9,6 +9,7 @@ from loto.timer_base_84m_campaign.provenance import (
     LICENSE,
     MODEL_ID,
     MODEL_REVISION,
+    OBSERVED_SOURCE_HEAD,
     PYTHON_LANE,
     REPO_ID,
     SOURCE_REPOSITORY,
@@ -39,6 +40,7 @@ class TimerBase84MProvider:
             "weight_sha256": WEIGHT_SHA256,
             "source_repository": SOURCE_REPOSITORY,
             "source_revision": SOURCE_REVISION,
+            "observed_source_head": OBSERVED_SOURCE_HEAD,
             "transformers_version": TRANSFORMERS_VERSION,
             "python_lane": PYTHON_LANE,
             "license": LICENSE,
@@ -47,6 +49,9 @@ class TimerBase84MProvider:
 
     def validate_request(self, payload: dict[str, Any]) -> TimerRequest:
         return TimerRequest.model_validate(payload)
+
+    def validate_request_json(self, payload: str | bytes | bytearray) -> TimerRequest:
+        return TimerRequest.model_validate_json(payload)
 
     def validate_environment(self) -> dict[str, Any]:
         project_file = self.environment_dir / "pyproject.toml"
