@@ -222,6 +222,27 @@ def verify_repository_hashes(root: Path, environment: dict[str, Any]) -> list[st
     return reasons
 
 
+def missing_status_report(
+    run_dir: Path,
+    *,
+    expected_commit: str | None,
+    expected_branch: str | None,
+) -> dict[str, Any]:
+    return {
+        "schema_version": 1,
+        "verified_at_utc": utc_now(),
+        "run_id": run_dir.name,
+        "run_dir": str(run_dir),
+        "status": "FAIL",
+        "reasons": ["STATUS_FILE_MISSING"],
+        "case_results": {},
+        "recomputed_reproducibility": None,
+        "checksum_entry_count": 0,
+        "expected_commit": expected_commit,
+        "expected_branch": expected_branch,
+    }
+
+
 def verify_run(
     run_dir: Path,
     *,
@@ -232,6 +253,13 @@ def verify_run(
     run_dir = run_dir.expanduser().resolve()
     if not run_dir.is_dir() or run_dir.is_symlink():
         raise EvidenceError(f"invalid run directory: {run_dir}")
+    status_path = run_dir / "status.txt"
+    if not status_path.is_file() or status_path.is_symlink():
+        return missing_status_report(
+            run_dir,
+            expected_commit=expected_commit,
+            expected_branch=expected_branch,
+        )
     checksum_entries = verify_checksums(run_dir)
     summary = load_json(run_dir / "certification-summary.json")
     environment = load_json(run_dir / "environment.json")
@@ -278,7 +306,11 @@ def verify_run(
         reasons.append("REPRODUCIBILITY_CLASSIFICATION_INVALID")
     if replay != reproducibility:
         reasons.append("REPRODUCIBILITY_RECOMPUTE_MISMATCH")
-    status_lines = (run_dir / "status.txt").read_text(encoding="utf-8").splitlines()
+    try:
+        status_lines = status_path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        status_lines = []
+        reasons.append("STATUS_FILE_UNREADABLE")
     if not status_lines or status_lines[0] != "SUNDIAL_PROVIDER_V2_CERTIFICATION=PASS":
         reasons.append("STATUS_FILE_MISMATCH")
     required_files = set(manifest.get("required_files", []))
@@ -334,13 +366,21 @@ def render_markdown(report: dict[str, Any]) -> str:
     )
 
 
-def create_archive(run_dir: Path, verification_dir: Path, archive_path: Path) -> None:
+def create_archive(
+    run_dir: Path,
+    verification_dir: Path,
+    archive_path: Path,
+    *,
+    semantic_reports: tuple[Path, ...] = (),
+) -> None:
     archive_path.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for source_root, prefix in ((run_dir, "run"), (verification_dir, "verification")):
             for path in sorted(source_root.rglob("*")):
                 if path.is_file():
                     archive.write(path, f"{prefix}/{path.relative_to(source_root).as_posix()}")
+        for path in semantic_reports:
+            archive.write(path, f"semantic/{path.name}")
     (archive_path.with_suffix(archive_path.suffix + ".sha256")).write_text(
         f"{sha256(archive_path)}  {archive_path.name}\n",
         encoding="utf-8",
@@ -353,6 +393,7 @@ def main() -> int:
     parser.add_argument("--repo-root", type=Path)
     parser.add_argument("--expected-commit")
     parser.add_argument("--expected-branch", default="feat/sundial-probabilistic-provider-v2")
+    parser.add_argument("--semantic-report", type=Path)
     parser.add_argument(
         "--output-root",
         type=Path,
@@ -360,12 +401,21 @@ def main() -> int:
     )
     parser.add_argument("--archive", action="store_true")
     args = parser.parse_args()
+    semantic_reports: tuple[Path, ...] = ()
+    if args.semantic_report is not None:
+        semantic_report = args.semantic_report.expanduser().resolve()
+        if semantic_report.is_symlink() or not semantic_report.is_file():
+            raise EvidenceError(f"invalid semantic report: {semantic_report}")
+        semantic_reports = (semantic_report,)
     report = verify_run(
         args.run_dir,
         repo_root=args.repo_root,
         expected_commit=args.expected_commit,
         expected_branch=args.expected_branch,
     )
+    report["semantic_reports"] = [
+        {"path": str(path), "sha256": sha256(path)} for path in semantic_reports
+    ]
     run_id = str(report["run_id"] or args.run_dir.name)
     output = args.output_root.expanduser().resolve() / run_id
     if output.exists():
@@ -377,7 +427,12 @@ def main() -> int:
     (output / "PR_COMMENT.md").write_text(markdown, encoding="utf-8")
     if args.archive and report["status"] == "PASS":
         archive = output.parent / f"{run_id}-evidence.zip"
-        create_archive(args.run_dir.resolve(), output, archive)
+        create_archive(
+            args.run_dir.resolve(),
+            output,
+            archive,
+            semantic_reports=semantic_reports,
+        )
         report["archive"] = str(archive)
         report["archive_sha256"] = sha256(archive)
         write_json(output / "VERIFICATION_REPORT.json", report)
