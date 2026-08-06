@@ -10,7 +10,7 @@ from loto.adapters.tabpfn_ts import (
     TaskFormulation,
     lane_manifest,
 )
-from tests.adapters.tabpfn_ts.conftest import build_position_request
+from .conftest import build_position_request
 
 
 def test_request_rejects_unknown_top_level_key() -> None:
