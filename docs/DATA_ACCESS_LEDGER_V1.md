@@ -12,18 +12,24 @@ registry, promotion, configuration, API, and PR-integration workflows.
 The v1 validator fails closed when it finds:
 
 - fitting or fitting a transformer outside the `train` split;
-- validation, holdout, or prospective access without a prediction cutoff;
-- a read window, dataset availability timestamp, or column-known timestamp after that cutoff;
+- predictive feature, fit, selection, tuning, evaluation, or scoring access without a prediction
+  cutoff or dataset-availability evidence;
+- a data-consuming event without a bounded end timestamp;
+- a read window, dataset availability timestamp, column-known timestamp, or dependency after the
+  consumer's prediction cutoff;
 - holdout use during feature construction, fitting, model selection, or hyperparameter tuning;
 - prospective or actual data use before scoring/audit/ingestion;
-- current target or actual columns used as features;
-- unbounded temporal scope;
-- unknown, non-causal, or later-split dependencies.
+- current target or actual columns used during feature construction;
+- unbounded column temporal scope;
+- unknown, non-causal, or later-split dependencies;
+- naive datetimes, while normalizing accepted timezone-aware values to UTC.
 
-The AST scanner identifies selected read, fit, fit-transform, and join calls that do not have a
-matching ledger event at the same repository-relative file and source line. The scanner is a static
-control: a clean result is evidence that declared calls are covered, not proof that no leakage exists.
-Dynamic SQL, reflection, generated code, C extensions, and unsupported I/O APIs remain outside v1.
+The AST scanner identifies selected read, write, fit, fit-transform, and join calls that do not have
+a matching ledger event at the same repository-relative file and source line. It distinguishes
+literal read/write modes for `open()` and covers common pathlib, pandas, and polars writes. The
+scanner is a static control: a clean result is evidence that declared calls are covered, not proof
+that no leakage exists. Dynamic SQL, reflection, generated code, C extensions, dynamically computed
+open modes, and unsupported I/O APIs remain outside v1.
 
 ## Minimal declaration
 
@@ -66,7 +72,11 @@ ledger = DataAccessLedger(
                     lag=1,
                 )
             ],
-            boundary=TimeBoundary(end=cutoff, prediction_cutoff=cutoff),
+            boundary=TimeBoundary(
+                end=cutoff,
+                prediction_cutoff=cutoff,
+                available_at=cutoff,
+            ),
             location=CodeLocation(path="src/pipeline/features.py", line=42),
         )
     ],
@@ -79,6 +89,7 @@ assert validate_ledger(ledger).passed
 - `schema_version` is exactly `1.0.0`.
 - Unknown fields are rejected at every model boundary.
 - Events are ordered by `(sequence, event_id)` and event IDs are unique.
+- All accepted datetimes are timezone-aware and canonicalized to UTC.
 - SHA-256 evidence fields, when present, are lowercase 64-character hexadecimal strings.
 - Code locations are repository-relative POSIX paths and cannot contain `..`.
 - Read-like events must enumerate accessed columns.
@@ -94,4 +105,5 @@ python -m compileall -q src/loto/data_access_ledger tests/data_access_ledger
 PYTHONPATH=src python -m pytest -q tests/data_access_ledger
 ```
 
-No runtime integration or production certification is claimed by this PR.
+The focused suite currently contains 11 tests. No runtime integration or production certification is
+claimed by this PR.
