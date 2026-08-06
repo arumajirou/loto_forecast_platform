@@ -148,6 +148,34 @@ def _canonical_sha256(payload: dict[str, Any]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _atomic_write_text(target: Path, content: str) -> None:
+    temporary = target.with_name(f".{target.name}.tmp")
+    try:
+        with temporary.open("w", encoding="utf-8") as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, target)
+        try:
+            directory_fd = os.open(target.parent, os.O_RDONLY)
+        except OSError:
+            return
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def resolve_payload(
     payload: dict[str, Any],
     *,
@@ -178,10 +206,15 @@ def resolve_payload(
     redacted = _redact(config.model_dump(mode="python"))
     if not isinstance(redacted, dict):
         raise TypeError("resolved configuration did not serialize to a mapping")
+    provenance = [record.to_dict() for record in records]
+    hash_payload = {
+        "resolved_config": redacted,
+        "environment_overrides": provenance,
+    }
     return ResolvedConfig(
         config=config,
         redacted_config=redacted,
-        config_sha256=_canonical_sha256(redacted),
+        config_sha256=_canonical_sha256(hash_payload),
         overrides=tuple(records),
     )
 
@@ -204,16 +237,13 @@ def write_resolved_config(resolved: ResolvedConfig, output: str | Path) -> tuple
     target = Path(output)
     target.parent.mkdir(parents=True, exist_ok=True)
     sidecar = target.with_name(f"{target.name}.sha256")
-    temporary = target.with_name(f".{target.name}.tmp")
-    sidecar_temporary = sidecar.with_name(f".{sidecar.name}.tmp")
-    temporary.write_text(
-        json.dumps(resolved.envelope(), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    sidecar_temporary.write_text(
-        f"{resolved.config_sha256}  {target.name}\n",
-        encoding="utf-8",
-    )
-    os.replace(temporary, target)
-    os.replace(sidecar_temporary, sidecar)
+    content = json.dumps(
+        resolved.envelope(),
+        ensure_ascii=False,
+        indent=2,
+        sort_keys=True,
+    ) + "\n"
+    _atomic_write_text(target, content)
+    artifact_sha256 = _file_sha256(target)
+    _atomic_write_text(sidecar, f"{artifact_sha256}  {target.name}\n")
     return target, sidecar
