@@ -62,59 +62,19 @@
       "size_bytes": 464
     },
     {
-      "path": "src/loto/research_sources/__init__.py",
-      "sha256": "202dee9a1a93aaab5aeff1ab3923030e421d3f9cc171a41debb4c8443aaf990d",
-      "size_bytes": 666
-    },
-    {
-      "path": "src/loto/research_sources/__main__.py",
-      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
-      "size_bytes": 48
-    },
-    {
-      "path": "src/loto/research_sources/cli.py",
-      "sha256": "d0514c6942c6ee7d6b10eee4be7a18025a16b041727501be6d05d0ac41a2e438",
-      "size_bytes": 2091
-    },
-    {
-      "path": "src/loto/research_sources/index.py",
-      "sha256": "be4d592517b5a843b4677f84c977bbe1ad5d7aa6fe732826df53365e77fd6091",
-      "size_bytes": 1007
-    },
-    {
-      "path": "src/loto/research_sources/models.py",
-      "sha256": "4060ef2ff9730962bd652d9333d37a9f3fb2923afd87b5ea33f426765bf5c551",
-      "size_bytes": 13168
-    },
-    {
-      "path": "src/loto/research_sources/registry.py",
-      "sha256": "f80d7e1ef06796b5d71c43e7ecd0ba3401c4e5aea0baa749208beba324201bde",
-      "size_bytes": 3733
-    },
-    {
-      "path": "tests/research_sources/test_contracts.py",
-      "sha256": "d6485c78d2b7518b96e1e720a391933ebbd09a27e56bd9b3c4bfd804eb55ee36",
-      "size_bytes": 6386
-    },
-    {
-      "path": "tests/research_sources/test_registry.py",
-      "sha256": "f1a4bed9d3ab2cf3472acd2518c500b029aa8c569ca7dd105d949b0f5c4dc108",
-      "size_bytes": 2737
-    },
-    {
       "path": "docs/research_sources/ARCHITECTURE.md",
       "sha256": "1d585a6df5cdaa62ecf103f4166b2cf14ac4bc67377cdc8019a62eeecf2d96f0",
       "size_bytes": 1463
     },
     {
       "path": "docs/research_sources/CHANGELOG.md",
-      "sha256": "2f1fcf12d4fcb64f3f331a45816c985eed5475e68fd724829cccb88647307095",
-      "size_bytes": 419
+      "sha256": "1f10d3e4dcd717e42cf63b1b4f39f8e4a7dbe834158919571629c3b36b8dfe72",
+      "size_bytes": 595
     },
     {
       "path": "docs/research_sources/DATA_CONTRACT.md",
-      "sha256": "5df012052ecb2974684c3b9216e9df5d409f6f6ee4a92d000d86bc400b32272b",
-      "size_bytes": 2080
+      "sha256": "80d168d184144875d5d7bb5a0b31b70c6a65f0b9ced818225d2aec50f738f76e",
+      "size_bytes": 2662
     },
     {
       "path": "docs/research_sources/HANDOFF.md",
@@ -138,18 +98,58 @@
     },
     {
       "path": "docs/research_sources/SPECIFICATION.md",
-      "sha256": "9a323b8959504789679ed3682836d6740d6320b26bad495867e529d416fae4c4",
-      "size_bytes": 2028
+      "sha256": "6f3e829620883e47a0ff9de6ec83c5af188d79d0731ec98348de042769a1f773",
+      "size_bytes": 2296
     },
     {
       "path": "docs/research_sources/TEST_PLAN.md",
-      "sha256": "dd87c6c07b58de729731c95e9804380c64c1a7de1c5aad7a0c6eddc075006e76",
-      "size_bytes": 1182
+      "sha256": "ea063b3b2c97fd55dfe0bbf9b83e558ce3fee508730842e77e93a3e059b5f982",
+      "size_bytes": 1384
     },
     {
       "path": "docs/research_sources/VERIFICATION_REPORT.md",
-      "sha256": "ce4f354db0d1c5388edbf7be11e70d5859c4506774d6d5a0dbc99b9b6e9c96c5",
-      "size_bytes": 2643
+      "sha256": "7efd676c16e7ff12d07aad60ca0409b15b61a6b23fbe779889a16943bdcab25d",
+      "size_bytes": 3232
+    },
+    {
+      "path": "src/loto/research_sources/__init__.py",
+      "sha256": "202dee9a1a93aaab5aeff1ab3923030e421d3f9cc171a41debb4c8443aaf990d",
+      "size_bytes": 666
+    },
+    {
+      "path": "src/loto/research_sources/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "size_bytes": 48
+    },
+    {
+      "path": "src/loto/research_sources/cli.py",
+      "sha256": "d0514c6942c6ee7d6b10eee4be7a18025a16b041727501be6d05d0ac41a2e438",
+      "size_bytes": 2091
+    },
+    {
+      "path": "src/loto/research_sources/index.py",
+      "sha256": "be4d592517b5a843b4677f84c977bbe1ad5d7aa6fe732826df53365e77fd6091",
+      "size_bytes": 1007
+    },
+    {
+      "path": "src/loto/research_sources/models.py",
+      "sha256": "ba5538fc921655039e4fa562020c70ad4b827ce9dccd091d309e2ab8f4aed821",
+      "size_bytes": 19959
+    },
+    {
+      "path": "src/loto/research_sources/registry.py",
+      "sha256": "f80d7e1ef06796b5d71c43e7ecd0ba3401c4e5aea0baa749208beba324201bde",
+      "size_bytes": 3733
+    },
+    {
+      "path": "tests/research_sources/test_contracts.py",
+      "sha256": "69e6d093d48f484dc847d55f35ba7c2352ce3e37c6e4f1d1cb389c960df56397",
+      "size_bytes": 12195
+    },
+    {
+      "path": "tests/research_sources/test_registry.py",
+      "sha256": "f1a4bed9d3ab2cf3472acd2518c500b029aa8c569ca7dd105d949b0f5c4dc108",
+      "size_bytes": 2737
     }
   ],
   "schema_version": "1.0.0"
