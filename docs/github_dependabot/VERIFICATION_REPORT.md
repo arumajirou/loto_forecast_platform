@@ -2,7 +2,8 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / CONFIGURATION_EXECUTED / RUNTIME_ACCEPTANCE_PENDING`
+`PARTIALLY_VERIFIED / CONFIGURATION_EXECUTED / FOCUSED_TESTS_PASSED /
+GITHUB_ACCEPTANCE_PENDING`
 
 ## Verified repository facts
 
@@ -41,34 +42,39 @@
 - no private registry or credential configuration;
 - repository-owned policy test and operations documentation.
 
-## Static review performed
+## Focused verification executed
 
-The committed YAML and Python test were manually reviewed for:
+Run identity: `dependabot-foundation-isolated-20260806T0815Z`
 
-- required Dependabot keys and supported ecosystem identifiers;
-- bounded schedules and PR limits;
-- exact sensitive-dependency exclusion set;
-- absence of auto-merge and credential keys;
-- Python typing and repository line-length expectations;
-- scope isolation from existing CI, dependencies, models and governance state.
+The exact UTF-8 contents were fetched back from the GitHub branch. Each reconstructed file was
+verified against its Git blob SHA before execution.
 
-This is not a substitute for executing PyYAML, Ruff, compileall or pytest.
+| Check | Result |
+|---|---|
+| PyYAML parse and policy inspection | PASS; version 2, ecosystems `uv` and `github-actions` |
+| Python compileall for owned test path | PASS; exit 0 |
+| focused pytest | PASS; 5 passed in 0.08s |
+| maximum line length review | PASS; all owned files at or below 100 characters |
+| focused secret-pattern scan | PASS; no matched private-key/token patterns |
+| large-file review | PASS; no owned file above 1 MB |
+| SHA-256 verification | PASS; 10 of 10 recorded artifacts matched |
 
-## Not executed
+The Python process emitted an unrelated `artifact_tool` spreadsheet warmup traceback on stderr,
+but compileall and pytest both returned exit code 0. It did not originate from repository code or
+the Dependabot test.
 
-- local YAML parse;
-- Ruff format and lint;
-- compileall;
-- focused pytest;
-- full pytest and coverage;
-- local secret, dependency or large-file scan;
-- Dependabot default-branch parse/job;
-- generated dependency PR;
-- `uv sync --frozen` on a generated PR;
-- GitHub Actions success.
+## Unavailable or not executed
 
-The GitHub connector used for this change does not provide a repository checkout or local command
-runner. These checks remain `EXECUTION_PENDING`; they are not represented as passed.
+- Ruff format and lint: `UNAVAILABLE`; the isolated interpreter reported `No module named ruff`;
+- mypy: not applicable to this configuration-only test surface and not executed;
+- full repository pytest and coverage: not executed because no repository checkout was available;
+- full dependency, detect-secrets or repository-wide large-file scan: not executed;
+- Dependabot default-branch parse/job: not executable before merge to the default branch;
+- generated dependency PR: not yet available;
+- `uv sync --frozen` on a generated PR: not yet available;
+- GitHub Actions success: blocked by Issue #58.
+
+Unavailable and unexecuted checks are not represented as passed.
 
 ## Actions classification
 
