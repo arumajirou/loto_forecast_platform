@@ -8,8 +8,10 @@
 - uppercase and malformed SHA-256 rejection;
 - duplicate and unsafe artifact path rejection;
 - code/weight license separation;
-- remote-code policy requirement;
-- release-state/status consistency;
+- remote-code policy, safe/unique allowlist, and reviewed-file inventory binding;
+- release-state/status consistency, paper identity, and verified-intake completeness;
+- concrete HTTPS repository identity and mirror-flag consistency;
+- floating package-version rejection;
 - nonofficial mirror canonical rejection;
 - supersession reference and cycle rejection;
 - unknown-field rejection;
