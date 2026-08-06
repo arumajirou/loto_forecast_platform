@@ -288,3 +288,4 @@ def test_full_allowlist_stress_stays_within_declared_series_budget() -> None:
         metrics.touched_series_count()
         <= metrics.catalog.total_series_upper_bound()
     )
+
