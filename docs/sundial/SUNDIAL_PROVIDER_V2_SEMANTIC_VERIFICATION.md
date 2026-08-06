@@ -2,10 +2,10 @@
 
 ## Status
 
-`SEMANTIC_VERIFIER_IMPLEMENTED / TARGET_HOST_EXECUTION_PENDING`
+`SEMANTIC_VERIFIER_IMPLEMENTED / EVIDENCE_ARCHIVE_WIRED / TARGET_HOST_EXECUTION_PENDING`
 
-Formal certification now includes a verifier independent from the provider response contract.
-It recomputes all summaries from the raw generated samples and checks the fixed snapshot before the
+Formal certification includes a verifier independent from the provider response contract. It
+recomputes all summaries from the raw generated samples and checks the fixed snapshot before the
 model is loaded.
 
 ## Snapshot pins
@@ -18,26 +18,40 @@ model.safetensors=414435b508391f92afadd2aaeec418c806776aeccbce12e638d73a139ca5ca
 ```
 
 The remote-code files are checked against the existing approved review and the hashes recorded by
-PR #14. An unexpected weight or runtime Python file fails the snapshot preflight.
+the pinned snapshot probe. Unexpected Python or weight files fail verification.
 
-## Output recomputation
+## Response recomputation
 
-For every CPU, CUDA, and replay case, the verifier recomputes:
+For each of the eight certification cases, the verifier recomputes from raw samples:
 
 - mean;
 - median;
 - population standard deviation;
 - every declared empirical quantile;
-- the selected legacy point forecast.
+- selected mean or median point prediction.
 
-It also checks `point_forecasts`, quantile keys and levels, response properties, snapshot path,
-artifact identity, and fixed config, weight, and remote-code hashes.
+It then compares the recomputed values with `sample_statistics`, `point_forecasts`, `quantiles`,
+and `predictions`, while also validating identity, shape, finite values, and snapshot properties.
 
-The final gate requires both semantic stages:
+## Evidence handoff
+
+A successful run writes:
 
 ```text
-semantic-snapshot-preflight
-semantic-output-verification
+artifacts/sundial-provider-v2-semantic-verification/<RUN_ID>.json
 ```
 
-A provider certification cannot become final-gate PASS when either semantic stage fails.
+The evidence verifier receives this path with `--semantic-report`, records its SHA-256, and embeds
+it inside the shareable evidence ZIP as:
+
+```text
+semantic/<RUN_ID>.json
+```
+
+Both the package launcher and final gate reopen the ZIP and require this entry before they can
+complete successfully.
+
+## Formal result
+
+`SUNDIAL_PROVIDER_V2_SEMANTIC_VERIFICATION=PASS` is required alongside certification, evidence
+verification, and final-gate PASS. Target-host execution remains pending.
