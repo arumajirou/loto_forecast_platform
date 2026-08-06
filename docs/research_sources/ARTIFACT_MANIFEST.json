@@ -73,8 +73,8 @@
     },
     {
       "path": "docs/research_sources/DATA_CONTRACT.md",
-      "sha256": "80d168d184144875d5d7bb5a0b31b70c6a65f0b9ced818225d2aec50f738f76e",
-      "size_bytes": 2662
+      "sha256": "55864a52657ec984fd69505c9ca607bb7f739cfbf49a74831f7a499b7fb2833b",
+      "size_bytes": 2661
     },
     {
       "path": "docs/research_sources/HANDOFF.md",
@@ -98,8 +98,8 @@
     },
     {
       "path": "docs/research_sources/SPECIFICATION.md",
-      "sha256": "6f3e829620883e47a0ff9de6ec83c5af188d79d0731ec98348de042769a1f773",
-      "size_bytes": 2296
+      "sha256": "438603233ae7af6f020bf9bd492c30712a92dab42c0662cd051c0b3e11052b48",
+      "size_bytes": 2295
     },
     {
       "path": "docs/research_sources/TEST_PLAN.md",
@@ -108,8 +108,8 @@
     },
     {
       "path": "docs/research_sources/VERIFICATION_REPORT.md",
-      "sha256": "7efd676c16e7ff12d07aad60ca0409b15b61a6b23fbe779889a16943bdcab25d",
-      "size_bytes": 3232
+      "sha256": "0881e13140a168656ce30be5ba2935791523a96d45904126884c14cce28abff1",
+      "size_bytes": 3279
     },
     {
       "path": "src/loto/research_sources/__init__.py",
