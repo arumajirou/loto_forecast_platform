@@ -1,0 +1,184 @@
+name: self-hosted-gpu-ci
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Validation scope
+        required: true
+        default: smoke
+        type: choice
+        options:
+          - smoke
+          - full
+      require_cuda:
+        description: Fail unless PyTorch executes on CUDA
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: self-hosted-gpu-ci-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  gpu-ci:
+    name: Local GPU CI (${{ inputs.suite }})
+    if: ${{ github.actor == github.repository_owner }}
+    runs-on: [self-hosted, linux, x64, loto-ci, gpu, cuda]
+    timeout-minutes: 360
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      PYTHONUNBUFFERED: "1"
+      CUDA_VISIBLE_DEVICES: "0"
+      UV_PYTHON: "3.13"
+      EVIDENCE_DIR: artifacts/self-hosted
+
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@v6
+        with:
+          clean: true
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Configure runner-scoped paths
+        run: |
+          set -Eeuo pipefail
+          printf 'HF_HOME=%s\n' "$RUNNER_TEMP/huggingface" >> "$GITHUB_ENV"
+          printf 'TORCH_HOME=%s\n' "$RUNNER_TEMP/torch" >> "$GITHUB_ENV"
+          printf 'UV_CACHE_DIR=%s\n' "$RUNNER_TEMP/uv-cache" >> "$GITHUB_ENV"
+          mkdir -p \
+            "$RUNNER_TEMP/huggingface" \
+            "$RUNNER_TEMP/torch" \
+            "$RUNNER_TEMP/uv-cache"
+
+      - name: Prepare evidence directory
+        run: |
+          set -Eeuo pipefail
+          mkdir -p "$EVIDENCE_DIR"
+          printf '%s\n' \
+            "repository=${GITHUB_REPOSITORY}" \
+            "ref=${GITHUB_REF}" \
+            "sha=${GITHUB_SHA}" \
+            "actor=${GITHUB_ACTOR}" \
+            "runner_name=${RUNNER_NAME}" \
+            "runner_os=${RUNNER_OS}" \
+            "runner_arch=${RUNNER_ARCH}" \
+            "run_id=${GITHUB_RUN_ID}" \
+            "run_attempt=${GITHUB_RUN_ATTEMPT}" \
+            > "$EVIDENCE_DIR/run-context.txt"
+
+      - name: Host preflight
+        run: |
+          set -Eeuo pipefail
+          command -v uv
+          PREFLIGHT_PYTHON="$(uv python find "$UV_PYTHON")"
+          printf 'preflight_python=%s\n' "$PREFLIGHT_PYTHON" \
+            | tee "$EVIDENCE_DIR/preflight-python.txt"
+          "$PREFLIGHT_PYTHON" --version \
+            | tee -a "$EVIDENCE_DIR/preflight-python.txt"
+          args=(
+            --require-runner-env
+            --min-free-disk-gib 20
+            --output "$EVIDENCE_DIR/preflight.json"
+          )
+          if [[ "${{ inputs.require_cuda }}" == "true" ]]; then
+            args+=(--require-cuda)
+          fi
+          "$PREFLIGHT_PYTHON" \
+            scripts/ci/self_hosted_runner_probe.py "${args[@]}" \
+            2>&1 | tee "$EVIDENCE_DIR/preflight.log"
+
+      - name: Resolve locked environment
+        run: |
+          set -Eeuo pipefail
+          command -v uv
+          uv --version | tee "$EVIDENCE_DIR/uv-version.txt"
+          uv sync --frozen --python "$UV_PYTHON" \
+            --extra api --extra dev --extra postgres \
+            2>&1 | tee "$EVIDENCE_DIR/uv-sync.log"
+          uv run --frozen python --version \
+            2>&1 | tee "$EVIDENCE_DIR/venv-python-version.txt"
+          uv pip check --python .venv/bin/python \
+            2>&1 | tee "$EVIDENCE_DIR/uv-pip-check.log"
+
+      - name: CUDA and PyTorch postflight
+        run: |
+          set -Eeuo pipefail
+          args=(
+            --require-runner-env
+            --verify-torch
+            --min-free-disk-gib 10
+            --output "$EVIDENCE_DIR/postflight.json"
+          )
+          if [[ "${{ inputs.require_cuda }}" == "true" ]]; then
+            args+=(--require-cuda)
+          fi
+          uv run --frozen python scripts/ci/self_hosted_runner_probe.py "${args[@]}" \
+            2>&1 | tee "$EVIDENCE_DIR/postflight.log"
+
+      - name: Fast quality gates
+        run: |
+          set -Eeuo pipefail
+          uv run --frozen ruff format --check src scripts tests \
+            2>&1 | tee "$EVIDENCE_DIR/ruff-format.log"
+          uv run --frozen ruff check src scripts tests \
+            2>&1 | tee "$EVIDENCE_DIR/ruff-check.log"
+          uv run --frozen python -m compileall -q src scripts tests \
+            2>&1 | tee "$EVIDENCE_DIR/compileall.log"
+
+      - name: Smoke import and device check
+        if: ${{ inputs.suite == 'smoke' }}
+        run: |
+          set -Eeuo pipefail
+          uv run --frozen python - <<'PY' \
+            2>&1 | tee "$EVIDENCE_DIR/smoke-import.log"
+          import torch
+          import loto
+
+          print(f"loto_package={loto.__name__}")
+          print(f"torch_version={torch.__version__}")
+          print(f"cuda_available={torch.cuda.is_available()}")
+          if "${{ inputs.require_cuda }}" == "true":
+              assert torch.cuda.is_available(), "CUDA is required"
+          PY
+
+      - name: Full test suite
+        if: ${{ inputs.suite == 'full' }}
+        run: |
+          set -Eeuo pipefail
+          uv run --frozen pytest -q \
+            2>&1 | tee "$EVIDENCE_DIR/pytest-full.log"
+
+      - name: Verify tracked files stayed clean
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Upload execution evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: self-hosted-gpu-ci-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/self-hosted/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Remove transient caches
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          rm -rf -- \
+            "$RUNNER_TEMP/huggingface" \
+            "$RUNNER_TEMP/torch" \
+            "$RUNNER_TEMP/uv-cache"
