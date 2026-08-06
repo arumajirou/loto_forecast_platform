@@ -1,0 +1,107 @@
+{
+  "artifact_count": 16,
+  "artifact_set": "otel-instrumentation-v1",
+  "base_branch": "feat/telemetry-contract-v1",
+  "base_sha": "0caa8e7fc86f49ffa953cd3e5f9867bf82d6b9ac",
+  "hash_entries": [
+    {
+      "path": "src/loto/telemetry/otel/__init__.py",
+      "sha256": "196bf0d4389a2b0e29b11b9fbf806f6a85798e81a92384635e980e2b1b7c28d3",
+      "size_bytes": 1189
+    },
+    {
+      "path": "src/loto/telemetry/otel/asgi.py",
+      "sha256": "421bbe9b242f4f364012813ed18c1598991ffa667d26ceeba58ae3426348ca7b",
+      "size_bytes": 3608
+    },
+    {
+      "path": "src/loto/telemetry/otel/config.py",
+      "sha256": "e00bc18d2539640a3304c4a647ab769deeccd1729912449df5bb93b24f53fb6f",
+      "size_bytes": 3566
+    },
+    {
+      "path": "src/loto/telemetry/otel/exporters.py",
+      "sha256": "2f9365cfe16cbea08466eefc02c2b83dd4dc8630b13d314f0f6b998b6df9becb",
+      "size_bytes": 2760
+    },
+    {
+      "path": "src/loto/telemetry/otel/httpx_instrumentation.py",
+      "sha256": "ac244fc5e0339296f75af7843a517c8a848e75b8ffbac72c6241e4954ede9167",
+      "size_bytes": 3443
+    },
+    {
+      "path": "src/loto/telemetry/otel/processor.py",
+      "sha256": "414a1844525da546266e5b1f513a7d900ab9d49b9b18a7d87cb1c616d9eaf7b3",
+      "size_bytes": 5395
+    },
+    {
+      "path": "src/loto/telemetry/otel/sqlalchemy_instrumentation.py",
+      "sha256": "bde2fa92a5b758e2b44704c68f10db4803a326bfcb6af31b1539e749cb64e2e1",
+      "size_bytes": 3302
+    },
+    {
+      "path": "src/loto/telemetry/otel/tracing.py",
+      "sha256": "38cb5c24ea50a16816fd8030151755bdb98b39933c5a44e268678bc5cc6c2b0b",
+      "size_bytes": 10285
+    },
+    {
+      "path": "tests/telemetry/test_otel_instrumentation_v1.py",
+      "sha256": "c3fc3a16b4bda1baa961d6da3ff7d7049271e10f4207e9e4c057a4e0a718f907",
+      "size_bytes": 14181
+    },
+    {
+      "path": "docs/otel/INSTRUMENTATION_CONTRACT.md",
+      "sha256": "54957b056244df1ebe7748ca84e6287a7e253d97c8ecb8c68149dba21d0d93ce",
+      "size_bytes": 6278
+    },
+    {
+      "path": "docs/otel/UPSTREAM_FACTCHECK.md",
+      "sha256": "57384450aeed8ae8f496d648941b7e5417bf7915f54b7f56da560fd49fa179d1",
+      "size_bytes": 3110
+    },
+    {
+      "path": "docs/otel/TEST_PLAN.md",
+      "sha256": "0bf1c07b24cf9888df0196022e2d1d8fe949438a52c8a406183475e1d4c34604",
+      "size_bytes": 2461
+    },
+    {
+      "path": "docs/otel/RUNBOOK.md",
+      "sha256": "a63701fd7700f06a570e14d6b3ea3367c99a5893c04c40b23365d8060c7c5ef8",
+      "size_bytes": 2607
+    },
+    {
+      "path": "docs/otel/VERIFICATION_REPORT.md",
+      "sha256": "c543a388b92504fafb0242840265dd32168b982c5491dbb902541a3356e36f3f",
+      "size_bytes": 6610
+    }
+  ],
+  "head_branch": "feat/otel-instrumentation-v1",
+  "non_claims": [
+    "PR_141_MERGED",
+    "APPLICATION_WIRING",
+    "LIVE_COLLECTOR_CERTIFICATION",
+    "TEMPO_PERSISTENCE",
+    "GRAFANA_QUERY",
+    "PRODUCTION_DEPLOYMENT",
+    "MERGE_READINESS"
+  ],
+  "repository": "arumajirou/loto_forecast_platform",
+  "schema_version": "1.0.0",
+  "status": "PARTIALLY_VERIFIED",
+  "unhashed_inventory_files": [
+    "docs/otel/ARTIFACT_MANIFEST.json",
+    "docs/otel/SHA256SUMS"
+  ],
+  "validation": {
+    "ast_parse": "PASS",
+    "compileall": "PASS",
+    "focused_pytest": "16 passed",
+    "full_pytest": "NOT_STARTED",
+    "line_length_gt_100": 0,
+    "live_collector": "NOT_PROBED",
+    "mypy": "BLOCKED_TOOL_UNAVAILABLE",
+    "otlp_http_loopback_stub": "PASS",
+    "production_secret_scan": "PASS",
+    "ruff": "BLOCKED_TOOL_UNAVAILABLE"
+  }
+}
