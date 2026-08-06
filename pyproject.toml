@@ -51,6 +51,7 @@ loto-lab = "loto.kpi_lab.cli:main"
 loto = "loto.cli:main"
 loto3 = "loto.cli_v3:main"
 loto-integrity = "loto.verify.integrity:main"
+loto-github-audit = "loto.github_audit.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
