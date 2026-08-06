@@ -2,19 +2,22 @@
 
 ## Status
 
-`FINAL_GATE_IMPLEMENTED / TARGET_HOST_EXECUTION_PENDING`
+`FINAL_GATE_IMPLEMENTED / REMAINING_HARDENING_WIRED / TARGET_HOST_EXECUTION_PENDING`
 
 The final gate runs all required local checks in a fixed order and stops at the first failure.
 It does not replace actionable GitHub CI or substantive review.
 
 ## Mandatory order
 
-1. Ruff on the Sundial provider, certification, verifier, and focused tests.
+1. Ruff on the Sundial provider, certification, semantic verifier, evidence verifier, and tests.
 2. mypy on the provider and runtime scripts.
-3. focused Sundial pytest files.
-4. real CPU and CUDA certification with the pinned snapshot.
-5. independent evidence verification and ZIP creation.
-6. full repository pytest as the final heavy gate.
+3. focused Sundial pytest files, including remaining-hardening coverage.
+4. semantic preflight of the pinned snapshot before model loading.
+5. real CPU and CUDA certification with the pinned snapshot.
+6. independent semantic recomputation over all eight runtime responses.
+7. independent evidence verification and ZIP creation with the semantic report embedded.
+8. archive-content verification for `semantic/<RUN_ID>.json`.
+9. full repository pytest as the final heavy gate.
 
 Full pytest cannot be disabled. A skipped stage cannot produce final-gate PASS.
 
@@ -35,13 +38,15 @@ bash scripts/run_sundial_provider_v2_final_gate.sh \
 ```
 
 The script requires a clean worktree, the expected branch, the exact commit, the pinned snapshot,
-`uv`, and `nvidia-smi`. It uses `set -Eeuo pipefail`; any failed command stops the gate.
+`uv`, and `nvidia-smi`. It exports `UV_FROZEN=1`, uses `uv run --frozen`, and stops on any failed
+command through `set -Eeuo pipefail`.
 
 ## Result
 
 Formal local completion requires:
 
 ```text
+SUNDIAL_PROVIDER_V2_SEMANTIC_VERIFICATION=PASS
 SUNDIAL_PROVIDER_V2_CERTIFICATION=PASS
 SUNDIAL_PROVIDER_V2_EVIDENCE_VERIFICATION=PASS
 SUNDIAL_PROVIDER_V2_FINAL_GATE=PASS
@@ -53,11 +58,20 @@ Logs are written under:
 artifacts/sundial-provider-v2-final-gate/<GATE_ID>/
 ```
 
-The evidence ZIP remains under `artifacts/sundial-provider-v2-verified/` and is accompanied by a
-SHA-256 file. The PR must remain Draft until target-host results and actionable CI are reviewed.
+The evidence ZIP remains under `artifacts/sundial-provider-v2-verified/`, is accompanied by a
+SHA-256 file, and must contain the semantic verification JSON. The PR must remain Draft until
+target-host results and actionable CI are reviewed.
 
-## Focused self-test
+## Focused hardening coverage
 
-The final-gate test verifies shell syntax, mandatory stage order, fixed identity checks, evidence
-ZIP requirements, and that full pytest cannot be skipped. The dependency-light self-test result is
-`3 passed`.
+The focused set covers:
+
+- strict rejection of fractional or non-integer `num_samples` in both runner and adapter;
+- acceptance of integral representations within the supported range;
+- structured `STATUS_FILE_MISSING` verification failure;
+- semantic report embedding and ZIP SHA-256 generation;
+- final-gate and package-gate semantic wiring;
+- shell syntax, fixed stage order, fixed identity, and full-pytest non-skippability.
+
+These tests are wired into the target-host focused gate. Real target-checkout execution remains
+pending.
