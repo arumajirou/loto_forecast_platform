@@ -222,6 +222,15 @@ def test_repository_object_requires_concrete_https_url() -> None:
         validate(data)
 
 
+def test_repository_url_rejects_internal_whitespace() -> None:
+    data = payload()
+    first_record(data)["official_source_repository"]["url"] = (
+        "https://github.com/example/repo name"
+    )
+    with pytest.raises(ValidationError, match="whitespace"):
+        validate(data)
+
+
 def test_mirror_flag_requires_mirror_repository_type() -> None:
     data = payload()
     repository = first_record(data)["official_source_repository"]
@@ -236,6 +245,22 @@ def test_floating_package_version_rejected() -> None:
     data = payload()
     first_record(data)["runtime_compatibility"]["packages"][0]["version"] = "latest"
     with pytest.raises(ValidationError, match="floating label"):
+        validate(data)
+
+
+def test_verified_intake_requires_concrete_paper_identity() -> None:
+    data = payload()
+    record = promote_first_model_to_verified(data)
+    record["official_paper_url"] = "UNKNOWN"
+    with pytest.raises(ValidationError, match="concrete paper identity"):
+        validate(data)
+
+
+def test_verified_intake_requires_canonical_official_repository() -> None:
+    data = payload()
+    record = promote_first_model_to_verified(data)
+    record["official_source_repository"]["canonical"] = False
+    with pytest.raises(ValidationError, match="canonical and official"):
         validate(data)
 
 
