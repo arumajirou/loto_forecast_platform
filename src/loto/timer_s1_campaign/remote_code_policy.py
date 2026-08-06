@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
+from datetime import datetime
 from pathlib import Path
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from loto.timer_s1_campaign.model_manifest import TimerS1ModelManifest
 
@@ -18,49 +21,70 @@ _ALLOWED_REMOTE_CODE = {
     "modeling_TimerS1.py",
     "ts_generation_mixin.py",
 }
+_SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_REVISION = re.compile(r"^[0-9a-f]{40}$")
 
 
 class ReviewModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+    model_config = ConfigDict(
+        extra="forbid",
+        strict=True,
+        frozen=True,
+        allow_inf_nan=False,
+    )
 
 
 class RemoteCodeReview(ReviewModel):
-    schema_version: int
-    status: str
+    schema_version: Literal[1]
+    status: Literal["APPROVED"]
     source_revision: str
     reviewed_files: dict[str, str]
-    shell_execution: bool
-    subprocess_execution: bool
-    dynamic_download: bool
-    arbitrary_file_write: bool
-    unapproved_external_imports: bool
+    shell_execution: Literal[False]
+    subprocess_execution: Literal[False]
+    dynamic_download: Literal[False]
+    arbitrary_file_write: Literal[False]
+    unapproved_external_imports: Literal[False]
     reviewer: str
-    reviewed_at: str
+    reviewed_at: datetime
+
+    @field_validator("source_revision")
+    @classmethod
+    def validate_revision(cls, value: str) -> str:
+        if not _REVISION.fullmatch(value):
+            raise ValueError("review source_revision must be a lowercase 40-character SHA")
+        return value
 
     @field_validator("reviewed_files")
     @classmethod
     def validate_file_set(cls, value: dict[str, str]) -> dict[str, str]:
         if set(value) != _ALLOWED_REMOTE_CODE:
             raise ValueError("remote-code review must cover the exact allowlist")
+        if any(not _SHA256.fullmatch(digest) for digest in value.values()):
+            raise ValueError("reviewed remote-code hashes must be lowercase SHA-256")
         return value
 
-    @model_validator(mode="after")
-    def validate_review(self) -> RemoteCodeReview:
-        if self.status != "APPROVED":
-            raise ValueError("remote-code review is not approved")
-        if any(
-            (
-                self.shell_execution,
-                self.subprocess_execution,
-                self.dynamic_download,
-                self.arbitrary_file_write,
-                self.unapproved_external_imports,
-            )
-        ):
-            raise ValueError("remote-code review contains a prohibited capability")
-        if not self.reviewer.strip() or not self.reviewed_at.strip():
-            raise ValueError("reviewer and reviewed_at are required")
-        return self
+    @field_validator("reviewed_at", mode="before")
+    @classmethod
+    def parse_reviewed_at(cls, value: object) -> datetime:
+        if isinstance(value, datetime):
+            return value
+        if isinstance(value, str):
+            return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        raise ValueError("reviewed_at must be an ISO-8601 datetime")
+
+    @field_validator("reviewed_at")
+    @classmethod
+    def validate_reviewed_at(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("reviewed_at must include a timezone")
+        return value
+
+    @field_validator("reviewer")
+    @classmethod
+    def validate_reviewer(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("reviewer is required")
+        return value
 
 
 def sha256_file(path: Path) -> str:
@@ -88,6 +112,7 @@ def validate_snapshot(
 
     root = snapshot_path.resolve(strict=True)
     python_files: set[str] = set()
+    snapshot_files: set[str] = set()
     for path in root.rglob("*"):
         if path.is_symlink():
             raise ValueError(f"snapshot contains symlink: {path.relative_to(root)}")
@@ -96,19 +121,30 @@ def validate_snapshot(
         resolved = path.resolve(strict=True)
         if root not in resolved.parents:
             raise ValueError("snapshot file escapes snapshot root")
+        relative_path = path.relative_to(root).as_posix()
+        snapshot_files.add(relative_path)
         if path.suffix == ".py":
-            python_files.add(path.relative_to(root).as_posix())
+            python_files.add(relative_path)
     if python_files != _ALLOWED_REMOTE_CODE:
         raise ValueError("snapshot remote Python files do not match allowlist")
 
     manifest_by_path = {item.path: item for item in manifest.artifacts}
-    for relative_path, expected_hash in review.reviewed_files.items():
+    if snapshot_files != set(manifest_by_path):
+        raise ValueError("snapshot file inventory does not exactly match the manifest")
+    actual_hashes: dict[str, str] = {}
+    for relative_path, record in manifest_by_path.items():
         path = root / relative_path
-        if not path.is_file():
-            raise ValueError(f"reviewed remote-code file is missing: {relative_path}")
+        if not path.is_file() or path.is_symlink():
+            raise ValueError(f"manifest artifact is not a regular file: {relative_path}")
+        if record.size_bytes is None or path.stat().st_size != record.size_bytes:
+            raise ValueError(f"manifest artifact size mismatch: {relative_path}")
+        if record.sha256 is None:
+            raise ValueError(f"manifest artifact hash is unpinned: {relative_path}")
         actual_hash = sha256_file(path)
-        if actual_hash != expected_hash:
-            raise ValueError(f"remote-code hash mismatch: {relative_path}")
-        record = manifest_by_path.get(relative_path)
-        if record is None or record.sha256 != actual_hash:
-            raise ValueError(f"manifest does not bind remote code: {relative_path}")
+        if actual_hash != record.sha256:
+            raise ValueError(f"manifest artifact hash mismatch: {relative_path}")
+        actual_hashes[relative_path] = actual_hash
+
+    for relative_path, expected_hash in review.reviewed_files.items():
+        if actual_hashes.get(relative_path) != expected_hash:
+            raise ValueError(f"remote-code review hash mismatch: {relative_path}")
