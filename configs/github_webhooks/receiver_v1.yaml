@@ -1,0 +1,39 @@
+schema_version: 1
+enabled: false
+repository:
+  repository_id: 1317186795
+  repository_full_name: arumajirou/loto_forecast_platform
+allowed_actions:
+  push:
+    - null
+  pull_request:
+    - opened
+    - synchronize
+    - reopened
+    - closed
+    - ready_for_review
+    - converted_to_draft
+  issues:
+    - opened
+    - edited
+    - closed
+    - reopened
+    - labeled
+    - unlabeled
+    - assigned
+    - unassigned
+  workflow_run:
+    - requested
+    - in_progress
+    - completed
+max_body_bytes: 2097152
+max_attempts: 5
+base_backoff_seconds: 30
+max_backoff_seconds: 3600
+handler_timeout_seconds: 5
+delivery_retention_days: 30
+history_retention_days: 180
+dead_letter_retention_days: 30
+dispatch_handlers:
+  - dispatch-v1
+forensic_raw_payload_enabled: false
