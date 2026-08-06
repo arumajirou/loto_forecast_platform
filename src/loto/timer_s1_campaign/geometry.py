@@ -6,17 +6,12 @@ import math
 from dataclasses import dataclass
 from datetime import datetime
 
-from loto.adapters.timer_s1.contracts import Game, HistoryRow, TimelineMode
-
-# Structural counts only. Lottery value domains remain owned by the platform's shared
-# data/domain validation layer and are intentionally not duplicated here.
-_POSITION_COUNTS: dict[Game, int] = {
-    Game.NUMBERS3: 3,
-    Game.NUMBERS4: 4,
-    Game.MINILOTO: 5,
-    Game.LOTO6: 6,
-    Game.LOTO7: 7,
-}
+from loto.adapters.timer_s1.contracts import (
+    POSITION_COUNTS,
+    Game,
+    HistoryRow,
+    TimelineMode,
+)
 
 
 @dataclass(frozen=True)
@@ -31,7 +26,7 @@ class CompiledGeometry:
 
 
 def position_count_for_game(game: Game) -> int:
-    return _POSITION_COUNTS[game]
+    return POSITION_COUNTS[game]
 
 
 def compile_history(
