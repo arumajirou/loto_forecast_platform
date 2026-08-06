@@ -2,7 +2,7 @@
 
 ## Status
 
-`PARTIALLY_VERIFIED / SYNTHETIC_CONTRACT_TESTS_PASS / REAL_LIFECYCLE_NOT_EXECUTED / CI_BLOCKED_PRE_RUN`
+`PARTIALLY_VERIFIED / CONTRACT_TESTS_PASS_IN_SEPARATE_LANES / COMBINED_SUITE_PENDING / REAL_LIFECYCLE_NOT_EXECUTED`
 
 ## Implemented
 
@@ -15,30 +15,42 @@
 - subject-hash, illegal-transition and non-mutation tests;
 - architecture and compatibility documentation.
 
+## Hardening follow-up
+
+A post-publication self-review identified and corrected three contract-level gaps:
+
+1. nested Pydantic models are canonicalized from Python values, so timezone-equivalent datetimes
+   produce the same subject SHA-256;
+2. verified Holdout promotion evidence requires multiple seeds;
+3. production-eligible license status requires a verified real evidence artifact.
+
+The Prospective timestamp validator also checks `utcoffset()` rather than relying only on a non-null
+`tzinfo` object.
+
 ## Executed validation
 
 ```text
-focused pytest=30 passed
-Python compileall=PASS
-Python AST parse=PASS
-Python lines over 100 characters=0
-remote/local source and test Git blob parity=PASS
-main-to-head add-only audit=PASS
+original focused suite on pre-hardening exact blobs=30 passed in 0.07s
+new hardening suite on modified exact local files=5 passed in 0.05s
+modified source and new tests compileall=PASS
+modified source and new tests AST parse=PASS
+modified source and new tests lines over 100 characters=0
 ```
 
-Ruff and mypy were unavailable in the authoring environment. Full repository pytest and real
-provider migration were not executed.
+The 30-test original suite and the 5-test hardening suite were executed in separate local lanes. A
+single combined 35-test invocation against the final remote head remains pending and is not claimed.
+Ruff and mypy were unavailable. Full repository pytest and real provider migration were not executed.
 
-## GitHub Actions
+## Prior GitHub Actions observation
 
-The initial PR-head workflow ended before any observable workflow step was created:
+The pre-hardening PR-head workflow ended before any observable workflow step was created:
 
 ```text
 workflow=ci
-run_number=2880
-run_id=31082609751
+run_number=2887
+run_id=31082672223
 job=test
-job_id=92554649984
+job_id=92554848211
 conclusion=failure
 steps=null
 logs_url=null
@@ -46,7 +58,8 @@ classification=CI_BLOCKED_PRE_RUN
 ```
 
 Checkout, Python setup, dependency installation, Ruff, compileall, mypy and pytest did not start.
-This is not evidence of an implementation or test failure. No rerun was requested.
+The final hardening head must be inspected separately and must not inherit this classification without
+checking its own job payload.
 
 ## Explicit non-claims
 
@@ -58,6 +71,7 @@ canary activation executed=false
 primary binding changed=false
 production binding changed=false
 provider P6-P12 migrated=false
+combined final-head suite passed=false
 real evidence parity proven=false
 ```
 
