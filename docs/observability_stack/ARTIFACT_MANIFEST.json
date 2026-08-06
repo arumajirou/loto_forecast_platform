@@ -5,42 +5,178 @@
   "base_sha": "60a0137c770e6b0d96a2701d8c365f7367addcc0",
   "generated_at_utc": "2026-08-06T10:21:08.495539+00:00",
   "hash_entries": [
-    {"path": "deploy/observability/.env.example", "sha256": "f46cf81033b386fa2a6cca71309d4ffce906dec55a5fbca2bc854173aca265bd", "size_bytes": 291},
-    {"path": "deploy/observability/.gitignore", "sha256": "70e82085733ee160b42884c142c2a7f732dc12d5fd9c38109f92d7628850633b", "size_bytes": 129},
-    {"path": "deploy/observability/alloy/config.alloy", "sha256": "748a7d4e9aaec19b6303f1abb761f2d38084e05f995072c51a26021fd4a031b2", "size_bytes": 2464},
-    {"path": "deploy/observability/backups/.gitkeep", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "size_bytes": 0},
-    {"path": "deploy/observability/compose.yaml", "sha256": "eeb24bcb65ef6511fed3b2d00ff56c39261fd6fe3658d9702791261449c4eb5a", "size_bytes": 3595},
-    {"path": "deploy/observability/grafana/dashboards/platform-overview.json", "sha256": "147070f70e16ade4aa559d282265f98ef594ae641f81bd2d2530c4b89f598303", "size_bytes": 3250},
-    {"path": "deploy/observability/grafana/provisioning/dashboards/dashboards.yml", "sha256": "894b8f6424e792d83a7d1306b58d35703131896dd22e1cab28dcabc1f0324c0c", "size_bytes": 307},
-    {"path": "deploy/observability/grafana/provisioning/datasources/datasources.yml", "sha256": "d8830956275db32bb5b46fa25ccc1b127d872a810261b9f90151e80f54d1c6e8", "size_bytes": 928},
-    {"path": "deploy/observability/images.versions.env", "sha256": "a56951fb8ce44f7dda4d67e384eb757fcdd2ca2567339da1166663fecf9f05ea", "size_bytes": 319},
-    {"path": "deploy/observability/loki/config.yml", "sha256": "b211735c00157acd691360e21ea60c0f92aa83f797112043becd7b7264e0c890", "size_bytes": 791},
-    {"path": "deploy/observability/prometheus/prometheus.yml", "sha256": "94b41b8c44e4af609786ee19fc2c22ea3b440b60d53aedc9e7d880e9a549387e", "size_bytes": 576},
-    {"path": "deploy/observability/prometheus/rules/platform-alerts.yml", "sha256": "e201f3b9ae665896c36afd820e06cb8c8187122582153585070774727310fc83", "size_bytes": 1837},
-    {"path": "deploy/observability/runtime/.gitkeep", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "size_bytes": 0},
-    {"path": "deploy/observability/secrets/.gitkeep", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "size_bytes": 0},
-    {"path": "deploy/observability/tempo/config.yml", "sha256": "5fe274d94c1084489e66573f326ec2eaf2ce9b37b15e737bd294f9b5ae656800", "size_bytes": 426},
-    {"path": "docs/observability_stack/ARCHITECTURE.md", "sha256": "59ff5cccc80c2054d12efe5585c45adbf8334dcf2b2971a29c8b5a98cf7fcca7", "size_bytes": 1466},
-    {"path": "docs/observability_stack/CHANGELOG.md", "sha256": "8979c4a4618238cc2f2195879db32a562e1445ecd4000a57a6f1f42f2df4c97c", "size_bytes": 588},
-    {"path": "docs/observability_stack/DATA_CONTRACT.md", "sha256": "ac425c68068891e471fa0729ada7e4a2caad149ecd652e2b9ada65f8ee5dbd68", "size_bytes": 1139},
-    {"path": "docs/observability_stack/HANDOFF.md", "sha256": "2efee35dfff98b7ef1a7ae41854d766645b265e00c4c68cfb222f26af1d7db62", "size_bytes": 1220},
-    {"path": "docs/observability_stack/README.md", "sha256": "34aa3bb5dce90926021a25666d2737039ba128fa6aecabb05d15790e42de5f38", "size_bytes": 4622},
-    {"path": "docs/observability_stack/REQUIREMENTS.md", "sha256": "06acd6827c731041f01f8041f1adbb487a489748c849d90a3e95b5c7007ad037", "size_bytes": 2093},
-    {"path": "docs/observability_stack/RUNBOOK.md", "sha256": "1caab3c6da6be3417c59cefa6b7fccb9dc1e6967e34ee4313cd969c42f837212", "size_bytes": 1781},
-    {"path": "docs/observability_stack/SPECIFICATION.md", "sha256": "3ee3e260b01a33af79156b7381c17184c235bacd21316275925ab1c337897916", "size_bytes": 2456},
-    {"path": "docs/observability_stack/TEST_PLAN.md", "sha256": "fc107c7c06db6e4c4051154f79d1d64b786004ab4b1fcd096179ade813245379", "size_bytes": 1359},
-    {"path": "docs/observability_stack/UPSTREAM_FACTCHECK.md", "sha256": "18bd96546ccd3123bd99aebdbbba2b40a22589a59ea3f4cca41017002f22b9cc", "size_bytes": 2522},
-    {"path": "docs/observability_stack/VERIFICATION_REPORT.md", "sha256": "d98129749063c6219e2c8bf56540df25ca90cb09e2f22142692931f85bf62f71", "size_bytes": 5491},
-    {"path": "scripts/observability/backup_restore.sh", "sha256": "ffbcf11b41a74a8db6f9fac9fa23bc366f6274d44691a4370a74be77bbd6bcd9", "size_bytes": 2253},
-    {"path": "scripts/observability/resolve_image_digests.py", "sha256": "46ce9eee40b09b510b347fd4824449aca078008b4b1ff6fd5de7bb7146adac2e", "size_bytes": 3190},
-    {"path": "scripts/observability/smoke.sh", "sha256": "75e3193d1dc4063d20d32687c9c8d2f2c7418a43c6c7dc2cee01c9ef327af6c8", "size_bytes": 1707},
-    {"path": "scripts/observability/start.sh", "sha256": "a0ba8d976ee17a848a45723552d0fd42d77b9a39109e0368cd45a71261fe1915", "size_bytes": 1132},
-    {"path": "scripts/observability/stop.sh", "sha256": "c993ebab71c2ad2096eedc506e7c2036a3bb69b0719e577e4aea460a6fc26194", "size_bytes": 591},
-    {"path": "scripts/observability/validate_stack.py", "sha256": "9f3e79f823f3249552408dde71ec0a5449f2dc47b93c23b4e93e9b5d502bc323", "size_bytes": 7846},
-    {"path": "tests/observability/test_lgtm_stack_v1.py", "sha256": "0d5ba09487d00e237388fbbf22f12e69cff8464f141af601cba989414e0f33c1", "size_bytes": 6807}
+    {
+      "path": "deploy/observability/.env.example",
+      "sha256": "f46cf81033b386fa2a6cca71309d4ffce906dec55a5fbca2bc854173aca265bd",
+      "size_bytes": 291
+    },
+    {
+      "path": "deploy/observability/.gitignore",
+      "sha256": "70e82085733ee160b42884c142c2a7f732dc12d5fd9c38109f92d7628850633b",
+      "size_bytes": 129
+    },
+    {
+      "path": "deploy/observability/alloy/config.alloy",
+      "sha256": "748a7d4e9aaec19b6303f1abb761f2d38084e05f995072c51a26021fd4a031b2",
+      "size_bytes": 2464
+    },
+    {
+      "path": "deploy/observability/backups/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "deploy/observability/compose.yaml",
+      "sha256": "eeb24bcb65ef6511fed3b2d00ff56c39261fd6fe3658d9702791261449c4eb5a",
+      "size_bytes": 3595
+    },
+    {
+      "path": "deploy/observability/grafana/dashboards/platform-overview.json",
+      "sha256": "147070f70e16ade4aa559d282265f98ef594ae641f81bd2d2530c4b89f598303",
+      "size_bytes": 3250
+    },
+    {
+      "path": "deploy/observability/grafana/provisioning/dashboards/dashboards.yml",
+      "sha256": "894b8f6424e792d83a7d1306b58d35703131896dd22e1cab28dcabc1f0324c0c",
+      "size_bytes": 307
+    },
+    {
+      "path": "deploy/observability/grafana/provisioning/datasources/datasources.yml",
+      "sha256": "d8830956275db32bb5b46fa25ccc1b127d872a810261b9f90151e80f54d1c6e8",
+      "size_bytes": 928
+    },
+    {
+      "path": "deploy/observability/images.versions.env",
+      "sha256": "a56951fb8ce44f7dda4d67e384eb757fcdd2ca2567339da1166663fecf9f05ea",
+      "size_bytes": 319
+    },
+    {
+      "path": "deploy/observability/loki/config.yml",
+      "sha256": "b211735c00157acd691360e21ea60c0f92aa83f797112043becd7b7264e0c890",
+      "size_bytes": 791
+    },
+    {
+      "path": "deploy/observability/prometheus/prometheus.yml",
+      "sha256": "94b41b8c44e4af609786ee19fc2c22ea3b440b60d53aedc9e7d880e9a549387e",
+      "size_bytes": 576
+    },
+    {
+      "path": "deploy/observability/prometheus/rules/platform-alerts.yml",
+      "sha256": "e201f3b9ae665896c36afd820e06cb8c8187122582153585070774727310fc83",
+      "size_bytes": 1837
+    },
+    {
+      "path": "deploy/observability/runtime/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "deploy/observability/secrets/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "deploy/observability/tempo/config.yml",
+      "sha256": "5fe274d94c1084489e66573f326ec2eaf2ce9b37b15e737bd294f9b5ae656800",
+      "size_bytes": 426
+    },
+    {
+      "path": "docs/observability_stack/ARCHITECTURE.md",
+      "sha256": "59ff5cccc80c2054d12efe5585c45adbf8334dcf2b2971a29c8b5a98cf7fcca7",
+      "size_bytes": 1466
+    },
+    {
+      "path": "docs/observability_stack/CHANGELOG.md",
+      "sha256": "8979c4a4618238cc2f2195879db32a562e1445ecd4000a57a6f1f42f2df4c97c",
+      "size_bytes": 588
+    },
+    {
+      "path": "docs/observability_stack/DATA_CONTRACT.md",
+      "sha256": "ac425c68068891e471fa0729ada7e4a2caad149ecd652e2b9ada65f8ee5dbd68",
+      "size_bytes": 1139
+    },
+    {
+      "path": "docs/observability_stack/HANDOFF.md",
+      "sha256": "2efee35dfff98b7ef1a7ae41854d766645b265e00c4c68cfb222f26af1d7db62",
+      "size_bytes": 1220
+    },
+    {
+      "path": "docs/observability_stack/README.md",
+      "sha256": "34aa3bb5dce90926021a25666d2737039ba128fa6aecabb05d15790e42de5f38",
+      "size_bytes": 4622
+    },
+    {
+      "path": "docs/observability_stack/REQUIREMENTS.md",
+      "sha256": "06acd6827c731041f01f8041f1adbb487a489748c849d90a3e95b5c7007ad037",
+      "size_bytes": 2093
+    },
+    {
+      "path": "docs/observability_stack/RUNBOOK.md",
+      "sha256": "1caab3c6da6be3417c59cefa6b7fccb9dc1e6967e34ee4313cd969c42f837212",
+      "size_bytes": 1781
+    },
+    {
+      "path": "docs/observability_stack/SPECIFICATION.md",
+      "sha256": "3ee3e260b01a33af79156b7381c17184c235bacd21316275925ab1c337897916",
+      "size_bytes": 2456
+    },
+    {
+      "path": "docs/observability_stack/TEST_PLAN.md",
+      "sha256": "fc107c7c06db6e4c4051154f79d1d64b786004ab4b1fcd096179ade813245379",
+      "size_bytes": 1359
+    },
+    {
+      "path": "docs/observability_stack/UPSTREAM_FACTCHECK.md",
+      "sha256": "18bd96546ccd3123bd99aebdbbba2b40a22589a59ea3f4cca41017002f22b9cc",
+      "size_bytes": 2522
+    },
+    {
+      "path": "docs/observability_stack/VERIFICATION_REPORT.md",
+      "sha256": "d98129749063c6219e2c8bf56540df25ca90cb09e2f22142692931f85bf62f71",
+      "size_bytes": 5491
+    },
+    {
+      "path": "scripts/observability/backup_restore.sh",
+      "sha256": "ffbcf11b41a74a8db6f9fac9fa23bc366f6274d44691a4370a74be77bbd6bcd9",
+      "size_bytes": 2253
+    },
+    {
+      "path": "scripts/observability/resolve_image_digests.py",
+      "sha256": "46ce9eee40b09b510b347fd4824449aca078008b4b1ff6fd5de7bb7146adac2e",
+      "size_bytes": 3190
+    },
+    {
+      "path": "scripts/observability/smoke.sh",
+      "sha256": "75e3193d1dc4063d20d32687c9c8d2f2c7418a43c6c7dc2cee01c9ef327af6c8",
+      "size_bytes": 1707
+    },
+    {
+      "path": "scripts/observability/start.sh",
+      "sha256": "a0ba8d976ee17a848a45723552d0fd42d77b9a39109e0368cd45a71261fe1915",
+      "size_bytes": 1132
+    },
+    {
+      "path": "scripts/observability/stop.sh",
+      "sha256": "c993ebab71c2ad2096eedc506e7c2036a3bb69b0719e577e4aea460a6fc26194",
+      "size_bytes": 591
+    },
+    {
+      "path": "scripts/observability/validate_stack.py",
+      "sha256": "9f3e79f823f3249552408dde71ec0a5449f2dc47b93c23b4e93e9b5d502bc323",
+      "size_bytes": 7846
+    },
+    {
+      "path": "tests/observability/test_lgtm_stack_v1.py",
+      "sha256": "0d5ba09487d00e237388fbbf22f12e69cff8464f141af601cba989414e0f33c1",
+      "size_bytes": 6807
+    }
   ],
   "head_branch": "ops/grafana-alloy-lgtm-v1",
-  "non_claims": ["PRODUCTION_DEPLOYMENT", "LIVE_BACKEND_CERTIFICATION", "MERGE_READINESS"],
+  "non_claims": [
+    "PRODUCTION_DEPLOYMENT",
+    "LIVE_BACKEND_CERTIFICATION",
+    "MERGE_READINESS"
+  ],
   "repository": "arumajirou/loto_forecast_platform",
   "schema_version": "1.0.0",
   "status": "PARTIALLY_VERIFIED",
