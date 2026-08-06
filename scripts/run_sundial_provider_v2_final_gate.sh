@@ -84,11 +84,13 @@ PYTHON_FILES=(
   tests/test_sundial_probabilistic_provider_v2.py
   tests/test_sundial_provider_v2_certification.py
   tests/test_sundial_provider_v2_evidence_verifier.py
+  tests/test_sundial_provider_v2_final_gate.py
 )
 FOCUSED_TESTS=(
   tests/test_sundial_probabilistic_provider_v2.py
   tests/test_sundial_provider_v2_certification.py
   tests/test_sundial_provider_v2_evidence_verifier.py
+  tests/test_sundial_provider_v2_final_gate.py
 )
 
 {
