@@ -11,7 +11,8 @@ REMOTE_BLOB_PARITY_PASS
 RUFF_BLOCKED_TOOL_UNAVAILABLE
 MYPY_BLOCKED_TOOL_UNAVAILABLE
 EVALUATION_REGRESSION_PENDING_COMPLETE_CHECKOUT
-FULL_PYTEST_PENDING_GITHUB_ACTIONS
+FULL_PYTEST_NOT_STARTED
+CI_BLOCKED_RUNNER_START
 ```
 
 ## Repository and branch
@@ -106,20 +107,38 @@ The focused suite verifies:
 - v2 artifact round trip;
 - historical artifact overwrite refusal.
 
-## Pending and blocked verification
+## Blocked verification
 
 ```text
 Ruff=BLOCKED_TOOL_UNAVAILABLE
 mypy=BLOCKED_TOOL_UNAVAILABLE
 evaluation-related repository regression=PENDING_COMPLETE_PRIVATE_CHECKOUT
-full pytest=PENDING_GITHUB_ACTIONS
-GitHub Actions=PENDING
+full pytest=NOT_STARTED
 ```
 
 The execution environment does not contain `ruff`, `mypy` or `gh`. Network-backed installation and a
-complete private checkout are unavailable. These checks are not represented as PASS. GitHub Actions
-shall be classified separately; a job that fails before creating steps is
-`CI_BLOCKED_RUNNER_START`, not a demonstrated code failure.
+complete private checkout are unavailable. These checks are not represented as PASS.
+
+## GitHub Actions classification
+
+Observed PR workflow evidence:
+
+```text
+workflow=ci
+run_id=31082649081
+run_number=2883
+job=test
+job_id=92554772922
+conclusion=failure
+recorded_steps=0
+steps=[]
+logs_url=null
+classification=CI_BLOCKED_RUNNER_START
+code_test_failure=NOT_DEMONSTRATED
+```
+
+No checkout, Python setup, dependency installation, Ruff, compileall, mypy or pytest step started.
+The workflow failure is therefore not represented as a code or test failure.
 
 ## Explicit non-claims
 
