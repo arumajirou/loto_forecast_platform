@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "model_id": "timer-s1",
+  "formal_runtime_enabled": false,
+  "supported_games": ["numbers3", "numbers4", "miniloto", "loto6", "loto7"],
+  "prediction_lengths": [1, 2, 5],
+  "timeline_modes": ["draw-sequence", "calendar-time"],
+  "target_layout": "position_univariate",
+  "batch_semantics": "independent_series",
+  "joint_multivariate": false,
+  "past_covariates": "unsupported",
+  "known_future_covariates": "unsupported",
+  "primary_metric": "Hit@±1"
+}
