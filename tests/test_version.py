@@ -8,6 +8,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 import loto
+import loto.entrypoints as entrypoints_module
 from loto.api.app import create_app
 from loto.entrypoints import (
     auto_campaign_main,
@@ -55,6 +56,23 @@ def test_console_scripts_expose_the_same_version(capsys) -> None:
     for entrypoint, program in entrypoints:
         assert entrypoint(["--version"]) == 0
         assert capsys.readouterr().out.strip() == f"{program} {__version__}"
+
+
+def test_loto3_integrity_generate_injects_the_canonical_release(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    def fake_delegate(program: str, module_name: str, argv) -> int:
+        captured.update(program=program, module_name=module_name, argv=list(argv))
+        return 0
+
+    monkeypatch.setattr(entrypoints_module, "_delegate", fake_delegate)
+
+    assert loto3_main(["integrity", "generate", "--root", "."]) == 0
+    assert captured == {
+        "program": "loto3",
+        "module_name": "loto.cli_v3",
+        "argv": ["integrity", "generate", "--root", ".", "--release", __version__],
+    }
 
 
 def test_fastapi_and_dashboard_use_the_canonical_version(tmp_path) -> None:
