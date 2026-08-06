@@ -115,3 +115,48 @@ def test_snapshot_symlink_is_rejected(
     set_offline_environment(monkeypatch)
     with pytest.raises(ValueError, match="symlink"):
         validate_snapshot(tmp_path, build_manifest(files), build_review(files))
+
+
+def test_unmanifested_non_python_file_is_rejected(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    files = write_snapshot(tmp_path)
+    (tmp_path / "README.md").write_text("unmanifested\n", encoding="utf-8")
+    set_offline_environment(monkeypatch)
+    with pytest.raises(ValueError, match="inventory"):
+        validate_snapshot(tmp_path, build_manifest(files), build_review(files))
+
+
+def test_remote_code_review_requires_timezone() -> None:
+    files = {
+        "configuration_TimerS1.py": b"# config\n",
+        "modeling_TimerS1.py": b"# model\n",
+        "ts_generation_mixin.py": b"# generation\n",
+    }
+    with pytest.raises(ValueError, match="timezone"):
+        RemoteCodeReview(
+            schema_version=1,
+            status="APPROVED",
+            source_revision="b" * 40,
+            reviewed_files={name: digest(content) for name, content in files.items()},
+            shell_execution=False,
+            subprocess_execution=False,
+            dynamic_download=False,
+            arbitrary_file_write=False,
+            unapproved_external_imports=False,
+            reviewer="test-reviewer",
+            reviewed_at="2026-08-06T00:00:00",
+        )
+
+
+def test_manifest_hash_tamper_is_rejected(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    files = write_snapshot(tmp_path)
+    manifest = build_manifest(files)
+    (tmp_path / "modeling_TimerS1.py").write_bytes(b"# tampr\n")
+    set_offline_environment(monkeypatch)
+    with pytest.raises(ValueError, match="manifest artifact hash mismatch"):
+        validate_snapshot(tmp_path, manifest, build_review(files))
