@@ -5,8 +5,17 @@ from datetime import datetime
 from enum import Enum
 from pathlib import PurePosixPath
 from typing import Literal
+from urllib.parse import urlsplit
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 STRICT_CONFIG = ConfigDict(
     extra="forbid",
@@ -29,6 +38,8 @@ _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _ID_RE = re.compile(r"^[a-z0-9]+(?:[._-][a-z0-9]+)*$")
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _PACKAGE_RE = re.compile(r"^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$")
+_VERSION_SENTINELS = {"UNKNOWN", "UNPINNED", "UNVERIFIED", "NOT_RELEASED"}
+_FLOATING_VERSION_NAMES = {"dev", "head", "latest", "main", "master", "nightly"}
 
 
 class IntakeStatus(str, Enum):
@@ -79,11 +90,28 @@ def _validate_identifier(value: str, field_name: str) -> str:
     return value
 
 
+def _validate_concrete_https_url(value: str) -> str:
+    if value != value.strip() or any(ord(character) < 32 for character in value):
+        raise ValueError("URL must not contain whitespace or control characters")
+    parsed = urlsplit(value)
+    if parsed.scheme != "https" or not parsed.netloc:
+        raise ValueError("URL must use https and include a host")
+    if parsed.username is not None or parsed.password is not None:
+        raise ValueError("URL must not contain credentials")
+    return value
+
+
 def _validate_url_or_sentinel(value: str) -> str:
     if value in _SENTINELS:
         return value
-    if not value.startswith("https://"):
-        raise ValueError("URL must use https or be an explicit sentinel")
+    return _validate_concrete_https_url(value)
+
+
+def _validate_nonempty_declaration(value: str, field_name: str) -> str:
+    if value in _VERSION_SENTINELS:
+        return value
+    if not value or value != value.strip():
+        raise ValueError(f"{field_name} must be non-empty or an explicit sentinel")
     return value
 
 
@@ -112,7 +140,7 @@ class RepositoryIdentity(BaseModel):
     canonical: bool
     mirror: bool
 
-    _url = field_validator("url")(_validate_url_or_sentinel)
+    _url = field_validator("url")(_validate_concrete_https_url)
 
     @model_validator(mode="after")
     def canonical_is_official(self) -> RepositoryIdentity:
@@ -120,6 +148,8 @@ class RepositoryIdentity(BaseModel):
             raise ValueError("canonical repository must be official and must not be a mirror")
         if self.repository_type == "mirror" and not self.mirror:
             raise ValueError("mirror repository_type requires mirror=true")
+        if self.mirror and self.repository_type != "mirror":
+            raise ValueError("mirror=true requires repository_type=mirror")
         return self
 
 
@@ -167,6 +197,14 @@ class PackageIdentity(BaseModel):
             raise ValueError("invalid package name")
         return value
 
+    @field_validator("version")
+    @classmethod
+    def fixed_or_explicit_version(cls, value: str) -> str:
+        value = _validate_nonempty_declaration(value, "package version")
+        if value.lower() in _FLOATING_VERSION_NAMES:
+            raise ValueError("package version must not use a floating label")
+        return value
+
     _source = field_validator("source")(_validate_url_or_sentinel)
 
 
@@ -198,6 +236,12 @@ class RuntimeCompatibilityDeclaration(BaseModel):
     packages: tuple[PackageIdentity, ...]
     verification_status: Literal["UNKNOWN", "UNVERIFIED", "VERIFIED"]
 
+    @field_validator("python", "torch", "transformers")
+    @classmethod
+    def explicit_compatibility(cls, value: str, info: ValidationInfo) -> str:
+        field_name = info.field_name
+        return _validate_nonempty_declaration(value, field_name)
+
 
 class RemoteCodePolicy(BaseModel):
     model_config = STRICT_CONFIG
@@ -206,6 +250,15 @@ class RemoteCodePolicy(BaseModel):
     review_status: ReviewStatus
     policy_id: str
     allowed_files: tuple[str, ...]
+
+    @field_validator("allowed_files")
+    @classmethod
+    def validate_allowed_files(cls, values: tuple[str, ...]) -> tuple[str, ...]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate remote-code allowed file")
+        for value in values:
+            ArtifactIdentity.safe_relative_path(value)
+        return values
 
     @model_validator(mode="after")
     def required_review_policy(self) -> RemoteCodePolicy:
@@ -217,6 +270,8 @@ class RemoteCodePolicy(BaseModel):
                 raise ValueError("remote code requires an explicit review status")
             if self.policy_id in _SENTINELS or not self.policy_id.strip():
                 raise ValueError("remote code requires a concrete review policy id")
+            if self.review_status == ReviewStatus.VERIFIED and not self.allowed_files:
+                raise ValueError("verified remote code requires a non-empty allowed file inventory")
         elif self.review_status == ReviewStatus.REMOTE_CODE_REVIEW_REQUIRED:
             raise ValueError("remote review status conflicts with trust_remote_code=false")
         return self
@@ -240,6 +295,13 @@ class SourceVerificationReport(BaseModel):
     official_urls_checked: tuple[str, ...]
     findings: tuple[str, ...]
     blockers: tuple[str, ...]
+
+    @field_validator("verification_method")
+    @classmethod
+    def nonempty_method(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("verification_method must be non-empty")
+        return value
 
     @field_validator("official_urls_checked")
     @classmethod
@@ -337,16 +399,64 @@ class ResearchSourceRecord(BaseModel):
         }:
             raise ValueError("not-released source cannot be marked available for intake")
         if self.verification.status == IntakeStatus.VERIFIED_FOR_INTAKE:
+            if self.release_status != ReleaseStatus.AVAILABLE:
+                raise ValueError("verified intake requires release_status=AVAILABLE")
+            if not isinstance(self.official_source_repository, RepositoryIdentity):
+                raise ValueError("verified formal source requires a concrete source repository")
             if self.source_revision in _SENTINELS:
                 raise ValueError("verified formal source must pin source_revision")
-            if self.source_kind == SourceKind.MODEL and self.model_revision in _SENTINELS:
-                raise ValueError("verified model intake must pin model_revision")
-        if self.remote_code_policy.trust_remote_code and self.verification.status not in {
-            IntakeStatus.REMOTE_CODE_REVIEW_REQUIRED,
-            IntakeStatus.LICENSE_REVIEW_REQUIRED,
-            IntakeStatus.BLOCKED,
-        }:
-            raise ValueError("unreviewed remote code cannot be promoted to intake")
+            if self.source_kind == SourceKind.MODEL:
+                if not isinstance(self.official_model_repository, RepositoryIdentity):
+                    raise ValueError("verified model intake requires a concrete model repository")
+                if self.model_revision in _SENTINELS:
+                    raise ValueError("verified model intake must pin model_revision")
+                required_artifacts = [
+                    artifact for artifact in self.required_files if artifact.required
+                ]
+                if not required_artifacts:
+                    raise ValueError("verified model intake requires required artifact inventory")
+                for artifact in required_artifacts:
+                    if not isinstance(artifact.size_bytes, int):
+                        raise ValueError("verified intake requires required artifact sizes")
+                    if not _SHA256_RE.fullmatch(artifact.sha256):
+                        raise ValueError(
+                            "verified intake requires required artifact SHA-256 values"
+                        )
+            unresolved_licenses = _SENTINELS | {""}
+            if self.license_boundary.code_license in unresolved_licenses:
+                raise ValueError("verified intake requires resolved code license")
+            if self.license_boundary.weight_license in unresolved_licenses:
+                raise ValueError("verified intake requires resolved weight license")
+            if self.license_boundary.code_license_source in _SENTINELS:
+                raise ValueError("verified intake requires resolved code license source")
+            if self.license_boundary.weight_license_source in _SENTINELS:
+                raise ValueError("verified intake requires resolved weight license source")
+            if self.license_boundary.commercial_eligibility in {
+                CommercialEligibility.UNKNOWN,
+                CommercialEligibility.LICENSE_REVIEW_REQUIRED,
+            }:
+                raise ValueError("verified intake requires resolved commercial eligibility")
+            if self.verification.blockers:
+                raise ValueError("verified intake cannot retain unresolved blockers")
+
+        if self.remote_code_policy.trust_remote_code:
+            if self.remote_code_policy.review_status != ReviewStatus.VERIFIED:
+                if self.verification.status not in {
+                    IntakeStatus.REMOTE_CODE_REVIEW_REQUIRED,
+                    IntakeStatus.LICENSE_REVIEW_REQUIRED,
+                    IntakeStatus.BLOCKED,
+                }:
+                    raise ValueError("unreviewed remote code cannot be promoted to intake")
+            else:
+                artifact_by_path = {artifact.path: artifact for artifact in self.required_files}
+                for allowed_file in self.remote_code_policy.allowed_files:
+                    artifact = artifact_by_path.get(allowed_file)
+                    if artifact is None:
+                        raise ValueError("reviewed remote file must exist in artifact inventory")
+                    if not isinstance(artifact.size_bytes, int) or not _SHA256_RE.fullmatch(
+                        artifact.sha256
+                    ):
+                        raise ValueError("reviewed remote file requires pinned size and SHA-256")
         if self.superseded_by_source_id == self.source_id:
             raise ValueError("source cannot supersede itself")
         return self
