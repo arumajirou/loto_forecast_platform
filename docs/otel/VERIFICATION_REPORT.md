@@ -123,6 +123,7 @@ console exporter smoke=PASS
 in-memory exporter smoke=PASS
 OTLP HTTP protobuf loopback stub=PASS
 FastAPI ASGI trace smoke=PASS
+required forecast-run parent span smoke=PASS
 HTTPX sync trace and propagation smoke=PASS
 HTTPX async trace smoke=PASS
 SQLAlchemy operation trace smoke=PASS
@@ -146,7 +147,9 @@ queue-saturation regressions were added.
 A final concurrency review then moved queue insertion and pending-count updates under the same condition
 lock, preventing a fast exporter from decrementing pending before the producer records acceptance. Domain
 spans now map platform `FAILED`/`BLOCKED` to OpenTelemetry error status, and HTTP client 4xx responses are
-marked as errors. The complete final suite passed 16 tests.
+marked as errors. A post-publication specification audit then found that `loto.forecast.run` was
+listed as required but lacked a dedicated helper. `forecast_run_span()` and parent/child regression
+coverage were added. The complete final suite passed 16 tests.
 
 ## Pending and blocked verification
 
