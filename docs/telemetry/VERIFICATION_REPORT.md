@@ -20,6 +20,7 @@ repository=arumajirou/loto_forecast_platform
 default_branch=main
 base_sha=d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0
 head_branch=feat/telemetry-contract-v1
+relation_before_final_evidence_update=ahead 14 / behind 0
 ```
 
 Before branch creation, GitHub was checked for the same branch, same-purpose PRs and Issues, the
@@ -71,6 +72,21 @@ JSON manifest parse=PASS
 line length above 100 characters=0
 secret-pattern scan=PASS
 SHA256SUMS verification=PASS
+remote source/test Git blob parity=PASS
+```
+
+Published source and focused-test blob parity:
+
+```text
+src/loto/telemetry/__init__.py=58ce9993580653bc238715fdca795a935e53dfa7
+src/loto/telemetry/buffer.py=5cd69a1ee47a394bd4c058220670d5c405c1ea19
+src/loto/telemetry/codec.py=ea0fba2be9204944953d71abac0d6cdfd3da69bf
+src/loto/telemetry/context.py=ca420411da586d781fc4960c237dff59611182c5
+src/loto/telemetry/contracts.py=7b97d215b773e62860ecde9d40b7d0b0d161ccc3
+src/loto/telemetry/factory.py=bf6e71cde35db650d601223677d3d7d0b2921228
+src/loto/telemetry/metrics.py=4e75ff322b6026fb41e33725dea36e77decc48ed
+src/loto/telemetry/redaction.py=15c0b698b39d40e98424da6012a17f937f96a9e6
+tests/telemetry/test_telemetry_contract_v1.py=ba1435677db3a3704a3ebea4409464e87f48d5a0
 ```
 
 The first focused run found a `TypeError` when a direct unredacted actual list reached the
