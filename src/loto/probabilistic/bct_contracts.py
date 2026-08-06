@@ -165,6 +165,15 @@ class _BayesianContextTreeIdentityV1(_StrictModel):
             raise ValueError("alphabet tokens must be unique")
         return value
 
+    @field_validator("actuals_used")
+    @classmethod
+    def validate_actuals_used(cls, value: list[int]) -> list[int]:
+        if any(index < 0 for index in value):
+            raise ValueError("actuals_used indexes must be non-negative")
+        if value != sorted(set(value)):
+            raise ValueError("actuals_used indexes must be unique and strictly increasing")
+        return value
+
     @model_validator(mode="after")
     def validate_identity_consistency(self) -> _BayesianContextTreeIdentityV1:
         expected_alphabet_sha = canonical_payload_sha256(self.alphabet)
@@ -176,8 +185,6 @@ class _BayesianContextTreeIdentityV1(_StrictModel):
                 raise ValueError("actuals_used contains an index beyond chronology evidence")
             if maximum_actual_index >= self.chronology_evidence.prediction_index:
                 raise ValueError("future actual leakage detected")
-        if len(self.actuals_used) != len(set(self.actuals_used)):
-            raise ValueError("actuals_used must not contain duplicate indexes")
         return self
 
 

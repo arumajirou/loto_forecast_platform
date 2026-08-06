@@ -202,6 +202,16 @@ def test_future_actual_leakage_is_rejected() -> None:
         _chronology(future_actuals_used=True)
 
 
+@pytest.mark.parametrize("actuals_used", [[-1], [3, 2, 1, 0], [0, 1, 1, 2]])
+def test_actual_indexes_must_be_nonnegative_unique_and_increasing(
+    actuals_used: list[int],
+) -> None:
+    payload = _request_payload()
+    payload["actuals_used"] = actuals_used
+    with pytest.raises(ValidationError):
+        BayesianContextTreeRequestV1.model_validate(payload)
+
+
 def test_path_traversal_is_rejected() -> None:
     payload = _response_payload()
     payload["artifact_paths"] = ["../outside.json"]
