@@ -13,19 +13,29 @@ from loto.data_access_ledger.contracts import (
 )
 
 _FIT_MODES = {AccessMode.FIT, AccessMode.TRANSFORM_FIT}
+_DATA_CONSUMING_MODES = {
+    AccessMode.READ,
+    AccessMode.FIT,
+    AccessMode.TRANSFORM_FIT,
+    AccessMode.TRANSFORM_APPLY,
+    AccessMode.JOIN,
+    AccessMode.AGGREGATE,
+    AccessMode.LABEL,
+    AccessMode.SCORE,
+}
 _SELECTION_PURPOSES = {
     AccessPurpose.MODEL_FIT,
     AccessPurpose.MODEL_SELECTION,
     AccessPurpose.HYPERPARAMETER_TUNING,
     AccessPurpose.FEATURE_BUILD,
 }
-_CUTOFF_SPLITS = {SplitRole.VALIDATION, SplitRole.HOLDOUT, SplitRole.PROSPECTIVE}
-_TARGET_SAFE_PURPOSES = {
+_CUTOFF_REQUIRED_PURPOSES = {
+    AccessPurpose.FEATURE_BUILD,
     AccessPurpose.MODEL_FIT,
+    AccessPurpose.MODEL_SELECTION,
+    AccessPurpose.HYPERPARAMETER_TUNING,
     AccessPurpose.EVALUATION,
     AccessPurpose.SCORING,
-    AccessPurpose.ACTUAL_INGESTION,
-    AccessPurpose.AUDIT,
 }
 _SPLIT_RANK = {
     SplitRole.RAW: 0,
@@ -55,12 +65,36 @@ def validate_ledger(ledger: DataAccessLedger) -> LedgerReport:
                 )
             )
 
-        if event.split in _CUTOFF_SPLITS and event.boundary.prediction_cutoff is None:
+        if event.mode in _DATA_CONSUMING_MODES and event.boundary.end is None:
+            findings.append(
+                _finding(
+                    "UNBOUNDED_EVENT_WINDOW",
+                    event.event_id,
+                    f"{event.mode.value} requires a bounded end timestamp",
+                )
+            )
+
+        if (
+            event.purpose in _CUTOFF_REQUIRED_PURPOSES
+            and event.boundary.prediction_cutoff is None
+        ):
             findings.append(
                 _finding(
                     "MISSING_PREDICTION_CUTOFF",
                     event.event_id,
-                    f"{event.split.value} access requires prediction_cutoff",
+                    f"{event.purpose.value} requires prediction_cutoff",
+                )
+            )
+
+        if (
+            event.purpose in _CUTOFF_REQUIRED_PURPOSES
+            and event.boundary.available_at is None
+        ):
+            findings.append(
+                _finding(
+                    "MISSING_DATASET_AVAILABILITY_EVIDENCE",
+                    event.event_id,
+                    f"{event.purpose.value} requires dataset available_at evidence",
                 )
             )
 
@@ -126,14 +160,13 @@ def validate_ledger(ledger: DataAccessLedger) -> LedgerReport:
             if (
                 column.role in {ColumnRole.TARGET, ColumnRole.ACTUAL}
                 and column.lag == 0
-                and event.purpose not in _TARGET_SAFE_PURPOSES
+                and event.purpose is AccessPurpose.FEATURE_BUILD
             ):
                 findings.append(
                     _finding(
                         "CURRENT_TARGET_AS_FEATURE",
                         event.event_id,
-                        f"current target/actual column {column.name!r} is used for "
-                        f"{event.purpose.value}",
+                        f"current target/actual column {column.name!r} is used for feature_build",
                     )
                 )
             if (
@@ -176,6 +209,25 @@ def validate_ledger(ledger: DataAccessLedger) -> LedgerReport:
                         f"{dependency.split.value}",
                     )
                 )
+            if cutoff is not None:
+                dependency_end = dependency.boundary.end
+                if dependency_end is not None and dependency_end > cutoff:
+                    findings.append(
+                        _finding(
+                            "DEPENDENCY_WINDOW_AFTER_CUTOFF",
+                            event.event_id,
+                            f"dependency {dependency_id!r} ends after prediction_cutoff",
+                        )
+                    )
+                dependency_available_at = dependency.boundary.available_at
+                if dependency_available_at is not None and dependency_available_at > cutoff:
+                    findings.append(
+                        _finding(
+                            "DEPENDENCY_NOT_AVAILABLE_AT_CUTOFF",
+                            event.event_id,
+                            f"dependency {dependency_id!r} was unavailable at prediction_cutoff",
+                        )
+                    )
 
     findings.sort(key=lambda item: (item.event_id, item.code, item.message))
     status = LedgerStatus.FAIL if findings else LedgerStatus.PASS
