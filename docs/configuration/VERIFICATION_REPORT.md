@@ -68,22 +68,24 @@ Executed against the exact proposed foundation files in a dependency-light Pytho
 ```text
 pydantic=2.13.4
 yaml=6.0.3
-focused pytest=9 passed
+focused pytest=10 passed
 python compileall=PASS
 example CLI validation=PASS
 resolved artifact write=PASS
-resolved SHA-256 sidecar=PASS
+resolved semantic SHA-256 and artifact sidecar=PASS
 secret redaction=PASS
 unknown-key rejection=PASS
 strict-type rejection=PASS
 range rejection=PASS
 protected-stage rejection=PASS
 explicit migration-required behavior=PASS
+override provenance changes semantic hash=PASS
 Python lines over 100=0
 ```
 
 The focused tests cover required safe defaults, metrics, seed aggregation, environment provenance,
-secret redaction, device/fallback distinction, atomic output, SHA-256, CLI output, and migration gates.
+secret redaction, device/fallback distinction, fsynced atomic output, semantic and artifact SHA-256,
+CLI output, and migration gates.
 
 ## Validation pending
 
