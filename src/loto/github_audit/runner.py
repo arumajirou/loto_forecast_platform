@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-import json
-import time
+import datetime as dt
 import urllib.parse
 from dataclasses import dataclass
 from pathlib import Path
@@ -12,8 +11,6 @@ from typing import Any
 from loto.github_audit.core import (
     DEFAULT_API_VERSION,
     GhClient,
-    classify_error,
-    iso_now,
     redact,
     redact_variable_values,
     safe_slug,
@@ -38,13 +35,14 @@ class AuditConfig:
     duplicate_threshold: float = 0.90
 
 
-def _safe_hooks(value: Any) -> Any:
+def _safe_hooks(value: Any) -> list[dict[str, Any]]:
     if not isinstance(value, list):
-        return redact(value)
+        return []
     result = []
     for hook in value:
         if not isinstance(hook, dict):
             continue
+        config = hook.get("config") or {}
         result.append(
             {
                 "id": hook.get("id"),
@@ -55,8 +53,8 @@ def _safe_hooks(value: Any) -> Any:
                 "created_at": hook.get("created_at"),
                 "updated_at": hook.get("updated_at"),
                 "config": {
-                    "content_type": (hook.get("config") or {}).get("content_type"),
-                    "insecure_ssl": (hook.get("config") or {}).get("insecure_ssl"),
+                    "content_type": config.get("content_type"),
+                    "insecure_ssl": config.get("insecure_ssl"),
                     "url": "<REDACTED>",
                 },
             }
@@ -64,9 +62,9 @@ def _safe_hooks(value: Any) -> Any:
     return result
 
 
-def _safe_deploy_keys(value: Any) -> Any:
+def _safe_deploy_keys(value: Any) -> list[dict[str, Any]]:
     if not isinstance(value, list):
-        return redact(value)
+        return []
     return [
         {
             "id": item.get("id"),
@@ -74,7 +72,7 @@ def _safe_deploy_keys(value: Any) -> Any:
             "verified": item.get("verified"),
             "read_only": item.get("read_only"),
             "created_at": item.get("created_at"),
-            "added_by": item.get("added_by"),
+            "added_by": redact(item.get("added_by")),
             "key": "<REDACTED>",
         }
         for item in value
@@ -88,7 +86,7 @@ class AuditRunner:
             raise ValueError("repo must use OWNER/REPO form")
         self.config = config
         self.owner, self.repo_name = config.repo.split("/", 1)
-        timestamp = iso_now().replace("-", "").replace(":", "").replace("+00:00", "Z")
+        timestamp = dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%S%fZ")
         self.run_dir = (
             config.output_root.expanduser().resolve()
             / f"{safe_slug(config.repo)}-audit-{timestamp}"
@@ -105,60 +103,77 @@ class AuditRunner:
         self.core_failures: list[str] = []
 
     def _core(self, name: str, value: Any) -> Any:
-        if value is None:
+        if value is None and name not in self.core_failures:
             self.core_failures.append(name)
         return value
 
     def collect(self) -> dict[str, Any]:
         self.client.log("INFO", "audit_start", repo=self.config.repo, deep=self.config.deep)
         self.client.verify_prerequisites()
-
         repository = self._core(
             "repository",
             self.client.get("repository", f"repos/{self.config.repo}"),
         )
         if not isinstance(repository, dict):
-            summary = finalize_report(
-                client=self.client,
-                config=self.config,
-                run_dir=self.run_dir,
-                core_failures=self.core_failures,
-            )
-            return summary
+            return self._finalize()
 
         default_branch = str(repository.get("default_branch") or "main")
         self.client.datasets["default_branch"] = default_branch
         branch_ref = urllib.parse.quote(default_branch, safe="")
+        self._collect_head(branch_ref)
+        self._collect_issues_and_pulls()
+        self._collect_repository_inventory(default_branch)
+        self._collect_actions()
+        self._collect_security_and_settings(branch_ref)
+        if self.config.deep:
+            self._collect_deep_issues()
+            self._collect_deep_prs()
+            self._collect_action_jobs()
+        return self._finalize()
+
+    def _finalize(self) -> dict[str, Any]:
+        return finalize_report(
+            client=self.client,
+            config=self.config,
+            run_dir=self.run_dir,
+            core_failures=self.core_failures,
+        )
+
+    def _collect_head(self, branch_ref: str) -> None:
+        repo = self.config.repo
         head = self.client.get(
             "default_branch_head",
-            f"repos/{self.config.repo}/commits/{branch_ref}",
+            f"repos/{repo}/commits/{branch_ref}",
         )
-        if isinstance(head, dict) and head.get("sha"):
-            head_sha = str(head["sha"])
-            self.client.datasets["head_sha"] = head_sha
-            self.client.get(
-                "main_combined_status",
-                f"repos/{self.config.repo}/commits/{head_sha}/status",
-            )
-            self.client.get_list(
-                "main_check_runs",
-                f"repos/{self.config.repo}/commits/{head_sha}/check-runs",
-                item_key="check_runs",
-                max_items=1000,
-            )
-            self.client.get_list(
-                "main_workflow_runs",
-                f"repos/{self.config.repo}/actions/runs",
-                params={"head_sha": head_sha},
-                item_key="workflow_runs",
-                max_items=1000,
-            )
+        if not isinstance(head, dict) or not head.get("sha"):
+            return
+        head_sha = str(head["sha"])
+        self.client.datasets["head_sha"] = head_sha
+        self.client.get(
+            "main_combined_status",
+            f"repos/{repo}/commits/{head_sha}/status",
+        )
+        self.client.get_list(
+            "main_check_runs",
+            f"repos/{repo}/commits/{head_sha}/check-runs",
+            item_key="check_runs",
+            max_items=1000,
+        )
+        self.client.get_list(
+            "main_workflow_runs",
+            f"repos/{repo}/actions/runs",
+            params={"head_sha": head_sha},
+            item_key="workflow_runs",
+            max_items=1000,
+        )
 
+    def _collect_issues_and_pulls(self) -> None:
+        repo = self.config.repo
         issues_all = self._core(
             "issues_all",
             self.client.get_list(
                 "issues_all",
-                f"repos/{self.config.repo}/issues",
+                f"repos/{repo}/issues",
                 params={"state": "all", "sort": "updated", "direction": "desc"},
             ),
         )
@@ -167,35 +182,18 @@ class AuditRunner:
             self.client.datasets["issues"] = issues
             write_json(
                 self.run_dir / "raw" / "issues_only.json",
-                {"_audit": {"status": "DERIVED", "fetched_at": iso_now()}, "data": issues},
+                {"_audit": {"status": "DERIVED"}, "data": issues},
             )
-
         pulls = self._core(
             "pulls_all",
             self.client.get_list(
                 "pulls_all",
-                f"repos/{self.config.repo}/pulls",
+                f"repos/{repo}/pulls",
                 params={"state": "all", "sort": "updated", "direction": "desc"},
             ),
         )
         if isinstance(pulls, list):
             self.client.datasets["pulls"] = pulls
-
-        self._collect_repository_inventory(default_branch)
-        self._collect_actions()
-        self._collect_security_and_settings(branch_ref)
-
-        if self.config.deep:
-            self._collect_deep_issues()
-            self._collect_deep_prs()
-            self._collect_action_jobs()
-
-        return finalize_report(
-            client=self.client,
-            config=self.config,
-            run_dir=self.run_dir,
-            core_failures=self.core_failures,
-        )
 
     def _collect_repository_inventory(self, default_branch: str) -> None:
         repo = self.config.repo
@@ -329,22 +327,18 @@ class AuditRunner:
             f"repos/{repo}/collaborators",
             params={"affiliation": "all"},
         )
-        hooks = self.client.get_list("webhooks_metadata", f"repos/{repo}/hooks", max_items=1000)
-        if hooks is not None:
-            safe = _safe_hooks(hooks)
-            self.client.datasets["webhooks_metadata"] = safe
-            write_json(
-                self.run_dir / "raw" / "webhooks_metadata.json",
-                {"_audit": {"status": "VERIFIED_REDACTED", "fetched_at": iso_now()}, "data": safe},
-            )
-        keys = self.client.get_list("deploy_keys_metadata", f"repos/{repo}/keys", max_items=1000)
-        if keys is not None:
-            safe = _safe_deploy_keys(keys)
-            self.client.datasets["deploy_keys_metadata"] = safe
-            write_json(
-                self.run_dir / "raw" / "deploy_keys_metadata.json",
-                {"_audit": {"status": "VERIFIED_REDACTED", "fetched_at": iso_now()}, "data": safe},
-            )
+        self.client.get_list(
+            "webhooks_metadata",
+            f"repos/{repo}/hooks",
+            max_items=1000,
+            postprocess=_safe_hooks,
+        )
+        self.client.get_list(
+            "deploy_keys_metadata",
+            f"repos/{repo}/keys",
+            max_items=1000,
+            postprocess=_safe_deploy_keys,
+        )
         self.client.get_list(
             "actions_secrets_metadata",
             f"repos/{repo}/actions/secrets",
@@ -416,10 +410,13 @@ class AuditRunner:
                 f"repos/{repo}/pulls/{number}/files",
                 raw_path=folder / "files.json",
             )
-            self._collect_review_threads(number, folder / "review_threads.json")
-            head_sha = None
-            if isinstance(detail, dict):
-                head_sha = (detail.get("head") or {}).get("sha")
+            self.client.graphql_review_threads(
+                owner=self.owner,
+                repo_name=self.repo_name,
+                number=number,
+                raw_path=folder / "review_threads.json",
+            )
+            head_sha = (detail.get("head") or {}).get("sha") if isinstance(detail, dict) else None
             if not head_sha:
                 head_sha = (item.get("head") or {}).get("sha")
             if head_sha:
@@ -443,94 +440,6 @@ class AuditRunner:
                     max_items=1000,
                     raw_path=folder / "workflow_runs.json",
                 )
-
-    def _collect_review_threads(self, number: int, raw_path: Path) -> None:
-        query = """
-query($owner:String!, $name:String!, $number:Int!, $endCursor:String) {
-  repository(owner:$owner, name:$name) {
-    pullRequest(number:$number) {
-      reviewThreads(first:100, after:$endCursor) {
-        nodes {
-          id isResolved isOutdated path line originalLine
-          comments(first:100) {
-            nodes { id body createdAt updatedAt url path line originalLine author { login } }
-          }
-        }
-        pageInfo { hasNextPage endCursor }
-      }
-    }
-  }
-}
-"""
-        command = [
-            "gh",
-            "api",
-            "graphql",
-            "--paginate",
-            "--slurp",
-            "-f",
-            f"query={query}",
-            "-F",
-            f"owner={self.owner}",
-            "-F",
-            f"name={self.repo_name}",
-            "-F",
-            f"number={number}",
-        ]
-        started = time.monotonic()
-        self.client.api_calls += 1
-        completed = self.client.run_command(command)
-        duration_ms = round((time.monotonic() - started) * 1000)
-        status = "VERIFIED"
-        error = None
-        threads: list[Any] = []
-        if completed.returncode == 0:
-            try:
-                pages = json.loads(completed.stdout) if completed.stdout.strip() else []
-                for page in pages if isinstance(pages, list) else [pages]:
-                    connection = (
-                        (page.get("data") or {})
-                        .get("repository", {})
-                        .get("pullRequest", {})
-                        .get("reviewThreads", {})
-                    )
-                    nodes = connection.get("nodes", [])
-                    if isinstance(nodes, list):
-                        threads.extend(nodes)
-                threads = redact(threads)
-            except (json.JSONDecodeError, AttributeError) as exc:
-                status = "FAILED"
-                error = f"Invalid GraphQL response: {exc}"
-        else:
-            status = classify_error(completed.stderr, completed.returncode)
-            error = completed.stderr.strip()[-4000:]
-        ok = status == "VERIFIED"
-        write_json(
-            raw_path,
-            {
-                "_audit": {
-                    "name": f"pr_{number}_review_threads",
-                    "endpoint": "graphql PullRequest.reviewThreads",
-                    "status": status,
-                    "fetched_at": iso_now(),
-                    "duration_ms": duration_ms,
-                    "returncode": completed.returncode,
-                    "error": error,
-                },
-                "data": threads if ok else None,
-            },
-        )
-        self.client._record(
-            name=f"pr_{number}_review_threads",
-            endpoint="graphql PullRequest.reviewThreads",
-            status=status,
-            ok=ok,
-            count=len(threads) if ok else None,
-            duration_ms=duration_ms,
-            returncode=completed.returncode,
-            error=error,
-            raw_path=raw_path,
-        )
 
     def _collect_action_jobs(self) -> None:
         runs = self.client.datasets.get("workflow_runs")
