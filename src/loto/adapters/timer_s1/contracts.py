@@ -367,6 +367,14 @@ class TimerS1Response(StrictModel):
     def validate_run_id(cls, value: str) -> str:
         return _validate_run_id(value)
 
+    @field_validator("package_version")
+    @classmethod
+    def validate_package_version(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized or normalized in {"UNVERIFIED", UNPINNED}:
+            raise ValueError("verified response package_version must be concrete")
+        return normalized
+
     @field_validator("source_revision", "model_revision")
     @classmethod
     def validate_revision(cls, value: str) -> str:

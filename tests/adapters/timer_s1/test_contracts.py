@@ -328,3 +328,13 @@ def test_success_response_rejects_unsafe_artifact_path() -> None:
         TimerS1Response.model_validate(
             valid_response_payload(artifact_paths=("../escape.json",))
         )
+
+
+@pytest.mark.parametrize("package_version", ["", " ", "UNVERIFIED", "UNPINNED"])
+def test_verified_response_requires_concrete_package_version(
+    package_version: str,
+) -> None:
+    with pytest.raises(ValidationError, match="package_version"):
+        TimerS1Response.model_validate(
+            valid_response_payload(package_version=package_version)
+        )

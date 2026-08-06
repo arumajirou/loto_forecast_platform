@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
-from loto.timer_s1_campaign.model_manifest import load_manifest
+import pytest
+from pydantic import ValidationError
+
+from loto.timer_s1_campaign.model_manifest import TimerS1ModelManifest, load_manifest
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -45,3 +49,32 @@ def test_manifest_rejects_unsafe_artifact_path() -> None:
             required=True,
             kind="weight",
         )
+
+
+def manifest_payload() -> dict[str, object]:
+    return json.loads(
+        (ROOT / "configs/timer_s1_campaign/model_manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+
+def test_manifest_rejects_missing_required_core_artifact() -> None:
+    payload = manifest_payload()
+    artifacts = payload["artifacts"]
+    assert isinstance(artifacts, list)
+    payload["artifacts"] = [
+        item for item in artifacts if item["path"] != "modeling_TimerS1.py"
+    ]
+    with pytest.raises(ValidationError, match="missing required artifacts"):
+        TimerS1ModelManifest.model_validate_json(json.dumps(payload))
+
+
+def test_manifest_rejects_optional_or_misclassified_core_artifact() -> None:
+    payload = manifest_payload()
+    artifacts = payload["artifacts"]
+    assert isinstance(artifacts, list)
+    config = next(item for item in artifacts if item["path"] == "config.json")
+    config["required"] = False
+    with pytest.raises(ValidationError, match="marked optional"):
+        TimerS1ModelManifest.model_validate_json(json.dumps(payload))

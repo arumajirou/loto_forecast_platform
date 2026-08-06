@@ -12,6 +12,17 @@ from loto.adapters.timer_s1.contracts import CANONICAL_REPO, MIRROR_REPO, UNPINN
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _REVISION = re.compile(r"^[0-9a-f]{40}$")
+_REQUIRED_ARTIFACT_KINDS = {
+    "config.json": "config",
+    "model.safetensors.index.json": "weight-index",
+    "model-00001-of-00004.safetensors": "weight",
+    "model-00002-of-00004.safetensors": "weight",
+    "model-00003-of-00004.safetensors": "weight",
+    "model-00004-of-00004.safetensors": "weight",
+    "configuration_TimerS1.py": "remote-code",
+    "modeling_TimerS1.py": "remote-code",
+    "ts_generation_mixin.py": "remote-code",
+}
 
 
 class ManifestModel(BaseModel):
@@ -106,6 +117,18 @@ class TimerS1ModelManifest(ManifestModel):
         paths = [item.path for item in self.artifacts]
         if len(paths) != len(set(paths)):
             raise ValueError("manifest artifact paths must be unique")
+        artifacts_by_path = {item.path: item for item in self.artifacts}
+        missing = sorted(set(_REQUIRED_ARTIFACT_KINDS) - set(artifacts_by_path))
+        if missing:
+            raise ValueError(f"manifest is missing required artifacts: {', '.join(missing)}")
+        for path, expected_kind in _REQUIRED_ARTIFACT_KINDS.items():
+            record = artifacts_by_path[path]
+            if not record.required:
+                raise ValueError(f"required Timer-S1 artifact marked optional: {path}")
+            if record.kind != expected_kind:
+                raise ValueError(
+                    f"Timer-S1 artifact kind mismatch for {path}: expected {expected_kind}"
+                )
         return self
 
     def artifact(self, path: str) -> ArtifactRecord:

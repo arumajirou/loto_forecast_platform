@@ -44,6 +44,9 @@ class RemoteCodeReview(ReviewModel):
     dynamic_download: Literal[False]
     arbitrary_file_write: Literal[False]
     unapproved_external_imports: Literal[False]
+    environment_secret_collection: Literal[False]
+    telemetry_or_exfiltration: Literal[False]
+    unsafe_deserialization: Literal[False]
     reviewer: str
     reviewed_at: datetime
 

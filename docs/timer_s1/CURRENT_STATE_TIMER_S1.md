@@ -12,8 +12,12 @@ review gate, an isolated environment declaration, a provider skeleton, focused t
 A post-publication self-review additionally bound request hashes to manifest records, enforced
 finite and monotone response matrices against exact game geometry, required consistent CPU/GPU
 runtime evidence, required exact snapshot inventory accounting, and sanitized invalid CLI run IDs.
+A final review-readiness audit additionally requires concrete package versions for verified
+responses, requires the canonical Timer-S1 core artifact inventory and kinds in every manifest,
+and requires remote-code approval to explicitly rule out environment-secret collection,
+telemetry/exfiltration, and unsafe deserialization.
 
-Focused verification completed with 49 tests passing and 85% focused source coverage. Ruff and
+Focused verification completed with 58 tests passing and 87% focused source coverage. Ruff and
 mypy remain unavailable. GitHub Actions failed before creating any workflow step across multiple
 unrelated PRs, so no actionable CI code-test result exists. No weight load, remote-code import,
 inference, or accuracy claim exists.

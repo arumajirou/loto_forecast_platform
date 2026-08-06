@@ -12,6 +12,9 @@
   "dynamic_download": false,
   "arbitrary_file_write": false,
   "unapproved_external_imports": true,
+  "environment_secret_collection": true,
+  "telemetry_or_exfiltration": true,
+  "unsafe_deserialization": true,
   "reviewer": "",
   "reviewed_at": ""
 }

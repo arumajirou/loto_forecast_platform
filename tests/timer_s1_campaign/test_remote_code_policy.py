@@ -43,7 +43,15 @@ def build_manifest(files: dict[str, bytes]) -> TimerS1ModelManifest:
                 size_bytes=len(content),
                 sha256=digest(content),
                 required=True,
-                kind="remote-code",
+                kind=(
+                    "config"
+                    if name == "config.json"
+                    else "weight-index"
+                    if name == "model.safetensors.index.json"
+                    else "weight"
+                    if name.endswith(".safetensors")
+                    else "remote-code"
+                ),
             )
             for name, content in files.items()
         ),
@@ -56,12 +64,17 @@ def build_review(files: dict[str, bytes]) -> RemoteCodeReview:
         schema_version=1,
         status="APPROVED",
         source_revision="b" * 40,
-        reviewed_files={name: digest(content) for name, content in files.items()},
+        reviewed_files={
+            name: digest(content) for name, content in files.items() if name.endswith(".py")
+        },
         shell_execution=False,
         subprocess_execution=False,
         dynamic_download=False,
         arbitrary_file_write=False,
         unapproved_external_imports=False,
+        environment_secret_collection=False,
+        telemetry_or_exfiltration=False,
+        unsafe_deserialization=False,
         reviewer="test-reviewer",
         reviewed_at="2026-08-06T00:00:00Z",
     )
@@ -69,6 +82,12 @@ def build_review(files: dict[str, bytes]) -> RemoteCodeReview:
 
 def write_snapshot(root: Path) -> dict[str, bytes]:
     files = {
+        "config.json": b"{}\n",
+        "model.safetensors.index.json": b"{}\n",
+        "model-00001-of-00004.safetensors": b"weight-1",
+        "model-00002-of-00004.safetensors": b"weight-2",
+        "model-00003-of-00004.safetensors": b"weight-3",
+        "model-00004-of-00004.safetensors": b"weight-4",
         "configuration_TimerS1.py": b"# config\n",
         "modeling_TimerS1.py": b"# model\n",
         "ts_generation_mixin.py": b"# generation\n",
@@ -139,12 +158,19 @@ def test_remote_code_review_requires_timezone() -> None:
             schema_version=1,
             status="APPROVED",
             source_revision="b" * 40,
-            reviewed_files={name: digest(content) for name, content in files.items()},
+            reviewed_files={
+                name: digest(content)
+                for name, content in files.items()
+                if name.endswith(".py")
+            },
             shell_execution=False,
             subprocess_execution=False,
             dynamic_download=False,
             arbitrary_file_write=False,
             unapproved_external_imports=False,
+            environment_secret_collection=False,
+            telemetry_or_exfiltration=False,
+            unsafe_deserialization=False,
             reviewer="test-reviewer",
             reviewed_at="2026-08-06T00:00:00",
         )
@@ -160,3 +186,23 @@ def test_manifest_hash_tamper_is_rejected(
     set_offline_environment(monkeypatch)
     with pytest.raises(ValueError, match="manifest artifact hash mismatch"):
         validate_snapshot(tmp_path, manifest, build_review(files))
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "environment_secret_collection",
+        "telemetry_or_exfiltration",
+        "unsafe_deserialization",
+    ],
+)
+def test_remote_code_review_rejects_unresolved_security_risk(field: str) -> None:
+    files = {
+        "configuration_TimerS1.py": b"# config\n",
+        "modeling_TimerS1.py": b"# model\n",
+        "ts_generation_mixin.py": b"# generation\n",
+    }
+    payload = build_review(files).model_dump(mode="json")
+    payload[field] = True
+    with pytest.raises(ValueError):
+        RemoteCodeReview.model_validate(payload)

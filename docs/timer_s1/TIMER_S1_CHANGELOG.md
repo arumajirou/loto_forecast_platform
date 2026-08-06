@@ -20,3 +20,11 @@
 - Required pinned, timezone-aware remote-code review evidence.
 - Sanitized unsafe invalid-request run IDs before structured CLI failure output.
 - Added regression tests for every hardening item.
+
+## PR-A final review-readiness hardening
+
+- Rejected empty, `UNVERIFIED`, and `UNPINNED` package versions in verified responses.
+- Required every canonical Timer-S1 core artifact, required flag, and artifact kind in the manifest.
+- Expanded remote-code approval to deny environment-secret collection, telemetry/exfiltration, and
+  unsafe deserialization explicitly.
+- Added focused regression tests for each final review-readiness gate.
