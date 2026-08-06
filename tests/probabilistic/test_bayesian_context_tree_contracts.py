@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from copy import deepcopy
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -122,6 +122,32 @@ def test_state_manifest_roundtrip() -> None:
     assert BayesianContextTreeStateManifestV1.model_validate_json(state.model_dump_json()) == state
 
 
+def test_prediction_timestamp_must_be_timezone_aware_utc() -> None:
+    with pytest.raises(ValidationError):
+        _chronology(prediction_created_at=datetime(2026, 8, 6, 2, 30))
+    with pytest.raises(ValidationError):
+        _chronology(
+            prediction_created_at=datetime(
+                2026, 8, 6, 11, 30, tzinfo=timezone(timedelta(hours=9))
+            )
+        )
+
+
+def test_state_timestamp_must_be_utc_and_not_precede_prediction() -> None:
+    payload = {
+        **_identity(),
+        "implementation_status": "CONTRACT_ONLY",
+        "state_sha256": "d" * 64,
+        "persisted_at": datetime(2026, 8, 6, 2, 29, tzinfo=UTC),
+        "artifact_paths": ["artifacts/bct/state.json", "artifacts/bct/state.npz"],
+    }
+    with pytest.raises(ValidationError):
+        BayesianContextTreeStateManifestV1.model_validate(payload)
+    payload["persisted_at"] = datetime(2026, 8, 6, 2, 31)
+    with pytest.raises(ValidationError):
+        BayesianContextTreeStateManifestV1.model_validate(payload)
+
+
 def test_unknown_field_is_rejected() -> None:
     payload = _request_payload()
     payload["unknown_field"] = "forbidden"
@@ -212,9 +238,19 @@ def test_actual_indexes_must_be_nonnegative_unique_and_increasing(
         BayesianContextTreeRequestV1.model_validate(payload)
 
 
-def test_path_traversal_is_rejected() -> None:
+@pytest.mark.parametrize(
+    "artifact_path",
+    [
+        "../outside.json",
+        "./artifacts/state.json",
+        "artifacts//state.json",
+        "artifacts/state.json/",
+        "artifacts/\nstate.json",
+    ],
+)
+def test_unsafe_or_noncanonical_artifact_paths_are_rejected(artifact_path: str) -> None:
     payload = _response_payload()
-    payload["artifact_paths"] = ["../outside.json"]
+    payload["artifact_paths"] = [artifact_path]
     with pytest.raises(ValidationError):
         BayesianContextTreeResponseV1.model_validate(payload)
 

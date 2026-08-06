@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import PurePosixPath
 from typing import Any, Literal
 
@@ -24,9 +24,21 @@ def _validate_sha256(value: str) -> str:
 def _validate_relative_artifact_path(value: str) -> str:
     if not value or "\\" in value:
         raise ValueError("artifact paths must be non-empty POSIX relative paths")
+    if any(ord(char) < 32 or ord(char) == 127 for char in value):
+        raise ValueError("artifact paths must not contain control characters")
     path = PurePosixPath(value)
-    if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
+    if path.is_absolute() or not path.parts or ".." in path.parts:
         raise ValueError("artifact paths must not be absolute or contain traversal segments")
+    if path.as_posix() != value:
+        raise ValueError("artifact paths must use canonical POSIX form")
+    return value
+
+
+def _validate_utc_datetime(value: datetime) -> datetime:
+    if value.tzinfo is None or value.utcoffset() is None:
+        raise ValueError("timestamps must be timezone-aware UTC datetimes")
+    if value.utcoffset() != timedelta(0):
+        raise ValueError("timestamps must use UTC")
     return value
 
 
@@ -104,6 +116,11 @@ class BayesianContextTreeChronologyEvidenceV1(_StrictModel):
     update_after_prediction: Literal[True] = True
     future_actuals_used: Literal[False] = False
     actual_known_at_prediction: Literal[False] = False
+
+    @field_validator("prediction_created_at")
+    @classmethod
+    def validate_prediction_created_at(cls, value: datetime) -> datetime:
+        return _validate_utc_datetime(value)
 
     @model_validator(mode="after")
     def validate_chronology(self) -> BayesianContextTreeChronologyEvidenceV1:
@@ -295,6 +312,11 @@ class BayesianContextTreeStateManifestV1(_BayesianContextTreeIdentityV1):
     def validate_state_sha256(cls, value: str) -> str:
         return _validate_sha256(value)
 
+    @field_validator("persisted_at")
+    @classmethod
+    def validate_persisted_at(cls, value: datetime) -> datetime:
+        return _validate_utc_datetime(value)
+
     @field_validator("artifact_paths")
     @classmethod
     def validate_state_artifact_paths(cls, value: list[str]) -> list[str]:
@@ -303,3 +325,9 @@ class BayesianContextTreeStateManifestV1(_BayesianContextTreeIdentityV1):
         if len(value) != len(set(value)):
             raise ValueError("state artifact_paths must not contain duplicates")
         return [_validate_relative_artifact_path(path) for path in value]
+
+    @model_validator(mode="after")
+    def validate_persistence_chronology(self) -> BayesianContextTreeStateManifestV1:
+        if self.persisted_at < self.chronology_evidence.prediction_created_at:
+            raise ValueError("persisted_at must not precede prediction_created_at")
+        return self
