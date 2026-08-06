@@ -39,7 +39,10 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def write_inventory(root: Path, name: str, paths: list[Path]) -> None:
     (root / name).write_text(
-        "".join(f"{sha256_file(path)}  {path.relative_to(root).as_posix()}\n" for path in sorted(paths)),
+        "".join(
+            f"{sha256_file(path)}  {path.relative_to(root).as_posix()}\n"
+            for path in sorted(paths)
+        ),
         encoding="utf-8",
     )
 
@@ -73,7 +76,10 @@ def prepare(args: argparse.Namespace) -> int:
         raise FileExistsError(args.workspace)
     manifest, approval, _ = validate_history_bundle(args.history_bundle, args.history_approval)
     validate_sha256(args.config_sha256)
-    if len(args.source_revision) != 40 or any(ch not in "0123456789abcdef" for ch in args.source_revision):
+    invalid_revision = len(args.source_revision) != 40 or any(
+        char not in "0123456789abcdef" for char in args.source_revision
+    )
+    if invalid_revision:
         raise ValueError("source_revision must be lowercase 40-character Git SHA")
     args.workspace.mkdir(parents=True)
     history = args.workspace / "approved_history"
@@ -133,7 +139,9 @@ def verify_preparation(workspace: Path) -> dict[str, Any]:
         workspace / "approved_history", workspace / "history_approval.json"
     )
     checks = {
-        "history_manifest_sha256": sha256_file(workspace / "approved_history/history_manifest.json"),
+        "history_manifest_sha256": sha256_file(
+            workspace / "approved_history/history_manifest.json"
+        ),
         "history_approval_sha256": sha256_file(workspace / "history_approval.json"),
         "history_tree_sha256": tree_sha256(workspace / "approved_history"),
         "certifier_sha256": sha256_file(workspace / "certify_kdpp_fixed_k_runtime.py"),
@@ -227,16 +235,31 @@ def run(args: argparse.Namespace) -> int:
     first = run_process(args.workspace, plan, "A")
     verify_preparation(args.workspace)
     second = run_process(args.workspace, plan, "B")
-    write_json(args.workspace / "process_pair.json", {"process_records": [first.model_dump(mode="json"), second.model_dump(mode="json")]})
-    files = [path for path in args.workspace.rglob("*") if path.is_file() and path.name != "RUN_SHA256SUMS"]
+    pair = {
+        "process_records": [
+            first.model_dump(mode="json"),
+            second.model_dump(mode="json"),
+        ]
+    }
+    write_json(args.workspace / "process_pair.json", pair)
+    files = [
+        path
+        for path in args.workspace.rglob("*")
+        if path.is_file() and path.name != "RUN_SHA256SUMS"
+    ]
     write_inventory(args.workspace, "RUN_SHA256SUMS", files)
-    print(json.dumps({"status": "TWO_PROCESS_EXECUTED", "workspace": str(args.workspace)}, sort_keys=True))
+    result = {"status": "TWO_PROCESS_EXECUTED", "workspace": str(args.workspace)}
+    print(json.dumps(result, sort_keys=True))
     return 0
 
 
 def verify(args: argparse.Namespace) -> int:
     verify_preparation(args.workspace)
-    all_files = {path.relative_to(args.workspace).as_posix() for path in args.workspace.rglob("*") if path.is_file()}
+    all_files = {
+        path.relative_to(args.workspace).as_posix()
+        for path in args.workspace.rglob("*")
+        if path.is_file()
+    }
     verify_inventory(args.workspace, "RUN_SHA256SUMS", all_files - {"RUN_SHA256SUMS"})
     pair = load_json(args.workspace / "process_pair.json")
     records_payload = pair.get("process_records")
@@ -283,7 +306,11 @@ def verify(args: argparse.Namespace) -> int:
         **gates,
     )
     write_json(args.workspace / "FORMAL_VERIFICATION_REPORT.json", report)
-    print(json.dumps({"status": report.status, "certification_class": report.certification_class}, sort_keys=True))
+    result = {
+        "status": report.status,
+        "certification_class": report.certification_class,
+    }
+    print(json.dumps(result, sort_keys=True))
     return 0 if passed else 2
 
 

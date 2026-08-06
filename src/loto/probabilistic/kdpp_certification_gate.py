@@ -132,7 +132,11 @@ class KDPPHistoryManifest(StrictModel):
             raise ValueError("invalid chronology/context")
         if self.game in {"numbers3", "numbers4"}:
             limit = 3 if self.game == "numbers3" else 4
-            if self.target_layout != "position_local" or self.position is None or self.position > limit:
+            if (
+                self.target_layout != "position_local"
+                or self.position is None
+                or self.position > limit
+            ):
                 raise ValueError("Numbers3/4 require valid position_local geometry")
             if (self.item_count, self.cardinality) != (10, 1):
                 raise ValueError("Numbers3/4 require ten items and k=1")
@@ -328,7 +332,9 @@ def validate_history_bundle(
     if manifest.item_ids_json_sha256 != sha256_file(files["item_ids.json"]):
         raise ValueError("item IDs hash mismatch")
     item_ids_payload = json.loads(files["item_ids.json"].read_text(encoding="utf-8"))
-    if not isinstance(item_ids_payload, list) or not all(isinstance(item, str) for item in item_ids_payload):
+    if not isinstance(item_ids_payload, list) or not all(
+        isinstance(item, str) for item in item_ids_payload
+    ):
         raise ValueError("item_ids.json must be an array of strings")
     item_ids = tuple(item_ids_payload)
     if len(item_ids) != manifest.item_count or len(set(item_ids)) != len(item_ids):
@@ -340,13 +346,21 @@ def validate_history_bundle(
     if item_ids != expected_ids:
         raise ValueError("item IDs do not match canonical game geometry")
     with np.load(files["training.npz"], allow_pickle=False) as arrays:
-        if set(arrays.files) not in ({"training_indicators", "draw_nos"}, {"training_indicators", "draw_nos", "item_features"}):
+        supported_arrays = (
+            {"training_indicators", "draw_nos"},
+            {"training_indicators", "draw_nos", "item_features"},
+        )
+        if set(arrays.files) not in supported_arrays:
             raise ValueError("training NPZ array set mismatch")
         training = np.asarray(arrays["training_indicators"])
         draw_nos = np.asarray(arrays["draw_nos"])
         if "item_features" in arrays:
             features = np.asarray(arrays["item_features"], dtype=np.float64)
-            if features.ndim != 2 or features.shape[0] != manifest.item_count or not np.isfinite(features).all():
+            if (
+                features.ndim != 2
+                or features.shape[0] != manifest.item_count
+                or not np.isfinite(features).all()
+            ):
                 raise ValueError("invalid item_features")
     if training.shape != (manifest.row_count, manifest.item_count):
         raise ValueError("training shape mismatch")
@@ -373,7 +387,11 @@ def verify_runtime_directory(root: Path) -> dict[str, Any]:
     if set(files) != RUNTIME_FILES:
         raise ValueError("runtime file set mismatch")
     verify_inventory(root, "CERTIFICATION_SHA256SUMS", RUNTIME_FILES - {"CERTIFICATION_SHA256SUMS"})
-    verify_inventory(root / "state", "SHA256SUMS", {"kdpp_state.json", "kdpp_state.npz", "artifact_manifest.json"})
+    verify_inventory(
+        root / "state",
+        "SHA256SUMS",
+        {"kdpp_state.json", "kdpp_state.npz", "artifact_manifest.json"},
+    )
     request = _load_json(files["request.json"])
     response = _load_json(files["response.json"])
     lock = _load_json(files["prediction.lock.json"])
@@ -390,7 +408,10 @@ def verify_runtime_directory(root: Path) -> dict[str, Any]:
         raise ValueError("GPU fields must be null")
     if response.get("quantiles") is not None or response.get("finite_check") is not True:
         raise ValueError("quantile/finite evidence mismatch")
-    if response.get("exact_cardinality_check") is not True or response.get("duplicate_check") is not True:
+    if (
+        response.get("exact_cardinality_check") is not True
+        or response.get("duplicate_check") is not True
+    ):
         raise ValueError("cardinality/duplicate evidence mismatch")
     if response.get("point_forecast_semantics") != "SEEDED_EXACT_KDPP_SAMPLE":
         raise ValueError("point semantics mismatch")
@@ -406,13 +427,27 @@ def verify_runtime_directory(root: Path) -> dict[str, Any]:
     cardinality = int(response.get("cardinality", 0))
     points = response.get("point_forecast")
     marginals = response.get("marginal_inclusion_probabilities")
-    if not isinstance(points, list) or not isinstance(marginals, list) or len(points) != len(marginals):
+    if (
+        not isinstance(points, list)
+        or not isinstance(marginals, list)
+        or len(points) != len(marginals)
+    ):
         raise ValueError("forecast/marginal horizon mismatch")
     for subset in points:
-        if not isinstance(subset, list) or len(subset) != cardinality or len(set(subset)) != cardinality:
+        if (
+            not isinstance(subset, list)
+            or len(subset) != cardinality
+            or len(set(subset)) != cardinality
+        ):
             raise ValueError("invalid exact subset")
     for row in marginals:
-        if not isinstance(row, list) or any(not isinstance(v, (int, float)) or not math.isfinite(float(v)) or not 0 <= float(v) <= 1 for v in row):
+        invalid_row = not isinstance(row, list) or any(
+            not isinstance(value, (int, float))
+            or not math.isfinite(float(value))
+            or not 0 <= float(value) <= 1
+            for value in row
+        )
+        if invalid_row:
             raise ValueError("invalid marginals")
         if not math.isclose(sum(float(v) for v in row), cardinality, abs_tol=1e-8):
             raise ValueError("marginals do not sum to k")
@@ -429,4 +464,5 @@ def verify_runtime_directory(root: Path) -> dict[str, Any]:
 def write_json(path: Path, payload: Any) -> None:
     if isinstance(payload, BaseModel):
         payload = payload.model_dump(mode="json")
-    path.write_text(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+    path.write_text(serialized, encoding="utf-8")
