@@ -26,6 +26,15 @@ def test_snapshot_manifest_requires_approved_review(tmp_path: Path) -> None:
     assert exc.value.status == "REMOTE_CODE_REVIEW_REQUIRED"
 
 
+def test_snapshot_manifest_rejects_non_object_review(tmp_path: Path) -> None:
+    review = tmp_path / "review.json"
+    review.write_text("[]", encoding="utf-8")
+    provider = TimerBase84MProvider(tmp_path, review)
+    with pytest.raises(TimerProviderError) as exc:
+        provider.resolve_snapshot_manifest()
+    assert exc.value.status == "REMOTE_CODE_REVIEW_REQUIRED"
+
+
 def test_load_and_predict_fail_closed(tmp_path: Path) -> None:
     provider = TimerBase84MProvider(tmp_path, tmp_path / "review.json")
     with pytest.raises(TimerProviderError) as load_exc:
