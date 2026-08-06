@@ -1,0 +1,27 @@
+schema_version: 1
+checkpoint_lane: v2_reg_legacy
+device: cuda
+seed: 1
+repeats: 2
+hold_seconds: 3.0
+poll_interval_seconds: 0.1
+process_timeout_seconds: 900
+prediction_tolerance: 0.0
+local_files_only: true
+offline_required: true
+telemetry_disabled: true
+network_access: false
+license_accepted: true
+required_evidence:
+  - checkpoint_sha256_verified_before_load
+  - output_shape_37
+  - finite_predictions
+  - exact_requested_and_execution_device
+  - model_parameter_cuda_device
+  - provider_pid_matches_child_pid
+  - nvidia_smi_pid_and_gpu_uuid
+  - positive_provider_and_external_vram
+  - provider_pid_released_after_exit
+  - two_distinct_processes
+  - same_seed_prediction_replay
+  - response_and_prediction_sha256
