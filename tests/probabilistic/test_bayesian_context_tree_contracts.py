@@ -22,6 +22,7 @@ from loto.probabilistic.bct_contracts import (
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = ROOT / "configs/probabilistic/bayesian_context_tree.yaml"
+EXPECTED_CONFIG_SHA256 = "4f01e804be92374556fc435ed96d2bfe0fa2667e6fd6a9454257d3ff372bc569"
 
 
 def _chronology(**updates: object) -> BayesianContextTreeChronologyEvidenceV1:
@@ -262,8 +263,10 @@ def test_config_schema_and_sha256_are_deterministic() -> None:
     )
     assert first.active_catalog_registration is False
     assert first.implementation_status == "CONTRACT_ONLY"
-    assert bct_config_sha256(first) == bct_config_sha256(second)
-    assert len(bct_config_sha256(first)) == 64
+    digest = bct_config_sha256(first)
+    assert digest == EXPECTED_CONFIG_SHA256
+    assert digest == bct_config_sha256(second)
+    assert len(digest) == 64
 
 
 def test_active_catalog_and_native_registry_do_not_register_model() -> None:
