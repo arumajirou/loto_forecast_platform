@@ -24,6 +24,7 @@ from loto.telemetry.otel import (
     TracingRuntimeStatus,
     configure_tracing,
     domain_span,
+    forecast_run_span,
     instrument_fastapi_app,
     instrument_sqlalchemy_engine,
     sanitize_span_attributes,
@@ -61,17 +62,26 @@ def test_configuration_is_strict_and_batch_is_bounded() -> None:
 def test_domain_spans_cover_required_stages_and_share_trace() -> None:
     runtime, exporter = _runtime()
     with bind_telemetry_context(run_id="run-1", game_id="numbers4", seed=1):
-        with domain_span(runtime, Stage.FIT, attributes={"safe.value": 1}) as parent:
-            parent_context = parent.get_span_context()
-            assert current_telemetry_context().trace_id == format(parent_context.trace_id, "032x")
-            with domain_span(runtime, Stage.PREDICT) as child:
-                assert child.get_span_context().trace_id == parent_context.trace_id
+        with forecast_run_span(runtime) as forecast:
+            forecast_context = forecast.get_span_context()
+            with domain_span(runtime, Stage.FIT, attributes={"safe.value": 1}) as parent:
+                parent_context = parent.get_span_context()
+                assert current_telemetry_context().trace_id == format(
+                    parent_context.trace_id, "032x"
+                )
+                assert parent_context.trace_id == forecast_context.trace_id
+                with domain_span(runtime, Stage.PREDICT) as child:
+                    assert child.get_span_context().trace_id == parent_context.trace_id
     assert current_telemetry_context().run_id is None
     runtime = runtime.force_flush()
     assert runtime.status is TracingRuntimeStatus.NOT_PROBED
     assert runtime.reason == "export_accepted_unverified"
     spans = exporter.get_finished_spans()
-    assert {span.name for span in spans} == {"loto.model.fit", "loto.model.predict"}
+    assert {span.name for span in spans} == {
+        "loto.forecast.run",
+        "loto.model.fit",
+        "loto.model.predict",
+    }
     child = next(span for span in spans if span.name == "loto.model.predict")
     assert child.parent is not None
     assert child.parent.span_id == parent_context.span_id
