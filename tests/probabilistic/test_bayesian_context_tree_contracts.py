@@ -239,6 +239,27 @@ def test_actual_indexes_must_be_nonnegative_unique_and_increasing(
         BayesianContextTreeRequestV1.model_validate(payload)
 
 
+@pytest.mark.parametrize("actuals_used", [[], [0, 1, 2]])
+def test_actual_indexes_must_match_declared_through_index(
+    actuals_used: list[int],
+) -> None:
+    payload = _request_payload()
+    payload["actuals_used"] = actuals_used
+    with pytest.raises(ValidationError):
+        BayesianContextTreeRequestV1.model_validate(payload)
+
+
+def test_empty_actual_indexes_require_minus_one_through_index() -> None:
+    payload = _request_payload()
+    payload["actuals_used"] = []
+    payload["chronology_evidence"] = _chronology(
+        history_last_index=-1,
+        actuals_used_through_index=-1,
+    )
+    request = BayesianContextTreeRequestV1.model_validate(payload)
+    assert request.actuals_used == []
+
+
 @pytest.mark.parametrize(
     "artifact_path",
     [

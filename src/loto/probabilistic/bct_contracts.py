@@ -196,12 +196,19 @@ class _BayesianContextTreeIdentityV1(_StrictModel):
         expected_alphabet_sha = canonical_payload_sha256(self.alphabet)
         if self.alphabet_sha256 != expected_alphabet_sha:
             raise ValueError("alphabet_sha256 does not match the canonical alphabet")
+        actuals_used_through_index = self.chronology_evidence.actuals_used_through_index
         if self.actuals_used:
-            maximum_actual_index = max(self.actuals_used)
-            if maximum_actual_index > self.chronology_evidence.actuals_used_through_index:
-                raise ValueError("actuals_used contains an index beyond chronology evidence")
+            maximum_actual_index = self.actuals_used[-1]
+            if maximum_actual_index != actuals_used_through_index:
+                raise ValueError(
+                    "actuals_used must end at actuals_used_through_index"
+                )
             if maximum_actual_index >= self.chronology_evidence.prediction_index:
                 raise ValueError("future actual leakage detected")
+        elif actuals_used_through_index != -1:
+            raise ValueError(
+                "empty actuals_used requires actuals_used_through_index=-1"
+            )
         return self
 
 
