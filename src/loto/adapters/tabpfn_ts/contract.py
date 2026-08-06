@@ -16,10 +16,13 @@ from pydantic import (
 
 from .geometry import GameGeometry
 from .manifests import (
+    PACKAGE_MANIFEST,
     TABPFN_TS_PACKAGE_VERSION,
     CheckpointLane,
+    ExecutionStatus,
     V2_REPO_ID,
     V2_REVISION,
+    lane_manifest,
 )
 
 NonEmptyString = Annotated[str, StringConstraints(min_length=1)]
@@ -161,6 +164,9 @@ class TabPFNTSRequestV2(StrictModel):
         history_ids = [series.series_id for series in self.history]
         if history_ids != self.series_ids:
             raise ValueError("history series order must exactly match series_ids")
+        reference_timestamps = self.history[0].timestamps
+        if any(series.timestamps != reference_timestamps for series in self.history[1:]):
+            raise ValueError("all history series must share identical timestamp identity")
 
         expected_series_count = (
             self.game_geometry.candidate_count
@@ -172,6 +178,22 @@ class TabPFNTSRequestV2(StrictModel):
                 "series count does not match task formulation and game geometry: "
                 f"expected={expected_series_count}, actual={len(self.series_ids)}"
             )
+
+        if self.task_formulation is TaskFormulation.CANDIDATE_SCORE:
+            if not self.game_geometry.strictly_increasing:
+                raise ValueError(
+                    "candidate_score requires a strictly increasing unique-selection game"
+                )
+            if self.prediction_length != 1:
+                raise ValueError(
+                    "legacy candidate_score contract supports prediction_length=1 only"
+                )
+
+        covariate_keys = [
+            (row.series_id, row.horizon_step) for row in self.known_future_covariates
+        ]
+        if len(covariate_keys) != len(set(covariate_keys)):
+            raise ValueError("known-future covariate rows must be unique per series/horizon")
 
         for row in self.known_future_covariates:
             if row.horizon_step > self.prediction_length:
@@ -230,6 +252,15 @@ class EffectiveArguments(StrictModel):
     telemetry_disabled: Literal[True] = True
     network_access: Literal[False] = False
     tabpfn_mode: Literal["LOCAL"] = "LOCAL"
+
+    @field_validator("quantile_levels")
+    @classmethod
+    def validate_quantile_levels(cls, values: list[float]) -> list[float]:
+        if not values:
+            raise ValueError("quantile_levels must not be empty")
+        if values != sorted(set(values)):
+            raise ValueError("quantile_levels must be strictly increasing and unique")
+        return values
 
 
 class FeatureManifest(StrictModel):
@@ -335,13 +366,71 @@ class TabPFNTSResponseV2(StrictModel):
             raise ValueError("prediction_index does not match prediction_length")
 
         if self.status is ResponseStatus.OK:
+            self._validate_provenance()
             self._validate_gpu_success()
+            self._validate_runtime_identity()
             self._validate_task_outputs()
             self._validate_quantiles()
         return self
 
+    def _validate_provenance(self) -> None:
+        identity = self.model_identity
+        manifest = lane_manifest(identity.checkpoint_lane)
+        if manifest.execution_status is not ExecutionStatus.READY:
+            raise ValueError(
+                f"BLOCKED: checkpoint lane is not executable: {manifest.execution_status.value}"
+            )
+        expected_identity = (
+            manifest.repo_id,
+            manifest.revision,
+            manifest.filename,
+            manifest.sha256,
+        )
+        actual_identity = (
+            identity.repo_id,
+            identity.revision,
+            identity.checkpoint_filename,
+            identity.checkpoint_sha256,
+        )
+        if actual_identity != expected_identity:
+            raise ValueError("model identity does not match the executable lane manifest")
+        if self.artifact_reference.weight_sha256 != identity.checkpoint_sha256:
+            raise ValueError("artifact weight_sha256 does not match model identity")
+        if self.license_evidence.code_license != PACKAGE_MANIFEST.code_license:
+            raise ValueError("code license does not match the package manifest")
+        if self.license_evidence.weight_license != manifest.weight_license:
+            raise ValueError("weight license does not match the checkpoint manifest")
+        if self.license_evidence.attribution_required != manifest.attribution_required:
+            raise ValueError("attribution requirement does not match the checkpoint manifest")
+        if manifest.license_acceptance_required and not self.license_evidence.license_accepted:
+            raise ValueError("checkpoint license acceptance is required for status=OK")
+        if (
+            self.license_evidence.production_champion_eligible
+            != manifest.production_champion_eligible
+        ):
+            raise ValueError("production eligibility does not match the checkpoint manifest")
+
+    def _validate_runtime_identity(self) -> None:
+        if self.feature_manifest.feature_set_id != self.effective_arguments.feature_set_id:
+            raise ValueError("feature_set_id differs between arguments and feature manifest")
+        if self.runtime_evidence.provider_pid != self.gpu_evidence.provider_pid:
+            raise ValueError("provider PID differs between runtime and GPU evidence")
+        device_fields = (
+            "model_parameter_device",
+            "training_table_device",
+            "test_table_device",
+            "prediction_tensor_device",
+        )
+        for field_name in device_fields:
+            runtime_value = getattr(self.runtime_evidence, field_name)
+            gpu_value = getattr(self.gpu_evidence, field_name)
+            if runtime_value != gpu_value:
+                raise ValueError(f"{field_name} differs between runtime and GPU evidence")
+
     def _validate_gpu_success(self) -> None:
         evidence = self.gpu_evidence
+        if evidence.requested_device is not evidence.effective_device or evidence.cpu_fallback:
+            raise ValueError("FAILED_CPU_FALLBACK: effective device differs from request")
         if evidence.requested_device is Device.CUDA:
             device_values = [
                 evidence.model_parameter_device,
@@ -349,8 +438,6 @@ class TabPFNTSResponseV2(StrictModel):
                 evidence.test_table_device,
                 evidence.prediction_tensor_device,
             ]
-            if evidence.effective_device is not Device.CUDA or evidence.cpu_fallback:
-                raise ValueError("FAILED_CPU_FALLBACK: CUDA request executed on CPU")
             if any(value is None or not value.startswith("cuda") for value in device_values):
                 raise ValueError("GPU evidence is incomplete for a successful CUDA response")
             if evidence.gpu_uuid is None:
@@ -372,11 +459,26 @@ class TabPFNTSResponseV2(StrictModel):
             if len(self.series_identity) != geometry.position_count:
                 raise ValueError("position response series count does not match game geometry")
             point_pairs = {(item.series_id, item.horizon_step) for item in self.point_forecast}
-            if point_pairs != self._expected_pairs():
-                raise ValueError("point forecast does not cover every series/horizon pair")
+            if (
+                point_pairs != self._expected_pairs()
+                or len(self.point_forecast) != len(point_pairs)
+            ):
+                raise ValueError(
+                    "point forecast must cover every series/horizon pair exactly once"
+                )
             if self.raw_candidate_scores is not None:
                 raise ValueError("position response must not contain candidate scores")
         else:
+            if not geometry.strictly_increasing:
+                raise ValueError(
+                    "candidate-score response requires a strictly increasing game geometry"
+                )
+            if self.effective_arguments.prediction_length != 1:
+                raise ValueError(
+                    "legacy candidate-score response supports prediction_length=1 only"
+                )
+            if len(self.series_identity) != geometry.candidate_count:
+                raise ValueError("candidate response series count does not match game geometry")
             if self.raw_candidate_scores is None:
                 raise ValueError("candidate-score response requires raw_candidate_scores")
             candidates = [item.candidate for item in self.raw_candidate_scores]
@@ -390,8 +492,13 @@ class TabPFNTSResponseV2(StrictModel):
                 probability_candidates = [
                     item.candidate for item in self.calibrated_candidate_probabilities
                 ]
-                if sorted(probability_candidates) != expected_candidates:
-                    raise ValueError("calibrated probabilities must cover the candidate universe")
+                if (
+                    sorted(probability_candidates) != expected_candidates
+                    or len(set(probability_candidates)) != len(probability_candidates)
+                ):
+                    raise ValueError(
+                        "calibrated probabilities must cover the candidate universe exactly once"
+                    )
                 total = sum(
                     item.calibrated_probability
                     for item in self.calibrated_candidate_probabilities
@@ -424,8 +531,11 @@ class TabPFNTSResponseV2(StrictModel):
                 (value.series_id, value.horizon_step): value.value
                 for value in quantile.values
             }
-            if set(mapping) != expected_pairs:
-                raise ValueError("quantile forecast shape does not match series/horizon identity")
+            if set(mapping) != expected_pairs or len(quantile.values) != len(mapping):
+                raise ValueError(
+                    "quantile forecast shape does not match series/horizon identity "
+                    "exactly once"
+                )
             by_level[quantile.level] = mapping
 
         for pair in expected_pairs:
