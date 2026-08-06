@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "phase": "P8",
+  "status": "IMPLEMENTED_LOCALLY_VERIFIED",
+  "parent_pr": 103,
+  "base_branch": "feat/chronos2-runtime-oof-v1",
+  "new_branch": "feat/chronos2-calibration-v1",
+  "owned_paths": [
+    "configs/chronos2_campaign/**",
+    "docs/chronos2/**",
+    "scripts/run_chronos2_calibration.py",
+    "src/loto/chronos2_campaign/calibration*.py",
+    "tests/chronos2_campaign/test_calibration_*.py"
+  ],
+  "forbidden_changes": [
+    "root pyproject.toml",
+    "root uv.lock",
+    ".github/workflows/**",
+    "src/loto/models/workers.py",
+    "src/loto/models/catalog.py",
+    "src/loto/models/catalog_full.py",
+    "common CLI",
+    "top-level README.md",
+    "Chronos-Bolt",
+    "Chronos-T5"
+  ],
+  "holdout_opened": false,
+  "prospective_opened": false,
+  "automatic_promotion": false
+}
