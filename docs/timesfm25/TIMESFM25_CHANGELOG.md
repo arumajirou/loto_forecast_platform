@@ -17,4 +17,7 @@
   deterministic ZIP finalization, and archive SHA-256 sidecars.
 - Added fail-closed operator states for running, partial, failed, incomplete, and
   corrupt runtime bundles.
+- Added P10 evidence intake with external/internal SHA verification, safe ZIP
+  extraction, identity cross-checks, and formal certification promotion rules.
+- Added explicit non-promotion of `PARTIALLY_VERIFIED_GPU`.
 - Added focused tests and phased verification documentation.

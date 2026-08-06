@@ -1,6 +1,6 @@
 # TimesFM 2.5 Artifact Manifest
 
-File count (excluding this manifest and SHA list): 68
+File count (excluding this manifest and SHA list): 75
 
 | Path | SHA-256 |
 |---|---|
@@ -13,8 +13,11 @@ File count (excluding this manifest and SHA list): 68
 | `docs/timesfm25/TIMESFM25_BACKEND_MATRIX.csv` | `a731d5022a7f41a61463caffa3e413c3ed4769cd5b8f89545b79570308e8e8c7` |
 | `docs/timesfm25/TIMESFM25_BASELINE_COMPARISON.csv` | `c3c54373ea79a6fb5cb9785863b3d3ac278e7bac496ebdb866baf3f3d24e6bab` |
 | `docs/timesfm25/TIMESFM25_CAPABILITY_MATRIX.csv` | `86df60e8e3c737b1102ff13f6a35ecbd0ae2d3efa210fe20eb5feede2d37ff90` |
-| `docs/timesfm25/TIMESFM25_CHANGELOG.md` | `d8038d654f1f536e660842422e8502852d9c1e389c18dd6110e5e3bf26f23b96` |
+| `docs/timesfm25/TIMESFM25_CHANGELOG.md` | `8536ba0b66015705f39ff42c05ed7d524ccece6ced44600ded078da952582dea` |
 | `docs/timesfm25/TIMESFM25_DATA_CONTRACT.md` | `319a5201c34e79b0f5701ffcffffca49177fc609df515b74015d660cca854cb8` |
+| `docs/timesfm25/TIMESFM25_EVIDENCE_REVIEW_POLICY.md` | `ba437e2dec4b6ac92733ba20caf973bbc32c35ac34f2be14ea41d2b2fdcfbee6` |
+| `docs/timesfm25/TIMESFM25_EVIDENCE_REVIEW_RUNBOOK.md` | `caee1bd06cfe00526d0d210644cb5daed41307dda7656f3f742d18f901d2bed0` |
+| `docs/timesfm25/TIMESFM25_EVIDENCE_REVIEW_VERIFICATION.md` | `562195304f73b1d5f618dfab858ed791d85044bdf678fe0e446846cb06562ed7` |
 | `docs/timesfm25/TIMESFM25_HANDOFF.md` | `c4cadef979b9d027e7089cfc0327aa38befca841171b6a7b0e8e3b7b56972363` |
 | `docs/timesfm25/TIMESFM25_LORA_MATRIX.csv` | `b0c5223570901aba41b90728d991f3da973047206cb5d47229a87ef3bd748a16` |
 | `docs/timesfm25/TIMESFM25_MODEL_MANIFEST.json` | `6b369b53a3ff1bc635e64222ad6f4331d15e3a79b9174c10a0e895c174f2381b` |
@@ -28,7 +31,7 @@ File count (excluding this manifest and SHA list): 68
 | `docs/timesfm25/TIMESFM25_RUNBOOK.md` | `7aaed7878016e1c9eb81d5604b609ad0d4039587d265c9c6549ca8a9583210a4` |
 | `docs/timesfm25/TIMESFM25_RUNTIME_CERTIFICATION.csv` | `0409ad97a155f83dc7fbe3f7dbe21e22d71bc8299e44eb24760b1de4c448ed8d` |
 | `docs/timesfm25/TIMESFM25_SPECIFICATION.md` | `6effc85622bc8745af5c242e32770561bbafffac6aa4dee020593bd2e592d55e` |
-| `docs/timesfm25/TIMESFM25_TEST_PLAN.md` | `f98f7323d330d55082f5a3c72a46ff335fb902296171a65be93e673cf522bd47` |
+| `docs/timesfm25/TIMESFM25_TEST_PLAN.md` | `a0e425334edad8072894f3279a3dbac35a0f4634b5fad76a0d2e58dff6d837f8` |
 | `docs/timesfm25/TIMESFM25_VERIFICATION_REPORT.md` | `94ac8354e602f19b96a44106f95969b652188abc4128c9de17bf17f14cdbbc5b` |
 | `docs/timesfm25/TIMESFM25_XREG_MATRIX.csv` | `0a2246047d4d989cfdecb28ecdebeaa9ed8fcef9ac8dce749c0bd8bf81b690cd` |
 | `environments/timesfm25-pytorch-source/pyproject.toml` | `71714d3f58ac14bb36d3098b24573bed01015b14d1896983ec7d6a38e8a41422` |
@@ -36,6 +39,7 @@ File count (excluding this manifest and SHA list): 68
 | `environments/timesfm25-transformers/pyproject.toml` | `23a6aaf97a408c20a5e8d7d5bdd79bd377065d9e0254a4ba04b0f8dc2994291c` |
 | `environments/timesfm25-xreg/README.md` | `77e950f721df4bc80f7c9bc2ce2c7384c70475479ec111c61c9973661c6050c1` |
 | `scripts/prepare_timesfm25_runtime.py` | `303d00f093b10d282c786bc461ba5c8a01a6875d27f794b49289f9236a14b62b` |
+| `scripts/review_timesfm25_evidence.py` | `ba89d50d6b56e29adc39768efb70f8a4810ee9295a7b4b3f63e5fee161de5114` |
 | `scripts/run_timesfm25_provider.py` | `cf19577632f985db4d0272f0c70dac860ba1dfdac12f3be45883aa496aba0fb3` |
 | `scripts/run_timesfm25_runtime_certification.py` | `084617118edd90f1575ef32ab42f188cda84b789f107d7721d20cb46fce31162` |
 | `scripts/run_timesfm25_target_host.py` | `23134f9e2c3a466c35df6b50ceb47e4d0ab9a46c660cb6f7b972da32e0cad5ca` |
@@ -48,6 +52,8 @@ File count (excluding this manifest and SHA list): 68
 | `src/loto/timesfm25_campaign/backend_registry.py` | `8fe9cb49d0ad02a0b631b169930cf8aa6be1561e4cb7ef4be8d0afebb1adc4c7` |
 | `src/loto/timesfm25_campaign/certification.py` | `7de0bf55cf51410b2b3f4860f78be477dd8c866735510f995dfa761cee92f4bd` |
 | `src/loto/timesfm25_campaign/certification_bundle.py` | `e5cd7db4ab3a54143ed3a33152b6b26cf60aa31da005ecfdf7fef12409715609` |
+| `src/loto/timesfm25_campaign/evidence_archive.py` | `32cada9ef265ea2f3cfd75a8250b87169f770349357f398cc639e506c96ad8f8` |
+| `src/loto/timesfm25_campaign/evidence_review.py` | `ece0a8f6fbadc4b1a45777aaaf08d16a59f6689551a844f0ed8079037f1fc686` |
 | `src/loto/timesfm25_campaign/forecast_config.py` | `566230a1a27713c0770f1613078cee9230124d0c70e1115b043f2f5f9b49c37c` |
 | `src/loto/timesfm25_campaign/geometry.py` | `76a5bdfbc2aec0b042d02c2925ad67399fb7d7912000943a2b2cc84c466e737a` |
 | `src/loto/timesfm25_campaign/model_manifest.py` | `2c5f16a66a63a12aa196f54d5fafb9f3bbdc051bdf4325d87fc5175a50317776` |
@@ -63,6 +69,7 @@ File count (excluding this manifest and SHA list): 68
 | `tests/adapters/timesfm25/test_contracts.py` | `98568ecec082904010a140fd848f70a573373e72346a6d8544272824fa08a9b2` |
 | `tests/timesfm25_campaign/test_certification.py` | `a2f0a081ea639abbbf84d8bbb0b2dffce47628f4df83edc52500392038597ac5` |
 | `tests/timesfm25_campaign/test_certification_bundle.py` | `9f3af4dad03ab2e0d78ec0a439d09917c2ec66abd87e4662c7fe756990552a74` |
+| `tests/timesfm25_campaign/test_evidence_review.py` | `b817d0d26af44f2e0ec9d0f6b36258c02189d085f81da511b0f3beb87a79341f` |
 | `tests/timesfm25_campaign/test_geometry.py` | `5bb730975a41b2eff274d0ec549264c2e268b49916970e166e8d3e11897abafa` |
 | `tests/timesfm25_campaign/test_manifest.py` | `b4d25fa2568e0de51597c1d8650c810e0c81e3f4f9d969d92d39e7548c2e3b5d` |
 | `tests/timesfm25_campaign/test_operator_workflow.py` | `e30464e983dda023454d92456fdd2054643c773ab2a62fcab16b5cb063479ed6` |

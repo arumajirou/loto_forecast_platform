@@ -19,7 +19,13 @@ materialization, absolute snapshot enforcement, offline runner generation, argum
 vector construction, running and partial states, deterministic ZIP bytes, tamper
 rejection, archive placement, CLI subcommands, and explicit lock generation.
 
+Evidence-review tests cover archive sidecars, single-root ZIP topology, zip-slip,
+duplicates, symlinks, internal SHA verification, Run ID and identity consistency,
+preflight and provider success, locked/offline command evidence, clean Git capture,
+strict GPU promotion, CPU-output rejection, NVIDIA process samples, partial GPU
+non-promotion, failed runtime rejection, and immutable outer review sealing.
+
 Pending execution tests are real target-host lock generation, model byte hashing,
 GPU load/inference/PID/VRAM evidence, separate-process snapshot reload with real
-weights, native/Transformers numeric parity, full pytest, and functional GitHub
-Actions execution.
+weights, review of a real P9 archive, native/Transformers numeric parity, full
+pytest, and functional GitHub Actions execution.
