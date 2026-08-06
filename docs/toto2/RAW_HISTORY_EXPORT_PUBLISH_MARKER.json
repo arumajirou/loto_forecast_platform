@@ -1,9 +1,0 @@
-{
-  "schema_version": 1,
-  "status": "PUBLISHED",
-  "parent_pr": 102,
-  "parent_head": "bd8e97c3d07c114e094f6c13938af5ba387910cf",
-  "focused_tests": 8,
-  "real_database_export_executed": false,
-  "real_pyarrow_write_executed": false
-}
