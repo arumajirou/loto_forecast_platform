@@ -1,6 +1,6 @@
 # TabPFN-TS Verification Report
 
-Status: `PARTIALLY_VERIFIED / CI_BLOCKED_RUNNER_START`
+Status: `PARTIALLY_VERIFIED`
 
 ## Implemented scope
 
@@ -12,29 +12,15 @@ The contract separates the fixed legacy V2 checkpoint lane from the current TS-3
 remains fail-closed until its exact repository identity, revision, checkpoint SHA-256, and weight
 license are verified.
 
-## Contract hardening
-
-The post-publication static review closed the following fail-open boundaries:
-
-- `status=OK` now requires an executable checkpoint lane;
-- model repository, revision, filename, checkpoint SHA-256, artifact SHA-256, and license
-  evidence must match the reviewed lane manifest;
-- runtime and GPU PID/device evidence must agree;
-- request histories must share identical timestamp identity;
-- known-future covariate rows must be unique per series and horizon;
-- point and quantile outputs must cover each series/horizon pair exactly once;
-- the legacy candidate-score formulation is restricted to one-step forecasting and strictly
-  increasing unique-selection games;
-- calibrated candidate probabilities must cover every candidate exactly once.
-
 ## Executed verification
 
 | Gate | Result |
 |---|---|
 | Python syntax / compileall | PASS |
 | Focused contract and safety tests | PASS: 54 tests |
-| Changed Python line-length scan (`<=100`) | PASS |
-| Published Git blob parity for four hardened files | PASS |
+| Focused tests with only `src` on `PYTHONPATH` | PASS: 54 tests |
+| Focused tests with repository root and `src` on `PYTHONPATH` | PASS: 54 tests |
+| Changed Python line length (`<=100`) | PASS |
 | Model-manifest JSON parse | PASS |
 | Contract YAML parse | PASS |
 | Patch whitespace check | PASS |
@@ -42,7 +28,16 @@ The post-publication static review closed the following fail-open boundaries:
 | Secret-pattern scan | PASS |
 | Large-file and bytecode-cache scan | PASS |
 
-The four hardened GitHub blobs exactly matched the locally tested file contents.
+## Test collection hardening
+
+The focused tests originally imported fixtures through the absolute module path
+`tests.adapters.tabpfn_ts.conftest`. Under pytest importlib mode, that path can depend on the
+repository root being explicitly importable. The four affected test modules now use the
+package-relative import `.conftest`.
+
+No shared `tests/__init__.py` file was added and no path outside the TabPFN-TS-owned test package
+was changed. The full 54-test set passes both with and without the repository root explicitly
+included in `PYTHONPATH`.
 
 ## GitHub publication
 
@@ -56,43 +51,38 @@ The four hardened GitHub blobs exactly matched the locally tested file contents.
 | Merge or auto-merge | NOT PERFORMED |
 
 The connected GitHub contents API creates one commit per changed file. This branch is therefore
-intended for **squash merge only** after actionable CI and review.
+intended for **squash merge only** after CI and review.
 
 ## GitHub Actions evidence
 
 | Head / attempt | Workflow run | Job | Result | Steps | Log retrieval |
 |---|---:|---:|---|---|---|
-| initial attempt | `31057547953` | `92478220826` | FAILURE | unavailable | `BlobNotFound` |
+| initial | `31057547953` | `92478220826` | FAILURE | unavailable | `BlobNotFound` |
 | failed-job rerun | `31057547953` | `92480636445` | FAILURE | empty | `BlobNotFound` |
-| evidence-only head `24e25ff9` | `31058539700` | `92481258894` | FAILURE | empty | `BlobNotFound` |
+| evidence head `24e25ff9` | `31058539700` | `92481258894` | FAILURE | empty | `BlobNotFound` |
 | hardened head `b1aaadb5` | `31061022162` | `92488826881` | FAILURE | empty | `BlobNotFound` |
+| report head `d48ac8ce` | `31061145234` | `92489197044` | FAILURE | empty | `BlobNotFound` |
+| import-hardened head `e4fe66fc` | `31061603702` | `92490537927` | FAILURE | empty | `BlobNotFound` |
 
-No checkout, Python setup, dependency installation, Ruff, compileall, or pytest step is evidenced
-for these runs. Contemporaneous unrelated Draft PRs #95 and #96 showed the same pre-step failure
-pattern. The current classification is therefore `CI_BLOCKED_RUNNER_START`; a TabPFN-TS code-test
-failure is not proven.
-
-GitHub's public status page reported Actions operational when the hardened-head run was checked.
-That narrows the unresolved scope to a repository/account-specific Actions condition or an
-unreported transient condition. Plausible categories include Actions policy, hosted-runner
-allocation, billing/budget restrictions, or account restrictions. These categories are hypotheses;
-the available connector cannot inspect repository billing or runner settings.
+No checkout, setup-python, dependency-installation, Ruff, compileall, or pytest step is evidenced.
+The CI condition remains classified as `CI_BLOCKED_RUNNER_START`; no TabPFN-TS code-test failure
+has been proven by GitHub Actions.
 
 ## Pending gates
 
 | Gate | Status | Reason |
 |---|---|---|
-| Executable repository CI | BLOCKED | Job terminates before step creation |
+| Repository CI | CI_BLOCKED_RUNNER_START | Workflow jobs stop before executable steps |
 | Full pytest | EXECUTION_PENDING | Final integration gate |
-| Ruff and mypy in repository environment | EXECUTION_PENDING | Repository toolchain required |
-| V2 real checkpoint load | EXECUTION_PENDING | Trusted checkpoint mount required |
+| Ruff and mypy in repository environment | EXECUTION_PENDING | Must use repository toolchain |
+| V2 real checkpoint load | EXECUTION_PENDING | Requires trusted checkpoint mount |
 | V2 CPU and GPU inference | EXECUTION_PENDING | Runtime integration intentionally deferred |
-| Separate-process reload certification | EXECUTION_PENDING | Actual provider environment required |
+| Separate-process reload certification | EXECUTION_PENDING | Requires actual provider environment |
 | TS-3 inference | BLOCKED | Checkpoint hash and weight-license review incomplete |
 
 ## Formal interpretation
 
 The contract, geometry, provenance gate, candidate-score semantics, quantile validation,
-known-future covariate contract, strict device evidence, local/batch parity rules, and schema-v1
-conversion are implemented and dependency-light verified. This is not evidence that a real
-TabPFN checkpoint loaded, executed on GPU, improved Hit@±1, or exceeded any baseline.
+known-future covariate contract, strict CUDA evidence, local/batch parity rules, schema-v1
+conversion, and test import boundary are implemented and locally verified. This is not yet
+evidence that a real TabPFN checkpoint loaded, executed on GPU, or improved forecasting metrics.
