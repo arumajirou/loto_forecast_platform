@@ -34,7 +34,10 @@ def loto_main(argv: Sequence[str] | None = None) -> int:
 
 
 def loto3_main(argv: Sequence[str] | None = None) -> int:
-    return _delegate("loto3", "loto.cli_v3", argv)
+    arguments = _arguments(argv)
+    if arguments[:2] == ["integrity", "generate"] and "--release" not in arguments:
+        arguments.extend(["--release", __version__])
+    return _delegate("loto3", "loto.cli_v3", arguments)
 
 
 def auto_campaign_main(argv: Sequence[str] | None = None) -> int:
