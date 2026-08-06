@@ -106,6 +106,7 @@ Python SDK `BatchSpanProcessor.export_timeout_millis` argument.
 Required mapping:
 
 ```text
+FORECAST_RUN        -> loto.forecast.run
 RECEIVE             -> loto.api.request
 DATA_LOAD           -> loto.data.load
 DATA_VALIDATE       -> loto.data.validate
