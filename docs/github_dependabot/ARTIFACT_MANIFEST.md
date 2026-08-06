@@ -7,7 +7,8 @@
 - Branch: `agent/github-dependabot-foundation-v1`
 - Design source: PR #139 head `814b59d49944b234dafc9deba1cb07b230c9a348`
 - Feature: `dependabot`
-- Status: `EXECUTED / PARTIALLY_VERIFIED / GITHUB_ACCEPTANCE_PENDING`
+- Status: `EXECUTED / PARTIALLY_VERIFIED / FOCUSED_TESTS_PASSED /
+  GITHUB_ACCEPTANCE_PENDING`
 
 ## Included files
 
@@ -45,8 +46,14 @@
 | duplicate branch/PR/Issue/file audit | VERIFIED for selected feature |
 | official syntax and ecosystem review | VERIFIED |
 | files written to feature branch | EXECUTED |
-| static semantic review | PARTIALLY_VERIFIED |
-| local YAML parse/Ruff/compileall/pytest | EXECUTION_PENDING |
+| exact Git blob/content reconstruction | VERIFIED for 10 hashed artifacts |
+| PyYAML parse and focused policy inspection | PASSED |
+| compileall for owned test path | PASSED |
+| focused pytest | PASSED; 5 tests |
+| focused secret-pattern and size scan | PASSED |
+| SHA-256 verification | PASSED; 10 of 10 |
+| Ruff | UNAVAILABLE in isolated interpreter |
+| full repository pytest | EXECUTION_PENDING |
 | GitHub Dependabot parse/job | EXECUTION_PENDING until default branch |
 | generated update PR behavior | EXECUTION_PENDING |
 | GitHub Actions | BLOCKED_BY_ISSUE_58 |
@@ -58,3 +65,6 @@
 It covers all included files except `SHA256SUMS` itself. Verification must recompute hashes from the
 same branch/ref and compare every entry. Git blob identities remain available independently through
 GitHub.
+
+The SHA-256 file must be regenerated whenever any covered file changes. The current version is
+updated after the focused verification report and this manifest revision.
