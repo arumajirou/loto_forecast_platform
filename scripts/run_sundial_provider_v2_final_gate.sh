@@ -88,6 +88,7 @@ PYTHON_FILES=(
   tests/test_sundial_provider_v2_semantic_verifier.py
   tests/test_sundial_provider_v2_evidence_verifier.py
   tests/test_sundial_provider_v2_final_gate.py
+  tests/test_sundial_provider_v2_remaining_hardening.py
 )
 FOCUSED_TESTS=(
   tests/test_sundial_probabilistic_provider_v2.py
@@ -95,6 +96,7 @@ FOCUSED_TESTS=(
   tests/test_sundial_provider_v2_semantic_verifier.py
   tests/test_sundial_provider_v2_evidence_verifier.py
   tests/test_sundial_provider_v2_final_gate.py
+  tests/test_sundial_provider_v2_remaining_hardening.py
 )
 
 {
@@ -139,6 +141,8 @@ run_logged certification \
 RUN_DIR="$(cat artifacts/sundial-provider-v2/LATEST)"
 test -d "$RUN_DIR"
 grep -Fx 'SUNDIAL_PROVIDER_V2_CERTIFICATION=PASS' "$RUN_DIR/status.txt"
+RUN_ID="$(basename "$RUN_DIR")"
+SEMANTIC_REPORT="artifacts/sundial-provider-v2-semantic-verification/$RUN_ID.json"
 
 run_logged semantic-output-verification \
   uv run --frozen --extra dev python \
@@ -147,6 +151,8 @@ run_logged semantic-output-verification \
   --snapshot "$SNAPSHOT" \
   --run-dir "$RUN_DIR"
 
+test -f "$SEMANTIC_REPORT"
+
 run_logged evidence-verification \
   uv run --frozen --extra dev python \
   scripts/verify_sundial_provider_v2_evidence.py \
@@ -154,17 +160,20 @@ run_logged evidence-verification \
   --repo-root "$ROOT" \
   --expected-commit "$EXPECTED_COMMIT" \
   --expected-branch "$EXPECTED_BRANCH" \
+  --semantic-report "$SEMANTIC_REPORT" \
   --archive
 
-RUN_ID="$(basename "$RUN_DIR")"
-SEMANTIC_REPORT="artifacts/sundial-provider-v2-semantic-verification/$RUN_ID.json"
 VERIFICATION_DIR="artifacts/sundial-provider-v2-verified/$RUN_ID"
 ARCHIVE="artifacts/sundial-provider-v2-verified/${RUN_ID}-evidence.zip"
-test -f "$SEMANTIC_REPORT"
 test -f "$VERIFICATION_DIR/VERIFICATION_REPORT.json"
 test -f "$VERIFICATION_DIR/PR_COMMENT.md"
 test -f "$ARCHIVE"
 test -f "$ARCHIVE.sha256"
+
+run_logged archive-content-check \
+  uv run --frozen --extra dev python -c \
+  'import sys, zipfile; p=sys.argv[2]; z=zipfile.ZipFile(sys.argv[1]); assert f"semantic/{p}" in z.namelist()' \
+  "$ARCHIVE" "$(basename "$SEMANTIC_REPORT")"
 
 run_logged full-pytest uv run --frozen --extra dev pytest
 
