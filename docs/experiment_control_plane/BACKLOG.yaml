@@ -1,0 +1,55 @@
+schema_version: "1.0.0"
+program_id: experiment-control-approval-evidence-index-v1
+status: DOCUMENTATION_ONLY
+items:
+  - id: EC-001
+    title: Experiment Plan Contract v1
+    branch: feat/experiment-plan-contract-v1
+    priority: P0
+    dependencies: []
+  - id: EC-002
+    title: Experiment Intake Forms and Templates v1
+    branch: feat/experiment-intake-forms-v1
+    priority: P0
+    dependencies: [EC-001]
+  - id: EC-003
+    title: Project Schema and Evidence Export v1
+    branch: feat/experiment-project-governance-v1
+    priority: P1
+    dependencies: [EC-001]
+  - id: EC-004
+    title: GitHub App and Check Run Contract v1
+    branch: feat/experiment-github-app-checks-v1
+    priority: P0
+    dependencies: [EC-001]
+  - id: EC-005
+    title: Local Experiment Agent Foundation v1
+    branch: feat/local-experiment-agent-foundation-v1
+    priority: P0
+    dependencies: [EC-001]
+  - id: EC-006
+    title: GitHub Control Workflows v1
+    branch: feat/experiment-control-workflows-v1
+    priority: P1
+    dependencies: [EC-002, EC-004]
+    blocked_by: [github_issue_58]
+  - id: EC-007
+    title: Result PR and Evidence Index v1
+    branch: feat/experiment-evidence-index-v1
+    priority: P0
+    dependencies: [EC-001, EC-005]
+  - id: EC-008
+    title: Proprietary API Budget Lane v1
+    branch: feat/proprietary-api-budget-lane-v1
+    priority: P1
+    dependencies: [EC-005]
+  - id: EC-009
+    title: Campaign Tags and Releases v1
+    branch: feat/experiment-campaign-release-v1
+    priority: P2
+    dependencies: [EC-007]
+  - id: EC-010
+    title: Target-host Integration and Failure Tests v1
+    branch: test/experiment-control-target-host-v1
+    priority: P1
+    dependencies: [EC-004, EC-005, EC-006, EC-007, EC-008]
