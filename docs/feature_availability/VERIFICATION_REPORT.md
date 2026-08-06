@@ -45,7 +45,7 @@ Python source line length <=100=PASS
 Ruff=PENDING_TOOL_UNAVAILABLE
 mypy=PENDING_TOOL_UNAVAILABLE
 full repository pytest=PENDING
-GitHub Actions=PENDING
+GitHub Actions=CI_BLOCKED_PRE_RUN
 ```
 
 Focused tests cover:
@@ -84,3 +84,23 @@ real feature manifests emitted before prediction=NOT_PERFORMED
 real-data leakage absence=NOT_PROVEN
 production deployment=NOT_PERFORMED
 ```
+
+## GitHub Actions
+
+The PR-head workflow ended before any observable step was created:
+
+```text
+workflow=ci
+run_number=2777
+run_id=31080592616
+job=test
+job_id=92548277217
+conclusion=failure
+steps=null
+logs_url=null
+classification=CI_BLOCKED_PRE_RUN
+```
+
+Checkout, Python setup, dependency installation, Ruff, compileall, mypy, and pytest did not
+start. This is not evidence of a Feature Availability implementation or test failure. No rerun was
+requested.
