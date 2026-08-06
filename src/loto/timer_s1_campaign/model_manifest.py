@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -13,7 +15,12 @@ _REVISION = re.compile(r"^[0-9a-f]{40}$")
 
 
 class ManifestModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+    model_config = ConfigDict(
+        extra="forbid",
+        strict=True,
+        frozen=True,
+        allow_inf_nan=False,
+    )
 
 
 class ArtifactRecord(ManifestModel):
@@ -23,6 +30,16 @@ class ArtifactRecord(ManifestModel):
     required: bool = True
     kind: str
 
+    @field_validator("path")
+    @classmethod
+    def validate_path(cls, value: str) -> str:
+        if not value or "\\" in value or "\x00" in value:
+            raise ValueError("artifact path must be a non-empty POSIX relative path")
+        path = PurePosixPath(value)
+        if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
+            raise ValueError("artifact path must remain inside the snapshot root")
+        return value
+
     @field_validator("sha256")
     @classmethod
     def validate_hash(cls, value: str | None) -> str | None:
@@ -30,9 +47,16 @@ class ArtifactRecord(ManifestModel):
             raise ValueError("artifact sha256 must be lowercase hexadecimal")
         return value
 
+    @field_validator("kind")
+    @classmethod
+    def validate_kind(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("artifact kind must be non-empty")
+        return value
+
 
 class TimerS1ModelManifest(ManifestModel):
-    schema_version: int
+    schema_version: Literal[1]
     model_id: str
     canonical_repo: str
     mirror_repo: str
@@ -71,6 +95,12 @@ class TimerS1ModelManifest(ManifestModel):
             raise ValueError("canonical repository mismatch")
         if self.mirror_repo != MIRROR_REPO:
             raise ValueError("mirror repository mismatch")
+        if self.license != "Apache-2.0":
+            raise ValueError("manifest license must be Apache-2.0")
+        if self.gated:
+            raise ValueError("Timer-S1 canonical repository is not declared gated")
+        if not self.trust_remote_code:
+            raise ValueError("Timer-S1 manifest must record the upstream remote-code boundary")
         if self.mirror_fallback_enabled:
             raise ValueError("mirror fallback is forbidden until complete byte parity is proven")
         paths = [item.path for item in self.artifacts]
@@ -78,12 +108,59 @@ class TimerS1ModelManifest(ManifestModel):
             raise ValueError("manifest artifact paths must be unique")
         return self
 
+    def artifact(self, path: str) -> ArtifactRecord:
+        for item in self.artifacts:
+            if item.path == path:
+                return item
+        raise ValueError(f"manifest is missing required artifact: {path}")
+
+    def artifact_sha256(self, path: str) -> str:
+        record = self.artifact(path)
+        if record.sha256 is None:
+            raise ValueError(f"manifest artifact hash is unpinned: {path}")
+        return record.sha256
+
+    @property
+    def weight_set_sha256(self) -> str | None:
+        weights = sorted(
+            (item for item in self.artifacts if item.required and item.kind == "weight"),
+            key=lambda item: item.path,
+        )
+        if not weights:
+            return None
+        if any(item.sha256 is None or item.size_bytes is None for item in weights):
+            return None
+        payload = {
+            "schema": "timer-s1-weight-set-v1",
+            "artifacts": [
+                {
+                    "path": item.path,
+                    "size_bytes": item.size_bytes,
+                    "sha256": item.sha256,
+                }
+                for item in weights
+            ],
+        }
+        encoded = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
+
     @property
     def formal_pin_complete(self) -> bool:
+        required_complete = all(
+            item.sha256 is not None and item.size_bytes is not None
+            for item in self.artifacts
+            if item.required
+        )
         return (
             self.model_revision != UNPINNED
             and self.source_revision != UNPINNED
-            and all(item.sha256 is not None for item in self.artifacts if item.required)
+            and required_complete
+            and self.weight_set_sha256 is not None
         )
 
 
@@ -92,8 +169,6 @@ def load_manifest(path: Path) -> TimerS1ModelManifest:
 
 
 def canonical_manifest_sha256(manifest: TimerS1ModelManifest) -> str:
-    import hashlib
-
     payload = json.dumps(
         manifest.model_dump(mode="json"),
         ensure_ascii=False,
