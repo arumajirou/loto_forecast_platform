@@ -149,6 +149,12 @@ class HoldoutEvidence(StrictModel):
     seed_count: int = Field(ge=1)
     best_seed_only_selection: Literal[False] = False
 
+    @model_validator(mode="after")
+    def validate_seed_count(self) -> "HoldoutEvidence":
+        if self.artifact.status is EvidenceStatus.VERIFIED and self.seed_count < 2:
+            raise ValueError("verified Holdout promotion evidence requires multiple seeds")
+        return self
+
 
 class ProspectiveWindowEvidence(StrictModel):
     window_id: str = Field(min_length=1, max_length=256)
@@ -168,7 +174,9 @@ class ProspectiveWindowEvidence(StrictModel):
 
     @model_validator(mode="after")
     def validate_window(self) -> "ProspectiveWindowEvidence":
-        if self.window_started_at.tzinfo is None or self.window_ended_at.tzinfo is None:
+        started_offset = self.window_started_at.utcoffset()
+        ended_offset = self.window_ended_at.utcoffset()
+        if started_offset is None or ended_offset is None:
             raise ValueError("prospective timestamps must be timezone-aware")
         if self.window_ended_at <= self.window_started_at:
             raise ValueError("prospective window end must follow start")
@@ -238,6 +246,8 @@ class LicenseEligibilityEvidence(StrictModel):
         expected = self.eligibility is LicenseEligibility.PRODUCTION_ELIGIBLE
         if self.production_eligible != expected:
             raise ValueError("license eligibility and production_eligible disagree")
+        if self.production_eligible and self.artifact.status is not EvidenceStatus.VERIFIED:
+            raise ValueError("production license eligibility requires verified evidence")
         return self
 
 
@@ -292,7 +302,7 @@ class PromotionSubject(StrictModel):
             if window.candidate_id != self.candidate_id:
                 raise ValueError("prospective window changed candidate identity")
         expected = canonical_sha256(
-            self.model_dump(mode="json", exclude={"subject_sha256"})
+            self.model_dump(mode="python", exclude={"subject_sha256"})
         )
         if self.subject_sha256 != expected:
             raise ValueError("PromotionSubject SHA-256 mismatch")
