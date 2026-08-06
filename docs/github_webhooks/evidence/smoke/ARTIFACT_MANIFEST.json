@@ -1,0 +1,10 @@
+{
+  "files": [
+    {
+      "path": "SMOKE_REPORT.json",
+      "sha256": "697eb925bb81b6612fee2260adfc3e736412c1bb898e672cbdbfae886a55df1d",
+      "size_bytes": 684
+    }
+  ],
+  "schema_version": 1
+}
