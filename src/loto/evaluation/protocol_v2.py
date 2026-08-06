@@ -325,13 +325,11 @@ def read_protocol_artifact(path: str | Path) -> EvaluationProtocolV2 | LegacyPro
 def write_protocol_artifact(
     path: str | Path,
     protocol: EvaluationProtocolV2,
-    *,
-    overwrite: bool = False,
 ) -> None:
-    """Atomically write a new v2 artifact without rewriting history by default."""
+    """Atomically write a new v2 artifact and never rewrite historical files."""
 
     destination = Path(path)
-    if destination.exists() and not overwrite:
+    if destination.exists():
         raise FileExistsError(f"refusing to overwrite historical artifact: {destination}")
     destination.parent.mkdir(parents=True, exist_ok=True)
     artifact = {
