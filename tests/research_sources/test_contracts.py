@@ -14,7 +14,7 @@ REGISTRY = Path("configs/research_sources/registry.v1.json")
 
 
 def payload() -> dict[str, object]:
-    return json.loads(REGISTRY.read_text(encoding="utf-8"))
+    return load_registry(REGISTRY).model_dump(mode="json")
 
 
 def validate(data: dict[str, object]) -> ResearchSourceRegistry:
