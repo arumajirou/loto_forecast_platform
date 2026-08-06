@@ -38,7 +38,20 @@ _READ_CALLS = {
     "polars.read_parquet",
     "pyarrow.parquet.read_table",
 }
-_PATH_READ_METHODS = {"open", "read_bytes", "read_text"}
+_PATH_READ_METHODS = {"read_bytes", "read_text"}
+_PATH_WRITE_METHODS = {"write_bytes", "write_text"}
+_WRITE_METHODS = {
+    "to_csv",
+    "to_excel",
+    "to_feather",
+    "to_json",
+    "to_parquet",
+    "to_pickle",
+    "write_csv",
+    "write_database",
+    "write_json",
+    "write_parquet",
+}
 _JOIN_METHODS = {"concat", "join", "merge"}
 _FIT_METHODS = {"fit", "partial_fit"}
 
@@ -54,10 +67,28 @@ def _qualified_name(node: ast.AST, aliases: dict[str, str]) -> str | None:
     return None
 
 
-def _classify_call(name: str) -> AccessMode | None:
+def _literal_open_mode(node: ast.Call) -> str | None:
+    if len(node.args) >= 2 and isinstance(node.args[1], ast.Constant):
+        value = node.args[1].value
+        return value if isinstance(value, str) else None
+    for keyword in node.keywords:
+        if keyword.arg == "mode" and isinstance(keyword.value, ast.Constant):
+            value = keyword.value.value
+            return value if isinstance(value, str) else None
+    return None
+
+
+def _classify_call(node: ast.Call, name: str) -> AccessMode | None:
     leaf = name.rsplit(".", 1)[-1]
+    if leaf == "open":
+        mode = _literal_open_mode(node)
+        if mode is not None and any(marker in mode for marker in ("w", "a", "x", "+")):
+            return AccessMode.WRITE
+        return AccessMode.READ
     if name in _READ_CALLS or leaf in _PATH_READ_METHODS:
         return AccessMode.READ
+    if leaf in _PATH_WRITE_METHODS or leaf in _WRITE_METHODS:
+        return AccessMode.WRITE
     if leaf in _FIT_METHODS:
         return AccessMode.FIT
     if leaf == "fit_transform":
@@ -102,7 +133,7 @@ def scan_python_source(
         name = _qualified_name(node.func, aliases)
         if name is None:
             continue
-        expected_mode = _classify_call(name)
+        expected_mode = _classify_call(node, name)
         if expected_mode is None:
             continue
         declared_modes = declarations.get((normalized_path, node.lineno), set())
