@@ -29,11 +29,77 @@ uv run pytest \
   2>&1 | tee "$LOG"
 ```
 
-## Runtime certification
+## Create the target-host request
 
-Prepare a schema-v2 request with a unique `run_id`, the exact pinned repository
-revision, `local_files_only=true`, and a pre-populated snapshot. Raw model data is
-never downloaded by the certification launcher.
+Copy the example, replace the timestamp-like placeholder with a unique Run ID, and
+set `snapshot_path` to the absolute pinned snapshot directory.
+
+```bash
+cd /absolute/path/to/loto_forecast_platform || exit 1
+set -Eeuo pipefail
+
+REQUEST="$HOME/Downloads/timesfm25-provider-request.json"
+cp configs/timesfm25_campaign/runtime_request.example.json "$REQUEST"
+
+printf 'REQUEST=%s\n' "$REQUEST"
+printf 'Edit run_id, history, geometry, and snapshot_path before continuing.\n'
+printf 'Enterキーで終了します...'
+read -r _
+```
+
+The preflight requires an absolute snapshot path containing exactly one
+`model.safetensors` plus a valid `config.json`. The weight SHA-256 must match the
+backend manifest.
+
+## Generate and verify the isolated lockfile
+
+When `environments/timesfm25-pytorch/uv.lock` does not exist, create it explicitly:
+
+```bash
+cd /absolute/path/to/loto_forecast_platform || exit 1
+set -Eeuo pipefail
+
+REQUEST="$HOME/Downloads/timesfm25-provider-request.json"
+PREFLIGHT="$HOME/Downloads/timesfm25-preflight-$(date +%Y%m%d-%H%M%S).json"
+
+uv run python scripts/prepare_timesfm25_runtime.py \
+  --request "$REQUEST" \
+  --environment environments/timesfm25-pytorch \
+  --manifest configs/timesfm25_campaign/model_manifest.json \
+  --output "$PREFLIGHT" \
+  --generate-lock \
+  --timeout 600
+
+printf 'PREFLIGHT=%s\n' "$PREFLIGHT"
+printf 'Enterキーで終了します...'
+read -r _
+```
+
+`--generate-lock` is the only preparation step permitted to resolve packages. The
+subsequent checks use `uv lock --check --offline` and
+`uv run --locked --offline`. When a lockfile already exists, omit
+`--generate-lock`; the script fails if the lockfile is missing, stale, malformed,
+or contains different pinned versions.
+
+The preflight also verifies:
+
+```text
+repo_id and revision match the backend manifest
+pyproject.toml exact TimesFM/Torch/Hugging Face Hub pins
+uv.lock exact locked versions
+absolute local snapshot path
+valid config.json
+exactly one model.safetensors
+model.safetensors SHA-256
+runtime import versions
+PyTorch CUDA availability and device count
+nvidia-smi availability and query success
+offline environment enforcement
+```
+
+Do not continue unless the generated report contains `"status": "PASS"`.
+
+## Runtime certification
 
 For a long GPU run, use `tmux` so the process and evidence survive terminal closure:
 
@@ -41,9 +107,9 @@ For a long GPU run, use `tmux` so the process and evidence survive terminal clos
 cd /absolute/path/to/loto_forecast_platform || exit 1
 set -Eeuo pipefail
 
-REQUEST="/absolute/path/to/provider_request.json"
+REQUEST="$HOME/Downloads/timesfm25-provider-request.json"
 SESSION="timesfm25-cert-$(date +%Y%m%d-%H%M%S)"
-LOG_ROOT="/absolute/path/to/logs/timesfm25-launcher"
+LOG_ROOT="$HOME/Downloads/timesfm25-launcher"
 mkdir -p "$LOG_ROOT"
 CONSOLE_LOG="${LOG_ROOT}/${SESSION}.log"
 
@@ -53,6 +119,7 @@ tmux new-session -d -s "$SESSION" \
      --request '$REQUEST' \
      --environment environments/timesfm25-pytorch \
      --output-root artifacts/timesfm25/runtime-certification \
+     --preflight-timeout 600 \
      --timeout 3600 \
      2>&1 | tee '$CONSOLE_LOG'; \
    rc=\${PIPESTATUS[0]}; \
@@ -64,11 +131,15 @@ printf 'CONSOLE_LOG=%s\n' "$CONSOLE_LOG"
 printf 'ATTACH_COMMAND=tmux attach -t %s\n' "$SESSION"
 ```
 
-The launcher creates an immutable run directory named after `request.run_id`. It
-refuses to overwrite an existing directory and records:
+The launcher independently repeats the preflight before starting the provider. A
+failed preflight creates and seals a failure bundle but does not start model loading
+or inference.
+
+The immutable run directory records:
 
 ```text
 provider_request.json
+preflight.json
 provider_response.json
 command.json
 environment.json
@@ -85,15 +156,15 @@ SHA256SUMS
 Exit codes:
 
 ```text
-0 = VERIFIEED_CPU or VERIFIED_GPU
+0 = VERIFIED_CPU or VERIFIED_GPU
 2 = PARTIALLY_VERIFIED_GPU
-1 = provider, request, bundle, or orchestration failure
+1 = preflight, provider, request, bundle, or orchestration failure
 ```
 
 `PARTIALLY_VERIFIED_GPU` is expected for the native API while mean and quantile
 outputs are CPU NumPy arrays. It must not be reported as strict GPU certification.
 
-Verify a completed evidence directory:
+## Verify a completed evidence directory
 
 ```bash
 cd /absolute/path/to/loto_forecast_platform || exit 1
@@ -113,6 +184,6 @@ for failure in failures:
 raise SystemExit(0 if ok else 1)
 PY
 
-printf 'Enterソーで終了します...'
+printf 'Enterキーで終了します...'
 read -r _
 ```

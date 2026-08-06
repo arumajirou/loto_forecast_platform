@@ -25,6 +25,11 @@ from loto.timesfm25_campaign.certification_bundle import (  # noqa: E402
     verify_sha256_manifest,
     write_sha256_manifest,
 )
+from loto.timesfm25_campaign.model_manifest import load_default_manifest  # noqa: E402
+from loto.timesfm25_campaign.preflight import (  # noqa: E402
+    offline_environment,
+    run_preflight,
+)
 
 PROVIDER = ROOT / "scripts" / "run_timesfm25_provider.py"
 DEFAULT_ENVIRONMENT = ROOT / "environments" / "timesfm25-pytorch"
@@ -148,6 +153,40 @@ def _load_response(path: Path) -> dict[str, Any] | None:
     return payload
 
 
+def _seal_preflight_failure(
+    run_dir: Path,
+    request: TimesFM25Request,
+    preflight: dict[str, Any],
+) -> tuple[Path, int]:
+    report = {
+        "schema_version": 1,
+        "run_id": request.run_id,
+        "backend": request.backend.value,
+        "repo_id": request.repo_id,
+        "revision": request.revision,
+        "device_requested": request.device,
+        "provider_exit_code": None,
+        "timed_out": False,
+        "runtime_status": "FAILED",
+        "gpu_certification_status": "NOT_EVALUATED",
+        "gpu_certification_reasons": [],
+        "failure_reason": "PREFLIGHT_FAILED",
+        "failed_preflight_checks": preflight["failed_checks"],
+    }
+    atomic_write_json(run_dir / "runtime_certification.json", report)
+    atomic_write_text(run_dir / "status.txt", "FAILED\n")
+    manifest = write_sha256_manifest(run_dir)
+    manifest_ok, failures = verify_sha256_manifest(run_dir)
+    if not manifest_ok:
+        raise RuntimeError(f"bundle SHA-256 verification failed: {failures}")
+    print(f"RUN_DIR={run_dir}")
+    print("STATUS=FAILED")
+    print("FAILURE_REASON=PREFLIGHT_FAILED")
+    print(f"SHA256_MANIFEST={manifest}")
+    print("EXIT_CODE=1")
+    return run_dir, 1
+
+
 def run_certification(args: argparse.Namespace) -> tuple[Path, int]:
     project_root = args.project_root.resolve()
     request_source = args.request.resolve()
@@ -164,11 +203,24 @@ def run_certification(args: argparse.Namespace) -> tuple[Path, int]:
     atomic_write_text(request_path, request.model_dump_json(indent=2) + "\n")
     atomic_write_json(run_dir / "environment.json", _environment_snapshot(project_root))
 
+    preflight = run_preflight(
+        request,
+        environment=args.environment,
+        manifest=load_default_manifest(),
+        project_root=project_root,
+        timeout=min(args.preflight_timeout, args.timeout),
+    )
+    atomic_write_json(run_dir / "preflight.json", preflight)
+    if preflight["status"] != "PASS":
+        return _seal_preflight_failure(run_dir, request, preflight)
+
     command = [
         "uv",
         "run",
         "--project",
         str(args.environment.resolve()),
+        "--locked",
+        "--offline",
         "python",
         str(PROVIDER),
         "--request",
@@ -182,6 +234,7 @@ def run_certification(args: argparse.Namespace) -> tuple[Path, int]:
             "command": command,
             "cwd": str(project_root),
             "timeout_seconds": args.timeout,
+            "offline_environment": offline_environment({}),
         },
     )
     monitor = _start_nvidia_monitor(run_dir, project_root)
@@ -191,6 +244,7 @@ def run_certification(args: argparse.Namespace) -> tuple[Path, int]:
         completed = subprocess.run(
             command,
             cwd=project_root,
+            env=offline_environment(),
             capture_output=True,
             text=True,
             timeout=args.timeout,
@@ -253,9 +307,12 @@ def main() -> None:
     parser.add_argument("--environment", type=Path, default=DEFAULT_ENVIRONMENT)
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--timeout", type=int, default=1800)
+    parser.add_argument("--preflight-timeout", type=int, default=300)
     args = parser.parse_args()
     if args.timeout < 1:
         parser.error("--timeout must be >= 1")
+    if args.preflight_timeout < 1:
+        parser.error("--preflight-timeout must be >= 1")
     try:
         _, exit_code = run_certification(args)
     except Exception as exc:
