@@ -18,13 +18,14 @@ EXIT_FILE="$RUNNER_DIR/_setup_logs/bootstrap-$RUN_ID.exitcode"
 
 finish() {
   local rc=$?
+  trap - EXIT
   printf '%s\n' "$rc" > "$EXIT_FILE"
   printf '\nstatus=%s\nlog=%s\nexit_code_file=%s\n' \
     "$([[ $rc -eq 0 ]] && echo VERIFIED || echo FAILED)" \
     "$LOG_FILE" \
     "$EXIT_FILE"
-  if [[ -t 0 && "$PAUSE_ON_EXIT" == "1" ]]; then
-    read -r -p "Enterキーで終了します..." _ || true
+  if [[ "$PAUSE_ON_EXIT" == "1" && -r /dev/tty ]]; then
+    read -r -p "Enterキーで終了します..." _ </dev/tty || true
   fi
   exit "$rc"
 }
@@ -69,11 +70,11 @@ if [[ -z "${RUNNER_SHA256:-}" ]]; then
   exit 21
 fi
 if [[ -z "${RUNNER_TOKEN:-}" ]]; then
-  if [[ -t 0 ]]; then
-    read -r -s -p "GitHubの1時間有効なRunner登録token: " RUNNER_TOKEN
+  if [[ -r /dev/tty ]]; then
+    read -r -s -p "GitHubの1時間有効なRunner登録token: " RUNNER_TOKEN </dev/tty
     printf '\n'
   else
-    echo "FAILED: RUNNER_TOKEN is required in non-interactive mode."
+    echo "FAILED: RUNNER_TOKEN is required when no controlling terminal is available."
     exit 22
   fi
 fi
