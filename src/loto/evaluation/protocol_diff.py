@@ -98,6 +98,15 @@ def build_protocol_diff(
     """Build a deterministic field-level diff."""
 
     differences = tuple(_walk(left_payload, right_payload))
+    if not differences and left_hash != right_hash:
+        differences = (
+            ProtocolDifference(
+                path="$hash",
+                left=left_hash,
+                right=right_hash,
+                severity=DifferenceSeverity.RESULT_AFFECTING,
+            ),
+        )
     return ProtocolDiff(
         comparable=not differences and left_hash == right_hash,
         left_hash=left_hash,
