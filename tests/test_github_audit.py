@@ -53,8 +53,7 @@ def test_runner_rejects_invalid_repository_before_writing(tmp_path: Path) -> Non
     assert list(tmp_path.iterdir()) == []
 
 
-def test_finalize_report_writes_verified_archive(tmp_path: Path) -> None:
-    run_dir = tmp_path / "audit-run"
+def _base_client(run_dir: Path) -> GhClient:
     client = GhClient(repo="owner/repo", run_dir=run_dir)
     client.datasets.update(
         {
@@ -83,6 +82,21 @@ def test_finalize_report_writes_verified_archive(tmp_path: Path) -> None:
             "secret_scanning_alerts_open": [],
         }
     )
+    return client
+
+
+def _config() -> SimpleNamespace:
+    return SimpleNamespace(
+        repo="owner/repo",
+        api_version="2026-03-10",
+        deep=False,
+        duplicate_threshold=0.90,
+    )
+
+
+def test_finalize_report_writes_verified_archive(tmp_path: Path) -> None:
+    run_dir = tmp_path / "audit-run"
+    client = _base_client(run_dir)
     client.records.append(
         EndpointRecord(
             name="repository",
@@ -97,23 +111,51 @@ def test_finalize_report_writes_verified_archive(tmp_path: Path) -> None:
             raw_file="raw/repository.json",
         )
     )
-    config = SimpleNamespace(
-        repo="owner/repo",
-        api_version="2026-03-10",
-        deep=False,
-        duplicate_threshold=0.90,
-    )
-
     summary = finalize_report(
         client=client,
-        config=config,
+        config=_config(),
         run_dir=run_dir,
         core_failures=[],
     )
-
     assert summary["status"] == "VERIFIED"
+    assert summary["exit_code"] == 0
     assert (run_dir / "REPORT.md").is_file()
     assert (run_dir / "SUMMARY.json").is_file()
+    assert (run_dir / "ARTIFACT_MANIFEST.json").is_file()
     assert (run_dir / "SHA256SUMS").is_file()
     assert Path(summary["zip"]).is_file()
     assert len(summary["zip_sha256"]) == 64
+    stored_summary = json.loads(
+        (run_dir / "SUMMARY.json").read_text(encoding="utf-8")
+    )
+    assert stored_summary["zip"] == summary["zip"]
+    assert stored_summary["exit_code"] == 0
+
+
+def test_non_core_gap_is_not_reported_as_fully_verified(tmp_path: Path) -> None:
+    run_dir = tmp_path / "audit-gap"
+    client = _base_client(run_dir)
+    client.records.append(
+        EndpointRecord(
+            name="secret_scanning_alerts_open",
+            endpoint="repos/owner/repo/secret-scanning/alerts",
+            status="BLOCKED",
+            ok=False,
+            count=None,
+            duration_ms=1,
+            fetched_at="2026-08-06T00:00:00+00:00",
+            returncode=1,
+            error="HTTP 403",
+            raw_file="raw/secret_scanning_alerts_open.json",
+        )
+    )
+    summary = finalize_report(
+        client=client,
+        config=_config(),
+        run_dir=run_dir,
+        core_failures=[],
+    )
+    assert summary["status"] == "VERIFIED_WITH_GAPS"
+    assert summary["exit_code"] == 0
+    report = (run_dir / "REPORT.md").read_text(encoding="utf-8")
+    assert "| `secret_scanning_alerts_open` | `BLOCKED` | UNKNOWN |" in report
