@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "run_sundial_provider_v2_final_gate.sh"
+PACKAGE_SCRIPT = ROOT / "scripts" / "package_sundial_provider_v2_evidence.sh"
 
 
 def test_final_gate_shell_syntax() -> None:
@@ -52,3 +53,19 @@ def test_final_gate_requires_fixed_identity_and_evidence() -> None:
     )
     for marker in required:
         assert marker in text
+
+
+def test_package_wrapper_requires_semantics_before_evidence() -> None:
+    proc = subprocess.run(
+        ["bash", "-n", str(PACKAGE_SCRIPT)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stderr
+    text = PACKAGE_SCRIPT.read_text(encoding="utf-8")
+    semantic = text.index("verify_sundial_provider_v2_semantics.py")
+    evidence = text.index("verify_sundial_provider_v2_evidence.py")
+    assert semantic < evidence
+    assert "git diff --quiet" in text
+    assert "SUNDIAL_PROVIDER_V2_CERTIFICATION=PASS" in text
