@@ -3,7 +3,7 @@
   "artifact_set": "grafana-alloy-lgtm-v1",
   "base_branch": "feat/platform-metrics-v1",
   "base_sha": "60a0137c770e6b0d96a2701d8c365f7367addcc0",
-  "generated_at_utc": "2026-08-06T10:21:08.495539+00:00",
+  "generated_at_utc": "2026-08-06T10:43:25.304457+00:00",
   "hash_entries": [
     {
       "path": "deploy/observability/.env.example",
@@ -102,8 +102,8 @@
     },
     {
       "path": "docs/observability_stack/README.md",
-      "sha256": "34aa3bb5dce90926021a25666d2737039ba128fa6aecabb05d15790e42de5f38",
-      "size_bytes": 4622
+      "sha256": "f62eace8b88b0445c64bfc3d45b98bf94188804f86ac589fe0f73489096c63d1",
+      "size_bytes": 4624
     },
     {
       "path": "docs/observability_stack/REQUIREMENTS.md",
@@ -132,13 +132,13 @@
     },
     {
       "path": "docs/observability_stack/VERIFICATION_REPORT.md",
-      "sha256": "d98129749063c6219e2c8bf56540df25ca90cb09e2f22142692931f85bf62f71",
-      "size_bytes": 5491
+      "sha256": "fea4256452599d545325a8d3c97650a357c144780f8eed4db0bceb0830dc9ee4",
+      "size_bytes": 5940
     },
     {
       "path": "scripts/observability/backup_restore.sh",
-      "sha256": "ffbcf11b41a74a8db6f9fac9fa23bc366f6274d44691a4370a74be77bbd6bcd9",
-      "size_bytes": 2253
+      "sha256": "ac2a32cb1fe78dadc7ed8ef20aa44504748f268bdb05ec85e9f484b4fb2511c0",
+      "size_bytes": 2271
     },
     {
       "path": "scripts/observability/resolve_image_digests.py",
@@ -147,8 +147,8 @@
     },
     {
       "path": "scripts/observability/smoke.sh",
-      "sha256": "75e3193d1dc4063d20d32687c9c8d2f2c7418a43c6c7dc2cee01c9ef327af6c8",
-      "size_bytes": 1707
+      "sha256": "ea103b233d3b87687c3fb79ccf5fd861b349844edf6d1e42583ef3b92a2e2b2b",
+      "size_bytes": 1708
     },
     {
       "path": "scripts/observability/start.sh",

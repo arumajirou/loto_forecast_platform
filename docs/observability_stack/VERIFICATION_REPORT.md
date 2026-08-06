@@ -112,6 +112,12 @@ and the final scan reported zero actual secret findings.
 
 No failed intermediate execution is represented as PASS.
 
+During remote Git blob parity review, the published backup/smoke shell files exposed that the original
+Python fixture writer had consumed shell line-continuation backslashes and newline escapes. The intended
+published shell scripts were made the local verification source of truth, the complete 13-test and parse
+suite was rerun, and the manifest/SHA-256 inventory was regenerated. No semantic mismatch was accepted
+without rerunning verification.
+
 ## Blocked and pending verification
 
 ```text
