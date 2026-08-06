@@ -244,6 +244,17 @@ def test_v1_and_v2_are_readable_but_not_silently_comparable(tmp_path: Path) -> N
         assert_protocols_comparable(legacy, current)
 
 
+def test_v2_artifact_round_trip_preserves_hashes(tmp_path: Path) -> None:
+    path = tmp_path / "protocol-v2.json"
+    protocol = _protocol()
+    write_protocol_artifact(path, protocol)
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    loaded = read_protocol_artifact(path)
+    assert isinstance(loaded, EvaluationProtocolV2)
+    assert loaded.protocol_hash == protocol.protocol_hash
+    assert payload["comparison_budget_hash"] == protocol.comparison_budget_hash
+
+
 def test_historical_artifact_is_not_modified(tmp_path: Path) -> None:
     path = tmp_path / "protocol.json"
     original = b'{"schema_version":"1.0.0"}\n'
