@@ -43,7 +43,7 @@ def test_final_gate_requires_fixed_identity_and_evidence() -> None:
         "SUNDIAL_PROVIDER_V2_CERTIFICATION=PASS",
         "VERIFICATION_REPORT.json",
         "evidence.zip",
-        "evidence.zip.sha256",
+        '"$ARCHIVE.sha256"',
     )
     for marker in required:
         assert marker in text
