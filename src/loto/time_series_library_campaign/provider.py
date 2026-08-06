@@ -20,6 +20,10 @@ from .data import (
     materialize_training_bundle,
     validate_frame,
 )
+from .film_runtime import (
+    fit_save as film_fit_save,
+    load_predict as film_load_predict,
+)
 from .frets_runtime import (
     fit_save as frets_fit_save,
     load_predict as frets_load_predict,
@@ -104,6 +108,10 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
         return tide_fit_save(request)
     if request.operation == Operation.TIDE_LOAD_PREDICT:
         return tide_load_predict(request)
+    if request.operation == Operation.FILM_FIT_SAVE:
+        return film_fit_save(request)
+    if request.operation == Operation.FILM_LOAD_PREDICT:
+        return film_load_predict(request)
     assert request.before_prediction_path is not None
     assert request.after_prediction_path is not None
     verification = verify_prediction_files(

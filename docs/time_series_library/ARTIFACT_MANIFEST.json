@@ -7,6 +7,24 @@
       "status": "existing_remote"
     },
     {
+      "path": "FILM_CPU_CERTIFICATION.json",
+      "sha256": "2d48bade5c0e505a46ebaa6747ea68250193a56746c404a0252939aa860f49dc",
+      "size_bytes": 5363,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "FILM_GEOMETRY_MATRIX.json",
+      "sha256": "3dc3f32176d5c4c5aa14fe9fb01ca43af46eb57d101e82e05440f52906d3f248",
+      "size_bytes": 5194,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "FILM_PARAMETER_CONTRACT.md",
+      "sha256": "92074eee3dbb7bcdc2d77f5b76f1a7dc2dc8f0dada9be2ea22cd352049111ec2",
+      "size_bytes": 2604,
+      "status": "generated_and_verified"
+    },
+    {
       "path": "FRETS_CPU_CERTIFICATION.json",
       "sha256": "efdba3f710b56d9633fb38f528b5877b9cec1e67ab3932c58abd6724f3962a94",
       "size_bytes": 4015,
@@ -43,16 +61,34 @@
       "status": "existing_remote"
     },
     {
+      "path": "LIGHTWEIGHT_MODEL_SELECTION.md",
+      "sha256": "4ff37b4a0257fa59bd0d67116668545f45c84bc097f065d602183366b8a0fa2e",
+      "size_bytes": 1803,
+      "status": "generated_and_verified"
+    },
+    {
       "path": "LOCK_RESOLUTION_REPORT.json",
       "sha256": "4fcc4dd5941bc2c1701b4e950bfdfa0fb8a900e874980019259827cd9c882051",
       "size_bytes": 442,
       "status": "existing_remote"
     },
     {
+      "path": "MODEL_INVENTORY_PINNED_SEARCH.json",
+      "sha256": "bc04b4951fe2ecae195192ba311453284ea747853add357e1de3febe0f191745",
+      "size_bytes": 4375,
+      "status": "generated_and_verified"
+    },
+    {
       "path": "PINNED_SOURCE_PROVIDER_CERTIFICATION.json",
       "sha256": "4095a101d67e177f7c10a86e8fd803957c71e0be4687b9554c5e536f6d9d15ee",
       "size_bytes": 3640,
       "status": "existing_remote"
+    },
+    {
+      "path": "README.md",
+      "sha256": "535469bd004e1af226dbc38fe5bd8f008b589067fcefa45bc584fbc83421d29e",
+      "size_bytes": 1873,
+      "status": "generated_and_verified"
     },
     {
       "path": "SCINET_CPU_CERTIFICATION.json",
@@ -91,6 +127,24 @@
       "status": "existing_remote"
     },
     {
+      "path": "TIDE_CPU_CERTIFICATION.json",
+      "sha256": "0680663b601115e9477f6e976513fab8252b41ec7a0b673d3aa4b7480dba1df0",
+      "size_bytes": 4143,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "TIDE_GEOMETRY_MATRIX.json",
+      "sha256": "c0f4e402cb21e8900e0ae8fe07662f2b2516e8eb6086c366f09d6bea468a0ccb",
+      "size_bytes": 7479,
+      "status": "generated_and_verified"
+    },
+    {
+      "path": "TIDE_PARAMETER_CONTRACT.md",
+      "sha256": "9673e7b7452ae96b360cfbb8236ee59bb3520d3f1eea62f0f55990df76099b2c",
+      "size_bytes": 2010,
+      "status": "generated_and_verified"
+    },
+    {
       "path": "TIMEFILTER_CPU_CERTIFICATION.json",
       "sha256": "4bf63c671e078ee57b0a549f8ad4b98e784a74820453a455d8a06611d63fcba4",
       "size_bytes": 5738,
@@ -115,57 +169,24 @@
       "status": "existing_remote"
     },
     {
-      "path": "LIGHTWEIGHT_MODEL_SELECTION.md",
-      "sha256": "473765e01cfd79e41116583c9a9517ee3c8366622ddefa86b68ba6726d58e11b",
-      "size_bytes": 1940,
-      "status": "generated_and_verified"
-    },
-    {
-      "path": "MODEL_INVENTORY_PINNED_SEARCH.json",
-      "sha256": "759cece3373c76e8258b8443794d053c0c098eb3c4a8557ee4ae647429f686e7",
-      "size_bytes": 4365,
-      "status": "generated_and_verified"
-    },
-    {
-      "path": "README.md",
-      "sha256": "c3e45816b18456b4810b59b8e2dff61c7e913eccc2f5072f18464462d6faba4a",
-      "size_bytes": 2009,
-      "status": "generated_and_verified"
-    },
-    {
-      "path": "TIDE_CPU_CERTIFICATION.json",
-      "sha256": "0680663b601115e9477f6e976513fab8252b41ec7a0b673d3aa4b7480dba1df0",
-      "size_bytes": 4143,
-      "status": "generated_and_verified"
-    },
-    {
-      "path": "TIDE_GEOMETRY_MATRIX.json",
-      "sha256": "c0f4e402cb21e8900e0ae8fe07662f2b2516e8eb6086c366f09d6bea468a0ccb",
-      "size_bytes": 7479,
-      "status": "generated_and_verified"
-    },
-    {
-      "path": "TIDE_PARAMETER_CONTRACT.md",
-      "sha256": "9673e7b7452ae96b360cfbb8236ee59bb3520d3f1eea62f0f55990df76099b2c",
-      "size_bytes": 2010,
-      "status": "generated_and_verified"
-    },
-    {
       "path": "VERIFICATION_REPORT.md",
-      "sha256": "f4d4a3f4da2e2ffbe556e7ce4c32c755b89d444f1c56575bae362bc857b12429",
-      "size_bytes": 3014,
+      "sha256": "55d3ff1a4b648af33ee9e2ef4347280dfb3ab57dcf9d737cda0e30818afc4d52",
+      "size_bytes": 2695,
       "status": "generated_and_verified"
     }
   ],
   "boundaries": {
     "ci": "BLOCKED_PRE_RUN",
+    "film_gpu_lane": "NOT_CERTIFIED_CPU_ONLY_LANE",
     "gpu_runtime": "EXECUTION_PENDING",
     "holdout_prospective": "NOT_OPENED",
     "isolated_uv_lock": "BLOCKED_OFFLINE_CACHE_MISS",
     "koopa": "DEFERRED_REQUIRES_DATA_PROVIDER_CONSTRUCTION",
+    "micn": "EXECUTION_PENDING_MULTIFILE_CLOSURE",
     "pattn": "BLOCKED_MISSING_REFORMER_PYTORCH",
     "real_data_metrics": "NOT_EXECUTED",
     "target_torch_2_9_1_runtime": "EXECUTION_PENDING",
+    "timesnet": "EXECUTION_PENDING_MULTIFILE_CLOSURE",
     "wpmixer": "BLOCKED_MISSING_PYWT"
   },
   "certified_models": [
@@ -176,9 +197,30 @@
     "FreTS",
     "SCINet",
     "TimeFilter",
-    "TiDE"
+    "TiDE",
+    "FiLM"
   ],
   "code_evidence": [
+    {
+      "path": "environments/tslib-core/pyproject.toml",
+      "sha256": "5ca8f695cef8743bc0bbe9e2efcd44d015686c22891276dcd7814519246d84d3",
+      "size_bytes": 575
+    },
+    {
+      "path": "external/time-series-library/UPSTREAM_REVISION.json",
+      "sha256": "e1a653a4cb9b71a37a4812c3952ad2da31ddd4466e7a9de365d66b5d945200bf",
+      "size_bytes": 1224
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/contracts.py",
+      "sha256": "b02156625041eb63b3985ce211f4ec19e8a5b7f536b0d77e8af001c1e6298093",
+      "size_bytes": 11412
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/film_runtime.py",
+      "sha256": "5907da7507dfcbb05a025dbb88133a666df555a614eb68d774a4c9f120cb1daa",
+      "size_bytes": 14478
+    },
     {
       "path": "src/loto/time_series_library_campaign/frets_runtime.py",
       "sha256": "3a4fd67c7cbc0b539238b20161408a4619bd5cd79306ed523c180f6d31498bd9",
@@ -188,6 +230,11 @@
       "path": "src/loto/time_series_library_campaign/lightts_runtime.py",
       "sha256": "b95d29361c6ab3200a6be7fe69bdab182f9edc018d3d794892bcb70238c06df6",
       "status": "existing_remote"
+    },
+    {
+      "path": "src/loto/time_series_library_campaign/provider.py",
+      "sha256": "d644977ec4f90ccabace90cf228c3e7a709f92ceb082db18a625dd8bf7aa61b5",
+      "size_bytes": 6006
     },
     {
       "path": "src/loto/time_series_library_campaign/scinet_runtime.py",
@@ -200,9 +247,25 @@
       "status": "existing_remote"
     },
     {
+      "path": "src/loto/time_series_library_campaign/tide_runtime.py",
+      "sha256": "8c82d6b51bad1edccbbe07f6556921e166f5958295c37d7c0568283cce76df7b",
+      "size_bytes": 12773,
+      "status": "generated_and_verified"
+    },
+    {
       "path": "src/loto/time_series_library_campaign/timefilter_runtime.py",
       "sha256": "1fc753b563f59dfa330c2a2f8e4e34b9a1bd468adf19db57569d637036f4ec76",
       "status": "existing_remote"
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_film_checkpoint_contract.py",
+      "sha256": "83fad3f375ed5d786ee8e63ae528e98615583274d21c61b58af63a3f9cec6268",
+      "size_bytes": 2994
+    },
+    {
+      "path": "tests/time_series_library_campaign/test_film_contract.py",
+      "sha256": "58e53749b4152115a816b43bc34947e3ba1af0c7f3bb11f50d75e04b3cfa55eb",
+      "size_bytes": 6860
     },
     {
       "path": "tests/time_series_library_campaign/test_frets_checkpoint_contract.py",
@@ -245,31 +308,9 @@
       "status": "existing_remote"
     },
     {
-      "path": "tests/time_series_library_campaign/test_timefilter_checkpoint_contract.py",
-      "sha256": "e795c36bab2873c2eaf6b421654cd09b5b7da8d1af4576d66199489549a72458",
-      "status": "existing_remote"
-    },
-    {
-      "path": "tests/time_series_library_campaign/test_timefilter_contract.py",
-      "sha256": "f6ae8e59a3b2263a7eda257c5949ed863864f9bab22095fc0ebb5b07e5064a80",
-      "status": "existing_remote"
-    },
-    {
-      "path": "src/loto/time_series_library_campaign/contracts.py",
-      "sha256": "32993219b28f4203a4d3d6c0d9533cb1a39289e3684d657b29f97826543be084",
-      "size_bytes": 10512,
-      "status": "generated_and_verified"
-    },
-    {
-      "path": "src/loto/time_series_library_campaign/provider.py",
-      "sha256": "17fc673ce37662cf974ebe24f77d97e074e70f57dffc760c48dbcf89406dabef",
-      "size_bytes": 5716,
-      "status": "generated_and_verified"
-    },
-    {
-      "path": "src/loto/time_series_library_campaign/tide_runtime.py",
-      "sha256": "8c82d6b51bad1edccbbe07f6556921e166f5958295c37d7c0568283cce76df7b",
-      "size_bytes": 12773,
+      "path": "tests/time_series_library_campaign/test_tide_checkpoint_contract.py",
+      "sha256": "58034dff41432ce499fb495cb2e4463a28f3d2a7e49e1e4e88c3377f5c6a125b",
+      "size_bytes": 3051,
       "status": "generated_and_verified"
     },
     {
@@ -279,26 +320,27 @@
       "status": "generated_and_verified"
     },
     {
-      "path": "tests/time_series_library_campaign/test_tide_checkpoint_contract.py",
-      "sha256": "58034dff41432ce499fb495cb2e4463a28f3d2a7e49e1e4e88c3377f5c6a125b",
-      "size_bytes": 3051,
-      "status": "generated_and_verified"
+      "path": "tests/time_series_library_campaign/test_timefilter_checkpoint_contract.py",
+      "sha256": "e795c36bab2873c2eaf6b421654cd09b5b7da8d1af4576d66199489549a72458",
+      "status": "existing_remote"
     },
     {
-      "path": "external/time-series-library/UPSTREAM_REVISION.json",
-      "sha256": "3b9a81c3ce978f84ea2c5d1a834bf45333ddbe98feab71bcec6d8ce96e88bef2",
-      "size_bytes": 1159,
-      "status": "generated_and_verified"
+      "path": "tests/time_series_library_campaign/test_timefilter_contract.py",
+      "sha256": "f6ae8e59a3b2263a7eda257c5949ed863864f9bab22095fc0ebb5b07e5064a80",
+      "status": "existing_remote"
     }
   ],
   "focused_validation": {
     "compileall": "PASS",
+    "film_contract": "9 passed",
+    "json_validation": "PASS",
     "line_length_100": "PASS",
-    "previous_split_total": "35 passed retained; not rerun in this stage",
+    "prior_suites": "RETAINED_NOT_RERUN_IN_FILM_STAGE",
     "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT",
-    "tide_contract": "7 passed"
+    "split_total": "16 passed",
+    "tide_regression": "7 passed"
   },
-  "parent_head": "edc0e2e84182fd3487a0b170af26dfe6ef848466",
+  "parent_head": "73c6a479c59078cf06a62cbe3d12ad6ca3cae4dd",
   "project_pr": 54,
   "schema_version": "1.0",
   "status": "PARTIALLY_VERIFIED",

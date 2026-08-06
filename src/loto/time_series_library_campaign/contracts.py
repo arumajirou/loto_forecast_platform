@@ -40,6 +40,8 @@ class Operation(StrEnum):
     TIMEFILTER_LOAD_PREDICT = "timefilter_load_predict"
     TIDE_FIT_SAVE = "tide_fit_save"
     TIDE_LOAD_PREDICT = "tide_load_predict"
+    FILM_FIT_SAVE = "film_fit_save"
+    FILM_LOAD_PREDICT = "film_load_predict"
     VERIFY_ROUNDTRIP = "verify_roundtrip"
 
 
@@ -154,6 +156,10 @@ class ProviderRequest(BaseModel):
             Operation.TIDE_FIT_SAVE,
             Operation.TIDE_LOAD_PREDICT,
         }
+        film_ops = {
+            Operation.FILM_FIT_SAVE,
+            Operation.FILM_LOAD_PREDICT,
+        }
         load_ops = {
             Operation.DLINEAR_LOAD_PREDICT,
             Operation.TSMIXER_LOAD_PREDICT,
@@ -163,6 +169,7 @@ class ProviderRequest(BaseModel):
             Operation.SCINET_LOAD_PREDICT,
             Operation.TIMEFILTER_LOAD_PREDICT,
             Operation.TIDE_LOAD_PREDICT,
+            Operation.FILM_LOAD_PREDICT,
         }
         if self.operation in dlinear_ops and self.model_name != "DLinear":
             raise ValueError("DLinear operations require model_name=DLinear")
@@ -180,6 +187,8 @@ class ProviderRequest(BaseModel):
             raise ValueError("TimeFilter operations require model_name=TimeFilter")
         if self.operation in tide_ops and self.model_name != "TiDE":
             raise ValueError("TiDE operations require model_name=TiDE")
+        if self.operation in film_ops and self.model_name != "FiLM":
+            raise ValueError("FiLM operations require model_name=FiLM")
         if self.operation in lightts_ops:
             if self.d_model < 16:
                 raise ValueError("LightTS requires d_model >= 16")
@@ -221,6 +230,15 @@ class ProviderRequest(BaseModel):
                 raise ValueError("TiDE certified lane requires e_layers=1 and tide_d_layers=1")
             if self.dropout != 0.0:
                 raise ValueError("TiDE certified lane requires dropout=0.0")
+        if self.operation == Operation.FILM_FIT_SAVE:
+            if self.pred_len < 2:
+                raise ValueError("FiLM certified lane requires pred_len >= 2")
+            if self.seq_len < 4 * self.pred_len:
+                raise ValueError("FiLM certified lane requires seq_len >= 4 * pred_len")
+            if self.e_layers != 1:
+                raise ValueError("FiLM certified lane requires e_layers=1")
+            if self.dropout != 0.0:
+                raise ValueError("FiLM certified lane requires dropout=0.0")
         if self.operation in load_ops and (
             self.checkpoint_path is None or self.input_path is None
         ):

@@ -1,0 +1,225 @@
+{
+  "boundaries": {
+    "ci": "BLOCKED_PRE_RUN",
+    "gpu_runtime": "NOT_CERTIFIED_CPU_ONLY_LANE",
+    "holdout_prospective": "NOT_OPENED",
+    "isolated_uv_lock": "BLOCKED_OFFLINE_CACHE_MISS",
+    "koopa": "DEFERRED_REQUIRES_DATA_PROVIDER_CONSTRUCTION",
+    "micn": "EXECUTION_PENDING_MULTIFILE_CLOSURE",
+    "real_data_metrics": "NOT_EXECUTED",
+    "target_torch_2_9_1_runtime": "EXECUTION_PENDING",
+    "timesnet": "EXECUTION_PENDING_MULTIFILE_CLOSURE"
+  },
+  "executed_at_utc": "2026-08-06T01:31:00Z",
+  "fit_save": {
+    "buffer_devices": [
+      "cpu"
+    ],
+    "checkpoint_sha256": "0b1949270d1ff643abf258a2a6b1b6a81050656f0983d73ec2fa747fb189303f",
+    "cpu_fallback": false,
+    "cuda_available": false,
+    "device": "cpu",
+    "finite_prediction": true,
+    "finite_state_dict": true,
+    "geometry": {
+      "channels": 3,
+      "dropout": 0.0,
+      "e_layers": 1,
+      "eval_matrix_shapes": [
+        [
+          2,
+          256
+        ],
+        [
+          4,
+          256
+        ],
+        [
+          8,
+          256
+        ]
+      ],
+      "expected_parameter_count": 393226,
+      "global_device_policy": "cpu_only_interpreter",
+      "hippo_order": 256,
+      "multiscale": [
+        1,
+        2,
+        4
+      ],
+      "pred_len": 2,
+      "required_input_lengths": [
+        2,
+        4,
+        8
+      ],
+      "scipy_required": true,
+      "seq_len": 8,
+      "spectral_modes": 1,
+      "window_size": [
+        256
+      ]
+    },
+    "input_device": "cpu",
+    "input_sha256": "afec1c7517505c22af8861fdd5b40ff7c0cd3bf2b426c707f3ac9925c4224561",
+    "losses": [
+      0.08693686872720718,
+      0.0763578936457634,
+      0.06707298010587692
+    ],
+    "numpy": "2.3.5",
+    "output_device": "cpu",
+    "parameter_count": 393226,
+    "parameter_devices": [
+      "cpu"
+    ],
+    "prediction_sha256": "8a5badde08d4e9d2daff169794232fe48303a72429eec4d821e357a5186b4b36",
+    "prediction_shape": [
+      2,
+      2,
+      3
+    ],
+    "process_id": 2542,
+    "python": "3.13.5",
+    "scipy": "1.17.0",
+    "torch": "2.10.0+cpu",
+    "train_steps": 3
+  },
+  "focused_validation": {
+    "compileall": "PASS",
+    "film_contract_and_checkpoint": "9 passed",
+    "line_length_100": "PASS",
+    "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT",
+    "split_total": "16 passed",
+    "tide_regression": "7 passed"
+  },
+  "formal_configuration": {
+    "c_out": 3,
+    "d_model": 8,
+    "dropout": 0.0,
+    "e_layers": 1,
+    "enc_in": 3,
+    "label_len": 0,
+    "num_class": 1,
+    "pred_len": 2,
+    "seq_len": 8,
+    "task_name": "long_term_forecast"
+  },
+  "geometry_matrix": {
+    "all_cpu": true,
+    "all_finite": true,
+    "all_parameter_formula_match": true,
+    "case_count": 6,
+    "status": "PASS"
+  },
+  "load_predict": {
+    "buffer_devices": [
+      "cpu"
+    ],
+    "cpu_fallback": false,
+    "cuda_available": false,
+    "device": "cpu",
+    "different_process_from_fit": true,
+    "finite_prediction": true,
+    "geometry": {
+      "channels": 3,
+      "dropout": 0.0,
+      "e_layers": 1,
+      "eval_matrix_shapes": [
+        [
+          2,
+          256
+        ],
+        [
+          4,
+          256
+        ],
+        [
+          8,
+          256
+        ]
+      ],
+      "expected_parameter_count": 393226,
+      "global_device_policy": "cpu_only_interpreter",
+      "hippo_order": 256,
+      "multiscale": [
+        1,
+        2,
+        4
+      ],
+      "pred_len": 2,
+      "required_input_lengths": [
+        2,
+        4,
+        8
+      ],
+      "scipy_required": true,
+      "seq_len": 8,
+      "spectral_modes": 1,
+      "window_size": [
+        256
+      ]
+    },
+    "input_device": "cpu",
+    "numpy": "2.3.5",
+    "output_device": "cpu",
+    "parameter_devices": [
+      "cpu"
+    ],
+    "prediction_sha256": "8a5badde08d4e9d2daff169794232fe48303a72429eec4d821e357a5186b4b36",
+    "prediction_shape": [
+      2,
+      2,
+      3
+    ],
+    "process_id": 2570,
+    "python": "3.13.5",
+    "scipy": "1.17.0",
+    "strict_state_load": true,
+    "torch": "2.10.0+cpu"
+  },
+  "model_name": "FiLM",
+  "roundtrip": {
+    "after_sha256": "8a5badde08d4e9d2daff169794232fe48303a72429eec4d821e357a5186b4b36",
+    "after_shape": [
+      2,
+      2,
+      3
+    ],
+    "atol": 1e-08,
+    "before_sha256": "8a5badde08d4e9d2daff169794232fe48303a72429eec4d821e357a5186b4b36",
+    "before_shape": [
+      2,
+      2,
+      3
+    ],
+    "equal_within_tolerance": true,
+    "finite": true,
+    "max_abs_error": 0.0,
+    "rtol": 1e-08,
+    "same_sha256": true,
+    "same_shape": true,
+    "status": "PASS"
+  },
+  "schema_version": "1.0",
+  "source_identity": {
+    "files": {
+      "models/FiLM.py": {
+        "actual_git_blob_sha": "1240e37047f26b0fd905151f0b2671255b6ec045",
+        "expected_git_blob_sha": "1240e37047f26b0fd905151f0b2671255b6ec045",
+        "sha256": "866054afc57411ebaf47c270566c05302b19acf3a3663b0b86e9153e386d2dc6"
+      }
+    },
+    "model_name": "FiLM",
+    "policy": "pinned",
+    "status": "VERIFIED"
+  },
+  "source_tamper_rejection": {
+    "error": "ValueError: pinned source mismatch: models/FiLM.py: expected 1240e37047f26b0fd905151f0b2671255b6ec045, got 1149e40233dcac40842c60ff1060536353e6661d",
+    "expected_exit_code": 2,
+    "provider_status": "FAILED",
+    "status": "PASS"
+  },
+  "status": "VERIFIED_CPU_PROVIDER",
+  "upstream_revision": "4e938a1767106324dd753b2a44832bf870a0252e"
+}

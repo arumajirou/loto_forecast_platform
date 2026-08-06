@@ -1,0 +1,278 @@
+{
+  "case_count": 6,
+  "cases": [
+    {
+      "buffer_devices": [
+        "cpu"
+      ],
+      "channels": 1,
+      "eval_matrix_shapes": [
+        [
+          2,
+          256
+        ],
+        [
+          4,
+          256
+        ],
+        [
+          8,
+          256
+        ]
+      ],
+      "expected_parameter_count": 393222,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.09483544528484344,
+      "parameter_count": 393222,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 2,
+      "prediction_shape": [
+        2,
+        2,
+        1
+      ],
+      "required_input_lengths": [
+        2,
+        4,
+        8
+      ],
+      "seq_len": 8,
+      "spectral_modes": 1,
+      "status": "PASS"
+    },
+    {
+      "buffer_devices": [
+        "cpu"
+      ],
+      "channels": 3,
+      "eval_matrix_shapes": [
+        [
+          3,
+          256
+        ],
+        [
+          6,
+          256
+        ],
+        [
+          12,
+          256
+        ]
+      ],
+      "expected_parameter_count": 393226,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.09220711886882782,
+      "parameter_count": 393226,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 3,
+      "prediction_shape": [
+        2,
+        3,
+        3
+      ],
+      "required_input_lengths": [
+        3,
+        6,
+        12
+      ],
+      "seq_len": 12,
+      "spectral_modes": 1,
+      "status": "PASS"
+    },
+    {
+      "buffer_devices": [
+        "cpu"
+      ],
+      "channels": 5,
+      "eval_matrix_shapes": [
+        [
+          4,
+          256
+        ],
+        [
+          8,
+          256
+        ],
+        [
+          16,
+          256
+        ]
+      ],
+      "expected_parameter_count": 786446,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.054654110223054886,
+      "parameter_count": 786446,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 4,
+      "prediction_shape": [
+        2,
+        4,
+        5
+      ],
+      "required_input_lengths": [
+        4,
+        8,
+        16
+      ],
+      "seq_len": 16,
+      "spectral_modes": 2,
+      "status": "PASS"
+    },
+    {
+      "buffer_devices": [
+        "cpu"
+      ],
+      "channels": 2,
+      "eval_matrix_shapes": [
+        [
+          6,
+          256
+        ],
+        [
+          12,
+          256
+        ],
+        [
+          24,
+          256
+        ]
+      ],
+      "expected_parameter_count": 1179656,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.09062524884939194,
+      "parameter_count": 1179656,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 6,
+      "prediction_shape": [
+        2,
+        6,
+        2
+      ],
+      "required_input_lengths": [
+        6,
+        12,
+        24
+      ],
+      "seq_len": 24,
+      "spectral_modes": 3,
+      "status": "PASS"
+    },
+    {
+      "buffer_devices": [
+        "cpu"
+      ],
+      "channels": 7,
+      "eval_matrix_shapes": [
+        [
+          8,
+          256
+        ],
+        [
+          16,
+          256
+        ],
+        [
+          32,
+          256
+        ]
+      ],
+      "expected_parameter_count": 1572882,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.03641156479716301,
+      "parameter_count": 1572882,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 8,
+      "prediction_shape": [
+        2,
+        8,
+        7
+      ],
+      "required_input_lengths": [
+        8,
+        16,
+        32
+      ],
+      "seq_len": 32,
+      "spectral_modes": 4,
+      "status": "PASS"
+    },
+    {
+      "buffer_devices": [
+        "cpu"
+      ],
+      "channels": 3,
+      "eval_matrix_shapes": [
+        [
+          10,
+          256
+        ],
+        [
+          20,
+          256
+        ],
+        [
+          40,
+          256
+        ]
+      ],
+      "expected_parameter_count": 1966090,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.04801700636744499,
+      "parameter_count": 1966090,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 10,
+      "prediction_shape": [
+        2,
+        10,
+        3
+      ],
+      "required_input_lengths": [
+        10,
+        20,
+        40
+      ],
+      "seq_len": 40,
+      "spectral_modes": 5,
+      "status": "PASS"
+    }
+  ],
+  "model_name": "FiLM",
+  "schema_version": "1.0",
+  "source_identity": {
+    "files": {
+      "models/FiLM.py": {
+        "actual_git_blob_sha": "1240e37047f26b0fd905151f0b2671255b6ec045",
+        "expected_git_blob_sha": "1240e37047f26b0fd905151f0b2671255b6ec045",
+        "sha256": "866054afc57411ebaf47c270566c05302b19acf3a3663b0b86e9153e386d2dc6"
+      }
+    },
+    "model_name": "FiLM",
+    "policy": "pinned",
+    "status": "VERIFIED"
+  },
+  "status": "PASS"
+}

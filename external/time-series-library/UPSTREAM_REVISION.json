@@ -1,20 +1,21 @@
 {
   "repository": "https://github.com/thuml/Time-Series-Library",
-  "retrieved_at_utc": "2026-08-06T00:53:00Z",
+  "retrieved_at_utc": "2026-08-06T01:31:00Z",
   "revision": "4e938a1767106324dd753b2a44832bf870a0252e",
-  "scope": "Pinned provider contract; eight CPU-certified model lanes; no Foundation Model or Mamba certification",
+  "scope": "Pinned provider contract; nine CPU-certified model lanes; no Foundation Model or Mamba certification",
   "tracked_blobs": {
     "layers/Autoformer_EncDec.py": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
     "layers/Embed.py": "977e25568d37b9dd0efd442dcc5b33eab9843d71",
     "layers/StandardNorm.py": "990d0fdc17751b724354e70b89fd6d3ff0f4dd29",
     "layers/TimeFilter_layers.py": "437c3bfd135c2d2b907c7332311ac553c8a2d523",
     "models/DLinear.py": "3f4d666a9ffe7fb6f58627ba43f1a9d3d9804d78",
+    "models/FiLM.py": "1240e37047f26b0fd905151f0b2671255b6ec045",
     "models/FreTS.py": "ca4e0b648db42a1846b7a0a9a661a39177f47005",
     "models/LightTS.py": "a2051e44d864ec4ec5e72e59660b98c30c93a902",
     "models/SCINet.py": "740d0f7d88e8a94aa7fe12c745f0876af7b0fc08",
     "models/SegRNN.py": "afff1bc07dd14d227bbecdd36941d57f8aa8f63e",
-    "models/TiDE.py": "0fbb98ea159ec5aa5d7afed83eddaf4c2476eaf1",
     "models/TSMixer.py": "76884d467f17d64aa87d8e22cc9f0aa6231914cf",
+    "models/TiDE.py": "0fbb98ea159ec5aa5d7afed83eddaf4c2476eaf1",
     "models/TimeFilter.py": "ff952b4a7741ad2772fde3e41b0d97bc2bbe7e19"
   }
 }
