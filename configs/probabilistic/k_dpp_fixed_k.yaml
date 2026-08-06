@@ -1,0 +1,23 @@
+schema_version: 1.0.0
+model_id: pp-k-dpp-fixed-k
+graph_id: k_dpp_fixed_k_v1
+model_revision: k_dpp_fixed_k_v1
+public_registration: false
+runtime_status: EXECUTION_PENDING
+comparison_model: pp-conditional-bernoulli-fixed-k
+kernel_type: L_ENSEMBLE
+psd_tolerance: 1.0e-10
+psd_repair_policy: REJECT
+supported_games:
+  - numbers3
+  - numbers4
+  - miniloto
+  - loto6
+  - loto7
+supported_prediction_lengths:
+  - 1
+  - 2
+  - 5
+requested_device: cpu
+quantiles_supported: false
+default_point_forecast_semantics: SEEDED_EXACT_KDPP_SAMPLE
