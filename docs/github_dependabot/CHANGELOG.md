@@ -10,6 +10,16 @@
 - Repository-owned configuration policy tests.
 - Requirements, operating guide, test plan, verification report, handoff and artifact manifest.
 
+### Verification
+
+- Exact branch contents reconstructed and checked against Git blob identities.
+- PyYAML parse and policy inspection passed.
+- Owned-path compileall passed.
+- Focused pytest passed: 5 tests.
+- Focused secret-pattern, line-length, file-size and SHA-256 checks passed.
+- Ruff was unavailable in the isolated interpreter and is not reported as passed.
+- Full repository pytest and GitHub runtime acceptance remain pending.
+
 ### Safety controls
 
 - No auto-merge.
@@ -24,4 +34,3 @@
 - Issue #58 continues to block GitHub-hosted jobs before step creation.
 - Dependabot parsing and generated PR behavior cannot be verified until the configuration reaches
   the default branch.
-- Local Ruff, compileall and pytest were not available through the connector execution surface.
