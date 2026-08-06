@@ -6,8 +6,8 @@
   "hash_entries": [
     {
       "path": "src/loto/telemetry/otel/__init__.py",
-      "sha256": "196bf0d4389a2b0e29b11b9fbf806f6a85798e81a92384635e980e2b1b7c28d3",
-      "size_bytes": 1189
+      "sha256": "1cc31a0a1d3d0ce91cfb012e14591127a610520bbf5552d0e42d4573fdd711f8",
+      "size_bytes": 1295
     },
     {
       "path": "src/loto/telemetry/otel/asgi.py",
@@ -41,18 +41,18 @@
     },
     {
       "path": "src/loto/telemetry/otel/tracing.py",
-      "sha256": "38cb5c24ea50a16816fd8030151755bdb98b39933c5a44e268678bc5cc6c2b0b",
-      "size_bytes": 10285
+      "sha256": "2ac2897f9af971fc325b9f8283c3f89912037c6d719f4a62037318bb08e406a5",
+      "size_bytes": 11247
     },
     {
       "path": "tests/telemetry/test_otel_instrumentation_v1.py",
-      "sha256": "c3fc3a16b4bda1baa961d6da3ff7d7049271e10f4207e9e4c057a4e0a718f907",
-      "size_bytes": 14181
+      "sha256": "1e7734b05b5874c4c634b2a1000843664b258fd1afa69dadfb31673a4eb01653",
+      "size_bytes": 14502
     },
     {
       "path": "docs/otel/INSTRUMENTATION_CONTRACT.md",
-      "sha256": "54957b056244df1ebe7748ca84e6287a7e253d97c8ecb8c68149dba21d0d93ce",
-      "size_bytes": 6278
+      "sha256": "ced2210b21591ed1e82517553f05a6e9a86ffb471cb546442254f290483d316d",
+      "size_bytes": 6319
     },
     {
       "path": "docs/otel/UPSTREAM_FACTCHECK.md",
@@ -61,8 +61,8 @@
     },
     {
       "path": "docs/otel/TEST_PLAN.md",
-      "sha256": "0bf1c07b24cf9888df0196022e2d1d8fe949438a52c8a406183475e1d4c34604",
-      "size_bytes": 2461
+      "sha256": "088636142d59a0ca0d51c4e71dc483a40030f49ba75724e859c2f25a2de0d3a7",
+      "size_bytes": 2521
     },
     {
       "path": "docs/otel/RUNBOOK.md",
@@ -71,8 +71,8 @@
     },
     {
       "path": "docs/otel/VERIFICATION_REPORT.md",
-      "sha256": "c543a388b92504fafb0242840265dd32168b982c5491dbb902541a3356e36f3f",
-      "size_bytes": 6610
+      "sha256": "debd97c4de6926cc078cfb95967f59989b4f67f69bc2ed4cc3519ad17312ce6d",
+      "size_bytes": 6855
     }
   ],
   "head_branch": "feat/otel-instrumentation-v1",
