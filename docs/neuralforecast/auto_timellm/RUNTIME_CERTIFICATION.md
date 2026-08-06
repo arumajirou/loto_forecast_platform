@@ -114,7 +114,7 @@ Requires:
 
 Requires all CPU lifecycle checks plus:
 
-- CUDA lequested and available;
+- CUDA requested and available;
 - fitted model parameter device is CUDA;
 - provider GPU PID equals the worker PID;
 - positive peak allocated or reserved VRAM;
