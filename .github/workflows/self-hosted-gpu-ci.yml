@@ -38,6 +38,7 @@ jobs:
     env:
       PYTHONUNBUFFERED: "1"
       CUDA_VISIBLE_DEVICES: "0"
+      UV_PYTHON: "3.13"
       EVIDENCE_DIR: artifacts/self-hosted
 
     steps:
@@ -78,6 +79,12 @@ jobs:
       - name: Host preflight
         run: |
           set -Eeuo pipefail
+          command -v uv
+          PREFLIGHT_PYTHON="$(uv python find "$UV_PYTHON")"
+          printf 'preflight_python=%s\n' "$PREFLIGHT_PYTHON" \
+            | tee "$EVIDENCE_DIR/preflight-python.txt"
+          "$PREFLIGHT_PYTHON" --version \
+            | tee -a "$EVIDENCE_DIR/preflight-python.txt"
           args=(
             --require-runner-env
             --min-free-disk-gib 20
@@ -86,7 +93,8 @@ jobs:
           if [[ "${{ inputs.require_cuda }}" == "true" ]]; then
             args+=(--require-cuda)
           fi
-          python3 scripts/ci/self_hosted_runner_probe.py "${args[@]}" \
+          "$PREFLIGHT_PYTHON" \
+            scripts/ci/self_hosted_runner_probe.py "${args[@]}" \
             2>&1 | tee "$EVIDENCE_DIR/preflight.log"
 
       - name: Resolve locked environment
@@ -94,8 +102,11 @@ jobs:
           set -Eeuo pipefail
           command -v uv
           uv --version | tee "$EVIDENCE_DIR/uv-version.txt"
-          uv sync --frozen --extra api --extra dev --extra postgres \
+          uv sync --frozen --python "$UV_PYTHON" \
+            --extra api --extra dev --extra postgres \
             2>&1 | tee "$EVIDENCE_DIR/uv-sync.log"
+          uv run --frozen python --version \
+            2>&1 | tee "$EVIDENCE_DIR/venv-python-version.txt"
           uv pip check --python .venv/bin/python \
             2>&1 | tee "$EVIDENCE_DIR/uv-pip-check.log"
 
