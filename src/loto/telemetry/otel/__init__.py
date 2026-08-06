@@ -6,16 +6,19 @@ from .httpx_instrumentation import TracedAsyncHTTPTransport, TracedHTTPTransport
 from .processor import BoundedBatchSpanProcessor, ProcessorSnapshot
 from .sqlalchemy_instrumentation import instrument_sqlalchemy_engine, uninstrument_sqlalchemy_engine
 from .tracing import (
+    FORECAST_RUN_SPAN_NAME,
     SPAN_NAME_BY_STAGE,
     TracingRuntime,
     configure_tracing,
     domain_span,
+    forecast_run_span,
     sanitize_span_attributes,
 )
 
 __all__ = [
     "BoundedBatchSpanProcessor",
     "ExporterSnapshot",
+    "FORECAST_RUN_SPAN_NAME",
     "OpenTelemetryASGIMiddleware",
     "ProcessorSnapshot",
     "OtlpProtocol",
@@ -28,6 +31,7 @@ __all__ = [
     "TrackingSpanExporter",
     "configure_tracing",
     "domain_span",
+    "forecast_run_span",
     "instrument_fastapi_app",
     "instrument_sqlalchemy_engine",
     "sanitize_span_attributes",
