@@ -1,0 +1,154 @@
+schema_version: 1
+project:
+  owner: arumajirou
+  owner_type: user
+  repository: arumajirou/loto_forecast_platform
+  title: Loto Forecast Platform Governance
+  visibility: PRIVATE
+  authority: governance_only
+fields:
+  - name: Status
+    data_type: SINGLE_SELECT
+    built_in: true
+    options:
+      - Intake
+      - Spec
+      - Design
+      - Ready
+      - In Progress
+      - Verification
+      - Blocked
+      - Failed
+      - Done
+  - name: Workstream
+    data_type: SINGLE_SELECT
+    options:
+      - Data
+      - Evaluation
+      - Model
+      - Runtime
+      - Registry
+      - Observability
+      - Security
+      - Docs
+  - name: Type
+    data_type: SINGLE_SELECT
+    options:
+      - Feature
+      - Bug
+      - Research
+      - Infrastructure
+      - Documentation
+      - Security
+      - Operations
+  - name: Priority
+    data_type: SINGLE_SELECT
+    options:
+      - P0
+      - P1
+      - P2
+      - P3
+  - name: Evidence Status
+    data_type: SINGLE_SELECT
+    options:
+      - PROPOSED
+      - EXECUTION_PENDING
+      - EXECUTED
+      - VERIFIED
+      - PARTIALLY_VERIFIED
+      - BLOCKED
+      - FAILED
+  - name: PR Phase
+    data_type: SINGLE_SELECT
+    options:
+      - No PR
+      - Draft
+      - Review
+      - Ready
+      - Merged
+      - Closed
+  - name: Provider
+    data_type: TEXT
+  - name: Risk
+    data_type: SINGLE_SELECT
+    options:
+      - Low
+      - Medium
+      - High
+      - Critical
+  - name: Base SHA
+    data_type: TEXT
+  - name: Protocol Hash
+    data_type: TEXT
+  - name: Target Release
+    data_type: TEXT
+views:
+  - name: Executive Board
+    layout: BOARD
+    filter: -status:Done
+    group_by: Status
+  - name: Active PRs
+    layout: TABLE
+    filter: is:pr -status:Done
+  - name: Runtime Certification
+    layout: TABLE
+    filter: workstream:Runtime
+  - name: Evaluation and Prospective Governance
+    layout: TABLE
+    filter: workstream:Evaluation
+  - name: Security and Dependencies
+    layout: TABLE
+    filter: workstream:Security
+  - name: Documentation
+    layout: TABLE
+    filter: workstream:Docs
+  - name: Roadmap
+    layout: ROADMAP
+    filter: -status:Done
+workflows:
+  - name: Auto-add open repository items
+    mode: BUILT_IN_UI
+    event: AUTO_ADD
+    repository: arumajirou/loto_forecast_platform
+    filter: is:open
+    target_status: null
+  - name: Added item enters Intake
+    mode: BUILT_IN_UI
+    event: ITEM_ADDED
+    target_status: Intake
+  - name: Closed issue becomes Done
+    mode: BUILT_IN_UI
+    event: ISSUE_CLOSED
+    target_status: Done
+  - name: Merged pull request becomes Done
+    mode: BUILT_IN_UI
+    event: PR_MERGED
+    target_status: Done
+manual_policies:
+  - trigger: label:blocked
+    action: set Status to Blocked
+    reason: Built-in workflow does not provide a verified label-to-status rule here.
+  - trigger: draft pull request
+    action: set PR Phase to Draft and Status to In Progress
+    reason: Preserve evidence status separately from lifecycle status.
+  - trigger: verification failure
+    action: set Status to Failed and Evidence Status to FAILED
+    reason: Failure must not collapse into Done or Verified.
+required_views:
+  - Executive Board
+  - Active PRs
+  - Runtime Certification
+  - Evaluation and Prospective Governance
+  - Security and Dependencies
+  - Documentation
+  - Roadmap
+evidence:
+  directory: docs/github_projects/evidence/project
+  required_files:
+    - PROJECT.json
+    - PROJECT_FIELDS.json
+    - PROJECT_ITEMS.json
+    - PROJECT_VIEWS.json
+    - PROJECT_WORKFLOWS.json
+    - ARTIFACT_MANIFEST.json
+    - SHA256SUMS
