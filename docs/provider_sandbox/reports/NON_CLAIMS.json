@@ -1,0 +1,13 @@
+{
+  "holdout_opened": false,
+  "kernel_isolation_certified": false,
+  "prediction_lock_modified": false,
+  "prospective_opened": false,
+  "provider_migration_performed": false,
+  "real_bubblewrap_execution": false,
+  "real_gpu_isolation_verified": false,
+  "real_rootless_oci_execution": false,
+  "runtime_certified": false,
+  "schema_version": "1.0.0",
+  "security_certified": false
+}

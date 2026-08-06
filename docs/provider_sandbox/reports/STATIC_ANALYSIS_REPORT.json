@@ -1,0 +1,14 @@
+{
+  "ast_parse": "PASS",
+  "compileall": "PASS",
+  "full_repository_pytest": "NOT_EXECUTED_NO_COMPLETE_CHECKOUT",
+  "json_parse": "PASS",
+  "line_length_over_100": 0,
+  "mypy": "BLOCKED_TOOL_UNAVAILABLE",
+  "production_secret_findings": 0,
+  "python_files_checked": 16,
+  "ruff": "BLOCKED_TOOL_UNAVAILABLE",
+  "schema_version": "1.0.0",
+  "subprocess_import_boundary": "PASS_EXECUTOR_ONLY",
+  "uv_version": "0.10.0"
+}
