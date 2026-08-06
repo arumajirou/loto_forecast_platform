@@ -1,0 +1,55 @@
+{
+  "artifact_count": 12,
+  "artifact_set": "telemetry-contract-v1",
+  "artifacts": [
+    {
+      "kind": "source",
+      "path": "src/loto/telemetry/__init__.py"
+    },
+    {
+      "kind": "source",
+      "path": "src/loto/telemetry/buffer.py"
+    },
+    {
+      "kind": "source",
+      "path": "src/loto/telemetry/codec.py"
+    },
+    {
+      "kind": "source",
+      "path": "src/loto/telemetry/context.py"
+    },
+    {
+      "kind": "source",
+      "path": "src/loto/telemetry/contracts.py"
+    },
+    {
+      "kind": "source",
+      "path": "src/loto/telemetry/factory.py"
+    },
+    {
+      "kind": "source",
+      "path": "src/loto/telemetry/metrics.py"
+    },
+    {
+      "kind": "source",
+      "path": "src/loto/telemetry/redaction.py"
+    },
+    {
+      "kind": "test",
+      "path": "tests/telemetry/test_telemetry_contract_v1.py"
+    },
+    {
+      "kind": "documentation",
+      "path": "docs/telemetry/TELEMETRY_CONTRACT.md"
+    },
+    {
+      "kind": "documentation",
+      "path": "docs/telemetry/TEST_PLAN.md"
+    },
+    {
+      "kind": "documentation",
+      "path": "docs/telemetry/VERIFICATION_REPORT.md"
+    }
+  ],
+  "schema_version": "1.0.0"
+}
