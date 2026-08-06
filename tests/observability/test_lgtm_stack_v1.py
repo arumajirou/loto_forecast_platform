@@ -157,6 +157,7 @@ def test_restore_requires_explicit_destructive_confirmation() -> None:
     assert "sha256sum -c SHA256SUMS" in text
 
 
+
 def test_prometheus_alert_rules_are_bounded_and_link_to_runbook() -> None:
     rules = yaml.safe_load(
         (DEPLOY / "prometheus/rules/platform-alerts.yml").read_text(encoding="utf-8")
