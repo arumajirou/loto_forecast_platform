@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -95,6 +96,17 @@ def test_environment_override_provenance_and_secret_redaction() -> None:
     assert secret not in resolved.config_sha256
 
 
+def test_override_provenance_is_bound_to_resolved_config_hash() -> None:
+    from_yaml = resolve_payload(_payload(), environ={})
+    from_environment = resolve_payload(
+        _payload(),
+        environ={"LOTO_CONFIG_OUTPUT_DIR": "artifacts/focused-test"},
+    )
+
+    assert from_yaml.redacted_config == from_environment.redacted_config
+    assert from_yaml.config_sha256 != from_environment.config_sha256
+
+
 def test_device_request_and_fallback_policy_are_distinct() -> None:
     invalid_cuda = _payload()
     invalid_cuda["runtime"]["device"] = {
@@ -127,8 +139,9 @@ def test_resolved_output_is_atomic_redacted_and_hash_bound(tmp_path) -> None:
     target, sidecar = write_resolved_config(resolved, output)
     envelope = json.loads(target.read_text(encoding="utf-8"))
 
+    artifact_sha256 = hashlib.sha256(target.read_bytes()).hexdigest()
     assert envelope["resolved_config_sha256"] == resolved.config_sha256
-    assert sidecar.read_text(encoding="utf-8") == f"{resolved.config_sha256}  resolved.json\n"
+    assert sidecar.read_text(encoding="utf-8") == f"{artifact_sha256}  resolved.json\n"
     assert not (tmp_path / ".resolved.json.tmp").exists()
     assert not (tmp_path / ".resolved.json.sha256.tmp").exists()
 
