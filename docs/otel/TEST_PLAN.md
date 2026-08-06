@@ -8,24 +8,25 @@ Required scenarios:
 2. enabled tracing rejects an unpinned service version;
 3. enabled OTLP tracing without endpoint is blocked;
 4. strict configuration rejects coercion, unsafe endpoint credentials and invalid batch geometry;
-5. domain spans share trace and parent/child identity;
-6. trace/span identity is bound to and restored from the telemetry context;
-7. exception messages and stack traces are absent;
-8. secret, protected-actual, nested and non-finite attributes are absent;
-9. FastAPI middleware extracts propagation and reuses but does not generate request ID;
-10. FastAPI spans omit raw path and query;
-11. synchronous HTTPX propagates trace context;
-12. asynchronous HTTPX exports a client span;
-13. HTTPX spans omit raw path and query;
-14. SQLAlchemy spans contain operation/system but no SQL or parameter values;
-15. instrumentation is idempotent and reversible where applicable;
-16. exporter failure becomes `DEGRADED`;
-17. queue saturation drops without blocking the producer;
-18. console exporter smoke succeeds;
-19. HTTP OTLP protobuf bytes reach a loopback stub;
-20. exporter acceptance does not become formal `VERIFIED`;
-21. platform `FAILED`/`BLOCKED` maps to OpenTelemetry error status;
-22. HTTP client 4xx maps to OpenTelemetry error status.
+5. `loto.forecast.run` is present and parents stage spans;
+6. domain spans share trace and parent/child identity;
+7. trace/span identity is bound to and restored from the telemetry context;
+8. exception messages and stack traces are absent;
+9. secret, protected-actual, nested and non-finite attributes are absent;
+10. FastAPI middleware extracts propagation and reuses but does not generate request ID;
+11. FastAPI spans omit raw path and query;
+12. synchronous HTTPX propagates trace context;
+13. asynchronous HTTPX exports a client span;
+14. HTTPX spans omit raw path and query;
+15. SQLAlchemy spans contain operation/system but no SQL or parameter values;
+16. instrumentation is idempotent and reversible where applicable;
+17. exporter failure becomes `DEGRADED`;
+18. queue saturation drops without blocking the producer;
+19. console exporter smoke succeeds;
+20. HTTP OTLP protobuf bytes reach a loopback stub;
+21. exporter acceptance does not become formal `VERIFIED`;
+22. platform `FAILED`/`BLOCKED` maps to OpenTelemetry error status;
+23. HTTP client 4xx maps to OpenTelemetry error status.
 
 ## Static checks
 
