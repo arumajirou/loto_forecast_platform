@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest
 from pydantic import ValidationError
@@ -103,14 +103,36 @@ def test_safe_train_ledger_passes() -> None:
     assert report.passed is True
 
 
-def test_contracts_forbid_unknown_fields_and_noncausal_event_order() -> None:
+def test_contracts_forbid_unknown_fields_noncausal_order_and_naive_datetimes() -> None:
     with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
         TimeBoundary(end=NOW, unknown=True)
+
+    with pytest.raises(ValidationError, match="timezone-aware"):
+        TimeBoundary(end=datetime(2026, 8, 6))
+
+    offset = timezone(timedelta(hours=9))
+    boundary = TimeBoundary(end=datetime(2026, 8, 6, 9, tzinfo=offset))
+    assert boundary.end == NOW
+    assert boundary.end is not None and boundary.end.tzinfo is UTC
 
     late = _event("late-event", sequence=2)
     early = _event("early-event", sequence=1)
     with pytest.raises(ValidationError, match="events must be sorted"):
         _ledger(late, early)
+
+
+def test_predictive_train_access_requires_cutoff_availability_and_bounded_end() -> None:
+    event = _event(
+        "train-unbounded",
+        sequence=1,
+        boundary=TimeBoundary(),
+    )
+
+    assert _codes(_ledger(event)) == {
+        "MISSING_DATASET_AVAILABILITY_EVIDENCE",
+        "MISSING_PREDICTION_CUTOFF",
+        "UNBOUNDED_EVENT_WINDOW",
+    }
 
 
 def test_future_access_and_post_cutoff_column_are_rejected() -> None:
@@ -156,6 +178,25 @@ def test_fit_holdout_and_current_target_feature_are_rejected() -> None:
     }
 
 
+def test_validation_target_is_allowed_for_model_selection_scoring() -> None:
+    target = _column(
+        "n1",
+        role=ColumnRole.TARGET,
+        scope=TemporalScope.TARGET,
+        lag=0,
+    )
+    event = _event(
+        "score-validation",
+        sequence=1,
+        mode=AccessMode.SCORE,
+        purpose=AccessPurpose.MODEL_SELECTION,
+        split=SplitRole.VALIDATION,
+        columns=[target],
+    )
+
+    assert validate_ledger(_ledger(event)).passed
+
+
 def test_dependency_must_exist_precede_event_and_not_come_from_later_split() -> None:
     future = _event(
         "future-holdout",
@@ -173,6 +214,28 @@ def test_dependency_must_exist_precede_event_and_not_come_from_later_split() -> 
         "FUTURE_SPLIT_DEPENDENCY",
         "NON_CAUSAL_DEPENDENCY_ORDER",
         "UNKNOWN_DEPENDENCY",
+    }
+
+
+def test_dependency_time_must_not_exceed_consumer_cutoff() -> None:
+    source = _event(
+        "source-event",
+        sequence=1,
+        purpose=AccessPurpose.AUDIT,
+        boundary=TimeBoundary(
+            end=NOW + timedelta(seconds=1),
+            available_at=NOW + timedelta(seconds=1),
+        ),
+    )
+    consumer = _event(
+        "consumer-event",
+        sequence=2,
+        dependencies=[source.event_id],
+    )
+
+    assert _codes(_ledger(source, consumer)) == {
+        "DEPENDENCY_NOT_AVAILABLE_AT_CUTOFF",
+        "DEPENDENCY_WINDOW_AFTER_CUTOFF",
     }
 
 
@@ -202,3 +265,24 @@ def test_ast_scanner_resolves_from_import_alias() -> None:
     event = _event("read-csv", sequence=1, line=2)
 
     assert scan_python_source(source, path="src/example.py", ledger=_ledger(event)) == []
+
+
+def test_ast_scanner_distinguishes_read_and_write_open_modes() -> None:
+    source = "\n".join(
+        [
+            "from pathlib import Path",
+            "text = Path('input.txt').read_text()",
+            "Path('output.txt').write_text(text)",
+            "with open('audit.json', mode='w') as handle:",
+            "    handle.write(text)",
+        ]
+    )
+    read = _event("read-text", sequence=1, mode=AccessMode.READ, line=2)
+    write_text = _event("write-text", sequence=2, mode=AccessMode.WRITE, line=3)
+    write_open = _event("write-open", sequence=3, mode=AccessMode.WRITE, line=4)
+
+    assert scan_python_source(
+        source,
+        path="src/example.py",
+        ledger=_ledger(read, write_text, write_open),
+    ) == []
