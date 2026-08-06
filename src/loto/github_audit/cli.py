@@ -6,8 +6,8 @@ import argparse
 import json
 import sys
 import traceback
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from loto.github_audit.core import DEFAULT_API_VERSION, classify_error, redact, safe_slug
 from loto.github_audit.runner import AuditConfig, AuditRunner
@@ -109,10 +109,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     except Exception as exc:
         print(
             json.dumps(
-                {
-                    "status": "FAILED",
-                    "error": f"{type(exc).__name__}: {exc}",
-                },
+                {"status": "FAILED", "error": f"{type(exc).__name__}: {exc}"},
                 ensure_ascii=False,
             )
         )
