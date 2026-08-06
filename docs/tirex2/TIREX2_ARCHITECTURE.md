@@ -22,3 +22,9 @@ root dependency files, workflows, Holdout, and Prospective paths are unchanged.
 The two-process certifier launches the same immutable request twice and compares model identity,
 snapshot identity, all nine quantiles, point forecasts, series identity, prediction index, device,
 and provider PID. Real package and GPU execution remain pending.
+## Dependency trust boundary
+
+The isolated provider now has a pre-import trust gate. Candidate lock generation is separated from
+runtime-lane installation. The installed `uv.lock`, deterministic review report, and human
+approval record form one cross-hashed unit. The provider validates that unit before importing
+`tirex2`; a missing, stale, or modified artifact prevents model loading.

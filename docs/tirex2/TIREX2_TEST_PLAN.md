@@ -13,5 +13,12 @@
 11. Two-process comparison: distinct PIDs, exact point/all-quantile identity, and drift rejection.
 12. Provider failures preserve structured JSON and return a non-zero process exit code.
 
+13. Bounded direct requirement satisfaction against resolved versions.
+14. Registry-only package sources and complete artifact SHA-256 inventory.
+15. Official TiRex-2 0.1.1 wheel/sdist hash presence.
+16. Dry-run immutability and explicit apply-token enforcement.
+17. Installed project/lock/report/approval cross-hash validation.
+18. Tampered installed lock rejection before provider import.
+
 Actual package, CPU, GPU, and subprocess reload tests require the dedicated environment and
 trusted model snapshot and are not claimed by the hermetic focused suite.
