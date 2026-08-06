@@ -130,8 +130,27 @@ live Prometheus scrape=NOT_PROBED
 Grafana queries=NOT_PROBED
 alert rules=NOT_IMPLEMENTED
 load and memory budgets=NOT_MEASURED
-GitHub Actions=PENDING_FINAL_HEAD
+GitHub Actions pre-seal evidence:
+
+```text
+head=a1157d7e5f0d760b217191f9d4e0c2c4a7da6396
+workflow_runs=0
+combined_statuses=0
+classification=CI_NOT_CREATED_YET
+code_test_failure=NOT_DEMONSTRATED
 ```
+```
+
+## Remote publication hardening
+
+During byte-level parity verification, the focused test blob initially differed from the exact locally
+validated file even though the visible logic was equivalent. The exact local bytes were published through
+the Git Data blob/tree/commit path, producing blob
+`6daa8a7300403dd4198864588fd7e09bd5172bcc`, and the full 14-test suite was rerun successfully.
+
+At the pre-seal implementation head, GitHub had not created a workflow run or status check. This is not
+represented as PASS, failure, runner blockage or code-test evidence. The Draft PR body records the latest
+final-head observation separately.
 
 ## Explicit non-claims
 

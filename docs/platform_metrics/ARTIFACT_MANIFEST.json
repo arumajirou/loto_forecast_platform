@@ -46,8 +46,8 @@
     },
     {
       "path": "docs/platform_metrics/VERIFICATION_REPORT.md",
-      "sha256": "2c321975cd540645b1d729b90234e4fe234140c50e446aa74f262d83ea67862e",
-      "size_bytes": 5151
+      "sha256": "197620b717549d546e718b748f8ad3fd78133f292bf19c04bb8aa593bf0b2b94",
+      "size_bytes": 5950
     }
   ],
   "head_branch": "feat/platform-metrics-v1",
