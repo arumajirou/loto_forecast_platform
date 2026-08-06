@@ -196,3 +196,135 @@ def test_cpu_fallback_cannot_produce_verified_gpu() -> None:
             gpu_uuid="GPU-test",
             gpu_process_vram_peak_bytes=1,
         )
+
+
+def valid_response_payload(**overrides: object) -> dict[str, object]:
+    quantiles = {
+        key: tuple((float(level_index),) for _ in range(7))
+        for level_index, key in enumerate(QUANTILE_KEYS, start=1)
+    }
+    chronology = ChronologyEvidence(
+        row_count=2,
+        first_timestamp=datetime(2026, 1, 1, tzinfo=UTC),
+        last_timestamp=datetime(2026, 1, 2, tzinfo=UTC),
+        strictly_increasing=True,
+        duplicate_timestamps=0,
+        calendar_mapping_sha256="a" * 64,
+    )
+    payload: dict[str, object] = {
+        "run_id": "verified-response",
+        "status": "VERIFIED_CPU",
+        "model_id": "timer-s1",
+        "model_repo": CANONICAL_REPO,
+        "package_version": "1",
+        "source_revision": "a" * 40,
+        "model_revision": "b" * 40,
+        "config_sha256": "c" * 64,
+        "weight_sha256": "d" * 64,
+        "weight_manifest_sha256": "e" * 64,
+        "game": "loto7",
+        "target_layout": "position_univariate",
+        "timeline_mode": "draw-sequence",
+        "context_length": 2,
+        "prediction_length": 1,
+        "seed": 1,
+        "requested_device": "cpu",
+        "effective_device": "cpu",
+        "cpu_fallback": False,
+        "input_shape": (7, 2),
+        "native_output_shape": (7, 9, 1),
+        "output_shape": (7, 1),
+        "point_forecast": quantiles["q0.5"],
+        "quantiles": quantiles,
+        "samples": None,
+        "chronology_evidence": chronology,
+        "runtime_pid": 1,
+    }
+    payload.update(overrides)
+    return payload
+
+
+def test_success_response_accepts_quantile_mapping_independent_of_key_order() -> None:
+    payload = valid_response_payload()
+    quantiles = payload["quantiles"]
+    assert isinstance(quantiles, dict)
+    payload["quantiles"] = dict(reversed(tuple(quantiles.items())))
+    response = TimerS1Response.model_validate(payload)
+    assert response.status is ProviderStatus.VERIFIED_CPU
+
+
+def test_success_response_rejects_non_verified_status() -> None:
+    with pytest.raises(ValidationError):
+        TimerS1Response.model_validate(valid_response_payload(status="FAILED"))
+
+
+def test_success_response_rejects_non_finite_quantile() -> None:
+    payload = valid_response_payload()
+    quantiles = dict(payload["quantiles"])
+    rows = list(quantiles["q0.9"])
+    rows[0] = (float("nan"),)
+    quantiles["q0.9"] = tuple(rows)
+    payload["quantiles"] = quantiles
+    with pytest.raises(ValidationError, match="finite"):
+        TimerS1Response.model_validate(payload)
+
+
+def test_success_response_rejects_quantile_crossing() -> None:
+    payload = valid_response_payload()
+    quantiles = dict(payload["quantiles"])
+    rows = list(quantiles["q0.9"])
+    rows[0] = (0.0,)
+    quantiles["q0.9"] = tuple(rows)
+    payload["quantiles"] = quantiles
+    with pytest.raises(ValidationError, match="monotone"):
+        TimerS1Response.model_validate(payload)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("input_shape", (1, 2)),
+        ("native_output_shape", (7, 8, 1)),
+        ("output_shape", (1, 1)),
+    ],
+)
+def test_success_response_rejects_shape_claims_not_bound_to_game_geometry(
+    field: str,
+    value: object,
+) -> None:
+    with pytest.raises(ValidationError, match="shape"):
+        TimerS1Response.model_validate(valid_response_payload(**{field: value}))
+
+
+def test_success_response_rejects_chronology_row_count_mismatch() -> None:
+    chronology = ChronologyEvidence(
+        row_count=3,
+        first_timestamp=datetime(2026, 1, 1, tzinfo=UTC),
+        last_timestamp=datetime(2026, 1, 3, tzinfo=UTC),
+        strictly_increasing=True,
+        duplicate_timestamps=0,
+        calendar_mapping_sha256="a" * 64,
+    )
+    with pytest.raises(ValidationError, match="row_count"):
+        TimerS1Response.model_validate(
+            valid_response_payload(chronology_evidence=chronology)
+        )
+
+
+def test_verified_cpu_rejects_gpu_evidence() -> None:
+    with pytest.raises(ValidationError, match="GPU process evidence"):
+        TimerS1Response.model_validate(
+            valid_response_payload(
+                gpu_uuid="GPU-test",
+                gpu_process_vram_before_bytes=0,
+                gpu_process_vram_peak_bytes=1,
+                gpu_process_vram_after_bytes=0,
+            )
+        )
+
+
+def test_success_response_rejects_unsafe_artifact_path() -> None:
+    with pytest.raises(ValidationError, match="run directory"):
+        TimerS1Response.model_validate(
+            valid_response_payload(artifact_paths=("../escape.json",))
+        )
