@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -20,6 +21,18 @@ from loto.adapters.timer_s1.contracts import (  # noqa: E402
 from loto.timer_s1_campaign.provider import handle_request  # noqa: E402
 
 
+_RUN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+
+
+def _failure_run_id(payload: object) -> str:
+    if not isinstance(payload, dict):
+        return "invalid-request"
+    candidate = payload.get("run_id")
+    if isinstance(candidate, str) and _RUN_ID.fullmatch(candidate):
+        return candidate
+    return "invalid-request"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Timer-S1 PR-A provider skeleton")
     parser.add_argument("request", type=Path)
@@ -29,11 +42,8 @@ def main() -> int:
         request = TimerS1Request.model_validate(payload)
         response = handle_request(request)
     except (OSError, json.JSONDecodeError, ValidationError) as exc:
-        run_id = "invalid-request"
-        if isinstance(locals().get("payload"), dict):
-            run_id = str(payload.get("run_id", run_id))
         response = TimerS1FailureResponse(
-            run_id=run_id,
+            run_id=_failure_run_id(locals().get("payload")),
             status=ProviderStatus.FAILED,
             error_code="INVALID_REQUEST",
             error_message=str(exc),
