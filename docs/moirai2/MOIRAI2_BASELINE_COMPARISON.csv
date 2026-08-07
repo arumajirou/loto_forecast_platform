@@ -1,0 +1,2 @@
+run_id,candidate,baseline,hit_pm1_delta,mae_delta,status
+NOT_RUN,moirai-2.0-r-small,NOT_RUN,,,EXECUTION_PENDING

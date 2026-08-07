@@ -1,0 +1,8 @@
+argument,status,formal_values,notes
+context_length,IMPLEMENTED,positive integer,token budget enforced
+prediction_length,IMPLEMENTED,1|2|5,formal comparison horizons
+position_count,IMPLEMENTED,1..64,game geometry bound
+native_quantile_levels,IMPLEMENTED,0.1..0.9,exact native set only
+num_samples,NOT_APPLICABLE,null,Moirai 2.0 uses quantile outputs
+device,IMPLEMENTED,cpu|cuda,CUDA request forbids CPU fallback
+local_files_only,IMPLEMENTED,true,formal snapshot condition

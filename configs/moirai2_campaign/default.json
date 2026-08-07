@@ -1,0 +1,31 @@
+{
+  "schema_version": "moirai2-campaign-v1",
+  "model_id": "moirai-2.0-r-small",
+  "repo_id": "Salesforce/moirai-2.0-R-small",
+  "revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+  "license_lane": "personal_noncommercial_research",
+  "runtime_lanes": [
+    "supported-py311",
+    "cuda13-experimental"
+  ],
+  "formal_horizons": [
+    1,
+    2,
+    5
+  ],
+  "native_quantile_levels": [
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9
+  ],
+  "point_method": "median_q0.5",
+  "seed": 1,
+  "local_files_only": true,
+  "production_champion_eligible": false
+}

@@ -1,0 +1,16 @@
+[project]
+name = "loto-moirai2-cuda13-experimental-provider"
+version = "0.1.0"
+description = "Unsupported-version experimental CUDA 13 Moirai 2.0 research runtime"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "uni2ts==2.0.0",
+  "gluonts==0.14.4",
+  "huggingface-hub==0.36.2",
+  "numpy==1.26.4",
+  "pandas==2.2.3",
+  "torch==2.13.0",
+]
+
+[dependency-groups]
+dev = ["pytest==9.0.2"]
