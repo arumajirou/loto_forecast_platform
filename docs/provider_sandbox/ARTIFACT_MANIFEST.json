@@ -1,0 +1,185 @@
+{
+  "artifact_set": "untrusted-provider-sandbox-contract-v1",
+  "artifacts": [
+    {
+      "path": "configs/provider_sandbox/default_policy.json",
+      "sha256": "c870423265885c6c976995b67984bedc886980573d47dc32506b705cc05a0ebb",
+      "size_bytes": 2487
+    },
+    {
+      "path": "docs/provider_sandbox/ARCHITECTURE.md",
+      "sha256": "7208a7c5f559ede016de9b3aadce2fe08606a413b5805b8b92d122eb20f5986f",
+      "size_bytes": 1094
+    },
+    {
+      "path": "docs/provider_sandbox/CHANGELOG.md",
+      "sha256": "6b0f4e9b1e93d9cc9447e20dc362c2ccb6f9bad18d9ab818d46ec3bb25e60cab",
+      "size_bytes": 379
+    },
+    {
+      "path": "docs/provider_sandbox/DATA_CONTRACT.md",
+      "sha256": "35ec3152ee1f2a1c67852dff0f9b9fcb2d4174078dbff2eced4d6f6934f14285",
+      "size_bytes": 1760
+    },
+    {
+      "path": "docs/provider_sandbox/HANDOFF.md",
+      "sha256": "a2027e7e62a4a16fa88550c3997121154548b60bad9f344fe7e64b73e133ecbf",
+      "size_bytes": 993
+    },
+    {
+      "path": "docs/provider_sandbox/MIGRATION_NOTES.md",
+      "sha256": "c110b277fb5d1abd1dff0e344ce65ed65d8f2ce0a09f93e953aa12da00190be2",
+      "size_bytes": 608
+    },
+    {
+      "path": "docs/provider_sandbox/README.md",
+      "sha256": "a7748f4f56b1af7a55b742ce8c3ef03a9c75e0a9d97398a4005e281c25302b60",
+      "size_bytes": 2477
+    },
+    {
+      "path": "docs/provider_sandbox/REQUIREMENTS.md",
+      "sha256": "d3c2d4fb8700be7f91a917c3b852a1ca028c0327a8a8e35e5c0d11a9b3ba75a9",
+      "size_bytes": 1953
+    },
+    {
+      "path": "docs/provider_sandbox/RUNBOOK.md",
+      "sha256": "57f99814aa244232a4e9b99933855ab3a85470dc57dcbd01abd9a280b7be8829",
+      "size_bytes": 1202
+    },
+    {
+      "path": "docs/provider_sandbox/SECURITY_NOTES.md",
+      "sha256": "e3f424063bb9ab4dec4065fefa339b0192ac2500c5b876291fd056fc15443b5d",
+      "size_bytes": 716
+    },
+    {
+      "path": "docs/provider_sandbox/SPECIFICATION.md",
+      "sha256": "a61f20ea3837810f7362c07154525f0e02439c00a73945f957034db259cda185",
+      "size_bytes": 2564
+    },
+    {
+      "path": "docs/provider_sandbox/TEST_PLAN.md",
+      "sha256": "9c9b527d169a325f7df6799c4b64902849205fb026f8e2979f39980bcff7c39c",
+      "size_bytes": 1061
+    },
+    {
+      "path": "docs/provider_sandbox/VERIFICATION_REPORT.md",
+      "sha256": "a698bb3e8b9fad0059dc2873fb71dbcef14d6d0023255d276acf82878976067c",
+      "size_bytes": 1636
+    },
+    {
+      "path": "docs/provider_sandbox/reports/FOCUSED_TEST_REPORT.json",
+      "sha256": "747b87dd54f5360e2fd25c77dc298762ceb28ff11c44dd5b564c52c10e5a2e7e",
+      "size_bytes": 235
+    },
+    {
+      "path": "docs/provider_sandbox/reports/NON_CLAIMS.json",
+      "sha256": "125a12e920be9d04bc70bff6b39905e489b7aceb9368b5e7e53985dc341a8038",
+      "size_bytes": 386
+    },
+    {
+      "path": "docs/provider_sandbox/reports/SMOKE_REPORT.json",
+      "sha256": "0d7e719055f0d69d157429ab4765c7ba1d41ca9111d22591204d93e0c3bc3513",
+      "size_bytes": 295
+    },
+    {
+      "path": "docs/provider_sandbox/reports/STATIC_ANALYSIS_REPORT.json",
+      "sha256": "6a138a807a6826e8d057e2b80f82111e1483d0c0e5a1793fddb4fc88d7e55891",
+      "size_bytes": 418
+    },
+    {
+      "path": "scripts/run_provider_sandbox.py",
+      "sha256": "6ce14c4fa211e6c4e6569e85d6ce6f1f0f2879cf688c4d4a9b95679aa32292d2",
+      "size_bytes": 4956
+    },
+    {
+      "path": "src/loto/provider_sandbox/__init__.py",
+      "sha256": "18fa526f805bed4ff8b62f884172ba1ba8bfa584c2a00520bde45c2e9bbb40e1",
+      "size_bytes": 1311
+    },
+    {
+      "path": "src/loto/provider_sandbox/argv.py",
+      "sha256": "8e177497c8409ae688803a6369e865d4a9c8ed938b737f318f5ae37c5b6f6701",
+      "size_bytes": 4704
+    },
+    {
+      "path": "src/loto/provider_sandbox/canonical.py",
+      "sha256": "c0d92c820c4aa35a65310a1573fccb1143be3cf61ed5b4fbe78a1bb4e6a60b20",
+      "size_bytes": 2877
+    },
+    {
+      "path": "src/loto/provider_sandbox/contracts.py",
+      "sha256": "569cf4b2f4e2eb597b871718a24cc7c591dc47127c7b8861548cd0f097193c6a",
+      "size_bytes": 13770
+    },
+    {
+      "path": "src/loto/provider_sandbox/evidence.py",
+      "sha256": "4ca6ee7a27dbb66a9c3812d37e055cc6141282cd9173443d5215e405e8cbf833",
+      "size_bytes": 7515
+    },
+    {
+      "path": "src/loto/provider_sandbox/executor.py",
+      "sha256": "32df109afde22c7869a01a7e8599f430e7067535df1b4aa9b017f0c3ecfadb32",
+      "size_bytes": 4491
+    },
+    {
+      "path": "src/loto/provider_sandbox/py.typed",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "src/loto/provider_sandbox/validation.py",
+      "sha256": "b69e2e1c5ac4c7ce9ad4ad285419bff7213b2f7d4f114a29c604786d4765adcf",
+      "size_bytes": 7320
+    },
+    {
+      "path": "tests/provider_sandbox/conftest.py",
+      "sha256": "99673d7da6e961443bee9fdc4cf9279bfec6cdfe344f39dfef156aa93477402e",
+      "size_bytes": 5068
+    },
+    {
+      "path": "tests/provider_sandbox/test_argv.py",
+      "sha256": "da9be582fb18b4702b90b096c588826788335aa2e6675cffea05a8e45a742f31",
+      "size_bytes": 2331
+    },
+    {
+      "path": "tests/provider_sandbox/test_cli.py",
+      "sha256": "47136889a4b0fa98af0c030a9b51063e0606000e93e24acede7b0a99d7477f13",
+      "size_bytes": 1836
+    },
+    {
+      "path": "tests/provider_sandbox/test_contracts.py",
+      "sha256": "d6eaf014fdc3e431a8fe7b45ba5cf4d2a697ded9337abf2f464acdc8d821c9de",
+      "size_bytes": 2839
+    },
+    {
+      "path": "tests/provider_sandbox/test_evidence.py",
+      "sha256": "e1f44c98e55d0b7ca93b5f1c1313a71503d2ac051372c04de375504a9040be95",
+      "size_bytes": 2478
+    },
+    {
+      "path": "tests/provider_sandbox/test_executor.py",
+      "sha256": "c01d2927c5513e1d8692af84d6d3371755dc0d0406179e17157337fe53294b0f",
+      "size_bytes": 1432
+    },
+    {
+      "path": "tests/provider_sandbox/test_static_boundaries.py",
+      "sha256": "b324b36dfc8d46993d1b8bac91127e4cfc2c95e10469c01fa2efebf6470a825e",
+      "size_bytes": 809
+    },
+    {
+      "path": "tests/provider_sandbox/test_validation.py",
+      "sha256": "a6adde44ddf773c6ad5ee8c52cf6662f5012447ca8b07b65a0067b8b64e00258",
+      "size_bytes": 3423
+    }
+  ],
+  "design_head": "1ae5b0736a3d740a4c787e77f918d77ea35fe7a1",
+  "design_pr": 140,
+  "holdout_opened": false,
+  "implementation_base": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "implementation_branch": "feat/untrusted-provider-sandbox-contract-v1",
+  "managed_artifact_count": 34,
+  "prospective_opened": false,
+  "provider_migration_performed": false,
+  "real_kernel_isolation_tested": false,
+  "schema_version": "1.0.0"
+}

@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONPATH=src pytest -q tests/provider_sandbox --cov=src/loto/provider_sandbox",
+  "coverage_percent": 88,
+  "failed": 0,
+  "passed": 28,
+  "python_version": "3.13.5",
+  "schema_version": "1.0.0",
+  "status": "PASS"
+}

@@ -1,0 +1,103 @@
+{
+  "backend": "BUBBLEWRAP",
+  "drop_all_capabilities": true,
+  "environment_allowlist": [
+    "PYTHONDONTWRITEBYTECODE",
+    "PYTHONHASHSEED",
+    "HF_HUB_OFFLINE",
+    "TRANSFORMERS_OFFLINE",
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS"
+  ],
+  "environment_deny_patterns": [
+    "TOKEN",
+    "SECRET",
+    "PASSWORD",
+    "API_KEY",
+    "PRIVATE_KEY",
+    "DSN",
+    "DATABASE_URL",
+    "MLFLOW",
+    "AWS_",
+    "GCP_",
+    "AZURE_",
+    "SSH_",
+    "DOCKER_"
+  ],
+  "executable_allowlist": [
+    "/sandbox/runtime/bin/python"
+  ],
+  "gpu_device_allowlist": [],
+  "limits": {
+    "cpu_cores": 4.0,
+    "file_size_bytes": 1073741824,
+    "memory_bytes": 8589934592,
+    "output_bytes": 268435456,
+    "pids": 64,
+    "wall_timeout_seconds": 3600.0
+  },
+  "mounts": [
+    {
+      "kind": "RUNTIME",
+      "mode": "READ_ONLY",
+      "mount_id": "runtime",
+      "required": true,
+      "source_path": "/opt/loto/provider-runtime",
+      "source_sha256": null,
+      "target_path": "/sandbox/runtime"
+    },
+    {
+      "kind": "REPOSITORY",
+      "mode": "READ_ONLY",
+      "mount_id": "repository",
+      "required": true,
+      "source_path": "/opt/loto/repository",
+      "source_sha256": null,
+      "target_path": "/sandbox/repository"
+    },
+    {
+      "kind": "MODEL_SNAPSHOT",
+      "mode": "READ_ONLY",
+      "mount_id": "model",
+      "required": true,
+      "source_path": "/opt/loto/model-snapshot",
+      "source_sha256": null,
+      "target_path": "/sandbox/model"
+    },
+    {
+      "kind": "INPUT",
+      "mode": "READ_ONLY",
+      "mount_id": "input",
+      "required": true,
+      "source_path": "/opt/loto/input/request.json",
+      "source_sha256": null,
+      "target_path": "/sandbox/input/request.json"
+    },
+    {
+      "kind": "OUTPUT",
+      "mode": "READ_WRITE_TMP",
+      "mount_id": "output",
+      "required": true,
+      "source_path": "/opt/loto/output",
+      "source_sha256": null,
+      "target_path": "/sandbox/output"
+    },
+    {
+      "kind": "TMPFS",
+      "mode": "READ_WRITE_TMP",
+      "mount_id": "tmp",
+      "required": true,
+      "source_path": null,
+      "source_sha256": null,
+      "target_path": "/sandbox/tmp"
+    }
+  ],
+  "network_mode": "DISABLED",
+  "no_new_privileges": true,
+  "oci_image": null,
+  "policy_id": "provider-sandbox-default-v1",
+  "policy_sha256": "8d6d02e3a15c646184bb9fad2fe2d1c4452a0d1dfcfb9e6442b7f38ab3508122",
+  "root_filesystem": "READ_ONLY",
+  "schema_version": "1.0.0",
+  "untrusted_remote_code": true
+}

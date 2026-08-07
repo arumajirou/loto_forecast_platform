@@ -1,0 +1,10 @@
+{
+  "default_policy_validation": "PASS",
+  "direct_execution_without_ack": "BLOCKED_AS_DESIGNED",
+  "fake_child_nonzero": "PASS",
+  "fake_child_output_limit": "PASS",
+  "fake_child_timeout": "PASS",
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "test_only_acknowledged_execution": "PASS"
+}
