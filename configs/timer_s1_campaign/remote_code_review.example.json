@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "status": "PENDING",
+  "source_revision": "UNPINNED",
+  "reviewed_files": {
+    "configuration_TimerS1.py": "UNPINNED",
+    "modeling_TimerS1.py": "UNPINNED",
+    "ts_generation_mixin.py": "UNPINNED"
+  },
+  "shell_execution": false,
+  "subprocess_execution": false,
+  "dynamic_download": false,
+  "arbitrary_file_write": false,
+  "unapproved_external_imports": true,
+  "environment_secret_collection": true,
+  "telemetry_or_exfiltration": true,
+  "unsafe_deserialization": true,
+  "reviewer": "",
+  "reviewed_at": ""
+}

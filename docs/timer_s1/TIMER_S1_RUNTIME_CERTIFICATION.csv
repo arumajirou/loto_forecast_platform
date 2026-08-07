@@ -1,0 +1,5 @@
+lane,status,model_load,inference,reload,gpu_evidence,cpu_fallback
+PR-A-skeleton,EXECUTION_PENDING,false,false,false,false,false
+CPU,NOT_EXECUTED,false,false,false,false,false
+CUDA-native,NOT_EXECUTED,false,false,false,false,unknown
+RTX5070Ti-16GB,BLOCKED_RUNTIME,false,false,false,false,unknown

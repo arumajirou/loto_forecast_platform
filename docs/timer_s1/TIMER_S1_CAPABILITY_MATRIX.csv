@@ -1,0 +1,13 @@
+capability,status,phase,notes
+identity,implemented,PR-A,Returns EXECUTION_PENDING
+position_univariate,implemented,PR-A,Independent series only
+horizon_1,contracted,PR-A,Runtime pending
+horizon_2,contracted,PR-A,Runtime pending
+horizon_5,contracted,PR-A,Runtime pending
+quantiles_q01_q09,contracted,PR-A,Native runtime pending
+point_q05,contracted,PR-A,No native mean claim
+samples,unsupported,PR-A,Must remain null
+past_covariates,unsupported,PR-A,Fail closed
+known_future_covariates,unsupported,PR-A,Fail closed
+joint_multivariate,unsupported,PR-A,Fail closed
+real_runtime,not_verified,PR-B,Checkpoint not loaded

@@ -1,0 +1,15 @@
+[project]
+name = "loto-timer-s1-runtime"
+version = "0.1.0"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "accelerate==1.14.0",
+  "huggingface-hub==0.36.2",
+  "pydantic>=2.10,<3",
+  "safetensors>=0.6,<0.7",
+  "torch==2.9.1",
+  "transformers==4.57.6",
+]
+
+[tool.uv]
+package = false

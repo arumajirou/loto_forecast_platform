@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "model_id": "timer-s1",
+  "canonical_repo": "bytedance-research/Timer-S1",
+  "mirror_repo": "thuml/Timer-S1",
+  "arxiv_id": "2603.04791",
+  "license": "Apache-2.0",
+  "gated": false,
+  "trust_remote_code": true,
+  "model_revision": "UNPINNED",
+  "source_revision": "UNPINNED",
+  "observed_model_revision": "8911430cc7f32add5c8913afe12e3b05742f5bb2",
+  "observed_source_revision": "0d35f1fe891243453ca1bfa903b5271cf9eb85cb",
+  "mirror_revision": "UNPINNED",
+  "package_versions": {
+    "accelerate": "1.14.0",
+    "huggingface-hub": "0.36.2",
+    "torch": "2.9.1",
+    "transformers": "4.57.6"
+  },
+  "python_compatibility": "TARGET_PY311_UNVERIFIED",
+  "artifacts": [
+    {
+      "path": "config.json",
+      "size_bytes": 750,
+      "sha256": null,
+      "required": true,
+      "kind": "config"
+    },
+    {
+      "path": "model.safetensors.index.json",
+      "size_bytes": 426000,
+      "sha256": null,
+      "required": true,
+      "kind": "weight-index"
+    },
+    {
+      "path": "model-00001-of-00004.safetensors",
+      "size_bytes": 4999034896,
+      "sha256": "8735f5cca42b847670cfc1a03118f092d3cd49150787a0254e863b05e892022c",
+      "required": true,
+      "kind": "weight"
+    },
+    {
+      "path": "model-00002-of-00004.safetensors",
+      "size_bytes": 4999220272,
+      "sha256": "d44c1ccffbce8263b98c5f9f5ac8027078d7166ffb13b7a55f1934f6b0c4c370",
+      "required": true,
+      "kind": "weight"
+    },
+    {
+      "path": "model-00003-of-00004.safetensors",
+      "size_bytes": null,
+      "sha256": null,
+      "required": true,
+      "kind": "weight"
+    },
+    {
+      "path": "model-00004-of-00004.safetensors",
+      "size_bytes": 1613025584,
+      "sha256": "ce442e869597b171db455ad31868722dbff0a1bd88ed77ccb21c5a4438a2edd3",
+      "required": true,
+      "kind": "weight"
+    },
+    {
+      "path": "configuration_TimerS1.py",
+      "size_bytes": 2310,
+      "sha256": null,
+      "required": true,
+      "kind": "remote-code"
+    },
+    {
+      "path": "modeling_TimerS1.py",
+      "size_bytes": 35800,
+      "sha256": null,
+      "required": true,
+      "kind": "remote-code"
+    },
+    {
+      "path": "ts_generation_mixin.py",
+      "size_bytes": 15585,
+      "sha256": null,
+      "required": true,
+      "kind": "remote-code"
+    }
+  ],
+  "mirror_fallback_enabled": false
+}

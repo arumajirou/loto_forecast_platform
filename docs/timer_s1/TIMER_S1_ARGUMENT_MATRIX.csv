@@ -1,0 +1,10 @@
+argument,accepted,effective,reason
+model_id,timer-s1,timer-s1,Canonical logical identity
+model_repo,bytedance-research/Timer-S1,canonical,Mirror fallback disabled
+context_length,1..11520,requested,Upstream documented limit
+prediction_length,1|2|5,requested,Formal lottery matrix
+seed,integer,requested,Retained for evidence
+requested_device,cpu|cuda,requested,Runtime deferred
+past_covariates,null,null,Unsupported in PR-A
+known_future_covariates,null,null,Unsupported in PR-A
+joint_multivariate,false,false,Independent univariate default
