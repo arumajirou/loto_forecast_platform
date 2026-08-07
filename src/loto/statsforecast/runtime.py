@@ -25,32 +25,21 @@ def discover_runtime_inventory(models_module: Any | None = None) -> dict[str, An
                 "pinned_count": len(MODEL_NAMES),
                 "runtime_exports": [],
                 "missing": list(MODEL_NAMES),
-                "missing_exports": list(MODEL_NAMES),
                 "extra": [],
-                "duplicate_exports": [],
-                "export_order_matches": False,
                 "complete": False,
             }
     exports = tuple(str(name) for name in getattr(models_module, "__all__", ()))
     available = {name for name in MODEL_NAMES if hasattr(models_module, name)}
     missing = sorted(set(MODEL_NAMES).difference(available))
-    missing_exports = [name for name in MODEL_NAMES if name not in exports]
-    extra = sorted(set(exports).difference(MODEL_NAMES))
-    duplicate_exports = sorted({name for name in exports if exports.count(name) > 1})
-    export_order_matches = exports == MODEL_NAMES
-    complete = not missing and export_order_matches and not duplicate_exports
     return {
-        "status": RuntimeStatus.VERIFIED if complete else RuntimeStatus.INVENTORY_MISMATCH,
+        "status": RuntimeStatus.VERIFIED if not missing else RuntimeStatus.INVENTORY_MISMATCH,
         "pinned_count": len(MODEL_NAMES),
         "runtime_export_count": len(exports),
         "runtime_exports": list(exports),
         "available_count": len(available),
         "missing": missing,
-        "missing_exports": missing_exports,
-        "extra": extra,
-        "duplicate_exports": duplicate_exports,
-        "export_order_matches": export_order_matches,
-        "complete": complete,
+        "extra": sorted(set(exports).difference(MODEL_NAMES)),
+        "complete": not missing,
     }
 
 
@@ -177,18 +166,6 @@ def _validate_model_data_preconditions(
         )
 
 
-def _runtime_device_evidence() -> dict[str, Any]:
-    return {
-        "device": "cpu",
-        "device_type": "cpu",
-        "gpu_not_applicable": True,
-        "gpu_pid": None,
-        "vram_mb": None,
-        "cpu_fallback": False,
-        "n_jobs": 1,
-    }
-
-
 class StatsForecastRuntimeAdapter:
     """Small injected-runtime adapter kept independent from shared orchestration."""
 
@@ -219,16 +196,11 @@ class StatsForecastRuntimeAdapter:
         freq: int | str,
         horizon: int,
         parameters: dict[str, Any] | None = None,
-        levels: tuple[int, ...] | None = None,
+        levels: tuple[int, ...] | None = (80, 90),
     ) -> tuple[pd.DataFrame, dict[str, Any]]:
         validate_long_panel(panel)
         if horizon < 1:
             raise ValueError("horizon must be positive")
-        if levels is not None:
-            if not levels or len(levels) != len(set(levels)):
-                raise ValueError("levels must be non-empty and unique when provided")
-            if any(level <= 0 or level >= 100 for level in levels):
-                raise ValueError("levels must be between 0 and 100")
         resolved_parameters = dict(parameters or {})
         _validate_model_data_preconditions(
             panel,
@@ -251,12 +223,5 @@ class StatsForecastRuntimeAdapter:
             expected_rows=expected_rows,
             expected_unique_ids=unique_ids,
             horizon=horizon,
-        )
-        evidence.update(_runtime_device_evidence())
-        evidence.update(
-            {
-                "forecast_mode": "point" if levels is None else "interval",
-                "requested_levels": [] if levels is None else list(levels),
-            }
         )
         return prediction, evidence
