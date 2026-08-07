@@ -15,6 +15,13 @@ from .neuralforecast_search_policy import (
     instantiate_search_algorithm,
     resolve_search_policy,
 )
+from .neuralforecast_search_space import (
+    SearchSpaceCompleteness,
+    SearchSpaceProfile,
+    profile_fixed_config,
+    profile_runtime_model_config,
+    unavailable_search_space_profile,
+)
 
 SUPPORTED_BACKENDS = {"optuna", "ray"}
 MODELS_REQUIRING_N_SERIES = {
@@ -64,12 +71,19 @@ class AutoModelPlan:
     adjustments: tuple[str, ...] = field(default_factory=tuple)
     search_algorithm: str = "library_default"
     search_policy: SearchPolicyDecision | None = None
+    search_space_profile: SearchSpaceProfile | None = None
     allow_search_fallback: bool = False
     ray_options: dict[str, Any] | None = None
     optuna_options: dict[str, Any] | None = None
 
 
-def choose_backend(*, gpus: int, cpus: int, requested: str | None, parallel_trials: int = 1) -> str:
+def choose_backend(
+    *,
+    gpus: int,
+    cpus: int,
+    requested: str | None,
+    parallel_trials: int = 1,
+) -> str:
     if requested is not None:
         if requested not in SUPPORTED_BACKENDS:
             raise ValueError(f"unsupported backend: {requested}")
@@ -112,7 +126,12 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
     if request.early_stop_patience_steps is not None:
         config["early_stop_patience_steps"] = int(request.early_stop_patience_steps)
     precision = request.precision
-    if request.model_name in FFT_MODELS and precision in {"16", "16-mixed", "bf16", "bf16-mixed"}:
+    if request.model_name in FFT_MODELS and precision in {
+        "16",
+        "16-mixed",
+        "bf16",
+        "bf16-mixed",
+    }:
         precision = "32-true"
         adjustments.append("precision_adjusted_for_fft")
     search_policy = resolve_search_policy(
@@ -139,6 +158,21 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
     if needs_n_series and request.n_series is not None:
         config["n_series"] = int(request.n_series)
         constructor_kwargs["n_series"] = int(request.n_series)
+    if config:
+        search_space_profile = profile_fixed_config(
+            config,
+            backend=backend,
+            model_name=request.model_name,
+        )
+    else:
+        search_space_profile = unavailable_search_space_profile(
+            backend=backend,
+            model_name=request.model_name,
+            reason=(
+                "official default search space is delegated to the installed "
+                "NeuralForecast runtime"
+            ),
+        )
     # Empty config intentionally delegates to the official per-model default search space.
     if config:
         if backend == "optuna":
@@ -156,8 +190,11 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
         adjustments=tuple(adjustments),
         search_algorithm=search_policy.effective_algorithm_name,
         search_policy=search_policy,
+        search_space_profile=search_space_profile,
         allow_search_fallback=request.allow_search_fallback,
-        ray_options={"cpus": request.cpus, "gpus": request.gpus} if backend == "ray" else None,
+        ray_options={"cpus": request.cpus, "gpus": request.gpus}
+        if backend == "ray"
+        else None,
         optuna_options={"study_kwargs": {"n_jobs": request.parallel_trials}}
         if backend == "optuna" and request.parallel_trials > 1
         else None,
@@ -195,4 +232,17 @@ def construct_auto_model(plan: AutoModelPlan):
     model = cls(**kwargs)
     if materialized is not None:
         model.search_policy_decision = materialized.decision.model_dump(mode="json")
+    search_space_profile = plan.search_space_profile
+    if (
+        search_space_profile is None
+        or search_space_profile.completeness is SearchSpaceCompleteness.UNAVAILABLE
+    ):
+        search_space_profile = profile_runtime_model_config(
+            model,
+            backend=plan.backend,
+            model_name=plan.model_name,
+            fallback=search_space_profile,
+        )
+    if search_space_profile is not None:
+        model.search_space_profile = search_space_profile.model_dump(mode="json")
     return model
