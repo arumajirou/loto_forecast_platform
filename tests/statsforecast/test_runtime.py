@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 
 from loto.statsforecast.contracts import RuntimeStatus
+from loto.statsforecast.inventory import MODEL_NAMES
 from loto.statsforecast.runtime import (
     StatsForecastRuntimeAdapter,
     constructor_argument_ledger,
@@ -25,7 +26,7 @@ class FakeCore:
         assert n_jobs == 1
 
     def forecast(self, *, df, h, level):
-        assert list(level) == [80, 90]
+        assert level is None
         rows = []
         for unique_id in df["unique_id"].unique():
             rows.append({"unique_id": unique_id, "ds": 4, "Naive": 3.0})
@@ -55,6 +56,14 @@ def test_fake_runtime_executes_forecast_and_validates() -> None:
     )
     assert len(prediction) == 2
     assert evidence["status"] is RuntimeStatus.VERIFIED
+    assert evidence["forecast_mode"] == "point"
+    assert evidence["requested_levels"] == []
+    assert evidence["device"] == "cpu"
+    assert evidence["gpu_not_applicable"] is True
+    assert evidence["gpu_pid"] is None
+    assert evidence["vram_mb"] is None
+    assert evidence["cpu_fallback"] is False
+    assert evidence["n_jobs"] == 1
 
 
 def test_nan_model_expected_negative_contract() -> None:
@@ -93,14 +102,14 @@ def test_partial_runtime_inventory_is_not_verified() -> None:
 
 
 def test_runtime_inventory_requires_every_project_model() -> None:
-    namespace = SimpleNamespace(__all__=())
-    inventory = __import__("loto.statsforecast.inventory", fromlist=["MODEL_NAMES"])
-    for name in inventory.MODEL_NAMES:
+    namespace = SimpleNamespace(__all__=MODEL_NAMES)
+    for name in MODEL_NAMES:
         setattr(namespace, name, type(name, (), {}))
     result = discover_runtime_inventory(namespace)
     assert result["status"] is RuntimeStatus.VERIFIED
     assert result["complete"] is True
     assert result["missing"] == []
+    assert result["export_order_matches"] is True
 
 
 def test_seasonal_model_requires_season_length() -> None:
@@ -208,3 +217,55 @@ def test_conformal_seasonal_pool_does_not_require_two_seasons() -> None:
         parameters={"season_length": 12},
     )
     assert evidence["status"] is RuntimeStatus.VERIFIED
+
+
+def test_runtime_inventory_rejects_reordered_exports() -> None:
+    namespace = SimpleNamespace(__all__=tuple(reversed(MODEL_NAMES)))
+    for name in MODEL_NAMES:
+        setattr(namespace, name, type(name, (), {}))
+    result = discover_runtime_inventory(namespace)
+    assert result["status"] is RuntimeStatus.INVENTORY_MISMATCH
+    assert result["complete"] is False
+    assert result["export_order_matches"] is False
+
+
+def test_interval_levels_require_explicit_opt_in() -> None:
+    observed = {}
+
+    class IntervalCore(FakeCore):
+        def forecast(self, *, df, h, level):
+            observed["level"] = level
+            rows = []
+            for unique_id in df["unique_id"].unique():
+                rows.append({"unique_id": unique_id, "ds": 4, "Naive": 3.0})
+            return pd.DataFrame(rows)
+
+    adapter = StatsForecastRuntimeAdapter(
+        core_class=IntervalCore,
+        models_module=SimpleNamespace(Naive=Naive),
+    )
+    _, evidence = adapter.forecast(
+        panel(),
+        model_name="Naive",
+        freq=1,
+        horizon=1,
+        levels=(80, 90),
+    )
+    assert observed["level"] == [80, 90]
+    assert evidence["forecast_mode"] == "interval"
+    assert evidence["requested_levels"] == [80, 90]
+
+
+def test_interval_levels_reject_duplicates() -> None:
+    adapter = StatsForecastRuntimeAdapter(
+        core_class=FakeCore,
+        models_module=SimpleNamespace(Naive=Naive),
+    )
+    with pytest.raises(ValueError, match="unique"):
+        adapter.forecast(
+            panel(),
+            model_name="Naive",
+            freq=1,
+            horizon=1,
+            levels=(80, 80),
+        )

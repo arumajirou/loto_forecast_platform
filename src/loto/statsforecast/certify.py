@@ -17,12 +17,32 @@ from .certification_io import (
     write_manifest_and_sums,
 )
 from .certification_models import certify_model, compare_predictions
-from .contracts import RuntimeStatus
+from .contracts import ExpectedStatus, RuntimeStatus
 from .inventory import MODEL_NAMES
 from .runtime import discover_runtime_inventory
 
 TARGET_VERSION = "2.1.1"
 _PASS = {RuntimeStatus.VERIFIED.value, RuntimeStatus.EXPECTED_NEGATIVE_PASS.value}
+
+
+def _model_result_satisfies_formal_contract(result: dict[str, Any]) -> bool:
+    if result.get("status") not in _PASS:
+        return False
+    if result.get("device") != "cpu" or result.get("device_type") != "cpu":
+        return False
+    if result.get("gpu_not_applicable") is not True:
+        return False
+    if result.get("gpu_pid") is not None or result.get("vram_mb") is not None:
+        return False
+    if result.get("cpu_fallback") is not False or result.get("n_jobs") != 1:
+        return False
+    if result.get("forecast_mode") != "point" or result.get("requested_levels") != []:
+        return False
+    expected_status = result.get("expected_status")
+    lifecycle_status = result.get("lifecycle_status")
+    if expected_status == ExpectedStatus.EXPECTED_NEGATIVE_PASS.value:
+        return lifecycle_status == "EXPECTED_NOT_APPLICABLE"
+    return lifecycle_status == "VERIFIED"
 
 
 def _package_evidence(injected_version: str | None = None) -> dict[str, Any]:
@@ -108,6 +128,13 @@ def certify_installed_runtime(
             "seed": seed,
             "lifecycle": lifecycle,
             "n_jobs": 1,
+            "forecast_mode": "point",
+            "interval_levels": [],
+            "runtime_device": {
+                "device": "cpu",
+                "gpu_not_applicable": True,
+                "cpu_fallback": False,
+            },
             "actual_known": False,
             "python": sys.version,
             "platform": platform.platform(),
@@ -151,9 +178,10 @@ def certify_installed_runtime(
     formal_pass = bool(
         package["status"] == RuntimeStatus.VERIFIED.value
         and inventory.get("status") == RuntimeStatus.VERIFIED
-        and set(chosen) == set(MODEL_NAMES)
+        and chosen == MODEL_NAMES
         and len(results) == len(MODEL_NAMES)
-        and all(result.get("status") in _PASS for result in results)
+        and lifecycle
+        and all(_model_result_satisfies_formal_contract(result) for result in results)
     )
     write_json(
         run_dir / "VERIFICATION_REPORT.json",
@@ -164,11 +192,18 @@ def certify_installed_runtime(
             "formal_pass": formal_pass,
             "package_status": package["status"],
             "inventory_status": str(inventory.get("status")),
-            "selected_all_models": set(chosen) == set(MODEL_NAMES),
+            "selected_all_models": chosen == MODEL_NAMES,
             "selected_model_count": len(chosen),
             "executed_model_count": len(results),
             "status_counts": status_counts,
             "lifecycle_requested": lifecycle,
+            "forecast_mode": "point",
+            "interval_levels": [],
+            "runtime_device": {
+                "device": "cpu",
+                "gpu_not_applicable": True,
+                "cpu_fallback": False,
+            },
             "finished_at_utc": utc_now(),
             "holdout_opened": False,
             "prospective_actual_known": False,
@@ -210,4 +245,10 @@ def main(argv: list[str] | None = None) -> int:
 if __name__ == "__main__":
     raise SystemExit(main())
 
-__all__ = ["TARGET_VERSION", "certify_installed_runtime", "compare_predictions", "main"]
+__all__ = [
+    "TARGET_VERSION",
+    "_model_result_satisfies_formal_contract",
+    "certify_installed_runtime",
+    "compare_predictions",
+    "main",
+]
