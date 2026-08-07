@@ -119,6 +119,7 @@ def _execution(
     return ProcessExecution(
         run_label=label,
         process_pid=pid,
+        process_identity_sha256=HEX if pid is not None else None,
         started_at_utc=NOW,
         finished_at_utc=NOW + timedelta(seconds=1),
         exit_code=exit_code,
@@ -135,6 +136,7 @@ def _cpu_device(pid: int, origin: EvidenceOrigin) -> DeviceEvidence:
         effective_device="cpu",
         cpu_fallback=False,
         provider_pid=pid,
+        provider_process_identity_sha256=HEX if origin == EvidenceOrigin.REAL else None,
         provider_gpu_pid=None,
         gpu_uuid=None,
         peak_vram_bytes=0,
@@ -150,12 +152,16 @@ def _gpu_device(pid: int, origin: EvidenceOrigin) -> DeviceEvidence:
         effective_device="cuda",
         cpu_fallback=False,
         provider_pid=pid,
+        provider_process_identity_sha256=HEX if origin == EvidenceOrigin.REAL else None,
         provider_gpu_pid=pid,
         gpu_uuid="GPU-FAKE-UUID",
         peak_vram_bytes=1024,
         external_gpu_samples=[
             GPUProcessSample(
                 provider_pid=pid,
+                provider_process_identity_sha256=(
+                    HEX if origin == EvidenceOrigin.REAL else None
+                ),
                 gpu_uuid="GPU-FAKE-UUID",
                 used_memory_bytes=1024,
                 observed_at_utc=NOW,
