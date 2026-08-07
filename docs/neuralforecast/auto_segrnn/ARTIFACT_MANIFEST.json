@@ -1,0 +1,90 @@
+{
+  "accuracy_status": "NOT_EVALUATED",
+  "base_branch": "main",
+  "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "files": [
+    {
+      "path": "docs/neuralforecast/auto_segrnn/README.md",
+      "role": "documentation",
+      "sha256": "0f47878250acae999adbfe937a64a66b754cde35cbe8b1e6d362d07bc0178e3c",
+      "size_bytes": 2701
+    },
+    {
+      "path": "docs/neuralforecast/auto_segrnn/THIRD_PARTY_NOTICE.md",
+      "role": "documentation",
+      "sha256": "aa9fbd8fc0db30ffde55805805279971d6440a26a863a303f1b523a5d6c32989",
+      "size_bytes": 1384
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_segrnn/__init__.py",
+      "role": "source",
+      "sha256": "de23a3841371bf14215cdfdb1137bc97cc554a301acd0bfd6334e1d94d8a37af",
+      "size_bytes": 1002
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_segrnn/auto.py",
+      "role": "source",
+      "sha256": "f89337819599995ab2355cb6b523c9ddeb422268a06383325f438a9d66e5ded6",
+      "size_bytes": 3669
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_segrnn/contracts.py",
+      "role": "source",
+      "sha256": "ab793e9eeca136b156b36b99d7d28f4b01477af897129a506d58f20dcee498c9",
+      "size_bytes": 3991
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_segrnn/model.py",
+      "role": "source",
+      "sha256": "e0837f2f17891567feaeec049b9ed42f6b14b46c37774c256afa5d8ccbff82cb",
+      "size_bytes": 6225
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_segrnn/runtime.py",
+      "role": "source",
+      "sha256": "a3187b2cc74f19d83520b085c2dd2b18583a4b7cfd44e6e6124e8e8998122d76",
+      "size_bytes": 3520
+    },
+    {
+      "path": "tests/neuralforecast/auto_segrnn/test_contracts.py",
+      "role": "test",
+      "sha256": "12d9891131c9f6145b974908c2fcecb0f9f7437fcd2359159dcd963603e930e6",
+      "size_bytes": 1975
+    },
+    {
+      "path": "tests/neuralforecast/auto_segrnn/test_runtime_factory.py",
+      "role": "test",
+      "sha256": "e9a49d4dde58944aabc12a3c193ba586810edab030aba40301269ca3b9edd138",
+      "size_bytes": 6080
+    }
+  ],
+  "model_id": "nf-local-auto-segrnn",
+  "registered": false,
+  "runtime_status": "REAL_RUNTIME_PENDING",
+  "schema_version": "1.0.0",
+  "status": "PARTIALLY_VERIFIED",
+  "target_runtime": {
+    "auto_contract": "BaseAuto",
+    "model_contract": "BaseModel",
+    "package": "neuralforecast",
+    "version": "3.2.0"
+  },
+  "upstream": {
+    "license": "MIT",
+    "repository": "thuml/Time-Series-Library",
+    "revision": "4e938a1767106324dd753b2a44832bf870a0252e",
+    "source_path": "models/SegRNN.py"
+  },
+  "validation": {
+    "ast_parse": "PASS",
+    "compileall": "PASS",
+    "cpu_fit_predict": "NOT_EXECUTED",
+    "focused_pytest": "11 passed in 2.27s",
+    "gpu_fit_predict": "NOT_EXECUTED",
+    "import_scan": "PASS",
+    "line_length_le_100": "PASS",
+    "real_neuralforecast_runtime": "NOT_EXECUTED",
+    "real_optuna_runtime": "NOT_EXECUTED",
+    "real_ray_runtime": "NOT_EXECUTED"
+  }
+}
