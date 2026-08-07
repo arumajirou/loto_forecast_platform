@@ -19,6 +19,7 @@ Migrate one provider per PR after this foundation is merged.
 - [ ] Convert snapshot files to `ArtifactIdentity` records.
 - [ ] Construct provider commands without shell interpolation.
 - [ ] Decode provider responses into `RunObservation`.
+- [ ] Bind REAL device samples to the executor-owned process-instance SHA-256, not PID alone.
 - [ ] Preserve model-specific load, input, inference and semantic checks.
 - [ ] Map real/synthetic/fake origin explicitly.
 - [ ] Keep CPU_SMOKE and GPU_FORMAL as separate profiles.
@@ -32,6 +33,7 @@ Migrate one provider per PR after this foundation is merged.
 - [ ] Compare shape, finite and quantile checks.
 - [ ] Compare requested/effective device and CPU-fallback handling.
 - [ ] Compare GPU PID, UUID, VRAM and PID-release checks.
+- [ ] Compare PID-reuse resistance and external-sample time/process binding.
 - [ ] Compare save/reload/re-predict and replay tolerance.
 - [ ] Compare manifest, SHA256SUMS and evidence ZIP bytes or documented format differences.
 - [ ] Prove synthetic evidence remains PARTIALLY_VERIFIED.
