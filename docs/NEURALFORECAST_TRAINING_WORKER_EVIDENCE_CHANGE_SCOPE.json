@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0",
+  "status": "TRAINING_WORKER_EVIDENCE_IMPLEMENTED_REAL_GPU_PENDING",
+  "base_branch": "agent/neuralforecast-db-runtime-verification",
+  "base_pr": 90,
+  "scope": {
+    "included": [
+      "Lightning training-hook evidence in the process that fits the model",
+      "stable pickle-addressable NeuralForecast AutoModel subclasses",
+      "Ray and Optuna backend-independent final-refit instrumentation",
+      "strict CUDA device, positive VRAM and exact worker PID proof",
+      "callback hook completeness and callback-error rejection",
+      "CPU training proof without CUDA promotion",
+      "legacy two-field GPU evidence rejection",
+      "database facade class patch and finally restoration",
+      "database execution-context model ID and GPU requirement propagation",
+      "runtime certification formal-training contract hardening",
+      "dependency-light imports and focused synthetic tests"
+    ],
+    "excluded": [
+      "real NeuralForecast 3.2.0 CPU smoke",
+      "real NeuralForecast 3.2.0 GPU smoke",
+      "RTX 5070 Ti certification",
+      "all-36 AutoModel campaign",
+      "automatic search-policy promotion",
+      "accuracy-improvement claims",
+      "Holdout or Prospective selection",
+      "raw-data modification",
+      "prediction-lock modification",
+      "merge or release"
+    ]
+  },
+  "safety": {
+    "direct_main_write": false,
+    "force_push": false,
+    "auto_merge": false,
+    "raw_data_changed": false,
+    "prediction_lock_changed": false
+  }
+}

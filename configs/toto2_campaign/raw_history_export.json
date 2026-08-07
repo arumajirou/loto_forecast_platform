@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "source_schema": "dataset",
+  "source_table": "loto_y_ts_unified",
+  "source_ts_type": "raw",
+  "games": ["numbers3", "numbers4", "miniloto", "loto6", "loto7"],
+  "minimum_complete_draws": 512,
+  "transaction_isolation": "repeatable read",
+  "transaction_read_only": true,
+  "write_formats": ["json", "parquet"],
+  "draw_no_semantics": "one_based_ordinal_over_ds"
+}

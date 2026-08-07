@@ -1,0 +1,52 @@
+{
+  "base_branch": "feat/moirai2-runtime-campaign-v1",
+  "base_sha": "234699692a939586f8159881ec31d7b3b8ac507d",
+  "changed_file_count": 23,
+  "changed_files": [
+    "configs/moirai2_campaign/p8b_lock_review.json",
+    "docs/moirai2/CURRENT_STATE_MOIRAI2.md",
+    "docs/moirai2/MOIRAI2_CAPABILITY_MATRIX.csv",
+    "docs/moirai2/MOIRAI2_CHANGELOG.md",
+    "docs/moirai2/MOIRAI2_HANDOFF.md",
+    "docs/moirai2/MOIRAI2_RUNTIME_CERTIFICATION.csv",
+    "docs/moirai2/MOIRAI2_SHA256SUMS",
+    "docs/moirai2/MOIRAI2_VERIFICATION_REPORT.md",
+    "docs/moirai2/P8B_CHANGE_SCOPE.json",
+    "docs/moirai2/P8B_LOCK_REVIEW.md",
+    "docs/moirai2/P8B_SHA256SUMS",
+    "docs/moirai2/P8B_TEST_PLAN.md",
+    "docs/moirai2/P8B_VERIFICATION_REPORT.md",
+    "scripts/generate_moirai2_lock_candidate.py",
+    "scripts/install_reviewed_moirai2_lock.py",
+    "scripts/preflight_moirai2_runtime_lane.py",
+    "scripts/run_moirai2_runtime_campaign.py",
+    "src/loto/moirai2_campaign/lock_review.py",
+    "src/loto/moirai2_campaign/runtime_preflight.py",
+    "tests/moirai2_campaign/test_lock_review.py",
+    "tests/moirai2_campaign/test_lock_workflow.py",
+    "tests/moirai2_campaign/test_p8b_cli_scope.py",
+    "tests/moirai2_campaign/test_runtime_preflight.py"
+  ],
+  "execution_claims": {
+    "accuracy_evaluation": false,
+    "frozen_runtime_probe": false,
+    "human_lock_review": false,
+    "real_model_inference": false,
+    "real_uv_lock_resolution": false,
+    "target_host_installation": false
+  },
+  "head_branch": "feat/moirai2-lock-review-v1",
+  "intentionally_unchanged": [
+    "root pyproject.toml and uv.lock",
+    ".github/workflows",
+    "shared workers and catalogs",
+    "common CLI and top-level README",
+    "Moirai provider inference and response contracts",
+    "Moirai 1.x, Moirai-MoE, and other providers",
+    "OOF, Holdout, and Prospective data paths"
+  ],
+  "parent_pr": 89,
+  "phase": "P8B_LOCK_REVIEW",
+  "schema_version": "moirai2-p8b-change-scope-v1",
+  "status": "IMPLEMENTED_LOCAL_VERIFIED_TARGET_HOST_PENDING"
+}

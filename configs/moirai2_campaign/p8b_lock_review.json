@@ -1,0 +1,41 @@
+{
+  "approval": {
+    "approval_token": "APPLY-REVIEWED-MOIRAI2-LOCK",
+    "decision": "APPROVED",
+    "replace_existing_requires_current_lock_sha256": true,
+    "require_expected_candidate_lock_sha256": true,
+    "require_reviewer": true,
+    "require_timezone_reviewed_at": true,
+    "separate_installation_output_directory": true
+  },
+  "candidate_generation": {
+    "candidate_artifact_remains_unchanged_during_install": true,
+    "lane_modified": false,
+    "mode": "non_destructive",
+    "output_directory_must_not_exist": true,
+    "uv_command": "uv lock --project <candidate-project>"
+  },
+  "installed_artifacts": [
+    "uv.lock",
+    "LOCK_REVIEW_REPORT.json",
+    "LOCK_REVIEW_APPROVAL.json"
+  ],
+  "preflight": {
+    "require_cross_hash_match": true,
+    "require_runtime_lane_match": true,
+    "require_zero_violations": true,
+    "run_before_frozen_probe": true
+  },
+  "production_champion_eligible": false,
+  "schema_version": "moirai2-p8b-lock-review-v1",
+  "static_review": {
+    "allow_registry_sources": true,
+    "allow_root_virtual_source": true,
+    "forbid_editable_sources": true,
+    "forbid_git_sources": true,
+    "forbid_path_sources": true,
+    "require_exact_direct_pins": true,
+    "require_registry_artifact_hash": true,
+    "require_resolved_dependency_names": true
+  }
+}

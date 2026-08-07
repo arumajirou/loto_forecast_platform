@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED",
+  "reviewer": "REPLACE_WITH_REVIEWER",
+  "reviewed_at": "2026-08-06T00:00:00Z",
+  "lock_sha256": "REPLACE_WITH_64_LOWERCASE_HEX",
+  "dependency_sources_reviewed": true,
+  "package_hashes_reviewed": true,
+  "licenses_reviewed": true
+}

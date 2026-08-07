@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "status": "AUTO_CAMPAIGN_PERSISTENCE_IMPLEMENTED_DB_CAMPAIGN_PENDING",
+  "base_branch": "agent/neuralforecast-search-space-profile",
+  "base_pr": 84,
+  "scope": {
+    "included": [
+      "pre-constructor auto-campaign search-space artifact persistence",
+      "failure-durable task-key-specific evidence directories",
+      "dedicated profile artifact manifest",
+      "profile and manifest SHA-256 files",
+      "read-after-write verification",
+      "fixed, Ray-domain and Optuna-callable profile selection",
+      "AutoHINT profile persistence",
+      "constructor artifact profile metadata",
+      "backward-compatible constructor artifact helper",
+      "focused persistence and integration tests"
+    ],
+    "excluded": [
+      "database AutoModel campaign persistence",
+      "automatic sampler switching",
+      "ASHA or other scheduler activation",
+      "multi-objective optimization",
+      "accuracy-improvement claims",
+      "real all-36 NeuralForecast execution",
+      "RTX 5070 Ti runtime certification",
+      "Holdout or Prospective model selection",
+      "merge or release"
+    ]
+  },
+  "safety": {
+    "direct_main_write": false,
+    "force_push": false,
+    "auto_merge": false,
+    "raw_data_changed": false,
+    "prediction_lock_changed": false
+  }
+}
