@@ -1,39 +1,33 @@
 # Moirai 2.0 Verification Report
 
-Status: `PARTIALLY_VERIFIED / P7_FAKE_RUNTIME_PASS / REAL_RUNTIME_PENDING`.
+Status: `PARTIALLY_VERIFIED / P8_HARNESS_LOCAL_PASS / REAL_RUNTIME_PENDING`.
 
-## P0-P6 evidence retained from PR #83
+## Retained evidence
 
-- focused pytest: `28 passed`;
-- Python `compileall`: `PASS`;
-- provider identity smoke: `PASS`;
-- structured-file parsing, path audit, SHA-256 verification, and secret scan: `PASS`.
+- P0-P6 Contract v2 and focused tests from PR #83;
+- P7 covariate compilation, native field wiring, hashes, and fake-boundary tests from PR #86.
 
-## P7 executed locally
+## P8 executed locally
 
-- changed-scope and related regression pytest: `30 passed`;
-- fake Torch/GluonTS/Uni2TS runner boundary: `PASS`;
-- past-only matrix shape and native field: `PASS`;
-- known-future history-plus-horizon shape and native field: `PASS`;
-- ordered feature identity and SHA-256 evidence: `PASS`;
-- calendar gap expansion: `PASS`;
-- target/covariate and cross-group collision rejection: `PASS`;
-- covariate-aware token-budget rejection: `PASS`;
-- univariate target shape and `one_dim_target=true`: `PASS`;
-- Python `compileall`: `PASS`;
+- canonical request and prediction SHA-256 utilities: `PASS`;
+- strict GPU/process CSV parsers: `PASS`;
+- torch forward input/output device hook: `PASS` on CPU;
+- fake provider runner device evidence: `PASS`;
+- distinct-process reload comparison: `PASS` with synthetic responses;
+- changed quantile, same PID, CPU fallback, and missing external CUDA PID rejection: `PASS`;
+- model artifact and covariate identity comparison: `PASS`;
+- provider PID post-exit release gate: `PASS`;
+- certification CLI and runner compileall: `PASS`;
 - Python source lines over 100 characters: `0`.
 
 ## Not executed or certified
 
-- Ruff and mypy were unavailable in the authoring environment;
-- isolated lockfile resolution and frozen synchronization;
-- real Uni2TS import, snapshot load, or predictor execution;
-- real native covariate transform and observed-mask behavior;
-- all-nine-quantile inference with covariates;
-- separate-process reload and re-prediction;
-- CUDA PID, UUID, VRAM, and no-fallback certification;
-- full repository pytest or successful GitHub Actions steps;
-- OOF, Holdout, Prospective, accuracy, baseline superiority, calibration, or fine-tuning.
+- resolved isolated lockfiles or frozen synchronization;
+- real Uni2TS import, snapshot load, predictor, or all-nine-quantile inference;
+- two real provider processes and exact real prediction equality;
+- real GPU PID, UUID, VRAM, or post-exit release evidence;
+- Ruff, mypy, full repository pytest, or successful GitHub Actions steps;
+- OOF, Holdout, Prospective, accuracy, calibration, baselines, or fine-tuning.
 
-The fake boundary verifies project-side field names, shapes, dimensions, and response evidence. It is
-not represented as model-runtime certification.
+No unexecuted item is represented as success. Research-only licensing continues to block production
+champion eligibility, automatic promotion, and commercial deployment certification.

@@ -34,6 +34,7 @@ from loto.moirai2_campaign.quantiles import (  # noqa: E402
     extract_native_quantiles,
     median_point_forecast,
 )
+from loto.moirai2_campaign.runtime_observer import ForwardDeviceObserver  # noqa: E402
 from loto.moirai2_campaign.time_adapter import (  # noqa: E402
     build_calendar_time_axis,
     build_draw_sequence_axis,
@@ -104,6 +105,11 @@ def run_provider(request: Moirai2ProviderRequest, *, runtime_lane: str) -> dict[
     from gluonts.dataset.common import ListDataset
     from uni2ts.model.moirai2 import Moirai2Forecast, Moirai2Module
 
+    np.random.seed(request.seed)
+    torch.manual_seed(request.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(request.seed)
+
     package_version = importlib.metadata.version("uni2ts")
     if package_version != UNI2TS_VERSION:
         raise RuntimeError(
@@ -167,10 +173,34 @@ def run_provider(request: Moirai2ProviderRequest, *, runtime_lane: str) -> dict[
         feat_dynamic_real_dim=covariates.known_future_dim,
         past_feat_dynamic_real_dim=covariates.past_dim,
     )
-    predictor = model.create_predictor(batch_size=request.batch_size, device=execution_device)
-    forecast = next(iter(predictor.predict(dataset)))
+    observer = ForwardDeviceObserver().attach(model)
+    try:
+        predictor = model.create_predictor(
+            batch_size=request.batch_size,
+            device=execution_device,
+        )
+        predictor_device = str(getattr(predictor, "device", execution_device))
+        forecast = next(iter(predictor.predict(dataset)))
+    finally:
+        observer.close()
+    forward_evidence = observer.evidence()
     if execution_device == "cuda":
         torch.cuda.synchronize()
+    expected_prefix = execution_device
+    observed_devices = [
+        str(module_parameter.device),
+        predictor_device,
+        *forward_evidence.input_tensor_devices,
+        *forward_evidence.output_tensor_devices,
+    ]
+    if forward_evidence.forward_call_count < 1:
+        raise RuntimeError("model forward device observation is missing")
+    if not forward_evidence.input_tensor_devices or not forward_evidence.output_tensor_devices:
+        raise RuntimeError("input/output tensor device evidence is incomplete")
+    if any(not device.startswith(expected_prefix) for device in observed_devices):
+        raise RuntimeError(
+            f"tensor device mismatch: expected={expected_prefix}, observed={observed_devices}"
+        )
     quantiles = extract_native_quantiles(
         forecast,
         horizon=request.prediction_length,
@@ -199,6 +229,9 @@ def run_provider(request: Moirai2ProviderRequest, *, runtime_lane: str) -> dict[
             "quantile_count": len(NATIVE_QUANTILE_LEVELS),
             "sample_support": False,
             "num_samples": None,
+            "seed": request.seed,
+            "predictor_device": predictor_device,
+            "forward_device_evidence": forward_evidence.as_dict(),
             "token_geometry": token_geometry.as_dict(),
             "time_semantics": request.time_semantics.value,
             "frequency_policy": time_axis.frequency_policy,

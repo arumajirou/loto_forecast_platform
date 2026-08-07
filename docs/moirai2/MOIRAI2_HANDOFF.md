@@ -1,14 +1,16 @@
 # Moirai 2.0 Handoff
 
-PR #83 remains the P0-P6 contract base. Continue P7 only on
-`feat/moirai2-covariate-runtime-v1`; do not modify or retarget PR #83.
+PR #83 is the P0-P6 base, PR #86 is the P7 covariate layer, and P8 continues only on
+`feat/moirai2-runtime-certification-v1`. Do not retarget or write to either parent branch.
 
-The next target-host gate is to resolve the isolated lockfile and run three separate cases:
+On the target host, generate and review the isolated lockfile, perform frozen synchronization, and
+create an explicit request containing a pinned local snapshot path. Run the P8 certification CLI
+into a new output directory. Never reuse or overwrite a previous Run ID.
 
-1. target-only;
-2. past-only covariates;
-3. past-only plus known-future covariates.
+Certification must retain two different provider PIDs, exact point and q0.1-q0.9 prediction hashes,
+model config/weight hashes, covariate hashes, forward tensor devices, stdout/stderr, exit codes, and
+external GPU samples. CUDA formal success also requires one GPU UUID, provider PID visibility,
+positive VRAM, no CPU fallback, and provider PID absence after exit.
 
-For each case, retain request, response, ordered feature names, input shapes, matrix hashes, future-tail hash, token geometry, all nine quantiles, PID/device evidence, and a unique Run ID. Run both
-draw-sequence and calendar-time cases. Do not open Holdout or Prospective data. Keep both PRs Draft
-until real Uni2TS execution, Ruff, mypy, focused tests, full pytest, and one actionable CI run pass.
+Do not open Holdout or Prospective data. Keep all stacked PRs Draft until real supported-lane and
+CUDA13 execution, Ruff, mypy, focused tests, one final full pytest, and one actionable CI run pass.
