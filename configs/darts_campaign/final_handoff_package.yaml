@@ -1,0 +1,21 @@
+schema_version: 1
+package_id: darts-p1-p12-final-handoff-20260805
+source_dir: docs/darts/final_handoff
+output_zip: artifacts/darts-final-handoff/darts-p1-p12-final-handoff-20260805.zip
+source_commit: b37dc3e463f95a1a8eced24cc99f4d14cc27fe67
+base_commit: d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0
+generated_at_utc: "2026-08-05T10:50:00Z"
+required_documents:
+  - README.md
+  - REQUIREMENTS.md
+  - SPECIFICATION.md
+  - ARCHITECTURE.md
+  - DATA_CONTRACT.md
+  - TEST_PLAN.md
+  - VERIFICATION_REPORT.md
+  - CHANGELOG.md
+  - HANDOFF.md
+  - RUNBOOK.md
+  - ARTIFACT_MANIFEST.md
+  - SHA256SUMS
+compression_level: 9

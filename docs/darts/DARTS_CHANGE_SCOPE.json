@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "scope_id": "darts-forecasting-contract-v1",
+  "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "branch": "feat/darts-forecasting-contract-v1",
+  "target_version": "darts==0.46.1",
+  "implemented_phases": [
+    "P1_PARTIAL_PACKAGE_ISOLATION",
+    "P2_PROVIDER_PROTOCOL",
+    "P3_RUNTIME_DISCOVERY_CONTRACT",
+    "P4_TIMESERIES_GAME_GEOMETRY_MINIMUM",
+    "P5_LOCAL_STATISTICAL_MODELS_CONTRACT",
+    "P6_REGRESSION_MODELS_CONTRACT",
+    "P7_TORCH_MODELS_CONTRACT",
+    "P8_FOUNDATION_MODELS_CONTRACT",
+    "P9_HISTORICAL_EVALUATION_CONTRACT",
+    "P10_ENSEMBLE_CONFORMAL_CONTRACT",
+    "P11_PERSISTENCE_GPU_CERTIFICATION_CONTRACT",
+    "P12_CROSS_LIBRARY_COMPARISON_CONTRACT"
+  ],
+  "finalization": [
+    "DETERMINISTIC_FINAL_HANDOFF_PACKAGE"
+  ],
+  "cross_cutting_contracts": [
+    "EVALUATION_AND_PERSISTENCE",
+    "PROSPECTIVE_SHA256_SEALING",
+    "OOF_MULTI_SEED_PROVENANCE",
+    "FAIL_CLOSED_DEVICE_CERTIFICATION",
+    "FOUNDATION_REVISION_AND_ARTIFACT_CERTIFICATION",
+    "HISTORICAL_FORECAST_BACKTEST_RESIDUAL_PARITY",
+    "ENSEMBLE_STACKING_AND_CONFORMAL_COVERAGE_CERTIFICATION",
+    "PROCESS_BOUNDARY_SAVE_LOAD_CHECKPOINT_CROSS_DEVICE_CERTIFICATION",
+    "CROSS_LIBRARY_FAIRNESS_WRAPPER_DEDUPLICATION_BASELINE_GATE",
+    "FINAL_HANDOFF_REQUIRED_DOCUMENTS_SHA256_DETERMINISTIC_ZIP"
+  ],
+  "owned_paths": [
+    "environments/darts-notorch/**",
+    "environments/darts-torch/**",
+    "scripts/run_darts_provider.py",
+    "src/loto/darts_campaign/**",
+    "tests/darts_campaign/**",
+    "configs/darts_campaign/**",
+    "docs/darts/**"
+  ],
+  "forbidden_paths_unchanged": [
+    "pyproject.toml",
+    "uv.lock",
+    "src/loto/models/workers.py",
+    "src/loto/models/catalog.py",
+    "src/loto/models/catalog_full.py",
+    ".github/workflows/**",
+    "README.md"
+  ],
+  "runtime_status": "REAL_CROSS_LIBRARY_PROVIDERS_BLOCKED",
+  "package_status": "LOCAL_DETERMINISTIC_HANDOFF_VERIFIED",
+  "ci_status": "BLOCKED_PRE_RUN",
+  "merge": "USER_APPROVAL_REQUIRED"
+}

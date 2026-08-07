@@ -1,0 +1,23 @@
+schema_version: 1
+run_id: darts-local-ensemble-smoke
+mode: fit_predict
+geometry:
+  game_id: loto7
+  positions: 7
+  min_value: 1
+  max_value: 37
+model:
+  public_name: RegressionEnsembleModel
+  wrapper_name: RegressionEnsembleModel
+  base_models:
+    - NaiveDrift
+    - ExponentialSmoothing
+series_layout: position_local
+horizon: 1
+model_args:
+  regression_train_n_points: 20
+runtime: notorch
+device: cpu
+seed: 1
+timeout_seconds: 900
+artifact_dir: artifacts/darts/local-smoke
