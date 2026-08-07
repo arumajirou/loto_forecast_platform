@@ -1,0 +1,176 @@
+{
+  "schema_version": "1.0.0",
+  "scope": "Data Access Ledger v1 foundation artifacts",
+  "artifact_count": 33,
+  "exclusions": [
+    "docs/data_access_ledger/ARTIFACT_MANIFEST.json (self)",
+    "docs/data_access_ledger/SHA256SUMS (self)"
+  ],
+  "artifacts": [
+    {
+      "path": "configs/data_access_ledger/example_ledger.json",
+      "sha256": "da154bed4f8ed18c9748ae794d47de35d57e382ab744a46e9323f4a9df370a24",
+      "size_bytes": 5465
+    },
+    {
+      "path": "docs/data_access_ledger/ARCHITECTURE.md",
+      "sha256": "51cbaab5e2d098768f2868fc080b46dc8a92ba60e0ff5b71cd57de9f685ba231",
+      "size_bytes": 905
+    },
+    {
+      "path": "docs/data_access_ledger/CHANGELOG.md",
+      "sha256": "5dd6f66f84349db8c27e8adc35cf2a8fa544f8662d1186fcc1a9a99945785e68",
+      "size_bytes": 618
+    },
+    {
+      "path": "docs/data_access_ledger/DATA_CONTRACT.md",
+      "sha256": "eeef2c5b13d6ca189b2117d4eb434f8f77fcdd170100594aae9d50929a96e553",
+      "size_bytes": 1555
+    },
+    {
+      "path": "docs/data_access_ledger/HANDOFF.md",
+      "sha256": "7e1db77e10f64c9d1fe07902bbddac44c77de24933850c7f354e7e58c30a093a",
+      "size_bytes": 1422
+    },
+    {
+      "path": "docs/data_access_ledger/README.md",
+      "sha256": "3cc8b93cb9b9794986cd7dc3cc7b0d9b9badc8571bc6c0e56353eae833f0ab0b",
+      "size_bytes": 1621
+    },
+    {
+      "path": "docs/data_access_ledger/REQUIREMENTS.md",
+      "sha256": "f7d43cdb1268f9e04d6fe99cfe9df64bc287d4eba31bc29aa9f31ad77dab7b70",
+      "size_bytes": 1693
+    },
+    {
+      "path": "docs/data_access_ledger/RUNBOOK.md",
+      "sha256": "9c05737aa73872388f46cf041d4851d1fcb3a02c9cffc1df9e01921a336d5579",
+      "size_bytes": 1063
+    },
+    {
+      "path": "docs/data_access_ledger/SPECIFICATION.md",
+      "sha256": "05d7efaacde3e25a9c945f3ecb516ee517110d0c921f4ec52af4da63eb13a2c5",
+      "size_bytes": 2011
+    },
+    {
+      "path": "docs/data_access_ledger/TEST_PLAN.md",
+      "sha256": "c13549f7faf820ae452c9e730fadaeb2a45e316bdef75776bea8c63656c726d7",
+      "size_bytes": 1126
+    },
+    {
+      "path": "docs/data_access_ledger/VERIFICATION_REPORT.md",
+      "sha256": "f6f4f3e59e56898cca25d72fc714283337ef5cd8f6278cebac57ab6c70376086",
+      "size_bytes": 1003
+    },
+    {
+      "path": "src/loto/data_access_ledger/__init__.py",
+      "sha256": "55024525251453d169271c9cb76655b33e958154d390e797b2e0b7300a1164b5",
+      "size_bytes": 1165
+    },
+    {
+      "path": "src/loto/data_access_ledger/_common.py",
+      "sha256": "dd9e51ffd0426af9c9c88e43f52a768d0d1159de2ce7a6107ba6b50d43f88039",
+      "size_bytes": 2523
+    },
+    {
+      "path": "src/loto/data_access_ledger/canonical.py",
+      "sha256": "257db482ff219ca7987a6ef5a2f357f69835232d1c42b835c2a3930d740c5755",
+      "size_bytes": 2969
+    },
+    {
+      "path": "src/loto/data_access_ledger/cli.py",
+      "sha256": "7ca4e6248aa8b198e32684e6cfffc27ee61bd8ba708d32d45a0ad0e3f058b3b5",
+      "size_bytes": 2997
+    },
+    {
+      "path": "src/loto/data_access_ledger/contracts.py",
+      "sha256": "2ab82d708c45ad5d4015c67b5eb0fa2711f06955198c218ddaa24a08993b5964",
+      "size_bytes": 7305
+    },
+    {
+      "path": "src/loto/data_access_ledger/enums.py",
+      "sha256": "b17e1b0aa327be781ac0c22cb99dda6bc879cda6d859c725f82a09c7e222234b",
+      "size_bytes": 3038
+    },
+    {
+      "path": "src/loto/data_access_ledger/report.py",
+      "sha256": "236d723e06e0c823d4258d772b87244559a6e8fdfe899f7c5ff1933aa6342e83",
+      "size_bytes": 1957
+    },
+    {
+      "path": "src/loto/data_access_ledger/rules_fit.py",
+      "sha256": "8d17da8a5f4abd82aa70ced8f1e2ebccf7859b577de2f56c33faabc2d11b338b",
+      "size_bytes": 5411
+    },
+    {
+      "path": "src/loto/data_access_ledger/rules_oof.py",
+      "sha256": "521f6ce74f3b4bf74c4b3e8e0ecdccbc8b6eb3a1aa23f5a695132d7575e15a15",
+      "size_bytes": 5302
+    },
+    {
+      "path": "src/loto/data_access_ledger/rules_prospective.py",
+      "sha256": "f60c97a7b1070c918723d1ad7ffe60466dfad66a6561d4a0529fb777703013da",
+      "size_bytes": 5333
+    },
+    {
+      "path": "src/loto/data_access_ledger/rules_state.py",
+      "sha256": "ee93d7b66e2e73050b6e62a751eb7df31f777588be75767dc986b95dd551b43e",
+      "size_bytes": 8591
+    },
+    {
+      "path": "src/loto/data_access_ledger/rules_structure.py",
+      "sha256": "d921141258048e091075df568eb3628b7dbf50b071820040472f0f27da9c143f",
+      "size_bytes": 7280
+    },
+    {
+      "path": "src/loto/data_access_ledger/validator.py",
+      "sha256": "21b1bd1c01aad98e48588f41b521b2078aaf215855bea72fb598b3ecffb8ba44",
+      "size_bytes": 1754
+    },
+    {
+      "path": "tests/data_access_ledger/conftest.py",
+      "sha256": "5e0502dbd97c7d293a30beed1d920ba58c4b41d08a5c03526a96e98af7e5fc07",
+      "size_bytes": 4583
+    },
+    {
+      "path": "tests/data_access_ledger/test_chronology.py",
+      "sha256": "64a050a7113f0bb2bf726f0bf715c349d01ced53749095ca1b7c2db9e9b8515c",
+      "size_bytes": 4788
+    },
+    {
+      "path": "tests/data_access_ledger/test_cli.py",
+      "sha256": "fc7ad49d8c20538fc16522c01a88631ba9aa14a5bf66f284a188ea21970cf333",
+      "size_bytes": 1732
+    },
+    {
+      "path": "tests/data_access_ledger/test_contracts.py",
+      "sha256": "4a990bf23f9cec3741107e71b72a510968c8d4c000a53165f4dcfc01da3a89d3",
+      "size_bytes": 2276
+    },
+    {
+      "path": "tests/data_access_ledger/test_fit_scope.py",
+      "sha256": "65abacc4a9d856b7ba862679949eb79a81d29f6c9a525c9e97b656060c2f686a",
+      "size_bytes": 3341
+    },
+    {
+      "path": "tests/data_access_ledger/test_oof_scope.py",
+      "sha256": "315d8f731e1cc4d27173ea21f8163dc89cdcf52517ae3bf6ad6565d3668887e6",
+      "size_bytes": 3920
+    },
+    {
+      "path": "tests/data_access_ledger/test_prospective_scope.py",
+      "sha256": "dc24328bf69491cf97379c4e9398992cd27db255ecda0da41877c6e973efd389",
+      "size_bytes": 5317
+    },
+    {
+      "path": "tests/data_access_ledger/test_state_provenance.py",
+      "sha256": "ecd0e50f4247d0368444e783975ec419d1ed7b04b492847901c82912904f911c",
+      "size_bytes": 2393
+    },
+    {
+      "path": "tests/data_access_ledger/test_tamper.py",
+      "sha256": "9197bf125d8e9d5d9826924f5ef55c9864d83a77a12cd0e7a10765e27c11185f",
+      "size_bytes": 2022
+    }
+  ]
+}
