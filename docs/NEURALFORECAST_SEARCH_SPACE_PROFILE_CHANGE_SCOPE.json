@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "status": "PROFILE_FOUNDATION_IMPLEMENTED_CAMPAIGN_PERSISTENCE_PENDING",
+  "base_branch": "agent/neuralforecast-search-policy-foundation",
+  "base_pr": 81,
+  "scope": {
+    "included": [
+      "dependency-light search-space profile schema",
+      "Ray-compatible static domain introspection without importing Ray",
+      "Optuna define-by-run recording-trial probes",
+      "explicit COMPLETE, PARTIAL, UNAVAILABLE and FAILED states",
+      "conservative Random, TPE, CMA-ES and Grid eligibility evidence",
+      "deterministic serialized profile SHA-256",
+      "atomic profile JSON and checksum writer contract",
+      "dependency-light AutoModel plan integration",
+      "runtime model profile attachment",
+      "focused unit and adapter tests"
+    ],
+    "excluded": [
+      "auto_campaign model_factory integration",
+      "database campaign model-directory persistence hook",
+      "automatic sampler switching",
+      "ASHA or other scheduler activation",
+      "multi-objective optimization",
+      "accuracy-improvement claims",
+      "all-36 real NeuralForecast execution",
+      "RTX 5070 Ti GPU certification",
+      "Holdout or Prospective model selection",
+      "merge or release"
+    ]
+  },
+  "safety": {
+    "direct_main_write": false,
+    "force_push": false,
+    "auto_merge": false,
+    "raw_data_changed": false,
+    "prediction_lock_changed": false
+  }
+}
