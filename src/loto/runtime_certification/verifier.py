@@ -62,6 +62,30 @@ def _validate_process_binding(
         raise CertificationVerificationError(
             "execution process PID differs from device provider PID"
         )
+    if evidence_origin == EvidenceOrigin.REAL:
+        process_identity = observation.execution.process_identity_sha256
+        if process_identity is None:
+            raise CertificationVerificationError(
+                "real evidence requires an executor-owned process identity"
+            )
+        if process_identity != observation.device.provider_process_identity_sha256:
+            raise CertificationVerificationError(
+                "execution process identity differs from device provider identity"
+            )
+        if observation.device.requested_device == "cuda":
+            matching_samples = [
+                sample
+                for sample in observation.device.external_gpu_samples
+                if sample.provider_pid == process_pid
+                and sample.provider_process_identity_sha256 == process_identity
+                and observation.execution.started_at_utc
+                <= sample.observed_at_utc
+                <= observation.execution.finished_at_utc
+            ]
+            if not matching_samples:
+                raise CertificationVerificationError(
+                    "real CUDA evidence requires a process-bound sample during execution"
+                )
 
 
 def build_certification_report(
