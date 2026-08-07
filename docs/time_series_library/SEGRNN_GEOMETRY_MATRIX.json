@@ -1,0 +1,192 @@
+{
+  "case_count": 6,
+  "cases": [
+    {
+      "channel_emb_shape": [
+        1,
+        8
+      ],
+      "channels": 1,
+      "d_model": 16,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss_after_backward": 0.02723488211631775,
+      "parameter_count": 1738,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pos_emb_shape": [
+        2,
+        8
+      ],
+      "pred_len": 4,
+      "prediction_shape": [
+        2,
+        4,
+        1
+      ],
+      "seg_len": 2,
+      "seg_num_x": 4,
+      "seg_num_y": 2,
+      "seq_len": 8,
+      "status": "PASS"
+    },
+    {
+      "channel_emb_shape": [
+        3,
+        10
+      ],
+      "channels": 3,
+      "d_model": 20,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss_after_backward": 0.029824309051036835,
+      "parameter_count": 2713,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pos_emb_shape": [
+        2,
+        10
+      ],
+      "pred_len": 6,
+      "prediction_shape": [
+        2,
+        6,
+        3
+      ],
+      "seg_len": 3,
+      "seg_num_x": 4,
+      "seg_num_y": 2,
+      "seq_len": 12,
+      "status": "PASS"
+    },
+    {
+      "channel_emb_shape": [
+        7,
+        12
+      ],
+      "channels": 7,
+      "d_model": 24,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss_after_backward": 0.020193757489323616,
+      "parameter_count": 3928,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pos_emb_shape": [
+        2,
+        12
+      ],
+      "pred_len": 8,
+      "prediction_shape": [
+        2,
+        8,
+        7
+      ],
+      "seg_len": 4,
+      "seg_num_x": 4,
+      "seg_num_y": 2,
+      "seq_len": 16,
+      "status": "PASS"
+    },
+    {
+      "channel_emb_shape": [
+        3,
+        8
+      ],
+      "channels": 3,
+      "d_model": 16,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss_after_backward": 0.06066193804144859,
+      "parameter_count": 1902,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pos_emb_shape": [
+        4,
+        8
+      ],
+      "pred_len": 24,
+      "prediction_shape": [
+        2,
+        24,
+        3
+      ],
+      "seg_len": 6,
+      "seg_num_x": 4,
+      "seg_num_y": 4,
+      "seq_len": 24,
+      "status": "PASS"
+    },
+    {
+      "channel_emb_shape": [
+        1,
+        16
+      ],
+      "channels": 1,
+      "d_model": 32,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss_after_backward": 0.011744208633899689,
+      "parameter_count": 6920,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pos_emb_shape": [
+        1,
+        16
+      ],
+      "pred_len": 8,
+      "prediction_shape": [
+        2,
+        8,
+        1
+      ],
+      "seg_len": 8,
+      "seg_num_x": 4,
+      "seg_num_y": 1,
+      "seq_len": 32,
+      "status": "PASS"
+    },
+    {
+      "channel_emb_shape": [
+        5,
+        9
+      ],
+      "channels": 5,
+      "d_model": 18,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss_after_backward": 0.023974020034074783,
+      "parameter_count": 2197,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pos_emb_shape": [
+        5,
+        9
+      ],
+      "pred_len": 5,
+      "prediction_shape": [
+        2,
+        5,
+        5
+      ],
+      "seg_len": 1,
+      "seg_num_x": 10,
+      "seg_num_y": 5,
+      "seq_len": 10,
+      "status": "PASS"
+    }
+  ],
+  "model": "SegRNN",
+  "source_git_blobs": {
+    "layers/Autoformer_EncDec.py": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
+    "models/SegRNN.py": "afff1bc07dd14d227bbecdd36941d57f8aa8f63e"
+  },
+  "status": "PASS",
+  "upstream_revision": "4e938a1767106324dd753b2a44832bf870a0252e"
+}

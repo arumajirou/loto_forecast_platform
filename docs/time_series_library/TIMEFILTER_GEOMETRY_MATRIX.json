@@ -1,0 +1,411 @@
+{
+  "case_count": 6,
+  "cases": [
+    {
+      "case_id": 0,
+      "config": {
+        "alpha": 0.0,
+        "c_out": 1,
+        "d_ff": 16,
+        "d_model": 8,
+        "dropout": 0.0,
+        "e_layers": 1,
+        "enc_in": 1,
+        "n_heads": 2,
+        "num_class": 1,
+        "patch_len": 4,
+        "pos": true,
+        "pred_len": 1,
+        "seq_len": 4,
+        "task_name": "long_term_forecast",
+        "top_p": 0.0
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "geometry": {
+        "alpha": 0.0,
+        "channels": 1,
+        "cross_region_size": 0,
+        "d_ff": 16,
+        "d_model": 8,
+        "dropout": 0.0,
+        "e_layers": 1,
+        "expected_parameter_count": 479,
+        "head_dim": 4,
+        "knn_zero_count": 0,
+        "mask_shape": [
+          1,
+          3,
+          1
+        ],
+        "n_heads": 2,
+        "noisy_gating": false,
+        "num_patches": 1,
+        "patch_len": 4,
+        "positional_embedding": true,
+        "positional_limit": 10000,
+        "pred_len": 1,
+        "same_channel_region_size": 0,
+        "same_time_region_size": 0,
+        "seq_len": 4,
+        "stride": 4,
+        "token_count": 1,
+        "top_p": 0.0
+      },
+      "one_step_loss": 0.0005804360844194889,
+      "parameter_count": 479,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        1,
+        1
+      ],
+      "status": "PASS"
+    },
+    {
+      "case_id": 1,
+      "config": {
+        "alpha": 0.1,
+        "c_out": 3,
+        "d_ff": 16,
+        "d_model": 8,
+        "dropout": 0.0,
+        "e_layers": 1,
+        "enc_in": 3,
+        "n_heads": 2,
+        "num_class": 1,
+        "patch_len": 2,
+        "pos": true,
+        "pred_len": 2,
+        "seq_len": 8,
+        "task_name": "long_term_forecast",
+        "top_p": 0.5
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "geometry": {
+        "alpha": 0.1,
+        "channels": 3,
+        "cross_region_size": 6,
+        "d_ff": 16,
+        "d_model": 8,
+        "dropout": 0.0,
+        "e_layers": 1,
+        "expected_parameter_count": 586,
+        "head_dim": 4,
+        "knn_zero_count": 1,
+        "mask_shape": [
+          12,
+          3,
+          12
+        ],
+        "n_heads": 2,
+        "noisy_gating": true,
+        "num_patches": 4,
+        "patch_len": 2,
+        "positional_embedding": true,
+        "positional_limit": 10000,
+        "pred_len": 2,
+        "same_channel_region_size": 3,
+        "same_time_region_size": 2,
+        "seq_len": 8,
+        "stride": 2,
+        "token_count": 12,
+        "top_p": 0.5
+      },
+      "one_step_loss": 0.060030724853277206,
+      "parameter_count": 586,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        2,
+        3
+      ],
+      "status": "PASS"
+    },
+    {
+      "case_id": 2,
+      "config": {
+        "alpha": 0.2,
+        "c_out": 3,
+        "d_ff": 24,
+        "d_model": 12,
+        "dropout": 0.0,
+        "e_layers": 2,
+        "enc_in": 3,
+        "n_heads": 3,
+        "num_class": 1,
+        "patch_len": 3,
+        "pos": true,
+        "pred_len": 3,
+        "seq_len": 9,
+        "task_name": "long_term_forecast",
+        "top_p": 0.8
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "geometry": {
+        "alpha": 0.2,
+        "channels": 3,
+        "cross_region_size": 4,
+        "d_ff": 24,
+        "d_model": 12,
+        "dropout": 0.0,
+        "e_layers": 2,
+        "expected_parameter_count": 1979,
+        "head_dim": 4,
+        "knn_zero_count": 1,
+        "mask_shape": [
+          9,
+          3,
+          9
+        ],
+        "n_heads": 3,
+        "noisy_gating": true,
+        "num_patches": 3,
+        "patch_len": 3,
+        "positional_embedding": true,
+        "positional_limit": 10000,
+        "pred_len": 3,
+        "same_channel_region_size": 2,
+        "same_time_region_size": 2,
+        "seq_len": 9,
+        "stride": 3,
+        "token_count": 9,
+        "top_p": 0.8
+      },
+      "one_step_loss": 0.045408330857753754,
+      "parameter_count": 1979,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        3,
+        3
+      ],
+      "status": "PASS"
+    },
+    {
+      "case_id": 3,
+      "config": {
+        "alpha": 0.3,
+        "c_out": 5,
+        "d_ff": 32,
+        "d_model": 16,
+        "dropout": 0.0,
+        "e_layers": 2,
+        "enc_in": 5,
+        "n_heads": 4,
+        "num_class": 1,
+        "patch_len": 4,
+        "pos": true,
+        "pred_len": 4,
+        "seq_len": 12,
+        "task_name": "long_term_forecast",
+        "top_p": 0.0
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "geometry": {
+        "alpha": 0.3,
+        "channels": 5,
+        "cross_region_size": 8,
+        "d_ff": 32,
+        "d_model": 16,
+        "dropout": 0.0,
+        "e_layers": 2,
+        "expected_parameter_count": 3352,
+        "head_dim": 4,
+        "knn_zero_count": 4,
+        "mask_shape": [
+          15,
+          3,
+          15
+        ],
+        "n_heads": 4,
+        "noisy_gating": false,
+        "num_patches": 3,
+        "patch_len": 4,
+        "positional_embedding": true,
+        "positional_limit": 10000,
+        "pred_len": 4,
+        "same_channel_region_size": 2,
+        "same_time_region_size": 4,
+        "seq_len": 12,
+        "stride": 4,
+        "token_count": 15,
+        "top_p": 0.0
+      },
+      "one_step_loss": 0.04690708965063095,
+      "parameter_count": 3352,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        4,
+        5
+      ],
+      "status": "PASS"
+    },
+    {
+      "case_id": 4,
+      "config": {
+        "alpha": 0.25,
+        "c_out": 7,
+        "d_ff": 48,
+        "d_model": 24,
+        "dropout": 0.0,
+        "e_layers": 3,
+        "enc_in": 7,
+        "n_heads": 6,
+        "num_class": 1,
+        "patch_len": 4,
+        "pos": true,
+        "pred_len": 5,
+        "seq_len": 16,
+        "task_name": "long_term_forecast",
+        "top_p": 0.9
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "geometry": {
+        "alpha": 0.25,
+        "channels": 7,
+        "cross_region_size": 18,
+        "d_ff": 48,
+        "d_model": 24,
+        "dropout": 0.0,
+        "e_layers": 3,
+        "expected_parameter_count": 10445,
+        "head_dim": 4,
+        "knn_zero_count": 7,
+        "mask_shape": [
+          28,
+          3,
+          28
+        ],
+        "n_heads": 6,
+        "noisy_gating": true,
+        "num_patches": 4,
+        "patch_len": 4,
+        "positional_embedding": true,
+        "positional_limit": 10000,
+        "pred_len": 5,
+        "same_channel_region_size": 3,
+        "same_time_region_size": 6,
+        "seq_len": 16,
+        "stride": 4,
+        "token_count": 28,
+        "top_p": 0.9
+      },
+      "one_step_loss": 0.08924601972103119,
+      "parameter_count": 10445,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        5,
+        7
+      ],
+      "status": "PASS"
+    },
+    {
+      "case_id": 5,
+      "config": {
+        "alpha": 0.5,
+        "c_out": 2,
+        "d_ff": 40,
+        "d_model": 20,
+        "dropout": 0.0,
+        "e_layers": 1,
+        "enc_in": 2,
+        "n_heads": 5,
+        "num_class": 1,
+        "patch_len": 6,
+        "pos": true,
+        "pred_len": 7,
+        "seq_len": 24,
+        "task_name": "long_term_forecast",
+        "top_p": 0.5
+      },
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "geometry": {
+        "alpha": 0.5,
+        "channels": 2,
+        "cross_region_size": 3,
+        "d_ff": 40,
+        "d_model": 20,
+        "dropout": 0.0,
+        "e_layers": 1,
+        "expected_parameter_count": 2955,
+        "head_dim": 4,
+        "knn_zero_count": 4,
+        "mask_shape": [
+          8,
+          3,
+          8
+        ],
+        "n_heads": 5,
+        "noisy_gating": true,
+        "num_patches": 4,
+        "patch_len": 6,
+        "positional_embedding": true,
+        "positional_limit": 10000,
+        "pred_len": 7,
+        "same_channel_region_size": 3,
+        "same_time_region_size": 1,
+        "seq_len": 24,
+        "stride": 6,
+        "token_count": 8,
+        "top_p": 0.5
+      },
+      "one_step_loss": 0.08202910423278809,
+      "parameter_count": 2955,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "prediction_shape": [
+        2,
+        7,
+        2
+      ],
+      "status": "PASS"
+    }
+  ],
+  "source_identity": {
+    "files": {
+      "layers/Embed.py": {
+        "actual_git_blob_sha": "977e25568d37b9dd0efd442dcc5b33eab9843d71",
+        "expected_git_blob_sha": "977e25568d37b9dd0efd442dcc5b33eab9843d71",
+        "sha256": "17e7c3577324c41a0da427a199c955b782fde905aabb1f7cbc3c4e15ebd4ae35"
+      },
+      "layers/StandardNorm.py": {
+        "actual_git_blob_sha": "990d0fdc17751b724354e70b89fd6d3ff0f4dd29",
+        "expected_git_blob_sha": "990d0fdc17751b724354e70b89fd6d3ff0f4dd29",
+        "sha256": "3f690dc5fc0e395d4f1ffe6396717548d18bd04f4518258308bbe5f392703f5f"
+      },
+      "layers/TimeFilter_layers.py": {
+        "actual_git_blob_sha": "437c3bfd135c2d2b907c7332311ac553c8a2d523",
+        "expected_git_blob_sha": "437c3bfd135c2d2b907c7332311ac553c8a2d523",
+        "sha256": "3441713bdb54de1153afe3d5e746de4e251c07b545492180a073c4f275df6b9f"
+      },
+      "models/TimeFilter.py": {
+        "actual_git_blob_sha": "ff952b4a7741ad2772fde3e41b0d97bc2bbe7e19",
+        "expected_git_blob_sha": "ff952b4a7741ad2772fde3e41b0d97bc2bbe7e19",
+        "sha256": "6cbce92f112a9907fe6117ea23527bf1864c0ea00721a812d786e86e0a1b0724"
+      }
+    },
+    "model_name": "TimeFilter",
+    "policy": "pinned",
+    "status": "VERIFIED"
+  },
+  "status": "PASS"
+}

@@ -1,0 +1,199 @@
+{
+  "cases": [
+    {
+      "case_id": 1,
+      "causal_conv_block_count": 60,
+      "channels": 1,
+      "expected_causal_conv_block_count": 60,
+      "expected_parameter_count": 792,
+      "expected_sci_block_count": 15,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss": 0.24254482984542847,
+      "parameter_count": 792,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 1,
+      "prediction_shape": [
+        2,
+        1,
+        1
+      ],
+      "raw_output_shape": [
+        2,
+        17,
+        1
+      ],
+      "sci_block_count": 15,
+      "seq_len": 8,
+      "stacks": 1,
+      "status": "PASS",
+      "zero_prefix_verified": true
+    },
+    {
+      "case_id": 2,
+      "causal_conv_block_count": 60,
+      "channels": 3,
+      "expected_causal_conv_block_count": 60,
+      "expected_parameter_count": 5868,
+      "expected_sci_block_count": 15,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss": 0.5265519618988037,
+      "parameter_count": 5868,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 3,
+      "prediction_shape": [
+        2,
+        3,
+        3
+      ],
+      "raw_output_shape": [
+        2,
+        21,
+        3
+      ],
+      "sci_block_count": 15,
+      "seq_len": 9,
+      "stacks": 1,
+      "status": "PASS",
+      "zero_prefix_verified": true
+    },
+    {
+      "case_id": 3,
+      "causal_conv_block_count": 120,
+      "channels": 3,
+      "expected_causal_conv_block_count": 120,
+      "expected_parameter_count": 11824,
+      "expected_sci_block_count": 30,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss": 0.2761336863040924,
+      "parameter_count": 11824,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 4,
+      "prediction_shape": [
+        2,
+        4,
+        3
+      ],
+      "raw_output_shape": [
+        2,
+        28,
+        3
+      ],
+      "sci_block_count": 30,
+      "seq_len": 12,
+      "stacks": 2,
+      "status": "PASS",
+      "zero_prefix_verified": true
+    },
+    {
+      "case_id": 4,
+      "causal_conv_block_count": 60,
+      "channels": 5,
+      "expected_causal_conv_block_count": 60,
+      "expected_parameter_count": 15936,
+      "expected_sci_block_count": 15,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss": 0.20803377032279968,
+      "parameter_count": 15936,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 5,
+      "prediction_shape": [
+        2,
+        5,
+        5
+      ],
+      "raw_output_shape": [
+        2,
+        37,
+        5
+      ],
+      "sci_block_count": 15,
+      "seq_len": 16,
+      "stacks": 1,
+      "status": "PASS",
+      "zero_prefix_verified": true
+    },
+    {
+      "case_id": 5,
+      "causal_conv_block_count": 120,
+      "channels": 7,
+      "expected_causal_conv_block_count": 120,
+      "expected_parameter_count": 61175,
+      "expected_sci_block_count": 30,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss": 0.4154621958732605,
+      "parameter_count": 61175,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 7,
+      "prediction_shape": [
+        2,
+        7,
+        7
+      ],
+      "raw_output_shape": [
+        2,
+        41,
+        7
+      ],
+      "sci_block_count": 30,
+      "seq_len": 17,
+      "stacks": 2,
+      "status": "PASS",
+      "zero_prefix_verified": true
+    },
+    {
+      "case_id": 6,
+      "causal_conv_block_count": 120,
+      "channels": 2,
+      "expected_causal_conv_block_count": 120,
+      "expected_parameter_count": 6324,
+      "expected_sci_block_count": 30,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "loss": 0.2684710919857025,
+      "parameter_count": 6324,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "parameter_formula_match": true,
+      "pred_len": 6,
+      "prediction_shape": [
+        2,
+        6,
+        2
+      ],
+      "raw_output_shape": [
+        2,
+        54,
+        2
+      ],
+      "sci_block_count": 30,
+      "seq_len": 24,
+      "stacks": 2,
+      "status": "PASS",
+      "zero_prefix_verified": true
+    }
+  ],
+  "source_git_blob": "740d0f7d88e8a94aa7fe12c745f0876af7b0fc08",
+  "status": "PASS",
+  "tree_level": 3
+}

@@ -1,0 +1,180 @@
+{
+  "certified_model_count": 9,
+  "discovery_method": "GitHub code search for top-level class Model at pinned revision",
+  "limitations": [
+    "This is a pinned source-search inventory, not a complete local full-tree AST execution.",
+    "Direct git clone and complete source-tree discovery were blocked by DNS.",
+    "Nine models have pinned CPU runtime evidence; remaining models are pending, deferred, or blocked."
+  ],
+  "model_count": 41,
+  "models": [
+    {
+      "model_name": "FiLM",
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
+    },
+    {
+      "model_name": "TiDE",
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
+    },
+    {
+      "model_name": "MICN",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "TiRex",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "Mamba",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "KANAD",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "FreTS",
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
+    },
+    {
+      "model_name": "Koopa",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "PAttn",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "SegRNN",
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
+    },
+    {
+      "model_name": "SCINet",
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
+    },
+    {
+      "model_name": "Moirai",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "MSGNet",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "Chronos",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "TimesFM",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "LightTS",
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
+    },
+    {
+      "model_name": "Sundial",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "TimeMoE",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "DLinear",
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
+    },
+    {
+      "model_name": "TimeXer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "TSMixer",
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
+    },
+    {
+      "model_name": "Reformer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "PatchTST",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "Chronos2",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "Informer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "TimesNet",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "FEDformer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "ETSformer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "TimeMixer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "TimeFilter",
+      "runtime_status": "VERIFIED_CPU_PROVIDER"
+    },
+    {
+      "model_name": "Autoformer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "Pyraformer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "Crossformer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "Transformer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "MambaSimple",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "iTransformer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "MambaSingleLayer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "MultiPatchFormer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "Nonstationary_Transformer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "WPMixer",
+      "runtime_status": "EXECUTION_PENDING"
+    },
+    {
+      "model_name": "TemporalFusionTransformer",
+      "runtime_status": "EXECUTION_PENDING"
+    }
+  ],
+  "schema_version": "1.0",
+  "status": "PARTIALLY_VERIFIED",
+  "upstream_repository": "https://github.com/thuml/Time-Series-Library",
+  "upstream_revision": "4e938a1767106324dd753b2a44832bf870a0252e"
+}

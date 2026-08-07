@@ -1,0 +1,159 @@
+{
+  "case_count": 6,
+  "cases": [
+    {
+      "case_id": 1,
+      "channel_fft_bins": 1,
+      "channel_frequency_mixing": false,
+      "channel_independence": "1",
+      "channels": 1,
+      "expected_parameter_count": 197761,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.45109209418296814,
+      "parameter_count": 197761,
+      "parameter_count_match": true,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pred_len": 1,
+      "prediction_shape": [
+        2,
+        1,
+        1
+      ],
+      "seq_len": 4,
+      "status": "PASS",
+      "temporal_fft_bins": 3
+    },
+    {
+      "case_id": 2,
+      "channel_fft_bins": 2,
+      "channel_frequency_mixing": true,
+      "channel_independence": "0",
+      "channels": 3,
+      "expected_parameter_count": 329090,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.5952046513557434,
+      "parameter_count": 329090,
+      "parameter_count_match": true,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pred_len": 2,
+      "prediction_shape": [
+        2,
+        2,
+        3
+      ],
+      "seq_len": 8,
+      "status": "PASS",
+      "temporal_fft_bins": 5
+    },
+    {
+      "case_id": 3,
+      "channel_fft_bins": 2,
+      "channel_frequency_mixing": false,
+      "channel_independence": "1",
+      "channels": 3,
+      "expected_parameter_count": 329090,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.5967668294906616,
+      "parameter_count": 329090,
+      "parameter_count_match": true,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pred_len": 2,
+      "prediction_shape": [
+        2,
+        2,
+        3
+      ],
+      "seq_len": 8,
+      "status": "PASS",
+      "temporal_fft_bins": 5
+    },
+    {
+      "case_id": 4,
+      "channel_fft_bins": 4,
+      "channel_frequency_mixing": true,
+      "channel_independence": "0",
+      "channels": 7,
+      "expected_parameter_count": 231043,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.6590510606765747,
+      "parameter_count": 231043,
+      "parameter_count_match": true,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pred_len": 3,
+      "prediction_shape": [
+        2,
+        3,
+        7
+      ],
+      "seq_len": 5,
+      "status": "PASS",
+      "temporal_fft_bins": 3
+    },
+    {
+      "case_id": 5,
+      "channel_fft_bins": 1,
+      "channel_frequency_mixing": true,
+      "channel_independence": "0",
+      "channels": 1,
+      "expected_parameter_count": 592005,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.6671893000602722,
+      "parameter_count": 592005,
+      "parameter_count_match": true,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pred_len": 5,
+      "prediction_shape": [
+        2,
+        5,
+        1
+      ],
+      "seq_len": 16,
+      "status": "PASS",
+      "temporal_fft_bins": 9
+    },
+    {
+      "case_id": 6,
+      "channel_fft_bins": 3,
+      "channel_frequency_mixing": false,
+      "channel_independence": "1",
+      "channels": 5,
+      "expected_parameter_count": 854663,
+      "finite_prediction": true,
+      "finite_state_dict": true,
+      "one_step_loss": 0.5483991503715515,
+      "parameter_count": 854663,
+      "parameter_count_match": true,
+      "parameter_devices": [
+        "cpu"
+      ],
+      "pred_len": 7,
+      "prediction_shape": [
+        2,
+        7,
+        5
+      ],
+      "seq_len": 24,
+      "status": "PASS",
+      "temporal_fft_bins": 13
+    }
+  ],
+  "model_blob": "ca4e0b648db42a1846b7a0a9a661a39177f47005",
+  "schema_version": "1.0",
+  "status": "PASS",
+  "upstream_revision": "4e938a1767106324dd753b2a44832bf870a0252e"
+}

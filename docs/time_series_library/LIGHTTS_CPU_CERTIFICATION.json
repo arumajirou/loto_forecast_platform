@@ -1,0 +1,117 @@
+{
+  "boundaries": {
+    "ci": "BLOCKED_PRE_RUN",
+    "gpu_runtime": "EXECUTION_PENDING",
+    "holdout_prospective": "NOT_OPENED",
+    "isolated_uv_lock": "BLOCKED_OFFLINE_CACHE_MISS_EINOPS",
+    "real_data_metrics": "NOT_EXECUTED",
+    "seg_rnn_runtime": "EXECUTION_PENDING",
+    "target_torch_2_9_1_runtime": "EXECUTION_PENDING"
+  },
+  "executed_at_utc": "2026-08-05T07:54:00Z",
+  "fit_save": {
+    "artifacts": {
+      "checkpoint_sha256": "3b6fbdbe2a29beac2f99c5405d2ce4386ec8faaa00b1b9a6515cf757fdfe5448",
+      "input_sha256": "afec1c7517505c22af8861fdd5b40ff7c0cd3bf2b426c707f3ac9925c4224561",
+      "prediction_after_sha256": "e01004eb6464382459c0d5f7b253913630216fcb7f2aa78ec2cdfad8ad18c721",
+      "prediction_before_sha256": "e01004eb6464382459c0d5f7b253913630216fcb7f2aa78ec2cdfad8ad18c721"
+    },
+    "chunk_geometry": {
+      "allow_padding": true,
+      "channels": 3,
+      "chunk_size": 5,
+      "d_model": 16,
+      "input_seq_len": 8,
+      "num_chunks": 2,
+      "padded_seq_len": 10,
+      "padding_length": 2,
+      "pred_len": 5,
+      "requested_chunk_size": 24,
+      "stage12_bottleneck_width": 1,
+      "stage12_hidden_width": 4,
+      "stage3_bottleneck_width": 2,
+      "stage3_input_width": 8
+    },
+    "finite_prediction": true,
+    "finite_state_dict": true,
+    "input_device": "cpu",
+    "output_device": "cpu",
+    "parameter_count": 264,
+    "parameter_devices": [
+      "cpu"
+    ],
+    "prediction_shape": [
+      2,
+      5,
+      3
+    ],
+    "process_id": 4738,
+    "source_identity": {
+      "files": {
+        "models/LightTS.py": {
+          "actual_git_blob_sha": "a2051e44d864ec4ec5e72e59660b98c30c93a902",
+          "expected_git_blob_sha": "a2051e44d864ec4ec5e72e59660b98c30c93a902",
+          "sha256": "1de1583c4ee0bbfa0764fa9b158f09ac8bcd7ddf7f2d9f1b58ab1a03a7d13989"
+        }
+      },
+      "model_name": "LightTS",
+      "policy": "pinned",
+      "status": "VERIFIED"
+    },
+    "status": "PASS",
+    "train_steps": 3
+  },
+  "focused_validation": {
+    "checkpoint_geometry_tamper_rejection": "PASS",
+    "compileall": "PASS",
+    "d_model_divisibility_rejection": "PASS",
+    "d_model_minimum_rejection": "PASS",
+    "implicit_padding_rejection": "PASS",
+    "line_length_100": "PASS",
+    "pinned_source_mismatch_rejection": "PASS",
+    "pytest": "16 passed",
+    "ruff": "NOT_AVAILABLE_IN_EXECUTION_ENVIRONMENT"
+  },
+  "load_predict": {
+    "input_device": "cpu",
+    "output_device": "cpu",
+    "parameter_devices": [
+      "cpu"
+    ],
+    "prediction_shape": [
+      2,
+      5,
+      3
+    ],
+    "process_id": 4758,
+    "separate_process": true,
+    "status": "PASS",
+    "strict_state_load": true
+  },
+  "project_head_before_increment": "c67f6b0ce10b06661427a1b00c85b9c1e4643439",
+  "project_pr": 54,
+  "roundtrip": {
+    "atol": 1e-08,
+    "equal_within_tolerance": true,
+    "max_abs_error": 0.0,
+    "prediction_hash_equal": true,
+    "rtol": 1e-08,
+    "status": "PASS"
+  },
+  "run_id": "tslib-lightts-pinned-cpu-20260805",
+  "runtime": {
+    "cpu_fallback": false,
+    "cuda_available": false,
+    "device": "cpu",
+    "python": "3.13.5",
+    "torch": "2.10.0+cpu"
+  },
+  "schema_version": "1.0",
+  "status": "PARTIALLY_VERIFIED",
+  "upstream": {
+    "model": "LightTS",
+    "repository": "https://github.com/thuml/Time-Series-Library",
+    "revision": "4e938a1767106324dd753b2a44832bf870a0252e",
+    "verified_git_blob": "a2051e44d864ec4ec5e72e59660b98c30c93a902"
+  }
+}
