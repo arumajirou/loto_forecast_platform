@@ -50,7 +50,7 @@ runtime_certification SDK
   contracts.py           strict shared evidence schema
   statuses.py            runtime/profile/origin/accuracy status axes
   identity.py            request/package/model/snapshot identity gates
-  subprocess_runner.py   bounded real executor + injected Executor protocol
+  subprocess_runner.py   bounded process-tree executor + injected Executor protocol
   output_validation.py   shape, finite and quantile monotonicity
   device_evidence.py     CPU/GPU device and external evidence checks
   replay.py              save/reload/re-predict and equality/tolerance
@@ -101,6 +101,17 @@ request canonical SHA-256
 
 Any mismatch raises a typed error. The SDK does not manufacture a PASS report from partial evidence.
 
+The real executor starts a dedicated POSIX process session, reaps the direct child, and terminates
+the process group on timeout or after the direct process exits. stdout and stderr are hashed while
+streaming rather than accumulated in memory and are limited to 16 MiB per stream. The default host
+environment is allowlisted; credential-bearing and process-injection overrides are rejected. Working
+directories must be absolute existing directories with no symlink component, and process-start
+failures do not retain the operating-system exception text.
+
+On Linux, REAL evidence also binds the PID to a SHA-256 identity derived from kernel boot ID and
+`/proc/<pid>/stat` start ticks. A missing process identity fails REAL certification closed; it is not
+reconstructed from a later PID lookup.
+
 ## Provider-owned responsibilities
 
 The SDK deliberately does not define:
@@ -123,7 +134,8 @@ separate provider-migration PR.
 
 The artifact helper provides:
 
-- atomic JSON writing;
+- atomic JSON writing with randomized exclusive temporary files and directory fsync;
+- explicit opt-in overwrite and output-symlink rejection;
 - complete regular-file inventory with symlink rejection;
 - portable POSIX-relative artifact names;
 - streamed SHA-256;
