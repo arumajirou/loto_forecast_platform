@@ -1,0 +1,26 @@
+{
+  "delivery_count": 1,
+  "duplicate": {
+    "delivery_id": "11111111-2222-4333-8444-555555555555",
+    "error_code": null,
+    "processing_status": "QUEUED",
+    "result": "duplicate",
+    "status_code": 200,
+    "trace_id": "22222222222222222222222222222222"
+  },
+  "first": {
+    "delivery_id": "11111111-2222-4333-8444-555555555555",
+    "error_code": null,
+    "processing_status": "QUEUED",
+    "result": "accepted",
+    "status_code": 202,
+    "trace_id": "11111111111111111111111111111111"
+  },
+  "outbox_count": 1,
+  "queue_depth": 1,
+  "raw_payload_persisted": false,
+  "schema_version": 1,
+  "secret_persisted": false,
+  "signature_persisted": false,
+  "status": "PASS"
+}
