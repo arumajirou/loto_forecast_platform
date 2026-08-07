@@ -21,12 +21,16 @@ fi
 
 case "$COMMAND" in
   prepare)
-    require_env HISTORY_ROOT
+    require_env HISTORY_EXPORT_ROOT
+    require_env HISTORY_VERIFICATION
+    require_env HISTORY_APPROVAL
     require_env SNAPSHOT
     require_env EXPECTED_HEAD
     require_env WORK_ROOT
     exec "$PYTHON" "$REPO_ROOT/scripts/prepare_toto2_4m_target_host.py" \
-      --history-root "$HISTORY_ROOT" \
+      --history-export-root "$HISTORY_EXPORT_ROOT" \
+      --history-verification "$HISTORY_VERIFICATION" \
+      --history-approval "$HISTORY_APPROVAL" \
       --snapshot "$SNAPSHOT" \
       --isolated-python "$PYTHON" \
       --expected-head "$EXPECTED_HEAD" \
@@ -63,7 +67,8 @@ Usage:
   target-host-certification.sh run
   target-host-certification.sh verify
 
-prepare requires: HISTORY_ROOT SNAPSHOT EXPECTED_HEAD WORK_ROOT
+prepare requires: HISTORY_EXPORT_ROOT HISTORY_VERIFICATION HISTORY_APPROVAL
+                  SNAPSHOT EXPECTED_HEAD WORK_ROOT
 run requires: SNAPSHOT WORK_ROOT LOCK_REVIEW
 verify requires: ARCHIVE ARCHIVE_SHA256_FILE VERIFY_OUTPUT
 EOF
