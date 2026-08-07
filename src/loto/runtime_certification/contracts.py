@@ -20,6 +20,11 @@ RUNTIME_CERTIFICATION_SCHEMA_VERSION = "1.0.0"
 SHA256_PATTERN = r"^[0-9a-f]{64}$"
 
 
+def contains_control_characters(value: str) -> bool:
+    """Return whether text contains C0 or DEL control characters."""
+    return any(ord(character) < 32 or ord(character) == 127 for character in value)
+
+
 class StrictModel(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -66,6 +71,8 @@ class ArtifactIdentity(StrictModel):
             raise ValueError("artifact path must be relative")
         if "\\" in value or ":" in value:
             raise ValueError("artifact path must use canonical POSIX syntax")
+        if contains_control_characters(value):
+            raise ValueError("artifact path must not contain control characters")
         if any(part in {"", ".", ".."} for part in value.split("/")):
             raise ValueError("artifact path contains an unsafe component")
         return value
