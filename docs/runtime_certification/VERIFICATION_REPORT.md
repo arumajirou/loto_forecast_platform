@@ -7,7 +7,7 @@ PARTIALLY_VERIFIED
 SDK_FOUNDATION_IMPLEMENTED
 ORIGINAL_FAKE_PROVIDER_FOCUSED_TESTS_PASS
 PROCESS_AND_ARTIFACT_SECURITY_HARDENING_APPLIED
-SECURITY_REGRESSION_TESTS_PASS
+NEW_SECURITY_REGRESSION_PYTEST_PENDING
 PYTHON_COMPILE_PASS
 REAL_PROVIDER_MIGRATION_NOT_PERFORMED
 REAL_GPU_EXECUTION_NOT_PERFORMED
@@ -24,6 +24,8 @@ MERGE_NOT_PERFORMED
 - original foundation head: `beb38810926428322709530fd393d060701d8dd6`;
 - patched security-test head before documentation-only updates:
   `22176d16d59b2b9df0f47d830ace886d543cff49`.
+- pre-remediation head for the current hardening pass:
+  `756d9e6cc093a83c5001ea32fddc7f7bf5aeea35`.
 
 No existing common runtime-certification SDK was present on the audited default branch. The audit
 identified repeated implementations in Chronos-2, TimesFM 2.5, Moirai 2.0, TiRex-2, Toto 2.0,
@@ -62,6 +64,13 @@ Holdout or Prospective path is changed.
 4. Real evidence requires an observed execution PID.
 5. Execution PID must equal the device-evidence provider PID whenever a PID is present.
 6. An observation loader cannot replace the executor-owned `ProcessExecution` value.
+7. Timeout cleanup terminates the provider process group and reaps the direct child.
+8. stdout/stderr are incrementally hashed with a 16 MiB per-stream hard limit.
+9. Host environment inheritance is allowlisted; secret-bearing and injection overrides fail closed.
+10. cwd symlink components are rejected and start errors redact OS exception details.
+11. REAL PID evidence binds to Linux boot/process-start identity to reject PID reuse.
+12. Strict contracts reject non-finite floats and require UTC timestamps.
+13. Artifact writes use randomized exclusive temp files and refuse implicit overwrite/symlinks.
 
 These changes close evidence-splicing and manifest-name ambiguity paths without migrating or enabling
 any provider.
@@ -83,21 +92,24 @@ Independent reconstruction of the patched source and the new security regression
 ```text
 AST parse=PASS
 compileall=PASS
-security regression pytest=7 passed in 0.76s
-real CPU compatibility smoke=PASS
+previous exact-head security regression pytest=7 passed in 0.76s
+current hardening manual subprocess smoke=12 PASS
+current hardening manual artifact/contract smoke=7 PASS
 Python lines over 100 characters=0
 ```
 
-The seven new regression cases cover three unsafe artifact-path variants, one unsafe ZIP member,
-real subprocess PID capture, PID/device binding, and executor-evidence replacement rejection.
+The current hardening adds regression coverage for process-tree cleanup, output limits, environment
+sanitization, cwd symlinks, error redaction, process-instance binding, finite/UTC contracts and
+artifact overwrite/symlink policy. The new pytest cases are present but have not been executed in
+this sandbox because pytest is unavailable; the 19 direct behavioral smokes above were executed.
 
 The tests use no CUDA and no real model provider. They validate SDK behavior only.
 
 ## GitHub Actions evidence
 
 ```text
-workflow run=31141143480
-job=92751121221
+workflow run=31141500015
+job=92752175372
 conclusion=failure
 executed steps=[]
 classification=CI_BLOCKED_PRE_RUN
@@ -110,7 +122,7 @@ evidence and is not represented as a repository-code test failure.
 
 | Validation | Status | Reason |
 |---|---|---|
-| Focused tests in complete private checkout | PENDING | Current connector has no checkout execution surface |
+| Focused pytest on current hardening | PENDING | pytest is unavailable in the independent sandbox |
 | Full repository compileall | PENDING | Complete checkout was unavailable |
 | Full repository pytest | PENDING | Deferred until a runnable repository environment exists |
 | Ruff | UNAVAILABLE | Ruff executable unavailable in the independent environment |
