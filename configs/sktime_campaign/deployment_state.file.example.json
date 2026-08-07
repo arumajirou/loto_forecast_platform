@@ -1,0 +1,3 @@
+{
+  "deployment_target": "file+json:///absolute/path/to/sktime-deployment.json"
+}
