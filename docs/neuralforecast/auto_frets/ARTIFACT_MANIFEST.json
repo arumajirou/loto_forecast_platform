@@ -1,0 +1,56 @@
+{
+  "files": [
+    {
+      "path": "docs/neuralforecast/auto_frets/README.md",
+      "sha256": "45b354a4bfcd888f39344b4bb31b1247cefcb8d471cfb6d739253929c801195b",
+      "size_bytes": 1932
+    },
+    {
+      "path": "docs/neuralforecast/auto_frets/THIRD_PARTY_NOTICE.md",
+      "sha256": "e57da0711deb7bc9008e4bf3f2c1883a14db92f9852ac6ffb16507c70861121f",
+      "size_bytes": 507
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_frets/__init__.py",
+      "sha256": "bd0518e841bc338ef35a52cc9834a8fef3d86fd852c86a795abf07c04b058e8a",
+      "size_bytes": 1082
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_frets/auto.py",
+      "sha256": "505c5754917f4c27991a1bd5d3bd08e64d6b9266add136a0a3eee203e7abb9ca",
+      "size_bytes": 3659
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_frets/contracts.py",
+      "sha256": "7b6a4fc751e57de3ca38b9cafe8f24eac86a821adf761ae49f9df2e84e5bce3a",
+      "size_bytes": 5409
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_frets/model.py",
+      "sha256": "c2e47e628d56368e838961a51c2434d61f21ba29407ee06d0e8e4658bbfc4d26",
+      "size_bytes": 7649
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_frets/runtime.py",
+      "sha256": "974417a09a34fc5e7c3f9e8aeeff883f77b987e00a5cdef06236a1c7f78cb344",
+      "size_bytes": 3586
+    },
+    {
+      "path": "tests/neuralforecast/auto_frets/test_contracts.py",
+      "sha256": "bfe6efa13e300022c42c857ef672658922caa6a757bbf8ad757ff0db24cf64ba",
+      "size_bytes": 2371
+    },
+    {
+      "path": "tests/neuralforecast/auto_frets/test_model_and_auto.py",
+      "sha256": "4ab5bce51d24da592768d70369debdf0c1dee71abd6166aa932ff7389a9093d4",
+      "size_bytes": 4752
+    },
+    {
+      "path": "tests/neuralforecast/auto_frets/test_runtime_factory.py",
+      "sha256": "274d5f057b040cc4b74ebe9e43331aa4bced0736ed5618dcc33f5e2105870609",
+      "size_bytes": 2479
+    }
+  ],
+  "model_id": "nf-local-auto-frets",
+  "schema_version": "1.0.0"
+}
