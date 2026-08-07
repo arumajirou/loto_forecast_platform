@@ -1,0 +1,11 @@
+{
+  "package": "statsforecast",
+  "version": "2.1.1",
+  "pypi_json_url": "https://pypi.org/pypi/statsforecast/2.1.1/json",
+  "published_date": "2026-07-16",
+  "requires_python": ">=3.10",
+  "source_distribution": {
+    "filename": "statsforecast-2.1.1.tar.gz",
+    "sha256": "3b4c91ac4e2a51a614596226df3cb210f99a152601f8235e0459248d05a42045"
+  }
+}
