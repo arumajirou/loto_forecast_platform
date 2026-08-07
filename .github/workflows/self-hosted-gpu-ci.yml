@@ -16,6 +16,11 @@ on:
         required: true
         default: true
         type: boolean
+      actions_only:
+        description: Run the lightweight Actions compatibility smoke only
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -25,9 +30,52 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  actions-smoke:
+    name: Local Actions compatibility smoke
+    if: ${{ github.actor == github.repository_owner && inputs.actions_only }}
+    runs-on: [self-hosted, linux, x64, loto-ci]
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@v7
+        with:
+          clean: true
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python 3.13 with setup-python v7
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Verify Actions compatibility
+        run: |
+          set -Eeuo pipefail
+          python --version
+          python - <<'PY'
+          import platform
+          import sys
+
+          assert sys.version_info[:2] == (3, 13), sys.version
+          print(f"python={sys.version}")
+          print(f"platform={platform.platform()}")
+          PY
+          test -f pyproject.toml
+          test -f uv.lock
+          git diff --exit-code
+          git diff --cached --exit-code
+
   gpu-ci:
     name: Local GPU CI (${{ inputs.suite }})
-    if: ${{ github.actor == github.repository_owner }}
+    if: ${{ github.actor == github.repository_owner && !inputs.actions_only }}
     runs-on: [self-hosted, linux, x64, loto-ci, gpu, cuda]
     timeout-minutes: 360
 
@@ -43,7 +91,7 @@ jobs:
 
     steps:
       - name: Checkout without persistent credentials
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           clean: true
           fetch-depth: 1
