@@ -1,19 +1,11 @@
 # Current State: Moirai 2.0
 
-Status: `PARTIALLY_VERIFIED / P0_P8D_IMPLEMENTED / TARGET_HOST_SEQUENCE_PENDING`.
+Status: `PARTIALLY_VERIFIED / CONTRACT_V2_IMPLEMENTED / REAL_RUNTIME_PENDING`
 
-PR #83 provides P0-P6, PR #86 provides P7, PR #87 provides P8, PR #89 provides P8A, PR #91
-provides P8B, and PR #98 provides P8C. P8D adds the target-host control plane that binds these
-existing phases into one ordered Run ID without approving dependencies or executing the model.
+The main branch previously contained a Loto7-only schema-v1 provider that retained only q0.5.
+This isolated increment adds a dedicated Moirai 2.0 contract without changing shared workers,
+shared catalogs, the root dependency graph, or other foundation-model providers.
 
-Preparation creates a control workspace outside the repository. The workspace records the clean
-source identity, pinned snapshot path, exact operator commands, current stage, artifact references,
-immutable checkpoints, event hash chain, artifact manifest, and SHA-256 sums.
-
-The sequence stops after every external action. A candidate must pass static review before it can be
-recorded. An installation must contain an actual human reviewer, timezone-aware review time,
-`apply_requested=true`, and matching lock hashes. A campaign is revalidated by P8C before recording.
-The final pair report is independently recomputed before P9 can open.
-
-Local pure tests pass. No target-host lock approval, real CPU/CUDA campaign, Uni2TS inference, GPU
-evidence, accuracy metric, or successful GitHub Actions step is claimed.
+Verified in this change: schema validation, dynamic game geometry, draw/calendar time adapters,
+token-budget checks, native quantile validation, license fail-closed policy, post-processing, and
+legacy schema-v1 conversion. Real `uni2ts` model loading and GPU execution are not claimed.
