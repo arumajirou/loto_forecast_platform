@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "loto-forecast-platform"
-dynamic = ["version"]
+version = "3.2.0"
 description = "Extensible, leakage-safe, multi-model Loto forecasting research and operations platform"
 requires-python = ">=3.11,<3.14"
 dependencies = [
@@ -46,15 +46,12 @@ frameworks = ["u8darts>=0.37", "gluonts>=0.16", "lightning>=2", "sktime>=0.37", 
 tsfm = ["transformers>=4.50", "accelerate>=1.5", "chronos-forecasting>=2.0"]
 
 [project.scripts]
-loto-auto-campaign = "loto.entrypoints:auto_campaign_main"
-loto-lab = "loto.entrypoints:kpi_lab_main"
-loto = "loto.entrypoints:loto_main"
-loto3 = "loto.entrypoints:loto3_main"
-loto-integrity = "loto.entrypoints:integrity_main"
-loto-build-info = "loto.version:main"
-
-[tool.setuptools.dynamic]
-version = {attr = "loto.version.__version__"}
+loto-auto-campaign = "loto.auto_campaign.cli:main"
+loto-lab = "loto.kpi_lab.cli:main"
+loto = "loto.cli:main"
+loto3 = "loto.cli_v3:main"
+loto-integrity = "loto.verify.integrity:main"
+loto-github-audit = "loto.github_audit.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
