@@ -1,0 +1,18 @@
+{
+  "schema_version": "moirai2-p8-certification-v1",
+  "separate_process_runs": 2,
+  "require_explicit_snapshot_path": true,
+  "require_exact_prediction_sha256_match": true,
+  "require_distinct_provider_pids": true,
+  "require_model_artifact_identity_match": true,
+  "require_covariate_identity_match": true,
+  "require_forward_tensor_device_observation": true,
+  "require_external_gpu_pid_match_for_cuda": true,
+  "require_gpu_uuid_for_cuda": true,
+  "require_provider_pid_absent_after_exit": true,
+  "monitor_interval_seconds": 0.25,
+  "timeout_seconds": 1800,
+  "formal_status_on_cpu_fallback": "FAILED_CPU_FALLBACK",
+  "save_load_status": "BASE_SNAPSHOT_RELOADED",
+  "production_champion_eligible": false
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "moirai2-p8-change-scope-v1",
+  "parent_pr": 86,
+  "base_branch": "feat/moirai2-covariate-runtime-v1",
+  "head_branch": "feat/moirai2-runtime-certification-v1",
+  "phase": "P8",
+  "owned_paths": [
+    "configs/moirai2_campaign/**",
+    "scripts/run_moirai2_provider.py",
+    "scripts/certify_moirai2_runtime.py",
+    "src/loto/moirai2_campaign/**",
+    "tests/moirai2_campaign/**",
+    "docs/moirai2/**"
+  ],
+  "forbidden_paths": [
+    "pyproject.toml",
+    "uv.lock",
+    "src/loto/models/workers.py",
+    "src/loto/models/catalog.py",
+    "src/loto/models/catalog_full.py",
+    "src/loto/cli.py",
+    ".github/workflows/**",
+    "README.md"
+  ],
+  "holdout_opened": false,
+  "prospective_opened": false,
+  "production_promotion": false,
+  "merge_allowed": false
+}

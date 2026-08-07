@@ -1,0 +1,29 @@
+{
+  "schema_version": "moirai2-p8d-target-execution-v1",
+  "control_workspace_must_be_outside_repository": true,
+  "human_approval_required": true,
+  "automatic_approval": false,
+  "automatic_installation": false,
+  "automatic_runtime_execution": false,
+  "strict_stage_order": [
+    "supported_candidate",
+    "supported_installation",
+    "supported_campaign",
+    "cuda_candidate",
+    "cuda_installation",
+    "cuda_campaign",
+    "pair_verification"
+  ],
+  "candidate_static_review_required": true,
+  "installation_status_required": "INSTALLED",
+  "timezone_aware_review_time_required": true,
+  "candidate_lock_sha256_binding_required": true,
+  "clean_source_identity_required": true,
+  "same_source_commit_across_campaigns_required": true,
+  "artifact_tree_sha256_required": true,
+  "event_hash_chain_required": true,
+  "concurrent_record_operations_forbidden": true,
+  "p9_oof_gate_open_only_after_pair_verification": true,
+  "accuracy_claimed": false,
+  "production_champion_eligible": false
+}

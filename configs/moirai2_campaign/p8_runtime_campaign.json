@@ -1,0 +1,27 @@
+{
+  "schema_version": "moirai2-p8-runtime-campaign-v1",
+  "required_cases": [
+    "draw-target-only",
+    "draw-past-only",
+    "draw-past-known-future",
+    "calendar-target-only",
+    "calendar-past-only",
+    "calendar-past-known-future"
+  ],
+  "execution_policy": "strictly_serial",
+  "parallel_case_count": 1,
+  "separate_process_runs_per_case": 2,
+  "history_length": 128,
+  "context_length": 128,
+  "prediction_length": 1,
+  "seed": 1,
+  "require_reviewed_uv_lock": true,
+  "require_frozen_probe": true,
+  "require_explicit_snapshot_path": true,
+  "require_all_cases_for_formal_success": true,
+  "require_exact_prediction_sha256_match": true,
+  "require_no_cpu_fallback": true,
+  "overwrite_existing_output": false,
+  "open_oof_after_pass": false,
+  "production_champion_eligible": false
+}
