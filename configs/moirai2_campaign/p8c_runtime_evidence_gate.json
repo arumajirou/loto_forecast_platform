@@ -1,0 +1,37 @@
+{
+  "schema_version": "moirai2-p8c-runtime-evidence-gate-v1",
+  "required_campaigns": [
+    {
+      "runtime_lane": "supported-py311",
+      "device": "cpu",
+      "formal_case_count": 6
+    },
+    {
+      "runtime_lane": "cuda13-experimental",
+      "device": "cuda",
+      "formal_case_count": 6
+    }
+  ],
+  "formal_entrypoint": "scripts/run_moirai2_runtime_campaign_p8c.py",
+  "require_clean_source_tree": true,
+  "require_same_source_commit_across_lanes": true,
+  "require_same_source_tree_across_lanes": true,
+  "require_same_model_revision_across_lanes": true,
+  "require_same_snapshot_config_sha256_across_lanes": true,
+  "require_same_snapshot_weight_sha256_across_lanes": true,
+  "require_reviewed_lock_evidence": true,
+  "require_complete_artifact_manifest": true,
+  "require_sha256_reverification": true,
+  "require_all_nine_native_quantiles": true,
+  "require_quantile_monotonicity": true,
+  "require_point_equals_q0_5": true,
+  "require_two_distinct_processes_per_case": true,
+  "require_external_gpu_monitor_rederivation_for_cuda": true,
+  "require_provider_pid_absent_after_exit": true,
+  "require_cpu_no_gpu_process_observation": true,
+  "cross_lane_exact_prediction_match_required": false,
+  "provider_process_evidence_count": 24,
+  "p9_oof_gate_open_on_pass": true,
+  "accuracy_claimed": false,
+  "production_champion_eligible": false
+}

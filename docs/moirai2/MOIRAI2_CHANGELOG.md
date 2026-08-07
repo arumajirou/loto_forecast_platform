@@ -1,5 +1,16 @@
 # Moirai 2.0 Changelog
 
+## 0.6.0
+
+- Added clean-tree Git commit, tree, and principal-source SHA-256 capture before formal campaigns.
+- Added a P8C wrapper that seals P8A outputs with source and launch evidence.
+- Added independent full-manifest and SHA-256 revalidation for CPU and CUDA campaign artifacts.
+- Added per-case request, response, reload, quantile, device, and artifact identity rechecks.
+- Added GPU monitor rederivation of provider PID, GPU UUID, peak VRAM, and post-exit release.
+- Added cross-lane source, model revision, config hash, and weight hash equality gates.
+- Added a fail-closed P9 OOF gate requiring both complete real campaigns.
+- Added P8C focused tests, change scope, test plan, verification report, and configuration.
+
 ## 0.5.0
 
 - Added non-destructive isolated `uv.lock` candidate generation.
