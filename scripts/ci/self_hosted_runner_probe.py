@@ -11,7 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +21,7 @@ STATUS_FAILED = "FAILED"
 
 def utc_now() -> str:
     """Return a timezone-aware UTC timestamp."""
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def run_command(command: list[str], timeout_seconds: int = 30) -> dict[str, Any]:
@@ -80,10 +80,7 @@ def write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
 
 def collect_nvidia_smi() -> dict[str, Any]:
     """Collect stable GPU fields from nvidia-smi."""
-    query = (
-        "index,name,driver_version,memory.total,memory.free,"
-        "temperature.gpu,power.draw"
-    )
+    query = "index,name,driver_version,memory.total,memory.free,temperature.gpu,power.draw"
     result = run_command(
         [
             "nvidia-smi",
@@ -215,23 +212,17 @@ def probe(args: argparse.Namespace) -> dict[str, Any]:
     free_disk_gib = disk.free / (1024**3)
     if free_disk_gib < args.min_free_disk_gib:
         failures.append(
-            f"free disk {free_disk_gib:.2f} GiB is below "
-            f"required {args.min_free_disk_gib:.2f} GiB"
+            f"free disk {free_disk_gib:.2f} GiB is below required {args.min_free_disk_gib:.2f} GiB"
         )
 
-    commands = {
-        name: run_command([name, "--version"])
-        for name in ("git", "uv")
-    }
+    commands = {name: run_command([name, "--version"]) for name in ("git", "uv")}
     for name, result in commands.items():
         if not result["available"] or result["returncode"] != 0:
             failures.append(f"required command unavailable or failing: {name}")
 
     nvidia_smi = collect_nvidia_smi()
     if args.require_cuda and (
-        not nvidia_smi["available"]
-        or nvidia_smi["returncode"] != 0
-        or not nvidia_smi.get("gpus")
+        not nvidia_smi["available"] or nvidia_smi["returncode"] != 0 or not nvidia_smi.get("gpus")
     ):
         failures.append("CUDA is required but nvidia-smi did not report a GPU")
     elif not nvidia_smi["available"]:
