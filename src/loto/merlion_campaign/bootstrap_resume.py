@@ -5,9 +5,10 @@ import json
 import os
 import platform
 import tempfile
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 PREFLIGHT_SCHEMA = "merlion-bootstrap-preflight-v1"
 PLAN_SCHEMA = "merlion-bootstrap-resume-plan-v1"
@@ -89,9 +90,7 @@ def build_resume_plan(
 
     network = _network_map(preflight)
     github_ready = network.get("github.com", False)
-    index_ready = network.get("pypi.org", False) and network.get(
-        "files.pythonhosted.org", False
-    )
+    index_ready = network.get("pypi.org", False) and network.get("files.pythonhosted.org", False)
     blockers: list[str] = []
     steps: list[dict[str, Any]] = []
     environment: dict[str, str] = {}
