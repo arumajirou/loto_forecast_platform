@@ -1,37 +1,37 @@
 # Moirai 2.0 Verification Report
 
-Status: `PARTIALLY_VERIFIED / P8D_ORCHESTRATOR_LOCAL_PASS / TARGET_HOST_PENDING`.
+Status: `PARTIALLY_VERIFIED / LOCAL_CONTRACT_TESTS_PASS / REAL_RUNTIME_PENDING`.
 
-## Retained implementation evidence
+## Executed locally
 
-- P0-P6 Contract v2;
-- P7 native covariate wiring;
-- P8 separate-process runtime certification;
-- P8A deterministic six-case campaigns;
-- P8B reviewed-lock workflow;
-- P8C independent CPU/CUDA evidence gate.
+- focused pytest: `28 passed`;
+- Python `compileall`: `PASS`;
+- direct provider `identity` smoke: `PASS`;
+- JSON, TOML, and CSV parsing: `PASS`;
+- Python source lines over 100 characters: `0`;
+- Moirai-owned changed-path audit: `PASS`;
+- SHA-256 manifest verification: `PASS`;
+- simple secret-pattern scan: `PASS`.
 
-## P8D local evidence
-
-- one clean-source Run ID and external workspace plan: `PASS`;
-- generated sequential operator command set: `PASS`;
-- automatic approval, installation, and runtime execution disabled: `PASS`;
-- strict seven-stage state machine: `PASS`;
-- candidate static-review and lock-SHA validation: `PASS`;
-- installation human-review and applied-status validation: `PASS`;
-- event hash chain and artifact-tree SHA-256: `PASS`;
-- invalid-order, tamper, symlink, and concurrency rejection: `PASS`;
-- checkpoint and control-manifest refresh: `PASS`;
-- focused pytest: `26 passed`.
+The focused suite covers strict unknown-key rejection, dynamic position counts, horizons 1/2/5,
+legacy schema conversion, context non-clamping, covariate chronology and availability evidence,
+required game geometries, license fail-closed behavior, constrained integer projection, exact native
+quantile inventory, finite values, crossing rejection, deterministic draw mapping, calendar gaps,
+token budgets, package hashes, model hashes, and snapshot mismatch rejection.
 
 ## Not executed or certified
 
-- real lock resolution, human approval, or installation;
-- real CPU or CUDA campaign;
-- real Uni2TS inference or GPU evidence;
-- real pair verification or P9 opening;
-- Ruff, mypy, full repository pytest, or successful GitHub Actions steps;
-- OOF, Holdout, Prospective, Hit@±1, MAE, MSE, RMSE, calibration, or baselines.
+- Ruff and mypy were unavailable in the execution environment;
+- isolated `uv.lock` resolution and frozen synchronization;
+- installation of either runtime lane;
+- real Uni2TS import through an isolated lane;
+- snapshot download/cache verification against the actual 45.6 MB weight file;
+- real model load or q0.1-q0.9 inference;
+- separate-process snapshot reload and re-prediction;
+- CUDA PID, GPU UUID, VRAM before/peak/after, and external PID matching;
+- full repository pytest or GitHub Actions success;
+- OOF, Holdout, Prospective, accuracy, baseline superiority, calibration, or fine-tuning;
+- shared worker, catalog, CLI, registry, or production integration.
 
-P8D validates orchestration only. It does not change the research-only licensing boundary and does not
-make the model eligible for production or commercial promotion.
+No unexecuted item is represented as success. Research-only license policy keeps production
+champion eligibility and automatic promotion disabled.
