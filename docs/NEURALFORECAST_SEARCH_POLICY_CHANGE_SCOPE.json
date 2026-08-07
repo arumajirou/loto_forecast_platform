@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0.0",
+  "status": "DESIGN_AND_FOCUSED_TESTS_ONLY",
+  "base_branch": "agent/p0-runtime-certification",
+  "scope": {
+    "included": [
+      "shared dependency-light search-policy resolution",
+      "execution-time sampler/searcher materialization",
+      "API and campaign policy unification",
+      "fail-closed dependency handling",
+      "constructor artifact policy evidence",
+      "focused unit and integration tests"
+    ],
+    "excluded": [
+      "search-space profiling",
+      "ASHA or other scheduler activation",
+      "multi-objective optimization",
+      "accuracy-improvement claims",
+      "all-36 real GPU execution",
+      "Holdout or Prospective evaluation",
+      "merge or release"
+    ]
+  },
+  "safety": {
+    "direct_main_write": false,
+    "force_push": false,
+    "auto_merge": false,
+    "prediction_lock_changed": false,
+    "raw_data_changed": false
+  }
+}

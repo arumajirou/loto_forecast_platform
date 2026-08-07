@@ -5,6 +5,13 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from loto.models.neuralforecast_search_policy import (
+    SearchAlgorithmMaterialization,
+    SearchPolicyDecision,
+    instantiate_search_algorithm,
+    resolve_search_policy,
+)
+
 from .contracts import CampaignConfig
 from .data_tracks import hint_summing_matrix
 from .domains import freeze_config
@@ -46,15 +53,24 @@ def _fixed_optuna_config(values: dict[str, Any]) -> Callable[[Any], dict[str, An
     return config_fn
 
 
-def _search_algorithm(backend: str, seed: int):
-    if backend == "ray":
-        from ray.tune.search.basic_variant import BasicVariantGenerator
-
-        return BasicVariantGenerator(random_state=seed)
-
-    import optuna
-
-    return optuna.samplers.RandomSampler(seed=seed)
+def _search_materialization(
+    *,
+    config: CampaignConfig,
+    backend: str,
+    model_name: str,
+    num_samples: int,
+) -> SearchAlgorithmMaterialization:
+    decision = resolve_search_policy(
+        backend=backend,
+        strategy=config.search.strategy,
+        search_seed=config.search.search_seed,
+        num_samples=num_samples,
+        model_name=model_name,
+    )
+    return instantiate_search_algorithm(
+        decision,
+        allow_fallback=config.search.allow_fallback,
+    )
 
 
 def _trainer_controls(config: CampaignConfig, *, seed: int) -> dict[str, Any]:
@@ -103,16 +119,22 @@ def _common_kwargs(
     *,
     config: CampaignConfig,
     backend: str,
+    model_name: str,
     alias: str,
     config_value: Any,
     num_samples: int,
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], SearchPolicyDecision]:
     from neuralforecast.common._base_auto import OptunaOptions, RayOptions
 
+    materialized = _search_materialization(
+        config=config,
+        backend=backend,
+        model_name=model_name,
+        num_samples=num_samples,
+    )
     kwargs: dict[str, Any] = {
         "h": config.h,
         "config": config_value,
-        "search_alg": _search_algorithm(backend, config.search.search_seed),
         "num_samples": num_samples,
         "time_budget": config.search.time_budget,
         "refit_with_val": config.search.refit_with_val,
@@ -127,10 +149,12 @@ def _common_kwargs(
         "cpus": None,
         "gpus": None,
     }
+    if materialized.algorithm is not None:
+        kwargs["search_alg"] = materialized.algorithm
     kwargs.update(config.extra_base_auto_args)
     if kwargs.get("cpus") is not None or kwargs.get("gpus") is not None:
         raise ValueError("NeuralForecast 3.2.0 rejects direct cpus/gpus; use resources/RayOptions")
-    return kwargs
+    return kwargs, materialized.decision
 
 
 def _constructor_argument_decisions(
@@ -188,6 +212,7 @@ def _constructor_argument_decisions(
 def _artifact_kwargs(
     effective_kwargs: dict[str, Any],
     ledger: list[dict[str, Any]],
+    search_policy: SearchPolicyDecision,
 ) -> dict[str, Any]:
     artifact = dict(effective_kwargs)
     artifact.update(
@@ -197,6 +222,7 @@ def _artifact_kwargs(
             "unexplained_dropped_arguments": [
                 row["argument"] for row in ledger if row["status"] == "DROPPED"
             ],
+            "search_policy": search_policy.model_dump(mode="json"),
         }
     )
     return artifact
@@ -259,9 +285,10 @@ def _hint_model(
     else:
         config_value = base_config
 
-    proposed_kwargs = _common_kwargs(
+    proposed_kwargs, search_policy = _common_kwargs(
         config=config,
         backend=backend,
+        model_name="AutoHINT",
         alias=alias,
         config_value=config_value,
         num_samples=num_samples,
@@ -282,7 +309,8 @@ def _hint_model(
     model = auto_cls(**kwargs)
     model.trial_artifact_root = str(trial_root)
     model.argument_coverage = ledger
-    return model, config_value, _artifact_kwargs(kwargs, ledger)
+    model.search_policy_decision = search_policy.model_dump(mode="json")
+    return model, config_value, _artifact_kwargs(kwargs, ledger, search_policy)
 
 
 def build_auto_model(
@@ -359,9 +387,10 @@ def build_auto_model(
         requested = config_value
 
     signature = inspect.signature(original_cls)
-    proposed_kwargs = _common_kwargs(
+    proposed_kwargs, search_policy = _common_kwargs(
         config=config,
         backend=backend,
+        model_name=model_name,
         alias=alias,
         config_value=config_value,
         num_samples=num_samples,
@@ -380,4 +409,5 @@ def build_auto_model(
     model = auto_cls(**kwargs)
     model.trial_artifact_root = str(trial_root)
     model.argument_coverage = ledger
-    return model, requested, _artifact_kwargs(kwargs, ledger)
+    model.search_policy_decision = search_policy.model_dump(mode="json")
+    return model, requested, _artifact_kwargs(kwargs, ledger, search_policy)
