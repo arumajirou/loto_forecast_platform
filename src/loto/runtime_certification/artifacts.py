@@ -9,7 +9,7 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-from .contracts import ArtifactIdentity
+from .contracts import ArtifactIdentity, contains_control_characters
 from .identity import sha256_file
 
 
@@ -191,6 +191,8 @@ def create_evidence_zip(source_root: Path, output_zip: Path) -> tuple[Path, Path
 
 def _validate_zip_name(name: str) -> None:
     if not name or name.startswith(("/", "\\")) or "\\" in name or ":" in name:
+        raise ArtifactVerificationError(f"unsafe ZIP member: {name!r}")
+    if contains_control_characters(name):
         raise ArtifactVerificationError(f"unsafe ZIP member: {name!r}")
     if any(part in {"", ".", ".."} for part in name.split("/")):
         raise ArtifactVerificationError(f"unsafe ZIP member: {name!r}")
