@@ -1,0 +1,42 @@
+{
+  "run_id": "chronos2-oof-example",
+  "position_columns": [
+    "n1",
+    "n2",
+    "n3",
+    "n4",
+    "n5",
+    "n6",
+    "n7"
+  ],
+  "candidate_min": 1,
+  "candidate_max": 37,
+  "allow_duplicates": false,
+  "sort_policy": "ascending",
+  "position_ranges": {},
+  "min_train_size": 128,
+  "horizon": 1,
+  "step_size": 1,
+  "allow_validation_overlap": false,
+  "require_gap_free_draw_no": true,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "seasonal_period": 1,
+  "quantile_levels": [
+    0.1,
+    0.5,
+    0.9
+  ],
+  "fixed_values": [
+    3,
+    8,
+    13,
+    18,
+    23,
+    28,
+    33
+  ]
+}
