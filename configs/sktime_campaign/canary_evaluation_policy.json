@@ -1,0 +1,15 @@
+{
+  "minimum_windows": 3,
+  "minimum_total_draws": 3,
+  "minimum_weighted_hit_at_1": 0.9,
+  "minimum_worst_window_hit_at_1": 0.9,
+  "maximum_weighted_mae": 1.0,
+  "require_all_baseline_superiority": true,
+  "strict_improvement_over_at_least_one_baseline": true,
+  "primary_promotion_executed": false,
+  "primary_binding_changed": false,
+  "prediction_publication_allowed": false,
+  "automatic_primary_promotion": false,
+  "automatic_retraining": false,
+  "automatic_rollback": false
+}
