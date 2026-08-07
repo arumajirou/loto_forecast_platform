@@ -1,0 +1,592 @@
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import re
+import tempfile
+from pathlib import Path, PurePosixPath
+from typing import Any
+
+from loto.basicts_campaign.basicts_module_closure import (
+    DECOMPOSITION_MODULE,
+    MODEL_CONFIG_MODULE,
+    RUNTIME_CRITICAL_MODULES,
+)
+from loto.basicts_campaign.dlinear_runtime_provenance import (
+    DLINEAR_MODULE_CONTRACTS,
+)
+from loto.basicts_campaign.installed_provenance import (
+    EXPECTED_DISTRIBUTION_NAME,
+    EXPECTED_IMPORT_NAME,
+    EXPECTED_PACKAGE_INIT,
+    EXPECTED_REPOSITORY_URL,
+)
+
+EXPECTED_BASICTS_VERSION = "1.1.0"
+EXPECTED_UPSTREAM_REVISION = "c2bb6e31e591167e84459775a21a62e70a5893ce"
+SHA256_LINE = re.compile(
+    r"^(?P<digest>[0-9a-f]{64})  (?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)$"
+)
+DIGEST_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+RECORD_DIGEST_PATTERN = re.compile(r"^[A-Za-z0-9_-]{43}$")
+
+
+class CertificationError(RuntimeError):
+    """Raised when P0 evidence is incomplete, unsafe, or internally inconsistent."""
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _load_json(path: Path) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CertificationError(f"cannot read JSON evidence: {path}") from exc
+    if not isinstance(payload, dict):
+        raise CertificationError(f"JSON evidence must contain an object: {path}")
+    return payload
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.")
+    os.close(descriptor)
+    temporary_path = Path(temporary)
+    try:
+        temporary_path.write_text(text, encoding="utf-8")
+        os.replace(temporary_path, path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
+
+
+def _regular_files(directory: Path) -> dict[str, Path]:
+    if not directory.is_dir():
+        raise CertificationError(f"evidence directory does not exist: {directory}")
+    files: dict[str, Path] = {}
+    for path in directory.iterdir():
+        if path.is_symlink():
+            raise CertificationError(f"symbolic links are forbidden in evidence: {path}")
+        if path.is_file():
+            files[path.name] = path
+    return files
+
+
+def verify_sha256sums(directory: Path) -> dict[str, str]:
+    """Verify a portable SHA256SUMS file with an exact regular-file set."""
+
+    files = _regular_files(directory)
+    sums_path = files.get("SHA256SUMS")
+    if sums_path is None:
+        raise CertificationError(f"SHA256SUMS is missing: {directory}")
+
+    expected: dict[str, str] = {}
+    for line_number, raw_line in enumerate(
+        sums_path.read_text(encoding="utf-8").splitlines(),
+        start=1,
+    ):
+        match = SHA256_LINE.fullmatch(raw_line)
+        if match is None:
+            raise CertificationError(
+                f"invalid SHA256SUMS line {line_number}: {raw_line!r}"
+            )
+        name = match.group("name")
+        if name == "SHA256SUMS":
+            raise CertificationError("SHA256SUMS must not hash itself")
+        if name in expected:
+            raise CertificationError(f"duplicate SHA256SUMS entry: {name}")
+        expected[name] = match.group("digest")
+
+    actual_names = set(files) - {"SHA256SUMS"}
+    if set(expected) != actual_names:
+        missing = sorted(actual_names - set(expected))
+        unknown = sorted(set(expected) - actual_names)
+        raise CertificationError(
+            f"SHA256SUMS file set mismatch: missing={missing}, unknown={unknown}"
+        )
+    for name, digest in expected.items():
+        actual = _sha256(files[name])
+        if actual != digest:
+            raise CertificationError(
+                f"SHA-256 mismatch for {directory / name}: "
+                f"expected {digest}, got {actual}"
+            )
+    return expected
+
+
+def _verify_manifest(directory: Path, operation: str) -> dict[str, Any]:
+    files = _regular_files(directory)
+    manifest_path = files.get("ARTIFACT_MANIFEST.json")
+    if manifest_path is None:
+        raise CertificationError(f"ARTIFACT_MANIFEST.json is missing: {directory}")
+    manifest = _load_json(manifest_path)
+    if manifest.get("schema_version") != "1.0":
+        raise CertificationError("unsupported artifact manifest schema")
+    if manifest.get("status") != "PASS":
+        raise CertificationError("artifact manifest status is not PASS")
+    if manifest.get("operation") != operation:
+        raise CertificationError("artifact manifest operation mismatch")
+
+    entries = manifest.get("files")
+    if not isinstance(entries, list):
+        raise CertificationError("artifact manifest files must be a list")
+    manifest_names: set[str] = set()
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise CertificationError("artifact manifest entry must be an object")
+        name = entry.get("path")
+        safe_line = f"{'0' * 64}  {name}"
+        if not isinstance(name, str) or SHA256_LINE.fullmatch(safe_line) is None:
+            raise CertificationError(f"unsafe artifact manifest path: {name!r}")
+        if name in manifest_names:
+            raise CertificationError(f"duplicate artifact manifest path: {name}")
+        manifest_names.add(name)
+        path = files.get(name)
+        if path is None:
+            raise CertificationError(f"manifest artifact is missing: {name}")
+        if entry.get("size_bytes") != path.stat().st_size:
+            raise CertificationError(f"manifest size mismatch: {name}")
+        if entry.get("sha256") != _sha256(path):
+            raise CertificationError(f"manifest SHA-256 mismatch: {name}")
+
+    expected_names = set(files) - {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+    if manifest_names != expected_names:
+        raise CertificationError(
+            "artifact manifest file set mismatch: "
+            f"expected={sorted(expected_names)}, actual={sorted(manifest_names)}"
+        )
+    return manifest
+
+
+def _verify_response(directory: Path, operation: str) -> dict[str, Any]:
+    response = _load_json(directory / "response.json")
+    required = {
+        "status": "PASS",
+        "operation": operation,
+        "provider": "basicts",
+        "environment_lane": "basicts-py311",
+        "expected_basicts_version": EXPECTED_BASICTS_VERSION,
+        "actual_basicts_version": EXPECTED_BASICTS_VERSION,
+        "expected_upstream_revision": EXPECTED_UPSTREAM_REVISION,
+        "actual_upstream_revision": EXPECTED_UPSTREAM_REVISION,
+    }
+    for field, expected in required.items():
+        if response.get(field) != expected:
+            raise CertificationError(
+                f"response field mismatch for {operation}.{field}: "
+                f"expected {expected!r}, got {response.get(field)!r}"
+            )
+    if response.get("error") is not None:
+        raise CertificationError(f"PASS response contains an error for {operation}")
+    evidence = response.get("evidence")
+    if not isinstance(evidence, dict):
+        raise CertificationError(f"response evidence must be an object for {operation}")
+    return response
+
+
+def _require_digest(value: Any, field: str) -> None:
+    if not isinstance(value, str) or DIGEST_PATTERN.fullmatch(value) is None:
+        raise CertificationError(f"identity {field} is invalid")
+
+
+def _require_record_digest(value: Any, field: str) -> None:
+    if not isinstance(value, str) or RECORD_DIGEST_PATTERN.fullmatch(value) is None:
+        raise CertificationError(f"identity {field} is invalid")
+
+
+def _require_record_size(value: Any, field: str) -> None:
+    if not isinstance(value, int) or value < 1:
+        raise CertificationError(f"identity {field} is invalid")
+
+
+def _verify_identity_provenance(evidence: dict[str, Any]) -> None:
+    required = {
+        "installed_provenance_status": "PASS",
+        "installed_record_integrity_status": "PASS",
+        "distribution_name": EXPECTED_DISTRIBUTION_NAME,
+        "distribution_version": EXPECTED_BASICTS_VERSION,
+        "direct_url_repository": EXPECTED_REPOSITORY_URL,
+        "direct_url_vcs": "git",
+        "direct_url_commit_id": EXPECTED_UPSTREAM_REVISION,
+        "direct_url_requested_revision": EXPECTED_UPSTREAM_REVISION,
+        "direct_url_record_status": "PASS",
+        "direct_url_record_hash_mode": "sha256",
+        "import_origin_status": "PASS",
+        "import_name": EXPECTED_IMPORT_NAME,
+        "distribution_package_entry": EXPECTED_PACKAGE_INIT,
+        "package_init_record_status": "PASS",
+        "package_init_record_hash_mode": "sha256",
+    }
+    for field, expected in required.items():
+        if evidence.get(field) != expected:
+            raise CertificationError(
+                f"identity provenance mismatch for {field}: "
+                f"expected {expected!r}, got {evidence.get(field)!r}"
+            )
+    if evidence.get("import_provider_distributions") != [EXPECTED_DISTRIBUTION_NAME]:
+        raise CertificationError("identity import provider mapping is invalid")
+
+    package_init = evidence.get("distribution_package_init")
+    import_origin = evidence.get("import_spec_origin")
+    if not isinstance(package_init, str) or not Path(package_init).is_absolute():
+        raise CertificationError("identity distribution_package_init is invalid")
+    if package_init != import_origin:
+        raise CertificationError("identity import origin differs from distribution package")
+    if not Path(package_init).as_posix().endswith(f"/{EXPECTED_PACKAGE_INIT}"):
+        raise CertificationError("identity distribution package path has an unexpected suffix")
+
+    direct_url_entry = evidence.get("direct_url_record_entry")
+    direct_url_path = evidence.get("direct_url_record_path")
+    if not isinstance(direct_url_entry, str) or not direct_url_entry.endswith(
+        ".dist-info/direct_url.json"
+    ):
+        raise CertificationError("identity direct_url_record_entry is invalid")
+    if not isinstance(direct_url_path, str) or not Path(direct_url_path).is_absolute():
+        raise CertificationError("identity direct_url_record_path is invalid")
+    if Path(direct_url_path).name != "direct_url.json":
+        raise CertificationError("identity direct_url_record_path has an unexpected suffix")
+
+    locations = evidence.get("import_submodule_search_locations")
+    expected_location = str(Path(package_init).parent)
+    if locations != [expected_location]:
+        raise CertificationError("identity package search locations are inconsistent")
+    if not isinstance(evidence.get("module_already_loaded"), bool):
+        raise CertificationError("identity module_already_loaded is invalid")
+    _require_digest(evidence.get("direct_url_sha256"), "direct_url_sha256")
+    _require_digest(evidence.get("import_origin_sha256"), "import_origin_sha256")
+    _require_record_digest(
+        evidence.get("direct_url_record_hash_value"),
+        "direct_url_record_hash_value",
+    )
+    _require_record_digest(
+        evidence.get("package_init_record_hash_value"),
+        "package_init_record_hash_value",
+    )
+    _require_record_size(
+        evidence.get("direct_url_record_size_bytes"),
+        "direct_url_record_size_bytes",
+    )
+    _require_record_size(
+        evidence.get("package_init_record_size_bytes"),
+        "package_init_record_size_bytes",
+    )
+
+
+def _verify_loaded_basicts_closure(evidence: dict[str, Any]) -> None:
+    if evidence.get("basicts_module_closure_status") != "PASS":
+        raise CertificationError("BasicTS loaded module closure status is not PASS")
+    if evidence.get("preloaded_basicts_modules") != []:
+        raise CertificationError("BasicTS modules were preloaded before closure verification")
+    modules = evidence.get("loaded_basicts_modules")
+    count = evidence.get("loaded_basicts_module_count")
+    if not isinstance(modules, list) or not isinstance(count, int):
+        raise CertificationError("BasicTS loaded module closure evidence is invalid")
+    if count != len(modules) or count < len(RUNTIME_CRITICAL_MODULES):
+        raise CertificationError("BasicTS loaded module closure count is inconsistent")
+
+    names: set[str] = set()
+    entries: set[str] = set()
+    for item in modules:
+        if not isinstance(item, dict):
+            raise CertificationError("BasicTS loaded module closure entry is invalid")
+        module_name = item.get("module_name")
+        if (
+            not isinstance(module_name, str)
+            or not (module_name == "basicts" or module_name.startswith("basicts."))
+            or module_name in names
+        ):
+            raise CertificationError("BasicTS loaded module closure names are invalid")
+        names.add(module_name)
+
+        entry = item.get("distribution_entry")
+        if not isinstance(entry, str) or not entry or "\\" in entry:
+            raise CertificationError(f"BasicTS distribution entry is invalid: {module_name}")
+        pure_entry = PurePosixPath(entry)
+        if pure_entry.is_absolute() or pure_entry.as_posix() != entry:
+            raise CertificationError(f"BasicTS distribution entry is unsafe: {module_name}")
+        if any(part in {"", ".", ".."} for part in pure_entry.parts):
+            raise CertificationError(f"BasicTS distribution entry is unsafe: {module_name}")
+        if entry in entries:
+            raise CertificationError("BasicTS loaded module distribution entries are duplicated")
+        entries.add(entry)
+
+        distribution_path = item.get("distribution_path")
+        if (
+            not isinstance(distribution_path, str)
+            or not Path(distribution_path).is_absolute()
+            or distribution_path != item.get("import_spec_origin")
+            or distribution_path != item.get("loaded_module_file")
+        ):
+            raise CertificationError(f"BasicTS loaded module path mismatch: {module_name}")
+        if not Path(distribution_path).as_posix().endswith(f"/{entry}"):
+            raise CertificationError(
+                f"BasicTS loaded module path suffix mismatch: {module_name}"
+            )
+        if item.get("record_status") != "PASS":
+            raise CertificationError(f"BasicTS loaded module RECORD failed: {module_name}")
+        if item.get("record_hash_mode") != "sha256":
+            raise CertificationError(
+                f"BasicTS loaded module RECORD hash mode is invalid: {module_name}"
+            )
+        _require_record_digest(
+            item.get("record_hash_value"),
+            f"BasicTS {module_name}.record_hash_value",
+        )
+        _require_record_size(
+            item.get("record_size_bytes"),
+            f"BasicTS {module_name}.record_size_bytes",
+        )
+        module_digest = item.get("module_file_sha256")
+        if not isinstance(module_digest, str) or DIGEST_PATTERN.fullmatch(
+            module_digest
+        ) is None:
+            raise CertificationError(
+                f"BasicTS module_file_sha256 is invalid: {module_name}"
+            )
+        if not isinstance(item.get("is_package"), bool):
+            raise CertificationError(
+                f"BasicTS loaded module package flag is invalid: {module_name}"
+            )
+
+    if not RUNTIME_CRITICAL_MODULES.issubset(names):
+        raise CertificationError("DLinear critical modules are missing from the closure")
+    if evidence.get("dlinear_dependency_binding_status") != "PASS":
+        raise CertificationError("DLinear dependency binding status is not PASS")
+    expected_base = f"{MODEL_CONFIG_MODULE}.BasicTSModelConfig"
+    expected_bindings = {
+        "decomposition_symbol": (
+            f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"
+        ),
+        "config_base_symbol": expected_base,
+        "dlinear_config_direct_base": expected_base,
+        "arch_decomposition_object_identity": True,
+        "config_model_config_object_identity": True,
+        "configs_export_object_identity": True,
+        "dlinear_config_direct_base_identity": True,
+    }
+    if evidence.get("dlinear_dependency_bindings") != expected_bindings:
+        raise CertificationError("DLinear dependency binding evidence is inconsistent")
+
+
+def _verify_dlinear_module_provenance(evidence: dict[str, Any]) -> None:
+    if evidence.get("dlinear_module_provenance_status") != "PASS":
+        raise CertificationError("DLinear module provenance status is not PASS")
+    modules = evidence.get("dlinear_runtime_modules")
+    if not isinstance(modules, list) or len(modules) != len(DLINEAR_MODULE_CONTRACTS):
+        raise CertificationError("DLinear runtime module evidence is incomplete")
+    by_label = {
+        item.get("label"): item
+        for item in modules
+        if isinstance(item, dict) and isinstance(item.get("label"), str)
+    }
+    if len(by_label) != len(DLINEAR_MODULE_CONTRACTS):
+        raise CertificationError("DLinear runtime module labels are invalid")
+
+    for label, module_name, entry, symbol in DLINEAR_MODULE_CONTRACTS:
+        item = by_label.get(label)
+        if item is None:
+            raise CertificationError(f"DLinear module evidence is missing: {label}")
+        required = {
+            "module_name": module_name,
+            "required_symbol": symbol,
+            "symbol_module": module_name,
+            "distribution_entry": entry,
+            "record_status": "PASS",
+            "record_hash_mode": "sha256",
+        }
+        for field, expected in required.items():
+            if item.get(field) != expected:
+                raise CertificationError(
+                    f"DLinear module evidence mismatch for {label}.{field}: "
+                    f"expected {expected!r}, got {item.get(field)!r}"
+                )
+        distribution_path = item.get("distribution_path")
+        spec_origin = item.get("import_spec_origin")
+        loaded_file = item.get("loaded_module_file")
+        if (
+            not isinstance(distribution_path, str)
+            or not Path(distribution_path).is_absolute()
+            or distribution_path != spec_origin
+            or distribution_path != loaded_file
+        ):
+            raise CertificationError(f"DLinear module path mismatch for {label}")
+        if not Path(distribution_path).as_posix().endswith(f"/{entry}"):
+            raise CertificationError(
+                f"DLinear distribution path suffix mismatch for {label}"
+            )
+        _require_record_digest(
+            item.get("record_hash_value"),
+            f"DLinear {label}.record_hash_value",
+        )
+        _require_record_size(
+            item.get("record_size_bytes"),
+            f"DLinear {label}.record_size_bytes",
+        )
+        module_digest = item.get("module_file_sha256")
+        if not isinstance(module_digest, str) or DIGEST_PATTERN.fullmatch(
+            module_digest
+        ) is None:
+            raise CertificationError(
+                f"DLinear module_file_sha256 is invalid for {label}"
+            )
+        if not isinstance(item.get("module_already_loaded"), bool):
+            raise CertificationError(f"DLinear module loaded-state is invalid for {label}")
+
+    _verify_loaded_basicts_closure(evidence)
+
+
+def verify_provider_bundle(directory: Path, operation: str) -> dict[str, Any]:
+    """Verify one provider response bundle and operation-specific PASS evidence."""
+
+    digests = verify_sha256sums(directory)
+    manifest = _verify_manifest(directory, operation)
+    response = _verify_response(directory, operation)
+    evidence = response["evidence"]
+
+    if operation == "identity":
+        if evidence.get("identity_status") != "PASS":
+            raise CertificationError("identity operation did not record PASS")
+        if evidence.get("python_process_boundary") is not True:
+            raise CertificationError("identity process boundary was not verified")
+        _verify_identity_provenance(evidence)
+    elif operation == "validate_config":
+        if evidence.get("config_import_policy") != "ALLOWLIST":
+            raise CertificationError("config import policy is not ALLOWLIST")
+        count = evidence.get("resolved_count")
+        resolved = evidence.get("resolved")
+        if not isinstance(count, int) or count < 1:
+            raise CertificationError("validate_config resolved_count must be positive")
+        if not isinstance(resolved, list) or len(resolved) != count:
+            raise CertificationError("validate_config resolved evidence is inconsistent")
+    elif operation == "dlinear_smoke":
+        required = {
+            "model_name": "DLinear",
+            "device": "cpu",
+            "cpu_fallback": False,
+            "prediction_finite": True,
+            "state_dict_finite": True,
+            "save_load_exact_match": True,
+        }
+        for field, expected in required.items():
+            if evidence.get(field) != expected:
+                raise CertificationError(
+                    f"DLinear evidence mismatch for {field}: "
+                    f"expected {expected!r}, got {evidence.get(field)!r}"
+                )
+        shape = evidence.get("prediction_shape")
+        if not isinstance(shape, list) or len(shape) != 3 or not all(
+            isinstance(value, int) and value > 0 for value in shape
+        ):
+            raise CertificationError("DLinear prediction shape is invalid")
+        _verify_dlinear_module_provenance(evidence)
+    else:
+        raise CertificationError(f"unsupported P0 operation: {operation}")
+
+    return {
+        "operation": operation,
+        "directory": str(directory),
+        "response_sha256": digests["response.json"],
+        "manifest_sha256": _sha256(directory / "ARTIFACT_MANIFEST.json"),
+        "file_count": len(manifest["files"]),
+    }
+
+
+def verify_lockfile(lockfile: Path) -> dict[str, Any]:
+    """Require a non-empty uv lock containing the frozen BasicTS revision."""
+
+    if lockfile.is_symlink() or not lockfile.is_file() or lockfile.stat().st_size <= 0:
+        raise CertificationError(f"reviewed uv.lock is missing or invalid: {lockfile}")
+    text = lockfile.read_text(encoding="utf-8")
+    lowered = text.lower()
+    if "basicts" not in lowered:
+        raise CertificationError("uv.lock does not contain a BasicTS package record")
+    if EXPECTED_UPSTREAM_REVISION not in text:
+        raise CertificationError("uv.lock does not contain the frozen BasicTS revision")
+    return {
+        "path": str(lockfile),
+        "size_bytes": lockfile.stat().st_size,
+        "sha256": _sha256(lockfile),
+        "frozen_revision": EXPECTED_UPSTREAM_REVISION,
+    }
+
+
+def certify_p0(
+    *,
+    lockfile: Path,
+    identity_dir: Path,
+    config_dir: Path,
+    dlinear_dir: Path,
+) -> dict[str, Any]:
+    """Build a fail-closed P0 certificate from independently hashed evidence."""
+
+    return {
+        "schema_version": "1.0",
+        "status": "PASS",
+        "scope": "BASICTS_P0_IDENTITY_CONFIG_DLINEAR_CPU",
+        "basicts_version": EXPECTED_BASICTS_VERSION,
+        "upstream_revision": EXPECTED_UPSTREAM_REVISION,
+        "lockfile": verify_lockfile(lockfile),
+        "bundles": [
+            verify_provider_bundle(identity_dir, "identity"),
+            verify_provider_bundle(config_dir, "validate_config"),
+            verify_provider_bundle(dlinear_dir, "dlinear_smoke"),
+        ],
+        "certified": {
+            "isolated_python_lane": "3.11",
+            "identity": True,
+            "installed_package_git_provenance": True,
+            "installed_record_integrity": True,
+            "import_origin_bound_to_distribution": True,
+            "dlinear_module_origin_bound_to_distribution": True,
+            "basicts_loaded_module_closure_bound_to_distribution": True,
+            "dlinear_dependency_object_binding": True,
+            "config_import_allowlist": True,
+            "dlinear_cpu_fit_predict": True,
+            "save_load_repredict_exact": True,
+            "portable_sha256": True,
+        },
+        "not_certified": [
+            "BasicTS Launcher or Runner",
+            "GPU, AMP, DDP, or distributed execution",
+            "chronological CV, OOF, HPO, Holdout, or Prospective evaluation",
+            "accuracy improvement or baseline superiority",
+            "shared worker, catalog, CLI, MLflow, or PostgreSQL integration",
+        ],
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Verify BasicTS P0 evidence")
+    parser.add_argument("--lockfile", type=Path, required=True)
+    parser.add_argument("--identity-dir", type=Path, required=True)
+    parser.add_argument("--config-dir", type=Path, required=True)
+    parser.add_argument("--dlinear-dir", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    args = parser.parse_args()
+
+    report = certify_p0(
+        lockfile=args.lockfile,
+        identity_dir=args.identity_dir,
+        config_dir=args.config_dir,
+        dlinear_dir=args.dlinear_dir,
+    )
+    report_path = args.output_dir / "P0_CERTIFICATION_REPORT.json"
+    _atomic_write_text(
+        report_path,
+        json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+    )
+    checksum_path = args.output_dir / "P0_CERTIFICATION_REPORT.json.sha256"
+    _atomic_write_text(checksum_path, f"{_sha256(report_path)}  {report_path.name}\n")
+    print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
