@@ -22,16 +22,25 @@ every selected model:
 4. the bundle is reloaded through `NeuralForecast.load()`;
 5. post-load inference succeeds;
 6. pre-save and post-load rows have the same unique `(unique_id, ds)` identities;
-7. prediction shapes match and point values match within `rtol=1e-6`, `atol=1e-6`;
-8. post-load predictions and the loaded state dictionary are finite;
-9. CPU/GPU runtime and `nvidia-smi` PID evidence are recorded independently before
-   saving and after reload inference;
-10. when GPU execution is required, both the original trained model and the reloaded
-    inference must have CUDA evidence. A CPU-only reload inference fails certification.
+7. deterministic models use a precision-aware point-value comparison;
+8. stochastic models such as DeepAR, DeepNPTS, TFT, and HINT use multiple explicitly
+   seeded predictions and compare their mean and standard deviation rather than
+   requiring one unseeded draw to be identical;
+9. post-load predictions and the loaded state dictionary are finite;
+10. pre-save inference and reload inference record independent runtime, device, VRAM,
+    process, and `nvidia-smi` evidence;
+11. formal GPU certification additionally requires training evidence captured in the
+    actual trial or training worker. A post-fit driver snapshot is not relabeled as
+    training proof;
+12. when GPU execution is required, missing training evidence or CPU fallback during
+    either inference phase fails certification.
 
-Prediction frames are sorted by `(unique_id, ds)` before value comparison. This accepts
+Prediction frames are sorted by `(unique_id, ds)` before comparison. This accepts
 harmless row-order changes while rejecting missing, duplicated, or reassigned forecast
-rows.
+rows. Deterministic comparison defaults to `rtol=1e-6`, `atol=1e-6` for 32-bit
+precision, with separate tolerances for 64-bit and mixed/bfloat16 execution.
+Stochastic comparison writes the seeded samples and their aggregate statistics to the
+certification artifact.
 
 The legacy-compatible top-level `status` remains `SUCCEEDED`, `PARTIAL`, or `FAILED`.
 Use `certification_status` for formal interpretation:
@@ -41,8 +50,10 @@ Use `certification_status` for formal interpretation:
 - `PARTIAL`: at least one model was certified and at least one model failed;
 - `FAILED`: no model achieved certification.
 
-The default random seed for this command is `1`. Formal comparisons still require
-multiple model seeds in the all-AutoModel campaign.
+The default random seed for this command is `1`. Formal accuracy comparisons still
+require multiple independent model seeds in the all-AutoModel campaign. The seeded
+runtime samples above only verify save/load stability; they do not replace multi-seed
+model evaluation.
 
 ## Dry run
 
@@ -90,6 +101,10 @@ With a GPU campaign, requested workers remain visible in the plan while
 `max_gpu_jobs` bounds simultaneous model training. Remaining models wait in the queue.
 Nested GPU trial parallelism is fail-closed: `parallel_trials` must be `1` whenever
 `gpus > 0`. Increase outer concurrency only through `workers` and `max_gpu_jobs`.
+
+A GPU campaign is not formally certified until the selected backend persists
+trial/worker training evidence. CPU CI can verify the fail-closed contract, but it
+cannot certify the registered RTX runtime.
 
 ## Full campaign
 
@@ -141,17 +156,23 @@ uses a 5 by 4 summing matrix.
   model count;
 - `models/<model-id>/run_report.json`: per-model training and certification status;
 - `models/<model-id>/predictions.csv`: raw and legal decoded predictions;
-- `models/<model-id>/prediction_after_load.csv`: prediction frame produced after reload;
-- `models/<model-id>/runtime_certification.json`: identity, finite-state, device/PID,
-  failure phase, failed checks, and prediction-comparison evidence. This file is written
-  for both PASS and FAIL outcomes before the task returns or raises;
+- `models/<model-id>/prediction_after_load.csv`: first prediction frame produced after
+  reload;
+- `models/<model-id>/prediction_samples_before_save.csv`: explicitly seeded pre-save
+  samples for stochastic models;
+- `models/<model-id>/prediction_samples_after_load.csv`: matching seeded samples after
+  reload;
+- `models/<model-id>/runtime_certification.json`: prediction policy, identity,
+  finite-state, precision-aware tolerances, stochastic summaries, phase-specific
+  device/PID evidence, failure phase, and failed checks. This file is written for both
+  PASS and FAIL outcomes before the task returns or raises;
 - `models/<model-id>/neuralforecast/`: retained model bundle when `--save-models` is
   enabled. After a successful verification the bundle may be removed when retention is
   disabled. Failed certifications retain any bundle already written for diagnosis.
 
 ## Resilient run script
 
-For the known Numbers4 SQLite bundle, run the staged wrapper:
+For the known Numbers 4 SQLite bundle, run the staged wrapper:
 
 ```bash
 cd /mnt/e/env/ts/loto_forecast_platform || exit 1
