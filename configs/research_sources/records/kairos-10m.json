@@ -1,0 +1,98 @@
+{
+  "contamination": {
+    "benchmark_contamination_risk": "MEDIUM",
+    "benchmark_names": [],
+    "evidence_status": "UNVERIFIED",
+    "pretraining_disclosure": "PreSTS corpus and adapted Chronos-related sources disclosed"
+  },
+  "license_boundary": {
+    "code_license": "Apache-2.0",
+    "code_license_source": "https://github.com/foundation-model-research/Kairos",
+    "commercial_eligibility": "ELIGIBLE",
+    "weight_license": "Apache-2.0",
+    "weight_license_source": "https://huggingface.co/mldi-lab/Kairos_10m"
+  },
+  "logical_model_id": "kairos-10m",
+  "model_revision": "UNPINNED",
+  "non_claims": {},
+  "official_model_repository": {
+    "canonical": true,
+    "mirror": false,
+    "official": true,
+    "repository_type": "model",
+    "url": "https://huggingface.co/mldi-lab/Kairos_10m"
+  },
+  "official_paper_url": "https://arxiv.org/abs/2509.25826",
+  "official_source_repository": {
+    "canonical": true,
+    "mirror": false,
+    "official": true,
+    "repository_type": "source",
+    "url": "https://github.com/foundation-model-research/Kairos"
+  },
+  "paper_identifier": "arXiv:2509.25826",
+  "paper_published_on": "UNKNOWN",
+  "paper_title": "Kairos: Toward Adaptive and Parameter-Efficient Time Series Foundation Models",
+  "release_status": "AVAILABLE",
+  "remote_code_policy": {
+    "allowed_files": [],
+    "policy_id": "research-source-remote-code-review-v1",
+    "review_status": "REMOTE_CODE_REVIEW_REQUIRED",
+    "trust_remote_code": true
+  },
+  "required_files": [
+    {
+      "path": "README.md",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "config.json",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "model.safetensors",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    }
+  ],
+  "runtime_compatibility": {
+    "packages": [
+      {
+        "name": "tsfm",
+        "source": "https://github.com/foundation-model-research/Kairos",
+        "version": "UNPINNED"
+      }
+    ],
+    "python": "UNKNOWN",
+    "torch": "UNKNOWN",
+    "transformers": "UNKNOWN",
+    "verification_status": "UNVERIFIED"
+  },
+  "source_id": "kairos-10m",
+  "source_kind": "MODEL",
+  "source_revision": "0322393840ccf6e2bfe9c663f9dcd088a5a7ee07",
+  "superseded_by_source_id": null,
+  "verification": {
+    "blockers": [
+      "Official example requires trust_remote_code=True.",
+      "Remote files, model revision, sizes, and hashes are not reviewed."
+    ],
+    "checked_at": "2026-08-06T06:52:00Z",
+    "findings": [
+      "Official 10M model repository and Apache-2.0 metadata observed.",
+      "Official source HEAD was resolved at intake time."
+    ],
+    "official_urls_checked": [
+      "https://arxiv.org/abs/2509.25826",
+      "https://github.com/foundation-model-research/Kairos",
+      "https://huggingface.co/mldi-lab/Kairos_10m"
+    ],
+    "status": "REMOTE_CODE_REVIEW_REQUIRED",
+    "verification_method": "official paper, official repository, and official model-card review"
+  }
+}

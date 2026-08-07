@@ -1,0 +1,98 @@
+{
+  "contamination": {
+    "benchmark_contamination_risk": "MEDIUM",
+    "benchmark_names": [],
+    "evidence_status": "VERIFIED",
+    "pretraining_disclosure": "GIFT-Eval Pretrain subset and Chronos pretraining corpus subset disclosed"
+  },
+  "license_boundary": {
+    "code_license": "Apache-2.0",
+    "code_license_source": "https://github.com/ibm-granite/granite-tsfm",
+    "commercial_eligibility": "ELIGIBLE",
+    "weight_license": "Apache-2.0",
+    "weight_license_source": "https://huggingface.co/ibm-granite/granite-timeseries-flowstate-r1"
+  },
+  "logical_model_id": "granite-flowstate",
+  "model_revision": "UNPINNED",
+  "non_claims": {},
+  "official_model_repository": {
+    "canonical": true,
+    "mirror": false,
+    "official": true,
+    "repository_type": "model",
+    "url": "https://huggingface.co/ibm-granite/granite-timeseries-flowstate-r1"
+  },
+  "official_paper_url": "https://arxiv.org/abs/2508.05287",
+  "official_source_repository": {
+    "canonical": true,
+    "mirror": false,
+    "official": true,
+    "repository_type": "source",
+    "url": "https://github.com/ibm-granite/granite-tsfm"
+  },
+  "paper_identifier": "arXiv:2508.05287",
+  "paper_published_on": "2025-08-07",
+  "paper_title": "FlowState: Sampling Rate Invariant Time Series Forecasting",
+  "release_status": "AVAILABLE",
+  "remote_code_policy": {
+    "allowed_files": [],
+    "policy_id": "UNKNOWN",
+    "review_status": "NOT_REQUIRED",
+    "trust_remote_code": false
+  },
+  "required_files": [
+    {
+      "path": "README.md",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "config.json",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "model.safetensors",
+      "required": true,
+      "sha256": "07a7844db841047d3a99ce9c6ce0ce5139a24d1f42e919c37c2d1e285fa0ff98",
+      "size_bytes": "UNKNOWN"
+    }
+  ],
+  "runtime_compatibility": {
+    "packages": [
+      {
+        "name": "granite-tsfm",
+        "source": "https://github.com/ibm-granite/granite-tsfm",
+        "version": "UNKNOWN"
+      }
+    ],
+    "python": "UNKNOWN",
+    "torch": "UNKNOWN",
+    "transformers": "4.52.1",
+    "verification_status": "UNVERIFIED"
+  },
+  "source_id": "granite-flowstate",
+  "source_kind": "MODEL",
+  "source_revision": "d473fc3d800c400230a3d8f5192fbdc6255a02f5",
+  "superseded_by_source_id": null,
+  "verification": {
+    "blockers": [
+      "Formal model revision is UNPINNED.",
+      "Complete byte inventory, sizes, and hashes are not verified."
+    ],
+    "checked_at": "2026-08-06T06:52:00Z",
+    "findings": [
+      "Official Granite model and Apache-2.0 metadata observed.",
+      "Official source HEAD was resolved at intake time."
+    ],
+    "official_urls_checked": [
+      "https://arxiv.org/abs/2508.05287",
+      "https://github.com/ibm-granite/granite-tsfm",
+      "https://huggingface.co/ibm-granite/granite-timeseries-flowstate-r1"
+    ],
+    "status": "CHECKPOINT_REVIEW_REQUIRED",
+    "verification_method": "official paper, official repository, and official model-card review"
+  }
+}

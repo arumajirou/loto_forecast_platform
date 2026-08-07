@@ -1,0 +1,83 @@
+{
+  "contamination": {
+    "benchmark_contamination_risk": "UNKNOWN",
+    "benchmark_names": [],
+    "evidence_status": "UNVERIFIED",
+    "pretraining_disclosure": "UNKNOWN"
+  },
+  "license_boundary": {
+    "code_license": "UNKNOWN",
+    "code_license_source": "UNKNOWN",
+    "commercial_eligibility": "LICENSE_REVIEW_REQUIRED",
+    "weight_license": "UNKNOWN",
+    "weight_license_source": "UNKNOWN"
+  },
+  "logical_model_id": "super-linear",
+  "model_revision": "UNKNOWN",
+  "non_claims": {},
+  "official_model_repository": "UNKNOWN",
+  "official_paper_url": "https://arxiv.org/abs/2509.15105",
+  "official_source_repository": {
+    "canonical": true,
+    "mirror": false,
+    "official": true,
+    "repository_type": "source",
+    "url": "https://github.com/azencot-group/SuperLinear"
+  },
+  "paper_identifier": "arXiv:2509.15105",
+  "paper_published_on": "UNKNOWN",
+  "paper_title": "Super-Linear: A Lightweight Forecasting Architecture",
+  "release_status": "UNKNOWN",
+  "remote_code_policy": {
+    "allowed_files": [],
+    "policy_id": "UNKNOWN",
+    "review_status": "NOT_REQUIRED",
+    "trust_remote_code": false
+  },
+  "required_files": [
+    {
+      "path": "README.md",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "requirements.txt",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    }
+  ],
+  "runtime_compatibility": {
+    "packages": [
+      {
+        "name": "UNKNOWN",
+        "source": "https://github.com/azencot-group/SuperLinear",
+        "version": "UNKNOWN"
+      }
+    ],
+    "python": "UNKNOWN",
+    "torch": "UNKNOWN",
+    "transformers": "UNKNOWN",
+    "verification_status": "UNVERIFIED"
+  },
+  "source_id": "super-linear",
+  "source_kind": "MODEL",
+  "source_revision": "eb32d734ff714f633fb6217f1ac431d2196edfa6",
+  "superseded_by_source_id": null,
+  "verification": {
+    "blockers": [
+      "Code license, checkpoint release, weight license, package and artifact inventory are unverified."
+    ],
+    "checked_at": "2026-08-06T06:52:00Z",
+    "findings": [
+      "Official source repository HEAD was resolved at intake time."
+    ],
+    "official_urls_checked": [
+      "https://arxiv.org/abs/2509.15105",
+      "https://github.com/azencot-group/SuperLinear"
+    ],
+    "status": "LICENSE_REVIEW_REQUIRED",
+    "verification_method": "official paper, official repository, and official model-card review"
+  }
+}

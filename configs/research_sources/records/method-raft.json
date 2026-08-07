@@ -1,0 +1,64 @@
+{
+  "contamination": {
+    "benchmark_contamination_risk": "HIGH",
+    "benchmark_names": [],
+    "evidence_status": "UNVERIFIED",
+    "pretraining_disclosure": "Retrieval candidates must be limited to observed Train histories and futures"
+  },
+  "license_boundary": {
+    "code_license": "UNKNOWN",
+    "code_license_source": "UNKNOWN",
+    "commercial_eligibility": "UNKNOWN",
+    "weight_license": "UNKNOWN",
+    "weight_license_source": "UNKNOWN"
+  },
+  "logical_model_id": "method-raft",
+  "model_revision": "UNKNOWN",
+  "non_claims": {},
+  "official_model_repository": "UNKNOWN",
+  "official_paper_url": "https://proceedings.mlr.press/v267/han25d.html",
+  "official_source_repository": "UNKNOWN",
+  "paper_identifier": "PMLR:267:han25d",
+  "paper_published_on": "2025-07-13",
+  "paper_title": "Retrieval Augmented Time Series Forecasting",
+  "release_status": "UNKNOWN",
+  "remote_code_policy": {
+    "allowed_files": [],
+    "policy_id": "UNKNOWN",
+    "review_status": "NOT_REQUIRED",
+    "trust_remote_code": false
+  },
+  "required_files": [],
+  "runtime_compatibility": {
+    "packages": [
+      {
+        "name": "UNKNOWN",
+        "source": "UNKNOWN",
+        "version": "UNKNOWN"
+      }
+    ],
+    "python": "UNKNOWN",
+    "torch": "UNKNOWN",
+    "transformers": "UNKNOWN",
+    "verification_status": "UNVERIFIED"
+  },
+  "source_id": "method-raft",
+  "source_kind": "METHOD",
+  "source_revision": "UNPINNED",
+  "superseded_by_source_id": null,
+  "verification": {
+    "blockers": [
+      "Official software repository and revision were not verified.",
+      "Retrieval leakage controls require a separate contract."
+    ],
+    "checked_at": "2026-08-06T06:52:00Z",
+    "findings": [
+      "Official ICML 2025 PMLR paper verified."
+    ],
+    "official_urls_checked": [
+      "https://proceedings.mlr.press/v267/han25d.html"
+    ],
+    "status": "CONDITIONAL",
+    "verification_method": "official paper, official repository, and official model-card review"
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "contamination": {
+    "benchmark_contamination_risk": "UNKNOWN",
+    "benchmark_names": [],
+    "evidence_status": "UNVERIFIED",
+    "pretraining_disclosure": "UNKNOWN"
+  },
+  "license_boundary": {
+    "code_license": "UNKNOWN",
+    "code_license_source": "UNKNOWN",
+    "commercial_eligibility": "LICENSE_REVIEW_REQUIRED",
+    "weight_license": "UNKNOWN",
+    "weight_license_source": "UNKNOWN"
+  },
+  "logical_model_id": "lightgts",
+  "model_revision": "UNPINNED",
+  "non_claims": {},
+  "official_model_repository": {
+    "canonical": true,
+    "mirror": false,
+    "official": true,
+    "repository_type": "model_and_code",
+    "url": "https://huggingface.co/DecisionIntelligence/LightGTS"
+  },
+  "official_paper_url": "https://arxiv.org/abs/2506.06005",
+  "official_source_repository": {
+    "canonical": true,
+    "mirror": false,
+    "official": true,
+    "repository_type": "model_and_code",
+    "url": "https://huggingface.co/DecisionIntelligence/LightGTS"
+  },
+  "paper_identifier": "arXiv:2506.06005",
+  "paper_published_on": "UNKNOWN",
+  "paper_title": "LightGTS: A Lightweight General Time Series Forecasting Model",
+  "release_status": "AVAILABLE",
+  "remote_code_policy": {
+    "allowed_files": [],
+    "policy_id": "research-source-remote-code-review-v1",
+    "review_status": "REMOTE_CODE_REVIEW_REQUIRED",
+    "trust_remote_code": true
+  },
+  "required_files": [
+    {
+      "path": "README.md",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "config.json",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "model.py",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "model.safetensors",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    }
+  ],
+  "runtime_compatibility": {
+    "packages": [
+      {
+        "name": "transformers",
+        "source": "https://huggingface.co/DecisionIntelligence/LightGTS",
+        "version": "4.30.2"
+      }
+    ],
+    "python": "UNKNOWN",
+    "torch": "UNKNOWN",
+    "transformers": "4.30.2",
+    "verification_status": "UNVERIFIED"
+  },
+  "source_id": "lightgts",
+  "source_kind": "MODEL",
+  "source_revision": "UNPINNED",
+  "superseded_by_source_id": null,
+  "verification": {
+    "blockers": [
+      "Code and weight licenses are not declared in retrieved metadata.",
+      "Remote-code and checkpoint byte review are required."
+    ],
+    "checked_at": "2026-08-06T06:52:00Z",
+    "findings": [
+      "Official model repository is present."
+    ],
+    "official_urls_checked": [
+      "https://arxiv.org/abs/2506.06005",
+      "https://huggingface.co/DecisionIntelligence/LightGTS"
+    ],
+    "status": "LICENSE_REVIEW_REQUIRED",
+    "verification_method": "official paper, official repository, and official model-card review"
+  }
+}

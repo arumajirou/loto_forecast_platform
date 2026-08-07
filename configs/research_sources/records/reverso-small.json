@@ -1,0 +1,89 @@
+{
+  "contamination": {
+    "benchmark_contamination_risk": "UNKNOWN",
+    "benchmark_names": [],
+    "evidence_status": "UNVERIFIED",
+    "pretraining_disclosure": "UNKNOWN"
+  },
+  "license_boundary": {
+    "code_license": "MIT",
+    "code_license_source": "https://huggingface.co/shinfxh/reverso",
+    "commercial_eligibility": "ELIGIBLE",
+    "weight_license": "MIT",
+    "weight_license_source": "https://huggingface.co/shinfxh/reverso"
+  },
+  "logical_model_id": "reverso-small",
+  "model_revision": "UNPINNED",
+  "non_claims": {},
+  "official_model_repository": {
+    "canonical": true,
+    "mirror": false,
+    "official": true,
+    "repository_type": "model_and_code",
+    "url": "https://huggingface.co/shinfxh/reverso"
+  },
+  "official_paper_url": "https://arxiv.org/abs/2602.17634",
+  "official_source_repository": {
+    "canonical": true,
+    "mirror": false,
+    "official": true,
+    "repository_type": "model_and_code",
+    "url": "https://huggingface.co/shinfxh/reverso"
+  },
+  "paper_identifier": "arXiv:2602.17634",
+  "paper_published_on": "UNKNOWN",
+  "paper_title": "Reverso: Efficient Zero-Shot Time Series Forecasting",
+  "release_status": "AVAILABLE",
+  "remote_code_policy": {
+    "allowed_files": [],
+    "policy_id": "UNKNOWN",
+    "review_status": "NOT_REQUIRED",
+    "trust_remote_code": false
+  },
+  "required_files": [
+    {
+      "path": "README.md",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "reverso-small.pt",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    }
+  ],
+  "runtime_compatibility": {
+    "packages": [
+      {
+        "name": "pytorch",
+        "source": "https://huggingface.co/shinfxh/reverso",
+        "version": "UNKNOWN"
+      }
+    ],
+    "python": "UNKNOWN",
+    "torch": "UNKNOWN",
+    "transformers": "UNKNOWN",
+    "verification_status": "UNVERIFIED"
+  },
+  "source_id": "reverso-small",
+  "source_kind": "MODEL",
+  "source_revision": "UNPINNED",
+  "superseded_by_source_id": null,
+  "verification": {
+    "blockers": [
+      "Formal revision, exact checkpoint path, size, SHA-256, and dependency lane are unverified."
+    ],
+    "checked_at": "2026-08-06T06:52:00Z",
+    "findings": [
+      "Official repository exposes Reverso-Small and MIT metadata."
+    ],
+    "official_urls_checked": [
+      "https://arxiv.org/abs/2602.17634",
+      "https://huggingface.co/shinfxh/reverso"
+    ],
+    "status": "CHECKPOINT_REVIEW_REQUIRED",
+    "verification_method": "official paper, official repository, and official model-card review"
+  }
+}

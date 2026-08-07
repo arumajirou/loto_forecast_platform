@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-08-06T06:52:00Z",
+  "record_files": [
+    "records/granite-flowstate.json",
+    "records/tempopfn-38m.json",
+    "records/kairos-10m.json",
+    "records/kairos-23m.json",
+    "records/kairos-50m.json",
+    "records/reverso-small.json",
+    "records/granite-patchtst-fm.json",
+    "records/lightgts.json",
+    "records/super-linear.json",
+    "records/method-raft.json",
+    "records/method-ts-rag.json"
+  ],
+  "schema_version": "1.0.0"
+}

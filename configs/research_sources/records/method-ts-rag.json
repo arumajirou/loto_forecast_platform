@@ -1,0 +1,91 @@
+{
+  "contamination": {
+    "benchmark_contamination_risk": "HIGH",
+    "benchmark_names": [],
+    "evidence_status": "UNVERIFIED",
+    "pretraining_disclosure": "Retriever knowledge base and TSFM backbone are disclosed at workflow level"
+  },
+  "license_boundary": {
+    "code_license": "MIT",
+    "code_license_source": "https://github.com/UConn-DSIS/TS-RAG",
+    "commercial_eligibility": "LICENSE_REVIEW_REQUIRED",
+    "weight_license": "UNKNOWN",
+    "weight_license_source": "UNKNOWN"
+  },
+  "logical_model_id": "method-ts-rag",
+  "model_revision": "UNKNOWN",
+  "non_claims": {},
+  "official_model_repository": "UNKNOWN",
+  "official_paper_url": "https://arxiv.org/abs/2503.07649",
+  "official_source_repository": {
+    "canonical": true,
+    "mirror": false,
+    "official": true,
+    "repository_type": "source",
+    "url": "https://github.com/UConn-DSIS/TS-RAG"
+  },
+  "paper_identifier": "arXiv:2503.07649",
+  "paper_published_on": "UNKNOWN",
+  "paper_title": "TS-RAG: Retrieval-Augmented Generation based Time Series Foundation Models are Stronger Zero-Shot Forecaster",
+  "release_status": "AVAILABLE",
+  "remote_code_policy": {
+    "allowed_files": [],
+    "policy_id": "UNKNOWN",
+    "review_status": "NOT_REQUIRED",
+    "trust_remote_code": false
+  },
+  "required_files": [
+    {
+      "path": "README.md",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "LICENSE",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    },
+    {
+      "path": "requirements.txt",
+      "required": true,
+      "sha256": "UNVERIFIED",
+      "size_bytes": "UNKNOWN"
+    }
+  ],
+  "runtime_compatibility": {
+    "packages": [
+      {
+        "name": "UNKNOWN",
+        "source": "https://github.com/UConn-DSIS/TS-RAG",
+        "version": "UNKNOWN"
+      }
+    ],
+    "python": "UNKNOWN",
+    "torch": "UNKNOWN",
+    "transformers": "UNKNOWN",
+    "verification_status": "UNVERIFIED"
+  },
+  "source_id": "method-ts-rag",
+  "source_kind": "METHOD",
+  "source_revision": "73ac807789d2e61b8a3dfc8514e3fc947fe185cc",
+  "superseded_by_source_id": null,
+  "verification": {
+    "blockers": [
+      "External checkpoint and dataset licenses remain unverified.",
+      "Fold-local retrieval and contamination controls require separate implementation."
+    ],
+    "checked_at": "2026-08-06T06:52:00Z",
+    "findings": [
+      "Official repository and MIT code license verified.",
+      "Official source HEAD was resolved at intake time."
+    ],
+    "official_urls_checked": [
+      "https://arxiv.org/abs/2503.07649",
+      "https://github.com/UConn-DSIS/TS-RAG"
+    ],
+    "status": "CONDITIONAL",
+    "verification_method": "official paper, official repository, and official model-card review"
+  }
+}
