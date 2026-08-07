@@ -1,0 +1,24 @@
+# Merge into configs/harness/gateway.yaml only after exporting GEMINI_API_KEY.
+# Keep disabled until profile-audit and profile-ab have been reviewed.
+models:
+  - key: gemini-3.6-flash
+    display_name: Gemini 3.6 Flash
+    engine: gemini
+    endpoint: https://generativelanguage.googleapis.com
+    provider: google
+    profile_id: gemini-interactions
+    capabilities:
+      - chat
+      - tools
+      - json_schema
+      - reasoning
+      - vision
+    declared_context: 1048576
+    certified_context: 0
+    virtual_context: 1048576
+    roles:
+      - planner
+      - reviewer
+      - judge
+    enabled: false
+    status: DISCOVERED

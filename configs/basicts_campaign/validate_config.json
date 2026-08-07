@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "operation": "validate_config",
+  "output_dir": "artifacts/basicts/p0/validate-config",
+  "environment_lane": "basicts-py311",
+  "expected_basicts_version": "1.1.0",
+  "expected_upstream_revision": "c2bb6e31e591167e84459775a21a62e70a5893ce",
+  "import_references": [
+    {
+      "module": "basicts.models.DLinear.arch.dlinear_arch",
+      "name": "DLinear"
+    },
+    {
+      "module": "torch.optim",
+      "name": "Adam"
+    }
+  ]
+}

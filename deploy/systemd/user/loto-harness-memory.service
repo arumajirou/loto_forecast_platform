@@ -1,0 +1,51 @@
+# PROPOSED systemd --user unit (Phase 7 proposal, NOT installed/enabled/started).
+# Fixes vs. the real deploy/systemd/user/loto-harness-memory.service (SVC-1/SVC-4):
+#   - WorkingDirectory / LOTO_HARNESS_REPO_ROOT pointed at the old non-worktree
+#     path (/mnt/e/env/ts/loto_forecast_platform) instead of this run's worktree.
+#   - LOTO_HARNESS_MEMORY_URL / LOTO_HARNESS_CODE_INDEX used relative sqlite paths,
+#     which resolve against whatever the process cwd happens to be; made absolute.
+#   - EnvironmentFile pointed at the old non-worktree .env.harness path.
+#   - ExecStart relied on /usr/bin/env uv (PATH lookup) instead of an absolute
+#     uv binary path.
+#   - Added StartLimitIntervalSec/StartLimitBurst (crash-loop cap),
+#     TimeoutStartSec, and explicit StandardOutput/StandardError=journal.
+# Port 127.0.0.1:17231 is UNCHANGED from the real unit -- it is the harness's own
+# documented default (LOTO_HARNESS_MCP_PORT), was confirmed free in Phase 1's
+# PORT_AUDIT.json, was bound and released cleanly twice during Phase 5's MCP HTTP
+# E2E (MCP_HTTP_E2E.json), and was re-confirmed free again at Phase 7 drafting
+# time. It matches PROPOSED_MCP_CONFIG.json's url exactly.
+# uv binary path (/home/az/.local/bin/uv) confirmed via `which uv` +
+# `readlink -f` at Phase 7 drafting time.
+
+[Unit]
+Description=Loto Harness Streamable HTTP MCP Memory Server
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+WorkingDirectory=/mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725
+Environment=LOTO_HARNESS_MEMORY_URL=sqlite:////mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725/artifacts/harness/memory.sqlite3
+Environment=LOTO_HARNESS_CODE_INDEX=/mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725/artifacts/harness/code-index.sqlite3
+Environment=LOTO_HARNESS_REPO_ROOT=/mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725
+Environment=LOTO_HARNESS_MCP_HOST=127.0.0.1
+Environment=LOTO_HARNESS_MCP_PORT=17231
+EnvironmentFile=-/mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725/.env.harness
+ExecStart=/home/az/.local/bin/uv run --extra harness loto-harness memory-mcp-http
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=30
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadOnlyPaths=/mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725/src
+ReadWritePaths=/mnt/e/env/ts/loto_forecast_platform-harness-20260804-194725/artifacts
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

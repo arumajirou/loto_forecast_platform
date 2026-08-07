@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "command": "PYTHONPATH=src pytest -q --cov=src/loto/clock_health tests/clock_health",
+  "passed": 29,
+  "failed": 0,
+  "skipped": 0,
+  "statement_coverage_percent": 85,
+  "real_host_clock_tested": false,
+  "holdout_opened": false,
+  "prospective_opened": false
+}

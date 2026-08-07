@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "backend": "file-json-cas-v1",
+  "compare_and_swap_required": true,
+  "one_time_authorization_required": true,
+  "append_only_consumption_required": true,
+  "automatic_deployment": false,
+  "automatic_retraining": false,
+  "automatic_rollback": false,
+  "rollback_requires_new_p7_authorization": true
+}

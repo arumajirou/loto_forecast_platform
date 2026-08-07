@@ -1,0 +1,10 @@
+{
+  "registry_target": "file+json:///absolute/path/to/sktime-registry.json",
+  "model_id": "replace-with-immutable-model-id",
+  "model_revision": "replace-with-immutable-commit-or-revision",
+  "shadow_candidate_id": "replace-with-p6-shadow-candidate",
+  "model_artifact_sha256": "replace-with-64-hex-sha256",
+  "data_snapshot_sha256": "replace-with-64-hex-sha256",
+  "runtime_environment_sha256": "replace-with-64-hex-sha256",
+  "code_sha256": "replace-with-64-hex-sha256"
+}

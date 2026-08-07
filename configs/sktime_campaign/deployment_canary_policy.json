@@ -1,0 +1,10 @@
+{
+  "minimum_shadow_draws": 3,
+  "maximum_probe_age_seconds": 3600,
+  "allow_cpu_fallback": false,
+  "require_primary_unchanged": true,
+  "prediction_publication_allowed": false,
+  "automatic_primary_promotion": false,
+  "automatic_retraining": false,
+  "automatic_rollback": false
+}

@@ -1,0 +1,15 @@
+limits:
+  max_iterations: 5
+  max_same_failure_repeats: 2
+  max_wall_seconds: 7200
+  max_total_input_tokens: 500000
+  max_total_output_tokens: 100000
+quality_gates:
+  - [uv, run, ruff, check, src/loto/harness, tests/harness]
+  - [uv, run, mypy, src/loto/harness]
+  - [uv, run, pytest, -q, tests/harness]
+forbidden_commands:
+  - git reset --hard
+  - git clean -fd
+  - git push --force
+  - rm -rf

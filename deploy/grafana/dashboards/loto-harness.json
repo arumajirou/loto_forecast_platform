@@ -1,0 +1,37 @@
+{
+  "title": "Loto Harness",
+  "uid": "loto-harness",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "time": {"from": "now-1h", "to": "now"},
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Request rate",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "targets": [{"expr": "sum(rate(loto_harness_requests_total[1m])) by (model, status)", "legendFormat": "{{model}} {{status}}"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "P95 request duration",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [{"expr": "histogram_quantile(0.95, sum(rate(loto_harness_request_duration_seconds_bucket[5m])) by (le, model))", "legendFormat": "{{model}}"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Token throughput",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [
+        {"expr": "sum(rate(loto_harness_prompt_tokens_total[1m])) by (model)", "legendFormat": "prompt {{model}}"},
+        {"expr": "sum(rate(loto_harness_completion_tokens_total[1m])) by (model)", "legendFormat": "completion {{model}}"}
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Compression ratio",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [{"expr": "avg(loto_harness_compression_ratio)", "legendFormat": "final/raw"}]
+    }
+  ]
+}

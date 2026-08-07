@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "policy_id": "clock-health-default-v1",
+  "require_synchronized": true,
+  "require_continuity": true,
+  "allowed_leap_statuses": [
+    "NORMAL"
+  ],
+  "warning_leap_statuses": [
+    "INSERT_SECOND",
+    "DELETE_SECOND"
+  ],
+  "max_stratum_warning": 4,
+  "max_stratum_block": 8,
+  "max_abs_last_offset_warning_seconds": 0.005,
+  "max_abs_last_offset_block_seconds": 0.05,
+  "max_rms_offset_warning_seconds": 0.005,
+  "max_rms_offset_block_seconds": 0.05,
+  "max_root_delay_warning_seconds": 0.1,
+  "max_root_delay_block_seconds": 0.5,
+  "max_root_dispersion_warning_seconds": 0.01,
+  "max_root_dispersion_block_seconds": 0.1,
+  "max_skew_warning_ppm": 50.0,
+  "max_skew_block_ppm": 200.0,
+  "min_online_sources_healthy": 2,
+  "max_sample_age_warning_seconds": 120.0,
+  "max_sample_age_block_seconds": 600.0,
+  "continuity_step_threshold_ns": 250000000,
+  "policy_sha256": "8a1a13e2dd28c9f8e251969bd4366b84629f4a9520bcf9113da06b2f5f953cf6"
+}

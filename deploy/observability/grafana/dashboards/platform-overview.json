@@ -1,0 +1,79 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+      "id": 1,
+      "options": {"legend": {"displayMode": "list", "placement": "bottom"}},
+      "targets": [{"expr": "sum by (stage, status) (rate(loto_pipeline_runs_total[5m]))", "refId": "A"}],
+      "title": "Pipeline run rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+      "id": 2,
+      "options": {"legend": {"displayMode": "list", "placement": "bottom"}},
+      "targets": [{"expr": "sum by (reason) (rate(loto_telemetry_dropped_total[5m]))", "refId": "A"}],
+      "title": "Telemetry drop rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"max": 1, "min": 0, "unit": "percentunit"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0},
+      "id": 3,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "values": false}},
+      "targets": [{"expr": "max(loto_evaluation_hit_at_1)", "refId": "A"}],
+      "title": "Best reported Hit@±1",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "dateTimeAsIso"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8},
+      "id": 4,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "values": false}},
+      "targets": [{"expr": "max by (game) (loto_data_last_observation_timestamp_seconds)", "refId": "A"}],
+      "title": "Latest data observation",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8},
+      "id": 5,
+      "options": {"legend": {"displayMode": "list", "placement": "bottom"}},
+      "targets": [{"expr": "sum by (artifact_type) (rate(loto_artifact_integrity_failure_total[5m]))", "refId": "A"}],
+      "title": "Artifact integrity failures",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {"defaults": {"max": 1, "min": 0}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 8},
+      "id": 6,
+      "options": {"legend": {"displayMode": "table", "placement": "bottom"}},
+      "targets": [{"expr": "min by (job) (up{job=~\"prometheus|alloy|loki|tempo|grafana\"})", "refId": "A"}],
+      "title": "LGTM component scrape status",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": ["loto", "observability", "provisioned"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "timezone": "browser",
+  "title": "Loto Platform Overview",
+  "uid": "loto-platform-overview-v1",
+  "version": 1
+}

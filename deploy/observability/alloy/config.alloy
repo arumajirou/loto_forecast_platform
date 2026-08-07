@@ -1,0 +1,133 @@
+logging {
+  level  = "info"
+  format = "json"
+}
+
+prometheus.scrape "loto_api" {
+  targets = [{
+    "__address__" = sys.env("LOTO_METRICS_TARGET"),
+    "job"         = "loto_api",
+  }]
+  scrape_interval = "15s"
+  scrape_timeout  = "10s"
+  forward_to      = [prometheus.remote_write.local.receiver]
+}
+
+prometheus.remote_write "local" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+
+    queue_config {
+      capacity             = 2500
+      min_shards           = 1
+      max_shards           = 4
+      max_samples_per_send = 500
+      batch_send_deadline  = "5s"
+      sample_age_limit     = "5m"
+    }
+  }
+}
+
+local.file_match "loto_jsonl" {
+  path_targets = [{
+    "__path__" = "/var/log/loto/*.jsonl",
+    "job"      = "loto_application",
+  }]
+}
+
+loki.source.file "loto_jsonl" {
+  targets       = local.file_match.loto_jsonl.targets
+  tail_from_end = true
+  forward_to    = [loki.process.loto_jsonl.receiver]
+}
+
+loki.process "loto_jsonl" {
+  stage.json {
+    expressions = {
+      component  = "component",
+      event_name = "event_name",
+      level      = "severity",
+    }
+  }
+
+  stage.labels {
+    values = {
+      component = "",
+      level     = "",
+    }
+  }
+
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+otelcol.receiver.otlp "local" {
+  grpc {
+    endpoint          = "0.0.0.0:4317"
+    max_recv_msg_size = "4MiB"
+  }
+
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    logs   = [otelcol.processor.attributes.loki.input]
+    traces = [otelcol.processor.batch.local.input]
+  }
+}
+
+otelcol.processor.attributes "loki" {
+  action {
+    key    = "loki.resource.labels"
+    value  = "service.name,deployment.environment.name"
+    action = "insert"
+  }
+
+  output {
+    logs = [otelcol.processor.batch.local.input]
+  }
+}
+
+otelcol.processor.batch "local" {
+  timeout             = "5s"
+  send_batch_size     = 512
+  send_batch_max_size = 1024
+
+  output {
+    logs   = [otelcol.exporter.loki.local.input]
+    traces = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+otelcol.exporter.loki "local" {
+  forward_to = [loki.write.local.receiver]
+}
+
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:4317"
+
+    tls {
+      insecure = true
+    }
+  }
+
+  timeout = "5s"
+
+  sending_queue {
+    enabled       = true
+    queue_size    = 500
+    num_consumers = 2
+  }
+
+  retry_on_failure {
+    enabled          = true
+    max_elapsed_time = "30s"
+  }
+}

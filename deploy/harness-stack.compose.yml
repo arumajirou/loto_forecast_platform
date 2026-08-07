@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.5-pg17
+    environment:
+      POSTGRES_DB: ${HARNESS_POSTGRES_DB:-loto_harness}
+      POSTGRES_USER: ${HARNESS_POSTGRES_USER:-loto_harness}
+      POSTGRES_PASSWORD: ${HARNESS_POSTGRES_PASSWORD:?set HARNESS_POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - harness-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${HARNESS_POSTGRES_USER:-loto_harness} -d ${HARNESS_POSTGRES_DB:-loto_harness}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  prometheus:
+    image: prom/prometheus:v3.11.3
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=15d"]
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - harness-prometheus:/prometheus
+
+  grafana:
+    image: grafana/grafana:13.1.0
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD}
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - harness-grafana:/var/lib/grafana
+    depends_on: [prometheus]
+
+volumes:
+  harness-postgres:
+  harness-prometheus:
+  harness-grafana:
