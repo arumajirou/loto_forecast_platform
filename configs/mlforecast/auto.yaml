@@ -1,0 +1,43 @@
+required_mlforecast_version: "1.1.0"
+mode: auto
+id_col: unique_id
+time_col: ds
+target_col: y
+static_features: []
+known_future_features: []
+h: 1
+holdout_size: 1
+prospective_h: 1
+seed: 1
+artifact_root: artifacts/mlforecast
+save_model: true
+verify_save_load: true
+auto:
+  models:
+    - AutoLightGBM
+    - AutoXGBoost
+    - AutoCatboost
+    - AutoLinearRegression
+    - AutoRidge
+    - AutoLasso
+    - AutoElasticNet
+    - AutoRandomForest
+  freq: 1
+  season_length: 1
+  num_threads: 1
+  reuse_cv_splits: true
+  n_windows: 3
+  num_samples: 20
+  refit: false
+  fitted: false
+  sampler: tpe
+  timeout_seconds: 3600
+  n_jobs: 1
+  cache_train_df: true
+  search_spaces:
+    AutoRidge:
+      alpha:
+        kind: float
+        low: 0.001
+        high: 10.0
+        log: true

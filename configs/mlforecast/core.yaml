@@ -1,0 +1,51 @@
+required_mlforecast_version: "1.1.0"
+mode: core
+id_col: unique_id
+time_col: ds
+target_col: y
+static_features: []
+known_future_features: []
+h: 1
+holdout_size: 1
+prospective_h: 1
+seed: 1
+artifact_root: artifacts/mlforecast
+save_model: true
+verify_save_load: true
+core:
+  models:
+    - ridge
+    - lightgbm
+  model_params:
+    ridge:
+      alpha: 1.0
+    lightgbm:
+      n_estimators: 300
+      learning_rate: 0.03
+      num_leaves: 31
+  models_fit_kwargs: {}
+  freq: 1
+  lags: [1, 2, 3, 5, 10, 20]
+  lag_transforms:
+    1:
+      - kind: expanding_mean
+        params: {}
+    5:
+      - kind: rolling_mean
+        params:
+          window_size: 10
+          min_samples: 2
+  date_features: []
+  num_threads: 1
+  date_features_as_dummies: false
+  drop_auxiliary_columns: true
+  target_transforms:
+    - kind: local_standard_scaler
+      params: {}
+  dropna: true
+  fitted: false
+  as_numpy: false
+  validate_data: true
+  cache_train_df: true
+  cv_n_windows: 3
+  cv_refit: true

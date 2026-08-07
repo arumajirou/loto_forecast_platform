@@ -1,0 +1,12 @@
+{
+  "package": "mlforecast",
+  "pypi_upload_time_utc": "2026-07-10T00:52:25.071033Z",
+  "release_date": "2026-07-10",
+  "required_version": "1.1.0",
+  "status": "TAG_API_AND_PYPI_DIGEST_VERIFIED / LOCAL_WHEEL_RUNTIME_PENDING",
+  "upstream_commit": "a1609efddf8cf1a83510a50cd5487b66f32271c6",
+  "upstream_tag": "v1.1.0",
+  "verified_on": "2026-08-05",
+  "wheel_filename": "mlforecast-1.1.0-py3-none-any.whl",
+  "wheel_sha256": "0043190f540510979c7709bb69267caa9ac325a11fa49298cf3425307200e748"
+}
