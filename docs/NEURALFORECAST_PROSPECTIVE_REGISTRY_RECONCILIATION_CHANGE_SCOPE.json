@@ -1,0 +1,62 @@
+{
+  "schema_version": "change-scope-v1.0.0",
+  "scope_id": "neuralforecast-prospective-registry-reconciliation",
+  "stacked_base_branch": "agent/p0-prospective-experiment-registry",
+  "stacked_base_sha": "47a9da201144988499417d2db9a408069d903ca7",
+  "dependency_pr": 72,
+  "in_scope": [
+    "read-only reconciliation of a PASS Prospective registry receipt",
+    "local receipt, PostgreSQL, and MLflow three-way comparison",
+    "reconstruction of candidate, seed, position, and artifact expectations",
+    "PostgreSQL run identity, hash, metric, key, and artifact verification",
+    "MLflow parent, child, per-seed metric, and remote artifact verification",
+    "PASS, DRIFT, and BLOCKED operational classifications",
+    "cross-backend MLflow parent run identity verification",
+    "exact copied source receipt and independent offline verification",
+    "complete SHA256SUMS and canonical manifest evidence",
+    "no automatic repair, promotion, deployment, or retraining",
+    "credential and token redaction from durable failures",
+    "configless reconciliation and verification CLI commands",
+    "focused core, backend, security, mutation, and CLI tests",
+    "operator documentation"
+  ],
+  "out_of_scope": [
+    "backend writes or automatic repair",
+    "PostgreSQL or MLflow server provisioning",
+    "continuous scheduler or alert delivery",
+    "model registry promotion or deployment",
+    "automatic retraining",
+    "accuracy or baseline-superiority claims",
+    "cryptographic signing or trusted timestamping",
+    "GPU execution",
+    "merge or main branch changes"
+  ],
+  "execution_boundaries": {
+    "dependency_minimal_tests": "PASS_13_TESTS",
+    "dependency_minimal_smoke": "PASS_14_ASSERTIONS",
+    "python_compile": "PASS",
+    "ast_parse": "PASS",
+    "line_length_100": "PASS",
+    "repository_ruff_compileall_mypy_pytest": "EXECUTION_PENDING",
+    "formal_pyarrow": "EXECUTION_PENDING",
+    "live_postgres_read": "EXECUTION_PENDING",
+    "live_mlflow_read_and_artifact_download": "EXECUTION_PENDING",
+    "github_actions": "CI_BLOCKED_PRE_RUN_STEPS_NULL",
+    "github_actions_latest_ids": "RECORDED_IN_PULL_REQUEST_BODY",
+    "merge": "USER_APPROVAL_REQUIRED"
+  },
+  "expected_changed_files": [
+    "docs/NEURALFORECAST_PROSPECTIVE_REGISTRY_RECONCILIATION.md",
+    "docs/NEURALFORECAST_PROSPECTIVE_REGISTRY_RECONCILIATION_CHANGE_SCOPE.json",
+    "src/loto/auto_campaign/cli.py",
+    "src/loto/auto_campaign/prospective_registry_reconciliation.py",
+    "src/loto/auto_campaign/prospective_registry_reconciliation_backends.py",
+    "src/loto/auto_campaign/prospective_registry_reconciliation_contract.py",
+    "src/loto/auto_campaign/prospective_registry_reconciliation_comparison.py",
+    "src/loto/auto_campaign/prospective_registry_reconciliation_expected.py",
+    "src/loto/auto_campaign/prospective_registry_reconciliation_verification.py",
+    "tests/auto_campaign/test_prospective_registry_reconciliation.py",
+    "tests/auto_campaign/test_prospective_registry_reconciliation_backends.py",
+    "tests/auto_campaign/test_prospective_registry_reconciliation_cli.py"
+  ]
+}
