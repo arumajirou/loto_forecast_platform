@@ -29,6 +29,13 @@ Toto, Sundial, TabPFN, NeuralForecast, Merlion or StatsForecast, and they do not
 7. Execution PID and device-evidence provider PID must match.
 8. An observation loader cannot replace executor-owned process evidence.
 9. The real subprocess executor records the started provider PID.
+10. REAL evidence binds PID plus process-instance identity and rejects identity mismatch.
+11. Reject credential-bearing and process-injection environment overrides.
+12. Do not inherit credential-bearing host environment values.
+13. Reject cwd paths containing symlink components.
+14. Redact operating-system details from process-start errors.
+15. Bound stdout/stderr without accumulating complete streams in memory.
+16. Kill the POSIX process group on timeout and reap the direct child.
 
 ## Artifact tests
 
@@ -40,6 +47,8 @@ Toto, Sundial, TabPFN, NeuralForecast, Merlion or StatsForecast, and they do not
 6. Reject traversal and symlink ZIP members.
 7. Reject control characters in artifact paths before line-based manifest generation.
 8. Reject control characters in ZIP member names.
+9. Reject implicit overwrite and symlinked artifact outputs.
+10. Reject NaN/Infinity in strict contracts and non-UTC process timestamps.
 
 ## Validation order
 
@@ -54,6 +63,10 @@ compile new SDK and focused tests
 
 Full repository pytest and GitHub Actions are final integration gates and must not be represented as
 PASS when unavailable or when a workflow fails before steps are created.
+
+When a sandbox does not expose `/proc/<pid>/stat`, Linux process-instance capture is expected to
+return unavailable and REAL certification must fail closed. The target-host/self-hosted lane is the
+required execution surface for that check.
 
 ## Future migration tests
 
