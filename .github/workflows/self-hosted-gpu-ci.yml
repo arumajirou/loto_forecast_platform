@@ -29,6 +29,8 @@ on:
         options:
           - none
           - postgres
+          - ray-core
+          - ray-optimization
 
 permissions:
   contents: read
@@ -138,6 +140,132 @@ jobs:
           print(f"psycopg_module={psycopg.__name__}")
 
           assert installed, "psycopg version metadata missing"
+          PY
+
+      - name: Ray dependency environment
+        if: ${{ startsWith(inputs.dependency_profile, 'ray-') }}
+        run: |
+          set -Eeuo pipefail
+          uv sync --frozen --python "3.13" --extra full
+          uv pip check --python .venv/bin/python
+          uv run --frozen python - <<'PY'
+          import re
+          from importlib.metadata import version
+
+          ray_version = version("ray")
+          print(f"ray={ray_version}")
+
+          match = re.match(r"^(\d+)\.(\d+)\.(\d+)", ray_version)
+          assert match is not None, ray_version
+          assert tuple(map(int, match.groups())) >= (2, 56, 1), ray_version
+          PY
+
+      - name: Ray core Tune smoke
+        if: ${{ inputs.dependency_profile == 'ray-core' }}
+        run: |
+          set -Eeuo pipefail
+          uv run --frozen python - <<'PY'
+          import tempfile
+          import warnings
+
+          import ray
+          from ray import tune
+
+          def trainable(config):
+              del config
+              tune.report({"score": 1.0})
+
+          ray.shutdown()
+
+          try:
+              with tempfile.TemporaryDirectory() as storage:
+                  with warnings.catch_warnings(record=True) as caught:
+                      warnings.simplefilter("always")
+
+                      tuner = tune.Tuner(
+                          tune.with_resources(
+                              trainable,
+                              {"cpu": 1.0, "gpu": 0.0},
+                          ),
+                          tune_config=tune.TuneConfig(
+                              num_samples=1,
+                              metric="score",
+                              mode="max",
+                          ),
+                          run_config=tune.RunConfig(
+                              storage_path=storage,
+                          ),
+                      )
+
+                      results = tuner.fit()
+
+                  bad = [
+                      str(item.message)
+                      for item in caught
+                      if (
+                          "RunConfig" in str(item.message)
+                          and "ray.tune" in str(item.message)
+                      )
+                  ]
+
+                  assert not bad, bad
+
+                  best = results.get_best_result(
+                      metric="score",
+                      mode="max",
+                  )
+
+                  assert float(best.metrics["score"]) == 1.0
+                  print("RAY_CORE_TUNE_SMOKE=PASS")
+          finally:
+              ray.shutdown()
+          PY
+
+      - name: Repository Ray optimization smoke
+        if: ${{ inputs.dependency_profile == 'ray-optimization' }}
+        run: |
+          set -Eeuo pipefail
+          uv run --frozen python - <<'PY'
+          import tempfile
+          import warnings
+
+          import ray
+
+          from loto.optimization.search import optimize_ray
+
+          ray.shutdown()
+
+          try:
+              with tempfile.TemporaryDirectory() as storage:
+                  with warnings.catch_warnings(record=True) as caught:
+                      warnings.simplefilter("always")
+
+                      result = optimize_ray(
+                          "__ray_compat_smoke__",
+                          lambda config: 1.0,
+                          trials=1,
+                          timeout_seconds=120,
+                          cpus_per_trial=1.0,
+                          gpus_per_trial=0.0,
+                          output_dir=storage,
+                      )
+
+                  bad = [
+                      str(item.message)
+                      for item in caught
+                      if (
+                          "RunConfig" in str(item.message)
+                          and "ray.tune" in str(item.message)
+                      )
+                  ]
+
+                  assert not bad, bad
+                  assert result.backend == "ray"
+                  assert float(result.best_value) == 1.0
+
+                  print("RAY_OPTIMIZATION_SMOKE=PASS")
+          finally:
+              ray.shutdown()
           PY
 
       - name: Verify tracked files stayed clean
