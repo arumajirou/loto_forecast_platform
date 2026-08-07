@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Literal
 
@@ -18,11 +18,51 @@ from .statuses import (
 
 RUNTIME_CERTIFICATION_SCHEMA_VERSION = "1.0.0"
 SHA256_PATTERN = r"^[0-9a-f]{64}$"
+_DANGEROUS_ENVIRONMENT_KEYS = frozenset(
+    {
+        "BASH_ENV",
+        "ENV",
+        "GIT_CONFIG",
+        "GIT_CONFIG_COUNT",
+        "LD_PRELOAD",
+        "PROMPT_COMMAND",
+        "PYTHONBREAKPOINT",
+        "PYTHONINSPECT",
+        "PYTHONPATH",
+        "PYTHONSTARTUP",
+    }
+)
+_SENSITIVE_ENVIRONMENT_SUFFIXES = (
+    "_ACCESS_KEY",
+    "_API_KEY",
+    "_CREDENTIAL",
+    "_CREDENTIALS",
+    "_PASSWORD",
+    "_PASSWD",
+    "_PRIVATE_KEY",
+    "_SECRET",
+    "_TOKEN",
+)
 
 
 def contains_control_characters(value: str) -> bool:
     """Return whether text contains C0 or DEL control characters."""
     return any(ord(character) < 32 or ord(character) == 127 for character in value)
+
+
+def environment_name_is_sensitive(name: str) -> bool:
+    upper = name.upper()
+    return upper in {
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+        "GITHUB_TOKEN",
+        "HF_TOKEN",
+    } or upper.endswith(_SENSITIVE_ENVIRONMENT_SUFFIXES)
+
+
+def environment_name_is_dangerous(name: str) -> bool:
+    upper = name.upper()
+    return upper in _DANGEROUS_ENVIRONMENT_KEYS or upper.startswith("DYLD_")
 
 
 class StrictModel(BaseModel):
@@ -31,6 +71,7 @@ class StrictModel(BaseModel):
         strict=True,
         frozen=True,
         validate_default=True,
+        allow_inf_nan=False,
     )
 
 
@@ -95,22 +136,42 @@ class SnapshotIdentity(StrictModel):
 
 
 class CommandSpec(StrictModel):
-    argv: list[str] = Field(min_length=1)
+    argv: list[str] = Field(min_length=1, max_length=1024)
     cwd: str = Field(min_length=1, max_length=4096)
     timeout_seconds: float = Field(gt=0.0, le=86_400.0)
-    environment: dict[str, str] = Field(default_factory=dict)
+    environment: dict[str, str] = Field(default_factory=dict, max_length=128)
 
     @field_validator("argv")
     @classmethod
     def non_empty_argv(cls, value: list[str]) -> list[str]:
-        if any(not item for item in value):
+        if any(not item or len(item) > 16_384 for item in value):
             raise ValueError("command arguments must not be empty")
+        if any(contains_control_characters(item) for item in value):
+            raise ValueError("command arguments must not contain control characters")
+        return value
+
+    @field_validator("environment")
+    @classmethod
+    def safe_environment(cls, value: dict[str, str]) -> dict[str, str]:
+        for name, item in value.items():
+            if (
+                not name
+                or "=" in name
+                or contains_control_characters(name)
+                or contains_control_characters(item)
+            ):
+                raise ValueError("environment contains an invalid name or value")
+            if environment_name_is_sensitive(name):
+                raise ValueError("environment must not contain credential-bearing keys")
+            if environment_name_is_dangerous(name):
+                raise ValueError("environment contains a forbidden process-injection key")
         return value
 
 
 class ProcessExecution(StrictModel):
     run_label: str = Field(min_length=1, max_length=128)
     process_pid: int | None = Field(default=None, ge=1)
+    process_identity_sha256: str | None = Field(default=None, pattern=SHA256_PATTERN)
     started_at_utc: datetime
     finished_at_utc: datetime
     exit_code: int | None = None
@@ -123,6 +184,11 @@ class ProcessExecution(StrictModel):
     def validate_process_state(self) -> ProcessExecution:
         if self.started_at_utc.utcoffset() is None or self.finished_at_utc.utcoffset() is None:
             raise ValueError("process timestamps must be timezone-aware")
+        if (
+            self.started_at_utc.utcoffset() != timedelta(0)
+            or self.finished_at_utc.utcoffset() != timedelta(0)
+        ):
+            raise ValueError("process timestamps must be UTC")
         if self.finished_at_utc < self.started_at_utc:
             raise ValueError("process finish time precedes start time")
         if self.timed_out and self.exit_code is not None:
@@ -175,6 +241,9 @@ class OutputEvidence(StrictModel):
 
 class GPUProcessSample(StrictModel):
     provider_pid: int = Field(ge=1)
+    provider_process_identity_sha256: str | None = Field(
+        default=None, pattern=SHA256_PATTERN
+    )
     gpu_uuid: str = Field(min_length=1, max_length=256)
     used_memory_bytes: int = Field(gt=0)
     observed_at_utc: datetime
@@ -184,6 +253,8 @@ class GPUProcessSample(StrictModel):
     def timezone_aware(cls, value: datetime) -> datetime:
         if value.utcoffset() is None:
             raise ValueError("GPU sample timestamp must be timezone-aware")
+        if value.utcoffset() != timedelta(0):
+            raise ValueError("GPU sample timestamp must be UTC")
         return value
 
 
@@ -192,6 +263,9 @@ class DeviceEvidence(StrictModel):
     effective_device: Literal["cpu", "cuda"]
     cpu_fallback: bool
     provider_pid: int = Field(ge=1)
+    provider_process_identity_sha256: str | None = Field(
+        default=None, pattern=SHA256_PATTERN
+    )
     provider_gpu_pid: int | None = Field(default=None, ge=1)
     gpu_uuid: str | None = Field(default=None, min_length=1, max_length=256)
     peak_vram_bytes: int = Field(default=0, ge=0)
@@ -205,6 +279,10 @@ class DeviceEvidence(StrictModel):
             raise ValueError("requested and effective devices differ")
         if self.cpu_fallback:
             raise ValueError("CPU fallback is not certifiable")
+        if self.origin == EvidenceOrigin.REAL and self.provider_process_identity_sha256 is None:
+            raise ValueError("real evidence requires a provider process identity")
+        if not self.pid_released_after_exit:
+            raise ValueError("provider PID must be released after exit")
         if self.requested_device == "cpu":
             if self.provider_gpu_pid is not None or self.gpu_uuid is not None:
                 raise ValueError("CPU evidence must not report a GPU identity")
@@ -220,11 +298,14 @@ class DeviceEvidence(StrictModel):
                 for sample in self.external_gpu_samples
                 if sample.provider_pid == self.provider_pid
                 and sample.gpu_uuid == self.gpu_uuid
+                and (
+                    self.origin != EvidenceOrigin.REAL
+                    or sample.provider_process_identity_sha256
+                    == self.provider_process_identity_sha256
+                )
             ]
             if not matching:
                 raise ValueError("CUDA evidence requires an external matching GPU sample")
-            if not self.pid_released_after_exit:
-                raise ValueError("CUDA provider PID must be released after exit")
         return self
 
 
