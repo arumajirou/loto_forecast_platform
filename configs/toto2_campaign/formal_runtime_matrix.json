@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "matrix_id": "toto2-4m-formal-v1",
+  "games": ["numbers3", "numbers4", "miniloto", "loto6", "loto7"],
+  "contexts": [128, 256, 512],
+  "horizons": [1, 2, 5],
+  "devices": ["cpu", "cuda"],
+  "request_pattern": "{game}-c{context}-h{horizon}-{device}.json"
+}
