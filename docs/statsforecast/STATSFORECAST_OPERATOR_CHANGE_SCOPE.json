@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN",
+  "stacked_base_branch": "agent/statsforecast-remediation-runner-v2",
+  "allowed_paths": [
+    "src/loto/statsforecast/runtime_lane_operator.py",
+    "scripts/run_statsforecast_runtime_operator.py",
+    "tests/statsforecast/test_runtime_lane_operator.py",
+    "docs/statsforecast/TARGET_HOST_OPERATOR.md",
+    "docs/statsforecast/STATSFORECAST_OPERATOR_CHANGE_SCOPE.json"
+  ],
+  "forbidden_paths": [
+    "pyproject.toml",
+    "uv.lock",
+    ".github/workflows/**",
+    "src/loto/models/workers.py",
+    "src/loto/models/catalog_full.py",
+    "README.md"
+  ]
+}
