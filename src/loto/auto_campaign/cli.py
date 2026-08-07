@@ -5,9 +5,10 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from .api_coverage import run_api_coverage
+from .api_coverage_pipeline import run_api_coverage_pipeline
 from .contracts import CampaignStage
-from .runner import inventory, load_config, plan, run_stage, verify_run
+from .coverage_verification import verify_run_with_coverage
+from .runner import inventory, load_config, plan, run_stage
 
 
 def _run_id(prefix: str, stage: str) -> str:
@@ -61,7 +62,7 @@ def main() -> None:
         }
     )
     if args.command == "verify":
-        result = verify_run(args.run.resolve())
+        result = verify_run_with_coverage(args.run.resolve())
     else:
         output = args.output
         if output is None:
@@ -76,7 +77,7 @@ def main() -> None:
         else:
             selected_stage = CampaignStage(args.stage)
             if selected_stage == CampaignStage.API_COVERAGE:
-                result = run_api_coverage(
+                result = run_api_coverage_pipeline(
                     project,
                     config,
                     output.resolve(),

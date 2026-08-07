@@ -1,0 +1,56 @@
+{
+  "schema_version": "change-scope-v1.2.1",
+  "scope_id": "neuralforecast-api-coverage-state",
+  "stacked_base_branch": "agent/p0-runtime-certification",
+  "stacked_base_sha": "dde70b5372d16651004d3a2a39f45935745250c6",
+  "stacked_base_sha_at_branch_creation": "dde70b5372d16651004d3a2a39f45935745250c6",
+  "current_stacked_base_head_sha": "2326b70fe0b0b46fb91324240c6843eb3dd31b83",
+  "stacked_history_status": "BEHIND_1_NONOVERLAPPING_BASE_COMMIT",
+  "stacked_branch_behind_by": 1,
+  "base_change_overlap_with_expected_files": false,
+  "dependency_pr": 43,
+  "in_scope": [
+    "static argument catalog and API result reconciliation",
+    "all-36-AutoModel constructor signature matrix",
+    "supported backend default-config probes",
+    "fail-closed coverage status validation",
+    "automatic integration into the existing api-coverage CLI stage",
+    "automatic integration into the existing verify CLI command",
+    "root and nested manifest consistency verification",
+    "root and nested portable SHA256 verification",
+    "required artifact, count, schema, and safe-path verification",
+    "explicit enforcement of the GPU EXECUTION_PENDING boundary",
+    "resume-safe replacement of stale coverage-state artifacts",
+    "removal of partial coverage-state output after resolver failure",
+    "structured resolver-failure evidence and non-PASS exit behavior",
+    "CSV, Parquet, JSON, manifest, VERIFICATION_REPORT, and SHA256SUMS artifacts",
+    "unit and CPU contract tests"
+  ],
+  "out_of_scope": [
+    "GPU fit execution",
+    "GPU reload inference",
+    "GPU PID or VRAM certification",
+    "target-host CPU fallback rejection",
+    "accuracy evaluation",
+    "Holdout evaluation",
+    "Prospective prediction"
+  ],
+  "execution_boundaries": {
+    "cpu_ci": "REQUIRED",
+    "local_gpu": "EXECUTION_PENDING",
+    "stacked_base_sync": "EXECUTION_PENDING",
+    "merge": "USER_APPROVAL_REQUIRED"
+  },
+  "expected_changed_files": [
+    "docs/NEURALFORECAST_API_COVERAGE_CHANGE_SCOPE.json",
+    "docs/NEURALFORECAST_API_COVERAGE_STATE.md",
+    "src/loto/auto_campaign/api_coverage_pipeline.py",
+    "src/loto/auto_campaign/cli.py",
+    "src/loto/auto_campaign/coverage_state.py",
+    "src/loto/auto_campaign/coverage_verification.py",
+    "tests/auto_campaign/test_api_coverage_pipeline.py",
+    "tests/auto_campaign/test_coverage_state.py",
+    "tests/auto_campaign/test_coverage_verification.py",
+    "tests/auto_campaign/test_coverage_verification_cli.py"
+  ]
+}
