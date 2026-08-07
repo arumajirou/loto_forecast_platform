@@ -1,0 +1,13 @@
+output,status
+mean,preserved
+median_q0.5,preserved
+q0.1,preserved
+q0.2,preserved
+q0.3,preserved
+q0.4,preserved
+q0.5,preserved
+q0.6,preserved
+q0.7,preserved
+q0.8,preserved
+q0.9,preserved
+monotonicity,validated

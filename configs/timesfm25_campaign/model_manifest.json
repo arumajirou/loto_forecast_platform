@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "base_model_id": "timesfm-2.5-200m",
+  "algorithm_identity": "timesfm-2.5-200m",
+  "package_provenance": {
+    "package": "timesfm",
+    "version": "2.0.2",
+    "wheel_sha256": "c7bde94beb1651e1251cdf1e9d09cf6f015e0218d038a4a836a170dc70b08071",
+    "sdist_sha256": "b03885d3467b09314a4b461e1f6729375844061dd31fd41e3c35aa503c333da3",
+    "source_revision": "3dae50b20d7a724981e8ea36cda75578f80dd2dc"
+  },
+  "backends": {
+    "pytorch_native": {
+      "backend": "pytorch_native",
+      "repo_id": "google/timesfm-2.5-200m-pytorch",
+      "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+      "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+      "environment": "environments/timesfm25-pytorch",
+      "runtime_status": "IMPLEMENTED_NOT_GPU_CERTIFIED"
+    },
+    "pytorch_source": {
+      "backend": "pytorch_source",
+      "repo_id": "google/timesfm-2.5-200m-pytorch",
+      "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+      "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+      "environment": "environments/timesfm25-pytorch-source",
+      "runtime_status": "SCHEMA_ONLY"
+    },
+    "transformers": {
+      "backend": "transformers",
+      "repo_id": "google/timesfm-2.5-200m-transformers",
+      "revision": "5a9806b9b291fad9233b5249d88263f1846304d3",
+      "weight_sha256": "b53f6d52114e2ad786890f3c4637ce05f580b7800d6e24401f88b398b76035ef",
+      "environment": "environments/timesfm25-transformers",
+      "runtime_status": "SCHEMA_ONLY_GITHUB_EVIDENCE_BLOCKED"
+    },
+    "xreg": {
+      "backend": "xreg",
+      "repo_id": "google/timesfm-2.5-200m-pytorch",
+      "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+      "weight_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+      "environment": "environments/timesfm25-xreg",
+      "runtime_status": "DEFERRED"
+    }
+  },
+  "supports_batched_univariate": true,
+  "supports_joint_multivariate": false,
+  "supports_cross_series_attention": false,
+  "formal_horizons": [
+    1,
+    2,
+    5
+  ]
+}
