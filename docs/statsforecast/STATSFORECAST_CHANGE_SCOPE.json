@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN",
+  "allowed_paths": [
+    "src/loto/statsforecast/**",
+    "tests/statsforecast/**",
+    "configs/statsforecast/**",
+    "docs/statsforecast/**"
+  ],
+  "forbidden_paths": [
+    "pyproject.toml",
+    "uv.lock",
+    ".github/workflows/**",
+    "src/loto/models/workers.py",
+    "src/loto/models/catalog_full.py",
+    "src/loto/cli/**",
+    "README.md"
+  ],
+  "integration_status": "BLOCKED_SHARED_SCOPE",
+  "base_branch": "main",
+  "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0"
+}
