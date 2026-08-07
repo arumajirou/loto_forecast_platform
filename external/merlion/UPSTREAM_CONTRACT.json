@@ -1,0 +1,21 @@
+{
+  "schema_version": "merlion-upstream-contract-v1",
+  "package": {
+    "name": "salesforce-merlion",
+    "version": "2.0.4",
+    "wheel_sha256": "3b50271ab371caa85c03b4a7ccb764c8e7eafb4b836d9e13026b49ee3ab06e89",
+    "sdist_sha256": "adc939ec07d95d64a97e6019c5e709dbf03d2eb7b7adc28d80ebfe8a5a84d2a8"
+  },
+  "repository": {
+    "name": "salesforce/Merlion",
+    "revision": "39507642dc3d7b8d04232e34e9f36b372cf4912d",
+    "archived": true,
+    "setup_version": "2.0.2"
+  },
+  "runtime_policy": {
+    "python": "3.11.x",
+    "numpy": ">=1.21,<2.0",
+    "root_install_allowed": false,
+    "provider_process_required": true
+  }
+}

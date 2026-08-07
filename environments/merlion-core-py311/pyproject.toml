@@ -1,0 +1,13 @@
+[project]
+name = "loto-merlion-provider"
+version = "0.1.0"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "salesforce-merlion==2.0.4",
+  "numpy>=1.21,<2.0",
+  "pandas>=1.5,<3",
+  "pydantic>=2.10,<3",
+]
+
+[tool.uv]
+package = false
