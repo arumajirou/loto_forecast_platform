@@ -1,0 +1,48 @@
+groups:
+  - name: loto-platform-local
+    interval: 30s
+    rules:
+      - alert: LotoObservabilityComponentDown
+        expr: min by (job) (up{job=~"prometheus|alloy|loki|tempo|grafana"}) == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Local observability component is down"
+          runbook_url: "docs/observability_stack/RUNBOOK.md#component-down"
+
+      - alert: LotoTelemetryDropsDetected
+        expr: sum(rate(loto_telemetry_dropped_total[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Telemetry drops are occurring"
+          runbook_url: "docs/observability_stack/RUNBOOK.md#telemetry-drops"
+
+      - alert: LotoArtifactIntegrityFailure
+        expr: sum(increase(loto_artifact_integrity_failure_total[10m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Artifact integrity failure was reported"
+          runbook_url: "docs/observability_stack/RUNBOOK.md#artifact-integrity-failure"
+
+      - alert: LotoPredictionLockVerificationFailure
+        expr: sum(increase(loto_prediction_lock_verification_total{status!="PASS"}[10m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Prediction lock verification did not pass"
+          runbook_url: "docs/observability_stack/RUNBOOK.md#prediction-lock-verification"
+
+      - alert: LotoPipelineStageNoRecentSuccess
+        expr: time() - max by (stage) (loto_pipeline_last_success_timestamp_seconds) > 86400
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "A pipeline stage has no success in 24 hours"
+          runbook_url: "docs/observability_stack/RUNBOOK.md#pipeline-no-recent-success"

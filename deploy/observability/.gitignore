@@ -1,0 +1,9 @@
+.env
+images.lock.env
+IMAGE_DIGESTS.lock.json
+secrets/*
+!secrets/.gitkeep
+runtime/*
+!runtime/.gitkeep
+backups/*
+!backups/.gitkeep
