@@ -1,0 +1,98 @@
+schema_version: 1.0.0
+base_main_sha: d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0
+status: DOCUMENTATION_ONLY
+foundation_dependencies:
+- pr: 120
+  name: version_single_source
+  state: OPEN_DRAFT
+- pr: 121
+  name: strict_configuration
+  state: OPEN_DRAFT
+- pr: 123
+  name: runtime_certification_sdk
+  state: OPEN_DRAFT
+- pr: 124
+  name: data_access_ledger
+  state: OPEN_DRAFT
+waves:
+- id: wave-0
+  name: foundation
+  items:
+  - id: SRC-01
+    title: Research Source Registry
+    priority: P0
+  - id: BENCH-01
+    title: Benchmark Fingerprint and Contamination
+    priority: P0
+  - id: BASE-01
+    title: Lightweight Baseline Inventory
+    priority: P0
+- id: wave-1
+  name: lightweight_models
+  items:
+  - id: REVERSO-SMALL
+    priority: P0
+    source_status: VERIFIED
+  - id: GRANITE-FLOWSTATE
+    priority: P0
+    source_status: VERIFIED
+  - id: KAIROS-10M
+    priority: P0
+    source_status: REMOTE_CODE_REVIEW_REQUIRED
+  - id: SUPER-LINEAR
+    priority: P1
+    source_status: CHECKPOINT_LICENSE_REVIEW_REQUIRED
+  - id: LIGHTGTS
+    priority: P1
+    source_status: LICENSE_REMOTE_CODE_REVIEW_REQUIRED
+- id: wave-2
+  name: medium_large_models
+  items:
+  - id: TEMPOPFN-38M
+    priority: P1
+    source_status: VERIFIED
+  - id: KAIROS-23M
+    priority: P1
+    source_status: REMOTE_CODE_REVIEW_REQUIRED
+  - id: KAIROS-50M
+    priority: P2
+    source_status: REMOTE_CODE_REVIEW_REQUIRED
+  - id: GRANITE-PATCHTST-FM
+    priority: P1
+    source_status: VERIFIED
+- id: wave-3
+  name: methods
+  items:
+  - id: RET-CONTRACT
+    title: Fold-local retrieval index
+    priority: P0
+  - id: RET-RAFT
+    title: RAFT
+    priority: P1
+  - id: RET-TSRAG
+    title: TS-RAG
+    priority: P1
+  - id: COV-ADAPTER
+    title: Covariate adapter
+    priority: P1
+  - id: ONLINE-STATE
+    title: Predict-lock-score-update
+    priority: P1
+  - id: ADAPTIVE-ENSEMBLE
+    title: Sample-conditioned ensemble
+    priority: P1
+  - id: PARTITION-SAMPLER
+    title: One-per-position exact sampler
+    priority: P0
+  - id: REL-CONFORMAL
+    title: Relational/online conformal
+    priority: P2
+global_exit_gates:
+- SOURCE_PINNED
+- LICENSE_REVIEWED
+- REAL_RUNTIME_VERIFIED
+- OOF_COMPLETE
+- BASELINES_COMPLETE
+- MULTI_SEED_COMPLETE
+- FULL_TESTS_PASS
+- ACTIONABLE_CI_PASS
