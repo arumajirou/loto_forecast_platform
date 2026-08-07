@@ -1,17 +1,15 @@
-"""Isolated BasicTS provider contracts and verification helpers."""
+"""Strict, version-isolated BasicTS integration contracts."""
 
-from loto.basicts_campaign.protocol import (
-    ImportReference,
-    ProviderOperation,
-    ProviderRequest,
-    ProviderResponse,
-    ProviderStatus,
+from .contracts import (
+    BasicTSOperation,
+    BasicTSProviderRequest,
+    BasicTSProviderResponse,
+    BasicTSStatus,
 )
 
 __all__ = [
-    "ImportReference",
-    "ProviderOperation",
-    "ProviderRequest",
-    "ProviderResponse",
-    "ProviderStatus",
+    "BasicTSOperation",
+    "BasicTSProviderRequest",
+    "BasicTSProviderResponse",
+    "BasicTSStatus",
 ]
