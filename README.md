@@ -1,163 +1,128 @@
-# Loto Forecast Platform v3.0.0
+# Loto Forecast Platform
 
-6ゲーム（ミニロト / ロト6 / ロト7 / ビンゴ5 / ナンバーズ3 / ナンバーズ4）を対象に、統計・機械学習・
-深層学習・時系列基盤モデルを **統計的に正当な手続きで** 比較する研究＋運用基盤です。
+時系列予測の研究・評価・再現・予測固定・運用証拠化を扱うプラットフォームです。
 
-v2.1.0 の独立監査で検出された10件の構造的欠陥を修正し、spec-kit の SDD サイクル
-（constitution → specify → plan → tasks → implement）で再構築しました。
+現在のpackage version、テスト件数、coverage、モデル総数、Git HEADなどの変動値はREADMEへ手書きしません。package versionの正本は`loto.version.__version__`とpackage metadataです。現在状態は実行時に生成された証拠またはmachine-readableな正本から確認します。
 
-- 仕様: [`specs/001-full-coverage/spec.md`](specs/001-full-coverage/spec.md)
-- 計画・設計判断: [`specs/001-full-coverage/plan.md`](specs/001-full-coverage/plan.md)
-- 一次情報調査ログ: [`specs/001-full-coverage/research.md`](specs/001-full-coverage/research.md)
-- タスク: [`specs/001-full-coverage/tasks.md`](specs/001-full-coverage/tasks.md)
-- 憲章: [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
+## Documentation authority
 
-## v2.1.0 との差分
+現在のrepository-wide文書入口は[`docs/README.md`](docs/README.md)です。
 
-| 項目 | v2.1.0 | v3.0.0 |
-|---|---:|---:|
-| 予測・評価できるゲーム | 1 (ロト7のみ) | **6** |
-| 登録モデル | 84 | **174** |
-| テスト | 53 | **313** |
-| カバレッジ | 65% | **75%** |
-| チェックサムマニフェスト | 2個（14/82不一致） | **1個（自己検証つき）** |
-| テスト密封性 | optuna有無で判定が変化 | **環境非依存** |
-| リーダーボードの分散情報 | なし | **n / sd / se / 区間 / 補正済みp** |
-| 多重比較補正 | なし | **Holm / BH / Romano-Wolf** |
-| 統計的受入層 | デッドコード | **研究ループへ結線** |
-| リーク検出 | なし | **3種の負対照 + 厳密因果監査** |
+文書の`CURRENT` / `HISTORICAL` / `GENERATED`等の扱いは[`docs/DOCUMENTATION_CONTRACT.md`](docs/DOCUMENTATION_CONTRACT.md)に従います。過去の検証レポートに記録されたテスト件数、モデル件数、merge状態などは、その時点のhistorical evidenceであり現在値ではありません。
 
-## 5分で確認する
+主要なcurrent文書:
 
-```bash
-uv sync --extra dev
-uv run pytest -q                      # 313 passed
-uv run loto3 games                    # 6ゲームの幾何
-uv run loto3 theory --game loto7      # 厳密理論限界（MAE下限 3.8337）
-uv run loto3 catalog --counts         # モデル件数（計算値）
-uv run loto3 integrity check          # 成果物の自己検証
-uv run loto3 research --game numbers4 # v2.1.0で不可能だったゲームの研究実行
+- [Architecture](docs/ARCHITECTURE.md)
+- [Evaluation Protocol](docs/EVALUATION_PROTOCOL.md)
+- [Data Contracts](docs/DATA_CONTRACTS.md)
+- [Directory Structure](docs/DIRECTORY_STRUCTURE.md)
+- [Model Inventory](docs/MODEL_INVENTORY.md)
+- [Operations](docs/OPERATIONS.md)
+- [Windows Installation](docs/WINDOWS_INSTALL.md)
+
+## Evaluation priority
+
+最優先の予測指標は**Hit@±1**です。
+
+正式な比較では少なくとも次を併記します。
+
+- pooled/element Hit@±1
+- 位置別Hit@±1
+- 全位置/row Hit@±1
+- MAE
+- MSE
+- RMSE
+
+select-familyゲームではHits@kなどの集合指標も利用できますが、位置予測のHit@±1とは別指標です。
+
+候補モデルは、適用可能なRandom、固定値、平均、中央値、直近値、頻度、統計モデル等のbaselineと同じデータ境界・評価窓で比較します。単一の最良seedだけを根拠に採用しません。
+
+詳細は[`docs/EVALUATION_PROTOCOL.md`](docs/EVALUATION_PROTOCOL.md)を参照してください。
+
+## Time-order and leakage policy
+
+評価は時間順を維持します。
+
+```text
+Train -> Validation/OOF -> Holdout -> Prospective
 ```
 
-## 設計上の核心
+Scaler、Encoder、特徴量選択、hyperparameter search等のfit/selectionは許可されたTrain/development境界内で行います。Holdoutは候補調整へ使わず、Prospective predictionはactual判明前に固定します。
 
-### 1. ゲーム幾何の単一情報源
+未来情報混入、順序違反、重複、欠損、外生変数の`available_at`不明を明示的に監査します。Raw source dataは不変の証拠層として扱い、訂正は新しいversion/snapshotを作ります。
 
-`loto.game.GameGeometry` が universe / slot / family を一元管理します。`select` 族（重複なし・
-昇順）と `digits` 族（重複可・先頭0有意）を別物として扱うため、ナンバーズの指標が黙って
-壊れることがありません。`loto.game` の外に幾何リテラルが現れないことを AST ベースのテストで
-強制しています。
+## Prediction lock
 
-### 2. protocol_hash
+Prospective predictionはactualを取り込む前にSHA-256とtimestamp evidenceで固定します。
 
-評価条件22項目の SHA-256。モデル実行より**先に**確定し、異なる hash 同士の比較は
-`ProtocolMismatch` で実行時に拒否されます。hash 欠落は「不明な protocol」として扱い、
-黙って一致とみなしません。
+`src/loto/auto_campaign/prediction_lock.py`はcampaign-level lockを構成し、configuration/data/lineage等のidentityとprediction artifactを結び付けます。lockは改ざん・順序に関する証拠であり、予測精度を証明するものではありません。
 
-### 3. champion は null になりうる
+## Runtime certification
 
-`Leaderboard.champion` の型は `LeaderboardRow | None` です。多重比較補正後にベースラインを
-有意に上回るモデルがなければ `verdict = NO_MODEL_BEATS_BASELINE` / `champion = null` を返します。
-i.i.d. な抽選に対してこれが**正解**であり、v2.1.0 がこれを表現できなかったことが
-「Champion: uniform」の原因でした。
+モデルがcatalog上で利用可能に見えることと、正式にruntime成功したことは別です。
 
-さらに `composite_score` は sharpness 項を伴わない `ece` 重み付けを拒否します。定数予測は
-`ece = 0` を構造的に達成するため、校正のみを評価する目的関数は自明なモデルを優遇します。
+正式なruntime evidenceでは対象経路に応じて、model/revision identity、load、input、inference、output shape、finite値、device、GPU process/VRAM、CPU fallback等を検証します。
 
-### 4. リークは反証可能
+provider-neutral foundationは`src/loto/runtime_certification/`にあります。未実行または取得不能な確認項目をPASSとして扱いません。
 
-毎回の研究実行でラベル置換・時間シフト・厳密因果監査を実施します。どれかが偶然水準を
-上回れば `SENTINEL_TRIPPED` となり昇格が阻止されます。全て通過した場合の解釈文は
-「absence of evidence only」であり、リークがないとは主張しません。
+## Main command surfaces
 
-### 5. 意識的選択回避
+package metadataで定義されている主要entry pointは次です。
 
-パリミュチュエルのため期待値は「不変の当選確率 × 改善可能な共同当選者数」に分解できます。
-実績当選口数から log 線形の人気度曲面を推定しますが、**置換検定で有意でなければ提案を返しません**。
-当選確率は全ての正当な組合せで同一であり「改善不可能」と明示します。
-
-## モデル在庫
-
-件数は `loto3 catalog --counts` が唯一の正です（[`docs/MODEL_INVENTORY.md`](docs/MODEL_INVENTORY.md)）。
-
-| library | 件数 |
-|---|---:|
-| statsforecast | 41 |
-| neuralforecast | 37 |
-| neuralforecast_auto | 36 |
-| tsfm | 21 |
-| hierarchicalforecast | 10 |
-| mlforecast_auto | 8 |
-| sklearn / builtin / GBDT / framework | 21 |
-| **合計** | **174** |
-
-TSFM 21 件は `revision` 未固定（`UNPINNED`）です。未確認のコミットSHAは
-**捏造しません**。protocol_hash の再現性を偽ることになるためです。`loto3 catalog --unpinned` で列挙できます。
-
-### DBからNeuralForecast AutoModelを実行
-
-SQLiteまたはPostgreSQLのテーブルを読み込み、Numbers4の`d1`～`d4`を4系列へ変換して、
-登録済み36 AutoModelを一括実行できます。最初にdry-runでDBスキーマと実行計画を確認してください。
-
-```bash
-uv run loto neuralforecast automodel-run \
-  --db-url /absolute/path/to/datasets.sqlite3 \
-  --table normalized_draws \
-  --game numbers4 \
-  --output runs/numbers4-nf-auto \
-  --models all \
-  --backend optuna \
-  --workers 8 \
-  --gpus 1 \
-  --max-gpu-jobs 1 \
-  --dry-run
+```text
+loto
+loto3
+loto-auto-campaign
+loto-lab
+loto-integrity
+loto-github-audit
+loto-build-info
 ```
 
-実学習、smoke設定、AutoHINTのRay専用処理、成果物構成は
-[`docs/NEURALFORECAST_DB_AUTOMODEL.md`](docs/NEURALFORECAST_DB_AUTOMODEL.md)を参照してください。
+各commandの利用可否は、対象環境でpackage/dependencyが解決できることを確認した上で判断してください。
 
-## 理論限界
+## Models and frameworks
 
-[`docs/THEORETICAL_BOUNDS.md`](docs/THEORETICAL_BOUNDS.md)（`loto3 theory` で再生成）。
-順序統計量 pmf を `fractions.Fraction` で厳密計算しています。ロト7の MAE 下限 3.8337 と
-全ゲームの全事象数が公表当選確率と一致することが、幾何表の独立検証になっています。
+モデル件数はREADMEへ固定しません。model catalog/inventoryを正本として確認してください。
 
-**MAE 下限と ±1 上限は同時達成できません。** ±1 最適予測の MAE は下限より悪く（ロト7: 4.0185 対
-3.8337）、中央値予測の ±1 率は上限より低い（0.2429 対 0.2923）。全 select ゲームでテスト強制しています。
+対象には統計モデル、機械学習、NeuralForecast系、各種forecasting framework、TSFM/provider adapter等が含まれます。新規モデルを追加する場合も、同一データ境界・同一評価protocol・baseline比較・multi-seed/OOF evidenceを優先します。
 
-## 未認定事項
+## Reproducibility
 
-隠さず記載します。いずれも v2.1.0 でも未認定であり、後退ではありません。
+実験証拠は可能な限り次を固定・追跡できる形にします。
 
-- TSFM 21 件の `revision` 未固定
-- loto-life.net への live HTTP 取得（robots.txt 対応実装済み・未実行）
-- RTX 5070 Ti 上での neuralforecast 73 系の実学習
-- PostgreSQL / MLflow server / Ray / Grafana / Loki / Tempo / Slack / SMTP
-- Holdout の開封と正式な champion 昇格
-- Ruff / mypy（`dev` に宣言済み・本環境に未導入）
+- Run ID
+- resolved configuration
+- data snapshot/hash
+- code hash / Git commit
+- model ID / immutable revision
+- seed
+- OOF/Holdout/Prospective evidence
+- predictions and actuals
+- evaluation metrics
+- runtime/device logs
+- SHA-256 manifests
 
-詳細は [`docs/IMPLEMENTATION_STATUS_V3.md`](docs/IMPLEMENTATION_STATUS_V3.md)。
+利用するstorage backendはworkflowごとに異なり得ますが、保存先の違いによって証拠契約を弱めません。
 
-## ライセンスと免責
+## Portability
 
-本ソフトウェアは時系列予測手法の**研究**を目的とします。宝くじの当選を予測する能力は
-主張しません。8サイクルの PDCA バックテストで、i.i.d. な抽選に対し seasonal-naive を
-有意に上回るモデルは存在しないことが確認されています。実装されている唯一の実効戦略は
-配当分散の回避であり、当選確率を変えるものではありません。
+WindowsとLinuxはrepository操作・検証の明示的なportability対象です。path separator、shell、line ending、case sensitivity、temporary directory、systemd/WSL、CUDA/GPU stack等のOS依存をcore contractへ混入させないことを目標とします。
 
-## v3.2.0: All-model / all-setting bounded auto coverage research
+ただし現在のroot dependency graphには`triton==3.5.1`がunconditional dependencyとして存在するため、Windowsのroot環境解決はplatform remediation対象です。環境が異なる状態で「同じruntime認定済み」とは扱いません。
 
-Run data acquisition and the bounded, resumable search for Mini Loto, Loto6 and Loto7:
+## Historical documents
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\run_auto_coverage_loop.ps1 -AcquireData
-```
+以下は重要なhistorical evidenceですが、現在のrepository-wide statusではありません。
 
-The search enumerates every value explicitly listed in `parameter_spaces`, tests declared ensembles,
-selects the smallest candidate set it can find for the requested ±1 row coverage, and optionally asks
-an OpenAI-compatible local LLM for additional bounded proposals every N experiments. It never opens the
-protected test during tuning and never reports 90% unless validation actually reaches it.
+- [`docs/IMPLEMENTATION_STATUS_V3.md`](docs/IMPLEMENTATION_STATUS_V3.md)
+- [`specs/001-full-coverage/plan.md`](specs/001-full-coverage/plan.md)
+- [`VERIFICATION_REPORT.md`](VERIFICATION_REPORT.md)
 
-Important: "all settings" cannot mean every real-number value or every possible neural architecture.
-Here it means the complete finite Cartesian product declared in the YAML. Expand that YAML intentionally,
-subject to `max_experiments` and `max_runtime_seconds`.
+これらの過去の数値やmerge stateは、現在値へ見せるために上書きしません。
+
+## Scientific position
+
+本softwareは時系列予測手法を比較・検証する研究基盤です。宝くじの当選能力や将来の予測優位性を、モデルの存在や単一runの結果だけから主張しません。
+
+改善が確認できない場合に`NO_MODEL_BEATS_BASELINE`やchampionなしを表現できることも、評価基盤の必要な挙動です。

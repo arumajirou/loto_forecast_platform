@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -42,7 +41,12 @@ def _preflight(
 
 
 def test_resume_plan_uses_existing_python(tmp_path: Path) -> None:
-    plan = build_resume_plan(_preflight(python_found=True), tmp_path, run_id="run-1")
+    plan = build_resume_plan(
+        _preflight(python_found=True),
+        tmp_path,
+        run_id="run-1",
+        platform_system="Linux",
+    )
     assert plan["status"] == "READY_TO_BOOTSTRAP"
     assert plan["strategy"] == "USE_EXISTING_PYTHON_311"
     assert plan["python_path"] == "/opt/python3.11"
@@ -59,6 +63,7 @@ def test_resume_plan_uses_repo_scoped_managed_python(tmp_path: Path) -> None:
         tmp_path,
         run_id="run-2",
         managed_python_dir=managed,
+        platform_system="Linux",
     )
     assert plan["status"] == "READY_TO_PROVISION_PYTHON"
     assert plan["strategy"] == "INSTALL_UV_MANAGED_PYTHON_311"
@@ -73,14 +78,34 @@ def test_resume_plan_blocks_when_network_sources_are_unavailable(tmp_path: Path)
         _preflight(python_found=False, github=False, index=False),
         tmp_path,
         run_id="run-3",
+        platform_system="Linux",
     )
     assert plan["status"] == "BLOCKED"
     assert "PYTHON_311_UNAVAILABLE_AND_DOWNLOAD_BLOCKED" in plan["blockers"]
     assert "PACKAGE_INDEX_DNS_UNAVAILABLE" in plan["blockers"]
 
 
+def test_resume_plan_blocks_native_windows_before_bash_plan(tmp_path: Path) -> None:
+    plan = build_resume_plan(
+        _preflight(python_found=True),
+        tmp_path,
+        run_id="run-windows",
+        platform_system="Windows",
+    )
+
+    assert plan["status"] == "BLOCKED"
+    assert plan["strategy"] == "BLOCKED_NATIVE_WINDOWS_BOOTSTRAP_ADAPTER_UNAVAILABLE"
+    assert plan["steps"] == []
+    assert "NATIVE_WINDOWS_BOOTSTRAP_ADAPTER_UNAVAILABLE" in plan["blockers"]
+
+
 def test_resume_plan_rejects_tampered_preflight(tmp_path: Path) -> None:
     preflight = _preflight(python_found=True)
     preflight["status"] = "BLOCKED"
     with pytest.raises(ValueError, match="report_sha256 mismatch"):
-        build_resume_plan(preflight, tmp_path, run_id="run-4")
+        build_resume_plan(
+            preflight,
+            tmp_path,
+            run_id="run-4",
+            platform_system="Linux",
+        )

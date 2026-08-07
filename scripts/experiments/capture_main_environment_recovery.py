@@ -55,13 +55,7 @@ codes = {
     ),
     "package_list": run(
         "package-list",
-        [
-            "uv",
-            "pip",
-            "list",
-            "--python",
-            ".venv/bin/python",
-        ],
+        ["uv", "pip", "list"],
     ),
     "runtime": run(
         "runtime",
@@ -157,7 +151,8 @@ report = {
         report,
         indent=2,
         ensure_ascii=False,
-    ),
+    )
+    + "\n",
     encoding="utf-8",
 )
 
