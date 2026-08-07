@@ -1721,7 +1721,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5" },
     { name = "pyyaml", specifier = ">=6.0" },
-    { name = "ray", extras = ["tune"], marker = "extra == 'full'", specifier = ">=2.40" },
+    { name = "ray", extras = ["tune"], marker = "extra == 'full'", specifier = ">=2.56.1" },
     { name = "reservoirpy", marker = "extra == 'frameworks'", specifier = ">=0.4" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.9" },
     { name = "scikit-learn", specifier = ">=1.5" },
