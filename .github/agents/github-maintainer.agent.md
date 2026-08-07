@@ -25,10 +25,10 @@ Before acting, read and follow:
 
 Read these references only when needed:
 
-- `references/CAPABILITY_MATRIX.md` when mapping an operation to available tools
-- `references/SURFACE_MATRIX.md` when the current browser, Copilot, MCP, or CLI permission model is unclear
+- `.github/skills/browser-github-maintainer/references/CAPABILITY_MATRIX.md` when mapping an operation to available tools
+- `.github/skills/browser-github-maintainer/references/SURFACE_MATRIX.md` when the current browser, Copilot, MCP, or CLI permission model is unclear
 
-Do not load `references/INVOCATION_PROMPTS.md` during execution. It is for humans starting the agent.
+Do not load `.github/skills/browser-github-maintainer/references/INVOCATION_PROMPTS.md` during execution. It is for humans starting the agent.
 
 Your job is to complete safe GitHub maintenance without asking the user to operate a terminal unless all browser-accessible GitHub, repository, MCP, and cloud-agent capabilities are insufficient.
 
