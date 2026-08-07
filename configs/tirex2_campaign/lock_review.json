@@ -1,0 +1,11 @@
+{
+  "schema_version": "tirex2-lock-policy-v1",
+  "runtime_lane": "tirex2-supported-py312",
+  "registry": "https://pypi.org/simple",
+  "apply_token": "APPLY-REVIEWED-TIREX2-LOCK",
+  "require_registry_artifact_sha256": true,
+  "require_official_tirex_2_0_1_1_artifact": true,
+  "reject_vcs_path_url_editable_workspace_sources": true,
+  "require_timezone_aware_reviewed_at": true,
+  "require_explicit_replacement_sha256": true
+}
