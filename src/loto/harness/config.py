@@ -74,12 +74,28 @@ class HarnessSettings(BaseModel):
             )
         return value
 
+    @staticmethod
+    def _resolve_allowed_root(value: str, *, config_dir: Path) -> str:
+        candidate = Path(value).expanduser()
+        if not candidate.is_absolute():
+            candidate = config_dir / candidate
+        return str(candidate.resolve())
+
     @classmethod
     def from_yaml(cls, path: str | Path) -> HarnessSettings:
-        source = Path(path)
+        source = Path(path).expanduser().resolve()
         if not source.is_file():
             raise ConfigurationError(f"configuration not found: {source}")
         raw: dict[str, Any] = yaml.safe_load(source.read_text(encoding="utf-8")) or {}
         settings = cls.model_validate(raw)
         settings.context.validate_budget()
+        normalized_roots = [
+            cls._resolve_allowed_root(value, config_dir=source.parent)
+            for value in settings.security.allowed_roots
+        ]
+        settings = settings.model_copy(
+            update={
+                "security": settings.security.model_copy(update={"allowed_roots": normalized_roots})
+            }
+        )
         return settings

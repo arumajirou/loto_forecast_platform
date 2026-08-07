@@ -17,5 +17,7 @@ def test_path_allowlist(tmp_path: Path) -> None:
     inside = tmp_path / "repo" / "file.txt"
     inside.parent.mkdir()
     assert ensure_allowed_path(inside, [tmp_path]) == inside.resolve()
+
+    outside = tmp_path.parent / f"{tmp_path.name}-outside.txt"
     with pytest.raises(UnsafeOperation):
-        ensure_allowed_path("/etc/passwd", [tmp_path])
+        ensure_allowed_path(outside, [tmp_path])
