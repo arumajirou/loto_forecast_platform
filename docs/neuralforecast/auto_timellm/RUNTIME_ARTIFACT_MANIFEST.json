@@ -1,0 +1,91 @@
+{
+  "accuracy_status": "NOT_EVALUATED",
+  "common_sdk_pr": 123,
+  "file_count_excluding_manifest_and_sha256s": 10,
+  "files": [
+    {
+      "path": "docs/neuralforecast/auto_timellm/RUNTIME_CERTIFICATION.md",
+      "role": "documentation",
+      "sha256": "86e62355556541487b692d920f12ddccba5f0b5321373c522950d32f91d8182a",
+      "size_bytes": 5674
+    },
+    {
+      "path": "docs/neuralforecast/auto_timellm/RUNTIME_TEST_PLAN.md",
+      "role": "documentation",
+      "sha256": "9b25f3b3c3e7c22f20950945320402d7d240ab2ad193ec1b49224efcaaab4d54",
+      "size_bytes": 2425
+    },
+    {
+      "path": "docs/neuralforecast/auto_timellm/RUNTIME_VERIFICATION_REPORT.md",
+      "role": "documentation",
+      "sha256": "7b45983abb095edf5b95f8db9b6e6735ac473fc68b462c9c86c8faf6a8107a51",
+      "size_bytes": 2096
+    },
+    {
+      "path": "scripts/run_auto_timellm_runtime_certification.sh",
+      "role": "operator_wrapper",
+      "sha256": "b1b9cc90be4738ce40244db881c77ad1fe34b512e84924836ff252308c9724f9",
+      "size_bytes": 474
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_timellm/certify.py",
+      "role": "runtime_source",
+      "sha256": "ad5d6d17f8d6fd6fdf46dcf2322856905029e89d9eeb3f75d65d6fa8292e7220",
+      "size_bytes": 1680
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_timellm/runtime_certification.py",
+      "role": "runtime_source",
+      "sha256": "ce07fd60f1ea62890acfecb9749886d13d130f038f23c51ac4f4f88237b05441",
+      "size_bytes": 14830
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_timellm/runtime_contracts.py",
+      "role": "runtime_source",
+      "sha256": "2ea3f6af2f3e606f14518ed03afeb4091965c84f3f12b3fd9ab4060b4dba5b44",
+      "size_bytes": 9585
+    },
+    {
+      "path": "src/loto/neuralforecast/auto_timellm/runtime_worker.py",
+      "role": "runtime_source",
+      "sha256": "46ea7d105e32f7119f8c29a4102ec43547b9aae53d26aaea5a36e8a08d07fd09",
+      "size_bytes": 10868
+    },
+    {
+      "path": "tests/neuralforecast/auto_timellm/test_runtime_certification_adapter.py",
+      "role": "focused_test",
+      "sha256": "aa2d6f547bbf4c0aea067a4d4658f24c05ec006e60a22aa76fa402c716f49eeb",
+      "size_bytes": 7353
+    },
+    {
+      "path": "tests/neuralforecast/auto_timellm/test_runtime_contracts_v2.py",
+      "role": "focused_test",
+      "sha256": "36447fbbcaf056a01fa4b02393d4533b4e6d099c6f716f1f601be7ca95c4dffc",
+      "size_bytes": 4952
+    }
+  ],
+  "non_claims": [
+    "real NeuralForecast runtime",
+    "real immutable LLM snapshot load",
+    "CPU smoke success",
+    "GPU formal success",
+    "forecast accuracy or baseline superiority",
+    "Holdout or Prospective success",
+    "catalog registration or production eligibility"
+  ],
+  "parent_branch": "feat/neuralforecast-auto-timellm-v1",
+  "parent_head_sha": "189caf6bbb7cae74402042426d3f13e56bf1840d",
+  "parent_pr": 126,
+  "runtime_execution": "NOT_EXECUTED",
+  "schema_version": "1.0.0",
+  "status": "PARTIALLY_VERIFIED",
+  "validation": {
+    "ast_parse": "PASS",
+    "compileall": "PASS",
+    "focused_pytest": "11 passed in 0.10s",
+    "line_length_100": "PASS",
+    "mypy": "BLOCKED_TOOL_UNAVAILABLE",
+    "ruff": "BLOCKED_TOOL_UNAVAILABLE",
+    "shell_syntax": "PASS"
+  }
+}
