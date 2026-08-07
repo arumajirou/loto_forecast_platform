@@ -1,0 +1,142 @@
+name: windows-portability-ci
+
+on:
+  pull_request:
+    branches:
+      - integration/all-open-prs-20260807-v1
+    paths:
+      - pyproject.toml
+      - uv.lock
+      - src/**
+      - docs/WINDOWS_INSTALL.md
+      - .github/workflows/windows-portability-ci.yml
+  push:
+    branches:
+      - integration/all-open-prs-20260807-v1
+    paths:
+      - pyproject.toml
+      - uv.lock
+      - src/**
+      - .github/workflows/windows-portability-ci.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-portability-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows-portability:
+    name: Native Windows dependency and package smoke
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    defaults:
+      run:
+        shell: pwsh
+
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.12.13"
+
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - name: Verify uv and install managed Python
+        run: |
+          $actual = (uv --version).Trim()
+          Write-Host "uv_version=$actual"
+          if ($actual -ne "uv $env:UV_VERSION") {
+            throw "unexpected uv version: $actual"
+          }
+
+          uv python install $env:UV_PYTHON
+          $python = (uv python find $env:UV_PYTHON).Trim()
+          Write-Host "python_path=$python"
+          & $python --version
+
+      - name: Validate committed universal lock
+        run: |
+          uv lock --check
+
+          $python = (uv python find $env:UV_PYTHON).Trim()
+          @'
+          import tomllib
+
+          with open("uv.lock", "rb") as stream:
+              lock = tomllib.load(stream)
+
+          packages = lock.get("package", [])
+          root = next(p for p in packages if p.get("name") == "loto-forecast-platform")
+          root_dependencies = root.get("dependencies", [])
+          assert not any(d.get("name") == "triton" for d in root_dependencies), root_dependencies
+
+          root_metadata = root.get("metadata", {})
+          requires_dist = root_metadata.get("requires-dist", [])
+          assert not any(d.get("name") == "triton" for d in requires_dist), requires_dist
+
+          torch = next(
+              p for p in packages
+              if p.get("name") == "torch" and p.get("version") == "2.9.1"
+          )
+          triton_edges = [
+              d for d in torch.get("dependencies", [])
+              if d.get("name") == "triton"
+          ]
+          expected_marker = "platform_machine == 'x86_64' and sys_platform == 'linux'"
+          assert len(triton_edges) == 1, triton_edges
+          assert triton_edges[0].get("marker") == expected_marker, triton_edges
+
+          print("root_direct_triton=false")
+          print("torch_triton_linux_x86_64_marker=PASS")
+          '@ | & $python -
+
+      - name: Resolve native Windows dependencies without installation
+        run: |
+          uv sync --dry-run --locked --python $env:UV_PYTHON
+          uv tree --locked `
+            --python-version 3.12 `
+            --python-platform x86_64-pc-windows-msvc `
+            | Tee-Object -FilePath windows-tree.txt
+
+          $triton = Select-String -Path windows-tree.txt -Pattern '(?i)\btriton\b'
+          if ($triton) {
+            $triton | ForEach-Object { Write-Host $_.Line }
+            throw "native Windows dependency tree unexpectedly selects Triton"
+          }
+          Write-Host "windows_triton_selected=false"
+
+      - name: Build wheel on native Windows
+        run: |
+          uv build --wheel
+          $wheels = @(Get-ChildItem -Path dist -Filter *.whl)
+          if ($wheels.Count -ne 1) {
+            throw "expected exactly one wheel, found $($wheels.Count)"
+          }
+          Write-Host "wheel=$($wheels[0].FullName)"
+
+      - name: Install wheel without dependencies and import package
+        run: |
+          uv venv .venv-portability --python $env:UV_PYTHON
+          $python = ".venv-portability\Scripts\python.exe"
+          $wheel = (Get-ChildItem -Path dist -Filter *.whl | Select-Object -First 1).FullName
+
+          uv pip install --python $python --no-deps $wheel
+          & $python -c "import loto; print(f'loto_version={loto.__version__}')"
+
+      - name: Verify tracked files stayed clean
+        if: ${{ always() }}
+        run: |
+          git diff --exit-code
+          git diff --cached --exit-code
