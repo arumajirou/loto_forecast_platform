@@ -1,0 +1,31 @@
+# Discovered from `lms ls` on 2026-08-04. This is inventory, not certification.
+# certified_context remains zero until the certification suite passes.
+endpoint: http://127.0.0.1:1234
+models:
+  - {key: agents-a1, architecture: qwen35moe, size_gb: 21.17}
+  - {key: deepseek-v4-flash, architecture: deepseek4, size_gb: 82.54}
+  - {key: fara1.5-27b@q3_k_m, architecture: qwen35, size_gb: 13.93}
+  - {key: fara1.5-27b@q4_k_s, architecture: qwen35, size_gb: 16.22}
+  - {key: gemma-4-31b-it, architecture: gemma4, size_gb: 14.74}
+  - {key: gpt-oss-120b, architecture: gpt-oss, size_gb: 62.76}
+  - {key: hy3-1m, architecture: hy_v3, size_gb: 96.02}
+  - {key: kwaipilot_kat-coder-v2.5-dev, architecture: qwen35moe, size_gb: 21.39}
+  - {key: laguna-s-2.1-ud-k-m, architecture: laguna, size_gb: 73.12, status: BLOCKED_REQUIRES_RECERTIFICATION}
+  - {key: mellum2-12b-a2.5b-thinking, architecture: mellum, size_gb: 8.07}
+  - {key: mistral-medium-3.5-128b, architecture: mistral3, size_gb: 71.25}
+  - {key: nvidia-qwen3.6-27b-nvfp4, architecture: qwen35, size_gb: 28.23}
+  - {key: ornith-1.0-35b, architecture: qwen35moe, size_gb: 13.74}
+  - {key: ornith-1.0-35b-mtp-apex, architecture: qwen35moe, size_gb: 14.34}
+  - {key: ornith-1.0-9b-mtp, architecture: qwen35, size_gb: 5.78}
+  - {key: ornith-397b-iq1s, architecture: qwen35moe, size_gb: 81.78}
+  - {key: ornith-397b-iq2ks, architecture: qwen35moe, size_gb: 97.77}
+  - {key: ornith-397b-unsloth-ud-s, architecture: qwen35moe, size_gb: 112.69}
+  - {key: qwen-agentworld-35b-a3b, architecture: qwen35moe, size_gb: 20.89}
+  - {key: qwen3-coder-30b-a3b-instruct, architecture: qwen3moe, size_gb: 17.67}
+  - {key: qwen3.6-27b-mtp, architecture: qwen35, size_gb: 16.12}
+  - {key: qwen3.6-35b-a3b-mtp, architecture: qwen35moe, size_gb: 21.39}
+  - {key: qwopus3.6-27b-coder-mtp, architecture: qwen35, size_gb: 13.50}
+  - {key: thinkingcap-qwen3.6-27b-mtp@q3_k_m, architecture: qwen35, size_gb: 13.50}
+  - {key: thinkingcap-qwen3.6-27b-mtp@q4_k_m, architecture: qwen35, size_gb: 15.72}
+embeddings:
+  - {key: text-embedding-nomic-embed-text-v1.5, architecture: nomic-bert, size_mb: 84.11}
