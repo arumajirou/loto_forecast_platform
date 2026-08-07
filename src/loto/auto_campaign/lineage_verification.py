@@ -10,6 +10,7 @@ from typing import Any
 from .contracts import CampaignStage
 from .lineage_integrity import verify_lineage_artifacts
 from .persistence import write_json, write_sha256s
+from .prediction_lock import verify_prediction_lock
 from .promotion_gate import GATED_STAGES
 from .verification_seal import (
     verify_verification_seal,
@@ -224,7 +225,7 @@ def _existing_seal_result(run_root: Path) -> dict[str, Any]:
 
 
 def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
-    """Run legacy, coverage, promotion-gate, lineage, and seal checks."""
+    """Run legacy, coverage, promotion, lineage, prediction-lock, and seal checks."""
 
     from .coverage_verification import verify_run_with_coverage
 
@@ -235,6 +236,7 @@ def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
     promotion_result = verify_promotion_gate_artifacts(run_root, manifest)
     lineage_result = verify_lineage_artifacts(run_root, manifest)
     semantic_result = verify_lineage_semantics(run_root, manifest)
+    prediction_result = verify_prediction_lock(run_root, manifest)
 
     if semantic_result.get("status") == "FAIL":
         lineage_failures = list(lineage_result.get("failures") or [])
@@ -273,6 +275,10 @@ def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
         f"lineage:{failure}"
         for failure in lineage_result.get("failures", [])
     )
+    failures.extend(
+        f"prediction-lock:{failure}"
+        for failure in prediction_result.get("failures", [])
+    )
     if existing_seal.get("status") == "FAIL":
         failures.extend(
             f"verification-seal:{failure}"
@@ -287,10 +293,12 @@ def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
             and manifest.get("status") == "PASS"
             and promotion_result.get("status") in {"PASS", "NOT_APPLICABLE"}
             and lineage_result.get("status") in {"PASS", "NOT_APPLICABLE"}
+            and prediction_result.get("status") in {"PASS", "NOT_APPLICABLE"}
             else "FAIL"
         ),
         "promotion_gate_verification": promotion_result,
         "lineage_verification": lineage_result,
+        "prediction_lock_verification": prediction_result,
         "preexisting_verification_seal": existing_seal,
         "failures": failures,
     }
@@ -317,7 +325,6 @@ def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
         seal_result = existing_seal
     result["verification_seal"] = seal_result
     if result["status"] == "PASS":
-        # Normalize first and repeated PASS reports to the same final seal state.
         result["preexisting_verification_seal"] = seal_result
 
     write_json(run_root / "VERIFICATION_REPORT.json", result)

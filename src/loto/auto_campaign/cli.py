@@ -9,14 +9,18 @@ from .api_coverage_pipeline import run_api_coverage_pipeline
 from .contracts import CampaignStage
 from .lineage_pipeline import run_stage_with_promotion_and_lineage
 from .lineage_verification import verify_run_with_lineage
-from .portable_artifact import export_portable_bundle, verify_portable_bundle
+from .portable_artifact import export_portable_bundle
+from .portable_prediction_verification import (
+    verify_portable_bundle_with_prediction_lock,
+)
 from .promotion_gate import GATED_STAGES
 from .runner import inventory, load_config, plan, run_stage
 
 # Compatibility patch points retained for existing callers and stacked-PR tests.
-# Their implementations now include lineage and verification-seal enforcement.
+# Their implementations now include lineage, prediction-lock, and seal enforcement.
 run_stage_with_promotion_gate = run_stage_with_promotion_and_lineage
 verify_run_with_coverage = verify_run_with_lineage
+verify_portable_bundle = verify_portable_bundle_with_prediction_lock
 
 
 def _run_id(prefix: str, stage: str) -> str:
