@@ -1,4 +1,6 @@
-# Loto Forecast Platform v3.0.0
+# Loto Forecast Platform
+
+現在のpackage versionはREADMEへ手書きしません。canonical versionは`loto.version.__version__`、installed CLI、またはpackage metadataから確認してください。
 
 6ゲーム（ミニロト / ロト6 / ロト7 / ビンゴ5 / ナンバーズ3 / ナンバーズ4）を対象に、統計・機械学習・
 深層学習・時系列基盤モデルを **統計的に正当な手続きで** 比較する研究＋運用基盤です。
