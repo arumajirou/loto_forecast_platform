@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Annotated
 
@@ -10,6 +11,10 @@ from fastapi.responses import HTMLResponse, Response
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, Field
 
+from loto.api.health_observability import (
+    DependencyProbeSpec,
+    install_health_observability,
+)
 from loto.data.lotteries import load_lottery_specs
 from loto.evaluation.shadow import score_combination
 from loto.models.catalog import get_model_spec, list_model_specs
@@ -51,13 +56,24 @@ class ModelPlanRequest(BaseModel):
     config: dict = Field(default_factory=dict)
 
 
-def create_app(output_dir: str | Path = ".", *, registry_url: str | None = None) -> FastAPI:
+def create_app(
+    output_dir: str | Path = ".",
+    *,
+    registry_url: str | None = None,
+    dependency_probe_specs: Sequence[DependencyProbeSpec] | None = None,
+    dependency_probe_timeout_seconds: float = 1.0,
+) -> FastAPI:
     root = Path(output_dir)
     registry = PlatformRegistry(
         registry_url or os.environ.get("LOTO_REGISTRY_URL", root / "platform.sqlite3")
     )
     token_map = parse_tokens()
     app = FastAPI(title="Loto Forecast Platform API", version="2.1.0")
+    install_health_observability(
+        app,
+        probe_specs=dependency_probe_specs,
+        timeout_seconds=dependency_probe_timeout_seconds,
+    )
 
     def current_identity(authorization: Annotated[str | None, Header()] = None) -> Identity:
         if not token_map and os.environ.get("LOTO_AUTH_DISABLED", "0") == "1":
