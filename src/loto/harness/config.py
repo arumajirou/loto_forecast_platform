@@ -95,9 +95,7 @@ class HarnessSettings(BaseModel):
         ]
         settings = settings.model_copy(
             update={
-                "security": settings.security.model_copy(
-                    update={"allowed_roots": normalized_roots}
-                )
+                "security": settings.security.model_copy(update={"allowed_roots": normalized_roots})
             }
         )
         return settings
