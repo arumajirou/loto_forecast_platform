@@ -4,37 +4,9 @@ zero_shot_predict,IMPLEMENTED_RUNTIME_PENDING,real Uni2TS run pending
 arbitrary_position_count,IMPLEMENTED,contract and runner are dynamic
 horizon_1_2_5,IMPLEMENTED,token budget validated
 native_quantiles,IMPLEMENTED,all nine retained
-past_covariates,IMPLEMENTED_FAKE_RUNTIME_VERIFIED,native past_feat_dynamic_real wiring
-known_future_covariates,IMPLEMENTED_FAKE_RUNTIME_VERIFIED,native feat_dynamic_real wiring
-covariate_matrix_hashing,IMPLEMENTED,ordered matrix and future-tail SHA-256
-token_budget_with_covariates,IMPLEMENTED,target plus both covariate classes
-forward_tensor_device_observation,IMPLEMENTED_LOCAL_CPU_VERIFIED,real lane pending
-separate_process_snapshot_reload,IMPLEMENTED_EXECUTION_PENDING,two real provider runs pending
-prediction_sha256_comparison,IMPLEMENTED,exact point and nine-quantile identity
-external_gpu_pid_uuid_vram,IMPLEMENTED_EXECUTION_PENDING,real CUDA evidence pending
-post_exit_gpu_pid_release,IMPLEMENTED_EXECUTION_PENDING,real CUDA evidence pending
-lock_candidate_generation,IMPLEMENTED_EXECUTION_PENDING,non-destructive candidate output
-lock_dependency_inventory,IMPLEMENTED_LOCAL_VERIFIED,package source edges and artifact hashes
-lock_source_policy,IMPLEMENTED_LOCAL_VERIFIED,VCS path editable sources fail closed
-lock_human_approval,IMPLEMENTED_EXECUTION_PENDING,reviewer time token and candidate SHA required
-lock_cross_hash_preflight,IMPLEMENTED_LOCAL_VERIFIED,lock report approval and lane must agree
-frozen_import_device_probe,IMPLEMENTED_EXECUTION_PENDING,exact imported versions and CUDA availability
-six_case_runtime_campaign,IMPLEMENTED_EXECUTION_PENDING,draw and calendar across three covariate modes
-serial_gpu_evidence_isolation,IMPLEMENTED,parallel case execution forbidden
-formal_all_case_gate,IMPLEMENTED,all six cases required for formal runtime certification
-clean_source_identity,IMPLEMENTED_LOCAL_VERIFIED,commit tree and principal file hashes sealed before run
-strict_artifact_reverification,IMPLEMENTED_LOCAL_VERIFIED,manifest and every SHA recalculated
-quantile_evidence_reverification,IMPLEMENTED_LOCAL_VERIFIED,nine finite monotonic quantiles and q0.5 parity
-external_gpu_monitor_rederivation,IMPLEMENTED_LOCAL_VERIFIED,PID UUID VRAM and release rederived from samples
-cross_lane_model_identity_gate,IMPLEMENTED_LOCAL_VERIFIED,CPU and CUDA must share source and model artifact
-target_execution_plan,IMPLEMENTED_LOCAL_VERIFIED,one Run ID and external control workspace
-target_execution_state_machine,IMPLEMENTED_LOCAL_VERIFIED,strict seven-stage transition order
-target_execution_hash_chain,IMPLEMENTED_LOCAL_VERIFIED,event and artifact tree SHA-256 evidence
-target_execution_human_gate,IMPLEMENTED_LOCAL_VERIFIED,no automatic approval or installation
-target_execution_concurrency_guard,IMPLEMENTED_LOCAL_VERIFIED,simultaneous recording fails closed
-p9_oof_gate,IMPLEMENTED_EXECUTION_PENDING,opens only after real P8C pair and P8D sequence pass
-fine_tuning,UPSTREAM_PATH_UNVERIFIED,out of current scope
-oof,NOT_OPENED,blocked until real P8D sequence pass
-holdout,NOT_OPENED,out of current scope
-prospective,NOT_OPENED,out of current scope
+past_covariates,IMPLEMENTED_RUNTIME_PENDING,schema accepted; P7 runtime rejects
+known_future_covariates,IMPLEMENTED_RUNTIME_PENDING,availability contract; P7 runtime rejects
+fine_tuning,UPSTREAM_PATH_UNVERIFIED,out of initial scope
+holdout,NOT_OPENED,out of initial scope
+prospective,NOT_OPENED,out of initial scope
 commercial_promotion,BLOCKED_BY_LICENSE,fail closed
