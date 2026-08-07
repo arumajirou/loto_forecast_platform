@@ -1,0 +1,29 @@
+{
+  "schema_version": "moirai2-p8a-change-scope-v1",
+  "phase": "P8A_RUNTIME_CAMPAIGN",
+  "base_branch": "feat/moirai2-runtime-certification-v1",
+  "head_branch": "feat/moirai2-runtime-campaign-v1",
+  "owned_paths": [
+    "configs/moirai2_campaign/**",
+    "scripts/preflight_moirai2_runtime_lane.py",
+    "scripts/run_moirai2_runtime_campaign.py",
+    "src/loto/moirai2_campaign/runtime_campaign.py",
+    "src/loto/moirai2_campaign/runtime_preflight.py",
+    "tests/moirai2_campaign/**",
+    "docs/moirai2/**"
+  ],
+  "excluded_paths": [
+    ".github/workflows/**",
+    "pyproject.toml",
+    "uv.lock",
+    "src/loto/adapters/**",
+    "src/loto/workers/**",
+    "README.md"
+  ],
+  "formal_cases": 6,
+  "execution_policy": "strictly_serial",
+  "oof_opened": false,
+  "holdout_opened": false,
+  "prospective_opened": false,
+  "production_promotion": false
+}
