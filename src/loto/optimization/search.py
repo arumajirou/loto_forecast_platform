@@ -138,7 +138,6 @@ def optimize_ray(
     output_dir: str | None = None,
 ) -> SearchResult:
     from ray import tune
-    from ray.air import RunConfig
 
     space = _ray_space(PARAM_SPACES.get(model_id, {}))
 
@@ -149,7 +148,7 @@ def optimize_ray(
         tune.with_resources(trainable, {"cpu": cpus_per_trial, "gpu": gpus_per_trial}),
         param_space=space,
         tune_config=tune.TuneConfig(num_samples=trials, metric="score", mode="max"),
-        run_config=RunConfig(
+        run_config=tune.RunConfig(
             storage_path=output_dir,
             stop={"time_total_s": timeout_seconds} if timeout_seconds else None,
         ),
