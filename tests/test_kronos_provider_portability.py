@@ -49,10 +49,7 @@ def test_hf_hub_cache_is_used_for_model_snapshot(tmp_path: Path) -> None:
     )
 
     assert resolved == (
-        hub
-        / "models--NeoQuasar--Kronos-base"
-        / "snapshots"
-        / provider.MODEL_REVISION
+        hub / "models--NeoQuasar--Kronos-base" / "snapshots" / provider.MODEL_REVISION
     )
 
 
