@@ -28,6 +28,7 @@ from loto.adapters.tirex2.contracts import (
     Tirex2Request,
     Tirex2Response,
 )
+from loto.tirex2_campaign.lock_review import validate_installed_review
 from loto.tirex2_campaign.provenance import (
     MODEL_CONFIG_SHA256,
     MODEL_WEIGHT_SHA256,
@@ -165,6 +166,10 @@ def _gpu_uuid() -> str | None:
 
 
 def run_provider(request: Tirex2Request) -> Tirex2Response:
+    validate_installed_review(
+        environment_path=REPOSITORY_ROOT / "environments" / "tirex2-supported-py312",
+        runtime_lane="tirex2-supported-py312",
+    )
     from tirex2 import load_model
 
     _package_version()
