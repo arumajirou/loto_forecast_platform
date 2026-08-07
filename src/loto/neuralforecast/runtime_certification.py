@@ -1,10 +1,4 @@
-"""Runtime certification for saved NeuralForecast model bundles.
-
-A training call is not considered runtime-certified merely because ``fit`` and
-``predict`` returned. Certification saves the fitted bundle, reloads it,
-repeats inference, checks finite values and prediction stability, and records
-CPU/GPU execution evidence.
-"""
+"""Save/load runtime certification for NeuralForecast model bundles."""
 
 from __future__ import annotations
 
@@ -14,99 +8,33 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from loto.auto_campaign.runtime import gpu_process_snapshot, torch_runtime_snapshot
 from loto.data.lineage import atomic_write_json
+
+from .runtime_compare import compare_predictions
+from .runtime_evidence import (
+    extract_training_evidence,
+    fitted_inner_model,
+    formal_training_cuda,
+    phase_has_cuda,
+    safe_gpu_process_snapshot as _safe_gpu_process_snapshot,
+    state_dict_finite,
+    torch_runtime_snapshot,
+)
+from .runtime_policy import (
+    PredictionComparisonPolicy,
+    precision_tolerance,
+    resolve_prediction_policy,
+    seed_runtime,
+)
+from .runtime_prediction import (
+    collect_prediction_samples,
+    key_frames_match,
+    prediction_frame,
+)
 
 
 class RuntimeCertificationFailure(RuntimeError):
-    """Raised only after structured runtime-certification evidence is durable."""
-
-
-def _point_column(prediction: pd.DataFrame, alias: str) -> str:
-    ignored = {"unique_id", "ds", "cutoff"}
-    candidates = [column for column in prediction.columns if column not in ignored]
-    if alias in candidates:
-        return alias
-    point_candidates = [
-        column
-        for column in candidates
-        if not any(
-            marker in str(column).lower() for marker in ("-lo-", "-hi-", "median", "quantile")
-        )
-    ]
-    if point_candidates:
-        return str(point_candidates[0])
-    if not candidates:
-        raise ValueError("NeuralForecast.predict returned no forecast value columns")
-    return str(candidates[0])
-
-
-def _state_dict_finite(model: Any | None) -> bool:
-    if model is None:
-        return False
-    state_dict = getattr(model, "state_dict", None)
-    if not callable(state_dict):
-        return False
-    state = state_dict()
-    if not state:
-        return False
-    for value in state.values():
-        try:
-            array = value.detach().cpu().numpy()
-        except AttributeError:
-            array = np.asarray(value)
-        if not np.isfinite(array).all():
-            return False
-    return True
-
-
-def _fitted_inner_model(neuralforecast: Any) -> Any | None:
-    models = getattr(neuralforecast, "models", None)
-    if not models or len(models) != 1:
-        return None
-    return getattr(models[0], "model", models[0])
-
-
-def _safe_gpu_process_snapshot() -> dict[str, Any]:
-    try:
-        return gpu_process_snapshot()
-    except FileNotFoundError:
-        return {
-            "pid": None,
-            "returncode": 127,
-            "gpu_pid_verified": False,
-            "rows": [],
-            "error": "nvidia-smi not found",
-        }
-
-
-def _runtime_has_cuda_evidence(snapshot: dict[str, Any]) -> bool:
-    return bool(
-        str(snapshot.get("parameter_device", "")).startswith("cuda")
-        or str(snapshot.get("trainer_root_device", "")).startswith("cuda")
-        or snapshot.get("cuda_memory_allocated", 0) > 0
-        or snapshot.get("cuda_memory_reserved", 0) > 0
-        or snapshot.get("cuda_peak_memory_allocated", 0) > 0
-    )
-
-
-def _key_frames_match(
-    before: pd.DataFrame,
-    after: pd.DataFrame,
-    key_columns: list[str],
-) -> bool:
-    if len(before) != len(after):
-        return False
-    try:
-        pd.testing.assert_frame_equal(
-            before[key_columns],
-            after[key_columns],
-            check_dtype=False,
-            check_exact=True,
-        )
-    except AssertionError:
-        return False
-    return True
+    """Raised only after structured certification evidence is durable."""
 
 
 def _finish_result(model_path: Path, result: dict[str, Any]) -> dict[str, Any]:
@@ -121,24 +49,19 @@ def _finish_result(model_path: Path, result: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def certify_saved_runtime(
+def _initial_result(
     *,
-    neuralforecast: Any,
-    neuralforecast_class: type,
-    model_path: Path,
-    prediction_before: pd.DataFrame,
-    alias: str,
-    verbose: bool,
+    policy: PredictionComparisonPolicy,
+    random_seed: int,
+    precision: str | None,
+    stochastic_samples: int,
     require_gpu: bool,
+    training_evidence: dict[str, Any] | None,
+    rtol: float,
+    atol: float,
 ) -> dict[str, Any]:
-    """Save, reload and verify a fitted NeuralForecast instance.
-
-    Structured evidence is atomically persisted for both PASS and FAIL outcomes.
-    Failed checks raise only after that evidence is durable, keeping execution
-    fail-closed without losing the root-cause record.
-    """
-
-    result: dict[str, Any] = {
+    return {
+        "schema_version": "1.2.0",
         "status": "FAIL",
         "failed_phase": "pre_save_validation",
         "loaded": False,
@@ -150,135 +73,236 @@ def certify_saved_runtime(
         "max_abs_diff": None,
         "state_before_finite": False,
         "state_after_finite": False,
+        "prediction_policy": policy,
+        "random_seed": random_seed,
+        "precision": precision or "32-true",
+        "comparison_rtol": rtol,
+        "comparison_atol": atol,
+        "stochastic_samples": stochastic_samples if policy == "stochastic" else 1,
         "require_gpu": require_gpu,
+        "training_evidence": training_evidence or {},
+        # Kept for compatibility. This is pre-save inference evidence, not training proof.
         "cuda_training_evidence": False,
+        "formal_cuda_training_evidence": False,
+        "cuda_pre_save_inference_evidence": False,
         "cuda_reload_inference_evidence": False,
         "cuda_execution_evidence": False,
         "cpu_fallback": require_gpu,
-        "runtime_before": {},
-        "runtime_after": {},
-        "gpu_before": {},
-        "gpu_after": {},
+        "runtime_pre_save_inference": {},
+        "runtime_reload_inference": {},
+        "gpu_pre_save_inference": {},
+        "gpu_reload_inference": {},
         "point_column_before": None,
         "point_column_after": None,
         "key_columns": ["unique_id", "ds"],
         "duplicate_keys_before": False,
         "duplicate_keys_after": False,
+        "prediction_comparison": {},
         "failed_checks": [],
     }
 
+
+def certify_saved_runtime(
+    *,
+    neuralforecast: Any,
+    neuralforecast_class: type,
+    model_path: Path,
+    prediction_before: pd.DataFrame,
+    alias: str,
+    verbose: bool,
+    require_gpu: bool,
+    prediction_policy: PredictionComparisonPolicy | None = None,
+    random_seed: int = 1,
+    precision: str | None = None,
+    stochastic_samples: int = 5,
+    training_evidence: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Persist, reload, infer, and fail closed with durable evidence.
+
+    Deterministic models compare point values with precision-aware tolerances.
+    Stochastic models compare the mean and standard deviation of explicitly
+    seeded samples. Formal GPU certification requires trial/worker training
+    proof plus independent pre-save and reload-inference CUDA evidence.
+    """
+
+    policy = resolve_prediction_policy(neuralforecast, prediction_policy)
+    if policy == "stochastic" and stochastic_samples < 2:
+        raise ValueError("stochastic_samples must be >= 2 for stochastic comparison")
+    base_rtol, base_atol = precision_tolerance(precision)
+    rtol = max(base_rtol, 5e-2) if policy == "stochastic" else base_rtol
+    atol = max(base_atol, 5e-2) if policy == "stochastic" else base_atol
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    resolved_training = training_evidence or extract_training_evidence(neuralforecast)
+    result = _initial_result(
+        policy=policy,
+        random_seed=random_seed,
+        precision=precision,
+        stochastic_samples=stochastic_samples,
+        require_gpu=require_gpu,
+        training_evidence=resolved_training,
+        rtol=rtol,
+        atol=atol,
+    )
+
     try:
-        key_columns = list(result["key_columns"])
-        missing_before = [column for column in key_columns if column not in prediction_before]
-        if missing_before:
-            result["failed_checks"] = ["prediction_keys_before"]
-            result["error"] = f"pre-save prediction is missing keys: {missing_before}"
-            return _finish_result(model_path, result)
-
-        before_point = _point_column(prediction_before, alias)
-        result["point_column_before"] = before_point
-        before_frame = prediction_before[[*key_columns, before_point]].copy()
-        result["duplicate_keys_before"] = bool(before_frame.duplicated(key_columns).any())
-        before_frame = before_frame.sort_values(key_columns, kind="stable").reset_index(drop=True)
-        before_values = before_frame[before_point].to_numpy(dtype=float)
-        finite_before = bool(np.isfinite(before_values).all())
-
-        fitted_model = _fitted_inner_model(neuralforecast)
-        state_before_finite = _state_dict_finite(fitted_model)
-        runtime_before = torch_runtime_snapshot(fitted_model)
-        gpu_before = _safe_gpu_process_snapshot()
-        result.update(
-            {
-                "state_before_finite": state_before_finite,
-                "runtime_before": runtime_before,
-                "gpu_before": gpu_before,
-            }
+        before_frame, before_point, initial_values, initial_duplicate = prediction_frame(
+            prediction_before,
+            alias,
         )
+        result["point_column_before"] = before_point
+        result["duplicate_keys_before"] = initial_duplicate
+        fitted_model = fitted_inner_model(neuralforecast)
+        result["state_before_finite"] = state_dict_finite(fitted_model)
 
-        pre_save_failures: list[str] = []
-        if not finite_before:
-            pre_save_failures.append("finite_predictions_before")
-        if not state_before_finite:
-            pre_save_failures.append("finite_state_dict_before")
-        if result["duplicate_keys_before"]:
-            pre_save_failures.append("unique_prediction_keys_before")
-        if pre_save_failures:
-            result["failed_checks"] = pre_save_failures
+        pre_failures: list[str] = []
+        if not np.isfinite(initial_values).all():
+            pre_failures.append("finite_predictions_before")
+        if not result["state_before_finite"]:
+            pre_failures.append("finite_state_dict_before")
+        if initial_duplicate:
+            pre_failures.append("unique_prediction_keys_before")
+        if pre_failures:
+            result["failed_checks"] = pre_failures
             result["error"] = "pre-save runtime certification checks failed"
             return _finish_result(model_path, result)
 
+        if policy == "stochastic":
+            (
+                before_samples,
+                before_point,
+                before_values,
+                before_duplicate,
+                before_keys_consistent,
+            ) = collect_prediction_samples(
+                neuralforecast,
+                alias=alias,
+                verbose=verbose,
+                random_seed=random_seed,
+                sample_count=stochastic_samples,
+            )
+            result["duplicate_keys_before"] = bool(initial_duplicate or before_duplicate)
+            pd.concat(before_samples, ignore_index=True).to_csv(
+                model_path.parent / "prediction_samples_before_save.csv",
+                index=False,
+            )
+            before_reference = before_samples[0].drop(columns=["sample_index", "seed"])
+            before_reference = before_reference.rename(columns={"prediction": before_point})
+        else:
+            before_values = initial_values.reshape(1, -1)
+            before_keys_consistent = True
+            before_reference = before_frame
+
+        runtime_pre = torch_runtime_snapshot(fitted_model)
+        gpu_pre = _safe_gpu_process_snapshot()
+        pre_cuda = phase_has_cuda(runtime_pre, gpu_pre)
+        result.update(
+            {
+                "runtime_pre_save_inference": runtime_pre,
+                "gpu_pre_save_inference": gpu_pre,
+                "cuda_pre_save_inference_evidence": pre_cuda,
+                "cuda_training_evidence": pre_cuda,
+                "formal_cuda_training_evidence": formal_training_cuda(resolved_training),
+            }
+        )
+
         result["failed_phase"] = "save"
         neuralforecast.save(str(model_path), save_dataset=True, overwrite=True)
-
         result["failed_phase"] = "load"
         loaded = neuralforecast_class.load(str(model_path))
         result["loaded"] = True
-
         result["failed_phase"] = "predict_after_load"
-        prediction_after = loaded.predict(verbose=verbose)
+
+        if policy == "stochastic":
+            (
+                after_samples,
+                after_point,
+                after_values,
+                after_duplicate,
+                after_keys_consistent,
+            ) = collect_prediction_samples(
+                loaded,
+                alias=alias,
+                verbose=verbose,
+                random_seed=random_seed,
+                sample_count=stochastic_samples,
+            )
+            first_after = after_samples[0].drop(columns=["sample_index", "seed"])
+            first_after = first_after.rename(columns={"prediction": after_point})
+            first_after.to_csv(model_path.parent / "prediction_after_load.csv", index=False)
+            pd.concat(after_samples, ignore_index=True).to_csv(
+                model_path.parent / "prediction_samples_after_load.csv",
+                index=False,
+            )
+            after_reference = first_after
+            result["duplicate_keys_after"] = after_duplicate
+        else:
+            seed_runtime(random_seed)
+            prediction_after = loaded.predict(verbose=verbose)
+            prediction_after.to_csv(model_path.parent / "prediction_after_load.csv", index=False)
+            after_reference, after_point, after_vector, after_duplicate = prediction_frame(
+                prediction_after,
+                alias,
+            )
+            after_values = after_vector.reshape(1, -1)
+            after_keys_consistent = True
+            result["duplicate_keys_after"] = after_duplicate
+
         result["predicted"] = True
-        prediction_after.to_csv(model_path.parent / "prediction_after_load.csv", index=False)
-
-        missing_after = [column for column in key_columns if column not in prediction_after]
-        if missing_after:
-            result["failed_checks"] = ["prediction_keys_after"]
-            result["error"] = f"post-load prediction is missing keys: {missing_after}"
-            return _finish_result(model_path, result)
-
-        after_point = _point_column(prediction_after, alias)
         result["point_column_after"] = after_point
-        after_frame = prediction_after[[*key_columns, after_point]].copy()
-        result["duplicate_keys_after"] = bool(after_frame.duplicated(key_columns).any())
-        after_frame = after_frame.sort_values(key_columns, kind="stable").reset_index(drop=True)
-        after_values = after_frame[after_point].to_numpy(dtype=float)
-
-        loaded_model = _fitted_inner_model(loaded)
-        state_after_finite = _state_dict_finite(loaded_model)
-        runtime_after = torch_runtime_snapshot(loaded_model)
-        gpu_after = _safe_gpu_process_snapshot()
+        loaded_model = fitted_inner_model(loaded)
+        result["state_after_finite"] = state_dict_finite(loaded_model)
+        runtime_reload = torch_runtime_snapshot(loaded_model)
+        gpu_reload = _safe_gpu_process_snapshot()
+        reload_cuda = phase_has_cuda(runtime_reload, gpu_reload)
+        result["runtime_reload_inference"] = runtime_reload
+        result["gpu_reload_inference"] = gpu_reload
+        result["cuda_reload_inference_evidence"] = reload_cuda
 
         shape_match = before_values.shape == after_values.shape
-        key_match = _key_frames_match(before_frame, after_frame, key_columns)
+        key_match = bool(
+            before_keys_consistent
+            and after_keys_consistent
+            and key_frames_match(before_reference, after_reference)
+        )
+        prediction_match, maximum, comparison = compare_predictions(
+            policy=policy,
+            before_values=before_values,
+            after_values=after_values,
+            key_match=key_match,
+            rtol=rtol,
+            atol=atol,
+            random_seed=random_seed,
+        )
+        finite_before = bool(np.isfinite(before_values).all())
         finite_after = bool(np.isfinite(after_values).all())
-        prediction_match = bool(
-            key_match
-            and shape_match
-            and np.allclose(before_values, after_values, rtol=1e-6, atol=1e-6)
-        )
-        max_abs_diff = (
-            float(np.max(np.abs(before_values - after_values)))
-            if key_match and shape_match and before_values.size
-            else None
-        )
-        cuda_training_evidence = bool(
-            _runtime_has_cuda_evidence(runtime_before) or gpu_before.get("gpu_pid_verified")
-        )
-        cuda_reload_inference_evidence = bool(
-            _runtime_has_cuda_evidence(runtime_after) or gpu_after.get("gpu_pid_verified")
-        )
-        cuda_execution_evidence = bool(
-            cuda_training_evidence and cuda_reload_inference_evidence
-            if require_gpu
-            else cuda_training_evidence or cuda_reload_inference_evidence
-        )
-        cpu_fallback = bool(require_gpu and not cuda_reload_inference_evidence)
+        formal_training = result["formal_cuda_training_evidence"]
 
         failed_checks: list[str] = []
         if not shape_match:
             failed_checks.append("prediction_shape_match")
         if not key_match:
             failed_checks.append("prediction_key_match")
+        if not finite_before:
+            failed_checks.append("finite_prediction_samples_before")
         if not finite_after:
             failed_checks.append("finite_predictions_after")
         if not prediction_match:
-            failed_checks.append("prediction_value_match")
-        if not state_after_finite:
+            failed_checks.append(
+                "prediction_distribution_match"
+                if policy == "stochastic"
+                else "prediction_value_match"
+            )
+        if not result["state_after_finite"]:
             failed_checks.append("finite_state_dict_after")
+        if result["duplicate_keys_before"]:
+            failed_checks.append("unique_prediction_keys_before")
         if result["duplicate_keys_after"]:
             failed_checks.append("unique_prediction_keys_after")
-        if require_gpu and not cuda_training_evidence:
+        if require_gpu and not formal_training:
             failed_checks.append("gpu_training_evidence")
-        if require_gpu and not cuda_reload_inference_evidence:
+        if require_gpu and not pre_cuda:
+            failed_checks.append("gpu_pre_save_inference_evidence")
+        if require_gpu and not reload_cuda:
             failed_checks.append("gpu_reload_inference_evidence")
 
         result.update(
@@ -287,16 +311,21 @@ def certify_saved_runtime(
                 "failed_phase": None if not failed_checks else "verification",
                 "shape_match": shape_match,
                 "key_match": key_match,
-                "finite": finite_after,
+                "finite": bool(finite_before and finite_after),
                 "prediction_match": prediction_match,
-                "max_abs_diff": max_abs_diff,
-                "state_after_finite": state_after_finite,
-                "cuda_training_evidence": cuda_training_evidence,
-                "cuda_reload_inference_evidence": cuda_reload_inference_evidence,
-                "cuda_execution_evidence": cuda_execution_evidence,
-                "cpu_fallback": cpu_fallback,
-                "runtime_after": runtime_after,
-                "gpu_after": gpu_after,
+                "max_abs_diff": maximum,
+                "prediction_comparison": comparison,
+                "cuda_execution_evidence": bool(
+                    formal_training and pre_cuda and reload_cuda
+                    if require_gpu
+                    else pre_cuda or reload_cuda
+                ),
+                "cpu_fallback": bool(require_gpu and not reload_cuda),
+                # Deprecated aliases retained for existing artifact consumers.
+                "runtime_before": runtime_pre,
+                "runtime_after": runtime_reload,
+                "gpu_before": gpu_pre,
+                "gpu_after": gpu_reload,
                 "failed_checks": failed_checks,
             }
         )
@@ -304,6 +333,8 @@ def certify_saved_runtime(
     except RuntimeCertificationFailure:
         raise
     except Exception as exc:
+        if not result["failed_checks"]:
+            result["failed_checks"] = [f"{result['failed_phase']}_exception"]
         result.update(
             {
                 "status": "FAIL",
