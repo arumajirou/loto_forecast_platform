@@ -1,0 +1,14 @@
+schema_version: 1
+bootstrap_id: darts-torch-bootstrap-v1
+profile_name: darts-torch
+project_path: environments/darts-torch
+runtime_profile_path: configs/darts_campaign/runtime_preflight_torch.yaml
+lockfile_path: environments/darts-torch/uv.lock
+python_version: "3.13"
+preflight_output_path: artifacts/darts-runtime/torch/preflight.json
+bootstrap_report_path: artifacts/darts-runtime/torch/bootstrap.json
+approval_path: artifacts/darts-runtime/torch/CAMPAIGN_APPROVAL.json
+timeout_seconds: 3600
+uv_executable: uv
+allow_network_for_lock: true
+require_frozen_sync: true
