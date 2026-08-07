@@ -1,13 +1,29 @@
-from loto.coverage.auto_research import certify_auto_research, run_auto_research
-from loto.coverage.core import CoverageConfig, CoverageEvaluation, PredictionSet
-from loto.coverage.runner import certify_coverage_experiment, run_coverage_experiment
+"""Coverage research helpers and opt-in Data Access Ledger adoption."""
+
+from loto.coverage.instrumented import (
+    EXPECTED_AUTO_RESEARCH_BLOB_SHA,
+    EXPECTED_COVERAGE_RUNNER_BLOB_SHA,
+    run_auto_research_with_ledger,
+    run_coverage_experiment_with_ledger,
+)
+from loto.coverage.ledger import (
+    CoverageDatasetEvidence,
+    CoverageLedgerBlocked,
+    CoverageLedgerCloseResult,
+    CoverageLedgerError,
+    CoverageLedgerPreflightError,
+    CoverageLedgerRecorder,
+)
 
 __all__ = [
-    "CoverageConfig",
-    "CoverageEvaluation",
-    "PredictionSet",
-    "run_coverage_experiment",
-    "certify_coverage_experiment",
-    "run_auto_research",
-    "certify_auto_research",
+    "CoverageDatasetEvidence",
+    "CoverageLedgerBlocked",
+    "CoverageLedgerCloseResult",
+    "CoverageLedgerError",
+    "CoverageLedgerPreflightError",
+    "CoverageLedgerRecorder",
+    "EXPECTED_AUTO_RESEARCH_BLOB_SHA",
+    "EXPECTED_COVERAGE_RUNNER_BLOB_SHA",
+    "run_auto_research_with_ledger",
+    "run_coverage_experiment_with_ledger",
 ]
