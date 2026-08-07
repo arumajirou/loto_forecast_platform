@@ -1,0 +1,11 @@
+{
+  "minimum_prospective_windows": 3,
+  "minimum_total_draws": 3,
+  "minimum_weighted_hit_at_1": 0.9,
+  "minimum_worst_window_hit_at_1": 0.9,
+  "maximum_hit_drop_from_holdout": 0.05,
+  "maximum_mae_increase_from_holdout": 0.5,
+  "maximum_warning_windows": 0,
+  "maximum_critical_windows": 0,
+  "require_all_baselines_beaten": true
+}
