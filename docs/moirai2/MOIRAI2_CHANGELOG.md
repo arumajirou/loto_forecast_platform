@@ -1,61 +1,37 @@
 # Moirai 2.0 Changelog
 
+## 0.7.0
+
+- Added a target-host execution plan bound to one Run ID and clean source identity.
+- Added generated sequential operator commands for P8B, P8C, and final pair verification.
+- Added a strict seven-stage state machine with no automatic approval or execution.
+- Added candidate, installation, campaign, and pair artifact validators.
+- Added artifact-directory SHA-256 and event hash-chain evidence.
+- Added immutable per-transition checkpoints and a concurrent-record guard.
+- Added P8D focused tests, scope, runbook, manifest, and verification report.
+
 ## 0.6.0
 
-- Added clean-tree Git commit, tree, and principal-source SHA-256 capture before formal campaigns.
-- Added a P8C wrapper that seals P8A outputs with source and launch evidence.
-- Added independent full-manifest and SHA-256 revalidation for CPU and CUDA campaign artifacts.
-- Added per-case request, response, reload, quantile, device, and artifact identity rechecks.
-- Added GPU monitor rederivation of provider PID, GPU UUID, peak VRAM, and post-exit release.
-- Added cross-lane source, model revision, config hash, and weight hash equality gates.
-- Added a fail-closed P9 OOF gate requiring both complete real campaigns.
-- Added P8C focused tests, change scope, test plan, verification report, and configuration.
+- Added clean-tree source identity and P8C launch sealing.
+- Added independent CPU/CUDA campaign evidence verification.
+- Added quantile, reload, model identity, and external GPU revalidation.
 
 ## 0.5.0
 
-- Added non-destructive isolated `uv.lock` candidate generation.
-- Added package, dependency-edge, source, and artifact-hash inventory.
-- Added fail-closed rejection of VCS, path, editable, unsupported, and unresolved lock entries.
-- Added human approval evidence bound to runtime lane, project SHA, lock SHA, report SHA, and time.
-- Added guarded atomic installation of the reviewed lock, report, and approval artifacts.
-- Strengthened runtime preflight to verify all three installed artifacts before frozen import.
-- Added replacement protection requiring the existing lock SHA-256 before overwrite.
-- Added P8B focused tests, change scope, test plan, verification report, and configuration.
+- Added non-destructive lock candidates, static review, and human-approved installation.
 
 ## 0.4.0
 
-- Added a fail-closed reviewed-lock and frozen-runtime preflight.
-- Added deterministic draw-sequence and calendar-time certification request factories.
-- Added target-only, past-only, and past-plus-known-future runtime cases.
-- Added a strictly serial six-case campaign runner that reuses the P8 two-process certifier.
-- Added campaign-level all-case aggregation, immutable output directories, manifests, and hashes.
-- Added explicit partial-run behavior that cannot grant formal runtime certification.
-- Added P8A focused tests, change scope, test plan, verification report, and run configuration.
+- Added the deterministic six-case target-host campaign.
 
 ## 0.3.0
 
-- Added a two-process pinned-snapshot runtime certification harness.
-- Added canonical prediction and nine-quantile SHA-256 comparison.
-- Added torch forward input/output tensor-device observation.
-- Added external `nvidia-smi` PID, GPU UUID, VRAM, and post-exit PID-release evidence.
-- Added immutable per-run request, response, logs, exit code, monitor samples, and manifests.
-- Added strict failure gates for same PID, changed predictions, changed artifacts, and CPU fallback.
-- Added P8 focused tests, change scope, test plan, verification report, and run configuration.
+- Added two-process pinned-snapshot runtime certification.
 
 ## 0.2.0
 
-- Wired past-only covariates to native `past_feat_dynamic_real`.
-- Wired known-future covariates to native `feat_dynamic_real`.
-- Added deterministic ordering, context slicing, calendar expansion, and SHA-256 evidence.
-- Added covariate dimensions to the model token-budget calculation.
-- Added adapter-side covariate identity and hash verification.
-- Corrected univariate GluonTS input to one-dimensional target with `one_dim_target=true`.
-- Added fake-boundary runner execution and focused regression tests.
+- Added native past and known-future covariate wiring.
 
 ## 0.1.0
 
-- Added isolated supported and CUDA13-experimental runtime declarations.
-- Added strict provider Contract v2 and schema-v1 compatibility conversion.
-- Added dynamic game/time/token geometry and nine-quantile retention.
-- Added package/model provenance and research-only license gates.
-- Added focused tests and operator documentation.
+- Added isolated runtime declarations and Contract v2.
