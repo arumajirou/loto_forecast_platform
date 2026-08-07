@@ -1,5 +1,16 @@
 # Moirai 2.0 Changelog
 
+## 0.5.0
+
+- Added non-destructive isolated `uv.lock` candidate generation.
+- Added package, dependency-edge, source, and artifact-hash inventory.
+- Added fail-closed rejection of VCS, path, editable, unsupported, and unresolved lock entries.
+- Added human approval evidence bound to runtime lane, project SHA, lock SHA, report SHA, and time.
+- Added guarded atomic installation of the reviewed lock, report, and approval artifacts.
+- Strengthened runtime preflight to verify all three installed artifacts before frozen import.
+- Added replacement protection requiring the existing lock SHA-256 before overwrite.
+- Added P8B focused tests, change scope, test plan, verification report, and configuration.
+
 ## 0.4.0
 
 - Added a fail-closed reviewed-lock and frozen-runtime preflight.

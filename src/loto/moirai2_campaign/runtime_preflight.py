@@ -9,6 +9,11 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
+from loto.moirai2_campaign.lock_review import (
+    LockReviewError,
+    validate_installed_review,
+)
+
 
 class RuntimePreflightError(RuntimeError):
     pass
@@ -73,15 +78,23 @@ def parse_lock_versions(lock_path: Path) -> dict[str, set[str]]:
     return versions
 
 
-def validate_lane_files(environment_path: Path, snapshot_path: Path) -> dict[str, Any]:
+def validate_lane_files(
+    environment_path: Path,
+    snapshot_path: Path,
+    *,
+    runtime_lane: str,
+) -> dict[str, Any]:
     pyproject_path = environment_path / "pyproject.toml"
     lock_path = environment_path / "uv.lock"
     if not pyproject_path.is_file():
         raise RuntimePreflightError(f"runtime pyproject is missing: {pyproject_path}")
-    if not lock_path.is_file():
-        raise RuntimePreflightError(
-            f"reviewed uv.lock is required before execution: {lock_path}"
+    try:
+        review_evidence = validate_installed_review(
+            environment_path=environment_path,
+            runtime_lane=runtime_lane,
         )
+    except LockReviewError as exc:
+        raise RuntimePreflightError(f"reviewed lock validation failed: {exc}") from exc
     if not snapshot_path.is_dir():
         raise RuntimePreflightError(f"snapshot directory is missing: {snapshot_path}")
     missing_snapshot = [
@@ -112,9 +125,11 @@ def validate_lane_files(environment_path: Path, snapshot_path: Path) -> dict[str
         "pyproject_sha256": sha256_file(pyproject_path),
         "lock_path": str(lock_path.resolve()),
         "lock_sha256": sha256_file(lock_path),
+        "lock_review": review_evidence,
         "snapshot_path": str(snapshot_path.resolve()),
         "snapshot_files": {
-            name: sha256_file(snapshot_path / name) for name in REQUIRED_SNAPSHOT_FILES
+            name: sha256_file(snapshot_path / name)
+            for name in REQUIRED_SNAPSHOT_FILES
         },
         "dependency_pins": dependencies,
         "locked_versions": {

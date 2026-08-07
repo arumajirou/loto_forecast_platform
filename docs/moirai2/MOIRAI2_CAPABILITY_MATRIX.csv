@@ -13,7 +13,11 @@ separate_process_snapshot_reload,IMPLEMENTED_EXECUTION_PENDING,two real provider
 prediction_sha256_comparison,IMPLEMENTED,exact point and nine-quantile identity
 external_gpu_pid_uuid_vram,IMPLEMENTED_EXECUTION_PENDING,real CUDA evidence pending
 post_exit_gpu_pid_release,IMPLEMENTED_EXECUTION_PENDING,real CUDA evidence pending
-reviewed_lock_preflight,IMPLEMENTED_EXECUTION_PENDING,missing or mismatched uv.lock fails closed
+lock_candidate_generation,IMPLEMENTED_EXECUTION_PENDING,non-destructive candidate output
+lock_dependency_inventory,IMPLEMENTED_LOCAL_VERIFIED,package source edges and artifact hashes
+lock_source_policy,IMPLEMENTED_LOCAL_VERIFIED,VCS path editable sources fail closed
+lock_human_approval,IMPLEMENTED_EXECUTION_PENDING,reviewer time token and candidate SHA required
+lock_cross_hash_preflight,IMPLEMENTED_LOCAL_VERIFIED,lock report approval and lane must agree
 frozen_import_device_probe,IMPLEMENTED_EXECUTION_PENDING,exact imported versions and CUDA availability
 six_case_runtime_campaign,IMPLEMENTED_EXECUTION_PENDING,draw and calendar across three covariate modes
 serial_gpu_evidence_isolation,IMPLEMENTED,parallel case execution forbidden

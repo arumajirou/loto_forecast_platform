@@ -147,11 +147,23 @@ def _artifact_manifest(output_dir: Path) -> dict[str, Any]:
 
 def run_campaign(arguments: argparse.Namespace) -> dict[str, Any]:
     if arguments.runtime_lane not in RUNTIME_LANES:
-        raise RuntimeCampaignError(f"unsupported runtime lane: {arguments.runtime_lane}")
-    if arguments.device == "cuda" and arguments.runtime_lane != "cuda13-experimental":
-        raise RuntimeCampaignError("CUDA campaign requires cuda13-experimental lane")
-    if arguments.monitor_interval_seconds <= 0 or arguments.monitor_interval_seconds > 5:
-        raise RuntimeCampaignError("monitor interval must be in the range (0, 5]")
+        raise RuntimeCampaignError(
+            f"unsupported runtime lane: {arguments.runtime_lane}"
+        )
+    if (
+        arguments.device == "cuda"
+        and arguments.runtime_lane != "cuda13-experimental"
+    ):
+        raise RuntimeCampaignError(
+            "CUDA campaign requires cuda13-experimental lane"
+        )
+    if (
+        arguments.monitor_interval_seconds <= 0
+        or arguments.monitor_interval_seconds > 5
+    ):
+        raise RuntimeCampaignError(
+            "monitor interval must be in the range (0, 5]"
+        )
     if not CERTIFIER.is_file():
         raise RuntimeCampaignError(f"P8 certifier is missing: {CERTIFIER}")
 
@@ -159,7 +171,9 @@ def run_campaign(arguments: argparse.Namespace) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=False)
     selected_cases = tuple(arguments.case or FORMAL_CASE_NAMES)
     if len(selected_cases) != len(set(selected_cases)):
-        raise RuntimeCampaignError("selected certification cases must be unique")
+        raise RuntimeCampaignError(
+            "selected certification cases must be unique"
+        )
     campaign_config = {
         "schema_version": "moirai2-p8-runtime-campaign-v1",
         "campaign_id": arguments.campaign_id,
@@ -182,6 +196,7 @@ def run_campaign(arguments: argparse.Namespace) -> dict[str, Any]:
     lane_evidence = validate_lane_files(
         RUNTIME_LANES[arguments.runtime_lane],
         arguments.snapshot_path,
+        runtime_lane=arguments.runtime_lane,
     )
     probe = run_frozen_probe(
         environment_path=RUNTIME_LANES[arguments.runtime_lane],
@@ -223,7 +238,10 @@ def run_campaign(arguments: argparse.Namespace) -> dict[str, Any]:
             "campaign_id": arguments.campaign_id,
             "selected_cases": list(request_paths),
             "formal_runtime_certified": False,
-            "message": "preflight and request generation passed; inference was not run",
+            "message": (
+                "preflight and request generation passed; "
+                "inference was not run"
+            ),
         }
     else:
         case_results = [
@@ -246,26 +264,45 @@ def run_campaign(arguments: argparse.Namespace) -> dict[str, Any]:
         summary["campaign_id"] = arguments.campaign_id
         summary["preflight_status"] = "PASS"
     _write_json(output_dir / "campaign_summary.json", summary)
-    _write_json(output_dir / "ARTIFACT_MANIFEST.json", _artifact_manifest(output_dir))
+    _write_json(
+        output_dir / "ARTIFACT_MANIFEST.json",
+        _artifact_manifest(output_dir),
+    )
     write_sha256_manifest(output_dir, output_dir / "SHA256SUMS")
     return summary
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Run the six-case Moirai 2.0 target-host certification campaign"
+        description=(
+            "Run the six-case Moirai 2.0 target-host "
+            "certification campaign"
+        )
     )
     parser.add_argument("--campaign-id", required=True)
     parser.add_argument("--snapshot-path", required=True, type=Path)
-    parser.add_argument("--runtime-lane", required=True, choices=sorted(RUNTIME_LANES))
+    parser.add_argument(
+        "--runtime-lane",
+        required=True,
+        choices=sorted(RUNTIME_LANES),
+    )
     parser.add_argument("--device", required=True, choices=("cpu", "cuda"))
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--case", action="append", choices=FORMAL_CASE_NAMES)
     parser.add_argument("--history-length", type=int, default=128)
     parser.add_argument("--context-length", type=int, default=128)
-    parser.add_argument("--prediction-length", type=int, default=1, choices=(1, 2, 5))
+    parser.add_argument(
+        "--prediction-length",
+        type=int,
+        default=1,
+        choices=(1, 2, 5),
+    )
     parser.add_argument("--timeout-seconds", type=int, default=1800)
-    parser.add_argument("--monitor-interval-seconds", type=float, default=0.25)
+    parser.add_argument(
+        "--monitor-interval-seconds",
+        type=float,
+        default=0.25,
+    )
     parser.add_argument("--prepare-only", action="store_true")
     arguments = parser.parse_args()
     try:
@@ -288,7 +325,10 @@ def main() -> int:
             arguments.output_dir / "ARTIFACT_MANIFEST.json",
             _artifact_manifest(arguments.output_dir),
         )
-        write_sha256_manifest(arguments.output_dir, arguments.output_dir / "SHA256SUMS")
+        write_sha256_manifest(
+            arguments.output_dir,
+            arguments.output_dir / "SHA256SUMS",
+        )
         return 2
     return 0 if summary.get("status") in {"PASS", "PREPARED"} else 2
 

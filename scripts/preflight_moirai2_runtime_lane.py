@@ -46,6 +46,7 @@ def main() -> int:
         lane_evidence = validate_lane_files(
             RUNTIME_LANES[arguments.runtime_lane],
             arguments.snapshot_path,
+            runtime_lane=arguments.runtime_lane,
         )
         probe = run_frozen_probe(
             environment_path=RUNTIME_LANES[arguments.runtime_lane],
