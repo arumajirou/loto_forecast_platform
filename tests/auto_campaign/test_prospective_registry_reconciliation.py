@@ -1,13 +1,28 @@
 from __future__ import annotations
 
-import json
 import shutil
 from pathlib import Path
 from typing import Any
 
 import pytest
 
-from loto.auto_campaign.prospective_registry_contract import _canonical_sha256
+from loto.auto_campaign import prospective_registry_reconciliation_expected as expected_module
+from loto.auto_campaign.persistence import (
+    sha256_file,
+    write_json,
+    write_sha256s,
+)
+from loto.auto_campaign.prospective_registry_contract import (
+    BACKEND_RECEIPTS,
+    REGISTRY_MANIFEST,
+    REGISTRY_PAYLOAD,
+    REGISTRY_REPORT,
+    REGISTRY_SCHEMA_VERSION,
+    _canonical_sha256,
+)
+from loto.auto_campaign.prospective_registry_payload import (
+    _registry_file_inventory,
+)
 from loto.auto_campaign.prospective_registry_reconciliation import (
     ReconciliationBackendFunctions,
     ReconciliationOptions,
@@ -114,6 +129,134 @@ def _expected() -> dict[str, Any]:
     return expected
 
 
+def _valid_registry_receipt(
+    root: Path,
+    expected: dict[str, Any],
+) -> Path:
+    """Create the smallest registry receipt accepted by the real verifier."""
+
+    root.mkdir()
+
+    receipts = {
+        "postgres_prepare": {
+            "backend": "postgres",
+            "status": "PASS",
+            "phase": "PREPARED",
+        },
+        "mlflow": {
+            "backend": "mlflow",
+            "status": "PASS",
+            "parent_run_id": "parent-1",
+        },
+        "postgres_finalize": {
+            "backend": "postgres",
+            "status": "PASS",
+            "phase": "FINALIZED",
+            "mlflow_parent_run_id": "parent-1",
+        },
+    }
+
+    payload = {
+        "schema_version": REGISTRY_SCHEMA_VERSION,
+        "registry_id": expected["registry_id"],
+        "registry_namespace": expected["registry_namespace"],
+        "scoring_id": expected["scoring_id"],
+        "created_at": expected["created_at"],
+        "source": {
+            # Deliberately unavailable. The registry verifier records
+            # source_reverification=NOT_AVAILABLE without weakening
+            # receipt integrity verification.
+            "scoring_root": str(root.parent / "unavailable-source-scoring"),
+        },
+        "metric_policy": {
+            "priority_metric": "hit_pm1",
+            "secondary_metrics": [
+                "all_positions_hit_pm1",
+                "mae",
+                "mse",
+                "rmse",
+            ],
+            "aggregation": [
+                "per_seed",
+                "mean",
+                "variance",
+                "minimum",
+                "maximum",
+                "worst_seed",
+            ],
+            "best_seed_only_selection": False,
+        },
+        "backend_policy": {
+            "required_backends": ["postgres", "mlflow"],
+        },
+        "counts": dict(expected["counts"]),
+        "scoring_report": {},
+    }
+
+    payload["payload_sha256"] = _canonical_sha256(payload)
+
+    write_json(
+        root / REGISTRY_PAYLOAD,
+        payload,
+    )
+
+    backend_receipts = {
+        "attempted": sorted(receipts),
+        "receipts": receipts,
+    }
+
+    write_json(
+        root / BACKEND_RECEIPTS,
+        backend_receipts,
+    )
+
+    report = {
+        "schema_version": REGISTRY_SCHEMA_VERSION,
+        "status": "PASS",
+        "registry_id": expected["registry_id"],
+        "registry_namespace": expected["registry_namespace"],
+        "scoring_id": expected["scoring_id"],
+        "payload_sha256": payload["payload_sha256"],
+        "source_reverification": "NOT_AVAILABLE",
+        "receipts": receipts,
+        "source_evidence": [],
+        "safety": {
+            "source_scoring_mutated": False,
+            "automatic_promotion": False,
+            "automatic_retraining": False,
+            "best_seed_only_selection": False,
+            "secrets_persisted": False,
+        },
+    }
+
+    write_json(
+        root / REGISTRY_REPORT,
+        report,
+    )
+
+    manifest = {
+        "schema_version": REGISTRY_SCHEMA_VERSION,
+        "status": "PASS",
+        "registry_id": expected["registry_id"],
+        "scoring_id": expected["scoring_id"],
+        "payload_sha256": payload["payload_sha256"],
+        "registry_report_sha256": sha256_file(root / REGISTRY_REPORT),
+        "backend_receipts_sha256": sha256_file(root / BACKEND_RECEIPTS),
+        "files": _registry_file_inventory(root),
+    }
+
+    manifest["manifest_sha256"] = _canonical_sha256(manifest)
+
+    write_json(
+        root / REGISTRY_MANIFEST,
+        manifest,
+    )
+
+    write_sha256s(root)
+
+    return root
+
+
 def _postgres(expected: dict[str, Any]) -> dict[str, Any]:
     source = expected["source"]
     return {
@@ -197,12 +340,15 @@ def test_backend_snapshots_match_expected_contract() -> None:
     expected = _expected()
 
     assert _compare_postgres(expected, _postgres(expected), 1e-12) == []
-    assert _compare_mlflow(
-        expected,
-        _mlflow(expected),
-        1e-12,
-        require_remote_artifacts=True,
-    ) == []
+    assert (
+        _compare_mlflow(
+            expected,
+            _mlflow(expected),
+            1e-12,
+            require_remote_artifacts=True,
+        )
+        == []
+    )
 
 
 def test_postgres_duplicate_and_metric_drift_are_detected() -> None:
@@ -241,20 +387,19 @@ def test_reconciliation_pass_is_self_contained(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     expected = _expected()
-    receipt = tmp_path / "receipt"
-    receipt.mkdir()
-    (receipt / "marker.txt").write_text("immutable\n", encoding="utf-8")
+    receipt = _valid_registry_receipt(
+        tmp_path / "receipt",
+        expected,
+    )
     output = tmp_path / "reconciliation"
     calls: list[str] = []
 
     monkeypatch.setattr(
-        "loto.auto_campaign.prospective_registry_reconciliation."
-        "verify_prospective_registry",
+        "loto.auto_campaign.prospective_registry_reconciliation.verify_prospective_registry",
         lambda _root: {"status": "PASS", "failures": []},
     )
     monkeypatch.setattr(
-        "loto.auto_campaign.prospective_registry_reconciliation."
-        "_expected_snapshot",
+        "loto.auto_campaign.prospective_registry_reconciliation._expected_snapshot",
         lambda _root: expected,
     )
     monkeypatch.setenv("TEST_POSTGRES_DSN", "postgresql://user:secret@db/loto")
@@ -295,17 +440,16 @@ def test_reconciliation_distinguishes_drift_from_blocked(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     expected = _expected()
-    receipt = tmp_path / "receipt"
-    receipt.mkdir()
-    (receipt / "marker.txt").write_text("immutable\n", encoding="utf-8")
+    receipt = _valid_registry_receipt(
+        tmp_path / "receipt",
+        expected,
+    )
     monkeypatch.setattr(
-        "loto.auto_campaign.prospective_registry_reconciliation."
-        "verify_prospective_registry",
+        "loto.auto_campaign.prospective_registry_reconciliation.verify_prospective_registry",
         lambda _root: {"status": "PASS", "failures": []},
     )
     monkeypatch.setattr(
-        "loto.auto_campaign.prospective_registry_reconciliation."
-        "_expected_snapshot",
+        "loto.auto_campaign.prospective_registry_reconciliation._expected_snapshot",
         lambda _root: expected,
     )
     monkeypatch.setenv("TEST_POSTGRES_DSN", "postgresql://db/loto")
@@ -348,8 +492,7 @@ def test_output_inside_source_is_rejected_before_parent_creation(
     target_parent = receipt / "new-directory"
     target = target_parent / "reconciliation"
     monkeypatch.setattr(
-        "loto.auto_campaign.prospective_registry_reconciliation."
-        "verify_prospective_registry",
+        "loto.auto_campaign.prospective_registry_reconciliation.verify_prospective_registry",
         lambda _root: {"status": "PASS", "failures": []},
     )
 
@@ -368,18 +511,17 @@ def test_reconciliation_mutation_is_detected(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     expected = _expected()
-    receipt = tmp_path / "receipt"
-    receipt.mkdir()
-    (receipt / "marker.txt").write_text("immutable\n", encoding="utf-8")
+    receipt = _valid_registry_receipt(
+        tmp_path / "receipt",
+        expected,
+    )
     output = tmp_path / "reconciliation"
     monkeypatch.setattr(
-        "loto.auto_campaign.prospective_registry_reconciliation."
-        "verify_prospective_registry",
+        "loto.auto_campaign.prospective_registry_reconciliation.verify_prospective_registry",
         lambda _root: {"status": "PASS", "failures": []},
     )
     monkeypatch.setattr(
-        "loto.auto_campaign.prospective_registry_reconciliation."
-        "_expected_snapshot",
+        "loto.auto_campaign.prospective_registry_reconciliation._expected_snapshot",
         lambda _root: expected,
     )
     monkeypatch.setenv("TEST_POSTGRES_DSN", "postgresql://db/loto")
@@ -399,3 +541,138 @@ def test_reconciliation_mutation_is_detected(
 
     assert verified["status"] == "FAIL"
     assert verified["failures"]
+
+
+def test_expected_snapshot_builds_real_expected_payload(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class _Frame:
+        def __init__(self, rows: list[dict[str, Any]]) -> None:
+            self.rows = rows
+
+        def to_dict(
+            self,
+            *,
+            orient: str,
+        ) -> list[dict[str, Any]]:
+            assert orient == "records"
+            return self.rows
+
+    payload = {
+        "registry_id": "registry-1",
+        "registry_namespace": "production",
+        "scoring_id": "score-1",
+        "payload_sha256": "a" * 64,
+        "created_at": "2026-08-05T00:00:00+00:00",
+        "source": {
+            "prediction_lock_sha256": "b" * 64,
+            "scoring_report_sha256": "c" * 64,
+            "artifact_manifest_sha256": "d" * 64,
+            "scoring_sha256s_sha256": "e" * 64,
+        },
+        "counts": {
+            "candidate_count": 1,
+            "seed_metric_rows": 1,
+            "position_metric_rows": 1,
+            "artifact_rows": 1,
+        },
+        "backend_policy": {
+            "postgres_dsn_env": "TEST_POSTGRES_DSN",
+            "mlflow_uri_env": "TEST_MLFLOW_URI",
+            "mlflow_experiment": "test-experiment",
+            "artifact_mode": "metadata",
+        },
+    }
+
+    documents = {
+        "REGISTRY_PAYLOAD.json": payload,
+        "REGISTRY_REPORT.json": {
+            "status": "PASS",
+        },
+        "BACKEND_RECEIPTS.json": {
+            "receipts": {
+                "mlflow": {
+                    "parent_run_id": "parent-1",
+                },
+                "postgres_finalize": {
+                    "mlflow_parent_run_id": "parent-1",
+                },
+            },
+        },
+    }
+
+    monkeypatch.setattr(
+        expected_module,
+        "_read_json",
+        lambda path, _label: documents[path.name],
+    )
+
+    monkeypatch.setattr(
+        expected_module,
+        "_read_registry_tables",
+        lambda _root: {
+            "seed_summary": object(),
+            "ranking": object(),
+            "seed_metrics": object(),
+            "position_metrics": object(),
+        },
+    )
+
+    monkeypatch.setattr(
+        expected_module,
+        "_candidate_frame",
+        lambda *_args: _Frame([{"candidate_key": "candidate-1"}]),
+    )
+
+    monkeypatch.setattr(
+        expected_module,
+        "_seed_metric_frame",
+        lambda *_args: _Frame([{"candidate_key": "candidate-1", "seed": 1}]),
+    )
+
+    monkeypatch.setattr(
+        expected_module,
+        "_position_metric_frame",
+        lambda *_args: _Frame(
+            [
+                {
+                    "candidate_key": "candidate-1",
+                    "position": "P1",
+                }
+            ]
+        ),
+    )
+
+    monkeypatch.setattr(
+        expected_module,
+        "_expected_artifacts",
+        lambda *_args: [
+            {
+                "registry_id": "registry-1",
+                "path": "SCORING_REPORT.json",
+                "size_bytes": 1,
+                "sha256": "f" * 64,
+            }
+        ],
+    )
+
+    monkeypatch.setattr(
+        expected_module,
+        "sha256_file",
+        lambda _path: "9" * 64,
+    )
+
+    monkeypatch.setattr(
+        expected_module.pd,
+        "DataFrame",
+        lambda rows: _Frame(list(rows)),
+    )
+
+    result = expected_module._expected_snapshot(tmp_path)
+
+    assert result["schema_version"] == "all-auto-prospective-registry-reconciliation-v1"
+    assert result["registry_id"] == "registry-1"
+    assert result["receipt_mlflow_parent_run_id"] == "parent-1"
+    assert result["candidates"] == [{"candidate_key": "candidate-1"}]
+    assert len(result["expected_sha256"]) == 64
