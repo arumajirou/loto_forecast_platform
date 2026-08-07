@@ -26,9 +26,3 @@
 
 Hermetic tests validate project-side contracts and comparison logic only. They are not model
 runtime or forecasting-performance evidence.
-## P1 reviewed lock workflow
-
-Local pure tests and orchestration smoke are complete. The implementation rejects unsafe package
-sources, missing hashes, incompatible direct versions, unrecognized TiRex-2 artifacts, invalid
-approval evidence, and installed-lock tampering. A real `uv lock` resolution, complete human
-review, frozen synchronization, package import, and model execution remain pending.
