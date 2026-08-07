@@ -21,6 +21,14 @@ on:
         required: true
         default: false
         type: boolean
+      dependency_profile:
+        description: Run a focused dependency validation profile
+        required: true
+        default: none
+        type: choice
+        options:
+          - none
+          - postgres
 
 permissions:
   contents: read
@@ -73,9 +81,77 @@ jobs:
           git diff --exit-code
           git diff --cached --exit-code
 
+  dependency-smoke:
+    name: Local dependency smoke (${{ inputs.dependency_profile }})
+    if: ${{ github.actor == github.repository_owner && !inputs.actions_only && inputs.dependency_profile != 'none' }}
+    runs-on: [self-hosted, linux, x64, loto-ci]
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@v7
+        with:
+          clean: true
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Configure uv cache
+        run: |
+          set -Eeuo pipefail
+          printf 'UV_CACHE_DIR=%s
+' "$RUNNER_TEMP/uv-dependency-cache" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/uv-dependency-cache"
+
+      - name: Verify locked dependency graph
+        run: |
+          set -Eeuo pipefail
+          command -v uv
+          uv --version
+          uv lock --check
+
+      - name: Postgres dependency smoke
+        if: ${{ inputs.dependency_profile == 'postgres' }}
+        run: |
+          set -Eeuo pipefail
+
+          uv sync             --frozen             --python "3.13"             --extra postgres
+
+          uv pip check --python .venv/bin/python
+
+          uv run --frozen python - <<'PY'
+          import psycopg
+          from importlib.metadata import version
+
+          installed = version("psycopg")
+          print(f"psycopg={installed}")
+          print(f"psycopg_module={psycopg.__name__}")
+
+          parts = tuple(int(p) for p in installed.split(".")[:3])
+          assert parts >= (3, 3, 4), installed
+          PY
+
+      - name: Verify tracked files stayed clean
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          git diff --exit-code
+          git diff --cached --exit-code
+
   gpu-ci:
     name: Local GPU CI (${{ inputs.suite }})
-    if: ${{ github.actor == github.repository_owner && !inputs.actions_only }}
+    if: ${{ github.actor == github.repository_owner && !inputs.actions_only && inputs.dependency_profile == 'none' }}
     runs-on: [self-hosted, linux, x64, loto-ci, gpu, cuda]
     timeout-minutes: 360
 
