@@ -26,8 +26,6 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
-from loto.version import __version__
-
 __all__ = [
     "MANIFEST_NAME",
     "DEFAULT_EXCLUDES",
@@ -179,7 +177,7 @@ class IntegrityReport:
 def generate_manifest(
     root: str | Path,
     *,
-    release: str = __version__,
+    release: str = "3.0.0",
     excludes: tuple[str, ...] = DEFAULT_EXCLUDES,
     write: bool = True,
 ) -> dict[str, object]:
@@ -276,7 +274,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     gen = sub.add_parser("generate", help="write INTEGRITY.json")
     gen.add_argument("root", nargs="?", default=".")
-    gen.add_argument("--release", default=__version__)
+    gen.add_argument("--release", default="3.0.0")
     chk = sub.add_parser("check", help="verify a tree against INTEGRITY.json")
     chk.add_argument("root", nargs="?", default=".")
     chk.add_argument("--manifest", default=None)
