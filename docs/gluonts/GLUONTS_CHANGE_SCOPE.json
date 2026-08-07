@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "phase": "P7D_EVIDENCE_HANDOFF",
+  "status": "PARTIALLY_VERIFIED",
+  "base_sha": "d6d0e5eae5d055ff545cae5467a1d6775c6e5bd0",
+  "branch": "feat/gluonts-probabilistic-contract-v1",
+  "owned_paths": [
+    "environments/gluonts-compat/**",
+    "environments/gluonts-latest/**",
+    "environments/gluonts-p7-target-machine.sh",
+    "environments/gluonts-p7b-*.sh",
+    "environments/gluonts-p7c-*.sh",
+    "environments/gluonts-p7d-*.sh",
+    "environments/gluonts_p7b/**",
+    "src/loto/adapters/gluonts/**",
+    "src/loto/gluonts_campaign/**",
+    "tests/adapters/gluonts/**",
+    "tests/gluonts_campaign/**",
+    "docs/gluonts/**"
+  ],
+  "forbidden_paths": [
+    "pyproject.toml",
+    "uv.lock",
+    "src/loto/models/workers.py",
+    "src/loto/models/catalog_full.py",
+    ".github/workflows/**",
+    "README.md"
+  ],
+  "implemented_operations": [
+    "fit_predict",
+    "load_predict",
+    "evaluate",
+    "backtest",
+    "model_discovery",
+    "distribution_discovery",
+    "runtime_certify",
+    "p6_campaign",
+    "p7_cross_lane_audit",
+    "p7b_target_machine_supervision",
+    "p7c_result_triage",
+    "p7c_remediation_queue",
+    "p7d_evidence_bundle_export",
+    "p7d_evidence_bundle_verify",
+    "p7d_safe_bundle_extract",
+    "p8_eligibility_gate"
+  ],
+  "model_count_per_lane": 9,
+  "maximum_model_lane_lifecycles": 18,
+  "outer_workers_per_lane": 8,
+  "threads_per_job": 1,
+  "certification_device": "cpu",
+  "p7c_remediation_classes": [
+    "VERIFIED",
+    "EVIDENCE_REPAIR",
+    "ENVIRONMENT_REPAIR",
+    "IMPLEMENTATION_REPAIR",
+    "TRANSIENT_RETRY",
+    "MANUAL_TRIAGE"
+  ],
+  "p7d_bundle_members": [
+    "P7D_BUNDLE_MANIFEST.json",
+    "P7D_SHA256SUMS",
+    "P7D_BUNDLE_COMPLETE",
+    "run/**"
+  ],
+  "p7d_sidecar": "<archive>.zip.sha256",
+  "p7d_verification_outputs": [
+    "p7d_verification_report.json",
+    "P7D_VERIFY_SHA256SUMS"
+  ],
+  "p7d_rejected_archive_features": [
+    "duplicate_member",
+    "absolute_path",
+    "path_traversal",
+    "backslash_path",
+    "symlink_member",
+    "encrypted_member",
+    "unsupported_compression",
+    "unsafe_expansion",
+    "checksum_mismatch",
+    "nested_identity_mismatch"
+  ],
+  "p8_gate": {
+    "evidence_state": "VALID",
+    "certification_status": "VERIFIED",
+    "verified_model_lane_lifecycles": 18,
+    "p8_eligible": true
+  },
+  "p7d_focused_and_public_api_tests": 13,
+  "real_runtime_claims": "EXECUTION_PENDING",
+  "real_p7d_bundle": "EXECUTION_PENDING",
+  "formally_verified_model_lane_lifecycles": 0,
+  "next_phase": "P7E_TARGET_MACHINE_EVIDENCE_INTAKE_AND_REMEDIATION",
+  "merge_policy": "DRAFT_PR_MANUAL_MERGE_ONLY"
+}

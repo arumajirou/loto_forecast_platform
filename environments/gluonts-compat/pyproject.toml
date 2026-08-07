@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loto-gluonts-provider-compat"
+version = "0.1.0"
+description = "Isolated GluonTS 0.16.3 provider for loto_forecast_platform"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "gluonts[torch]==0.16.3",
+  "torch==2.9.1",
+  "lightning>=2.2.2,<2.5",
+  "pytorch-lightning>=2.2.2,<2.5",
+  "pydantic>=2.10,<3",
+  "numpy>=2,<3",
+  "pandas>=2.2,<3",
+]
+
+[project.scripts]
+loto-gluonts-provider = "loto_gluonts_provider:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.9", "mypy>=1.14"]

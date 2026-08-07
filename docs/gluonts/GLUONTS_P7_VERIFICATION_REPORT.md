@@ -1,0 +1,216 @@
+# GluonTS P7 target-machine evidence audit
+
+## Status
+
+```text
+PHASE=GLUONTS_P7
+STATUS=PARTIALLY_VERIFIED
+P7_AUDIT_FRAMEWORK=VERIFIED_WITH_SYNTHETIC_EVIDENCE
+REAL_TARGET_MACHINE_RUN=EXECUTION_PENDING
+FORMALLY_VERIFIED_MODEL_LANE_LIFECYCLES=0
+```
+
+## Purpose
+
+P7 separates two questions that must not be conflated:
+
+1. Is the collected evidence complete and untampered?
+2. Did every model lifecycle actually pass?
+
+A model failure may still produce valid evidence. Conversely, a result claiming
+success is not accepted when its checksum inventory, provenance, lockfile,
+registry, process identity, or lane identity cannot be verified.
+
+## Target-machine command
+
+```bash
+bash environments/gluonts-p7-target-machine.sh
+```
+
+The runner executes the compatibility and latest lanes sequentially. Each lane
+continues to use up to eight outer model workers and one CPU thread per provider
+job. Sequential lane execution avoids mixing the two isolated dependency sets.
+
+## Exit codes
+
+```text
+0 = evidence valid and all 18 model-lane lifecycles VERIFIED
+2 = evidence valid or incomplete, but certification not complete
+3 = evidence invalid, tampered, or audit runtime unavailable
+```
+
+A non-zero lifecycle result is preserved and classified before the runner exits.
+
+## P7 validation chain
+
+For each lane, P7 verifies:
+
+```text
+P6_SHA256SUMS syntax and every listed digest
+exact file inventory, including rejection of post-run additions
+campaign result file SHA-256
+canonical campaign payload SHA-256
+campaign manifest identity
+campaign/provenance run, lane, status, and worker identity
+lane pyproject.toml SHA-256
+lane uv.lock SHA-256
+P6 registry source SHA-256
+P6 contract source SHA-256
+isolated Python executable and sys.prefix
+non-null GluonTS and Torch versions
+exact nine-model order and set
+per-model manifest identity and distinct fit/load PIDs
+cross-lane registry and model-set equality
+```
+
+Absolute checksum paths are accepted only when they resolve inside the artifact
+root. Relative parent traversal, paths outside the root, duplicate entries,
+missing entries, stale entries, and additional unlisted files fail closed.
+
+## Evidence and certification states
+
+Evidence state:
+
+```text
+VALID
+INCOMPLETE
+INVALID
+```
+
+Certification state:
+
+```text
+VERIFIED
+PARTIALLY_VERIFIED
+BLOCKED
+FAILED
+NOT_EVALUATED
+```
+
+`INVALID` evidence always produces `NOT_EVALUATED`; it is never converted into a
+model failure. `INCOMPLETE` evidence is reported as blocked rather than tampered.
+
+## Failure classification
+
+P7 retains the P6 model-stage categories and adds audit-level categories:
+
+```text
+BOOTSTRAP_FAILED
+MISSING_ARTIFACT
+CHECKSUM_MISMATCH
+CHECKSUM_INVENTORY_MISMATCH
+MANIFEST_MISMATCH
+PROVENANCE_MISMATCH
+LOCKFILE_MISMATCH
+REGISTRY_MISMATCH
+MODEL_SET_MISMATCH
+PROVIDER_CRASH
+TIMEOUT
+```
+
+The output matrix records lane, model, failed stage, fit and reload status,
+manifest identity, process IDs, category, and errors.
+
+## Artifacts
+
+```text
+artifacts/gluonts-p7/<run-id>/
+├── RUN_ID
+├── compat/
+│   └── complete P6 artifact tree
+├── latest/
+│   └── complete P6 artifact tree
+├── audit/
+│   ├── p7_target_machine_audit.json
+│   ├── p7_failure_matrix.json
+│   ├── p7_artifact_manifest.json
+│   └── P7_SHA256SUMS
+├── compat_bootstrap.stdout.log
+├── compat_bootstrap.stderr.log
+├── compat_bootstrap.rc
+├── latest_bootstrap.stdout.log
+├── latest_bootstrap.stderr.log
+├── latest_bootstrap.rc
+├── p7_audit.stdout.log
+├── p7_audit.stderr.log
+├── p7_audit.rc
+├── gpu_process_monitor.log
+└── P7_EXECUTION_SHA256SUMS
+```
+
+The GPU monitor samples active compute process PID, process name, and used GPU
+memory every two seconds. This is retained as operational evidence. Formal CPU
+certification still depends on the provider's observed model parameter devices,
+not merely on an empty GPU snapshot.
+
+## P6 provenance correction
+
+The P6 bootstrap previously generated provenance with bare `python` after
+installing the lane environment. That could record the system interpreter and
+system package versions instead of the isolated lane.
+
+Both lane scripts now use:
+
+```bash
+uv run --project "${ROOT}" python - ...
+```
+
+The provenance now also records Python executable, Python prefix, process ID,
+platform, machine, Torch import state, CUDA availability, CUDA device count, and
+device names. P7 rejects provenance whose executable or prefix is outside the
+lane directory.
+
+## Focused verification
+
+```text
+P7_AUDIT_TESTS=9 passed
+P7_COMPILEALL=PASS
+P7_TARGET_RUNNER_BASH_SYNTAX=PASS
+P6_COMPAT_BOOTSTRAP_BASH_SYNTAX=PASS
+P6_LATEST_BOOTSTRAP_BASH_SYNTAX=PASS
+P7_MAXIMUM_PYTHON_LINE_LENGTH=99
+```
+
+The tests cover:
+
+1. all 18 model-lane lifecycles verified,
+2. valid evidence containing a model fit failure,
+3. modified file digest mismatch,
+4. unlisted post-run file detection,
+5. incomplete bootstrap classification,
+6. cross-lane registry divergence,
+7. lockfile drift after execution,
+8. absolute checksum paths inside the artifact root,
+9. provenance generated by a non-isolated Python interpreter.
+
+## Defects found and corrected
+
+1. Two `.p6-tree-probe*` files had been committed and were removed.
+2. The main change-scope file still described P5 after P6 completion.
+3. The P6 scope still described only the P6A constructor matrix.
+4. P6 provenance could be generated by the system Python.
+5. P6 checksum paths were changed to artifact-root-relative paths for portable
+   verification.
+
+## Certification boundary
+
+The available execution environment cannot resolve or install the pinned
+GluonTS lane packages. Therefore P7 does not claim:
+
+- successful target-machine `uv lock` or `uv sync`,
+- real execution of either nine-model campaign,
+- real Predictor serialization or cross-process reload,
+- real finite output, shape, or CPU parameter-device evidence,
+- absence of provider PIDs from GPU VRAM during execution,
+- any OOF, Holdout, Prospective, Hit@±1, MAE, MSE, or RMSE result.
+
+Real remediation must be based on `p7_failure_matrix.json` from the target
+machine. No compatibility workaround should be applied from synthetic tests
+alone.
+
+## Next phase
+
+P7B runs the target-machine command, preserves both lane trees, classifies each
+real failure, and changes only incompatibilities demonstrated by those artifacts.
+After all 18 lifecycles are formally verified, P8 can begin chronological OOF,
+Holdout, and Prospective accuracy evaluation against the required baselines.
