@@ -9,10 +9,16 @@ runtime_certification_schema_version=1.0.0
 All Pydantic models use:
 
 ```python
-ConfigDict(extra="forbid", strict=True, frozen=True, validate_default=True)
+ConfigDict(
+    extra="forbid",
+    strict=True,
+    frozen=True,
+    validate_default=True,
+    allow_inf_nan=False,
+)
 ```
 
-Unknown fields and implicit string-to-number conversion are rejected.
+Unknown fields, implicit string-to-number conversion, NaN and Infinity are rejected.
 
 ## Identity records
 
@@ -61,13 +67,18 @@ symlinks are rejected before model loading.
 
 - unique run label;
 - optional launcher-visible PID;
-- timezone-aware start and finish times;
+- optional process-instance SHA-256 derived from Linux boot ID and process start ticks;
+- timezone-aware UTC start and finish times;
 - exit code or timeout, never both;
 - stdout/stderr SHA-256;
 - optional response SHA-256.
 
-Provider PID identity is retained separately in `DeviceEvidence`, because a generic
-`subprocess.run()` boundary does not expose the child PID after completion.
+`CommandSpec.environment` rejects credential-bearing names, control characters and known
+process-injection keys such as `LD_PRELOAD` and `PYTHONPATH`. The real executor inherits only a
+small host-environment allowlist and does not copy the complete host environment to providers.
+
+REAL device evidence must carry the same process-instance SHA-256 as the executor-owned process
+record. This prevents a later process that reused the same numeric PID from satisfying the binding.
 
 ## Output contract
 
@@ -90,6 +101,7 @@ Requires:
 - requested and effective device both CPU;
 - `cpu_fallback=false`;
 - no GPU PID, UUID, VRAM or external GPU samples.
+- provider PID released after exit.
 
 ### GPU_FORMAL
 
@@ -101,6 +113,7 @@ Requires:
 - non-empty GPU UUID;
 - positive peak VRAM;
 - at least one matching external GPU sample;
+- matching process-instance SHA-256 in REAL external GPU evidence;
 - provider PID absent after exit.
 
 `origin=REAL|SYNTHETIC|INJECTED_FAKE` is mandatory. Report origin and device origin must match.
@@ -150,6 +163,9 @@ symlinked or changed files fail verification.
 The evidence ZIP is deterministic and accompanied by `<name>.zip.sha256`. ZIP verification is
 read-only and checks byte hash, safe members, duplicate/casefold collisions, symlinks, encryption,
 CRC and bounded resource limits.
+
+Artifact writers refuse implicit overwrite and symlinked output targets. Callers must opt in
+explicitly to replacing an existing regular output.
 
 ## Non-claims
 
