@@ -14,6 +14,8 @@ from .portable_prediction_verification import (
     verify_portable_bundle_with_prediction_lock,
 )
 from .promotion_gate import GATED_STAGES
+from .prospective_scoring import score_locked_prospective_run
+from .prospective_scoring_verification import verify_prospective_scoring
 from .runner import inventory, load_config, plan, run_stage
 
 # Compatibility patch points retained for existing callers and stacked-PR tests.
@@ -91,6 +93,16 @@ def build_parser() -> argparse.ArgumentParser:
     export.add_argument("--output", type=Path, required=True)
     portable_verify = sub.add_parser("verify-portable")
     portable_verify.add_argument("--bundle", type=Path, required=True)
+    score = sub.add_parser("score-prospective")
+    score.add_argument("--run", type=Path, required=True)
+    score.add_argument("--actuals", type=Path, required=True)
+    score.add_argument("--history", type=Path, required=True)
+    score.add_argument("--output", type=Path, required=True)
+    score.add_argument("--random-seed", type=int, default=1)
+    score.add_argument("--actual-source-label", default="UNSPECIFIED")
+    score.add_argument("--actual-published-at", default=None)
+    scoring_verify = sub.add_parser("verify-scoring")
+    scoring_verify.add_argument("--run", type=Path, required=True)
     return parser
 
 
@@ -110,6 +122,26 @@ def _run_portable_command(args: argparse.Namespace, project: Path) -> dict[str, 
             }
     if args.command == "verify-portable":
         return verify_portable_bundle(_resolve_path(args.bundle, project))
+    if args.command == "score-prospective":
+        try:
+            return score_locked_prospective_run(
+                run_root=_resolve_path(args.run, project),
+                actuals_path=_resolve_path(args.actuals, project),
+                history_path=_resolve_path(args.history, project),
+                output=_resolve_path(args.output, project),
+                random_seed=args.random_seed,
+                actual_source_label=args.actual_source_label,
+                actual_published_at=args.actual_published_at,
+            )
+        except (OSError, RuntimeError, ValueError) as exc:
+            return {
+                "status": "FAIL",
+                "command": args.command,
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+            }
+    if args.command == "verify-scoring":
+        return verify_prospective_scoring(_resolve_path(args.run, project))
     return None
 
 
