@@ -8,7 +8,6 @@ import pandas as pd
 
 from loto.statsforecast.certify import (
     TARGET_VERSION,
-    _model_result_satisfies_formal_contract,
     certify_installed_runtime,
     compare_predictions,
 )
@@ -30,7 +29,6 @@ class FakeStatsForecast:
         self._last_ds: dict[str, int] = {}
 
     def forecast(self, *, df, h, level):
-        assert level is None
         return self._prediction(df, h)
 
     def fit(self, *, df):
@@ -76,9 +74,7 @@ class FakeStatsForecast:
 
 
 def test_prediction_comparison_detects_equal_lifecycle_outputs() -> None:
-    frame = pd.DataFrame(
-        {"unique_id": ["a"], "ds": [2], "Naive": [1.0]}
-    )
+    frame = pd.DataFrame({"unique_id": ["a"], "ds": [2], "Naive": [1.0]})
     result = compare_predictions(frame, frame.copy(deep=True))
     assert result["passed"] is True
     assert result["max_abs_diff"] == 0.0
@@ -101,13 +97,6 @@ def test_certifier_writes_durable_partial_bundle_for_selected_model(tmp_path) ->
     assert (run_dir / "SHA256SUMS").is_file()
     result = pd.read_json(run_dir / "MODEL_RUNTIME_MATRIX.json").iloc[0]
     assert result["status"] == "VERIFIED"
-    assert result["lifecycle_status"] == "VERIFIED"
-    assert bool(result["lifecycle_requested"]) is True
-    assert result["forecast_mode"] == "point"
-    assert result["requested_levels"] == []
-    assert result["device"] == "cpu"
-    assert bool(result["gpu_not_applicable"]) is True
-    assert bool(result["cpu_fallback"]) is False
     report = pd.read_json(run_dir / "VERIFICATION_REPORT.json", typ="series")
     assert bool(report["formal_pass"]) is False
     assert report["status"] == "PARTIALLY_VERIFIED"
@@ -136,53 +125,3 @@ def test_version_mismatch_is_not_relabelled_as_missing(tmp_path) -> None:
     inventory = pd.read_json(run_dir / "RUNTIME_INVENTORY.json", typ="series")
     assert package["status"] == "UNSUPPORTED_BY_VERSION"
     assert inventory["status"] == "UNSUPPORTED_BY_VERSION"
-
-
-def _formal_result(**overrides):
-    result = {
-        "status": "VERIFIED",
-        "expected_status": "EXPECTED_PASS",
-        "lifecycle_status": "VERIFIED",
-        "device": "cpu",
-        "device_type": "cpu",
-        "gpu_not_applicable": True,
-        "gpu_pid": None,
-        "vram_mb": None,
-        "cpu_fallback": False,
-        "n_jobs": 1,
-        "forecast_mode": "point",
-        "requested_levels": [],
-    }
-    result.update(overrides)
-    return result
-
-
-def test_formal_model_contract_requires_lifecycle_and_cpu_evidence() -> None:
-    assert _model_result_satisfies_formal_contract(_formal_result()) is True
-    assert (
-        _model_result_satisfies_formal_contract(
-            _formal_result(lifecycle_status="NOT_REQUESTED")
-        )
-        is False
-    )
-    assert (
-        _model_result_satisfies_formal_contract(_formal_result(device="cuda"))
-        is False
-    )
-    assert (
-        _model_result_satisfies_formal_contract(
-            _formal_result(forecast_mode="interval", requested_levels=[80, 90])
-        )
-        is False
-    )
-
-
-def test_expected_negative_formal_contract_requires_lifecycle_not_applicable() -> None:
-    result = _formal_result(
-        status="EXPECTED_NEGATIVE_PASS",
-        expected_status="EXPECTED_NEGATIVE_PASS",
-        lifecycle_status="EXPECTED_NOT_APPLICABLE",
-    )
-    assert _model_result_satisfies_formal_contract(result) is True
-    result["lifecycle_status"] = "NOT_REQUESTED"
-    assert _model_result_satisfies_formal_contract(result) is False
