@@ -18,13 +18,17 @@ Toto, Sundial, TabPFN, NeuralForecast, Merlion or StatsForecast, and they do not
 9. Fail on timeout and non-zero process exit.
 10. Exercise the complete two-process flow through an injected fake executor.
 
-## Evidence-origin tests
+## Evidence-origin and process-binding tests
 
 1. Real CPU evidence may produce `RUNTIME_CERTIFIED` with profile `CPU_SMOKE`.
 2. Complete synthetic CUDA evidence remains `PARTIALLY_VERIFIED` with profile `GPU_FORMAL`.
 3. Synthetic evidence cannot be relabelled as real runtime certification.
 4. Device/report origin mismatch fails closed.
 5. Runtime success retains `accuracy_status=NOT_EVALUATED`.
+6. Real evidence requires an observed provider process PID.
+7. Execution PID and device-evidence provider PID must match.
+8. An observation loader cannot replace executor-owned process evidence.
+9. The real subprocess executor records the started provider PID.
 
 ## Artifact tests
 
@@ -34,6 +38,8 @@ Toto, Sundial, TabPFN, NeuralForecast, Merlion or StatsForecast, and they do not
 4. Produce byte-identical evidence ZIPs from identical input trees.
 5. Verify the adjacent ZIP SHA-256 sidecar.
 6. Reject traversal and symlink ZIP members.
+7. Reject control characters in artifact paths before line-based manifest generation.
+8. Reject control characters in ZIP member names.
 
 ## Validation order
 
