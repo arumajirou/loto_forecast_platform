@@ -1,0 +1,48 @@
+schema_version: 1
+source_root: docs-public
+allowed_extensions:
+  - .html
+  - .css
+  - .txt
+  - .xml
+allowed_extensionless_files:
+  - .nojekyll
+required_files:
+  - index.html
+  - architecture.html
+  - evaluation.html
+  - security.html
+  - 404.html
+  - robots.txt
+  - assets/site.css
+max_file_bytes: 262144
+external_link_hosts:
+  - github.com
+  - docs.github.com
+external_embed_hosts: []
+blocked_path_components:
+  - runs
+  - artifacts
+  - logs
+  - raw
+  - data
+  - models
+  - secrets
+  - private
+blocked_text_patterns:
+  - '(?i)-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----'
+  - '(?i)github_pat_[A-Za-z0-9_]+'
+  - '(?i)gh[pousr]_[A-Za-z0-9]{20,}'
+  - '(?i)AKIA[0-9A-Z]{16}'
+  - '(?i)LOTO_POSTGRES_DSN'
+  - '(?i)MLFLOW_TRACKING_URI'
+  - '(?i)SMTP_(PASSWORD|TOKEN)'
+  - '(?i)authorization\s*:\s*bearer'
+  - '(?i)https?://[^\s/@]+:[^\s/@]+@'
+  - '(?i)(^|[\s"''(])(/home/|/mnt/|/Users/)'
+  - '(?i)[A-Z]:\\Users\\'
+  - '(?i)file://'
+  - '(?i)(localhost|127\.0\.0\.1|0\.0\.0\.0)'
+  - '(?i)https?://10\.'
+  - '(?i)https?://192\.168\.'
+  - '(?i)https?://172\.(1[6-9]|2[0-9]|3[01])\.'
