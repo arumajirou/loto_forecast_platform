@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "model_id": "toto-2.0-4m",
+  "repo_id": "Datadog/Toto-2.0-4m",
+  "revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+  "source_revision": "44ea4e88852228039564aa3e76fac26aafac0803",
+  "seed": 1,
+  "formal_context_lengths": [128, 256, 512],
+  "formal_prediction_lengths": [1, 2, 5],
+  "native_quantile_levels": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+  "point_method": "median_q0.5",
+  "game_ids": ["numbers3", "numbers4", "miniloto", "loto6", "loto7"],
+  "series_layouts": ["position_univariate", "position_multivariate"],
+  "local_files_only": true,
+  "root_runtime_inference_allowed": false,
+  "accuracy_certified": false,
+  "lottery_domain_compatibility_certified": false
+}
