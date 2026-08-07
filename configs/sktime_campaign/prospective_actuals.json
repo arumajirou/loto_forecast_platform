@@ -1,0 +1,22 @@
+{
+  "actuals": {
+    "game_id": "numbers3-synthetic-contract",
+    "revealed_at_utc": "2099-01-01T00:00:01Z",
+    "source_id": "synthetic-contract-only-not-real-actuals",
+    "source_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "draw_no": [1031, 1032, 1033],
+    "position_names": ["N1", "N2", "N3"],
+    "values": [
+      [0.0, 1.0, 2.0],
+      [1.0, 2.0, 3.0],
+      [2.0, 3.0, 4.0]
+    ]
+  },
+  "policy": {
+    "hit_at_1_target": 0.90,
+    "warning_hit_drop": 0.05,
+    "critical_hit_drop": 0.10,
+    "warning_mae_increase": 0.50,
+    "critical_mae_increase": 1.00
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "game_id": "numbers3-synthetic-contract",
+  "source_id": "synthetic-contract-actuals-after-p3-lock",
+  "draw_no": [1026, 1027, 1028, 1029, 1030],
+  "position_names": ["N1", "N2", "N3"],
+  "values": [
+    [5.0, 6.0, 7.0],
+    [6.0, 7.0, 8.0],
+    [7.0, 8.0, 9.0],
+    [8.0, 9.0, 0.0],
+    [9.0, 0.0, 1.0]
+  ],
+  "legal_min": [0, 0, 0],
+  "legal_max": [9, 9, 9]
+}

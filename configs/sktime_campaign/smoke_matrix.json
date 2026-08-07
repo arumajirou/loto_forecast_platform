@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "operation": "smoke_matrix",
+  "output_dir": "artifacts/sktime/smoke-matrix-example",
+  "environment_lane": "classic-py312",
+  "expected_sktime_version": "1.0.1",
+  "model_ids": [
+    "naive_last",
+    "polynomial_trend_d1",
+    "exponential_smoothing",
+    "theta"
+  ],
+  "forecast_horizon": [1, 2],
+  "series": [
+    4, 7, 3, 8, 6, 9, 5, 10,
+    7, 11, 8, 12, 9, 13, 10, 14,
+    11, 15, 12, 16, 13, 17, 14, 18
+  ],
+  "save_load": true,
+  "device": "cpu",
+  "seed": 1
+}
