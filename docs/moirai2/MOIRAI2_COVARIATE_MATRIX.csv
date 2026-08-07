@@ -1,4 +1,6 @@
-field,semantic,length_contract,availability_contract,status
-past_covariates,past-only,history,not_applicable,IMPLEMENTED_RUNTIME_PENDING
-future_covariates,known-future,history+prediction_length,known_at_prediction_time,IMPLEMENTED_RUNTIME_PENDING
-unknown_future_values,forbidden,n/a,missing_or_nonmatching_evidence,FAIL_CLOSED
+field,semantic,input_length,runtime_field,evidence,status
+past_covariates,past-only,history,past_feat_dynamic_real,ordered names shape matrix_sha256,IMPLEMENTED_FAKE_RUNTIME_VERIFIED
+future_covariates,known-future,history+prediction_length,feat_dynamic_real,availability matrix_sha256 tail_sha256,IMPLEMENTED_FAKE_RUNTIME_VERIFIED
+calendar_gap,missing calendar period,expanded target history,both native fields,NaN plus observed mask path,IMPLEMENTED_CONTRACT_VERIFIED
+unknown_future_values,forbidden,n/a,n/a,missing or nonmatching availability evidence,FAIL_CLOSED
+name_collision,target or cross-group duplicate,n/a,n/a,contract rejection,FAIL_CLOSED

@@ -1,11 +1,14 @@
 # Current State: Moirai 2.0
 
-Status: `PARTIALLY_VERIFIED / CONTRACT_V2_IMPLEMENTED / REAL_RUNTIME_PENDING`
+Status: `PARTIALLY_VERIFIED / P0_P7_IMPLEMENTED / REAL_UNI2TS_RUNTIME_PENDING`
 
-The main branch previously contained a Loto7-only schema-v1 provider that retained only q0.5.
-This isolated increment adds a dedicated Moirai 2.0 contract without changing shared workers,
-shared catalogs, the root dependency graph, or other foundation-model providers.
+The isolated Contract v2 from PR #83 remains the stacked base. P7 now compiles past-only and
+known-future covariates into the native GluonTS fields consumed by `Moirai2Forecast`:
 
-Verified in this change: schema validation, dynamic game geometry, draw/calendar time adapters,
-token-budget checks, native quantile validation, license fail-closed policy, post-processing, and
-legacy schema-v1 conversion. Real `uni2ts` model loading and GPU execution are not claimed.
+- `past_feat_dynamic_real`: past-only features aligned to the target history;
+- `feat_dynamic_real`: known-future features aligned to target history plus forecast horizon.
+
+P7 also includes covariate dimensions in the 512-token budget, preserves calendar gaps, hashes
+ordered feature matrices and the future tail, rejects target/covariate name collisions, and verifies
+response identity in the adapter. A fake-boundary runner test proves the wiring without claiming a
+real Uni2TS model load. Real supported-lane and CUDA13-experimental execution remain pending.
