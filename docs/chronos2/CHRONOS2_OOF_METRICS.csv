@@ -1,0 +1,2 @@
+run_id,game_id,layout,seed,fold,hit_pm1,mae,mse,rmse,pinball_loss,crps,coverage80,coverage90,status
+P0-P4-NOT-OPENED,,,,,,,,,,,,,NOT_RUN

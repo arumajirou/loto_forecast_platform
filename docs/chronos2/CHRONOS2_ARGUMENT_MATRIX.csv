@@ -1,0 +1,8 @@
+argument,accepted_values,p0_p4_status,runtime_status,notes
+context_length,1..8192,ACCEPTED,MOCK_VERIFIED,greater than history becomes NOT_APPLICABLE
+prediction_length,1..1024,ACCEPTED,1_2_5_MOCK_VERIFIED,real runtime pending
+cross_learning,false|true,CONDITIONAL,MOCK_VERIFIED,true only for position_panel
+dtype,float32|bfloat16,ACCEPTED,NOT_RUN,real hardware verification pending
+attention_implementation,sdpa|eager,ACCEPTED,NOT_RUN,forwarded fail-closed
+quantile_levels,(0,1),ACCEPTED,MOCK_VERIFIED,sorted unique values
+local_files_only,true,REQUIRED,VALIDATED,false is rejected

@@ -1,0 +1,3 @@
+lane,repo_id,revision,reviewed_at,status,metrics_mixing
+legacy_reproduction,amazon/chronos-2,29ec3766d36d6f73f0696f85560a422f50e8498c,2026-08-05,REFERENCE_EVIDENCE_ONLY,FORBIDDEN
+current_reviewed,amazon/chronos-2,29ec3766d36d6f73f0696f85560a422f50e8498c,2026-08-05,REVIEWED_MAIN,FORBIDDEN
