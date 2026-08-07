@@ -1,0 +1,34 @@
+{
+  "schema_version": "timer-base-84m.remote-code-review.v1",
+  "review_status": "PENDING_HASH_VERIFICATION",
+  "approved": false,
+  "trust_remote_code_allowed": false,
+  "reviewer": null,
+  "reviewed_at_utc": null,
+  "repo_id": "thuml/timer-base-84m",
+  "model_revision": "70077a71acce1b4c00d98332fcaabc694255d8e5",
+  "source_repository": "https://github.com/thuml/Large-Time-Series-Model",
+  "source_revision": "UNPINNED",
+  "observed_source_head": "1ff8d1afc073182e6d46022069ff32470ab47945",
+  "license": "Apache-2.0",
+  "license_file_status": "NOT_PRESENT_IN_MODEL_SNAPSHOT",
+  "remote_code_files": [
+    "configuration_timer.py",
+    "modeling_timer.py",
+    "ts_generation_mixin.py"
+  ],
+  "files": {
+    "README.md": "UNVERIFIED",
+    "config.json": "UNVERIFIED",
+    "configuration_timer.py": "UNVERIFIED",
+    "generation_config.json": "UNVERIFIED",
+    "model.safetensors": "9c3d18f12ffe1ea7d4fa70eb3304b26e3841164a6a265fbae4f7a05cd213aa3d",
+    "modeling_timer.py": "UNVERIFIED",
+    "ts_generation_mixin.py": "UNVERIFIED"
+  },
+  "review_notes": [
+    "The official repository HEAD is observed provenance, not a proven source revision for the HF checkpoint.",
+    "Byte-exact hashes for small Hugging Face files remain unverified.",
+    "The provider rejects trust_remote_code until every digest is fixed and the review is approved."
+  ]
+}
