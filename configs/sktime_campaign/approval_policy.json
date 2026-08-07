@@ -1,0 +1,18 @@
+{
+  "required_roles": [
+    "model_owner",
+    "independent_reviewer"
+  ],
+  "required_risk_acknowledgements": [
+    "REAL_PROSPECTIVE_ACCURACY_REVIEWED",
+    "BASELINE_COMPARISON_REVIEWED",
+    "LEAKAGE_AND_INTEGRITY_REVIEWED",
+    "ROLLBACK_PLAN_REVIEWED"
+  ],
+  "authorization_ttl_seconds": 3600,
+  "require_distinct_approvers": true,
+  "require_distinct_signers": true,
+  "signature_scheme": "ssh-ed25519",
+  "signature_namespace": "loto-sktime-p7",
+  "one_time_use": true
+}
