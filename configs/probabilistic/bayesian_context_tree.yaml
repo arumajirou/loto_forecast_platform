@@ -1,0 +1,26 @@
+schema_version: 1.0.0
+model_id: pp-bayesian-context-tree
+family: tree_bayesian
+target_mode: categorical_context
+primary_backend: builtin
+native_graph_id: bayesian_context_tree_v1
+implementation_status: CONTRACT_ONLY
+active_catalog_registration: false
+max_depth: 8
+beta: 0.5
+prior_concentration: 0.5
+top_k: 10
+max_nodes: 1000000
+missing_policy: skip_update_reset_context
+update_mode: predict_before_update
+rollout_mode: horizon1_native_recursive_extension
+exact_lane:
+  enabled: true
+  exact_posterior: true
+  context_pruning: false
+  posterior_mass_pruning: false
+bounded_lane:
+  enabled: false
+  approximate: true
+  max_nodes_enforced: true
+  pruning_evidence_required: true
