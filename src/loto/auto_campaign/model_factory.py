@@ -133,6 +133,75 @@ def _common_kwargs(
     return kwargs
 
 
+def _constructor_argument_decisions(
+    cls: type,
+    kwargs: dict[str, Any],
+    *,
+    strict_keys: set[str],
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Classify every proposed constructor argument before model creation.
+
+    Explicit user overrides are fail-closed: when the installed NeuralForecast
+    class does not accept one, model construction is rejected instead of
+    silently dropping it. Framework-supplied common arguments that are absent
+    from a model-specific signature are retained in an auditable ledger as
+    ``NOT_APPLICABLE`` or ``UNSUPPORTED_BY_VERSION``.
+    """
+
+    signature = inspect.signature(cls)
+    accepts_var_kwargs = any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD
+        for parameter in signature.parameters.values()
+    )
+    accepted_names = set(signature.parameters)
+    effective: dict[str, Any] = {}
+    ledger: list[dict[str, Any]] = []
+    rejected: list[str] = []
+    for key, value in kwargs.items():
+        if key in accepted_names or accepts_var_kwargs:
+            effective[key] = value
+            status = "ACCEPTED"
+            reason = "constructor signature accepts argument"
+        elif key in strict_keys:
+            status = "REJECTED"
+            reason = "explicit extra_base_auto_args key is absent from constructor signature"
+            rejected.append(key)
+        elif key in {"cpus", "gpus"}:
+            status = "UNSUPPORTED_BY_VERSION"
+            reason = "NeuralForecast 3.2.0 requires RayOptions instead of direct resources"
+        else:
+            status = "NOT_APPLICABLE"
+            reason = "model-specific constructor does not expose this common BaseAuto argument"
+        ledger.append(
+            {
+                "argument": key,
+                "status": status,
+                "reason": reason,
+                "value_repr": repr(value),
+            }
+        )
+    if rejected:
+        raise ValueError(f"constructor rejected explicit arguments for {cls.__name__}: {rejected}")
+    return effective, ledger
+
+
+def _artifact_kwargs(
+    effective_kwargs: dict[str, Any],
+    ledger: list[dict[str, Any]],
+) -> dict[str, Any]:
+    artifact = dict(effective_kwargs)
+    artifact.update(
+        {
+            "effective_constructor_kwargs": effective_kwargs,
+            "argument_coverage": ledger,
+            "unexplained_dropped_arguments": [
+                row["argument"] for row in ledger if row["status"] == "DROPPED"
+            ],
+        }
+    )
+    return artifact
+
+
 def _hint_model(
     *,
     config: CampaignConfig,
@@ -190,14 +259,14 @@ def _hint_model(
     else:
         config_value = base_config
 
-    kwargs = _common_kwargs(
+    proposed_kwargs = _common_kwargs(
         config=config,
         backend=backend,
         alias=alias,
         config_value=config_value,
         num_samples=num_samples,
     )
-    kwargs.update(
+    proposed_kwargs.update(
         {
             "cls_model": NHITS,
             "loss": GMM(n_components=2, level=[80, 90]),
@@ -205,9 +274,15 @@ def _hint_model(
             "S": hint_summing_matrix(5),
         }
     )
+    kwargs, ledger = _constructor_argument_decisions(
+        AutoHINT,
+        proposed_kwargs,
+        strict_keys=set(config.extra_base_auto_args),
+    )
     model = auto_cls(**kwargs)
     model.trial_artifact_root = str(trial_root)
-    return model, config_value, kwargs
+    model.argument_coverage = ledger
+    return model, config_value, _artifact_kwargs(kwargs, ledger)
 
 
 def build_auto_model(
@@ -284,7 +359,7 @@ def build_auto_model(
         requested = config_value
 
     signature = inspect.signature(original_cls)
-    kwargs = _common_kwargs(
+    proposed_kwargs = _common_kwargs(
         config=config,
         backend=backend,
         alias=alias,
@@ -294,11 +369,15 @@ def build_auto_model(
     if "n_series" in signature.parameters:
         if n_series is None:
             raise ValueError(f"{model_name} requires n_series")
-        kwargs["n_series"] = n_series
+        proposed_kwargs["n_series"] = n_series
 
     # Keep model-specific loss defaults by not overriding loss/valid_loss.
-    accepted = set(signature.parameters)
-    kwargs = {key: value for key, value in kwargs.items() if key in accepted}
+    kwargs, ledger = _constructor_argument_decisions(
+        original_cls,
+        proposed_kwargs,
+        strict_keys=set(config.extra_base_auto_args),
+    )
     model = auto_cls(**kwargs)
     model.trial_artifact_root = str(trial_root)
-    return model, requested, kwargs
+    model.argument_coverage = ledger
+    return model, requested, _artifact_kwargs(kwargs, ledger)

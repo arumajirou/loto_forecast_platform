@@ -6,7 +6,9 @@ import sys
 import types
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
+import pytest
 
 from loto.models.neuralforecast_adapter import AutoModelRequest, resolve_auto_model_plan
 from loto.neuralforecast.db_automodel import (
@@ -65,6 +67,9 @@ def test_all_catalog_automodels_are_in_campaign_plan(tmp_path):
     assert hint["special_handling"] == "hierarchical-ray-backend-override"
     multivariate = next(row for row in plan["models"] if row["class_name"] == "AutoTSMixer")
     assert multivariate["requires_n_series"] is True
+    assert plan["runtime_certification"]["verify_load_predict"] is True
+    assert plan["runtime_certification"]["require_gpu_execution"] is False
+    assert config.random_seed == 1
 
 
 def test_dry_run_loads_database_and_writes_auditable_plan(tmp_path):
@@ -82,16 +87,38 @@ def test_dry_run_loads_database_and_writes_auditable_plan(tmp_path):
         )
     )
     assert result["status"] == "DRY_RUN_VERIFIED"
+    assert result["certification_status"] == "NOT_EXECUTED"
     assert result["model_count"] == 36
     plan = json.loads((output / "campaign_plan.json").read_text(encoding="utf-8"))
     assert plan["panel"]["series"] == 4
     assert plan["optimization"]["requested_workers"] == 8
     assert plan["optimization"]["effective_workers"] == 1
     assert plan["optimization"]["queue_policy"] == "gpu_bounded_queue"
+    assert plan["optimization"]["parallel_trials"] == 1
+    assert plan["runtime_certification"]["require_gpu_execution"] is True
 
 
-def test_single_automodel_passes_core_and_fit_arguments(monkeypatch, tmp_path):
+def test_gpu_campaign_rejects_nested_parallel_trials(tmp_path):
+    with pytest.raises(ValueError, match="parallel_trials=1"):
+        AutoModelCampaignConfig(
+            source=DatabaseTableSource(str(tmp_path / "unused.sqlite3")),
+            output_dir=str(tmp_path / "out"),
+            gpus=1,
+            parallel_trials=2,
+        )
+
+
+def test_single_automodel_passes_core_fit_and_runtime_certification(monkeypatch, tmp_path):
     captured: dict = {}
+
+    class FakeInnerModel:
+        def state_dict(self):
+            return {"weight": np.array([1.0], dtype=float)}
+
+    class FakeAutoModel:
+        def __init__(self, alias: str):
+            self.alias = alias
+            self.model = FakeInnerModel()
 
     class FakeNeuralForecast:
         def __init__(
@@ -101,6 +128,7 @@ def test_single_automodel_passes_core_and_fit_arguments(monkeypatch, tmp_path):
             local_scaler_type=None,
             local_static_scaler_type=None,
         ):
+            self.models = models
             captured["core"] = {
                 "models": models,
                 "freq": freq,
@@ -123,8 +151,16 @@ def test_single_automodel_passes_core_and_fit_arguments(monkeypatch, tmp_path):
                 }
             )
 
-        def save(self, *args, **kwargs):
-            captured["save"] = {"args": args, "kwargs": kwargs}
+        def save(self, path, **kwargs):
+            Path(path).mkdir(parents=True, exist_ok=True)
+            captured["save"] = {"path": path, "kwargs": kwargs}
+
+        @classmethod
+        def load(cls, path):
+            captured["load"] = path
+            loaded = object.__new__(cls)
+            loaded.models = [FakeAutoModel("AutoDLinear-optuna")]
+            return loaded
 
     monkeypatch.setitem(
         sys.modules,
@@ -133,15 +169,16 @@ def test_single_automodel_passes_core_and_fit_arguments(monkeypatch, tmp_path):
     )
     monkeypatch.setattr(
         "loto.neuralforecast.db_automodel.construct_auto_model",
-        lambda plan: types.SimpleNamespace(alias=plan.constructor_kwargs["alias"]),
+        lambda plan: FakeAutoModel(plan.constructor_kwargs["alias"]),
     )
 
     db_path = tmp_path / "datasets.sqlite3"
     _write_sqlite(db_path, _numbers4_frame())
+    campaign_dir = tmp_path / "campaign"
     result = run_automodel_campaign(
         AutoModelCampaignConfig(
             source=DatabaseTableSource(str(db_path)),
-            output_dir=str(tmp_path / "campaign"),
+            output_dir=str(campaign_dir),
             models=("nf-auto-dlinear",),
             val_size=4,
             num_samples=1,
@@ -153,6 +190,8 @@ def test_single_automodel_passes_core_and_fit_arguments(monkeypatch, tmp_path):
         )
     )
     assert result["status"] == "SUCCEEDED"
+    assert result["certification_status"] == "RUNTIME_CERTIFIED"
+    assert result["runtime_certified_model_count"] == 1
     assert captured["core"]["freq"] == 1
     assert captured["core"]["local_scaler_type"] == "robust"
     assert captured["core"]["local_static_scaler_type"] == "standard"
@@ -161,9 +200,19 @@ def test_single_automodel_passes_core_and_fit_arguments(monkeypatch, tmp_path):
     assert captured["fit"]["id_col"] == "unique_id"
     assert captured["fit"]["time_col"] == "ds"
     assert captured["fit"]["target_col"] == "y"
-    predictions = pd.read_csv(
-        tmp_path / "campaign" / "models" / "nf-auto-dlinear" / "predictions.csv"
+    assert "load" in captured
+    model_dir = campaign_dir / "models" / "nf-auto-dlinear"
+    certification = json.loads(
+        (model_dir / "runtime_certification.json").read_text(encoding="utf-8")
     )
+    assert certification["status"] == "PASS"
+    assert certification["prediction_match"] is True
+    assert certification["state_before_finite"] is True
+    assert certification["state_after_finite"] is True
+    assert certification["cpu_fallback"] is False
+    assert (model_dir / "prediction_after_load.csv").is_file()
+    assert not (model_dir / "neuralforecast").exists()
+    predictions = pd.read_csv(model_dir / "predictions.csv")
     assert predictions["decoded_prediction"].tolist() == [1, 2, 4, 9]
 
 
