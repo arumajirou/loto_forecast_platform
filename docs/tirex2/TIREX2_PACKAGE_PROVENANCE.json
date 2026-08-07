@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "package": "tirex-2",
+  "version": "0.1.1",
+  "wheel_sha256": "1d9f0ead93662d4438371ef0bb3b6319dc4811ba9d17fe343c8fa8f456b1730b",
+  "sdist_sha256": "bc82b6e0698b9828888cd6e5037717dba8e107320116725061824308e10fbeb2",
+  "source_attestation_commit": "abdf2898162482cc5c862905a406fc1134fbae67",
+  "source_access_status": "PYPI_ATTESTED_NOT_FULLY_PUBLICLY_AUDITABLE"
+}

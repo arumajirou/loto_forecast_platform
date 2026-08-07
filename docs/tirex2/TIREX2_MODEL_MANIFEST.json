@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "model_id": "tirex-2",
+  "repo_id": "NX-AI/TiRex-2",
+  "revision": "05e5b26db52bfb256f1ae1bdf785589850482de3",
+  "weight_file": "model.ckpt",
+  "weight_sha256": "184b160ffbe4c01a26beeba14015ff3507c7497e1f3577114187bbc1d19fcac1",
+  "config_file": "model-config.yaml",
+  "config_sha256": "cddbe6d0be4919cb7b0cad747fb19a295264e129d1c0790cf62133b4cb5da727",
+  "license": "Apache-2.0",
+  "pretraining_overlap": "UNKNOWN"
+}

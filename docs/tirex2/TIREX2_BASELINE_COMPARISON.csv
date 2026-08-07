@@ -1,0 +1,8 @@
+run_id,candidate,baseline,hit_pm1_delta,mae_delta,mse_delta,rmse_delta,status
+UNEXECUTED,tirex-2,random,,,,,EXECUTION_PENDING
+UNEXECUTED,tirex-2,fixed,,,,,EXECUTION_PENDING
+UNEXECUTED,tirex-2,mean,,,,,EXECUTION_PENDING
+UNEXECUTED,tirex-2,median,,,,,EXECUTION_PENDING
+UNEXECUTED,tirex-2,last,,,,,EXECUTION_PENDING
+UNEXECUTED,tirex-2,frequency,,,,,EXECUTION_PENDING
+UNEXECUTED,tirex-2,seasonal_naive,,,,,EXECUTION_PENDING

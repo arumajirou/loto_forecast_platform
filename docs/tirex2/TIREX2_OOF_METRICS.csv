@@ -1,0 +1,2 @@
+run_id,model_id,series_layout,covariate_track,config_index,seed,fold,hit_pm1,mae,mse,rmse,status
+UNEXECUTED,tirex-2,UNVERIFIED,UNVERIFIED,UNVERIFIED,UNVERIFIED,UNVERIFIED,,,,,EXECUTION_PENDING
