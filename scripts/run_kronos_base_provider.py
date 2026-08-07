@@ -8,6 +8,7 @@ import math
 import os
 import sys
 import traceback
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -23,16 +24,8 @@ TOKENIZER_REVISION = "0e0117387f39004a9016484a186a908917e22426"
 
 KRONOS_CODE_REVISION = "67b630e67f6a18c9e9be918d9b4337c960db1e9a"
 
-MODEL_SNAPSHOT = Path(
-    f"/mnt/e/env/huggingface/hub/models--NeoQuasar--Kronos-base/snapshots/{MODEL_REVISION}"
-)
-
-TOKENIZER_SNAPSHOT = Path(
-    "/mnt/e/env/huggingface/hub/"
-    "models--NeoQuasar--Kronos-Tokenizer-base/"
-    "snapshots/"
-    f"{TOKENIZER_REVISION}"
-)
+MODEL_SNAPSHOT_ENV = "LOTO_KRONOS_MODEL_SNAPSHOT"
+TOKENIZER_SNAPSHOT_ENV = "LOTO_KRONOS_TOKENIZER_SNAPSHOT"
 
 LOOKBACK = 128
 PREDICTION_LENGTH = 4
@@ -47,6 +40,47 @@ EXPECTED_COLUMNS = [
     "volume",
     "amount",
 ]
+
+
+def _repo_cache_name(repo_id: str) -> str:
+    return f"models--{repo_id.replace('/', '--')}"
+
+
+def resolve_hf_hub_cache(
+    *,
+    env: Mapping[str, str] | None = None,
+    home: Path | None = None,
+) -> Path:
+    values = os.environ if env is None else env
+
+    if hf_hub_cache := values.get("HF_HUB_CACHE"):
+        return Path(hf_hub_cache).expanduser()
+
+    if hf_home := values.get("HF_HOME"):
+        return Path(hf_home).expanduser() / "hub"
+
+    if xdg_cache_home := values.get("XDG_CACHE_HOME"):
+        return Path(xdg_cache_home).expanduser() / "huggingface" / "hub"
+
+    base_home = Path.home() if home is None else home
+    return base_home.expanduser() / ".cache" / "huggingface" / "hub"
+
+
+def resolve_snapshot_path(
+    repo_id: str,
+    revision: str,
+    *,
+    override_env: str,
+    env: Mapping[str, str] | None = None,
+    home: Path | None = None,
+) -> Path:
+    values = os.environ if env is None else env
+
+    if override := values.get(override_env):
+        return Path(override).expanduser()
+
+    hub_cache = resolve_hf_hub_cache(env=values, home=home)
+    return hub_cache / _repo_cache_name(repo_id) / "snapshots" / revision
 
 
 def sha256(path: Path) -> str:
@@ -160,8 +194,19 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
                 "local_files_only must be true",
             )
 
+        model_snapshot = resolve_snapshot_path(
+            MODEL_REPO_ID,
+            MODEL_REVISION,
+            override_env=MODEL_SNAPSHOT_ENV,
+        )
+        tokenizer_snapshot = resolve_snapshot_path(
+            TOKENIZER_REPO_ID,
+            TOKENIZER_REVISION,
+            override_env=TOKENIZER_SNAPSHOT_ENV,
+        )
+
         model_artifact = validate_snapshot(
-            MODEL_SNAPSHOT,
+            model_snapshot,
             MODEL_REVISION,
             (
                 "README.md",
@@ -171,7 +216,7 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
         )
 
         tokenizer_artifact = validate_snapshot(
-            TOKENIZER_SNAPSHOT,
+            tokenizer_snapshot,
             TOKENIZER_REVISION,
             (
                 "README.md",
@@ -192,12 +237,12 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
         torch.cuda.reset_peak_memory_stats(0)
 
         tokenizer = KronosTokenizer.from_pretrained(
-            str(TOKENIZER_SNAPSHOT),
+            str(tokenizer_snapshot),
             local_files_only=True,
         )
 
         model = Kronos.from_pretrained(
-            str(MODEL_SNAPSHOT),
+            str(model_snapshot),
             local_files_only=True,
         )
 
