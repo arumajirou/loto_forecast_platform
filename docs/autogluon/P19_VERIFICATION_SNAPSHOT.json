@@ -1,0 +1,82 @@
+{
+  "backend": "file-json-cas-v1",
+  "compileall": "PASS",
+  "deployment": "NOT_EXECUTED",
+  "external_registry_adapter": "NOT_IMPLEMENTED",
+  "files": {
+    "configs/autogluon_campaign/p19_registry_policy.json": {
+      "bytes": 413,
+      "sha256": "1e0953c5ca6f6135ceb50611396360492a795ecda5494bdd27b2315e5690b3d8"
+    },
+    "docs/autogluon/P19_REGISTRY_TRANSACTION.md": {
+      "bytes": 8125,
+      "sha256": "0eecaf70f99508c20fcb2defce1e22fcd2b4cb3c5183ff1f8cc1692ed8fbfedd"
+    },
+    "scripts/run_autogluon_p19_registry.py": {
+      "bytes": 124,
+      "sha256": "5f7823ba92bfc39b2bdd052b3293a48b66094c6259e076adb7bd397f9fbbb15a"
+    },
+    "src/loto/autogluon_campaign/registry_transaction.py": {
+      "bytes": 22286,
+      "sha256": "b20ca00a2a7dca89e70febe6bcdbbca4426508ece607f4b47741bee50ab02784"
+    },
+    "src/loto/autogluon_campaign/registry_transaction_cli.py": {
+      "bytes": 3827,
+      "sha256": "6617726e75b74d9849d7741fcfa0de5e8b7f3395acf7c22ab991351df6072d15"
+    },
+    "src/loto/autogluon_campaign/registry_transaction_contract.py": {
+      "bytes": 13444,
+      "sha256": "fd7eeebb672959b6442d6536de91fd20eb9b7633fdbe652bd134e1dd76c5cb2f"
+    },
+    "src/loto/autogluon_campaign/registry_transaction_io.py": {
+      "bytes": 9179,
+      "sha256": "a528666f8774a55f3cce63080b25351367ae2e7c987d3d6246f244ae23113f18"
+    },
+    "tests/autogluon_campaign/p19_test_support.py": {
+      "bytes": 3409,
+      "sha256": "2cb1c83ee8a46aa5aa12749498230002e71d99f200e0c640b72b2f2a313c2244"
+    },
+    "tests/autogluon_campaign/test_registry_transaction_artifacts.py": {
+      "bytes": 16637,
+      "sha256": "9913334165a6e65faf20c70b2630c15156f6ec20c9f28fc2d797001d822effbe"
+    },
+    "tests/autogluon_campaign/test_registry_transaction_cli.py": {
+      "bytes": 2637,
+      "sha256": "a9fba039ae0a69f033e209e3515258b0b644cab3b54b0f8624bfc1123cbc8fa8"
+    },
+    "tests/autogluon_campaign/test_registry_transaction_contract.py": {
+      "bytes": 3892,
+      "sha256": "de643032a95f14102a5de657f847028a61c1ac9bcfcd6c5cf4bd91e71e4e4f71"
+    }
+  },
+  "focused_tests": {
+    "failed": 0,
+    "passed": 39
+  },
+  "full_repository_pytest": "NOT_RUN",
+  "github_ci": "CI_BLOCKED_PRE_RUN",
+  "line_length_over_100": 0,
+  "mypy": "NOT_AVAILABLE",
+  "p18_p19_regression_tests": {
+    "failed": 0,
+    "passed": 67
+  },
+  "phase": "AUTOGLUON_P19_REGISTRY_CAS",
+  "real_autogluon_runtime": "BLOCKED_RUNTIME",
+  "real_p18_authorization": "NOT_RUN",
+  "real_registry_transaction": "NOT_RUN",
+  "rollback": "NOT_EXECUTED",
+  "ruff": "NOT_AVAILABLE",
+  "safety": {
+    "append_only_ledgers": true,
+    "automatic_deployment": false,
+    "automatic_retraining": false,
+    "compare_and_swap": true,
+    "external_registry_write": false,
+    "file_and_directory_fsync": true,
+    "one_time_authorization": true,
+    "same_directory_atomic_replace": true
+  },
+  "schema_version": 1,
+  "status": "PARTIALLY_VERIFIED"
+}

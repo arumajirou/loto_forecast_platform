@@ -1,0 +1,32 @@
+{
+  "compileall": "PASS",
+  "files": {
+    "docs/autogluon/P15_COVARIATE_RUNTIME_CERTIFICATION.md": {
+      "bytes": 3666,
+      "sha256": "824e8b3a9f3d3f5161d6f0524ec132c4c0c5a6a0bd1d31aa1827746a99147ffc"
+    },
+    "src/loto/autogluon_campaign/covariate_runtime_certification.py": {
+      "bytes": 29938,
+      "sha256": "1b3c0fbe7e3abec2242da4a7a8a7cfa6cd6affcd82d45c7a19912ce0f23b9e8b"
+    },
+    "tests/autogluon_campaign/test_covariate_runtime_certification.py": {
+      "bytes": 9557,
+      "sha256": "a3af5dbcedcf8daee326cac52748ec131e7e4f8d34baf6a4736cbf4afc22e539"
+    }
+  },
+  "full_pytest": "NOT_RUN",
+  "full_scenarios": 60,
+  "github_ci": "CI_BLOCKED_PRE_RUN",
+  "line_length_over_100": 0,
+  "mypy": "NOT_RUN",
+  "p15_focused_tests": {
+    "failed": 0,
+    "passed": 8
+  },
+  "phase": "AUTOGLUON_P15_COVARIATE_RUNTIME_CERTIFICATION",
+  "real_autogluon_runtime": "BLOCKED_RUNTIME",
+  "ruff": "NOT_AVAILABLE",
+  "schema_version": 1,
+  "smoke_scenarios": 6,
+  "status": "PARTIALLY_VERIFIED"
+}

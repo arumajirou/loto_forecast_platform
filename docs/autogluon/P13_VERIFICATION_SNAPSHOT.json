@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "phase": "AUTOGLUON_P13_EXTERNAL_COVARIATES",
+  "status": "PARTIALLY_VERIFIED",
+  "focused_tests": {"passed": 15, "failed": 0},
+  "compileall": "PASS",
+  "line_length_over_100": 0,
+  "real_autogluon_runtime": "BLOCKED_RUNTIME",
+  "ruff": "NOT_AVAILABLE",
+  "mypy": "NOT_RUN",
+  "full_pytest": "NOT_RUN",
+  "github_ci": "CI_BLOCKED_PRE_RUN",
+  "files": {
+    "src/loto/adapters/autogluon/covariates.py": {
+      "sha256": "771849a04f6cffd713d2aefc7506d1aab5537941db3a4389f9d9a89e9231fbf1"
+    },
+    "src/loto/adapters/autogluon/covariate_provider.py": {
+      "sha256": "59cc2bebb2ebd5ba18afe019475a3706e53c3af6648a58c506a06cd2799f0d6f"
+    },
+    "src/loto/adapters/autogluon/strict_provider.py": {
+      "sha256": "4acacd26a70888ef3b8cbbc666fe8f86da049f4d8e36ef806d8408ae717f027d"
+    },
+    "docs/autogluon/P13_COVARIATE_CONTRACT.md": {
+      "sha256": "34a8403ae0afb77b99365c0153f100324702b3b34aee903d9d457417705f7660"
+    }
+  }
+}

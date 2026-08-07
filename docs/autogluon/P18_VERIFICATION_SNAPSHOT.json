@@ -1,0 +1,86 @@
+{
+  "authorization_policy": {
+    "authorization_ttl_seconds": 3600,
+    "one_time_use": true,
+    "required_approvals": 2,
+    "required_roles": [
+      "model_owner",
+      "independent_reviewer"
+    ],
+    "signature_namespace": "loto-autogluon-p18",
+    "signature_scheme": "ssh-ed25519"
+  },
+  "compileall": "PASS",
+  "files": {
+    "configs/autogluon_campaign/p18_approval_policy.json": {
+      "bytes": 602,
+      "sha256": "8fb7635e069ee1e2ca9b3b9f0c1612cd6d18175ec26d2407954c59491d37a00c"
+    },
+    "configs/autogluon_campaign/p18_registry_subject.example.json": {
+      "bytes": 703,
+      "sha256": "a3821a737940a89e32b2a6d17c2a4220fc0daae8ed36901dafa60334b35416a4"
+    },
+    "docs/autogluon/P18_APPROVAL_AUTHORIZATION.md": {
+      "bytes": 8379,
+      "sha256": "b8bace15cf96c99cfcadd9b2a8139b1c60853f3b70e8c955efbd3e4c2dea6d67"
+    },
+    "scripts/run_autogluon_p18_approval.py": {
+      "bytes": 126,
+      "sha256": "9c1299eb13dabcc8ff441f1206124e4c1f7717559eb1baf6296b96945964a78f"
+    },
+    "src/loto/autogluon_campaign/approval_authorization.py": {
+      "bytes": 10970,
+      "sha256": "5b50d1fd7f5b7d24732a3a5cb1772566fbc4edcf1222d9f4c82bb8e8f8e2b75f"
+    },
+    "src/loto/autogluon_campaign/approval_authorization_cli.py": {
+      "bytes": 7184,
+      "sha256": "cad78235d02f8bcba2d7884d61e6a20ca40a3582945e406b0b5be74841e378e9"
+    },
+    "src/loto/autogluon_campaign/approval_authorization_contract.py": {
+      "bytes": 19521,
+      "sha256": "455b6e614d102ef3e2c91ca5e9a80046b11fbc34e4b5f14481d1307db9e3789f"
+    },
+    "src/loto/autogluon_campaign/approval_authorization_io.py": {
+      "bytes": 11355,
+      "sha256": "ef7cd73abfb77f805175719c51e879ab76e2680cebae0f1f899317d1a9b24f44"
+    },
+    "tests/autogluon_campaign/p18_test_support.py": {
+      "bytes": 4918,
+      "sha256": "8117a23ba72bcf7db93da6ef1542d9eed16276ef2cf8c08a551c86ba299dd805"
+    },
+    "tests/autogluon_campaign/test_approval_authorization_artifacts.py": {
+      "bytes": 8982,
+      "sha256": "385384edcbb8262aa81bae9bcfce9f54beaa514b6a94cfdf3e62a1ae932c4bbe"
+    },
+    "tests/autogluon_campaign/test_approval_authorization_contract.py": {
+      "bytes": 10475,
+      "sha256": "fcf1dcfa88bdee0a11295b7267448c65a5a0b9c2a9c142ad857bc7ccf32d81ec"
+    }
+  },
+  "focused_tests": {
+    "failed": 0,
+    "passed": 28
+  },
+  "full_pytest": "NOT_RUN",
+  "github_ci": "CI_BLOCKED_PRE_RUN",
+  "line_length_over_100": 0,
+  "model_promotion": "NOT_EXECUTED",
+  "mypy": "NOT_AVAILABLE",
+  "phase": "AUTOGLUON_P18_MANUAL_APPROVAL_AUTHORIZATION",
+  "real_autogluon_runtime": "BLOCKED_RUNTIME",
+  "real_p17_eligibility": "NOT_RUN",
+  "real_two_person_ssh_ceremony": "NOT_RUN",
+  "registry_write": "NOT_EXECUTED",
+  "ruff": "NOT_AVAILABLE",
+  "safety": {
+    "automatic_promotion": false,
+    "automatic_retraining": false,
+    "human_approval_granted_only_after_two_verified_signatures": true,
+    "promotion_status": "APPROVED_NOT_REGISTERED",
+    "registry_write_authorized_after_approval": true,
+    "registry_write_executed": false
+  },
+  "schema_version": 1,
+  "ssh_keygen_runtime": "NOT_AVAILABLE_IN_AUTHORING_ENVIRONMENT",
+  "status": "PARTIALLY_VERIFIED"
+}

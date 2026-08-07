@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "primary_metric": "hit_at_1",
+  "required_metrics": [
+    "hit_at_1",
+    "position_hit_at_1",
+    "all_position_hit_at_1",
+    "mae",
+    "mse",
+    "rmse"
+  ],
+  "required_baselines": [
+    "baseline_random",
+    "baseline_fixed",
+    "baseline_mean",
+    "baseline_median",
+    "baseline_last",
+    "baseline_frequency",
+    "baseline_ar1"
+  ],
+  "model_seeds": [1, 2, 3],
+  "random_baseline_seeds": [1, 2, 3],
+  "outer_workers": 8,
+  "nested_autogluon_workers": 1,
+  "drift_policy": {
+    "hit_at_1_target": 0.9,
+    "warning_hit_at_1_drop": 0.05,
+    "critical_hit_at_1_drop": 0.1,
+    "warning_mae_increase": 0.5,
+    "critical_mae_increase": 1.0
+  },
+  "automatic_promotion": false,
+  "automatic_retraining": false,
+  "best_seed_selection": false
+}
