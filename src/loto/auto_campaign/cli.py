@@ -8,11 +8,18 @@ from pathlib import Path
 from .api_coverage_pipeline import run_api_coverage_pipeline
 from .contracts import CampaignStage
 from .coverage_verification import verify_run_with_coverage
+from .promotion_gate import GATED_STAGES, run_stage_with_promotion_gate
 from .runner import inventory, load_config, plan, run_stage
 
 
 def _run_id(prefix: str, stage: str) -> str:
     return f"{prefix}-{stage}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+
+
+def _resolve_optional_path(value: Path | None, project: Path) -> Path | None:
+    if value is None:
+        return None
+    return (value if value.is_absolute() else project / value).resolve()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -40,6 +47,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run.add_argument("--output", type=Path, default=None)
     run.add_argument("--source-run", type=Path, default=None)
+    run.add_argument(
+        "--coverage-run",
+        type=Path,
+        default=None,
+        help="verified API coverage run required by HPO and later stages",
+    )
+    run.add_argument(
+        "--runtime-run",
+        type=Path,
+        default=None,
+        help="36-model runtime campaign report required when GPU resources are requested",
+    )
     run.add_argument("--resume", action="store_true")
     verify = sub.add_parser("verify")
     verify.add_argument("--run", type=Path, required=True)
@@ -70,34 +89,42 @@ def main() -> None:
             output = config.output_root / _run_id(config.campaign_id_prefix, stage)
         else:
             output = output if output.is_absolute() else project / output
+        output = output.resolve()
         if args.command == "inventory":
-            result = inventory(project, config, output.resolve())
+            result = inventory(project, config, output)
         elif args.command == "plan":
-            result = plan(project, config, output.resolve())
+            result = plan(project, config, output)
         else:
             selected_stage = CampaignStage(args.stage)
+            source_run = _resolve_optional_path(args.source_run, project)
+            coverage_run = _resolve_optional_path(args.coverage_run, project)
+            runtime_run = _resolve_optional_path(args.runtime_run, project)
             if selected_stage == CampaignStage.API_COVERAGE:
                 result = run_api_coverage_pipeline(
                     project,
                     config,
-                    output.resolve(),
+                    output,
+                    resume=args.resume,
+                )
+            elif selected_stage in GATED_STAGES:
+                result = run_stage_with_promotion_gate(
+                    runner=run_stage,
+                    project_root=project,
+                    config=config,
+                    run_root=output,
+                    target_stage=selected_stage,
+                    source_run=source_run,
+                    coverage_run=coverage_run,
+                    runtime_run=runtime_run,
                     resume=args.resume,
                 )
             else:
                 result = run_stage(
                     project,
                     config,
-                    output.resolve(),
+                    output,
                     selected_stage,
-                    source_run=(
-                        None
-                        if args.source_run is None
-                        else (
-                            args.source_run
-                            if args.source_run.is_absolute()
-                            else project / args.source_run
-                        ).resolve()
-                    ),
+                    source_run=source_run,
                     resume=args.resume,
                 )
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))

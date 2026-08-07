@@ -1,0 +1,38 @@
+{
+  "schema_version": "change-scope-v1",
+  "scope_id": "neuralforecast-promotion-gate",
+  "stacked_base_branch": "agent/p0-api-coverage-state",
+  "stacked_base_sha": "12accacd0a3bc6541d865059c37f15b1b8bd6067",
+  "dependency_pr": 45,
+  "in_scope": [
+    "fail-closed gate for HPO, validate-trials, OOF, Holdout, and Prospective stages",
+    "verified API coverage evidence requirement",
+    "separate 36-model GPU runtime campaign evidence requirement",
+    "training-worker, device, PID, VRAM, finite-output, save-load, and CPU-fallback checks",
+    "blocked sidecar evidence without creating the requested run directory",
+    "passed gate evidence embedded into the downstream run manifest",
+    "root SHA256SUMS regeneration after gate artifact persistence",
+    "CPU and unit contract tests"
+  ],
+  "out_of_scope": [
+    "executing the local RTX 5070 Ti campaign",
+    "creating synthetic GPU success evidence",
+    "accuracy or champion selection",
+    "Holdout or Prospective result claims",
+    "main branch writes",
+    "merging PR 43 or PR 45"
+  ],
+  "execution_boundaries": {
+    "local_gpu": "EXECUTION_PENDING",
+    "github_ci": "REQUIRED",
+    "merge": "USER_APPROVAL_REQUIRED"
+  },
+  "expected_changed_files": [
+    "docs/NEURALFORECAST_PROMOTION_GATE.md",
+    "docs/NEURALFORECAST_PROMOTION_GATE_CHANGE_SCOPE.json",
+    "src/loto/auto_campaign/cli.py",
+    "src/loto/auto_campaign/promotion_gate.py",
+    "tests/auto_campaign/test_promotion_gate.py",
+    "tests/auto_campaign/test_promotion_gate_cli.py"
+  ]
+}
