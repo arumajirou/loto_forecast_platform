@@ -36,22 +36,28 @@ class SubprocessExecutor:
         environment = dict(self._base_environment)
         environment.update(spec.environment)
         try:
-            completed = subprocess.run(
+            process = subprocess.Popen(
                 spec.argv,
                 cwd=Path(spec.cwd),
                 env=environment,
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
-                timeout=spec.timeout_seconds,
-                check=False,
+                encoding="utf-8",
+                errors="replace",
             )
-        except subprocess.TimeoutExpired as exc:
+        except OSError as exc:
+            raise ExecutionError(f"failed to start provider process: {exc}") from exc
+
+        try:
+            stdout, stderr = process.communicate(timeout=spec.timeout_seconds)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            stdout, stderr = process.communicate()
             finished = datetime.now(UTC)
-            stdout = exc.stdout.decode() if isinstance(exc.stdout, bytes) else (exc.stdout or "")
-            stderr = exc.stderr.decode() if isinstance(exc.stderr, bytes) else (exc.stderr or "")
             return ProcessExecution(
                 run_label=run_label,
-                process_pid=None,
+                process_pid=process.pid,
                 started_at_utc=started,
                 finished_at_utc=finished,
                 exit_code=None,
@@ -60,15 +66,16 @@ class SubprocessExecutor:
                 stderr_sha256=_sha256_text(stderr),
                 response_sha256=None,
             )
+
         finished = datetime.now(UTC)
         return ProcessExecution(
             run_label=run_label,
-            process_pid=None,
+            process_pid=process.pid,
             started_at_utc=started,
             finished_at_utc=finished,
-            exit_code=completed.returncode,
+            exit_code=process.returncode,
             timed_out=False,
-            stdout_sha256=_sha256_text(completed.stdout),
-            stderr_sha256=_sha256_text(completed.stderr),
+            stdout_sha256=_sha256_text(stdout),
+            stderr_sha256=_sha256_text(stderr),
             response_sha256=None,
         )
