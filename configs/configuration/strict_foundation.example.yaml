@@ -1,0 +1,48 @@
+config_schema_version: "1.0.0"
+experiment_name: strict-foundation-example
+runtime:
+  output_dir: artifacts/config-foundation-example
+  device:
+    requested: cpu
+    cpu_fallback_policy: not_applicable
+split_policy:
+  immutable: true
+  chronological: true
+  model_fit_scope: train_only
+  scaler_fit_scope: train_only
+  encoder_fit_scope: train_only
+  feature_selection_scope: train_only
+  hyperparameter_tuning_scope: train_only
+  holdout:
+    auto_run: false
+    auto_open_actuals: false
+    explicit_approval_required: true
+  prospective:
+    auto_run: false
+    auto_open_actuals: false
+    explicit_approval_required: true
+evaluation:
+  metrics:
+    primary_metric: "Hit@±1"
+    report_metrics:
+      - "Hit@±1"
+      - MAE
+      - MSE
+      - RMSE
+      - "Position Hit@±1"
+      - "All-position Hit@±1"
+  seed_policy:
+    seeds: [1, 2, 3]
+    aggregation: mean_variance_worst
+    best_seed_only_selection: false
+observability:
+  mlflow:
+    enabled: false
+    tracking_uri: null
+    experiment_name: loto-config-foundation
+    token: null
+git_metadata:
+  enabled: true
+  require_commit: true
+  capture_dirty_state: true
+  require_clean_worktree: false
