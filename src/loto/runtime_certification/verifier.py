@@ -50,6 +50,20 @@ class CertificationVerificationError(RuntimeError):
     pass
 
 
+def _validate_process_binding(
+    observation: RunObservation,
+    *,
+    evidence_origin: EvidenceOrigin,
+) -> None:
+    process_pid = observation.execution.process_pid
+    if evidence_origin == EvidenceOrigin.REAL and process_pid is None:
+        raise CertificationVerificationError("real evidence requires an observed process PID")
+    if process_pid is not None and process_pid != observation.device.provider_pid:
+        raise CertificationVerificationError(
+            "execution process PID differs from device provider PID"
+        )
+
+
 def build_certification_report(
     *,
     certification_id: str,
@@ -71,6 +85,7 @@ def build_certification_report(
             raise CertificationVerificationError("process timed out")
         if observation.execution.exit_code != 0:
             raise CertificationVerificationError("provider process exit was not zero")
+        _validate_process_binding(observation, evidence_origin=evidence_origin)
         validate_device_evidence(observation.device, profile=profile)
     first_output = validate_output(first.output, output_contract)
     second_output = validate_output(second.output, output_contract)
@@ -151,8 +166,12 @@ def execute_two_process_certification(
     verify_snapshot_identity(snapshot)
     first_execution = executor.execute(first_command, run_label="run-a")
     first = observation_loader("run-a", first_execution)
+    if first.execution != first_execution:
+        raise CertificationVerificationError("observation replaced executor process evidence")
     second_execution = executor.execute(second_command, run_label="run-b")
     second = observation_loader("run-b", second_execution)
+    if second.execution != second_execution:
+        raise CertificationVerificationError("observation replaced executor process evidence")
     return build_certification_report(
         certification_id=certification_id,
         profile=profile,
