@@ -1,245 +1,70 @@
 name: ci
 
 on:
+  push:
   pull_request:
-    branches: [main]
-
-permissions:
-  contents: write
-
-concurrency:
-  group: ruff-small-safe-repair-${{ github.event.pull_request.number }}
-  cancel-in-progress: false
 
 jobs:
   test:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-lint-small-semantics-v1' }}
-    runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 180
-    defaults:
-      run:
-        shell: bash
-    env:
-      TARGET_BRANCH: fix/ruff-lint-small-semantics-v1
-      UV_VERSION: "0.11.21"
-      UV_PYTHON: "3.13"
-      EXPECTED_RUFF_VERSION: "0.16.0"
-      BASELINE_COLLECTION_ERRORS: "34"
-      EXPECTED_REMAINING_LINT: "190"
-      RESULT_PATH: .github/ruff-small-safe-repair.txt
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Verify trusted runner
-        run: |
-          set -Eeuo pipefail
-          test "$RUNNER_NAME" = "az-loto-gpu"
-          test "$RUNNER_OS" = "Linux"
-          test "$RUNNER_ARCH" = "X64"
+      - uses: actions/checkout@v6
 
-      - name: Checkout trusted branch
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@v6
         with:
-          ref: fix/ruff-lint-small-semantics-v1
-          persist-credentials: true
-          fetch-depth: 1
-          clean: true
+          python-version: "3.13"
 
-      - name: Gate repair trigger
-        id: gate
+      - name: Show disk usage before install
+        run: df -h
+
+      - name: Free runner disk space
         run: |
-          set -Eeuo pipefail
-          message="$(git log -1 --pretty=%s)"
-          echo "head_message=$message"
-          if [[ "$message" == "ci: run Ruff small safe repairs (#200)" ]]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          docker system prune --all --force || true
+          df -h
 
-      - name: Install exact uv
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          version: ${{ env.UV_VERSION }}
-          enable-cache: false
-
-      - name: Prepare isolated environment and apply locked safe subset
-        if: ${{ steps.gate.outputs.run == 'true' }}
+      - name: Install matching CPU-only PyTorch
         run: |
-          set -Eeuo pipefail
-          case "$(uv --version)" in "uv $UV_VERSION"*) ;; *) exit 1 ;; esac
-          uv python install "$UV_PYTHON"
-          venv="$RUNNER_TEMP/loto-ruff-small-repair-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          cache="$RUNNER_TEMP/loto-ruff-small-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          case "$venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
-          case "$cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
-          rm -rf -- "$venv" "$cache"
-          mkdir -p "$cache"
-          uv venv "$venv" --python "$UV_PYTHON"
-          echo "CI_VENV=$venv" >> "$GITHUB_ENV"
-          echo "UV_CACHE_DIR=$cache" >> "$GITHUB_ENV"
-          python="$venv/bin/python"
-          ruff_version="$("$python" - <<'PY'
-          import tomllib
-          with open('uv.lock','rb') as f:
-              lock=tomllib.load(f)
-          versions=[p['version'] for p in lock['package'] if p.get('name')=='ruff']
-          if len(versions)!=1:
-              raise SystemExit(versions)
-          print(versions[0])
-          PY
-          )"
-          test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
-          echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
-          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
-          "$python" -m ruff check --select UP035,UP037,I001 --fix \
-            src/loto/autogluon_campaign/holdout_prospective.py \
-            src/loto/moirai2_campaign/target_execution.py
-          mapfile -t changed < <(git diff --name-only | sort)
-          expected=(
-            src/loto/autogluon_campaign/holdout_prospective.py
-            src/loto/moirai2_campaign/target_execution.py
-          )
-          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
-          test "${#changed[@]}" -eq 2
-          diff -u <(printf '%s\n' "${expected_sorted[@]}") <(printf '%s\n' "${changed[@]}")
-          git diff --check
-          git diff -- src/loto/autogluon_campaign/holdout_prospective.py src/loto/moirai2_campaign/target_execution.py
+          python -m pip install --upgrade pip
+          python -m pip install \
+            --no-cache-dir \
+            --index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.9.1"
 
-      - name: Verify static gates
-        if: ${{ steps.gate.outputs.run == 'true' }}
+      - name: Install project and test dependencies
         run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          "$python" -m ruff check --select UP035,UP037,I001 \
-            src/loto/autogluon_campaign/holdout_prospective.py \
-            src/loto/moirai2_campaign/target_execution.py
-          "$python" -m ruff format --check \
-            src/loto/autogluon_campaign/holdout_prospective.py \
-            src/loto/moirai2_campaign/target_execution.py
-          "$python" -m compileall -q src scripts tests
-          echo "STATIC_RC=0" >> "$GITHUB_ENV"
+          python -m pip install \
+            --no-cache-dir \
+            -e ".[api,dev,postgres]"
 
-      - name: Install project dependencies
-        if: ${{ steps.gate.outputs.run == 'true' }}
+      - name: Verify CPU-only PyTorch remains selected
         run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" \
-            --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
-          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
-          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" "ruff==$EXPECTED_RUFF_VERSION"
-          uv pip check --python "$python"
-          "$python" - <<'PY'
+          python - <<'PY'
           import torch
+
           assert torch.__version__.startswith("2.9.1"), torch.__version__
           assert torch.version.cuda is None, torch.version.cuda
+          print(f"torch_version={torch.__version__}")
+          print("torch_cuda_runtime=NONE")
           PY
-          echo "DEPS_RC=0" >> "$GITHUB_ENV"
+          python -m pip check
 
-      - name: Verify facade regressions and focused tests
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          "$python" -m pytest -q \
-            tests/autogluon_campaign/test_holdout_prospective.py \
-            tests/moirai2_campaign/test_p8d_scripts.py \
-            tests/moirai2_campaign/test_target_execution_artifacts.py \
-            tests/moirai2_campaign/test_target_execution_integrity.py \
-            tests/moirai2_campaign/test_target_execution_state.py
-          echo "FOCUSED_RC=0" >> "$GITHUB_ENV"
+      - name: Show disk usage after install
+        run: df -h
 
-      - name: Verify collection parity and residual lint
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          set +e
-          "$python" -m pytest -q > "$RUNNER_TEMP/pytest.log" 2>&1
-          PYTEST_RC=$?
-          "$python" -m ruff check --output-format=json src scripts tests > "$RUNNER_TEMP/all-lint.json"
-          ALL_LINT_RC=$?
-          set -e
-          if grep -Fq "Interrupted: $BASELINE_COLLECTION_ERRORS errors during collection" "$RUNNER_TEMP/pytest.log"; then
-            COLLECTION_PARITY=1
-          else
-            COLLECTION_PARITY=0
-          fi
-          lint_env="$RUNNER_TEMP/lint-env.txt"
-          "$python" - "$RUNNER_TEMP/all-lint.json" <<'PY' > "$lint_env"
-          import collections, json, sys
-          from pathlib import Path
-          rows=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8') or '[]')
-          counts=collections.Counter(row.get('code','UNKNOWN') for row in rows)
-          print(f"REMAINING_LINT_COUNT={len(rows)}")
-          print("REMAINING_RULE_COUNTS=" + ",".join(f"{k}:{v}" for k,v in sorted(counts.items())))
-          PY
-          source "$lint_env"
-          cat "$lint_env" >> "$GITHUB_ENV"
-          echo "PYTEST_RC=$PYTEST_RC" >> "$GITHUB_ENV"
-          echo "COLLECTION_PARITY=$COLLECTION_PARITY" >> "$GITHUB_ENV"
-          echo "ALL_LINT_RC=$ALL_LINT_RC" >> "$GITHUB_ENV"
-          cat "$lint_env"
-          test "$COLLECTION_PARITY" -eq 1
-          test "$REMAINING_LINT_COUNT" -eq "$EXPECTED_REMAINING_LINT"
+      - name: Run Ruff format check
+        run: python -m ruff format --check src scripts tests
 
-      - name: Commit verified source repair
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          before="$(git rev-parse HEAD)"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            src/loto/autogluon_campaign/holdout_prospective.py \
-            src/loto/moirai2_campaign/target_execution.py
-          git diff --cached --check
-          git commit -m "fix: repair Ruff small safe facade findings (#200)"
-          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
-          test "$remote_before" = "$before"
-          git push origin "HEAD:$TARGET_BRANCH"
-          echo "REPAIRED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Run Ruff lint
+        run: python -m ruff check src scripts tests
 
-      - name: Persist verification evidence
-        if: ${{ always() && steps.gate.outputs.run == 'true' && env.REPAIRED_HEAD != '' }}
-        run: |
-          set -Eeuo pipefail
-          cat > "$RESULT_PATH" <<EOF
-          RUFF_SMALL_SAFE_REPAIR_VERSION=1
-          RUN_ID=$GITHUB_RUN_ID
-          RUFF_VERSION=${RUFF_VERSION:-UNKNOWN}
-          REPAIRED_HEAD=${REPAIRED_HEAD:-UNKNOWN}
-          STATIC_RC=${STATIC_RC:-UNKNOWN}
-          DEPS_RC=${DEPS_RC:-UNKNOWN}
-          FOCUSED_RC=${FOCUSED_RC:-UNKNOWN}
-          PYTEST_RC=${PYTEST_RC:-UNKNOWN}
-          COLLECTION_PARITY=${COLLECTION_PARITY:-UNKNOWN}
-          REMAINING_LINT_COUNT=${REMAINING_LINT_COUNT:-UNKNOWN}
-          REMAINING_RULE_COUNTS=${REMAINING_RULE_COUNTS:-UNKNOWN}
-          EOF
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$RESULT_PATH"
-          git diff --cached --check
-          git commit -m "chore: capture Ruff small safe repair evidence (#200)"
-          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
-          test "$remote_before" = "$(git rev-parse HEAD^)"
-          git push origin "HEAD:$TARGET_BRANCH"
+      - name: Compile Python sources
+        run: python -m compileall -q src scripts tests
 
-      - name: Enforce repair gates
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          test "${STATIC_RC:-99}" -eq 0
-          test "${DEPS_RC:-99}" -eq 0
-          test "${FOCUSED_RC:-99}" -eq 0
-          test "${COLLECTION_PARITY:-0}" -eq 1
-          test "${REMAINING_LINT_COUNT:-999}" -eq "$EXPECTED_REMAINING_LINT"
-
-      - name: Cleanup
-        if: ${{ always() }}
-        run: |
-          set -Eeuo pipefail
-          [[ -z "${CI_VENV:-}" ]] || { case "$CI_VENV" in "$RUNNER_TEMP"/*) rm -rf "$CI_VENV" ;; *) exit 1 ;; esac; }
-          [[ -z "${UV_CACHE_DIR:-}" ]] || { case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf "$UV_CACHE_DIR" ;; *) exit 1 ;; esac; }
+      - name: Run tests
+        run: python -m pytest -q
