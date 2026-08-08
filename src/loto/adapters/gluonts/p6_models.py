@@ -4,11 +4,11 @@ import hashlib
 import importlib
 import inspect
 import json
+from collections.abc import Callable
 from enum import StrEnum
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-
 
 EXPECTED_ESTIMATORS = (
     "DeepNPTSEstimator",

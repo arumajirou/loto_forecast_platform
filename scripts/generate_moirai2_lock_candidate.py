@@ -7,7 +7,7 @@ import os
 import shutil
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +20,6 @@ from loto.moirai2_campaign.lock_review import (  # noqa: E402
     sha256_file,
     write_sha256_manifest,
 )
-
 
 RUNTIME_LANES = {
     "supported-py311": ROOT / "environments" / "moirai2-supported-py311",
@@ -114,7 +113,7 @@ def build_candidate(
             "schema_version": "moirai2-lock-candidate-v1",
             "status": "FAILED",
             "runtime_lane": runtime_lane,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "command": command,
             "exit_code": process.returncode,
             "message": "uv lock did not produce a candidate lockfile",
@@ -145,7 +144,7 @@ def build_candidate(
         "schema_version": "moirai2-lock-candidate-v1",
         "status": "PASS" if report["status"] == "PASS" else "FAILED",
         "runtime_lane": runtime_lane,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "command": command,
         "exit_code": process.returncode,
         "source_pyproject": str(source_pyproject.resolve()),

@@ -15,7 +15,6 @@ from loto.orchestration.pipeline_downstream_types import (
     DownstreamCommitState,
     DownstreamCommitStatus,
     DownstreamStepState,
-    DownstreamStepStatus,
     PreparedDownstreamCommit,
 )
 

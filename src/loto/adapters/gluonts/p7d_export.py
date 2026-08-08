@@ -43,7 +43,7 @@ def _metadata_payloads(
         f"RUN_ID={manifest.run_id}\n"
         f"COMMIT_SHA={manifest.source_commit_sha}\n"
         f"P8_ELIGIBLE={str(manifest.p8_eligible).lower()}\n"
-    ).encode("utf-8")
+    ).encode()
     lines = [f"{entry.sha256}  {entry.path}" for entry in manifest.entries]
     lines.extend(
         (
@@ -129,6 +129,6 @@ def create_evidence_bundle(
     archive_sha = sha256_file(archive_path)
     atomic_write_bytes(
         sidecar,
-        f"{archive_sha}  {archive_path.name}\n".encode("utf-8"),
+        f"{archive_sha}  {archive_path.name}\n".encode(),
     )
     return manifest, archive_sha

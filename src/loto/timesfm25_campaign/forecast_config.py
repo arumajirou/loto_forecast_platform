@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from loto.adapters.timesfm25.contracts import ForecastConfigLedger, TimesFM25Request
+from loto.adapters.timesfm25.contracts import TimesFM25Request
 
 
 def build_native_forecast_config(request: TimesFM25Request) -> dict[str, Any]:

@@ -30,7 +30,6 @@ from loto.github_webhooks.security import (
 from loto.github_webhooks.service import ReceiverService
 from loto.github_webhooks.store import WebhookStore
 
-
 ROOT = Path(__file__).resolve().parents[2]
 POLICY_PATH = ROOT / "configs" / "github_webhooks" / "receiver_v1.yaml"
 DELIVERY_ID = UUID("11111111-2222-4333-8444-555555555555")

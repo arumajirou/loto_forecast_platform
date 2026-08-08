@@ -1,20 +1,18 @@
 from __future__ import annotations
 
-from typing import Literal
-
 import re
 from pathlib import PurePosixPath
+from typing import Literal
 
 from pydantic import AwareDatetime, BaseModel, ValidationInfo, field_validator, model_validator
 
 from .common import (
-    STRICT_CONFIG,
     _FLOATING_VERSION_NAMES,
     _PACKAGE_RE,
     _SENTINELS,
-    _SHA256_RE,
     _VERSION_OPERATOR_CHARACTERS,
     _VERSION_SENTINELS,
+    STRICT_CONFIG,
     CommercialEligibility,
     ContaminationRisk,
     IntakeStatus,

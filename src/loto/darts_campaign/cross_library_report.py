@@ -3,9 +3,9 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from .cross_library_contract import (
+    REQUIRED_BASELINES,
     CrossLibraryCampaignConfig,
     CrossLibraryContractError,
-    REQUIRED_BASELINES,
     canonical_sha256,
 )
 from .cross_library_metrics import (

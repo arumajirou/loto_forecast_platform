@@ -1,4 +1,5 @@
 import hashlib
+
 from loto.models.neuralforecast_search_space import (
     SearchSpaceCompleteness,
     profile_fixed_config,

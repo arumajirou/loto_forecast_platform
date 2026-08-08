@@ -28,10 +28,10 @@ from .prospective_registry_payload import (
     _registry_file_inventory,
     _safe_error,
 )
-from .prospective_scoring_verification import verify_prospective_scoring
 
 # Re-export focused helpers used by existing tests and audit tooling.
 from .prospective_registry_payload import _position_metric_frame as _position_metric_frame
+from .prospective_scoring_verification import verify_prospective_scoring
 
 
 def register_prospective_scoring(

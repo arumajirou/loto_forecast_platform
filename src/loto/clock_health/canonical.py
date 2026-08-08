@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
@@ -54,7 +54,7 @@ def _normalize(value: object) -> object:
     if isinstance(value, datetime):
         if value.tzinfo is None or value.utcoffset() is None:
             raise CanonicalizationError("datetime must be timezone-aware")
-        normalized = value.astimezone(timezone.utc)
+        normalized = value.astimezone(UTC)
         return normalized.isoformat(timespec="microseconds").replace("+00:00", "Z")
     if isinstance(value, Enum):
         return _normalize(value.value)

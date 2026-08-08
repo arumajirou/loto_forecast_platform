@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -9,8 +9,8 @@ import numpy as np
 
 from loto.probabilistic.kdpp_certification_gate import sha256_file
 from loto.probabilistic.kdpp_history_contracts import (
-    RAW_SOURCE_FILES,
     _GAME_SPECS,
+    RAW_SOURCE_FILES,
     RawHistoryApproval,
     RawHistoryHandoff,
     RawHistoryVerification,
@@ -26,7 +26,7 @@ def _load_object(path: Path) -> dict[str, Any]:
 
 def _parse_utc_text(value: str, label: str) -> datetime:
     parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    if parsed.tzinfo is None or parsed.utcoffset() != timezone.utc.utcoffset(parsed):
+    if parsed.tzinfo is None or parsed.utcoffset() != UTC.utcoffset(parsed):
         raise ValueError(f"{label} must be UTC")
     return parsed
 

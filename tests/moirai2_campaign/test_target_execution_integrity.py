@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -9,20 +9,14 @@ import pytest
 from loto.moirai2_campaign.target_execution import (
     CUDA_LANE,
     EVENT_ORDER,
-    STAGES,
     SUPPORTED_LANE,
     TargetExecutionError,
     append_event,
     artifact_tree_sha256,
     build_initial_state,
-    candidate_summary_for_lane,
-    event_type_for,
-    expected_next_event,
-    load_json_object,
     sha256_file,
     validate_candidate_artifact,
     validate_installation_artifact,
-    validate_state,
     verify_recorded_artifacts,
 )
 
@@ -106,7 +100,7 @@ def test_artifact_tree_rejects_symlink(tmp_path: Path) -> None:
 
 def test_state_timestamp_is_not_interpreted_as_approval(tmp_path: Path) -> None:
     state = _state(tmp_path)
-    assert datetime.fromisoformat(state["created_at"]).tzinfo == timezone.utc
+    assert datetime.fromisoformat(state["created_at"]).tzinfo == UTC
     assert state["stage"] == "INITIALIZED"
 
 

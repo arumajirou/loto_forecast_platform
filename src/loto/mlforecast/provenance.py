@@ -3,7 +3,6 @@ from __future__ import annotations
 import importlib.metadata as metadata
 from typing import Any
 
-
 MLFORECAST_REQUIRED_VERSION = "1.1.0"
 MLFORECAST_UPSTREAM_TAG = "v1.1.0"
 MLFORECAST_UPSTREAM_COMMIT = "a1609efddf8cf1a83510a50cd5487b66f32271c6"

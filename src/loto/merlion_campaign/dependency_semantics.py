@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import re
 import tomllib
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 from loto.merlion_campaign.dependency_gate import (
     _canonical_sha256,

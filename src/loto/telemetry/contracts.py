@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import math
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any, Literal
 
@@ -197,7 +197,7 @@ class TelemetryEvent(StrictTelemetryModel):
     def validate_timestamp_utc(cls, value: datetime) -> datetime:
         if value.utcoffset() is None:
             raise ValueError("timestamp_utc must be timezone-aware")
-        return value.astimezone(timezone.utc)
+        return value.astimezone(UTC)
 
     @field_validator("event_name")
     @classmethod

@@ -12,7 +12,6 @@ from typing import Any
 
 from loto.mlforecast.artifacts import atomic_write_text, sha256_bytes, sha256_file
 
-
 BUNDLE_FORMAT = 1
 RUN_ID_PATTERN = re.compile(r"^mlforecast-runtime-\d{8}-\d{6}-\d{6}$")
 DIGEST_PATTERN = re.compile(r"^[0-9a-f]{64}$")

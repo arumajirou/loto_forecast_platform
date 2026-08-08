@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -46,7 +46,7 @@ def prepare_root(root: Path) -> None:
 
 
 def fixed_clock() -> datetime:
-    return datetime(2026, 8, 5, 12, 0, tzinfo=timezone.utc)
+    return datetime(2026, 8, 5, 12, 0, tzinfo=UTC)
 
 
 class FakeRunner:

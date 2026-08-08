@@ -35,7 +35,7 @@ class HoldoutActuals(BaseModel):
     legal_max: list[int] = Field(min_length=1)
 
     @model_validator(mode="after")
-    def validate_geometry(self) -> "HoldoutActuals":
+    def validate_geometry(self) -> HoldoutActuals:
         width = len(self.position_names)
         if len(set(self.position_names)) != width:
             raise ValueError("position_names must be unique")
@@ -84,7 +84,7 @@ class HoldoutScoringRequest(BaseModel):
     actuals: HoldoutActuals
 
     @model_validator(mode="after")
-    def validate_times(self) -> "HoldoutScoringRequest":
+    def validate_times(self) -> HoldoutScoringRequest:
         scored = _parse_utc(self.scored_at_utc, label="scored_at_utc")
         revealed = _parse_utc(
             self.actuals.revealed_at_utc,

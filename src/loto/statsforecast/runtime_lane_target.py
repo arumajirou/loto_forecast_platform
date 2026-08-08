@@ -8,10 +8,11 @@ import subprocess
 import sys
 import traceback
 import zipfile
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, Callable
+from typing import Any
 
 from .runtime_lane_artifacts import (
     atomic_write,
@@ -21,7 +22,6 @@ from .runtime_lane_artifacts import (
     verify_portable_sha256sums,
     write_json,
 )
-
 from .runtime_lane_execution import execute_runtime_lane
 from .runtime_lane_wheel_policy import prepare_offline_bundle, verify_offline_bundle
 
@@ -155,7 +155,7 @@ def create_deterministic_zip(source_dir: Path) -> Path:
     sidecar = archive.with_suffix(".zip.sha256")
     atomic_write(
         sidecar,
-        f"{sha256_file(archive)}  {archive.name}\n".encode("utf-8"),
+        f"{sha256_file(archive)}  {archive.name}\n".encode(),
     )
     return archive
 
@@ -244,7 +244,7 @@ def run_target_host_certification(
         raise ValueError("offline target-host execution requires --wheelhouse")
     if prepare_offline and wheelhouse is None:
         raise ValueError("--prepare-offline requires --wheelhouse")
-    run_id = run_id or datetime.now(timezone.utc).strftime("statsforecast-target-%Y%m%d-%H%M%S")
+    run_id = run_id or datetime.now(UTC).strftime("statsforecast-target-%Y%m%d-%H%M%S")
     output_root.mkdir(parents=True, exist_ok=True)
     controller_dir = output_root / run_id
     controller_dir.mkdir(parents=False, exist_ok=False)

@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import json
 import zipfile
+from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping
+from typing import Any
 
 from .runtime_lane_admission import inspect_target_host_archive as _base_inspector
 

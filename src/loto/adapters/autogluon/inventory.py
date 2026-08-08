@@ -4,11 +4,12 @@ import hashlib
 import importlib
 import importlib.metadata
 import json
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, is_dataclass
 from enum import StrEnum
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Callable
+from typing import Any
 
 TARGET_AUTOGLUON_VERSION = "1.5.0"
 

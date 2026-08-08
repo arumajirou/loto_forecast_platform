@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .contracts import ArchitectureProfile, FRETS_PRECISION, TrainingProfile
+from .contracts import FRETS_PRECISION, ArchitectureProfile, TrainingProfile
 
 
 def build_auto_frets_class(

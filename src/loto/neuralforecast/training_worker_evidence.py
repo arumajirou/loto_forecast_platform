@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import os
 import socket
+from collections.abc import Callable
 from datetime import UTC, datetime
 from threading import RLock
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -303,8 +304,8 @@ class TrainingWorkerEvidenceMixin:
             distributed_config=distributed_config,
         )
         evidence = callback.evidence().model_dump(mode="json")
-        setattr(model, "training_runtime_evidence", evidence)
-        setattr(model, "runtime_training_evidence", evidence)
+        model.training_runtime_evidence = evidence
+        model.runtime_training_evidence = evidence
         return model
 
 

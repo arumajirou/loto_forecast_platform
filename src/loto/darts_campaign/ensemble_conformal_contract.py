@@ -109,7 +109,7 @@ class EnsembleConfig(BaseModel):
                 "train_using_historical_forecasts": (self.train_using_historical_forecasts),
                 "regression_model_id": self.regression_model_id,
             }
-            if any((value for value in regression_only.values())):
+            if any(value for value in regression_only.values()):
                 raise ValueError("naive ensemble cannot use regression-only settings")
         else:
             if self.regression_train_n_points == 0 or self.regression_train_n_points < -1:
@@ -198,8 +198,8 @@ class P10CampaignConfig(BaseModel):
 
     @model_validator(mode="after")
     def validate_campaign(self) -> P10CampaignConfig:
-        requested = tuple((item.public_name for item in self.ensembles)) + tuple(
-            (item.public_name for item in self.conformal_models)
+        requested = tuple(item.public_name for item in self.ensembles) + tuple(
+            item.public_name for item in self.conformal_models
         )
         if set(requested) != set(P10_MODEL_IDENTITIES):
             raise ValueError("P10 campaign must retain all four required identities")
@@ -244,12 +244,12 @@ def _validate_protected_args(arguments: Mapping[str, Any], protected: set[str], 
 
 
 def _validate_quantiles(quantiles: Sequence[float]) -> None:
-    values = tuple((float(item) for item in quantiles))
+    values = tuple(float(item) for item in quantiles)
     if len(values) < 3 or len(values) % 2 == 0:
         raise ValueError("quantiles must contain an odd number of at least three values")
     if values != tuple(sorted(values)) or len(set(values)) != len(values):
         raise ValueError("quantiles must be strictly increasing and unique")
-    if any((value <= 0.0 or value >= 1.0 for value in values)):
+    if any(value <= 0.0 or value >= 1.0 for value in values):
         raise ValueError("quantiles must lie strictly between zero and one")
     if 0.5 not in values or values[len(values) // 2] != 0.5:
         raise ValueError("quantiles must be centered on the median")
@@ -278,10 +278,8 @@ def classify_arguments(
 ) -> tuple[dict[str, Any], tuple[ArgumentLedgerEntry, ...]]:
     signature = inspect.signature(target)
     accepts_kwargs = any(
-        (
-            parameter.kind is inspect.Parameter.VAR_KEYWORD
-            for parameter in signature.parameters.values()
-        )
+        parameter.kind is inspect.Parameter.VAR_KEYWORD
+        for parameter in signature.parameters.values()
     )
     accepted_names = set(signature.parameters)
     effective: dict[str, Any] = {}
@@ -329,8 +327,8 @@ def build_ensemble_plan(
     shifts = {model.output_chunk_shift for model in models}
     if len(shifts) != 1:
         raise P10ContractError("all base models must share output_chunk_shift")
-    all_global = all((model.is_global for model in models))
-    all_prefitted = all((model.is_fitted for model in models))
+    all_global = all(model.is_global for model in models)
+    all_prefitted = all(model.is_fitted for model in models)
     if not config.train_forecasting_models and (not (all_global and all_prefitted)):
         raise P10ContractError("disabled base-model training requires pre-fitted global models")
     effective_train_points: int | None = None
@@ -347,7 +345,7 @@ def build_ensemble_plan(
                 )
         effective_train_points = config.regression_train_n_points
     if config.predict_likelihood_parameters:
-        if not all((model.supports_likelihood_parameters for model in models)):
+        if not all(model.supports_likelihood_parameters for model in models):
             raise P10ContractError(
                 "likelihood-parameter ensembling requires support from every base model"
             )
@@ -384,7 +382,7 @@ def build_ensemble_plan(
         all_global=all_global,
         all_prefitted=all_prefitted,
         probabilistic_base_ids=tuple(
-            (model.model_id for model in models if model.supports_probabilistic_prediction)
+            model.model_id for model in models if model.supports_probabilistic_prediction
         ),
         effective_regression_train_n_points=effective_train_points,
         effective_train_num_samples=effective_samples,

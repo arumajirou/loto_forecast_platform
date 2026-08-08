@@ -5,9 +5,10 @@ import json
 import math
 import random
 import statistics as stats
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -42,7 +43,7 @@ class GeometryContract(BaseModel):
     sort_policy: str = "ascending"
 
     @model_validator(mode="after")
-    def valid(self) -> "GeometryContract":
+    def valid(self) -> GeometryContract:
         if not self.position_columns or len(set(self.position_columns)) != len(
             self.position_columns
         ):
@@ -70,7 +71,7 @@ class SelectionEvidence(BaseModel):
         return value
 
     @model_validator(mode="after")
-    def no_auto(self) -> "SelectionEvidence":
+    def no_auto(self) -> SelectionEvidence:
         if self.automatic_selection:
             raise ValueError("automatic selection is forbidden")
         return self
@@ -363,13 +364,3 @@ def build_baseline_predictions(
 
 def _prediction_rows(rows: Sequence[Mapping[str, Any]]) -> tuple[PredictionRow, ...]:
     return tuple(PredictionRow.model_validate(row) for row in rows)
-
-
-from loto.autogluon_campaign.holdout_prospective_lock import (  # noqa: E402
-    create_prediction_lock,
-    verify_prediction_lock,
-)
-from loto.autogluon_campaign.holdout_prospective_score import (  # noqa: E402
-    score_prediction_lock,
-    verify_scoring_output,
-)

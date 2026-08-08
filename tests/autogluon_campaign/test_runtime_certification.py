@@ -13,7 +13,6 @@ from loto.autogluon_campaign.runtime_certification import (
     run_runtime_certification,
 )
 
-
 FAKE_PROVIDER = r"""
 import argparse
 import json

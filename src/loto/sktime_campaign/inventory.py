@@ -4,7 +4,6 @@ import inspect
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
-
 SELECTED_TAGS: tuple[str, ...] = (
     "capability:pred_int",
     "capability:missing_values",

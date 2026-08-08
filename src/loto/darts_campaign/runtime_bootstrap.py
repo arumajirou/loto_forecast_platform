@@ -5,7 +5,7 @@ import os
 import shutil
 import subprocess
 from collections.abc import Callable, Mapping, Sequence
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
 
@@ -278,7 +278,7 @@ def run_runtime_bootstrap(
     *,
     runner: Runner = subprocess.run,
     uv_locator: Callable[[str], str | None] = shutil.which,
-    clock: Clock = lambda: datetime.now(timezone.utc),
+    clock: Clock = lambda: datetime.now(UTC),
     process_id: int | None = None,
 ) -> tuple[RuntimeBootstrapReport, CampaignApproval | None]:
     root = repository_root.resolve()
@@ -288,7 +288,7 @@ def run_runtime_bootstrap(
     preflight_output = _safe_path(root, profile.preflight_output_path)
     report_output = _safe_path(root, profile.bootstrap_report_path)
     approval_output = _safe_path(root, profile.approval_path)
-    generated_at = clock().astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    generated_at = clock().astimezone(UTC).isoformat().replace("+00:00", "Z")
     pid = process_id or os.getpid()
 
     for stale in (preflight_output, report_output, approval_output):

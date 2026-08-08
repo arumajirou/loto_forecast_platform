@@ -1,15 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from loto.moirai2_campaign.target_execution_common import (
-    CUDA_LANE,
     LANE_DEVICES,
-    MANIFEST_FILENAME,
-    SHA_FILENAME,
-    SUPPORTED_LANE,
     TargetExecutionError,
     load_json_object,
     sha256_file,

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any
 
 from loto.moirai2_campaign.target_execution_common import (
-    CUDA_LANE,
     EVENT_ORDER,
     LANE_DEVICES,
     SCHEMA_VERSION,

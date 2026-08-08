@@ -4,9 +4,10 @@ import hashlib
 import json
 import re
 import zipfile
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 FORMAL_GAMES = ("numbers3", "numbers4", "miniloto", "loto6", "loto7")
 FORMAL_CONTEXTS = (128, 256, 512)

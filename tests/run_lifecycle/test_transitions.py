@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from conftest import make_command
 
 from loto.run_lifecycle import (
     RunAggregate,
@@ -10,8 +11,6 @@ from loto.run_lifecycle import (
     TransitionEngine,
     TransitionRejected,
 )
-
-from conftest import make_command
 
 
 def test_unknown_transition_fails_closed() -> None:

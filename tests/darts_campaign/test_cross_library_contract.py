@@ -1,32 +1,22 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import pytest
 from pydantic import ValidationError
 
 from loto.darts_campaign.cross_library import (
     PROVIDER_TRACKS,
     CrossLibraryCampaignConfig,
-    CrossLibraryCertificationError,
     ExecutionEvidence,
     FairnessContract,
     ProviderExecution,
-    TemporalBoundaries,
-    build_cross_library_report,
-    canonical_sha256,
-    certify_prediction_key_parity,
-    evaluate_execution,
-    run_cross_library_matrix,
 )
+
 from .cross_library_fixtures import (
     HASH_A,
     HASH_B,
     HASH_E,
     _algorithm,
-    _baselines,
     _config,
-    _evidence,
     _fairness,
     _providers,
     _records,

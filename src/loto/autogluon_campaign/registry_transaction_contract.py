@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Literal
 from urllib.parse import unquote, urlparse
@@ -62,7 +61,7 @@ class RegistryHistoryRecord(BaseModel):
     record_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
-    def validate_record(self) -> "RegistryHistoryRecord":
+    def validate_record(self) -> RegistryHistoryRecord:
         parse_utc(self.committed_at_utc, label="committed_at_utc")
         if self.post_generation != self.pre_generation + 1:
             raise ValueError("history generation must advance exactly once")
@@ -101,7 +100,7 @@ class RegistryState(BaseModel):
         return value
 
     @model_validator(mode="after")
-    def validate_state(self) -> "RegistryState":
+    def validate_state(self) -> RegistryState:
         if self.generation != len(self.history):
             raise ValueError("registry generation must equal history length")
         if len(self.consumed_authorization_ids) != self.generation:
@@ -172,7 +171,7 @@ class RegistryTransactionRequest(BaseModel):
     policy: RegistryPolicy = Field(default_factory=RegistryPolicy)
 
     @model_validator(mode="after")
-    def validate_request(self) -> "RegistryTransactionRequest":
+    def validate_request(self) -> RegistryTransactionRequest:
         parse_utc(self.executed_at_utc, label="executed_at_utc")
         return self
 

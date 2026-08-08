@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -26,7 +26,7 @@ from loto.probabilistic.kdpp_certification_gate import (
 )
 
 SHA = "a" * 64
-NOW = datetime(2026, 8, 6, 3, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 6, 3, 0, tzinfo=UTC)
 ROOT = Path(__file__).parents[2]
 SCRIPT = ROOT / "scripts" / "run_kdpp_fixed_k_target_host.py"
 

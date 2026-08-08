@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import importlib.util
 import os
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from threading import RLock
-from typing import Any, Iterator
+from typing import Any
 
 from .contracts import (
     ArchitectureProfile,

@@ -3,9 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 CONTEXT_FILENAME = "loto_provider_context_v2.json"
 PLAN_FILENAME = "loto_execution_plan_v2.json"

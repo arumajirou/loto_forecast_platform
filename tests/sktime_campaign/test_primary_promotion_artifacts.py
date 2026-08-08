@@ -4,13 +4,13 @@ import json
 from pathlib import Path
 
 import pytest
+from p11_helpers import build_request, fake_verifier
 
 from loto.sktime_campaign.primary_promotion_artifacts import (
     P11VerificationError,
     persist_p11,
     verify_p11,
 )
-from p11_helpers import build_request, fake_verifier
 
 
 def persist(tmp_path: Path):

@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from pathlib import Path
 from typing import Any
 
 from loto.orchestration.pipeline_downstream_effects_common import (
     json_equal as _json_equal,
+)
+from loto.orchestration.pipeline_downstream_effects_common import (
     reject_symlink_components as _reject_symlink_components,
 )
 from loto.orchestration.pipeline_downstream_preflight import (

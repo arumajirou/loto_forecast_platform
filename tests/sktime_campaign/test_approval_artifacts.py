@@ -4,13 +4,13 @@ import json
 from pathlib import Path
 
 import pytest
+from test_approval_authorization import ISSUED, make_request, verifier
 
 from loto.sktime_campaign.approval_artifacts import (
     P7VerificationError,
     persist_p7,
     verify_p7,
 )
-from test_approval_authorization import ISSUED, make_request, verifier
 
 
 def _rewrite(path: Path, payload: object) -> None:

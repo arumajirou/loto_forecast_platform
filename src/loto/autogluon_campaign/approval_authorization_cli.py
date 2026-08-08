@@ -4,9 +4,9 @@ import argparse
 import json
 import secrets
 import sys
-from datetime import datetime, timedelta, timezone
+from collections.abc import Sequence
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Sequence
 
 from loto.autogluon_campaign.approval_authorization import (
     build_approval_intent,
@@ -28,7 +28,7 @@ from loto.autogluon_campaign.approval_authorization_io import load_json, write_j
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _load_policy(path: Path) -> ApprovalPolicy:
@@ -41,7 +41,7 @@ def _load_subject(path: Path) -> RegistrySubject:
 
 def _intent(args: argparse.Namespace) -> int:
     requested = args.requested_at_utc or _utc_now()
-    requested_dt = datetime.strptime(requested, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    requested_dt = datetime.strptime(requested, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
     policy = _load_policy(args.policy)
     expires = args.expires_at_utc or (
         requested_dt + timedelta(seconds=policy.authorization_ttl_seconds)

@@ -5,8 +5,9 @@ import hashlib
 import json
 import os
 import re
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from loto.autogluon_campaign.approval_authorization_contract import (
     ApprovalAuthorizationError,

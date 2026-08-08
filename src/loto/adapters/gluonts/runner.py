@@ -5,9 +5,10 @@ import json
 import os
 import subprocess
 import tempfile
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from loto.adapters.gluonts.inventory import RuntimeInventory, inventory_sha256
 from loto.adapters.gluonts.protocol import (

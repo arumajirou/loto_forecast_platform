@@ -7,9 +7,9 @@ from typing import Literal
 
 from loto.probabilistic.kdpp_certification_gate import sha256_file
 from loto.probabilistic.kdpp_target_contracts import (
-    RepositoryIdentity,
     _EXPORTER_FILES,
     _KDPP_FILES,
+    RepositoryIdentity,
 )
 
 

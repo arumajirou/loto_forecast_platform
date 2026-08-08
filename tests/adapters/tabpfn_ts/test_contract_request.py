@@ -10,6 +10,7 @@ from loto.adapters.tabpfn_ts import (
     TaskFormulation,
     lane_manifest,
 )
+
 from .conftest import build_position_request
 
 

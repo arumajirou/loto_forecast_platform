@@ -3,18 +3,17 @@ from __future__ import annotations
 import copy
 
 import pytest
+from p10_helpers import (
+    SHADOW_ID,
+    make_request,
+    make_window_payload,
+    reseal_window_payload,
+)
 from pydantic import ValidationError
 
 from loto.sktime_campaign.canary_evaluation import (
     CanaryEvaluationRequest,
     evaluate_shadow_canary,
-)
-from p10_helpers import (
-    ACTIVATION_ID,
-    SHADOW_ID,
-    make_request,
-    make_window_payload,
-    reseal_window_payload,
 )
 
 

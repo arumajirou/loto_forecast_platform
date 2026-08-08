@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from loto.merlion_campaign.bootstrap_evidence_verify import verify_bootstrap_evidence_zip
 from loto.merlion_campaign.license_review import (

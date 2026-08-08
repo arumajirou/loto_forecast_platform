@@ -7,11 +7,11 @@ import json
 import zipfile
 from pathlib import Path
 
-from loto.merlion_campaign.lock_admission import evaluate_lock_admission
 from loto.merlion_campaign.license_review import (
     LICENSE_REVIEW_SCHEMA,
     canonical_sha256,
 )
+from loto.merlion_campaign.lock_admission import evaluate_lock_admission
 
 HEAD = "a" * 40
 

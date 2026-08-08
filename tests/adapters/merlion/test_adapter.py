@@ -8,7 +8,6 @@ import pytest
 from loto.adapters.merlion.adapter import MerlionProviderAdapter, MerlionProviderError
 from loto.merlion_campaign.protocol import Operation, ProviderRequest
 
-
 SLEEP_PROVIDER = r"""
 import argparse
 import time

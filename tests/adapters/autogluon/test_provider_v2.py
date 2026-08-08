@@ -20,7 +20,7 @@ class FakeTimeSeriesDataFrame:
 
 
 class FakePredictor:
-    instances: list["FakePredictor"] = []
+    instances: list[FakePredictor] = []
     loaded_paths: list[str] = []
     saved_model_names: dict[str, list[str]] = {}
     prediction_horizon = 2

@@ -9,10 +9,11 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from loto.basicts_campaign.certification import (
     EXPECTED_UPSTREAM_REVISION,

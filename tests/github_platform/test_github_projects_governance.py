@@ -9,7 +9,6 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT_PATH = ROOT / "scripts" / "github_projects" / "governance.py"
 SPEC_PATH = ROOT / "configs" / "github_projects" / "governance_v1.yaml"

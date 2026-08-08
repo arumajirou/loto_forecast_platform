@@ -20,7 +20,6 @@ from loto.adapters.timer_s1.contracts import (  # noqa: E402
 )
 from loto.timer_s1_campaign.provider import handle_request  # noqa: E402
 
-
 _RUN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
 

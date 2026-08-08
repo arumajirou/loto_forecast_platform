@@ -10,7 +10,6 @@ from typing import Any
 from loto.basicts_campaign.dlinear_runtime_provenance import (
     DLINEAR_ARCH_MODULE,
     DLINEAR_CONFIG_MODULE,
-    DLINEAR_MODULE_CONTRACTS,
     verify_dlinear_runtime_modules,
 )
 from loto.basicts_campaign.installed_provenance import (

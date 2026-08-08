@@ -57,9 +57,9 @@ def certify_naive_average(
     if not arrays:
         raise CertificationError("no base predictions supplied")
     shapes = {array.shape for array in arrays}
-    if len(shapes) != 1 or any((array.ndim != 2 for array in arrays)):
+    if len(shapes) != 1 or any(array.ndim != 2 for array in arrays):
         raise CertificationError("base prediction shapes must match position x horizon")
-    if any((not np.isfinite(array).all() for array in arrays)):
+    if any(not np.isfinite(array).all() for array in arrays):
         raise CertificationError("base predictions contain NaN or Inf")
     observed = np.asarray(ensemble_prediction, dtype=float)
     if observed.shape != arrays[0].shape or not np.isfinite(observed).all():
@@ -69,7 +69,7 @@ def certify_naive_average(
         raise CertificationError("naive ensemble prediction differs from arithmetic mean")
     return {
         "base_model_ids": tuple(base_model_ids),
-        "shape": tuple((int(value) for value in observed.shape)),
+        "shape": tuple(int(value) for value in observed.shape),
         "max_abs_delta": float(np.max(np.abs(observed - expected))),
         "prediction_sha256": canonical_sha256(observed.tolist()),
     }
@@ -100,22 +100,17 @@ def certify_stacking_evidence(
         for item in evidence.evaluation_records
     }
     if any(
-        (
-            not partition.train_start <= item.origin < partition.calibration_end
-            or item.target_index >= partition.evaluation_start
-            for item in evidence.training_records
-        )
+        not partition.train_start <= item.origin < partition.calibration_end
+        or item.target_index >= partition.evaluation_start
+        for item in evidence.training_records
     ):
         raise CertificationError("stacking record uses evaluation-period information")
     overlap = training_keys & evaluation_keys
     if overlap:
         raise CertificationError("stacking training and evaluation keys overlap")
     if any(
-        (
-            item.origin < partition.evaluation_start
-            or item.target_index >= partition.evaluation_end
-            for item in evidence.evaluation_records
-        )
+        item.origin < partition.evaluation_start or item.target_index >= partition.evaluation_end
+        for item in evidence.evaluation_records
     ):
         raise CertificationError("evaluation records fall outside the evaluation partition")
     grouped: dict[tuple[int, int, int, str], set[str]] = defaultdict(set)

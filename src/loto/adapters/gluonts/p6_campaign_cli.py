@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 import json
 import shlex
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from .p6_campaign import run_p6_campaign
 from .p6_contract import P6Status

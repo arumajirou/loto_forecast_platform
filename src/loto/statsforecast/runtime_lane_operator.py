@@ -7,11 +7,12 @@ import shutil
 import smtplib
 import subprocess
 import traceback
+from collections.abc import Callable, Mapping, MutableMapping
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.message import EmailMessage
 from pathlib import Path
-from typing import Any, Callable, Mapping, MutableMapping
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -37,7 +38,7 @@ class EmailSettings:
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _atomic_write(path: Path, content: bytes) -> None:
@@ -325,7 +326,7 @@ def run_target_host_operator(
     if expected_seed < 0 or horizon < 1:
         raise ValueError("seed and horizon must be valid fixed values")
 
-    run_id = run_id or datetime.now(timezone.utc).strftime("statsforecast-operator-%Y%m%d-%H%M%S")
+    run_id = run_id or datetime.now(UTC).strftime("statsforecast-operator-%Y%m%d-%H%M%S")
     output_root.mkdir(parents=True, exist_ok=True)
     output_dir = output_root / run_id
     output_dir.mkdir(parents=False, exist_ok=False)

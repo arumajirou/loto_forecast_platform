@@ -1,36 +1,21 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import numpy as np
-
-import pandas as pd
-
 import pytest
-
-from pydantic import ValidationError
 
 from loto.darts_campaign.ensemble_conformal import (
     BaseModelEvidence,
     CertificationError,
     ConformalConfig,
-    DependencyUnavailableError,
     EnsembleConfig,
     ForecastPoint,
-    P10CampaignConfig,
     P10ContractError,
-    P10_MODEL_IDENTITIES,
     StackingEvidence,
     TemporalPartition,
-    assert_frame_unchanged,
-    build_ensemble_plan,
-    canonical_sha256,
     certify_conformal_quantiles,
     certify_naive_average,
     certify_stacking_evidence,
     compute_interval_metrics,
-    p10_identity_sha256,
-    run_p10_matrix,
 )
 
 PARTITION = TemporalPartition(
@@ -108,17 +93,13 @@ def test_naive_average_parity_shape_and_finite_checks() -> None:
 
 def test_regression_stacking_rejects_leakage_and_incomplete_rows() -> None:
     training = tuple(
-        (
-            _point(model, seed=seed, fold_id=0, origin=12, target=13, position="N1")
-            for seed in (1, 7)
-            for model in ("a", "b")
-        )
+        _point(model, seed=seed, fold_id=0, origin=12, target=13, position="N1")
+        for seed in (1, 7)
+        for model in ("a", "b")
     )
     evaluation = tuple(
-        (
-            _point("ensemble", seed=seed, fold_id=0, origin=15, target=16, position="N1")
-            for seed in (1, 7)
-        )
+        _point("ensemble", seed=seed, fold_id=0, origin=15, target=16, position="N1")
+        for seed in (1, 7)
     )
     evidence = StackingEvidence(
         training_records=training,

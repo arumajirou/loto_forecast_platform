@@ -3,9 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -54,7 +55,7 @@ class ObservedHistory(BaseModel):
     legal_max: list[int] = Field(min_length=1)
 
     @model_validator(mode="after")
-    def validate_history(self) -> "ObservedHistory":
+    def validate_history(self) -> ObservedHistory:
         width = len(self.position_names)
         if len(set(self.position_names)) != width:
             raise ValueError("position_names must be unique")
@@ -105,7 +106,7 @@ class ProspectiveRequest(BaseModel):
     actuals_known: Literal[False] = False
 
     @model_validator(mode="after")
-    def validate_request(self) -> "ProspectiveRequest":
+    def validate_request(self) -> ProspectiveRequest:
         if self.prospective_draw_no != sorted(self.prospective_draw_no):
             raise ValueError("prospective_draw_no must be sorted")
         if len(set(self.prospective_draw_no)) != len(self.prospective_draw_no):
@@ -407,7 +408,7 @@ class ProspectiveActuals(BaseModel):
     values: list[list[float]] = Field(min_length=1)
 
     @model_validator(mode="after")
-    def validate_actuals(self) -> "ProspectiveActuals":
+    def validate_actuals(self) -> ProspectiveActuals:
         if len(self.draw_no) != len(self.values):
             raise ValueError("actual draw and value row counts differ")
         if len(set(self.position_names)) != len(self.position_names):
@@ -432,7 +433,7 @@ class DriftPolicy(BaseModel):
     critical_mae_increase: float = Field(default=1.00, ge=0.0)
 
     @model_validator(mode="after")
-    def validate_thresholds(self) -> "DriftPolicy":
+    def validate_thresholds(self) -> DriftPolicy:
         if self.critical_hit_drop < self.warning_hit_drop:
             raise ValueError("critical_hit_drop must be >= warning_hit_drop")
         if self.critical_mae_increase < self.warning_mae_increase:
@@ -452,7 +453,7 @@ class ProspectiveMonitoringRequest(BaseModel):
     policy: DriftPolicy = Field(default_factory=DriftPolicy)
 
     @model_validator(mode="after")
-    def validate_monitoring(self) -> "ProspectiveMonitoringRequest":
+    def validate_monitoring(self) -> ProspectiveMonitoringRequest:
         verify_prospective_lock(self.prediction_lock)
         sealed = _parse_utc(
             str(self.prediction_lock["sealed_at_utc"]),

@@ -6,9 +6,10 @@ import os
 import shutil
 import subprocess
 import urllib.request
-from datetime import datetime, timezone
+from collections.abc import Callable, Iterable, Mapping, Sequence
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, Callable, Iterable, Mapping, Sequence
+from typing import Any
 
 from packaging.tags import Tag, sys_tags
 from packaging.utils import parse_wheel_filename
@@ -19,7 +20,7 @@ PYPI_JSON_URL = f"https://pypi.org/pypi/{TARGET_PACKAGE}/{TARGET_VERSION}/json"
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def canonical_json(payload: Any) -> bytes:

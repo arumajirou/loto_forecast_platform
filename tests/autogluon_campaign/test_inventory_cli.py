@@ -4,9 +4,9 @@ import types
 from dataclasses import replace
 
 from loto.adapters.autogluon.inventory import (
-    InventoryStatus,
     SOURCE_ENSEMBLE_SPECS,
     SOURCE_MODEL_SPECS,
+    InventoryStatus,
     discover_runtime_inventory,
 )
 from loto.autogluon_campaign import inventory_cli

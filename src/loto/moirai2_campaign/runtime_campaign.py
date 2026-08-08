@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from loto.moirai2_campaign.model_manifest import (
     MODEL_ID,
@@ -88,7 +89,7 @@ def draw_timestamps(history_length: int, *, first_draw: int = 100_000) -> list[i
 
 
 def calendar_timestamps(history_length: int) -> list[str]:
-    start = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    start = datetime(2020, 1, 1, tzinfo=UTC)
     timestamps: list[str] = []
     day_offset = 0
     for index in range(history_length):

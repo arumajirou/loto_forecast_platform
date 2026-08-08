@@ -6,8 +6,8 @@ from pydantic import ValidationError
 from loto.adapters.timesfm25.contracts import (
     ArtifactReference,
     Backend,
-    GPUExecutionEvidence,
     GameGeometry,
+    GPUExecutionEvidence,
     ModelIdentity,
     RuntimeEvidence,
     TimesFM25Request,

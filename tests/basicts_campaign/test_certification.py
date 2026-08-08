@@ -12,8 +12,8 @@ from loto.basicts_campaign.basicts_module_closure import (
     RUNTIME_CRITICAL_MODULES,
 )
 from loto.basicts_campaign.certification import (
-    CertificationError,
     EXPECTED_UPSTREAM_REVISION,
+    CertificationError,
     certify_p0,
     verify_provider_bundle,
 )

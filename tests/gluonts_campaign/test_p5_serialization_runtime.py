@@ -15,7 +15,6 @@ from loto_gluonts_provider import serialization_runtime as runtime
 from loto_gluonts_provider.protocol import DatasetItem, GluonTSProviderRequest
 from loto_gluonts_provider.serialization import LifecycleOutcome
 
-
 VERSIONS = {
     "gluonts": "0.16.3",
     "torch": "2.9.1",

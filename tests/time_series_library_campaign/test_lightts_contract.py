@@ -9,7 +9,6 @@ import pytest
 
 from loto.time_series_library_campaign import ProviderRequest
 
-
 FAKE_LIGHTTS = (
     """
 import torch

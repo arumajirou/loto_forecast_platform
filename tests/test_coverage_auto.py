@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 
 import pytest
-
 from coverage_test_support import (
     FakeAuto,
     PandasProxy,
@@ -12,6 +11,7 @@ from coverage_test_support import (
     auto_config,
     corrupt_protected_rows,
 )
+
 from loto.coverage.instrumented import run_auto_research_with_ledger
 from loto.coverage.ledger import (
     CoverageLedgerBlocked,

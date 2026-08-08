@@ -9,9 +9,10 @@ import socket
 import subprocess
 import tempfile
 import tomllib
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping, Sequence
+from typing import Any
 
 EXPECTED_MERLION_VERSION = "2.0.4"
 EXPECTED_REGISTRY = "https://pypi.org/simple"

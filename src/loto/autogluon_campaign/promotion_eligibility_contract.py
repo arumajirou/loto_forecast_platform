@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import math
 import statistics as stats
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -39,7 +40,7 @@ class PromotionPolicy(BaseModel):
     registry_write_allowed: bool = False
 
     @model_validator(mode="after")
-    def fail_closed(self) -> "PromotionPolicy":
+    def fail_closed(self) -> PromotionPolicy:
         if self.automatic_promotion:
             raise ValueError("automatic promotion is forbidden")
         if self.automatic_retraining:

@@ -60,10 +60,10 @@ def _bwrap_plan(
 
 
 def _oci_mount(mount: object) -> str:
-    source_path = getattr(mount, "source_path")
-    target_path = getattr(mount, "target_path")
-    mode = getattr(mount, "mode")
-    if getattr(mount, "kind") == MountKind.TMPFS:
+    source_path = mount.source_path
+    target_path = mount.target_path
+    mode = mount.mode
+    if mount.kind == MountKind.TMPFS:
         return f"type=tmpfs,destination={target_path},rw,noexec,nosuid,nodev"
     suffix = "ro" if mode == MountMode.READ_ONLY else "rw"
     return f"type=bind,source={source_path},destination={target_path},{suffix},nosuid,nodev"

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -93,5 +93,5 @@ def test_request_rejects_partial_control_separator() -> None:
             executable="/usr/bin/python3",
             arguments=(),
             environment={"SAFE": "line1\nline2"},
-            issued_at=datetime.now(timezone.utc),
+            issued_at=datetime.now(UTC),
         )

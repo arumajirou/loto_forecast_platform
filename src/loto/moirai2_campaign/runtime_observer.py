@@ -41,7 +41,7 @@ class ForwardDeviceObserver:
         self._forward_call_count = 0
         self._handles: list[Any] = []
 
-    def attach(self, module: Any) -> "ForwardDeviceObserver":
+    def attach(self, module: Any) -> ForwardDeviceObserver:
         if self._handles:
             raise RuntimeError("forward device observer is already attached")
         self._handles = [

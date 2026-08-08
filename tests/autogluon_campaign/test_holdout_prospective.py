@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -83,7 +83,7 @@ def make_holdout(tmp_path: Path) -> Path:
         future_draw_ids=(13, 14),
         selection=selection(),
         model_predictions=model_predictions(),
-        now=datetime(2026, 8, 5, 9, 0, tzinfo=timezone.utc),
+        now=datetime(2026, 8, 5, 9, 0, tzinfo=UTC),
     )
     return root
 

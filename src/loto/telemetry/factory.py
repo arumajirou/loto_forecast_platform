@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from loto.telemetry.context import current_telemetry_context
@@ -58,7 +58,7 @@ def build_event(
     safe_attributes = redact_mapping(safe_attributes, reveal_state=reveal_state)
     return TelemetryEvent.model_validate(
         {
-            "timestamp_utc": timestamp_utc or datetime.now(timezone.utc),
+            "timestamp_utc": timestamp_utc or datetime.now(UTC),
             "severity": severity,
             "event_name": event_name,
             "component": component,

@@ -82,7 +82,7 @@ class ClockCommandEvidence(StrictFrozenModel):
         return _require_utc(value)
 
     @model_validator(mode="after")
-    def command_contract(self) -> "ClockCommandEvidence":
+    def command_contract(self) -> ClockCommandEvidence:
         if not self.argv:
             raise ValueError("argv must not be empty")
         if any(not item or len(item) > 256 or "\x00" in item for item in self.argv):
@@ -116,7 +116,7 @@ class ClockParserEvidence(StrictFrozenModel):
         return value
 
     @model_validator(mode="after")
-    def command_identity_contract(self) -> "ClockParserEvidence":
+    def command_identity_contract(self) -> ClockParserEvidence:
         identifiers = [item.command_id for item in self.commands]
         if len(identifiers) != len(set(identifiers)):
             raise ValueError("parser command identifiers must be unique")
@@ -135,7 +135,7 @@ class ClockSourceObservation(StrictFrozenModel):
     uncertainty_seconds: NonNegativeFloat | None = None
 
     @model_validator(mode="after")
-    def source_consistency(self) -> "ClockSourceObservation":
+    def source_consistency(self) -> ClockSourceObservation:
         if self.selected and not self.online:
             raise ValueError("selected source must be online")
         if self.selection_state == SourceSelectionState.CURRENT and not self.selected:
@@ -161,7 +161,7 @@ class ClockContinuityEvidence(StrictFrozenModel):
         return _require_utc(value)
 
     @model_validator(mode="after")
-    def continuity_contract(self) -> "ClockContinuityEvidence":
+    def continuity_contract(self) -> ClockContinuityEvidence:
         if self.ended_at_utc < self.started_at_utc:
             raise ValueError("continuity end cannot precede start")
         expected_difference = abs(self.wall_delta_ns - self.monotonic_delta_ns)
@@ -184,7 +184,7 @@ class ClockContinuityEvidence(StrictFrozenModel):
         wall_delta_ns: int,
         monotonic_delta_ns: int,
         step_threshold_ns: int,
-    ) -> "ClockContinuityEvidence":
+    ) -> ClockContinuityEvidence:
         payload = {
             "sample_id": sample_id,
             "started_at_utc": started_at_utc,
@@ -226,7 +226,7 @@ class ClockObservation(StrictFrozenModel):
         return _require_utc(value)
 
     @model_validator(mode="after")
-    def observation_contract(self) -> "ClockObservation":
+    def observation_contract(self) -> ClockObservation:
         source_ids = [source.source_id_sha256 for source in self.sources]
         if len(source_ids) != len(set(source_ids)):
             raise ValueError("clock source identities must be unique")
@@ -242,7 +242,7 @@ class ClockObservation(StrictFrozenModel):
         return self
 
     @classmethod
-    def create(cls, **values: object) -> "ClockObservation":
+    def create(cls, **values: object) -> ClockObservation:
         payload = {"schema_version": SCHEMA_VERSION, **values}
         return cls(
             **payload,
@@ -279,7 +279,7 @@ class ClockHealthPolicy(StrictFrozenModel):
     policy_sha256: Sha256
 
     @model_validator(mode="after")
-    def policy_contract(self) -> "ClockHealthPolicy":
+    def policy_contract(self) -> ClockHealthPolicy:
         pairs = (
             (self.max_stratum_warning, self.max_stratum_block, "stratum"),
             (
@@ -324,7 +324,7 @@ class ClockHealthPolicy(StrictFrozenModel):
         return self
 
     @classmethod
-    def create(cls, **values: object) -> "ClockHealthPolicy":
+    def create(cls, **values: object) -> ClockHealthPolicy:
         allowed = set(cls.model_fields) - {"policy_sha256"}
         unknown = sorted(set(values) - allowed)
         if unknown:
@@ -375,7 +375,7 @@ class ClockHealthDecision(StrictFrozenModel):
         return _require_utc(value)
 
     @model_validator(mode="after")
-    def decision_contract(self) -> "ClockHealthDecision":
+    def decision_contract(self) -> ClockHealthDecision:
         check_ids = [item.check_id for item in self.checks]
         if len(check_ids) != len(set(check_ids)):
             raise ValueError("clock check identifiers must be unique")
@@ -412,7 +412,7 @@ class ClockHealthDecision(StrictFrozenModel):
         checks: tuple[ClockCheckResult, ...],
         clock_step_detected: bool,
         evaluated_at_utc: datetime,
-    ) -> "ClockHealthDecision":
+    ) -> ClockHealthDecision:
         failed = tuple(item.check_id for item in checks if item.outcome == CheckOutcome.FAIL)
         warnings = tuple(item.check_id for item in checks if item.outcome == CheckOutcome.WARNING)
         unknowns = tuple(item.check_id for item in checks if item.outcome == CheckOutcome.UNKNOWN)

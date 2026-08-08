@@ -18,7 +18,6 @@ from loto.sktime_campaign.approval_authorization import (
     verify_registry_authorization,
 )
 
-
 HASH = "a" * 64
 OTHER_HASH = "b" * 64
 REQUESTED = "2026-08-05T09:00:00Z"

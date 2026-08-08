@@ -16,9 +16,11 @@ from .runtime_evidence import (
     fitted_inner_model,
     formal_training_cuda,
     phase_has_cuda,
-    safe_gpu_process_snapshot as _safe_gpu_process_snapshot,
     state_dict_finite,
     torch_runtime_snapshot,
+)
+from .runtime_evidence import (
+    safe_gpu_process_snapshot as _safe_gpu_process_snapshot,
 )
 from .runtime_policy import (
     PredictionComparisonPolicy,

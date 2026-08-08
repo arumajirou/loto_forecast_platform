@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Callable
 from datetime import UTC, datetime
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -60,7 +61,7 @@ class RollingOriginRequest(BaseModel):
     device: Literal["cpu"] = "cpu"
 
     @model_validator(mode="after")
-    def validate_request(self) -> "RollingOriginRequest":
+    def validate_request(self) -> RollingOriginRequest:
         if self.split.total_rows != len(self.dataset.values):
             raise ValueError("split row total must equal dataset row count")
         if len(set(self.baseline_ids)) != len(self.baseline_ids):

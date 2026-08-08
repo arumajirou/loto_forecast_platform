@@ -21,7 +21,6 @@ from .runtime_lane_end_to_end_hardening import (
     run_end_to_end_certification,
 )
 from .runtime_lane_execution import execute_runtime_lane
-from .runtime_lane_triage import TriageResult, triage_end_to_end_run
 from .runtime_lane_target import (
     TargetHostResult,
     collect_target_host_preflight,
@@ -29,6 +28,7 @@ from .runtime_lane_target import (
     run_target_host_certification,
     verify_target_host_package,
 )
+from .runtime_lane_triage import TriageResult, triage_end_to_end_run
 from .runtime_lane_wheel_policy import (
     prepare_offline_bundle,
     verify_offline_bundle,

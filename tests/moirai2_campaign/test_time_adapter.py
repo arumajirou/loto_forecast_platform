@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import numpy as np
 
@@ -19,8 +19,8 @@ def test_draw_sequence_mapping_is_deterministic() -> None:
 def test_calendar_axis_preserves_missing_dates_as_nan() -> None:
     target = np.asarray([[1.0, 3.0], [2.0, 4.0]], dtype=np.float32)
     timestamps = [
-        datetime(2026, 1, 1, tzinfo=timezone.utc),
-        datetime(2026, 1, 3, tzinfo=timezone.utc),
+        datetime(2026, 1, 1, tzinfo=UTC),
+        datetime(2026, 1, 3, tzinfo=UTC),
     ]
     axis = build_calendar_time_axis(target, timestamps)
     assert axis.target.shape == (2, 3)

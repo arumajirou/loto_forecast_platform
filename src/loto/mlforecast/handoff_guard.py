@@ -24,7 +24,6 @@ from loto.mlforecast.handoff import (
 )
 from loto.mlforecast.provenance import upstream_contract
 
-
 DIGEST_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 DEFAULT_MAX_FILES = 10_000

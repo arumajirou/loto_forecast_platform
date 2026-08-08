@@ -4,10 +4,10 @@ import json
 import types
 
 from loto.adapters.autogluon.inventory import (
-    FailureCategory,
-    InventoryStatus,
     SOURCE_ENSEMBLE_SPECS,
     SOURCE_MODEL_SPECS,
+    FailureCategory,
+    InventoryStatus,
     discover_runtime_inventory,
     write_runtime_inventory,
 )

@@ -1,10 +1,10 @@
 """Inactive local NeuralForecast FreTS and AutoFreTS extension."""
 
 from .contracts import (
-    ArchitectureProfile,
-    ArchitectureSpec,
     MODEL_ID,
     SCHEMA_VERSION,
+    ArchitectureProfile,
+    ArchitectureSpec,
     TrainingProfile,
     TrainingSpec,
     TrialParameters,

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import fcntl
-import hashlib
 import json
 import os
 import tempfile
@@ -45,7 +44,7 @@ class RegistryHistoryRecord(BaseModel):
     record_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
-    def verify_record(self) -> "RegistryHistoryRecord":
+    def verify_record(self) -> RegistryHistoryRecord:
         payload = self.model_dump(mode="json", exclude={"record_sha256"})
         if canonical_sha256(payload) != self.record_sha256:
             raise ValueError("registry history record SHA-256 mismatch")
@@ -66,7 +65,7 @@ class FileRegistryState(BaseModel):
     state_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
-    def verify_state(self) -> "FileRegistryState":
+    def verify_state(self) -> FileRegistryState:
         if len(self.consumed_authorization_ids) != len(set(self.consumed_authorization_ids)):
             raise ValueError("consumed authorization IDs must be unique")
         if len(self.consumed_transaction_nonces) != len(set(self.consumed_transaction_nonces)):
@@ -106,7 +105,7 @@ class P8RegistryTransactionRequest(BaseModel):
     automatic_retraining: Literal[False] = False
 
     @model_validator(mode="after")
-    def validate_request(self) -> "P8RegistryTransactionRequest":
+    def validate_request(self) -> P8RegistryTransactionRequest:
         verify_registry_authorization(self.authorization)
         if self.transaction.authorization_id != self.authorization.get("authorization_id"):
             raise ValueError("P8 transaction authorization ID mismatch")

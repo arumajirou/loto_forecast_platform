@@ -47,7 +47,7 @@ class PublicDocsPolicy(StrictModel):
         return value
 
     @model_validator(mode="after")
-    def validate_policy(self) -> "PublicDocsPolicy":
+    def validate_policy(self) -> PublicDocsPolicy:
         if not self.source_root or PurePosixPath(self.source_root).is_absolute():
             raise ValueError("source_root must be a non-empty relative path")
         if any(not extension.startswith(".") for extension in self.allowed_extensions):

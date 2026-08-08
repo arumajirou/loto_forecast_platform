@@ -4,7 +4,7 @@ import hashlib
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
 
@@ -115,7 +115,7 @@ class TargetExecutionPlan(StrictModel):
     @field_validator("created_at_utc")
     @classmethod
     def utc_time(cls, value: datetime) -> datetime:
-        if value.tzinfo is None or value.utcoffset() != timezone.utc.utcoffset(value):
+        if value.tzinfo is None or value.utcoffset() != UTC.utcoffset(value):
             raise ValueError("created_at_utc must be UTC")
         return value
 
@@ -190,7 +190,7 @@ class ExecutionEvent(StrictModel):
     @field_validator("recorded_at_utc")
     @classmethod
     def utc_time(cls, value: datetime) -> datetime:
-        if value.tzinfo is None or value.utcoffset() != timezone.utc.utcoffset(value):
+        if value.tzinfo is None or value.utcoffset() != UTC.utcoffset(value):
             raise ValueError("recorded_at_utc must be UTC")
         return value
 
@@ -213,7 +213,7 @@ class ExecutionEvent(StrictModel):
 
 
 def now_utc() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def canonical_json_bytes(payload: Any) -> bytes:

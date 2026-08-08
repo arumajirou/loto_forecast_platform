@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from enum import StrEnum
-from typing import Any, Iterable
+from typing import Any
 
 from .inventory import SOURCE_MODEL_SPECS, TARGET_AUTOGLUON_VERSION
 

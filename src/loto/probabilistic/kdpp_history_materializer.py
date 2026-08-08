@@ -5,7 +5,6 @@ import json
 import os
 import shutil
 import zipfile
-from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -22,8 +21,8 @@ from loto.probabilistic.kdpp_certification_gate import (
     write_json,
 )
 from loto.probabilistic.kdpp_history_contracts import (
-    RAW_APPROVAL_SCOPE,
     _GAME_SPECS,
+    RAW_APPROVAL_SCOPE,
     MaterializationResult,
     PendingKDPPHistoryApproval,
 )

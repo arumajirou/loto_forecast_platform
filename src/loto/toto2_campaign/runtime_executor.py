@@ -4,10 +4,11 @@ import hashlib
 import importlib.metadata
 import os
 import platform
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable, Iterator
+from typing import Any
 
 import numpy as np
 

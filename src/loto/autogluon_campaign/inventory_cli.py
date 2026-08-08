@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from loto.adapters.autogluon.inventory import (
-    InventoryStatus,
     TARGET_AUTOGLUON_VERSION,
+    InventoryStatus,
     discover_runtime_inventory,
     write_runtime_inventory,
 )

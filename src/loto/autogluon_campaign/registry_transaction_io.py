@@ -4,7 +4,7 @@ import fcntl
 import json
 import os
 import stat
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
@@ -29,7 +29,6 @@ from loto.autogluon_campaign.approval_authorization_io import (
     write_json,
 )
 from loto.autogluon_campaign.registry_transaction_contract import (
-    BACKEND,
     RegistryState,
     RegistryTransactionError,
     make_registry_state,

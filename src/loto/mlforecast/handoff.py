@@ -2,18 +2,16 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import stat
 import subprocess
 import zipfile
+from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, Iterable
+from typing import Any
 
 from loto.mlforecast.artifacts import atomic_write_text, sha256_bytes, sha256_file
 from loto.mlforecast.provenance import upstream_contract
-
 
 FIXED_ZIP_DATETIME = (1980, 1, 1, 0, 0, 0)
 HANDOFF_FORMAT = 1

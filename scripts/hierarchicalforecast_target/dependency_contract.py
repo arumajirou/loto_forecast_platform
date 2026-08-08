@@ -9,7 +9,7 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
-from .constants import CertificationError, TARGET_VERSION
+from .constants import TARGET_VERSION, CertificationError
 from .integrity import require_regular_file, sha_file
 
 _REQUIRED_DEV_TOOLS = frozenset({"mypy", "pydantic", "pytest", "pytest-cov", "ruff"})

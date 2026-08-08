@@ -11,11 +11,11 @@ import json
 import os
 import re
 import subprocess
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from importlib import metadata
 from pathlib import Path
-from typing import Callable
 
 __version__ = "3.2.0"
 

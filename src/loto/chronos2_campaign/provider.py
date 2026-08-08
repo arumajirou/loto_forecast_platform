@@ -15,8 +15,8 @@ from loto.adapters.chronos2.contracts import (
     Operation,
 )
 from loto.adapters.chronos2.manifest import (
-    CHRONOS_PACKAGE_VERSION,
     CHRONOS_PACKAGE_SOURCE_REVISION,
+    CHRONOS_PACKAGE_VERSION,
     build_model_manifest,
 )
 from loto.adapters.chronos2.runtime import PipelineLoader, run_prediction

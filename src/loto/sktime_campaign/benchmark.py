@@ -56,7 +56,7 @@ class GameMatrix(BaseModel):
     legal_max: list[int] = Field(min_length=1)
 
     @model_validator(mode="after")
-    def validate_geometry(self) -> "GameMatrix":
+    def validate_geometry(self) -> GameMatrix:
         width = len(self.position_names)
         if len(set(self.position_names)) != width:
             raise ValueError("position_names must be unique")
@@ -99,7 +99,7 @@ class ValidationBenchmarkRequest(BaseModel):
     device: Literal["cpu"] = "cpu"
 
     @model_validator(mode="after")
-    def validate_request(self) -> "ValidationBenchmarkRequest":
+    def validate_request(self) -> ValidationBenchmarkRequest:
         if self.split.total_rows != len(self.dataset.values):
             raise ValueError("split row total must equal dataset row count")
         if len(set(self.baseline_ids)) != len(self.baseline_ids):

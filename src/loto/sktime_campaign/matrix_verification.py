@@ -21,7 +21,6 @@ from loto.sktime_campaign.verification import (
     verify_sha256sums,
 )
 
-
 FORMAL_P1_MODEL_IDS: tuple[str, ...] = (
     SmokeModelId.NAIVE_LAST.value,
     SmokeModelId.POLYNOMIAL_TREND_D1.value,

@@ -7,14 +7,13 @@ import sys
 from pathlib import Path
 
 import pytest
+from conftest import OBSERVED_AT, observation_from_bytes
 
 from loto.clock_health import (
     evaluate_clock_health,
     verify_evidence_bundle,
     write_evidence_bundle,
 )
-
-from conftest import OBSERVED_AT, observation_from_bytes
 
 
 def test_evidence_bundle_round_trip(

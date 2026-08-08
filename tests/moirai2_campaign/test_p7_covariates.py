@@ -3,7 +3,7 @@ from __future__ import annotations
 import importlib.util
 import sys
 import types
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -85,9 +85,9 @@ def test_covariate_compiler_sorts_slices_hashes_and_attaches_native_fields() -> 
 
 def test_calendar_covariates_preserve_missing_periods() -> None:
     timestamps = [
-        datetime(2026, 1, 1, tzinfo=timezone.utc),
-        datetime(2026, 1, 3, tzinfo=timezone.utc),
-        datetime(2026, 1, 4, tzinfo=timezone.utc),
+        datetime(2026, 1, 1, tzinfo=UTC),
+        datetime(2026, 1, 3, tzinfo=UTC),
+        datetime(2026, 1, 4, tzinfo=UTC),
     ]
     bundle = compile_covariates(
         history_length=3,

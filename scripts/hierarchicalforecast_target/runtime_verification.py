@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from .constants import (
-    CertificationError,
     EXECUTABLE,
     EXPECTED_STATUS,
     GAMES,
@@ -13,6 +12,7 @@ from .constants import (
     PRIMARY,
     REQUIRED,
     TARGET_VERSION,
+    CertificationError,
 )
 from .integrity import (
     checksums,

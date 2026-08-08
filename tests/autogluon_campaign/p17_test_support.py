@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from loto.autogluon_campaign.holdout_prospective import (
@@ -171,5 +171,5 @@ def run_gate(tmp_path: Path, *, holdout=None, prospective=None):
         prospective_score_dirs=prospective,
         output_dir=tmp_path / "promotion",
         run_id="p17-fixture",
-        now=datetime(2026, 8, 5, 10, 0, tzinfo=timezone.utc),
+        now=datetime(2026, 8, 5, 10, 0, tzinfo=UTC),
     )

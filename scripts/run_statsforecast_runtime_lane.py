@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from loto.statsforecast.runtime_lane import (
@@ -154,7 +154,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"WHEELHOUSE={bundle}")
         return 0
 
-    run_id = args.run_id or datetime.now(timezone.utc).strftime("statsforecast-lane-%Y%m%d-%H%M%S")
+    run_id = args.run_id or datetime.now(UTC).strftime("statsforecast-lane-%Y%m%d-%H%M%S")
     run_dir = execute_runtime_lane(
         _repo_root(),
         args.output_root,

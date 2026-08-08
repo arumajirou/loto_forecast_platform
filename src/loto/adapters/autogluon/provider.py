@@ -4,7 +4,7 @@ import importlib.metadata
 import math
 import os
 from dataclasses import dataclass
-from datetime import timezone
+from datetime import UTC
 from pathlib import Path
 from typing import Any
 
@@ -224,7 +224,7 @@ def _prediction_records(
                 quantiles[str(column)] = value
             timestamp = pd.Timestamp(row["timestamp"]).to_pydatetime()
             if timestamp.tzinfo is None:
-                timestamp = timestamp.replace(tzinfo=timezone.utc)
+                timestamp = timestamp.replace(tzinfo=UTC)
             records.append(
                 PredictionRecord(
                     item_id=str(item_id),

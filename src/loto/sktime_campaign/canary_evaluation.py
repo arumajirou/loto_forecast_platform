@@ -9,7 +9,6 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-
 REQUIRED_BASELINES = {
     "random",
     "fixed",
@@ -77,7 +76,7 @@ class PositionRange(BaseModel):
     maximum: int
 
     @model_validator(mode="after")
-    def validate_bounds(self) -> "PositionRange":
+    def validate_bounds(self) -> PositionRange:
         if self.minimum > self.maximum:
             raise ValueError("position range minimum exceeds maximum")
         return self
@@ -113,7 +112,7 @@ class ShadowEvaluationWindow(BaseModel):
     predictions: list[LockedCandidatePrediction] = Field(min_length=8)
 
     @model_validator(mode="after")
-    def validate_window(self) -> "ShadowEvaluationWindow":
+    def validate_window(self) -> ShadowEvaluationWindow:
         locked = _parse_utc(
             self.prediction_locked_at_utc,
             label="prediction_locked_at_utc",
@@ -235,7 +234,7 @@ class CanaryEvaluationRequest(BaseModel):
     windows: list[ShadowEvaluationWindow] = Field(min_length=1)
 
     @model_validator(mode="after")
-    def validate_request(self) -> "CanaryEvaluationRequest":
+    def validate_request(self) -> CanaryEvaluationRequest:
         evaluated = _parse_utc(self.evaluated_at_utc, label="evaluated_at_utc")
         ids = [item.window_id for item in self.windows]
         if len(ids) != len(set(ids)):

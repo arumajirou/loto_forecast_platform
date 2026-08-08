@@ -5,7 +5,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 FAKE_FRETS = (
     """
 import torch

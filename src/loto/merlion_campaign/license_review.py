@@ -4,8 +4,9 @@ import csv
 import hashlib
 import io
 import json
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 LICENSE_REVIEW_SCHEMA = "merlion-license-review-v1"
 LICENSE_TEMPLATE_SCHEMA = "merlion-license-review-template-v1"

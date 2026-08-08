@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import shutil
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -51,7 +50,7 @@ def generate_candidate(
     project_path = environment_path / "pyproject.toml"
     if not project_path.is_file():
         raise FileNotFoundError(project_path)
-    run_id = datetime.now(timezone.utc).strftime("tirex2-lock-%Y%m%dT%H%M%SZ")
+    run_id = datetime.now(UTC).strftime("tirex2-lock-%Y%m%dT%H%M%SZ")
     candidate_path = output_root / run_id
     candidate_path.mkdir(parents=True, exist_ok=False)
     shutil.copy2(project_path, candidate_path / "pyproject.toml")

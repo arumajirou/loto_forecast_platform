@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
 from loto.merlion_campaign.certification import certify_core_model
 from loto.merlion_campaign.protocol import Operation, ProviderRequest, SeriesPayload
-
 
 FAKE_PROVIDER = r"""
 import argparse

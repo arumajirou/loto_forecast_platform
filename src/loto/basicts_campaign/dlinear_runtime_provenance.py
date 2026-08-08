@@ -175,7 +175,7 @@ def verify_dlinear_runtime_modules() -> dict[str, Any]:
                 **item,
                 "module_name": module_name,
                 "required_symbol": required_symbol,
-                "symbol_module": getattr(symbol, "__module__"),
+                "symbol_module": symbol.__module__,
                 "import_spec_origin": str(expected_path),
                 "loaded_module_file": loaded_file,
                 "module_already_loaded": already_loaded,

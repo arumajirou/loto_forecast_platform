@@ -6,11 +6,11 @@ import argparse
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from collections.abc import Callable, Sequence
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import Callable, Sequence
 
-from .constants import CertificationError, TARGET_VERSION
+from .constants import TARGET_VERSION, CertificationError
 from .integrity import (
     atomic_write,
     canonical,
@@ -25,7 +25,7 @@ from .quality_gate import EXPECTED_FOCUSED_TESTS
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _safe_name(value: str) -> str:
@@ -249,7 +249,7 @@ def execute(
     quality_root = resolve_requested_root(root, quality_root, "quality root")
     runtime_root = resolve_requested_root(root, runtime_root, "runtime root")
     operator_root = resolve_requested_root(root, operator_root, "operator root")
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
     run_id = f"hierarchicalforecast-promotion-{stamp}-{os.getpid()}"
     directory = promotion_root / run_id
     report: dict[str, object] = {

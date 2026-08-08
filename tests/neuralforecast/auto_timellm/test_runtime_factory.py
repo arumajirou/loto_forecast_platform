@@ -11,11 +11,11 @@ from typing import Any
 
 import pytest
 
+from loto.neuralforecast.auto_timellm import runtime
 from loto.neuralforecast.auto_timellm.contracts import (
     PinnedLLMIdentity,
     SnapshotFileEvidence,
 )
-from loto.neuralforecast.auto_timellm import runtime
 
 REVISION = "b" * 40
 

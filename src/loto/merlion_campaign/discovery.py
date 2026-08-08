@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import importlib
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
-from typing import Mapping
-
 
 CORE_CPU_MODELS = ("Arima", "ETS", "MSES")
 

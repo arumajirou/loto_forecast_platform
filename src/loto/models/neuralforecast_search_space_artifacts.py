@@ -82,7 +82,7 @@ def persist_search_space_artifacts(
     _atomic_write(root / MANIFEST_NAME, manifest_bytes)
     _atomic_write(
         root / MANIFEST_SUM_NAME,
-        f"{manifest_sha256}  {MANIFEST_NAME}\n".encode("utf-8"),
+        f"{manifest_sha256}  {MANIFEST_NAME}\n".encode(),
     )
     verified = verify_search_space_artifacts(root)
     if verified["status"] != "PASS":

@@ -4,10 +4,11 @@ import hashlib
 import os
 import subprocess
 import tempfile
+from collections.abc import Callable, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Sequence
+from typing import Any
 
 from .p6_contract import (
     FIT_CHECKS,

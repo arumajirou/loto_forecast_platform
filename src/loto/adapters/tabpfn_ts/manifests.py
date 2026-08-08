@@ -4,7 +4,6 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
 TABPFN_TS_PACKAGE_VERSION = "1.2.0"
 TABPFN_TS_WHEEL_SHA256 = "3358d222a3056190dc7862d5a9e8a7e7a311d374a1f2d6bc1b3f342201bfbd8f"
 TABPFN_TS_SDIST_SHA256 = "c94d0f63c0f921be56e91b9c50724ef49e2b95df72fa22d960c4d52df1d3f2db"

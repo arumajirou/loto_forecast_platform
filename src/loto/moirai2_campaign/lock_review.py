@@ -4,11 +4,11 @@ import hashlib
 import json
 import re
 import tomllib
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Iterable
-
+from typing import Any
 
 REVIEW_SCHEMA = "moirai2-lock-review-v1"
 APPROVAL_SCHEMA = "moirai2-lock-approval-v1"

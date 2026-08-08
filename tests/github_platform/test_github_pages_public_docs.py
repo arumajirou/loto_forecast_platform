@@ -10,7 +10,6 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT_PATH = ROOT / "scripts" / "github_pages" / "public_docs.py"
 POLICY_PATH = ROOT / "configs" / "github_pages" / "public_docs_policy_v1.yaml"

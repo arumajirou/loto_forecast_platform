@@ -5,15 +5,15 @@ import hashlib
 from pathlib import Path
 
 from loto.merlion_campaign.bootstrap_evidence_verify import verify_bootstrap_evidence_zip
+from loto.merlion_campaign.license_review import (
+    build_license_review_template,
+    parse_dependency_inventory,
+)
 from loto.merlion_campaign.lock_admission import (
     EVIDENCE_INVENTORY_PATH,
     EVIDENCE_LOCK_PATH,
     read_evidence_payloads,
     write_json,
-)
-from loto.merlion_campaign.license_review import (
-    build_license_review_template,
-    parse_dependency_inventory,
 )
 
 

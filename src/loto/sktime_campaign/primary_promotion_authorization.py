@@ -5,12 +5,12 @@ import hashlib
 import json
 import subprocess
 import tempfile
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-
 
 ACKNOWLEDGEMENTS = (
     "P10_METRICS_AND_BASELINES_REVIEWED",
@@ -66,7 +66,7 @@ class DeploymentBinding(BaseModel):
     mode: Literal["primary", "shadow_canary"]
 
     @model_validator(mode="after")
-    def validate_time(self) -> "DeploymentBinding":
+    def validate_time(self) -> DeploymentBinding:
         _parse_utc(self.activated_at_utc, label="activated_at_utc")
         return self
 
@@ -109,7 +109,7 @@ class DeploymentPrecondition(BaseModel):
     state_snapshot_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
-    def validate_canary(self) -> "DeploymentPrecondition":
+    def validate_canary(self) -> DeploymentPrecondition:
         if self.canary_binding.mode != "shadow_canary":
             raise ValueError("P11 requires an active shadow canary")
         payload = self.model_dump(mode="json", exclude={"state_snapshot_sha256"})
@@ -134,7 +134,7 @@ class PromotionPolicy(BaseModel):
     prediction_publication_allowed_before_p12: Literal[False] = False
 
     @model_validator(mode="after")
-    def validate_policy(self) -> "PromotionPolicy":
+    def validate_policy(self) -> PromotionPolicy:
         if self.required_roles != REQUIRED_ROLES:
             raise ValueError("required roles must match the formal P11 inventory")
         if self.required_acknowledgements != ACKNOWLEDGEMENTS:
@@ -156,7 +156,7 @@ class ApprovalRecord(BaseModel):
     signature_base64: str = Field(min_length=1)
 
     @model_validator(mode="after")
-    def validate_approval(self) -> "ApprovalRecord":
+    def validate_approval(self) -> ApprovalRecord:
         _parse_utc(self.approved_at_utc, label="approved_at_utc")
         if self.acknowledgements != ACKNOWLEDGEMENTS:
             raise ValueError("approval acknowledgements mismatch")
@@ -188,7 +188,7 @@ class PrimaryPromotionAuthorizationRequest(BaseModel):
     approvals: tuple[ApprovalRecord, ...]
 
     @model_validator(mode="after")
-    def validate_request(self) -> "PrimaryPromotionAuthorizationRequest":
+    def validate_request(self) -> PrimaryPromotionAuthorizationRequest:
         requested = _parse_utc(
             self.requested_at_utc,
             label="requested_at_utc",
@@ -422,7 +422,7 @@ class PrimaryPromotionTransactionRequest(BaseModel):
     clear_canary_on_commit: Literal[True] = True
 
     @model_validator(mode="after")
-    def validate_time(self) -> "PrimaryPromotionTransactionRequest":
+    def validate_time(self) -> PrimaryPromotionTransactionRequest:
         _parse_utc(self.requested_at_utc, label="requested_at_utc")
         return self
 

@@ -6,9 +6,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-from loto.data_access_ledger import AccessOperation
-
 from conftest import make_event, make_ledger
+
+from loto.data_access_ledger import AccessOperation
 
 
 def run_cli(tmp_path: Path, ledger_text: str) -> subprocess.CompletedProcess[str]:

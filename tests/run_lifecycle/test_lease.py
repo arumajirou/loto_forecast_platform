@@ -3,14 +3,13 @@ from __future__ import annotations
 from datetime import timedelta
 
 import pytest
+from conftest import make_command
 
 from loto.run_lifecycle import (
     LeaseExpiredError,
     LeaseOwnershipError,
     StaleFencingTokenError,
 )
-
-from conftest import make_command
 
 
 def test_acquire_renew_expiry_takeover_and_fencing(service, clock) -> None:

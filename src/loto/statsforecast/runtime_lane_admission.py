@@ -5,8 +5,9 @@ import json
 import stat
 import zipfile
 from collections import Counter
+from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping
+from typing import Any
 
 TARGET_PACKAGE = "statsforecast"
 TARGET_VERSION = "2.1.1"

@@ -15,7 +15,6 @@ from loto.mlforecast.contracts import (
     TargetTransformSpec,
 )
 
-
 AUTO_CLASS_NAMES = {
     "AutoLightGBM": "AutoLightGBM",
     "AutoXGBoost": "AutoXGBoost",

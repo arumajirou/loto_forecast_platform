@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import traceback
+from collections.abc import Callable
 from contextvars import ContextVar
 from dataclasses import dataclass
 from pathlib import Path
 from threading import RLock
 from types import ModuleType
-from typing import Any, Callable
+from typing import Any
 
 import pandas as pd
 

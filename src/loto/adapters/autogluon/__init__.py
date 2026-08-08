@@ -17,6 +17,22 @@ from .contracts import (
 )
 from .execution import ExecutionPlan, ExecutionPlanError, build_execution_plan
 from .geometry import CompiledHistory, TimelineMappingRow, compile_regular_history
+from .inventory import (
+    SOURCE_ENSEMBLE_SPECS,
+    SOURCE_MODEL_SPECS,
+    TARGET_AUTOGLUON_VERSION,
+    AutoGluonRuntimeInventory,
+    EnsembleInventoryEntry,
+    FailureCategory,
+    InventoryFailure,
+    InventoryStatus,
+    ModelInventoryEntry,
+    SourceEnsembleSpec,
+    SourceModelSpec,
+    discover_runtime_inventory,
+    write_runtime_inventory,
+)
+from .provider import ProviderRuntime, run_provider_v2
 from .search_spaces import (
     SPACE_MARKER,
     SUPPORTED_SPACE_TYPES,
@@ -26,22 +42,6 @@ from .search_spaces import (
     materialize_search_spaces,
     validate_search_space_descriptors,
 )
-from .inventory import (
-    AutoGluonRuntimeInventory,
-    EnsembleInventoryEntry,
-    FailureCategory,
-    InventoryFailure,
-    InventoryStatus,
-    ModelInventoryEntry,
-    SOURCE_ENSEMBLE_SPECS,
-    SOURCE_MODEL_SPECS,
-    SourceEnsembleSpec,
-    SourceModelSpec,
-    TARGET_AUTOGLUON_VERSION,
-    discover_runtime_inventory,
-    write_runtime_inventory,
-)
-from .provider import ProviderRuntime, run_provider_v2
 
 __all__ = [
     "ArgumentLedgerEntry",

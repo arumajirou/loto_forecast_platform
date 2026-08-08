@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -266,7 +265,7 @@ def main() -> int:
             "src/loto/moirai2_campaign/target_execution.py",
         ),
     )
-    created_at = datetime.now(timezone.utc).isoformat()
+    created_at = datetime.now(UTC).isoformat()
     control_dir = workspace / "control"
     control_dir.mkdir(parents=True, exist_ok=False)
     plan = {
