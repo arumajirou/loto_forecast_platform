@@ -1,0 +1,160 @@
+name: pytest-import-layout-shadow
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  shadow:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fix/pytest-collection-inventory-v1'
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    steps:
+      - name: Verify trusted runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout inventory branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: fix/pytest-collection-inventory-v1
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: '0.11.21'
+          enable-cache: false
+
+      - name: Shadow package-qualified test imports
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          uv python install 3.13
+          venv="$RUNNER_TEMP/loto-import-shadow-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-import-shadow-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$venv" "$cache"
+          mkdir -p "$cache"
+          uv venv "$venv" --python 3.13
+          python="$venv/bin/python"
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu 'torch==2.9.1'
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" -e '.[api,dev,postgres]'
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" 'ruff==0.16.0'
+          uv pip check --python "$python"
+          "$python" -m ruff check src scripts tests
+
+          set +e
+          "$python" -m pytest --collect-only -q --tb=short > "$RUNNER_TEMP/before.txt" 2>&1
+          before_rc=$?
+          set -e
+          test "$before_rc" -eq 2
+          "$python" - "$RUNNER_TEMP/before.txt" <<'PY'
+          import re, sys
+          from pathlib import Path
+          text=Path(sys.argv[1]).read_text(encoding='utf-8',errors='replace')
+          nums=[int(m.group(1)) for m in re.finditer(r'(\d+) errors? during collection',text)]
+          count=nums[-1] if nums else sum('ERROR collecting ' in line for line in text.splitlines())
+          print(f'BASELINE_COLLECTION_ERRORS={count}')
+          assert count==34,count
+          PY
+
+          "$python" - <<'PY'
+          from pathlib import Path
+
+          replacements = []
+          for directory in ('clock_health','data_access_ledger','run_lifecycle'):
+              root=Path('tests')/directory
+              old='from conftest import '
+              new=f'from tests.{directory}.conftest import '
+              for path in sorted(root.glob('test_*.py')):
+                  text=path.read_text(encoding='utf-8')
+                  if old in text:
+                      updated=text.replace(old,new)
+                      assert updated!=text,path
+                      path.write_text(updated,encoding='utf-8')
+                      replacements.append((path.as_posix(),old,new))
+
+          sktime = {
+              'test_approval_authorization': 'tests.sktime_campaign.test_approval_authorization',
+              'p10_helpers': 'tests.sktime_campaign.p10_helpers',
+              'test_holdout_scoring': 'tests.sktime_campaign.test_holdout_scoring',
+              'p11_helpers': 'tests.sktime_campaign.p11_helpers',
+              'test_registry_transaction': 'tests.sktime_campaign.test_registry_transaction',
+          }
+          for path in sorted(Path('tests/sktime_campaign').glob('test_*.py')):
+              text=path.read_text(encoding='utf-8')
+              original=text
+              for old_module,new_module in sktime.items():
+                  text=text.replace(f'from {old_module} import ',f'from {new_module} import ')
+              if text!=original:
+                  path.write_text(text,encoding='utf-8')
+                  replacements.append((path.as_posix(),'sktime-local-helper','package-qualified'))
+
+          for name in ('tests/test_coverage_auto.py','tests/test_coverage_build.py'):
+              path=Path(name)
+              text=path.read_text(encoding='utf-8')
+              old='from coverage_test_support import '
+              new='from tests.coverage_test_support import '
+              assert old in text,path
+              path.write_text(text.replace(old,new),encoding='utf-8')
+              replacements.append((path.as_posix(),old,new))
+
+          unique=sorted({item[0] for item in replacements})
+          print(f'SHADOW_REPLACEMENTS={len(replacements)}')
+          print(f'SHADOW_CHANGED_TEST_FILES={len(unique)}')
+          for path in unique:
+              print(f'SHADOW_CHANGED\t{path}')
+          assert len(replacements)==25,len(replacements)
+          assert len(unique)==25,len(unique)
+          PY
+
+          mapfile -t changed < <(git diff --name-only | sort)
+          test "${#changed[@]}" -eq 25
+          for path in "${changed[@]}"; do case "$path" in tests/*.py|tests/**/*.py) ;; *) echo "unexpected path: $path"; exit 1 ;; esac; done
+          git diff --check
+          "$python" -m ruff check "${changed[@]}"
+          "$python" -m ruff format --check "${changed[@]}"
+          "$python" -m compileall -q tests
+
+          set +e
+          "$python" -m pytest --collect-only -q --tb=short > "$RUNNER_TEMP/after.txt" 2>&1
+          after_rc=$?
+          set -e
+          echo "SHADOW_COLLECT_RC=$after_rc"
+
+          "$python" - "$RUNNER_TEMP/after.txt" <<'PY'
+          import collections,re,sys
+          from pathlib import Path
+          text=Path(sys.argv[1]).read_text(encoding='utf-8',errors='replace')
+          nums=[int(m.group(1)) for m in re.finditer(r'(\d+) errors? during collection',text)]
+          count=nums[-1] if nums else sum('ERROR collecting ' in line for line in text.splitlines())
+          print(f'SHADOW_COLLECTION_ERRORS={count}')
+          assert count < 34,count
+          heading=re.compile(r'^_+ ERROR collecting (.+?) _+$',re.MULTILINE)
+          matches=list(heading.finditer(text))
+          roots=collections.Counter()
+          print('SHADOW_ERRORS_BEGIN')
+          for i,m in enumerate(matches):
+              path=m.group(1).strip()
+              block=text[m.end():(matches[i+1].start() if i+1<len(matches) else len(text))]
+              exc=[line.strip() for line in block.splitlines() if re.match(r'^\s*(E\s+)?(ModuleNotFoundError|ImportError|AttributeError|NameError|TypeError|ValueError|RuntimeError):',line)]
+              root=exc[-1] if exc else 'UNKNOWN'
+              roots[root]+=1
+              print(f'SHADOW_ERROR\t{path}\t{root}')
+          print('SHADOW_ERRORS_END')
+          print('SHADOW_ROOT_COUNTS_BEGIN')
+          for root,n in roots.most_common(): print(f'{n}\t{root}')
+          print('SHADOW_ROOT_COUNTS_END')
+          PY
+
+          git reset --hard HEAD
+          test -z "$(git status --porcelain)"
+          rm -rf -- "$venv" "$cache" "$RUNNER_TEMP/before.txt" "$RUNNER_TEMP/after.txt"
