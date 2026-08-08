@@ -1,0 +1,529 @@
+loto-forecast-platform
+笏懌楳笏 huggingface-hub v0.36.2
+笏・  笏懌楳笏 filelock v3.32.2
+笏・  笏懌楳笏 fsspec v2026.7.0
+笏・  笏懌楳笏 hf-xet v1.5.2
+笏・  笏懌楳笏 packaging v26.2
+笏・  笏懌楳笏 pyyaml v6.0.3
+笏・  笏懌楳笏 requests v2.34.2
+笏・  笏・  笏懌楳笏 certifi v2026.7.22
+笏・  笏・  笏懌楳笏 charset-normalizer v3.4.9
+笏・  笏・  笏懌楳笏 idna v3.18
+笏・  笏・  笏披楳笏 urllib3 v2.7.0
+笏・  笏懌楳笏 tqdm v4.70.0
+笏・  笏・  笏披楳笏 colorama v0.4.6
+笏・  笏披楳笏 typing-extensions v4.16.0
+笏懌楳笏 neuralforecast v3.2.0
+笏・  笏懌楳笏 coreforecast v0.0.18
+笏・  笏・  笏披楳笏 numpy v2.4.6
+笏・  笏懌楳笏 fsspec v2026.7.0
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 optuna v4.9.0
+笏・  笏・  笏懌楳笏 alembic v1.18.5
+笏・  笏・  笏・  笏懌楳笏 mako v1.3.12
+笏・  笏・  笏・  笏・  笏披楳笏 markupsafe v3.0.3
+笏・  笏・  笏・  笏懌楳笏 sqlalchemy v2.0.51
+笏・  笏・  笏・  笏・  笏懌楳笏 greenlet v3.5.4
+笏・  笏・  笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏懌楳笏 colorlog v6.12.0
+笏・  笏・  笏・  笏披楳笏 colorama v0.4.6
+笏・  笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏・  笏懌楳笏 packaging v26.2
+笏・  笏・  笏懌楳笏 pyyaml v6.0.3
+笏・  笏・  笏懌楳笏 sqlalchemy v2.0.51 (*)
+笏・  笏・  笏披楳笏 tqdm v4.70.0 (*)
+笏・  笏懌楳笏 pandas v2.3.3
+笏・  笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏・  笏懌楳笏 python-dateutil v2.9.0.post0
+笏・  笏・  笏・  笏披楳笏 six v1.17.0
+笏・  笏・  笏懌楳笏 pytz v2026.3.post1
+笏・  笏・  笏披楳笏 tzdata v2026.3
+笏・  笏懌楳笏 pytorch-lightning v2.5.6
+笏・  笏・  笏懌楳笏 fsspec[http] v2026.7.0
+笏・  笏・  笏・  笏披楳笏 aiohttp v3.14.3 (extra: http)
+笏・  笏・  笏・      笏懌楳笏 aiohappyeyeballs v2.7.1
+笏・  笏・  笏・      笏懌楳笏 aiosignal v1.4.0
+笏・  笏・  笏・      笏・  笏懌楳笏 frozenlist v1.8.0
+笏・  笏・  笏・      笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏・      笏懌楳笏 attrs v26.1.0
+笏・  笏・  笏・      笏懌楳笏 frozenlist v1.8.0
+笏・  笏・  笏・      笏懌楳笏 multidict v6.7.1
+笏・  笏・  笏・      笏懌楳笏 propcache v0.5.2
+笏・  笏・  笏・      笏懌楳笏 typing-extensions v4.16.0
+笏・  笏・  笏・      笏披楳笏 yarl v1.24.5
+笏・  笏・  笏・          笏懌楳笏 idna v3.18
+笏・  笏・  笏・          笏懌楳笏 multidict v6.7.1
+笏・  笏・  笏・          笏披楳笏 propcache v0.5.2
+笏・  笏・  笏懌楳笏 lightning-utilities v0.15.3
+笏・  笏・  笏・  笏懌楳笏 packaging v26.2
+笏・  笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏懌楳笏 packaging v26.2
+笏・  笏・  笏懌楳笏 pyyaml v6.0.3
+笏・  笏・  笏懌楳笏 torch v2.9.1
+笏・  笏・  笏・  笏懌楳笏 filelock v3.32.2
+笏・  笏・  笏・  笏懌楳笏 fsspec v2026.7.0
+笏・  笏・  笏・  笏懌楳笏 jinja2 v3.1.6
+笏・  笏・  笏・  笏・  笏披楳笏 markupsafe v3.0.3
+笏・  笏・  笏・  笏懌楳笏 networkx v3.6.1
+笏・  笏・  笏・  笏懌楳笏 setuptools v83.0.0
+笏・  笏・  笏・  笏懌楳笏 sympy v1.14.0
+笏・  笏・  笏・  笏・  笏披楳笏 mpmath v1.3.0
+笏・  笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏懌楳笏 torchmetrics v1.9.0
+笏・  笏・  笏・  笏懌楳笏 lightning-utilities v0.15.3 (*)
+笏・  笏・  笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏・  笏・  笏懌楳笏 packaging v26.2
+笏・  笏・  笏・  笏披楳笏 torch v2.9.1 (*)
+笏・  笏・  笏懌楳笏 tqdm v4.70.0 (*)
+笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏懌楳笏 ray[train, tune] v2.56.1
+笏・  笏・  笏懌楳笏 click v8.4.2
+笏・  笏・  笏・  笏披楳笏 colorama v0.4.6
+笏・  笏・  笏懌楳笏 filelock v3.32.2
+笏・  笏・  笏懌楳笏 jsonschema v4.26.0
+笏・  笏・  笏・  笏懌楳笏 attrs v26.1.0
+笏・  笏・  笏・  笏懌楳笏 jsonschema-specifications v2025.9.1
+笏・  笏・  笏・  笏・  笏披楳笏 referencing v0.37.0
+笏・  笏・  笏・  笏・      笏懌楳笏 attrs v26.1.0
+笏・  笏・  笏・  笏・      笏懌楳笏 rpds-py v2026.6.3
+笏・  笏・  笏・  笏・      笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏・  笏懌楳笏 referencing v0.37.0 (*)
+笏・  笏・  笏・  笏披楳笏 rpds-py v2026.6.3
+笏・  笏・  笏懌楳笏 msgpack v1.2.1
+笏・  笏・  笏懌楳笏 packaging v26.2
+笏・  笏・  笏懌楳笏 protobuf v6.33.6
+笏・  笏・  笏懌楳笏 pyyaml v6.0.3
+笏・  笏・  笏懌楳笏 requests v2.34.2 (*)
+笏・  笏・  笏懌楳笏 fsspec v2026.7.0 (extra: train)
+笏・  笏・  笏懌楳笏 pandas v2.3.3 (extra: train) (*)
+笏・  笏・  笏懌楳笏 pyarrow v24.0.0 (extra: train)
+笏・  笏・  笏懌楳笏 pydantic v2.13.4 (extra: train)
+笏・  笏・  笏・  笏懌楳笏 annotated-types v0.8.0
+笏・  笏・  笏・  笏懌楳笏 pydantic-core v2.46.4
+笏・  笏・  笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏・  笏懌楳笏 typing-extensions v4.16.0
+笏・  笏・  笏・  笏披楳笏 typing-inspection v0.4.2
+笏・  笏・  笏・      笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏懌楳笏 requests v2.34.2 (extra: train) (*)
+笏・  笏・  笏懌楳笏 tensorboardx v2.6.5 (extra: train)
+笏・  笏・  笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏・  笏・  笏懌楳笏 packaging v26.2
+笏・  笏・  笏・  笏披楳笏 protobuf v6.33.6
+笏・  笏・  笏懌楳笏 fsspec v2026.7.0 (extra: tune)
+笏・  笏・  笏懌楳笏 pandas v2.3.3 (extra: tune) (*)
+笏・  笏・  笏懌楳笏 pyarrow v24.0.0 (extra: tune)
+笏・  笏・  笏懌楳笏 pydantic v2.13.4 (extra: tune) (*)
+笏・  笏・  笏懌楳笏 requests v2.34.2 (extra: tune) (*)
+笏・  笏・  笏披楳笏 tensorboardx v2.6.5 (extra: tune) (*)
+笏・  笏懌楳笏 scipy v1.18.0
+笏・  笏・  笏披楳笏 numpy v2.4.6
+笏・  笏懌楳笏 torch v2.9.1 (*)
+笏・  笏懌楳笏 tornado v6.5.7
+笏・  笏披楳笏 utilsforecast v0.2.16
+笏・      笏懌楳笏 narwhals v2.24.0
+笏・      笏懌楳笏 numpy v2.4.6
+笏・      笏懌楳笏 packaging v26.2
+笏・      笏披楳笏 pandas v2.3.3 (*)
+笏懌楳笏 numpy v2.4.6
+笏懌楳笏 optuna-dashboard v0.20.0
+笏・  笏懌楳笏 bottle v0.13.4
+笏・  笏披楳笏 optuna v4.9.0 (*)
+笏懌楳笏 pandas v2.3.3 (*)
+笏懌楳笏 prometheus-client v0.26.0
+笏懌楳笏 pyarrow v24.0.0
+笏懌楳笏 pydantic v2.13.4 (*)
+笏懌楳笏 pyyaml v6.0.3
+笏懌楳笏 scikit-learn v1.7.2
+笏・  笏懌楳笏 joblib v1.5.3
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 scipy v1.18.0 (*)
+笏・  笏披楳笏 threadpoolctl v3.6.0
+笏懌楳笏 scipy v1.18.0 (*)
+笏懌楳笏 tabulate v0.10.0
+笏懌楳笏 torch v2.9.1 (*)
+笏懌楳笏 transformers v4.57.6
+笏・  笏懌楳笏 filelock v3.32.2
+笏・  笏懌楳笏 huggingface-hub v0.36.2 (*)
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 packaging v26.2
+笏・  笏懌楳笏 pyyaml v6.0.3
+笏・  笏懌楳笏 regex v2026.7.19
+笏・  笏懌楳笏 requests v2.34.2 (*)
+笏・  笏懌楳笏 safetensors v0.8.0
+笏・  笏懌楳笏 tokenizers v0.22.2
+笏・  笏・  笏披楳笏 huggingface-hub v0.36.2 (*)
+笏・  笏披楳笏 tqdm v4.70.0 (*)
+笏懌楳笏 fastapi v0.119.1 (extra: api)
+笏・  笏懌楳笏 pydantic v2.13.4 (*)
+笏・  笏懌楳笏 starlette v0.48.0
+笏・  笏・  笏懌楳笏 anyio v4.14.2
+笏・  笏・  笏・  笏懌楳笏 idna v3.18
+笏・  笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏披楳笏 typing-extensions v4.16.0
+笏懌楳笏 httpx v0.28.1 (extra: api)
+笏・  笏懌楳笏 anyio v4.14.2 (*)
+笏・  笏懌楳笏 certifi v2026.7.22
+笏・  笏懌楳笏 httpcore v1.0.9
+笏・  笏・  笏懌楳笏 certifi v2026.7.22
+笏・  笏・  笏披楳笏 h11 v0.16.0
+笏・  笏披楳笏 idna v3.18
+笏懌楳笏 starlette v0.48.0 (extra: api) (*)
+笏懌楳笏 uvicorn v0.52.1 (extra: api)
+笏・  笏懌楳笏 click v8.4.2 (*)
+笏・  笏披楳笏 h11 v0.16.0
+笏懌楳笏 optuna v4.9.0 (extra: auto-campaign) (*)
+笏懌楳笏 psutil v7.2.2 (extra: auto-campaign)
+笏懌楳笏 statsforecast v2.1.1 (extra: auto-campaign)
+笏・  笏懌楳笏 cloudpickle v3.1.2
+笏・  笏懌楳笏 coreforecast v0.0.18 (*)
+笏・  笏懌楳笏 fugue v0.9.7
+笏・  笏・  笏懌楳笏 adagio v0.2.6
+笏・  笏・  笏・  笏披楳笏 triad v1.0.2
+笏・  笏・  笏・      笏懌楳笏 fsspec v2026.7.0
+笏・  笏・  笏・      笏懌楳笏 numpy v2.4.6
+笏・  笏・  笏・      笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏・  笏・      笏懌楳笏 pyarrow v24.0.0
+笏・  笏・  笏・      笏披楳笏 six v1.17.0
+笏・  笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏・  笏披楳笏 triad v1.0.2 (*)
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏懌楳笏 scipy v1.18.0 (*)
+笏・  笏懌楳笏 statsmodels v0.14.6
+笏・  笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏・  笏懌楳笏 packaging v26.2
+笏・  笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏・  笏懌楳笏 patsy v1.0.2
+笏・  笏・  笏・  笏披楳笏 numpy v2.4.6
+笏・  笏・  笏披楳笏 scipy v1.18.0 (*)
+笏・  笏懌楳笏 threadpoolctl v3.6.0
+笏・  笏懌楳笏 tqdm v4.70.0 (*)
+笏・  笏披楳笏 utilsforecast v0.2.16 (*)
+笏懌楳笏 fastapi v0.119.1 (extra: dev) (*)
+笏懌楳笏 httpx v0.28.1 (extra: dev) (*)
+笏懌楳笏 hypothesis v6.165.0 (extra: dev)
+笏・  笏披楳笏 sortedcontainers v2.4.0
+笏懌楳笏 mypy v2.3.0 (extra: dev)
+笏・  笏懌楳笏 ast-serialize v0.6.0
+笏・  笏懌楳笏 librt v0.13.0
+笏・  笏懌楳笏 mypy-extensions v1.1.0
+笏・  笏懌楳笏 pathspec v1.1.1
+笏・  笏披楳笏 typing-extensions v4.16.0
+笏懌楳笏 neuralforecast v3.2.0 (extra: dev) (*)
+笏懌楳笏 optuna v4.9.0 (extra: dev) (*)
+笏懌楳笏 pytest v9.1.1 (extra: dev)
+笏・  笏懌楳笏 colorama v0.4.6
+笏・  笏懌楳笏 iniconfig v2.3.0
+笏・  笏懌楳笏 packaging v26.2
+笏・  笏懌楳笏 pluggy v1.6.0
+笏・  笏披楳笏 pygments v2.20.0
+笏懌楳笏 pytest-cov v7.1.0 (extra: dev)
+笏・  笏懌楳笏 coverage[toml] v7.15.2
+笏・  笏懌楳笏 pluggy v1.6.0
+笏・  笏披楳笏 pytest v9.1.1 (*)
+笏懌楳笏 ruff v0.16.1 (extra: dev)
+笏懌楳笏 starlette v0.48.0 (extra: dev) (*)
+笏懌楳笏 torch v2.9.1 (extra: dev) (*)
+笏懌楳笏 uvicorn v0.52.1 (extra: dev) (*)
+笏懌楳笏 gluonts v0.16.3 (extra: frameworks)
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏懌楳笏 pydantic v2.13.4 (*)
+笏・  笏懌楳笏 toolz v0.12.1
+笏・  笏懌楳笏 tqdm v4.70.0 (*)
+笏・  笏披楳笏 typing-extensions v4.16.0
+笏懌楳笏 lightning v2.6.5 (extra: frameworks)
+笏・  笏懌楳笏 fsspec[http] v2026.7.0 (*)
+笏・  笏懌楳笏 lightning-utilities v0.15.3 (*)
+笏・  笏懌楳笏 packaging v26.2
+笏・  笏懌楳笏 pytorch-lightning v2.5.6 (*)
+笏・  笏懌楳笏 pyyaml v6.0.3
+笏・  笏懌楳笏 torch v2.9.1 (*)
+笏・  笏懌楳笏 torchmetrics v1.9.0 (*)
+笏・  笏懌楳笏 tqdm v4.70.0 (*)
+笏・  笏披楳笏 typing-extensions v4.16.0
+笏懌楳笏 reservoirpy v0.4.2 (extra: frameworks)
+笏・  笏懌楳笏 joblib v1.5.3
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏披楳笏 scipy v1.18.0 (*)
+笏懌楳笏 skforecast v0.23.0 (extra: frameworks)
+笏・  笏懌楳笏 joblib v1.5.3
+笏・  笏懌楳笏 numba v0.66.0
+笏・  笏・  笏懌楳笏 llvmlite v0.48.0
+笏・  笏・  笏披楳笏 numpy v2.4.6
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 optuna v4.9.0 (*)
+笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏懌楳笏 rich v15.0.0
+笏・  笏・  笏懌楳笏 markdown-it-py v4.2.0
+笏・  笏・  笏・  笏披楳笏 mdurl v0.1.2
+笏・  笏・  笏披楳笏 pygments v2.20.0
+笏・  笏懌楳笏 scikit-learn v1.7.2 (*)
+笏・  笏懌楳笏 scipy v1.18.0 (*)
+笏・  笏披楳笏 tqdm v4.70.0 (*)
+笏懌楳笏 sktime v1.1.0 (extra: frameworks)
+笏・  笏懌楳笏 joblib v1.5.3
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 packaging v26.2
+笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏懌楳笏 scikit-base v1.0.2
+笏・  笏懌楳笏 scikit-learn v1.7.2 (*)
+笏・  笏披楳笏 scipy v1.18.0 (*)
+笏懌楳笏 u8darts v0.41.0 (extra: frameworks)
+笏・  笏披楳笏 darts v0.41.0
+笏・      笏懌楳笏 holidays v0.101
+笏・      笏・  笏披楳笏 python-dateutil v2.9.0.post0 (*)
+笏・      笏懌楳笏 joblib v1.5.3
+笏・      笏懌楳笏 matplotlib v3.11.1
+笏・      笏・  笏懌楳笏 contourpy v1.3.3
+笏・      笏・  笏・  笏披楳笏 numpy v2.4.6
+笏・      笏・  笏懌楳笏 cycler v0.12.1
+笏・      笏・  笏懌楳笏 fonttools v4.63.0
+笏・      笏・  笏懌楳笏 kiwisolver v1.5.0
+笏・      笏・  笏懌楳笏 numpy v2.4.6
+笏・      笏・  笏懌楳笏 packaging v26.2
+笏・      笏・  笏懌楳笏 pillow v12.3.0
+笏・      笏・  笏懌楳笏 pyparsing v3.3.2
+笏・      笏・  笏披楳笏 python-dateutil v2.9.0.post0 (*)
+笏・      笏懌楳笏 narwhals v2.24.0
+笏・      笏懌楳笏 nfoursid v1.0.2
+笏・      笏・  笏懌楳笏 matplotlib v3.11.1 (*)
+笏・      笏・  笏懌楳笏 numpy v2.4.6
+笏・      笏・  笏披楳笏 pandas v2.3.3 (*)
+笏・      笏懌楳笏 numpy v2.4.6
+笏・      笏懌楳笏 pandas v2.3.3 (*)
+笏・      笏懌楳笏 pyod v3.6.2
+笏・      笏・  笏懌楳笏 joblib v1.5.3
+笏・      笏・  笏懌楳笏 matplotlib v3.11.1 (*)
+笏・      笏・  笏懌楳笏 numba v0.66.0 (*)
+笏・      笏・  笏懌楳笏 numpy v2.4.6
+笏・      笏・  笏懌楳笏 scikit-learn v1.7.2 (*)
+笏・      笏・  笏披楳笏 scipy v1.18.0 (*)
+笏・      笏懌楳笏 requests v2.34.2 (*)
+笏・      笏懌楳笏 scikit-learn v1.7.2 (*)
+笏・      笏懌楳笏 scipy v1.18.0 (*)
+笏・      笏懌楳笏 shap v0.52.0
+笏・      笏・  笏懌楳笏 cloudpickle v3.1.2
+笏・      笏・  笏懌楳笏 llvmlite v0.48.0
+笏・      笏・  笏懌楳笏 numba v0.66.0 (*)
+笏・      笏・  笏懌楳笏 numpy v2.4.6
+笏・      笏・  笏懌楳笏 packaging v26.2
+笏・      笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・      笏・  笏懌楳笏 scikit-learn v1.7.2 (*)
+笏・      笏・  笏懌楳笏 scipy v1.18.0 (*)
+笏・      笏・  笏懌楳笏 slicer v0.0.8
+笏・      笏・  笏披楳笏 tqdm v4.70.0 (*)
+笏・      笏懌楳笏 statsmodels v0.14.6 (*)
+笏・      笏懌楳笏 tqdm v4.70.0 (*)
+笏・      笏懌楳笏 typing-extensions v4.16.0
+笏・      笏披楳笏 xarray v2026.7.0
+笏・          笏懌楳笏 numpy v2.4.6
+笏・          笏懌楳笏 packaging v26.2
+笏・          笏披楳笏 pandas v2.3.3 (*)
+笏懌楳笏 catboost v1.2.10 (extra: full)
+笏・  笏懌楳笏 graphviz v0.21
+笏・  笏懌楳笏 matplotlib v3.11.1 (*)
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏懌楳笏 plotly v6.9.0
+笏・  笏・  笏懌楳笏 narwhals v2.24.0
+笏・  笏・  笏披楳笏 packaging v26.2
+笏・  笏懌楳笏 scipy v1.18.0 (*)
+笏・  笏披楳笏 six v1.17.0
+笏懌楳笏 fastapi v0.119.1 (extra: full) (*)
+笏懌楳笏 hierarchicalforecast v1.5.1 (extra: full)
+笏・  笏懌楳笏 matplotlib v3.11.1 (*)
+笏・  笏懌楳笏 narwhals v2.24.0
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏懌楳笏 qpsolvers[clarabel] v4.13.0
+笏・  笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏・  笏懌楳笏 scipy v1.18.0 (*)
+笏・  笏・  笏披楳笏 clarabel v0.11.1 (extra: clarabel)
+笏・  笏・      笏懌楳笏 cffi v2.1.0
+笏・  笏・      笏・  笏披楳笏 pycparser v3.0
+笏・  笏・      笏懌楳笏 numpy v2.4.6
+笏・  笏・      笏披楳笏 scipy v1.18.0 (*)
+笏・  笏懌楳笏 scikit-learn v1.7.2 (*)
+笏・  笏披楳笏 utilsforecast v0.2.16 (*)
+笏懌楳笏 httpx v0.28.1 (extra: full) (*)
+笏懌楳笏 lightgbm v4.7.0 (extra: full)
+笏・  笏懌楳笏 narwhals v2.24.0
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏披楳笏 scipy v1.18.0 (*)
+笏懌楳笏 mlflow v3.15.1 (extra: full)
+笏・  笏懌楳笏 aiohttp v3.14.3 (*)
+笏・  笏懌楳笏 alembic v1.18.5 (*)
+笏・  笏懌楳笏 cryptography v48.0.1
+笏・  笏・  笏披楳笏 cffi v2.1.0 (*)
+笏・  笏懌楳笏 docker v7.2.0
+笏・  笏・  笏懌楳笏 pywin32 v312
+笏・  笏・  笏懌楳笏 requests v2.34.2 (*)
+笏・  笏・  笏披楳笏 urllib3 v2.7.0
+笏・  笏懌楳笏 flask v3.1.3
+笏・  笏・  笏懌楳笏 blinker v1.9.0
+笏・  笏・  笏懌楳笏 click v8.4.2 (*)
+笏・  笏・  笏懌楳笏 itsdangerous v2.2.0
+笏・  笏・  笏懌楳笏 jinja2 v3.1.6 (*)
+笏・  笏・  笏懌楳笏 markupsafe v3.0.3
+笏・  笏・  笏披楳笏 werkzeug v3.1.8
+笏・  笏・      笏披楳笏 markupsafe v3.0.3
+笏・  笏懌楳笏 flask-cors v6.0.5
+笏・  笏・  笏懌楳笏 flask v3.1.3 (*)
+笏・  笏・  笏披楳笏 werkzeug v3.1.8 (*)
+笏・  笏懌楳笏 graphene v3.4.3
+笏・  笏・  笏懌楳笏 graphql-core v3.2.11
+笏・  笏・  笏懌楳笏 graphql-relay v3.2.0
+笏・  笏・  笏・  笏披楳笏 graphql-core v3.2.11
+笏・  笏・  笏懌楳笏 python-dateutil v2.9.0.post0 (*)
+笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏懌楳笏 huey v3.3.0
+笏・  笏懌楳笏 matplotlib v3.11.1 (*)
+笏・  笏懌楳笏 mlflow-skinny v3.15.1
+笏・  笏・  笏懌楳笏 cachetools v7.1.6
+笏・  笏・  笏懌楳笏 click v8.4.2 (*)
+笏・  笏・  笏懌楳笏 cloudpickle v3.1.2
+笏・  笏・  笏懌楳笏 databricks-sdk v0.122.0
+笏・  笏・  笏・  笏懌楳笏 google-auth v2.56.2
+笏・  笏・  笏・  笏・  笏懌楳笏 cryptography v48.0.1 (*)
+笏・  笏・  笏・  笏・  笏披楳笏 pyasn1-modules v0.4.2
+笏・  笏・  笏・  笏・      笏披楳笏 pyasn1 v0.6.4
+笏・  笏・  笏・  笏懌楳笏 protobuf v6.33.6
+笏・  笏・  笏・  笏懌楳笏 requests v2.34.2 (*)
+笏・  笏・  笏・  笏披楳笏 urllib3 v2.7.0
+笏・  笏・  笏懌楳笏 fastapi v0.119.1 (*)
+笏・  笏・  笏懌楳笏 gitpython v3.1.57
+笏・  笏・  笏・  笏披楳笏 gitdb v4.0.12
+笏・  笏・  笏・      笏披楳笏 smmap v5.0.3
+笏・  笏・  笏懌楳笏 importlib-metadata v9.0.0
+笏・  笏・  笏・  笏披楳笏 zipp v4.1.0
+笏・  笏・  笏懌楳笏 opentelemetry-api v1.44.0
+笏・  笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏懌楳笏 opentelemetry-proto v1.44.0
+笏・  笏・  笏・  笏披楳笏 protobuf v6.33.6
+笏・  笏・  笏懌楳笏 opentelemetry-sdk v1.44.0
+笏・  笏・  笏・  笏懌楳笏 opentelemetry-api v1.44.0 (*)
+笏・  笏・  笏・  笏懌楳笏 opentelemetry-semantic-conventions v0.65b0
+笏・  笏・  笏・  笏・  笏懌楳笏 opentelemetry-api v1.44.0 (*)
+笏・  笏・  笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏懌楳笏 packaging v26.2
+笏・  笏・  笏懌楳笏 protobuf v6.33.6
+笏・  笏・  笏懌楳笏 pydantic v2.13.4 (*)
+笏・  笏・  笏懌楳笏 python-dotenv v1.2.2
+笏・  笏・  笏懌楳笏 pyyaml v6.0.3
+笏・  笏・  笏懌楳笏 requests v2.34.2 (*)
+笏・  笏・  笏懌楳笏 sqlparse v0.5.5
+笏・  笏・  笏懌楳笏 starlette v0.48.0 (*)
+笏・  笏・  笏懌楳笏 typing-extensions v4.16.0
+笏・  笏・  笏披楳笏 uvicorn v0.52.1 (*)
+笏・  笏懌楳笏 mlflow-tracing v3.15.1
+笏・  笏・  笏懌楳笏 cachetools v7.1.6
+笏・  笏・  笏懌楳笏 databricks-sdk v0.122.0 (*)
+笏・  笏・  笏懌楳笏 opentelemetry-api v1.44.0 (*)
+笏・  笏・  笏懌楳笏 opentelemetry-proto v1.44.0 (*)
+笏・  笏・  笏懌楳笏 opentelemetry-sdk v1.44.0 (*)
+笏・  笏・  笏懌楳笏 packaging v26.2
+笏・  笏・  笏懌楳笏 protobuf v6.33.6
+笏・  笏・  笏披楳笏 pydantic v2.13.4 (*)
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏懌楳笏 pyarrow v24.0.0
+笏・  笏懌楳笏 scikit-learn v1.7.2 (*)
+笏・  笏懌楳笏 scipy v1.18.0 (*)
+笏・  笏懌楳笏 skops v0.14.0
+笏・  笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏・  笏懌楳笏 packaging v26.2
+笏・  笏・  笏懌楳笏 prettytable v3.18.0
+笏・  笏・  笏・  笏披楳笏 wcwidth v0.8.2
+笏・  笏・  笏懌楳笏 scikit-learn v1.7.2 (*)
+笏・  笏・  笏披楳笏 scipy v1.18.0 (*)
+笏・  笏懌楳笏 sqlalchemy v2.0.51 (*)
+笏・  笏披楳笏 waitress v3.0.2
+笏懌楳笏 mlforecast v1.1.0 (extra: full)
+笏・  笏懌楳笏 cloudpickle v3.1.2
+笏・  笏懌楳笏 coreforecast v0.0.18 (*)
+笏・  笏懌楳笏 fsspec v2026.7.0
+笏・  笏懌楳笏 narwhals v2.24.0
+笏・  笏懌楳笏 optuna v4.9.0 (*)
+笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏懌楳笏 scikit-learn v1.7.2 (*)
+笏・  笏披楳笏 utilsforecast v0.2.16 (*)
+笏懌楳笏 neuralforecast v3.2.0 (extra: full) (*)
+笏懌楳笏 opentelemetry-exporter-otlp v1.44.0 (extra: full)
+笏・  笏懌楳笏 opentelemetry-exporter-otlp-proto-grpc v1.44.0
+笏・  笏・  笏懌楳笏 googleapis-common-protos v1.75.0
+笏・  笏・  笏・  笏披楳笏 protobuf v6.33.6
+笏・  笏・  笏懌楳笏 grpcio v1.83.0
+笏・  笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏・  笏懌楳笏 opentelemetry-api v1.44.0 (*)
+笏・  笏・  笏懌楳笏 opentelemetry-exporter-otlp-proto-common v1.44.0
+笏・  笏・  笏・  笏披楳笏 opentelemetry-proto v1.44.0 (*)
+笏・  笏・  笏懌楳笏 opentelemetry-proto v1.44.0 (*)
+笏・  笏・  笏懌楳笏 opentelemetry-sdk v1.44.0 (*)
+笏・  笏・  笏披楳笏 typing-extensions v4.16.0
+笏・  笏披楳笏 opentelemetry-exporter-otlp-proto-http v1.44.0
+笏・      笏懌楳笏 googleapis-common-protos v1.75.0 (*)
+笏・      笏懌楳笏 opentelemetry-api v1.44.0 (*)
+笏・      笏懌楳笏 opentelemetry-exporter-otlp-proto-common v1.44.0 (*)
+笏・      笏懌楳笏 opentelemetry-proto v1.44.0 (*)
+笏・      笏懌楳笏 opentelemetry-sdk v1.44.0 (*)
+笏・      笏懌楳笏 requests v2.34.2 (*)
+笏・      笏披楳笏 typing-extensions v4.16.0
+笏懌楳笏 opentelemetry-sdk v1.44.0 (extra: full) (*)
+笏懌楳笏 optuna v4.9.0 (extra: full) (*)
+笏懌楳笏 plotly v6.9.0 (extra: full) (*)
+笏懌楳笏 psutil v7.2.2 (extra: full)
+笏懌楳笏 psycopg[binary] v3.3.4 (extra: full)
+笏・  笏懌楳笏 typing-extensions v4.16.0
+笏・  笏懌楳笏 tzdata v2026.3
+笏・  笏披楳笏 psycopg-binary v3.3.4 (extra: binary)
+笏懌楳笏 pyarrow v24.0.0 (extra: full)
+笏懌楳笏 ray[tune] v2.56.1 (extra: full)
+笏・  笏懌楳笏 click v8.4.2 (*)
+笏・  笏懌楳笏 filelock v3.32.2
+笏・  笏懌楳笏 jsonschema v4.26.0 (*)
+笏・  笏懌楳笏 msgpack v1.2.1
+笏・  笏懌楳笏 packaging v26.2
+笏・  笏懌楳笏 protobuf v6.33.6
+笏・  笏懌楳笏 pyyaml v6.0.3
+笏・  笏懌楳笏 requests v2.34.2 (*)
+笏・  笏懌楳笏 fsspec v2026.7.0 (extra: tune)
+笏・  笏懌楳笏 pandas v2.3.3 (extra: tune) (*)
+笏・  笏懌楳笏 pyarrow v24.0.0 (extra: tune)
+笏・  笏懌楳笏 pydantic v2.13.4 (extra: tune) (*)
+笏・  笏懌楳笏 requests v2.34.2 (extra: tune) (*)
+笏・  笏披楳笏 tensorboardx v2.6.5 (extra: tune) (*)
+笏懌楳笏 sqlalchemy v2.0.51 (extra: full) (*)
+笏懌楳笏 starlette v0.48.0 (extra: full) (*)
+笏懌楳笏 statsforecast v2.1.1 (extra: full) (*)
+笏懌楳笏 structlog v26.1.0 (extra: full)
+笏懌楳笏 uvicorn v0.52.1 (extra: full) (*)
+笏懌楳笏 xgboost v3.3.0 (extra: full)
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏披楳笏 scipy v1.18.0 (*)
+笏懌楳笏 mlflow v3.15.1 (extra: mlflow) (*)
+笏懌楳笏 psycopg[binary] v3.3.4 (extra: postgres) (*)
+笏懌楳笏 sqlalchemy v2.0.51 (extra: postgres) (*)
+笏懌楳笏 accelerate v1.14.0 (extra: tsfm)
+笏・  笏懌楳笏 huggingface-hub v0.36.2 (*)
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 packaging v26.2
+笏・  笏懌楳笏 psutil v7.2.2
+笏・  笏懌楳笏 pyyaml v6.0.3
+笏・  笏懌楳笏 safetensors v0.8.0
+笏・  笏披楳笏 torch v2.9.1 (*)
+笏懌楳笏 chronos-forecasting v2.3.1 (extra: tsfm)
+笏・  笏懌楳笏 accelerate v1.14.0 (*)
+笏・  笏懌楳笏 einops v0.8.2
+笏・  笏懌楳笏 numpy v2.4.6
+笏・  笏懌楳笏 pandas v2.3.3 (*)
+笏・  笏懌楳笏 torch v2.9.1 (*)
+笏・  笏披楳笏 transformers v4.57.6 (*)
+笏懌楳笏 transformers v4.57.6 (extra: tsfm) (*)
+笏懌楳笏 allpairspy v2.5.1 (group: dev)
+笏披楳笏 openpyxl v3.1.5 (group: dev)
+    笏披楳笏 et-xmlfile v2.0.0
+(*) Package tree already displayed

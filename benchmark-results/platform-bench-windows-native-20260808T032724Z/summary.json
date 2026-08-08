@@ -1,0 +1,111 @@
+{
+  "run_id": "platform-bench-windows-native-20260808T032724Z",
+  "platform": "Native Windows",
+  "target_sha": "f13ebf6dd4b5495eb0bd47f27375c7e47c17ce60",
+  "target_pr": 183,
+  "benchmark_uv": "uv 0.11.21 (5aa65dd7a 2026-06-11 x86_64-pc-windows-msvc)",
+  "benchmark_python": "3.12.13",
+  "triton_selected": false,
+  "all_stages_pass": true,
+  "stages": [
+    {
+      "stage": "uv_bootstrap_exact",
+      "wall_seconds": 2.723,
+      "free_memory_mb_before": 107056.8,
+      "free_memory_mb_after": 107029.7,
+      "system_cpu_pct_before": 12.0,
+      "system_cpu_pct_after": 5.0,
+      "disk_bytes_per_sec_before": 76770094.0,
+      "disk_bytes_per_sec_after": 1038688.0,
+      "success": true
+    },
+    {
+      "stage": "uv_python_312_ready",
+      "wall_seconds": 1.843,
+      "free_memory_mb_before": 106968.4,
+      "free_memory_mb_after": 106852.7,
+      "system_cpu_pct_before": 14.0,
+      "system_cpu_pct_after": 20.0,
+      "disk_bytes_per_sec_before": 4111471.0,
+      "disk_bytes_per_sec_after": 3969452.0,
+      "success": true
+    },
+    {
+      "stage": "uv_lock_check",
+      "wall_seconds": 1.151,
+      "free_memory_mb_before": 106152.0,
+      "free_memory_mb_after": 106192.9,
+      "system_cpu_pct_before": 3.0,
+      "system_cpu_pct_after": 2.0,
+      "disk_bytes_per_sec_before": 6523422.0,
+      "disk_bytes_per_sec_after": 136516868.0,
+      "success": true
+    },
+    {
+      "stage": "windows_resolve_first",
+      "wall_seconds": 0.466,
+      "free_memory_mb_before": 106174.1,
+      "free_memory_mb_after": 106151.3,
+      "system_cpu_pct_before": 15.0,
+      "system_cpu_pct_after": 43.0,
+      "disk_bytes_per_sec_before": 59389349.0,
+      "disk_bytes_per_sec_after": 37056716.0,
+      "success": true
+    },
+    {
+      "stage": "windows_resolve_second",
+      "wall_seconds": 0.339,
+      "free_memory_mb_before": 106050.1,
+      "free_memory_mb_after": 105899.3,
+      "system_cpu_pct_before": 30.0,
+      "system_cpu_pct_after": 6.0,
+      "disk_bytes_per_sec_before": 342976145.0,
+      "disk_bytes_per_sec_after": 130241003.0,
+      "success": true
+    },
+    {
+      "stage": "windows_dependency_tree",
+      "wall_seconds": 0.161,
+      "free_memory_mb_before": 105934.2,
+      "free_memory_mb_after": 105898.5,
+      "system_cpu_pct_before": 16.0,
+      "system_cpu_pct_after": 23.0,
+      "disk_bytes_per_sec_before": 235734291.0,
+      "disk_bytes_per_sec_after": 148932870.0,
+      "success": true
+    },
+    {
+      "stage": "python_compile_src",
+      "wall_seconds": 2.246,
+      "free_memory_mb_before": 105850.2,
+      "free_memory_mb_after": 106145.6,
+      "system_cpu_pct_before": 12.0,
+      "system_cpu_pct_after": 9.0,
+      "disk_bytes_per_sec_before": 118954187.0,
+      "disk_bytes_per_sec_after": 91438904.0,
+      "success": true
+    },
+    {
+      "stage": "wheel_build",
+      "wall_seconds": 5.481,
+      "free_memory_mb_before": 106159.0,
+      "free_memory_mb_after": 106280.5,
+      "system_cpu_pct_before": 4.0,
+      "system_cpu_pct_after": 22.0,
+      "disk_bytes_per_sec_before": 32171701.0,
+      "disk_bytes_per_sec_after": 120010564.0,
+      "success": true
+    },
+    {
+      "stage": "wheel_install_import_312",
+      "wall_seconds": 0.706,
+      "free_memory_mb_before": 106287.9,
+      "free_memory_mb_after": 106296.2,
+      "system_cpu_pct_before": 8.0,
+      "system_cpu_pct_after": 4.0,
+      "disk_bytes_per_sec_before": 134479150.0,
+      "disk_bytes_per_sec_after": 91965702.0,
+      "success": true
+    }
+  ]
+}
