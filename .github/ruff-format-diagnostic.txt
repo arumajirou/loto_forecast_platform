@@ -1,0 +1,19 @@
+FORMAT_DIAGNOSTIC_VERSION=1
+RUN_ID=31252949425
+RUN_ATTEMPT=1
+HEAD_SHA=287377fc22caf7191f061a285dc67f973d07fc16
+RUFF_VERSION=0.16.0
+APPLY_STATUS=2
+CHECK_STATUS=2
+FORMATTER_CHANGED_FILES=603
+UNEXPECTED_CHANGED_FILES=0
+--- APPLY_STDOUT_FIRST_120_LINES ---
+603 files reformatted, 1191 files left unchanged
+--- APPLY_STDERR_FIRST_120_LINES ---
+error: Failed to read src/loto/auto_campaign/prospective_registry_reconciliation_expected.py: stream did not contain valid UTF-8
+--- CHECK_STDOUT_FIRST_120_LINES ---
+io: stream did not contain valid UTF-8
+--> src/loto/auto_campaign/prospective_registry_reconciliation_expected.py:1:1
+
+1794 files already formatted
+--- CHECK_STDERR_FIRST_120_LINES ---
