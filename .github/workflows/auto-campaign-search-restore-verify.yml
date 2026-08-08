@@ -25,14 +25,16 @@ jobs:
         with:
           ref: fix/auto-campaign-search-integration-restore-v1
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 0
 
-      - name: Verify recovered source provenance
+      - name: Verify recovered contract provenance
         shell: bash
         run: |
           set -Eeuo pipefail
           test "$(git rev-parse HEAD:src/loto/auto_campaign/model_factory.py)" = "e597f4d710676815040e2fbe6ddd7812f803fcc8"
-          echo 'RECOVERED_MODEL_FACTORY_BLOB=PASS'
+          test "$(git rev-parse HEAD:src/loto/auto_campaign/contracts.py)" = "18923413e32c1ec841bfe77d914e09a1d194e407"
+          git cat-file -e 2122ec0dee7befa551eb331e598ee9a1b3965d23^{commit}
+          echo 'RECOVERED_AUTO_CAMPAIGN_CONTRACTS=PASS'
 
       - name: Install exact uv
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
@@ -40,19 +42,21 @@ jobs:
           version: '0.11.21'
           enable-cache: false
 
-      - name: Verify collection and AutoCampaign contracts
+      - name: Verify collection target tests and baseline parity
         shell: bash
         run: |
           set -Eeuo pipefail
           uv python install 3.13
           venv="$RUNNER_TEMP/loto-auto-search-restore-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           cache="$RUNNER_TEMP/loto-auto-search-restore-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          rm -rf -- "$venv" "$cache"
+          base_root="$RUNNER_TEMP/loto-auto-search-base-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$venv" "$cache" "$base_root"
           mkdir -p "$cache"
           uv venv "$venv" --python 3.13
           python="$venv/bin/python"
           echo "venv=$venv" >> "$GITHUB_ENV"
           echo "cache=$cache" >> "$GITHUB_ENV"
+          echo "base_root=$base_root" >> "$GITHUB_ENV"
 
           UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" \
             --index-url https://download.pytorch.org/whl/cpu 'torch==2.9.1'
@@ -61,14 +65,28 @@ jobs:
           uv pip check --python "$python"
           test "$("$python" -m ruff --version)" = 'ruff 0.16.0'
 
-          "$python" -m ruff check --select I001 --fix src/loto/auto_campaign/model_factory.py
-          "$python" -m ruff format src/loto/auto_campaign/model_factory.py
-          mapfile -t formatted < <(git diff --name-only | sort)
-          test "${#formatted[@]}" -eq 1
-          test "${formatted[0]}" = 'src/loto/auto_campaign/model_factory.py'
+          "$python" -m ruff check --select I001 --fix \
+            src/loto/auto_campaign/model_factory.py \
+            src/loto/auto_campaign/contracts.py \
+            tests/auto_campaign/test_search_space_artifact_persistence.py
+          "$python" -m ruff format \
+            src/loto/auto_campaign/model_factory.py \
+            src/loto/auto_campaign/contracts.py \
+            tests/auto_campaign/test_search_space_artifact_persistence.py
+          mapfile -t normalized < <(git diff --name-only | sort)
+          test "${#normalized[@]}" -ge 1
+          for path in "${normalized[@]}"; do
+            case "$path" in
+              src/loto/auto_campaign/model_factory.py|src/loto/auto_campaign/contracts.py|tests/auto_campaign/test_search_space_artifact_persistence.py) ;;
+              *) echo "unexpected normalized path: $path"; exit 1 ;;
+            esac
+          done
           git diff --check
           "$python" -m ruff check src scripts tests
-          "$python" -m ruff format --check src/loto/auto_campaign/model_factory.py
+          "$python" -m ruff format --check \
+            src/loto/auto_campaign/model_factory.py \
+            src/loto/auto_campaign/contracts.py \
+            tests/auto_campaign/test_search_space_artifact_persistence.py
           "$python" -m compileall -q src scripts tests
           echo 'STATIC_GATES=PASS'
 
@@ -91,8 +109,71 @@ jobs:
           assert 'opentelemetry' in text
           PY
 
-          "$python" -m pytest -q tests/auto_campaign
-          echo 'FOCUSED_AUTO_CAMPAIGN_TESTS=PASS'
+          "$python" -m pytest -q \
+            tests/auto_campaign/test_search_policy_integration.py \
+            tests/auto_campaign/test_search_space_artifact_persistence.py
+          echo 'TARGET_AUTO_CAMPAIGN_SEARCH_TESTS=PASS'
+
+          git worktree add --detach "$base_root" 2122ec0dee7befa551eb331e598ee9a1b3965d23
+          "$python" - "$base_root" "$RUNNER_TEMP/baseline-outcomes.json" "$RUNNER_TEMP/candidate-outcomes.json" <<'PY'
+          from __future__ import annotations
+          import json, os, subprocess, sys
+          from pathlib import Path
+
+          candidate=Path.cwd().resolve()
+          baseline=Path(sys.argv[1]).resolve()
+          excluded={
+              'tests/auto_campaign/test_search_policy_integration.py',
+              'tests/auto_campaign/test_search_space_artifact_persistence.py',
+          }
+          tests=sorted(
+              path.relative_to(candidate).as_posix()
+              for path in (candidate/'tests/auto_campaign').glob('test_*.py')
+              if path.relative_to(candidate).as_posix() not in excluded
+          )
+          assert tests, 'no AutoCampaign parity test files selected'
+          print(f'PARITY_TEST_FILES={len(tests)}')
+
+          def run(root: Path) -> dict[str, dict[str, object]]:
+              out={}
+              for test in tests:
+                  env=os.environ.copy()
+                  env['PYTHONPATH']=str(root/'src')
+                  proc=subprocess.run(
+                      [sys.executable,'-m','pytest','-q','--tb=no',test],
+                      cwd=root,
+                      env=env,
+                      text=True,
+                      capture_output=True,
+                      check=False,
+                  )
+                  text=(proc.stdout or '')+'\n'+(proc.stderr or '')
+                  ids=[]
+                  for line in text.splitlines():
+                      stripped=line.strip()
+                      if stripped.startswith('FAILED ') or stripped.startswith('ERROR '):
+                          ids.append(stripped.split(' - ',1)[0])
+                  out[test]={
+                      'returncode':proc.returncode,
+                      'problem_ids':sorted(set(ids)),
+                  }
+                  print(f'OUTCOME\t{root.name}\t{proc.returncode}\t{test}\t{",".join(sorted(set(ids)))}')
+              return out
+
+          before=run(baseline)
+          after=run(candidate)
+          Path(sys.argv[2]).write_text(json.dumps(before,sort_keys=True,indent=2)+'\n',encoding='utf-8')
+          Path(sys.argv[3]).write_text(json.dumps(after,sort_keys=True,indent=2)+'\n',encoding='utf-8')
+          if before != after:
+              changed={key:{'baseline':before[key],'candidate':after[key]} for key in before if before[key]!=after[key]}
+              print('PARITY_DIFF='+json.dumps(changed,sort_keys=True))
+              raise AssertionError(changed)
+          passed=sum(1 for item in before.values() if item['returncode']==0)
+          nonpass=len(before)-passed
+          print('NON_TARGET_AUTO_CAMPAIGN_PARITY=PASS')
+          print(f'BASELINE_PASS_FILES={passed}')
+          print(f'BASELINE_NONPASS_FILES={nonpass}')
+          PY
 
           "$python" - <<'PY'
           import json
@@ -107,6 +188,7 @@ jobs:
               _search_space_evidence_root,
               _search_space_profile,
           )
+          from loto.models.neuralforecast_search_policy import resolve_search_policy
           from loto.models.neuralforecast_search_space_artifacts import verify_search_space_artifacts
 
           class Choice:
@@ -117,15 +199,19 @@ jobs:
               data_path=Path('input.csv'),
               search=SearchConfig(backend='optuna',strategy='auto',num_samples=10,search_seed=1),
           )
+          assert config.search.allow_fallback is False
           materialized=_search_materialization(
               config=config,backend='optuna',model_name='AutoNHITS',num_samples=10
           )
           assert isinstance(materialized.algorithm,optuna.samplers.TPESampler)
           assert materialized.decision.effective_algorithm_name=='TPESampler'
+          policy=resolve_search_policy(
+              backend='optuna',strategy='random',search_seed=1,num_samples=1,model_name='AutoTFT'
+          )
           artifact=_artifact_kwargs(
               {'h':1},
               [{'argument':'h','status':'ACCEPTED'}],
-              materialized.decision,
+              policy,
           )
           assert artifact['search_policy']['search_seed']==1
 
@@ -161,6 +247,10 @@ jobs:
         shell: bash
         run: |
           set +e
+          if [[ -n "${base_root:-}" ]] && [[ -d "${base_root:-}" ]]; then
+            git worktree remove --force "$base_root" || true
+          fi
           git reset --hard HEAD
           git clean -ffdx
-          rm -rf -- "${venv:-}" "${cache:-}" "$RUNNER_TEMP/collection.txt" || true
+          rm -rf -- "${venv:-}" "${cache:-}" "$RUNNER_TEMP/collection.txt" \
+            "$RUNNER_TEMP/baseline-outcomes.json" "$RUNNER_TEMP/candidate-outcomes.json" || true
