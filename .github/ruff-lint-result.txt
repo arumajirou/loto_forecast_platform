@@ -1,0 +1,380 @@
+RUFF_LINT_EVIDENCE_VERSION=1
+RUN_ID=31255571489
+SOURCE_HEAD=1c08f14b58cb9ce01b8b700b9e553ca4714e3487
+RUFF_VERSION=0.16.0
+LINT_RC=1
+PARSED_FINDINGS=0
+RULE_COUNTS=
+TOP_FILES=
+--- FIRST_250_LINES ---
+UP035 [*] Import from `collections.abc` instead: `Mapping`
+ --> scripts/certify_merlion_lock_commit.py:6:1
+  |
+4 | import json
+5 | from pathlib import Path
+6 | from typing import Any, Mapping
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 |
+8 | from loto.merlion_campaign.bootstrap_evidence_verify import verify_bootstrap_evidence_zip
+  |
+help: Import from `collections.abc`
+  |
+5 | from pathlib import Path
+  - from typing import Any, Mapping
+6 + from typing import Any
+7 + from collections.abc import Mapping
+8 |
+  |
+
+UP017 [*] Use `datetime.UTC` alias
+  --> scripts/certify_sundial_provider_v2.py:27:25
+   |
+26 | def utc_now() -> str:
+27 |     return datetime.now(timezone.utc).isoformat()
+   |                         ^^^^^^^^^^^^
+   |
+help: Convert to `datetime.UTC` alias
+   |
+12 | import time
+   - from datetime import datetime, timezone
+13 + from datetime import datetime, timezone, UTC
+14 | from pathlib import Path
+--------------------------------------------------------------------------------
+26 | def utc_now() -> str:
+   -     return datetime.now(timezone.utc).isoformat()
+27 +     return datetime.now(UTC).isoformat()
+28 |
+   |
+
+B905 `zip()` without an explicit `strict=` parameter
+   --> scripts/certify_sundial_provider_v2.py:367:76
+    |
+365 |         return {"classification": "SHAPE_MISMATCH", "passed": False}
+366 |     exact = a == b
+367 |     close = all(math.isclose(x, y, rel_tol=1e-6, abs_tol=1e-7) for x, y in zip(a, b))
+    |                                                                            ^^^^^^^^^
+368 |     return {
+369 |         "classification": "EXACT" if exact else "NUMERIC_CLOSE" if close else "DIVERGENT",
+    |
+help: Add explicit value for parameter `strict=`
+
+B905 `zip()` without an explicit `strict=` parameter
+   --> scripts/certify_sundial_provider_v2.py:372:68
+    |
+370 |         "passed": exact or close,
+371 |         "sample_count": len(a),
+372 |         "maximum_absolute_difference": max((abs(x - y) for x, y in zip(a, b)), default=0.0),
+    |                                                                    ^^^^^^^^^
+373 |     }
+    |
+help: Add explicit value for parameter `strict=`
+
+E402 Module level import not at top of file
+  --> scripts/commit_trusted_vertical_slice.py:15:1
+   |
+13 |       sys.path.insert(0, str(SRC))
+14 |
+15 | / from loto.orchestration.pipeline_downstream_commit import (
+16 | |     DownstreamCommitError,
+17 | |     execute_downstream_commit,
+18 | | )
+   | |_^
+19 |   from loto.orchestration.pipeline_downstream_effects import (
+20 |       DefaultDownstreamEffects,
+   |
+help: Move module level imports to top of file
+
+E402 Module level import not at top of file
+  --> scripts/commit_trusted_vertical_slice.py:19:1
+   |
+17 |       execute_downstream_commit,
+18 |   )
+19 | / from loto.orchestration.pipeline_downstream_effects import (
+20 | |     DefaultDownstreamEffects,
+21 | |     DownstreamCommitConfig,
+22 | | )
+   | |_^
+   |
+help: Move module level imports to top of file
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> scripts/create_merlion_license_review_template.py:1:1
+   |
+ 1 | / from __future__ import annotations
+ 2 | |
+ 3 | | import argparse
+ 4 | | import hashlib
+ 5 | | from pathlib import Path
+ 6 | |
+ 7 | | from loto.merlion_campaign.bootstrap_evidence_verify import verify_bootstrap_evidence_zip
+ 8 | | from loto.merlion_campaign.lock_admission import (
+ 9 | |     EVIDENCE_INVENTORY_PATH,
+10 | |     EVIDENCE_LOCK_PATH,
+11 | |     read_evidence_payloads,
+12 | |     write_json,
+13 | | )
+14 | | from loto.merlion_campaign.license_review import (
+15 | |     build_license_review_template,
+16 | |     parse_dependency_inventory,
+17 | | )
+   | |_^
+   |
+help: Organize imports
+   |
+7  | from loto.merlion_campaign.bootstrap_evidence_verify import verify_bootstrap_evidence_zip
+8  + from loto.merlion_campaign.license_review import (
+9  +     build_license_review_template,
+10 +     parse_dependency_inventory,
+11 + )
+12 | from loto.merlion_campaign.lock_admission import (
+--------------------------------------------------------------------------------
+16 |     write_json,
+   - )
+   - from loto.merlion_campaign.license_review import (
+   -     build_license_review_template,
+   -     parse_dependency_inventory,
+17 | )
+   |
+
+F401 [*] `json` imported but unused
+ --> scripts/export_toto2_4m_raw_history.py:4:8
+  |
+3 | import argparse
+4 | import json
+  |        ^^^^
+5 | import os
+6 | import sys
+  |
+help: Remove unused import: `json`
+  |
+3 | import argparse
+  - import json
+4 | import os
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> scripts/generate_moirai2_lock_candidate.py:17:1
+   |
+15 |   sys.path.insert(0, str(ROOT / "src"))
+16 |
+17 | / from loto.moirai2_campaign.lock_review import (  # noqa: E402
+18 | |     REPORT_FILENAME,
+19 | |     inspect_lock,
+20 | |     sha256_file,
+21 | |     write_sha256_manifest,
+22 | | )
+   | |_^
+   |
+help: Organize imports
+   |
+23 |
+   -
+24 | RUNTIME_LANES = {
+   |
+
+UP017 [*] Use `datetime.UTC` alias
+   --> scripts/generate_moirai2_lock_candidate.py:117:42
+    |
+115 |             "status": "FAILED",
+116 |             "runtime_lane": runtime_lane,
+117 |             "generated_at": datetime.now(timezone.utc).isoformat(),
+    |                                          ^^^^^^^^^^^^
+118 |             "command": command,
+119 |             "exit_code": process.returncode,
+    |
+help: Convert to `datetime.UTC` alias
+    |
+9   | import sys
+    - from datetime import datetime, timezone
+10  + from datetime import datetime, timezone, UTC
+11  | from pathlib import Path
+--------------------------------------------------------------------------------
+116 |             "runtime_lane": runtime_lane,
+    -             "generated_at": datetime.now(timezone.utc).isoformat(),
+117 +             "generated_at": datetime.now(UTC).isoformat(),
+118 |             "command": command,
+    |
+
+UP017 [*] Use `datetime.UTC` alias
+   --> scripts/generate_moirai2_lock_candidate.py:148:38
+    |
+146 |         "status": "PASS" if report["status"] == "PASS" else "FAILED",
+147 |         "runtime_lane": runtime_lane,
+148 |         "generated_at": datetime.now(timezone.utc).isoformat(),
+    |                                      ^^^^^^^^^^^^
+149 |         "command": command,
+150 |         "exit_code": process.returncode,
+    |
+help: Convert to `datetime.UTC` alias
+    |
+9   | import sys
+    - from datetime import datetime, timezone
+10  + from datetime import datetime, timezone, UTC
+11  | from pathlib import Path
+--------------------------------------------------------------------------------
+147 |         "runtime_lane": runtime_lane,
+    -         "generated_at": datetime.now(timezone.utc).isoformat(),
+148 +         "generated_at": datetime.now(UTC).isoformat(),
+149 |         "command": command,
+    |
+
+F401 [*] `hashlib` imported but unused
+ --> scripts/generate_tirex2_lock_candidate.py:4:8
+  |
+3 | import argparse
+4 | import hashlib
+  |        ^^^^^^^
+5 | import json
+6 | import shutil
+  |
+help: Remove unused import: `hashlib`
+  |
+3 | import argparse
+  - import hashlib
+4 | import json
+  |
+
+E402 Module level import not at top of file
+  --> scripts/generate_tirex2_lock_candidate.py:17:1
+   |
+15 |       sys.path.insert(0, str(SOURCE_ROOT))
+16 |
+17 | / from loto.tirex2_campaign.lock_review import (
+18 | |     LOCK_FILENAME,
+19 | |     REPORT_FILENAME,
+20 | |     inspect_lock,
+21 | |     sha256_file,
+22 | | )
+   | |_^
+   |
+help: Move module level imports to top of file
+
+UP017 [*] Use `datetime.UTC` alias
+  --> scripts/generate_tirex2_lock_candidate.py:54:27
+   |
+52 |     if not project_path.is_file():
+53 |         raise FileNotFoundError(project_path)
+54 |     run_id = datetime.now(timezone.utc).strftime("tirex2-lock-%Y%m%dT%H%M%SZ")
+   |                           ^^^^^^^^^^^^
+55 |     candidate_path = output_root / run_id
+--- LAST_120_LINES ---
+   |
+10 |
+   -
+11 | ROOT = Path(__file__).resolve().parents[2]
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/timesfm25_campaign/test_certification_bundle.py:1:1
+   |
+ 1 | / from __future__ import annotations
+ 2 | |
+ 3 | | import json
+ 4 | | from pathlib import Path
+ 5 | |
+ 6 | | import pytest
+ 7 | |
+ 8 | | from loto.adapters.timesfm25.contracts import (
+ 9 | |     ArtifactReference,
+10 | |     Backend,
+11 | |     GPUExecutionEvidence,
+12 | |     GameGeometry,
+13 | |     ModelIdentity,
+14 | |     RuntimeEvidence,
+15 | |     TimesFM25Request,
+16 | |     TimesFM25Response,
+17 | | )
+18 | | from loto.timesfm25_campaign.certification_bundle import (
+19 | |     atomic_write_json,
+20 | |     build_certification_report,
+21 | |     validate_run_id,
+22 | |     verify_sha256_manifest,
+23 | |     write_sha256_manifest,
+24 | | )
+   | |_^
+   |
+help: Organize imports
+   |
+10 |     Backend,
+11 +     GameGeometry,
+12 |     GPUExecutionEvidence,
+   -     GameGeometry,
+13 |     ModelIdentity,
+   |
+
+UP035 [*] Import from `collections.abc` instead: `Callable`
+ --> tests/timesfm25_campaign/test_evidence_review.py:7:1
+  |
+5 | import zipfile
+6 | from pathlib import Path
+7 | from typing import Any, Callable
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+8 |
+9 | import pytest
+  |
+help: Import from `collections.abc`
+  |
+6 | from pathlib import Path
+  - from typing import Any, Callable
+7 + from typing import Any
+8 + from collections.abc import Callable
+9 |
+  |
+
+B905 `zip()` without an explicit `strict=` parameter
+  --> tests/timesfm25_campaign/test_postprocess.py:17:48
+   |
+15 |     result = constrained_integer_projection([8.2, 8.1, 8.0, 7.9, 7.8, 40.0, -5.0], geometry)
+16 |     assert all(isinstance(value, int) for value in result)
+17 |     assert all(left < right for left, right in zip(result, result[1:]))
+   |                                                ^^^^^^^^^^^^^^^^^^^^^^^
+18 |     assert result[0] >= 1 and result[-1] <= 37
+   |
+help: Add explicit value for parameter `strict=`
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/timesfm25_campaign/test_serialization.py:1:1
+   |
+ 1 | / from __future__ import annotations
+ 2 | |
+ 3 | | from loto.adapters.timesfm25.contracts import (
+ 4 | |     ArtifactReference,
+ 5 | |     Backend,
+ 6 | |     GPUExecutionEvidence,
+ 7 | |     GameGeometry,
+ 8 | |     ModelIdentity,
+ 9 | |     RuntimeEvidence,
+10 | |     TimesFM25Request,
+11 | |     TimesFM25Response,
+12 | | )
+13 | | from loto.timesfm25_campaign.serialization import verify_separate_process_reload
+   | |________________________________________________________________________________^
+   |
+help: Organize imports
+  |
+5 |     Backend,
+6 +     GameGeometry,
+7 |     GPUExecutionEvidence,
+  -     GameGeometry,
+8 |     ModelIdentity,
+  |
+
+UP037 [*] Remove quotes from type annotation
+   --> tests/toto2_campaign/test_runtime_executor.py:138:48
+    |
+137 |         @classmethod
+138 |         def from_pretrained(cls, path: str) -> "Toto2Model":
+    |                                                ^^^^^^^^^^^^
+139 |             assert path
+140 |             return cls()
+    |
+help: Remove quotes
+    |
+137 |         @classmethod
+    -         def from_pretrained(cls, path: str) -> "Toto2Model":
+138 +         def from_pretrained(cls, path: str) -> Toto2Model:
+139 |             assert path
+    |
+
+Found 929 errors.
+[*] 764 fixable with the `--fix` option (105 hidden fixes can be enabled with the `--unsafe-fixes` option).

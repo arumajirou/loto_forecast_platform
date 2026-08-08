@@ -1,0 +1,366 @@
+PYTEST_EVIDENCE_VERSION=1
+RUN_ID=31255571489
+SOURCE_HEAD=1c08f14b58cb9ce01b8b700b9e553ca4714e3487
+PYTEST_RC=2
+--- FIRST_180_LINES ---
+
+==================================== ERRORS ====================================
+____ ERROR collecting tests/auto_campaign/test_search_policy_integration.py ____
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/auto_campaign/test_search_policy_integration.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/auto_campaign/test_search_policy_integration.py:6: in <module>
+    from loto.auto_campaign.model_factory import _artifact_kwargs, _search_materialization
+E   ImportError: cannot import name '_search_materialization' from 'loto.auto_campaign.model_factory' (/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/src/loto/auto_campaign/model_factory.py)
+_ ERROR collecting tests/auto_campaign/test_search_space_artifact_persistence.py _
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/auto_campaign/test_search_space_artifact_persistence.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/auto_campaign/test_search_space_artifact_persistence.py:6: in <module>
+    from loto.auto_campaign.model_factory import (
+E   ImportError: cannot import name '_persist_search_space_profile' from 'loto.auto_campaign.model_factory' (/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/src/loto/auto_campaign/model_factory.py)
+___________ ERROR collecting tests/basicts_campaign/test_dataset.py ____________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/basicts_campaign/test_dataset.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/basicts_campaign/test_dataset.py:5: in <module>
+    from loto.basicts_campaign.dataset import GameGeometry, build_windows, compile_wide_rows
+E   ImportError: cannot import name 'build_windows' from 'loto.basicts_campaign.dataset' (/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/src/loto/basicts_campaign/dataset.py)
+_______ ERROR collecting tests/basicts_campaign/test_security_metrics.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/basicts_campaign/test_security_metrics.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/basicts_campaign/test_security_metrics.py:8: in <module>
+    from loto.basicts_campaign.security import ConfigImportRejected, validate_import_reference
+E   ImportError: cannot import name 'ConfigImportRejected' from 'loto.basicts_campaign.security' (/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/src/loto/basicts_campaign/security.py)
+_____________ ERROR collecting tests/clock_health/test_chronyc.py ______________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/clock_health/test_chronyc.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/clock_health/test_chronyc.py:14: in <module>
+    from conftest import OBSERVED_AT, continuity
+E   ModuleNotFoundError: No module named 'conftest'
+____________ ERROR collecting tests/clock_health/test_evaluator.py _____________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/clock_health/test_evaluator.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/clock_health/test_evaluator.py:5: in <module>
+    from conftest import OBSERVED_AT, observation_from_bytes
+E   ModuleNotFoundError: No module named 'conftest'
+____________ ERROR collecting tests/clock_health/test_io_and_cli.py ____________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/clock_health/test_io_and_cli.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/clock_health/test_io_and_cli.py:17: in <module>
+    from conftest import OBSERVED_AT, observation_from_bytes
+E   ModuleNotFoundError: No module named 'conftest'
+_________ ERROR collecting tests/data_access_ledger/test_chronology.py _________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/data_access_ledger/test_chronology.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/data_access_ledger/test_chronology.py:15: in <module>
+    from conftest import BASE, make_event, make_ledger, make_slice, make_state
+E   ModuleNotFoundError: No module named 'conftest'
+____________ ERROR collecting tests/data_access_ledger/test_cli.py _____________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/data_access_ledger/test_cli.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/data_access_ledger/test_cli.py:11: in <module>
+    from conftest import make_event, make_ledger
+E   ModuleNotFoundError: No module named 'conftest'
+_________ ERROR collecting tests/data_access_ledger/test_contracts.py __________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/data_access_ledger/test_contracts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/data_access_ledger/test_contracts.py:17: in <module>
+    from conftest import HASH_A, ORIGIN, as_python, make_event, make_slice
+E   ModuleNotFoundError: No module named 'conftest'
+_________ ERROR collecting tests/data_access_ledger/test_fit_scope.py __________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/data_access_ledger/test_fit_scope.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/data_access_ledger/test_fit_scope.py:13: in <module>
+    from conftest import make_event, make_ledger, make_slice, make_state
+E   ModuleNotFoundError: No module named 'conftest'
+_________ ERROR collecting tests/data_access_ledger/test_oof_scope.py __________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/data_access_ledger/test_oof_scope.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/data_access_ledger/test_oof_scope.py:17: in <module>
+    from conftest import BASE, make_event, make_ledger, make_slice, make_state
+E   ModuleNotFoundError: No module named 'conftest'
+_____ ERROR collecting tests/data_access_ledger/test_prospective_scope.py ______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/data_access_ledger/test_prospective_scope.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/data_access_ledger/test_prospective_scope.py:15: in <module>
+    from conftest import BASE, ORIGIN, make_event, make_ledger, make_slice, make_state
+E   ModuleNotFoundError: No module named 'conftest'
+______ ERROR collecting tests/data_access_ledger/test_state_provenance.py ______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/data_access_ledger/test_state_provenance.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/data_access_ledger/test_state_provenance.py:10: in <module>
+    from conftest import HASH_C, make_event, make_ledger, make_slice, make_state
+E   ModuleNotFoundError: No module named 'conftest'
+___________ ERROR collecting tests/data_access_ledger/test_tamper.py ___________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/data_access_ledger/test_tamper.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/data_access_ledger/test_tamper.py:15: in <module>
+    from conftest import make_event, make_ledger
+E   ModuleNotFoundError: No module named 'conftest'
+__________ ERROR collecting tests/run_lifecycle/test_events_replay.py __________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/run_lifecycle/test_events_replay.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/run_lifecycle/test_events_replay.py:19: in <module>
+    from conftest import make_command
+E   ModuleNotFoundError: No module named 'conftest'
+_________ ERROR collecting tests/run_lifecycle/test_full_lifecycle.py __________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/run_lifecycle/test_full_lifecycle.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/run_lifecycle/test_full_lifecycle.py:15: in <module>
+    from conftest import make_command
+E   ModuleNotFoundError: No module named 'conftest'
+_______ ERROR collecting tests/run_lifecycle/test_idempotency_service.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/run_lifecycle/test_idempotency_service.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/run_lifecycle/test_idempotency_service.py:19: in <module>
+    from conftest import make_command
+E   ModuleNotFoundError: No module named 'conftest'
+______________ ERROR collecting tests/run_lifecycle/test_lease.py ______________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/run_lifecycle/test_lease.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/run_lifecycle/test_lease.py:13: in <module>
+    from conftest import make_command
+E   ModuleNotFoundError: No module named 'conftest'
+___________ ERROR collecting tests/run_lifecycle/test_transitions.py ___________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/run_lifecycle/test_transitions.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/run_lifecycle/test_transitions.py:14: in <module>
+    from conftest import make_command
+E   ModuleNotFoundError: No module named 'conftest'
+______ ERROR collecting tests/sktime_campaign/test_approval_artifacts.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_approval_artifacts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_approval_artifacts.py:13: in <module>
+    from test_approval_authorization import ISSUED, make_request, verifier
+E   ModuleNotFoundError: No module named 'test_approval_authorization'
+_______ ERROR collecting tests/sktime_campaign/test_canary_evaluation.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_canary_evaluation.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_canary_evaluation.py:12: in <module>
+    from p10_helpers import (
+E   ModuleNotFoundError: No module named 'p10_helpers'
+__ ERROR collecting tests/sktime_campaign/test_canary_evaluation_artifacts.py __
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_canary_evaluation_artifacts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_canary_evaluation_artifacts.py:12: in <module>
+    from p10_helpers import make_request
+E   ModuleNotFoundError: No module named 'p10_helpers'
+_______ ERROR collecting tests/sktime_campaign/test_holdout_artifacts.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_holdout_artifacts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_holdout_artifacts.py:13: in <module>
+    from test_holdout_scoring import _lock, _request
+E   ModuleNotFoundError: No module named 'test_holdout_scoring'
+__ ERROR collecting tests/sktime_campaign/test_primary_promotion_artifacts.py __
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_primary_promotion_artifacts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_primary_promotion_artifacts.py:13: in <module>
+    from p11_helpers import build_request, fake_verifier
+E   ModuleNotFoundError: No module named 'p11_helpers'
+_ ERROR collecting tests/sktime_campaign/test_primary_promotion_authorization.py _
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_primary_promotion_authorization.py'.
+Hint: make sure your test modules/packages have valid Python names.
+--- LAST_180_LINES ---
+Traceback:
+tests/run_lifecycle/test_events_replay.py:19: in <module>
+    from conftest import make_command
+E   ModuleNotFoundError: No module named 'conftest'
+_________ ERROR collecting tests/run_lifecycle/test_full_lifecycle.py __________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/run_lifecycle/test_full_lifecycle.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/run_lifecycle/test_full_lifecycle.py:15: in <module>
+    from conftest import make_command
+E   ModuleNotFoundError: No module named 'conftest'
+_______ ERROR collecting tests/run_lifecycle/test_idempotency_service.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/run_lifecycle/test_idempotency_service.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/run_lifecycle/test_idempotency_service.py:19: in <module>
+    from conftest import make_command
+E   ModuleNotFoundError: No module named 'conftest'
+______________ ERROR collecting tests/run_lifecycle/test_lease.py ______________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/run_lifecycle/test_lease.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/run_lifecycle/test_lease.py:13: in <module>
+    from conftest import make_command
+E   ModuleNotFoundError: No module named 'conftest'
+___________ ERROR collecting tests/run_lifecycle/test_transitions.py ___________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/run_lifecycle/test_transitions.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/run_lifecycle/test_transitions.py:14: in <module>
+    from conftest import make_command
+E   ModuleNotFoundError: No module named 'conftest'
+______ ERROR collecting tests/sktime_campaign/test_approval_artifacts.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_approval_artifacts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_approval_artifacts.py:13: in <module>
+    from test_approval_authorization import ISSUED, make_request, verifier
+E   ModuleNotFoundError: No module named 'test_approval_authorization'
+_______ ERROR collecting tests/sktime_campaign/test_canary_evaluation.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_canary_evaluation.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_canary_evaluation.py:12: in <module>
+    from p10_helpers import (
+E   ModuleNotFoundError: No module named 'p10_helpers'
+__ ERROR collecting tests/sktime_campaign/test_canary_evaluation_artifacts.py __
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_canary_evaluation_artifacts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_canary_evaluation_artifacts.py:12: in <module>
+    from p10_helpers import make_request
+E   ModuleNotFoundError: No module named 'p10_helpers'
+_______ ERROR collecting tests/sktime_campaign/test_holdout_artifacts.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_holdout_artifacts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_holdout_artifacts.py:13: in <module>
+    from test_holdout_scoring import _lock, _request
+E   ModuleNotFoundError: No module named 'test_holdout_scoring'
+__ ERROR collecting tests/sktime_campaign/test_primary_promotion_artifacts.py __
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_primary_promotion_artifacts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_primary_promotion_artifacts.py:13: in <module>
+    from p11_helpers import build_request, fake_verifier
+E   ModuleNotFoundError: No module named 'p11_helpers'
+_ ERROR collecting tests/sktime_campaign/test_primary_promotion_authorization.py _
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_primary_promotion_authorization.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_primary_promotion_authorization.py:17: in <module>
+    from p11_helpers import (
+E   ModuleNotFoundError: No module named 'p11_helpers'
+______ ERROR collecting tests/sktime_campaign/test_registry_artifacts.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/sktime_campaign/test_registry_artifacts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/sktime_campaign/test_registry_artifacts.py:14: in <module>
+    from test_registry_transaction import request, subject
+E   ModuleNotFoundError: No module named 'test_registry_transaction'
+_______ ERROR collecting tests/telemetry/test_otel_instrumentation_v1.py _______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/telemetry/test_otel_instrumentation_v1.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/telemetry/test_otel_instrumentation_v1.py:13: in <module>
+    from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SpanExporter, SpanExportResult
+E   ModuleNotFoundError: No module named 'opentelemetry'
+_________________ ERROR collecting tests/test_coverage_auto.py _________________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/test_coverage_auto.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/test_coverage_auto.py:8: in <module>
+    from coverage_test_support import (
+E   ModuleNotFoundError: No module named 'coverage_test_support'
+________________ ERROR collecting tests/test_coverage_build.py _________________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/test_coverage_build.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/test_coverage_build.py:9: in <module>
+    from coverage_test_support import (
+E   ModuleNotFoundError: No module named 'coverage_test_support'
+_________ ERROR collecting tests/test_reconciliation_console_script.py _________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/test_reconciliation_console_script.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/test_reconciliation_console_script.py:8: in <module>
+    from loto.reconciliation import portable_package_certification as pc
+src/loto/reconciliation/portable_package_certification.py:18: in <module>
+    from loto.reconciliation import package_certification as legacy
+src/loto/reconciliation/package_certification.py:14: in <module>
+    from loto.reconciliation import runtime_certification as runtime
+src/loto/reconciliation/runtime_certification.py:27: in <module>
+    from loto.reconciliation.hierarchy import (
+E   ImportError: cannot import name 'UPSTREAM_METHODS' from 'loto.reconciliation.hierarchy' (/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/src/loto/reconciliation/hierarchy.py)
+_____ ERROR collecting tests/test_reconciliation_package_certification.py ______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/test_reconciliation_package_certification.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/test_reconciliation_package_certification.py:12: in <module>
+    from loto.reconciliation import portable_package_certification as pc
+src/loto/reconciliation/portable_package_certification.py:18: in <module>
+    from loto.reconciliation import package_certification as legacy
+src/loto/reconciliation/package_certification.py:14: in <module>
+    from loto.reconciliation import runtime_certification as runtime
+src/loto/reconciliation/runtime_certification.py:27: in <module>
+    from loto.reconciliation.hierarchy import (
+E   ImportError: cannot import name 'UPSTREAM_METHODS' from 'loto.reconciliation.hierarchy' (/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/src/loto/reconciliation/hierarchy.py)
+_____ ERROR collecting tests/test_reconciliation_runtime_certification.py ______
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/test_reconciliation_runtime_certification.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/test_reconciliation_runtime_certification.py:12: in <module>
+    from loto.reconciliation import runtime_certification as rc
+src/loto/reconciliation/runtime_certification.py:27: in <module>
+    from loto.reconciliation.hierarchy import (
+E   ImportError: cannot import name 'UPSTREAM_METHODS' from 'loto.reconciliation.hierarchy' (/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/src/loto/reconciliation/hierarchy.py)
+________ ERROR collecting tests/test_reconciliation_upstream_matrix.py _________
+ImportError while importing test module '/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/tests/test_reconciliation_upstream_matrix.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/test_reconciliation_upstream_matrix.py:13: in <module>
+    from loto.reconciliation.hierarchy import (
+E   ImportError: cannot import name 'UPSTREAM_METHODS' from 'loto.reconciliation.hierarchy' (/home/tajim/actions-runner-loto-gpu-v2/_work/loto_forecast_platform/loto_forecast_platform/src/loto/reconciliation/hierarchy.py)
+=========================== short test summary info ============================
+ERROR tests/auto_campaign/test_search_policy_integration.py
+ERROR tests/auto_campaign/test_search_space_artifact_persistence.py
+ERROR tests/basicts_campaign/test_dataset.py
+ERROR tests/basicts_campaign/test_security_metrics.py
+ERROR tests/clock_health/test_chronyc.py
+ERROR tests/clock_health/test_evaluator.py
+ERROR tests/clock_health/test_io_and_cli.py
+ERROR tests/data_access_ledger/test_chronology.py
+ERROR tests/data_access_ledger/test_cli.py
+ERROR tests/data_access_ledger/test_contracts.py
+ERROR tests/data_access_ledger/test_fit_scope.py
+ERROR tests/data_access_ledger/test_oof_scope.py
+ERROR tests/data_access_ledger/test_prospective_scope.py
+ERROR tests/data_access_ledger/test_state_provenance.py
+ERROR tests/data_access_ledger/test_tamper.py
+ERROR tests/run_lifecycle/test_events_replay.py
+ERROR tests/run_lifecycle/test_full_lifecycle.py
+ERROR tests/run_lifecycle/test_idempotency_service.py
+ERROR tests/run_lifecycle/test_lease.py
+ERROR tests/run_lifecycle/test_transitions.py
+ERROR tests/sktime_campaign/test_approval_artifacts.py
+ERROR tests/sktime_campaign/test_canary_evaluation.py
+ERROR tests/sktime_campaign/test_canary_evaluation_artifacts.py
+ERROR tests/sktime_campaign/test_holdout_artifacts.py
+ERROR tests/sktime_campaign/test_primary_promotion_artifacts.py
+ERROR tests/sktime_campaign/test_primary_promotion_authorization.py
+ERROR tests/sktime_campaign/test_registry_artifacts.py
+ERROR tests/telemetry/test_otel_instrumentation_v1.py
+ERROR tests/test_coverage_auto.py
+ERROR tests/test_coverage_build.py
+ERROR tests/test_reconciliation_console_script.py
+ERROR tests/test_reconciliation_package_certification.py
+ERROR tests/test_reconciliation_runtime_certification.py
+ERROR tests/test_reconciliation_upstream_matrix.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 34 errors during collection !!!!!!!!!!!!!!!!!!!
