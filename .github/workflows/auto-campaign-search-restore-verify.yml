@@ -1,0 +1,168 @@
+name: auto-campaign-search-restore-verify
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fix/auto-campaign-search-integration-restore-v1'
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    steps:
+      - name: Verify trusted runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout recovery branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: fix/auto-campaign-search-integration-restore-v1
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Verify recovered source provenance
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$(git rev-parse HEAD:src/loto/auto_campaign/model_factory.py)" = "e597f4d710676815040e2fbe6ddd7812f803fcc8"
+          echo 'RECOVERED_MODEL_FACTORY_BLOB=PASS'
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: '0.11.21'
+          enable-cache: false
+
+      - name: Verify collection and AutoCampaign contracts
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          uv python install 3.13
+          venv="$RUNNER_TEMP/loto-auto-search-restore-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-auto-search-restore-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$venv" "$cache"
+          mkdir -p "$cache"
+          uv venv "$venv" --python 3.13
+          python="$venv/bin/python"
+          echo "venv=$venv" >> "$GITHUB_ENV"
+          echo "cache=$cache" >> "$GITHUB_ENV"
+
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu 'torch==2.9.1'
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" -e '.[api,dev,postgres]'
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" 'ruff==0.16.0'
+          uv pip check --python "$python"
+          test "$("$python" -m ruff --version)" = 'ruff 0.16.0'
+
+          "$python" -m ruff check src scripts tests
+          "$python" -m ruff format src/loto/auto_campaign/model_factory.py
+          mapfile -t formatted < <(git diff --name-only | sort)
+          test "${#formatted[@]}" -le 1
+          if [[ "${#formatted[@]}" -eq 1 ]]; then
+            test "${formatted[0]}" = 'src/loto/auto_campaign/model_factory.py'
+          fi
+          git diff --check
+          "$python" -m ruff check src scripts tests
+          "$python" -m ruff format --check src/loto/auto_campaign/model_factory.py
+          "$python" -m compileall -q src scripts tests
+          echo 'STATIC_GATES=PASS'
+
+          set +e
+          "$python" -m pytest --collect-only -q --tb=short > "$RUNNER_TEMP/collection.txt" 2>&1
+          collect_rc=$?
+          set -e
+          test "$collect_rc" -eq 2
+          "$python" - "$RUNNER_TEMP/collection.txt" <<'PY'
+          import re,sys
+          from pathlib import Path
+          text=Path(sys.argv[1]).read_text(encoding='utf-8',errors='replace')
+          nums=[int(m.group(1)) for m in re.finditer(r'(\d+) errors? during collection',text)]
+          count=nums[-1] if nums else sum('ERROR collecting ' in line for line in text.splitlines())
+          headings=set(re.findall(r'^_+ ERROR collecting (.+?) _+$',text,re.MULTILINE))
+          print(f'POST_AUTO_CAMPAIGN_COLLECTION_ERRORS={count}')
+          for path in sorted(headings): print(f'REMAINING_COLLECTION_ERROR\t{path}')
+          assert count==1,(count,text[-8000:])
+          assert headings=={'tests/telemetry/test_otel_instrumentation_v1.py'},headings
+          assert 'opentelemetry' in text
+          PY
+
+          "$python" -m pytest -q tests/auto_campaign
+          echo 'FOCUSED_AUTO_CAMPAIGN_TESTS=PASS'
+
+          "$python" - <<'PY'
+          import json
+          import tempfile
+          from pathlib import Path
+          import optuna
+          from loto.auto_campaign.contracts import CampaignConfig, SearchConfig
+          from loto.auto_campaign.model_factory import (
+              _artifact_kwargs,
+              _persist_search_space_profile,
+              _search_materialization,
+              _search_space_evidence_root,
+              _search_space_profile,
+          )
+          from loto.models.neuralforecast_search_space_artifacts import verify_search_space_artifacts
+
+          class Choice:
+              def __init__(self,categories):
+                  self.categories=categories
+
+          config=CampaignConfig(
+              data_path=Path('input.csv'),
+              search=SearchConfig(backend='optuna',strategy='auto',num_samples=10,search_seed=1),
+          )
+          materialized=_search_materialization(
+              config=config,backend='optuna',model_name='AutoNHITS',num_samples=10
+          )
+          assert isinstance(materialized.algorithm,optuna.samplers.TPESampler)
+          assert materialized.decision.effective_algorithm_name=='TPESampler'
+          artifact=_artifact_kwargs(
+              {'h':1},
+              [{'argument':'h','status':'ACCEPTED'}],
+              materialized.decision,
+          )
+          assert artifact['search_policy']['search_seed']==1
+
+          with tempfile.TemporaryDirectory() as tmp:
+              trial_root=Path(tmp)/'run-1'/'trial_work'/'hpo'/'AutoNHITS'/'seed-1'
+              profile=_search_space_profile(
+                  model_name='AutoNHITS',
+                  backend='ray',
+                  config_value={'input_size':Choice([12,24]),'max_steps':500},
+                  fixed_values=None,
+              )
+              persisted=_persist_search_space_profile(
+                  trial_root=trial_root,
+                  profile=profile,
+                  model_name='AutoNHITS',
+                  backend='ray',
+                  alias='candidate',
+                  seed=1,
+                  num_samples=30,
+                  smoke=False,
+              )
+              root=_search_space_evidence_root(trial_root)
+              assert persisted['verification_status']=='PASS'
+              assert verify_search_space_artifacts(root)['status']=='PASS'
+              manifest=json.loads((root/'SEARCH_SPACE_PROFILE_MANIFEST.json').read_text())
+              assert manifest['context']['seed']==1
+              assert manifest['context']['num_samples']==30
+          print('AUTO_CAMPAIGN_SEARCH_CONTRACT_SMOKE=PASS')
+          PY
+
+      - name: Cleanup
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          git reset --hard HEAD
+          git clean -ffdx
+          rm -rf -- "${venv:-}" "${cache:-}" "$RUNNER_TEMP/collection.txt" || true
