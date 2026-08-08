@@ -3,13 +3,13 @@ from __future__ import annotations
 import json
 
 import pytest
-from p10_helpers import make_request
 
 from loto.sktime_campaign.canary_evaluation_artifacts import (
     P10VerificationError,
     persist_p10,
     verify_p10,
 )
+from tests.sktime_campaign.p10_helpers import make_request
 
 
 def test_persist_and_verify_complete_bundle(tmp_path) -> None:

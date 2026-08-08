@@ -68,9 +68,8 @@ def test_local_health_cannot_generate_trusted_evidence(
 
 @pytest.fixture
 def healthy_decision(policy, tracking_bytes, sources_bytes):
-    from conftest import observation_from_bytes
-
     from loto.clock_health import evaluate_clock_health
+    from tests.clock_health.conftest import observation_from_bytes
 
     observation = observation_from_bytes(policy, tracking_bytes, sources_bytes)
     return evaluate_clock_health(

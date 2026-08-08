@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 
 import pytest
-from conftest import make_event, make_ledger
 
 from loto.data_access_ledger import (
     AccessOperation,
@@ -12,6 +11,7 @@ from loto.data_access_ledger import (
     compute_ledger_sha256,
     validate_ledger,
 )
+from tests.data_access_ledger.conftest import make_event, make_ledger
 
 
 def test_canonical_hash_ignores_dictionary_input_order() -> None:

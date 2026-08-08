@@ -5,7 +5,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 import yaml
-from coverage_test_support import (
+
+from loto.coverage.instrumented import run_coverage_experiment_with_ledger
+from loto.coverage.ledger import CoverageLedgerPreflightError, git_blob_sha
+from tests.coverage_test_support import (
     FakeRunner,
     PandasProxy,
     SpyRecorder,
@@ -13,9 +16,6 @@ from coverage_test_support import (
     corrupt_protected_rows,
     make_csv,
 )
-
-from loto.coverage.instrumented import run_coverage_experiment_with_ledger
-from loto.coverage.ledger import CoverageLedgerPreflightError, git_blob_sha
 
 
 def build_config(tmp_path: Path, input_csv: Path, output: Path) -> Path:

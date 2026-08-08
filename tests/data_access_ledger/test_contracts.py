@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import datetime
 
 import pytest
-from conftest import ORIGIN, as_python, make_event, make_slice
 from pydantic import ValidationError
 
 from loto.data_access_ledger import (
@@ -14,6 +13,7 @@ from loto.data_access_ledger import (
     DataRole,
     DatasetSlice,
 )
+from tests.data_access_ledger.conftest import ORIGIN, as_python, make_event, make_slice
 
 
 def test_dataset_slice_rejects_unknown_field() -> None:

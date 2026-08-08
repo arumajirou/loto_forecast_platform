@@ -3,11 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from p11_helpers import (
-    build_request,
-    failing_verifier,
-    fake_verifier,
-)
 from pydantic import ValidationError
 
 from loto.sktime_campaign.primary_promotion_authorization import (
@@ -16,6 +11,11 @@ from loto.sktime_campaign.primary_promotion_authorization import (
     issue_primary_promotion_authorization,
     validate_primary_promotion_transaction,
     verify_authorization_seal,
+)
+from tests.sktime_campaign.p11_helpers import (
+    build_request,
+    failing_verifier,
+    fake_verifier,
 )
 
 

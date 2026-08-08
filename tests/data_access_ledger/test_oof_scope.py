@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from conftest import BASE, make_event, make_ledger, make_slice, make_state
-
 from loto.data_access_ledger import (
     AccessDecision,
     AccessOperation,
@@ -15,6 +13,7 @@ from loto.data_access_ledger import (
     sha256_hex,
     validate_ledger,
 )
+from tests.data_access_ledger.conftest import BASE, make_event, make_ledger, make_slice, make_state
 
 
 def fold_hash(slices) -> str:
