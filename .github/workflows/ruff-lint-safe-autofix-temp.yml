@@ -3,7 +3,9 @@ name: ruff-lint-safe-autofix-temp
 on:
   push:
     branches: [fix/ruff-lint-safe-autofix-v1]
-  workflow_dispatch:
+  pull_request:
+    types: [edited]
+    branches: [main]
 
 permissions:
   contents: write
@@ -14,7 +16,7 @@ concurrency:
 
 jobs:
   remediate:
-    if: ${{ github.repository == 'arumajirou/loto_forecast_platform' && github.ref == 'refs/heads/fix/ruff-lint-safe-autofix-v1' && !contains(github.event.head_commit.message, 'style: apply locked Ruff safe fixes') && !contains(github.event.head_commit.message, 'capture Ruff safe-fix evidence') }}
+    if: ${{ github.repository == 'arumajirou/loto_forecast_platform' && ((github.event_name == 'push' && github.ref == 'refs/heads/fix/ruff-lint-safe-autofix-v1' && !contains(github.event.head_commit.message, 'style: apply locked Ruff safe fixes') && !contains(github.event.head_commit.message, 'capture Ruff safe-fix evidence')) || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-lint-safe-autofix-v1')) }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
     timeout-minutes: 180
     defaults:
@@ -61,16 +63,19 @@ jobs:
           uv_cache="$RUNNER_TEMP/loto-ruff-safe-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           case "$ci_venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
           case "$uv_cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
-          rm -rf -- "$ci_venv" "$uv_cache"; mkdir -p "$uv_cache"
+          rm -rf -- "$ci_venv" "$uv_cache"
+          mkdir -p "$uv_cache"
           echo "CI_VENV=$ci_venv" >> "$GITHUB_ENV"
           echo "UV_CACHE_DIR=$uv_cache" >> "$GITHUB_ENV"
           UV_CACHE_DIR="$uv_cache" uv venv "$ci_venv" --python "$UV_PYTHON"
           python="$ci_venv/bin/python"
           ruff_version="$("$python" - <<'PY'
           import tomllib
-          with open('uv.lock','rb') as f: lock=tomllib.load(f)
+          with open('uv.lock','rb') as f:
+              lock=tomllib.load(f)
           v=[p['version'] for p in lock['package'] if p.get('name')=='ruff']
-          if len(v)!=1: raise SystemExit(v)
+          if len(v)!=1:
+              raise SystemExit(v)
           print(v[0])
           PY
           )"
@@ -122,7 +127,15 @@ jobs:
           rows=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8') or '[]')
           rules=collections.Counter(r.get('code','UNKNOWN') for r in rows)
           files=collections.Counter(r.get('filename','UNKNOWN') for r in rows)
-          out=['RUFF_SAFE_FIX_REMAINING_VERSION=1',f"RUN_ID={os.environ['GITHUB_RUN_ID']}",f"RUFF_VERSION={os.environ.get('RUFF_VERSION')}",f"LINT_RC={os.environ.get('LINT_RC')}",f"REMAINING_FINDINGS={len(rows)}",'RULE_COUNTS='+','.join(f'{k}:{v}' for k,v in sorted(rules.items())),'TOP_FILES='+','.join(f'{k}:{v}' for k,v in files.most_common(50))]
+          out=[
+              'RUFF_SAFE_FIX_REMAINING_VERSION=1',
+              f"RUN_ID={os.environ['GITHUB_RUN_ID']}",
+              f"RUFF_VERSION={os.environ.get('RUFF_VERSION')}",
+              f"LINT_RC={os.environ.get('LINT_RC')}",
+              f"REMAINING_FINDINGS={len(rows)}",
+              'RULE_COUNTS='+','.join(f'{k}:{v}' for k,v in sorted(rules.items())),
+              'TOP_FILES='+','.join(f'{k}:{v}' for k,v in files.most_common(50)),
+          ]
           Path(sys.argv[2]).write_text('\n'.join(out)+'\n',encoding='utf-8')
           PY
 
@@ -133,17 +146,41 @@ jobs:
           set +e
           UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1" > "$RUNNER_TEMP/deps.log" 2>&1
           D1=$?
-          [[ $D1 -eq 0 ]] && UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" -e ".[api,dev,postgres]" >> "$RUNNER_TEMP/deps.log" 2>&1; D2=$?
-          [[ $D1 -eq 0 && $D2 -eq 0 ]] && uv pip check --python "$python" >> "$RUNNER_TEMP/deps.log" 2>&1; D3=$?
-          DEPS_RC=0; for rc in "$D1" "$D2" "$D3"; do [[ "$rc" -eq 0 ]] || DEPS_RC=1; done
-          if [[ "$DEPS_RC" -eq 0 ]]; then "$python" -m pytest -q > "$RUNNER_TEMP/pytest.log" 2>&1; PYTEST_RC=$?; else echo 'dependency gate failed' > "$RUNNER_TEMP/pytest.log"; PYTEST_RC=99; fi
+          D2=99
+          D3=99
+          if [[ $D1 -eq 0 ]]; then
+            UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" -e ".[api,dev,postgres]" >> "$RUNNER_TEMP/deps.log" 2>&1
+            D2=$?
+          fi
+          if [[ $D1 -eq 0 && $D2 -eq 0 ]]; then
+            uv pip check --python "$python" >> "$RUNNER_TEMP/deps.log" 2>&1
+            D3=$?
+          fi
+          DEPS_RC=0
+          for rc in "$D1" "$D2" "$D3"; do
+            [[ "$rc" -eq 0 ]] || DEPS_RC=1
+          done
+          if [[ "$DEPS_RC" -eq 0 ]]; then
+            "$python" -m pytest -q > "$RUNNER_TEMP/pytest.log" 2>&1
+            PYTEST_RC=$?
+          else
+            echo 'dependency gate failed' > "$RUNNER_TEMP/pytest.log"
+            PYTEST_RC=99
+          fi
           set -e
-          echo "DEPS_RC=$DEPS_RC" >> "$GITHUB_ENV"; echo "PYTEST_RC=$PYTEST_RC" >> "$GITHUB_ENV"
+          echo "DEPS_RC=$DEPS_RC" >> "$GITHUB_ENV"
+          echo "PYTEST_RC=$PYTEST_RC" >> "$GITHUB_ENV"
           PYTEST_RC="$PYTEST_RC" "$python" - "$RUNNER_TEMP/pytest.log" "$PYTEST_PATH" <<'PY'
           import os,sys
           from pathlib import Path
           lines=Path(sys.argv[1]).read_text(encoding='utf-8',errors='backslashreplace').splitlines()
-          out=['RUFF_SAFE_FIX_PYTEST_VERSION=1',f"RUN_ID={os.environ['GITHUB_RUN_ID']}",f"PYTEST_RC={os.environ.get('PYTEST_RC')}",'--- LAST_220_LINES ---',*lines[-220:]]
+          out=[
+              'RUFF_SAFE_FIX_PYTEST_VERSION=1',
+              f"RUN_ID={os.environ['GITHUB_RUN_ID']}",
+              f"PYTEST_RC={os.environ.get('PYTEST_RC')}",
+              '--- LAST_220_LINES ---',
+              *lines[-220:],
+          ]
           Path(sys.argv[2]).write_text('\n'.join(out)+'\n',encoding='utf-8')
           PY
 
@@ -162,7 +199,8 @@ jobs:
           DEPS_RC=${DEPS_RC:-UNKNOWN}
           PYTEST_RC=${PYTEST_RC:-UNKNOWN}
           EOF
-          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$SUMMARY_PATH" "$REMAINING_PATH" "$PYTEST_PATH"
           git diff --cached --check
           git commit -m "chore: capture Ruff safe-fix evidence (#200)"
