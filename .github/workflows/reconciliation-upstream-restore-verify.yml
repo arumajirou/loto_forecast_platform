@@ -92,13 +92,22 @@ jobs:
               print(f'REMAINING_COLLECTION_ERROR\t{path}')
           assert count==5,(count,text[-8000:])
           expected={
-              'tests/auto_campaign/test_model_factory.py',
-              'tests/auto_campaign/test_search_space_profile.py',
-              'tests/basicts_campaign/test_bridge.py',
-              'tests/basicts_campaign/test_config_loader.py',
-              'tests/telemetry/test_otel_backend.py',
+              'tests/auto_campaign/test_search_policy_integration.py',
+              'tests/auto_campaign/test_search_space_artifact_persistence.py',
+              'tests/basicts_campaign/test_dataset.py',
+              'tests/basicts_campaign/test_security_metrics.py',
+              'tests/telemetry/test_otel_instrumentation_v1.py',
           }
           assert set(headings)==expected,(set(headings),expected)
+          for token in (
+              '_search_materialization',
+              '_persist_search_space_profile',
+              'build_windows',
+              'ConfigImportRejected',
+              'opentelemetry',
+          ):
+              assert token in text,(token,text[-8000:])
+              print(f'RESIDUAL_SIGNATURE\t{token}\tPRESENT')
           PY
 
           "$python" -m pytest -q \
