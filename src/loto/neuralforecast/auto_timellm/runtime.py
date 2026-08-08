@@ -21,6 +21,9 @@ _RUNTIME_LOCK = RLock()
 _RUNTIME_CLASSES: tuple[type[Any], type[Any]] | None = None
 _REQUIRED_MODULES = ("neuralforecast", "ray", "transformers")
 
+PinnedTimeLLM: type[Any]
+AutoTimeLLM: type[Any]
+
 
 class RuntimeDependencyError(RuntimeError):
     pass

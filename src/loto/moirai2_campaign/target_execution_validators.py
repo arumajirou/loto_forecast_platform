@@ -10,6 +10,7 @@ from loto.moirai2_campaign.target_execution_common import (
     TargetExecutionError,
     load_json_object,
     sha256_file,
+    sha256_payload,
     verify_sha256_manifest,
 )
 
