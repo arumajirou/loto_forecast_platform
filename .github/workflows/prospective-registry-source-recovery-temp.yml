@@ -27,9 +27,12 @@ jobs:
       UV_PYTHON: "3.13"
       TARGET_PATH: "src/loto/auto_campaign/prospective_registry_reconciliation_expected.py"
       CORRUPT_BLOB: "21750ca3c282de160da8825cb503013bf5da0974"
+      REPAIR_BLOB: "e13b5d78c22e529a2b516e8da1ab1b205245dcf8"
+      TEST_PATH: "tests/auto_campaign/test_prospective_registry_reconciliation.py"
+      STALE_TEST_BLOB: "f11167a4b27ff59b9e414c8898227b635e9a4c71"
+      REPAIR_TEST_BLOB: "640c8e491ca1a75db23ae3f5a75dd764fd890070"
       REPAIR_BRANCH: "fix/prospective-registry-reconciliation-source-corruption-v1"
       REPAIR_COMMIT: "45ce9fa84b6b7a4a7aae347c45c784187a0b0984"
-      REPAIR_BLOB: "e13b5d78c22e529a2b516e8da1ab1b205245dcf8"
 
     steps:
       - name: Verify expected self-hosted runner
@@ -47,37 +50,38 @@ jobs:
         with:
           ref: fix/prospective-registry-reconciliation-source-corruption-main-v2
           persist-credentials: true
-          fetch-depth: 0
+          fetch-depth: 1
           clean: true
 
-      - name: Recover exact PR 179 source blob when needed
+      - name: Fetch and verify exact PR 179 recovery commit
         run: |
           set -Eeuo pipefail
-          current_blob="$(git hash-object "$TARGET_PATH")"
-          echo "current_blob=$current_blob"
-
-          if [[ "$current_blob" == "$REPAIR_BLOB" ]]; then
-            echo "source_recovery=ALREADY_APPLIED"
-            exit 0
-          fi
-
-          if [[ "$current_blob" != "$CORRUPT_BLOB" ]]; then
-            echo "unexpected current source blob: $current_blob" >&2
-            exit 1
-          fi
-
-          git fetch --no-tags origin \
+          git fetch --no-tags --depth=1 origin \
             "refs/heads/$REPAIR_BRANCH:refs/remotes/origin/pr179-source-recovery"
           fetched_commit="$(git rev-parse refs/remotes/origin/pr179-source-recovery)"
           echo "fetched_repair_commit=$fetched_commit"
           test "$fetched_commit" = "$REPAIR_COMMIT"
 
+      - name: Recover exact PR 179 source blob when needed
+        run: |
+          set -Eeuo pipefail
+          current_blob="$(git hash-object "$TARGET_PATH")"
+          echo "current_source_blob=$current_blob"
+
+          if [[ "$current_blob" == "$REPAIR_BLOB" ]]; then
+            echo "source_recovery=ALREADY_APPLIED"
+            exit 0
+          fi
+          if [[ "$current_blob" != "$CORRUPT_BLOB" ]]; then
+            echo "unexpected current source blob: $current_blob" >&2
+            exit 1
+          fi
+
           recovered="$RUNNER_TEMP/prospective_registry_reconciliation_expected.py"
           git show "$REPAIR_COMMIT:$TARGET_PATH" > "$recovered"
           recovered_blob="$(git hash-object "$recovered")"
-          echo "recovered_blob=$recovered_blob"
+          echo "recovered_source_blob=$recovered_blob"
           test "$recovered_blob" = "$REPAIR_BLOB"
-
           cp -- "$recovered" "$TARGET_PATH"
           test "$(git hash-object "$TARGET_PATH")" = "$REPAIR_BLOB"
           test "$(git diff --name-only)" = "$TARGET_PATH"
@@ -89,6 +93,39 @@ jobs:
           test "$(git diff --cached --name-only)" = "$TARGET_PATH"
           git diff --cached --check
           git commit -m "fix(auto-campaign): recover corrupted reconciliation expected-state builder"
+          git push origin HEAD:fix/prospective-registry-reconciliation-source-corruption-main-v2
+
+      - name: Recover exact PR 179 regression fixture when needed
+        run: |
+          set -Eeuo pipefail
+          current_blob="$(git hash-object "$TEST_PATH")"
+          echo "current_test_blob=$current_blob"
+
+          if [[ "$current_blob" == "$REPAIR_TEST_BLOB" ]]; then
+            echo "test_recovery=ALREADY_APPLIED"
+            exit 0
+          fi
+          if [[ "$current_blob" != "$STALE_TEST_BLOB" ]]; then
+            echo "unexpected current test blob: $current_blob" >&2
+            exit 1
+          fi
+
+          recovered="$RUNNER_TEMP/test_prospective_registry_reconciliation.py"
+          git show "$REPAIR_COMMIT:$TEST_PATH" > "$recovered"
+          recovered_blob="$(git hash-object "$recovered")"
+          echo "recovered_test_blob=$recovered_blob"
+          test "$recovered_blob" = "$REPAIR_TEST_BLOB"
+          cp -- "$recovered" "$TEST_PATH"
+          test "$(git hash-object "$TEST_PATH")" = "$REPAIR_TEST_BLOB"
+          test "$(git diff --name-only)" = "$TEST_PATH"
+          git diff --check -- "$TEST_PATH"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$TEST_PATH"
+          test "$(git diff --cached --name-only)" = "$TEST_PATH"
+          git diff --cached --check
+          git commit -m "test(auto-campaign): restore valid reconciliation receipt regression"
           git push origin HEAD:fix/prospective-registry-reconciliation-source-corruption-main-v2
 
       - name: Install exact uv without GitHub cache
@@ -143,14 +180,15 @@ jobs:
           uv pip install --quiet --python "$python" "ruff==$ruff_version"
           "$python" -m ruff --version
 
-      - name: Verify repaired source syntax and locked formatting
+      - name: Verify exact recovery blobs syntax and locked Ruff gates
         run: |
           set -Eeuo pipefail
           python="$CI_VENV/bin/python"
           test "$(git hash-object "$TARGET_PATH")" = "$REPAIR_BLOB"
-          "$python" -m py_compile "$TARGET_PATH"
-          "$python" -m ruff format --check "$TARGET_PATH"
-          "$python" -m ruff check "$TARGET_PATH"
+          test "$(git hash-object "$TEST_PATH")" = "$REPAIR_TEST_BLOB"
+          "$python" -m py_compile "$TARGET_PATH" "$TEST_PATH"
+          "$python" -m ruff format --check "$TARGET_PATH" "$TEST_PATH"
+          "$python" -m ruff check "$TARGET_PATH" "$TEST_PATH"
 
       - name: Install matching CPU-only PyTorch and project test dependencies
         run: |
@@ -163,20 +201,10 @@ jobs:
           uv pip install --quiet --python "$python" "ruff==$RUFF_VERSION"
           uv pip check --python "$python"
 
-      - name: Run current-main reconciliation focused tests
+      - name: Run repaired reconciliation focused tests
         run: |
           set -Eeuo pipefail
-          "$CI_VENV/bin/python" -m pytest -q \
-            tests/auto_campaign/test_prospective_registry_reconciliation.py
-
-      - name: Re-run PR 179 direct recovery regression
-        run: |
-          set -Eeuo pipefail
-          historical_test="$RUNNER_TEMP/test_prospective_registry_reconciliation_pr179.py"
-          git show "$REPAIR_COMMIT:tests/auto_campaign/test_prospective_registry_reconciliation.py" \
-            > "$historical_test"
-          "$CI_VENV/bin/python" -m pytest -q "$historical_test" \
-            -k test_expected_snapshot_builds_real_expected_payload
+          "$CI_VENV/bin/python" -m pytest -q "$TEST_PATH"
 
       - name: Compile auto-campaign package
         run: |
@@ -188,6 +216,7 @@ jobs:
         run: |
           set -Eeuo pipefail
           test "$(git hash-object "$TARGET_PATH")" = "$REPAIR_BLOB"
+          test "$(git hash-object "$TEST_PATH")" = "$REPAIR_TEST_BLOB"
           git diff --exit-code
           git diff --cached --exit-code
 
