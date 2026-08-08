@@ -42,9 +42,7 @@ def _source_identity() -> dict[str, object]:
 
 
 def test_prepare_script_contains_manual_approval_boundaries() -> None:
-    text = (
-        ROOT / "scripts" / "prepare_moirai2_target_execution.py"
-    ).read_text(encoding="utf-8")
+    text = (ROOT / "scripts" / "prepare_moirai2_target_execution.py").read_text(encoding="utf-8")
     assert "human_approval_required" in text
     assert '"automatic_approval": False' in text
     assert "SUPPORTED_REVIEWER" in text
@@ -138,9 +136,7 @@ def test_lock_file_prevents_concurrent_record(tmp_path: Path) -> None:
 
 
 def test_record_script_does_not_contain_auto_approval() -> None:
-    text = (
-        ROOT / "scripts" / "record_moirai2_target_execution.py"
-    ).read_text(encoding="utf-8")
+    text = (ROOT / "scripts" / "record_moirai2_target_execution.py").read_text(encoding="utf-8")
     assert "APPLY-REVIEWED-MOIRAI2-LOCK" not in text
     assert "install_reviewed_moirai2_lock.py" not in text
     assert "subprocess.run" not in text
@@ -213,9 +209,7 @@ def test_full_record_sequence_opens_p9_gate(
         "validate_candidate_artifact",
         lambda artifact_dir, runtime_lane: {
             "runtime_lane": runtime_lane,
-            "candidate_lock_sha256": (
-                "d" * 64 if runtime_lane == SUPPORTED_LANE else "e" * 64
-            ),
+            "candidate_lock_sha256": ("d" * 64 if runtime_lane == SUPPORTED_LANE else "e" * 64),
         },
     )
     monkeypatch.setattr(

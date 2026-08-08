@@ -23,6 +23,7 @@ from tests.moirai2_campaign.p8c_evidence_fixtures_core import (
     _write_json,
 )
 
+
 def _case(
     *,
     root: Path,
@@ -224,11 +225,7 @@ def _campaign(
             "campaign_config_sha256": sha256_file(root / "campaign_config.json"),
         },
     )
-    files = sorted(
-        path.relative_to(root).as_posix()
-        for path in root.rglob("*")
-        if path.is_file()
-    )
+    files = sorted(path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file())
     _write_json(
         root / "ARTIFACT_MANIFEST.json",
         {
@@ -239,5 +236,3 @@ def _campaign(
     )
     write_sha256_manifest(root, root / "SHA256SUMS")
     return root
-
-

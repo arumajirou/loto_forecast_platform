@@ -68,20 +68,15 @@ def verify_wheel_file(
     actual_sha256 = sha256_file(wheel_path)
     if actual_sha256 != expected_sha256:
         raise RuntimeError(
-            "MLForecast wheel SHA-256 mismatch: "
-            f"expected={expected_sha256}, actual={actual_sha256}"
+            f"MLForecast wheel SHA-256 mismatch: expected={expected_sha256}, actual={actual_sha256}"
         )
 
     with zipfile.ZipFile(wheel_path) as archive:
         metadata_paths = [
-            name
-            for name in archive.namelist()
-            if name.endswith(".dist-info/METADATA")
+            name for name in archive.namelist() if name.endswith(".dist-info/METADATA")
         ]
         if len(metadata_paths) != 1:
-            raise RuntimeError(
-                "MLForecast wheel must contain exactly one dist-info/METADATA file"
-            )
+            raise RuntimeError("MLForecast wheel must contain exactly one dist-info/METADATA file")
         package_metadata = BytesParser().parsebytes(archive.read(metadata_paths[0]))
 
     package_name = package_metadata.get("Name")
@@ -296,8 +291,7 @@ def _thread_environment() -> dict[str, str]:
     invalid = {name: value for name, value in values.items() if value != "1"}
     if invalid:
         raise RuntimeError(
-            "single-thread runtime contract requires all thread variables to equal '1': "
-            f"{invalid}"
+            f"single-thread runtime contract requires all thread variables to equal '1': {invalid}"
         )
     return {name: str(value) for name, value in values.items()}
 

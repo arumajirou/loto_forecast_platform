@@ -170,9 +170,7 @@ def _constructor_evidence(
     rows: Sequence[Mapping[str, Any]],
 ) -> dict[tuple[str, str], dict[str, Any]]:
     failed = [row for row in rows if row.get("verification_status") == "FAILED"]
-    pending = [
-        row for row in rows if row.get("verification_status") == "PARTIALLY_VERIFIED"
-    ]
+    pending = [row for row in rows if row.get("verification_status") == "PARTIALLY_VERIFIED"]
     if failed:
         status = VerificationStatus.FAILED.value
     elif pending:
@@ -337,9 +335,7 @@ def write_coverage_state_bundle(
     )
     write_json(output_dir / "COVERAGE_SUMMARY.json", summary)
 
-    constructor_statuses = Counter(
-        str(row["verification_status"]) for row in constructor_matrix
-    )
+    constructor_statuses = Counter(str(row["verification_status"]) for row in constructor_matrix)
     manifest = {
         "schema_version": "all-auto-coverage-state-v1",
         "created_at": datetime.now(UTC).isoformat(),

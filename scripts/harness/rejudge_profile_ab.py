@@ -43,8 +43,7 @@ def _recommend(task_name: str, results: dict[str, Any]) -> str | None:
     eligible = {
         mode: result
         for mode, result in results.items()
-        if float(result.get("tasks", {}).get(task_name, {}).get("success_rate", 0.0))
-        >= floor
+        if float(result.get("tasks", {}).get(task_name, {}).get("success_rate", 0.0)) >= floor
     }
     if not eligible:
         return None
@@ -62,11 +61,7 @@ def _recommend(task_name: str, results: dict[str, Any]) -> str | None:
 def rejudge(data: dict[str, Any]) -> dict[str, Any]:
     results = data.get("results", {})
     tasks = sorted(
-        {
-            task_name
-            for result in results.values()
-            for task_name in result.get("tasks", {})
-        }
+        {task_name for result in results.values() for task_name in result.get("tasks", {})}
     )
     mode_judgments: dict[str, Any] = {}
     eligible_modes: list[str] = []
@@ -89,9 +84,7 @@ def rejudge(data: dict[str, Any]) -> dict[str, Any]:
         }
 
     best_observed_mode = (
-        max(results, key=lambda mode: _mode_rank(mode, results[mode]))
-        if results
-        else None
+        max(results, key=lambda mode: _mode_rank(mode, results[mode])) if results else None
     )
     best_mode = (
         max(eligible_modes, key=lambda mode: _mode_rank(mode, results[mode]))

@@ -36,8 +36,7 @@ def resolve_effective_arguments(
     if request.context_length > history_length:
         context_status = ArgumentStatus.NOT_APPLICABLE
         context_reason = (
-            "requested context exceeds available history; "
-            "effective context is truncated"
+            "requested context exceeds available history; effective context is truncated"
         )
         warnings.append("CONTEXT_LENGTH_EXCEEDS_HISTORY")
     effective = {
@@ -185,8 +184,7 @@ def _normalize_forecast(
         subset = subset.sort_values("timestamp", kind="stable")
         if len(subset) != request.prediction_length:
             raise ValueError(
-                f"series {series_id!r} has {len(subset)} rows; "
-                f"expected {request.prediction_length}"
+                f"series {series_id!r} has {len(subset)} rows; expected {request.prediction_length}"
             )
         points = tuple(float(value) for value in subset["predictions"].tolist())
         if not all(math.isfinite(value) for value in points):
@@ -259,9 +257,7 @@ def run_prediction(
         validate_inputs=True,
         freq="D",
     )
-    point, median, quantiles, prediction_index = _normalize_forecast(
-        request, compiled, forecast_df
-    )
+    point, median, quantiles, prediction_index = _normalize_forecast(request, compiled, forecast_df)
     _, peak, after = _cuda_memory()
     pid = os.getpid()
     gpu_uuid, process_match = _nvidia_process_evidence(pid)

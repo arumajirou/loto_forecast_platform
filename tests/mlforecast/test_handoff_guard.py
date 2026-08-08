@@ -99,10 +99,7 @@ def _rewrite_zip(
     mutate: Callable[[EntryList], EntryList],
 ) -> None:
     with zipfile.ZipFile(zip_path) as archive:
-        entries = [
-            (info.filename, archive.read(info.filename))
-            for info in archive.infolist()
-        ]
+        entries = [(info.filename, archive.read(info.filename)) for info in archive.infolist()]
     entries = mutate(entries)
     temporary = zip_path.with_suffix(".rewrite")
     with zipfile.ZipFile(
@@ -166,9 +163,7 @@ def test_guarded_verify_rejects_manifest_provenance_mismatch(
             if name == "ARTIFACT_MANIFEST.json":
                 manifest = json.loads(payload)
                 manifest["source_commit"] = "b" * 40
-                payload = (
-                    json.dumps(manifest, indent=2, sort_keys=True) + "\n"
-                ).encode()
+                payload = (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode()
             output.append((name, payload))
         return output
 

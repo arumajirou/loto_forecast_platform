@@ -25,9 +25,7 @@ def persist(tmp_path: Path):
 
 def test_persist_and_verify_success(tmp_path):
     request, response, output_dir = persist(tmp_path)
-    assert response["decision"] == (
-        "AUTHORIZED_FOR_ONE_PRIMARY_PROMOTION_TRANSACTION"
-    )
+    assert response["decision"] == ("AUTHORIZED_FOR_ONE_PRIMARY_PROMOTION_TRANSACTION")
     result = verify_p11(output_dir, request)
     assert result["status"] == "PASS"
     assert result["primary_promotion_executed"] is False

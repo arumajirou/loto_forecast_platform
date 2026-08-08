@@ -106,9 +106,7 @@ class KatCoderProfile(ModelProfile):
             {
                 "thinking_mode_supported": True,
                 "thinking_enabled": not direct_mode,
-                "preserve_thinking": bool(
-                    chat_template_kwargs.get("preserve_thinking")
-                ),
+                "preserve_thinking": bool(chat_template_kwargs.get("preserve_thinking")),
                 "official_profile_contract": "KAT-Coder-V2.5-Dev",
             }
         )

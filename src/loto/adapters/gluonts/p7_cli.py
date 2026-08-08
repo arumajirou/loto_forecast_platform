@@ -46,10 +46,7 @@ def main() -> int:
     identities = write_target_audit(args.output_dir.resolve(), audit)
     print(f"P7_EVIDENCE_STATE={audit.evidence_state.value}")
     print(f"P7_CERTIFICATION_STATUS={audit.certification_status.value}")
-    print(
-        "P7_VERIFIED_MODEL_LIFECYCLES="
-        f"{audit.verified_model_lifecycles}"
-    )
+    print(f"P7_VERIFIED_MODEL_LIFECYCLES={audit.verified_model_lifecycles}")
     for key, value in identities.items():
         print(f"P7_{key.upper()}={value}")
     if audit.evidence_state is EvidenceState.INVALID:

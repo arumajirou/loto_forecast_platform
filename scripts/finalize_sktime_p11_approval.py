@@ -15,9 +15,7 @@ def main() -> int:
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     payload = json.loads(args.draft.read_text(encoding="utf-8"))
-    payload["signature_base64"] = base64.b64encode(
-        args.signature.read_bytes()
-    ).decode("ascii")
+    payload["signature_base64"] = base64.b64encode(args.signature.read_bytes()).decode("ascii")
     approval = ApprovalRecord.model_validate(payload)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

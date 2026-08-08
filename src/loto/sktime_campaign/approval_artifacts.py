@@ -109,8 +109,7 @@ def _write_manifest_and_sha(output_dir: Path) -> None:
     files = sorted(
         path
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     manifest = {
         "schema_version": "1.0",
@@ -127,9 +126,7 @@ def _write_manifest_and_sha(output_dir: Path) -> None:
     }
     _write_json(output_dir / "ARTIFACT_MANIFEST.json", manifest)
     hashed = sorted(
-        path
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     )
     _atomic_write_text(
         output_dir / "SHA256SUMS",
@@ -212,8 +209,7 @@ def _verify_manifest(output_dir: Path) -> None:
     expected = {
         path.name
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     }
     if seen != expected:
         raise P7VerificationError("manifest coverage mismatch")
@@ -236,9 +232,7 @@ def _verify_sha256sums(output_dir: Path) -> None:
         if not artifact.is_file() or _sha256(artifact) != expected:
             raise P7VerificationError(f"SHA-256 mismatch: {name}")
     expected_files = {
-        item.name
-        for item in output_dir.iterdir()
-        if item.is_file() and item.name != "SHA256SUMS"
+        item.name for item in output_dir.iterdir() if item.is_file() and item.name != "SHA256SUMS"
     }
     if seen != expected_files:
         raise P7VerificationError("SHA256SUMS coverage mismatch")
@@ -258,30 +252,22 @@ def verify_p7(
     )
     authorization = expected["authorization"]
     verify_registry_authorization(authorization)
-    if _load_json(output_dir / "REQUEST_METADATA.json") != _request_metadata(
-        request
-    ):
+    if _load_json(output_dir / "REQUEST_METADATA.json") != _request_metadata(request):
         raise P7VerificationError("request metadata mismatch")
     if _load_json(output_dir / "P6_LINEAGE.json") != _p6_lineage(request):
         raise P7VerificationError("P6 lineage mismatch")
-    if _load_json(output_dir / "APPROVAL_INTENT.json") != (
-        approval_intent_payload(request)
-    ):
+    if _load_json(output_dir / "APPROVAL_INTENT.json") != (approval_intent_payload(request)):
         raise P7VerificationError("approval intent mismatch")
     if _load_json(output_dir / "APPROVALS.json") != [
         item.model_dump(mode="json") for item in request.approvals
     ]:
         raise P7VerificationError("approval evidence mismatch")
-    if _load_json(output_dir / "SIGNATURE_VERIFICATION.json") != expected[
-        "signature_verification"
-    ]:
+    if _load_json(output_dir / "SIGNATURE_VERIFICATION.json") != expected["signature_verification"]:
         raise P7VerificationError("signature verification evidence mismatch")
     if _load_json(output_dir / "REGISTRY_AUTHORIZATION.json") != authorization:
         raise P7VerificationError("registry authorization mismatch")
     requirements = _transaction_requirements(authorization)
-    if _load_json(output_dir / "REGISTRY_TRANSACTION_REQUIREMENTS.json") != (
-        requirements
-    ):
+    if _load_json(output_dir / "REGISTRY_TRANSACTION_REQUIREMENTS.json") != (requirements):
         raise P7VerificationError("registry transaction requirements mismatch")
     response = _load_json(output_dir / "response.json")
     if response.get("status") != "PASS":

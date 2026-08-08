@@ -109,9 +109,9 @@ def test_verify_run_rejects_parent_symlink_artifact(tmp_path: Path) -> None:
             {
                 "path": "RUNTIME_CERTIFICATION.json",
                 "size_bytes": (run_dir / "RUNTIME_CERTIFICATION.json").stat().st_size,
-                "sha256": __import__("hashlib").sha256(
-                    (run_dir / "RUNTIME_CERTIFICATION.json").read_bytes()
-                ).hexdigest(),
+                "sha256": __import__("hashlib")
+                .sha256((run_dir / "RUNTIME_CERTIFICATION.json").read_bytes())
+                .hexdigest(),
             },
             {
                 "path": "linked/evidence.txt",
@@ -169,9 +169,7 @@ def test_verify_bundle_writes_external_report(tmp_path: Path) -> None:
     run_dir = _make_run(tmp_path)
     result = bundle_run(run_dir, tmp_path / "bundles")
     report = tmp_path / "verification.json"
-    verified = verify_bundle_archive(
-        result.zip_path, result.sha256_path, report_path=report
-    )
+    verified = verify_bundle_archive(result.zip_path, result.sha256_path, report_path=report)
     assert verified.report_path == report.absolute()
     payload = json.loads(report.read_text(encoding="utf-8"))
     assert payload["status"] == "BUNDLE_VERIFIED"

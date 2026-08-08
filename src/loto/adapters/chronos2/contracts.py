@@ -238,8 +238,7 @@ class Chronos2RequestV2(StrictModel):
         if not future_schema.issubset(past_schema):
             missing = sorted(future_schema - past_schema)
             raise ValueError(
-                "future_covariates keys must be a subset of past_covariates keys: "
-                f"{missing}"
+                f"future_covariates keys must be a subset of past_covariates keys: {missing}"
             )
         return self
 

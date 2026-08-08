@@ -266,14 +266,10 @@ def compare_provider_responses(
         ),
         artifact_identity_match=_artifact_identity(first) == _artifact_identity(second),
         model_identity_match=first.get("model_identity") == second.get("model_identity"),
-        covariate_identity_match=(
-            _covariate_identity(first) == _covariate_identity(second)
-        ),
+        covariate_identity_match=(_covariate_identity(first) == _covariate_identity(second)),
     )
     if not comparison.exact_prediction_match:
-        raise RuntimeCertificationError(
-            "separate-process prediction SHA-256 values do not match"
-        )
+        raise RuntimeCertificationError("separate-process prediction SHA-256 values do not match")
     if not comparison.artifact_identity_match:
         raise RuntimeCertificationError("snapshot artifact identity changed between runs")
     if not comparison.model_identity_match:

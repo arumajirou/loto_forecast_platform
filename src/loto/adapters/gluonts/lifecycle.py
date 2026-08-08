@@ -79,9 +79,7 @@ def certify_predictor_lifecycle(
     if not request.dataset:
         raise ValueError("P5 lifecycle requires a non-empty dataset")
     predictor_artifact_dir = predictor_artifact_dir.resolve()
-    fit_request = request.model_copy(
-        update={"artifact_dir": str(predictor_artifact_dir)}
-    )
+    fit_request = request.model_copy(update={"artifact_dir": str(predictor_artifact_dir)})
     fit_invocation = invoke(
         fit_request,
         command,
@@ -126,9 +124,7 @@ def certify_predictor_lifecycle(
         outcome=outcome,
         fit_request_id=fit_request.request_id,
         load_request_id=(
-            f"{fit_request.request_id}-reload"
-            if load_invocation is not None
-            else "not-run"
+            f"{fit_request.request_id}-reload" if load_invocation is not None else "not-run"
         ),
         fit=fit,
         reload=reload,
@@ -146,24 +142,16 @@ def certify_predictor_lifecycle(
         "lane": request.lane.value,
         "fit_request_id": fit_request.request_id,
         "load_request_id": (
-            load_invocation.response.request_id
-            if load_invocation is not None
-            else None
+            load_invocation.response.request_id if load_invocation is not None else None
         ),
         "fit_response_sha256": fit_invocation.response_sha256,
         "load_response_sha256": (
-            load_invocation.response_sha256
-            if load_invocation is not None
-            else None
+            load_invocation.response_sha256 if load_invocation is not None else None
         ),
         "predictor_artifact_manifest_sha256": fit.artifact_manifest_sha256,
         "predictor_lifecycle_sha256": result_sha,
         "fit_return_code": fit_invocation.return_code,
-        "load_return_code": (
-            load_invocation.return_code
-            if load_invocation is not None
-            else None
-        ),
+        "load_return_code": (load_invocation.return_code if load_invocation is not None else None),
     }
     manifest_path = lifecycle_dir / "lifecycle_manifest.json"
     manifest_sha = atomic_write_json(manifest_path, manifest)

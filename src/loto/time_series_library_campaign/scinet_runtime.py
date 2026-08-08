@@ -66,12 +66,7 @@ def load_scinet(source_root: Path) -> type[Any]:
 def expected_parameter_count(seq_len: int, pred_len: int, channels: int, stacks: int) -> int:
     if stacks == 1:
         return 600 * channels**2 + 120 * channels + seq_len * (seq_len + pred_len)
-    return (
-        1200 * channels**2
-        + 240 * channels
-        + seq_len * pred_len
-        + (seq_len + pred_len) ** 2
-    )
+    return 1200 * channels**2 + 240 * channels + seq_len * pred_len + (seq_len + pred_len) ** 2
 
 
 def validate_scinet_config(config: dict[str, Any]) -> dict[str, Any]:
@@ -105,9 +100,7 @@ def validate_scinet_config(config: dict[str, Any]) -> dict[str, Any]:
         "inv_timescales_length": pe_hidden_size // 2,
         "raw_output_length": 2 * seq_len + pred_len,
         "forecast_slice_start": 2 * seq_len,
-        "expected_parameter_count": expected_parameter_count(
-            seq_len, pred_len, channels, stacks
-        ),
+        "expected_parameter_count": expected_parameter_count(seq_len, pred_len, channels, stacks),
     }
 
 
@@ -168,13 +161,9 @@ def verify_model_geometry(
         return
     modules = list(model.modules())
     sci_blocks = sum(module.__class__.__name__ == "SCIBlock" for module in modules)
-    causal_blocks = sum(
-        module.__class__.__name__ == "CausalConvBlock" for module in modules
-    )
+    causal_blocks = sum(module.__class__.__name__ == "CausalConvBlock" for module in modules)
     expected_sci_blocks = geometry["sci_blocks_per_tree"] * geometry["stacks"]
-    expected_causal_blocks = (
-        expected_sci_blocks * geometry["causal_conv_blocks_per_sci_block"]
-    )
+    expected_causal_blocks = expected_sci_blocks * geometry["causal_conv_blocks_per_sci_block"]
     if sci_blocks != expected_sci_blocks or causal_blocks != expected_causal_blocks:
         raise ValueError(
             "SCINet module-count mismatch: "
@@ -330,8 +319,7 @@ def load_predict(request: ProviderRequest) -> ProviderResponse:
     expected_input = (2, geometry["seq_len"], geometry["channels"])
     if tuple(x.shape) != expected_input:
         raise ValueError(
-            "invalid SCINet input shape: "
-            f"expected {expected_input}, got {tuple(x.shape)}"
+            f"invalid SCINet input shape: expected {expected_input}, got {tuple(x.shape)}"
         )
     with torch.no_grad():
         raw_tensor = model(x, None, None, None)

@@ -57,9 +57,7 @@ def test_inventory_operation_writes_manifest_and_portable_hashes(
     }
     assert required <= {path.name for path in output_dir.iterdir()}
 
-    manifest = json.loads(
-        (output_dir / "ARTIFACT_MANIFEST.json").read_text(encoding="utf-8")
-    )
+    manifest = json.loads((output_dir / "ARTIFACT_MANIFEST.json").read_text(encoding="utf-8"))
     assert manifest["status"] == "PASS"
     assert manifest["operation"] == "inventory"
 

@@ -180,9 +180,7 @@ def test_verify_rejects_handoff_missing_portable_files(
         zip_name: _zip_bytes({"README.md"}),
     }
     digest = hashlib.sha256(payloads[zip_name]).hexdigest()
-    payloads[f"{zip_name}.sha256"] = (
-        f"{digest}  {Path(zip_name).name}\n".encode()
-    )
+    payloads[f"{zip_name}.sha256"] = f"{digest}  {Path(zip_name).name}\n".encode()
     with pytest.raises(RuntimeError, match="omits final-evidence files"):
         final_evidence.verify_nested(
             payloads,

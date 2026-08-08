@@ -72,7 +72,6 @@ class HarnessMetrics:
         self.completion_tokens.labels(engine, model).inc(response.usage.completion_tokens)
         self.cached_tokens.labels(engine, model).inc(response.usage.cached_tokens)
 
-
     def record_profile(
         self,
         model: str,

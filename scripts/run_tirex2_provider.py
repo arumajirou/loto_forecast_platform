@@ -108,17 +108,13 @@ def _timeseries_batch(
         "future_covariate_device": str(future.device) if future is not None else None,
     }
     if request.series_layout == SeriesLayout.POSITION_JOINT_MULTIVARIATE:
-        timeseries = TimeseriesType(
-            target=target, past_covariates=past, future_covariates=future
-        )
+        timeseries = TimeseriesType(target=target, past_covariates=past, future_covariates=future)
         return [timeseries], evidence
     rows: list[Any] = []
     for index in range(target.shape[0]):
         target_row = target[index : index + 1]
         rows.append(
-            TimeseriesType(
-                target=target_row, past_covariates=past, future_covariates=future
-            )
+            TimeseriesType(target=target_row, past_covariates=past, future_covariates=future)
         )
     return rows, evidence
 

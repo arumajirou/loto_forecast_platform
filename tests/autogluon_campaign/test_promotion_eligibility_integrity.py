@@ -132,14 +132,10 @@ def test_fixed_time_output_is_deterministic(tmp_path: Path) -> None:
         now=fixed_time,
     )
     first_files = {
-        path.name: path.read_bytes()
-        for path in Path(first.output_dir).iterdir()
-        if path.is_file()
+        path.name: path.read_bytes() for path in Path(first.output_dir).iterdir() if path.is_file()
     }
     second_files = {
-        path.name: path.read_bytes()
-        for path in Path(second.output_dir).iterdir()
-        if path.is_file()
+        path.name: path.read_bytes() for path in Path(second.output_dir).iterdir() if path.is_file()
     }
     assert first_files == second_files
 
@@ -192,18 +188,21 @@ def test_cli_returns_two_for_not_eligible(tmp_path: Path, capsys) -> None:
 def test_cli_returns_two_for_invalid_source(tmp_path: Path, capsys) -> None:
     from loto.autogluon_campaign.promotion_eligibility_cli import main
 
-    assert main(
-        [
-            "create",
-            "--holdout-score",
-            str(tmp_path / "missing"),
-            "--prospective-score",
-            str(tmp_path / "missing-p"),
-            "--output",
-            str(tmp_path / "output"),
-            "--run-id",
-            "invalid",
-        ]
-    ) == 2
+    assert (
+        main(
+            [
+                "create",
+                "--holdout-score",
+                str(tmp_path / "missing"),
+                "--prospective-score",
+                str(tmp_path / "missing-p"),
+                "--output",
+                str(tmp_path / "output"),
+                "--run-id",
+                "invalid",
+            ]
+        )
+        == 2
+    )
     payload = json.loads(capsys.readouterr().err)
     assert payload["status"] == "FAILED"

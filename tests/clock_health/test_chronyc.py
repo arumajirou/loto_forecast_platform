@@ -99,8 +99,7 @@ def test_duplicate_tracking_field_becomes_parser_error(
         continuity=continuity(policy),
     )
     assert any(
-        "duplicate tracking field" in error
-        for error in observation.parser_evidence.parse_errors
+        "duplicate tracking field" in error for error in observation.parser_evidence.parse_errors
     )
 
 

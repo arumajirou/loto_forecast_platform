@@ -34,10 +34,7 @@ class ContextCompiler:
     def compile(self, items: list[ContextItem]) -> CompiledContext:
         measured = [
             item.model_copy(
-                update={
-                    "token_estimate": item.token_estimate
-                    or estimate_tokens(item.content)
-                }
+                update={"token_estimate": item.token_estimate or estimate_tokens(item.content)}
             )
             for item in items
         ]

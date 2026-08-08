@@ -61,9 +61,7 @@ class MetricDefinition(BaseModel):
 
     @field_validator("label_allowlist")
     @classmethod
-    def validate_labels(
-        cls, value: dict[str, tuple[str, ...]]
-    ) -> dict[str, tuple[str, ...]]:
+    def validate_labels(cls, value: dict[str, tuple[str, ...]]) -> dict[str, tuple[str, ...]]:
         if len(value) > 5:
             raise ValueError("metric labels exceed the maximum of 5")
         for label, allowed in value.items():

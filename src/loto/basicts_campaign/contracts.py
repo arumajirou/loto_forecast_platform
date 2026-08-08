@@ -115,10 +115,14 @@ class BasicTSProviderRequest(StrictModel):
 
     @model_validator(mode="after")
     def validate_operation_payload(self) -> BasicTSProviderRequest:
-        if self.operation in {
-            BasicTSOperation.VALIDATE_CONFIG,
-            BasicTSOperation.CONSTRUCT_FORWARD_SAVE_LOAD_SMOKE,
-        } and self.config is None:
+        if (
+            self.operation
+            in {
+                BasicTSOperation.VALIDATE_CONFIG,
+                BasicTSOperation.CONSTRUCT_FORWARD_SAVE_LOAD_SMOKE,
+            }
+            and self.config is None
+        ):
             raise ValueError(f"config is required for {self.operation}")
         if self.operation == BasicTSOperation.COMPILE_DATASET and self.dataset is None:
             raise ValueError("dataset is required for compile_dataset")

@@ -37,8 +37,7 @@ def validate_fit_tune_and_availability(
                         FindingCode.FIT_SCOPE_VIOLATION,
                         event_id=event.event_id,
                         message=(
-                            "fit, scaler, encoder, and feature selection inputs must "
-                            "be TRAIN only"
+                            "fit, scaler, encoder, and feature selection inputs must be TRAIN only"
                         ),
                         expected=DataRole.TRAIN.value,
                         observed=str(invalid or "no input_slices"),
@@ -74,9 +73,7 @@ def validate_fit_tune_and_availability(
                         FindingCode.TUNE_SCOPE_VIOLATION,
                         event_id=event.event_id,
                         message="TUNE requires TRAIN-role chronological inner folds",
-                        expected=(
-                            "TRAIN outer data with train_end < validation_start per fold"
-                        ),
+                        expected=("TRAIN outer data with train_end < validation_start per fold"),
                         observed=str(invalid or "invalid/missing fold partitions"),
                     )
                 )
@@ -91,8 +88,7 @@ def validate_fit_tune_and_availability(
                         FindingCode.HPO_FOLD_HASH_MISSING,
                         event_id=event.event_id,
                         message=(
-                            "TUNE output must be an HPO_RESULT containing the exact "
-                            "fold hash"
+                            "TUNE output must be an HPO_RESULT containing the exact fold hash"
                         ),
                         expected=expected_fold_hash,
                         observed=(
@@ -125,9 +121,7 @@ def validate_fit_tune_and_availability(
                             event_id=event.event_id,
                             message="input became available after forecast origin",
                             expected=f"available_at <= {origin.isoformat()}",
-                            observed=(
-                                f"{item.dataset_id}:{item.available_at.isoformat()}"
-                            ),
+                            observed=(f"{item.dataset_id}:{item.available_at.isoformat()}"),
                         )
                     )
     return findings

@@ -14,7 +14,7 @@ from loto.autogluon_campaign.runtime_certification import (
 )
 
 
-FAKE_PROVIDER = r'''
+FAKE_PROVIDER = r"""
 import argparse
 import json
 import os
@@ -83,7 +83,7 @@ response = {
 }
 args.response.parent.mkdir(parents=True, exist_ok=True)
 args.response.write_text(json.dumps(response) + "\n")
-'''
+"""
 
 
 def _fake_provider(tmp_path: Path) -> Path:
@@ -195,9 +195,7 @@ def test_response_operation_mismatch_fails_closed(tmp_path, monkeypatch) -> None
     assert any("operation mismatch" in error for error in report.scenarios[0].errors)
 
 
-def test_artifact_paths_must_remain_inside_scenario_artifact_dir(
-    tmp_path, monkeypatch
-) -> None:
+def test_artifact_paths_must_remain_inside_scenario_artifact_dir(tmp_path, monkeypatch) -> None:
     provider = _fake_provider(tmp_path)
     monkeypatch.setenv("FAKE_ARTIFACT_ESCAPE", "1")
     report = run_runtime_certification(
@@ -213,9 +211,7 @@ def test_artifact_paths_must_remain_inside_scenario_artifact_dir(
     assert any("escapes artifact_dir" in error for error in report.scenarios[0].errors)
 
 
-def test_load_scenario_is_blocked_when_fit_dependency_fails(
-    tmp_path, monkeypatch
-) -> None:
+def test_load_scenario_is_blocked_when_fit_dependency_fails(tmp_path, monkeypatch) -> None:
     provider = _fake_provider(tmp_path)
     monkeypatch.setenv("FAKE_FAIL_SCENARIO", "explicit-naive-fit")
     report = run_runtime_certification(

@@ -1,4 +1,5 @@
 """SQLAlchemy engine tracing without retaining SQL statements or parameters."""
+
 from __future__ import annotations
 
 import re

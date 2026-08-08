@@ -74,18 +74,8 @@ def test_failed_entry_requires_error_evidence() -> None:
 def test_root_and_provider_inventory_contracts_are_identical() -> None:
     paths = [
         ROOT / "src" / "loto" / "adapters" / "gluonts" / "inventory.py",
-        ROOT
-        / "environments"
-        / "gluonts-compat"
-        / "src"
-        / "loto_gluonts_provider"
-        / "inventory.py",
-        ROOT
-        / "environments"
-        / "gluonts-latest"
-        / "src"
-        / "loto_gluonts_provider"
-        / "inventory.py",
+        ROOT / "environments" / "gluonts-compat" / "src" / "loto_gluonts_provider" / "inventory.py",
+        ROOT / "environments" / "gluonts-latest" / "src" / "loto_gluonts_provider" / "inventory.py",
     ]
     contents = [path.read_text(encoding="utf-8") for path in paths]
     assert contents[0] == contents[1] == contents[2]

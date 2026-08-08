@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Resolve reviewed image tags to immutable manifest digests without pulling them."""
+
 from __future__ import annotations
 
 import argparse

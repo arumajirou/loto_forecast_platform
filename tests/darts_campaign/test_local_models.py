@@ -64,6 +64,7 @@ def _models_module(*, omit: str | None = None, fail: str | None = None) -> Simpl
         if spec.public_name == omit:
             continue
         if spec.public_name == fail:
+
             class FailingModel(FakeLocalModel):
                 def fit(self, series: FakeTimeSeries, verbose: bool = False) -> FailingModel:
                     del series, verbose

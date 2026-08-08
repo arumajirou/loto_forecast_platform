@@ -97,9 +97,7 @@ def compile_regular_history(
                     f"history row {source_index} column {column!r} is not numeric"
                 ) from exc
             if not math.isfinite(value):
-                raise ValueError(
-                    f"history row {source_index} column {column!r} is not finite"
-                )
+                raise ValueError(f"history row {source_index} column {column!r} is not finite")
             if value < geometry.candidate_min or value > geometry.candidate_max:
                 raise ValueError(
                     f"history row {source_index} column {column!r}={value} is outside "

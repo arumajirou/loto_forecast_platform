@@ -27,10 +27,7 @@ def _lock():
     rows = []
     for kind, candidate, seed in expected_formal_lock_keys():
         base = 0 if candidate == "last" else (seed % 2)
-        prediction = [
-            [float((row + col + base) % 10) for col in range(2)]
-            for row in range(5)
-        ]
+        prediction = [[float((row + col + base) % 10) for col in range(2)] for row in range(5)]
         rows.append(
             {
                 "candidate_kind": kind,
@@ -76,10 +73,7 @@ def _actuals(revealed="2026-08-05T08:00:00Z"):
         source_sha256="5" * 64,
         draw_no=[26, 27, 28, 29, 30],
         position_names=["N1", "N2"],
-        values=[
-            [float((row + col) % 10) for col in range(2)]
-            for row in range(5)
-        ],
+        values=[[float((row + col) % 10) for col in range(2)] for row in range(5)],
         legal_min=[0, 0],
         legal_max=[9, 9],
     )
@@ -106,10 +100,7 @@ def test_formal_score_uses_every_locked_candidate_seed():
     result = score_holdout(_request(lock), lock)
     assert result["status"] == "PASS"
     assert len(result["holdout_results"]) == len(expected_formal_lock_keys())
-    assert all(
-        row["model_execution"] is False
-        for row in result["holdout_results"]
-    )
+    assert all(row["model_execution"] is False for row in result["holdout_results"])
     assert result["retraining"] is False
     assert result["reprediction"] is False
 
@@ -136,9 +127,7 @@ def test_metrics_and_position_metrics_are_retained():
 def test_random_seed_aggregate_keeps_all_three_seeds():
     result = score_holdout(_request(), _lock())
     random_row = next(
-        row
-        for row in result["candidate_aggregates"]
-        if row["candidate_id"] == "random_uniform"
+        row for row in result["candidate_aggregates"] if row["candidate_id"] == "random_uniform"
     )
     assert random_row["seeds"] == [1, 2, 3]
     assert random_row["seed_count"] == 3
@@ -215,6 +204,4 @@ def test_locked_prediction_shape_mismatch_is_rejected():
 
 def test_promotion_remains_blocked_until_prospective():
     result = score_holdout(_request(), _lock())
-    assert result["promotion_status"] == (
-        "HOLDOUT_SCORED_NOT_PROMOTED_PROSPECTIVE_REQUIRED"
-    )
+    assert result["promotion_status"] == ("HOLDOUT_SCORED_NOT_PROMOTED_PROSPECTIVE_REQUIRED")

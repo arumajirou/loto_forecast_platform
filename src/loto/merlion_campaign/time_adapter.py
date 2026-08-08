@@ -64,10 +64,7 @@ def compile_series(payload: SeriesPayload, semantics: TimeSemantics) -> Compiled
         index = [timestamp.astimezone(timezone.utc) for timestamp in payload.timestamps]
         if index != sorted(index) or len(set(index)) != len(index):
             raise ValueError("timestamps must be strictly increasing and unique")
-        mapping = [
-            {"calendar_timestamp": timestamp.isoformat()}
-            for timestamp in index
-        ]
+        mapping = [{"calendar_timestamp": timestamp.isoformat()} for timestamp in index]
 
     frame = pd.DataFrame({payload.name: values}, index=pd.DatetimeIndex(index))
     frame.index.name = "timestamp"

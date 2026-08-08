@@ -52,15 +52,10 @@ def _write_control_manifest(control_dir: Path) -> None:
             "file_count": len(files),
         },
     )
-    paths = sorted(
-        path
-        for path in control_dir.rglob("*")
-        if path.is_file() and path != sha_path
-    )
+    paths = sorted(path for path in control_dir.rglob("*") if path.is_file() and path != sha_path)
     sha_path.write_text(
         "".join(
-            f"{sha256_file(path)}  {path.relative_to(control_dir).as_posix()}\n"
-            for path in paths
+            f"{sha256_file(path)}  {path.relative_to(control_dir).as_posix()}\n" for path in paths
         ),
         encoding="utf-8",
     )
@@ -132,9 +127,7 @@ def _record(
         summary=summary,
         recorded_at=recorded_at,
     )
-    checkpoint = control_dir / "checkpoints" / (
-        f"{len(updated['events']):04d}-{event_type}.json"
-    )
+    checkpoint = control_dir / "checkpoints" / (f"{len(updated['events']):04d}-{event_type}.json")
     write_json_atomic(checkpoint, updated["events"][-1])
     write_json_atomic(state_path, updated)
     _write_control_manifest(control_dir)

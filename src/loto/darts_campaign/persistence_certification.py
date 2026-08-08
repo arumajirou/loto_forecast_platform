@@ -83,8 +83,7 @@ def certify_persistence(spec: PersistenceSpec, evidence: PersistenceEvidence) ->
         and evidence.before_snapshot.public_name == spec.public_name
         and evidence.after_snapshot.public_name == spec.public_name
         and evidence.before_snapshot.class_path == evidence.after_snapshot.class_path
-        and evidence.before_snapshot.parameters_sha256
-        == evidence.after_snapshot.parameters_sha256
+        and evidence.before_snapshot.parameters_sha256 == evidence.after_snapshot.parameters_sha256
     )
     checks.append(
         _check(
@@ -144,9 +143,7 @@ def certify_persistence(spec: PersistenceSpec, evidence: PersistenceEvidence) ->
             before_shape=evidence.prediction_before.shape,
             after_shape=evidence.prediction_after.shape,
             max_abs_delta=(
-                None
-                if before.shape != after.shape
-                else float(np.max(np.abs(before - after)))
+                None if before.shape != after.shape else float(np.max(np.abs(before - after)))
             ),
         )
     )

@@ -68,12 +68,8 @@ class ResearchLedgerAdapterReport(BaseModel):
     ledger_path: str | None = None
     validation_path: str | None = None
     ledger_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
-    source_file_sha256_before: str | None = Field(
-        default=None, pattern=r"^[0-9a-f]{64}$"
-    )
-    source_file_sha256_after: str | None = Field(
-        default=None, pattern=r"^[0-9a-f]{64}$"
-    )
+    source_file_sha256_before: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    source_file_sha256_after: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     coverage_gaps: list[str] = Field(default_factory=list)
     verified_events: int = Field(default=0, ge=0)
 
@@ -205,9 +201,7 @@ def _event_id(prefix: str, *parts: object) -> str:
 
 
 def _projection_hash(dataset_sha256: str, projection: str) -> str:
-    return sha256_hex(
-        {"dataset_sha256": dataset_sha256, "projection": projection}
-    )
+    return sha256_hex({"dataset_sha256": dataset_sha256, "projection": projection})
 
 
 def _slice(
@@ -332,9 +326,7 @@ def _build_events(
             test_end = int(fold["test_end"])
             for draw_index in range(test_start, test_end):
                 if draw_index >= len(evidence.observed_times):
-                    raise ResearchLedgerBlocked(
-                        f"fold row exceeds canonical dataset: {draw_index}"
-                    )
+                    raise ResearchLedgerBlocked(f"fold row exceeds canonical dataset: {draw_index}")
                 forecast_origin = evidence.observed_times[draw_index]
                 draw_id = evidence.draw_ids[draw_index]
                 fold_id = f"{outer_id}/draw-{draw_index}"
@@ -351,9 +343,7 @@ def _build_events(
                     fold_id=fold_id,
                     fold_role=FoldRole.TRAIN,
                 )
-                fit_id = _event_id(
-                    "fit", run_id, model_id, seed, fold_id, evidence.dataset_sha256
-                )
+                fit_id = _event_id("fit", run_id, model_id, seed, fold_id, evidence.dataset_sha256)
                 events.append(
                     AccessEvent(
                         event_id=fit_id,
@@ -386,9 +376,7 @@ def _build_events(
                     fold_role=FoldRole.VALIDATION,
                     draw_id=draw_id,
                 )
-                predict_id = _event_id(
-                    "predict", run_id, model_id, seed, fold_id, draw_id
-                )
+                predict_id = _event_id("predict", run_id, model_id, seed, fold_id, draw_id)
                 events.append(
                     AccessEvent(
                         event_id=predict_id,
@@ -423,9 +411,7 @@ def _build_events(
                 )
                 events.append(
                     AccessEvent(
-                        event_id=_event_id(
-                            "actual", run_id, model_id, seed, fold_id, draw_id
-                        ),
+                        event_id=_event_id("actual", run_id, model_id, seed, fold_id, draw_id),
                         run_id=run_id,
                         sequence_no=len(events) + 1,
                         stage=Stage.OOF,
@@ -482,9 +468,7 @@ def run_research_experiment_with_ledger(
     gaps = _preflight_gaps(config)
     if gaps:
         _write_preflight_report(output=output, run_id=run_id, gaps=gaps)
-        raise ResearchLedgerPreflightError(
-            "research ledger preflight blocked: " + ", ".join(gaps)
-        )
+        raise ResearchLedgerPreflightError("research ledger preflight blocked: " + ", ".join(gaps))
 
     source = _absolute_path(Path(str(_getattr_path(config, "data.input"))))
     _assert_regular_file(source, label="research input")
@@ -568,8 +552,7 @@ def run_research_experiment_with_ledger(
         details = [*coverage_gaps]
         details.extend(item.code.value for item in validation.findings)
         raise ResearchLedgerBlocked(
-            "research ledger validation blocked downstream use: "
-            + ", ".join(sorted(set(details)))
+            "research ledger validation blocked downstream use: " + ", ".join(sorted(set(details)))
         )
     return summary
 

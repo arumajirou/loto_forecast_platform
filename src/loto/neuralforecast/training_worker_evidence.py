@@ -17,9 +17,7 @@ class TrainingWorkerEvidence(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal["1.0.0"] = "1.0.0"
-    source: Literal["pytorch_lightning_training_callback"] = (
-        "pytorch_lightning_training_callback"
-    )
+    source: Literal["pytorch_lightning_training_callback"] = "pytorch_lightning_training_callback"
     status: Literal["PASS", "FAIL"]
     backend: Literal["ray", "optuna"]
     model_name: str = Field(min_length=1)
@@ -91,9 +89,7 @@ def _runtime_snapshot(trainer: Any, module: Any) -> dict[str, Any]:
                     "cuda_current_device": int(torch.cuda.current_device()),
                     "cuda_memory_allocated": int(torch.cuda.memory_allocated()),
                     "cuda_memory_reserved": int(torch.cuda.memory_reserved()),
-                    "cuda_peak_memory_allocated": int(
-                        torch.cuda.max_memory_allocated()
-                    ),
+                    "cuda_peak_memory_allocated": int(torch.cuda.max_memory_allocated()),
                 }
             )
     except Exception as exc:
@@ -164,14 +160,9 @@ class _Recorder:
         worker_pid = os.getpid()
         runtime_pid_match = self.runtime.get("pid") == worker_pid
         gpu_pid_match = self.gpu_process.get("pid") == worker_pid
-        gpu_pid_verified = bool(
-            self.gpu_process.get("gpu_pid_verified") is True and gpu_pid_match
-        )
+        gpu_pid_verified = bool(self.gpu_process.get("gpu_pid_verified") is True and gpu_pid_match)
         cuda_execution = bool(
-            device_cuda
-            and vram_positive
-            and gpu_pid_verified
-            and runtime_pid_match
+            device_cuda and vram_positive and gpu_pid_verified and runtime_pid_match
         )
         failed: list[str] = []
         if not self.observed_fit_start:

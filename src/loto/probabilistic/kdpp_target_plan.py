@@ -62,8 +62,10 @@ def prepare_workspace(
         raise FileExistsError(workspace)
     exporter_repo = exporter_repo.resolve()
     kdpp_repo = kdpp_repo.resolve()
-    if exporter_repo == kdpp_repo or _is_within(exporter_repo, kdpp_repo) or _is_within(
-        kdpp_repo, exporter_repo
+    if (
+        exporter_repo == kdpp_repo
+        or _is_within(exporter_repo, kdpp_repo)
+        or _is_within(kdpp_repo, exporter_repo)
     ):
         raise ValueError("exporter and k-DPP repositories must be distinct worktrees")
     if _is_within(workspace, exporter_repo) or _is_within(workspace, kdpp_repo):
@@ -131,5 +133,3 @@ def _load_plan(workspace: Path) -> TargetExecutionPlan:
     _recheck_repository(plan.exporter)
     _recheck_repository(plan.kdpp)
     return plan
-
-

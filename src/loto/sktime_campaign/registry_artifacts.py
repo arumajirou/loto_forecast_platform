@@ -62,8 +62,7 @@ def _write_manifest(output_dir: Path) -> None:
     files = sorted(
         path
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     manifest = {
         "schema_version": "1.0",
@@ -80,9 +79,7 @@ def _write_manifest(output_dir: Path) -> None:
     }
     _write_json(output_dir / "ARTIFACT_MANIFEST.json", manifest)
     hashed = sorted(
-        path
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     )
     _atomic_write_text(
         output_dir / "SHA256SUMS",
@@ -97,9 +94,7 @@ def _rollback_plan(result: dict[str, Any]) -> dict[str, Any]:
         "transaction_id": result["transaction_id"],
         "automatic_rollback": False,
         "rollback_status": "AVAILABLE_REQUIRES_NEW_P7_AUTHORIZATION",
-        "rollback_expected_registry_state_sha256": result["post_state"][
-            "state_sha256"
-        ],
+        "rollback_expected_registry_state_sha256": result["post_state"]["state_sha256"],
         "rollback_target_binding": record.get("previous_binding"),
         "rollback_source_binding": record["new_binding"],
         "deployment_rollback_required": False,
@@ -134,20 +129,14 @@ def persist_p8(
         "schema_version": "1.0",
         "p7_bundle_sha256": request.p7_bundle_sha256,
         "authorization_id": request.transaction.authorization_id,
-        "authorization_seal_sha256": (
-            request.transaction.authorization_seal_sha256
-        ),
+        "authorization_seal_sha256": (request.transaction.authorization_seal_sha256),
         "authorization_expires_at_utc": request.authorization["expires_at_utc"],
-        "approval_intent_sha256": request.authorization[
-            "approval_intent_sha256"
-        ],
+        "approval_intent_sha256": request.authorization["approval_intent_sha256"],
     }
     plan = {
         "schema_version": "1.0",
         "backend": "file-json-cas-v1",
-        "expected_registry_state_sha256": (
-            request.transaction.expected_registry_state_sha256
-        ),
+        "expected_registry_state_sha256": (request.transaction.expected_registry_state_sha256),
         "registry_target": request.transaction.subject.registry_target,
         "subject": request.transaction.subject.model_dump(mode="json"),
         "authorization_id": request.transaction.authorization_id,
@@ -159,9 +148,7 @@ def persist_p8(
         "authorization_id": request.transaction.authorization_id,
         "transaction_nonce": request.transaction.transaction_nonce,
         "consumption_status": (
-            "CONSUMED"
-            if result["registry_write_executed"]
-            else "ALREADY_CONSUMED_EXACT_REPLAY"
+            "CONSUMED" if result["registry_write_executed"] else "ALREADY_CONSUMED_EXACT_REPLAY"
         ),
         "registry_generation": result["post_state"]["generation"],
         "transaction_id": result["transaction_id"],
@@ -210,10 +197,7 @@ def persist_p8(
 
 def _verify_manifest(output_dir: Path) -> None:
     manifest = _load_json(output_dir / "ARTIFACT_MANIFEST.json")
-    if (
-        manifest.get("status") != "PASS"
-        or manifest.get("scope") != "sktime-p8-file-registry-cas"
-    ):
+    if manifest.get("status") != "PASS" or manifest.get("scope") != "sktime-p8-file-registry-cas":
         raise P8VerificationError("manifest identity mismatch")
     seen: set[str] = set()
     for item in manifest.get("files", []):
@@ -222,16 +206,12 @@ def _verify_manifest(output_dir: Path) -> None:
         if name in seen or not path.is_file():
             raise P8VerificationError("manifest path mismatch")
         seen.add(name)
-        if (
-            path.stat().st_size != int(item["size_bytes"])
-            or _sha256(path) != item["sha256"]
-        ):
+        if path.stat().st_size != int(item["size_bytes"]) or _sha256(path) != item["sha256"]:
             raise P8VerificationError(f"manifest mismatch: {name}")
     expected = {
         path.name
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     }
     if seen != expected:
         raise P8VerificationError("manifest coverage mismatch")
@@ -239,17 +219,13 @@ def _verify_manifest(output_dir: Path) -> None:
 
 def _verify_sha(output_dir: Path) -> None:
     seen: set[str] = set()
-    for line in (output_dir / "SHA256SUMS").read_text(
-        encoding="utf-8"
-    ).splitlines():
+    for line in (output_dir / "SHA256SUMS").read_text(encoding="utf-8").splitlines():
         expected, name = line.split("  ", 1)
         if name in seen or _sha256(output_dir / name) != expected:
             raise P8VerificationError(f"SHA256SUMS mismatch: {name}")
         seen.add(name)
     expected = {
-        path.name
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path.name for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     }
     if seen != expected:
         raise P8VerificationError("SHA256SUMS coverage mismatch")
@@ -260,31 +236,21 @@ def verify_p8(
     request: P8RegistryTransactionRequest,
 ) -> dict[str, Any]:
     output_dir = output_dir.resolve()
-    pre = FileRegistryState.model_validate(
-        _load_json(output_dir / "PRE_REGISTRY_STATE.json")
-    )
-    post = FileRegistryState.model_validate(
-        _load_json(output_dir / "POST_REGISTRY_STATE.json")
-    )
+    pre = FileRegistryState.model_validate(_load_json(output_dir / "PRE_REGISTRY_STATE.json"))
+    post = FileRegistryState.model_validate(_load_json(output_dir / "POST_REGISTRY_STATE.json"))
     receipt = _load_json(output_dir / "TRANSACTION_RECEIPT.json")
     response = _load_json(output_dir / "response.json")
     plan = _load_json(output_dir / "TRANSACTION_PLAN.json")
     consumption = _load_json(output_dir / "AUTHORIZATION_CONSUMPTION.json")
     rollback = _load_json(output_dir / "ROLLBACK_PLAN.json")
-    if (
-        plan["expected_registry_state_sha256"]
-        != request.transaction.expected_registry_state_sha256
-    ):
+    if plan["expected_registry_state_sha256"] != request.transaction.expected_registry_state_sha256:
         raise P8VerificationError("transaction plan expected-state mismatch")
     if (
         pre.state_sha256 != request.transaction.expected_registry_state_sha256
         and receipt["decision"] != "IDEMPOTENT_ALREADY_COMMITTED"
     ):
         raise P8VerificationError("pre-state does not match CAS expectation")
-    if (
-        post.current_binding is None
-        or post.current_binding.subject != request.transaction.subject
-    ):
+    if post.current_binding is None or post.current_binding.subject != request.transaction.subject:
         raise P8VerificationError("post-state binding differs from authorized subject")
     if request.transaction.authorization_id not in post.consumed_authorization_ids:
         raise P8VerificationError("authorization was not consumed")

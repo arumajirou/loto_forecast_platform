@@ -122,9 +122,7 @@ def _run_artifacts(
             },
             "samples": [
                 {
-                    "memory": [
-                        {"gpu_uuid": "GPU-test", "used_memory_mib": 612}
-                    ],
+                    "memory": [{"gpu_uuid": "GPU-test", "used_memory_mib": 612}],
                     "processes": [
                         {
                             "pid": process_id,
@@ -144,9 +142,7 @@ def _run_artifacts(
     else:
         monitor = {
             "before": {"memory": [], "processes": [], "errors": []},
-            "samples": [
-                {"memory": [], "processes": [], "errors": []}
-            ],
+            "samples": [{"memory": [], "processes": [], "errors": []}],
             "after": {"memory": [], "processes": [], "errors": []},
         }
     _write_json(run_dir / "gpu_monitor.json", monitor)
@@ -173,5 +169,3 @@ def _run_artifacts(
     }
     _write_json(run_dir / "run_evidence.json", evidence)
     return evidence
-
-

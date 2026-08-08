@@ -51,8 +51,7 @@ def request_payload(*, game: Game = Game.NUMBERS3, context: int = 96) -> dict[st
         "requested_device": "cpu",
         "input_shape": (geometry.position_count, context),
         "series": tuple(
-            tuple(float(index) for index in range(context))
-            for _ in range(geometry.position_count)
+            tuple(float(index) for index in range(context)) for _ in range(geometry.position_count)
         ),
         "past_covariates": None,
         "known_future_covariates": None,
@@ -172,9 +171,7 @@ def test_runner_rejects_unknown_command_field() -> None:
     runner = runpy.run_path(str(root / "scripts" / "run_timer_base_84m_provider.py"))
     payload = json.loads(json_payload(request_payload()))
     with pytest.raises(ValueError, match="unknown command fields"):
-        runner["run"](
-            {"operation": "validate_request", "request": payload, "unexpected": True}
-        )
+        runner["run"]({"operation": "validate_request", "request": payload, "unexpected": True})
 
 
 def test_runner_rejects_unknown_operation() -> None:

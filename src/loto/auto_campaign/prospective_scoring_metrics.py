@@ -102,9 +102,7 @@ def _extract_locked_predictions(
                 raise ValueError(f"invalid u_local position: {task_path}")
             expected_id = number_columns[position - 1]
             if set(filtered["unique_id"]) != {expected_id}:
-                raise ValueError(
-                    f"u_local unique_id mismatch: {task_path}; expected={expected_id}"
-                )
+                raise ValueError(f"u_local unique_id mismatch: {task_path}; expected={expected_id}")
         candidate_id = f"task:{task_path}"
         for record in filtered[["ds", "unique_id", "prediction"]].to_dict("records"):
             rows.append(
@@ -197,8 +195,7 @@ def _score_candidates(
         complete = ids == number_columns
         if not complete and metadata.get("track") != "u_local":
             raise ValueError(
-                "non-local candidate is missing positions: "
-                f"{metadata['candidate_id']}"
+                f"non-local candidate is missing positions: {metadata['candidate_id']}"
             )
         pivot = group.pivot(index="ds", columns="unique_id", values="prediction")
         if sorted(int(value) for value in pivot.index) != expected_ds:
@@ -276,8 +273,7 @@ def _add_combined_local_candidates(
             raise ValueError(f"duplicate local prediction keys: {key}")
         model_name, seed, backend, config_index = key
         candidate_id = (
-            f"combined-local:{model_name}:seed={seed}:backend={backend}:"
-            f"config={config_index}"
+            f"combined-local:{model_name}:seed={seed}:backend={backend}:config={config_index}"
         )
         for record in group[["ds", "unique_id", "prediction"]].to_dict("records"):
             combined_rows.append(
@@ -361,23 +357,13 @@ def _seed_summary(
         "mse",
         "rmse",
     ]
-    per_seed = (
-        primary.groupby(seed_columns, dropna=False)[metric_columns]
-        .mean()
-        .reset_index()
-    )
-    aggregations = {
-        metric: ["mean", "std", "var", "min", "max"]
-        for metric in metric_columns
-    }
+    per_seed = primary.groupby(seed_columns, dropna=False)[metric_columns].mean().reset_index()
+    aggregations = {metric: ["mean", "std", "var", "min", "max"] for metric in metric_columns}
     summary = per_seed.groupby(group_columns, dropna=False).agg(aggregations)
     summary.columns = [f"{metric}_{stat}" for metric, stat in summary.columns]
     summary = summary.reset_index()
     seed_counts = (
-        per_seed.groupby(group_columns, dropna=False)
-        .size()
-        .rename("seed_count")
-        .reset_index()
+        per_seed.groupby(group_columns, dropna=False).size().rename("seed_count").reset_index()
     )
     summary = summary.merge(
         seed_counts,
@@ -417,8 +403,7 @@ def _baseline_comparison(ranking: pd.DataFrame) -> tuple[pd.DataFrame, dict[str,
                 "baseline": baseline["baseline_name"],
                 "hit_pm1_delta": champion["hit_pm1_mean"] - baseline["hit_pm1_mean"],
                 "all_positions_hit_pm1_delta": (
-                    champion["all_positions_hit_pm1_mean"]
-                    - baseline["all_positions_hit_pm1_mean"]
+                    champion["all_positions_hit_pm1_mean"] - baseline["all_positions_hit_pm1_mean"]
                 ),
                 "mae_improvement": baseline["mae_mean"] - champion["mae_mean"],
                 "rmse_improvement": baseline["rmse_mean"] - champion["rmse_mean"],

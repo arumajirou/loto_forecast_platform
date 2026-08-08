@@ -41,8 +41,7 @@ def write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     temporary.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True, default=str)
-        + "\n",
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True, default=str) + "\n",
         encoding="utf-8",
     )
     temporary.replace(path)
@@ -51,10 +50,7 @@ def write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
 def _model_name_matches(alias: str, observed_name: str) -> bool:
     if observed_name == alias:
         return True
-    return any(
-        observed_name.startswith(f"{alias}{separator}")
-        for separator in ("/", "_", "-")
-    )
+    return any(observed_name.startswith(f"{alias}{separator}") for separator in ("/", "_", "-"))
 
 
 def model_identity_evidence(

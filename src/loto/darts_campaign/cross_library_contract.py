@@ -347,8 +347,7 @@ class CrossLibraryCampaignConfig(BaseModel):
             canonical = [item for item in variants if item.canonical_for_algorithm]
             if len(canonical) != 1:
                 raise ValueError(
-                    "each base algorithm requires exactly one canonical execution: "
-                    f"{algorithm_key}"
+                    f"each base algorithm requires exactly one canonical execution: {algorithm_key}"
                 )
         return self
 

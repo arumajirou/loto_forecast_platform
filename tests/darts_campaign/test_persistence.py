@@ -290,35 +290,25 @@ def test_process_boundary_is_mandatory() -> None:
 def test_artifact_manifest_detects_tamper() -> None:
     spec = specs()[0]
     current = evidence(spec, "manual")
-    artifact_record = current.artifacts[0].model_copy(
-        update={"sha256_at_load": "b" * 64}
-    )
+    artifact_record = current.artifacts[0].model_copy(update={"sha256_at_load": "b" * 64})
     report = certify_persistence(
         spec,
         current.model_copy(update={"artifacts": (artifact_record,)}),
     )
     assert report.status == "FAILED"
-    assert any(
-        check.failure_class == "ARTIFACT_INTEGRITY_MISMATCH"
-        for check in report.checks
-    )
+    assert any(check.failure_class == "ARTIFACT_INTEGRITY_MISMATCH" for check in report.checks)
 
 
 def test_prediction_replay_shape_and_values_are_certified() -> None:
     spec = specs()[0]
     current = evidence(spec, "manual")
-    changed = current.prediction_after.model_copy(
-        update={"values": ((1.0, 2.0), (3.0, 9.0))}
-    )
+    changed = current.prediction_after.model_copy(update={"values": ((1.0, 2.0), (3.0, 9.0))})
     report = certify_persistence(
         spec,
         current.model_copy(update={"prediction_after": changed}),
     )
     assert report.status == "FAILED"
-    assert any(
-        check.failure_class == "PREDICTION_REPLAY_MISMATCH"
-        for check in report.checks
-    )
+    assert any(check.failure_class == "PREDICTION_REPLAY_MISMATCH" for check in report.checks)
 
 
 def test_clean_save_removes_global_training_and_covariate_state() -> None:
@@ -332,10 +322,7 @@ def test_clean_save_removes_global_training_and_covariate_state() -> None:
         broken.model_copy(update={"after_snapshot": after}),
     )
     assert report.status == "FAILED"
-    assert any(
-        check.failure_class == "CLEAN_SAVE_CONTRACT_FAILED"
-        for check in report.checks
-    )
+    assert any(check.failure_class == "CLEAN_SAVE_CONTRACT_FAILED" for check in report.checks)
 
 
 def test_torch_manual_requires_weight_companion_and_gpu_evidence() -> None:
@@ -348,10 +335,7 @@ def test_torch_manual_requires_weight_companion_and_gpu_evidence() -> None:
         current.model_copy(update={"artifacts": current.artifacts[:1]}),
     )
     assert report.status == "FAILED"
-    assert any(
-        check.failure_class == "TORCH_WEIGHT_ARTIFACT_MISSING"
-        for check in report.checks
-    )
+    assert any(check.failure_class == "TORCH_WEIGHT_ARTIFACT_MISSING" for check in report.checks)
 
 
 def test_checkpoint_best_and_last_restore_training_state() -> None:
@@ -365,10 +349,7 @@ def test_checkpoint_best_and_last_restore_training_state() -> None:
         current.model_copy(update={"optimizer_state_restored": False}),
     )
     assert report.status == "FAILED"
-    assert any(
-        check.failure_class == "CHECKPOINT_RESTORE_INCOMPLETE"
-        for check in report.checks
-    )
+    assert any(check.failure_class == "CHECKPOINT_RESTORE_INCOMPLETE" for check in report.checks)
 
 
 def test_load_weights_requires_initialized_model_weights_and_encoders() -> None:
@@ -381,10 +362,7 @@ def test_load_weights_requires_initialized_model_weights_and_encoders() -> None:
         current.model_copy(update={"encoders_loaded": False}),
     )
     assert report.status == "FAILED"
-    assert any(
-        check.failure_class == "WEIGHTS_RESTORE_INCOMPLETE"
-        for check in report.checks
-    )
+    assert any(check.failure_class == "WEIGHTS_RESTORE_INCOMPLETE" for check in report.checks)
 
 
 def test_cross_device_cpu_and_cuda_reject_cpu_fallback() -> None:
@@ -408,10 +386,7 @@ def test_cross_device_cpu_and_cuda_reject_cpu_fallback() -> None:
         current.model_copy(update={"device_after": fallback}),
     )
     assert report.status == "FAILED"
-    assert any(
-        check.failure_class == "DEVICE_CERTIFICATION_FAILED"
-        for check in report.checks
-    )
+    assert any(check.failure_class == "DEVICE_CERTIFICATION_FAILED" for check in report.checks)
 
 
 def test_matrix_retains_failure_and_continues_all_tasks() -> None:

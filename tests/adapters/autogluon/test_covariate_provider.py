@@ -38,8 +38,7 @@ class _FakePredictor:
                 rows.append(
                     {
                         "item_id": item_id,
-                        "timestamp": pd.Timestamp("2000-01-03")
-                        + pd.Timedelta(days=offset),
+                        "timestamp": pd.Timestamp("2000-01-03") + pd.Timedelta(days=offset),
                         "mean": 5.0,
                         "0.1": 4.0,
                         "0.5": 5.0,

@@ -79,12 +79,7 @@ def deterministic_history(
     for row_index in range(history_length):
         offset = (row_index * 3) % offset_count
         values = [candidate_min + offset + index for index in range(position_count)]
-        rows.append(
-            {
-                f"n{position + 1}": value
-                for position, value in enumerate(values)
-            }
-        )
+        rows.append({f"n{position + 1}": value for position, value in enumerate(values)})
     return rows
 
 
@@ -335,9 +330,7 @@ def summarize_campaign(
         "requested_device": requested_device,
         "required_cases": list(required),
         "observed_cases": observed,
-        "passed_case_count": sum(
-            1 for result in case_results if result.get("status") == "PASS"
-        ),
+        "passed_case_count": sum(1 for result in case_results if result.get("status") == "PASS"),
         "required_case_count": len(required),
         "failures": failures,
         "case_result_sha256": sha256_payload(case_results),

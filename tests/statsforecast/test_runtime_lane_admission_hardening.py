@@ -54,9 +54,7 @@ def test_accepts_hardened_point_cpu_evidence(tmp_path: Path) -> None:
 def test_rejects_interval_mode(tmp_path: Path) -> None:
     rows = _rows()
     rows[0]["forecast_mode"] = "interval"
-    report = inspect_target_host_archive(
-        _archive(tmp_path, rows), base_inspector=_pass
-    )
+    report = inspect_target_host_archive(_archive(tmp_path, rows), base_inspector=_pass)
     assert report["decision"] == "MERGE_BLOCKED"
     assert any("forecast_mode" in item for item in report["failures"])
 
@@ -64,9 +62,7 @@ def test_rejects_interval_mode(tmp_path: Path) -> None:
 def test_rejects_non_cpu_device(tmp_path: Path) -> None:
     rows = _rows()
     rows[0]["device"] = "cuda"
-    report = inspect_target_host_archive(
-        _archive(tmp_path, rows), base_inspector=_pass
-    )
+    report = inspect_target_host_archive(_archive(tmp_path, rows), base_inspector=_pass)
     assert report["formal_pass"] is False
     assert any("device" in item for item in report["failures"])
 
@@ -89,8 +85,6 @@ def test_preserves_base_gate_failures(tmp_path: Path) -> None:
             "failures": ["outer SHA mismatch"],
         }
 
-    report = inspect_target_host_archive(
-        _archive(tmp_path), base_inspector=reject
-    )
+    report = inspect_target_host_archive(_archive(tmp_path), base_inspector=reject)
     assert report["formal_pass"] is False
     assert "outer SHA mismatch" in report["failures"]

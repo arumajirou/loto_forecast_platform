@@ -163,26 +163,18 @@ def verify_evidence_bundle(archive_path: Path) -> P7DVerificationReport:
     comparisons = {
         "run_id": context["run_id"],
         "source_commit_sha": context["commit_sha"],
-        "p7b_execution_manifest_sha256": context[
-            "execution_manifest_sha256"
-        ],
-        "p7b_execution_checksum_sha256": context[
-            "execution_checksum_sha256"
-        ],
+        "p7b_execution_manifest_sha256": context["execution_manifest_sha256"],
+        "p7b_execution_checksum_sha256": context["execution_checksum_sha256"],
         "p7c_manifest_sha256": context["manifest_sha256"],
         "p7c_checksum_sha256": context["checksum_sha256"],
-        "orchestration_checksum_sha256": context[
-            "orchestration_checksum_sha256"
-        ],
+        "orchestration_checksum_sha256": context["orchestration_checksum_sha256"],
         "audit_sha256": context["audit_sha256"],
         "failure_matrix_sha256": context["failure_matrix_sha256"],
         "p7b_return_code": context["p7b_return_code"],
         "p7c_return_code": context["p7c_return_code"],
         "evidence_state": context["evidence_state"],
         "certification_status": context["certification_status"],
-        "verified_model_lifecycles": context[
-            "verified_model_lifecycles"
-        ],
+        "verified_model_lifecycles": context["verified_model_lifecycles"],
         "p8_eligible": context["p8_eligible"],
     }
     for field, actual in comparisons.items():
@@ -191,9 +183,7 @@ def verify_evidence_bundle(archive_path: Path) -> P7DVerificationReport:
     return P7DVerificationReport(
         archive_path=str(archive_path),
         archive_sha256=archive_sha,
-        bundle_manifest_sha256=sha256_bytes(
-            canonical_json_bytes(manifest.model_dump(mode="json"))
-        ),
+        bundle_manifest_sha256=sha256_bytes(canonical_json_bytes(manifest.model_dump(mode="json"))),
         bundle_checksum_sha256=checksum_sha,
         run_id=manifest.run_id,
         source_commit_sha=manifest.source_commit_sha,
@@ -217,9 +207,7 @@ def verify_and_extract_bundle(
         raise ValueError("P7D verification output must be absent or empty")
     report = verify_evidence_bundle(archive_path)
     output_dir.parent.mkdir(parents=True, exist_ok=True)
-    temporary = Path(
-        tempfile.mkdtemp(prefix=f".{output_dir.name}.", dir=output_dir.parent)
-    )
+    temporary = Path(tempfile.mkdtemp(prefix=f".{output_dir.name}.", dir=output_dir.parent))
     try:
         _extract_archive(archive_path, temporary)
         report_path = temporary / "p7d_verification_report.json"

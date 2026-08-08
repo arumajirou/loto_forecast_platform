@@ -89,9 +89,7 @@ class P7DVerificationReport(BaseModel):
 
     schema_version: Literal[1] = 1
     phase: Literal["P7D_EVIDENCE_HANDOFF"] = "P7D_EVIDENCE_HANDOFF"
-    verification_state: Literal[P7DVerificationState.VERIFIED] = (
-        P7DVerificationState.VERIFIED
-    )
+    verification_state: Literal[P7DVerificationState.VERIFIED] = P7DVerificationState.VERIFIED
     archive_path: str = Field(min_length=1)
     archive_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     bundle_manifest_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -115,8 +113,7 @@ class P7DVerificationReport(BaseModel):
 
 def canonical_json_bytes(payload: Any) -> bytes:
     return (
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n"
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     ).encode("utf-8")
 
 

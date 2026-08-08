@@ -400,8 +400,7 @@ def run_provider_v2(
 
         prediction = predictor.predict(time_series, random_seed=request.seed)
         expected_items = tuple(
-            f"position-{index}"
-            for index in range(1, request.geometry.selection_count + 1)
+            f"position-{index}" for index in range(1, request.geometry.selection_count + 1)
         )
         records = _prediction_records(
             prediction,
@@ -418,9 +417,7 @@ def run_provider_v2(
                 run_id=request.run_id,
                 request_payload=request.model_dump(mode="json"),
                 execution_plan=plan.to_dict(),
-                timeline_mapping=[
-                    row.model_dump(mode="json") for row in compiled.timeline_mapping
-                ],
+                timeline_mapping=[row.model_dump(mode="json") for row in compiled.timeline_mapping],
                 source_order_sha256=compiled.source_order_sha256,
                 timeline_mapping_sha256=compiled.mapping_sha256,
                 geometry_sha256=compiled.geometry_sha256,

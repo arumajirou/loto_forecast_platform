@@ -126,17 +126,13 @@ def verify_dependency_contract(root: Path) -> dict[str, object]:
     if not isinstance(locked_full, list):
         raise CertificationError("uv.lock full optional dependency set is missing")
     locked_full_names = {
-        _normalise_name(str(row.get("name", "")))
-        for row in locked_full
-        if isinstance(row, dict)
+        _normalise_name(str(row.get("name", ""))) for row in locked_full if isinstance(row, dict)
     }
     if "hierarchicalforecast" not in locked_full_names:
         raise CertificationError("uv.lock full extra omits HierarchicalForecast")
 
     declaration = hierarchical_declarations[0]
-    exact_declaration = declaration.replace(" ", "") == (
-        f"hierarchicalforecast=={TARGET_VERSION}"
-    )
+    exact_declaration = declaration.replace(" ", "") == (f"hierarchicalforecast=={TARGET_VERSION}")
     return {
         "status": "VERIFIED",
         "formal_success": True,

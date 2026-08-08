@@ -15,13 +15,12 @@ from loto.moirai2_campaign.runtime_evidence_prediction import (
     _require_true,
 )
 
+
 def _snapshot_records(snapshot: Any, key: str) -> list[dict[str, Any]]:
     if not isinstance(snapshot, dict):
         raise RuntimeEvidenceGateError("GPU monitor snapshot is not an object")
     records = snapshot.get(key)
-    if not isinstance(records, list) or not all(
-        isinstance(item, dict) for item in records
-    ):
+    if not isinstance(records, list) or not all(isinstance(item, dict) for item in records):
         raise RuntimeEvidenceGateError(f"GPU monitor {key} records are invalid")
     return records
 
@@ -71,11 +70,7 @@ def _verify_gpu_monitor(
         raise RuntimeEvidenceGateError("GPU monitor samples are invalid")
     before_memory = _memory_map(before)
     after_memory = _memory_map(after)
-    sample_processes = [
-        record
-        for sample in samples
-        for record in _process_records(sample)
-    ]
+    sample_processes = [record for sample in samples for record in _process_records(sample)]
     after_processes = _process_records(after)
     if any(pid == provider_pid for pid, _, _ in after_processes):
         raise RuntimeEvidenceGateError("provider PID remains in GPU monitor after exit")
@@ -114,6 +109,7 @@ def _verify_gpu_monitor(
         "vram_after_mib": after_memory.get(gpu_uuid),
     }
 
+
 def _verify_run_evidence(
     *,
     run_dir: Path,
@@ -131,9 +127,7 @@ def _verify_run_evidence(
     ):
         actual = sha256_file(_required_file(run_dir, relative))
         _require_equal(evidence.get(key), actual, f"{key} differs")
-    exit_code = _required_file(run_dir, "exit_code.txt").read_text(
-        encoding="utf-8"
-    ).strip()
+    exit_code = _required_file(run_dir, "exit_code.txt").read_text(encoding="utf-8").strip()
     _require_equal(exit_code, "0", "provider exit code differs")
     external = evidence.get("external_gpu")
     if not isinstance(external, dict):
@@ -171,9 +165,7 @@ def _verify_run_evidence(
         if not str(external.get("gpu_uuid", "")):
             raise RuntimeEvidenceGateError("external GPU UUID is missing")
         if int(external.get("peak_process_memory_mib", 0)) <= 0:
-            raise RuntimeEvidenceGateError(
-                "external CUDA process memory is not positive"
-            )
+            raise RuntimeEvidenceGateError("external CUDA process memory is not positive")
     else:
         _require_equal(
             external.get("gpu_uuid"),
@@ -194,5 +186,3 @@ def _verify_run_evidence(
     ) != canonical_json_bytes(response):
         raise RuntimeEvidenceGateError("run evidence embedded response differs")
     return evidence
-
-

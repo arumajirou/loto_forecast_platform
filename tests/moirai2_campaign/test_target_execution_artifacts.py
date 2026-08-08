@@ -90,9 +90,7 @@ def _seal(root: Path) -> None:
     lines = []
     for path in sorted(root.rglob("*")):
         if path.is_file() and path != manifest:
-            lines.append(
-                f"{sha256_file(path)}  {path.relative_to(root).as_posix()}"
-            )
+            lines.append(f"{sha256_file(path)}  {path.relative_to(root).as_posix()}")
     manifest.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -218,5 +216,3 @@ def test_event_type_mapping_is_explicit() -> None:
     assert event_type_for("candidate", SUPPORTED_LANE) == EVENT_ORDER[0]
     assert event_type_for("campaign", CUDA_LANE) == EVENT_ORDER[5]
     assert event_type_for("verification", None) == EVENT_ORDER[6]
-
-

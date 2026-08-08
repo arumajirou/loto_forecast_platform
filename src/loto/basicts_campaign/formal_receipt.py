@@ -71,8 +71,7 @@ def _bundle_fingerprint(checksums: dict[str, str]) -> str:
     if not checksums:
         raise FormalReceiptError("source bundle checksum map is empty")
     valid_items = all(
-        isinstance(path, str) and isinstance(digest, str)
-        for path, digest in checksums.items()
+        isinstance(path, str) and isinstance(digest, str) for path, digest in checksums.items()
     )
     if not valid_items:
         raise FormalReceiptError("source bundle checksum map is invalid")

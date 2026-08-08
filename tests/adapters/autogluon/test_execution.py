@@ -64,9 +64,7 @@ def test_explicit_single_maps_model_id_and_disables_preset_and_ensemble() -> Non
     assert plan.fit_kwargs["hyperparameters"] == {"Naive": {"seasonal_period": 1}}
     assert "presets" not in plan.fit_kwargs
     assert plan.fit_kwargs["enable_ensemble"] is False
-    transformed = {
-        entry.argument: entry.status.value for entry in plan.argument_ledger
-    }
+    transformed = {entry.argument: entry.status.value for entry in plan.argument_ledger}
     assert transformed["fit.hyperparameters"] == "TRANSFORMED"
     assert transformed["fit.presets"] == "DROPPED_WITH_REASON"
     assert transformed["fit.enable_ensemble"] == "TRANSFORMED"

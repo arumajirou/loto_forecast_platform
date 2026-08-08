@@ -101,12 +101,8 @@ class ShadowEvaluationWindow(BaseModel):
     window_id: str = Field(pattern=r"^[A-Za-z0-9._-]+$", min_length=1)
     activation_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     shadow_candidate_id: str = Field(min_length=1)
-    prediction_locked_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
-    actuals_revealed_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    prediction_locked_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+    actuals_revealed_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     prediction_lock_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     actual_source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     history_snapshot_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -153,9 +149,7 @@ class ShadowEvaluationWindow(BaseModel):
             raise ValueError("shadow candidate ID mismatch")
         if shadow_rows[0].seed is not None:
             raise ValueError("deployed shadow prediction cannot select a seed")
-        baseline_ids = {
-            item.candidate_id for item in self.predictions if item.role == "baseline"
-        }
+        baseline_ids = {item.candidate_id for item in self.predictions if item.role == "baseline"}
         if baseline_ids != REQUIRED_BASELINES:
             raise ValueError("required baseline inventory mismatch")
         random_seeds = sorted(
@@ -235,9 +229,7 @@ class CanaryEvaluationRequest(BaseModel):
     git_commit: str = Field(pattern=r"^[0-9a-f]{7,40}$")
     code_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     config_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    evaluated_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    evaluated_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     p9: P9ActivationEvidence
     policy: CanaryEvaluationPolicy = Field(default_factory=CanaryEvaluationPolicy)
     windows: list[ShadowEvaluationWindow] = Field(min_length=1)
@@ -282,9 +274,7 @@ def _metrics(actuals: list[list[int]], predictions: list[list[int]]) -> dict[str
     position_hits = [0] * position_count
     for actual_row, prediction_row in zip(actuals, predictions, strict=True):
         row_all_hit = True
-        for index, (actual, predicted) in enumerate(
-            zip(actual_row, prediction_row, strict=True)
-        ):
+        for index, (actual, predicted) in enumerate(zip(actual_row, prediction_row, strict=True)):
             error = float(predicted - actual)
             absolute_sum += abs(error)
             square_sum += error * error
@@ -317,10 +307,10 @@ def _weighted_population_variance(
 ) -> float:
     total = sum(weights)
     mean = sum(value * weight for value, weight in zip(values, weights, strict=True)) / total
-    return sum(
-        weight * ((value - mean) ** 2)
-        for value, weight in zip(values, weights, strict=True)
-    ) / total
+    return (
+        sum(weight * ((value - mean) ** 2) for value, weight in zip(values, weights, strict=True))
+        / total
+    )
 
 
 def _aggregate_metric_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -328,10 +318,10 @@ def _aggregate_metric_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     draw_weights = [int(item["draw_count"]) for item in rows]
     total_values = sum(value_weights)
     total_draws = sum(draw_weights)
-    weighted_mse = sum(
-        float(item["mse"]) * weight
-        for item, weight in zip(rows, value_weights, strict=True)
-    ) / total_values
+    weighted_mse = (
+        sum(float(item["mse"]) * weight for item, weight in zip(rows, value_weights, strict=True))
+        / total_values
+    )
     position_count = int(rows[0]["position_count"])
     position_hit = []
     for index in range(position_count):
@@ -369,9 +359,7 @@ def _aggregate_metric_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "variance": {},
         "worst": {
             "hit_at_1": min(float(item["hit_at_1"]) for item in rows),
-            "all_position_hit_at_1": min(
-                float(item["all_position_hit_at_1"]) for item in rows
-            ),
+            "all_position_hit_at_1": min(float(item["all_position_hit_at_1"]) for item in rows),
             "position_hit_at_1": [
                 min(float(item["position_hit_at_1"][index]) for item in rows)
                 for index in range(position_count)
@@ -442,9 +430,9 @@ def evaluate_shadow_canary(request: CanaryEvaluationRequest) -> dict[str, Any]:
             for key in ["hit_at_1", "all_position_hit_at_1", "mae", "mse", "rmse"]:
                 values = [float(row["mean"][key]) for row in seed_rows]
                 mean_metrics[key] = sum(values) / seed_count
-                variance_metrics[key] = sum(
-                    (value - mean_metrics[key]) ** 2 for value in values
-                ) / seed_count
+                variance_metrics[key] = (
+                    sum((value - mean_metrics[key]) ** 2 for value in values) / seed_count
+                )
                 worst_metrics[key] = min(values) if "hit" in key else max(values)
             position_count = len(seed_rows[0]["mean"]["position_hit_at_1"])
             mean_metrics["position_hit_at_1"] = [
@@ -487,9 +475,7 @@ def evaluate_shadow_canary(request: CanaryEvaluationRequest) -> dict[str, Any]:
     comparisons = []
     for baseline_id in sorted(REQUIRED_BASELINES):
         baseline = candidate_metrics[baseline_id]
-        hit_delta = float(shadow["mean"]["hit_at_1"]) - float(
-            baseline["mean"]["hit_at_1"]
-        )
+        hit_delta = float(shadow["mean"]["hit_at_1"]) - float(baseline["mean"]["hit_at_1"])
         mae_delta = float(baseline["mean"]["mae"]) - float(shadow["mean"]["mae"])
         comparisons.append(
             {
@@ -521,8 +507,7 @@ def evaluate_shadow_canary(request: CanaryEvaluationRequest) -> dict[str, Any]:
         },
         {
             "rule": "weighted_hit_at_1",
-            "passed": float(shadow["mean"]["hit_at_1"])
-            >= request.policy.minimum_weighted_hit_at_1,
+            "passed": float(shadow["mean"]["hit_at_1"]) >= request.policy.minimum_weighted_hit_at_1,
             "observed": shadow["mean"]["hit_at_1"],
             "required": request.policy.minimum_weighted_hit_at_1,
         },
@@ -535,8 +520,7 @@ def evaluate_shadow_canary(request: CanaryEvaluationRequest) -> dict[str, Any]:
         },
         {
             "rule": "weighted_mae",
-            "passed": float(shadow["mean"]["mae"])
-            <= request.policy.maximum_weighted_mae,
+            "passed": float(shadow["mean"]["mae"]) <= request.policy.maximum_weighted_mae,
             "observed": shadow["mean"]["mae"],
             "required_maximum": request.policy.maximum_weighted_mae,
         },
@@ -551,9 +535,7 @@ def evaluate_shadow_canary(request: CanaryEvaluationRequest) -> dict[str, Any]:
             "rule": "strict_improvement_over_at_least_one_baseline",
             "passed": any(item["strictly_better"] for item in comparisons),
             "strictly_better_baselines": [
-                item["baseline_id"]
-                for item in comparisons
-                if item["strictly_better"]
+                item["baseline_id"] for item in comparisons if item["strictly_better"]
             ],
         },
     ]
@@ -591,8 +573,7 @@ def evaluate_shadow_canary(request: CanaryEvaluationRequest) -> dict[str, Any]:
         "shadow_candidate_id": request.p9.subject.shadow_candidate_id,
         "window_count": len(request.windows),
         "total_draws": sum(len(item.draw_ids) for item in request.windows),
-        "primary_promotion_eligible": decision
-        == "ELIGIBLE_FOR_PRIMARY_PROMOTION_REVIEW",
+        "primary_promotion_eligible": decision == "ELIGIBLE_FOR_PRIMARY_PROMOTION_REVIEW",
         "primary_promotion_executed": False,
         "primary_binding_changed": False,
         "prediction_publication_allowed": False,

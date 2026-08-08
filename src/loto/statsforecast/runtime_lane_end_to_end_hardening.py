@@ -21,16 +21,8 @@ def run_end_to_end_certification(
 ) -> EndToEndResult:
     """Run the base gate with hardened point/CPU admission defaults."""
 
-    inspector = (
-        inspect_target_host_archive
-        if admission_inspector is None
-        else admission_inspector
-    )
-    writer = (
-        write_admission_artifacts
-        if admission_writer is None
-        else admission_writer
-    )
+    inspector = inspect_target_host_archive if admission_inspector is None else admission_inspector
+    writer = write_admission_artifacts if admission_writer is None else admission_writer
     return _run_end_to_end_certification(
         repo_root,
         output_root,

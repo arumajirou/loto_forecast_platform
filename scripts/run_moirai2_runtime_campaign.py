@@ -104,9 +104,7 @@ def _run_case(
         certification = json.loads(certification_path.read_text(encoding="utf-8"))
     status = (
         "PASS"
-        if return_code == 0
-        and certification is not None
-        and certification.get("status") == "PASS"
+        if return_code == 0 and certification is not None and certification.get("status") == "PASS"
         else "FAILED"
     )
     result = {
@@ -134,9 +132,7 @@ def _run_case(
 
 def _artifact_manifest(output_dir: Path) -> dict[str, Any]:
     files = sorted(
-        path.relative_to(output_dir).as_posix()
-        for path in output_dir.rglob("*")
-        if path.is_file()
+        path.relative_to(output_dir).as_posix() for path in output_dir.rglob("*") if path.is_file()
     )
     return {
         "schema_version": "moirai2-p8-runtime-campaign-artifacts-v1",
@@ -147,23 +143,11 @@ def _artifact_manifest(output_dir: Path) -> dict[str, Any]:
 
 def run_campaign(arguments: argparse.Namespace) -> dict[str, Any]:
     if arguments.runtime_lane not in RUNTIME_LANES:
-        raise RuntimeCampaignError(
-            f"unsupported runtime lane: {arguments.runtime_lane}"
-        )
-    if (
-        arguments.device == "cuda"
-        and arguments.runtime_lane != "cuda13-experimental"
-    ):
-        raise RuntimeCampaignError(
-            "CUDA campaign requires cuda13-experimental lane"
-        )
-    if (
-        arguments.monitor_interval_seconds <= 0
-        or arguments.monitor_interval_seconds > 5
-    ):
-        raise RuntimeCampaignError(
-            "monitor interval must be in the range (0, 5]"
-        )
+        raise RuntimeCampaignError(f"unsupported runtime lane: {arguments.runtime_lane}")
+    if arguments.device == "cuda" and arguments.runtime_lane != "cuda13-experimental":
+        raise RuntimeCampaignError("CUDA campaign requires cuda13-experimental lane")
+    if arguments.monitor_interval_seconds <= 0 or arguments.monitor_interval_seconds > 5:
+        raise RuntimeCampaignError("monitor interval must be in the range (0, 5]")
     if not CERTIFIER.is_file():
         raise RuntimeCampaignError(f"P8 certifier is missing: {CERTIFIER}")
 
@@ -171,9 +155,7 @@ def run_campaign(arguments: argparse.Namespace) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=False)
     selected_cases = tuple(arguments.case or FORMAL_CASE_NAMES)
     if len(selected_cases) != len(set(selected_cases)):
-        raise RuntimeCampaignError(
-            "selected certification cases must be unique"
-        )
+        raise RuntimeCampaignError("selected certification cases must be unique")
     campaign_config = {
         "schema_version": "moirai2-p8-runtime-campaign-v1",
         "campaign_id": arguments.campaign_id,
@@ -238,10 +220,7 @@ def run_campaign(arguments: argparse.Namespace) -> dict[str, Any]:
             "campaign_id": arguments.campaign_id,
             "selected_cases": list(request_paths),
             "formal_runtime_certified": False,
-            "message": (
-                "preflight and request generation passed; "
-                "inference was not run"
-            ),
+            "message": ("preflight and request generation passed; inference was not run"),
         }
     else:
         case_results = [
@@ -274,10 +253,7 @@ def run_campaign(arguments: argparse.Namespace) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description=(
-            "Run the six-case Moirai 2.0 target-host "
-            "certification campaign"
-        )
+        description=("Run the six-case Moirai 2.0 target-host certification campaign")
     )
     parser.add_argument("--campaign-id", required=True)
     parser.add_argument("--snapshot-path", required=True, type=Path)

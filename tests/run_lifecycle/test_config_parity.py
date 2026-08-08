@@ -103,9 +103,7 @@ def _expand(payload: dict[str, object]) -> list[dict[str, str]]:
 def test_machine_readable_transition_matrix_matches_code() -> None:
     root = Path(__file__).resolve().parents[2]
     payload = json.loads(
-        (root / "configs/run_lifecycle/transition_matrix.v1.json").read_text(
-            encoding="utf-8"
-        )
+        (root / "configs/run_lifecycle/transition_matrix.v1.json").read_text(encoding="utf-8")
     )
     assert payload["schema_version"] == "1.0.0"
     assert payload["unknown_transition_policy"] == "FAIL_CLOSED"

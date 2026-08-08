@@ -64,9 +64,7 @@ def test_verified_item_rejects_commands() -> None:
 
 def test_plan_rejects_false_p8_gate() -> None:
     items = [
-        verified_item(lane, model)
-        for lane in ("compat", "latest")
-        for model in EXPECTED_MODELS
+        verified_item(lane, model) for lane in ("compat", "latest") for model in EXPECTED_MODELS
     ]
     with pytest.raises(ValidationError):
         P7CRemediationPlan(
@@ -139,9 +137,7 @@ def make_p7b(
                 category = failure[2]
             rows.append(model_row(lane, model, category))
     verified = sum(row["certification_status"] == "VERIFIED" for row in rows)
-    status = certification_status or (
-        "VERIFIED" if verified == 18 else "FAILED"
-    )
+    status = certification_status or ("VERIFIED" if verified == 18 else "FAILED")
     audit = {
         "schema_version": 1,
         "phase": "P7_TARGET_MACHINE_EXECUTION",
@@ -210,10 +206,7 @@ def test_verified_run_is_p8_eligible(tmp_path: Path) -> None:
     plan = build_remediation_plan(make_p7b(tmp_path))
     assert plan.p8_eligible
     assert plan.verified_model_lifecycles == 18
-    assert all(
-        item.remediation_class is P7CRemediationClass.VERIFIED
-        for item in plan.items
-    )
+    assert all(item.remediation_class is P7CRemediationClass.VERIFIED for item in plan.items)
 
 
 @pytest.mark.parametrize(
@@ -235,11 +228,7 @@ def test_failure_classification(
         failure=("compat", "WaveNetEstimator", category),
     )
     plan = build_remediation_plan(root)
-    item = next(
-        item
-        for item in plan.items
-        if item.item_id == "compat:WaveNetEstimator"
-    )
+    item = next(item for item in plan.items if item.item_id == "compat:WaveNetEstimator")
     assert item.remediation_class is expected
     assert item.preserve_verified
     assert plan.verified_model_lifecycles == 17
@@ -256,10 +245,7 @@ def test_invalid_evidence_creates_only_p0_evidence_item(
     )
     plan = build_remediation_plan(root)
     assert len(plan.items) == 1
-    assert (
-        plan.items[0].remediation_class
-        is P7CRemediationClass.EVIDENCE_REPAIR
-    )
+    assert plan.items[0].remediation_class is P7CRemediationClass.EVIDENCE_REPAIR
     assert plan.items[0].priority is P7CPriority.P0
     assert plan.verified_model_lifecycles == 0
 

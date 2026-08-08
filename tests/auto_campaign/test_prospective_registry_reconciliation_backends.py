@@ -71,9 +71,7 @@ def test_postgres_probe_is_read_only_and_redacts_uri(monkeypatch) -> None:
 
     assert result["status"] == "PASS"
     assert result["safe_uri"] == "postgresql://user:***@db/loto"
-    assert result["run_rows"] == [
-        {"registry_id": "registry-1", "status": "PASS"}
-    ]
+    assert result["run_rows"] == [{"registry_id": "registry-1", "status": "PASS"}]
     assert result["candidates"][0]["candidate_key"] == "c1"
 
 

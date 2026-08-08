@@ -87,10 +87,7 @@ class FakeFoundation:
         future_covariates: object | None = None,
     ) -> object:
         if isinstance(series, list):
-            return [
-                np.arange(n, dtype=float) + index
-                for index, _ in enumerate(series)
-            ]
+            return [np.arange(n, dtype=float) + index for index, _ in enumerate(series)]
         if series.data.ndim == 2:
             positions = series.data.shape[1]
             return np.arange(
@@ -137,12 +134,14 @@ def geometry() -> GameGeometry:
 
 
 def frame() -> pd.DataFrame:
-    return pd.DataFrame({
-        "draw_no": list(range(1, 33)),
-        "N1": [index % 10 for index in range(32)],
-        "N2": [(index + 1) % 10 for index in range(32)],
-        "N3": [(index + 2) % 10 for index in range(32)],
-    })
+    return pd.DataFrame(
+        {
+            "draw_no": list(range(1, 33)),
+            "N1": [index % 10 for index in range(32)],
+            "N2": [(index + 1) % 10 for index in range(32)],
+            "N3": [(index + 2) % 10 for index in range(32)],
+        }
+    )
 
 
 def source(
@@ -187,10 +186,7 @@ def campaign(
     return FoundationCampaignConfig(
         run_id="p8-test",
         track=track,
-        models=tuple(
-            model(name, finetuning=finetuning)
-            for name in names
-        ),
+        models=tuple(model(name, finetuning=finetuning) for name in names),
         input_chunk_length=(8, 24),
         output_chunk_length=3,
         output_chunk_shift=0,
@@ -276,12 +272,8 @@ def test_foundation_identity_and_capability_matrix_is_stable() -> None:
         "TiRexModel",
         "PatchTSTFMModel",
     )
-    assert FOUNDATION_CAPABILITIES[
-        "Chronos2Model"
-    ].supports_past_covariates
-    assert not FOUNDATION_CAPABILITIES[
-        "TimesFM2p5Model"
-    ].supports_past_covariates
+    assert FOUNDATION_CAPABILITIES["Chronos2Model"].supports_past_covariates
+    assert not FOUNDATION_CAPABILITIES["TimesFM2p5Model"].supports_past_covariates
     assert len(capability_matrix_sha256()) == 64
 
 
@@ -302,15 +294,19 @@ def test_variable_input_and_model_specific_limits() -> None:
     config = campaign(names=("Chronos2Model",))
     assert config.input_chunk_length == (8, 24)
     with pytest.raises(ValidationError):
-        FoundationCampaignConfig(**{
-            **config.model_dump(),
-            "input_chunk_length": (24, 8),
-        })
+        FoundationCampaignConfig(
+            **{
+                **config.model_dump(),
+                "input_chunk_length": (24, 8),
+            }
+        )
     with pytest.raises(ValidationError):
-        FoundationCampaignConfig(**{
-            **config.model_dump(),
-            "output_chunk_length": 1025,
-        })
+        FoundationCampaignConfig(
+            **{
+                **config.model_dump(),
+                "output_chunk_length": 1025,
+            }
+        )
 
 
 def test_tirex_requires_license_and_partial_finetuning_backend() -> None:
@@ -345,10 +341,12 @@ def test_source_certification_rejects_revision_and_manifest_drift() -> None:
     )
     record = certify_source(configured, mismatch)
     assert record["failure_class"] == "FOUNDATION_REVISION_MISMATCH"
-    missing_hash = mismatch.model_copy(update={
-        "resolved_revision": configured.hub_model_revision,
-        "local_manifest_sha256": None,
-    })
+    missing_hash = mismatch.model_copy(
+        update={
+            "resolved_revision": configured.hub_model_revision,
+            "local_manifest_sha256": None,
+        }
+    )
     record = certify_source(configured, missing_hash)
     assert record["failure_class"] == "FOUNDATION_ARTIFACT_UNVERIFIED"
 
@@ -411,9 +409,7 @@ def test_package_import_failure_retains_all_requested_models(
         device_probe=gpu_probe,
     )
     assert len(results) == 4
-    assert {item.failure_class for item in results} == {
-        "DEPENDENCY_MISSING"
-    }
+    assert {item.failure_class for item in results} == {"DEPENDENCY_MISSING"}
 
 
 def test_zero_shot_global_matrix_passes_with_evidence() -> None:
@@ -430,14 +426,8 @@ def test_zero_shot_global_matrix_passes_with_evidence() -> None:
     )
     assert [item.status for item in results] == ["PASS"] * 4
     assert all(item.predictions is not None for item in results)
-    assert all(
-        item.source_certification["passed"]
-        for item in results
-    )
-    assert all(
-        item.capability_certification["passed"]
-        for item in results
-    )
+    assert all(item.source_certification["passed"] for item in results)
+    assert all(item.capability_certification["passed"] for item in results)
     assert original.equals(frame())
 
 

@@ -41,9 +41,7 @@ def _load_subject(path: Path) -> RegistrySubject:
 
 def _intent(args: argparse.Namespace) -> int:
     requested = args.requested_at_utc or _utc_now()
-    requested_dt = datetime.strptime(requested, "%Y-%m-%dT%H:%M:%SZ").replace(
-        tzinfo=timezone.utc
-    )
+    requested_dt = datetime.strptime(requested, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
     policy = _load_policy(args.policy)
     expires = args.expires_at_utc or (
         requested_dt + timedelta(seconds=policy.authorization_ttl_seconds)
@@ -61,8 +59,12 @@ def _intent(args: argparse.Namespace) -> int:
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     write_json(args.output, intent.model_dump(mode="json"))
-    print(json.dumps({"status": "PASS", "intent": str(args.output),
-                      "intent_sha256": intent.intent_sha256}, sort_keys=True))
+    print(
+        json.dumps(
+            {"status": "PASS", "intent": str(args.output), "intent_sha256": intent.intent_sha256},
+            sort_keys=True,
+        )
+    )
     return 0
 
 
@@ -102,9 +104,7 @@ def _finalize(args: argparse.Namespace) -> int:
 
 def _authorize(args: argparse.Namespace) -> int:
     intent = ApprovalIntent.model_validate(load_json(args.intent))
-    approvals = [
-        HumanApproval.model_validate(load_json(path)) for path in args.approval
-    ]
+    approvals = [HumanApproval.model_validate(load_json(path)) for path in args.approval]
     verifier = make_ssh_signature_verifier(args.allowed_signers)
     result = create_approval_authorization(
         p17_evidence_dir=args.p17,
@@ -184,8 +184,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         return int(args.handler(args))
     except (ApprovalAuthorizationError, ValueError, OSError) as exc:
         code = getattr(exc, "code", type(exc).__name__)
-        print(json.dumps({"status": "FAILED", "error_code": code,
-                          "message": str(exc)}, sort_keys=True), file=sys.stderr)
+        print(
+            json.dumps(
+                {"status": "FAILED", "error_code": code, "message": str(exc)}, sort_keys=True
+            ),
+            file=sys.stderr,
+        )
         return 2
 
 

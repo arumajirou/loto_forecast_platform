@@ -114,12 +114,16 @@ def _install_runtime_doubles(monkeypatch) -> None:
     for name, module in modules.items():
         monkeypatch.setitem(sys.modules, name, module)
 
-    monkeypatch.setattr(runtime, "runtime_dependency_status", lambda: {
-        "neuralforecast": True,
-        "optuna": True,
-        "ray": True,
-        "torch": True,
-    })
+    monkeypatch.setattr(
+        runtime,
+        "runtime_dependency_status",
+        lambda: {
+            "neuralforecast": True,
+            "optuna": True,
+            "ray": True,
+            "torch": True,
+        },
+    )
     runtime._reset_runtime_classes_for_tests()
 
 

@@ -35,9 +35,7 @@ def execute_runtime_lane(
         bundle_verification = verify_offline_bundle(wheelhouse)
         if bundle_verification["status"] != "PASS":
             failures = bundle_verification["failures"]
-            raise ValueError(
-                f"offline bundle failed verification: {failures}"
-            )
+            raise ValueError(f"offline bundle failed verification: {failures}")
     run_dir = output_root / run_id
     run_dir.mkdir(parents=True, exist_ok=False)
     environment_dir = run_dir / "environment"
@@ -52,23 +50,14 @@ def execute_runtime_lane(
             environment_dir,
         )
     else:
-        template = (
-            repo_root
-            / "environments"
-            / "statsforecast-py313"
-            / "pyproject.toml"
-        )
+        template = repo_root / "environments" / "statsforecast-py313" / "pyproject.toml"
         shutil.copy2(template, environment_dir / "pyproject.toml")
     commands: list[dict[str, Any]] = []
     env = os.environ.copy()
     env["UV_PROJECT_ENVIRONMENT"] = str(environment_dir / ".venv")
     if wheelhouse is not None:
         packages = wheelhouse / "packages"
-        find_links = (
-            packages.resolve()
-            if packages.is_dir()
-            else wheelhouse.resolve()
-        )
+        find_links = packages.resolve() if packages.is_dir() else wheelhouse.resolve()
         env["UV_FIND_LINKS"] = str(find_links)
     if offline:
         env["UV_OFFLINE"] = "1"
@@ -131,12 +120,7 @@ def execute_runtime_lane(
     if sync_rc == 0:
         python = venv_python(environment_dir / ".venv")
         certification_output = run_dir / "certification"
-        parameters = (
-            repo_root
-            / "configs"
-            / "statsforecast"
-            / "runtime_parameters.json"
-        )
+        parameters = repo_root / "configs" / "statsforecast" / "runtime_parameters.json"
         certification_command = [
             str(python),
             "-m",
@@ -166,23 +150,14 @@ def execute_runtime_lane(
                 "returncode": certification_rc,
             }
         )
-        stdout = (run_dir / "certification.stdout.log").read_text(
-            encoding="utf-8"
-        )
+        stdout = (run_dir / "certification.stdout.log").read_text(encoding="utf-8")
         for line in stdout.splitlines():
             if line.startswith("RUN_DIR="):
-                inner_run = Path(
-                    line.removeprefix("RUN_DIR=").strip()
-                )
+                inner_run = Path(line.removeprefix("RUN_DIR=").strip())
                 break
         if inner_run is not None:
             checksum_report = verify_portable_sha256sums(inner_run)
-    status = (
-        "PASS"
-        if certification_rc == 0
-        and checksum_report["status"] == "PASS"
-        else "PARTIAL"
-    )
+    status = "PASS" if certification_rc == 0 and checksum_report["status"] == "PASS" else "PARTIAL"
     report = {
         "schema_version": 1,
         "run_id": run_id,
@@ -191,18 +166,12 @@ def execute_runtime_lane(
         "target_version": TARGET_VERSION,
         "python_lane": "3.13",
         "offline": offline,
-        "wheelhouse": (
-            str(wheelhouse.resolve())
-            if wheelhouse is not None
-            else None
-        ),
+        "wheelhouse": (str(wheelhouse.resolve()) if wheelhouse is not None else None),
         "offline_bundle_verification": bundle_verification,
         "lock_returncode": lock_rc,
         "sync_returncode": sync_rc,
         "certification_returncode": certification_rc,
-        "inner_run": (
-            str(inner_run) if inner_run is not None else None
-        ),
+        "inner_run": (str(inner_run) if inner_run is not None else None),
         "inner_checksum_verification": checksum_report,
         "holdout_opened": False,
         "prospective_actual_known": False,

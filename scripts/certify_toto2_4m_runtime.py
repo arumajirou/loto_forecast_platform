@@ -170,9 +170,10 @@ def _run_one_process(
         "--handshake-timeout-seconds",
         str(ready_timeout_seconds),
     ]
-    with stdout_path.open("w", encoding="utf-8") as stdout_handle, stderr_path.open(
-        "w", encoding="utf-8"
-    ) as stderr_handle:
+    with (
+        stdout_path.open("w", encoding="utf-8") as stdout_handle,
+        stderr_path.open("w", encoding="utf-8") as stderr_handle,
+    ):
         process = subprocess.Popen(
             command,
             stdout=stdout_handle,

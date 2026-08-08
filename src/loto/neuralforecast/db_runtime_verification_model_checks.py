@@ -68,12 +68,8 @@ def runtime_failures(
                 "formal_training_cuda": (
                     certification.get("formal_cuda_training_evidence") is True
                 ),
-                "pre_save_cuda": (
-                    certification.get("cuda_pre_save_inference_evidence") is True
-                ),
-                "reload_cuda": (
-                    certification.get("cuda_reload_inference_evidence") is True
-                ),
+                "pre_save_cuda": (certification.get("cuda_pre_save_inference_evidence") is True),
+                "reload_cuda": (certification.get("cuda_reload_inference_evidence") is True),
                 "combined_cuda": certification.get("cuda_execution_evidence") is True,
                 "pre_save_device_cuda": (
                     isinstance(runtime_pre, Mapping) and _cuda_device(runtime_pre)
@@ -81,9 +77,7 @@ def runtime_failures(
                 "reload_device_cuda": (
                     isinstance(runtime_reload, Mapping) and _cuda_device(runtime_reload)
                 ),
-                "pre_save_vram": (
-                    isinstance(runtime_pre, Mapping) and _vram_evidence(runtime_pre)
-                ),
+                "pre_save_vram": (isinstance(runtime_pre, Mapping) and _vram_evidence(runtime_pre)),
                 "reload_vram": (
                     isinstance(runtime_reload, Mapping) and _vram_evidence(runtime_reload)
                 ),
@@ -91,8 +85,7 @@ def runtime_failures(
                     isinstance(gpu_pre, Mapping) and gpu_pre.get("gpu_pid_verified") is True
                 ),
                 "reload_gpu_pid": (
-                    isinstance(gpu_reload, Mapping)
-                    and gpu_reload.get("gpu_pid_verified") is True
+                    isinstance(gpu_reload, Mapping) and gpu_reload.get("gpu_pid_verified") is True
                 ),
             }
         )

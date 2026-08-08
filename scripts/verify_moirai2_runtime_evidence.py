@@ -28,10 +28,7 @@ def _write_json(path: Path, payload: Any) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description=(
-            "Independently verify supported and CUDA Moirai 2.0 runtime "
-            "campaign evidence"
-        )
+        description=("Independently verify supported and CUDA Moirai 2.0 runtime campaign evidence")
     )
     parser.add_argument("--supported-campaign-dir", required=True, type=Path)
     parser.add_argument("--cuda-campaign-dir", required=True, type=Path)

@@ -37,9 +37,11 @@ def evaluate_prediction_frame(frame: pd.DataFrame) -> dict[str, object]:
         )
         for unique_id, group in frame.groupby("unique_id", sort=False)
     }
-    per_draw = frame.assign(
-        hit=(frame["prediction"].sub(frame["actual"]).abs() <= 1.0)
-    ).groupby("ds", sort=False)["hit"].all()
+    per_draw = (
+        frame.assign(hit=(frame["prediction"].sub(frame["actual"]).abs() <= 1.0))
+        .groupby("ds", sort=False)["hit"]
+        .all()
+    )
     return {
         **overall,
         "all_position_hit_at_pm1": float(per_draw.mean()),

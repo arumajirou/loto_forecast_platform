@@ -14,9 +14,7 @@ from loto.tirex2_campaign.runtime_certification import (
 
 
 def _response(pid: int, point: float = 5.0) -> Tirex2Response:
-    quantiles = {
-        f"{level / 10:.1f}": [[float(level)]] for level in range(1, 10)
-    }
+    quantiles = {f"{level / 10:.1f}": [[float(level)]] for level in range(1, 10)}
     quantiles["0.5"] = [[point]]
     for level in range(6, 10):
         quantiles[f"{level / 10:.1f}"] = [[point + level - 5]]

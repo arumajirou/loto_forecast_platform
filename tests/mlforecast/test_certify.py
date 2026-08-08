@@ -49,17 +49,13 @@ def test_verify_wheel_file_rejects_version_mismatch(tmp_path: Path) -> None:
 
 
 def test_prediction_check_rejects_nonfinite_values() -> None:
-    prediction = pd.DataFrame(
-        {"unique_id": ["p1", "p2"], "ds": [1, 1], "ridge": [1.0, np.nan]}
-    )
+    prediction = pd.DataFrame({"unique_id": ["p1", "p2"], "ds": [1, 1], "ridge": [1.0, np.nan]})
     with pytest.raises(RuntimeError, match="non-finite"):
         _prediction_check(prediction, column="ridge", expected_rows=2)
 
 
 def test_prediction_keys_reject_duplicates() -> None:
-    prediction = pd.DataFrame(
-        {"unique_id": ["p1", "p1"], "ds": [1, 1], "ridge": [1.0, 1.0]}
-    )
+    prediction = pd.DataFrame({"unique_id": ["p1", "p1"], "ds": [1, 1], "ridge": [1.0, 1.0]})
     with pytest.raises(RuntimeError, match="duplicate prediction keys"):
         _validated_prediction_keys(prediction)
 
@@ -102,12 +98,8 @@ class _Study:
 
 
 def test_prediction_key_match_rejects_different_keys() -> None:
-    before = pd.DataFrame(
-        {"unique_id": ["p1", "p2"], "ds": [1, 1], "ridge": [1.0, 2.0]}
-    )
-    after = pd.DataFrame(
-        {"unique_id": ["p1", "p2"], "ds": [1, 2], "ridge": [1.0, 2.0]}
-    )
+    before = pd.DataFrame({"unique_id": ["p1", "p2"], "ds": [1, 1], "ridge": [1.0, 2.0]})
+    after = pd.DataFrame({"unique_id": ["p1", "p2"], "ds": [1, 2], "ridge": [1.0, 2.0]})
     with pytest.raises(RuntimeError, match="prediction key mismatch"):
         _assert_prediction_keys_match(before, after)
 

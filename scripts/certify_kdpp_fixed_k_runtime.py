@@ -95,9 +95,7 @@ def main() -> int:
             if "item_features" in arrays
             else None
         )
-    item_ids_payload = json.loads(
-        args.item_ids_json.read_text(encoding="utf-8")
-    )
+    item_ids_payload = json.loads(args.item_ids_json.read_text(encoding="utf-8"))
     if not isinstance(item_ids_payload, list) or not all(
         isinstance(item, str) for item in item_ids_payload
     ):
@@ -193,9 +191,7 @@ def main() -> int:
             "schema_version": SCHEMA_VERSION,
             "status": "PRIVATE_RUNTIME_EXECUTED",
             "formal_runtime_certification": False,
-            "reason": (
-                "Dataset provenance requires independent review before certification."
-            ),
+            "reason": ("Dataset provenance requires independent review before certification."),
             "runtime_pid": os.getpid(),
             "requested_device": "cpu",
             "effective_device": "cpu",

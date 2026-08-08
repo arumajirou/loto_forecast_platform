@@ -216,9 +216,7 @@ def test_standard_verify_wrapper_includes_coverage_report(tmp_path: Path) -> Non
 
     assert result["status"] == "PASS"
     assert result["coverage_state_verification"]["status"] == "PASS"
-    report = json.loads(
-        (run_root / "VERIFICATION_REPORT.json").read_text(encoding="utf-8")
-    )
+    report = json.loads((run_root / "VERIFICATION_REPORT.json").read_text(encoding="utf-8"))
     assert report["coverage_state_verification"]["constructor_model_count"] == 36
     assert (run_root / "SHA256SUMS").is_file()
 

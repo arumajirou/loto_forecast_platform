@@ -134,9 +134,10 @@ def _run_once(
     before = _capture_gpu_state()
     samples: list[dict[str, Any]] = []
     started_ns = time.time_ns()
-    with stdout_path.open("w", encoding="utf-8") as stdout_stream, stderr_path.open(
-        "w", encoding="utf-8"
-    ) as stderr_stream:
+    with (
+        stdout_path.open("w", encoding="utf-8") as stdout_stream,
+        stderr_path.open("w", encoding="utf-8") as stderr_stream,
+    ):
         process = subprocess.Popen(
             command,
             cwd=ROOT,
@@ -191,9 +192,7 @@ def _run_once(
     before_memory, _ = _records(before)
     after_memory, after_processes = _records(after)
     process_samples = [
-        ComputeProcessRecord(**record)
-        for sample in samples
-        for record in sample["processes"]
+        ComputeProcessRecord(**record) for sample in samples for record in sample["processes"]
     ]
     external_gpu = certify_external_gpu_evidence(
         response=response,
@@ -251,9 +250,7 @@ def certify(
     timeout_seconds: int,
     monitor_interval_seconds: float,
 ) -> dict[str, Any]:
-    request = Moirai2ProviderRequest.model_validate_json(
-        request_path.read_text(encoding="utf-8")
-    )
+    request = Moirai2ProviderRequest.model_validate_json(request_path.read_text(encoding="utf-8"))
     _validate_inputs(request, runtime_lane, monitor_interval_seconds)
     output_dir.mkdir(parents=True, exist_ok=False)
     request_payload = request.model_dump(mode="json")

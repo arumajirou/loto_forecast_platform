@@ -147,9 +147,7 @@ def test_required_baseline_inventory_is_enforced(tmp_path) -> None:
     payload = request.model_dump(mode="json")
     changed = copy.deepcopy(payload["windows"][0])
     changed["predictions"] = [
-        item
-        for item in changed["predictions"]
-        if item["candidate_id"] != "frequency"
+        item for item in changed["predictions"] if item["candidate_id"] != "frequency"
     ]
     payload["windows"][0] = reseal_window_payload(changed)
     with pytest.raises(ValidationError, match="baseline inventory"):
@@ -160,11 +158,7 @@ def test_random_seed_inventory_is_enforced(tmp_path) -> None:
     request = make_request(tmp_path / "out")
     payload = request.model_dump(mode="json")
     changed = copy.deepcopy(payload["windows"][0])
-    random_rows = [
-        item
-        for item in changed["predictions"]
-        if item["candidate_id"] == "random"
-    ]
+    random_rows = [item for item in changed["predictions"] if item["candidate_id"] == "random"]
     random_rows[2]["seed"] = 4
     payload["windows"][0] = reseal_window_payload(changed)
     with pytest.raises(ValidationError, match="random baseline"):

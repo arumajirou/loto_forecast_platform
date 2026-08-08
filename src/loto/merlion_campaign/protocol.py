@@ -97,9 +97,7 @@ class PredictionPayload(BaseModel):
 class ProviderResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal["merlion-provider-response-v1"] = (
-        "merlion-provider-response-v1"
-    )
+    schema_version: Literal["merlion-provider-response-v1"] = "merlion-provider-response-v1"
     request_id: str
     status: Literal["PASS", "FAILED", "BLOCKED"]
     phase: str

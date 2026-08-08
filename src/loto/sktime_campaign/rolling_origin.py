@@ -40,9 +40,7 @@ class RollingOriginRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal["1.0"] = "1.0"
-    operation: Literal["rolling_origin_oof_holdout_lock"] = (
-        "rolling_origin_oof_holdout_lock"
-    )
+    operation: Literal["rolling_origin_oof_holdout_lock"] = "rolling_origin_oof_holdout_lock"
     output_dir: str = Field(min_length=1)
     environment_lane: Literal["classic-py312"] = "classic-py312"
     expected_sktime_version: Literal["1.0.1"] = "1.0.1"
@@ -54,9 +52,7 @@ class RollingOriginRequest(BaseModel):
     dataset: GameMatrix
     split: ChronologicalSplit
     rolling_origin: RollingOriginSpec
-    baseline_ids: list[BaselineId] = Field(
-        default_factory=lambda: list(FORMAL_BASELINES)
-    )
+    baseline_ids: list[BaselineId] = Field(default_factory=lambda: list(FORMAL_BASELINES))
     model_ids: list[SmokeModelId] = Field(default_factory=lambda: list(FORMAL_MODELS))
     random_seeds: list[int] = Field(default_factory=lambda: [1, 2, 3], min_length=3)
     season_length: int = Field(default=7, ge=1)
@@ -403,9 +399,7 @@ def aggregate_oof_results(
         if passed:
             item["metrics"] = {}
             for name in metric_names:
-                values = np.asarray(
-                    [row["metrics"][name]["mean"] for row in passed], dtype=float
-                )
+                values = np.asarray([row["metrics"][name]["mean"] for row in passed], dtype=float)
                 item["metrics"][name] = {
                     "mean": float(values.mean()),
                     "variance": float(values.var()),
@@ -416,9 +410,7 @@ def aggregate_oof_results(
 
 
 def build_oof_leaderboard(aggregates: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    eligible = [
-        row for row in aggregates if row.get("status") == "PASS" and "metrics" in row
-    ]
+    eligible = [row for row in aggregates if row.get("status") == "PASS" and "metrics" in row]
     return sorted(
         eligible,
         key=lambda row: (
@@ -490,9 +482,7 @@ def lock_holdout_predictions(
         "visible_rows": visible_rows,
         "visible_values_sha256": canonical_sha256(visible.tolist()),
         "holdout_draw_no": request.dataset.draw_no[visible_rows:],
-        "holdout_draw_no_sha256": canonical_sha256(
-            request.dataset.draw_no[visible_rows:]
-        ),
+        "holdout_draw_no_sha256": canonical_sha256(request.dataset.draw_no[visible_rows:]),
         "selected_oof_candidate_id": selected_candidate_id,
         "all_candidate_predictions_locked": True,
         "actuals_known": False,

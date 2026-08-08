@@ -98,9 +98,7 @@ class ApprovalPolicy(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal["1.0"] = "1.0"
-    required_roles: tuple[
-        Literal["model_owner", "independent_reviewer"], ...
-    ] = REQUIRED_ROLES
+    required_roles: tuple[Literal["model_owner", "independent_reviewer"], ...] = REQUIRED_ROLES
     required_risk_acknowledgements: tuple[str, ...] = REQUIRED_RISKS
     authorization_ttl_seconds: int = Field(default=3600, ge=300, le=86400)
     require_distinct_approvers: Literal[True] = True
@@ -123,20 +121,14 @@ class ApprovalPolicy(BaseModel):
 class ApprovalIntent(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    schema_version: Literal["autogluon-p18-approval-intent-v1"] = (
-        "autogluon-p18-approval-intent-v1"
-    )
+    schema_version: Literal["autogluon-p18-approval-intent-v1"] = "autogluon-p18-approval-intent-v1"
     operation: Literal["issue_one_time_registry_authorization"] = (
         "issue_one_time_registry_authorization"
     )
     run_id: str = Field(pattern=r"^[A-Za-z0-9._-]+$", min_length=1)
     git_commit: str = Field(pattern=r"^[0-9a-f]{7,40}$")
-    approval_requested_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
-    authorization_expires_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    approval_requested_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+    authorization_expires_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     authorization_nonce: str = Field(pattern=r"^[0-9a-f]{64}$")
     allowed_signers_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     allowed_signer_identities: tuple[str, str]
@@ -176,15 +168,11 @@ class ApprovalIntent(BaseModel):
 class ApprovalDraft(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    schema_version: Literal["autogluon-p18-approval-draft-v1"] = (
-        "autogluon-p18-approval-draft-v1"
-    )
+    schema_version: Literal["autogluon-p18-approval-draft-v1"] = "autogluon-p18-approval-draft-v1"
     role: Literal["model_owner", "independent_reviewer"]
     approver_id: str = Field(pattern=r"^[A-Za-z0-9._@-]+$", min_length=2)
     signer_identity: str = Field(pattern=r"^[A-Za-z0-9._@-]+$", min_length=2)
-    approved_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    approved_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     decision: Literal["APPROVE"] = "APPROVE"
     approval_intent_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     signature_namespace: Literal["loto-autogluon-p18"] = SIGNATURE_NAMESPACE

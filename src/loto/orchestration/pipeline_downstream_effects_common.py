@@ -57,9 +57,7 @@ def reject_symlink_components(path: Path, *, label: str) -> None:
 def file_uri_path(uri: str) -> Path:
     parsed = urlparse(uri)
     if parsed.scheme != "file":
-        raise DownstreamCommitConflict(
-            f"artifact store returned a non-file URI: {uri}"
-        )
+        raise DownstreamCommitConflict(f"artifact store returned a non-file URI: {uri}")
     return Path(unquote(parsed.path))
 
 

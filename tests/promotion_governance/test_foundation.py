@@ -168,9 +168,7 @@ def context(
         accuracy_axis=AccuracyAxis.VERIFIED_ELIGIBLE,
         registry=registry,
         deployment=deployment,
-        human_approval=(
-            approval(item.subject_sha256, approval_scope) if approval_scope else None
-        ),
+        human_approval=(approval(item.subject_sha256, approval_scope) if approval_scope else None),
     )
 
 

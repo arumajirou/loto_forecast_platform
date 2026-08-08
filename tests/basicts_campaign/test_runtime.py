@@ -87,9 +87,7 @@ def provenance() -> dict[str, object]:
         "direct_url_sha256": "a" * 64,
         "direct_url_record_status": "PASS",
         "direct_url_record_entry": "BasicTS-1.1.0.dist-info/direct_url.json",
-        "direct_url_record_path": (
-            "/venv/site-packages/BasicTS-1.1.0.dist-info/direct_url.json"
-        ),
+        "direct_url_record_path": ("/venv/site-packages/BasicTS-1.1.0.dist-info/direct_url.json"),
         "direct_url_record_hash_mode": "sha256",
         "direct_url_record_hash_value": "A" * 43,
         "direct_url_record_size_bytes": 200,
@@ -159,14 +157,11 @@ def dlinear_modules() -> dict[str, object]:
         "preloaded_basicts_modules": [],
         "loaded_basicts_module_count": len(closure_names),
         "loaded_basicts_modules": [
-            _closure_item(module_name, index)
-            for index, module_name in enumerate(closure_names)
+            _closure_item(module_name, index) for index, module_name in enumerate(closure_names)
         ],
         "dlinear_dependency_binding_status": "PASS",
         "dlinear_dependency_bindings": {
-            "decomposition_symbol": (
-                f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"
-            ),
+            "decomposition_symbol": (f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"),
             "config_base_symbol": expected_base,
             "dlinear_config_direct_base": expected_base,
             "arch_decomposition_object_identity": True,

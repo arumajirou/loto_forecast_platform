@@ -90,9 +90,7 @@ def _seal(root: Path) -> None:
     lines = []
     for path in sorted(root.rglob("*")):
         if path.is_file() and path != manifest:
-            lines.append(
-                f"{sha256_file(path)}  {path.relative_to(root).as_posix()}"
-            )
+            lines.append(f"{sha256_file(path)}  {path.relative_to(root).as_posix()}")
     manifest.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -153,5 +151,3 @@ def test_relative_snapshot_is_rejected() -> None:
             source_identity=_source_identity(),
             created_at="2026-08-06T00:00:00+00:00",
         )
-
-

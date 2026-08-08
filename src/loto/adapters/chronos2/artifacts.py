@@ -36,9 +36,7 @@ def write_json_atomic(path: Path, value: Any) -> None:
 
 def write_sha256sums(root: Path, *, output_name: str = "SHA256SUMS") -> Path:
     output = root / output_name
-    files = sorted(
-        path for path in root.rglob("*") if path.is_file() and path.name != output_name
-    )
+    files = sorted(path for path in root.rglob("*") if path.is_file() and path.name != output_name)
     lines = [f"{sha256_file(path)}  {path.relative_to(root).as_posix()}" for path in files]
     output.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
     return output

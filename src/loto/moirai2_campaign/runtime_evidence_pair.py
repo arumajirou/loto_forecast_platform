@@ -12,6 +12,7 @@ from loto.moirai2_campaign.runtime_evidence_common import (
 )
 from loto.moirai2_campaign.runtime_evidence_prediction import _require_equal
 
+
 def _cross_lane_prediction_evidence(
     supported: CampaignVerification,
     cuda: CampaignVerification,
@@ -76,12 +77,10 @@ def verify_runtime_evidence_pair(
         "CPU and CUDA snapshot weight SHA values differ",
     )
     supported_artifact = {
-        (case.model_revision, case.config_sha256, case.weight_sha256)
-        for case in supported.cases
+        (case.model_revision, case.config_sha256, case.weight_sha256) for case in supported.cases
     }
     cuda_artifact = {
-        (case.model_revision, case.config_sha256, case.weight_sha256)
-        for case in cuda.cases
+        (case.model_revision, case.config_sha256, case.weight_sha256) for case in cuda.cases
     }
     _require_equal(supported_artifact, cuda_artifact, "CPU and CUDA model identities differ")
     cross_lane = _cross_lane_prediction_evidence(supported, cuda)
@@ -119,10 +118,7 @@ def write_sha256_manifest(root: Path, output_path: Path) -> None:
         for path in root.rglob("*")
         if path.is_file() and path.resolve() != output_path.resolve()
     )
-    lines = [
-        f"{sha256_file(path)}  {path.relative_to(root).as_posix()}"
-        for path in paths
-    ]
+    lines = [f"{sha256_file(path)}  {path.relative_to(root).as_posix()}" for path in paths]
     output_path.write_text(
         "\n".join(lines) + ("\n" if lines else ""),
         encoding="utf-8",

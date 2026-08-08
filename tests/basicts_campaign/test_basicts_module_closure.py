@@ -105,17 +105,13 @@ def _install(
         lambda name: distribution,
     )
 
-    basic_config = type(
-        "BasicTSModelConfig", (), {"__module__": MODEL_CONFIG_MODULE}
-    )
+    basic_config = type("BasicTSModelConfig", (), {"__module__": MODEL_CONFIG_MODULE})
     dlinear_config = type(
         "DLinearConfig",
         (basic_config,),
         {"__module__": DLINEAR_CONFIG_MODULE},
     )
-    moving_average = type(
-        "MovingAverageDecomposition", (), {"__module__": DECOMPOSITION_MODULE}
-    )
+    moving_average = type("MovingAverageDecomposition", (), {"__module__": DECOMPOSITION_MODULE})
     dlinear = type("DLinear", (), {"__module__": DLINEAR_ARCH_MODULE})
 
     modules: dict[str, types.ModuleType] = {}
@@ -224,13 +220,8 @@ def test_accepts_complete_loaded_basicts_closure(monkeypatch, tmp_path) -> None:
     assert evidence["dlinear_dependency_binding_status"] == "PASS"
     assert evidence["preloaded_basicts_modules"] == []
     assert evidence["loaded_basicts_module_count"] == len(MODULE_PATHS)
-    assert {item["module_name"] for item in evidence["loaded_basicts_modules"]} == set(
-        MODULE_PATHS
-    )
-    assert all(
-        item["record_status"] == "PASS"
-        for item in evidence["loaded_basicts_modules"]
-    )
+    assert {item["module_name"] for item in evidence["loaded_basicts_modules"]} == set(MODULE_PATHS)
+    assert all(item["record_status"] == "PASS" for item in evidence["loaded_basicts_modules"])
 
 
 def test_rejects_any_preloaded_basicts_module(monkeypatch, tmp_path) -> None:
@@ -279,9 +270,7 @@ def test_rejects_config_base_identity_drift(monkeypatch, tmp_path) -> None:
     def verify_critical():
         evidence = original()
         config = sys.modules[DLINEAR_CONFIG_MODULE]
-        config.BasicTSModelConfig = type(
-            "OtherConfig", (), {"__module__": "shadow.config"}
-        )
+        config.BasicTSModelConfig = type("OtherConfig", (), {"__module__": "shadow.config"})
         return evidence
 
     monkeypatch.setattr(provenance, "verify_dlinear_runtime_modules", verify_critical)

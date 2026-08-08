@@ -19,10 +19,7 @@ def main() -> int:
     write_inventory_csv(args.inventory, report["inventory"])
     print(f"LOCK_AUDIT_STATUS={report['status']}")
     print(f"LOCK_PACKAGE_COUNT={report['package_count']}")
-    print(
-        "LOCK_REQUIRES_PYTHON_EQUIVALENT="
-        f"{str(report['requires_python_equivalent']).lower()}"
-    )
+    print(f"LOCK_REQUIRES_PYTHON_EQUIVALENT={str(report['requires_python_equivalent']).lower()}")
     print(f"LOCK_AUDIT_REPORT={args.report.resolve()}")
     print(f"LOCK_INVENTORY={args.inventory.resolve()}")
     return 0 if report["status"] == "PASS" else 2

@@ -30,9 +30,7 @@ def main() -> int:
 
     predictions = pd.read_csv(args.predictions)
     folds = pd.read_csv(args.folds)
-    config = CalibrationConfig.model_validate_json(
-        Path(args.config).read_text(encoding="utf-8")
-    )
+    config = CalibrationConfig.model_validate_json(Path(args.config).read_text(encoding="utf-8"))
     result = run_calibration_evaluation(predictions, folds, config)
     artifacts = persist_calibration_result(result, args.output)
     print(json.dumps(artifacts, ensure_ascii=False, indent=2))

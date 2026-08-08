@@ -64,7 +64,8 @@ class _FakeMlflowClient:
             if all(
                 f"tags.{key} = '{value}'" in filter_string
                 for key, value in run.data.tags.items()
-                if key in {
+                if key
+                in {
                     "registry_id",
                     "registry_role",
                     "candidate_key",
@@ -210,14 +211,9 @@ def _frames() -> dict[str, pd.DataFrame]:
 
 
 def test_redact_uri_hides_credentials_and_query_values() -> None:
-    value = redact_uri(
-        "postgresql://user:password@db.example:5432/loto?sslmode=require&token=abc"
-    )
+    value = redact_uri("postgresql://user:password@db.example:5432/loto?sslmode=require&token=abc")
 
-    assert value == (
-        "postgresql://user:***@db.example:5432/loto?"
-        "sslmode=***&token=***"
-    )
+    assert value == ("postgresql://user:***@db.example:5432/loto?sslmode=***&token=***")
     assert "password" not in value
     assert "abc" not in value
 
@@ -267,17 +263,10 @@ def test_mlflow_parent_and_seed_children_are_idempotent(
     assert second["reused_child_count"] == 2
     assert len(client.runs) == 3
     parent = client.runs[first["parent_run_id"]]
-    children = [
-        run
-        for run in client.runs.values()
-        if run.data.tags.get("registry_role") == "seed"
-    ]
+    children = [run for run in client.runs.values() if run.data.tags.get("registry_role") == "seed"]
     assert parent.data.tags["registry_role"] == "parent"
     assert all(
-        child.data.tags["mlflow.parentRunId"] == first["parent_run_id"]
-        for child in children
+        child.data.tags["mlflow.parentRunId"] == first["parent_run_id"] for child in children
     )
     assert first["safe_uri"] == "http://user:***@mlflow.local"
-    assert client.artifacts == [
-        (first["parent_run_id"], str(evidence), "registry_evidence")
-    ]
+    assert client.artifacts == [(first["parent_run_id"], str(evidence), "registry_evidence")]

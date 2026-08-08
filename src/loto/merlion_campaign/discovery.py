@@ -62,9 +62,11 @@ def discover_factory_aliases(
             module = importlib.import_module(module_name)
             getattr(module, attribute)
         except Exception as exc:
-            status = "OPTIONAL_DEPENDENCY_MISSING" if isinstance(
-                exc, (ImportError, ModuleNotFoundError)
-            ) else "FAILED"
+            status = (
+                "OPTIONAL_DEPENDENCY_MISSING"
+                if isinstance(exc, (ImportError, ModuleNotFoundError))
+                else "FAILED"
+            )
             error = f"{type(exc).__name__}: {exc}"
         else:
             status = "IMPORTABLE"

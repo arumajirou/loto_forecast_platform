@@ -70,8 +70,6 @@ def _record_event(
     return event
 
 
-
-
 __all__ = [
     "_final_report_payload",
     "_load_events",

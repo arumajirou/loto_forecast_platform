@@ -73,9 +73,7 @@ def _request_metadata(request: HoldoutScoringRequest) -> dict[str, Any]:
 def _write_manifest_and_sha(output_dir: Path, *, status: str) -> None:
     excluded = {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     files = sorted(
-        path
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name not in excluded
+        path for path in output_dir.iterdir() if path.is_file() and path.name not in excluded
     )
     manifest = {
         "schema_version": "1.0",
@@ -92,17 +90,11 @@ def _write_manifest_and_sha(output_dir: Path, *, status: str) -> None:
     }
     _write_json(output_dir / "ARTIFACT_MANIFEST.json", manifest)
     hashed = sorted(
-        path
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     )
     _atomic_write_text(
         output_dir / "SHA256SUMS",
-        "\n".join(
-            f"{file_sha256(path)}  {path.name}"
-            for path in hashed
-        )
-        + "\n",
+        "\n".join(f"{file_sha256(path)}  {path.name}" for path in hashed) + "\n",
     )
 
 
@@ -128,9 +120,7 @@ def persist_p4(
         "candidate_result_count": len(result["holdout_results"]),
         "candidate_aggregate_count": len(result["candidate_aggregates"]),
         "selected_oof_candidate_id": result["selected_oof_candidate_id"],
-        "selected_holdout_rank": result["baseline_comparison"].get(
-            "selected_holdout_rank"
-        ),
+        "selected_holdout_rank": result["baseline_comparison"].get("selected_holdout_rank"),
         "scoring_scope": result["scoring_scope"],
         "model_execution": False,
         "retraining": False,
@@ -184,9 +174,7 @@ def _verify_sha256sums(output_dir: Path) -> None:
         if not target.is_file() or file_sha256(target) != expected:
             raise P4VerificationError(f"SHA-256 mismatch: {name}")
     expected_files = {
-        item.name
-        for item in output_dir.iterdir()
-        if item.is_file() and item.name != "SHA256SUMS"
+        item.name for item in output_dir.iterdir() if item.is_file() and item.name != "SHA256SUMS"
     }
     if seen != expected_files:
         raise P4VerificationError("SHA256SUMS coverage mismatch")
@@ -212,8 +200,7 @@ def _verify_manifest(output_dir: Path, *, expected_status: str) -> None:
     expected = {
         item.name
         for item in output_dir.iterdir()
-        if item.is_file()
-        and item.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if item.is_file() and item.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     }
     if seen != expected:
         raise P4VerificationError("manifest coverage mismatch")
@@ -239,40 +226,27 @@ def verify_p4(
         raise P4VerificationError("P4 unexpectedly claims retraining")
     if response.get("reprediction") is not False:
         raise P4VerificationError("P4 unexpectedly claims reprediction")
-    if response.get("promotion_status") != (
-        "HOLDOUT_SCORED_NOT_PROMOTED_PROSPECTIVE_REQUIRED"
-    ):
+    if response.get("promotion_status") != ("HOLDOUT_SCORED_NOT_PROMOTED_PROSPECTIVE_REQUIRED"):
         raise P4VerificationError("Holdout result was incorrectly promoted")
     if formal and response.get("status") != "PASS":
         raise P4VerificationError("formal P4 requires every locked row to PASS")
 
-    if _load_json(output_dir / "REQUEST_METADATA.json") != _request_metadata(
-        request
-    ):
+    if _load_json(output_dir / "REQUEST_METADATA.json") != _request_metadata(request):
         raise P4VerificationError("request metadata mismatch")
-    if _load_json(output_dir / "P3_LINEAGE.json") != expected[
-        "prediction_lock_lineage"
-    ]:
+    if _load_json(output_dir / "P3_LINEAGE.json") != expected["prediction_lock_lineage"]:
         raise P4VerificationError("P3 lineage mismatch")
-    if _load_json(output_dir / "HOLDOUT_ACTUALS.json") != request.actuals.model_dump(
-        mode="json"
-    ):
+    if _load_json(output_dir / "HOLDOUT_ACTUALS.json") != request.actuals.model_dump(mode="json"):
         raise P4VerificationError("Holdout actuals mismatch")
-    if _load_json(output_dir / "HOLDOUT_RESULTS.json") != expected[
-        "holdout_results"
-    ]:
+    if _load_json(output_dir / "HOLDOUT_RESULTS.json") != expected["holdout_results"]:
         raise P4VerificationError("Holdout result metrics mismatch")
-    if _load_json(
-        output_dir / "HOLDOUT_CANDIDATE_AGGREGATES.json"
-    ) != expected["candidate_aggregates"]:
+    if (
+        _load_json(output_dir / "HOLDOUT_CANDIDATE_AGGREGATES.json")
+        != expected["candidate_aggregates"]
+    ):
         raise P4VerificationError("Holdout candidate aggregates mismatch")
-    if _load_json(output_dir / "HOLDOUT_LEADERBOARD.json") != expected[
-        "leaderboard"
-    ]:
+    if _load_json(output_dir / "HOLDOUT_LEADERBOARD.json") != expected["leaderboard"]:
         raise P4VerificationError("Holdout leaderboard mismatch")
-    if _load_json(output_dir / "BASELINE_COMPARISON.json") != expected[
-        "baseline_comparison"
-    ]:
+    if _load_json(output_dir / "BASELINE_COMPARISON.json") != expected["baseline_comparison"]:
         raise P4VerificationError("baseline comparison mismatch")
 
     _verify_manifest(output_dir, expected_status=expected["status"])

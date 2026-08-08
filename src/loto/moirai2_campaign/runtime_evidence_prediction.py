@@ -11,11 +11,10 @@ from loto.moirai2_campaign.runtime_evidence_common import (
     sha256_payload,
 )
 
+
 def _require_equal(actual: Any, expected: Any, message: str) -> None:
     if actual != expected:
-        raise RuntimeEvidenceGateError(
-            f"{message}: expected={expected!r} actual={actual!r}"
-        )
+        raise RuntimeEvidenceGateError(f"{message}: expected={expected!r} actual={actual!r}")
 
 
 def _require_true(value: Any, message: str) -> None:
@@ -59,9 +58,7 @@ def _shape(value: Any) -> tuple[int, ...]:
         if len(shapes) != 1:
             raise RuntimeEvidenceGateError("prediction arrays are ragged")
         return (len(value), *next(iter(shapes)))
-    raise RuntimeEvidenceGateError(
-        f"prediction shape value is unsupported: {type(value).__name__}"
-    )
+    raise RuntimeEvidenceGateError(f"prediction shape value is unsupported: {type(value).__name__}")
 
 
 def _flatten(value: Any) -> list[float]:
@@ -114,8 +111,7 @@ def _artifact_identity(response: dict[str, Any]) -> tuple[str, str, str]:
     if not isinstance(artifact, dict):
         raise RuntimeEvidenceGateError("artifact_reference is missing")
     values = tuple(
-        str(artifact.get(key, ""))
-        for key in ("model_revision", "config_sha256", "weight_sha256")
+        str(artifact.get(key, "")) for key in ("model_revision", "config_sha256", "weight_sha256")
     )
     if not values[0] or not all(_SHA256_PATTERN.fullmatch(value) for value in values[1:]):
         raise RuntimeEvidenceGateError("model artifact identity is invalid")
@@ -174,9 +170,7 @@ def validate_response_device(
         *[str(item) for item in forward.get("input_tensor_devices", [])],
         *[str(item) for item in forward.get("output_tensor_devices", [])],
     ]
-    if len(observed) < 4 or any(
-        not value.startswith(requested_device) for value in observed
-    ):
+    if len(observed) < 4 or any(not value.startswith(requested_device) for value in observed):
         raise RuntimeEvidenceGateError(
             f"observed tensor/module devices differ from {requested_device}: {observed}"
         )
@@ -188,6 +182,3 @@ def validate_response_device(
     elif gpu.get("gpu_pid") is not None:
         raise RuntimeEvidenceGateError("CPU response reports a GPU PID")
     return process_id
-
-
-

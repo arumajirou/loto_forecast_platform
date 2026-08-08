@@ -28,6 +28,7 @@ from loto.orchestration.pipeline_downstream_types import (
     DownstreamStepStatus,
 )
 
+
 def execute_downstream_commit(
     output_dir: str | Path,
     *,
@@ -54,25 +55,15 @@ def execute_downstream_commit(
             or existing_receipt.status is not DownstreamCommitStatus.COMMITTED
             or set(existing_receipt.step_results) != set(STEP_ORDER)
         ):
-            raise DownstreamCommitConflict(
-                "existing receipt conflicts with prepared commit"
-            )
+            raise DownstreamCommitConflict("existing receipt conflicts with prepared commit")
         existing_state = _load_state(state_path)
         if existing_state is None:
-            raise DownstreamCommitConflict(
-                "committed receipt exists without transaction state"
-            )
+            raise DownstreamCommitConflict("committed receipt exists without transaction state")
         _verify_state_identity(existing_state, prepared)
-        if (
-            existing_state.status is not DownstreamCommitStatus.COMMITTED
-            or any(
-                item.status is not DownstreamStepStatus.SUCCEEDED
-                for item in existing_state.steps
-            )
+        if existing_state.status is not DownstreamCommitStatus.COMMITTED or any(
+            item.status is not DownstreamStepStatus.SUCCEEDED for item in existing_state.steps
         ):
-            raise DownstreamCommitConflict(
-                "receipt and transaction state disagree"
-            )
+            raise DownstreamCommitConflict("receipt and transaction state disagree")
         verify_prepared_snapshot(prepared)
         return existing_receipt
 
@@ -108,9 +99,7 @@ def execute_downstream_commit(
             except DownstreamCommitConflict as exc:
                 step.status = DownstreamStepStatus.FAILED
                 step.finished_at = _utc_now()
-                step.error = (
-                    f"{type(exc).__name__}:{str(exc)[:3500]}"
-                )
+                step.error = f"{type(exc).__name__}:{str(exc)[:3500]}"
                 state.status = DownstreamCommitStatus.RETRY_REQUIRED
                 state.updated_at = _utc_now()
                 _atomic_write_json(
@@ -121,9 +110,7 @@ def execute_downstream_commit(
             except Exception as exc:
                 step.status = DownstreamStepStatus.FAILED
                 step.finished_at = _utc_now()
-                step.error = (
-                    f"{type(exc).__name__}:{str(exc)[:3500]}"
-                )
+                step.error = f"{type(exc).__name__}:{str(exc)[:3500]}"
                 state.status = DownstreamCommitStatus.RETRY_REQUIRED
                 state.updated_at = _utc_now()
                 _atomic_write_json(
@@ -133,8 +120,7 @@ def execute_downstream_commit(
                 if isinstance(exc, DownstreamCommitRetryable):
                     raise
                 raise DownstreamCommitRetryable(
-                    f"{step.name} failed: "
-                    f"{type(exc).__name__}:{str(exc)[:500]}"
+                    f"{step.name} failed: {type(exc).__name__}:{str(exc)[:500]}"
                 ) from exc
             step.status = DownstreamStepStatus.SUCCEEDED
             step.finished_at = _utc_now()
@@ -156,9 +142,7 @@ def execute_downstream_commit(
             forecast_id=prepared.forecast_id,
             model_id=prepared.model_id,
             committed_at=_utc_now(),
-            step_results={
-                item.name: dict(item.result) for item in state.steps
-            },
+            step_results={item.name: dict(item.result) for item in state.steps},
         )
         _atomic_write_json(
             receipt_path,

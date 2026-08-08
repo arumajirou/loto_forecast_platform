@@ -82,9 +82,7 @@ def test_package_run_creates_verified_zip_and_sidecar(
             assert info.compress_type == zipfile.ZIP_STORED
             assert info.date_time == pc._FIXED_ZIP_TIMESTAMP
             assert (info.external_attr >> 16) & 0xFFFF == pc._REGULAR_FILE_MODE
-        manifest = json.loads(
-            archive.read(f"{run_dir.name}/{pc.PACKAGE_MANIFEST}").decode("utf-8")
-        )
+        manifest = json.loads(archive.read(f"{run_dir.name}/{pc.PACKAGE_MANIFEST}").decode("utf-8"))
         assert manifest["run_id"] == run_dir.name
         assert manifest["certification_status"] == "VERIFIED"
         assert len(manifest["files"]) == 5

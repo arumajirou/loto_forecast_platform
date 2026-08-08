@@ -48,9 +48,7 @@ def run_auto_research_with_ledger(
         )
     output = absolute(raw.get("output", "runs/auto-coverage-ledger"))
     root = Path(__file__).resolve().parents[3]
-    audited = absolute(
-        auto_source or root / "src/loto/coverage/auto_research.py"
-    )
+    audited = absolute(auto_source or root / "src/loto/coverage/auto_research.py")
     source_pin(
         source=audited,
         expected=expected_auto_blob_sha,
@@ -58,14 +56,10 @@ def run_auto_research_with_ledger(
     )
     games_cfg = raw.get("games", {})
     if not games_cfg:
-        raise CoverageLedgerPreflightError(
-            "auto research games mapping is empty"
-        )
+        raise CoverageLedgerPreflightError("auto research games mapping is empty")
     for game, game_cfg in games_cfg.items():
         if game in auto.GAME_GEOMETRY:
-            require_regular_file(
-                absolute(game_cfg["input"]), label=f"{game} input"
-            )
+            require_regular_file(absolute(game_cfg["input"]), label=f"{game} input")
     require_empty_output(output)
 
     budget = auto.SearchBudget(**raw.get("budget", {}))
@@ -95,9 +89,7 @@ def run_auto_research_with_ledger(
 
     with (output / "experiments.jsonl").open("w", encoding="utf-8") as handle:
         for record in state["completed"].values():
-            handle.write(
-                json.dumps(record, ensure_ascii=False, default=str) + "\n"
-            )
+            handle.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
     summary = {
         "schema_version": "1.0.0",
         "status": final_status(summaries, blocked),
@@ -115,10 +107,9 @@ def run_auto_research_with_ledger(
     }
     atomic_write_json(output / "auto_research_summary.json", summary)
     if blocked:
-        raise CoverageLedgerBlocked(
-            "auto research was blocked by incomplete experiment evidence"
-        )
+        raise CoverageLedgerBlocked("auto research was blocked by incomplete experiment evidence")
     return summary
+
 
 def final_status(summaries: dict[str, Any], blocked: bool) -> str:
     if blocked:
@@ -126,4 +117,3 @@ def final_status(summaries: dict[str, Any], blocked: bool) -> str:
     if all(item.get("status") == "TARGET_MET" for item in summaries.values()):
         return "TARGET_MET_ALL"
     return "TARGET_NOT_MET_ALL"
-

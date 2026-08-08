@@ -25,13 +25,16 @@ from .runtime_source import verify_working_source
 def _atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
-    content = json.dumps(
-        payload,
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-        allow_nan=False,
-    ) + "\n"
+    content = (
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n"
+    )
     try:
         with temporary.open("w", encoding="utf-8") as handle:
             handle.write(content)
@@ -45,10 +48,7 @@ def _atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
 def synthetic_values(length: int, seed: int) -> list[float]:
     """Produce deterministic bounded values without reading project data."""
 
-    return [
-        float(((index * 11) + (seed * 5)) % 41 + 1)
-        for index in range(length)
-    ]
+    return [float(((index * 11) + (seed * 5)) % 41 + 1) for index in range(length)]
 
 
 def _prediction_matrix(
@@ -59,20 +59,15 @@ def _prediction_matrix(
 ) -> tuple[tuple[float, ...], ...]:
     if alias not in frame.columns:
         excluded = {"unique_id", "ds", "cutoff"}
-        candidates = [
-            column for column in frame.columns if column not in excluded
-        ]
+        candidates = [column for column in frame.columns if column not in excluded]
         if len(candidates) != 1:
             raise RuntimeError(
-                "prediction output does not expose the expected alias: "
-                f"candidates={candidates}"
+                f"prediction output does not expose the expected alias: candidates={candidates}"
             )
         alias = candidates[0]
     values = [float(value) for value in frame[alias].tolist()]
     if len(values) != horizon:
-        raise RuntimeError(
-            f"prediction horizon mismatch: expected {horizon}, got {len(values)}"
-        )
+        raise RuntimeError(f"prediction horizon mismatch: expected {horizon}, got {len(values)}")
     return (tuple(values),)
 
 
@@ -80,15 +75,9 @@ def _maximum_difference(
     first: tuple[tuple[float, ...], ...],
     second: tuple[tuple[float, ...], ...],
 ) -> float:
-    if len(first) != len(second) or any(
-        len(a) != len(b) for a, b in zip(first, second)
-    ):
+    if len(first) != len(second) or any(len(a) != len(b) for a, b in zip(first, second)):
         raise RuntimeError("pre-save and post-load prediction shapes differ")
-    return max(
-        abs(a - b)
-        for row_a, row_b in zip(first, second)
-        for a, b in zip(row_a, row_b)
-    )
+    return max(abs(a - b) for row_a, row_b in zip(first, second) for a, b in zip(row_a, row_b))
 
 
 def parse_nvidia_smi_output(
@@ -180,9 +169,7 @@ def _parameter_device(model: Any) -> str:
         )
         if device_type in {"cpu", "cuda"}:
             return device_type
-    raise RuntimeError(
-        "fitted model does not expose a CPU or CUDA parameter device"
-    )
+    raise RuntimeError("fitted model does not expose a CPU or CUDA parameter device")
 
 
 def _fitted_model_class(model: Any) -> str:
@@ -204,9 +191,7 @@ def _frets_evidence(model: Any) -> dict[str, Any]:
     architecture = getattr(candidate, "loto_architecture", None)
     if not isinstance(architecture, dict):
         raise RuntimeError("FreTS architecture evidence is missing")
-    expected_parameter_count = int(
-        architecture["expected_parameter_count"]
-    )
+    expected_parameter_count = int(architecture["expected_parameter_count"])
     temporal_fft_bins = int(architecture["temporal_fft_bins"])
     parameters = list(candidate.parameters())
     parameter_count = sum(parameter.numel() for parameter in parameters)
@@ -226,9 +211,7 @@ def _frets_evidence(model: Any) -> dict[str, Any]:
     if fft_dtype != "float32":
         raise RuntimeError("FreTS runtime did not retain float32 FFT evidence")
     if channel_mixing is not False:
-        raise RuntimeError(
-            "FreTS runtime unexpectedly enabled channel-frequency mixing"
-        )
+        raise RuntimeError("FreTS runtime unexpectedly enabled channel-frequency mixing")
     return {
         "fft_dtype": fft_dtype,
         "temporal_fft_bins": temporal_fft_bins,
@@ -333,9 +316,7 @@ def _run_provider(
             f"got {installed_version}"
         )
     if request.requested_device == "cuda" and not torch.cuda.is_available():
-        raise RuntimeError(
-            "CUDA was requested but torch.cuda.is_available() is false"
-        )
+        raise RuntimeError("CUDA was requested but torch.cuda.is_available() is false")
 
     random.seed(request.seed)
     np.random.seed(request.seed)
@@ -352,10 +333,7 @@ def _run_provider(
             "y": np.asarray(values, dtype=np.float32),
         }
     )
-    if (
-        history.isna().any().any()
-        or not np.isfinite(history["y"].to_numpy()).all()
-    ):
+    if history.isna().any().any() or not np.isfinite(history["y"].to_numpy()).all():
         raise RuntimeError("synthetic runtime input is invalid")
     if history["y"].to_numpy().dtype != np.float32:
         raise RuntimeError("synthetic FreTS input must be float32")
@@ -399,10 +377,7 @@ def _run_provider(
     fitted_model = reloaded.models[0]
     model_evidence = _frets_evidence(fitted_model)
     effective_device = _parameter_device(fitted_model)
-    cpu_fallback = (
-        request.requested_device == "cuda"
-        and effective_device != "cuda"
-    )
+    cpu_fallback = request.requested_device == "cuda" and effective_device != "cuda"
     provider_pid = os.getpid()
     if effective_device == "cuda":
         peak_vram = max(
@@ -411,9 +386,7 @@ def _run_provider(
         )
         samples = _capture_gpu_samples(provider_pid)
         if not samples:
-            raise RuntimeError(
-                "CUDA execution lacks matching nvidia-smi PID evidence"
-            )
+            raise RuntimeError("CUDA execution lacks matching nvidia-smi PID evidence")
         gpu_uuid = samples[0].gpu_uuid
         provider_gpu_pid = provider_pid
     else:

@@ -13,6 +13,7 @@ from loto.orchestration.pipeline_downstream_commit import (
 )
 from loto.orchestration.pipeline_downstream_types import DownstreamCommitStatus
 
+
 class FakeEffects:
     def __init__(self, *, fail_once: str | None = None):
         self.calls: list[str] = []
@@ -43,11 +44,15 @@ class FakeEffects:
 
     def ensure_event(self, prepared):
         return self._run("event_publication")
+
+
 def _write_json(path: Path, payload) -> None:
     path.write_text(
         json.dumps(payload, sort_keys=True),
         encoding="utf-8",
     )
+
+
 def make_staged_output(root: Path) -> dict:
     root.mkdir()
     run_id = "pipeline-ledger-test"
@@ -72,10 +77,7 @@ def make_staged_output(root: Path) -> dict:
             "deferred_operations": [
                 "Registry.record_stage",
                 "Registry.record_forecast",
-                (
-                    "PlatformRegistry.create_run/update_run/"
-                    "register_forecast/register_model"
-                ),
+                ("PlatformRegistry.create_run/update_run/register_forecast/register_model"),
                 "MlflowBridge.record_run",
                 "create_release_bundle",
                 "ArtifactStore.put_file",
@@ -152,14 +154,20 @@ def make_staged_output(root: Path) -> dict:
         "ledger_sha256": ledger_sha,
         "forecast": forecast,
     }
+
+
 def fake_validator(ledger, saved):
     return {
         "run_id": ledger["run_id"],
         "ledger_sha256": ledger["ledger_sha256"],
         "verified_events": saved["verified_event_count"],
     }
+
+
 def fake_seal_verifier(sealed, secret):
     return sealed.get("signature") == "test" and len(secret) >= 16
+
+
 def execute(root: Path, effects: FakeEffects):
     return execute_downstream_commit(
         root,
@@ -193,6 +201,7 @@ def test_success_and_receipt_short_circuit(tmp_path: Path) -> None:
     assert repeated.commit_id == receipt.commit_id
     assert second.calls == []
 
+
 def test_retry_skips_completed_steps(tmp_path: Path) -> None:
     root = tmp_path / "run"
     make_staged_output(root)
@@ -204,9 +213,7 @@ def test_retry_skips_completed_steps(tmp_path: Path) -> None:
     ):
         execute(root, effects)
 
-    state = json.loads(
-        (root / "downstream_commit_state.json").read_text()
-    )
+    state = json.loads((root / "downstream_commit_state.json").read_text())
     assert state["status"] == "RETRY_REQUIRED"
     assert state["steps"][0]["status"] == "SUCCEEDED"
     assert state["steps"][1]["status"] == "SUCCEEDED"
@@ -218,6 +225,7 @@ def test_retry_skips_completed_steps(tmp_path: Path) -> None:
     assert effects.calls.count("artifact_store") == 1
     assert effects.calls.count("mlflow") == 2
     assert effects.calls.count("event_publication") == 1
+
 
 def test_changed_snapshot_conflicts_with_journal(tmp_path: Path) -> None:
     root = tmp_path / "run"
@@ -233,6 +241,7 @@ def test_changed_snapshot_conflicts_with_journal(tmp_path: Path) -> None:
         match="another prepared snapshot",
     ):
         execute(root, FakeEffects())
+
 
 def test_invalid_plan_blocks_before_state(tmp_path: Path) -> None:
     root = tmp_path / "run"
@@ -250,6 +259,7 @@ def test_invalid_plan_blocks_before_state(tmp_path: Path) -> None:
         execute(root, effects)
     assert effects.calls == []
     assert not (root / "downstream_commit_state.json").exists()
+
 
 def test_unverified_seal_blocks_before_side_effects(
     tmp_path: Path,
@@ -269,6 +279,7 @@ def test_unverified_seal_blocks_before_side_effects(
         execute(root, effects)
     assert effects.calls == []
 
+
 def test_existing_lock_is_retryable(tmp_path: Path) -> None:
     root = tmp_path / "run"
     make_staged_output(root)
@@ -281,6 +292,7 @@ def test_existing_lock_is_retryable(tmp_path: Path) -> None:
         match="lock already exists",
     ):
         execute(root, FakeEffects())
+
 
 def test_conflicting_receipt_is_rejected(tmp_path: Path) -> None:
     root = tmp_path / "run"
@@ -307,6 +319,7 @@ def test_conflicting_receipt_is_rejected(tmp_path: Path) -> None:
         match="receipt conflicts",
     ):
         execute(root, FakeEffects())
+
 
 def test_duplicate_json_keys_are_rejected(tmp_path: Path) -> None:
     root = tmp_path / "run"

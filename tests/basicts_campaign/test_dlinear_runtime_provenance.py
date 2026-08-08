@@ -93,8 +93,7 @@ def _install(
         DLINEAR_CONFIG_MODULE: config_origin or config,
     }
     specs = {
-        name: importlib.util.spec_from_file_location(name, path)
-        for name, path in origins.items()
+        name: importlib.util.spec_from_file_location(name, path) for name, path in origins.items()
     }
     monkeypatch.setattr(
         provenance.importlib.util,

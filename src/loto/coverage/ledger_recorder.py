@@ -37,15 +37,9 @@ class CoverageLedgerRecorder(CoverageRecorderEventsMixin, CoverageRecorderBase):
         gaps = list(self.coverage_gaps)
         gaps.extend(item.code.value for item in validation.findings)
         gaps = list(dict.fromkeys(gaps))
-        status = (
-            "PASS"
-            if not gaps and validation.status is AccessDecision.PASS
-            else "BLOCKED"
-        )
+        status = "PASS" if not gaps and validation.status is AccessDecision.PASS else "BLOCKED"
         ledger_path = self.output_dir / "coverage_data_access_ledger.json"
-        validation_path = (
-            self.output_dir / "coverage_data_access_validation.json"
-        )
+        validation_path = self.output_dir / "coverage_data_access_validation.json"
         report_path = self.output_dir / "coverage_data_access_report.json"
         atomic_write_json(ledger_path, ledger.model_dump(mode="json"))
         atomic_write_json(
@@ -81,7 +75,5 @@ class CoverageLedgerRecorder(CoverageRecorderEventsMixin, CoverageRecorderBase):
             coverage_gaps=tuple(gaps),
         )
         if status != "PASS":
-            raise CoverageLedgerBlocked(
-                "coverage ledger blocked: " + ", ".join(gaps)
-            )
+            raise CoverageLedgerBlocked("coverage ledger blocked: " + ", ".join(gaps))
         return result

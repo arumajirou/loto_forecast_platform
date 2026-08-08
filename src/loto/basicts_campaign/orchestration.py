@@ -88,9 +88,7 @@ def _write_json(path: Path, payload: Any) -> None:
 def _safe_run_id(value: str) -> str:
     allowed = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_"
     if not value or any(character not in allowed for character in value):
-        raise OrchestrationError(
-            "run_id must contain only letters, numbers, dash, or underscore"
-        )
+        raise OrchestrationError("run_id must contain only letters, numbers, dash, or underscore")
     return value
 
 
@@ -105,17 +103,13 @@ def _require_repo_root(repo_root: Path) -> Path:
     )
     missing = [str(path) for path in required if not path.is_file()]
     if missing:
-        raise OrchestrationError(
-            f"repository root is incomplete: missing={missing}"
-        )
+        raise OrchestrationError(f"repository root is incomplete: missing={missing}")
     return resolved
 
 
 def _prepend_pythonpath(env: dict[str, str], src_dir: Path) -> None:
     current = env.get("PYTHONPATH")
-    env["PYTHONPATH"] = (
-        str(src_dir) if not current else f"{src_dir}{os.pathsep}{current}"
-    )
+    env["PYTHONPATH"] = str(src_dir) if not current else f"{src_dir}{os.pathsep}{current}"
 
 
 def _timeout_text(value: str | bytes | None) -> str:
@@ -135,9 +129,7 @@ def _run_checked(
     log_dir: Path,
     timeout_seconds: int,
 ) -> CommandResult:
-    if not command or any(
-        not isinstance(part, str) or not part for part in command
-    ):
+    if not command or any(not isinstance(part, str) or not part for part in command):
         raise OrchestrationError(f"invalid command for phase {phase}")
     stdout_path = log_dir / f"{phase}.stdout.log"
     stderr_path = log_dir / f"{phase}.stderr.log"
@@ -176,8 +168,7 @@ def _run_checked(
     )
     if completed.returncode != 0:
         raise CommandExecutionError(
-            f"phase {phase} failed with returncode={completed.returncode}; "
-            f"stderr={stderr_path}",
+            f"phase {phase} failed with returncode={completed.returncode}; stderr={stderr_path}",
             result,
         )
     return result
@@ -203,9 +194,7 @@ def _regular_run_files(run_dir: Path) -> list[Path]:
     files: list[Path] = []
     for path in run_dir.rglob("*"):
         if path.is_symlink():
-            raise OrchestrationError(
-                f"symbolic links are forbidden in P0 evidence: {path}"
-            )
+            raise OrchestrationError(f"symbolic links are forbidden in P0 evidence: {path}")
         if path.is_file():
             files.append(path)
     return sorted(files)
@@ -239,10 +228,7 @@ def _write_portable_bundle(run_dir: Path, payload: dict[str, Any]) -> None:
     ]
     _atomic_write_text(
         run_dir / "SHA256SUMS",
-        "".join(
-            f"{_sha256(path)}  {path.relative_to(run_dir).as_posix()}\n"
-            for path in hashed
-        ),
+        "".join(f"{_sha256(path)}  {path.relative_to(run_dir).as_posix()}\n" for path in hashed),
     )
 
 
@@ -264,18 +250,14 @@ def _request_evidence(requests: dict[str, Path]) -> list[dict[str, Any]]:
 def _read_git_commit(result: CommandResult) -> str:
     commit = Path(result.stdout_path).read_text(encoding="utf-8").strip()
     if COMMIT_PATTERN.fullmatch(commit) is None:
-        raise OrchestrationError(
-            f"git rev-parse returned an invalid commit: {commit!r}"
-        )
+        raise OrchestrationError(f"git rev-parse returned an invalid commit: {commit!r}")
     return commit
 
 
 def _require_clean_git(result: CommandResult) -> None:
     status = Path(result.stdout_path).read_text(encoding="utf-8")
     if status.strip():
-        raise OrchestrationError(
-            "tracked repository changes must be committed before P0 execution"
-        )
+        raise OrchestrationError("tracked repository changes must be committed before P0 execution")
 
 
 def _prepared_lock_sha256(artifacts_root: Path, lockfile: Path) -> str | None:
@@ -289,9 +271,7 @@ def _prepared_lock_sha256(artifacts_root: Path, lockfile: Path) -> str | None:
     try:
         audit = json.loads(audit_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise OrchestrationError(
-            f"cannot read formal preflight audit: {audit_path}"
-        ) from exc
+        raise OrchestrationError(f"cannot read formal preflight audit: {audit_path}") from exc
     if not isinstance(audit, dict) or audit.get("status") != "PASS":
         raise OrchestrationError("formal preflight audit did not record PASS")
     lock_record = audit.get("lockfile")
@@ -550,9 +530,7 @@ def run_p0(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Run and certify BasicTS P0 on a target host"
-    )
+    parser = argparse.ArgumentParser(description="Run and certify BasicTS P0 on a target host")
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     parser.add_argument(
         "--artifacts-root",

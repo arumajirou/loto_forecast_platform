@@ -141,9 +141,9 @@ def run_trusted_vertical_slice_staged(
             adapter = adapter_type().fit(hist_candidates)
             prediction = adapter.predict(query)
             position = deps.PositionFrequencyAdapter().fit(history).predict_matrix()
-            decoded = deps.decode_hybrid(
-                prediction["rank_score"].to_numpy(), position, top_k=1
-            )[0].numbers
+            decoded = deps.decode_hybrid(prediction["rank_score"].to_numpy(), position, top_k=1)[
+                0
+            ].numbers
             recorder.record_oof_prediction(
                 model_id=model_id,
                 fold_id=fold_id,
@@ -168,14 +168,10 @@ def run_trusted_vertical_slice_staged(
                 actual=fold_actual,
                 predicted=deps.np.asarray([decoded]),
                 targets=fold_target,
-                probabilities=deps.np.asarray(
-                    [prediction["probability"].to_numpy()]
-                ),
+                probabilities=deps.np.asarray([prediction["probability"].to_numpy()]),
                 components=deps,
             )
-            per_draw_metrics.append(
-                {"model_id": model_id, "fold_id": fold_id, **fold_metric}
-            )
+            per_draw_metrics.append({"model_id": model_id, "fold_id": fold_id, **fold_metric})
             recorder.record_oof_score(model_id=model_id, fold_id=fold_id)
 
         uniform_prediction, uniform_decoded = predictions["uniform"]
@@ -217,8 +213,7 @@ def run_trusted_vertical_slice_staged(
 
     champion = (
         "frequency"
-        if metrics_frequency["mean_hits_at_7"]
-        > metrics_uniform["mean_hits_at_7"]
+        if metrics_frequency["mean_hits_at_7"] > metrics_uniform["mean_hits_at_7"]
         and metrics_frequency["brier"] <= metrics_uniform["brier"] * 1.02
         else "uniform"
     )
@@ -236,16 +231,12 @@ def run_trusted_vertical_slice_staged(
     all_candidates = deps.to_candidate_table(master)
     next_query = deps.build_next_candidate_features(master, windows=windows)
     adapter_type = (
-        deps.FrequencyCandidateAdapter
-        if champion == "frequency"
-        else deps.UniformCandidateAdapter
+        deps.FrequencyCandidateAdapter if champion == "frequency" else deps.UniformCandidateAdapter
     )
     model = adapter_type().fit(all_candidates)
     prediction = model.predict(next_query)
     position = deps.PositionFrequencyAdapter().fit(master).predict_matrix()
-    combinations = deps.decode_hybrid(
-        prediction["rank_score"].to_numpy(), position, top_k=20
-    )
+    combinations = deps.decode_hybrid(prediction["rank_score"].to_numpy(), position, top_k=20)
     created = _utc(now())
     draw_time = max(
         created + timedelta(minutes=1),

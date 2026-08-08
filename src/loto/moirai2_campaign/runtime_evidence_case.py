@@ -22,6 +22,7 @@ from loto.moirai2_campaign.runtime_evidence_prediction import (
     validate_response_device,
 )
 
+
 def _request_identity(request: dict[str, Any]) -> dict[str, Any]:
     return {
         "model_id": request.get("model_id"),
@@ -56,9 +57,7 @@ def verify_case(
         request.get("local_files_only"),
         "request local_files_only is not true",
     )
-    case_result = load_json_object(
-        _required_file(case_dir, "campaign_case_result.json")
-    )
+    case_result = load_json_object(_required_file(case_dir, "campaign_case_result.json"))
     _require_equal(case_result.get("case"), case_name, "case result name differs")
     _require_equal(case_result.get("status"), "PASS", "case result did not pass")
     _require_equal(
@@ -213,5 +212,3 @@ def verify_case(
         quantile_keys=EXPECTED_QUANTILE_KEYS,
         external_gpu_verified=requested_device == "cuda",
     )
-
-

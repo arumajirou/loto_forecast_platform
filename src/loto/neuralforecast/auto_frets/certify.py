@@ -43,10 +43,7 @@ def fingerprint(
         "model_id": "nf-local-auto-frets",
         "source_revision": source_revision,
         "source_tree_sha256": canonical_source_tree_sha256(files),
-        "files": [
-            item.model_dump(mode="json")
-            for item in files
-        ],
+        "files": [item.model_dump(mode="json") for item in files],
     }
 
 

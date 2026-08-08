@@ -118,7 +118,6 @@ def _verify_sha256sums(root: Path) -> None:
         assert actual == expected
 
 
-
 def test_config_requires_interval_quantiles() -> None:
     with pytest.raises(ValidationError, match="interval endpoints"):
         _config(quantile_levels=(0.1, 0.5, 0.9))
@@ -201,9 +200,7 @@ def test_quantile_and_conformal_variants_are_emitted() -> None:
         "chronos2_bias_quantile_calibrated",
         "chronos2_bias_quantile_conformal",
     }
-    conformal = result.predictions.query(
-        "candidate == 'chronos2_bias_quantile_conformal'"
-    )
+    conformal = result.predictions.query("candidate == 'chronos2_bias_quantile_conformal'")
     assert conformal["q_0.05"].notna().all()
     assert conformal["q_0.95"].notna().all()
 
@@ -217,9 +214,9 @@ def test_conformal_intervals_are_not_narrower_than_quantile_intervals() -> None:
     conformal = result.predictions.query(
         "candidate == 'chronos2_bias_quantile_conformal'"
     ).reset_index(drop=True)
-    assert ((conformal["q_0.95"] - conformal["q_0.05"]) >= (
-        quantile["q_0.95"] - quantile["q_0.05"]
-    )).all()
+    assert (
+        (conformal["q_0.95"] - conformal["q_0.05"]) >= (quantile["q_0.95"] - quantile["q_0.05"])
+    ).all()
 
 
 def test_parameters_preserve_fit_and_conformal_hashes() -> None:
@@ -337,5 +334,3 @@ def test_comparison_disables_automatic_promotion() -> None:
     comparison = run_calibration_evaluation(predictions, folds, _config()).comparison
     assert not comparison["automatic_promotion"].any()
     assert "delta_hit_at_1" in comparison.columns
-
-

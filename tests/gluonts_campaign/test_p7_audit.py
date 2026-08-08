@@ -24,12 +24,8 @@ def make_repo(tmp_path: Path) -> Path:
     for lane in ("compat", "latest"):
         lane_root = repo / f"environments/gluonts-{lane}"
         lane_root.mkdir(parents=True)
-        (lane_root / "pyproject.toml").write_text(
-            f"[project]\nname='lane-{lane}'\n"
-        )
-        (lane_root / "uv.lock").write_text(
-            f"version = 1\nlane = '{lane}'\n"
-        )
+        (lane_root / "pyproject.toml").write_text(f"[project]\nname='lane-{lane}'\n")
+        (lane_root / "uv.lock").write_text(f"version = 1\nlane = '{lane}'\n")
     source = repo / "src/loto/adapters/gluonts"
     source.mkdir(parents=True)
     (source / "p6_registry.py").write_text("REGISTRY = 1\n")
@@ -106,11 +102,7 @@ def make_lane_artifacts(
         "workers": 8,
         "registry_sha256": registry_sha,
         "models": models,
-        "errors": (
-            ["one or more model lifecycles failed"]
-            if failed_model
-            else []
-        ),
+        "errors": (["one or more model lifecycles failed"] if failed_model else []),
     }
     result_path = root / "p6_campaign_result.json"
     result_sha = atomic_write_json(result_path, campaign)
@@ -122,9 +114,7 @@ def make_lane_artifacts(
         "registry_sha256": registry_sha,
         "campaign_result_sha256": result_sha,
         "campaign_payload_sha256": sha256_json(campaign),
-        "model_statuses": {
-            row["model_class"]: row["status"] for row in models
-        },
+        "model_statuses": {row["model_class"]: row["status"] for row in models},
     }
     manifest_path = root / "p6_campaign_manifest.json"
     atomic_write_json(manifest_path, manifest)
@@ -150,12 +140,8 @@ def make_lane_artifacts(
             "lane_uv_lock": sha256_file(lane_root / "uv.lock"),
             "campaign_result": sha256_file(result_path),
             "campaign_manifest": sha256_file(manifest_path),
-            "registry_source": sha256_file(
-                repo / "src/loto/adapters/gluonts/p6_registry.py"
-            ),
-            "contract_source": sha256_file(
-                repo / "src/loto/adapters/gluonts/p6_contract.py"
-            ),
+            "registry_source": sha256_file(repo / "src/loto/adapters/gluonts/p6_registry.py"),
+            "contract_source": sha256_file(repo / "src/loto/adapters/gluonts/p6_contract.py"),
         },
     }
     atomic_write_json(root / "p6_environment_provenance.json", provenance)
@@ -221,9 +207,7 @@ def test_model_failure_is_valid_classified_evidence(tmp_path: Path) -> None:
     lane = audit(repo, root, "compat", rc=1)
     assert lane.evidence_state is EvidenceState.VALID
     assert lane.certification_status is CertificationStatus.FAILED
-    failed = next(
-        row for row in lane.models if row.model_class == "WaveNetEstimator"
-    )
+    failed = next(row for row in lane.models if row.model_class == "WaveNetEstimator")
     assert failed.failure_category is P7FailureCategory.FIT_FAILED
     assert failed.failed_stage == "fit_serialize"
 
@@ -245,10 +229,7 @@ def test_unlisted_extra_file_is_invalid_evidence(tmp_path: Path) -> None:
     (root / "after-the-fact.txt").write_text("tamper")
     lane = audit(repo, root, "latest")
     assert lane.evidence_state is EvidenceState.INVALID
-    assert (
-        P7FailureCategory.CHECKSUM_INVENTORY_MISMATCH
-        in lane.failure_categories
-    )
+    assert P7FailureCategory.CHECKSUM_INVENTORY_MISMATCH in lane.failure_categories
 
 
 def test_missing_campaign_is_incomplete_not_tampered(tmp_path: Path) -> None:

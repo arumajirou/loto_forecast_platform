@@ -139,10 +139,6 @@ def test_p5_contract_sources_are_identical() -> None:
     ).read_bytes()
     assert compat_runtime == latest_runtime
 
-    compat_cli = (
-        LANES["compat"] / "loto_gluonts_provider" / "cli.py"
-    ).read_bytes()
-    latest_cli = (
-        LANES["latest"] / "loto_gluonts_provider" / "cli.py"
-    ).read_bytes()
+    compat_cli = (LANES["compat"] / "loto_gluonts_provider" / "cli.py").read_bytes()
+    latest_cli = (LANES["latest"] / "loto_gluonts_provider" / "cli.py").read_bytes()
     assert compat_cli == latest_cli

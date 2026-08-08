@@ -80,15 +80,11 @@ def _upstream_lineage(request: PromotionGateRequest) -> dict[str, Any]:
     return {
         "schema_version": "1.0",
         "upstream_artifact_sha256": request.upstream_artifact_sha256,
-        "p5_monitor_bundle_sha256": [
-            item.monitor_bundle_sha256 for item in request.windows
-        ],
+        "p5_monitor_bundle_sha256": [item.monitor_bundle_sha256 for item in request.windows],
         "prediction_lock_seal_sha256": [
             item.prediction_lock_seal_sha256 for item in request.windows
         ],
-        "actuals_source_sha256": [
-            item.actuals_source_sha256 for item in request.windows
-        ],
+        "actuals_source_sha256": [item.actuals_source_sha256 for item in request.windows],
     }
 
 
@@ -96,8 +92,7 @@ def _write_manifest_and_sha(output_dir: Path) -> None:
     files = sorted(
         path
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     manifest = {
         "schema_version": "1.0",
@@ -114,9 +109,7 @@ def _write_manifest_and_sha(output_dir: Path) -> None:
     }
     _write_json(output_dir / "ARTIFACT_MANIFEST.json", manifest)
     hashed = sorted(
-        path
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     )
     _atomic_write_text(
         output_dir / "SHA256SUMS",
@@ -134,9 +127,7 @@ def persist_p6(request: PromotionGateRequest) -> dict[str, Any]:
         "schema_version": "1.0",
         "shadow_candidate_id": result["shadow_candidate_id"],
         "decision": result["decision"],
-        "eligible_for_human_approval": result[
-            "eligible_for_human_approval"
-        ],
+        "eligible_for_human_approval": result["eligible_for_human_approval"],
         "human_approval_required": True,
         "human_approval_granted": False,
         "automatic_promotion": False,
@@ -155,9 +146,7 @@ def persist_p6(request: PromotionGateRequest) -> dict[str, Any]:
         "window_count": result["aggregated_metrics"]["window_count"],
         "total_draw_count": result["aggregated_metrics"]["total_draw_count"],
         "decision": result["decision"],
-        "eligible_for_human_approval": result[
-            "eligible_for_human_approval"
-        ],
+        "eligible_for_human_approval": result["eligible_for_human_approval"],
         "automatic_promotion": False,
         "automatic_retraining": False,
         "promotion_status": "NOT_PROMOTED",
@@ -202,8 +191,7 @@ def _verify_manifest(output_dir: Path) -> None:
     expected = {
         path.name
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     }
     if seen != expected:
         raise P6VerificationError("manifest coverage mismatch")
@@ -223,9 +211,7 @@ def _verify_sha256sums(output_dir: Path) -> None:
         if not artifact.is_file() or _sha256(artifact) != expected:
             raise P6VerificationError(f"SHA-256 mismatch: {name}")
     expected_files = {
-        item.name
-        for item in output_dir.iterdir()
-        if item.is_file() and item.name != "SHA256SUMS"
+        item.name for item in output_dir.iterdir() if item.is_file() and item.name != "SHA256SUMS"
     }
     if seen != expected_files:
         raise P6VerificationError("SHA256SUMS coverage mismatch")
@@ -236,25 +222,17 @@ def verify_p6(
     request: PromotionGateRequest,
 ) -> dict[str, Any]:
     expected = run_promotion_gate(request)
-    if _load_json(output_dir / "REQUEST_METADATA.json") != _request_metadata(
-        request
-    ):
+    if _load_json(output_dir / "REQUEST_METADATA.json") != _request_metadata(request):
         raise P6VerificationError("request metadata mismatch")
-    if _load_json(output_dir / "UPSTREAM_LINEAGE.json") != _upstream_lineage(
-        request
-    ):
+    if _load_json(output_dir / "UPSTREAM_LINEAGE.json") != _upstream_lineage(request):
         raise P6VerificationError("upstream lineage mismatch")
     if _load_json(output_dir / "WINDOW_EVIDENCE.json") != [
         item.model_dump(mode="json") for item in request.windows
     ]:
         raise P6VerificationError("window evidence mismatch")
-    if _load_json(output_dir / "AGGREGATED_METRICS.json") != expected[
-        "aggregated_metrics"
-    ]:
+    if _load_json(output_dir / "AGGREGATED_METRICS.json") != expected["aggregated_metrics"]:
         raise P6VerificationError("aggregated metrics mismatch")
-    if _load_json(output_dir / "RULE_EVALUATION.json") != expected[
-        "rule_evaluation"
-    ]:
+    if _load_json(output_dir / "RULE_EVALUATION.json") != expected["rule_evaluation"]:
         raise P6VerificationError("rule evaluation mismatch")
     decision = _load_json(output_dir / "PROMOTION_DECISION.json")
     if decision.get("decision") != expected["decision"]:
@@ -281,9 +259,7 @@ def verify_p6(
         "status": "PASS",
         "certification_scope": "sktime-p6-manual-promotion-gate",
         "decision": expected["decision"],
-        "eligible_for_human_approval": expected[
-            "eligible_for_human_approval"
-        ],
+        "eligible_for_human_approval": expected["eligible_for_human_approval"],
         "automatic_promotion": False,
         "automatic_retraining": False,
         "registry_write_allowed": False,

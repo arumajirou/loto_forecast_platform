@@ -78,9 +78,7 @@ def build_certification_report(
         base["failure_reason"] = "PROVIDER_RESPONSE_MISSING"
         return base
     if response_payload.get("status") != "OK":
-        base["failure_reason"] = str(
-            response_payload.get("message", "PROVIDER_RESPONSE_ERROR")
-        )
+        base["failure_reason"] = str(response_payload.get("message", "PROVIDER_RESPONSE_ERROR"))
         base["provider_error_type"] = response_payload.get("error_type")
         return base
 

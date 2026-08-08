@@ -154,13 +154,9 @@ def local_model_inventory(models_module: Any | None = None) -> list[dict[str, An
             continue
 
         lifecycle = {
-            method: _signature(getattr(model_cls, method, None))
-            for method in _LIFECYCLE_METHODS
+            method: _signature(getattr(model_cls, method, None)) for method in _LIFECYCLE_METHODS
         }
-        support = {
-            name: _support_value(model_cls, name)
-            for name in _SUPPORT_PROPERTIES
-        }
+        support = {name: _support_value(model_cls, name) for name in _SUPPORT_PROPERTIES}
         rows.append(
             {
                 **spec.model_dump(mode="json"),
@@ -225,12 +221,8 @@ def _validate_lifecycle_arguments(
 ) -> list[dict[str, Any]]:
     _, fit_ledger = classify_arguments(model_cls.fit, request.fit_args)
     _, predict_ledger = classify_arguments(model_cls.predict, request.predict_args)
-    return [
-        {"stage": "fit", **decision.model_dump(mode="json")}
-        for decision in fit_ledger
-    ] + [
-        {"stage": "predict", **decision.model_dump(mode="json")}
-        for decision in predict_ledger
+    return [{"stage": "fit", **decision.model_dump(mode="json")} for decision in fit_ledger] + [
+        {"stage": "predict", **decision.model_dump(mode="json")} for decision in predict_ledger
     ]
 
 

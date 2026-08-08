@@ -19,21 +19,15 @@ class RuntimeDependencyError(RuntimeError):
 
 
 def runtime_dependency_status() -> dict[str, bool]:
-    return {
-        name: importlib.util.find_spec(name) is not None
-        for name in _REQUIRED_MODULES
-    }
+    return {name: importlib.util.find_spec(name) is not None for name in _REQUIRED_MODULES}
 
 
 def _load_runtime_dependencies() -> dict[str, Any]:
     status = runtime_dependency_status()
-    missing = sorted(
-        name for name, available in status.items() if not available
-    )
+    missing = sorted(name for name, available in status.items() if not available)
     if missing:
         raise RuntimeDependencyError(
-            "AutoSegRNN runtime dependencies are unavailable: "
-            + ", ".join(missing)
+            "AutoSegRNN runtime dependencies are unavailable: " + ", ".join(missing)
         )
 
     import torch

@@ -66,13 +66,17 @@ def main() -> int:
     parser.add_argument("root", nargs="?", default=".")
     args = parser.parse_args()
     root = Path(args.root).expanduser().resolve()
-    if not (root / ".git").exists() and subprocess.run(
-        ["git", "rev-parse", "--is-inside-work-tree"],
-        cwd=root,
-        check=False,
-        capture_output=True,
-        text=True,
-    ).returncode != 0:
+    if (
+        not (root / ".git").exists()
+        and subprocess.run(
+            ["git", "rev-parse", "--is-inside-work-tree"],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        ).returncode
+        != 0
+    ):
         raise SystemExit(f"not a git worktree: {root}")
 
     paths = sorted(_git_paths(root))

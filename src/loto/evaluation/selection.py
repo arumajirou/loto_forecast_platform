@@ -39,9 +39,7 @@ def select_by_primary_metric(candidates: Sequence[CandidateMetrics]) -> Candidat
         required = ("hit_at_1", "all_positions_hit_at_1", "mae", "rmse")
         missing = [metric_id for metric_id in required if metric_id not in values]
         if missing:
-            raise ValueError(
-                f"candidate {candidate.model_id!r} is missing metrics: {missing}"
-            )
+            raise ValueError(f"candidate {candidate.model_id!r} is missing metrics: {missing}")
         hit = _finite(values["hit_at_1"], "hit_at_1")
         all_hit = _finite(values["all_positions_hit_at_1"], "all_positions_hit_at_1")
         mae = _finite(values["mae"], "mae")

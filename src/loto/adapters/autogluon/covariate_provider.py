@@ -183,8 +183,7 @@ def run_provider_v2_covariates(
             predict_kwargs["known_covariates"] = known_covariates
         prediction = predictor.predict(time_series, **predict_kwargs)
         expected_items = tuple(
-            f"position-{index}"
-            for index in range(1, request.geometry.selection_count + 1)
+            f"position-{index}" for index in range(1, request.geometry.selection_count + 1)
         )
         records = _prediction_records(
             prediction,
@@ -226,9 +225,7 @@ def run_provider_v2_covariates(
                     "loaded predictor model names differ from the saved runtime snapshot",
                 )
             artifacts = dict(saved_context.artifacts)
-            artifacts["covariate_context"] = str(
-                artifact_dir / "loto_covariate_context_v2.json"
-            )
+            artifacts["covariate_context"] = str(artifact_dir / "loto_covariate_context_v2.json")
             saved_context_sha256 = canonical_sha256(saved_context.context)
     except Exception as exc:
         message = str(exc)

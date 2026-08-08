@@ -67,15 +67,9 @@ def test_validation_contract_changes_holdout_hash_only_when_holdout_changes() ->
     second = ValidationBenchmarkRequest.model_validate(changed_payload)
     first_contract = data_contract(first)
     second_contract = data_contract(second)
-    assert first_contract["train_values_sha256"] == second_contract[
-        "train_values_sha256"
-    ]
-    assert first_contract["validation_values_sha256"] == second_contract[
-        "validation_values_sha256"
-    ]
-    assert first_contract["holdout_values_sha256"] != second_contract[
-        "holdout_values_sha256"
-    ]
+    assert first_contract["train_values_sha256"] == second_contract["train_values_sha256"]
+    assert first_contract["validation_values_sha256"] == second_contract["validation_values_sha256"]
+    assert first_contract["holdout_values_sha256"] != second_contract["holdout_values_sha256"]
 
 
 def test_metrics_include_primary_and_position_scores() -> None:

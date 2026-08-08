@@ -92,9 +92,7 @@ def _run_git(repo_root: Path, *args: str) -> str:
         ).strip()
     except (OSError, subprocess.CalledProcessError) as exc:
         detail = getattr(exc, "stderr", "") or str(exc)
-        raise RuntimeError(
-            f"git command failed: {' '.join(args)}: {detail.strip()}"
-        ) from exc
+        raise RuntimeError(f"git command failed: {' '.join(args)}: {detail.strip()}") from exc
 
 
 def _valid_commit(value: Any, *, label: str) -> str:
@@ -151,8 +149,7 @@ def _repository_state(repo_root: Path) -> RepositoryState:
     )
     if status:
         raise RuntimeError(
-            "MLForecast handoff inputs are dirty; commit or clean them first:\n"
-            f"{status}"
+            f"MLForecast handoff inputs are dirty; commit or clean them first:\n{status}"
         )
     for shared in SHARED_SNAPSHOT_PATHS:
         _run_git(root, "ls-files", "--error-unmatch", shared)
@@ -204,11 +201,7 @@ def _safe_path(value: str) -> PurePosixPath:
         raise RuntimeError(f"unsafe handoff archive path: {value!r}")
     for part in path.parts:
         base = part.split(".", 1)[0].casefold()
-        if (
-            ":" in part
-            or part.endswith((" ", "."))
-            or base in WINDOWS_RESERVED_NAMES
-        ):
+        if ":" in part or part.endswith((" ", ".")) or base in WINDOWS_RESERVED_NAMES:
             raise RuntimeError(f"non-portable handoff archive path: {value!r}")
     return path
 
@@ -218,11 +211,7 @@ def _sidecar_digest(sidecar: Path, zip_path: Path) -> str:
     if len(lines) != 1:
         raise RuntimeError("handoff sidecar must contain exactly one line")
     digest, separator, name = lines[0].partition("  ")
-    if (
-        separator != "  "
-        or name != zip_path.name
-        or DIGEST_PATTERN.fullmatch(digest) is None
-    ):
+    if separator != "  " or name != zip_path.name or DIGEST_PATTERN.fullmatch(digest) is None:
         raise RuntimeError("invalid handoff sidecar format")
     return digest
 
@@ -269,9 +258,7 @@ def verify_guarded_handoff(
     with zipfile.ZipFile(resolved_zip) as archive:
         infos = archive.infolist()
         if len(infos) > max_files:
-            raise RuntimeError(
-                f"handoff ZIP exceeds file limit: {len(infos)} > {max_files}"
-            )
+            raise RuntimeError(f"handoff ZIP exceeds file limit: {len(infos)} > {max_files}")
         total_uncompressed = sum(info.file_size for info in infos)
         if total_uncompressed > max_uncompressed_bytes:
             raise RuntimeError(
@@ -348,11 +335,7 @@ def verify_guarded_handoff(
         sums: dict[str, str] = {}
         for line in archive.read("SHA256SUMS").decode("utf-8").splitlines():
             digest, separator, name = line.partition("  ")
-            if (
-                separator != "  "
-                or name in sums
-                or DIGEST_PATTERN.fullmatch(digest) is None
-            ):
+            if separator != "  " or name in sums or DIGEST_PATTERN.fullmatch(digest) is None:
                 raise RuntimeError("invalid handoff SHA256SUMS")
             _safe_path(name)
             sums[name] = digest
@@ -368,9 +351,7 @@ def verify_guarded_handoff(
         if provenance.get("handoff_format") != HANDOFF_FORMAT:
             raise RuntimeError("unsupported source provenance format")
         if provenance.get("source_commit") != manifest_commit:
-            raise RuntimeError(
-                "source commit disagrees between manifest and provenance"
-            )
+            raise RuntimeError("source commit disagrees between manifest and provenance")
         source_branch = _valid_branch(
             provenance.get("source_branch"),
             label="source provenance branch",

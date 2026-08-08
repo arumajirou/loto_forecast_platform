@@ -51,12 +51,15 @@ def _atomic_write(path: Path, content: bytes) -> None:
 
 
 def _write_json(path: Path, payload: Any) -> None:
-    content = json.dumps(
-        payload,
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-    ).encode("utf-8") + b"\n"
+    content = (
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        ).encode("utf-8")
+        + b"\n"
+    )
     _atomic_write(path, content)
 
 
@@ -322,9 +325,7 @@ def run_target_host_operator(
     if expected_seed < 0 or horizon < 1:
         raise ValueError("seed and horizon must be valid fixed values")
 
-    run_id = run_id or datetime.now(timezone.utc).strftime(
-        "statsforecast-operator-%Y%m%d-%H%M%S"
-    )
+    run_id = run_id or datetime.now(timezone.utc).strftime("statsforecast-operator-%Y%m%d-%H%M%S")
     output_root.mkdir(parents=True, exist_ok=True)
     output_dir = output_root / run_id
     output_dir.mkdir(parents=False, exist_ok=False)
@@ -340,8 +341,7 @@ def run_target_host_operator(
     failures: list[str] = []
     if git_context.get("head") != normalized_commit:
         failures.append(
-            "Git HEAD mismatch: "
-            f"expected {normalized_commit}, got {git_context.get('head')}"
+            f"Git HEAD mismatch: expected {normalized_commit}, got {git_context.get('head')}"
         )
     if not git_context.get("working_tree_clean"):
         failures.append("working tree is not clean")
@@ -402,9 +402,7 @@ def run_target_host_operator(
                     output_dir / "triage",
                 )
                 triage_dir = Path(triage_result.output_dir)
-                failures.append(
-                    "End-to-End certification did not produce RUNTIME_CERTIFIED"
-                )
+                failures.append("End-to-End certification did not produce RUNTIME_CERTIFIED")
         except Exception as exc:
             exception = {
                 "type": type(exc).__name__,
@@ -455,13 +453,9 @@ def run_target_host_operator(
     notification_results: list[dict[str, Any]] = []
     if enable_tts:
         notifier = tts_notifier or send_tts_notification
-        notification_results.append(
-            _safe_notification_call("tts", notifier, message)
-        )
+        notification_results.append(_safe_notification_call("tts", notifier, message))
     else:
-        notification_results.append(
-            {"channel": "tts", "status": "DISABLED"}
-        )
+        notification_results.append({"channel": "tts", "status": "DISABLED"})
     if enable_email:
         if email_notifier is None:
 
@@ -483,9 +477,7 @@ def run_target_host_operator(
             )
         )
     else:
-        notification_results.append(
-            {"channel": "email", "status": "DISABLED"}
-        )
+        notification_results.append({"channel": "email", "status": "DISABLED"})
     _write_json(
         notification_report_path,
         {

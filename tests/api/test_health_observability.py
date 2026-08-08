@@ -129,9 +129,7 @@ def test_request_id_is_preserved_when_safe_and_replaced_when_unsafe() -> None:
 
 
 def test_required_dependency_failure_is_unready() -> None:
-    client = _client(
-        _specs(required_state=DependencyState.CONFIGURED_BUT_UNAVAILABLE)
-    )
+    client = _client(_specs(required_state=DependencyState.CONFIGURED_BUT_UNAVAILABLE))
 
     response = client.get("/readyz")
 
@@ -140,9 +138,7 @@ def test_required_dependency_failure_is_unready() -> None:
 
 
 def test_optional_dependency_failure_is_degraded_not_dead_or_unready() -> None:
-    client = _client(
-        _specs(optional_state=DependencyState.CONFIGURED_BUT_UNAVAILABLE)
-    )
+    client = _client(_specs(optional_state=DependencyState.CONFIGURED_BUT_UNAVAILABLE))
 
     readiness = client.get("/readyz")
     liveness = client.get("/livez")
@@ -216,9 +212,7 @@ def test_health_dependencies_contains_exact_fixed_inventory() -> None:
     dependencies = response.json()["dependencies"]
 
     assert response.status_code == 200
-    assert {item["dependency"] for item in dependencies} == {
-        item.value for item in DependencyName
-    }
+    assert {item["dependency"] for item in dependencies} == {item.value for item in DependencyName}
     assert all("latency_ms" in item for item in dependencies)
     assert all("criticality" in item for item in dependencies)
 

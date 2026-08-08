@@ -61,8 +61,7 @@ def _write_manifest_and_sha(output_dir: Path) -> None:
     files = sorted(
         path
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     manifest = {
         "schema_version": "1.0",
@@ -79,9 +78,7 @@ def _write_manifest_and_sha(output_dir: Path) -> None:
     }
     _write_json(output_dir / "ARTIFACT_MANIFEST.json", manifest)
     hashed = sorted(
-        path
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     )
     _atomic_write_text(
         output_dir / "SHA256SUMS",
@@ -118,9 +115,7 @@ def persist_p9(
     plan = {
         "schema_version": "1.0",
         "deployment_target": request.deployment_target,
-        "expected_deployment_state_sha256": (
-            request.expected_deployment_state_sha256
-        ),
+        "expected_deployment_state_sha256": (request.expected_deployment_state_sha256),
         "activation_nonce": request.activation_nonce,
         "subject": request.p8.subject.model_dump(mode="json"),
         "policy": request.policy.model_dump(mode="json"),
@@ -196,8 +191,7 @@ def _verify_manifest(output_dir: Path) -> None:
     expected = {
         path.name
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     }
     if seen != expected:
         raise P9VerificationError("manifest coverage mismatch")
@@ -215,9 +209,7 @@ def _verify_sha256sums(output_dir: Path) -> None:
             raise P9VerificationError(f"SHA-256 mismatch: {name}")
         seen.add(name)
     expected_files = {
-        item.name
-        for item in output_dir.iterdir()
-        if item.is_file() and item.name != "SHA256SUMS"
+        item.name for item in output_dir.iterdir() if item.is_file() and item.name != "SHA256SUMS"
     }
     if seen != expected_files:
         raise P9VerificationError("SHA256SUMS coverage mismatch")
@@ -235,9 +227,7 @@ def verify_p9(output_dir: Path, request: CanaryActivationRequest) -> dict[str, A
         raise P9VerificationError("P9 enabled automatic primary promotion")
     if response.get("promotion_status") != "CANARY_ACTIVE_NOT_PRIMARY":
         raise P9VerificationError("P9 promotion status mismatch")
-    if _load_json(output_dir / "P8_LINEAGE.json") != request.p8.model_dump(
-        mode="json"
-    ):
+    if _load_json(output_dir / "P8_LINEAGE.json") != request.p8.model_dump(mode="json"):
         raise P9VerificationError("P8 lineage mismatch")
     if _load_json(output_dir / "RUNTIME_PROBE.json") != (
         request.runtime_probe.model_dump(mode="json")
@@ -254,14 +244,10 @@ def verify_p9(output_dir: Path, request: CanaryActivationRequest) -> dict[str, A
         raise P9VerificationError("primary binding changed")
     if post_state["canary_binding"] is None:
         raise P9VerificationError("canary binding was not activated")
-    if post_state["canary_binding"]["subject"] != request.p8.subject.model_dump(
-        mode="json"
-    ):
+    if post_state["canary_binding"]["subject"] != request.p8.subject.model_dump(mode="json"):
         raise P9VerificationError("canary subject mismatch")
     receipt = _load_json(output_dir / "ACTIVATION_RECEIPT.json")
-    receipt_payload = {
-        key: value for key, value in receipt.items() if key != "receipt_sha256"
-    }
+    receipt_payload = {key: value for key, value in receipt.items() if key != "receipt_sha256"}
     if receipt.get("receipt_sha256") != canonical_sha256(receipt_payload):
         raise P9VerificationError("activation receipt seal mismatch")
     if receipt.get("pre_state_sha256") != pre_state["state_sha256"]:

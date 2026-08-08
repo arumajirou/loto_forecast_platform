@@ -255,9 +255,7 @@ def run_runtime_matrix(
                 verification["errors"].append("perturbed response failed verification")
             if not point_changed:
                 verification["errors"].append("covariate perturbation had no forecast effect")
-            verification["verified"] = bool(
-                verification["verified"] and perturbation_verified
-            )
+            verification["verified"] = bool(verification["verified"] and perturbation_verified)
         evidence_rows.append(
             {
                 "scenario_id": scenario.scenario_id,
@@ -276,9 +274,7 @@ def run_runtime_matrix(
                 "context_length": scenario.context_length,
                 "use_past_covariates": scenario.use_past_covariates,
                 "use_future_covariates": scenario.use_future_covariates,
-                "verify_covariate_perturbation": (
-                    scenario.verify_covariate_perturbation
-                ),
+                "verify_covariate_perturbation": (scenario.verify_covariate_perturbation),
                 "perturbation_verified": perturbation_verified,
                 "perturbation_response_sha256": perturbation_response_sha256,
                 "request_sha256": _canonical_sha256(request),
@@ -300,8 +296,7 @@ def run_runtime_matrix(
         "passed": passed,
         "failed": len(rows) - passed,
         "covariate_perturbations_required": sum(
-            bool(scenario.verify_covariate_perturbation)
-            for scenario in config.scenarios
+            bool(scenario.verify_covariate_perturbation) for scenario in config.scenarios
         ),
         "covariate_perturbations_verified": sum(
             row.get("perturbation_verified") is True for row in rows
@@ -327,20 +322,16 @@ def persist_runtime_matrix(
     if root.exists():
         root.rmdir()
     root.parent.mkdir(parents=True, exist_ok=True)
-    staging = Path(
-        tempfile.mkdtemp(prefix=f".{root.name}.staging-", dir=root.parent)
-    )
+    staging = Path(tempfile.mkdtemp(prefix=f".{root.name}.staging-", dir=root.parent))
     try:
         report_path = staging / "CHRONOS2_RUNTIME_MATRIX_REPORT.json"
         rows_path = staging / "CHRONOS2_RUNTIME_MATRIX.json"
         report_path.write_text(
-            json.dumps(result.report, ensure_ascii=False, indent=2, sort_keys=True)
-            + "\n",
+            json.dumps(result.report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
         rows_path.write_text(
-            json.dumps(list(result.rows), ensure_ascii=False, indent=2, sort_keys=True)
-            + "\n",
+            json.dumps(list(result.rows), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
         scenario_artifacts: dict[str, dict[str, str]] = {}
@@ -360,8 +351,7 @@ def persist_runtime_matrix(
                     continue
                 path = scenario_root / f"{key}.json"
                 path.write_text(
-                    json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True)
-                    + "\n",
+                    json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
                     encoding="utf-8",
                 )
                 paths[key] = path.relative_to(staging).as_posix()
@@ -378,14 +368,11 @@ def persist_runtime_matrix(
             },
         }
         manifest_path.write_text(
-            json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True)
-            + "\n",
+            json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
         sums_path = staging / "SHA256SUMS"
-        files: Sequence[Path] = tuple(
-            sorted(path for path in staging.rglob("*") if path.is_file())
-        )
+        files: Sequence[Path] = tuple(sorted(path for path in staging.rglob("*") if path.is_file()))
         lines = [
             f"{hashlib.sha256(path.read_bytes()).hexdigest()}  "
             f"{path.relative_to(staging).as_posix()}"

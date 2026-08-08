@@ -13,9 +13,7 @@ from .canonical import canonical_sha256
 
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 SAFE_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,255}$")
-UNKNOWN_REVISIONS = frozenset(
-    {"unknown", "unversioned", "unpinned", "latest", "none", "n/a"}
-)
+UNKNOWN_REVISIONS = frozenset({"unknown", "unversioned", "unpinned", "latest", "none", "n/a"})
 
 
 class StrictModel(BaseModel):
@@ -301,9 +299,7 @@ class PromotionSubject(StrictModel):
         for window in self.prospective_windows:
             if window.candidate_id != self.candidate_id:
                 raise ValueError("prospective window changed candidate identity")
-        expected = canonical_sha256(
-            self.model_dump(mode="python", exclude={"subject_sha256"})
-        )
+        expected = canonical_sha256(self.model_dump(mode="python", exclude={"subject_sha256"}))
         if self.subject_sha256 != expected:
             raise ValueError("PromotionSubject SHA-256 mismatch")
         return self

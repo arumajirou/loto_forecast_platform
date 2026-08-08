@@ -123,9 +123,7 @@ class P6DatasetItem(BaseModel):
         cls,
         values: list[list[float]] | None,
     ) -> list[list[float]] | None:
-        if values is not None and not all(
-            math.isfinite(value) for row in values for value in row
-        ):
+        if values is not None and not all(math.isfinite(value) for row in values for value in row):
             raise ValueError("dataset numeric matrices must contain only finite values")
         return values
 
@@ -380,9 +378,7 @@ class P6CampaignResult(BaseModel):
         if len(names) != len(set(names)):
             raise ValueError("campaign contains duplicate model lifecycles")
         if self.status is P6Status.VERIFIED:
-            if self.errors or any(
-                model.status is not P6Status.VERIFIED for model in self.models
-            ):
+            if self.errors or any(model.status is not P6Status.VERIFIED for model in self.models):
                 raise ValueError("VERIFIED campaign requires all nine models VERIFIED")
         elif not self.errors:
             raise ValueError("non-VERIFIED campaign requires errors")
@@ -391,8 +387,7 @@ class P6CampaignResult(BaseModel):
 
 def canonical_json_bytes(payload: Any) -> bytes:
     return (
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n"
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     ).encode("utf-8")
 
 

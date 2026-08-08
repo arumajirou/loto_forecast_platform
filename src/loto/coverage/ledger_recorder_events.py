@@ -92,9 +92,7 @@ class CoverageRecorderEventsMixin:
                 input_slices=[
                     self._slice(
                         dataset_id=f"{self.evidence.dataset_id}:identity",
-                        dataset_sha256=self._projection_hash(
-                            "target-free-identity"
-                        ),
+                        dataset_sha256=self._projection_hash("target-free-identity"),
                         data_role=DataRole.VALIDATION,
                         row_start=index,
                         row_end=index,
@@ -120,9 +118,7 @@ class CoverageRecorderEventsMixin:
     def record_actual(self, *, fold_id: str) -> None:
         state = self._state(fold_id)
         if not state.predicted or state.predict_event_id is None:
-            raise CoverageLedgerBlocked(
-                f"actual access requires an earlier prediction: {fold_id}"
-            )
+            raise CoverageLedgerBlocked(f"actual access requires an earlier prediction: {fold_id}")
         if state.actual_read:
             raise CoverageLedgerBlocked(f"actual already recorded: {fold_id}")
         index = state.test_index
@@ -166,9 +162,7 @@ class CoverageRecorderEventsMixin:
     def record_score(self, *, fold_id: str) -> None:
         state = self._state(fold_id)
         if not state.actual_read or state.actual_event_id is None:
-            raise CoverageLedgerBlocked(
-                f"score requires an earlier actual read: {fold_id}"
-            )
+            raise CoverageLedgerBlocked(f"score requires an earlier actual read: {fold_id}")
         if state.scored:
             raise CoverageLedgerBlocked(f"score already recorded: {fold_id}")
         self.events.append(

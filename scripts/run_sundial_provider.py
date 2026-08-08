@@ -382,9 +382,7 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
         request.get("snapshot_path"),
     )
     config_path = snapshot_path / "config.json"
-    weights = sorted(snapshot_path.glob("*.safetensors")) + sorted(
-        snapshot_path.glob("*.bin")
-    )
+    weights = sorted(snapshot_path.glob("*.safetensors")) + sorted(snapshot_path.glob("*.bin"))
     if not config_path.is_file():
         raise SundialProviderRuntimeError(
             "PARTIAL_SNAPSHOT",
@@ -395,9 +393,7 @@ def run_provider(request: dict[str, Any]) -> dict[str, Any]:
             "MODEL_WEIGHTS_MISSING",
             f"no model weights found in {snapshot_path}",
         )
-    reviewed_remote_code = _load_reviewed_remote_code_sha256(
-        REMOTE_CODE_REVIEW_PATH
-    )
+    reviewed_remote_code = _load_reviewed_remote_code_sha256(REMOTE_CODE_REVIEW_PATH)
     requested_remote_code = _approved_remote_code_sha256(request)
     if requested_remote_code != reviewed_remote_code:
         raise SundialProviderRuntimeError(

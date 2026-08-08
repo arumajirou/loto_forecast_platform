@@ -29,6 +29,7 @@ _VARIANTS = (
     "chronos2_bias_quantile_conformal",
 )
 
+
 def run_calibration_evaluation(
     predictions: pd.DataFrame,
     folds: pd.DataFrame,
@@ -102,8 +103,7 @@ def run_calibration_evaluation(
                 level: np.zeros_like(source_raw) for level in config.quantile_levels
             }
             qhat_matrices = {
-                coverage: np.zeros_like(source_raw)
-                for coverage in config.interval_coverages
+                coverage: np.zeros_like(source_raw) for coverage in config.interval_coverages
             }
 
             for position_index, position in enumerate(config.position_columns):
@@ -153,9 +153,7 @@ def run_calibration_evaluation(
                                 {str(level): value for level, value in qhats.items()},
                                 sort_keys=True,
                             ),
-                            "fit_sha256": canonical_sha256(
-                                fit_rows.to_dict(orient="records")
-                            ),
+                            "fit_sha256": canonical_sha256(fit_rows.to_dict(orient="records")),
                             "conformal_sha256": canonical_shaa256(
                                 conformal_rows.to_dict(orient="records")
                             ),
@@ -203,9 +201,7 @@ def run_calibration_evaluation(
                         conformal_quantiles[level][position_index, horizon_index] = value
             total_rearrangements += target_rearrangements
 
-            variants: tuple[
-                tuple[str, np.ndarray, Mapping[float, np.ndarray]], ...
-            ] = (
+            variants: tuple[tuple[str, np.ndarray, Mapping[float, np.ndarray]], ...] = (
                 ("chronos2_uncalibrated", source_point, source_quantiles),
                 ("chronos2_bias_calibrated", bias_point, {}),
                 (
@@ -281,9 +277,7 @@ def run_calibration_evaluation(
         "source_prediction_sha256": source_prediction_sha256,
         "source_fold_sha256": source_fold_sha256,
         "config_sha256": canonical_sha256(config.model_dump(mode="json")),
-        "calibrated_prediction_sha256": canonical_sha256(
-            predictions_df.to_dict(orient="records")
-        ),
+        "calibrated_prediction_sha256": canonical_sha256(predictions_df.to_dict(orient="records")),
         "parameter_sha256": canonical_sha256(parameters_df.to_dict(orient="records")),
         "eligible_fold_ids": eligible_fold_ids,
         "warmup_fold_ids": warmup_fold_ids,

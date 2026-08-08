@@ -18,7 +18,7 @@ from loto.autogluon_campaign.covariate_runtime_certification import (
 
 
 def _write_fake_provider(path: Path, *, error_code: str | None = None) -> None:
-    source = '''
+    source = """
 import argparse
 import hashlib
 import json
@@ -128,7 +128,7 @@ else:
     }
 response_path.parent.mkdir(parents=True, exist_ok=True)
 response_path.write_text(json.dumps(payload), encoding="utf-8")
-'''.replace("__ERROR_CODE__", repr(error_code))
+""".replace("__ERROR_CODE__", repr(error_code))
     path.write_text(source, encoding="utf-8")
 
 
@@ -168,8 +168,7 @@ def test_response_validation_rejects_artifact_escape(tmp_path) -> None:
         "status": "OK",
         "operation": scenario.operation,
         "predictions": [
-            {"mean": float(index), "item_id": "x", "horizon_step": 1}
-            for index in range(6)
+            {"mean": float(index), "item_id": "x", "horizon_step": 1} for index in range(6)
         ],
         "metadata": {
             "finite": True,

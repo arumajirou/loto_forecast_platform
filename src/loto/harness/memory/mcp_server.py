@@ -31,9 +31,7 @@ def build_server(
     location: str = memory_location or default_location
     store = create_memory_store(location)
     repo_root = Path(os.getenv("LOTO_HARNESS_REPO_ROOT", ".")).resolve()
-    code_index_path = os.getenv(
-        "LOTO_HARNESS_CODE_INDEX", "artifacts/harness/code-index.sqlite3"
-    )
+    code_index_path = os.getenv("LOTO_HARNESS_CODE_INDEX", "artifacts/harness/code-index.sqlite3")
     code_index = SQLiteCodeIndex(code_index_path)
     if streamable_http:
         server = FastMCP(
@@ -105,9 +103,7 @@ def main_http() -> None:
     port = int(os.getenv("LOTO_HARNESS_MCP_PORT", "17231"))
     if host == "0.0.0.0" and os.getenv("HARNESS_ALLOW_PUBLIC_BIND") != "1":
         raise RuntimeError("public MCP bind requires HARNESS_ALLOW_PUBLIC_BIND=1")
-    build_server(streamable_http=True, host=host, port=port).run(
-        transport="streamable-http"
-    )
+    build_server(streamable_http=True, host=host, port=port).run(transport="streamable-http")
 
 
 if __name__ == "__main__":

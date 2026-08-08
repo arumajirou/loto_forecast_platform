@@ -26,9 +26,7 @@ from loto.basicts_campaign.installed_provenance import (
 
 EXPECTED_BASICTS_VERSION = "1.1.0"
 EXPECTED_UPSTREAM_REVISION = "c2bb6e31e591167e84459775a21a62e70a5893ce"
-SHA256_LINE = re.compile(
-    r"^(?P<digest>[0-9a-f]{64})  (?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)$"
-)
+SHA256_LINE = re.compile(r"^(?P<digest>[0-9a-f]{64})  (?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)$")
 DIGEST_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 RECORD_DIGEST_PATTERN = re.compile(r"^[A-Za-z0-9_-]{43}$")
 
@@ -94,9 +92,7 @@ def verify_sha256sums(directory: Path) -> dict[str, str]:
     ):
         match = SHA256_LINE.fullmatch(raw_line)
         if match is None:
-            raise CertificationError(
-                f"invalid SHA256SUMS line {line_number}: {raw_line!r}"
-            )
+            raise CertificationError(f"invalid SHA256SUMS line {line_number}: {raw_line!r}")
         name = match.group("name")
         if name == "SHA256SUMS":
             raise CertificationError("SHA256SUMS must not hash itself")
@@ -115,8 +111,7 @@ def verify_sha256sums(directory: Path) -> dict[str, str]:
         actual = _sha256(files[name])
         if actual != digest:
             raise CertificationError(
-                f"SHA-256 mismatch for {directory / name}: "
-                f"expected {digest}, got {actual}"
+                f"SHA-256 mismatch for {directory / name}: expected {digest}, got {actual}"
             )
     return expected
 
@@ -326,9 +321,7 @@ def _verify_loaded_basicts_closure(evidence: dict[str, Any]) -> None:
         ):
             raise CertificationError(f"BasicTS loaded module path mismatch: {module_name}")
         if not Path(distribution_path).as_posix().endswith(f"/{entry}"):
-            raise CertificationError(
-                f"BasicTS loaded module path suffix mismatch: {module_name}"
-            )
+            raise CertificationError(f"BasicTS loaded module path suffix mismatch: {module_name}")
         if item.get("record_status") != "PASS":
             raise CertificationError(f"BasicTS loaded module RECORD failed: {module_name}")
         if item.get("record_hash_mode") != "sha256":
@@ -344,12 +337,8 @@ def _verify_loaded_basicts_closure(evidence: dict[str, Any]) -> None:
             f"BasicTS {module_name}.record_size_bytes",
         )
         module_digest = item.get("module_file_sha256")
-        if not isinstance(module_digest, str) or DIGEST_PATTERN.fullmatch(
-            module_digest
-        ) is None:
-            raise CertificationError(
-                f"BasicTS module_file_sha256 is invalid: {module_name}"
-            )
+        if not isinstance(module_digest, str) or DIGEST_PATTERN.fullmatch(module_digest) is None:
+            raise CertificationError(f"BasicTS module_file_sha256 is invalid: {module_name}")
         if not isinstance(item.get("is_package"), bool):
             raise CertificationError(
                 f"BasicTS loaded module package flag is invalid: {module_name}"
@@ -361,9 +350,7 @@ def _verify_loaded_basicts_closure(evidence: dict[str, Any]) -> None:
         raise CertificationError("DLinear dependency binding status is not PASS")
     expected_base = f"{MODEL_CONFIG_MODULE}.BasicTSModelConfig"
     expected_bindings = {
-        "decomposition_symbol": (
-            f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"
-        ),
+        "decomposition_symbol": (f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"),
         "config_base_symbol": expected_base,
         "dlinear_config_direct_base": expected_base,
         "arch_decomposition_object_identity": True,
@@ -418,9 +405,7 @@ def _verify_dlinear_module_provenance(evidence: dict[str, Any]) -> None:
         ):
             raise CertificationError(f"DLinear module path mismatch for {label}")
         if not Path(distribution_path).as_posix().endswith(f"/{entry}"):
-            raise CertificationError(
-                f"DLinear distribution path suffix mismatch for {label}"
-            )
+            raise CertificationError(f"DLinear distribution path suffix mismatch for {label}")
         _require_record_digest(
             item.get("record_hash_value"),
             f"DLinear {label}.record_hash_value",
@@ -430,12 +415,8 @@ def _verify_dlinear_module_provenance(evidence: dict[str, Any]) -> None:
             f"DLinear {label}.record_size_bytes",
         )
         module_digest = item.get("module_file_sha256")
-        if not isinstance(module_digest, str) or DIGEST_PATTERN.fullmatch(
-            module_digest
-        ) is None:
-            raise CertificationError(
-                f"DLinear module_file_sha256 is invalid for {label}"
-            )
+        if not isinstance(module_digest, str) or DIGEST_PATTERN.fullmatch(module_digest) is None:
+            raise CertificationError(f"DLinear module_file_sha256 is invalid for {label}")
         if not isinstance(item.get("module_already_loaded"), bool):
             raise CertificationError(f"DLinear module loaded-state is invalid for {label}")
 
@@ -481,8 +462,10 @@ def verify_provider_bundle(directory: Path, operation: str) -> dict[str, Any]:
                     f"expected {expected!r}, got {evidence.get(field)!r}"
                 )
         shape = evidence.get("prediction_shape")
-        if not isinstance(shape, list) or len(shape) != 3 or not all(
-            isinstance(value, int) and value > 0 for value in shape
+        if (
+            not isinstance(shape, list)
+            or len(shape) != 3
+            or not all(isinstance(value, int) and value > 0 for value in shape)
         ):
             raise CertificationError("DLinear prediction shape is invalid")
         _verify_dlinear_module_provenance(evidence)

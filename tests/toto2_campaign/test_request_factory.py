@@ -18,16 +18,10 @@ def _history_payload(game: str, count: int, max_value: int) -> dict[str, object]
     rows = []
     for draw_no in range(1, 521):
         if game in {"numbers3", "numbers4"}:
-            values = {
-                column: float((draw_no + index) % 10)
-                for index, column in enumerate(columns)
-            }
+            values = {column: float((draw_no + index) % 10) for index, column in enumerate(columns)}
         else:
             start = 1 + draw_no % (max_value - count)
-            values = {
-                column: float(start + index)
-                for index, column in enumerate(columns)
-            }
+            values = {column: float(start + index) for index, column in enumerate(columns)}
         rows.append({"draw_no": draw_no, "values": values})
     return {
         "schema_version": 1,
@@ -73,9 +67,7 @@ def test_write_request_set_creates_exact_formal_matrix(tmp_path: Path) -> None:
     assert manifest["request_count"] == 90
     assert set(manifest["source_exports"]) == set(FORMAL_GAMES)
     assert len(list(requests_root.glob("*.json"))) == 91
-    request = json.loads(
-        (requests_root / "loto7-c128-h5-cuda.json").read_text(encoding="utf-8")
-    )
+    request = json.loads((requests_root / "loto7-c128-h5-cuda.json").read_text(encoding="utf-8"))
     assert request["context_length"] == 128
     assert request["prediction_length"] == 5
     assert request["device"] == "cuda"

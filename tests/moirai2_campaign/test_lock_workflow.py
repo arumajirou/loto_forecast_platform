@@ -50,7 +50,6 @@ def _environment(tmp_path: Path) -> Path:
     return environment
 
 
-
 def _install_output(tmp_path: Path, name: str = "install-output") -> Path:
     output = tmp_path / name
     output.mkdir()

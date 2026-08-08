@@ -19,10 +19,7 @@ class RuntimeDependencyError(RuntimeError):
 
 
 def runtime_dependency_status() -> dict[str, bool]:
-    return {
-        name: importlib.util.find_spec(name) is not None
-        for name in _REQUIRED_MODULES
-    }
+    return {name: importlib.util.find_spec(name) is not None for name in _REQUIRED_MODULES}
 
 
 def _load_runtime_dependencies() -> dict[str, Any]:

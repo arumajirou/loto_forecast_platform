@@ -80,21 +80,16 @@ def register_prospective_scoring(
                 {
                     "phase": "POSTGRES_PREPARE",
                     "error_type": "ConfigurationError",
-                    "error": (
-                        f"PostgreSQL DSN is missing; set "
-                        f"{options.postgres_dsn_env}"
-                    ),
+                    "error": (f"PostgreSQL DSN is missing; set {options.postgres_dsn_env}"),
                 }
             )
             registration_status = "BLOCKED"
         else:
             try:
-                receipts["postgres_prepare"] = (
-                    backend_functions.prepare_postgres(
-                        dsn,
-                        payload,
-                        frames,
-                    )
+                receipts["postgres_prepare"] = backend_functions.prepare_postgres(
+                    dsn,
+                    payload,
+                    frames,
                 )
             except Exception as exc:  # noqa: BLE001
                 failures.append(
@@ -142,12 +137,10 @@ def register_prospective_scoring(
 
         if registration_status == "PASS":
             try:
-                receipts["postgres_finalize"] = (
-                    backend_functions.finalize_postgres(
-                        dsn,
-                        payload,
-                        receipts["mlflow"],
-                    )
+                receipts["postgres_finalize"] = backend_functions.finalize_postgres(
+                    dsn,
+                    payload,
+                    receipts["mlflow"],
                 )
             except Exception as exc:  # noqa: BLE001
                 failures.append(
@@ -161,12 +154,10 @@ def register_prospective_scoring(
 
         if registration_status != "PASS" and dsn and "postgres_prepare" in receipts:
             try:
-                receipts["postgres_blocked"] = (
-                    backend_functions.mark_postgres_blocked(
-                        dsn,
-                        payload,
-                        failures[-1],
-                    )
+                receipts["postgres_blocked"] = backend_functions.mark_postgres_blocked(
+                    dsn,
+                    payload,
+                    failures[-1],
                 )
             except Exception as exc:  # noqa: BLE001
                 receipts["postgres_blocked"] = {
@@ -281,18 +272,10 @@ def verify_prospective_registry(root: Path) -> dict[str, Any]:
             "failures": failures,
         }
 
-    payload_core = {
-        key: value
-        for key, value in payload.items()
-        if key != "payload_sha256"
-    }
+    payload_core = {key: value for key, value in payload.items() if key != "payload_sha256"}
     if payload.get("payload_sha256") != _canonical_sha256(payload_core):
         failures.append("registry payload canonical SHA-256 mismatch")
-    manifest_core = {
-        key: value
-        for key, value in manifest.items()
-        if key != "manifest_sha256"
-    }
+    manifest_core = {key: value for key, value in manifest.items() if key != "manifest_sha256"}
     if manifest.get("manifest_sha256") != _canonical_sha256(manifest_core):
         failures.append("registry manifest canonical SHA-256 mismatch")
     if manifest.get("files") != _registry_file_inventory(root):
@@ -363,9 +346,7 @@ def verify_prospective_registry(root: Path) -> dict[str, Any]:
             if receipts.get(name, {}).get("status") != "PASS":
                 failures.append(f"required backend receipt is not PASS: {name}")
         parent_id = receipts.get("mlflow", {}).get("parent_run_id")
-        finalized_id = receipts.get("postgres_finalize", {}).get(
-            "mlflow_parent_run_id"
-        )
+        finalized_id = receipts.get("postgres_finalize", {}).get("mlflow_parent_run_id")
         if not parent_id or parent_id != finalized_id:
             failures.append("MLflow parent run differs from PostgreSQL finalization")
     elif registration_status != "BLOCKED":
@@ -380,12 +361,8 @@ def verify_prospective_registry(root: Path) -> dict[str, Any]:
             failures.append("current source scoring artifact verification failed")
         else:
             checks = {
-                "SCORING_REPORT.json": payload["source"][
-                    "scoring_report_sha256"
-                ],
-                "ARTIFACT_MANIFEST.json": payload["source"][
-                    "artifact_manifest_sha256"
-                ],
+                "SCORING_REPORT.json": payload["source"]["scoring_report_sha256"],
+                "ARTIFACT_MANIFEST.json": payload["source"]["artifact_manifest_sha256"],
                 "SHA256SUMS": payload["source"]["scoring_sha256s_sha256"],
                 "ACTUALS_LOCK.json": payload["source"]["actuals_lock_sha256"],
             }

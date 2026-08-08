@@ -25,14 +25,10 @@ def compare_predictions(
         before_std = np.std(before_values, axis=0)
         after_std = np.std(after_values, axis=0)
         mean_match = bool(
-            key_match
-            and shape_match
-            and np.allclose(before_mean, after_mean, rtol=rtol, atol=atol)
+            key_match and shape_match and np.allclose(before_mean, after_mean, rtol=rtol, atol=atol)
         )
         std_match = bool(
-            key_match
-            and shape_match
-            and np.allclose(before_std, after_std, rtol=rtol, atol=atol)
+            key_match and shape_match and np.allclose(before_std, after_std, rtol=rtol, atol=atol)
         )
         maximum = (
             float(np.max(np.abs(before_mean - after_mean)))
@@ -57,19 +53,21 @@ def compare_predictions(
         return bool(mean_match and std_match), maximum, details
 
     matched = bool(
-        key_match
-        and shape_match
-        and np.allclose(before_values, after_values, rtol=rtol, atol=atol)
+        key_match and shape_match and np.allclose(before_values, after_values, rtol=rtol, atol=atol)
     )
     maximum = (
         float(np.max(np.abs(before_values - after_values)))
         if key_match and shape_match and before_values.size
         else None
     )
-    return matched, maximum, {
-        "policy": policy,
-        "sample_count": 1,
-        "seeds": [random_seed],
-        "value_match": matched,
-        "max_abs_diff": maximum,
-    }
+    return (
+        matched,
+        maximum,
+        {
+            "policy": policy,
+            "sample_count": 1,
+            "seeds": [random_seed],
+            "value_match": matched,
+            "max_abs_diff": maximum,
+        },
+    )

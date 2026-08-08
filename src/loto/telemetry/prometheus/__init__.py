@@ -1,4 +1,5 @@
 """Strict low-cardinality Prometheus metric catalog and isolated collectors."""
+
 from .catalog import (
     ARTIFACT_TYPE_LABELS,
     COLUMN_GROUP_LABELS,

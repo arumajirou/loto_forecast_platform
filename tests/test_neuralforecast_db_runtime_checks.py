@@ -48,9 +48,7 @@ def runtime_certification(*, require_gpu: bool, stochastic: bool = False) -> dic
         "prediction_policy": "stochastic" if stochastic else "deterministic",
         "require_gpu": require_gpu,
         "training_evidence": (
-            {"formal_training_proof": True, "cuda_execution_evidence": True}
-            if require_gpu
-            else {}
+            {"formal_training_proof": True, "cuda_execution_evidence": True} if require_gpu else {}
         ),
         "formal_cuda_training_evidence": require_gpu,
         "cuda_pre_save_inference_evidence": require_gpu,

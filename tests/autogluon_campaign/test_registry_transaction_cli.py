@@ -17,15 +17,18 @@ from tests.autogluon_campaign.p19_test_support import (
 def test_cli_bootstrap_and_state(tmp_path: Path, capsys) -> None:
     path = tmp_path / "registry" / "state.json"
     path.parent.mkdir()
-    assert cli.main(
-        [
-            "bootstrap",
-            "--registry",
-            str(path),
-            "--registry-target",
-            registry_target(path),
-        ]
-    ) == 0
+    assert (
+        cli.main(
+            [
+                "bootstrap",
+                "--registry",
+                str(path),
+                "--registry-target",
+                registry_target(path),
+            ]
+        )
+        == 0
+    )
     capsys.readouterr()
     assert cli.main(["state", "--registry", str(path)]) == 0
     payload = json.loads(capsys.readouterr().out)
@@ -50,27 +53,30 @@ def test_cli_transact_and_verify_route_exact_arguments(
         )
 
     monkeypatch.setattr(cli, "create_registry_transaction", injected)
-    assert cli.main(
-        [
-            "transact",
-            "--p18",
-            str(p18),
-            "--registry",
-            str(registry),
-            "--output",
-            str(output),
-            "--run-id",
-            request.run_id,
-            "--git-commit",
-            request.git_commit,
-            "--expected-state-sha256",
-            request.expected_current_state_sha256,
-            "--transaction-nonce",
-            request.transaction_nonce,
-            "--executed-at-utc",
-            request.executed_at_utc,
-        ]
-    ) == 0
+    assert (
+        cli.main(
+            [
+                "transact",
+                "--p18",
+                str(p18),
+                "--registry",
+                str(registry),
+                "--output",
+                str(output),
+                "--run-id",
+                request.run_id,
+                "--git-commit",
+                request.git_commit,
+                "--expected-state-sha256",
+                request.expected_current_state_sha256,
+                "--transaction-nonce",
+                request.transaction_nonce,
+                "--executed-at-utc",
+                request.executed_at_utc,
+            ]
+        )
+        == 0
+    )
     transaction = json.loads(capsys.readouterr().out)
     assert transaction["decision"] == "REGISTRY_TRANSACTION_COMMITTED"
     assert cli.main(["verify", "--run", str(output)]) == 0

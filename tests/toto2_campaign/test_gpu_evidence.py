@@ -9,9 +9,7 @@ from loto.toto2_campaign.gpu_evidence import (
 
 
 def test_parse_and_summarize_provider_pid() -> None:
-    samples = parse_compute_apps_csv(
-        "1234, GPU-aaa, 64\n9999, GPU-bbb, 128\n1234, GPU-aaa, 70\n"
-    )
+    samples = parse_compute_apps_csv("1234, GPU-aaa, 64\n9999, GPU-bbb, 128\n1234, GPU-aaa, 70\n")
     summary = summarize_pid_samples(samples, 1234)
     assert summary == {
         "provider_pid": 1234,

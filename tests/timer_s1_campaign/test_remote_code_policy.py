@@ -159,9 +159,7 @@ def test_remote_code_review_requires_timezone() -> None:
             status="APPROVED",
             source_revision="b" * 40,
             reviewed_files={
-                name: digest(content)
-                for name, content in files.items()
-                if name.endswith(".py")
+                name: digest(content) for name, content in files.items() if name.endswith(".py")
             },
             shell_execution=False,
             subprocess_execution=False,

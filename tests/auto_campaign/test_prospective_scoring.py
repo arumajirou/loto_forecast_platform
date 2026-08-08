@@ -123,9 +123,7 @@ def _locked_source(tmp_path: Path, history: Path) -> Path:
         {
             "frozen_at": "2026-08-05T07:00:00+00:00",
             "actual_known": False,
-            "prediction_sha256": sha256_file(
-                bundle / "prediction_before_save.parquet"
-            ),
+            "prediction_sha256": sha256_file(bundle / "prediction_before_save.parquet"),
             "task": task_payload,
         },
     )
@@ -258,10 +256,7 @@ def test_scoring_artifact_mutation_is_detected(tmp_path: Path) -> None:
     verified = verify_prospective_scoring(output)
 
     assert verified["status"] == "FAIL"
-    assert any(
-        "SHA256SUMS mismatch: METRICS.parquet" in item
-        for item in verified["failures"]
-    )
+    assert any("SHA256SUMS mismatch: METRICS.parquet" in item for item in verified["failures"])
 
 
 def test_history_hash_mismatch_is_rejected_before_output_creation(tmp_path: Path) -> None:

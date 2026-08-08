@@ -177,10 +177,7 @@ def test_retrain_false_requires_prefit_evidence() -> None:
         evidence(fits=(), prefit=False),
     )
     assert failed.status == "FAILED"
-    assert any(
-        check.failure_class == "PREFIT_EVIDENCE_MISSING"
-        for check in failed.checks
-    )
+    assert any(check.failure_class == "PREFIT_EVIDENCE_MISSING" for check in failed.checks)
     passed = build_contract_report(
         frame(),
         POSITIONS,
@@ -213,9 +210,7 @@ def test_integer_retrain_schedule_is_verified_exactly() -> None:
     metric_values = calculate_metrics(point_tuple, POSITIONS)
     runtime = HistoricalRuntimeEvidence(
         records=point_tuple,
-        backtest_metrics={
-            name: float(metric_values[name]) for name in ("mae", "mse", "rmse")
-        },
+        backtest_metrics={name: float(metric_values[name]) for name in ("mae", "mse", "rmse")},
         residuals=canonical_residuals(point_tuple),
         observed_fit_origins=(4, 6),
         optimized_records=point_tuple,

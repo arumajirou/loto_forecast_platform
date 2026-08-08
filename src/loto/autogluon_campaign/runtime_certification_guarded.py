@@ -129,11 +129,7 @@ def verify_guarded_output(output_dir: Path) -> tuple[str, ...]:
 
     entries, manifest_errors = _parse_sha256sums(sums_path)
     errors.extend(manifest_errors)
-    expected = {
-        path.relative_to(root).as_posix()
-        for path in files
-        if path.name != "SHA256SUMS"
-    }
+    expected = {path.relative_to(root).as_posix() for path in files if path.name != "SHA256SUMS"}
     if set(entries) != expected:
         missing = sorted(expected - set(entries))
         extra = sorted(set(entries) - expected)

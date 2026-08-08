@@ -139,9 +139,7 @@ def _require_empty_output(path: Path) -> None:
     if path.exists() and not path.is_dir():
         raise StagedPipelinePreflightError(f"output is not a directory: {path}")
     if path.exists() and any(path.iterdir()):
-        raise StagedPipelinePreflightError(
-            "staged pipeline requires an empty output directory"
-        )
+        raise StagedPipelinePreflightError("staged pipeline requires an empty output directory")
     path.mkdir(parents=True, exist_ok=True)
 
 

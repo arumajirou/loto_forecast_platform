@@ -89,9 +89,7 @@ def verify_checksum_inventory(root: Path) -> None:
     if set(entries) != observed:
         missing = sorted(str(path) for path in observed - set(entries))
         stale = sorted(str(path) for path in set(entries) - observed)
-        raise ValueError(
-            f"checksum inventory mismatch: missing={missing}, stale={stale}"
-        )
+        raise ValueError(f"checksum inventory mismatch: missing={missing}, stale={stale}")
     for path, expected in entries.items():
         actual = sha256_file(path)
         if actual != expected:
@@ -121,9 +119,7 @@ def _classify_model(lane: str, model: dict[str, Any]) -> P7ModelClassification:
     reload = model.get("reload") if isinstance(model.get("reload"), dict) else None
     fit_status = str(fit.get("status", "FAILED"))
     reload_status = str(reload.get("status")) if reload is not None else None
-    fit_evidence = (
-        fit.get("evidence") if isinstance(fit.get("evidence"), dict) else {}
-    )
+    fit_evidence = fit.get("evidence") if isinstance(fit.get("evidence"), dict) else {}
     reload_evidence = (
         reload.get("evidence")
         if reload is not None and isinstance(reload.get("evidence"), dict)
@@ -143,9 +139,7 @@ def _classify_model(lane: str, model: dict[str, Any]) -> P7ModelClassification:
             load_process_id=reload_evidence.get("process_id"),
         )
     failed_evidence = (
-        reload_evidence
-        if reload is not None and reload_status != "VERIFIED"
-        else fit_evidence
+        reload_evidence if reload is not None and reload_status != "VERIFIED" else fit_evidence
     )
     failed_stage = (
         "load_predict"
@@ -153,9 +147,7 @@ def _classify_model(lane: str, model: dict[str, Any]) -> P7ModelClassification:
         else "fit_serialize"
     )
     raw_errors = (
-        model.get("errors")
-        or failed_evidence.get("errors")
-        or ["unclassified model failure"]
+        model.get("errors") or failed_evidence.get("errors") or ["unclassified model failure"]
     )
     status = (
         CertificationStatus.BLOCKED
@@ -169,9 +161,7 @@ def _classify_model(lane: str, model: dict[str, Any]) -> P7ModelClassification:
         model_class=model_class,
         certification_status=status,
         failed_stage=failed_stage,
-        failure_category=_failure_category(
-            failed_evidence.get("failure_category")
-        ),
+        failure_category=_failure_category(failed_evidence.get("failure_category")),
         errors=[str(error) for error in raw_errors],
         fit_status=fit_status,
         reload_status=reload_status,
@@ -227,9 +217,7 @@ def audit_lane(
 ) -> P7LaneAudit:
     if lane not in {"compat", "latest"}:
         raise ValueError("lane must be compat or latest")
-    missing = [
-        name for name in PRIMARY_FILES if not (artifact_root / name).is_file()
-    ]
+    missing = [name for name in PRIMARY_FILES if not (artifact_root / name).is_file()]
     if missing:
         return _incomplete_lane(
             lane,
@@ -265,11 +253,7 @@ def audit_lane(
         ):
             raise ValueError("lane identity mismatch across P6 artifacts")
         run_id = campaign.get("run_id")
-        if (
-            not run_id
-            or manifest.get("run_id") != run_id
-            or provenance.get("run_id") != run_id
-        ):
+        if not run_id or manifest.get("run_id") != run_id or provenance.get("run_id") != run_id:
             raise ValueError("run identity mismatch across P6 artifacts")
         if manifest.get("campaign_result_sha256") != result_sha:
             raise ValueError("campaign result file SHA-256 mismatch")
@@ -288,12 +272,8 @@ def audit_lane(
             "lane_uv_lock": sha256_file(lane_root / "uv.lock"),
             "campaign_result": result_sha,
             "campaign_manifest": manifest_sha,
-            "registry_source": sha256_file(
-                repo_root / "src/loto/adapters/gluonts/p6_registry.py"
-            ),
-            "contract_source": sha256_file(
-                repo_root / "src/loto/adapters/gluonts/p6_contract.py"
-            ),
+            "registry_source": sha256_file(repo_root / "src/loto/adapters/gluonts/p6_registry.py"),
+            "contract_source": sha256_file(repo_root / "src/loto/adapters/gluonts/p6_contract.py"),
         }
         for key, expected in expected_source_hashes.items():
             if provenance_hashes.get(key) != expected:
@@ -302,50 +282,32 @@ def audit_lane(
                     if key in {"lane_pyproject", "lane_uv_lock"}
                     else P7FailureCategory.PROVENANCE_MISMATCH
                 )
-                raise RuntimeError(
-                    f"{category.value}:{key} SHA-256 mismatch"
-                )
+                raise RuntimeError(f"{category.value}:{key} SHA-256 mismatch")
 
         lane_resolved = lane_root.resolve()
-        python_executable = Path(
-            str(provenance.get("python_executable", ""))
-        ).resolve()
-        python_prefix = Path(
-            str(provenance.get("python_prefix", ""))
-        ).resolve()
+        python_executable = Path(str(provenance.get("python_executable", ""))).resolve()
+        python_prefix = Path(str(provenance.get("python_prefix", ""))).resolve()
         if lane_resolved not in python_executable.parents:
-            raise RuntimeError(
-                "PROVENANCE_MISMATCH:python executable is outside isolated lane"
-            )
-        if (
-            lane_resolved not in python_prefix.parents
-            and python_prefix != lane_resolved
-        ):
-            raise RuntimeError(
-                "PROVENANCE_MISMATCH:python prefix is outside isolated lane"
-            )
+            raise RuntimeError("PROVENANCE_MISMATCH:python executable is outside isolated lane")
+        if lane_resolved not in python_prefix.parents and python_prefix != lane_resolved:
+            raise RuntimeError("PROVENANCE_MISMATCH:python prefix is outside isolated lane")
         versions = provenance.get("versions")
         if (
             not isinstance(versions, dict)
             or not versions.get("gluonts")
             or not versions.get("torch")
         ):
-            raise RuntimeError(
-                "PROVENANCE_MISMATCH:isolated runtime versions are incomplete"
-            )
+            raise RuntimeError("PROVENANCE_MISMATCH:isolated runtime versions are incomplete")
 
         raw_models = campaign.get("models")
         if not isinstance(raw_models, list) or len(raw_models) != 9:
-            raise ValueError(
-                "campaign must contain exactly nine model lifecycles"
-            )
+            raise ValueError("campaign must contain exactly nine model lifecycles")
         names = [str(model.get("model_class", "")) for model in raw_models]
         if tuple(names) != EXPECTED_MODELS:
             raise ValueError(f"campaign model order/set mismatch: {names}")
         model_statuses = manifest.get("model_statuses")
         expected_statuses = {
-            str(model["model_class"]): str(model["status"])
-            for model in raw_models
+            str(model["model_class"]): str(model["status"]) for model in raw_models
         }
         if model_statuses != expected_statuses:
             raise ValueError("campaign manifest model statuses mismatch")
@@ -367,11 +329,7 @@ def audit_lane(
             certification = CertificationStatus.PARTIALLY_VERIFIED
             errors = ["lane contains mixed model lifecycle states"]
         categories = sorted(
-            {
-                model.failure_category
-                for model in models
-                if model.failure_category is not None
-            },
+            {model.failure_category for model in models if model.failure_category is not None},
             key=lambda item: item.value,
         )
         return P7LaneAudit(
@@ -432,24 +390,17 @@ def build_target_audit(
     else:
         evidence_state = EvidenceState.VALID
     registry_match = (
-        compat.registry_sha256 is not None
-        and compat.registry_sha256 == latest.registry_sha256
+        compat.registry_sha256 is not None and compat.registry_sha256 == latest.registry_sha256
     )
     compat_names = {model.model_class for model in compat.models}
     latest_names = {model.model_class for model in latest.models}
-    model_set_match = (
-        bool(compat_names)
-        and compat_names == latest_names == set(EXPECTED_MODELS)
-    )
+    model_set_match = bool(compat_names) and compat_names == latest_names == set(EXPECTED_MODELS)
     all_models = [*compat.models, *latest.models]
     verified = sum(
-        model.certification_status is CertificationStatus.VERIFIED
-        for model in all_models
+        model.certification_status is CertificationStatus.VERIFIED for model in all_models
     )
     counts = Counter(
-        model.failure_category.value
-        for model in all_models
-        if model.failure_category is not None
+        model.failure_category.value for model in all_models if model.failure_category is not None
     )
     errors: list[str] = []
     if evidence_state is EvidenceState.INVALID:
@@ -515,8 +466,7 @@ def write_target_audit(
         "schema_version": 1,
         "run_id": audit.run_id,
         "rows": [
-            model.model_dump(mode="json")
-            for model in [*audit.compat.models, *audit.latest.models]
+            model.model_dump(mode="json") for model in [*audit.compat.models, *audit.latest.models]
         ],
     }
     matrix_sha = atomic_write_json(matrix_path, matrix)

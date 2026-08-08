@@ -17,6 +17,7 @@ from loto.orchestration.pipeline_downstream_effects import (
     DownstreamCommitConfig,
 )
 
+
 class FakeEffects:
     def __init__(self, *, fail_once: str | None = None):
         self.calls: list[str] = []
@@ -47,11 +48,15 @@ class FakeEffects:
 
     def ensure_event(self, prepared):
         return self._run("event_publication")
+
+
 def _write_json(path: Path, payload) -> None:
     path.write_text(
         json.dumps(payload, sort_keys=True),
         encoding="utf-8",
     )
+
+
 def make_staged_output(root: Path) -> dict:
     root.mkdir()
     run_id = "pipeline-ledger-test"
@@ -76,10 +81,7 @@ def make_staged_output(root: Path) -> dict:
             "deferred_operations": [
                 "Registry.record_stage",
                 "Registry.record_forecast",
-                (
-                    "PlatformRegistry.create_run/update_run/"
-                    "register_forecast/register_model"
-                ),
+                ("PlatformRegistry.create_run/update_run/register_forecast/register_model"),
                 "MlflowBridge.record_run",
                 "create_release_bundle",
                 "ArtifactStore.put_file",
@@ -156,14 +158,20 @@ def make_staged_output(root: Path) -> dict:
         "ledger_sha256": ledger_sha,
         "forecast": forecast,
     }
+
+
 def fake_validator(ledger, saved):
     return {
         "run_id": ledger["run_id"],
         "ledger_sha256": ledger["ledger_sha256"],
         "verified_events": saved["verified_event_count"],
     }
+
+
 def fake_seal_verifier(sealed, secret):
     return sealed.get("signature") == "test" and len(secret) >= 16
+
+
 def execute(root: Path, effects: FakeEffects):
     return execute_downstream_commit(
         root,
@@ -187,11 +195,7 @@ def _install_fake_mlflow(monkeypatch):
 
     def get_experiment_by_name(name):
         value = experiments.get(name)
-        return (
-            None
-            if value is None
-            else types.SimpleNamespace(experiment_id=value)
-        )
+        return None if value is None else types.SimpleNamespace(experiment_id=value)
 
     def create_experiment(name):
         value = str(len(experiments) + 1)
@@ -205,11 +209,9 @@ def _install_fake_mlflow(monkeypatch):
         output_format,
     ):
         commit_id = filter_string.split("'")[1]
-        return [
-            run
-            for run in runs
-            if run.data.tags.get("loto_commit_id") == commit_id
-        ][:max_results]
+        return [run for run in runs if run.data.tags.get("loto_commit_id") == commit_id][
+            :max_results
+        ]
 
     class Context:
         def __init__(self, run):
@@ -225,9 +227,7 @@ def _install_fake_mlflow(monkeypatch):
 
     def start_run(experiment_id, run_name):
         run = types.SimpleNamespace(
-            info=types.SimpleNamespace(
-                run_id=f"mlflow-{len(runs) + 1}"
-            ),
+            info=types.SimpleNamespace(run_id=f"mlflow-{len(runs) + 1}"),
             data=types.SimpleNamespace(tags={}),
         )
         return Context(run)
@@ -246,6 +246,7 @@ def _install_fake_mlflow(monkeypatch):
     module.log_artifact = lambda value: None
     monkeypatch.setitem(__import__("sys").modules, "mlflow", module)
     return runs
+
 
 def test_default_effects_are_idempotent_with_local_backends(
     tmp_path: Path,
@@ -276,12 +277,8 @@ def test_default_effects_are_idempotent_with_local_backends(
     assert len(mlflow_runs) == 1
 
     with sqlite3.connect(root / "registry.sqlite3") as connection:
-        assert connection.execute(
-            "SELECT COUNT(*) FROM stage_events"
-        ).fetchone()[0] == 1
-        assert connection.execute(
-            "SELECT COUNT(*) FROM forecasts"
-        ).fetchone()[0] == 1
+        assert connection.execute("SELECT COUNT(*) FROM stage_events").fetchone()[0] == 1
+        assert connection.execute("SELECT COUNT(*) FROM forecasts").fetchone()[0] == 1
     with sqlite3.connect(root / "platform.sqlite3") as connection:
         for table in (
             "runs",
@@ -290,14 +287,9 @@ def test_default_effects_are_idempotent_with_local_backends(
             "forecasts",
             "audit_log",
         ):
-            assert connection.execute(
-                f"SELECT COUNT(*) FROM {table}"
-            ).fetchone()[0] == 1
-    assert len(
-        (root / "events.jsonl").read_text(
-            encoding="utf-8"
-        ).splitlines()
-    ) == 1
+            assert connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0] == 1
+    assert len((root / "events.jsonl").read_text(encoding="utf-8").splitlines()) == 1
+
 
 def test_platform_model_conflict_blocks_candidate_registration(
     tmp_path: Path,
@@ -337,8 +329,6 @@ def test_platform_model_conflict_blocks_candidate_registration(
             root,
             DefaultDownstreamEffects(config),
         )
-    state = json.loads(
-        (root / "downstream_commit_state.json").read_text()
-    )
+    state = json.loads((root / "downstream_commit_state.json").read_text())
     assert state["status"] == "RETRY_REQUIRED"
     assert not (root / "downstream_commit_receipt.json").exists()

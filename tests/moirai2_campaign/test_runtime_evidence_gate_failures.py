@@ -21,6 +21,7 @@ from tests.moirai2_campaign.p8c_evidence_mutations import (
     _rewrite_response_and_evidence,
 )
 
+
 def test_same_campaign_directory_is_rejected(tmp_path: Path) -> None:
     supported = _campaign(
         tmp_path / "supported",
@@ -243,5 +244,3 @@ def test_same_reload_pid_is_rejected(tmp_path: Path) -> None:
             expected_runtime_lane="supported-py311",
             expected_device="cpu",
         )
-
-

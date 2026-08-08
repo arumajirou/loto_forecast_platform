@@ -64,25 +64,15 @@ class GameMatrix(BaseModel):
             raise ValueError("draw_no and values row counts differ")
         if len(self.legal_min) != width or len(self.legal_max) != width:
             raise ValueError("legal bounds must match position count")
-        if any(
-            high < low
-            for low, high in zip(self.legal_min, self.legal_max, strict=True)
-        ):
+        if any(high < low for low, high in zip(self.legal_min, self.legal_max, strict=True)):
             raise ValueError("legal_max must be >= legal_min")
-        if self.draw_no != sorted(self.draw_no) or len(set(self.draw_no)) != len(
-            self.draw_no
-        ):
+        if self.draw_no != sorted(self.draw_no) or len(set(self.draw_no)) != len(self.draw_no):
             raise ValueError("draw_no must be strictly increasing and unique")
-        if any(
-            next_no != current + 1
-            for current, next_no in zip(self.draw_no, self.draw_no[1:])
-        ):
+        if any(next_no != current + 1 for current, next_no in zip(self.draw_no, self.draw_no[1:])):
             raise ValueError("draw_no must be gap-free")
         for row_index, row in enumerate(self.values):
             if len(row) != width:
-                raise ValueError(
-                    f"row {row_index} width does not match position_names"
-                )
+                raise ValueError(f"row {row_index} width does not match position_names")
             for column, value in enumerate(row):
                 if not math.isfinite(value):
                     raise ValueError("values must be finite")
@@ -95,17 +85,13 @@ class ValidationBenchmarkRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal["1.0"] = "1.0"
-    operation: Literal["chronological_validation_benchmark"] = (
-        "chronological_validation_benchmark"
-    )
+    operation: Literal["chronological_validation_benchmark"] = "chronological_validation_benchmark"
     output_dir: str = Field(min_length=1)
     environment_lane: Literal["classic-py312"] = "classic-py312"
     expected_sktime_version: Literal["1.0.1"] = "1.0.1"
     dataset: GameMatrix
     split: ChronologicalSplit
-    baseline_ids: list[BaselineId] = Field(
-        default_factory=lambda: list(FORMAL_BASELINES)
-    )
+    baseline_ids: list[BaselineId] = Field(default_factory=lambda: list(FORMAL_BASELINES))
     model_ids: list[SmokeModelId] = Field(default_factory=lambda: list(FORMAL_MODELS))
     random_seeds: list[int] = Field(default_factory=lambda: [1, 2, 3], min_length=3)
     season_length: int = Field(default=7, ge=1)
@@ -168,9 +154,7 @@ def data_contract(request: ValidationBenchmarkRequest) -> dict[str, Any]:
         "validation_draw_no": views["validation_draw_no"],
         "holdout_draw_no": views["holdout_draw_no"],
         "train_values_sha256": canonical_sha256(views["train"].tolist()),
-        "validation_values_sha256": canonical_sha256(
-            views["validation"].tolist()
-        ),
+        "validation_values_sha256": canonical_sha256(views["validation"].tolist()),
         "holdout_values_sha256": canonical_sha256(views["holdout"].tolist()),
         "fit_scope": "TRAIN_ONLY",
         "evaluation_scope": "VALIDATION_ONLY",
@@ -213,8 +197,7 @@ def compute_metrics(
     return {
         "hit_at_1": float(hit_matrix.mean()),
         "position_hit_at_1": {
-            name: float(hit_matrix[:, index].mean())
-            for index, name in enumerate(position_names)
+            name: float(hit_matrix[:, index].mean()) for index, name in enumerate(position_names)
         },
         "all_position_hit_at_1": float(hit_matrix.all(axis=1).mean()),
         "mae": float(absolute_error.mean()),
@@ -258,16 +241,12 @@ def baseline_predictions(
     elif baseline_id is BaselineId.LAST:
         values = train[-1]
     elif baseline_id is BaselineId.FREQUENCY:
-        values = np.asarray(
-            [_frequency_value(train[:, index]) for index in range(width)]
-        )
+        values = np.asarray([_frequency_value(train[:, index]) for index in range(width)])
     elif baseline_id is BaselineId.SEASONAL_NAIVE:
         if train.shape[0] < season_length:
             raise ValueError("seasonal_naive requires at least one full season")
         seasonal = train[-season_length:]
-        return np.vstack(
-            [seasonal[index % season_length] for index in range(horizon)]
-        )
+        return np.vstack([seasonal[index % season_length] for index in range(horizon)])
     else:  # pragma: no cover
         raise ValueError(f"unsupported baseline: {baseline_id}")
     return np.tile(values, (horizon, 1)).astype(float)
@@ -320,9 +299,7 @@ def evaluate_sktime_model(
     request: ValidationBenchmarkRequest,
 ) -> dict[str, Any]:
     spec = MODEL_SPECS[model_id]
-    dependency_versions, missing = _distribution_versions(
-        spec.required_distributions
-    )
+    dependency_versions, missing = _distribution_versions(spec.required_distributions)
     base: dict[str, Any] = {
         "candidate_id": model_id.value,
         "candidate_kind": "sktime",
@@ -410,9 +387,7 @@ def aggregate_seed_results(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if passed:
             aggregate["metrics"] = {}
             for name in metric_names:
-                values = np.asarray(
-                    [row["metrics"][name] for row in passed], dtype=float
-                )
+                values = np.asarray([row["metrics"][name] for row in passed], dtype=float)
                 worst = float(values.min()) if "hit" in name else float(values.max())
                 aggregate["metrics"][name] = {
                     "mean": float(values.mean()),
@@ -424,9 +399,7 @@ def aggregate_seed_results(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def build_leaderboard(aggregates: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    eligible = [
-        row for row in aggregates if row.get("status") == "PASS" and "metrics" in row
-    ]
+    eligible = [row for row in aggregates if row.get("status") == "PASS" and "metrics" in row]
     return sorted(
         eligible,
         key=lambda row: (
@@ -444,11 +417,7 @@ def run_validation_benchmark(request: ValidationBenchmarkRequest) -> dict[str, A
     validation = views["validation"]
     rows: list[dict[str, Any]] = []
     for baseline_id in request.baseline_ids:
-        seeds = (
-            request.random_seeds
-            if baseline_id is BaselineId.RANDOM_UNIFORM
-            else [1]
-        )
+        seeds = request.random_seeds if baseline_id is BaselineId.RANDOM_UNIFORM else [1]
         rows.extend(
             evaluate_baseline(
                 baseline_id,
@@ -471,11 +440,7 @@ def run_validation_benchmark(request: ValidationBenchmarkRequest) -> dict[str, A
     aggregates = aggregate_seed_results(rows)
     leaderboard = build_leaderboard(aggregates)
     pass_count = sum(row.get("status") == "PASS" for row in rows)
-    overall = (
-        "PASS"
-        if pass_count == len(rows)
-        else ("PARTIAL" if pass_count else "FAILED")
-    )
+    overall = "PASS" if pass_count == len(rows) else ("PARTIAL" if pass_count else "FAILED")
     return {
         "schema_version": "1.0",
         "status": overall,
@@ -485,8 +450,6 @@ def run_validation_benchmark(request: ValidationBenchmarkRequest) -> dict[str, A
         "candidate_results": rows,
         "seed_aggregates": aggregates,
         "leaderboard": leaderboard,
-        "best_validation_candidate": (
-            leaderboard[0]["candidate_id"] if leaderboard else None
-        ),
+        "best_validation_candidate": (leaderboard[0]["candidate_id"] if leaderboard else None),
         "promotion_status": "VALIDATION_ONLY_NOT_PROMOTED",
     }

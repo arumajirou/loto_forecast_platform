@@ -108,9 +108,7 @@ class BaselineManifest(StrictModel):
             raise ValueError("baseline inventory contains duplicates")
         missing = set(REQUIRED_BASELINE_IDS).difference(value)
         if missing:
-            raise ValueError(
-                f"baseline inventory is missing required baselines: {sorted(missing)}"
-            )
+            raise ValueError(f"baseline inventory is missing required baselines: {sorted(missing)}")
         return value
 
 

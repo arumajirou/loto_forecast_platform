@@ -116,9 +116,7 @@ def build_common_identities(
         for item in request.llm_identity.files
     ]
     config_sha256 = next(
-        item.sha256
-        for item in request.llm_identity.files
-        if item.relative_path == "config.json"
+        item.sha256 for item in request.llm_identity.files if item.relative_path == "config.json"
     )
     request_identity = sdk.root.RequestIdentity(
         request_id=request.run_id,
@@ -223,9 +221,7 @@ def _gpu_pid_absent(provider_pid: int) -> bool:
     if completed.returncode != 0:
         return False
     active_pids = {
-        int(line.strip())
-        for line in completed.stdout.splitlines()
-        if line.strip().isdigit()
+        int(line.strip()) for line in completed.stdout.splitlines() if line.strip().isdigit()
     }
     return provider_pid not in active_pids
 
@@ -309,13 +305,16 @@ def _prepare_output_root(output_root: Path) -> Path:
 
 
 def _atomic_write_request(path: Path, request: AutoTimeLLMRuntimeRequest) -> None:
-    content = json.dumps(
-        canonical_request_payload(request),
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-        allow_nan=False,
-    ) + "\n"
+    content = (
+        json.dumps(
+            canonical_request_payload(request),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n"
+    )
     temporary = path.with_name(f".{path.name}.tmp")
     try:
         with temporary.open("w", encoding="utf-8") as handle:

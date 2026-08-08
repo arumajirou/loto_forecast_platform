@@ -201,8 +201,7 @@ class DependencyHealthService:
             missing = sorted(item.value for item in expected - actual)
             extra = sorted(item.value for item in actual - expected)
             raise ValueError(
-                "dependency probe inventory mismatch: "
-                f"missing={missing}, extra={extra}"
+                f"dependency probe inventory mismatch: missing={missing}, extra={extra}"
             )
         self._specs = tuple(specs)
         self.timeout_seconds = timeout_seconds
@@ -285,8 +284,7 @@ def classify_readiness(statuses: Sequence[DependencyStatus]) -> ReadinessStatus:
         DependencyState.UNKNOWN,
     }
     if any(
-        item.criticality == DependencyCriticality.REQUIRED
-        and item.state in required_failure_states
+        item.criticality == DependencyCriticality.REQUIRED and item.state in required_failure_states
         for item in statuses
     ):
         return ReadinessStatus.UNREADY

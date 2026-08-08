@@ -29,11 +29,13 @@ class FakeFeatureManifest:
     def model_dump(self, mode="json"):
         return {"feature_set_id": self.feature_set_id}
 
+
 @dataclass
 class FakeCandidate:
     candidate_number: int
     probability: float
     rank_score: float
+
 
 class FakeForecast:
     def __init__(self, **kwargs):
@@ -46,6 +48,7 @@ class FakeForecast:
         for key in ("created_at", "draw_time"):
             result[key] = result[key].isoformat()
         return result
+
 
 class UniformAdapter:
     model_id = "uniform"
@@ -63,6 +66,7 @@ class UniformAdapter:
             }
         )
 
+
 class FrequencyAdapter(UniformAdapter):
     model_id = "frequency"
 
@@ -71,12 +75,14 @@ class FrequencyAdapter(UniformAdapter):
         frame["rank_score"] = np.linspace(0, 1, 37)
         return frame
 
+
 class PositionAdapter:
     def fit(self, frame):
         return self
 
     def predict_matrix(self):
         return np.zeros((7, 37))
+
 
 class FakeRecorder:
     last = None
@@ -128,6 +134,7 @@ class FakeRecorder:
             verified_events=len(self.log),
             coverage_gaps=(),
         )
+
 
 def fake_components(log):
     def canonicalize(frame, source):
@@ -193,6 +200,7 @@ def fake_components(log):
         collect_gpu_evidence=lambda gpu_required: {"eligible": True},
     )
 
+
 def make_csv(path: Path) -> None:
     rows = []
     for draw in range(1, 11):
@@ -201,6 +209,7 @@ def make_csv(path: Path) -> None:
             row[f"n{index}"] = index
         rows.append(row)
     pd.DataFrame(rows).to_csv(path, index=False)
+
 
 def test_staged_pipeline_is_ready_without_downstream_side_effects(tmp_path: Path) -> None:
     input_csv = tmp_path / "input.csv"
@@ -236,6 +245,7 @@ def test_staged_pipeline_is_ready_without_downstream_side_effects(tmp_path: Path
         }
         assert positions["predict"] < positions["actual"] < positions["score"]
 
+
 def test_source_pin_mismatch_blocks_before_output(tmp_path: Path) -> None:
     input_csv = tmp_path / "input.csv"
     make_csv(input_csv)
@@ -251,6 +261,7 @@ def test_source_pin_mismatch_blocks_before_output(tmp_path: Path) -> None:
             components=fake_components([]),
             recorder_factory=FakeRecorder,
         )
+
 
 def test_nonempty_output_is_rejected(tmp_path: Path) -> None:
     input_csv = tmp_path / "input.csv"
@@ -271,6 +282,7 @@ def test_nonempty_output_is_rejected(tmp_path: Path) -> None:
             recorder_factory=FakeRecorder,
         )
 
+
 def test_short_secret_is_rejected(tmp_path: Path) -> None:
     input_csv = tmp_path / "input.csv"
     make_csv(input_csv)
@@ -286,6 +298,7 @@ def test_short_secret_is_rejected(tmp_path: Path) -> None:
             components=fake_components([]),
             recorder_factory=FakeRecorder,
         )
+
 
 def test_symlink_input_is_rejected(tmp_path: Path) -> None:
     real = tmp_path / "input.csv"
@@ -304,6 +317,7 @@ def test_symlink_input_is_rejected(tmp_path: Path) -> None:
             components=fake_components([]),
             recorder_factory=FakeRecorder,
         )
+
 
 def test_unverified_forecast_seal_blocks_staged_pipeline(tmp_path: Path) -> None:
     input_csv = tmp_path / "input.csv"

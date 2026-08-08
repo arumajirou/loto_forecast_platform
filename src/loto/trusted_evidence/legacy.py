@@ -59,9 +59,7 @@ def legacy_actual_source_evidence(
         parser_version=str(actuals_lock.get("schema_version") or "UNKNOWN"),
         parser_code_sha256=actuals_lock_sha256,
         source_format="LEGACY_ACTUALS_LOCK",
-        input_raw_bytes_sha256=str(
-            (actuals_lock.get("actuals_input") or {}).get("sha256")
-        ),
+        input_raw_bytes_sha256=str((actuals_lock.get("actuals_input") or {}).get("sha256")),
         output_payload_sha256=str(actuals_lock.get("actuals_normalized_sha256")),
         parsed_at_utc=datetime.fromisoformat(
             str(actuals_lock.get("ingested_at")).replace("Z", "+00:00")

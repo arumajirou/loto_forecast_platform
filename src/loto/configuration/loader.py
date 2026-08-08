@@ -88,18 +88,12 @@ def _parse_integer_list(value: str) -> list[int]:
 ENVIRONMENT_OVERRIDES: dict[str, OverrideSpec] = {
     "LOTO_CONFIG_EXPERIMENT_NAME": OverrideSpec(("experiment_name",), _parse_string),
     "LOTO_CONFIG_OUTPUT_DIR": OverrideSpec(("runtime", "output_dir"), _parse_string),
-    "LOTO_CONFIG_REQUESTED_DEVICE": OverrideSpec(
-        ("runtime", "device", "requested"), _parse_string
-    ),
+    "LOTO_CONFIG_REQUESTED_DEVICE": OverrideSpec(("runtime", "device", "requested"), _parse_string),
     "LOTO_CONFIG_CPU_FALLBACK_POLICY": OverrideSpec(
         ("runtime", "device", "cpu_fallback_policy"), _parse_string
     ),
-    "LOTO_CONFIG_SEEDS": OverrideSpec(
-        ("evaluation", "seed_policy", "seeds"), _parse_integer_list
-    ),
-    "LOTO_CONFIG_MLFLOW_ENABLED": OverrideSpec(
-        ("observability", "mlflow", "enabled"), _parse_bool
-    ),
+    "LOTO_CONFIG_SEEDS": OverrideSpec(("evaluation", "seed_policy", "seeds"), _parse_integer_list),
+    "LOTO_CONFIG_MLFLOW_ENABLED": OverrideSpec(("observability", "mlflow", "enabled"), _parse_bool),
     "LOTO_CONFIG_MLFLOW_TRACKING_URI": OverrideSpec(
         ("observability", "mlflow", "tracking_uri"), _parse_string
     ),
@@ -250,12 +244,15 @@ def write_resolved_config(resolved: ResolvedConfig, output: str | Path) -> tuple
     target = Path(output)
     target.parent.mkdir(parents=True, exist_ok=True)
     sidecar = target.with_name(f"{target.name}.sha256")
-    content = json.dumps(
-        resolved.envelope(),
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-    ) + "\n"
+    content = (
+        json.dumps(
+            resolved.envelope(),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
     _atomic_write_text(target, content)
     artifact_sha256 = _file_sha256(target)
     _atomic_write_text(sidecar, f"{artifact_sha256}  {target.name}\n")

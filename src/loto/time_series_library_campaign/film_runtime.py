@@ -27,8 +27,7 @@ def verify_pinned_film_source(source_root: Path) -> dict[str, Any]:
     actual = git_blob_sha(path)
     if actual != PINNED_FILM_GIT_BLOB:
         raise ValueError(
-            f"pinned source mismatch: models/FiLM.py: expected {PINNED_FILM_GIT_BLOB}, "
-            f"got {actual}"
+            f"pinned source mismatch: models/FiLM.py: expected {PINNED_FILM_GIT_BLOB}, got {actual}"
         )
     return {
         "status": "VERIFIED",

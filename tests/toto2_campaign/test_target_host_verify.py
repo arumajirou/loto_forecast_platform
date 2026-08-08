@@ -41,17 +41,15 @@ def _build_archive(path: Path, *, break_gpu: bool = False) -> str:
                             "effective_arguments": {"actuals_used": False},
                         }
                     )
-                    files[
-                        f"cases/{case_id}/runtime/CERTIFICATION_RESULT.json"
-                    ] = _json_bytes(
+                    files[f"cases/{case_id}/runtime/CERTIFICATION_RESULT.json"] = _json_bytes(
                         {
                             "status": "PASS",
                             "two_process_exact_replay": True,
                         }
                     )
-                    files[
-                        f"cases/{case_id}/runtime/REPLAY_COMPARISON.json"
-                    ] = _json_bytes({"exact_equal": True})
+                    files[f"cases/{case_id}/runtime/REPLAY_COMPARISON.json"] = _json_bytes(
+                        {"exact_equal": True}
+                    )
                     for process in ("process-1", "process-2"):
                         cuda = device == "cuda"
                         captured = cuda and not break_gpu
@@ -66,13 +64,9 @@ def _build_archive(path: Path, *, break_gpu: bool = False) -> str:
                             "runtime_scope": "FULL_INFERENCE",
                         }
                         prefix = f"cases/{case_id}/runtime/{process}"
-                        files[f"{prefix}/runtime_evidence.json"] = _json_bytes(
-                            evidence
-                        )
+                        files[f"{prefix}/runtime_evidence.json"] = _json_bytes(evidence)
                         if cuda:
-                            files[
-                                f"{prefix}/external_gpu_pid_evidence.json"
-                            ] = _json_bytes(
+                            files[f"{prefix}/external_gpu_pid_evidence.json"] = _json_bytes(
                                 {
                                     "captured": captured,
                                     "gpu_uuids": ["GPU-test"] if captured else [],
@@ -103,12 +97,9 @@ def _build_archive(path: Path, *, break_gpu: bool = False) -> str:
             "files": manifest_entries,
         }
     )
-    files["SHA256SUMS"] = (
-        "".join(
-            f"{entry['sha256']}  {entry['path']}\n"
-            for entry in manifest_entries
-        ).encode()
-    )
+    files["SHA256SUMS"] = "".join(
+        f"{entry['sha256']}  {entry['path']}\n" for entry in manifest_entries
+    ).encode()
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for name, data in sorted(files.items()):
             info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))

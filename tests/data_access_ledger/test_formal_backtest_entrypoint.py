@@ -10,10 +10,7 @@ import pytest
 from loto.orchestration import formal_backtest_entrypoint_support as support
 from loto.orchestration.formal_backtest_execution import run_instrumented_fold
 
-MAIN_SOURCE = (
-    Path(__file__).resolve().parents[2]
-    / "src/loto/orchestration/formal_backtest_main.py"
-)
+MAIN_SOURCE = Path(__file__).resolve().parents[2] / "src/loto/orchestration/formal_backtest_main.py"
 
 
 def fake_parser_module() -> ModuleType:
@@ -88,8 +85,7 @@ def test_runtime_events_precede_leakage_check() -> None:
             None,
         ),
         np=np,
-        execute_leakage_checks=lambda *args: order.append("leakage")
-        or {"status": "PASS"},
+        execute_leakage_checks=lambda *args: order.append("leakage") or {"status": "PASS"},
     )
     result = run_instrumented_fold(
         module=module,

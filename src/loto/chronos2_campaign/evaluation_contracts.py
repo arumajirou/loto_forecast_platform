@@ -66,9 +66,7 @@ class OOFConfig(StrictModel):
             raise ValueError("sort_policy must be ascending or preserve")
         if not self.allow_validation_overlap and self.step_size < self.horizon:
             raise ValueError("step_size must be >= horizon when overlap is disabled")
-        if self.fixed_values is not None and len(self.fixed_values) != len(
-            self.position_columns
-        ):
+        if self.fixed_values is not None and len(self.fixed_values) != len(self.position_columns):
             raise ValueError("fixed_values length must equal position count")
         if self.position_ranges:
             if set(self.position_ranges) != set(self.position_columns):

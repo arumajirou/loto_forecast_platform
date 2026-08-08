@@ -8,6 +8,7 @@ import pandas as pd
 from .calibration_contracts import CalibrationConfig
 from .evaluation_contracts import OOFConfig
 
+
 def _quantile_column(level: float) -> str:
     return f"q_{level}"
 
@@ -94,13 +95,9 @@ def _validate_inputs(
         raise ValueError("every fold must have chronology_verified=true")
     fold_table["chronology_verified"] = verified
     fold_table = fold_table.sort_values("validation_start", kind="stable").reset_index(drop=True)
-    train_ends = pd.to_numeric(
-        fold_table["train_end_exclusive"], errors="raise"
-    ).to_numpy()
+    train_ends = pd.to_numeric(fold_table["train_end_exclusive"], errors="raise").to_numpy()
     starts = pd.to_numeric(fold_table["validation_start"], errors="raise").to_numpy()
-    ends = pd.to_numeric(
-        fold_table["validation_end_exclusive"], errors="raise"
-    ).to_numpy()
+    ends = pd.to_numeric(fold_table["validation_end_exclusive"], errors="raise").to_numpy()
     if len(starts) > 1 and not np.all(np.diff(starts) > 0):
         raise ValueError("validation_start values must be strictly increasing")
     if not np.all(train_ends <= starts):
@@ -126,8 +123,7 @@ def _validate_inputs(
     expected_rows = len(fold_ids) * len(seeds) * len(config.position_columns) * config.horizon
     if len(selected) != expected_rows:
         raise ValueError(
-            "source candidate grid is incomplete: "
-            f"rows={len(selected)}, expected={expected_rows}"
+            f"source candidate grid is incomplete: rows={len(selected)}, expected={expected_rows}"
         )
 
     consistency = selected.groupby(["fold_id", "position", "horizon_step"])["actual"]
@@ -143,9 +139,7 @@ def _validate_inputs(
             raise ValueError(f"column {column} contains non-finite values")
         selected[column] = values
 
-    selected["horizon_step"] = pd.to_numeric(
-        selected["horizon_step"], errors="raise"
-    ).astype(int)
+    selected["horizon_step"] = pd.to_numeric(selected["horizon_step"], errors="raise").astype(int)
     selected["fold_id"] = selected["fold_id"].astype(str)
     return selected, fold_table, fold_ids, seeds
 
@@ -167,4 +161,3 @@ def _split_prior_folds(
     if len(conformal_ids) < config.min_conformal_folds:
         raise RuntimeError("internal split produced too few conformal folds")
     return fit_ids, conformal_ids
-

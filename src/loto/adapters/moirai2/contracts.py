@@ -72,9 +72,9 @@ class Moirai2ProviderRequest(BaseModel):
     time_semantics: TimeSemantics = TimeSemantics.DRAW_SEQUENCE
     past_covariates: dict[str, list[NumericScalar]] = Field(default_factory=dict)
     future_covariates: dict[str, list[NumericScalar]] = Field(default_factory=dict)
-    future_covariate_availability: dict[
-        str, Literal["known_at_prediction_time"]
-    ] = Field(default_factory=dict)
+    future_covariate_availability: dict[str, Literal["known_at_prediction_time"]] = Field(
+        default_factory=dict
+    )
     context_length: StrictInt = Field(default=128, ge=1)
     prediction_length: Literal[1, 2, 5] = 1
     native_quantile_levels: tuple[float, ...] = NATIVE_QUANTILE_LEVELS
@@ -131,9 +131,7 @@ class Moirai2ProviderRequest(BaseModel):
         expected_columns = set(self.position_columns)
         for index, row in enumerate(self.history):
             if set(row) != expected_columns:
-                raise ValueError(
-                    f"history row {index} columns differ from position_columns"
-                )
+                raise ValueError(f"history row {index} columns differ from position_columns")
         if self.timestamps and len(self.timestamps) != len(self.history):
             raise ValueError("timestamps must be empty or match history length")
         if self.timestamps:
@@ -155,14 +153,10 @@ class Moirai2ProviderRequest(BaseModel):
                 )
         expected_known_future = len(self.history) + self.prediction_length
         if set(self.future_covariates) != set(self.future_covariate_availability):
-            raise ValueError(
-                "future covariates require matching known-at-prediction-time evidence"
-            )
+            raise ValueError("future covariates require matching known-at-prediction-time evidence")
         for name, values in self.future_covariates.items():
             if len(values) != expected_known_future:
-                raise ValueError(
-                    f"future covariate {name!r} must contain history+horizon values"
-                )
+                raise ValueError(f"future covariate {name!r} must contain history+horizon values")
         from loto.moirai2_campaign.token_geometry import calculate_token_geometry
 
         calculate_token_geometry(

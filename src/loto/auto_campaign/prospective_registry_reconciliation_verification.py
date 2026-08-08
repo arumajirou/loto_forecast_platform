@@ -38,8 +38,7 @@ def _reject_symlinks(root: Path) -> list[str]:
     if root.is_symlink() or not root.is_dir():
         return [f"reconciliation artifact is not a regular directory: {root}"]
     return [
-        f"reconciliation artifact contains symlink: "
-        f"{path.relative_to(root).as_posix()}"
+        f"reconciliation artifact contains symlink: {path.relative_to(root).as_posix()}"
         for path in root.rglob("*")
         if path.is_symlink()
     ]
@@ -73,18 +72,10 @@ def verify_registry_reconciliation(root: Path) -> dict[str, Any]:
             "schema_version": RECONCILIATION_SCHEMA_VERSION,
             "failures": failures,
         }
-    expected_core = {
-        key: value
-        for key, value in expected.items()
-        if key != "expected_sha256"
-    }
+    expected_core = {key: value for key, value in expected.items() if key != "expected_sha256"}
     if expected.get("expected_sha256") != _canonical_sha256(expected_core):
         failures.append("expected snapshot canonical SHA-256 mismatch")
-    manifest_core = {
-        key: value
-        for key, value in manifest.items()
-        if key != "manifest_sha256"
-    }
+    manifest_core = {key: value for key, value in manifest.items() if key != "manifest_sha256"}
     if manifest.get("manifest_sha256") != _canonical_sha256(manifest_core):
         failures.append("reconciliation manifest canonical SHA-256 mismatch")
     if manifest.get("files") != _reconciliation_inventory(root):
@@ -100,21 +91,13 @@ def verify_registry_reconciliation(root: Path) -> dict[str, Any]:
     }
     if len(identities) != 1:
         failures.append("reconciliation registry_id is missing or inconsistent")
-    if manifest.get("expected_sha256") != sha256_file(
-        root / RECONCILIATION_EXPECTED
-    ):
+    if manifest.get("expected_sha256") != sha256_file(root / RECONCILIATION_EXPECTED):
         failures.append("expected snapshot file SHA mismatch")
-    if manifest.get("postgres_snapshot_sha256") != sha256_file(
-        root / POSTGRES_SNAPSHOT
-    ):
+    if manifest.get("postgres_snapshot_sha256") != sha256_file(root / POSTGRES_SNAPSHOT):
         failures.append("PostgreSQL snapshot file SHA mismatch")
-    if manifest.get("mlflow_snapshot_sha256") != sha256_file(
-        root / MLFLOW_SNAPSHOT
-    ):
+    if manifest.get("mlflow_snapshot_sha256") != sha256_file(root / MLFLOW_SNAPSHOT):
         failures.append("MLflow snapshot file SHA mismatch")
-    if manifest.get("report_sha256") != sha256_file(
-        root / RECONCILIATION_REPORT
-    ):
+    if manifest.get("report_sha256") != sha256_file(root / RECONCILIATION_REPORT):
         failures.append("reconciliation report file SHA mismatch")
     if report.get("safety", {}).get("read_only_backend_access") is not True:
         failures.append("reconciliation safety must state read-only backend access")
@@ -136,9 +119,7 @@ def verify_registry_reconciliation(root: Path) -> dict[str, Any]:
         if not report.get("backend_errors"):
             failures.append("BLOCKED reconciliation lacks backend errors")
     else:
-        failures.append(
-            f"unsupported reconciliation operational status: {operational_status}"
-        )
+        failures.append(f"unsupported reconciliation operational status: {operational_status}")
 
     source_receipt = root / "source_receipt"
     source_status = "NOT_AVAILABLE"
@@ -166,4 +147,3 @@ def verify_registry_reconciliation(root: Path) -> dict[str, Any]:
         "source_receipt_verification": source_status,
         "failures": failures,
     }
-

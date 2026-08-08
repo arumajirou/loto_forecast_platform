@@ -19,8 +19,7 @@ def test_context_deduplicates_and_preserves_protected_items() -> None:
         item_id="log",
         kind="log",
         content="\n".join(
-            [f"noise line {index}" for index in range(200)]
-            + ["exit_code=1 ERROR failed"]
+            [f"noise line {index}" for index in range(200)] + ["exit_code=1 ERROR failed"]
         ),
         priority=ContextPriority.HIGH,
     )

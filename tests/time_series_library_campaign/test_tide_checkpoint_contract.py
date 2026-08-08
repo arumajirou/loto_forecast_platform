@@ -10,7 +10,8 @@ import torch
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts" / "run_time_series_library_provider.py"
 
-FAKE_TIDE = (ROOT / "tests" / "time_series_library_campaign" / "test_tide_contract.py")
+FAKE_TIDE = ROOT / "tests" / "time_series_library_campaign" / "test_tide_contract.py"
+
 
 def write_fake_source(root: Path) -> None:
     source = FAKE_TIDE.read_text(encoding="utf-8")
@@ -21,6 +22,7 @@ def write_fake_source(root: Path) -> None:
     models.mkdir(parents=True)
     (models / "__init__.py").write_text("", encoding="utf-8")
     (models / "TiDE.py").write_text(source[start:end], encoding="utf-8")
+
 
 def run_request(request: Path, response: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(

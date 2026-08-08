@@ -141,9 +141,7 @@ def validate_remote_code_review(review: dict[str, Any]) -> None:
     if CONFIG_SHA256 != "UNVERIFIED" and files.get("config.json") != CONFIG_SHA256:
         raise ProvenanceError("config hash mismatch")
 
-    unresolved = [
-        name for name, digest in files.items() if digest in {"UNVERIFIED", "NOT_PRESENT"}
-    ]
+    unresolved = [name for name, digest in files.items() if digest in {"UNVERIFIED", "NOT_PRESENT"}]
     if unresolved:
         raise ProvenanceError(f"snapshot hashes remain unverified: {sorted(unresolved)}")
     malformed = [

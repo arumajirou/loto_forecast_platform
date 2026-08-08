@@ -55,8 +55,7 @@ def formal_gpu_evidence_available(evidence: DeviceEvidence) -> bool:
         and any(
             sample.provider_pid == evidence.provider_pid
             and sample.gpu_uuid == evidence.gpu_uuid
-            and sample.provider_process_identity_sha256
-            == evidence.provider_process_identity_sha256
+            and sample.provider_process_identity_sha256 == evidence.provider_process_identity_sha256
             for sample in evidence.external_gpu_samples
         )
     )

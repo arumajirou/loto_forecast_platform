@@ -95,9 +95,7 @@ def build_runner_script(
         "OUTPUT_ROOT": output_root.resolve(),
         "CONTROL_DIR": control_dir.resolve(),
     }
-    assignments = "\n".join(
-        f"{name}={shlex.quote(str(value))}" for name, value in values.items()
-    )
+    assignments = "\n".join(f"{name}={shlex.quote(str(value))}" for name, value in values.items())
     return f"""#!/usr/bin/env bash
 set -Eeuo pipefail
 

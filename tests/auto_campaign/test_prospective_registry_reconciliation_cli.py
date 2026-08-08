@@ -75,9 +75,7 @@ def test_verify_reconciliation_command_is_configless(
         "verify_registry_reconciliation",
         lambda root: expected | {"root": str(root)},
     )
-    args = cli.build_parser().parse_args(
-        ["verify-registry-reconciliation", "--run", "artifact"]
-    )
+    args = cli.build_parser().parse_args(["verify-registry-reconciliation", "--run", "artifact"])
 
     result = cli._run_portable_command(args, tmp_path)
 

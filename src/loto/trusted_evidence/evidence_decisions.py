@@ -54,9 +54,7 @@ def _external_decision(
                 result = verifier.verify(evidence, material_root)
             except Exception as exc:
                 effective_status = unverified_status
-                failures.append(
-                    f"external verifier raised: {type(exc).__name__}: {exc}"
-                )
+                failures.append(f"external verifier raised: {type(exc).__name__}: {exc}")
             else:
                 result_failures = validate_external_result(
                     result,

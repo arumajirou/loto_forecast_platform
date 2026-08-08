@@ -54,9 +54,9 @@ class ProviderRequest(BaseModel):
     output_dir: str = Field(min_length=1)
     environment_lane: Literal["basicts-py311"] = "basicts-py311"
     expected_basicts_version: Literal["1.1.0"] = "1.1.0"
-    expected_upstream_revision: Literal[
+    expected_upstream_revision: Literal["c2bb6e31e591167e84459775a21a62e70a5893ce"] = (
         "c2bb6e31e591167e84459775a21a62e70a5893ce"
-    ] = "c2bb6e31e591167e84459775a21a62e70a5893ce"
+    )
     import_references: list[ImportReference] = Field(default_factory=list)
     series: list[list[float]] = Field(
         default_factory=lambda: [[float(index)] for index in range(1, 17)],

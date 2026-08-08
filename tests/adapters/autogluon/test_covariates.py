@@ -126,9 +126,7 @@ def test_missing_history_covariate_is_rejected() -> None:
 
 def test_future_horizon_mismatch_is_rejected() -> None:
     payload = _payload()
-    payload["covariates"]["future_known_covariates"] = [
-        {"horizon_step": 1, "holiday": 0}
-    ]
+    payload["covariates"]["future_known_covariates"] = [{"horizon_step": 1, "holiday": 0}]
     request = ProviderRequestV2Covariates.model_validate(payload)
     with pytest.raises(CovariateContractError) as exc_info:
         compile_covariates(request)

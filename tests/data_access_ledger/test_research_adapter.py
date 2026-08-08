@@ -66,9 +66,7 @@ def successful_runner(config: Config) -> dict:
         "run_id": "research-test-run",
         "status": "SUCCEEDED",
         "data_version": "loto7-test-v1",
-        "outer_folds": [
-            {"fold_id": "outer-0", "train_end": 3, "test_start": 3, "test_end": 5}
-        ],
+        "outer_folds": [{"fold_id": "outer-0", "train_end": 3, "test_start": 3, "test_end": 5}],
         "successful_trials": 1,
         "failed_trials": 0,
         "skipped_trials": 0,
@@ -140,9 +138,7 @@ def test_failed_trial_blocks_after_evidence_is_written(tmp_path: Path) -> None:
     def runner(config: Config) -> dict:
         output = Path(config.runtime.output)
         output.mkdir(parents=True, exist_ok=True)
-        (output / "trial_results.csv").write_text(
-            "model_id,seed,status\n", encoding="utf-8"
-        )
+        (output / "trial_results.csv").write_text("model_id,seed,status\n", encoding="utf-8")
         return {
             "run_id": "research-failed",
             "status": "FAILED",

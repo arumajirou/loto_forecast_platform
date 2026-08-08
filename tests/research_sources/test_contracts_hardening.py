@@ -47,6 +47,7 @@ def promote_first_model_to_verified(data: dict[str, object]) -> dict[str, object
     record["verification"]["blockers"] = []
     return record
 
+
 def test_repository_object_requires_concrete_https_url() -> None:
     data = payload()
     first_record(data)["official_source_repository"]["url"] = "UNKNOWN"
@@ -56,9 +57,7 @@ def test_repository_object_requires_concrete_https_url() -> None:
 
 def test_repository_url_rejects_internal_whitespace() -> None:
     data = payload()
-    first_record(data)["official_source_repository"]["url"] = (
-        "https://github.com/example/repo name"
-    )
+    first_record(data)["official_source_repository"]["url"] = "https://github.com/example/repo name"
     with pytest.raises(ValidationError, match="whitespace"):
         validate(data)
 

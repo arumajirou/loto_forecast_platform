@@ -113,9 +113,7 @@ def test_bootstrap_and_activate(tmp_path: Path) -> None:
     req = request(tmp_path)
     result = activate_shadow_canary(req, committed_at_utc="2026-08-05T10:06:00Z")
     assert result["decision"] == "SHADOW_CANARY_ACTIVATED"
-    assert result["post_state"]["canary_binding"]["subject"]["model_id"] == (
-        "sktime-model"
-    )
+    assert result["post_state"]["canary_binding"]["subject"]["model_id"] == ("sktime-model")
     assert result["primary_binding_unchanged"] is True
     assert result["prediction_publication_allowed"] is False
 
@@ -166,9 +164,7 @@ def test_shape_mismatch_rejected() -> None:
 
 def test_cuda_requires_gpu_evidence() -> None:
     with pytest.raises(ValueError, match="GPU PID"):
-        RuntimeProbeEvidence.model_validate(
-            probe(requested_device="cuda", actual_device="cuda")
-        )
+        RuntimeProbeEvidence.model_validate(probe(requested_device="cuda", actual_device="cuda"))
 
 
 def test_cpu_fallback_rejected_by_default(tmp_path: Path) -> None:

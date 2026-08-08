@@ -125,10 +125,7 @@ def install_candidate(
         "reviewed_at": reviewed_at,
         "apply_requested": apply,
         "replace_existing": bool(existing),
-        "target_files": {
-            name: str(path.resolve())
-            for name, path in targets.items()
-        },
+        "target_files": {name: str(path.resolve()) for name, path in targets.items()},
     }
     if not apply:
         return plan

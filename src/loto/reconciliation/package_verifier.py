@@ -51,8 +51,10 @@ def _canonical_json_bytes(payload: object) -> bytes:
 
 
 def _valid_sha256(value: object) -> bool:
-    return isinstance(value, str) and len(value) == 64 and all(
-        character in "0123456789abcdef" for character in value
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
     )
 
 
@@ -200,9 +202,7 @@ def verify_package(
                 _verify_member_metadata(info, run_id)
             if archive.testzip() is not None:
                 raise PackageVerificationError("ZIP CRC verification failed")
-            members = {
-                name: archive.read(f"{run_id}/{name}") for name in REQUIRED_ARTIFACTS
-            }
+            members = {name: archive.read(f"{run_id}/{name}") for name in REQUIRED_ARTIFACTS}
             manifest_bytes = archive.read(f"{run_id}/{PACKAGE_MANIFEST}")
     except (OSError, zipfile.BadZipFile, KeyError) as exc:
         raise PackageVerificationError(f"cannot read ZIP: {exc}") from exc

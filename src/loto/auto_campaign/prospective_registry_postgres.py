@@ -30,12 +30,7 @@ def _json(value: Any) -> str:
 def _records(frame: pd.DataFrame) -> list[dict[str, Any]]:
     output: list[dict[str, Any]] = []
     for row in frame.to_dict(orient="records"):
-        output.append(
-            {
-                key: None if pd.isna(value) else value
-                for key, value in row.items()
-            }
-        )
+        output.append({key: None if pd.isna(value) else value for key, value in row.items()})
     return output
 
 
@@ -170,9 +165,7 @@ def prepare_postgres(
                 {"registry_id": payload["registry_id"]},
             ).scalar_one_or_none()
             if existing is not None and str(existing) != payload["payload_sha256"]:
-                raise ValueError(
-                    "registry_id already exists with a different payload SHA-256"
-                )
+                raise ValueError("registry_id already exists with a different payload SHA-256")
             if existing is None:
                 connection.execute(
                     text(

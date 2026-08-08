@@ -61,18 +61,14 @@ def _component_summary(result: Mapping[str, Any]) -> dict[str, Any]:
     promotion = result.get("promotion_gate_verification")
     lineage = result.get("lineage_verification")
     prediction = result.get("prediction_lock_verification")
-    prediction_status = (
-        prediction.get("status") if isinstance(prediction, Mapping) else None
-    )
+    prediction_status = prediction.get("status") if isinstance(prediction, Mapping) else None
     if prediction_status == "NOT_APPLICABLE":
         prediction_status = None
     return {
         "overall_status": result.get("status"),
         "legacy_manifest_status": result.get("run_manifest_status"),
         "coverage_status": coverage.get("status") if isinstance(coverage, Mapping) else None,
-        "promotion_status": (
-            promotion.get("status") if isinstance(promotion, Mapping) else None
-        ),
+        "promotion_status": (promotion.get("status") if isinstance(promotion, Mapping) else None),
         "lineage_status": lineage.get("status") if isinstance(lineage, Mapping) else None,
         "prediction_lock_status": prediction_status,
         "failure_count": len(result.get("failures") or []),

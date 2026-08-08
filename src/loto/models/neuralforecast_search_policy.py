@@ -97,9 +97,7 @@ def resolve_search_policy(
     if requested is SearchStrategy.AUTO:
         reasons = ["AUTO_STRATEGY"]
         resolved = (
-            SearchStrategy.RANDOM
-            if num_samples < AUTO_TPE_MIN_SAMPLES
-            else SearchStrategy.TPE
+            SearchStrategy.RANDOM if num_samples < AUTO_TPE_MIN_SAMPLES else SearchStrategy.TPE
         )
         reasons.append(
             "BUDGET_LT_AUTO_TPE_THRESHOLD"
@@ -179,8 +177,7 @@ def instantiate_search_algorithm(
     except ImportError as exc:
         if not allow_fallback:
             raise SearchPolicyDependencyError(
-                f"cannot import {decision.algorithm_module} for "
-                f"{decision.effective_algorithm_name}"
+                f"cannot import {decision.algorithm_module} for {decision.effective_algorithm_name}"
             ) from exc
         fallback = decision.model_copy(
             update={

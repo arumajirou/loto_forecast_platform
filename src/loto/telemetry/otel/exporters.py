@@ -1,4 +1,5 @@
 """Export outcome tracking without retaining payload or exception messages."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

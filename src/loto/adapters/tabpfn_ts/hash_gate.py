@@ -78,8 +78,7 @@ def verify_checkpoint_before_load(
     actual_sha256 = sha256_file(visible_checkpoint)
     if actual_sha256 != spec.expected_sha256:
         raise CheckpointIntegrityError(
-            "checkpoint SHA-256 mismatch: "
-            f"expected={spec.expected_sha256}, actual={actual_sha256}"
+            f"checkpoint SHA-256 mismatch: expected={spec.expected_sha256}, actual={actual_sha256}"
         )
 
     size_bytes = visible_checkpoint.stat().st_size

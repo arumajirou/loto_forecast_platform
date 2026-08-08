@@ -27,6 +27,7 @@ def evidence() -> PipelineDatasetEvidence:
         draw_ids=tuple(f"loto7-{i + 1}" for i in range(10)),
     )
 
+
 def fake_seal(
     run_id,
     created_at,
@@ -54,6 +55,7 @@ def fake_seal(
         coverage_gaps=tuple(gaps),
     )
 
+
 def test_recorder_valid_order_and_monotonic_time(tmp_path: Path) -> None:
     constant = datetime(2026, 2, 1, tzinfo=UTC)
     recorder = PipelineLedgerRecorder(
@@ -64,9 +66,7 @@ def test_recorder_valid_order_and_monotonic_time(tmp_path: Path) -> None:
         seal_validator=fake_seal,
     )
     recorder.register_oof(model_id="uniform", fold_id="fold-9")
-    recorder.record_oof_prediction(
-        model_id="uniform", fold_id="fold-9", test_index=8
-    )
+    recorder.record_oof_prediction(model_id="uniform", fold_id="fold-9", test_index=8)
     recorder.record_oof_actual(model_id="uniform", fold_id="fold-9", test_index=8)
     recorder.record_oof_score(model_id="uniform", fold_id="fold-9")
     recorder.record_prospective_prediction(
@@ -93,6 +93,7 @@ def test_recorder_valid_order_and_monotonic_time(tmp_path: Path) -> None:
     times = [event.occurred_at for event in recorder.events]
     assert all(left < right for left, right in zip(times, times[1:]))
 
+
 def test_recorder_rejects_actual_before_prediction(tmp_path: Path) -> None:
     recorder = PipelineLedgerRecorder(
         run_id="pipeline-test",
@@ -102,9 +103,8 @@ def test_recorder_rejects_actual_before_prediction(tmp_path: Path) -> None:
     )
     recorder.register_oof(model_id="uniform", fold_id="fold-9")
     with pytest.raises(PipelineLedgerBlocked, match="requires prediction"):
-        recorder.record_oof_actual(
-            model_id="uniform", fold_id="fold-9", test_index=8
-        )
+        recorder.record_oof_actual(model_id="uniform", fold_id="fold-9", test_index=8)
+
 
 def test_unverified_lock_blocks_close(tmp_path: Path) -> None:
     recorder = PipelineLedgerRecorder(
@@ -123,6 +123,7 @@ def test_unverified_lock_blocks_close(tmp_path: Path) -> None:
     with pytest.raises(PipelineLedgerBlocked, match="FORECAST_SEAL_NOT_VERIFIED"):
         recorder.close()
 
+
 def test_recorder_seals_with_foundation_contract(tmp_path: Path) -> None:
     recorder = PipelineLedgerRecorder(
         run_id="pipeline-integration",
@@ -132,12 +133,8 @@ def test_recorder_seals_with_foundation_contract(tmp_path: Path) -> None:
     )
     for model_id in ("uniform", "frequency"):
         recorder.register_oof(model_id=model_id, fold_id="fold-9")
-        recorder.record_oof_prediction(
-            model_id=model_id, fold_id="fold-9", test_index=8
-        )
-        recorder.record_oof_actual(
-            model_id=model_id, fold_id="fold-9", test_index=8
-        )
+        recorder.record_oof_prediction(model_id=model_id, fold_id="fold-9", test_index=8)
+        recorder.record_oof_actual(model_id=model_id, fold_id="fold-9", test_index=8)
         recorder.record_oof_score(model_id=model_id, fold_id="fold-9")
     recorder.record_prospective_prediction(
         model_id="uniform",

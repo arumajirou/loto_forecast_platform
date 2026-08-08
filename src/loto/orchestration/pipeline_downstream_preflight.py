@@ -33,6 +33,7 @@ from loto.orchestration.pipeline_downstream_types import (
     sha256_value,
 )
 
+
 def prepare_downstream_commit(
     output_dir: str | Path,
     *,
@@ -41,15 +42,11 @@ def prepare_downstream_commit(
     seal_verifier: SealVerifier | None = None,
 ) -> PreparedDownstreamCommit:
     if not isinstance(secret, bytes) or len(secret) < 16:
-        raise DownstreamCommitPreflightError(
-            "secret must contain at least 16 bytes"
-        )
+        raise DownstreamCommitPreflightError("secret must contain at least 16 bytes")
     root = absolute_path(Path(output_dir))
     reject_symlink_components(root, label="staged output")
     if not root.is_dir():
-        raise DownstreamCommitPreflightError(
-            f"staged output is not a directory: {root}"
-        )
+        raise DownstreamCommitPreflightError(f"staged output is not a directory: {root}")
 
     paths = {name: root / name for name in IMMUTABLE_ARTIFACTS}
     for name, path in paths.items():
@@ -66,19 +63,14 @@ def prepare_downstream_commit(
         raise DownstreamCommitPreflightError(
             "downstream commit plan is not an unexecuted READY plan"
         )
-    missing_operations = REQUIRED_DEFERRED_OPERATIONS.difference(
-        plan.deferred_operations
-    )
+    missing_operations = REQUIRED_DEFERRED_OPERATIONS.difference(plan.deferred_operations)
     if missing_operations:
         raise DownstreamCommitPreflightError(
-            "downstream commit plan is missing operations: "
-            + ",".join(sorted(missing_operations))
+            "downstream commit plan is missing operations: " + ",".join(sorted(missing_operations))
         )
 
     ledger_payload = load_json(paths["pipeline_data_access_ledger.json"])
-    saved_validation = load_json(
-        paths["pipeline_data_access_validation.json"]
-    )
+    saved_validation = load_json(paths["pipeline_data_access_validation.json"])
     pipeline_report = load_json(paths["pipeline_data_access_report.json"])
     validated = (ledger_validator or default_ledger_validator)(
         ledger_payload,
@@ -96,53 +88,33 @@ def prepare_downstream_commit(
             "saved Data Access Ledger validation status is not PASS"
         )
     if saved_validation.get("run_id") != plan.run_id:
-        raise DownstreamCommitPreflightError(
-            "saved validation run_id does not match plan"
-        )
+        raise DownstreamCommitPreflightError("saved validation run_id does not match plan")
     if saved_validation.get("ledger_sha256") != plan.ledger_sha256:
-        raise DownstreamCommitPreflightError(
-            "saved validation ledger hash does not match plan"
-        )
+        raise DownstreamCommitPreflightError("saved validation ledger hash does not match plan")
     if int(saved_validation.get("error_count", -1)) != 0:
-        raise DownstreamCommitPreflightError(
-            "saved validation contains errors"
-        )
+        raise DownstreamCommitPreflightError("saved validation contains errors")
     if (
         pipeline_report.get("status") != "PASS"
         or pipeline_report.get("complete") is not True
         or pipeline_report.get("downstream_commit_executed") is not False
         or pipeline_report.get("coverage_gaps") not in ([], None)
     ):
-        raise DownstreamCommitPreflightError(
-            "pipeline report is not a complete pre-commit PASS"
-        )
+        raise DownstreamCommitPreflightError("pipeline report is not a complete pre-commit PASS")
     if pipeline_report.get("run_id") != plan.run_id:
-        raise DownstreamCommitPreflightError(
-            "pipeline report run_id does not match plan"
-        )
+        raise DownstreamCommitPreflightError("pipeline report run_id does not match plan")
     if pipeline_report.get("ledger_sha256") != plan.ledger_sha256:
-        raise DownstreamCommitPreflightError(
-            "pipeline report ledger hash does not match plan"
-        )
+        raise DownstreamCommitPreflightError("pipeline report ledger hash does not match plan")
 
     forecast = load_json(paths["forecast.json"])
     sealed = load_json(paths["forecast.sealed.json"])
     if not (seal_verifier or default_seal_verifier)(sealed, secret):
-        raise DownstreamCommitPreflightError(
-            "forecast seal verification failed"
-        )
-    if canonical_json_bytes(sealed.get("payload")) != canonical_json_bytes(
-        forecast
-    ):
-        raise DownstreamCommitPreflightError(
-            "sealed forecast payload differs from forecast.json"
-        )
+        raise DownstreamCommitPreflightError("forecast seal verification failed")
+    if canonical_json_bytes(sealed.get("payload")) != canonical_json_bytes(forecast):
+        raise DownstreamCommitPreflightError("sealed forecast payload differs from forecast.json")
 
     metadata = forecast.get("metadata")
     if not isinstance(metadata, dict) or metadata.get("run_id") != plan.run_id:
-        raise DownstreamCommitPreflightError(
-            "forecast metadata run_id does not match plan"
-        )
+        raise DownstreamCommitPreflightError("forecast metadata run_id does not match plan")
     required_forecast_fields = (
         "forecast_id",
         "draw_id",
@@ -155,16 +127,12 @@ def prepare_downstream_commit(
         for name in required_forecast_fields
     )
     if missing_identity:
-        raise DownstreamCommitPreflightError(
-            "forecast identity fields are missing"
-        )
+        raise DownstreamCommitPreflightError("forecast identity fields are missing")
 
     evaluation = load_json(paths["evaluation.json"])
     champion = evaluation.get("champion")
     if champion not in {"uniform", "frequency"}:
-        raise DownstreamCommitPreflightError(
-            f"unsupported staged champion: {champion!r}"
-        )
+        raise DownstreamCommitPreflightError(f"unsupported staged champion: {champion!r}")
     metrics = float_metrics(evaluation, champion)
 
     artifacts = [
@@ -229,13 +197,10 @@ def verify_prepared_snapshot(prepared: PreparedDownstreamCommit) -> None:
                 "size_bytes": size,
             }
         )
-    observed_hash = sha256_value(
-        sorted(observed, key=lambda value: value["relative_path"])
-    )
+    observed_hash = sha256_value(sorted(observed, key=lambda value: value["relative_path"]))
     if observed_hash != prepared.snapshot_sha256:
-        raise DownstreamCommitConflict(
-            "staged artifact snapshot hash changed"
-        )
+        raise DownstreamCommitConflict("staged artifact snapshot hash changed")
+
 
 __all__ = [
     "DownstreamCommitConflict",

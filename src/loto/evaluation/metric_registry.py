@@ -115,11 +115,7 @@ METRIC_REGISTRY: Final[Mapping[str, MetricDefinition]] = MappingProxyType(
 )
 
 _ALIAS_TO_CANONICAL: Final[Mapping[str, str]] = MappingProxyType(
-    {
-        alias: item.metric_id
-        for item in _METRICS
-        for alias in (item.metric_id, *item.legacy_aliases)
-    }
+    {alias: item.metric_id for item in _METRICS for alias in (item.metric_id, *item.legacy_aliases)}
 )
 
 PRIMARY_METRIC_ID: Final[str] = "hit_at_1"
@@ -171,9 +167,7 @@ def canonicalize_metric_values(values: Mapping[str, float]) -> dict[str, float]:
         metric_id = resolve_metric_id(key)
         numeric = float(value)
         if metric_id in canonical and canonical[metric_id] != numeric:
-            raise ValueError(
-                f"conflicting values supplied for canonical metric {metric_id!r}"
-            )
+            raise ValueError(f"conflicting values supplied for canonical metric {metric_id!r}")
         canonical[metric_id] = numeric
     return canonical
 

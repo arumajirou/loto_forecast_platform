@@ -109,7 +109,7 @@ name = "{name}"
 version = "{version}"
 source = {{ registry = "https://pypi.org/simple" }}
 wheels = [
-  {{ url = "{wheel}", hash = "sha256:{'a' * 64}", size = 1 }},
+  {{ url = "{wheel}", hash = "sha256:{"a" * 64}", size = 1 }},
 ]
 """
 
@@ -143,8 +143,7 @@ source = { virtual = "." }
 def test_lock_audit_accepts_pinned_registry_sources(tmp_path: Path) -> None:
     lock, pyproject = _write_lock(
         tmp_path,
-        _registry_package("salesforce-merlion", "2.0.4")
-        + _registry_package("numpy", "1.26.4"),
+        _registry_package("salesforce-merlion", "2.0.4") + _registry_package("numpy", "1.26.4"),
     )
     report = audit_uv_lock(lock, pyproject)
     assert report["status"] == "PASS"
@@ -174,8 +173,7 @@ source = { git = "https://example.invalid/repo.git" }
 def test_lock_audit_rejects_wrong_merlion_and_numpy_major(tmp_path: Path) -> None:
     lock, pyproject = _write_lock(
         tmp_path,
-        _registry_package("salesforce-merlion", "2.0.3")
-        + _registry_package("numpy", "2.0.0"),
+        _registry_package("salesforce-merlion", "2.0.3") + _registry_package("numpy", "2.0.0"),
     )
     report = audit_uv_lock(lock, pyproject)
     assert report["status"] == "BLOCKED"
@@ -186,8 +184,7 @@ def test_lock_audit_rejects_wrong_merlion_and_numpy_major(tmp_path: Path) -> Non
 def test_inventory_csv_is_sorted_and_complete(tmp_path: Path) -> None:
     lock, pyproject = _write_lock(
         tmp_path,
-        _registry_package("salesforce-merlion", "2.0.4")
-        + _registry_package("numpy", "1.26.4"),
+        _registry_package("salesforce-merlion", "2.0.4") + _registry_package("numpy", "1.26.4"),
     )
     report = audit_uv_lock(lock, pyproject)
     output = tmp_path / "inventory.csv"

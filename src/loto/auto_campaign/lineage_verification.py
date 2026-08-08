@@ -127,8 +127,7 @@ def _evidence_stage(
         return
     if evidence.get("stage") != expected.value:
         failures.append(
-            f"{label} stage mismatch: expected={expected.value}, "
-            f"actual={evidence.get('stage')}"
+            f"{label} stage mismatch: expected={expected.value}, actual={evidence.get('stage')}"
         )
     if evidence.get("verification_status") != "PASS":
         failures.append(f"{label} verification_status must be PASS")
@@ -174,9 +173,7 @@ def verify_lineage_semantics(
         if target_stage in {CampaignStage.VALIDATE_TRIALS, CampaignStage.OOF}:
             if isinstance(source, Mapping) and isinstance(predecessor, Mapping):
                 if source.get("path") != predecessor.get("path"):
-                    failures.append(
-                        f"{target_stage.value} source and predecessor paths must match"
-                    )
+                    failures.append(f"{target_stage.value} source and predecessor paths must match")
         if target_stage in {CampaignStage.HOLDOUT, CampaignStage.PROSPECTIVE}:
             if isinstance(source, Mapping) and isinstance(predecessor, Mapping):
                 if source.get("path") == predecessor.get("path"):
@@ -267,22 +264,14 @@ def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
 
     failures = list(base_result.get("failures") or [])
     failures.extend(f"manifest:{failure}" for failure in manifest_failures)
+    failures.extend(f"promotion-gate:{failure}" for failure in promotion_result.get("failures", []))
+    failures.extend(f"lineage:{failure}" for failure in lineage_result.get("failures", []))
     failures.extend(
-        f"promotion-gate:{failure}"
-        for failure in promotion_result.get("failures", [])
-    )
-    failures.extend(
-        f"lineage:{failure}"
-        for failure in lineage_result.get("failures", [])
-    )
-    failures.extend(
-        f"prediction-lock:{failure}"
-        for failure in prediction_result.get("failures", [])
+        f"prediction-lock:{failure}" for failure in prediction_result.get("failures", [])
     )
     if existing_seal.get("status") == "FAIL":
         failures.extend(
-            f"verification-seal:{failure}"
-            for failure in existing_seal.get("failures", [])
+            f"verification-seal:{failure}" for failure in existing_seal.get("failures", [])
         )
 
     result: dict[str, Any] = {
@@ -316,8 +305,7 @@ def verify_run_with_lineage(run_root: Path) -> dict[str, Any]:
         seal_result = verify_verification_seal(run_root)
         if seal_result.get("status") != "PASS":
             failures.extend(
-                f"verification-seal:{failure}"
-                for failure in seal_result.get("failures", [])
+                f"verification-seal:{failure}" for failure in seal_result.get("failures", [])
             )
             result["status"] = "FAIL"
             result["failures"] = failures

@@ -56,11 +56,7 @@ def _frame(rows: int = 12) -> pd.DataFrame:
 
 
 def _script() -> Path:
-    return (
-        Path(__file__).resolve().parents[2]
-        / "scripts"
-        / "run_time_series_library_provider.py"
-    )
+    return Path(__file__).resolve().parents[2] / "scripts" / "run_time_series_library_provider.py"
 
 
 def test_split_contract_fails_closed() -> None:

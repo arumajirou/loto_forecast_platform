@@ -376,8 +376,7 @@ def load_predict(request: ProviderRequest) -> ProviderResponse:
     expected_input = (2, geometry["seq_len"], geometry["channels"])
     if tuple(x.shape) != expected_input:
         raise ValueError(
-            "invalid TimeFilter input shape: "
-            f"expected {expected_input}, got {tuple(x.shape)}"
+            f"invalid TimeFilter input shape: expected {expected_input}, got {tuple(x.shape)}"
         )
     with torch.no_grad():
         prediction_tensor = model(x, None, None, None)

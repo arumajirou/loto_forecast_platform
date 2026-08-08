@@ -22,9 +22,7 @@ def finalize_build(**ctx: Any) -> dict[str, Any]:
         cfg.target_coverage + cfg.calibration_margin,
     )
     center = runner._point_forecast(data, "median")
-    method_centers = np.vstack(
-        [runner._point_forecast(data, method) for method in methods]
-    )
+    method_centers = np.vstack([runner._point_forecast(data, method) for method in methods])
     ensemble_center = np.rint(np.median(method_centers, axis=0)).astype(int)
     residuals = cal_actual - cal_pred
     probabilities = runner.position_probabilities(data, ensemble_center)
@@ -52,12 +50,8 @@ def finalize_build(**ctx: Any) -> dict[str, Any]:
         max_candidates=cfg.max_candidates,
         diversity_penalty=cfg.diversity_penalty,
     )
-    calibration_eval = runner.evaluate_candidates(
-        cal_actual, selected, cfg.tolerance
-    )
-    validation_eval = runner.evaluate_candidates(
-        ctx["val_actual"], selected, cfg.tolerance
-    )
+    calibration_eval = runner.evaluate_candidates(cal_actual, selected, cfg.tolerance)
+    validation_eval = runner.evaluate_candidates(ctx["val_actual"], selected, cfg.tolerance)
     prediction_set = runner.PredictionSet(
         candidates=selected,
         target_coverage=cfg.target_coverage,
@@ -72,9 +66,7 @@ def finalize_build(**ctx: Any) -> dict[str, Any]:
             "data_access_mode": "INSTRUMENTED_PREFIX_ONLY",
         },
     )
-    candidates = pd.DataFrame(
-        selected, columns=[f"n{index}" for index in range(1, 8)]
-    )
+    candidates = pd.DataFrame(selected, columns=[f"n{index}" for index in range(1, 8)])
     candidates.insert(0, "rank", np.arange(1, len(candidates) + 1))
     candidates.to_csv(output / "prediction_set.csv", index=False)
     atomic_write_json(output / "prediction_set.json", prediction_set.to_dict())

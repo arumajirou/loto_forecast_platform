@@ -36,9 +36,7 @@ def verify_sha256sums(directory: Path) -> None:
             raise ValueError(f"P10 SHA mismatch: {name}")
         seen.add(name)
     expected_names = {
-        item.name
-        for item in directory.iterdir()
-        if item.is_file() and item.name != "SHA256SUMS"
+        item.name for item in directory.iterdir() if item.is_file() and item.name != "SHA256SUMS"
     }
     if seen != expected_names:
         raise ValueError("P10 SHA256SUMS coverage mismatch")
@@ -63,12 +61,8 @@ def main() -> int:
 
     verify_sha256sums(args.p10_dir)
     response = json.loads((args.p10_dir / "response.json").read_text())
-    decision = json.loads(
-        (args.p10_dir / "PRIMARY_PROMOTION_REVIEW_DECISION.json").read_text()
-    )
-    aggregate = json.loads(
-        (args.p10_dir / "AGGREGATED_METRICS.json").read_text()
-    )
+    decision = json.loads((args.p10_dir / "PRIMARY_PROMOTION_REVIEW_DECISION.json").read_text())
+    aggregate = json.loads((args.p10_dir / "AGGREGATED_METRICS.json").read_text())
     p9 = json.loads((args.p10_dir / "P9_LINEAGE.json").read_text())
     if response.get("decision") != "ELIGIBLE_FOR_PRIMARY_PROMOTION_REVIEW":
         raise ValueError("P10 is not eligible for primary-promotion review")
@@ -88,18 +82,10 @@ def main() -> int:
     p10_payload = {
         "schema_version": "1.0",
         "p10_bundle_sha256": sha256(args.p10_dir / "SHA256SUMS"),
-        "p10_decision_sha256": sha256(
-            args.p10_dir / "PRIMARY_PROMOTION_REVIEW_DECISION.json"
-        ),
-        "p10_aggregated_metrics_sha256": sha256(
-            args.p10_dir / "AGGREGATED_METRICS.json"
-        ),
-        "p10_baseline_comparison_sha256": sha256(
-            args.p10_dir / "BASELINE_COMPARISON.json"
-        ),
-        "p10_window_evidence_sha256": sha256(
-            args.p10_dir / "WINDOW_EVIDENCE.json"
-        ),
+        "p10_decision_sha256": sha256(args.p10_dir / "PRIMARY_PROMOTION_REVIEW_DECISION.json"),
+        "p10_aggregated_metrics_sha256": sha256(args.p10_dir / "AGGREGATED_METRICS.json"),
+        "p10_baseline_comparison_sha256": sha256(args.p10_dir / "BASELINE_COMPARISON.json"),
+        "p10_window_evidence_sha256": sha256(args.p10_dir / "WINDOW_EVIDENCE.json"),
         "p9_activation_id": p9["activation_id"],
         "decision": response["decision"],
         "eligible_for_primary_promotion_review": True,
@@ -141,9 +127,7 @@ def main() -> int:
             "state_snapshot_sha256": canonical_sha256(deployment_payload),
         }
     )
-    policy = PromotionPolicy.model_validate_json(
-        args.policy.read_text(encoding="utf-8")
-    )
+    policy = PromotionPolicy.model_validate_json(args.policy.read_text(encoding="utf-8"))
     allowed_signers_sha = sha256(args.allowed_signers_file)
     common = {
         "schema_version": "1.0",

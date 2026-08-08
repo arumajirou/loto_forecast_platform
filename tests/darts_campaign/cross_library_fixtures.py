@@ -316,5 +316,3 @@ def _baselines(hit: float = 0.5, worst: float = 0.4) -> tuple[BaselineResult, ..
             "statistical",
         )
     )
-
-

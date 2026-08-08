@@ -63,9 +63,7 @@ def build_position_local(frame: pd.DataFrame, geometry: GameGeometry) -> Positio
     return PositionLocalPayload(values, tuple(geometry.position_columns))
 
 
-def build_position_multivariate(
-    frame: pd.DataFrame, geometry: GameGeometry
-) -> MultivariatePayload:
+def build_position_multivariate(frame: pd.DataFrame, geometry: GameGeometry) -> MultivariatePayload:
     validated = validate_panel(frame, geometry)
     index = pd.RangeIndex(
         start=int(validated[geometry.draw_no_col].iloc[0]),

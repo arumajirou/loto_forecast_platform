@@ -14,9 +14,7 @@ def _supports_hybrid_thinking(descriptor: ModelDescriptor) -> bool:
     """
 
     identity = " ".join(
-        value.lower()
-        for value in (descriptor.key, descriptor.architecture or "")
-        if value
+        value.lower() for value in (descriptor.key, descriptor.architecture or "") if value
     )
     return "qwen3-coder" not in identity and "qwen3coder" not in identity
 
@@ -75,9 +73,7 @@ class QwenProfile(ModelProfile):
                         "min_p": 0.0,
                     }
                 )
-                effects.extend(
-                    ("reduce_reasoning_repetition", "improve_complex_reasoning")
-                )
+                effects.extend(("reduce_reasoning_repetition", "improve_complex_reasoning"))
             else:
                 update.update(
                     {
@@ -139,9 +135,7 @@ class QwenProfile(ModelProfile):
 
         extra["top_k"] = update.get("top_k", base.request.top_k)
         extra["min_p"] = update.get("min_p", base.request.min_p)
-        update["extra_body"] = {
-            key: value for key, value in extra.items() if value is not None
-        }
+        update["extra_body"] = {key: value for key, value in extra.items() if value is not None}
         metadata = dict(base.request.metadata)
         metadata["thinking_mode_supported"] = hybrid_thinking
         update["metadata"] = metadata

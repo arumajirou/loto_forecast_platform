@@ -25,13 +25,16 @@ from .runtime_source import verify_working_source
 def _atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
-    content = json.dumps(
-        payload,
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-        allow_nan=False,
-    ) + "\n"
+    content = (
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n"
+    )
     try:
         with temporary.open("w", encoding="utf-8") as handle:
             handle.write(content)
@@ -74,11 +77,7 @@ def _maximum_difference(
 ) -> float:
     if len(first) != len(second) or any(len(a) != len(b) for a, b in zip(first, second)):
         raise RuntimeError("pre-save and post-load prediction shapes differ")
-    return max(
-        abs(a - b)
-        for row_a, row_b in zip(first, second)
-        for a, b in zip(row_a, row_b)
-    )
+    return max(abs(a - b) for row_a, row_b in zip(first, second) for a, b in zip(row_a, row_b))
 
 
 def parse_nvidia_smi_output(

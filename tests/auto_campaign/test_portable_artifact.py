@@ -23,9 +23,7 @@ def _pass_result(*, gated: bool) -> dict[str, object]:
         "status": "PASS",
         "run_manifest_status": "PASS",
         "coverage_state_verification": {"status": "NOT_APPLICABLE"},
-        "promotion_gate_verification": {
-            "status": "PASS" if gated else "NOT_APPLICABLE"
-        },
+        "promotion_gate_verification": {"status": "PASS" if gated else "NOT_APPLICABLE"},
         "lineage_verification": {"status": "PASS" if gated else "NOT_APPLICABLE"},
         "failures": [],
     }

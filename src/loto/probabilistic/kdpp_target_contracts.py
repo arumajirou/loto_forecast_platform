@@ -244,5 +244,3 @@ def _load_object(path: Path) -> dict[str, Any]:
 
 def _sha256_bytes(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
-
-

@@ -12,8 +12,7 @@ def request_payload(game_id: str = "numbers3", rows: int = 8) -> dict[str, objec
     geometry = geometry_for_game(game_id)
     columns = [f"p{index}" for index in range(1, geometry.position_count + 1)]
     history = [
-        {name: float(row + index) for index, name in enumerate(columns)}
-        for row in range(rows)
+        {name: float(row + index) for index, name in enumerate(columns)} for row in range(rows)
     ]
     return {
         "schema_version": 2,

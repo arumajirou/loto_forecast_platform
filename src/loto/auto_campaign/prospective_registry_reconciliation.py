@@ -65,8 +65,7 @@ def reconcile_prospective_registry(
     local = verify_prospective_registry(receipt_root)
     if local.get("status") != "PASS":
         raise ValueError(
-            "registry receipt verification failed: "
-            + "; ".join(local.get("failures", []))
+            "registry receipt verification failed: " + "; ".join(local.get("failures", []))
         )
     expected = _expected_snapshot(receipt_root)
     backend_policy = expected["backend_policy"]
@@ -148,13 +147,8 @@ def reconcile_prospective_registry(
         postgres_runs = postgres_snapshot.get("run_rows") or []
         mlflow_parents = mlflow_snapshot.get("parent_runs") or []
         if len(postgres_runs) == 1 and len(mlflow_parents) == 1:
-            if (
-                postgres_runs[0].get("mlflow_parent_run_id")
-                != mlflow_parents[0].get("run_id")
-            ):
-                failures.append(
-                    "PostgreSQL and MLflow disagree on parent run ID"
-                )
+            if postgres_runs[0].get("mlflow_parent_run_id") != mlflow_parents[0].get("run_id"):
+                failures.append("PostgreSQL and MLflow disagree on parent run ID")
 
     status = "BLOCKED" if backend_errors else "DRIFT" if failures else "PASS"
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -228,4 +222,3 @@ def reconcile_prospective_registry(
         "backend_errors": backend_errors,
         "integrity_status": "PASS",
     }
-

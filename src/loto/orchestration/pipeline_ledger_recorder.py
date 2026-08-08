@@ -33,7 +33,7 @@ class PipelineLedgerRecorder(PipelineLedgerOofMixin, PipelineLedgerProspectiveMi
         seed: int = 0,
         clock: Clock | None = None,
         seal_validator: SealAndValidate | None = None,
-        ) -> None:
+    ) -> None:
         self.run_id = run_id
         self.output_dir = absolute_path(output_dir)
         reject_symlink_components(self.output_dir, label="output")
@@ -138,7 +138,7 @@ class PipelineLedgerRecorder(PipelineLedgerOofMixin, PipelineLedgerProspectiveMi
         forecast_origin: datetime | None = None,
         fold_id: str | None = None,
         fold_role: str | None = None,
-        ) -> SliceDraft:
+    ) -> SliceDraft:
         end = len(self.evidence.observed_times) - 1 if row_end is None else row_end
         origin = forecast_origin or self.evidence.observed_times[end]
         return SliceDraft(

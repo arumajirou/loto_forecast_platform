@@ -29,28 +29,18 @@ def auto_prefix(
     protected_test_start = source_total_rows - test_size
     frame = pd_module.read_csv(input_path, nrows=protected_test_start)
     if "draw_date" in frame.columns:
-        frame["draw_date"] = pd_module.to_datetime(
-            frame["draw_date"], errors="raise", utc=True
-        )
+        frame["draw_date"] = pd_module.to_datetime(frame["draw_date"], errors="raise", utc=True)
     columns = auto_module._number_columns(frame, game)
-    values = frame[columns].apply(
-        pd_module.to_numeric, errors="raise"
-    ).to_numpy(dtype=int)
+    values = frame[columns].apply(pd_module.to_numeric, errors="raise").to_numpy(dtype=int)
     _, maximum = auto_module.GAME_GEOMETRY[game]
     if auto_module.np.any(values < 1) or auto_module.np.any(values > maximum):
-        raise CoverageLedgerPreflightError(
-            f"{game}: values outside 1..{maximum}"
-        )
+        raise CoverageLedgerPreflightError(f"{game}: values outside 1..{maximum}")
     if auto_module.np.any(auto_module.np.diff(values, axis=1) <= 0):
-        raise CoverageLedgerPreflightError(
-            f"{game}: rows must be strictly increasing"
-        )
+        raise CoverageLedgerPreflightError(f"{game}: rows must be strictly increasing")
     validation_start = len(values) - validation_size
     calibration_start = validation_start - calibration_size
     if calibration_start < min_train:
-        raise CoverageLedgerPreflightError(
-            f"{game}: insufficient accessible prefix"
-        )
+        raise CoverageLedgerPreflightError(f"{game}: insufficient accessible prefix")
     return (
         frame,
         source_total_rows,
@@ -85,13 +75,10 @@ def auto_walk_forward(
         )
         history = data[:index]
         points = [
-            auto_module._point(history, method, proposal.params, maximum)
-            for method in methods
+            auto_module._point(history, method, proposal.params, maximum) for method in methods
         ]
         prediction = auto_module._legalize(
-            auto_module.np.median(
-                auto_module.np.asarray(points), axis=0
-            ),
+            auto_module.np.median(auto_module.np.asarray(points), axis=0),
             data.shape[1],
             maximum,
         )

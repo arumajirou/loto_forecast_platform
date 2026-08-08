@@ -43,25 +43,14 @@ class RuntimeSDK:
 def load_runtime_sdk() -> RuntimeSDK:
     try:
         root = importlib.import_module("loto.runtime_certification")
-        contracts = importlib.import_module(
-            "loto.runtime_certification.contracts"
-        )
-        statuses = importlib.import_module(
-            "loto.runtime_certification.statuses"
-        )
-        verifier = importlib.import_module(
-            "loto.runtime_certification.verifier"
-        )
-        runner = importlib.import_module(
-            "loto.runtime_certification.subprocess_runner"
-        )
-        artifacts = importlib.import_module(
-            "loto.runtime_certification.artifacts"
-        )
+        contracts = importlib.import_module("loto.runtime_certification.contracts")
+        statuses = importlib.import_module("loto.runtime_certification.statuses")
+        verifier = importlib.import_module("loto.runtime_certification.verifier")
+        runner = importlib.import_module("loto.runtime_certification.subprocess_runner")
+        artifacts = importlib.import_module("loto.runtime_certification.artifacts")
     except ModuleNotFoundError as exc:
         raise RuntimeSDKUnavailableError(
-            "AutoFreTS runtime certification requires the "
-            "provider-neutral SDK from PR #123"
+            "AutoFreTS runtime certification requires the provider-neutral SDK from PR #123"
         ) from exc
     return RuntimeSDK(
         root=root,
@@ -133,12 +122,7 @@ def _worker_output_path(
     output_root: Path,
     run_label: str,
 ) -> Path:
-    return (
-        output_root
-        / "processes"
-        / run_label
-        / "WORKER_RESPONSE.json"
-    )
+    return output_root / "processes" / run_label / "WORKER_RESPONSE.json"
 
 
 def build_command_specs(
@@ -204,9 +188,7 @@ def _gpu_pid_absent(provider_pid: int) -> bool:
     if completed.returncode != 0:
         return False
     active_pids = {
-        int(line.strip())
-        for line in completed.stdout.splitlines()
-        if line.strip().isdigit()
+        int(line.strip()) for line in completed.stdout.splitlines() if line.strip().isdigit()
     }
     return provider_pid not in active_pids
 
@@ -222,49 +204,27 @@ def build_observation_loader(
         response_path = _worker_output_path(output_root, run_label)
         if not response_path.is_file():
             raise AutoFreTSCertificationError(
-                "worker response is missing for "
-                f"{run_label}: {response_path}"
+                f"worker response is missing for {run_label}: {response_path}"
             )
         response = load_worker_response(response_path)
         if response.run_label != run_label:
-            raise AutoFreTSCertificationError(
-                "worker response run_label mismatch"
-            )
+            raise AutoFreTSCertificationError("worker response run_label mismatch")
         if response.status != "PASS":
             raise AutoFreTSCertificationError(
-                "worker failed: "
-                f"{response.error_type}: {response.error_message}"
+                f"worker failed: {response.error_type}: {response.error_message}"
             )
         if response.execution_mode != request.execution_mode:
-            raise AutoFreTSCertificationError(
-                "worker execution_mode mismatch"
-            )
+            raise AutoFreTSCertificationError("worker execution_mode mismatch")
         if response.source_revision != request.source_revision:
-            raise AutoFreTSCertificationError(
-                "worker source revision mismatch"
-            )
+            raise AutoFreTSCertificationError("worker source revision mismatch")
         if response.source_tree_sha256 != request.source_tree_sha256:
-            raise AutoFreTSCertificationError(
-                "worker source-tree SHA-256 mismatch"
-            )
-        if (
-            response.package_version
-            != request.expected_neuralforecast_version
-        ):
-            raise AutoFreTSCertificationError(
-                "worker package version mismatch"
-            )
+            raise AutoFreTSCertificationError("worker source-tree SHA-256 mismatch")
+        if response.package_version != request.expected_neuralforecast_version:
+            raise AutoFreTSCertificationError("worker package version mismatch")
         if response.output is None or response.effective_device is None:
-            raise AutoFreTSCertificationError(
-                "worker PASS response is incomplete"
-            )
-        if (
-            response.cpu_fallback is None
-            or response.peak_vram_bytes is None
-        ):
-            raise AutoFreTSCertificationError(
-                "worker device response is incomplete"
-            )
+            raise AutoFreTSCertificationError("worker PASS response is incomplete")
+        if response.cpu_fallback is None or response.peak_vram_bytes is None:
+            raise AutoFreTSCertificationError("worker device response is incomplete")
 
         samples = [
             sdk.contracts.GPUProcessSample(
@@ -297,9 +257,7 @@ def build_observation_loader(
             output=[list(row) for row in response.output],
             device=device,
             load_success=response.load_success,
-            input_validation_success=(
-                response.input_validation_success
-            ),
+            input_validation_success=(response.input_validation_success),
             inference_success=response.inference_success,
             save_succeeded=response.save_succeeded,
             reload_succeeded=response.reload_succeeded,
@@ -314,14 +272,10 @@ def _prepare_output_root(
     working_directory: Path,
 ) -> Path:
     if output_root.exists() and any(output_root.iterdir()):
-        raise AutoFreTSCertificationError(
-            "output_root must not be an existing non-empty directory"
-        )
+        raise AutoFreTSCertificationError("output_root must not be an existing non-empty directory")
     output_root.mkdir(parents=True, exist_ok=True)
     if output_root.is_symlink():
-        raise AutoFreTSCertificationError(
-            "output_root must not be a symlink"
-        )
+        raise AutoFreTSCertificationError("output_root must not be a symlink")
     resolved_output = output_root.resolve(strict=True)
     resolved_working = working_directory.resolve(strict=True)
     try:
@@ -329,8 +283,7 @@ def _prepare_output_root(
     except ValueError:
         return resolved_output
     raise AutoFreTSCertificationError(
-        "output_root must be outside the Git worktree "
-        "to preserve clean-source evidence"
+        "output_root must be outside the Git worktree to preserve clean-source evidence"
     )
 
 
@@ -338,13 +291,16 @@ def _atomic_write_request(
     path: Path,
     request: AutoFreTSRuntimeRequest,
 ) -> None:
-    content = json.dumps(
-        canonical_request_payload(request),
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-        allow_nan=False,
-    ) + "\n"
+    content = (
+        json.dumps(
+            canonical_request_payload(request),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n"
+    )
     temporary = path.with_name(f".{path.name}.tmp")
     try:
         with temporary.open("w", encoding="utf-8") as handle:
@@ -364,9 +320,7 @@ def certify_auto_frets(
     executor: Any | None = None,
     package_version_reader: Callable[[str], str] | None = None,
     pid_release_checker: Callable[[int], bool] = _gpu_pid_absent,
-    source_preparer: Callable[..., PreparedSource] = (
-        prepare_source_snapshot
-    ),
+    source_preparer: Callable[..., PreparedSource] = (prepare_source_snapshot),
 ) -> Any:
     resolved_sdk = sdk or load_runtime_sdk()
     working_directory = Path(request.working_directory)
@@ -400,19 +354,12 @@ def certify_auto_frets(
         if request.profile == "CPU_SMOKE"
         else resolved_sdk.statuses.CertificationProfile.GPU_FORMAL
     )
-    real_executor = (
-        executor
-        or resolved_sdk.runner.SubprocessExecutor()
-    )
+    real_executor = executor or resolved_sdk.runner.SubprocessExecutor()
     try:
         report = resolved_sdk.root.execute_two_process_certification(
-            certification_id=(
-                f"auto-frets-{request.execution_mode}-{request.run_id}"
-            ),
+            certification_id=(f"auto-frets-{request.execution_mode}-{request.run_id}"),
             profile=profile,
-            evidence_origin=(
-                resolved_sdk.statuses.EvidenceOrigin.REAL
-            ),
+            evidence_origin=(resolved_sdk.statuses.EvidenceOrigin.REAL),
             request=identities["request"],
             package=identities["package"],
             model=identities["model"],
@@ -432,9 +379,7 @@ def certify_auto_frets(
             replay_tolerance=request.replay_tolerance,
         )
     except Exception as exc:
-        failure_path = (
-            evidence_root / "CERTIFICATION_FAILURE.json"
-        )
+        failure_path = evidence_root / "CERTIFICATION_FAILURE.json"
         resolved_sdk.artifacts.atomic_write_json(
             failure_path,
             {
@@ -459,9 +404,7 @@ def certify_auto_frets(
             evidence_root,
             sha_path,
         )
-        zip_path = evidence_root.with_name(
-            f"{evidence_root.name}.zip"
-        )
+        zip_path = evidence_root.with_name(f"{evidence_root.name}.zip")
         resolved_sdk.artifacts.create_evidence_zip(
             evidence_root,
             zip_path,
@@ -493,9 +436,7 @@ def certify_auto_frets(
         evidence_root,
         sha_path,
     )
-    zip_path = evidence_root.with_name(
-        f"{evidence_root.name}.zip"
-    )
+    zip_path = evidence_root.with_name(f"{evidence_root.name}.zip")
     resolved_sdk.artifacts.create_evidence_zip(
         evidence_root,
         zip_path,

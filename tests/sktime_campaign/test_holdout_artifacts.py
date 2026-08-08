@@ -15,9 +15,7 @@ from test_holdout_scoring import _lock, _request
 
 def test_persist_and_verify_p4_bundle(tmp_path: Path):
     lock = _lock()
-    request = _request(lock).model_copy(
-        update={"output_dir": str(tmp_path / "p4")}
-    )
+    request = _request(lock).model_copy(update={"output_dir": str(tmp_path / "p4")})
     response = persist_p4(request, lock)
     assert response["status"] == "PASS"
     report = verify_p4(Path(request.output_dir), request, lock)
@@ -27,9 +25,7 @@ def test_persist_and_verify_p4_bundle(tmp_path: Path):
 
 def test_p4_bundle_contains_expected_files(tmp_path: Path):
     lock = _lock()
-    request = _request(lock).model_copy(
-        update={"output_dir": str(tmp_path / "p4")}
-    )
+    request = _request(lock).model_copy(update={"output_dir": str(tmp_path / "p4")})
     persist_p4(request, lock)
     names = {path.name for path in Path(request.output_dir).iterdir()}
     assert names == {
@@ -48,9 +44,7 @@ def test_p4_bundle_contains_expected_files(tmp_path: Path):
 
 def test_verifier_detects_metric_tampering(tmp_path: Path):
     lock = _lock()
-    request = _request(lock).model_copy(
-        update={"output_dir": str(tmp_path / "p4")}
-    )
+    request = _request(lock).model_copy(update={"output_dir": str(tmp_path / "p4")})
     persist_p4(request, lock)
     path = Path(request.output_dir) / "HOLDOUT_RESULTS.json"
     rows = json.loads(path.read_text(encoding="utf-8"))
@@ -62,9 +56,7 @@ def test_verifier_detects_metric_tampering(tmp_path: Path):
 
 def test_verifier_detects_lineage_tampering(tmp_path: Path):
     lock = _lock()
-    request = _request(lock).model_copy(
-        update={"output_dir": str(tmp_path / "p4")}
-    )
+    request = _request(lock).model_copy(update={"output_dir": str(tmp_path / "p4")})
     persist_p4(request, lock)
     path = Path(request.output_dir) / "P3_LINEAGE.json"
     lineage = json.loads(path.read_text(encoding="utf-8"))
@@ -76,9 +68,7 @@ def test_verifier_detects_lineage_tampering(tmp_path: Path):
 
 def test_verifier_detects_actual_tampering(tmp_path: Path):
     lock = _lock()
-    request = _request(lock).model_copy(
-        update={"output_dir": str(tmp_path / "p4")}
-    )
+    request = _request(lock).model_copy(update={"output_dir": str(tmp_path / "p4")})
     persist_p4(request, lock)
     path = Path(request.output_dir) / "HOLDOUT_ACTUALS.json"
     actuals = json.loads(path.read_text(encoding="utf-8"))

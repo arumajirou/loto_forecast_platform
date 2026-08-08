@@ -75,8 +75,7 @@ def make_allowed_signers(path: Path) -> Path:
     owner_key = base64.b64encode(b"owner-ed25519-public-key").decode("ascii")
     reviewer_key = base64.b64encode(b"reviewer-ed25519-public-key").decode("ascii")
     path.write_text(
-        f"owner@example ssh-ed25519 {owner_key}\n"
-        f"reviewer@example ssh-ed25519 {reviewer_key}\n",
+        f"owner@example ssh-ed25519 {owner_key}\nreviewer@example ssh-ed25519 {reviewer_key}\n",
         encoding="utf-8",
     )
     return path
@@ -131,9 +130,7 @@ def make_approvals(intent: ApprovalIntent) -> list[HumanApproval]:
         rationale="Independently reviewed baselines, leakage, and rollback evidence.",
     )
     signature = (
-        "-----BEGIN SSH SIGNATURE-----\n"
-        "fake-signature-material\n"
-        "-----END SSH SIGNATURE-----"
+        "-----BEGIN SSH SIGNATURE-----\nfake-signature-material\n-----END SSH SIGNATURE-----"
     )
     return [
         HumanApproval(draft=owner, signature=signature),

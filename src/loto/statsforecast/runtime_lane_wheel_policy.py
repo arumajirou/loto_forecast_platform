@@ -53,9 +53,7 @@ def prepare_offline_bundle(
             os.environ["PIP_ONLY_BINARY"] = previous
     report = verify_offline_bundle(bundle)
     if report["status"] != "PASS":
-        raise RuntimeError(
-            f"wheel-only offline bundle verification failed: {report['failures']}"
-        )
+        raise RuntimeError(f"wheel-only offline bundle verification failed: {report['failures']}")
     return bundle
 
 

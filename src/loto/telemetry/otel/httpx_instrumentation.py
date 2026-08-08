@@ -1,4 +1,5 @@
 """Explicit HTTPX transport wrappers with W3C propagation and bounded attributes."""
+
 from __future__ import annotations
 
 from typing import Any

@@ -28,9 +28,7 @@ def validate_prospective_and_holdout(
                 for item in event.input_slices
                 if item.data_role is DataRole.ACTUALS or item.contains_actuals
             ]
-            actual_states = [
-                item.state_id for item in event.input_states if item.contains_actuals
-            ]
+            actual_states = [item.state_id for item in event.input_states if item.contains_actuals]
             if actual_slices or actual_states:
                 findings.append(
                     finding(
@@ -44,12 +42,8 @@ def validate_prospective_and_holdout(
     for forecast_id, events in by_forecast.items():
         events.sort(key=lambda item: item.sequence_no)
         predicts = [item for item in events if item.operation is AccessOperation.PREDICT]
-        locks = [
-            item for item in events if item.operation is AccessOperation.LOCK_PREDICTION
-        ]
-        reads = [
-            item for item in events if item.operation is AccessOperation.READ_ACTUALS
-        ]
+        locks = [item for item in events if item.operation is AccessOperation.LOCK_PREDICTION]
+        reads = [item for item in events if item.operation is AccessOperation.READ_ACTUALS]
         scores = [item for item in events if item.operation is AccessOperation.SCORE]
 
         for lock in locks:

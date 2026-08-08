@@ -77,8 +77,7 @@ def _write_manifest_and_sha(output_dir: Path, *, status: str) -> None:
     files = sorted(
         path
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     manifest = {
         "schema_version": "1.0",
@@ -146,9 +145,7 @@ def _verify_sha256sums(output_dir: Path) -> None:
         if not path.is_file() or _sha256(path) != expected:
             raise BenchmarkVerificationError(f"SHA-256 mismatch: {relative_name}")
     expected_files = {
-        path.name
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path.name for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     }
     if seen != expected_files:
         raise BenchmarkVerificationError("SHA256SUMS coverage mismatch")
@@ -172,8 +169,7 @@ def _verify_manifest(output_dir: Path, *, expected_status: str) -> None:
     expected = {
         path.name
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     }
     if seen != expected:
         raise BenchmarkVerificationError("manifest coverage mismatch")
@@ -216,9 +212,7 @@ def verify_validation_benchmark(
             raise BenchmarkVerificationError("formal random seeds must be [1, 2, 3]")
 
     views = split_views(request)
-    actual = np.asarray(
-        _load_json(output_dir / "VALIDATION_ACTUALS.json"), dtype=float
-    )
+    actual = np.asarray(_load_json(output_dir / "VALIDATION_ACTUALS.json"), dtype=float)
     if not np.array_equal(actual, views["validation"]):
         raise BenchmarkVerificationError("persisted validation actuals mismatch")
 
@@ -227,9 +221,7 @@ def verify_validation_benchmark(
         if row.get("fit_scope") != "TRAIN_ONLY":
             raise BenchmarkVerificationError("candidate used a non-Train fit scope")
         if row.get("evaluation_scope") != "VALIDATION_ONLY":
-            raise BenchmarkVerificationError(
-                "candidate used a non-Validation score scope"
-            )
+            raise BenchmarkVerificationError("candidate used a non-Validation score scope")
         if row.get("status") != "PASS":
             continue
         prediction = np.asarray(row.get("predictions"), dtype=float)
@@ -253,9 +245,7 @@ def verify_validation_benchmark(
 
     pass_count = sum(row.get("status") == "PASS" for row in rows)
     recalculated_status = (
-        "PASS"
-        if pass_count == len(rows)
-        else ("PARTIAL" if pass_count else "FAILED")
+        "PASS" if pass_count == len(rows) else ("PARTIAL" if pass_count else "FAILED")
     )
     if expected_status != recalculated_status:
         raise BenchmarkVerificationError("aggregate status mismatch")

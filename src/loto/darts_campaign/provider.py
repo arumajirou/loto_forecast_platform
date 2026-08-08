@@ -46,9 +46,7 @@ def _execute_request(request: DartsRequest, frame: pd.DataFrame | None) -> Darts
         run_id=request.run_id,
         status="FAILED" if failed else "SUCCEEDED",
         failure_class=FailureClass.PERSISTENCE_FAILED if failed else None,
-        message=(
-            f"runtime certification failed for {len(failed)} position(s)" if failed else None
-        ),
+        message=(f"runtime certification failed for {len(failed)} position(s)" if failed else None),
         predictions=predictions,
         argument_ledger=ledger,
         metrics=metrics,

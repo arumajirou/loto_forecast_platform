@@ -137,9 +137,7 @@ def test_recursive_redaction_covers_secret_uri_bearer_and_query() -> None:
 
 def test_protected_actuals_are_redacted_before_reveal_and_allowed_after_authorization() -> None:
     protected = redact_mapping({"actuals": [1, 2, 3]})
-    authorized = redact_mapping(
-        {"actuals": [1, 2, 3]}, reveal_state=RevealState.AUTHORIZED
-    )
+    authorized = redact_mapping({"actuals": [1, 2, 3]}, reveal_state=RevealState.AUTHORIZED)
     assert protected["actuals"] == PROTECTED_ACTUAL
     assert authorized["actuals"] == [1, 2, 3]
 
@@ -270,9 +268,7 @@ def test_bounded_buffer_drops_optional_and_blocks_required_without_waiting() -> 
 
 
 def test_buffer_drain_is_bounded_and_preserves_order() -> None:
-    events = [
-        _event(event_name=f"model.predict.step_{index}") for index in range(3)
-    ]
+    events = [_event(event_name=f"model.predict.step_{index}") for index in range(3)]
     buffer = BoundedTelemetryBuffer(max_events=3)
     for event in events:
         buffer.emit(event)

@@ -139,9 +139,7 @@ class P7BExecutionJournal(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal[1] = 1
-    phase: Literal["P7B_TARGET_MACHINE_SUPERVISION"] = (
-        "P7B_TARGET_MACHINE_SUPERVISION"
-    )
+    phase: Literal["P7B_TARGET_MACHINE_SUPERVISION"] = "P7B_TARGET_MACHINE_SUPERVISION"
     run_id: str = Field(min_length=1)
     output_directory: str = Field(min_length=1)
     started_at_utc: str
@@ -170,10 +168,14 @@ class P7BExecutionJournal(BaseModel):
                 raise ValueError("completed execution requires terminal stage states")
             if self.stages[P7BStage.FINALIZE].state is not P7BStageState.COMPLETED:
                 raise ValueError("completed execution requires completed finalization")
-        if self.execution_state in {
-            P7BExecutionState.BLOCKED,
-            P7BExecutionState.INTERRUPTED,
-        } and not self.errors:
+        if (
+            self.execution_state
+            in {
+                P7BExecutionState.BLOCKED,
+                P7BExecutionState.INTERRUPTED,
+            }
+            and not self.errors
+        ):
             raise ValueError("non-completed terminal execution requires errors")
         return self
 
@@ -182,9 +184,7 @@ class P7BExecutionManifest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal[1] = 1
-    phase: Literal["P7B_TARGET_MACHINE_SUPERVISION"] = (
-        "P7B_TARGET_MACHINE_SUPERVISION"
-    )
+    phase: Literal["P7B_TARGET_MACHINE_SUPERVISION"] = "P7B_TARGET_MACHINE_SUPERVISION"
     run_id: str = Field(min_length=1)
     commit_sha: str = Field(pattern=r"^[0-9a-f]{40}$")
     journal_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -218,8 +218,7 @@ class P7BExecutionManifest(BaseModel):
 
 def canonical_json_bytes(payload: Any) -> bytes:
     return (
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n"
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     ).encode("utf-8")
 
 

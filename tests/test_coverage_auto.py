@@ -93,7 +93,5 @@ def test_auto_experiment_failure_blocks_run(tmp_path: Path) -> None:
 
     with pytest.raises(CoverageLedgerBlocked, match="incomplete experiment evidence"):
         execute_auto(config, source, FailingAuto)
-    summary = json.loads(
-        (output / "auto_research_summary.json").read_text(encoding="utf-8")
-    )
+    summary = json.loads((output / "auto_research_summary.json").read_text(encoding="utf-8"))
     assert summary["status"] == "BLOCKED"

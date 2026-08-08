@@ -55,8 +55,7 @@ def _normalise_repository_url(value: Any) -> str:
     normalised = f"https://github.com{path}"
     if normalised != EXPECTED_REPOSITORY_URL:
         raise InstalledProvenanceError(
-            "BasicTS repository mismatch: "
-            f"expected {EXPECTED_REPOSITORY_URL}, got {normalised}"
+            f"BasicTS repository mismatch: expected {EXPECTED_REPOSITORY_URL}, got {normalised}"
         )
     return normalised
 
@@ -126,8 +125,7 @@ def _distribution_direct_url(
     ]
     if len(candidates) != 1:
         raise InstalledProvenanceError(
-            "BasicTS direct_url.json RECORD entry mismatch: "
-            f"expected one, got {len(candidates)}"
+            f"BasicTS direct_url.json RECORD entry mismatch: expected one, got {len(candidates)}"
         )
     entry = candidates[0]
     direct_url_path = Path(distribution.locate_file(entry))
@@ -213,8 +211,7 @@ def _verify_import_origin(
     resolved_origin = import_origin.resolve(strict=True)
     if resolved_origin != package_init:
         raise InstalledProvenanceError(
-            "BasicTS import origin is shadowed: "
-            f"expected {package_init}, got {resolved_origin}"
+            f"BasicTS import origin is shadowed: expected {package_init}, got {resolved_origin}"
         )
 
     locations = spec.submodule_search_locations
@@ -253,9 +250,7 @@ def _verify_import_origin(
         "distribution_package_entry": package_entry,
         "distribution_package_init": str(package_init),
         "import_spec_origin": str(resolved_origin),
-        "import_submodule_search_locations": [
-            str(location) for location in resolved_locations
-        ],
+        "import_submodule_search_locations": [str(location) for location in resolved_locations],
         "import_origin_sha256": _sha256(package_init),
         "module_already_loaded": loaded is not None,
         **record,
@@ -301,8 +296,7 @@ def verify_installed_basicts_provenance() -> dict[str, Any]:
         raise InstalledProvenanceError("BasicTS commit_id is invalid")
     if commit_id != EXPECTED_UPSTREAM_REVISION:
         raise InstalledProvenanceError(
-            "BasicTS commit mismatch: "
-            f"expected {EXPECTED_UPSTREAM_REVISION}, got {commit_id}"
+            f"BasicTS commit mismatch: expected {EXPECTED_UPSTREAM_REVISION}, got {commit_id}"
         )
 
     requested_revision = vcs_info.get("requested_revision")

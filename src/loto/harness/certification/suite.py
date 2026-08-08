@@ -257,9 +257,7 @@ class CertificationSuite:
                             steps.append(
                                 CertificationStep(
                                     f"context_trial_{context}_{trial}",
-                                    HarnessStatus.VERIFIED
-                                    if trial_ok
-                                    else HarnessStatus.FAILED,
+                                    HarnessStatus.VERIFIED if trial_ok else HarnessStatus.FAILED,
                                     f"utilization={context_utilization}",
                                 )
                             )
@@ -269,9 +267,7 @@ class CertificationSuite:
                         steps.append(
                             CertificationStep(
                                 f"context_probe_{context}",
-                                HarnessStatus.VERIFIED
-                                if context_ok
-                                else HarnessStatus.FAILED,
+                                HarnessStatus.VERIFIED if context_ok else HarnessStatus.FAILED,
                                 (
                                     f"utilization={context_utilization};"
                                     f"passed={passed_trials}/{context_repetitions};"

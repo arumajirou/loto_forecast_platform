@@ -86,9 +86,7 @@ def test_invalid_identity_or_unsupported_arguments_are_rejected(
 
 @pytest.mark.parametrize("prediction_length", [1, 2, 5])
 def test_contract_accepts_formal_horizons(prediction_length: int) -> None:
-    request = TimerS1Request.model_validate(
-        request_payload(prediction_length=prediction_length)
-    )
+    request = TimerS1Request.model_validate(request_payload(prediction_length=prediction_length))
     assert request.prediction_length == prediction_length
 
 
@@ -107,10 +105,7 @@ def test_non_finite_history_is_rejected() -> None:
 
 
 def test_success_response_requires_q05_point_identity() -> None:
-    quantiles = {
-        key: ((float(index),),)
-        for index, key in enumerate(QUANTILE_KEYS, start=1)
-    }
+    quantiles = {key: ((float(index),),) for index, key in enumerate(QUANTILE_KEYS, start=1)}
     chronology = ChronologyEvidence(
         row_count=2,
         first_timestamp=datetime(2026, 1, 1, tzinfo=UTC),
@@ -152,10 +147,7 @@ def test_success_response_requires_q05_point_identity() -> None:
 
 
 def test_cpu_fallback_cannot_produce_verified_gpu() -> None:
-    quantiles = {
-        key: ((float(index),),)
-        for index, key in enumerate(QUANTILE_KEYS, start=1)
-    }
+    quantiles = {key: ((float(index),),) for index, key in enumerate(QUANTILE_KEYS, start=1)}
     chronology = ChronologyEvidence(
         row_count=2,
         first_timestamp=datetime(2026, 1, 1, tzinfo=UTC),
@@ -306,9 +298,7 @@ def test_success_response_rejects_chronology_row_count_mismatch() -> None:
         calendar_mapping_sha256="a" * 64,
     )
     with pytest.raises(ValidationError, match="row_count"):
-        TimerS1Response.model_validate(
-            valid_response_payload(chronology_evidence=chronology)
-        )
+        TimerS1Response.model_validate(valid_response_payload(chronology_evidence=chronology))
 
 
 def test_verified_cpu_rejects_gpu_evidence() -> None:
@@ -325,9 +315,7 @@ def test_verified_cpu_rejects_gpu_evidence() -> None:
 
 def test_success_response_rejects_unsafe_artifact_path() -> None:
     with pytest.raises(ValidationError, match="run directory"):
-        TimerS1Response.model_validate(
-            valid_response_payload(artifact_paths=("../escape.json",))
-        )
+        TimerS1Response.model_validate(valid_response_payload(artifact_paths=("../escape.json",)))
 
 
 @pytest.mark.parametrize("package_version", ["", " ", "UNVERIFIED", "UNPINNED"])
@@ -335,6 +323,4 @@ def test_verified_response_requires_concrete_package_version(
     package_version: str,
 ) -> None:
     with pytest.raises(ValidationError, match="package_version"):
-        TimerS1Response.model_validate(
-            valid_response_payload(package_version=package_version)
-        )
+        TimerS1Response.model_validate(valid_response_payload(package_version=package_version))

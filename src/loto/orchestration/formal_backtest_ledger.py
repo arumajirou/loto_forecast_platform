@@ -130,9 +130,7 @@ class FormalBacktestLedgerRecorder:
         clock: Clock | None = None,
     ) -> None:
         if resume:
-            raise FormalBacktestLedgerBlocked(
-                "instrumented formal backtest requires --no-resume"
-            )
+            raise FormalBacktestLedgerBlocked("instrumented formal backtest requires --no-resume")
         self.run_id = run_id
         self.output_dir = _absolute(output_dir)
         _reject_symlink_components(self.output_dir, label="output")
@@ -207,9 +205,7 @@ class FormalBacktestLedgerRecorder:
         if key in self._predicted:
             raise FormalBacktestLedgerBlocked(f"duplicate fold prediction: {key}")
         if test_index <= 0 or test_index >= len(self.evidence.observed_times):
-            raise FormalBacktestLedgerBlocked(
-                f"invalid test_index for {key}: {test_index}"
-            )
+            raise FormalBacktestLedgerBlocked(f"invalid test_index for {key}: {test_index}")
         origin = self.evidence.observed_times[test_index]
         train = self._slice(
             dataset_id=self.evidence.dataset_id,
@@ -277,8 +273,7 @@ class FormalBacktestLedgerRecorder:
                 seed=self.seed,
                 actuals_known=False,
                 notes=(
-                    "Output contract passed before leakage checks or target value "
-                    "materialization."
+                    "Output contract passed before leakage checks or target value materialization."
                 ),
             )
         )
@@ -294,9 +289,7 @@ class FormalBacktestLedgerRecorder:
     ) -> None:
         key = (model_id, fold_id)
         if key not in self._predicted:
-            raise FormalBacktestLedgerBlocked(
-                f"actual read requires an earlier prediction: {key}"
-            )
+            raise FormalBacktestLedgerBlocked(f"actual read requires an earlier prediction: {key}")
         if key in self._actual_read:
             raise FormalBacktestLedgerBlocked(f"duplicate actual read: {key}")
         origin = self.evidence.observed_times[test_index]
@@ -344,9 +337,7 @@ class FormalBacktestLedgerRecorder:
     def record_score(self, *, model_id: str, fold_id: str) -> None:
         key = (model_id, fold_id)
         if key not in self._actual_read:
-            raise FormalBacktestLedgerBlocked(
-                f"score requires an earlier actual read: {key}"
-            )
+            raise FormalBacktestLedgerBlocked(f"score requires an earlier actual read: {key}")
         if key in self._scored:
             raise FormalBacktestLedgerBlocked(f"duplicate fold score: {key}")
         actual_id = self._event_id("actual", model_id, fold_id, self.seed)
@@ -456,9 +447,7 @@ class FormalBacktestLedgerRecorder:
             coverage.append("FOLD_COVERAGE_INCOMPLETE")
         status = (
             AccessDecision.PASS
-            if complete
-            and validation.status is AccessDecision.PASS
-            and not coverage
+            if complete and validation.status is AccessDecision.PASS and not coverage
             else AccessDecision.BLOCKED
         )
         ledger_path, validation_path, report_path = self.artifact_paths

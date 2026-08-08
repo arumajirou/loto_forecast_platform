@@ -91,9 +91,7 @@ def verify_recursive_sha256(directory: Path) -> dict[str, str]:
     ):
         match = CHECKSUM_LINE.fullmatch(line)
         if match is None:
-            raise FormalVerificationError(
-                f"invalid SHA256SUMS line {line_number}: {line!r}"
-            )
+            raise FormalVerificationError(f"invalid SHA256SUMS line {line_number}: {line!r}")
         relative = _safe_relative_path(match.group("path"))
         if relative == "SHA256SUMS":
             raise FormalVerificationError("SHA256SUMS must not hash itself")
@@ -158,8 +156,7 @@ def verify_recursive_manifest(
     expected = set(files) - {manifest_name, "SHA256SUMS"}
     if names != expected:
         raise FormalVerificationError(
-            "manifest file set mismatch: "
-            f"expected={sorted(expected)}, actual={sorted(names)}"
+            f"manifest file set mismatch: expected={sorted(expected)}, actual={sorted(names)}"
         )
     return manifest
 
@@ -189,8 +186,7 @@ def _require_fields(payload: dict[str, Any], expected: dict[str, Any], context: 
     for field, value in expected.items():
         if payload.get(field) != value:
             raise FormalVerificationError(
-                f"{context}.{field} mismatch: expected {value!r}, "
-                f"got {payload.get(field)!r}"
+                f"{context}.{field} mismatch: expected {value!r}, got {payload.get(field)!r}"
             )
 
 
@@ -234,9 +230,7 @@ def _verify_commands(
             "dlinear_smoke",
         }:
             if "--frozen" not in argv:
-                raise FormalVerificationError(
-                    f"formal core command is not frozen: {phase}"
-                )
+                raise FormalVerificationError(f"formal core command is not frozen: {phase}")
     if tuple(phases) != expected_phases:
         raise FormalVerificationError(
             f"command phase order mismatch: expected={expected_phases}, actual={tuple(phases)}"
@@ -322,9 +316,7 @@ def _verify_preflight(run_dir: Path, lock_sha256: str) -> dict[str, Any]:
         "packages",
     ):
         if recorded_resolution.get(field) != resolution[field]:
-            raise FormalVerificationError(
-                f"workspace metadata evidence mismatch for {field}"
-            )
+            raise FormalVerificationError(f"workspace metadata evidence mismatch for {field}")
     return {
         "audit_sha256": audit_sha256,
         "metadata_sha256": resolution["sha256"],
@@ -398,10 +390,7 @@ def _verify_core(run_dir: Path, lock_sha256: str) -> dict[str, Any]:
     certificate_lock = certificate.get("lockfile")
     if not isinstance(certificate_lock, dict):
         raise FormalVerificationError("core_certificate.lockfile is missing")
-    if (
-        _require_digest(certificate_lock.get("sha256"), "core_certificate.lockfile")
-        != lock_sha256
-    ):
+    if _require_digest(certificate_lock.get("sha256"), "core_certificate.lockfile") != lock_sha256:
         raise FormalVerificationError("certificate and formal lock SHA-256 differ")
 
     verified_bundles = [
@@ -414,9 +403,7 @@ def _verify_core(run_dir: Path, lock_sha256: str) -> dict[str, Any]:
         raise FormalVerificationError("core_certificate.bundles is invalid")
     actual_records = [_normalise_bundle_record(item) for item in verified_bundles]
     recorded_records = [
-        _normalise_bundle_record(item)
-        for item in recorded_bundles
-        if isinstance(item, dict)
+        _normalise_bundle_record(item) for item in recorded_bundles if isinstance(item, dict)
     ]
     actual = {item["operation"]: item for item in actual_records}
     recorded = {item["operation"]: item for item in recorded_records}

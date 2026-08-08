@@ -164,9 +164,7 @@ def run_oof(
         for seed in config.seeds:
             for fold in folds:
                 train = frame.iloc[fold.train_start : fold.train_end].copy(deep=True)
-                validation = frame.iloc[
-                    fold.validation_start : fold.validation_end
-                ].copy(deep=True)
+                validation = frame.iloc[fold.validation_start : fold.validation_end].copy(deep=True)
                 metrics = evaluator(train, validation, seed, fold)
                 results.append(
                     SeedFoldResult(
@@ -239,9 +237,7 @@ def aggregate_candidate(records: Sequence[SeedFoldResult]) -> CandidateAggregate
                 fold_ids=fold_ids,
                 metrics=MetricVector(
                     hit_at_1=_metric_mean(seed_records, "hit_at_1"),
-                    all_positions_hit_at_1=_metric_mean(
-                        seed_records, "all_positions_hit_at_1"
-                    ),
+                    all_positions_hit_at_1=_metric_mean(seed_records, "all_positions_hit_at_1"),
                     mae=_metric_mean(seed_records, "mae"),
                     mse=_metric_mean(seed_records, "mse"),
                     rmse=_metric_mean(seed_records, "rmse"),

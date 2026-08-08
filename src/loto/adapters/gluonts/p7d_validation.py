@@ -83,12 +83,8 @@ def _verify_p7c(p7c_root: Path, p7b: dict[str, Any]) -> dict[str, Any]:
     expected = {
         "run_id": p7b["run_id"],
         "source_commit_sha": p7b["commit_sha"],
-        "source_execution_manifest_sha256": p7b[
-            "execution_manifest_sha256"
-        ],
-        "source_execution_checksum_sha256": p7b[
-            "execution_checksum_sha256"
-        ],
+        "source_execution_manifest_sha256": p7b["execution_manifest_sha256"],
+        "source_execution_checksum_sha256": p7b["execution_checksum_sha256"],
         "source_audit_sha256": p7b["audit_sha256"],
         "source_failure_matrix_sha256": p7b["failure_matrix_sha256"],
     }
@@ -176,5 +172,3 @@ def verify_run_root(run_root: Path) -> dict[str, Any]:
         "p7c_return_code": p7c_rc,
         "orchestration_checksum_sha256": orchestration_sha,
     }
-
-

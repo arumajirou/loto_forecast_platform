@@ -14,9 +14,7 @@ from loto.adapters.autogluon.inventory import (
 
 
 def _fake_runtime(*, extra_aliases: tuple[str, ...] = ()):
-    classes = {
-        spec.class_name: type(spec.class_name, (), {}) for spec in SOURCE_MODEL_SPECS
-    }
+    classes = {spec.class_name: type(spec.class_name, (), {}) for spec in SOURCE_MODEL_SPECS}
 
     class FakeRegistry:
         @classmethod
@@ -94,8 +92,7 @@ def test_version_mismatch_is_explicit() -> None:
     assert inventory.status is InventoryStatus.PARTIAL
     assert inventory.version_matches is False
     assert any(
-        failure.category is FailureCategory.VERSION_MISMATCH
-        for failure in inventory.failures
+        failure.category is FailureCategory.VERSION_MISMATCH for failure in inventory.failures
     )
 
 
@@ -111,8 +108,7 @@ def test_missing_package_is_classified_without_silent_empty_inventory() -> None:
     assert inventory.source_model_count == 29
     assert inventory.runtime_discovered_model_count == 0
     assert any(
-        failure.category is FailureCategory.PACKAGE_MISSING
-        for failure in inventory.failures
+        failure.category is FailureCategory.PACKAGE_MISSING for failure in inventory.failures
     )
 
 
@@ -178,7 +174,10 @@ def test_empty_runtime_registry_marks_all_source_aliases_missing() -> None:
     )
     assert inventory.status is InventoryStatus.PARTIAL
     assert inventory.runtime_discovered_model_count == 0
-    assert sum(
-        failure.category is FailureCategory.RUNTIME_ALIAS_MISSING
-        for failure in inventory.failures
-    ) == 29
+    assert (
+        sum(
+            failure.category is FailureCategory.RUNTIME_ALIAS_MISSING
+            for failure in inventory.failures
+        )
+        == 29
+    )

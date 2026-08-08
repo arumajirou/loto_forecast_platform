@@ -22,8 +22,6 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-
-
 PINNED_DLINEAR_GIT_BLOBS = {
     "models/DLinear.py": "3f4d666a9ffe7fb6f58627ba43f1a9d3d9804d78",
     "layers/Autoformer_EncDec.py": "6fce4bcd6b3d3eb00e9bcf5931ed2ee301554f4a",
@@ -133,9 +131,7 @@ def validate_frame(
         raise ValueError("draw numbers must be unique and time ordered")
     if draw_dates.duplicated().any() or not draw_dates.is_monotonic_increasing:
         raise ValueError("draw dates must be unique and time ordered")
-    values = frame.loc[:, list(geometry.position_columns)].apply(
-        pd.to_numeric, errors="raise"
-    )
+    values = frame.loc[:, list(geometry.position_columns)].apply(pd.to_numeric, errors="raise")
     array = values.to_numpy(dtype=float)
     if not np.isfinite(array).all():
         raise ValueError("position values must be finite")
@@ -165,9 +161,11 @@ def materialize_training_bundle(
         *geometry.position_columns,
     ]
     train = frame.iloc[: split.train_end_exclusive].loc[:, columns].copy()
-    valid = frame.iloc[
-        split.train_end_exclusive : split.validation_end_exclusive
-    ].loc[:, columns].copy()
+    valid = (
+        frame.iloc[split.train_end_exclusive : split.validation_end_exclusive]
+        .loc[:, columns]
+        .copy()
+    )
     train_path = output_dir / "train.csv"
     valid_path = output_dir / "validation.csv"
     train.to_csv(train_path, index=False)

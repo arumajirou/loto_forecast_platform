@@ -12,6 +12,7 @@ from loto.moirai2_campaign.runtime_evidence_common import (
     sha256_file,
 )
 
+
 def parse_sha256_manifest(path: Path) -> dict[str, str]:
     entries: dict[str, str] = {}
     for line_number, raw_line in enumerate(
@@ -21,21 +22,15 @@ def parse_sha256_manifest(path: Path) -> dict[str, str]:
         if not raw_line:
             continue
         if "  " not in raw_line:
-            raise RuntimeEvidenceGateError(
-                f"invalid SHA256SUMS line {line_number}: {raw_line!r}"
-            )
+            raise RuntimeEvidenceGateError(f"invalid SHA256SUMS line {line_number}: {raw_line!r}")
         digest, relative = raw_line.split("  ", 1)
         if not _SHA256_PATTERN.fullmatch(digest):
-            raise RuntimeEvidenceGateError(
-                f"invalid SHA-256 at line {line_number}: {digest!r}"
-            )
+            raise RuntimeEvidenceGateError(f"invalid SHA-256 at line {line_number}: {digest!r}")
         relative = _safe_relative_path(relative)
         if relative == "SHA256SUMS":
             raise RuntimeEvidenceGateError("SHA256SUMS must not hash itself")
         if relative in entries:
-            raise RuntimeEvidenceGateError(
-                f"duplicate SHA256SUMS path: {relative}"
-            )
+            raise RuntimeEvidenceGateError(f"duplicate SHA256SUMS path: {relative}")
         entries[relative] = digest
     if not entries:
         raise RuntimeEvidenceGateError("SHA256SUMS is empty")
@@ -50,9 +45,7 @@ def verify_campaign_manifest(campaign_dir: Path) -> ManifestVerification:
     for relative, expected in sorted(entries.items()):
         artifact = root / relative
         if not artifact.is_file():
-            raise RuntimeEvidenceGateError(
-                f"SHA256SUMS artifact is missing: {relative}"
-            )
+            raise RuntimeEvidenceGateError(f"SHA256SUMS artifact is missing: {relative}")
         actual = sha256_file(artifact)
         if actual != expected:
             raise RuntimeEvidenceGateError(
@@ -60,13 +53,9 @@ def verify_campaign_manifest(campaign_dir: Path) -> ManifestVerification:
             )
         verified += 1
 
-    artifact_manifest = load_json_object(
-        _required_file(root, "ARTIFACT_MANIFEST.json")
-    )
+    artifact_manifest = load_json_object(_required_file(root, "ARTIFACT_MANIFEST.json"))
     raw_files = artifact_manifest.get("files")
-    if not isinstance(raw_files, list) or not all(
-        isinstance(item, str) for item in raw_files
-    ):
+    if not isinstance(raw_files, list) or not all(isinstance(item, str) for item in raw_files):
         raise RuntimeEvidenceGateError("artifact manifest files must be text paths")
     artifact_files = [_safe_relative_path(item) for item in raw_files]
     if len(artifact_files) != len(set(artifact_files)):
@@ -82,9 +71,7 @@ def verify_campaign_manifest(campaign_dir: Path) -> ManifestVerification:
         )
 
     actual_files = sorted(
-        path.relative_to(root).as_posix()
-        for path in root.rglob("*")
-        if path.is_file()
+        path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file()
     )
     expected_actual = sorted([*entries, "SHA256SUMS"])
     if actual_files != expected_actual:
@@ -99,5 +86,3 @@ def verify_campaign_manifest(campaign_dir: Path) -> ManifestVerification:
         actual_file_count=len(actual_files),
         verified_file_count=verified,
     )
-
-

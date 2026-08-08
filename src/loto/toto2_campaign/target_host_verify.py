@@ -227,8 +227,7 @@ def verify_certification_archive(
     archive_sha256 = hashlib.sha256(archive_path.read_bytes()).hexdigest()
     if expected_sha256 is not None and archive_sha256 != expected_sha256:
         raise ValueError(
-            f"archive SHA-256 mismatch: expected={expected_sha256} "
-            f"actual={archive_sha256}"
+            f"archive SHA-256 mismatch: expected={expected_sha256} actual={archive_sha256}"
         )
     with zipfile.ZipFile(archive_path) as archive:
         members = _safe_members(archive)

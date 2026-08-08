@@ -82,8 +82,7 @@ def make_window_payload(
         **{
             **payload,
             "position_ranges": [
-                PositionRange.model_validate(item)
-                for item in payload["position_ranges"]
+                PositionRange.model_validate(item) for item in payload["position_ranges"]
             ],
             "predictions": [LockedCandidatePrediction.model_validate(item) for item in predictions],
         }
@@ -98,18 +97,14 @@ def reseal_window_payload(payload: dict[str, Any]) -> dict[str, Any]:
         **{
             **payload,
             "position_ranges": [
-                PositionRange.model_validate(item)
-                for item in payload["position_ranges"]
+                PositionRange.model_validate(item) for item in payload["position_ranges"]
             ],
             "predictions": [
-                LockedCandidatePrediction.model_validate(item)
-                for item in payload["predictions"]
+                LockedCandidatePrediction.model_validate(item) for item in payload["predictions"]
             ],
         }
     )
-    payload["prediction_lock_sha256"] = canonical_sha256(
-        prediction_lock_payload(temporary)
-    )
+    payload["prediction_lock_sha256"] = canonical_sha256(prediction_lock_payload(temporary))
     return payload
 
 

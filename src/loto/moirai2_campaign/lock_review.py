@@ -165,7 +165,6 @@ def _dependency_names(package: dict[str, Any]) -> tuple[str, ...]:
     return tuple(sorted(names))
 
 
-
 def _valid_artifact_hash(value: str) -> bool:
     if not value.startswith("sha256:"):
         return False
@@ -230,9 +229,7 @@ def inspect_lock(
             violations.append(f"{name}=={raw_version}: registry package lacks artifact hashes")
         invalid_hashes = [value for value in artifact_hashes if not _valid_artifact_hash(value)]
         if invalid_hashes:
-            violations.append(
-                f"{name}=={raw_version}: invalid artifact hashes={invalid_hashes}"
-            )
+            violations.append(f"{name}=={raw_version}: invalid artifact hashes={invalid_hashes}")
         inventory.append(
             PackageInventory(
                 name=name,
@@ -269,10 +266,13 @@ def inspect_lock(
     if duplicates:
         warnings.append(f"multiple locked versions detected: {duplicates}")
 
-    inventory_payload = [package.as_dict() for package in sorted(
-        inventory,
-        key=lambda item: (item.name, item.version, item.source_kind),
-    )]
+    inventory_payload = [
+        package.as_dict()
+        for package in sorted(
+            inventory,
+            key=lambda item: (item.name, item.version, item.source_kind),
+        )
+    ]
     edge_count = sum(len(package.dependency_names) for package in inventory)
     source_counts: dict[str, int] = {}
     for package in inventory:
@@ -428,10 +428,7 @@ def write_sha256_manifest(root: Path, output_path: Path) -> None:
         for path in root.rglob("*")
         if path.is_file() and path.resolve() != output_path.resolve()
     )
-    lines = [
-        f"{sha256_file(path)}  {path.relative_to(root).as_posix()}"
-        for path in paths
-    ]
+    lines = [f"{sha256_file(path)}  {path.relative_to(root).as_posix()}" for path in paths]
     output_path.write_text(
         "\n".join(lines) + ("\n" if lines else ""),
         encoding="utf-8",

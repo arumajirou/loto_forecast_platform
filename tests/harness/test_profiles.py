@@ -53,7 +53,6 @@ def test_qwen_reasoning_profile_avoids_greedy_sampling() -> None:
     assert applied.request.metadata["thinking_mode_supported"] is True
 
 
-
 def test_qwen_coder_reasoning_uses_verification_cue_without_think_switch() -> None:
     applied = ProfileRegistry().apply(
         request("reasoning"),

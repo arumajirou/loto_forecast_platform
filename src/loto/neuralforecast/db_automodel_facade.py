@@ -148,9 +148,7 @@ def _construct_auto_hint(config: Any, panel: pd.DataFrame):
             runtime_profile,
             phase="runtime_resolved",
             backend="ray",
-            planning_profile_sha256=(
-                fallback.profile_sha256 if fallback is not None else None
-            ),
+            planning_profile_sha256=(fallback.profile_sha256 if fallback is not None else None),
         )
     model = AutoHINT(
         cls_model=NHITS,

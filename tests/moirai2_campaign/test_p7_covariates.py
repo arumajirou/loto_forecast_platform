@@ -43,12 +43,8 @@ def _request_payload() -> dict:
         "context_length": 16,
         "prediction_length": 2,
         "past_covariates": {"rolling": [float(index) for index in range(16)]},
-        "future_covariates": {
-            "weekday": [float(index % 7) for index in range(18)]
-        },
-        "future_covariate_availability": {
-            "weekday": "known_at_prediction_time"
-        },
+        "future_covariates": {"weekday": [float(index % 7) for index in range(18)]},
+        "future_covariate_availability": {"weekday": "known_at_prediction_time"},
     }
 
 

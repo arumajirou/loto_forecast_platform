@@ -126,10 +126,7 @@ def compile_covariates(
         raise CovariateCompilationError("target time axis is shorter than context_length")
     if set(future_covariates) != set(future_covariate_availability):
         raise CovariateCompilationError("known-future availability evidence is incomplete")
-    if any(
-        value != "known_at_prediction_time"
-        for value in future_covariate_availability.values()
-    ):
+    if any(value != "known_at_prediction_time" for value in future_covariate_availability.values()):
         raise CovariateCompilationError("future covariate is not known at prediction time")
 
     history_start = history_length - context_length
@@ -150,9 +147,7 @@ def compile_covariates(
     )
 
     if time_semantics == "calendar_time":
-        calendar_timestamps = [
-            value for value in context_timestamps if isinstance(value, datetime)
-        ]
+        calendar_timestamps = [value for value in context_timestamps if isinstance(value, datetime)]
         if len(calendar_timestamps) != len(context_timestamps):
             raise CovariateCompilationError("calendar_time requires datetime timestamps")
         if past_matrix is not None:

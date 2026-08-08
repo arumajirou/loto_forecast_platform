@@ -217,16 +217,10 @@ def _second_authorization(
 ) -> P8RegistryTransactionRequest:
     data = base.model_dump(mode="json")
     data["authorization"]["authorization_id"] = "d" * 64
-    payload = {
-        key: value
-        for key, value in data["authorization"].items()
-        if key != "seal_sha256"
-    }
+    payload = {key: value for key, value in data["authorization"].items() if key != "seal_sha256"}
     data["authorization"]["seal_sha256"] = canonical_sha256(payload)
     data["transaction"]["authorization_id"] = "d" * 64
-    data["transaction"]["authorization_seal_sha256"] = data[
-        "authorization"
-    ]["seal_sha256"]
+    data["transaction"]["authorization_seal_sha256"] = data["authorization"]["seal_sha256"]
     return P8RegistryTransactionRequest.model_validate(data)
 
 
@@ -236,9 +230,7 @@ def test_concurrent_stale_transactions_only_one_commits(
     path = tmp_path / "registry.json"
     state = bootstrap_registry(path, subject(path).registry_target)
     first = request(path, state.state_sha256)
-    second = _second_authorization(
-        request(path, state.state_sha256, tx_nonce="c" * 64)
-    )
+    second = _second_authorization(request(path, state.state_sha256, tx_nonce="c" * 64))
 
     def execute(item: P8RegistryTransactionRequest) -> str:
         try:

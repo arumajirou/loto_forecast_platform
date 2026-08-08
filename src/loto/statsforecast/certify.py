@@ -92,9 +92,7 @@ def certify_installed_runtime(
     unknown = sorted(set(chosen).difference(MODEL_NAMES))
     if unknown:
         raise ValueError(f"unknown model names: {unknown}")
-    run_id = run_id or datetime.now(timezone.utc).strftime(
-        "statsforecast-runtime-%Y%m%d-%H%M%S"
-    )
+    run_id = run_id or datetime.now(timezone.utc).strftime("statsforecast-runtime-%Y%m%d-%H%M%S")
     run_dir = Path(output_root) / run_id
     run_dir.mkdir(parents=True, exist_ok=False)
     write_json(

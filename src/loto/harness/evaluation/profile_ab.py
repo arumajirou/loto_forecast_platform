@@ -150,9 +150,7 @@ class TaskAggregate:
             "completion_tokens": self.completion_tokens,
             "cached_tokens": self.cached_tokens,
             "cache_hit_rate": (
-                self.cached_tokens / self.prompt_tokens
-                if self.prompt_tokens
-                else 0.0
+                self.cached_tokens / self.prompt_tokens if self.prompt_tokens else 0.0
             ),
             "errors": self.errors,
             "trials": self.trials,
@@ -220,10 +218,7 @@ class ProfileABEvaluator:
                 messages=[
                     Message(
                         role="user",
-                        content=(
-                            "Compute (17 + 29) * 3 - 8. "
-                            "Return only the final integer."
-                        ),
+                        content=("Compute (17 + 29) * 3 - 8. Return only the final integer."),
                     )
                 ],
                 temperature=0.2,
@@ -237,10 +232,15 @@ class ProfileABEvaluator:
         correctness = bool(integers and integers[-1] == "130")
         format_compliance = stripped == "130"
         success = correctness and format_compliance
-        return success, response, applied, {
-            "correctness": correctness,
-            "format_compliance": format_compliance,
-        }
+        return (
+            success,
+            response,
+            applied,
+            {
+                "correctness": correctness,
+                "format_compliance": format_compliance,
+            },
+        )
 
     async def _coding(
         self,
@@ -269,10 +269,15 @@ class ProfileABEvaluator:
         behavior = "returna+b" in normalized and "returna-b" not in normalized
         format_compliance = "defadd(" in normalized
         success = behavior and format_compliance
-        return success, response, applied, {
-            "behavior": behavior,
-            "format_compliance": format_compliance,
-        }
+        return (
+            success,
+            response,
+            applied,
+            {
+                "behavior": behavior,
+                "format_compliance": format_compliance,
+            },
+        )
 
     async def _structured(
         self,
@@ -317,10 +322,15 @@ class ProfileABEvaluator:
         except json.JSONDecodeError:
             pass
         success = parseable and schema_match
-        return success, response, applied, {
-            "json_parseable": parseable,
-            "schema_match": schema_match,
-        }
+        return (
+            success,
+            response,
+            applied,
+            {
+                "json_parseable": parseable,
+                "schema_match": schema_match,
+            },
+        )
 
     async def _tool(
         self,
@@ -369,10 +379,15 @@ class ProfileABEvaluator:
                     arguments = {}
             argument_match = isinstance(arguments, dict) and arguments.get("value") == 7
         success = name_match and argument_match
-        return success, response, applied, {
-            "function_name_match": name_match,
-            "arguments_match": argument_match,
-        }
+        return (
+            success,
+            response,
+            applied,
+            {
+                "function_name_match": name_match,
+                "arguments_match": argument_match,
+            },
+        )
 
     async def _context(
         self,
@@ -404,10 +419,15 @@ class ProfileABEvaluator:
         marker_found = marker in response.content
         exact_marker = response.content.strip() == marker
         success = marker_found and exact_marker
-        return success, response, applied, {
-            "marker_found": marker_found,
-            "format_compliance": exact_marker,
-        }
+        return (
+            success,
+            response,
+            applied,
+            {
+                "marker_found": marker_found,
+                "format_compliance": exact_marker,
+            },
+        )
 
     @staticmethod
     def _task_floor(task_name: str) -> float:
@@ -479,8 +499,7 @@ class ProfileABEvaluator:
             task_names.append("tools")
 
         aggregates: dict[str, dict[str, TaskAggregate]] = {
-            mode: {task_name: TaskAggregate() for task_name in task_names}
-            for mode in modes
+            mode: {task_name: TaskAggregate() for task_name in task_names} for mode in modes
         }
         applications: dict[str, dict[str, Any]] = {mode: {} for mode in modes}
         execution_order: list[dict[str, Any]] = []
@@ -551,15 +570,9 @@ class ProfileABEvaluator:
             task_payload = {name: value.as_dict() for name, value in tasks.items()}
             attempts = sum(value.attempts for value in tasks.values())
             successes = sum(value.successes for value in tasks.values())
-            rates = [
-                value.successes / value.attempts
-                for value in tasks.values()
-                if value.attempts
-            ]
+            rates = [value.successes / value.attempts for value in tasks.values() if value.attempts]
             stability = (
-                1.0 - statistics.pstdev(rates)
-                if len(rates) > 1
-                else (rates[0] if rates else 0.0)
+                1.0 - statistics.pstdev(rates) if len(rates) > 1 else (rates[0] if rates else 0.0)
             )
             available_weight = sum(weights[name] for name in tasks)
             achievement_rate = (
@@ -584,12 +597,8 @@ class ProfileABEvaluator:
                 criteria_rates = task.get("criteria_success_rates", {})
                 semantic_key = PRIMARY_CRITERIA.get(name, "task_success")
                 contract_key = CONTRACT_CRITERIA.get(name, "task_success")
-                semantic_rate = float(
-                    criteria_rates.get(semantic_key, task["success_rate"])
-                )
-                contract_rate = float(
-                    criteria_rates.get(contract_key, task["success_rate"])
-                )
+                semantic_rate = float(criteria_rates.get(semantic_key, task["success_rate"]))
+                contract_rate = float(criteria_rates.get(contract_key, task["success_rate"]))
                 semantic_rates[name] = semantic_rate
                 contract_rates[name] = contract_rate
                 floor = self._task_floor(name)
@@ -604,14 +613,12 @@ class ProfileABEvaluator:
                 task_failure_classification[name] = classification
 
             semantic_achievement_rate = (
-                sum(weights[name] * semantic_rates[name] for name in tasks)
-                / available_weight
+                sum(weights[name] * semantic_rates[name] for name in tasks) / available_weight
                 if available_weight
                 else 0.0
             )
             contract_achievement_rate = (
-                sum(weights[name] * contract_rates[name] for name in tasks)
-                / available_weight
+                sum(weights[name] * contract_rates[name] for name in tasks) / available_weight
                 if available_weight
                 else 0.0
             )
@@ -624,9 +631,7 @@ class ProfileABEvaluator:
                 "minimum_task_success_rate": min(rates, default=0.0),
                 "tasks": task_payload,
                 "task_weights": {name: weights[name] for name in tasks},
-                "critical_task_floors": {
-                    name: self._task_floor(name) for name in tasks
-                },
+                "critical_task_floors": {name: self._task_floor(name) for name in tasks},
                 "semantic_success_rates": semantic_rates,
                 "contract_success_rates": contract_rates,
                 "task_failure_classification": task_failure_classification,
@@ -644,23 +649,30 @@ class ProfileABEvaluator:
                     value["achievement_rate"] - baseline["achievement_rate"]
                 )
 
-        best_observed_mode = max(
-            results,
-            key=lambda name: self._mode_rank(name, results[name]),
-        ) if results else None
+        best_observed_mode = (
+            max(
+                results,
+                key=lambda name: self._mode_rank(name, results[name]),
+            )
+            if results
+            else None
+        )
         eligible_modes = [
             mode
             for mode, result in results.items()
             if result["achievement_rate"] >= DEFAULT_MINIMUM_ACHIEVEMENT_RATE
             and result["critical_tasks_meet_floor"]
         ]
-        best_mode = max(
-            eligible_modes,
-            key=lambda name: self._mode_rank(name, results[name]),
-        ) if eligible_modes else None
+        best_mode = (
+            max(
+                eligible_modes,
+                key=lambda name: self._mode_rank(name, results[name]),
+            )
+            if eligible_modes
+            else None
+        )
         recommended_mode_by_task = {
-            task_name: self._recommend_mode_for_task(task_name, results)
-            for task_name in task_names
+            task_name: self._recommend_mode_for_task(task_name, results) for task_name in task_names
         }
         best_semantic_mode_by_task: dict[str, str | None] = {}
         for task_name in task_names:

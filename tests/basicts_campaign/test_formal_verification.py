@@ -38,8 +38,7 @@ def _write_bundle(root: Path, manifest_name: str, status: str) -> None:
     files = sorted(
         path
         for path in root.rglob("*")
-        if path.is_file()
-        and path.relative_to(root).as_posix() not in {manifest_name, "SHA256SUMS"}
+        if path.is_file() and path.relative_to(root).as_posix() not in {manifest_name, "SHA256SUMS"}
     )
     _write_json(
         root / manifest_name,
@@ -62,9 +61,7 @@ def _write_bundle(root: Path, manifest_name: str, status: str) -> None:
         if path.is_file() and path.relative_to(root).as_posix() != "SHA256SUMS"
     )
     (root / "SHA256SUMS").write_text(
-        "".join(
-            f"{_sha256(path)}  {path.relative_to(root).as_posix()}\n" for path in hashed
-        ),
+        "".join(f"{_sha256(path)}  {path.relative_to(root).as_posix()}\n" for path in hashed),
         encoding="utf-8",
     )
 

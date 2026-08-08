@@ -30,8 +30,7 @@ def _response(device: str = "cuda", num_samples: int = 3) -> dict[str, Any]:
         "provider_version": 2,
         "samples_shape": [7, num_samples, 1],
         "samples": [
-            [[float(series + sample)] for sample in range(num_samples)]
-            for series in range(7)
+            [[float(series + sample)] for sample in range(num_samples)] for series in range(7)
         ],
         "predictions": [float(index) for index in range(7)],
         "quantile_source": "EMPIRICAL_FROM_GENERATED_SAMPLES",
@@ -78,14 +77,17 @@ def test_cuda_validation_requires_external_pid_and_vram() -> None:
 
 def test_cpu_validation_rejects_gpu_use() -> None:
     response = _response(device="cpu", num_samples=1)
-    assert HARNESS.validate_response(
-        response,
-        pid=123,
-        device="cpu",
-        num_samples=1,
-        external_seen=False,
-        external_peak_mib=0,
-    ) == []
+    assert (
+        HARNESS.validate_response(
+            response,
+            pid=123,
+            device="cpu",
+            num_samples=1,
+            external_seen=False,
+            external_peak_mib=0,
+        )
+        == []
+    )
 
     response["gpu_evidence"]["gpu_used"] = True
     reasons = HARNESS.validate_response(

@@ -168,11 +168,7 @@ def _verify_quality_report(quality: dict[str, object], git_sha: str) -> None:
     ):
         raise CertificationError("quality focused JUnit evidence mismatch")
     full = quality.get("full_junit")
-    if (
-        not isinstance(full, dict)
-        or full.get("failures") != 0
-        or full.get("errors") != 0
-    ):
+    if not isinstance(full, dict) or full.get("failures") != 0 or full.get("errors") != 0:
         raise CertificationError("quality full-suite JUnit evidence mismatch")
 
 
@@ -461,10 +457,15 @@ def execute(
                 "package_verification": "FAILED_PACKAGE_VERIFICATION",
                 "postflight": "FAILED_POSTFLIGHT_GIT_DRIFT",
             }.get(str(report["phase"]), "FAILED_PROMOTION_GATE")
-        if directory_created and exit_code == 3 and report["status"] not in {
-            "FAILED_PREFLIGHT",
-            "FAILED_POSTFLIGHT_GIT_DRIFT",
-        }:
+        if (
+            directory_created
+            and exit_code == 3
+            and report["status"]
+            not in {
+                "FAILED_PREFLIGHT",
+                "FAILED_POSTFLIGHT_GIT_DRIFT",
+            }
+        ):
             exit_code = 2
     finally:
         report["finished_at"] = utc_now()

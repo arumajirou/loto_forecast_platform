@@ -170,9 +170,7 @@ def test_manifest_rejects_false_p8_gate() -> None:
             certification_status="VERIFIED",
             verified_model_lifecycles=18,
             p8_eligible=False,
-            entries=[
-                P7DBundleEntry(path="run/a", sha256="3" * 64, size_bytes=1)
-            ],
+            entries=[P7DBundleEntry(path="run/a", sha256="3" * 64, size_bytes=1)],
         )
 
 

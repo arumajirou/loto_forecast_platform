@@ -198,13 +198,9 @@ def test_shadow_candidate_is_not_reselected_by_prospective_rank(monkeypatch) -> 
 def test_hit_target_failure_is_critical(monkeypatch) -> None:
     lock = make_lock(monkeypatch)
     far_actuals = [[9.0, 9.0, 9.0]] * 3
-    result = monitor_prospective(
-        make_monitor_request(lock, values=far_actuals)
-    )
+    result = monitor_prospective(make_monitor_request(lock, values=far_actuals))
     assert result["drift_status"] == "CRITICAL"
-    assert result["recommendation"] == (
-        "BLOCK_PROMOTION_RETRAIN_REVIEW_REQUIRED"
-    )
+    assert result["recommendation"] == ("BLOCK_PROMOTION_RETRAIN_REVIEW_REQUIRED")
     assert any(alert["code"] == "HIT_AT_1_BELOW_TARGET" for alert in result["alerts"])
 
 

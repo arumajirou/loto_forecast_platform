@@ -187,10 +187,7 @@ def build_scinet_class(
             module_names = [type(module).__name__ for module in self.modules()]
             if module_names.count("SCIBlock") != architecture.sci_blocks:
                 raise ValueError("SCINet SCIBlock count mismatch")
-            if (
-                module_names.count("CausalConvBlock")
-                != architecture.causal_conv_blocks
-            ):
+            if module_names.count("CausalConvBlock") != architecture.causal_conv_blocks:
                 raise ValueError("SCINet CausalConvBlock count mismatch")
 
             self.loto_model_id = "nf-local-auto-scinet"
@@ -220,9 +217,7 @@ def build_scinet_class(
         def forward(self, windows_batch: dict[str, Any]) -> Any:
             insample_y = windows_batch["insample_y"]
             if insample_y.ndim != 3 or insample_y.shape[-1] != 1:
-                raise ValueError(
-                    "SCINet expects insample_y shape [batch, input_size, 1]"
-                )
+                raise ValueError("SCINet expects insample_y shape [batch, input_size, 1]")
             if insample_y.shape[1] != self.input_size:
                 raise ValueError("SCINet input_size does not match the window")
             if not torch.isfinite(insample_y).all().item():

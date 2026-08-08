@@ -58,9 +58,7 @@ def test_fake_runtime_executes_forecast_and_validates() -> None:
 
 
 def test_nan_model_expected_negative_contract() -> None:
-    prediction = pd.DataFrame(
-        {"unique_id": ["d1"], "ds": [1], "NaNModel": [np.nan]}
-    )
+    prediction = pd.DataFrame({"unique_id": ["d1"], "ds": [1], "NaNModel": [np.nan]})
     evidence = validate_forecast_output(
         prediction,
         model_name="NaNModel",

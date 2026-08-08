@@ -10,7 +10,8 @@ import pytest
 from loto.time_series_library_campaign import ProviderRequest
 
 
-FAKE_SEGRNN = """
+FAKE_SEGRNN = (
+    """
 import torch
 from torch import nn
 from layers.Autoformer_EncDec import series_decomp
@@ -31,20 +32,21 @@ class Model(nn.Module):
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         return self.linear(x_enc.permute(0, 2, 1)).permute(0, 2, 1)
-""".strip() + "\n"
+""".strip()
+    + "\n"
+)
 
-FAKE_AUTOFORMER = """
+FAKE_AUTOFORMER = (
+    """
 class series_decomp:
     pass
-""".strip() + "\n"
+""".strip()
+    + "\n"
+)
 
 
 def _script() -> Path:
-    return (
-        Path(__file__).resolve().parents[2]
-        / "scripts"
-        / "run_time_series_library_provider.py"
-    )
+    return Path(__file__).resolve().parents[2] / "scripts" / "run_time_series_library_provider.py"
 
 
 def _write_fake_source(root: Path) -> None:

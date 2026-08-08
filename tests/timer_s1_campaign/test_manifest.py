@@ -30,9 +30,7 @@ def test_manifest_covers_expected_remote_code_and_four_weight_shards() -> None:
         "modeling_TimerS1.py",
         "ts_generation_mixin.py",
     }.issubset(paths)
-    assert {
-        f"model-{index:05d}-of-00004.safetensors" for index in range(1, 5)
-    }.issubset(paths)
+    assert {f"model-{index:05d}-of-00004.safetensors" for index in range(1, 5)}.issubset(paths)
 
 
 def test_manifest_rejects_unsafe_artifact_path() -> None:
@@ -53,9 +51,7 @@ def test_manifest_rejects_unsafe_artifact_path() -> None:
 
 def manifest_payload() -> dict[str, object]:
     return json.loads(
-        (ROOT / "configs/timer_s1_campaign/model_manifest.json").read_text(
-            encoding="utf-8"
-        )
+        (ROOT / "configs/timer_s1_campaign/model_manifest.json").read_text(encoding="utf-8")
     )
 
 
@@ -63,9 +59,7 @@ def test_manifest_rejects_missing_required_core_artifact() -> None:
     payload = manifest_payload()
     artifacts = payload["artifacts"]
     assert isinstance(artifacts, list)
-    payload["artifacts"] = [
-        item for item in artifacts if item["path"] != "modeling_TimerS1.py"
-    ]
+    payload["artifacts"] = [item for item in artifacts if item["path"] != "modeling_TimerS1.py"]
     with pytest.raises(ValidationError, match="missing required artifacts"):
         TimerS1ModelManifest.model_validate_json(json.dumps(payload))
 

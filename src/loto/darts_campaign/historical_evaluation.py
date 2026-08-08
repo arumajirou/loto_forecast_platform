@@ -52,9 +52,7 @@ class HistoricalForecastPolicy(BaseModel):
         protected_backtest = {"series", "historical_forecasts", "metric"}
         protected_residual = {"series", "historical_forecasts"}
         overlaps = {
-            "historical": sorted(
-                protected_historical & set(self.historical_extra_args)
-            ),
+            "historical": sorted(protected_historical & set(self.historical_extra_args)),
             "backtest": sorted(protected_backtest & set(self.backtest_extra_args)),
             "residuals": sorted(protected_residual & set(self.residual_extra_args)),
         }
@@ -263,9 +261,7 @@ def calculate_metrics(
     grouped_hits: dict[tuple[int, int], list[bool]] = {}
     for item, hit in zip(ordered, hits, strict=True):
         grouped_hits.setdefault((item.origin, item.target_index), []).append(bool(hit))
-    all_position_hit = float(
-        np.mean([all(values) for values in grouped_hits.values()])
-    )
+    all_position_hit = float(np.mean([all(values) for values in grouped_hits.values()]))
     return {
         "hit_at_plus_minus_1": float(hits.mean()),
         "position_hit_at_plus_minus_1": position_hits,
@@ -516,7 +512,9 @@ def build_contract_report(
     )
 
 
-def _classify_call(method_name: str, function: Any, requested: Mapping[str, Any]) -> tuple[
+def _classify_call(
+    method_name: str, function: Any, requested: Mapping[str, Any]
+) -> tuple[
     dict[str, Any],
     ApiCallEvidence,
 ]:

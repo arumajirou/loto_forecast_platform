@@ -103,9 +103,7 @@ def test_schema_v1_adapter_is_explicitly_seven_position_only() -> None:
 
 
 def valid_response() -> Tirex2Response:
-    quantiles = {
-        f"{level / 10:.1f}": [[float(level), float(level + 1)]] for level in range(1, 10)
-    }
+    quantiles = {f"{level / 10:.1f}": [[float(level), float(level + 1)]] for level in range(1, 10)}
     return Tirex2Response(
         run_id="test-run",
         model_identity=ModelIdentity(

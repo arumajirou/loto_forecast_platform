@@ -141,9 +141,7 @@ def test_actual_read_before_lock_is_blocked() -> None:
 def test_score_before_actual_read_is_blocked() -> None:
     fit, predict, lock, _, score = prediction_chain()
     score = score.model_copy(update={"sequence_no": 4, "parent_event_ids": [lock.event_id]})
-    assert FindingCode.SCORE_BEFORE_ACTUAL_READ in codes(
-        make_ledger([fit, predict, lock, score])
-    )
+    assert FindingCode.SCORE_BEFORE_ACTUAL_READ in codes(make_ledger([fit, predict, lock, score]))
 
 
 def test_future_available_feature_is_blocked() -> None:
@@ -170,6 +168,4 @@ def test_actual_draw_identity_mismatch_is_blocked() -> None:
     fit, predict, lock, read, _ = prediction_chain()
     mismatched = read.input_slices[0].model_copy(update={"draw_id": "draw-999"})
     read = read.model_copy(update={"input_slices": [mismatched]})
-    assert FindingCode.ACTUAL_IDENTITY_MISMATCH in codes(
-        make_ledger([fit, predict, lock, read])
-    )
+    assert FindingCode.ACTUAL_IDENTITY_MISMATCH in codes(make_ledger([fit, predict, lock, read]))

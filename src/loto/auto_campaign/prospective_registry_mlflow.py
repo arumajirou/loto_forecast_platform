@@ -46,12 +46,7 @@ def redact_uri(uri: str) -> str:
 def _records(frame: pd.DataFrame) -> list[dict[str, Any]]:
     output: list[dict[str, Any]] = []
     for row in frame.to_dict(orient="records"):
-        output.append(
-            {
-                key: None if pd.isna(value) else value
-                for key, value in row.items()
-            }
-        )
+        output.append({key: None if pd.isna(value) else value for key, value in row.items()})
     return output
 
 
@@ -86,9 +81,7 @@ def _find_run(
         max_results=2,
     )
     if len(runs) > 1:
-        raise ValueError(
-            f"multiple MLflow runs found for registry role={role}"
-        )
+        raise ValueError(f"multiple MLflow runs found for registry role={role}")
     return runs[0] if runs else None
 
 
@@ -183,10 +176,7 @@ def record_mlflow(
     if parent.data.tags.get("registry_payload_logged") != "true":
         client.log_batch(
             parent_run_id,
-            params=[
-                Param(key, _safe_param(value))
-                for key, value in parent_params.items()
-            ],
+            params=[Param(key, _safe_param(value)) for key, value in parent_params.items()],
             metrics=[
                 Metric(
                     key,
@@ -214,9 +204,7 @@ def record_mlflow(
             child = client.create_run(
                 experiment_id,
                 tags={
-                    "mlflow.runName": (
-                        f"{row['candidate_key']}:seed={row['seed_token']}"
-                    )[:250],
+                    "mlflow.runName": (f"{row['candidate_key']}:seed={row['seed_token']}")[:250],
                     "mlflow.parentRunId": parent_run_id,
                     "registry_id": payload["registry_id"],
                     "registry_role": "seed",
@@ -235,10 +223,7 @@ def record_mlflow(
             }
             client.log_batch(
                 child_id,
-                params=[
-                    Param(key, _safe_param(value))
-                    for key, value in params.items()
-                ],
+                params=[Param(key, _safe_param(value)) for key, value in params.items()],
                 metrics=[
                     Metric(
                         key,
@@ -252,9 +237,7 @@ def record_mlflow(
             client.set_terminated(child_id, status="FINISHED")
         else:
             if existing.data.tags.get("payload_sha256") != payload["payload_sha256"]:
-                raise ValueError(
-                    "existing MLflow child run has a different payload SHA-256"
-                )
+                raise ValueError("existing MLflow child run has a different payload SHA-256")
             child_id = str(existing.info.run_id)
             reused_children += 1
         child_ids.append(child_id)

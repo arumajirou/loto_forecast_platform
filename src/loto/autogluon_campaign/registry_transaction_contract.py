@@ -53,9 +53,7 @@ class RegistryHistoryRecord(BaseModel):
     authorization_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     authorization_seal_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     transaction_nonce: str = Field(pattern=r"^[0-9a-f]{64}$")
-    committed_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    committed_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     expected_pre_state_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     pre_generation: int = Field(ge=0)
     post_generation: int = Field(ge=1)
@@ -95,9 +93,7 @@ class RegistryState(BaseModel):
     @classmethod
     def unique_hashes(cls, value: tuple[str, ...]) -> tuple[str, ...]:
         if any(
-            len(item) != 64
-            or any(ch not in "0123456789abcdef" for ch in item)
-            for item in value
+            len(item) != 64 or any(ch not in "0123456789abcdef" for ch in item) for item in value
         ):
             raise ValueError("consumption ledger contains invalid SHA-256 identity")
         if len(set(value)) != len(value):
@@ -134,9 +130,7 @@ class RegistryState(BaseModel):
                 "registry_target": self.registry_target,
                 "generation": index,
                 "current_binding": (
-                    previous_binding.model_dump(mode="json")
-                    if previous_binding
-                    else None
+                    previous_binding.model_dump(mode="json") if previous_binding else None
                 ),
                 "consumed_authorization_ids": prefix_authorizations,
                 "consumed_transaction_nonces": prefix_nonces,
@@ -169,16 +163,12 @@ class RegistryTransactionRequest(BaseModel):
     schema_version: Literal["autogluon-p19-transaction-request-v1"] = (
         "autogluon-p19-transaction-request-v1"
     )
-    operation: Literal["consume_authorization_and_register"] = (
-        "consume_authorization_and_register"
-    )
+    operation: Literal["consume_authorization_and_register"] = "consume_authorization_and_register"
     run_id: str = Field(pattern=r"^[A-Za-z0-9._-]+$", min_length=1)
     git_commit: str = Field(pattern=r"^[0-9a-f]{7,40}$")
     expected_current_state_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     transaction_nonce: str = Field(pattern=r"^[0-9a-f]{64}$")
-    executed_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    executed_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     policy: RegistryPolicy = Field(default_factory=RegistryPolicy)
 
     @model_validator(mode="after")
@@ -246,9 +236,7 @@ def make_history_record(
         ),
         "new_binding": new_binding.model_dump(mode="json"),
     }
-    return RegistryHistoryRecord.model_validate(
-        {**core, "record_sha256": canonical_sha256(core)}
-    )
+    return RegistryHistoryRecord.model_validate({**core, "record_sha256": canonical_sha256(core)})
 
 
 def make_registry_state(
@@ -265,9 +253,7 @@ def make_registry_state(
         "backend": BACKEND,
         "registry_target": registry_target,
         "generation": generation,
-        "current_binding": (
-            current_binding.model_dump(mode="json") if current_binding else None
-        ),
+        "current_binding": (current_binding.model_dump(mode="json") if current_binding else None),
         "consumed_authorization_ids": list(consumed_authorization_ids),
         "consumed_transaction_nonces": list(consumed_transaction_nonces),
         "history": [row.model_dump(mode="json") for row in history],

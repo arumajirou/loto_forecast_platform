@@ -189,12 +189,9 @@ def validate_state_provenance(ledger: DataAccessLedger) -> list[ValidationFindin
                             event_id=event.event_id,
                             related=[producer.event_id],
                             message=(
-                                "state was fitted with data unavailable at consumer "
-                                "forecast origin"
+                                "state was fitted with data unavailable at consumer forecast origin"
                             ),
-                            expected=(
-                                f"available_at <= {event.forecast_origin.isoformat()}"
-                            ),
+                            expected=(f"available_at <= {event.forecast_origin.isoformat()}"),
                             observed=",".join(late_inputs),
                         )
                     )

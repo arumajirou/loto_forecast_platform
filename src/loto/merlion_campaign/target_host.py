@@ -164,9 +164,7 @@ def run_target_host_certification(
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     if output_dir.exists():
         raise TargetHostError(f"output already exists: {output_dir}")
-    staging = Path(
-        tempfile.mkdtemp(prefix=f".{output_dir.name}.partial-", dir=output_dir.parent)
-    )
+    staging = Path(tempfile.mkdtemp(prefix=f".{output_dir.name}.partial-", dir=output_dir.parent))
     phase = "initialization"
     status = "BLOCKED"
     identity_evidence: dict[str, Any] = {}

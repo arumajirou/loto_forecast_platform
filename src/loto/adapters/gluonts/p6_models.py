@@ -255,15 +255,12 @@ def validate_registry() -> None:
 
 def canonical_json_bytes(payload: Any) -> bytes:
     return (
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n"
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     ).encode("utf-8")
 
 
 def matrix_sha256(matrix: P6ConstructorMatrix) -> str:
-    return hashlib.sha256(
-        canonical_json_bytes(matrix.model_dump(mode="json"))
-    ).hexdigest()
+    return hashlib.sha256(canonical_json_bytes(matrix.model_dump(mode="json"))).hexdigest()
 
 
 def constructor_kwargs(

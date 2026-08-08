@@ -37,9 +37,7 @@ def main() -> int:
 
     request_id = "unknown"
     try:
-        request = ProviderRequest.model_validate_json(
-            args.request.read_text(encoding="utf-8")
-        )
+        request = ProviderRequest.model_validate_json(args.request.read_text(encoding="utf-8"))
         request_id = request.request_id
         response = execute(request, args.work_root.resolve())
         return_code = 0 if response.status == "PASS" else 2

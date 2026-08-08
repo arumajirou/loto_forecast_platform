@@ -83,8 +83,7 @@ class AutoFreTSRuntimeRequest(StrictRuntimeModel):
         minimum_history = architecture.input_size + self.horizon + self.validation_size + 1
         if self.history_length < minimum_history:
             raise ValueError(
-                f"history_length must be at least {minimum_history} "
-                "for the selected geometry"
+                f"history_length must be at least {minimum_history} for the selected geometry"
             )
         return self
 
@@ -262,15 +261,11 @@ def canonical_request_sha256(request: AutoFreTSRuntimeRequest) -> str:
 
 
 def load_runtime_request(path: Path) -> AutoFreTSRuntimeRequest:
-    return AutoFreTSRuntimeRequest.model_validate_json(
-        path.read_text(encoding="utf-8")
-    )
+    return AutoFreTSRuntimeRequest.model_validate_json(path.read_text(encoding="utf-8"))
 
 
 def load_worker_response(path: Path) -> AutoFreTSWorkerResponse:
-    return AutoFreTSWorkerResponse.model_validate_json(
-        path.read_text(encoding="utf-8")
-    )
+    return AutoFreTSWorkerResponse.model_validate_json(path.read_text(encoding="utf-8"))
 
 
 __all__ = [

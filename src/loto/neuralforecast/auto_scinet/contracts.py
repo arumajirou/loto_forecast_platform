@@ -64,9 +64,7 @@ class ArchitectureSpec(BaseModel):
             raise ValueError("SCINet v1 fixes effective dropout=0.0")
         if self.sci_blocks != SCINET_BLOCKS_PER_TREE:
             raise ValueError("SCINet v1 requires 15 SCI blocks")
-        expected_causal = (
-            SCINET_BLOCKS_PER_TREE * SCINET_CAUSAL_BLOCKS_PER_SCI_BLOCK
-        )
+        expected_causal = SCINET_BLOCKS_PER_TREE * SCINET_CAUSAL_BLOCKS_PER_SCI_BLOCK
         if self.causal_conv_blocks != expected_causal:
             raise ValueError("SCINet v1 requires 60 causal convolution blocks")
         if self.expected_parameter_count != expected_parameter_count(
@@ -136,9 +134,7 @@ def resolve_architecture(
     minimum, multiplier = multipliers[selected]
     input_size = _round_up(max(minimum, h * multiplier), 8)
     if input_size > SCINET_MAX_INPUT_SIZE:
-        raise ValueError(
-            f"resolved input_size exceeds {SCINET_MAX_INPUT_SIZE}: {input_size}"
-        )
+        raise ValueError(f"resolved input_size exceeds {SCINET_MAX_INPUT_SIZE}: {input_size}")
     return ArchitectureSpec(
         profile=selected,
         h=h,
@@ -148,9 +144,7 @@ def resolve_architecture(
         stacks=SCINET_STACKS,
         dropout=SCINET_DROPOUT,
         sci_blocks=SCINET_BLOCKS_PER_TREE,
-        causal_conv_blocks=(
-            SCINET_BLOCKS_PER_TREE * SCINET_CAUSAL_BLOCKS_PER_SCI_BLOCK
-        ),
+        causal_conv_blocks=(SCINET_BLOCKS_PER_TREE * SCINET_CAUSAL_BLOCKS_PER_SCI_BLOCK),
         expected_parameter_count=expected_parameter_count(input_size, h),
     )
 

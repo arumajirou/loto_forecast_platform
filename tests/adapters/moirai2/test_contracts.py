@@ -9,8 +9,7 @@ from loto.adapters.moirai2.contracts import Moirai2ProviderRequest, request_v1_t
 def _payload(position_count: int = 5, horizon: int = 1) -> dict:
     columns = [f"n{index}" for index in range(1, position_count + 1)]
     history = [
-        {column: float(row + index) for index, column in enumerate(columns)}
-        for row in range(128)
+        {column: float(row + index) for index, column in enumerate(columns)} for row in range(128)
     ]
     return {
         "run_id": "contract-test",
@@ -51,9 +50,7 @@ def test_request_accepts_arbitrary_position_count_and_formal_horizons() -> None:
 def test_future_covariate_requires_history_plus_horizon() -> None:
     payload = _payload(horizon=2)
     payload["future_covariates"] = {"weekday": [1.0, 2.0]}
-    payload["future_covariate_availability"] = {
-        "weekday": "known_at_prediction_time"
-    }
+    payload["future_covariate_availability"] = {"weekday": "known_at_prediction_time"}
     with pytest.raises(ValidationError, match=r"history\+horizon"):
         Moirai2ProviderRequest.model_validate(payload)
 
@@ -83,9 +80,7 @@ def test_future_covariate_requires_known_at_prediction_time_evidence() -> None:
     payload["future_covariates"] = {"weekday": [1.0] * 130}
     with pytest.raises(ValidationError, match="known-at-prediction-time"):
         Moirai2ProviderRequest.model_validate(payload)
-    payload["future_covariate_availability"] = {
-        "weekday": "known_at_prediction_time"
-    }
+    payload["future_covariate_availability"] = {"weekday": "known_at_prediction_time"}
     request = Moirai2ProviderRequest.model_validate(payload)
     assert request.future_covariate_availability["weekday"] == "known_at_prediction_time"
 

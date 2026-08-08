@@ -10,8 +10,10 @@ from loto.run_lifecycle import canonical_json, sha256_canonical
 json_scalars = st.none() | st.booleans() | st.integers() | st.text()
 json_values = st.recursive(
     json_scalars,
-    lambda children: st.lists(children, max_size=4)
-    | st.dictionaries(st.text(min_size=1, max_size=8), children, max_size=4),
+    lambda children: (
+        st.lists(children, max_size=4)
+        | st.dictionaries(st.text(min_size=1, max_size=8), children, max_size=4)
+    ),
     max_leaves=12,
 )
 
@@ -24,6 +26,4 @@ def test_canonicalization_is_deterministic(value) -> None:
 
 @given(st.text(min_size=1))
 def test_hash_changes_for_changed_payload(value: str) -> None:
-    assert sha256_canonical({"value": value}) != sha256_canonical(
-        {"value": value + "-changed"}
-    )
+    assert sha256_canonical({"value": value}) != sha256_canonical({"value": value + "-changed"})

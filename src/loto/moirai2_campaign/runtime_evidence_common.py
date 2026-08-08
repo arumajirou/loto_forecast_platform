@@ -8,7 +8,6 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 
-
 FORMAL_CASE_NAMES = (
     "draw-target-only",
     "draw-past-only",
@@ -114,9 +113,7 @@ def load_json_object(path: Path) -> dict[str, Any]:
 def _required_file(root: Path, relative_path: str) -> Path:
     path = root / relative_path
     if not path.is_file():
-        raise RuntimeEvidenceGateError(
-            f"required campaign artifact is missing: {relative_path}"
-        )
+        raise RuntimeEvidenceGateError(f"required campaign artifact is missing: {relative_path}")
     return path
 
 
@@ -128,5 +125,3 @@ def _safe_relative_path(value: str) -> str:
     if normalized != value:
         raise RuntimeEvidenceGateError(f"non-canonical manifest path: {value!r}")
     return normalized
-
-

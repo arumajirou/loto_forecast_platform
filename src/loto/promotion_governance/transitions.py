@@ -160,9 +160,7 @@ _ALLOWED: dict[PromotionStatus, frozenset[PromotionStatus]] = {
     PromotionStatus.REVOKED: frozenset(),
 }
 
-_TERMINAL = frozenset(
-    {PromotionStatus.BLOCKED, PromotionStatus.REJECTED, PromotionStatus.REVOKED}
-)
+_TERMINAL = frozenset({PromotionStatus.BLOCKED, PromotionStatus.REJECTED, PromotionStatus.REVOKED})
 
 
 def _issue(code: TransitionIssueCode, detail: str) -> TransitionIssue:
@@ -197,10 +195,7 @@ def _shadow_evidence_issues(subject: PromotionSubject) -> list[TransitionIssue]:
                 "required baseline inventory is incomplete",
             )
         )
-    if (
-        subject.license_eligibility.eligibility
-        is not LicenseEligibility.PRODUCTION_ELIGIBLE
-    ):
+    if subject.license_eligibility.eligibility is not LicenseEligibility.PRODUCTION_ELIGIBLE:
         issues.append(
             _issue(TransitionIssueCode.LICENSE_INELIGIBLE, "license is not production eligible")
         )
@@ -214,9 +209,7 @@ def _approval_issues(
 ) -> list[TransitionIssue]:
     approval = request.context.human_approval
     if approval is None:
-        return [
-            _issue(TransitionIssueCode.HUMAN_APPROVAL_MISSING, "human approval is required")
-        ]
+        return [_issue(TransitionIssueCode.HUMAN_APPROVAL_MISSING, "human approval is required")]
     issues: list[TransitionIssue] = []
     if approval.scope is not scope:
         issues.append(
@@ -287,17 +280,21 @@ def validate_transition(
             issues.append(
                 _issue(TransitionIssueCode.RUNTIME_AXIS_MISMATCH, "runtime axis is not VERIFIED")
             )
-    if target in {
-        PromotionStatus.EVALUATION_PENDING,
-        PromotionStatus.SHADOW_ELIGIBLE,
-        PromotionStatus.HUMAN_REVIEW_REQUIRED,
-        PromotionStatus.APPROVED_NOT_REGISTERED,
-        PromotionStatus.REGISTERED_NOT_DEPLOYED,
-        PromotionStatus.SHADOW_CANARY_ACTIVE,
-        PromotionStatus.PRIMARY_REVIEW_ELIGIBLE,
-        PromotionStatus.PRIMARY_AUTHORIZED_NOT_EXECUTED,
-        PromotionStatus.PRIMARY_ACTIVE,
-    } and context.runtime_axis is not RuntimeAxis.VERIFIED:
+    if (
+        target
+        in {
+            PromotionStatus.EVALUATION_PENDING,
+            PromotionStatus.SHADOW_ELIGIBLE,
+            PromotionStatus.HUMAN_REVIEW_REQUIRED,
+            PromotionStatus.APPROVED_NOT_REGISTERED,
+            PromotionStatus.REGISTERED_NOT_DEPLOYED,
+            PromotionStatus.SHADOW_CANARY_ACTIVE,
+            PromotionStatus.PRIMARY_REVIEW_ELIGIBLE,
+            PromotionStatus.PRIMARY_AUTHORIZED_NOT_EXECUTED,
+            PromotionStatus.PRIMARY_ACTIVE,
+        }
+        and context.runtime_axis is not RuntimeAxis.VERIFIED
+    ):
         issues.append(
             _issue(TransitionIssueCode.RUNTIME_AXIS_MISMATCH, "target requires verified runtime")
         )
@@ -351,11 +348,15 @@ def validate_transition(
                     "registry write must not imply deployment",
                 )
             )
-    if target in {
-        PromotionStatus.SHADOW_CANARY_ACTIVE,
-        PromotionStatus.PRIMARY_REVIEW_ELIGIBLE,
-        PromotionStatus.PRIMARY_AUTHORIZED_NOT_EXECUTED,
-    } and context.deployment.status is not DeploymentAxis.SHADOW_CANARY:
+    if (
+        target
+        in {
+            PromotionStatus.SHADOW_CANARY_ACTIVE,
+            PromotionStatus.PRIMARY_REVIEW_ELIGIBLE,
+            PromotionStatus.PRIMARY_AUTHORIZED_NOT_EXECUTED,
+        }
+        and context.deployment.status is not DeploymentAxis.SHADOW_CANARY
+    ):
         issues.append(
             _issue(
                 TransitionIssueCode.DEPLOYMENT_AXIS_MISMATCH,

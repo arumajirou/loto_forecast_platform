@@ -44,8 +44,7 @@ class HttpJsonClient:
                 )
                 if response.status_code not in accepted_codes:
                     raise EngineUnavailable(
-                        f"{method} {url} returned {response.status_code}: "
-                        f"{response.text[:500]}"
+                        f"{method} {url} returned {response.status_code}: {response.text[:500]}"
                     )
                 if not response.content:
                     return {}

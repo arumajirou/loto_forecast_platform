@@ -73,9 +73,7 @@ def _fit_predict(
         model = build_core_forecast(config.core, seed=config.seed)
         intervals = build_prediction_intervals(config.core.prediction_intervals)
         levels = (
-            config.core.prediction_intervals.levels
-            if config.core.prediction_intervals
-            else None
+            config.core.prediction_intervals.levels if config.core.prediction_intervals else None
         )
         cv_prediction = model.cross_validation(
             train,
@@ -149,8 +147,7 @@ def _fit_predict(
     levels = config.auto.prediction_intervals.levels if config.auto.prediction_intervals else None
     prediction = model.predict(h=config.h, level=levels, X_df=x_df)
     trials = {
-        f"optuna_trials_{name}": study.trials_dataframe()
-        for name, study in model.results_.items()
+        f"optuna_trials_{name}": study.trials_dataframe() for name, study in model.results_.items()
     }
     metadata = {
         "mode": "auto",
@@ -244,9 +241,7 @@ def _update_for_prospective(
     if config.mode is RunMode.CORE:
         model.update(holdout, validate_new_data=True)
         levels = (
-            config.core.prediction_intervals.levels
-            if config.core.prediction_intervals
-            else None
+            config.core.prediction_intervals.levels if config.core.prediction_intervals else None
         )
         x_df = _validated_x_df(
             model,

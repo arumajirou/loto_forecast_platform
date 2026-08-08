@@ -117,5 +117,3 @@ def verify_control_workspace(workspace: Path) -> ControlState:
     elif report_path.exists():
         raise ValueError("target execution report exists before CPU_FORMAL")
     return state
-
-

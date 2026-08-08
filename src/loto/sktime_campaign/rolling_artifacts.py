@@ -47,12 +47,15 @@ def _atomic_write_text(path: Path, text: str) -> None:
 
 
 def _write_json(path: Path, payload: Any) -> None:
-    text = json.dumps(
-        payload,
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-    ) + "\n"
+    text = (
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
     _atomic_write_text(path, text)
 
 
@@ -93,9 +96,7 @@ def _data_contract(request: RollingOriginRequest) -> dict[str, Any]:
         "raw_rows": len(request.dataset.values),
         "raw_sha256": canonical_sha256(request.dataset.model_dump(mode="json")),
         "train_values_sha256": canonical_sha256(values[:train_end].tolist()),
-        "validation_values_sha256": canonical_sha256(
-            values[train_end:validation_end].tolist()
-        ),
+        "validation_values_sha256": canonical_sha256(values[train_end:validation_end].tolist()),
         "holdout_values_sha256": canonical_sha256(values[validation_end:].tolist()),
         "visible_values_sha256": canonical_sha256(values[:validation_end].tolist()),
         "oof_scope": "TRAIN_ONLY",
@@ -108,8 +109,7 @@ def _write_manifest_and_sha(output_dir: Path, *, status: str) -> None:
     files = sorted(
         path
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     manifest = {
         "schema_version": "1.0",
@@ -126,9 +126,7 @@ def _write_manifest_and_sha(output_dir: Path, *, status: str) -> None:
     }
     _write_json(output_dir / "ARTIFACT_MANIFEST.json", manifest)
     hashed = sorted(
-        path
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     )
     _atomic_write_text(
         output_dir / "SHA256SUMS",
@@ -191,9 +189,7 @@ def _verify_sha256sums(output_dir: Path) -> None:
         if not path.is_file() or _sha256(path) != expected:
             raise P3VerificationError(f"SHA-256 mismatch: {name}")
     expected_files = {
-        path.name
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path.name for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     }
     if seen != expected_files:
         raise P3VerificationError("SHA256SUMS coverage mismatch")
@@ -215,8 +211,7 @@ def _verify_manifest(output_dir: Path, *, expected_status: str) -> None:
     expected = {
         path.name
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     }
     if seen != expected:
         raise P3VerificationError("manifest coverage mismatch")
@@ -272,23 +267,17 @@ def verify_p3(
             raise P3VerificationError("OOF row used wrong evaluation scope")
         expected_train = train_only[fold["train_start"] : fold["train_end"]]
         expected_actual = train_only[fold["test_start"] : fold["test_end"]]
-        if row.get("train_values_sha256") != canonical_sha256(
-            expected_train.tolist()
-        ):
+        if row.get("train_values_sha256") != canonical_sha256(expected_train.tolist()):
             raise P3VerificationError("OOF Train-prefix hash mismatch")
         if row.get("actual_values") != expected_actual.tolist():
             raise P3VerificationError("OOF actual values are not the fold future block")
         if row.get("test_draw_no") != fold["test_draw_no"]:
             raise P3VerificationError("OOF test draw identity mismatch")
-        if row.get("actual_values_sha256") != canonical_sha256(
-            row.get("actual_values")
-        ):
+        if row.get("actual_values_sha256") != canonical_sha256(row.get("actual_values")):
             raise P3VerificationError("OOF actual-value hash mismatch")
         if row.get("status") == "PASS":
             prediction = np.asarray(row["predictions"], dtype=float)
-            if prediction.shape != expected_actual.shape or not np.isfinite(
-                prediction
-            ).all():
+            if prediction.shape != expected_actual.shape or not np.isfinite(prediction).all():
                 raise P3VerificationError("OOF prediction shape or finite check failed")
             expected = compute_metrics(
                 expected_actual,
@@ -315,9 +304,7 @@ def verify_p3(
     except ValueError as exc:
         raise P3VerificationError(str(exc)) from exc
     visible_rows = request.split.train_rows + request.split.validation_rows
-    if lock.get("visible_values_sha256") != canonical_sha256(
-        values[:visible_rows].tolist()
-    ):
+    if lock.get("visible_values_sha256") != canonical_sha256(values[:visible_rows].tolist()):
         raise P3VerificationError("prediction lock visible-data hash mismatch")
     if lock.get("holdout_draw_no") != request.dataset.draw_no[visible_rows:]:
         raise P3VerificationError("prediction lock Holdout draw identity mismatch")
@@ -343,19 +330,13 @@ def verify_p3(
                 request.split.holdout_rows,
                 len(request.dataset.position_names),
             )
-            if prediction.shape != expected_shape or not np.isfinite(
-                prediction
-            ).all():
-                raise P3VerificationError(
-                    "locked Holdout prediction shape or finite check failed"
-                )
+            if prediction.shape != expected_shape or not np.isfinite(prediction).all():
+                raise P3VerificationError("locked Holdout prediction shape or finite check failed")
     if observed_lock_keys != expected_keys:
         raise P3VerificationError("prediction-lock candidate/seed inventory mismatch")
 
     all_oof_pass = bool(rows) and all(row.get("status") == "PASS" for row in rows)
-    all_lock_pass = bool(lock_rows) and all(
-        row.get("status") == "PASS" for row in lock_rows
-    )
+    all_lock_pass = bool(lock_rows) and all(row.get("status") == "PASS" for row in lock_rows)
     combined_rows = rows + lock_rows
     any_pass = any(row.get("status") == "PASS" for row in combined_rows)
     all_unavailable = bool(combined_rows) and all(
@@ -380,9 +361,7 @@ def verify_p3(
         if request.random_seeds != [1, 2, 3]:
             raise P3VerificationError("formal seeds must be [1, 2, 3]")
         if status != "PASS":
-            raise P3VerificationError(
-                "formal P3 requires every OOF and lock row to PASS"
-            )
+            raise P3VerificationError("formal P3 requires every OOF and lock row to PASS")
 
     _verify_manifest(output_dir, expected_status=status)
     _verify_sha256sums(output_dir)

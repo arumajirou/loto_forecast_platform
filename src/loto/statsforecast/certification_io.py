@@ -38,13 +38,16 @@ def atomic_write(path: Path, content: bytes) -> None:
 
 
 def write_json(path: Path, payload: Any) -> None:
-    content = json.dumps(
-        payload,
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-        default=json_default,
-    ).encode("utf-8") + b"\n"
+    content = (
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+            default=json_default,
+        ).encode("utf-8")
+        + b"\n"
+    )
     atomic_write(path, content)
 
 

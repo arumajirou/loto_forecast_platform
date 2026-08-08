@@ -90,8 +90,7 @@ def _write_manifest_and_sha(
     files = sorted(
         path
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     manifest = {
         "schema_version": "1.0",
@@ -108,9 +107,7 @@ def _write_manifest_and_sha(
     }
     _write_json(output_dir / "ARTIFACT_MANIFEST.json", manifest)
     hashed = sorted(
-        path
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     )
     _atomic_write_text(
         output_dir / "SHA256SUMS",
@@ -135,9 +132,7 @@ def _verify_sha256sums(output_dir: Path) -> None:
         if not path.is_file() or _sha256(path) != expected:
             raise P5VerificationError(f"SHA-256 mismatch: {relative_name}")
     expected_files = {
-        path.name
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path.name for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     }
     if seen != expected_files:
         raise P5VerificationError("SHA256SUMS coverage mismatch")
@@ -170,8 +165,7 @@ def _verify_manifest(
     expected = {
         path.name
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     }
     if seen != expected:
         raise P5VerificationError("manifest coverage mismatch")
@@ -221,9 +215,7 @@ def _history_contract(request: ProspectiveRequest) -> dict[str, Any]:
         "legal_min": request.history.legal_min,
         "legal_max": request.history.legal_max,
         "prospective_draw_no": request.prospective_draw_no,
-        "prospective_draw_no_sha256": canonical_sha256(
-            request.prospective_draw_no
-        ),
+        "prospective_draw_no_sha256": canonical_sha256(request.prospective_draw_no),
         "fit_scope": "OBSERVED_HISTORY_ONLY",
         "future_actual_access": "IDENTITIES_ONLY_NOT_SCORED",
     }
@@ -303,9 +295,7 @@ def verify_prospective_bundle(
         raise P5VerificationError("request metadata mismatch")
     if _load_json(output_dir / "HISTORY_CONTRACT.json") != _history_contract(request):
         raise P5VerificationError("history contract mismatch")
-    if _load_json(output_dir / "P4_LINEAGE.json") != _p4_lineage(
-        request, context
-    ):
+    if _load_json(output_dir / "P4_LINEAGE.json") != _p4_lineage(request, context):
         raise P5VerificationError("P4 lineage mismatch")
 
     lock = _load_json(output_dir / "PROSPECTIVE_PREDICTION_LOCK.json")
@@ -351,17 +341,11 @@ def verify_prospective_bundle(
                 raise P5VerificationError("Prospective finite-value flag mismatch")
     all_pass = bool(rows) and all(row.get("status") == "PASS" for row in rows)
     any_pass = any(row.get("status") == "PASS" for row in rows)
-    all_unavailable = bool(rows) and all(
-        row.get("status") == "UNAVAILABLE" for row in rows
-    )
+    all_unavailable = bool(rows) and all(row.get("status") == "UNAVAILABLE" for row in rows)
     expected_status = (
         "PASS"
         if all_pass
-        else (
-            "PARTIAL"
-            if any_pass
-            else ("UNAVAILABLE" if all_unavailable else "FAILED")
-        )
+        else ("PARTIAL" if any_pass else ("UNAVAILABLE" if all_unavailable else "FAILED"))
     )
 
     response = _load_json(output_dir / "response.json")
@@ -504,23 +488,15 @@ def verify_prospective_monitor(
     verify_prospective_lock(request.prediction_lock)
     expected = monitor_prospective(request)
 
-    if _load_json(output_dir / "ACTUALS_SNAPSHOT.json") != request.actuals.model_dump(
-        mode="json"
-    ):
+    if _load_json(output_dir / "ACTUALS_SNAPSHOT.json") != request.actuals.model_dump(mode="json"):
         raise P5VerificationError("Prospective actual snapshot mismatch")
-    if _load_json(output_dir / "P5_LOCK_LINEAGE.json") != _monitor_lock_lineage(
-        request
-    ):
+    if _load_json(output_dir / "P5_LOCK_LINEAGE.json") != _monitor_lock_lineage(request):
         raise P5VerificationError("Prospective lock lineage mismatch")
     if _load_json(output_dir / "PROSPECTIVE_RESULTS.json") != expected["score_rows"]:
         raise P5VerificationError("Prospective result rows mismatch")
-    if _load_json(output_dir / "CANDIDATE_AGGREGATES.json") != expected[
-        "candidate_aggregates"
-    ]:
+    if _load_json(output_dir / "CANDIDATE_AGGREGATES.json") != expected["candidate_aggregates"]:
         raise P5VerificationError("Prospective candidate aggregates mismatch")
-    if _load_json(output_dir / "PROSPECTIVE_LEADERBOARD.json") != expected[
-        "leaderboard"
-    ]:
+    if _load_json(output_dir / "PROSPECTIVE_LEADERBOARD.json") != expected["leaderboard"]:
         raise P5VerificationError("Prospective leaderboard mismatch")
 
     expected_drift = {
@@ -541,9 +517,7 @@ def verify_prospective_monitor(
     response = _load_json(output_dir / "response.json")
     if response.get("status") != expected["status"]:
         raise P5VerificationError("Prospective monitoring status mismatch")
-    if response.get("shadow_candidate_id") != request.prediction_lock.get(
-        "shadow_candidate_id"
-    ):
+    if response.get("shadow_candidate_id") != request.prediction_lock.get("shadow_candidate_id"):
         raise P5VerificationError("Prospective monitoring changed shadow candidate")
     if response.get("automatic_retraining") is not False:
         raise P5VerificationError("Prospective monitor enabled automatic retraining")

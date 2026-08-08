@@ -17,11 +17,7 @@ def execute_bounded_remediation(
 ) -> RemediationExecutionResult:
     """Execute bounded retries through the hardened End-to-End entrypoint."""
 
-    runner = (
-        run_end_to_end_certification
-        if end_to_end_runner is None
-        else end_to_end_runner
-    )
+    runner = run_end_to_end_certification if end_to_end_runner is None else end_to_end_runner
     return _execute_bounded_remediation(
         *args,
         end_to_end_runner=runner,

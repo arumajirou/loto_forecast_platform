@@ -91,9 +91,7 @@ def export(output_root: Path) -> dict[str, Any]:
         raise RuntimeError("SQLAlchemy is required; run with the postgres extra") from exc
     engine = create_engine(_database_url(), pool_pre_ping=True)
     with engine.connect() as connection:
-        connection.exec_driver_sql(
-            "BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY"
-        )
+        connection.exec_driver_sql("BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
         try:
             connection.exec_driver_sql("SET LOCAL statement_timeout = '10min'")
             schema = pd.read_sql_query(

@@ -100,9 +100,7 @@ def _run_evidence(
     lineage_path = root / "LINEAGE.json"
     if require_lineage:
         if manifest.get("lineage_status") != "PASS":
-            failures.append(
-                f"{label} lineage_status is not PASS: {manifest.get('lineage_status')}"
-            )
+            failures.append(f"{label} lineage_status is not PASS: {manifest.get('lineage_status')}")
         if not lineage_path.is_file():
             failures.append(f"{label} LINEAGE.json missing")
         elif manifest.get("lineage_sha256") != sha256_file(lineage_path):
@@ -162,9 +160,7 @@ def evaluate_lineage_inputs(
         if source_run is not None:
             failures.append(f"{target_stage.value} does not accept a source run")
     elif source_run is None:
-        failures.append(
-            f"{target_stage.value} requires source run stage={expected_source.value}"
-        )
+        failures.append(f"{target_stage.value} requires source run stage={expected_source.value}")
     else:
         source_evidence, source_failures = _run_evidence(
             source_run,
@@ -180,9 +176,7 @@ def evaluate_lineage_inputs(
     elif target_stage in {CampaignStage.VALIDATE_TRIALS, CampaignStage.OOF}:
         if predecessor_run is not None and source_run is not None:
             if predecessor_run.resolve() != source_run.resolve():
-                failures.append(
-                    f"{target_stage.value} predecessor must equal its source run"
-                )
+                failures.append(f"{target_stage.value} predecessor must equal its source run")
         predecessor_evidence = source_evidence
     elif predecessor_run is None:
         failures.append(
@@ -213,9 +207,7 @@ def evaluate_lineage_inputs(
 
 def _lineage_core(payload: Mapping[str, Any]) -> dict[str, Any]:
     return {
-        key: value
-        for key, value in payload.items()
-        if key not in {"created_at", "chain_sha256"}
+        key: value for key, value in payload.items() if key not in {"created_at", "chain_sha256"}
     }
 
 

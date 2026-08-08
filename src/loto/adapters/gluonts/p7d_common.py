@@ -47,9 +47,7 @@ def _read_json(path: Path) -> dict[str, Any]:
     try:
         payload = json.loads(path.read_text("utf-8"))
     except Exception as exc:
-        raise P7DBundleError(
-            f"failed to read JSON {path}: {type(exc).__name__}: {exc}"
-        ) from exc
+        raise P7DBundleError(f"failed to read JSON {path}: {type(exc).__name__}: {exc}") from exc
     if not isinstance(payload, dict):
         raise P7DBundleError(f"JSON root must be an object: {path}")
     return payload
@@ -81,9 +79,7 @@ def _checksum_entries(root: Path, checksum_name: str) -> dict[Path, str]:
             continue
         parts = line.split(maxsplit=1)
         if len(parts) != 2 or len(parts[0]) != 64:
-            raise P7DBundleError(
-                f"invalid checksum line {line_number}: {checksum_name}"
-            )
+            raise P7DBundleError(f"invalid checksum line {line_number}: {checksum_name}")
         digest, token = parts
         relative = _safe_relative(token.strip().lstrip("*"))
         path = (root / Path(*relative.parts)).resolve()
@@ -107,20 +103,13 @@ def verify_checksum_inventory(
     entries = _checksum_entries(root, checksum_name)
     excluded = {checksum_name, *(excluded_names or set())}
     observed = {
-        path.resolve()
-        for path in root.rglob("*")
-        if path.is_file() and path.name not in excluded
+        path.resolve() for path in root.rglob("*") if path.is_file() and path.name not in excluded
     }
     if set(entries) != observed:
-        missing = sorted(
-            str(path.relative_to(root)) for path in observed - set(entries)
-        )
-        stale = sorted(
-            str(path.relative_to(root)) for path in set(entries) - observed
-        )
+        missing = sorted(str(path.relative_to(root)) for path in observed - set(entries))
+        stale = sorted(str(path.relative_to(root)) for path in set(entries) - observed)
         raise P7DBundleError(
-            f"checksum inventory mismatch for {checksum_name}: "
-            f"missing={missing}, stale={stale}"
+            f"checksum inventory mismatch for {checksum_name}: missing={missing}, stale={stale}"
         )
     for path, expected in entries.items():
         if not path.is_file() or sha256_file(path) != expected:
@@ -144,5 +133,3 @@ def _read_return_code(path: Path) -> int:
         return int(path.read_text("utf-8").strip())
     except Exception as exc:
         raise P7DBundleError(f"invalid return-code file: {path}") from exc
-
-

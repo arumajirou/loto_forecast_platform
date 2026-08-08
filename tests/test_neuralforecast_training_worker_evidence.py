@@ -122,9 +122,10 @@ def test_gpu_callback_fails_closed(runtime, gpu, failure) -> None:
 
 
 def test_formal_training_cuda_rejects_forged_legacy_dict() -> None:
-    assert formal_training_cuda(
-        {"formal_training_proof": True, "cuda_execution_evidence": True}
-    ) is False
+    assert (
+        formal_training_cuda({"formal_training_proof": True, "cuda_execution_evidence": True})
+        is False
+    )
 
 
 def test_formal_training_cuda_rejects_worker_pid_mismatch() -> None:

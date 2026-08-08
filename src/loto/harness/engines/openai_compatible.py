@@ -93,9 +93,7 @@ class OpenAICompatibleEngine(InferenceEngine):
     def _payload(request: ChatRequest) -> dict[str, Any]:
         payload: dict[str, Any] = {
             "model": request.model,
-            "messages": [
-                message.model_dump(exclude_none=True) for message in request.messages
-            ],
+            "messages": [message.model_dump(exclude_none=True) for message in request.messages],
             "temperature": request.temperature,
             "max_tokens": request.max_tokens,
             "stream": request.stream,
@@ -145,25 +143,19 @@ class OpenAICompatibleEngine(InferenceEngine):
                 else None
             ),
             finish_reason=(
-                str(choice["finish_reason"])
-                if choice.get("finish_reason") is not None
-                else None
+                str(choice["finish_reason"]) if choice.get("finish_reason") is not None else None
             ),
             tool_calls=[item for item in tool_calls if isinstance(item, dict)],
             usage=Usage(
                 prompt_tokens=int(usage_raw.get("prompt_tokens") or 0),
                 completion_tokens=int(usage_raw.get("completion_tokens") or 0),
                 total_tokens=int(usage_raw.get("total_tokens") or 0),
-                cached_tokens=int(
-                    details.get("cached_tokens") or timings_raw.get("cache_n") or 0
-                ),
+                cached_tokens=int(details.get("cached_tokens") or timings_raw.get("cache_n") or 0),
             ),
             timings=EngineTimings(
                 total_seconds=total_seconds,
                 prompt_tokens_per_second=timings_raw.get("prompt_per_second"),
-                generation_tokens_per_second=timings_raw.get(
-                    "predicted_per_second"
-                ),
+                generation_tokens_per_second=timings_raw.get("predicted_per_second"),
             ),
             raw=payload,
         )

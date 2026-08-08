@@ -1,4 +1,5 @@
 """Local OpenTelemetry provider construction and safe domain spans."""
+
 from __future__ import annotations
 
 import math

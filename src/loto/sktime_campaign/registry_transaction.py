@@ -28,9 +28,7 @@ class RegistryBinding(BaseModel):
     subject: RegistrySubject
     transaction_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     authorization_id: str = Field(pattern=r"^[0-9a-f]{64}$")
-    registered_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    registered_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
 
 class RegistryHistoryRecord(BaseModel):
@@ -41,9 +39,7 @@ class RegistryHistoryRecord(BaseModel):
     authorization_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     authorization_seal_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     transaction_nonce: str = Field(pattern=r"^[0-9a-f]{64}$")
-    committed_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    committed_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     previous_binding: RegistryBinding | None
     new_binding: RegistryBinding
     record_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -71,13 +67,9 @@ class FileRegistryState(BaseModel):
 
     @model_validator(mode="after")
     def verify_state(self) -> "FileRegistryState":
-        if len(self.consumed_authorization_ids) != len(
-            set(self.consumed_authorization_ids)
-        ):
+        if len(self.consumed_authorization_ids) != len(set(self.consumed_authorization_ids)):
             raise ValueError("consumed authorization IDs must be unique")
-        if len(self.consumed_transaction_nonces) != len(
-            set(self.consumed_transaction_nonces)
-        ):
+        if len(self.consumed_transaction_nonces) != len(set(self.consumed_transaction_nonces)):
             raise ValueError("consumed transaction nonces must be unique")
         if len(self.transaction_history) != self.generation:
             raise ValueError("registry generation/history length mismatch")
@@ -100,9 +92,7 @@ class P8RegistryTransactionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal["1.0"] = "1.0"
-    operation: Literal["compare_and_swap_registry_write"] = (
-        "compare_and_swap_registry_write"
-    )
+    operation: Literal["compare_and_swap_registry_write"] = "compare_and_swap_registry_write"
     output_dir: str = Field(min_length=1)
     run_id: str = Field(pattern=r"^[A-Za-z0-9._-]+$", min_length=1)
     git_commit: str = Field(pattern=r"^[0-9a-f]{7,40}$")
@@ -118,17 +108,11 @@ class P8RegistryTransactionRequest(BaseModel):
     @model_validator(mode="after")
     def validate_request(self) -> "P8RegistryTransactionRequest":
         verify_registry_authorization(self.authorization)
-        if self.transaction.authorization_id != self.authorization.get(
-            "authorization_id"
-        ):
+        if self.transaction.authorization_id != self.authorization.get("authorization_id"):
             raise ValueError("P8 transaction authorization ID mismatch")
-        if self.transaction.authorization_seal_sha256 != self.authorization.get(
-            "seal_sha256"
-        ):
+        if self.transaction.authorization_seal_sha256 != self.authorization.get("seal_sha256"):
             raise ValueError("P8 transaction authorization seal mismatch")
-        if self.transaction.subject.model_dump(mode="json") != self.authorization.get(
-            "subject"
-        ):
+        if self.transaction.subject.model_dump(mode="json") != self.authorization.get("subject"):
             raise ValueError("P8 transaction subject differs from authorization")
         expected_path = file_registry_path(self.transaction.subject.registry_target)
         if Path(self.registry_state_path).resolve() != expected_path:
@@ -167,9 +151,7 @@ def sealed_state(
         "backend": "file-json-cas-v1",
         "registry_target": registry_target,
         "generation": generation,
-        "current_binding": (
-            current_binding.model_dump(mode="json") if current_binding else None
-        ),
+        "current_binding": (current_binding.model_dump(mode="json") if current_binding else None),
         "consumed_authorization_ids": consumed_authorization_ids or [],
         "consumed_transaction_nonces": consumed_transaction_nonces or [],
         "transaction_history": [
@@ -315,9 +297,7 @@ def commit_registry_transaction(
             "transaction_id": transaction_id,
             "previous_state_sha256": pre_state.state_sha256,
             "authorization_id": request.transaction.authorization_id,
-            "authorization_seal_sha256": (
-                request.transaction.authorization_seal_sha256
-            ),
+            "authorization_seal_sha256": (request.transaction.authorization_seal_sha256),
             "transaction_nonce": request.transaction.transaction_nonce,
             "committed_at_utc": committed_at_utc,
             "previous_binding": (

@@ -62,9 +62,7 @@ class RegistryOptions(BaseModel):
     @model_validator(mode="after")
     def validate_required_backends(self) -> RegistryOptions:
         if not self.require_postgres or not self.require_mlflow:
-            raise ValueError(
-                "formal prospective registration requires both PostgreSQL and MLflow"
-            )
+            raise ValueError("formal prospective registration requires both PostgreSQL and MLflow")
         return self
 
 
@@ -93,9 +91,7 @@ def _read_json(path: Path, label: str) -> dict[str, Any]:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise ValueError(
-            f"{label} is unreadable: {type(exc).__name__}: {exc}"
-        ) from exc
+        raise ValueError(f"{label} is unreadable: {type(exc).__name__}: {exc}") from exc
     if not isinstance(payload, dict) or not payload:
         raise ValueError(f"{label} must be a non-empty JSON object")
     return payload

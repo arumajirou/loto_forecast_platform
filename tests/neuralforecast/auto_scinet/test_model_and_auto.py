@@ -42,6 +42,7 @@ class FakeBaseAuto:
     def _ray_config_to_optuna(cls, config: dict[str, Any]):
         def define(_trial: Any) -> dict[str, Any]:
             return dict(config)
+
         return define
 
 

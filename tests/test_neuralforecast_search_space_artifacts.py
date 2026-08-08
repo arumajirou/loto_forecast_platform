@@ -42,9 +42,7 @@ def test_persisted_profile_manifest_and_checksums_verify(tmp_path: Path) -> None
 
 
 def test_verifier_detects_profile_tampering(tmp_path: Path) -> None:
-    profile = profile_fixed_config(
-        {"input_size": 12}, backend="ray", model_name="AutoTFT"
-    )
+    profile = profile_fixed_config({"input_size": 12}, backend="ray", model_name="AutoTFT")
     persist_search_space_artifacts(tmp_path, profile)
     (tmp_path / PROFILE_NAME).write_text("{}\n", encoding="utf-8")
 

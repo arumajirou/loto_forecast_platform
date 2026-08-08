@@ -154,9 +154,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"WHEELHOUSE={bundle}")
         return 0
 
-    run_id = args.run_id or datetime.now(timezone.utc).strftime(
-        "statsforecast-lane-%Y%m%d-%H%M%S"
-    )
+    run_id = args.run_id or datetime.now(timezone.utc).strftime("statsforecast-lane-%Y%m%d-%H%M%S")
     run_dir = execute_runtime_lane(
         _repo_root(),
         args.output_root,

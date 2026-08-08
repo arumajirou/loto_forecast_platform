@@ -45,19 +45,12 @@ def main() -> None:
         )
     if len(full_df) != int(manifest["row_count"]):
         raise SystemExit(
-            "canonical row count differs from manifest: "
-            f"{len(full_df)} != {manifest['row_count']}"
+            f"canonical row count differs from manifest: {len(full_df)} != {manifest['row_count']}"
         )
 
     test_draws = args.test_draws
     if test_draws is None:
-        test_draws = (
-            10
-            if args.stage == "smoke"
-            else 30
-            if args.stage == "screening"
-            else 100
-        )
+        test_draws = 10 if args.stage == "smoke" else 30 if args.stage == "screening" else 100
     if len(full_df) - test_draws < args.min_train_draws:
         raise SystemExit(
             "Insufficient history for requested chronological lane: "
@@ -82,9 +75,7 @@ def main() -> None:
         requested = {item.strip() for item in args.models.split(",") if item.strip()}
         specs = [item for item in specs if item.model_id in requested]
     if not specs:
-        recorder.record_failure(
-            model_id="__catalog__", fold_id="__none__", reason="NO_MODELS"
-        )
+        recorder.record_failure(model_id="__catalog__", fold_id="__none__", reason="NO_MODELS")
         recorder.close()
         raise SystemExit("No models selected")
 
@@ -160,9 +151,9 @@ def main() -> None:
                     precision=args.precision,
                     stage=args.stage,
                 )
-                actual_pos = test_row[
-                    [f"n{index}" for index in range(1, 8)]
-                ].to_numpy(int).reshape(1, -1)
+                actual_pos = (
+                    test_row[[f"n{index}" for index in range(1, 8)]].to_numpy(int).reshape(1, -1)
+                )
                 actual_candidates = module.np.zeros((1, 37))
                 for value in actual_pos[0]:
                     actual_candidates[0, value - 1] = 1.0
@@ -215,10 +206,7 @@ def main() -> None:
                     recorder.record_failure(
                         model_id=model_id,
                         fold_id=fold_id,
-                        reason=(
-                            "LEAKAGE_STATUS_"
-                            f"{leakage.get('status', 'LEAKAGE_NOT_VERIFIED')}"
-                        ),
+                        reason=(f"LEAKAGE_STATUS_{leakage.get('status', 'LEAKAGE_NOT_VERIFIED')}"),
                     )
                 recorder.record_score(model_id=model_id, fold_id=fold_id)
             except SystemExit as exc:
@@ -266,9 +254,7 @@ def main() -> None:
                         "train_end": train_end,
                         "test_draw": test_draw_no,
                         "error": error_message,
-                        "leakage_status": leakage.get(
-                            "status", "LEAKAGE_NOT_VERIFIED"
-                        ),
+                        "leakage_status": leakage.get("status", "LEAKAGE_NOT_VERIFIED"),
                         "data_access_run_id": run_id,
                     },
                 )

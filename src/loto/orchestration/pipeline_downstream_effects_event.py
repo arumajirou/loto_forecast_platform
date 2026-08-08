@@ -9,6 +9,7 @@ from loto.orchestration.pipeline_downstream_effects_common import (
 from loto.orchestration.pipeline_downstream_preflight import DownstreamCommitConflict
 from loto.orchestration.pipeline_downstream_types import PreparedDownstreamCommit
 
+
 class EventEffectsMixin:
     def ensure_event(
         self,
@@ -21,18 +22,14 @@ class EventEffectsMixin:
         matches = []
         if path.exists():
             if path.is_symlink() or not path.is_file():
-                raise DownstreamCommitConflict(
-                    "events path is not a regular file"
-                )
+                raise DownstreamCommitConflict("events path is not a regular file")
             for line in path.read_text(encoding="utf-8").splitlines():
                 if not line.strip():
                     continue
                 try:
                     event = json.loads(line)
                 except json.JSONDecodeError as exc:
-                    raise DownstreamCommitConflict(
-                        "events file contains invalid JSON"
-                    ) from exc
+                    raise DownstreamCommitConflict("events file contains invalid JSON") from exc
                 data = event.get("data")
                 if (
                     event.get("type") == "pipeline.downstream.committed"
@@ -41,9 +38,7 @@ class EventEffectsMixin:
                 ):
                     matches.append(event)
         if len(matches) > 1:
-            raise DownstreamCommitConflict(
-                "duplicate downstream commit events exist"
-            )
+            raise DownstreamCommitConflict("duplicate downstream commit events exist")
         if matches:
             event = matches[0]
         else:

@@ -35,8 +35,7 @@ def compare_wrapper_variants(
         canonical_provider = canonical[0]
         canonical_evidence = evidence_by_provider[canonical_provider.provider_id]
         canonical_records = {
-            record.comparison_key(): record.predicted
-            for record in canonical_evidence.records
+            record.comparison_key(): record.predicted for record in canonical_evidence.records
         }
         canonical_metrics = metrics_by_provider[canonical_provider.provider_id].metrics.mean
         for variant in successful:
@@ -44,8 +43,7 @@ def compare_wrapper_variants(
                 continue
             variant_evidence = evidence_by_provider[variant.provider_id]
             variant_records = {
-                record.comparison_key(): record.predicted
-                for record in variant_evidence.records
+                record.comparison_key(): record.predicted for record in variant_evidence.records
             }
             if set(variant_records) != set(canonical_records):
                 raise CrossLibraryCertificationError("wrapper comparison key mismatch")
@@ -84,8 +82,7 @@ def compare_wrapper_variants(
                     max_abs_prediction_delta=float(deltas.max()),
                     mean_abs_prediction_delta=float(deltas.mean()),
                     hit_at_plus_minus_1_delta=(
-                        variant_metrics.hit_at_plus_minus_1
-                        - canonical_metrics.hit_at_plus_minus_1
+                        variant_metrics.hit_at_plus_minus_1 - canonical_metrics.hit_at_plus_minus_1
                     ),
                     all_position_hit_delta=(
                         variant_metrics.all_position_hit_at_plus_minus_1

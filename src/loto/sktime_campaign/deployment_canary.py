@@ -65,9 +65,7 @@ class RuntimeProbeEvidence(BaseModel):
 
     schema_version: Literal["1.0"] = "1.0"
     probe_run_id: str = Field(pattern=r"^[A-Za-z0-9._-]+$", min_length=1)
-    probed_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    probed_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     model_id: str = Field(min_length=1)
     model_revision: str = Field(pattern=r"^[0-9a-f]{7,64}$")
     model_artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -103,9 +101,7 @@ class RuntimeProbeEvidence(BaseModel):
             if self.cpu_fallback:
                 raise ValueError("CUDA probe cannot claim CPU fallback")
         if self.cpu_fallback:
-            if not (
-                self.requested_device == "cuda" and self.actual_device == "cpu"
-            ):
+            if not (self.requested_device == "cuda" and self.actual_device == "cpu"):
                 raise ValueError("CPU fallback device transition is invalid")
             if not self.fallback_reason:
                 raise ValueError("CPU fallback requires a reason")
@@ -176,13 +172,9 @@ class DeploymentState(BaseModel):
 
     @model_validator(mode="after")
     def validate_state(self) -> "DeploymentState":
-        if len(self.consumed_activation_ids) != len(
-            set(self.consumed_activation_ids)
-        ):
+        if len(self.consumed_activation_ids) != len(set(self.consumed_activation_ids)):
             raise ValueError("consumed activation IDs must be unique")
-        if len(self.consumed_activation_nonces) != len(
-            set(self.consumed_activation_nonces)
-        ):
+        if len(self.consumed_activation_nonces) != len(set(self.consumed_activation_nonces)):
             raise ValueError("consumed activation nonces must be unique")
         if self.generation != len(self.history):
             raise ValueError("deployment generation/history length mismatch")
@@ -209,9 +201,7 @@ class CanaryActivationRequest(BaseModel):
     git_commit: str = Field(pattern=r"^[0-9a-f]{7,40}$")
     code_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     config_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    requested_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    requested_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     deployment_target: str = Field(min_length=1)
     expected_deployment_state_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     activation_nonce: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -246,9 +236,7 @@ class CanaryActivationRequest(BaseModel):
 
 
 def _sealed_state(payload: dict[str, Any]) -> DeploymentState:
-    return DeploymentState.model_validate(
-        {**payload, "state_sha256": canonical_sha256(payload)}
-    )
+    return DeploymentState.model_validate({**payload, "state_sha256": canonical_sha256(payload)})
 
 
 def empty_deployment_state(deployment_target: str) -> DeploymentState:

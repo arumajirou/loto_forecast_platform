@@ -37,16 +37,14 @@ def _build(tmp_path: Path, *, status: str = "VERIFIED") -> tuple[Path, Path, str
         "INPUT_EVIDENCE.json": inputs,
     }
     artifact_rows = [
-        {"path": name, "bytes": len(data), "sha256": _sha(data)}
-        for name, data in first.items()
+        {"path": name, "bytes": len(data), "sha256": _sha(data)} for name, data in first.items()
     ]
     artifact = _canonical({"run_id": run_id, "files": artifact_rows})
     primary = {**first, "ARTIFACT_MANIFEST.json": artifact}
     sums = "".join(f"{_sha(data)}  {name}\n" for name, data in primary.items()).encode()
     required = {**primary, "SHA256SUMS": sums}
     package_rows = [
-        {"path": name, "bytes": len(data), "sha256": _sha(data)}
-        for name, data in required.items()
+        {"path": name, "bytes": len(data), "sha256": _sha(data)} for name, data in required.items()
     ]
     package = _canonical(
         {
@@ -73,9 +71,7 @@ def _rewrite(zip_path: Path, mutate) -> None:
         for info, data in rows:
             name, changed = mutate(info.filename, data)
             archive.writestr(_info(name), changed)
-    Path(f"{zip_path}.sha256").write_text(
-        f"{verifier._sha256_file(zip_path)}  {zip_path.name}\n"
-    )
+    Path(f"{zip_path}.sha256").write_text(f"{verifier._sha256_file(zip_path)}  {zip_path.name}\n")
 
 
 def test_verify_package_and_cli_success(tmp_path: Path, capsys) -> None:
@@ -132,9 +128,7 @@ def test_internal_checksum_mismatch_is_rejected(tmp_path: Path) -> None:
             for row in payload["files"]:
                 if row["path"] == "SHA256SUMS":
                     broken = next(
-                        original
-                        for member, original in members
-                        if member.endswith("SHA256SUMS")
+                        original for member, original in members if member.endswith("SHA256SUMS")
                     )
                     changed = broken.replace(broken[:64], b"0" * 64, 1)
                     row["bytes"] = len(changed)
@@ -183,9 +177,7 @@ def test_runtime_identity_mismatch_is_rejected(tmp_path: Path) -> None:
     with zipfile.ZipFile(zip_path, "w") as archive:
         for name, data in mapping.items():
             archive.writestr(_info(name), data)
-    Path(f"{zip_path}.sha256").write_text(
-        f"{verifier._sha256_file(zip_path)}  {zip_path.name}\n"
-    )
+    Path(f"{zip_path}.sha256").write_text(f"{verifier._sha256_file(zip_path)}  {zip_path.name}\n")
     with pytest.raises(verifier.PackageVerificationError, match="identity/status"):
         verifier.verify_package(zip_path)
 
@@ -198,8 +190,6 @@ def test_unsafe_member_is_rejected(tmp_path: Path) -> None:
         for name, data in rows:
             archive.writestr(_info(name), data)
         archive.writestr(_info("../escape"), b"x")
-    Path(f"{zip_path}.sha256").write_text(
-        f"{verifier._sha256_file(zip_path)}  {zip_path.name}\n"
-    )
+    Path(f"{zip_path}.sha256").write_text(f"{verifier._sha256_file(zip_path)}  {zip_path.name}\n")
     with pytest.raises(verifier.PackageVerificationError, match="coverage"):
         verifier.verify_package(zip_path)

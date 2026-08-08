@@ -64,21 +64,15 @@ def create_prediction_lock(
         if report["selected_candidate_id"] != selection.selected_candidate_id:
             raise HoldoutProspectiveError("SHADOW_CANDIDATE_CHANGED", run_id)
         selection_payload["holdout_score_sha256"] = report["report_sha256"]
-        selection_payload["holdout_reference_metrics"] = report[
-            "selected_candidate_metrics"
-        ]
+        selection_payload["holdout_reference_metrics"] = report["selected_candidate_metrics"]
     baselines = build_baseline_predictions(history, future, geometry)
     root = _empty(output_dir)
     payloads = {
         "GEOMETRY.json": geometry.model_dump(mode="json"),
         "HISTORY.json": {"rows": history},
         "SELECTION_EVIDENCE.json": selection_payload,
-        "MODEL_PREDICTIONS.json": {
-            "rows": [row.model_dump(mode="json") for row in model_rows]
-        },
-        "BASELINE_PREDICTIONS.json": {
-            "rows": [row.model_dump(mode="json") for row in baselines]
-        },
+        "MODEL_PREDICTIONS.json": {"rows": [row.model_dump(mode="json") for row in model_rows]},
+        "BASELINE_PREDICTIONS.json": {"rows": [row.model_dump(mode="json") for row in baselines]},
     }
     for name, payload in payloads.items():
         _write(root / name, payload)
@@ -102,17 +96,27 @@ def create_prediction_lock(
     _write_evidence(root, [*payloads, "PREDICTION_LOCK.json"])
     verify_prediction_lock(root)
     return LockResult(
-        str(root), str(root / "PREDICTION_LOCK.json"), lock["lock_sha256"],
-        stage, selection.selected_candidate_id, len(model_rows), len(baselines),
+        str(root),
+        str(root / "PREDICTION_LOCK.json"),
+        lock["lock_sha256"],
+        stage,
+        selection.selected_candidate_id,
+        len(model_rows),
+        len(baselines),
     )
 
 
 def verify_prediction_lock(root: Path) -> dict[str, Any]:
     root = root.resolve()
     required = {
-        "GEOMETRY.json", "HISTORY.json", "SELECTION_EVIDENCE.json",
-        "MODEL_PREDICTIONS.json", "BASELINE_PREDICTIONS.json",
-        "PREDICTION_LOCK.json", "ARTIFACT_MANIFEST.json", "SHA256SUMS",
+        "GEOMETRY.json",
+        "HISTORY.json",
+        "SELECTION_EVIDENCE.json",
+        "MODEL_PREDICTIONS.json",
+        "BASELINE_PREDICTIONS.json",
+        "PREDICTION_LOCK.json",
+        "ARTIFACT_MANIFEST.json",
+        "SHA256SUMS",
     }
     observed = _verify_hashes(root, "LOCK")
     if observed != required:

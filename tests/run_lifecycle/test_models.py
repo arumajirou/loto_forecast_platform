@@ -40,9 +40,7 @@ def test_implicit_coercion_and_bool_int_confusion_are_rejected() -> None:
 
 def test_naive_and_non_utc_datetime_are_rejected() -> None:
     with pytest.raises(ValidationError):
-        RunCommand.model_validate(
-            {**valid_command_payload(), "issued_at": datetime(2026, 8, 6)}
-        )
+        RunCommand.model_validate({**valid_command_payload(), "issued_at": datetime(2026, 8, 6)})
 
 
 def test_sha256_and_identifier_are_fail_closed() -> None:

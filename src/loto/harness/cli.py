@@ -86,8 +86,7 @@ async def _discover(settings: HarnessSettings) -> int:
         for key, engine in engines.items():
             try:
                 payload[key] = [
-                    descriptor.model_dump(mode="json")
-                    for descriptor in await engine.discover()
+                    descriptor.model_dump(mode="json") for descriptor in await engine.discover()
                 ]
             except Exception as exc:
                 payload[key] = {"error": str(exc)}
@@ -108,9 +107,7 @@ def _write_json_report(path: Path, payload: dict[str, Any]) -> Path:
     content = json.dumps(payload, indent=2, ensure_ascii=False, default=str) + "\n"
     path.write_text(content, encoding="utf-8")
     digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
-    path.with_suffix(path.suffix + ".sha256").write_text(
-        f"{digest}  {path}\n", encoding="utf-8"
-    )
+    path.with_suffix(path.suffix + ".sha256").write_text(f"{digest}  {path}\n", encoding="utf-8")
     return path
 
 
@@ -150,10 +147,7 @@ async def _certify(
             int(step.name.rsplit("_", 1)[1])
             for step in steps
             if step.status == HarnessStatus.VERIFIED
-            and (
-                step.name.startswith("inference_")
-                or step.name.startswith("embedding_")
-            )
+            and (step.name.startswith("inference_") or step.name.startswith("embedding_"))
         }
     )
     deep_status = {
@@ -162,9 +156,7 @@ async def _certify(
         if step.name.startswith("context_probe_")
     }
     deep_verified_contexts = sorted(
-        context
-        for context, status in deep_status.items()
-        if status == HarnessStatus.VERIFIED
+        context for context, status in deep_status.items() if status == HarnessStatus.VERIFIED
     )
     failed_contexts = sorted(
         context
@@ -172,14 +164,18 @@ async def _certify(
         if status in {HarnessStatus.FAILED, HarnessStatus.BLOCKED}
     )
     contiguous_verified: list[int] = []
-    status_source = deep_status if deep_context else {
-        context: (
-            HarnessStatus.VERIFIED
-            if context in inference_verified_contexts
-            else HarnessStatus.FAILED
-        )
-        for context in requested_contexts
-    }
+    status_source = (
+        deep_status
+        if deep_context
+        else {
+            context: (
+                HarnessStatus.VERIFIED
+                if context in inference_verified_contexts
+                else HarnessStatus.FAILED
+            )
+            for context in requested_contexts
+        }
+    )
     failure_seen = False
     non_monotonic = False
     for context in requested_contexts:
@@ -211,11 +207,15 @@ async def _certify(
             for step in steps
         ],
     }
-    report_path = Path(output) if output else (
-        Path(settings.artifact_root)
-        / "certification"
-        / _safe_model_name(model_key)
-        / f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+    report_path = (
+        Path(output)
+        if output
+        else (
+            Path(settings.artifact_root)
+            / "certification"
+            / _safe_model_name(model_key)
+            / f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+        )
     )
     report_path = _write_json_report(report_path, payload)
     print(json.dumps(payload, indent=2, ensure_ascii=False))
@@ -339,11 +339,15 @@ def _profile_audit(
         "notes": list(profile.notes),
         "applications": applications,
     }
-    report = Path(output).resolve() if output else _absolute_artifact_path(
-        settings,
-        "profile-audit",
-        _safe_model_name(model_key),
-        f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json",
+    report = (
+        Path(output).resolve()
+        if output
+        else _absolute_artifact_path(
+            settings,
+            "profile-audit",
+            _safe_model_name(model_key),
+            f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json",
+        )
     )
     report = _write_json_report(report, payload)
     print(json.dumps(payload, indent=2, ensure_ascii=False))
@@ -379,11 +383,15 @@ async def _profile_ab(
         await engine.close()
     payload["started_from_config"] = configured.model_dump(mode="json")
     payload["finished_at"] = datetime.now().astimezone().isoformat()
-    report = Path(output).resolve() if output else _absolute_artifact_path(
-        settings,
-        "profile-ab",
-        _safe_model_name(model_key),
-        f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json",
+    report = (
+        Path(output).resolve()
+        if output
+        else _absolute_artifact_path(
+            settings,
+            "profile-ab",
+            _safe_model_name(model_key),
+            f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json",
+        )
     )
     report = _write_json_report(report, payload)
     print(json.dumps(payload, indent=2, ensure_ascii=False))
