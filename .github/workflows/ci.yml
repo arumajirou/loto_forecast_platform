@@ -93,6 +93,7 @@ jobs:
           set -Eeuo pipefail
           python="$CI_VENV/bin/python"
           uv pip install \
+            --quiet \
             --python "$python" \
             --index-url https://download.pytorch.org/whl/cpu \
             "torch==2.9.1"
@@ -102,6 +103,7 @@ jobs:
           set -Eeuo pipefail
           python="$CI_VENV/bin/python"
           uv pip install \
+            --quiet \
             --python "$python" \
             -e ".[api,dev,postgres]"
 
@@ -118,6 +120,12 @@ jobs:
           print("torch_cuda_runtime=NONE")
           PY
           uv pip check --python "$python"
+
+      - name: Report CI tool versions
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m ruff --version
+          "$CI_VENV/bin/python" -m pytest --version
 
       - name: Run Ruff format check
         run: |
