@@ -17,14 +17,6 @@ gh auth status -h github.com >/dev/null
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
 
-CURRENT_BRANCH="$(git branch --show-current)"
-if [[ "$CURRENT_BRANCH" != "$TARGET_BRANCH" ]]; then
-  echo "STOP_REASON=WRONG_BRANCH"
-  echo "EXPECTED_BRANCH=$TARGET_BRANCH"
-  echo "CURRENT_BRANCH=$CURRENT_BRANCH"
-  exit 11
-fi
-
 if [[ -n "$(git status --porcelain=v1)" ]]; then
   echo "STOP_REASON=WORKTREE_NOT_CLEAN"
   git status --short
@@ -47,14 +39,20 @@ trap cleanup EXIT
 echo "RUN_ID=$RUN_ID"
 echo "ROOT=$ROOT"
 
-git fetch --prune origin main "$TARGET_BRANCH"
+git fetch --prune origin \
+  "+refs/heads/main:refs/remotes/origin/main" \
+  "+refs/heads/$TARGET_BRANCH:refs/remotes/origin/$TARGET_BRANCH"
+
 LOCAL_SHA="$(git rev-parse HEAD)"
 REMOTE_SHA="$(git rev-parse "origin/$TARGET_BRANCH")"
 MAIN_SHA="$(git rev-parse origin/main)"
+CURRENT_BRANCH="$(git branch --show-current || true)"
 
-printf 'LOCAL_SHA=%s\nREMOTE_SHA=%s\nMAIN_SHA=%s\n' "$LOCAL_SHA" "$REMOTE_SHA" "$MAIN_SHA"
+printf 'CURRENT_BRANCH=%s\nLOCAL_SHA=%s\nREMOTE_SHA=%s\nMAIN_SHA=%s\n' \
+  "${CURRENT_BRANCH:-DETACHED}" "$LOCAL_SHA" "$REMOTE_SHA" "$MAIN_SHA"
+
 if [[ "$LOCAL_SHA" != "$REMOTE_SHA" ]]; then
-  echo "STOP_REASON=TARGET_BRANCH_NOT_UP_TO_DATE"
+  echo "STOP_REASON=TARGET_WORKTREE_NOT_AT_REMOTE_HEAD"
   exit 13
 fi
 
@@ -62,6 +60,7 @@ fi
   echo "RUN_ID=$RUN_ID"
   echo "REPOSITORY=$REPO"
   echo "TARGET_BRANCH=$TARGET_BRANCH"
+  echo "SOURCE_WORKTREE_BRANCH=${CURRENT_BRANCH:-DETACHED}"
   echo "TARGET_FILE=$TARGET_FILE"
   echo "LOCAL_SHA=$LOCAL_SHA"
   echo "REMOTE_SHA=$REMOTE_SHA"
@@ -84,7 +83,7 @@ out = Path(sys.argv[2])
 data = source.read_bytes()
 
 records = [
-    "SOURCE_INTEGRITY_CAPTURE_VERSION=1",
+    "SOURCE_INTEGRITY_CAPTURE_VERSION=2",
     f"TARGET_FILE={source.as_posix()}",
     f"SIZE_BYTES={len(data)}",
     f"SHA256={hashlib.sha256(data).hexdigest()}",
@@ -131,7 +130,7 @@ for i, (start, end, reason) in enumerate(errors, start=1):
 records.append("UTF8_DECODE=PASS" if not errors else "UTF8_DECODE=FAIL")
 try:
     py_compile.compile(str(source), doraise=True)
-except Exception as exc:  # noqa: BLE001 - capture evidence only
+except Exception as exc:  # noqa: BLE001 - evidence capture only
     records.append("PY_COMPILE=FAIL")
     records.append(f"PY_COMPILE_ERROR={type(exc).__name__}: {exc}")
 else:
@@ -139,8 +138,6 @@ else:
 
 out.write_text("\n".join(records) + "\n", encoding="utf-8")
 PY
-
-sha256sum "$CAPTURE_DIR"/* > "$CAPTURE_DIR/SHA256SUMS"
 
 if grep -q '^UTF8_DECODE=FAIL$' "$CAPTURE_DIR/source-integrity.txt"; then
   STOP_REASON="SOURCE_INVALID_UTF8_GITHUB_ISSUE_199"
@@ -151,12 +148,18 @@ fi
 cat > "$CAPTURE_DIR/summary.env" <<EOF
 RUN_ID=$RUN_ID
 TARGET_BRANCH=$TARGET_BRANCH
+SOURCE_WORKTREE_BRANCH=${CURRENT_BRANCH:-DETACHED}
 TARGET_FILE=$TARGET_FILE
 LOCAL_SHA=$LOCAL_SHA
 REMOTE_SHA=$REMOTE_SHA
 MAIN_SHA=$MAIN_SHA
 STOP_REASON=$STOP_REASON
 EOF
+
+(
+  cd "$CAPTURE_DIR"
+  sha256sum environment.env source-integrity.txt summary.env > SHA256SUMS
+)
 
 EVIDENCE_BRANCH="evidence/issue199-source-integrity-$RUN_ID"
 if git ls-remote --exit-code --heads origin "$EVIDENCE_BRANCH" >/dev/null 2>&1; then
@@ -176,7 +179,7 @@ git -C "$EVIDENCE_WT" -c user.name="loto-maintainer-evidence" -c user.email="nor
 git -C "$EVIDENCE_WT" push -u origin "$EVIDENCE_BRANCH"
 EVIDENCE_SHA="$(git -C "$EVIDENCE_WT" rev-parse HEAD)"
 
-COMMENT="Remote source-integrity capture completed.\n\n- run: \`$RUN_ID\`\n- source branch/head: \`$TARGET_BRANCH\` / \`$LOCAL_SHA\`\n- evidence branch: \`$EVIDENCE_BRANCH\`\n- evidence commit: \`$EVIDENCE_SHA\`\n- result: \`$STOP_REASON\`\n\nEvidence path: \`evidence/maintainer-runs/$RUN_ID/\`"
+COMMENT="Remote source-integrity capture completed.\n\n- run: \`$RUN_ID\`\n- source branch/head: \`$TARGET_BRANCH\` / \`$LOCAL_SHA\`\n- source worktree: \`${CURRENT_BRANCH:-DETACHED}\`\n- evidence branch: \`$EVIDENCE_BRANCH\`\n- evidence commit: \`$EVIDENCE_SHA\`\n- result: \`$STOP_REASON\`\n\nEvidence path: \`evidence/maintainer-runs/$RUN_ID/\`"
 if gh issue comment "$ISSUE" --repo "$REPO" --body "$COMMENT" >/dev/null; then
   ISSUE_COMMENT=PASS
 else
