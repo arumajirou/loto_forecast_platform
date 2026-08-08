@@ -107,6 +107,33 @@ jobs:
             --python "$python" \
             -e ".[api,dev,postgres]"
 
+      - name: Align Ruff with repository lock
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          ruff_version="$(
+            "$python" - <<'PY'
+          import tomllib
+
+          with open("uv.lock", "rb") as stream:
+              lock = tomllib.load(stream)
+
+          versions = [
+              package["version"]
+              for package in lock["package"]
+              if package.get("name") == "ruff"
+          ]
+          if len(versions) != 1:
+              raise SystemExit(f"expected exactly one Ruff version in uv.lock, got {versions!r}")
+          print(versions[0])
+          PY
+          )"
+          echo "locked_ruff_version=$ruff_version"
+          uv pip install \
+            --quiet \
+            --python "$python" \
+            "ruff==$ruff_version"
+
       - name: Verify CPU-only PyTorch remains selected
         run: |
           set -Eeuo pipefail
