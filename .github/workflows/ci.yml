@@ -1,253 +1,70 @@
 name: ci
 
 on:
+  push:
   pull_request:
-    branches: [main]
-
-permissions:
-  contents: write
-
-concurrency:
-  group: ruff-safe-fix-reexport-audit-${{ github.event.pull_request.number }}
-  cancel-in-progress: false
 
 jobs:
   test:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-lint-safe-autofix-v1' }}
-    runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 60
-    defaults:
-      run:
-        shell: bash
-    env:
-      TARGET_BRANCH: fix/ruff-lint-safe-autofix-v1
-      UV_VERSION: "0.11.21"
-      UV_PYTHON: "3.13"
-      BASE_SHA: cd4b77f1baf526a696c01122d9ce3b0ecd415141
-      RESULT_PATH: .github/ruff-safe-fix-reexport-audit.txt
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Verify runner
-        run: |
-          set -Eeuo pipefail
-          test "$RUNNER_NAME" = "az-loto-gpu"
-          test "$RUNNER_OS" = "Linux"
-          test "$RUNNER_ARCH" = "X64"
+      - uses: actions/checkout@v6
 
-      - name: Checkout trusted branch
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@v6
         with:
-          ref: fix/ruff-lint-safe-autofix-v1
-          persist-credentials: true
-          fetch-depth: 0
-          clean: true
+          python-version: "3.13"
 
-      - name: Gate audit commit
-        id: gate
+      - name: Show disk usage before install
+        run: df -h
+
+      - name: Free runner disk space
         run: |
-          set -Eeuo pipefail
-          message="$(git log -1 --pretty=%s)"
-          echo "head_message=$message"
-          if [[ "$message" == "ci: audit Ruff safe-fix re-export parity (#200)" ]]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          docker system prune --all --force || true
+          df -h
 
-      - name: Install exact Python
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          version: ${{ env.UV_VERSION }}
-          enable-cache: false
-
-      - name: Audit removed import export references
-        if: ${{ steps.gate.outputs.run == 'true' }}
+      - name: Install matching CPU-only PyTorch
         run: |
-          set -Eeuo pipefail
-          uv python install "$UV_PYTHON"
-          python="$(uv python find "$UV_PYTHON")"
-          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
-          test "$(git rev-parse origin/main)" = "$BASE_SHA"
-          "$python" - "$BASE_SHA" "$RESULT_PATH" <<'PY'
-          from __future__ import annotations
+          python -m pip install --upgrade pip
+          python -m pip install \
+            --no-cache-dir \
+            --index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.9.1"
 
-          import ast
-          import os
-          import subprocess
-          import sys
-          from pathlib import Path
+      - name: Install project and test dependencies
+        run: |
+          python -m pip install \
+            --no-cache-dir \
+            -e ".[api,dev,postgres]"
 
-          base_sha, result_path = sys.argv[1:]
-          root = Path.cwd()
+      - name: Verify CPU-only PyTorch remains selected
+        run: |
+          python - <<'PY'
+          import torch
 
-          def module_names(path: str) -> set[str]:
-              p = Path(path)
-              names: set[str] = set()
-              if path.startswith("src/") and p.suffix == ".py":
-                  parts = list(p.with_suffix("").parts[1:])
-                  if parts and parts[-1] == "__init__":
-                      parts.pop()
-                  if parts:
-                      names.add(".".join(parts))
-              elif p.suffix == ".py":
-                  parts = list(p.with_suffix("").parts)
-                  if parts and parts[-1] == "__init__":
-                      parts.pop()
-                  if parts:
-                      names.add(".".join(parts))
-                      names.add(parts[-1])
-              return names
-
-          def imports(tree: ast.AST) -> dict[str, str]:
-              out: dict[str, str] = {}
-              for node in getattr(tree, "body", []):
-                  if isinstance(node, ast.Import):
-                      for alias in node.names:
-                          bound = alias.asname or alias.name.split(".")[0]
-                          out[bound] = alias.name
-                  elif isinstance(node, ast.ImportFrom):
-                      prefix = "." * node.level + (node.module or "")
-                      for alias in node.names:
-                          if alias.name == "*":
-                              continue
-                          bound = alias.asname or alias.name
-                          out[bound] = f"{prefix}:{alias.name}"
-              return out
-
-          def explicit_all(tree: ast.AST) -> set[str]:
-              result: set[str] = set()
-              for node in getattr(tree, "body", []):
-                  if not isinstance(node, (ast.Assign, ast.AnnAssign)):
-                      continue
-                  targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-                  if not any(isinstance(t, ast.Name) and t.id == "__all__" for t in targets):
-                      continue
-                  value = node.value
-                  if isinstance(value, (ast.List, ast.Tuple, ast.Set)):
-                      for elt in value.elts:
-                          if isinstance(elt, ast.Constant) and isinstance(elt.value, str):
-                              result.add(elt.value)
-              return result
-
-          all_files = subprocess.check_output(
-              ["git", "ls-files", "*.py"], text=True
-          ).splitlines()
-          import_from_edges: dict[tuple[str, str], set[str]] = {}
-          attr_edges: dict[tuple[str, str], set[str]] = {}
-
-          for consumer in all_files:
-              try:
-                  text = Path(consumer).read_text(encoding="utf-8")
-                  tree = ast.parse(text, filename=consumer)
-              except Exception:
-                  continue
-              aliases: dict[str, str] = {}
-              for node in ast.walk(tree):
-                  if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
-                      for alias in node.names:
-                          if alias.name != "*":
-                              import_from_edges.setdefault((node.module, alias.name), set()).add(consumer)
-                  elif isinstance(node, ast.Import):
-                      for alias in node.names:
-                          bound = alias.asname or alias.name.split(".")[-1]
-                          aliases[bound] = alias.name
-              for node in ast.walk(tree):
-                  if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
-                      module = aliases.get(node.value.id)
-                      if module:
-                          attr_edges.setdefault((module, node.attr), set()).add(consumer)
-
-          changed = subprocess.check_output(
-              ["git", "diff", "--name-only", f"{base_sha}..HEAD", "--", "src", "scripts", "tests"],
-              text=True,
-          ).splitlines()
-
-          suspects: list[str] = []
-          removed_total = 0
-          checked_files = 0
-          for path in changed:
-              if not path.endswith(".py") or not Path(path).is_file():
-                  continue
-              try:
-                  before_text = subprocess.check_output(["git", "show", f"{base_sha}:{path}"]).decode("utf-8")
-                  after_text = Path(path).read_text(encoding="utf-8")
-                  before_tree = ast.parse(before_text, filename=path)
-                  after_tree = ast.parse(after_text, filename=path)
-              except Exception:
-                  continue
-              checked_files += 1
-              before_imports = imports(before_tree)
-              after_imports = imports(after_tree)
-              removed = sorted(set(before_imports) - set(after_imports))
-              removed_total += len(removed)
-              if not removed:
-                  continue
-              modules = module_names(path)
-              all_names = explicit_all(before_tree)
-              for name in removed:
-                  if name.startswith("_"):
-                      continue
-                  refs: set[str] = set()
-                  for module in modules:
-                      refs |= import_from_edges.get((module, name), set())
-                      refs |= attr_edges.get((module, name), set())
-                  refs.discard(path)
-                  source = before_imports[name]
-                  local_source = source.startswith(".") or source.startswith("loto.") or source.startswith("loto:")
-                  init_export = path.endswith("/__init__.py") and local_source
-                  explicit_export = name in all_names
-                  if refs or init_export or explicit_export:
-                      reasons = []
-                      if refs:
-                          reasons.append("referenced_by=" + ",".join(sorted(refs)[:20]))
-                      if init_export:
-                          reasons.append("package_init")
-                      if explicit_export:
-                          reasons.append("explicit___all__")
-                      suspects.append(
-                          f"{path}\t{name}\t{source}\t" + ";".join(reasons)
-                      )
-
-          lines = [
-              "RUFF_SAFE_FIX_REEXPORT_AUDIT_VERSION=1",
-              f"RUN_ID={os.environ.get('GITHUB_RUN_ID','UNKNOWN')}",
-              f"BASE_SHA={base_sha}",
-              f"HEAD_SHA={subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()}",
-              f"CHANGED_PY_FILES_CHECKED={checked_files}",
-              f"REMOVED_IMPORT_BINDINGS={removed_total}",
-              f"SUSPECT_REEXPORT_COUNT={len(suspects)}",
-              "STATUS=PASS" if not suspects else "STATUS=FAIL",
-          ]
-          if suspects:
-              lines.append("--- SUSPECT_REEXPORTS ---")
-              lines.extend(suspects)
-          Path(result_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
-          print("\n".join(lines[:8]))
+          assert torch.__version__.startswith("2.9.1"), torch.__version__
+          assert torch.version.cuda is None, torch.version.cuda
+          print(f"torch_version={torch.__version__}")
+          print("torch_cuda_runtime=NONE")
           PY
+          python -m pip check
 
-      - name: Persist audit evidence
-        if: ${{ always() && steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          test -f "$RESULT_PATH"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$RESULT_PATH"
-          git diff --cached --check
-          git commit -m "chore: capture Ruff re-export parity audit (#200)"
-          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
-          test "$remote_before" = "$(git rev-parse HEAD^)"
-          git push origin "HEAD:$TARGET_BRANCH"
+      - name: Show disk usage after install
+        run: df -h
 
-      - name: Enforce audit
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          grep -Fxq 'STATUS=PASS' "$RESULT_PATH"
+      - name: Run Ruff format check
+        run: python -m ruff format --check src scripts tests
 
-      - name: Cleanup
-        if: ${{ always() }}
-        run: |
-          set -Eeuo pipefail
-          true
+      - name: Run Ruff lint
+        run: python -m ruff check src scripts tests
+
+      - name: Compile Python sources
+        run: python -m compileall -q src scripts tests
+
+      - name: Run tests
+        run: python -m pytest -q
