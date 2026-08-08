@@ -41,8 +41,9 @@ class TelemetryContext:
         }
 
 
+_EMPTY_TELEMETRY_CONTEXT = TelemetryContext()
 _CURRENT: ContextVar[TelemetryContext] = ContextVar(
-    "loto_telemetry_context", default=TelemetryContext()
+    "loto_telemetry_context", default=_EMPTY_TELEMETRY_CONTEXT
 )
 
 

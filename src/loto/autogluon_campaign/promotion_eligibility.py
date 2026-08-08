@@ -28,6 +28,8 @@ from loto.autogluon_campaign.promotion_eligibility_rules import (
     evaluate_promotion_rules,
 )
 
+_DEFAULT_PROMOTION_POLICY = PromotionPolicy()
+
 
 @dataclass(frozen=True)
 class PromotionEligibilityResult:
@@ -44,7 +46,7 @@ def create_promotion_eligibility(
     holdout_score_dir: Path,
     prospective_score_dirs: Sequence[Path],
     output_dir: Path,
-    policy: PromotionPolicy = PromotionPolicy(),
+    policy: PromotionPolicy = _DEFAULT_PROMOTION_POLICY,
     run_id: str,
     now: datetime | None = None,
 ) -> PromotionEligibilityResult:

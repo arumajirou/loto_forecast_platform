@@ -28,6 +28,8 @@ from loto.autogluon_campaign.holdout_prospective import (
 )
 from loto.autogluon_campaign.holdout_prospective_lock import verify_prediction_lock
 
+_DEFAULT_DRIFT_POLICY = DriftPolicy()
+
 
 def _aggregate(rows: Sequence[dict[str, Any]]) -> tuple[list[dict], list[dict]]:
     grouped: dict[tuple[str, int], list[dict]] = {}
@@ -125,7 +127,7 @@ def score_prediction_lock(
     actual_rows: Sequence[Mapping[str, Any]],
     actual_source_label: str,
     actual_observed_at: datetime | None = None,
-    drift_policy: DriftPolicy = DriftPolicy(),
+    drift_policy: DriftPolicy = _DEFAULT_DRIFT_POLICY,
 ) -> ScoreResult:
     if not actual_source_label.strip():
         raise HoldoutProspectiveError(
