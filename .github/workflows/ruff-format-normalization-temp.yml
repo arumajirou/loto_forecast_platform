@@ -1,0 +1,255 @@
+name: ruff-format-normalization-temp
+
+on:
+  push:
+    branches:
+      - fix/ruff-format-normalization-v1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ruff-format-normalization-temp-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  normalize-and-verify:
+    if: ${{ github.repository == 'arumajirou/loto_forecast_platform' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1' }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 120
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
+
+    steps:
+      - name: Verify expected self-hosted runner
+        run: |
+          set -Eeuo pipefail
+          echo "runner_name=$RUNNER_NAME"
+          echo "runner_os=$RUNNER_OS"
+          echo "runner_arch=$RUNNER_ARCH"
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout trusted normalization branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: fix/ruff-format-normalization-v1
+          persist-credentials: true
+          fetch-depth: 1
+          clean: true
+
+      - name: Install exact uv without GitHub cache
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+
+      - name: Prepare isolated Python environment
+        run: |
+          set -Eeuo pipefail
+
+          actual="$(uv --version)"
+          echo "uv_version=$actual"
+          case "$actual" in
+            "uv $UV_VERSION"*) ;;
+            *) echo "unexpected uv version: $actual" >&2; exit 1 ;;
+          esac
+
+          uv python install "$UV_PYTHON"
+
+          ci_venv="$RUNNER_TEMP/loto-ruff-normalize-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          uv_cache="$RUNNER_TEMP/loto-ruff-normalize-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+          case "$ci_venv" in
+            "$RUNNER_TEMP"/*) ;;
+            *) echo "unsafe CI venv path: $ci_venv" >&2; exit 1 ;;
+          esac
+          case "$uv_cache" in
+            "$RUNNER_TEMP"/*) ;;
+            *) echo "unsafe uv cache path: $uv_cache" >&2; exit 1 ;;
+          esac
+
+          rm -rf -- "$ci_venv" "$uv_cache"
+          mkdir -p -- "$uv_cache"
+
+          echo "CI_VENV=$ci_venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$uv_cache" >> "$GITHUB_ENV"
+
+          UV_CACHE_DIR="$uv_cache" uv venv "$ci_venv" --python "$UV_PYTHON"
+          "$ci_venv/bin/python" --version
+
+      - name: Install repository-locked Ruff only
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          ruff_version="$(
+            "$python" - <<'PY'
+          import tomllib
+
+          with open("uv.lock", "rb") as stream:
+              lock = tomllib.load(stream)
+
+          versions = [
+              package["version"]
+              for package in lock["package"]
+              if package.get("name") == "ruff"
+          ]
+          if len(versions) != 1:
+              raise SystemExit(f"expected exactly one Ruff version in uv.lock, got {versions!r}")
+          print(versions[0])
+          PY
+          )"
+          echo "locked_ruff_version=$ruff_version"
+          echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
+          uv pip install --quiet --python "$python" "ruff==$ruff_version"
+          "$python" -m ruff --version
+
+      - name: Apply locked Ruff formatting
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m ruff format src scripts tests
+          "$CI_VENV/bin/python" -m ruff format --check src scripts tests
+
+      - name: Verify formatting changed only allowed paths
+        run: |
+          set -Eeuo pipefail
+          git diff --check
+
+          unexpected=0
+          while IFS= read -r path; do
+            [[ -z "$path" ]] && continue
+            case "$path" in
+              src/*|scripts/*|tests/*) ;;
+              *)
+                echo "unexpected formatter change: $path" >&2
+                unexpected=1
+                ;;
+            esac
+          done < <(git diff --name-only)
+
+          test "$unexpected" -eq 0
+
+          changed_count="$(git diff --name-only -- src scripts tests | sed '/^$/d' | wc -l)"
+          echo "formatter_changed_files=$changed_count"
+
+      - name: Commit mechanical formatting if needed
+        run: |
+          set -Eeuo pipefail
+
+          if git diff --quiet -- src scripts tests; then
+            echo "no formatting changes to commit"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- src scripts tests
+
+          unexpected=0
+          while IFS= read -r path; do
+            [[ -z "$path" ]] && continue
+            case "$path" in
+              src/*|scripts/*|tests/*) ;;
+              *)
+                echo "unexpected staged path: $path" >&2
+                unexpected=1
+                ;;
+            esac
+          done < <(git diff --cached --name-only)
+          test "$unexpected" -eq 0
+
+          git diff --cached --check
+          git commit -m "style: normalize locked Ruff formatting (#196)"
+          git push origin HEAD:fix/ruff-format-normalization-v1
+
+      - name: Install matching CPU-only PyTorch
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          uv pip install \
+            --quiet \
+            --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.9.1"
+
+      - name: Install project and test dependencies
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          uv pip install \
+            --quiet \
+            --python "$python" \
+            -e ".[api,dev,postgres]"
+          uv pip install --quiet --python "$python" "ruff==$RUFF_VERSION"
+
+      - name: Verify CPU-only PyTorch remains selected
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          "$python" - <<'PY'
+          import torch
+
+          assert torch.__version__.startswith("2.9.1"), torch.__version__
+          assert torch.version.cuda is None, torch.version.cuda
+          print(f"torch_version={torch.__version__}")
+          print("torch_cuda_runtime=NONE")
+          PY
+          uv pip check --python "$python"
+
+      - name: Report verification tool versions
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m ruff --version
+          "$CI_VENV/bin/python" -m pytest --version
+
+      - name: Run Ruff format check
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m ruff format --check src scripts tests
+
+      - name: Run Ruff lint
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m ruff check src scripts tests
+
+      - name: Compile Python sources
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m compileall -q src scripts tests
+
+      - name: Run full tests
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m pytest -q
+
+      - name: Verify repository state
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Remove CI-owned temporary environment
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          if [[ -n "${CI_VENV:-}" ]]; then
+            case "$CI_VENV" in
+              "$RUNNER_TEMP"/*) rm -rf -- "$CI_VENV" ;;
+              *) echo "refusing to remove unsafe CI_VENV=$CI_VENV" >&2; exit 1 ;;
+            esac
+          fi
+          if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+            case "$UV_CACHE_DIR" in
+              "$RUNNER_TEMP"/*) rm -rf -- "$UV_CACHE_DIR" ;;
+              *) echo "refusing to remove unsafe UV_CACHE_DIR=$UV_CACHE_DIR" >&2; exit 1 ;;
+            esac
+          fi
