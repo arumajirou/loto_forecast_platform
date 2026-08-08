@@ -33,8 +33,7 @@ class GameGeometry:
         maximum_value: int | None = None,
     ) -> None:
         legacy = any(
-            value is not None
-            for value in (game_id, position_columns, minimum_value, maximum_value)
+            value is not None for value in (game_id, position_columns, minimum_value, maximum_value)
         )
         current = any(value is not None for value in (game, positions, minimum, maximum))
         if legacy and current:
@@ -128,10 +127,7 @@ def validate_dataset(payload: DatasetPayload) -> tuple[np.ndarray, tuple[int, ..
         raise ValueError("draw_no must already be strictly chronological")
     if len(set(draw_numbers)) != len(draw_numbers):
         raise ValueError("draw_no values must be unique")
-    if any(
-        right - left != 1
-        for left, right in zip(draw_numbers, draw_numbers[1:], strict=False)
-    ):
+    if any(right - left != 1 for left, right in zip(draw_numbers, draw_numbers[1:], strict=False)):
         raise ValueError("draw_no values must be gap-free")
 
     values = np.asarray([row.values for row in payload.rows], dtype=np.int64)
@@ -178,10 +174,7 @@ def compile_wide_rows(
         raise ValueError("draw_no must be unique")
     if draw_numbers != sorted(draw_numbers):
         raise ValueError("rows must already be ordered by draw_no")
-    if any(
-        right - left != 1
-        for left, right in zip(draw_numbers, draw_numbers[1:], strict=False)
-    ):
+    if any(right - left != 1 for left, right in zip(draw_numbers, draw_numbers[1:], strict=False)):
         raise ValueError("draw_no must be gap-free")
 
     values: list[list[float]] = []
