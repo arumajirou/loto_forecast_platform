@@ -33,7 +33,7 @@ jobs:
           version: '0.11.21'
           enable-cache: false
 
-      - name: Compare focused tests before and after shadow migration
+      - name: Compare per-file test outcomes before and after shadow migration
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -57,7 +57,7 @@ jobs:
           set -e
           test "$rc" -eq 1
 
-          "$python" - "$RUNNER_TEMP/up042.json" "$RUNNER_TEMP/selected-tests.txt" <<'PY'
+          "$python" - "$RUNNER_TEMP/up042.json" "$RUNNER_TEMP/selected-tests.json" <<'PY'
           import ast,json,re,sys
           from pathlib import Path
           root=Path.cwd().resolve()
@@ -77,40 +77,39 @@ jobs:
           selected=[]
           for test in Path('tests').rglob('test_*.py'):
               text=test.read_text(encoding='utf-8',errors='replace')
-              keep=False
-              for module,package,name in symbols:
-                  if module in text:
-                      keep=True; break
-                  if package in text and re.search(rf'\b{re.escape(name)}\b',text):
-                      keep=True; break
-              if keep:
+              if any(module in text or (package in text and re.search(rf'\b{re.escape(name)}\b',text)) for module,package,name in symbols):
                   selected.append(test.as_posix())
           selected=sorted(set(selected))
-          known_collection_debt={
-              'tests/clock_health/test_evaluator.py',
-              'tests/run_lifecycle/test_events_replay.py',
-              'tests/run_lifecycle/test_full_lifecycle.py',
-              'tests/run_lifecycle/test_idempotency_service.py',
-              'tests/run_lifecycle/test_transitions.py',
-          }
-          selected_set=set(selected)
           assert len(selected)==40,len(selected)
-          assert known_collection_debt <= selected_set, known_collection_debt-selected_set
-          runnable=sorted(selected_set-known_collection_debt)
-          assert len(runnable)==35,len(runnable)
-          Path(sys.argv[2]).write_text('\n'.join(runnable)+'\n',encoding='utf-8')
+          Path(sys.argv[2]).write_text(json.dumps(selected,indent=2)+'\n',encoding='utf-8')
           print('SELECTED_TEST_FILES=40')
-          print('KNOWN_COLLECTION_DEBT_FILES=5')
-          print('RUNNABLE_FOCUSED_TEST_FILES=35')
-          for path in sorted(known_collection_debt):
-              print('KNOWN_COLLECTION_DEBT='+path)
-          for path in runnable:
-              print('RUNNABLE_TEST='+path)
           PY
 
-          mapfile -t tests < "$RUNNER_TEMP/selected-tests.txt"
-          "$python" -m pytest -q "${tests[@]}"
-          echo 'BASELINE_FOCUSED_TESTS=PASS'
+          cat > "$RUNNER_TEMP/test-outcomes.py" <<'PY'
+          from __future__ import annotations
+          import json,re,subprocess,sys
+          from pathlib import Path
+          tests=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+          out={}
+          for test in tests:
+              proc=subprocess.run(
+                  [sys.executable,'-m','pytest','-q','--tb=no',test],
+                  text=True,capture_output=True,check=False,
+              )
+              text=(proc.stdout or '')+'\n'+(proc.stderr or '')
+              ids=[]
+              for line in text.splitlines():
+                  stripped=line.strip()
+                  if stripped.startswith('FAILED ') or stripped.startswith('ERROR '):
+                      token=stripped.split(' - ',1)[0]
+                      ids.append(token)
+              out[test]={'returncode':proc.returncode,'problem_ids':sorted(set(ids))}
+              print(f"TEST_OUTCOME\t{proc.returncode}\t{test}\t{','.join(sorted(set(ids)))}")
+          Path(sys.argv[2]).write_text(json.dumps(out,sort_keys=True,indent=2)+'\n',encoding='utf-8')
+          PY
+
+          "$python" "$RUNNER_TEMP/test-outcomes.py" "$RUNNER_TEMP/selected-tests.json" "$RUNNER_TEMP/before-outcomes.json"
+          echo 'BASELINE_PER_FILE_OUTCOMES=CAPTURED'
 
           "$python" -m ruff check --select UP042 --fix --unsafe-fixes src scripts tests
           "$python" -m ruff check src scripts tests
@@ -118,9 +117,21 @@ jobs:
           test "${#changed[@]}" -eq 20
           "$python" -m ruff format --check "${changed[@]}"
           "$python" -m compileall -q src scripts tests
+          echo 'SHADOW_STATIC_GATES=PASS'
 
-          "$python" -m pytest -q "${tests[@]}"
-          echo 'SHADOW_FOCUSED_TESTS=PASS'
+          "$python" "$RUNNER_TEMP/test-outcomes.py" "$RUNNER_TEMP/selected-tests.json" "$RUNNER_TEMP/after-outcomes.json"
+          "$python" - "$RUNNER_TEMP/before-outcomes.json" "$RUNNER_TEMP/after-outcomes.json" <<'PY'
+          import json,sys
+          from pathlib import Path
+          before=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+          after=json.loads(Path(sys.argv[2]).read_text(encoding='utf-8'))
+          assert before==after, {'before':before,'after':after}
+          passed=sum(1 for item in before.values() if item['returncode']==0)
+          nonpass=len(before)-passed
+          print(f'PER_FILE_PARITY=PASS')
+          print(f'BASELINE_PASS_FILES={passed}')
+          print(f'BASELINE_NONPASS_FILES={nonpass}')
+          PY
 
           set +e
           "$python" -m pytest -q > "$RUNNER_TEMP/full-pytest.txt" 2>&1
@@ -142,4 +153,7 @@ jobs:
 
           git reset --hard HEAD
           test -z "$(git status --porcelain)"
-          rm -rf -- "$venv" "$cache" "$RUNNER_TEMP/up042.json" "$RUNNER_TEMP/selected-tests.txt" "$RUNNER_TEMP/full-pytest.txt"
+          rm -rf -- "$venv" "$cache" "$RUNNER_TEMP/up042.json" \
+            "$RUNNER_TEMP/selected-tests.json" "$RUNNER_TEMP/test-outcomes.py" \
+            "$RUNNER_TEMP/before-outcomes.json" "$RUNNER_TEMP/after-outcomes.json" \
+            "$RUNNER_TEMP/full-pytest.txt"
