@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -21,13 +21,13 @@ FRETS_CHANNEL_INDEPENDENCE = "1"
 FRETS_PRECISION = "32-true"
 
 
-class ArchitectureProfile(str, Enum):
+class ArchitectureProfile(StrEnum):
     COMPACT = "compact"
     BALANCED = "balanced"
     WIDE = "wide"
 
 
-class TrainingProfile(str, Enum):
+class TrainingProfile(StrEnum):
     SMOKE = "smoke"
     STANDARD = "standard"
     EXTENDED = "extended"

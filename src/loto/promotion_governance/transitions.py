@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import Field
 
@@ -21,7 +21,7 @@ from .contracts import (
 )
 
 
-class TransitionIssueCode(str, Enum):
+class TransitionIssueCode(StrEnum):
     SUBJECT_HASH_MISMATCH = "SUBJECT_HASH_MISMATCH"
     ILLEGAL_STATUS_EDGE = "ILLEGAL_STATUS_EDGE"
     TERMINAL_STATUS = "TERMINAL_STATUS"

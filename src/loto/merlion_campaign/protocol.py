@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 from pydantic import (
@@ -14,7 +14,7 @@ from pydantic import (
 )
 
 
-class Operation(str, Enum):
+class Operation(StrEnum):
     IDENTITY = "identity"
     DISCOVER = "discover"
     TRAIN_SAVE = "train_save"
@@ -22,7 +22,7 @@ class Operation(str, Enum):
     VERIFY_ARTIFACT = "verify_artifact"
 
 
-class TimeSemantics(str, Enum):
+class TimeSemantics(StrEnum):
     DRAW_SEQUENCE = "draw_sequence"
     CALENDAR_TIME = "calendar_time"
 

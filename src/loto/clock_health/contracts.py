@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -33,14 +33,14 @@ class StrictFrozenModel(BaseModel):
     )
 
 
-class ClockHealthStatus(str, Enum):
+class ClockHealthStatus(StrEnum):
     HEALTHY = "HEALTHY"
     DEGRADED = "DEGRADED"
     BLOCKED = "BLOCKED"
     UNKNOWN = "UNKNOWN"
 
 
-class LeapStatus(str, Enum):
+class LeapStatus(StrEnum):
     NORMAL = "NORMAL"
     INSERT_SECOND = "INSERT_SECOND"
     DELETE_SECOND = "DELETE_SECOND"
@@ -48,14 +48,14 @@ class LeapStatus(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
-class CheckOutcome(str, Enum):
+class CheckOutcome(StrEnum):
     PASS = "PASS"
     WARNING = "WARNING"
     FAIL = "FAIL"
     UNKNOWN = "UNKNOWN"
 
 
-class SourceSelectionState(str, Enum):
+class SourceSelectionState(StrEnum):
     CURRENT = "CURRENT"
     COMBINED = "COMBINED"
     EXCLUDED = "EXCLUDED"

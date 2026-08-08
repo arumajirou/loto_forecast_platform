@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -26,7 +26,7 @@ class StrictModel(BaseModel):
     )
 
 
-class PromotionStatus(str, Enum):
+class PromotionStatus(StrEnum):
     CANDIDATE = "CANDIDATE"
     RUNTIME_UNVERIFIED = "RUNTIME_UNVERIFIED"
     RUNTIME_VERIFIED = "RUNTIME_VERIFIED"
@@ -44,55 +44,55 @@ class PromotionStatus(str, Enum):
     REVOKED = "REVOKED"
 
 
-class EvidenceStatus(str, Enum):
+class EvidenceStatus(StrEnum):
     NOT_PROVIDED = "NOT_PROVIDED"
     UNVERIFIED = "UNVERIFIED"
     VERIFIED = "VERIFIED"
     FAILED = "FAILED"
 
 
-class EvidenceOrigin(str, Enum):
+class EvidenceOrigin(StrEnum):
     REAL = "REAL"
     SYNTHETIC = "SYNTHETIC"
     INJECTED_FAKE = "INJECTED_FAKE"
 
 
-class RuntimeAxis(str, Enum):
+class RuntimeAxis(StrEnum):
     UNVERIFIED = "UNVERIFIED"
     VERIFIED = "VERIFIED"
     FAILED = "FAILED"
 
 
-class AccuracyAxis(str, Enum):
+class AccuracyAxis(StrEnum):
     NOT_EVALUATED = "NOT_EVALUATED"
     PENDING = "PENDING"
     VERIFIED_ELIGIBLE = "VERIFIED_ELIGIBLE"
     VERIFIED_INELIGIBLE = "VERIFIED_INELIGIBLE"
 
 
-class RegistryAxis(str, Enum):
+class RegistryAxis(StrEnum):
     NOT_REGISTERED = "NOT_REGISTERED"
     AUTHORIZED = "AUTHORIZED"
     REGISTERED = "REGISTERED"
 
 
-class DeploymentAxis(str, Enum):
+class DeploymentAxis(StrEnum):
     NOT_DEPLOYED = "NOT_DEPLOYED"
     SHADOW_CANARY = "SHADOW_CANARY"
     PRIMARY = "PRIMARY"
 
 
-class ApprovalScope(str, Enum):
+class ApprovalScope(StrEnum):
     SHADOW_REGISTRATION = "SHADOW_REGISTRATION"
     PRIMARY_ACTIVATION = "PRIMARY_ACTIVATION"
 
 
-class ActorKind(str, Enum):
+class ActorKind(StrEnum):
     SYSTEM = "SYSTEM"
     HUMAN = "HUMAN"
 
 
-class LicenseEligibility(str, Enum):
+class LicenseEligibility(StrEnum):
     UNKNOWN = "UNKNOWN"
     INELIGIBLE = "INELIGIBLE"
     RESEARCH_ONLY = "RESEARCH_ONLY"

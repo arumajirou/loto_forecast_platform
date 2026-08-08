@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 from pydantic import (
@@ -24,12 +24,12 @@ from loto.moirai2_campaign.model_manifest import (
 NumericScalar = StrictFloat | StrictInt
 
 
-class Operation(str, Enum):
+class Operation(StrEnum):
     IDENTITY = "identity"
     PREDICT = "predict"
 
 
-class TimeSemantics(str, Enum):
+class TimeSemantics(StrEnum):
     DRAW_SEQUENCE = "draw_sequence"
     CALENDAR_TIME = "calendar_time"
 
