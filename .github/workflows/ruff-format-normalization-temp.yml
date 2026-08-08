@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - fix/ruff-format-normalization-v1
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -15,7 +18,7 @@ concurrency:
 
 jobs:
   normalize-and-verify:
-    if: ${{ github.repository == 'arumajirou/loto_forecast_platform' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1' }}
+    if: ${{ github.repository == 'arumajirou/loto_forecast_platform' && ((github.event_name == 'push' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-format-normalization-v1')) }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
     timeout-minutes: 120
 
@@ -55,19 +58,15 @@ jobs:
       - name: Prepare isolated Python environment
         run: |
           set -Eeuo pipefail
-
           actual="$(uv --version)"
           echo "uv_version=$actual"
           case "$actual" in
             "uv $UV_VERSION"*) ;;
             *) echo "unexpected uv version: $actual" >&2; exit 1 ;;
           esac
-
           uv python install "$UV_PYTHON"
-
           ci_venv="$RUNNER_TEMP/loto-ruff-normalize-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           uv_cache="$RUNNER_TEMP/loto-ruff-normalize-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-
           case "$ci_venv" in
             "$RUNNER_TEMP"/*) ;;
             *) echo "unsafe CI venv path: $ci_venv" >&2; exit 1 ;;
@@ -76,13 +75,10 @@ jobs:
             "$RUNNER_TEMP"/*) ;;
             *) echo "unsafe uv cache path: $uv_cache" >&2; exit 1 ;;
           esac
-
           rm -rf -- "$ci_venv" "$uv_cache"
           mkdir -p -- "$uv_cache"
-
           echo "CI_VENV=$ci_venv" >> "$GITHUB_ENV"
           echo "UV_CACHE_DIR=$uv_cache" >> "$GITHUB_ENV"
-
           UV_CACHE_DIR="$uv_cache" uv venv "$ci_venv" --python "$UV_PYTHON"
           "$ci_venv/bin/python" --version
 
@@ -122,50 +118,37 @@ jobs:
         run: |
           set -Eeuo pipefail
           git diff --check
-
           unexpected=0
           while IFS= read -r path; do
             [[ -z "$path" ]] && continue
             case "$path" in
               src/*|scripts/*|tests/*) ;;
-              *)
-                echo "unexpected formatter change: $path" >&2
-                unexpected=1
-                ;;
+              *) echo "unexpected formatter change: $path" >&2; unexpected=1 ;;
             esac
           done < <(git diff --name-only)
-
           test "$unexpected" -eq 0
-
           changed_count="$(git diff --name-only -- src scripts tests | sed '/^$/d' | wc -l)"
           echo "formatter_changed_files=$changed_count"
 
       - name: Commit mechanical formatting if needed
         run: |
           set -Eeuo pipefail
-
           if git diff --quiet -- src scripts tests; then
             echo "no formatting changes to commit"
             exit 0
           fi
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- src scripts tests
-
           unexpected=0
           while IFS= read -r path; do
             [[ -z "$path" ]] && continue
             case "$path" in
               src/*|scripts/*|tests/*) ;;
-              *)
-                echo "unexpected staged path: $path" >&2
-                unexpected=1
-                ;;
+              *) echo "unexpected staged path: $path" >&2; unexpected=1 ;;
             esac
           done < <(git diff --cached --name-only)
           test "$unexpected" -eq 0
-
           git diff --cached --check
           git commit -m "style: normalize locked Ruff formatting (#196)"
           git push origin HEAD:fix/ruff-format-normalization-v1
@@ -174,20 +157,13 @@ jobs:
         run: |
           set -Eeuo pipefail
           python="$CI_VENV/bin/python"
-          uv pip install \
-            --quiet \
-            --python "$python" \
-            --index-url https://download.pytorch.org/whl/cpu \
-            "torch==2.9.1"
+          uv pip install --quiet --python "$python" --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
 
       - name: Install project and test dependencies
         run: |
           set -Eeuo pipefail
           python="$CI_VENV/bin/python"
-          uv pip install \
-            --quiet \
-            --python "$python" \
-            -e ".[api,dev,postgres]"
+          uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
           uv pip install --quiet --python "$python" "ruff==$RUFF_VERSION"
 
       - name: Verify CPU-only PyTorch remains selected
