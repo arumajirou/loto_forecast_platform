@@ -47,7 +47,7 @@ jobs:
         run: |
           set -Eeuo pipefail
           message="$(git log -1 --pretty=%s)"
-          if [[ "$message" == "ci: inventory Ruff undefined symbols (#200)" ]]; then
+          if [[ "$message" == "ci: fix undefined-symbol inventory environment (#200)" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -65,7 +65,12 @@ jobs:
         run: |
           set -Eeuo pipefail
           uv python install "$UV_PYTHON"
-          python="$(uv python find "$UV_PYTHON")"
+          venv="$RUNNER_TEMP/loto-ruff-undefined-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          case "$venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          rm -rf -- "$venv"
+          uv venv "$venv" --python "$UV_PYTHON"
+          python="$venv/bin/python"
+          echo "CI_VENV=$venv" >> "$GITHUB_ENV"
           ruff_version="$("$python" - <<'PY'
           import tomllib
           with open('uv.lock','rb') as f:
@@ -98,9 +103,7 @@ jobs:
           ]
           for row in rows:
               loc=row.get('location') or {}
-              out.append(
-                  f"{row.get('code')}\t{row.get('filename')}:{loc.get('row')}:{loc.get('column')}\t{row.get('message')}"
-              )
+              out.append(f"{row.get('code')}\t{row.get('filename')}:{loc.get('row')}:{loc.get('column')}\t{row.get('message')}")
           Path(sys.argv[2]).write_text('\n'.join(out)+'\n',encoding='utf-8')
           PY
           "$python" -m compileall -q src scripts tests
@@ -121,4 +124,6 @@ jobs:
 
       - name: Cleanup
         if: ${{ always() }}
-        run: true
+        run: |
+          set -Eeuo pipefail
+          [[ -z "${CI_VENV:-}" ]] || { case "$CI_VENV" in "$RUNNER_TEMP"/*) rm -rf "$CI_VENV" ;; *) exit 1 ;; esac; }
