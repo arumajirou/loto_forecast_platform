@@ -4,33 +4,34 @@ on:
   push:
     branches:
       - fix/ruff-format-normalization-v1
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: ruff-format-normalization-temp-${{ github.ref }}
+  group: ruff-format-normalization-temp
   cancel-in-progress: false
 
 jobs:
-  diagnose-source-encoding:
-    if: ${{ github.repository == 'arumajirou/loto_forecast_platform' && ((github.event_name == 'push' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-format-normalization-v1')) }}
+  normalize-and-verify:
+    if: ${{ github.repository == 'arumajirou/loto_forecast_platform' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1' }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 20
+    timeout-minutes: 180
 
     defaults:
       run:
         shell: bash
 
     env:
+      TARGET_BRANCH: fix/ruff-format-normalization-v1
       UV_VERSION: "0.11.21"
       UV_PYTHON: "3.13"
-      TARGET_PATH: "src/loto/auto_campaign/prospective_registry_reconciliation_expected.py"
-      ENCODING_DIAGNOSTIC_PATH: ".github/ruff-source-encoding-diagnostic.txt"
+      EXPECTED_RUFF_VERSION: "0.16.0"
+      REPAIRED_SOURCE: src/loto/auto_campaign/prospective_registry_reconciliation_expected.py
+      REPAIRED_SOURCE_BLOB: e13b5d78c22e529a2b516e8da1ab1b205245dcf8
+      REPAIRED_TEST: tests/auto_campaign/test_prospective_registry_reconciliation.py
+      REPAIRED_TEST_BLOB: 640c8e491ca1a75db23ae3f5a75dd764fd890070
 
     steps:
       - name: Verify expected self-hosted runner
@@ -48,29 +49,48 @@ jobs:
         with:
           ref: fix/ruff-format-normalization-v1
           persist-credentials: true
-          fetch-depth: 1
+          fetch-depth: 0
           clean: true
 
-      - name: Stop when encoding diagnostic already exists
-        id: existing
+      - name: Synchronize exact current main without force
         run: |
           set -Eeuo pipefail
-          if [[ -f "$ENCODING_DIAGNOSTIC_PATH" ]]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "encoding diagnostic already exists"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch --no-tags origin \
+            "+refs/heads/main:refs/remotes/origin/main" \
+            "+refs/heads/$TARGET_BRANCH:refs/remotes/origin/$TARGET_BRANCH"
+
+          local_head="$(git rev-parse HEAD)"
+          remote_head="$(git rev-parse "origin/$TARGET_BRANCH")"
+          main_head="$(git rev-parse origin/main)"
+          echo "local_head=$local_head"
+          echo "remote_head=$remote_head"
+          echo "main_head=$main_head"
+          test "$local_head" = "$remote_head"
+
+          if git merge-base --is-ancestor origin/main HEAD; then
+            echo "current main already contained"
           else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            git merge --no-edit origin/main
           fi
 
+          test "$(git hash-object "$REPAIRED_SOURCE")" = "$REPAIRED_SOURCE_BLOB"
+          test "$(git hash-object "$REPAIRED_TEST")" = "$REPAIRED_TEST_BLOB"
+          git diff --exit-code
+          git diff --cached --exit-code
+
+          echo "SYNCED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "MAIN_HEAD=$main_head" >> "$GITHUB_ENV"
+
       - name: Install exact uv without GitHub cache
-        if: ${{ steps.existing.outputs.exists != 'true' }}
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
 
-      - name: Prepare isolated Python
-        if: ${{ steps.existing.outputs.exists != 'true' }}
+      - name: Prepare isolated Python and locked Ruff
         run: |
           set -Eeuo pipefail
           actual="$(uv --version)"
@@ -79,116 +99,119 @@ jobs:
             "uv $UV_VERSION"*) ;;
             *) echo "unexpected uv version: $actual" >&2; exit 1 ;;
           esac
-          uv python install "$UV_PYTHON"
-          ci_venv="$RUNNER_TEMP/loto-source-encoding-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          case "$ci_venv" in
-            "$RUNNER_TEMP"/*) ;;
-            *) echo "unsafe CI venv path: $ci_venv" >&2; exit 1 ;;
-          esac
-          rm -rf -- "$ci_venv"
-          echo "CI_VENV=$ci_venv" >> "$GITHUB_ENV"
-          uv venv "$ci_venv" --python "$UV_PYTHON"
-          "$ci_venv/bin/python" --version
 
-      - name: Capture byte-level encoding evidence
-        if: ${{ steps.existing.outputs.exists != 'true' }}
+          uv python install "$UV_PYTHON"
+          ci_venv="$RUNNER_TEMP/loto-ruff-normalization-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          uv_cache="$RUNNER_TEMP/loto-ruff-normalization-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          case "$ci_venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          case "$uv_cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          rm -rf -- "$ci_venv" "$uv_cache"
+          mkdir -p -- "$uv_cache"
+          echo "CI_VENV=$ci_venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$uv_cache" >> "$GITHUB_ENV"
+          UV_CACHE_DIR="$uv_cache" uv venv "$ci_venv" --python "$UV_PYTHON"
+
+          python="$ci_venv/bin/python"
+          ruff_version="$(
+            "$python" - <<'PY'
+          import tomllib
+          with open("uv.lock", "rb") as stream:
+              lock = tomllib.load(stream)
+          versions = [p["version"] for p in lock["package"] if p.get("name") == "ruff"]
+          if len(versions) != 1:
+              raise SystemExit(f"expected one Ruff version, got {versions!r}")
+          print(versions[0])
+          PY
+          )"
+          echo "ruff_version=$ruff_version"
+          test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
+          echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
+          UV_CACHE_DIR="$uv_cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
+          "$python" -m ruff --version
+
+      - name: Apply only the locked Ruff formatter
         run: |
           set -Eeuo pipefail
-          "$CI_VENV/bin/python" - <<'PY'
-          from __future__ import annotations
+          python="$CI_VENV/bin/python"
 
-          import hashlib
-          import os
-          import subprocess
-          from pathlib import Path
+          "$python" -m ruff format src scripts tests
 
-          target = Path(os.environ["TARGET_PATH"])
-          output = Path(os.environ["ENCODING_DIAGNOSTIC_PATH"])
-          data = target.read_bytes()
+          git diff --name-only | sort > "$RUNNER_TEMP/ruff-format-changed.txt"
+          changed_count="$(wc -l < "$RUNNER_TEMP/ruff-format-changed.txt" | tr -d ' ')"
+          echo "formatter_changed_files=$changed_count"
 
-          records: list[str] = [
-              "SOURCE_ENCODING_DIAGNOSTIC_VERSION=1",
-              f"RUN_ID={os.environ['GITHUB_RUN_ID']}",
-              f"RUN_ATTEMPT={os.environ['GITHUB_RUN_ATTEMPT']}",
-              f"HEAD_SHA={subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()}",
-              f"TARGET_PATH={target.as_posix()}",
-              f"SIZE_BYTES={len(data)}",
-              f"SHA256={hashlib.sha256(data).hexdigest()}",
-              f"UTF8_BOM={data.startswith(bytes.fromhex('efbbbf'))}",
-              f"UTF16_LE_BOM={data.startswith(bytes.fromhex('fffe'))}",
-              f"UTF16_BE_BOM={data.startswith(bytes.fromhex('feff'))}",
-              f"NUL_BYTE_COUNT={data.count(bytes([0]))}",
-          ]
+          unexpected="$(awk '!($0 ~ /^src\// || $0 ~ /^scripts\// || $0 ~ /^tests\//) {print}' "$RUNNER_TEMP/ruff-format-changed.txt")"
+          if [[ -n "$unexpected" ]]; then
+            echo "formatter escaped intended scope:" >&2
+            printf '%s\n' "$unexpected" >&2
+            exit 1
+          fi
 
-          errors: list[tuple[int, int, str]] = []
-          cursor = 0
-          while cursor < len(data):
-              try:
-                  data[cursor:].decode("utf-8")
-                  break
-              except UnicodeDecodeError as exc:
-                  start = cursor + exc.start
-                  end = cursor + exc.end
-                  errors.append((start, end, exc.reason))
-                  cursor = end if end > start else start + 1
-                  if len(errors) >= 50:
-                      break
+          git diff --check
 
-          records.append(f"UTF8_DECODE_ERROR_COUNT_CAPPED={len(errors)}")
-          for index, (start, end, reason) in enumerate(errors, start=1):
-              line = data.count(b"\n", 0, start) + 1
-              previous_newline = data.rfind(b"\n", 0, start)
-              column = start + 1 if previous_newline < 0 else start - previous_newline
-              lo = max(0, start - 48)
-              hi = min(len(data), end + 48)
-              window = data[lo:hi]
-              records.extend(
-                  [
-                      f"ERROR_{index}_START={start}",
-                      f"ERROR_{index}_END={end}",
-                      f"ERROR_{index}_LINE={line}",
-                      f"ERROR_{index}_BYTE_COLUMN={column}",
-                      f"ERROR_{index}_REASON={reason}",
-                      f"ERROR_{index}_BYTES_HEX={data[start:end].hex()}",
-                      f"ERROR_{index}_WINDOW_HEX={window.hex()}",
-                      f"ERROR_{index}_WINDOW_BACKSLASH={window.decode('utf-8', errors='backslashreplace')!r}",
-                  ]
-              )
+          if [[ "$changed_count" -gt 0 ]]; then
+            git add src scripts tests
+            test "$(git diff --cached --name-only | sort)" = "$(cat "$RUNNER_TEMP/ruff-format-changed.txt")"
+            git diff --cached --check
+            git commit -m "style: normalize repository with locked Ruff formatter (#196)"
+          else
+            echo "formatter produced no new changes"
+          fi
 
-          if not errors:
-              records.append("UTF8_DECODE=PASS")
-          else:
-              records.append("UTF8_DECODE=FAIL")
+          local_before_push="$(git rev-parse "origin/$TARGET_BRANCH")"
+          remote_before_push="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$local_before_push" = "$remote_before_push"
 
-          compile_result = subprocess.run(
-              [os.environ["CI_VENV"] + "/bin/python", "-m", "py_compile", str(target)],
-              stdout=subprocess.PIPE,
-              stderr=subprocess.PIPE,
-              text=True,
-              errors="backslashreplace",
-              check=False,
-          )
-          records.append(f"PY_COMPILE_STATUS={compile_result.returncode}")
-          records.append("--- PY_COMPILE_STDERR_FIRST_80_LINES ---")
-          records.extend(compile_result.stderr.splitlines()[:80])
+          git push origin "HEAD:$TARGET_BRANCH"
+          pushed_head="$(git rev-parse HEAD)"
+          remote_after_push="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$pushed_head" = "$remote_after_push"
+          echo "PUSHED_HEAD=$pushed_head" >> "$GITHUB_ENV"
 
-          output.write_text("\n".join(records) + "\n", encoding="utf-8")
+      - name: Verify locked Ruff format gate
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m ruff format --check src scripts tests
+
+      - name: Verify locked Ruff lint gate
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m ruff check src scripts tests
+
+      - name: Compile repository Python paths
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m compileall -q src scripts tests
+
+      - name: Install project test dependencies with CPU-only Torch
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.9.1"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" "ruff==$RUFF_VERSION"
+          uv pip check --python "$python"
+          "$python" - <<'PY'
+          import torch
+          assert torch.__version__.startswith("2.9.1"), torch.__version__
+          assert torch.version.cuda is None, torch.version.cuda
+          print(f"torch_version={torch.__version__}")
+          print("torch_cuda_runtime=NONE")
           PY
 
-          git diff --check -- "$ENCODING_DIAGNOSTIC_PATH"
-          test -z "$(git diff --name-only -- src scripts tests)"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$ENCODING_DIAGNOSTIC_PATH"
-          test "$(git diff --cached --name-only)" = "$ENCODING_DIAGNOSTIC_PATH"
-          git diff --cached --check
-          git commit -m "chore: capture invalid source encoding diagnostic (#196)"
-          git push origin HEAD:fix/ruff-format-normalization-v1
+      - name: Run full repository pytest
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m pytest -q
 
       - name: Verify repository state
         if: ${{ always() }}
         run: |
           set -Eeuo pipefail
+          test "$(git hash-object "$REPAIRED_SOURCE")" = "$REPAIRED_SOURCE_BLOB"
+          test "$(git hash-object "$REPAIRED_TEST")" = "$REPAIRED_TEST_BLOB"
           git diff --exit-code
           git diff --cached --exit-code
 
@@ -197,8 +220,8 @@ jobs:
         run: |
           set -Eeuo pipefail
           if [[ -n "${CI_VENV:-}" ]]; then
-            case "$CI_VENV" in
-              "$RUNNER_TEMP"/*) rm -rf -- "$CI_VENV" ;;
-              *) echo "refusing to remove unsafe CI_VENV=$CI_VENV" >&2; exit 1 ;;
-            esac
+            case "$CI_VENV" in "$RUNNER_TEMP"/*) rm -rf -- "$CI_VENV" ;; *) exit 1 ;; esac
+          fi
+          if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+            case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf -- "$UV_CACHE_DIR" ;; *) exit 1 ;; esac
           fi
