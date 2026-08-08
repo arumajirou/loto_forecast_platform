@@ -1,0 +1,10 @@
+stage,wall_seconds,cpu_pct,max_rss_kb,fs_inputs,fs_outputs,vol_ctx,invol_ctx,success
+uv_bootstrap_exact,1.74,24.0,16680,0,167144,3775,8,True
+uv_python_312_ready,1.7,62.0,49768,264,209136,21962,0,True
+uv_lock_check,0.1,95.0,43808,0,112,38,2,True
+wsl_resolve_first,0.02,75.0,45708,0,136,37,0,True
+wsl_resolve_second,0.02,79.0,45880,0,136,37,0,True
+wsl_dependency_tree,0.02,85.0,43672,0,48,37,1,True
+python_compile_src,0.7,99.0,22808,392,22808,20,4,True
+wheel_build,1.33,91.0,52848,8,59144,5428,3,True
+wheel_install_import_312,0.16,159.0,60044,0,17344,2131,1,True

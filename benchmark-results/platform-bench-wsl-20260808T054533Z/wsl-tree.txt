@@ -1,0 +1,547 @@
+loto-forecast-platform
+├── huggingface-hub v0.36.2
+│   ├── filelock v3.32.2
+│   ├── fsspec v2026.7.0
+│   ├── hf-xet v1.5.2
+│   ├── packaging v26.2
+│   ├── pyyaml v6.0.3
+│   ├── requests v2.34.2
+│   │   ├── certifi v2026.7.22
+│   │   ├── charset-normalizer v3.4.9
+│   │   ├── idna v3.18
+│   │   └── urllib3 v2.7.0
+│   ├── tqdm v4.70.0
+│   └── typing-extensions v4.16.0
+├── neuralforecast v3.2.0
+│   ├── coreforecast v0.0.18
+│   │   └── numpy v2.4.6
+│   ├── fsspec v2026.7.0
+│   ├── numpy v2.4.6
+│   ├── optuna v4.9.0
+│   │   ├── alembic v1.18.5
+│   │   │   ├── mako v1.3.12
+│   │   │   │   └── markupsafe v3.0.3
+│   │   │   ├── sqlalchemy v2.0.51
+│   │   │   │   ├── greenlet v3.5.4
+│   │   │   │   └── typing-extensions v4.16.0
+│   │   │   └── typing-extensions v4.16.0
+│   │   ├── colorlog v6.12.0
+│   │   ├── numpy v2.4.6
+│   │   ├── packaging v26.2
+│   │   ├── pyyaml v6.0.3
+│   │   ├── sqlalchemy v2.0.51 (*)
+│   │   └── tqdm v4.70.0
+│   ├── pandas v2.3.3
+│   │   ├── numpy v2.4.6
+│   │   ├── python-dateutil v2.9.0.post0
+│   │   │   └── six v1.17.0
+│   │   ├── pytz v2026.3.post1
+│   │   └── tzdata v2026.3
+│   ├── pytorch-lightning v2.5.6
+│   │   ├── fsspec[http] v2026.7.0
+│   │   │   └── aiohttp v3.14.3 (extra: http)
+│   │   │       ├── aiohappyeyeballs v2.7.1
+│   │   │       ├── aiosignal v1.4.0
+│   │   │       │   ├── frozenlist v1.8.0
+│   │   │       │   └── typing-extensions v4.16.0
+│   │   │       ├── attrs v26.1.0
+│   │   │       ├── frozenlist v1.8.0
+│   │   │       ├── multidict v6.7.1
+│   │   │       ├── propcache v0.5.2
+│   │   │       ├── typing-extensions v4.16.0
+│   │   │       └── yarl v1.24.5
+│   │   │           ├── idna v3.18
+│   │   │           ├── multidict v6.7.1
+│   │   │           └── propcache v0.5.2
+│   │   ├── lightning-utilities v0.15.3
+│   │   │   ├── packaging v26.2
+│   │   │   └── typing-extensions v4.16.0
+│   │   ├── packaging v26.2
+│   │   ├── pyyaml v6.0.3
+│   │   ├── torch v2.9.1
+│   │   │   ├── filelock v3.32.2
+│   │   │   ├── fsspec v2026.7.0
+│   │   │   ├── jinja2 v3.1.6
+│   │   │   │   └── markupsafe v3.0.3
+│   │   │   ├── networkx v3.6.1
+│   │   │   ├── nvidia-cublas-cu12 v12.8.4.1
+│   │   │   ├── nvidia-cuda-cupti-cu12 v12.8.90
+│   │   │   ├── nvidia-cuda-nvrtc-cu12 v12.8.93
+│   │   │   ├── nvidia-cuda-runtime-cu12 v12.8.90
+│   │   │   ├── nvidia-cudnn-cu12 v9.10.2.21
+│   │   │   │   └── nvidia-cublas-cu12 v12.8.4.1
+│   │   │   ├── nvidia-cufft-cu12 v11.3.3.83
+│   │   │   │   └── nvidia-nvjitlink-cu12 v12.8.93
+│   │   │   ├── nvidia-cufile-cu12 v1.13.1.3
+│   │   │   ├── nvidia-curand-cu12 v10.3.9.90
+│   │   │   ├── nvidia-cusolver-cu12 v11.7.3.90
+│   │   │   │   ├── nvidia-cublas-cu12 v12.8.4.1
+│   │   │   │   ├── nvidia-cusparse-cu12 v12.5.8.93
+│   │   │   │   │   └── nvidia-nvjitlink-cu12 v12.8.93
+│   │   │   │   └── nvidia-nvjitlink-cu12 v12.8.93
+│   │   │   ├── nvidia-cusparse-cu12 v12.5.8.93 (*)
+│   │   │   ├── nvidia-cusparselt-cu12 v0.7.1
+│   │   │   ├── nvidia-nccl-cu12 v2.27.5
+│   │   │   ├── nvidia-nvjitlink-cu12 v12.8.93
+│   │   │   ├── nvidia-nvshmem-cu12 v3.3.20
+│   │   │   ├── nvidia-nvtx-cu12 v12.8.90
+│   │   │   ├── setuptools v83.0.0
+│   │   │   ├── sympy v1.14.0
+│   │   │   │   └── mpmath v1.3.0
+│   │   │   ├── triton v3.5.1
+│   │   │   └── typing-extensions v4.16.0
+│   │   ├── torchmetrics v1.9.0
+│   │   │   ├── lightning-utilities v0.15.3 (*)
+│   │   │   ├── numpy v2.4.6
+│   │   │   ├── packaging v26.2
+│   │   │   └── torch v2.9.1 (*)
+│   │   ├── tqdm v4.70.0
+│   │   └── typing-extensions v4.16.0
+│   ├── ray[train, tune] v2.56.1
+│   │   ├── click v8.4.2
+│   │   ├── filelock v3.32.2
+│   │   ├── jsonschema v4.26.0
+│   │   │   ├── attrs v26.1.0
+│   │   │   ├── jsonschema-specifications v2025.9.1
+│   │   │   │   └── referencing v0.37.0
+│   │   │   │       ├── attrs v26.1.0
+│   │   │   │       ├── rpds-py v2026.6.3
+│   │   │   │       └── typing-extensions v4.16.0
+│   │   │   ├── referencing v0.37.0 (*)
+│   │   │   └── rpds-py v2026.6.3
+│   │   ├── msgpack v1.2.1
+│   │   ├── packaging v26.2
+│   │   ├── protobuf v6.33.6
+│   │   ├── pyyaml v6.0.3
+│   │   ├── requests v2.34.2 (*)
+│   │   ├── fsspec v2026.7.0 (extra: train)
+│   │   ├── pandas v2.3.3 (extra: train) (*)
+│   │   ├── pyarrow v24.0.0 (extra: train)
+│   │   ├── pydantic v2.13.4 (extra: train)
+│   │   │   ├── annotated-types v0.8.0
+│   │   │   ├── pydantic-core v2.46.4
+│   │   │   │   └── typing-extensions v4.16.0
+│   │   │   ├── typing-extensions v4.16.0
+│   │   │   └── typing-inspection v0.4.2
+│   │   │       └── typing-extensions v4.16.0
+│   │   ├── requests v2.34.2 (extra: train) (*)
+│   │   ├── tensorboardx v2.6.5 (extra: train)
+│   │   │   ├── numpy v2.4.6
+│   │   │   ├── packaging v26.2
+│   │   │   └── protobuf v6.33.6
+│   │   ├── fsspec v2026.7.0 (extra: tune)
+│   │   ├── pandas v2.3.3 (extra: tune) (*)
+│   │   ├── pyarrow v24.0.0 (extra: tune)
+│   │   ├── pydantic v2.13.4 (extra: tune) (*)
+│   │   ├── requests v2.34.2 (extra: tune) (*)
+│   │   └── tensorboardx v2.6.5 (extra: tune) (*)
+│   ├── scipy v1.18.0
+│   │   └── numpy v2.4.6
+│   ├── torch v2.9.1 (*)
+│   ├── tornado v6.5.7
+│   └── utilsforecast v0.2.16
+│       ├── narwhals v2.24.0
+│       ├── numpy v2.4.6
+│       ├── packaging v26.2
+│       └── pandas v2.3.3 (*)
+├── numpy v2.4.6
+├── optuna-dashboard v0.20.0
+│   ├── bottle v0.13.4
+│   └── optuna v4.9.0 (*)
+├── pandas v2.3.3 (*)
+├── prometheus-client v0.26.0
+├── pyarrow v24.0.0
+├── pydantic v2.13.4 (*)
+├── pyyaml v6.0.3
+├── scikit-learn v1.7.2
+│   ├── joblib v1.5.3
+│   ├── numpy v2.4.6
+│   ├── scipy v1.18.0 (*)
+│   └── threadpoolctl v3.6.0
+├── scipy v1.18.0 (*)
+├── tabulate v0.10.0
+├── torch v2.9.1 (*)
+├── transformers v4.57.6
+│   ├── filelock v3.32.2
+│   ├── huggingface-hub v0.36.2 (*)
+│   ├── numpy v2.4.6
+│   ├── packaging v26.2
+│   ├── pyyaml v6.0.3
+│   ├── regex v2026.7.19
+│   ├── requests v2.34.2 (*)
+│   ├── safetensors v0.8.0
+│   ├── tokenizers v0.22.2
+│   │   └── huggingface-hub v0.36.2 (*)
+│   └── tqdm v4.70.0
+├── fastapi v0.119.1 (extra: api)
+│   ├── pydantic v2.13.4 (*)
+│   ├── starlette v0.48.0
+│   │   ├── anyio v4.14.2
+│   │   │   ├── idna v3.18
+│   │   │   └── typing-extensions v4.16.0
+│   │   └── typing-extensions v4.16.0
+│   └── typing-extensions v4.16.0
+├── httpx v0.28.1 (extra: api)
+│   ├── anyio v4.14.2 (*)
+│   ├── certifi v2026.7.22
+│   ├── httpcore v1.0.9
+│   │   ├── certifi v2026.7.22
+│   │   └── h11 v0.16.0
+│   └── idna v3.18
+├── starlette v0.48.0 (extra: api) (*)
+├── uvicorn v0.52.1 (extra: api)
+│   ├── click v8.4.2
+│   └── h11 v0.16.0
+├── optuna v4.9.0 (extra: auto-campaign) (*)
+├── psutil v7.2.2 (extra: auto-campaign)
+├── statsforecast v2.1.1 (extra: auto-campaign)
+│   ├── cloudpickle v3.1.2
+│   ├── coreforecast v0.0.18 (*)
+│   ├── fugue v0.9.7
+│   │   ├── adagio v0.2.6
+│   │   │   └── triad v1.0.2
+│   │   │       ├── fsspec v2026.7.0
+│   │   │       ├── numpy v2.4.6
+│   │   │       ├── pandas v2.3.3 (*)
+│   │   │       ├── pyarrow v24.0.0
+│   │   │       └── six v1.17.0
+│   │   ├── pandas v2.3.3 (*)
+│   │   └── triad v1.0.2 (*)
+│   ├── numpy v2.4.6
+│   ├── pandas v2.3.3 (*)
+│   ├── scipy v1.18.0 (*)
+│   ├── statsmodels v0.14.6
+│   │   ├── numpy v2.4.6
+│   │   ├── packaging v26.2
+│   │   ├── pandas v2.3.3 (*)
+│   │   ├── patsy v1.0.2
+│   │   │   └── numpy v2.4.6
+│   │   └── scipy v1.18.0 (*)
+│   ├── threadpoolctl v3.6.0
+│   ├── tqdm v4.70.0
+│   └── utilsforecast v0.2.16 (*)
+├── fastapi v0.119.1 (extra: dev) (*)
+├── httpx v0.28.1 (extra: dev) (*)
+├── hypothesis v6.165.0 (extra: dev)
+│   └── sortedcontainers v2.4.0
+├── mypy v2.3.0 (extra: dev)
+│   ├── ast-serialize v0.6.0
+│   ├── librt v0.13.0
+│   ├── mypy-extensions v1.1.0
+│   ├── pathspec v1.1.1
+│   └── typing-extensions v4.16.0
+├── neuralforecast v3.2.0 (extra: dev) (*)
+├── optuna v4.9.0 (extra: dev) (*)
+├── pytest v9.1.1 (extra: dev)
+│   ├── iniconfig v2.3.0
+│   ├── packaging v26.2
+│   ├── pluggy v1.6.0
+│   └── pygments v2.20.0
+├── pytest-cov v7.1.0 (extra: dev)
+│   ├── coverage[toml] v7.15.2
+│   ├── pluggy v1.6.0
+│   └── pytest v9.1.1 (*)
+├── ruff v0.16.1 (extra: dev)
+├── starlette v0.48.0 (extra: dev) (*)
+├── torch v2.9.1 (extra: dev) (*)
+├── uvicorn v0.52.1 (extra: dev) (*)
+├── gluonts v0.16.3 (extra: frameworks)
+│   ├── numpy v2.4.6
+│   ├── pandas v2.3.3 (*)
+│   ├── pydantic v2.13.4 (*)
+│   ├── toolz v0.12.1
+│   ├── tqdm v4.70.0
+│   └── typing-extensions v4.16.0
+├── lightning v2.6.5 (extra: frameworks)
+│   ├── fsspec[http] v2026.7.0 (*)
+│   ├── lightning-utilities v0.15.3 (*)
+│   ├── packaging v26.2
+│   ├── pytorch-lightning v2.5.6 (*)
+│   ├── pyyaml v6.0.3
+│   ├── torch v2.9.1 (*)
+│   ├── torchmetrics v1.9.0 (*)
+│   ├── tqdm v4.70.0
+│   └── typing-extensions v4.16.0
+├── reservoirpy v0.4.2 (extra: frameworks)
+│   ├── joblib v1.5.3
+│   ├── numpy v2.4.6
+│   └── scipy v1.18.0 (*)
+├── skforecast v0.23.0 (extra: frameworks)
+│   ├── joblib v1.5.3
+│   ├── numba v0.66.0
+│   │   ├── llvmlite v0.48.0
+│   │   └── numpy v2.4.6
+│   ├── numpy v2.4.6
+│   ├── optuna v4.9.0 (*)
+│   ├── pandas v2.3.3 (*)
+│   ├── rich v15.0.0
+│   │   ├── markdown-it-py v4.2.0
+│   │   │   └── mdurl v0.1.2
+│   │   └── pygments v2.20.0
+│   ├── scikit-learn v1.7.2 (*)
+│   ├── scipy v1.18.0 (*)
+│   └── tqdm v4.70.0
+├── sktime v1.1.0 (extra: frameworks)
+│   ├── joblib v1.5.3
+│   ├── numpy v2.4.6
+│   ├── packaging v26.2
+│   ├── pandas v2.3.3 (*)
+│   ├── scikit-base v1.0.2
+│   ├── scikit-learn v1.7.2 (*)
+│   └── scipy v1.18.0 (*)
+├── u8darts v0.41.0 (extra: frameworks)
+│   └── darts v0.41.0
+│       ├── holidays v0.101
+│       │   └── python-dateutil v2.9.0.post0 (*)
+│       ├── joblib v1.5.3
+│       ├── matplotlib v3.11.1
+│       │   ├── contourpy v1.3.3
+│       │   │   └── numpy v2.4.6
+│       │   ├── cycler v0.12.1
+│       │   ├── fonttools v4.63.0
+│       │   ├── kiwisolver v1.5.0
+│       │   ├── numpy v2.4.6
+│       │   ├── packaging v26.2
+│       │   ├── pillow v12.3.0
+│       │   ├── pyparsing v3.3.2
+│       │   └── python-dateutil v2.9.0.post0 (*)
+│       ├── narwhals v2.24.0
+│       ├── nfoursid v1.0.2
+│       │   ├── matplotlib v3.11.1 (*)
+│       │   ├── numpy v2.4.6
+│       │   └── pandas v2.3.3 (*)
+│       ├── numpy v2.4.6
+│       ├── pandas v2.3.3 (*)
+│       ├── pyod v3.6.2
+│       │   ├── joblib v1.5.3
+│       │   ├── matplotlib v3.11.1 (*)
+│       │   ├── numba v0.66.0 (*)
+│       │   ├── numpy v2.4.6
+│       │   ├── scikit-learn v1.7.2 (*)
+│       │   └── scipy v1.18.0 (*)
+│       ├── requests v2.34.2 (*)
+│       ├── scikit-learn v1.7.2 (*)
+│       ├── scipy v1.18.0 (*)
+│       ├── shap v0.52.0
+│       │   ├── cloudpickle v3.1.2
+│       │   ├── llvmlite v0.48.0
+│       │   ├── numba v0.66.0 (*)
+│       │   ├── numpy v2.4.6
+│       │   ├── packaging v26.2
+│       │   ├── pandas v2.3.3 (*)
+│       │   ├── scikit-learn v1.7.2 (*)
+│       │   ├── scipy v1.18.0 (*)
+│       │   ├── slicer v0.0.8
+│       │   └── tqdm v4.70.0
+│       ├── statsmodels v0.14.6 (*)
+│       ├── tqdm v4.70.0
+│       ├── typing-extensions v4.16.0
+│       └── xarray v2026.7.0
+│           ├── numpy v2.4.6
+│           ├── packaging v26.2
+│           └── pandas v2.3.3 (*)
+├── catboost v1.2.10 (extra: full)
+│   ├── graphviz v0.21
+│   ├── matplotlib v3.11.1 (*)
+│   ├── numpy v2.4.6
+│   ├── pandas v2.3.3 (*)
+│   ├── plotly v6.9.0
+│   │   ├── narwhals v2.24.0
+│   │   └── packaging v26.2
+│   ├── scipy v1.18.0 (*)
+│   └── six v1.17.0
+├── fastapi v0.119.1 (extra: full) (*)
+├── hierarchicalforecast v1.5.1 (extra: full)
+│   ├── matplotlib v3.11.1 (*)
+│   ├── narwhals v2.24.0
+│   ├── numpy v2.4.6
+│   ├── pandas v2.3.3 (*)
+│   ├── qpsolvers[clarabel] v4.13.0
+│   │   ├── numpy v2.4.6
+│   │   ├── scipy v1.18.0 (*)
+│   │   └── clarabel v0.11.1 (extra: clarabel)
+│   │       ├── cffi v2.1.0
+│   │       │   └── pycparser v3.0
+│   │       ├── numpy v2.4.6
+│   │       └── scipy v1.18.0 (*)
+│   ├── scikit-learn v1.7.2 (*)
+│   └── utilsforecast v0.2.16 (*)
+├── httpx v0.28.1 (extra: full) (*)
+├── lightgbm v4.7.0 (extra: full)
+│   ├── narwhals v2.24.0
+│   ├── numpy v2.4.6
+│   └── scipy v1.18.0 (*)
+├── mlflow v3.15.1 (extra: full)
+│   ├── aiohttp v3.14.3 (*)
+│   ├── alembic v1.18.5 (*)
+│   ├── cryptography v48.0.1
+│   │   └── cffi v2.1.0 (*)
+│   ├── docker v7.2.0
+│   │   ├── requests v2.34.2 (*)
+│   │   └── urllib3 v2.7.0
+│   ├── flask v3.1.3
+│   │   ├── blinker v1.9.0
+│   │   ├── click v8.4.2
+│   │   ├── itsdangerous v2.2.0
+│   │   ├── jinja2 v3.1.6 (*)
+│   │   ├── markupsafe v3.0.3
+│   │   └── werkzeug v3.1.8
+│   │       └── markupsafe v3.0.3
+│   ├── flask-cors v6.0.5
+│   │   ├── flask v3.1.3 (*)
+│   │   └── werkzeug v3.1.8 (*)
+│   ├── graphene v3.4.3
+│   │   ├── graphql-core v3.2.11
+│   │   ├── graphql-relay v3.2.0
+│   │   │   └── graphql-core v3.2.11
+│   │   ├── python-dateutil v2.9.0.post0 (*)
+│   │   └── typing-extensions v4.16.0
+│   ├── gunicorn v26.0.0
+│   │   └── packaging v26.2
+│   ├── huey v3.3.0
+│   ├── matplotlib v3.11.1 (*)
+│   ├── mlflow-skinny v3.15.1
+│   │   ├── cachetools v7.1.6
+│   │   ├── click v8.4.2
+│   │   ├── cloudpickle v3.1.2
+│   │   ├── databricks-sdk v0.122.0
+│   │   │   ├── google-auth v2.56.2
+│   │   │   │   ├── cryptography v48.0.1 (*)
+│   │   │   │   └── pyasn1-modules v0.4.2
+│   │   │   │       └── pyasn1 v0.6.4
+│   │   │   ├── protobuf v6.33.6
+│   │   │   ├── requests v2.34.2 (*)
+│   │   │   └── urllib3 v2.7.0
+│   │   ├── fastapi v0.119.1 (*)
+│   │   ├── gitpython v3.1.57
+│   │   │   └── gitdb v4.0.12
+│   │   │       └── smmap v5.0.3
+│   │   ├── importlib-metadata v9.0.0
+│   │   │   └── zipp v4.1.0
+│   │   ├── opentelemetry-api v1.44.0
+│   │   │   └── typing-extensions v4.16.0
+│   │   ├── opentelemetry-proto v1.44.0
+│   │   │   └── protobuf v6.33.6
+│   │   ├── opentelemetry-sdk v1.44.0
+│   │   │   ├── opentelemetry-api v1.44.0 (*)
+│   │   │   ├── opentelemetry-semantic-conventions v0.65b0
+│   │   │   │   ├── opentelemetry-api v1.44.0 (*)
+│   │   │   │   └── typing-extensions v4.16.0
+│   │   │   └── typing-extensions v4.16.0
+│   │   ├── packaging v26.2
+│   │   ├── protobuf v6.33.6
+│   │   ├── pydantic v2.13.4 (*)
+│   │   ├── python-dotenv v1.2.2
+│   │   ├── pyyaml v6.0.3
+│   │   ├── requests v2.34.2 (*)
+│   │   ├── sqlparse v0.5.5
+│   │   ├── starlette v0.48.0 (*)
+│   │   ├── typing-extensions v4.16.0
+│   │   └── uvicorn v0.52.1 (*)
+│   ├── mlflow-tracing v3.15.1
+│   │   ├── cachetools v7.1.6
+│   │   ├── databricks-sdk v0.122.0 (*)
+│   │   ├── opentelemetry-api v1.44.0 (*)
+│   │   ├── opentelemetry-proto v1.44.0 (*)
+│   │   ├── opentelemetry-sdk v1.44.0 (*)
+│   │   ├── packaging v26.2
+│   │   ├── protobuf v6.33.6
+│   │   └── pydantic v2.13.4 (*)
+│   ├── numpy v2.4.6
+│   ├── pandas v2.3.3 (*)
+│   ├── pyarrow v24.0.0
+│   ├── scikit-learn v1.7.2 (*)
+│   ├── scipy v1.18.0 (*)
+│   ├── skops v0.14.0
+│   │   ├── numpy v2.4.6
+│   │   ├── packaging v26.2
+│   │   ├── prettytable v3.18.0
+│   │   │   └── wcwidth v0.8.2
+│   │   ├── scikit-learn v1.7.2 (*)
+│   │   └── scipy v1.18.0 (*)
+│   └── sqlalchemy v2.0.51 (*)
+├── mlforecast v1.1.0 (extra: full)
+│   ├── cloudpickle v3.1.2
+│   ├── coreforecast v0.0.18 (*)
+│   ├── fsspec v2026.7.0
+│   ├── narwhals v2.24.0
+│   ├── optuna v4.9.0 (*)
+│   ├── pandas v2.3.3 (*)
+│   ├── scikit-learn v1.7.2 (*)
+│   └── utilsforecast v0.2.16 (*)
+├── neuralforecast v3.2.0 (extra: full) (*)
+├── opentelemetry-exporter-otlp v1.44.0 (extra: full)
+│   ├── opentelemetry-exporter-otlp-proto-grpc v1.44.0
+│   │   ├── googleapis-common-protos v1.75.0
+│   │   │   └── protobuf v6.33.6
+│   │   ├── grpcio v1.83.0
+│   │   │   └── typing-extensions v4.16.0
+│   │   ├── opentelemetry-api v1.44.0 (*)
+│   │   ├── opentelemetry-exporter-otlp-proto-common v1.44.0
+│   │   │   └── opentelemetry-proto v1.44.0 (*)
+│   │   ├── opentelemetry-proto v1.44.0 (*)
+│   │   ├── opentelemetry-sdk v1.44.0 (*)
+│   │   └── typing-extensions v4.16.0
+│   └── opentelemetry-exporter-otlp-proto-http v1.44.0
+│       ├── googleapis-common-protos v1.75.0 (*)
+│       ├── opentelemetry-api v1.44.0 (*)
+│       ├── opentelemetry-exporter-otlp-proto-common v1.44.0 (*)
+│       ├── opentelemetry-proto v1.44.0 (*)
+│       ├── opentelemetry-sdk v1.44.0 (*)
+│       ├── requests v2.34.2 (*)
+│       └── typing-extensions v4.16.0
+├── opentelemetry-sdk v1.44.0 (extra: full) (*)
+├── optuna v4.9.0 (extra: full) (*)
+├── plotly v6.9.0 (extra: full) (*)
+├── psutil v7.2.2 (extra: full)
+├── psycopg[binary] v3.3.4 (extra: full)
+│   ├── typing-extensions v4.16.0
+│   └── psycopg-binary v3.3.4 (extra: binary)
+├── pyarrow v24.0.0 (extra: full)
+├── ray[tune] v2.56.1 (extra: full)
+│   ├── click v8.4.2
+│   ├── filelock v3.32.2
+│   ├── jsonschema v4.26.0 (*)
+│   ├── msgpack v1.2.1
+│   ├── packaging v26.2
+│   ├── protobuf v6.33.6
+│   ├── pyyaml v6.0.3
+│   ├── requests v2.34.2 (*)
+│   ├── fsspec v2026.7.0 (extra: tune)
+│   ├── pandas v2.3.3 (extra: tune) (*)
+│   ├── pyarrow v24.0.0 (extra: tune)
+│   ├── pydantic v2.13.4 (extra: tune) (*)
+│   ├── requests v2.34.2 (extra: tune) (*)
+│   └── tensorboardx v2.6.5 (extra: tune) (*)
+├── sqlalchemy v2.0.51 (extra: full) (*)
+├── starlette v0.48.0 (extra: full) (*)
+├── statsforecast v2.1.1 (extra: full) (*)
+├── structlog v26.1.0 (extra: full)
+├── uvicorn v0.52.1 (extra: full) (*)
+├── xgboost v3.3.0 (extra: full)
+│   ├── numpy v2.4.6
+│   ├── nvidia-nccl-cu12 v2.27.5
+│   └── scipy v1.18.0 (*)
+├── mlflow v3.15.1 (extra: mlflow) (*)
+├── psycopg[binary] v3.3.4 (extra: postgres) (*)
+├── sqlalchemy v2.0.51 (extra: postgres) (*)
+├── accelerate v1.14.0 (extra: tsfm)
+│   ├── huggingface-hub v0.36.2 (*)
+│   ├── numpy v2.4.6
+│   ├── packaging v26.2
+│   ├── psutil v7.2.2
+│   ├── pyyaml v6.0.3
+│   ├── safetensors v0.8.0
+│   └── torch v2.9.1 (*)
+├── chronos-forecasting v2.3.1 (extra: tsfm)
+│   ├── accelerate v1.14.0 (*)
+│   ├── einops v0.8.2
+│   ├── numpy v2.4.6
+│   ├── pandas v2.3.3 (*)
+│   ├── torch v2.9.1 (*)
+│   └── transformers v4.57.6 (*)
+├── transformers v4.57.6 (extra: tsfm) (*)
+├── allpairspy v2.5.1 (group: dev)
+└── openpyxl v3.1.5 (group: dev)
+    └── et-xmlfile v2.0.0
+(*) Package tree already displayed

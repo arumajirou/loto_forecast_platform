@@ -1,0 +1,23 @@
+	Command being timed: "bash -lc cd "$TARGET"; "$UV_EXE" venv "$TARGET/.venv-portability-bench" --python "$PYTHON_VERSION"; "$UV_EXE" pip install --python "$TARGET/.venv-portability-bench/bin/python" --no-deps /mnt/e/env/ts/.wsl-physical-ext4-bench-runtime-20260808T054531Z-6567/tmp/loto-wsl-target-6708/.benchmark-dist/loto_forecast_platform-3.2.0-py3-none-any.whl; "$TARGET/.venv-portability-bench/bin/python" -c "import loto; print(\"loto_version=\" + loto.__version__)""
+	User time (seconds): 0.07
+	System time (seconds): 0.18
+	Percent of CPU this job got: 159%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.16
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 60044
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 33301
+	Voluntary context switches: 2131
+	Involuntary context switches: 1
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 17344
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

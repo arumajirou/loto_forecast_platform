@@ -1,0 +1,111 @@
+{
+  "run_id": "platform-bench-wsl-20260808T054533Z",
+  "platform": "WSL",
+  "target_sha": "f13ebf6dd4b5495eb0bd47f27375c7e47c17ce60",
+  "target_pr": 183,
+  "benchmark_uv": "0.11.21",
+  "benchmark_python": "3.12.13",
+  "triton_selected": true,
+  "all_stages_pass": true,
+  "stages": [
+    {
+      "stage": "uv_bootstrap_exact",
+      "success": true,
+      "cpu_pct": 24.0,
+      "wall_seconds": 1.74,
+      "max_rss_kb": 16680,
+      "vol_ctx": 3775,
+      "invol_ctx": 8,
+      "fs_inputs": 0,
+      "fs_outputs": 167144
+    },
+    {
+      "stage": "uv_python_312_ready",
+      "success": true,
+      "cpu_pct": 62.0,
+      "wall_seconds": 1.7,
+      "max_rss_kb": 49768,
+      "vol_ctx": 21962,
+      "invol_ctx": 0,
+      "fs_inputs": 264,
+      "fs_outputs": 209136
+    },
+    {
+      "stage": "uv_lock_check",
+      "success": true,
+      "cpu_pct": 95.0,
+      "wall_seconds": 0.1,
+      "max_rss_kb": 43808,
+      "vol_ctx": 38,
+      "invol_ctx": 2,
+      "fs_inputs": 0,
+      "fs_outputs": 112
+    },
+    {
+      "stage": "wsl_resolve_first",
+      "success": true,
+      "cpu_pct": 75.0,
+      "wall_seconds": 0.02,
+      "max_rss_kb": 45708,
+      "vol_ctx": 37,
+      "invol_ctx": 0,
+      "fs_inputs": 0,
+      "fs_outputs": 136
+    },
+    {
+      "stage": "wsl_resolve_second",
+      "success": true,
+      "cpu_pct": 79.0,
+      "wall_seconds": 0.02,
+      "max_rss_kb": 45880,
+      "vol_ctx": 37,
+      "invol_ctx": 0,
+      "fs_inputs": 0,
+      "fs_outputs": 136
+    },
+    {
+      "stage": "wsl_dependency_tree",
+      "success": true,
+      "cpu_pct": 85.0,
+      "wall_seconds": 0.02,
+      "max_rss_kb": 43672,
+      "vol_ctx": 37,
+      "invol_ctx": 1,
+      "fs_inputs": 0,
+      "fs_outputs": 48
+    },
+    {
+      "stage": "python_compile_src",
+      "success": true,
+      "cpu_pct": 99.0,
+      "wall_seconds": 0.7,
+      "max_rss_kb": 22808,
+      "vol_ctx": 20,
+      "invol_ctx": 4,
+      "fs_inputs": 392,
+      "fs_outputs": 22808
+    },
+    {
+      "stage": "wheel_build",
+      "success": true,
+      "cpu_pct": 91.0,
+      "wall_seconds": 1.33,
+      "max_rss_kb": 52848,
+      "vol_ctx": 5428,
+      "invol_ctx": 3,
+      "fs_inputs": 8,
+      "fs_outputs": 59144
+    },
+    {
+      "stage": "wheel_install_import_312",
+      "success": true,
+      "cpu_pct": 159.0,
+      "wall_seconds": 0.16,
+      "max_rss_kb": 60044,
+      "vol_ctx": 2131,
+      "invol_ctx": 1,
+      "fs_inputs": 0,
+      "fs_outputs": 17344
+    }
+  ]
+}

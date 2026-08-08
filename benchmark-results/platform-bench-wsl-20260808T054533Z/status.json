@@ -1,0 +1,7 @@
+{
+  "run_id": "platform-bench-wsl-20260808T054533Z",
+  "overall_status": "PASS",
+  "phase": "complete",
+  "valid_for_performance_comparison": true,
+  "target_sha": "f13ebf6dd4b5495eb0bd47f27375c7e47c17ce60"
+}
