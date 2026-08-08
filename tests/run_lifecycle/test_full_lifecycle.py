@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import timedelta
 
 import pytest
-from conftest import make_command
 
 from loto.run_lifecycle import (
     RunCommandType,
@@ -12,6 +11,7 @@ from loto.run_lifecycle import (
     TransitionRejected,
     replay_events,
 )
+from tests.run_lifecycle.conftest import make_command
 
 
 def test_complete_lifecycle_replays_and_becomes_immutable(service, repository, clock) -> None:

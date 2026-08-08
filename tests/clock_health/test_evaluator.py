@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from conftest import OBSERVED_AT, observation_from_bytes
-
 from loto.clock_health import ClockHealthStatus, evaluate_clock_health
+from tests.clock_health.conftest import OBSERVED_AT, observation_from_bytes
 
 
 def _evaluate(policy, tracking: bytes, sources: bytes, **continuity_values):

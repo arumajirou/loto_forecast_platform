@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
-from conftest import OBSERVED_AT, continuity
 from pydantic import ValidationError
 
 from loto.clock_health import (
@@ -13,6 +12,7 @@ from loto.clock_health import (
     parse_chronyc_observation,
     verify_raw_observation,
 )
+from tests.clock_health.conftest import OBSERVED_AT, continuity
 
 
 class FakeRunner:
