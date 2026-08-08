@@ -6,17 +6,17 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: prospective-registry-source-recovery-${{ github.event.pull_request.number }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  recover-and-focused-verify:
+  verify-recovery:
     if: ${{ github.repository == 'arumajirou/loto_forecast_platform' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/prospective-registry-reconciliation-source-corruption-main-v2' }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 60
+    timeout-minutes: 180
 
     defaults:
       run:
@@ -26,10 +26,8 @@ jobs:
       UV_VERSION: "0.11.21"
       UV_PYTHON: "3.13"
       TARGET_PATH: "src/loto/auto_campaign/prospective_registry_reconciliation_expected.py"
-      CORRUPT_BLOB: "21750ca3c282de160da8825cb503013bf5da0974"
       REPAIR_BLOB: "e13b5d78c22e529a2b516e8da1ab1b205245dcf8"
       TEST_PATH: "tests/auto_campaign/test_prospective_registry_reconciliation.py"
-      STALE_TEST_BLOB: "f11167a4b27ff59b9e414c8898227b635e9a4c71"
       REPAIR_TEST_BLOB: "640c8e491ca1a75db23ae3f5a75dd764fd890070"
       REPAIR_BRANCH: "fix/prospective-registry-reconciliation-source-corruption-v1"
       REPAIR_COMMIT: "45ce9fa84b6b7a4a7aae347c45c784187a0b0984"
@@ -45,15 +43,15 @@ jobs:
           test "$RUNNER_OS" = "Linux"
           test "$RUNNER_ARCH" = "X64"
 
-      - name: Checkout trusted clean-main recovery branch
+      - name: Checkout trusted clean-main recovery branch without persistent credentials
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: fix/prospective-registry-reconciliation-source-corruption-main-v2
-          persist-credentials: true
+          persist-credentials: false
           fetch-depth: 1
           clean: true
 
-      - name: Fetch and verify exact PR 179 recovery commit
+      - name: Verify exact PR 179 recovery provenance and blobs
         run: |
           set -Eeuo pipefail
           git fetch --no-tags --depth=1 origin \
@@ -62,71 +60,20 @@ jobs:
           echo "fetched_repair_commit=$fetched_commit"
           test "$fetched_commit" = "$REPAIR_COMMIT"
 
-      - name: Recover exact PR 179 source blob when needed
-        run: |
-          set -Eeuo pipefail
-          current_blob="$(git hash-object "$TARGET_PATH")"
-          echo "current_source_blob=$current_blob"
+          source_blob="$(git hash-object "$TARGET_PATH")"
+          test_blob="$(git hash-object "$TEST_PATH")"
+          historical_source_blob="$(git rev-parse "$REPAIR_COMMIT:$TARGET_PATH")"
+          historical_test_blob="$(git rev-parse "$REPAIR_COMMIT:$TEST_PATH")"
 
-          if [[ "$current_blob" == "$REPAIR_BLOB" ]]; then
-            echo "source_recovery=ALREADY_APPLIED"
-            exit 0
-          fi
-          if [[ "$current_blob" != "$CORRUPT_BLOB" ]]; then
-            echo "unexpected current source blob: $current_blob" >&2
-            exit 1
-          fi
+          echo "source_blob=$source_blob"
+          echo "test_blob=$test_blob"
+          echo "historical_source_blob=$historical_source_blob"
+          echo "historical_test_blob=$historical_test_blob"
 
-          recovered="$RUNNER_TEMP/prospective_registry_reconciliation_expected.py"
-          git show "$REPAIR_COMMIT:$TARGET_PATH" > "$recovered"
-          recovered_blob="$(git hash-object "$recovered")"
-          echo "recovered_source_blob=$recovered_blob"
-          test "$recovered_blob" = "$REPAIR_BLOB"
-          cp -- "$recovered" "$TARGET_PATH"
-          test "$(git hash-object "$TARGET_PATH")" = "$REPAIR_BLOB"
-          test "$(git diff --name-only)" = "$TARGET_PATH"
-          git diff --check -- "$TARGET_PATH"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$TARGET_PATH"
-          test "$(git diff --cached --name-only)" = "$TARGET_PATH"
-          git diff --cached --check
-          git commit -m "fix(auto-campaign): recover corrupted reconciliation expected-state builder"
-          git push origin HEAD:fix/prospective-registry-reconciliation-source-corruption-main-v2
-
-      - name: Recover exact PR 179 regression fixture when needed
-        run: |
-          set -Eeuo pipefail
-          current_blob="$(git hash-object "$TEST_PATH")"
-          echo "current_test_blob=$current_blob"
-
-          if [[ "$current_blob" == "$REPAIR_TEST_BLOB" ]]; then
-            echo "test_recovery=ALREADY_APPLIED"
-            exit 0
-          fi
-          if [[ "$current_blob" != "$STALE_TEST_BLOB" ]]; then
-            echo "unexpected current test blob: $current_blob" >&2
-            exit 1
-          fi
-
-          recovered="$RUNNER_TEMP/test_prospective_registry_reconciliation.py"
-          git show "$REPAIR_COMMIT:$TEST_PATH" > "$recovered"
-          recovered_blob="$(git hash-object "$recovered")"
-          echo "recovered_test_blob=$recovered_blob"
-          test "$recovered_blob" = "$REPAIR_TEST_BLOB"
-          cp -- "$recovered" "$TEST_PATH"
-          test "$(git hash-object "$TEST_PATH")" = "$REPAIR_TEST_BLOB"
-          test "$(git diff --name-only)" = "$TEST_PATH"
-          git diff --check -- "$TEST_PATH"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$TEST_PATH"
-          test "$(git diff --cached --name-only)" = "$TEST_PATH"
-          git diff --cached --check
-          git commit -m "test(auto-campaign): restore valid reconciliation receipt regression"
-          git push origin HEAD:fix/prospective-registry-reconciliation-source-corruption-main-v2
+          test "$source_blob" = "$REPAIR_BLOB"
+          test "$test_blob" = "$REPAIR_TEST_BLOB"
+          test "$historical_source_blob" = "$REPAIR_BLOB"
+          test "$historical_test_blob" = "$REPAIR_TEST_BLOB"
 
       - name: Install exact uv without GitHub cache
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
@@ -143,9 +90,10 @@ jobs:
             "uv $UV_VERSION"*) ;;
             *) echo "unexpected uv version: $actual" >&2; exit 1 ;;
           esac
+
           uv python install "$UV_PYTHON"
-          ci_venv="$RUNNER_TEMP/loto-source-recovery-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          uv_cache="$RUNNER_TEMP/loto-source-recovery-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          ci_venv="$RUNNER_TEMP/loto-source-recovery-final-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          uv_cache="$RUNNER_TEMP/loto-source-recovery-final-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           case "$ci_venv" in
             "$RUNNER_TEMP"/*) ;;
             *) echo "unsafe CI venv path: $ci_venv" >&2; exit 1 ;;
@@ -180,12 +128,10 @@ jobs:
           uv pip install --quiet --python "$python" "ruff==$ruff_version"
           "$python" -m ruff --version
 
-      - name: Verify exact recovery blobs syntax and locked Ruff gates
+      - name: Verify recovered files syntax and locked Ruff gates
         run: |
           set -Eeuo pipefail
           python="$CI_VENV/bin/python"
-          test "$(git hash-object "$TARGET_PATH")" = "$REPAIR_BLOB"
-          test "$(git hash-object "$TEST_PATH")" = "$REPAIR_TEST_BLOB"
           "$python" -m py_compile "$TARGET_PATH" "$TEST_PATH"
           "$python" -m ruff format --check "$TARGET_PATH" "$TEST_PATH"
           "$python" -m ruff check "$TARGET_PATH" "$TEST_PATH"
@@ -201,6 +147,17 @@ jobs:
           uv pip install --quiet --python "$python" "ruff==$RUFF_VERSION"
           uv pip check --python "$python"
 
+      - name: Verify CPU-only PyTorch remains selected
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" - <<'PY'
+          import torch
+          assert torch.__version__.startswith("2.9.1"), torch.__version__
+          assert torch.version.cuda is None, torch.version.cuda
+          print(f"torch_version={torch.__version__}")
+          print("torch_cuda_runtime=NONE")
+          PY
+
       - name: Run repaired reconciliation focused tests
         run: |
           set -Eeuo pipefail
@@ -211,7 +168,12 @@ jobs:
           set -Eeuo pipefail
           "$CI_VENV/bin/python" -m compileall -q src/loto/auto_campaign
 
-      - name: Verify exact recovery scope and clean workspace
+      - name: Run full repository pytest
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m pytest -q
+
+      - name: Verify repository state
         if: ${{ always() }}
         run: |
           set -Eeuo pipefail
