@@ -31,6 +31,7 @@ on:
           - postgres
           - ray-core
           - ray-optimization
+          - routine
 
 permissions:
   contents: read
@@ -267,6 +268,207 @@ jobs:
           finally:
               ray.shutdown()
           PY
+
+      - name: Routine dependency environment
+        if: ${{ inputs.dependency_profile == 'routine' }}
+        run: |
+          set -Eeuo pipefail
+
+          uv sync \
+            --frozen \
+            --python "3.13" \
+            --extra api \
+            --extra dev \
+            --extra frameworks \
+            --extra mlflow
+
+          uv pip check --python .venv/bin/python
+
+          uv run \
+            --frozen \
+            --extra api \
+            --extra dev \
+            --extra frameworks \
+            --extra mlflow \
+            python - <<'PY'
+          from importlib.metadata import version
+
+          for package in (
+              "uvicorn",
+              "hypothesis",
+              "ruff",
+              "gluonts",
+              "mlflow",
+              "mlflow-skinny",
+              "mlflow-tracing",
+          ):
+              print(
+                  "ROUTINE_PACKAGE_VERSION="
+                  f"{package}={version(package)}"
+              )
+
+          print("ROUTINE_DEPENDENCY_ENVIRONMENT=PASS")
+          PY
+
+      - name: GluonTS real inference smoke
+        if: ${{ inputs.dependency_profile == 'routine' }}
+        run: |
+          set -Eeuo pipefail
+
+          uv run \
+            --frozen \
+            --extra api \
+            --extra dev \
+            --extra frameworks \
+            --extra mlflow \
+            python - <<'PY'
+          import numpy as np
+          import pandas as pd
+
+          from gluonts.model.seasonal_naive import (
+              SeasonalNaivePredictor,
+          )
+
+          item = {
+              "start": pd.Period("2025-01-01", freq="D"),
+              "target": np.asarray(
+                  [1, 2, 3, 4, 5, 6],
+                  dtype=np.float32,
+              ),
+          }
+
+          predictor = SeasonalNaivePredictor(
+              prediction_length=2,
+              season_length=2,
+          )
+
+          forecast = predictor.predict_item(item)
+          mean = np.asarray(forecast.mean, dtype=float)
+
+          print(f"GLUONTS_OUTPUT_SHAPE={mean.shape}")
+          print(f"GLUONTS_OUTPUT={mean.tolist()}")
+
+          assert mean.shape == (2,)
+          assert np.isfinite(mean).all()
+          assert np.allclose(mean, [5.0, 6.0])
+
+          print("GLUONTS_RUNTIME_SMOKE=PASS")
+          PY
+
+      - name: MLflow local tracking smoke
+        if: ${{ inputs.dependency_profile == 'routine' }}
+        run: |
+          set -Eeuo pipefail
+
+          uv run \
+            --frozen \
+            --extra api \
+            --extra dev \
+            --extra frameworks \
+            --extra mlflow \
+            python - <<'PY'
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+
+          from mlflow import MlflowClient
+
+          with TemporaryDirectory() as tmp:
+              root = Path(tmp).resolve()
+              db_path = root / "mlflow.db"
+              artifacts = root / "artifacts"
+
+              tracking_uri = f"sqlite:///{db_path}"
+              artifact_uri = artifacts.as_uri()
+
+              client = MlflowClient(
+                  tracking_uri=tracking_uri
+              )
+
+              experiment_id = client.create_experiment(
+                  "routine-dependency-smoke",
+                  artifact_location=artifact_uri,
+              )
+
+              run = client.create_run(
+                  experiment_id=experiment_id
+              )
+
+              client.log_metric(
+                  run.info.run_id,
+                  "dependency_smoke",
+                  1.0,
+              )
+
+              client.set_terminated(
+                  run.info.run_id,
+                  status="FINISHED",
+              )
+
+              runs = client.search_runs(
+                  experiment_ids=[experiment_id]
+              )
+
+              assert len(runs) == 1
+              assert (
+                  runs[0].data.metrics["dependency_smoke"]
+                  == 1.0
+              )
+              assert runs[0].info.status == "FINISHED"
+
+          print("MLFLOW_TRACKING_BACKEND=SQLITE")
+          print("MLFLOW_RUNTIME_SMOKE=PASS")
+          PY
+
+      - name: Uvicorn and Hypothesis runtime smoke
+        if: ${{ inputs.dependency_profile == 'routine' }}
+        run: |
+          set -Eeuo pipefail
+
+          uv run \
+            --frozen \
+            --extra api \
+            --extra dev \
+            --extra frameworks \
+            --extra mlflow \
+            python - <<'PY'
+          from fastapi import FastAPI
+          from hypothesis import (
+              given,
+              settings,
+              strategies as st,
+          )
+          import uvicorn
+
+          app = FastAPI()
+
+          config = uvicorn.Config(
+              app,
+              host="127.0.0.1",
+              port=0,
+              log_level="warning",
+          )
+
+          assert config.app is app
+
+          @settings(
+              max_examples=8,
+              derandomize=True,
+          )
+          @given(st.integers())
+          def identity(value: int) -> None:
+              assert value == value
+
+          identity()
+
+          print("UVICORN_CONFIG_SMOKE=PASS")
+          print("HYPOTHESIS_RUNTIME_SMOKE=PASS")
+          PY
+
+      - name: Routine dependency smoke result
+        if: ${{ inputs.dependency_profile == 'routine' }}
+        run: |
+          set -Eeuo pipefail
+          echo "ROUTINE_DEPENDENCY_SMOKE=PASS"
 
       - name: Verify tracked files stayed clean
         if: ${{ always() }}
