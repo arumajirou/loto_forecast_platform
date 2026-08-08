@@ -219,9 +219,7 @@ def _as_forecast_matrix(values: np.ndarray, hierarchy: Hierarchy, *, name: str) 
     if matrix.ndim != 2:
         raise ValueError(f"{name} must be one- or two-dimensional")
     if matrix.shape[0] != hierarchy.n_total:
-        raise ValueError(
-            f"{name} expected {hierarchy.n_total} series, got {matrix.shape[0]}"
-        )
+        raise ValueError(f"{name} expected {hierarchy.n_total} series, got {matrix.shape[0]}")
     if not np.isfinite(matrix).all():
         raise ValueError(f"{name} contains NaN or Inf")
     return matrix
@@ -262,9 +260,7 @@ def reconcile_with_hierarchicalforecast(
     if coherence_tolerance < 0:
         raise ValueError("coherence_tolerance must be non-negative")
     if (insample_actuals is None) != (insample_forecasts is None):
-        raise ValueError(
-            "insample_actuals and insample_forecasts must be supplied together"
-        )
+        raise ValueError("insample_actuals and insample_forecasts must be supplied together")
 
     actuals: np.ndarray | None = None
     fitted: np.ndarray | None = None
@@ -316,9 +312,7 @@ def reconcile_with_hierarchicalforecast(
             "error": f"{type(exc).__name__}: {exc}",
         }
     reconciler_class = getattr(hfm, method)
-    strict_only = bool(
-        getattr(reconciler_class, "is_strictly_hierarchical", False)
-    )
+    strict_only = bool(getattr(reconciler_class, "is_strictly_hierarchical", False))
     if strict_only and not hierarchy_is_strict:
         return {
             "status": "UNSUPPORTED_HIERARCHY",
