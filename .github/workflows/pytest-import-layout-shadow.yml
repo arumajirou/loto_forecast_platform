@@ -112,12 +112,12 @@ jobs:
           print(f'SHADOW_CHANGED_TEST_FILES={len(unique)}')
           for path in unique:
               print(f'SHADOW_CHANGED\t{path}')
-          assert len(replacements)==25,len(replacements)
-          assert len(unique)==25,len(unique)
+          assert len(replacements)==26,len(replacements)
+          assert len(unique)==26,len(unique)
           PY
 
           mapfile -t changed < <(git diff --name-only | sort)
-          test "${#changed[@]}" -eq 25
+          test "${#changed[@]}" -eq 26
           for path in "${changed[@]}"; do case "$path" in tests/*.py|tests/**/*.py) ;; *) echo "unexpected path: $path"; exit 1 ;; esac; done
           git diff --check
           "$python" -m ruff check "${changed[@]}"
