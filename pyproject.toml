@@ -38,6 +38,10 @@ dev = [
   # _build_search_algorithm falls back to "library_default" and the suite verdict silently
   # changes with the environment. optuna is therefore a DEV dependency, not just a `full` one.
   "optuna>=4.0",
+  # Telemetry tests import the SDK directly and exercise the OTLP exporters.
+  # Keep the standard dev/test environment hermetic instead of relying on the `full` extra.
+  "opentelemetry-sdk>=1.30",
+  "opentelemetry-exporter-otlp>=1.30",
 ]
 postgres = ["psycopg[binary]>=3.2", "sqlalchemy>=2.0"]
 full = ["fastapi>=0.115,<0.120", "starlette<0.49", "httpx>=0.27,<1", "uvicorn>=0.34", "mlflow>=3.0", "psycopg[binary]>=3.2", "sqlalchemy>=2.0", "pyarrow>=18", "psutil>=6", "lightgbm>=4.5", "xgboost>=2.1", "catboost>=1.2", "statsforecast>=2.0", "mlforecast>=1.0", "hierarchicalforecast>=1.0", "neuralforecast>=3.0", "optuna>=4.0", "ray[tune]>=2.40", "opentelemetry-sdk>=1.30", "opentelemetry-exporter-otlp>=1.30", "structlog>=25", "plotly>=6"]
