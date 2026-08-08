@@ -276,7 +276,7 @@ def execute_bounded_remediation(
     if verification["status"] != "PASS":
         raise ValueError(f"triage evidence verification failed: {verification['failures']}")
     classification = _load_object(triage_dir / "FAILURE_CLASSIFICATION.json")
-    remediation = _load_object(triage_dir / "REMEDIATION_PLAN.json")
+    _load_object(triage_dir / "REMEDIATION_PLAN.json")
     source_dir = _resolve_source_dir(triage_dir, classification, source_end_to_end_dir)
     source_classification = str(classification.get("primary_classification"))
 
