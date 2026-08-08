@@ -16,10 +16,17 @@ def evaluate_predictions(actual: np.ndarray, predicted: np.ndarray) -> dict[str,
     error = predicted_values - actual_values
     absolute_error = np.abs(error)
     hit_matrix = absolute_error <= 1.0
+    hit_at_plus_minus_1 = float(hit_matrix.mean())
+    all_position_hit_at_plus_minus_1 = float(hit_matrix.all(axis=1).mean())
+    position_hit_at_plus_minus_1 = hit_matrix.mean(axis=0).astype(float).tolist()
     return {
-        "hit_at_plus_minus_1": float(hit_matrix.mean()),
-        "all_position_hit_at_plus_minus_1": float(hit_matrix.all(axis=1).mean()),
-        "position_hit_at_plus_minus_1": hit_matrix.mean(axis=0).astype(float).tolist(),
+        "hit_at_plus_minus_1": hit_at_plus_minus_1,
+        "all_position_hit_at_plus_minus_1": all_position_hit_at_plus_minus_1,
+        "position_hit_at_plus_minus_1": position_hit_at_plus_minus_1,
+        # Compatibility aliases for the pre-conflict PR #56 naming contract.
+        "hit_at_1": hit_at_plus_minus_1,
+        "all_position_hit_at_1": all_position_hit_at_plus_minus_1,
+        "position_hit_at_1": position_hit_at_plus_minus_1,
         "mae": float(absolute_error.mean()),
         "mse": float(np.square(error).mean()),
         "rmse": float(np.sqrt(np.square(error).mean())),
