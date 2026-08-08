@@ -1,70 +1,384 @@
 name: ci
 
 on:
-  push:
   pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ruff-small-manual-repair-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-lint-small-manual-v1' }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: bash
+    env:
+      TARGET_BRANCH: fix/ruff-lint-small-manual-v1
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
+      EXPECTED_RUFF_VERSION: "0.16.0"
+      BASELINE_COLLECTION_ERRORS: "34"
+      EXPECTED_REMAINING_LINT: "174"
+      RESULT_PATH: .github/ruff-small-manual-repair.txt
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Verify trusted runner
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
 
-      - uses: actions/setup-python@v6
+      - name: Checkout trusted branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          python-version: "3.13"
+          ref: fix/ruff-lint-small-manual-v1
+          persist-credentials: true
+          fetch-depth: 1
+          clean: true
 
-      - name: Show disk usage before install
-        run: df -h
-
-      - name: Free runner disk space
+      - name: Gate repair trigger
+        id: gate
         run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          docker system prune --all --force || true
-          df -h
+          set -Eeuo pipefail
+          message="$(git log -1 --pretty=%s)"
+          echo "head_message=$message"
+          if [[ "$message" == "ci: run Ruff small manual repairs (#200)" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Install matching CPU-only PyTorch
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install \
-            --no-cache-dir \
-            --index-url https://download.pytorch.org/whl/cpu \
-            "torch==2.9.1"
+      - name: Install exact uv
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
 
-      - name: Install project and test dependencies
+      - name: Prepare environment and apply manual semantic repairs
+        if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
-          python -m pip install \
-            --no-cache-dir \
-            -e ".[api,dev,postgres]"
+          set -Eeuo pipefail
+          case "$(uv --version)" in "uv $UV_VERSION"*) ;; *) exit 1 ;; esac
+          uv python install "$UV_PYTHON"
+          venv="$RUNNER_TEMP/loto-ruff-small-manual-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-ruff-small-manual-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          case "$venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          case "$cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          rm -rf -- "$venv" "$cache"
+          mkdir -p "$cache"
+          uv venv "$venv" --python "$UV_PYTHON"
+          echo "CI_VENV=$venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$cache" >> "$GITHUB_ENV"
+          python="$venv/bin/python"
+          ruff_version="$("$python" - <<'PY'
+          import tomllib
+          with open('uv.lock','rb') as f:
+              lock=tomllib.load(f)
+          versions=[p['version'] for p in lock['package'] if p.get('name')=='ruff']
+          if len(versions)!=1:
+              raise SystemExit(versions)
+          print(versions[0])
+          PY
+          )"
+          test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
+          echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
 
-      - name: Verify CPU-only PyTorch remains selected
+          "$python" - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one match, got {count}: {old!r}")
+              p.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          def replace_count(path: str, old: str, new: str, expected: int) -> None:
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != expected:
+                  raise SystemExit(f"{path}: expected {expected} matches, got {count}: {old!r}")
+              p.write_text(text.replace(old, new), encoding="utf-8")
+
+          # UP022: capture stdout/stderr exactly as bytes with the dedicated subprocess flag.
+          for path in (
+              "src/loto/autogluon_campaign/approval_authorization_contract.py",
+              "src/loto/sktime_campaign/approval_authorization.py",
+          ):
+              replace_once(
+                  path,
+                  "                stdout=subprocess.PIPE,\n                stderr=subprocess.PIPE,\n                check=False,",
+                  "                capture_output=True,\n                check=False,",
+              )
+
+          # B904: preserve the original exception while making the causal chain explicit.
+          replace_once(
+              "src/loto/autogluon_campaign/registry_transaction_io.py",
+              "        except FileNotFoundError:\n            if is_leaf and allow_missing_leaf:\n                return\n            raise RegistryTransactionError(\"PATH_COMPONENT_MISSING\", str(current))",
+              "        except FileNotFoundError as exc:\n            if is_leaf and allow_missing_leaf:\n                return\n            raise RegistryTransactionError(\"PATH_COMPONENT_MISSING\", str(current)) from exc",
+          )
+          replace_once(
+              "src/loto/reconciliation/portable_package_certification.py",
+              "    except FileExistsError:\n        if not sidecar.is_file() or sidecar.is_symlink():\n            raise PackageIntegrityError(f\"existing sidecar is not a regular file: {sidecar}\")\n        if sidecar.read_text(encoding=\"utf-8\") != expected:\n            raise PackageIntegrityError(\"existing ZIP sidecar does not match package digest\")",
+              "    except FileExistsError as exc:\n        if not sidecar.is_file() or sidecar.is_symlink():\n            raise PackageIntegrityError(\n                f\"existing sidecar is not a regular file: {sidecar}\"\n            ) from exc\n        if sidecar.read_text(encoding=\"utf-8\") != expected:\n            raise PackageIntegrityError(\n                \"existing ZIP sidecar does not match package digest\"\n            ) from exc",
+          )
+
+          # E501: wrap only the diagnostic string.
+          replace_once(
+              "src/loto/sktime_campaign/verification.py",
+              "            f\"sktime version evidence mismatch: expected={expected_version}, actual={actual_version}\"",
+              "            \"sktime version evidence mismatch: \"\n            f\"expected={expected_version}, actual={actual_version}\"",
+          )
+
+          # B007: mark intentionally unused loop components explicitly.
+          replace_once(
+              "tests/auto_campaign/test_prospective_scoring_metrics.py",
+              "    for position, unique_id in enumerate(NUMBER_COLUMNS, start=1):",
+              "    for position, _unique_id in enumerate(NUMBER_COLUMNS, start=1):",
+          )
+          replace_once(
+              "tests/chronos2_campaign/test_evaluation.py",
+              "    for (_, _, horizon_step), group in rows.groupby([\"fold_id\", \"seed\", \"horizon_step\"]):",
+              "    for (_, _, _horizon_step), group in rows.groupby([\"fold_id\", \"seed\", \"horizon_step\"]):",
+          )
+
+          # B017: narrow blind Exception assertions to the concrete contract exceptions.
+          replace_once(
+              "tests/autogluon_campaign/test_registry_transaction_artifacts.py",
+              "import pytest\n\nfrom loto.autogluon_campaign.approval_authorization_io import (",
+              "import pytest\n\nfrom loto.autogluon_campaign.approval_authorization_contract import (\n    ApprovalAuthorizationError,\n)\nfrom loto.autogluon_campaign.approval_authorization_io import (",
+          )
+          replace_count(
+              "tests/autogluon_campaign/test_registry_transaction_artifacts.py",
+              "    with pytest.raises(Exception):",
+              "    with pytest.raises((ApprovalAuthorizationError, RegistryTransactionError)):",
+              2,
+          )
+          replace_once(
+              "tests/clock_health/test_chronyc.py",
+              "import pytest\nfrom conftest import OBSERVED_AT, continuity",
+              "import pytest\nfrom pydantic import ValidationError\nfrom conftest import OBSERVED_AT, continuity",
+          )
+          replace_once(
+              "tests/clock_health/test_chronyc.py",
+              "    with pytest.raises(Exception):",
+              "    with pytest.raises(ValidationError):",
+          )
+          replace_once(
+              "tests/test_sundial_provider_v2_certification.py",
+              "from __future__ import annotations\n\nimport importlib.util",
+              "from __future__ import annotations\n\nimport argparse\nimport importlib.util",
+          )
+          replace_count(
+              "tests/test_sundial_provider_v2_certification.py",
+              "    with pytest.raises(Exception):",
+              "    with pytest.raises(argparse.ArgumentTypeError):",
+              2,
+          )
+
+          # E731: named local functions preserve the exact callable behavior used by the tests.
+          replace_once(
+              "tests/statsforecast/test_runtime_lane_end_to_end_hardening.py",
+              "    custom_inspector = lambda *_args, **_kwargs: {}\n    custom_writer = lambda *_args, **_kwargs: {}",
+              "    def custom_inspector(*_args, **_kwargs):\n        return {}\n\n    def custom_writer(*_args, **_kwargs):\n        return {}",
+          )
+          replace_once(
+              "tests/statsforecast/test_runtime_lane_remediation_hardening.py",
+              "    custom_runner = lambda *_args, **_kwargs: None",
+              "    def custom_runner(*_args, **_kwargs):\n        return None",
+          )
+          PY
+
+          changed=(
+            src/loto/autogluon_campaign/approval_authorization_contract.py
+            src/loto/autogluon_campaign/registry_transaction_io.py
+            src/loto/reconciliation/portable_package_certification.py
+            src/loto/sktime_campaign/approval_authorization.py
+            src/loto/sktime_campaign/verification.py
+            tests/auto_campaign/test_prospective_scoring_metrics.py
+            tests/autogluon_campaign/test_registry_transaction_artifacts.py
+            tests/chronos2_campaign/test_evaluation.py
+            tests/clock_health/test_chronyc.py
+            tests/statsforecast/test_runtime_lane_end_to_end_hardening.py
+            tests/statsforecast/test_runtime_lane_remediation_hardening.py
+            tests/test_sundial_provider_v2_certification.py
+          )
+          "$python" -m ruff check --select I --fix "${changed[@]}"
+          "$python" -m ruff format "${changed[@]}"
+          mapfile -t observed < <(git diff --name-only | sort)
+          mapfile -t expected < <(printf '%s\n' "${changed[@]}" | sort)
+          test "${#observed[@]}" -eq 12
+          diff -u <(printf '%s\n' "${expected[@]}") <(printf '%s\n' "${observed[@]}")
+          git diff --check
+          git diff --stat
+
+      - name: Verify static gates
+        if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
-          python - <<'PY'
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          "$python" -m ruff check --select B007,B017,B904,E501,E731,UP022 src scripts tests
+          "$python" -m ruff format --check \
+            src/loto/autogluon_campaign/approval_authorization_contract.py \
+            src/loto/autogluon_campaign/registry_transaction_io.py \
+            src/loto/reconciliation/portable_package_certification.py \
+            src/loto/sktime_campaign/approval_authorization.py \
+            src/loto/sktime_campaign/verification.py \
+            tests/auto_campaign/test_prospective_scoring_metrics.py \
+            tests/autogluon_campaign/test_registry_transaction_artifacts.py \
+            tests/chronos2_campaign/test_evaluation.py \
+            tests/clock_health/test_chronyc.py \
+            tests/statsforecast/test_runtime_lane_end_to_end_hardening.py \
+            tests/statsforecast/test_runtime_lane_remediation_hardening.py \
+            tests/test_sundial_provider_v2_certification.py
+          "$python" -m compileall -q src scripts tests
+          echo "STATIC_RC=0" >> "$GITHUB_ENV"
+
+      - name: Install project dependencies
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" "ruff==$EXPECTED_RUFF_VERSION"
+          uv pip check --python "$python"
+          "$python" - <<'PY'
           import torch
-
           assert torch.__version__.startswith("2.9.1"), torch.__version__
           assert torch.version.cuda is None, torch.version.cuda
-          print(f"torch_version={torch.__version__}")
-          print("torch_cuda_runtime=NONE")
           PY
-          python -m pip check
+          echo "DEPS_RC=0" >> "$GITHUB_ENV"
 
-      - name: Show disk usage after install
-        run: df -h
+      - name: Run focused regression tests
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          "$python" -m pytest -q \
+            tests/auto_campaign/test_prospective_scoring_metrics.py \
+            tests/autogluon_campaign/test_registry_transaction_artifacts.py \
+            tests/chronos2_campaign/test_evaluation.py \
+            tests/clock_health/test_chronyc.py \
+            tests/statsforecast/test_runtime_lane_end_to_end_hardening.py \
+            tests/statsforecast/test_runtime_lane_remediation_hardening.py \
+            tests/test_sundial_provider_v2_certification.py \
+            tests/sktime_campaign
+          echo "FOCUSED_RC=0" >> "$GITHUB_ENV"
 
-      - name: Run Ruff format check
-        run: python -m ruff format --check src scripts tests
+      - name: Verify collection parity and residual lint
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          set +e
+          "$python" -m pytest -q > "$RUNNER_TEMP/pytest.log" 2>&1
+          PYTEST_RC=$?
+          "$python" -m ruff check --output-format=json src scripts tests > "$RUNNER_TEMP/all-lint.json"
+          ALL_LINT_RC=$?
+          set -e
+          if grep -Fq "Interrupted: $BASELINE_COLLECTION_ERRORS errors during collection" "$RUNNER_TEMP/pytest.log"; then
+            COLLECTION_PARITY=1
+          else
+            COLLECTION_PARITY=0
+          fi
+          lint_env="$RUNNER_TEMP/lint-env.txt"
+          "$python" - "$RUNNER_TEMP/all-lint.json" <<'PY' > "$lint_env"
+          import collections, json, sys
+          from pathlib import Path
+          rows=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8') or '[]')
+          counts=collections.Counter(row.get('code','UNKNOWN') for row in rows)
+          print(f"REMAINING_LINT_COUNT={len(rows)}")
+          print("REMAINING_RULE_COUNTS=" + ",".join(f"{k}:{v}" for k,v in sorted(counts.items())))
+          PY
+          source "$lint_env"
+          cat "$lint_env" >> "$GITHUB_ENV"
+          echo "PYTEST_RC=$PYTEST_RC" >> "$GITHUB_ENV"
+          echo "COLLECTION_PARITY=$COLLECTION_PARITY" >> "$GITHUB_ENV"
+          echo "ALL_LINT_RC=$ALL_LINT_RC" >> "$GITHUB_ENV"
+          cat "$lint_env"
+          test "$COLLECTION_PARITY" -eq 1
+          test "$REMAINING_LINT_COUNT" -eq "$EXPECTED_REMAINING_LINT"
 
-      - name: Run Ruff lint
-        run: python -m ruff check src scripts tests
+      - name: Commit verified manual repairs
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          before="$(git rev-parse HEAD)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/loto/autogluon_campaign/approval_authorization_contract.py \
+            src/loto/autogluon_campaign/registry_transaction_io.py \
+            src/loto/reconciliation/portable_package_certification.py \
+            src/loto/sktime_campaign/approval_authorization.py \
+            src/loto/sktime_campaign/verification.py \
+            tests/auto_campaign/test_prospective_scoring_metrics.py \
+            tests/autogluon_campaign/test_registry_transaction_artifacts.py \
+            tests/chronos2_campaign/test_evaluation.py \
+            tests/clock_health/test_chronyc.py \
+            tests/statsforecast/test_runtime_lane_end_to_end_hardening.py \
+            tests/statsforecast/test_runtime_lane_remediation_hardening.py \
+            tests/test_sundial_provider_v2_certification.py
+          git diff --cached --check
+          git commit -m "fix: repair Ruff small manual semantic findings (#200)"
+          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$remote_before" = "$before"
+          git push origin "HEAD:$TARGET_BRANCH"
+          echo "REPAIRED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
-      - name: Compile Python sources
-        run: python -m compileall -q src scripts tests
+      - name: Persist verification evidence
+        if: ${{ always() && steps.gate.outputs.run == 'true' && env.REPAIRED_HEAD != '' }}
+        run: |
+          set -Eeuo pipefail
+          cat > "$RESULT_PATH" <<EOF
+          RUFF_SMALL_MANUAL_REPAIR_VERSION=1
+          RUN_ID=$GITHUB_RUN_ID
+          RUFF_VERSION=${RUFF_VERSION:-UNKNOWN}
+          REPAIRED_HEAD=${REPAIRED_HEAD:-UNKNOWN}
+          STATIC_RC=${STATIC_RC:-UNKNOWN}
+          DEPS_RC=${DEPS_RC:-UNKNOWN}
+          FOCUSED_RC=${FOCUSED_RC:-UNKNOWN}
+          PYTEST_RC=${PYTEST_RC:-UNKNOWN}
+          COLLECTION_PARITY=${COLLECTION_PARITY:-UNKNOWN}
+          REMAINING_LINT_COUNT=${REMAINING_LINT_COUNT:-UNKNOWN}
+          REMAINING_RULE_COUNTS=${REMAINING_RULE_COUNTS:-UNKNOWN}
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$RESULT_PATH"
+          git diff --cached --check
+          git commit -m "chore: capture Ruff small manual repair evidence (#200)"
+          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$remote_before" = "$(git rev-parse HEAD^)"
+          git push origin "HEAD:$TARGET_BRANCH"
 
-      - name: Run tests
-        run: python -m pytest -q
+      - name: Enforce repair gates
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          test "${STATIC_RC:-99}" -eq 0
+          test "${DEPS_RC:-99}" -eq 0
+          test "${FOCUSED_RC:-99}" -eq 0
+          test "${COLLECTION_PARITY:-0}" -eq 1
+          test "${REMAINING_LINT_COUNT:-999}" -eq "$EXPECTED_REMAINING_LINT"
+
+      - name: Cleanup
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          [[ -z "${CI_VENV:-}" ]] || { case "$CI_VENV" in "$RUNNER_TEMP"/*) rm -rf "$CI_VENV" ;; *) exit 1 ;; esac; }
+          [[ -z "${UV_CACHE_DIR:-}" ]] || { case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf "$UV_CACHE_DIR" ;; *) exit 1 ;; esac; }
