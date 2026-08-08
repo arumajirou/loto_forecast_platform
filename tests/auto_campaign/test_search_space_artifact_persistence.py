@@ -9,7 +9,7 @@ from loto.auto_campaign.model_factory import (
     _search_space_evidence_root,
     _search_space_profile,
 )
-from loto.models.neuralforecast_search_policy import SearchPolicyDecision
+from loto.models.neuralforecast_search_policy import resolve_search_policy
 from loto.models.neuralforecast_search_space import SearchSpaceCompleteness
 from loto.models.neuralforecast_search_space_artifacts import verify_search_space_artifacts
 
@@ -60,7 +60,13 @@ def test_constructor_artifact_keeps_policy_and_profile_evidence() -> None:
         config_value=lambda trial: {"x": trial.suggest_int("x", 1, 3)},
         fixed_values=None,
     )
-    policy = SearchPolicyDecision(model_name="AutoTFT")
+    policy = resolve_search_policy(
+        backend="optuna",
+        strategy="random",
+        search_seed=1,
+        num_samples=1,
+        model_name="AutoTFT",
+    )
     artifact = _artifact_kwargs(
         {"h": 1},
         [{"argument": "h", "status": "ACCEPTED"}],
