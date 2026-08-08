@@ -1,0 +1,1 @@
+One-shot trigger for the verified AutoCampaign search-integration publisher. Temporary; remove before merge.
