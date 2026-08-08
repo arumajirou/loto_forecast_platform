@@ -154,7 +154,7 @@ def run_calibration_evaluation(
                                 sort_keys=True,
                             ),
                             "fit_sha256": canonical_sha256(fit_rows.to_dict(orient="records")),
-                            "conformal_sha256": canonical_shaa256(
+                            "conformal_sha256": canonical_sha256(
                                 conformal_rows.to_dict(orient="records")
                             ),
                             "target_fold_excluded": target_fold_id

@@ -13,6 +13,9 @@ _RUNTIME_LOCK = RLock()
 _RUNTIME_CLASSES: tuple[type[Any], type[Any]] | None = None
 _REQUIRED_MODULES = ("neuralforecast", "optuna", "ray", "torch")
 
+SegRNN: type[Any]
+AutoSegRNN: type[Any]
+
 
 class RuntimeDependencyError(RuntimeError):
     """Raised when an executable AutoSegRNN dependency is unavailable."""

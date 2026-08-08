@@ -12,6 +12,7 @@ from loto.orchestration.pipeline_ledger import (
 )
 from loto.orchestration.pipeline_staged_support import (
     EXPECTED_PIPELINE_BLOB_SHA,
+    Clock,
     PipelineComponents,
     RecorderFactory,
     StagedPipelineBlocked,
