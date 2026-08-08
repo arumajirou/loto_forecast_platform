@@ -44,7 +44,7 @@ def validate_dataset(payload: DatasetPayload) -> tuple[np.ndarray, tuple[int, ..
         raise ValueError("draw_no must already be strictly chronological")
     if len(set(draw_numbers)) != len(draw_numbers):
         raise ValueError("draw_no values must be unique")
-    if any(right - left != 1 for left, right in zip(draw_numbers, draw_numbers[1:])):
+    if any(right - left != 1 for left, right in zip(draw_numbers, draw_numbers[1:], strict=False)):
         raise ValueError("draw_no values must be gap-free")
 
     values = np.asarray([row.values for row in payload.rows], dtype=np.int64)

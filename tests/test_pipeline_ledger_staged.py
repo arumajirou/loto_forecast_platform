@@ -91,7 +91,7 @@ def test_recorder_valid_order_and_monotonic_time(tmp_path: Path) -> None:
         "LOCK_PREDICTION",
     ]
     times = [event.occurred_at for event in recorder.events]
-    assert all(left < right for left, right in zip(times, times[1:]))
+    assert all(left < right for left, right in zip(times, times[1:], strict=False))
 
 
 def test_recorder_rejects_actual_before_prediction(tmp_path: Path) -> None:

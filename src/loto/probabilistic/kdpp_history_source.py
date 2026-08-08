@@ -127,7 +127,9 @@ def parse_game_history(
         parsed = [_strict_int(row_values[column], column) for column in expected_columns]
         if any(value < minimum or value > maximum for value in parsed):
             raise ValueError("history value outside game domain")
-        if increasing and any(right <= left for left, right in zip(parsed, parsed[1:])):
+        if increasing and any(
+            right <= left for left, right in zip(parsed, parsed[1:], strict=False)
+        ):
             raise ValueError("lottery positions must be strictly increasing")
         values.append(parsed)
     return (

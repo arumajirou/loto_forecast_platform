@@ -253,7 +253,9 @@ def _validate_quantiles(quantiles: Sequence[float]) -> None:
         raise ValueError("quantiles must lie strictly between zero and one")
     if 0.5 not in values or values[len(values) // 2] != 0.5:
         raise ValueError("quantiles must be centered on the median")
-    for lower, upper in zip(values[: len(values) // 2], reversed(values[len(values) // 2 + 1 :])):
+    for lower, upper in zip(
+        values[: len(values) // 2], reversed(values[len(values) // 2 + 1 :]), strict=True
+    ):
         if not np.isclose(lower + upper, 1.0, atol=1e-12, rtol=0.0):
             raise ValueError("quantiles must define symmetric coverage pairs")
 

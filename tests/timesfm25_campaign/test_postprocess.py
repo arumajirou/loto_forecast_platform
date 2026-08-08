@@ -14,5 +14,5 @@ def test_constrained_projection_is_integer_unique_and_increasing() -> None:
     )
     result = constrained_integer_projection([8.2, 8.1, 8.0, 7.9, 7.8, 40.0, -5.0], geometry)
     assert all(isinstance(value, int) for value in result)
-    assert all(left < right for left, right in zip(result, result[1:]))
+    assert all(left < right for left, right in zip(result, result[1:], strict=False))
     assert result[0] >= 1 and result[-1] <= 37
