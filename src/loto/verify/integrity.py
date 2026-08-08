@@ -26,6 +26,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
+from loto.version import __version__
+
 __all__ = [
     "MANIFEST_NAME",
     "DEFAULT_EXCLUDES",
@@ -177,7 +179,7 @@ class IntegrityReport:
 def generate_manifest(
     root: str | Path,
     *,
-    release: str = "3.0.0",
+    release: str | None = None,
     excludes: tuple[str, ...] = DEFAULT_EXCLUDES,
     write: bool = True,
 ) -> dict[str, object]:
@@ -185,6 +187,7 @@ def generate_manifest(
     root_path = Path(root).resolve()
     if not root_path.is_dir():
         raise NotADirectoryError(f"{root_path} is not a directory")
+    resolved_release = __version__ if release is None else release
     files = iter_tracked_files(root_path, excludes)
     entries: dict[str, dict[str, object]] = {}
     total = 0
@@ -194,7 +197,7 @@ def generate_manifest(
         total += size
     payload: dict[str, object] = {
         "manifest_schema": MANIFEST_SCHEMA,
-        "release": release,
+        "release": resolved_release,
         "generated_at": datetime.now(UTC).isoformat(),
         "root_name": root_path.name,
         "excludes": list(excludes),
@@ -274,7 +277,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     gen = sub.add_parser("generate", help="write INTEGRITY.json")
     gen.add_argument("root", nargs="?", default=".")
-    gen.add_argument("--release", default="3.0.0")
+    gen.add_argument("--release", default=__version__)
     chk = sub.add_parser("check", help="verify a tree against INTEGRITY.json")
     chk.add_argument("root", nargs="?", default=".")
     chk.add_argument("--manifest", default=None)

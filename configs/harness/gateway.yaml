@@ -13,9 +13,10 @@ context:
   emergency_threshold: 0.85
   uncertified_native_cap_tokens: 32768
 security:
+  # Relative roots are resolved against this configuration file's directory.
+  # ../.. therefore means the repository root on Windows, Linux, and macOS.
   allowed_roots:
-  - /mnt/e/env/ts/loto_forecast_platform
-  - /mnt/e/env/ts/loto_forecast_platform-harness
+  - ../..
   command_timeout_seconds: 300
   max_request_bytes: 16777216
   max_context_items: 128
