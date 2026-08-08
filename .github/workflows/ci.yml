@@ -5,20 +5,28 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: ruff-state-default-safety-repair-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
 
 jobs:
   test:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-lint-state-default-safety-v1' }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 30
+    timeout-minutes: 180
     defaults:
       run:
         shell: bash
     env:
+      TARGET_BRANCH: fix/ruff-lint-state-default-safety-v1
       UV_VERSION: "0.11.21"
       UV_PYTHON: "3.13"
       EXPECTED_RUFF_VERSION: "0.16.0"
+      BASELINE_COLLECTION_ERRORS: "34"
+      EXPECTED_REMAINING_LINT: "194"
+      RESULT_PATH: .github/ruff-state-default-safety-repair.txt
 
     steps:
       - name: Verify runner
@@ -32,16 +40,17 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: fix/ruff-lint-state-default-safety-v1
-          persist-credentials: false
+          persist-credentials: true
           fetch-depth: 1
           clean: true
 
-      - name: Gate preview commit
+      - name: Gate repair commit
         id: gate
         run: |
           set -Eeuo pipefail
           message="$(git log -1 --pretty=%s)"
-          if [[ "$message" == "ci: preview import-order normalization for state/default repairs (#200)" ]]; then
+          echo "head_message=$message"
+          if [[ "$message" == "ci: finalize verified state/default safety repairs (#200)" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -54,16 +63,23 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
 
-      - name: Preview I001 diff after four repairs
+      - name: Prepare isolated environment and deterministic repairs
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
+          actual="$(uv --version)"
+          case "$actual" in "uv $UV_VERSION"*) ;; *) exit 1 ;; esac
           uv python install "$UV_PYTHON"
-          venv="$RUNNER_TEMP/loto-ruff-i001-preview-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          venv="$RUNNER_TEMP/loto-ruff-state-repair-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-ruff-state-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           case "$venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          case "$cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          rm -rf -- "$venv" "$cache"
+          mkdir -p "$cache"
           uv venv "$venv" --python "$UV_PYTHON"
-          python="$venv/bin/python"
           echo "CI_VENV=$venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$cache" >> "$GITHUB_ENV"
+          python="$venv/bin/python"
           ruff_version="$("$python" - <<'PY'
           import tomllib
           with open('uv.lock','rb') as f:
@@ -75,31 +91,214 @@ jobs:
           PY
           )"
           test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
-          uv pip install --quiet --python "$python" "ruff==$ruff_version"
+          echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
           "$python" - <<'PY'
           from pathlib import Path
 
           def replace_once(path: str, old: str, new: str) -> None:
-              p=Path(path); text=p.read_text(encoding='utf-8')
-              if text.count(old) != 1: raise SystemExit(f'{path}: match count != 1')
-              p.write_text(text.replace(old,new,1),encoding='utf-8')
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one match, got {count}: {old!r}")
+              p.write_text(text.replace(old, new, 1), encoding="utf-8")
 
-          replace_once('src/loto/autogluon_campaign/holdout_prospective_score.py','from loto.autogluon_campaign.holdout_prospective_lock import verify_prediction_lock\n\n\ndef _aggregate','from loto.autogluon_campaign.holdout_prospective_lock import verify_prediction_lock\n\n\n_DEFAULT_DRIFT_POLICY = DriftPolicy()\n\n\ndef _aggregate')
-          replace_once('src/loto/autogluon_campaign/holdout_prospective_score.py','    drift_policy: DriftPolicy = DriftPolicy(),','    drift_policy: DriftPolicy = _DEFAULT_DRIFT_POLICY,')
-          replace_once('src/loto/autogluon_campaign/promotion_eligibility.py','from loto.autogluon_campaign.promotion_eligibility_rules import (\n    evaluate_promotion_rules,\n)\n\n\n@dataclass','from loto.autogluon_campaign.promotion_eligibility_rules import (\n    evaluate_promotion_rules,\n)\n\n\n_DEFAULT_PROMOTION_POLICY = PromotionPolicy()\n\n\n@dataclass')
-          replace_once('src/loto/autogluon_campaign/promotion_eligibility.py','    policy: PromotionPolicy = PromotionPolicy(),','    policy: PromotionPolicy = _DEFAULT_PROMOTION_POLICY,')
-          replace_once('src/loto/telemetry/context.py','_CURRENT: ContextVar[TelemetryContext] = ContextVar(\n    "loto_telemetry_context", default=TelemetryContext()\n)','_EMPTY_TELEMETRY_CONTEXT = TelemetryContext()\n_CURRENT: ContextVar[TelemetryContext] = ContextVar(\n    "loto_telemetry_context", default=_EMPTY_TELEMETRY_CONTEXT\n)')
-          replace_once('src/loto/statsforecast/runtime_lane_remediation.py','    remediation = _load_object(triage_dir / "REMEDIATION_PLAN.json")','    _load_object(triage_dir / "REMEDIATION_PLAN.json")')
+          replace_once(
+              "src/loto/autogluon_campaign/holdout_prospective_score.py",
+              "from loto.autogluon_campaign.holdout_prospective_lock import verify_prediction_lock\n\n\ndef _aggregate",
+              "from loto.autogluon_campaign.holdout_prospective_lock import verify_prediction_lock\n\n_DEFAULT_DRIFT_POLICY = DriftPolicy()\n\n\ndef _aggregate",
+          )
+          replace_once(
+              "src/loto/autogluon_campaign/holdout_prospective_score.py",
+              "    drift_policy: DriftPolicy = DriftPolicy(),",
+              "    drift_policy: DriftPolicy = _DEFAULT_DRIFT_POLICY,",
+          )
+          replace_once(
+              "src/loto/autogluon_campaign/promotion_eligibility.py",
+              "from loto.autogluon_campaign.promotion_eligibility_rules import (\n    evaluate_promotion_rules,\n)\n\n\n@dataclass",
+              "from loto.autogluon_campaign.promotion_eligibility_rules import (\n    evaluate_promotion_rules,\n)\n\n_DEFAULT_PROMOTION_POLICY = PromotionPolicy()\n\n\n@dataclass",
+          )
+          replace_once(
+              "src/loto/autogluon_campaign/promotion_eligibility.py",
+              "    policy: PromotionPolicy = PromotionPolicy(),",
+              "    policy: PromotionPolicy = _DEFAULT_PROMOTION_POLICY,",
+          )
+          replace_once(
+              "src/loto/telemetry/context.py",
+              '_CURRENT: ContextVar[TelemetryContext] = ContextVar(\n    "loto_telemetry_context", default=TelemetryContext()\n)',
+              '_EMPTY_TELEMETRY_CONTEXT = TelemetryContext()\n_CURRENT: ContextVar[TelemetryContext] = ContextVar(\n    "loto_telemetry_context", default=_EMPTY_TELEMETRY_CONTEXT\n)',
+          )
+          replace_once(
+              "src/loto/statsforecast/runtime_lane_remediation.py",
+              '    remediation = _load_object(triage_dir / "REMEDIATION_PLAN.json")',
+              '    _load_object(triage_dir / "REMEDIATION_PLAN.json")',
+          )
           PY
-          echo '=== I001 FIX DIFF: HOLDOUT SCORE ==='
-          "$python" -m ruff check --select I001 --fix --diff src/loto/autogluon_campaign/holdout_prospective_score.py || true
-          echo '=== I001 FIX DIFF: PROMOTION ==='
-          "$python" -m ruff check --select I001 --fix --diff src/loto/autogluon_campaign/promotion_eligibility.py || true
-          echo '=== TARGETED SAFETY ==='
+          mapfile -t changed < <(git diff --name-only | sort)
+          expected=(
+            src/loto/autogluon_campaign/holdout_prospective_score.py
+            src/loto/autogluon_campaign/promotion_eligibility.py
+            src/loto/statsforecast/runtime_lane_remediation.py
+            src/loto/telemetry/context.py
+          )
+          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
+          test "${#changed[@]}" -eq "${#expected_sorted[@]}"
+          diff -u <(printf '%s\n' "${expected_sorted[@]}") <(printf '%s\n' "${changed[@]}")
+          git diff --check
+
+      - name: Verify static gates
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
           "$python" -m ruff check --select B008,B039,F841 src scripts tests
+          "$python" -m ruff format --check \
+            src/loto/autogluon_campaign/holdout_prospective_score.py \
+            src/loto/autogluon_campaign/promotion_eligibility.py \
+            src/loto/statsforecast/runtime_lane_remediation.py \
+            src/loto/telemetry/context.py
+          "$python" -m compileall -q src scripts tests
+          echo "STATIC_RC=0" >> "$GITHUB_ENV"
+
+      - name: Install project dependencies
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" "ruff==$EXPECTED_RUFF_VERSION"
+          uv pip check --python "$python"
+          "$python" - <<'PY'
+          import torch
+          assert torch.__version__.startswith("2.9.1"), torch.__version__
+          assert torch.version.cuda is None, torch.version.cuda
+          PY
+          echo "DEPS_RC=0" >> "$GITHUB_ENV"
+
+      - name: Verify immutable singleton contracts and focused tests
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          "$python" - <<'PY'
+          import inspect
+          import sys
+
+          from loto.autogluon_campaign import holdout_prospective as holdout
+          from loto.autogluon_campaign import promotion_eligibility as promotion
+          from loto.telemetry import context as telemetry_context
+
+          score = sys.modules["loto.autogluon_campaign.holdout_prospective_score"]
+          assert score.DriftPolicy.__dataclass_params__.frozen
+          assert inspect.signature(holdout.score_prediction_lock).parameters["drift_policy"].default is score._DEFAULT_DRIFT_POLICY
+          assert promotion.PromotionPolicy.model_config.get("frozen") is True
+          assert inspect.signature(promotion.create_promotion_eligibility).parameters["policy"].default is promotion._DEFAULT_PROMOTION_POLICY
+          assert telemetry_context.TelemetryContext.__dataclass_params__.frozen
+          assert telemetry_context.current_telemetry_context() is telemetry_context._EMPTY_TELEMETRY_CONTEXT
+          PY
+          "$python" -m pytest -q \
+            tests/autogluon_campaign/test_holdout_prospective.py \
+            tests/autogluon_campaign/test_promotion_eligibility_integrity.py \
+            tests/telemetry/test_telemetry_contract_v1.py \
+            tests/statsforecast/test_runtime_lane_remediation.py
+          echo "FOCUSED_RC=0" >> "$GITHUB_ENV"
+
+      - name: Verify collection parity and exact residual lint
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          set +e
+          "$python" -m pytest -q > "$RUNNER_TEMP/pytest.log" 2>&1
+          PYTEST_RC=$?
+          "$python" -m ruff check --output-format=json src scripts tests > "$RUNNER_TEMP/all-lint.json"
+          ALL_LINT_RC=$?
+          set -e
+          if grep -Fq "Interrupted: $BASELINE_COLLECTION_ERRORS errors during collection" "$RUNNER_TEMP/pytest.log"; then
+            COLLECTION_PARITY=1
+          else
+            COLLECTION_PARITY=0
+          fi
+          lint_env="$RUNNER_TEMP/lint-env.txt"
+          "$python" - "$RUNNER_TEMP/all-lint.json" <<'PY' > "$lint_env"
+          import collections, json, sys
+          from pathlib import Path
+          rows=json.loads(Path(sys.argv[1]).read_text(encoding="utf-8") or "[]")
+          counts=collections.Counter(row.get("code", "UNKNOWN") for row in rows)
+          print(f"REMAINING_LINT_COUNT={len(rows)}")
+          print("REMAINING_RULE_COUNTS=" + ",".join(f"{k}:{v}" for k,v in sorted(counts.items())))
+          PY
+          source "$lint_env"
+          cat "$lint_env" >> "$GITHUB_ENV"
+          echo "PYTEST_RC=$PYTEST_RC" >> "$GITHUB_ENV"
+          echo "COLLECTION_PARITY=$COLLECTION_PARITY" >> "$GITHUB_ENV"
+          echo "ALL_LINT_RC=$ALL_LINT_RC" >> "$GITHUB_ENV"
+          echo "remaining_lint_count=$REMAINING_LINT_COUNT"
+          echo "remaining_rule_counts=$REMAINING_RULE_COUNTS"
+          test "$COLLECTION_PARITY" -eq 1
+          test "$REMAINING_LINT_COUNT" -eq "$EXPECTED_REMAINING_LINT"
+
+      - name: Commit verified source repair
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          before="$(git rev-parse HEAD)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/loto/autogluon_campaign/holdout_prospective_score.py \
+            src/loto/autogluon_campaign/promotion_eligibility.py \
+            src/loto/statsforecast/runtime_lane_remediation.py \
+            src/loto/telemetry/context.py
+          git diff --cached --check
+          git commit -m "fix: repair Ruff state and default safety findings (#200)"
+          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$remote_before" = "$before"
+          git push origin "HEAD:$TARGET_BRANCH"
+          echo "REPAIRED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Persist verification evidence
+        if: ${{ always() && steps.gate.outputs.run == 'true' && env.REPAIRED_HEAD != '' }}
+        run: |
+          set -Eeuo pipefail
+          cat > "$RESULT_PATH" <<EOF
+          RUFF_STATE_DEFAULT_SAFETY_REPAIR_VERSION=1
+          RUN_ID=$GITHUB_RUN_ID
+          RUFF_VERSION=${RUFF_VERSION:-UNKNOWN}
+          REPAIRED_HEAD=${REPAIRED_HEAD:-UNKNOWN}
+          STATIC_RC=${STATIC_RC:-UNKNOWN}
+          DEPS_RC=${DEPS_RC:-UNKNOWN}
+          FOCUSED_RC=${FOCUSED_RC:-UNKNOWN}
+          PYTEST_RC=${PYTEST_RC:-UNKNOWN}
+          COLLECTION_PARITY=${COLLECTION_PARITY:-UNKNOWN}
+          REMAINING_LINT_COUNT=${REMAINING_LINT_COUNT:-UNKNOWN}
+          REMAINING_RULE_COUNTS=${REMAINING_RULE_COUNTS:-UNKNOWN}
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$RESULT_PATH"
+          git diff --cached --check
+          git commit -m "chore: capture Ruff state/default safety repair evidence (#200)"
+          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$remote_before" = "$(git rev-parse HEAD^)"
+          git push origin "HEAD:$TARGET_BRANCH"
+
+      - name: Enforce repair gates
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          test "${STATIC_RC:-99}" -eq 0
+          test "${DEPS_RC:-99}" -eq 0
+          test "${FOCUSED_RC:-99}" -eq 0
+          test "${COLLECTION_PARITY:-0}" -eq 1
+          test "${REMAINING_LINT_COUNT:-999}" -eq "$EXPECTED_REMAINING_LINT"
 
       - name: Cleanup
         if: ${{ always() }}
         run: |
           set -Eeuo pipefail
           [[ -z "${CI_VENV:-}" ]] || { case "$CI_VENV" in "$RUNNER_TEMP"/*) rm -rf "$CI_VENV" ;; *) exit 1 ;; esac; }
+          [[ -z "${UV_CACHE_DIR:-}" ]] || { case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf "$UV_CACHE_DIR" ;; *) exit 1 ;; esac; }
