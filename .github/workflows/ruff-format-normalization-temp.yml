@@ -17,10 +17,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  diagnose-formatter:
+  diagnose-source-encoding:
     if: ${{ github.repository == 'arumajirou/loto_forecast_platform' && ((github.event_name == 'push' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-format-normalization-v1')) }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 30
+    timeout-minutes: 20
 
     defaults:
       run:
@@ -29,7 +29,8 @@ jobs:
     env:
       UV_VERSION: "0.11.21"
       UV_PYTHON: "3.13"
-      DIAGNOSTIC_PATH: ".github/ruff-format-diagnostic.txt"
+      TARGET_PATH: "src/loto/auto_campaign/prospective_registry_reconciliation_expected.py"
+      ENCODING_DIAGNOSTIC_PATH: ".github/ruff-source-encoding-diagnostic.txt"
 
     steps:
       - name: Verify expected self-hosted runner
@@ -50,13 +51,13 @@ jobs:
           fetch-depth: 1
           clean: true
 
-      - name: Stop when diagnostic evidence already exists
+      - name: Stop when encoding diagnostic already exists
         id: existing
         run: |
           set -Eeuo pipefail
-          if [[ -f "$DIAGNOSTIC_PATH" ]]; then
+          if [[ -f "$ENCODING_DIAGNOSTIC_PATH" ]]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "diagnostic evidence already exists"
+            echo "encoding diagnostic already exists"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
@@ -68,7 +69,7 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
 
-      - name: Prepare isolated Python environment
+      - name: Prepare isolated Python
         if: ${{ steps.existing.outputs.exists != 'true' }}
         run: |
           set -Eeuo pipefail
@@ -79,99 +80,109 @@ jobs:
             *) echo "unexpected uv version: $actual" >&2; exit 1 ;;
           esac
           uv python install "$UV_PYTHON"
-          ci_venv="$RUNNER_TEMP/loto-ruff-diagnose-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          uv_cache="$RUNNER_TEMP/loto-ruff-diagnose-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          ci_venv="$RUNNER_TEMP/loto-source-encoding-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           case "$ci_venv" in
             "$RUNNER_TEMP"/*) ;;
             *) echo "unsafe CI venv path: $ci_venv" >&2; exit 1 ;;
           esac
-          case "$uv_cache" in
-            "$RUNNER_TEMP"/*) ;;
-            *) echo "unsafe uv cache path: $uv_cache" >&2; exit 1 ;;
-          esac
-          rm -rf -- "$ci_venv" "$uv_cache"
-          mkdir -p -- "$uv_cache"
+          rm -rf -- "$ci_venv"
           echo "CI_VENV=$ci_venv" >> "$GITHUB_ENV"
-          echo "UV_CACHE_DIR=$uv_cache" >> "$GITHUB_ENV"
-          UV_CACHE_DIR="$uv_cache" uv venv "$ci_venv" --python "$UV_PYTHON"
+          uv venv "$ci_venv" --python "$UV_PYTHON"
           "$ci_venv/bin/python" --version
 
-      - name: Install repository-locked Ruff only
+      - name: Capture byte-level encoding evidence
         if: ${{ steps.existing.outputs.exists != 'true' }}
         run: |
           set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          ruff_version="$(
-            "$python" - <<'PY'
-          import tomllib
+          "$CI_VENV/bin/python" - <<'PY'
+          from __future__ import annotations
 
-          with open("uv.lock", "rb") as stream:
-              lock = tomllib.load(stream)
+          import hashlib
+          import os
+          import subprocess
+          from pathlib import Path
 
-          versions = [
-              package["version"]
-              for package in lock["package"]
-              if package.get("name") == "ruff"
+          target = Path(os.environ["TARGET_PATH"])
+          output = Path(os.environ["ENCODING_DIAGNOSTIC_PATH"])
+          data = target.read_bytes()
+
+          records: list[str] = [
+              "SOURCE_ENCODING_DIAGNOSTIC_VERSION=1",
+              f"RUN_ID={os.environ['GITHUB_RUN_ID']}",
+              f"RUN_ATTEMPT={os.environ['GITHUB_RUN_ATTEMPT']}",
+              f"HEAD_SHA={subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()}",
+              f"TARGET_PATH={target.as_posix()}",
+              f"SIZE_BYTES={len(data)}",
+              f"SHA256={hashlib.sha256(data).hexdigest()}",
+              f"UTF8_BOM={data.startswith(bytes.fromhex('efbbbf'))}",
+              f"UTF16_LE_BOM={data.startswith(bytes.fromhex('fffe'))}",
+              f"UTF16_BE_BOM={data.startswith(bytes.fromhex('feff'))}",
+              f"NUL_BYTE_COUNT={data.count(bytes([0]))}",
           ]
-          if len(versions) != 1:
-              raise SystemExit(f"expected exactly one Ruff version in uv.lock, got {versions!r}")
-          print(versions[0])
+
+          errors: list[tuple[int, int, str]] = []
+          cursor = 0
+          while cursor < len(data):
+              try:
+                  data[cursor:].decode("utf-8")
+                  break
+              except UnicodeDecodeError as exc:
+                  start = cursor + exc.start
+                  end = cursor + exc.end
+                  errors.append((start, end, exc.reason))
+                  cursor = end if end > start else start + 1
+                  if len(errors) >= 50:
+                      break
+
+          records.append(f"UTF8_DECODE_ERROR_COUNT_CAPPED={len(errors)}")
+          for index, (start, end, reason) in enumerate(errors, start=1):
+              line = data.count(b"\n", 0, start) + 1
+              previous_newline = data.rfind(b"\n", 0, start)
+              column = start + 1 if previous_newline < 0 else start - previous_newline
+              lo = max(0, start - 48)
+              hi = min(len(data), end + 48)
+              window = data[lo:hi]
+              records.extend(
+                  [
+                      f"ERROR_{index}_START={start}",
+                      f"ERROR_{index}_END={end}",
+                      f"ERROR_{index}_LINE={line}",
+                      f"ERROR_{index}_BYTE_COLUMN={column}",
+                      f"ERROR_{index}_REASON={reason}",
+                      f"ERROR_{index}_BYTES_HEX={data[start:end].hex()}",
+                      f"ERROR_{index}_WINDOW_HEX={window.hex()}",
+                      f"ERROR_{index}_WINDOW_BACKSLASH={window.decode('utf-8', errors='backslashreplace')!r}",
+                  ]
+              )
+
+          if not errors:
+              records.append("UTF8_DECODE=PASS")
+          else:
+              records.append("UTF8_DECODE=FAIL")
+
+          compile_result = subprocess.run(
+              [os.environ["CI_VENV"] + "/bin/python", "-m", "py_compile", str(target)],
+              stdout=subprocess.PIPE,
+              stderr=subprocess.PIPE,
+              text=True,
+              errors="backslashreplace",
+              check=False,
+          )
+          records.append(f"PY_COMPILE_STATUS={compile_result.returncode}")
+          records.append("--- PY_COMPILE_STDERR_FIRST_80_LINES ---")
+          records.extend(compile_result.stderr.splitlines()[:80])
+
+          output.write_text("\n".join(records) + "\n", encoding="utf-8")
           PY
-          )"
-          echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
-          uv pip install --quiet --python "$python" "ruff==$ruff_version"
-          "$python" -m ruff --version
 
-      - name: Capture formatter exit codes and bounded output
-        if: ${{ steps.existing.outputs.exists != 'true' }}
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          out="$RUNNER_TEMP/ruff-format.stdout"
-          err="$RUNNER_TEMP/ruff-format.stderr"
-          check_out="$RUNNER_TEMP/ruff-check.stdout"
-          check_err="$RUNNER_TEMP/ruff-check.stderr"
-
-          set +e
-          "$python" -m ruff format src scripts tests >"$out" 2>"$err"
-          apply_status=$?
-          "$python" -m ruff format --check src scripts tests >"$check_out" 2>"$check_err"
-          check_status=$?
-          set -e
-
-          changed_count="$(git diff --name-only -- src scripts tests | sed '/^$/d' | wc -l)"
-          unexpected_count="$(git diff --name-only | grep -Ev '^(src|scripts|tests)/' | sed '/^$/d' | wc -l || true)"
-
-          {
-            echo "FORMAT_DIAGNOSTIC_VERSION=1"
-            echo "RUN_ID=$GITHUB_RUN_ID"
-            echo "RUN_ATTEMPT=$GITHUB_RUN_ATTEMPT"
-            echo "HEAD_SHA=$(git rev-parse HEAD)"
-            echo "RUFF_VERSION=$RUFF_VERSION"
-            echo "APPLY_STATUS=$apply_status"
-            echo "CHECK_STATUS=$check_status"
-            echo "FORMATTER_CHANGED_FILES=$changed_count"
-            echo "UNEXPECTED_CHANGED_FILES=$unexpected_count"
-            echo "--- APPLY_STDOUT_FIRST_120_LINES ---"
-            sed -n '1,120p' "$out"
-            echo "--- APPLY_STDERR_FIRST_120_LINES ---"
-            sed -n '1,120p' "$err"
-            echo "--- CHECK_STDOUT_FIRST_120_LINES ---"
-            sed -n '1,120p' "$check_out"
-            echo "--- CHECK_STDERR_FIRST_120_LINES ---"
-            sed -n '1,120p' "$check_err"
-          } > "$DIAGNOSTIC_PATH"
-
-          git restore --worktree -- src scripts tests
+          git diff --check -- "$ENCODING_DIAGNOSTIC_PATH"
           test -z "$(git diff --name-only -- src scripts tests)"
-          test "$unexpected_count" -eq 0
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$DIAGNOSTIC_PATH"
-          test "$(git diff --cached --name-only)" = "$DIAGNOSTIC_PATH"
+          git add -- "$ENCODING_DIAGNOSTIC_PATH"
+          test "$(git diff --cached --name-only)" = "$ENCODING_DIAGNOSTIC_PATH"
           git diff --cached --check
-          git commit -m "chore: capture Ruff formatter diagnostic (#196)"
+          git commit -m "chore: capture invalid source encoding diagnostic (#196)"
           git push origin HEAD:fix/ruff-format-normalization-v1
 
       - name: Verify repository state
@@ -189,11 +200,5 @@ jobs:
             case "$CI_VENV" in
               "$RUNNER_TEMP"/*) rm -rf -- "$CI_VENV" ;;
               *) echo "refusing to remove unsafe CI_VENV=$CI_VENV" >&2; exit 1 ;;
-            esac
-          fi
-          if [[ -n "${UV_CACHE_DIR:-}" ]]; then
-            case "$UV_CACHE_DIR" in
-              "$RUNNER_TEMP"/*) rm -rf -- "$UV_CACHE_DIR" ;;
-              *) echo "refusing to remove unsafe UV_CACHE_DIR=$UV_CACHE_DIR" >&2; exit 1 ;;
             esac
           fi
