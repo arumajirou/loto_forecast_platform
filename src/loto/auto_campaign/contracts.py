@@ -58,11 +58,13 @@ class SearchConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     backend: Literal["ray", "optuna"] = "ray"
+    strategy: Literal["auto", "random", "tpe", "cmaes"] = "auto"
     num_samples: int = 10
     search_seed: int = 1
     time_budget: int | None = None
     refit_with_val: bool = False
     verbose: bool = False
+    allow_fallback: bool = False
     optuna_smoke: bool = True
     coverage_random_samples: int = 4
 
