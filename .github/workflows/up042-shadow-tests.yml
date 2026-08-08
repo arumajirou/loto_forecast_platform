@@ -87,22 +87,18 @@ jobs:
 
           cat > "$RUNNER_TEMP/test-outcomes.py" <<'PY'
           from __future__ import annotations
-          import json,re,subprocess,sys
+          import json,subprocess,sys
           from pathlib import Path
           tests=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
           out={}
           for test in tests:
-              proc=subprocess.run(
-                  [sys.executable,'-m','pytest','-q','--tb=no',test],
-                  text=True,capture_output=True,check=False,
-              )
+              proc=subprocess.run([sys.executable,'-m','pytest','-q','--tb=no',test],text=True,capture_output=True,check=False)
               text=(proc.stdout or '')+'\n'+(proc.stderr or '')
               ids=[]
               for line in text.splitlines():
                   stripped=line.strip()
                   if stripped.startswith('FAILED ') or stripped.startswith('ERROR '):
-                      token=stripped.split(' - ',1)[0]
-                      ids.append(token)
+                      ids.append(stripped.split(' - ',1)[0])
               out[test]={'returncode':proc.returncode,'problem_ids':sorted(set(ids))}
               print(f"TEST_OUTCOME\t{proc.returncode}\t{test}\t{','.join(sorted(set(ids)))}")
           Path(sys.argv[2]).write_text(json.dumps(out,sort_keys=True,indent=2)+'\n',encoding='utf-8')
@@ -112,6 +108,7 @@ jobs:
           echo 'BASELINE_PER_FILE_OUTCOMES=CAPTURED'
 
           "$python" -m ruff check --select UP042 --fix --unsafe-fixes src scripts tests
+          "$python" -m ruff check --select F401 --fix src scripts tests
           "$python" -m ruff check src scripts tests
           mapfile -t changed < <(git diff --name-only | sort)
           test "${#changed[@]}" -eq 20
@@ -128,7 +125,7 @@ jobs:
           assert before==after, {'before':before,'after':after}
           passed=sum(1 for item in before.values() if item['returncode']==0)
           nonpass=len(before)-passed
-          print(f'PER_FILE_PARITY=PASS')
+          print('PER_FILE_PARITY=PASS')
           print(f'BASELINE_PASS_FILES={passed}')
           print(f'BASELINE_NONPASS_FILES={nonpass}')
           PY
