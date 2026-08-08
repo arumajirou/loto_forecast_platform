@@ -31,8 +31,9 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          git fetch origin main --depth=1
-          mapfile -t changed < <(git diff --name-only origin/main...HEAD | sort)
+          base=e4fa85bedb4c814f28d711967ecedb1696473a47
+          git fetch origin "$base" --depth=1
+          mapfile -t changed < <(git diff --name-only "$base" HEAD | sort)
           printf 'BRANCH_CHANGED\t%s\n' "${changed[@]}"
           allowed=(
             .github/workflows/basicts-contract-restore-verify.yml
@@ -61,7 +62,6 @@ jobs:
           python="$venv/bin/python"
           echo "venv=$venv" >> "$GITHUB_ENV"
           echo "cache=$cache" >> "$GITHUB_ENV"
-          echo "python=$python" >> "$GITHUB_ENV"
 
           UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" \
             --index-url https://download.pytorch.org/whl/cpu 'torch==2.9.1'
@@ -102,44 +102,25 @@ jobs:
           assert headings==expected,(headings,expected)
           for token in ('_search_materialization','_persist_search_space_profile','opentelemetry'):
               assert token in text,token
-              print(f'RESIDUAL_SIGNATURE\t{token}\tPRESENT')
           PY
 
           "$python" -m pytest -q tests/basicts_campaign
           echo 'FOCUSED_BASICTS_TESTS=PASS'
 
           "$python" - <<'PY'
+          import tempfile
+          from pathlib import Path
+          import numpy as np
           import torch.optim
           from loto.basicts_campaign.contracts import DatasetPayload, ImportReference, SafeConfig
-          from loto.basicts_campaign.dataset import (
-              GEOMETRIES,
-              GameGeometry,
-              build_windows,
-              compile_basic_ts_dataset,
-              compile_wide_rows,
-              split_chronologically,
-          )
+          from loto.basicts_campaign.dataset import GEOMETRIES, GameGeometry, build_windows, compile_basic_ts_dataset, compile_wide_rows, split_chronologically
           from loto.basicts_campaign.metrics import evaluate_predictions
-          from loto.basicts_campaign.security import (
-              ConfigImportRejected,
-              UnsafeImportReference,
-              resolve_import_reference,
-              validate_import_reference,
-              validate_safe_config,
-          )
-          import numpy as np
-          from pathlib import Path
-          import tempfile
+          from loto.basicts_campaign.security import ConfigImportRejected, UnsafeImportReference, resolve_import_reference, validate_import_reference, validate_safe_config
 
           assert ConfigImportRejected is UnsafeImportReference
           current=GEOMETRIES['numbers3']
           assert (current.game,current.positions,current.minimum,current.maximum)==('numbers3',3,0,9)
-          legacy=GameGeometry(
-              game_id='numbers3',
-              position_columns=('n1','n2','n3'),
-              minimum_value=0,
-              maximum_value=9,
-          )
+          legacy=GameGeometry(game_id='numbers3',position_columns=('n1','n2','n3'),minimum_value=0,maximum_value=9)
           assert (legacy.game,legacy.positions,legacy.minimum,legacy.maximum)==('numbers3',3,0,9)
           rows=[
               {'draw_no':1,'n1':1,'n2':2,'n3':3},
@@ -159,17 +140,14 @@ jobs:
               'validation_size':2,
               'holdout_size':2,
           })
-          split=split_chronologically(payload)
-          assert split.train_draw_no==(1,2,3,4)
+          assert split_chronologically(payload).train_draw_no==(1,2,3,4)
           with tempfile.TemporaryDirectory() as tmp:
-              evidence=compile_basic_ts_dataset(payload,Path(tmp))
-              assert evidence['formal_holdout_materialized'] is False
+              assert compile_basic_ts_dataset(payload,Path(tmp))['formal_holdout_materialized'] is False
 
           ref=ImportReference(module='torch.optim',name='Adam')
           validate_import_reference(ref)
           assert resolve_import_reference(ref) is torch.optim.Adam
-          resolved=validate_safe_config(SafeConfig(),resolve=False)
-          assert resolved['optimizer']=='torch.optim.Adam'
+          assert validate_safe_config(SafeConfig(),resolve=False)['optimizer']=='torch.optim.Adam'
           try:
               validate_import_reference(ImportReference(module='os',name='system'))
           except ConfigImportRejected:
