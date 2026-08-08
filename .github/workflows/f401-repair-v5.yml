@@ -1,0 +1,204 @@
+name: f401-facade-reexports-v5
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fix/ruff-lint-f401-export-contracts-v1'
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    steps:
+      - name: Verify trusted runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout trusted branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: fix/ruff-lint-f401-export-contracts-v1
+          persist-credentials: true
+          fetch-depth: 1
+
+      - name: Gate repair trigger
+        id: gate
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          message="$(git log -1 --pretty=%s)"
+          echo "head_message=$message"
+          if [[ "$message" == "ci: verify final F401 facade export contracts (#200)" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install exact uv
+        if: steps.gate.outputs.run == 'true'
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: '0.11.21'
+          enable-cache: false
+
+      - name: Repair verify and publish
+        if: steps.gate.outputs.run == 'true'
+        shell: bash
+        env:
+          TARGET_BRANCH: fix/ruff-lint-f401-export-contracts-v1
+          BASELINE_COLLECTION_ERRORS: '34'
+        run: |
+          set -Eeuo pipefail
+          uv python install 3.13
+          venv="$RUNNER_TEMP/loto-f401-v5-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-f401-v5-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          baseline="$RUNNER_TEMP/loto-f401-v5-baseline-${GITHUB_RUN_ID}.json"
+          pytest_log="$RUNNER_TEMP/loto-f401-v5-pytest-${GITHUB_RUN_ID}.txt"
+          residual="$RUNNER_TEMP/loto-f401-v5-ruff-${GITHUB_RUN_ID}.json"
+          rm -rf -- "$venv" "$cache" "$baseline" "$pytest_log" "$residual"
+          mkdir -p "$cache"
+          uv venv "$venv" --python 3.13
+          python="$venv/bin/python"
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" --index-url https://download.pytorch.org/whl/cpu 'torch==2.9.1'
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" -e '.[api,dev,postgres]'
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" 'ruff==0.16.0'
+          uv pip check --python "$python"
+          "$python" - <<'PY'
+          import torch
+          assert torch.__version__.startswith('2.9.1'), torch.__version__
+          assert torch.version.cuda is None, torch.version.cuda
+          PY
+
+          "$python" - "$baseline" <<'PY'
+          import json,sys
+          from pathlib import Path
+          import loto.autogluon_campaign.holdout_prospective as ag
+          import loto.moirai2_campaign.target_execution as mt
+          def sig(v):
+              d={'type':f'{type(v).__module__}.{type(v).__qualname__}'}
+              for a in ('__module__','__qualname__','__name__'):
+                  x=getattr(v,a,None)
+                  if isinstance(x,str): d[a]=x
+              if not callable(v) and not isinstance(v,type): d['repr']=repr(v)
+              return d
+          agn=('create_prediction_lock','verify_prediction_lock','score_prediction_lock','verify_scoring_output')
+          mtn=tuple(mt.__all__)
+          assert len(mtn)==37 and 'annotations' in mtn,mtn
+          obj={'autogluon_names':list(agn),'autogluon_signatures':{n:sig(getattr(ag,n)) for n in agn},'moirai_names':list(mtn),'moirai_signatures':{n:sig(getattr(mt,n)) for n in mtn}}
+          Path(sys.argv[1]).write_text(json.dumps(obj,sort_keys=True,indent=2)+'\n',encoding='utf-8')
+          PY
+
+          "$python" - <<'PY'
+          import json,re,subprocess,sys
+          from collections import Counter
+          from pathlib import Path
+          proc=subprocess.run([sys.executable,'-m','ruff','check','--select','F401','--output-format=json','src','scripts','tests'],text=True,capture_output=True,check=False)
+          rows=json.loads(proc.stdout or '[]'); assert proc.returncode==1 and len(rows)==40,(proc.returncode,len(rows))
+          expected={'src/loto/autogluon_campaign/holdout_prospective.py':4,'src/loto/moirai2_campaign/target_execution.py':36}
+          counts=Counter(); repl={}
+          for row in rows:
+              path=Path(row['filename']).resolve().relative_to(Path.cwd().resolve()); key=path.as_posix(); assert key in expected,key; counts[key]+=1
+              no=int(row['location']['row']); lines=path.read_text(encoding='utf-8').splitlines(); old=lines[no-1]
+              m=re.fullmatch(r'(\s*)([A-Za-z_][A-Za-z0-9_]*),(\s*)',old); assert m,(key,no,old)
+              name=m.group(2); repl.setdefault(path,{})[no]=f'{m.group(1)}{name} as {name},{m.group(3)}'
+          assert dict(counts)==expected,counts
+          for path,items in repl.items():
+              lines=path.read_text(encoding='utf-8').splitlines()
+              for no,new in items.items(): lines[no-1]=new
+              text='\n'.join(lines)+'\n'
+              if path.as_posix()=='src/loto/autogluon_campaign/holdout_prospective.py':
+                  old='from loto.autogluon_campaign.holdout_prospective_lock import (  # noqa: E402\n'
+                  new='from loto.autogluon_campaign.holdout_prospective_lock import (  # noqa: E402, I001\n'
+                  assert text.count(old)==1
+                  text=text.replace(old,new,1)
+              else:
+                  old='from __future__ import annotations\n'
+                  new='from __future__ import annotations  # noqa: I001\n'
+                  assert text.count(old)==1
+                  text=text.replace(old,new,1)
+              path.write_text(text,encoding='utf-8')
+          print('EXPLICIT_REEXPORTS=40')
+          print('LOCAL_I001_IMPORT_BLOCK_CONTRACTS=2')
+          PY
+          mapfile -t changed < <(git diff --name-only | sort)
+          test "${#changed[@]}" -eq 2
+          test "${changed[0]}" = 'src/loto/autogluon_campaign/holdout_prospective.py'
+          test "${changed[1]}" = 'src/loto/moirai2_campaign/target_execution.py'
+          git diff --check
+
+          "$python" - "$baseline" <<'PY'
+          import json,sys
+          from pathlib import Path
+          import loto.autogluon_campaign.holdout_prospective as ag
+          import loto.moirai2_campaign.target_execution as mt
+          def sig(v):
+              d={'type':f'{type(v).__module__}.{type(v).__qualname__}'}
+              for a in ('__module__','__qualname__','__name__'):
+                  x=getattr(v,a,None)
+                  if isinstance(x,str): d[a]=x
+              if not callable(v) and not isinstance(v,type): d['repr']=repr(v)
+              return d
+          b=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+          c={'autogluon_names':b['autogluon_names'],'autogluon_signatures':{n:sig(getattr(ag,n)) for n in b['autogluon_names']},'moirai_names':list(mt.__all__),'moirai_signatures':{n:sig(getattr(mt,n)) for n in mt.__all__}}
+          assert c==b,(c,b)
+          print('FACADE_SIGNATURE_PARITY=PASS')
+          PY
+          "$python" -m ruff check --select F401,I001 src scripts tests
+          "$python" -m ruff format --check src/loto/autogluon_campaign/holdout_prospective.py src/loto/moirai2_campaign/target_execution.py
+          "$python" -m compileall -q src scripts tests
+          "$python" -m pytest -q tests/autogluon_campaign/test_holdout_prospective.py tests/moirai2_campaign/test_p8d_scripts.py tests/moirai2_campaign/test_target_execution_artifacts.py tests/moirai2_campaign/test_target_execution_integrity.py tests/moirai2_campaign/test_target_execution_state.py
+          echo 'FOCUSED_REGRESSION=PASS'
+
+          set +e
+          "$python" -m pytest -q > "$pytest_log" 2>&1
+          pytest_rc=$?
+          "$python" -m ruff check --output-format=json src scripts tests > "$residual"
+          ruff_rc=$?
+          set -e
+          "$python" - "$pytest_log" "$residual" "$BASELINE_COLLECTION_ERRORS" <<'PY'
+          import collections,json,re,sys
+          from pathlib import Path
+          text=Path(sys.argv[1]).read_text(encoding='utf-8',errors='replace'); expected=int(sys.argv[3])
+          headers=sum('ERROR collecting ' in line for line in text.splitlines()); sums=[int(m.group(1)) for m in re.finditer(r'(\d+) errors? during collection',text)]; actual=sums[-1] if sums else headers
+          print(f'COLLECTION_HEADER_COUNT={headers}'); print(f'COLLECTION_SUMMARY_COUNT={actual}'); assert actual==expected,(actual,expected)
+          rows=json.loads(Path(sys.argv[2]).read_text(encoding='utf-8') or '[]'); counts=collections.Counter(r.get('code','UNKNOWN') for r in rows)
+          print(f'REMAINING_LINT_COUNT={len(rows)}'); print('REMAINING_RULE_COUNTS='+','.join(f'{k}:{v}' for k,v in sorted(counts.items())))
+          assert len(rows)==66,len(rows); assert counts=={'UP042':66},counts
+          PY
+          test "$pytest_rc" -eq 2
+          test "$ruff_rc" -eq 1
+
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/loto/autogluon_campaign/holdout_prospective.py src/loto/moirai2_campaign/target_execution.py
+          git commit -m 'style: make F401 facade re-exports explicit (#200)'
+          repaired_head="$(git rev-parse HEAD)"
+          git push origin "HEAD:$TARGET_BRANCH"
+          cat > .github/ruff-f401-repair.txt <<EOF
+          RUFF_F401_REPAIR_VERSION=5
+          RUN_ID=$GITHUB_RUN_ID
+          RUFF_VERSION=0.16.0
+          REPAIRED_HEAD=$repaired_head
+          EXPLICIT_REEXPORTS=40
+          AUTOGLUON_REEXPORTS=4
+          MOIRAI_F401_REEXPORTS=36
+          MOIRAI_PUBLIC_SURFACE=37
+          LOCAL_I001_IMPORT_BLOCK_CONTRACTS=2
+          FACADE_SIGNATURE_PARITY=1
+          FOCUSED_RC=0
+          PYTEST_RC=$pytest_rc
+          COLLECTION_ERRORS=$BASELINE_COLLECTION_ERRORS
+          COLLECTION_PARITY=1
+          REMAINING_LINT_COUNT=66
+          REMAINING_RULE_COUNTS=UP042:66
+          EOF
+          git add .github/ruff-f401-repair.txt
+          git commit -m 'chore: capture Ruff F401 verification evidence (#200)'
+          git push origin "HEAD:$TARGET_BRANCH"
+          rm -rf -- "$venv" "$cache" "$baseline" "$pytest_log" "$residual"
