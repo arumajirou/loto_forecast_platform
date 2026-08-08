@@ -2,49 +2,114 @@ name: ci
 
 on:
   push:
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 120
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
 
     steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-
-      - name: Show disk usage before install
-        run: df -h
-
-      - name: Free runner disk space
+      - name: Verify expected self-hosted runner
         run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          docker system prune --all --force || true
-          df -h
+          set -Eeuo pipefail
+          echo "runner_name=$RUNNER_NAME"
+          echo "runner_os=$RUNNER_OS"
+          echo "runner_arch=$RUNNER_ARCH"
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          clean: true
+
+      - name: Install exact uv without GitHub cache
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+
+      - name: Prepare isolated CI Python environment
+        run: |
+          set -Eeuo pipefail
+
+          actual="$(uv --version)"
+          echo "uv_version=$actual"
+          case "$actual" in
+            "uv $UV_VERSION"*) ;;
+            *) echo "unexpected uv version: $actual" >&2; exit 1 ;;
+          esac
+
+          uv python install "$UV_PYTHON"
+
+          ci_venv="$RUNNER_TEMP/loto-ci-venv-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          uv_cache="$RUNNER_TEMP/loto-uv-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+          case "$ci_venv" in
+            "$RUNNER_TEMP"/*) ;;
+            *) echo "unsafe CI venv path: $ci_venv" >&2; exit 1 ;;
+          esac
+          case "$uv_cache" in
+            "$RUNNER_TEMP"/*) ;;
+            *) echo "unsafe uv cache path: $uv_cache" >&2; exit 1 ;;
+          esac
+
+          rm -rf -- "$ci_venv" "$uv_cache"
+          mkdir -p -- "$uv_cache"
+
+          echo "CI_VENV=$ci_venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$uv_cache" >> "$GITHUB_ENV"
+
+          UV_CACHE_DIR="$uv_cache" uv venv "$ci_venv" --python "$UV_PYTHON"
+          "$ci_venv/bin/python" --version
 
       - name: Install matching CPU-only PyTorch
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install \
-            --no-cache-dir \
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          uv pip install \
+            --python "$python" \
             --index-url https://download.pytorch.org/whl/cpu \
             "torch==2.9.1"
 
       - name: Install project and test dependencies
         run: |
-          python -m pip install \
-            --no-cache-dir \
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          uv pip install \
+            --python "$python" \
             -e ".[api,dev,postgres]"
 
       - name: Verify CPU-only PyTorch remains selected
         run: |
-          python - <<'PY'
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          "$python" - <<'PY'
           import torch
 
           assert torch.__version__.startswith("2.9.1"), torch.__version__
@@ -52,19 +117,48 @@ jobs:
           print(f"torch_version={torch.__version__}")
           print("torch_cuda_runtime=NONE")
           PY
-          python -m pip check
-
-      - name: Show disk usage after install
-        run: df -h
+          uv pip check --python "$python"
 
       - name: Run Ruff format check
-        run: python -m ruff format --check src scripts tests
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m ruff format --check src scripts tests
 
       - name: Run Ruff lint
-        run: python -m ruff check src scripts tests
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m ruff check src scripts tests
 
       - name: Compile Python sources
-        run: python -m compileall -q src scripts tests
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m compileall -q src scripts tests
 
       - name: Run tests
-        run: python -m pytest -q
+        run: |
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m pytest -q
+
+      - name: Verify repository stayed clean
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Remove CI-owned temporary environment
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          if [[ -n "${CI_VENV:-}" ]]; then
+            case "$CI_VENV" in
+              "$RUNNER_TEMP"/*) rm -rf -- "$CI_VENV" ;;
+              *) echo "refusing to remove unsafe CI_VENV=$CI_VENV" >&2; exit 1 ;;
+            esac
+          fi
+          if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+            case "$UV_CACHE_DIR" in
+              "$RUNNER_TEMP"/*) rm -rf -- "$UV_CACHE_DIR" ;;
+              *) echo "refusing to remove unsafe UV_CACHE_DIR=$UV_CACHE_DIR" >&2; exit 1 ;;
+            esac
+          fi
