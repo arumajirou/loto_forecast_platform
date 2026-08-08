@@ -370,31 +370,52 @@ jobs:
           from pathlib import Path
           from tempfile import TemporaryDirectory
 
-          import mlflow
+          from mlflow import MlflowClient
 
           with TemporaryDirectory() as tmp:
-              mlflow.set_tracking_uri(
-                  Path(tmp).resolve().as_uri()
+              root = Path(tmp).resolve()
+              db_path = root / "mlflow.db"
+              artifacts = root / "artifacts"
+
+              tracking_uri = f"sqlite:///{db_path}"
+              artifact_uri = artifacts.as_uri()
+
+              client = MlflowClient(
+                  tracking_uri=tracking_uri
               )
 
-              experiment = mlflow.set_experiment(
-                  "routine-dependency-smoke"
+              experiment_id = client.create_experiment(
+                  "routine-dependency-smoke",
+                  artifact_location=artifact_uri,
               )
 
-              with mlflow.start_run():
-                  mlflow.log_metric(
-                      "dependency_smoke",
-                      1.0,
-                  )
-
-              runs = mlflow.search_runs(
-                  experiment_ids=[
-                      experiment.experiment_id
-                  ]
+              run = client.create_run(
+                  experiment_id=experiment_id
               )
 
-              assert not runs.empty
+              client.log_metric(
+                  run.info.run_id,
+                  "dependency_smoke",
+                  1.0,
+              )
 
+              client.set_terminated(
+                  run.info.run_id,
+                  status="FINISHED",
+              )
+
+              runs = client.search_runs(
+                  experiment_ids=[experiment_id]
+              )
+
+              assert len(runs) == 1
+              assert (
+                  runs[0].data.metrics["dependency_smoke"]
+                  == 1.0
+              )
+              assert runs[0].info.status == "FINISHED"
+
+          print("MLFLOW_TRACKING_BACKEND=SQLITE")
           print("MLFLOW_RUNTIME_SMOKE=PASS")
           PY
 
