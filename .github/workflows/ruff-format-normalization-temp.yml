@@ -17,10 +17,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  normalize-and-verify:
+  diagnose-formatter:
     if: ${{ github.repository == 'arumajirou/loto_forecast_platform' && ((github.event_name == 'push' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/ruff-format-normalization-v1') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-format-normalization-v1')) }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 120
+    timeout-minutes: 30
 
     defaults:
       run:
@@ -29,6 +29,7 @@ jobs:
     env:
       UV_VERSION: "0.11.21"
       UV_PYTHON: "3.13"
+      DIAGNOSTIC_PATH: ".github/ruff-format-diagnostic.txt"
 
     steps:
       - name: Verify expected self-hosted runner
@@ -49,13 +50,26 @@ jobs:
           fetch-depth: 1
           clean: true
 
+      - name: Stop when diagnostic evidence already exists
+        id: existing
+        run: |
+          set -Eeuo pipefail
+          if [[ -f "$DIAGNOSTIC_PATH" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "diagnostic evidence already exists"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install exact uv without GitHub cache
+        if: ${{ steps.existing.outputs.exists != 'true' }}
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
 
       - name: Prepare isolated Python environment
+        if: ${{ steps.existing.outputs.exists != 'true' }}
         run: |
           set -Eeuo pipefail
           actual="$(uv --version)"
@@ -65,8 +79,8 @@ jobs:
             *) echo "unexpected uv version: $actual" >&2; exit 1 ;;
           esac
           uv python install "$UV_PYTHON"
-          ci_venv="$RUNNER_TEMP/loto-ruff-normalize-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          uv_cache="$RUNNER_TEMP/loto-ruff-normalize-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          ci_venv="$RUNNER_TEMP/loto-ruff-diagnose-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          uv_cache="$RUNNER_TEMP/loto-ruff-diagnose-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           case "$ci_venv" in
             "$RUNNER_TEMP"/*) ;;
             *) echo "unsafe CI venv path: $ci_venv" >&2; exit 1 ;;
@@ -83,6 +97,7 @@ jobs:
           "$ci_venv/bin/python" --version
 
       - name: Install repository-locked Ruff only
+        if: ${{ steps.existing.outputs.exists != 'true' }}
         run: |
           set -Eeuo pipefail
           python="$CI_VENV/bin/python"
@@ -103,108 +118,61 @@ jobs:
           print(versions[0])
           PY
           )"
-          echo "locked_ruff_version=$ruff_version"
           echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
           uv pip install --quiet --python "$python" "ruff==$ruff_version"
           "$python" -m ruff --version
 
-      - name: Apply locked Ruff formatting
+      - name: Capture formatter exit codes and bounded output
+        if: ${{ steps.existing.outputs.exists != 'true' }}
         run: |
           set -Eeuo pipefail
-          "$CI_VENV/bin/python" -m ruff format src scripts tests
-          "$CI_VENV/bin/python" -m ruff format --check src scripts tests
+          python="$CI_VENV/bin/python"
+          out="$RUNNER_TEMP/ruff-format.stdout"
+          err="$RUNNER_TEMP/ruff-format.stderr"
+          check_out="$RUNNER_TEMP/ruff-check.stdout"
+          check_err="$RUNNER_TEMP/ruff-check.stderr"
 
-      - name: Verify formatting changed only allowed paths
-        run: |
-          set -Eeuo pipefail
-          git diff --check
-          unexpected=0
-          while IFS= read -r path; do
-            [[ -z "$path" ]] && continue
-            case "$path" in
-              src/*|scripts/*|tests/*) ;;
-              *) echo "unexpected formatter change: $path" >&2; unexpected=1 ;;
-            esac
-          done < <(git diff --name-only)
-          test "$unexpected" -eq 0
+          set +e
+          "$python" -m ruff format src scripts tests >"$out" 2>"$err"
+          apply_status=$?
+          "$python" -m ruff format --check src scripts tests >"$check_out" 2>"$check_err"
+          check_status=$?
+          set -e
+
           changed_count="$(git diff --name-only -- src scripts tests | sed '/^$/d' | wc -l)"
-          echo "formatter_changed_files=$changed_count"
+          unexpected_count="$(git diff --name-only | grep -Ev '^(src|scripts|tests)/' | sed '/^$/d' | wc -l || true)"
 
-      - name: Commit mechanical formatting if needed
-        run: |
-          set -Eeuo pipefail
-          if git diff --quiet -- src scripts tests; then
-            echo "no formatting changes to commit"
-            exit 0
-          fi
+          {
+            echo "FORMAT_DIAGNOSTIC_VERSION=1"
+            echo "RUN_ID=$GITHUB_RUN_ID"
+            echo "RUN_ATTEMPT=$GITHUB_RUN_ATTEMPT"
+            echo "HEAD_SHA=$(git rev-parse HEAD)"
+            echo "RUFF_VERSION=$RUFF_VERSION"
+            echo "APPLY_STATUS=$apply_status"
+            echo "CHECK_STATUS=$check_status"
+            echo "FORMATTER_CHANGED_FILES=$changed_count"
+            echo "UNEXPECTED_CHANGED_FILES=$unexpected_count"
+            echo "--- APPLY_STDOUT_FIRST_120_LINES ---"
+            sed -n '1,120p' "$out"
+            echo "--- APPLY_STDERR_FIRST_120_LINES ---"
+            sed -n '1,120p' "$err"
+            echo "--- CHECK_STDOUT_FIRST_120_LINES ---"
+            sed -n '1,120p' "$check_out"
+            echo "--- CHECK_STDERR_FIRST_120_LINES ---"
+            sed -n '1,120p' "$check_err"
+          } > "$DIAGNOSTIC_PATH"
+
+          git restore --worktree -- src scripts tests
+          test -z "$(git diff --name-only -- src scripts tests)"
+          test "$unexpected_count" -eq 0
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- src scripts tests
-          unexpected=0
-          while IFS= read -r path; do
-            [[ -z "$path" ]] && continue
-            case "$path" in
-              src/*|scripts/*|tests/*) ;;
-              *) echo "unexpected staged path: $path" >&2; unexpected=1 ;;
-            esac
-          done < <(git diff --cached --name-only)
-          test "$unexpected" -eq 0
+          git add -- "$DIAGNOSTIC_PATH"
+          test "$(git diff --cached --name-only)" = "$DIAGNOSTIC_PATH"
           git diff --cached --check
-          git commit -m "style: normalize locked Ruff formatting (#196)"
+          git commit -m "chore: capture Ruff formatter diagnostic (#196)"
           git push origin HEAD:fix/ruff-format-normalization-v1
-
-      - name: Install matching CPU-only PyTorch
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          uv pip install --quiet --python "$python" --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
-
-      - name: Install project and test dependencies
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
-          uv pip install --quiet --python "$python" "ruff==$RUFF_VERSION"
-
-      - name: Verify CPU-only PyTorch remains selected
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          "$python" - <<'PY'
-          import torch
-
-          assert torch.__version__.startswith("2.9.1"), torch.__version__
-          assert torch.version.cuda is None, torch.version.cuda
-          print(f"torch_version={torch.__version__}")
-          print("torch_cuda_runtime=NONE")
-          PY
-          uv pip check --python "$python"
-
-      - name: Report verification tool versions
-        run: |
-          set -Eeuo pipefail
-          "$CI_VENV/bin/python" -m ruff --version
-          "$CI_VENV/bin/python" -m pytest --version
-
-      - name: Run Ruff format check
-        run: |
-          set -Eeuo pipefail
-          "$CI_VENV/bin/python" -m ruff format --check src scripts tests
-
-      - name: Run Ruff lint
-        run: |
-          set -Eeuo pipefail
-          "$CI_VENV/bin/python" -m ruff check src scripts tests
-
-      - name: Compile Python sources
-        run: |
-          set -Eeuo pipefail
-          "$CI_VENV/bin/python" -m compileall -q src scripts tests
-
-      - name: Run full tests
-        run: |
-          set -Eeuo pipefail
-          "$CI_VENV/bin/python" -m pytest -q
 
       - name: Verify repository state
         if: ${{ always() }}
