@@ -1578,6 +1578,7 @@ wheels = [
 
 [[package]]
 name = "loto-forecast-platform"
+version = "3.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "huggingface-hub" },
