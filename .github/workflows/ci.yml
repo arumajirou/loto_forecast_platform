@@ -50,7 +50,7 @@ jobs:
           set -Eeuo pipefail
           message="$(git log -1 --pretty=%s)"
           echo "head_message=$message"
-          if [[ "$message" == "ci: run classified Ruff B905 repairs (#200)" ]]; then
+          if [[ "$message" == "ci: retry classified Ruff B905 repairs (#200)" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -63,7 +63,7 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
 
-      - name: Apply classified zip strictness
+      - name: Prepare environment and apply classified B905 repairs
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
@@ -92,93 +92,7 @@ jobs:
           test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
           echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
           UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
-
-          "$python" - <<'PY'
-          import ast
-          from pathlib import Path
-
-          # Lines classified from read-only run 31260664581.
-          # True: equal-length is already validated or is a required fail-closed invariant.
-          # False: intentional adjacent-pair traversal (seq with seq[1:]) where lengths differ by one.
-          rules: dict[str, dict[int, bool]] = {
-              "scripts/certify_sundial_provider_v2.py": {367: True, 372: True},
-              "scripts/verify_sundial_provider_v2_evidence.py": {122: True, 127: True},
-              "src/loto/adapters/timesfm25/contracts.py": {194: False},
-              "src/loto/autogluon_campaign/holdout_prospective.py": {
-                  277: True, 279: False, 287: True, 319: True,
-              },
-              "src/loto/basicts_campaign/dataset.py": {47: False},
-              "src/loto/coverage/instrumented_common.py": {80: False},
-              "src/loto/darts_campaign/conformal_certification.py": {110: True},
-              "src/loto/darts_campaign/ensemble_conformal_contract.py": {256: True},
-              "src/loto/merlion_campaign/time_adapter.py": {45: False},
-              "src/loto/neuralforecast/auto_frets/runtime_worker.py": {78: True, 80: True},
-              "src/loto/neuralforecast/auto_segrnn/runtime_worker.py": {78: True, 80: True},
-              "src/loto/neuralforecast/auto_timellm/runtime_worker.py": {72: True, 74: True},
-              "src/loto/probabilistic/kdpp_history_source.py": {130: False},
-              "src/loto/sktime_campaign/benchmark.py": {71: False},
-              "src/loto/sktime_campaign/prospective.py": {68: False, 118: False},
-              "src/loto/toto2_campaign/request_factory.py": {91: False},
-              "tests/test_coverage_ledger.py": {74: False},
-              "tests/test_pipeline_ledger_staged.py": {94: False},
-              "tests/timesfm25_campaign/test_postprocess.py": {17: False},
-          }
-
-          matched = 0
-          strict_true = 0
-          strict_false = 0
-          for path_text, line_rules in rules.items():
-              path = Path(path_text)
-              source = path.read_text(encoding="utf-8")
-              tree = ast.parse(source, filename=path_text)
-              lines = source.splitlines(keepends=True)
-              starts = []
-              total = 0
-              for line in lines:
-                  starts.append(total)
-                  total += len(line)
-              insertions: list[tuple[int, str]] = []
-              found_per_line = {line: 0 for line in line_rules}
-              for node in ast.walk(tree):
-                  if not isinstance(node, ast.Call):
-                      continue
-                  if not isinstance(node.func, ast.Name) or node.func.id != "zip":
-                      continue
-                  if node.lineno not in line_rules:
-                      continue
-                  if any(keyword.arg == "strict" for keyword in node.keywords):
-                      raise SystemExit(f"{path_text}:{node.lineno}: strict already present")
-                  if node.end_lineno is None or node.end_col_offset is None:
-                      raise SystemExit(f"{path_text}:{node.lineno}: missing AST end position")
-                  absolute_end = starts[node.end_lineno - 1] + node.end_col_offset
-                  if source[absolute_end - 1] != ")":
-                      raise SystemExit(f"{path_text}:{node.lineno}: zip call does not end at expected paren")
-                  strict = line_rules[node.lineno]
-                  insertions.append((absolute_end - 1, f", strict={strict}"))
-                  found_per_line[node.lineno] += 1
-                  matched += 1
-                  strict_true += int(strict)
-                  strict_false += int(not strict)
-              for line, count in found_per_line.items():
-                  expected = 3 if path_text.endswith("runtime_worker.py") and line in {80, 74} else 1
-                  # runtime worker return lines contain two zip calls, while the precheck line contains one.
-                  if path_text.endswith("runtime_worker.py") and line in {80, 74}:
-                      expected = 2
-                  if count != expected:
-                      raise SystemExit(f"{path_text}:{line}: expected {expected} zip calls, got {count}")
-              for offset, insertion in sorted(insertions, reverse=True):
-                  source = source[:offset] + insertion + source[offset:]
-              path.write_text(source, encoding="utf-8")
-
-          if matched != 31:
-              raise SystemExit(f"expected 31 zip calls, got {matched}")
-          if strict_true != 18 or strict_false != 13:
-              raise SystemExit(f"classification mismatch: strict_true={strict_true}, strict_false={strict_false}")
-          print(f"B905_CLASSIFIED_CALLS={matched}")
-          print(f"STRICT_TRUE={strict_true}")
-          print(f"STRICT_FALSE={strict_false}")
-          PY
-
+          "$python" .github/b905_repair.py
           changed=(
             scripts/certify_sundial_provider_v2.py
             scripts/verify_sundial_provider_v2_evidence.py
@@ -260,7 +174,6 @@ jobs:
           python="$CI_VENV/bin/python"
           export PYTHONPATH="tests/sktime_campaign${PYTHONPATH:+:$PYTHONPATH}"
           "$python" - <<'PY'
-          # Equal-length strict=True must fail closed on mismatch; adjacent-pair strict=False must retain traversal semantics.
           try:
               list(zip((1, 2), (1,), strict=True))
           except ValueError:
@@ -286,7 +199,7 @@ jobs:
             tests/test_pipeline_ledger_staged.py
           echo "FOCUSED_RC=0" >> "$GITHUB_ENV"
 
-      - name: Verify collection parity and residual lint
+      - name: Verify collection parity and exact residual lint
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
