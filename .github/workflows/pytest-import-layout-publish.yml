@@ -1,0 +1,182 @@
+name: pytest-import-layout-publish
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fix/pytest-collection-inventory-v1'
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    steps:
+      - name: Verify trusted runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout exact event head
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: true
+          fetch-depth: 1
+
+      - name: Gate one-shot publish
+        id: gate
+        shell: bash
+        env:
+          EVENT_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -Eeuo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EVENT_HEAD"
+          message="$(git log -1 --pretty=%s)"
+          echo "event_head=$EVENT_HEAD"
+          echo "head_message=$message"
+          if [[ "$message" == "ci: publish verified pytest import layout (#201)" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install exact uv
+        if: steps.gate.outputs.run == 'true'
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: '0.11.21'
+          enable-cache: false
+
+      - name: Verify and publish test import repair
+        if: steps.gate.outputs.run == 'true'
+        shell: bash
+        env:
+          EVENT_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -Eeuo pipefail
+          uv python install 3.13
+          venv="$RUNNER_TEMP/loto-import-publish-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-import-publish-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$venv" "$cache"
+          mkdir -p "$cache"
+          uv venv "$venv" --python 3.13
+          python="$venv/bin/python"
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu 'torch==2.9.1'
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" -e '.[api,dev,postgres]'
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" 'ruff==0.16.0'
+          uv pip check --python "$python"
+          test "$("$python" -m ruff --version)" = 'ruff 0.16.0'
+          "$python" -m ruff check src scripts tests
+          "$python" -m compileall -q src scripts tests
+
+          set +e
+          "$python" -m pytest --collect-only -q --tb=short > "$RUNNER_TEMP/before.txt" 2>&1
+          before_rc=$?
+          set -e
+          test "$before_rc" -eq 2
+          "$python" - "$RUNNER_TEMP/before.txt" <<'PY'
+          import re,sys
+          from pathlib import Path
+          text=Path(sys.argv[1]).read_text(encoding='utf-8',errors='replace')
+          nums=[int(m.group(1)) for m in re.finditer(r'(\d+) errors? during collection',text)]
+          count=nums[-1] if nums else sum('ERROR collecting ' in line for line in text.splitlines())
+          print(f'BASELINE_COLLECTION_ERRORS={count}')
+          assert count==34,count
+          PY
+
+          "$python" - <<'PY'
+          from pathlib import Path
+          replacements=[]
+          for directory in ('clock_health','data_access_ledger','run_lifecycle'):
+              root=Path('tests')/directory
+              old='from conftest import '
+              new=f'from tests.{directory}.conftest import '
+              for path in sorted(root.glob('test_*.py')):
+                  text=path.read_text(encoding='utf-8')
+                  if old in text:
+                      path.write_text(text.replace(old,new),encoding='utf-8')
+                      replacements.append(path.as_posix())
+          sktime={
+              'test_approval_authorization':'tests.sktime_campaign.test_approval_authorization',
+              'p10_helpers':'tests.sktime_campaign.p10_helpers',
+              'test_holdout_scoring':'tests.sktime_campaign.test_holdout_scoring',
+              'p11_helpers':'tests.sktime_campaign.p11_helpers',
+              'test_registry_transaction':'tests.sktime_campaign.test_registry_transaction',
+          }
+          for path in sorted(Path('tests/sktime_campaign').glob('test_*.py')):
+              text=path.read_text(encoding='utf-8')
+              original=text
+              for old_module,new_module in sktime.items():
+                  text=text.replace(f'from {old_module} import ',f'from {new_module} import ')
+              if text!=original:
+                  path.write_text(text,encoding='utf-8')
+                  replacements.append(path.as_posix())
+          for name in ('tests/test_coverage_auto.py','tests/test_coverage_build.py'):
+              path=Path(name)
+              text=path.read_text(encoding='utf-8')
+              old='from coverage_test_support import '
+              assert old in text,path
+              path.write_text(text.replace(old,'from tests.coverage_test_support import '),encoding='utf-8')
+              replacements.append(path.as_posix())
+          unique=sorted(set(replacements))
+          print(f'REPLACEMENTS={len(replacements)}')
+          print(f'CHANGED_TEST_FILES={len(unique)}')
+          assert len(replacements)==26,len(replacements)
+          assert len(unique)==26,len(unique)
+          Path('/tmp/loto-import-layout-changed.txt').write_text('\n'.join(unique)+'\n',encoding='utf-8')
+          PY
+
+          mapfile -t changed < /tmp/loto-import-layout-changed.txt
+          test "${#changed[@]}" -eq 26
+          mapfile -t actual_changed < <(git diff --name-only | sort)
+          test "${actual_changed[*]}" = "${changed[*]}"
+          for path in "${changed[@]}"; do case "$path" in tests/*.py|tests/**/*.py) ;; *) echo "unexpected changed path: $path"; exit 1 ;; esac; done
+
+          "$python" -m ruff check --select I001 --fix "${changed[@]}"
+          "$python" -m ruff format "${changed[@]}"
+          "$python" -m ruff check src scripts tests
+          "$python" -m ruff format --check "${changed[@]}"
+          "$python" -m compileall -q src scripts tests
+          git diff --check
+          echo 'STATIC_GATES=PASS'
+
+          set +e
+          "$python" -m pytest --collect-only -q --tb=short > "$RUNNER_TEMP/after.txt" 2>&1
+          after_rc=$?
+          set -e
+          test "$after_rc" -eq 2
+          "$python" - "$RUNNER_TEMP/after.txt" /tmp/loto-import-layout-changed.txt <<'PY'
+          import re,sys
+          from pathlib import Path
+          text=Path(sys.argv[1]).read_text(encoding='utf-8',errors='replace')
+          changed=set(Path(sys.argv[2]).read_text(encoding='utf-8').splitlines())
+          nums=[int(m.group(1)) for m in re.finditer(r'(\d+) errors? during collection',text)]
+          count=nums[-1] if nums else sum('ERROR collecting ' in line for line in text.splitlines())
+          headings=re.findall(r'^_+ ERROR collecting (.+?) _+$',text,re.MULTILINE)
+          overlap=sorted(changed.intersection(headings))
+          print(f'POST_REPAIR_COLLECTION_ERRORS={count}')
+          print(f'CHANGED_TEST_COLLECTION_ERRORS={len(overlap)}')
+          assert count==9,count
+          assert not overlap,overlap
+          PY
+
+          git fetch origin fix/pytest-collection-inventory-v1
+          remote_head="$(git rev-parse origin/fix/pytest-collection-inventory-v1)"
+          test "$remote_head" = "$EVENT_HEAD"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -- "${changed[@]}"
+          mapfile -t staged < <(git diff --cached --name-only | sort)
+          test "${staged[*]}" = "${changed[*]}"
+          git commit -m "test: fix importlib-mode test imports (#201)"
+          repaired_head="$(git rev-parse HEAD)"
+          echo "REPAIRED_HEAD=$repaired_head"
+          git push origin HEAD:fix/pytest-collection-inventory-v1
+
+          rm -rf -- "$venv" "$cache" "$RUNNER_TEMP/before.txt" "$RUNNER_TEMP/after.txt" /tmp/loto-import-layout-changed.txt
