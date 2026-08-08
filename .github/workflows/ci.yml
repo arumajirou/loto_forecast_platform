@@ -36,12 +36,12 @@ jobs:
           fetch-depth: 1
           clean: true
 
-      - name: Gate audit commit
+      - name: Gate preview commit
         id: gate
         run: |
           set -Eeuo pipefail
           message="$(git log -1 --pretty=%s)"
-          if [[ "$message" == "ci: locate import-order findings after state/default repairs (#200)" ]]; then
+          if [[ "$message" == "ci: preview import-order normalization for state/default repairs (#200)" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -54,12 +54,12 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
 
-      - name: Reproduce four repairs and report I001
+      - name: Preview I001 diff after four repairs
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
           uv python install "$UV_PYTHON"
-          venv="$RUNNER_TEMP/loto-ruff-i001-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          venv="$RUNNER_TEMP/loto-ruff-i001-preview-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           case "$venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
           uv venv "$venv" --python "$UV_PYTHON"
           python="$venv/bin/python"
@@ -80,10 +80,8 @@ jobs:
           from pathlib import Path
 
           def replace_once(path: str, old: str, new: str) -> None:
-              p=Path(path)
-              text=p.read_text(encoding='utf-8')
-              if text.count(old) != 1:
-                  raise SystemExit(f'{path}: match count != 1')
+              p=Path(path); text=p.read_text(encoding='utf-8')
+              if text.count(old) != 1: raise SystemExit(f'{path}: match count != 1')
               p.write_text(text.replace(old,new,1),encoding='utf-8')
 
           replace_once('src/loto/autogluon_campaign/holdout_prospective_score.py','from loto.autogluon_campaign.holdout_prospective_lock import verify_prediction_lock\n\n\ndef _aggregate','from loto.autogluon_campaign.holdout_prospective_lock import verify_prediction_lock\n\n\n_DEFAULT_DRIFT_POLICY = DriftPolicy()\n\n\ndef _aggregate')
@@ -93,13 +91,11 @@ jobs:
           replace_once('src/loto/telemetry/context.py','_CURRENT: ContextVar[TelemetryContext] = ContextVar(\n    "loto_telemetry_context", default=TelemetryContext()\n)','_EMPTY_TELEMETRY_CONTEXT = TelemetryContext()\n_CURRENT: ContextVar[TelemetryContext] = ContextVar(\n    "loto_telemetry_context", default=_EMPTY_TELEMETRY_CONTEXT\n)')
           replace_once('src/loto/statsforecast/runtime_lane_remediation.py','    remediation = _load_object(triage_dir / "REMEDIATION_PLAN.json")','    _load_object(triage_dir / "REMEDIATION_PLAN.json")')
           PY
-          echo '=== I001 AFTER REPAIRS ==='
-          set +e
-          "$python" -m ruff check --select I001 src scripts tests
-          rc=$?
-          set -e
-          echo "I001_RC=$rc"
-          echo '=== TARGETED B008/B039/F841 ==='
+          echo '=== I001 FIX DIFF: HOLDOUT SCORE ==='
+          "$python" -m ruff check --select I001 --fix --diff src/loto/autogluon_campaign/holdout_prospective_score.py || true
+          echo '=== I001 FIX DIFF: PROMOTION ==='
+          "$python" -m ruff check --select I001 --fix --diff src/loto/autogluon_campaign/promotion_eligibility.py || true
+          echo '=== TARGETED SAFETY ==='
           "$python" -m ruff check --select B008,B039,F841 src scripts tests
 
       - name: Cleanup
