@@ -1,0 +1,98 @@
+name: e402-inventory
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-lint-e402-import-order-v1' }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 60
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
+      EXPECTED_RUFF_VERSION: "0.16.0"
+      EXPECTED_TOTAL_LINT: "143"
+      EXPECTED_E402: "37"
+    steps:
+      - name: Verify trusted runner
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+      - name: Checkout trusted branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: fix/ruff-lint-e402-import-order-v1
+          persist-credentials: false
+          fetch-depth: 1
+          clean: true
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+      - name: Inventory E402 findings with context
+        run: |
+          set -Eeuo pipefail
+          uv python install "$UV_PYTHON"
+          venv="$RUNNER_TEMP/loto-e402-audit-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-e402-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$venv" "$cache"
+          mkdir -p "$cache"
+          uv venv "$venv" --python "$UV_PYTHON"
+          python="$venv/bin/python"
+          ruff_version="$("$python" - <<'PY'
+          import tomllib
+          with open('uv.lock','rb') as f:
+              lock=tomllib.load(f)
+          versions=[p['version'] for p in lock['package'] if p.get('name')=='ruff']
+          if len(versions)!=1:
+              raise SystemExit(versions)
+          print(versions[0])
+          PY
+          )"
+          test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
+          set +e
+          "$python" -m ruff check --output-format=json src scripts tests > "$RUNNER_TEMP/all.json"
+          all_rc=$?
+          "$python" -m ruff check --select E402 --output-format=json src scripts tests > "$RUNNER_TEMP/e402.json"
+          e402_rc=$?
+          set -e
+          test "$all_rc" -eq 1
+          test "$e402_rc" -eq 1
+          "$python" - "$RUNNER_TEMP/all.json" "$RUNNER_TEMP/e402.json" <<'PY'
+          import collections, json, os, sys
+          from pathlib import Path
+          all_rows=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8') or '[]')
+          rows=json.loads(Path(sys.argv[2]).read_text(encoding='utf-8') or '[]')
+          counts=collections.Counter(row.get('code','UNKNOWN') for row in all_rows)
+          by_file=collections.Counter(Path(row['filename']).as_posix() for row in rows)
+          print(f"TOTAL_LINT_COUNT={len(all_rows)}")
+          print("TOTAL_RULE_COUNTS=" + ",".join(f"{k}:{v}" for k,v in sorted(counts.items())))
+          print(f"E402_COUNT={len(rows)}")
+          print("E402_FILES=" + ",".join(f"{k}:{v}" for k,v in sorted(by_file.items())))
+          for index,row in enumerate(rows, start=1):
+              path=Path(row['filename'])
+              loc=row.get('location') or {}
+              line=int(loc.get('row') or 1)
+              source=path.read_text(encoding='utf-8').splitlines()
+              lo=max(1,line-8); hi=min(len(source),line+3)
+              context=' || '.join(f"{n}:{source[n-1].strip()}" for n in range(lo,hi+1))
+              fix=row.get('fix')
+              applicability=None if fix is None else fix.get('applicability')
+              print(f"E402|{index}|{path.as_posix()}:{line}:{loc.get('column')}|fix={applicability or ('available' if fix else 'none')}|{row.get('message','')}|CTX={context}")
+          if len(all_rows) != int(os.environ['EXPECTED_TOTAL_LINT']):
+              raise SystemExit(f"unexpected total lint: {len(all_rows)}")
+          if len(rows) != int(os.environ['EXPECTED_E402']):
+              raise SystemExit(f"unexpected E402 count: {len(rows)}")
+          PY
+          git diff --exit-code
+          test -z "$(git status --porcelain=v1)"
+          rm -rf -- "$venv" "$cache"
