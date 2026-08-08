@@ -17,6 +17,10 @@ class UnsafeImportReference(ValueError):
     """Raised when a declarative object reference is outside the approved surface."""
 
 
+# Pre-conflict PR #56 tests and callers used this name for the same fail-closed condition.
+ConfigImportRejected = UnsafeImportReference
+
+
 def is_allowed_module(module: str) -> bool:
     return any(module == root or module.startswith(f"{root}.") for root in _ALLOWED_MODULE_ROOTS)
 
