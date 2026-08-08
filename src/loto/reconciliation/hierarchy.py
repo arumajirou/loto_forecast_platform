@@ -9,16 +9,17 @@ Two implementations are provided:
 
 * :func:`reconcile` -- a self-contained MinT/OLS/BottomUp/TopDown reconciliation that runs on
   numpy alone, so the core dependency set does not grow.
-* :func:`reconcile_with_hierarchicalforecast` -- delegates to Nixtla's
-  ``hierarchicalforecast`` when installed, exposing all ten upstream methods.
+* :func:`reconcile_with_hierarchicalforecast` -- executes Nixtla's
+  ``hierarchicalforecast`` when installed and verifies the returned forecast.
 
-Both are exact in the sense that the returned forecasts satisfy ``S @ bottom == full`` to
-floating-point tolerance, which :func:`coherence_error` verifies rather than assumes.
+Both implementations verify ``S @ bottom == full`` rather than assuming coherence.
 """
 
 from __future__ import annotations
 
+import inspect
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 
@@ -31,9 +32,41 @@ __all__ = [
     "coherence_error",
     "reconcile_with_hierarchicalforecast",
     "AVAILABLE_METHODS",
+    "UPSTREAM_METHODS",
 ]
 
-AVAILABLE_METHODS: tuple[str, ...] = ("bottom_up", "top_down", "ols", "wls_struct", "mint_shrink")
+AVAILABLE_METHODS: tuple[str, ...] = (
+    "bottom_up",
+    "top_down",
+    "ols",
+    "wls_struct",
+    "mint_shrink",
+)
+UPSTREAM_METHODS: tuple[str, ...] = (
+    "BottomUp",
+    "BottomUpSparse",
+    "TopDown",
+    "TopDownSparse",
+    "MiddleOut",
+    "MiddleOutSparse",
+    "MinTrace",
+    "MinTraceSparse",
+    "OptimalCombination",
+    "ERM",
+)
+
+_UPSTREAM_DEFAULT_OPTIONS: dict[str, dict[str, object]] = {
+    "BottomUp": {},
+    "BottomUpSparse": {},
+    "TopDown": {"method": "forecast_proportions"},
+    "TopDownSparse": {"method": "forecast_proportions"},
+    "MiddleOut": {"top_down_method": "forecast_proportions"},
+    "MiddleOutSparse": {"top_down_method": "forecast_proportions"},
+    "MinTrace": {"method": "ols"},
+    "MinTraceSparse": {"method": "ols"},
+    "OptimalCombination": {"method": "ols"},
+    "ERM": {"method": "closed"},
+}
 
 
 @dataclass(frozen=True)
@@ -117,7 +150,13 @@ def _projection(hierarchy: Hierarchy, method: str, residuals: np.ndarray | None)
         diag = np.diag(np.diag(cov))
         off = cov - diag
         denom = float(np.sum(off**2))
-        lam = float(np.clip(1.0 - denom / (denom + float(np.sum(diag**2)) + 1e-12), 0.0, 1.0))
+        lam = float(
+            np.clip(
+                1.0 - denom / (denom + float(np.sum(diag**2)) + 1e-12),
+                0.0,
+                1.0,
+            )
+        )
         shrunk = lam * diag + (1.0 - lam) * cov
         shrunk = shrunk + np.eye(hierarchy.n_total) * 1e-8
         w_inv = np.linalg.pinv(shrunk)
@@ -173,49 +212,235 @@ def coherence_error(full: np.ndarray, bottom: np.ndarray, hierarchy: Hierarchy) 
     return float(np.abs(hierarchy.summing_matrix @ b - f).max())
 
 
+def _as_forecast_matrix(values: np.ndarray, hierarchy: Hierarchy, *, name: str) -> np.ndarray:
+    matrix = np.asarray(values, dtype=float)
+    if matrix.ndim == 1:
+        matrix = matrix.reshape(-1, 1)
+    if matrix.ndim != 2:
+        raise ValueError(f"{name} must be one- or two-dimensional")
+    if matrix.shape[0] != hierarchy.n_total:
+        raise ValueError(
+            f"{name} expected {hierarchy.n_total} series, got {matrix.shape[0]}"
+        )
+    if not np.isfinite(matrix).all():
+        raise ValueError(f"{name} contains NaN or Inf")
+    return matrix
+
+
+def _hierarchy_tags(hierarchy: Hierarchy) -> dict[str, np.ndarray]:
+    tags: dict[str, list[int]] = {}
+    for index, label in enumerate(hierarchy.labels):
+        level = label if label == "total" else label.split("/", maxsplit=1)[0]
+        tags.setdefault(level, []).append(index)
+    return {name: np.asarray(indices, dtype=int) for name, indices in tags.items()}
+
+
+def _filtered_call_kwargs(callable_object: Any, values: dict[str, object]) -> dict[str, object]:
+    parameters = inspect.signature(callable_object).parameters
+    if any(parameter.kind is inspect.Parameter.VAR_KEYWORD for parameter in parameters.values()):
+        return values
+    return {key: value for key, value in values.items() if key in parameters}
+
+
 def reconcile_with_hierarchicalforecast(
-    base_forecasts: np.ndarray, hierarchy: Hierarchy, *, method: str = "MinTrace"
+    base_forecasts: np.ndarray,
+    hierarchy: Hierarchy,
+    *,
+    method: str = "MinTrace",
+    method_options: dict[str, object] | None = None,
+    insample_actuals: np.ndarray | None = None,
+    insample_forecasts: np.ndarray | None = None,
+    coherence_tolerance: float = 1e-8,
 ) -> dict[str, object]:
-    """Delegate to Nixtla ``hierarchicalforecast``. Reports UNAVAILABLE rather than faking it."""
+    """Execute and verify Nixtla ``hierarchicalforecast`` reconciliation.
+
+    The optional dependency is fail-closed: unavailable packages, incompatible grouped
+    hierarchies, missing in-sample arrays, constructor errors, execution errors, non-finite
+    results, shape mismatches, and incoherent outputs receive distinct statuses.
+    """
+    base = _as_forecast_matrix(base_forecasts, hierarchy, name="base_forecasts")
+    if coherence_tolerance < 0:
+        raise ValueError("coherence_tolerance must be non-negative")
+    if (insample_actuals is None) != (insample_forecasts is None):
+        raise ValueError(
+            "insample_actuals and insample_forecasts must be supplied together"
+        )
+
+    actuals: np.ndarray | None = None
+    fitted: np.ndarray | None = None
+    if insample_actuals is not None and insample_forecasts is not None:
+        actuals = _as_forecast_matrix(
+            insample_actuals,
+            hierarchy,
+            name="insample_actuals",
+        )
+        fitted = _as_forecast_matrix(
+            insample_forecasts,
+            hierarchy,
+            name="insample_forecasts",
+        )
+        if actuals.shape != fitted.shape:
+            raise ValueError("in-sample actual and forecast shapes must match")
+
+    if method not in UPSTREAM_METHODS:
+        raise ValueError(
+            f"hierarchicalforecast has no supported method {method!r}; "
+            f"available={list(UPSTREAM_METHODS)}"
+        )
+
     try:
+        import hierarchicalforecast
         import hierarchicalforecast.methods as hfm
+        from hierarchicalforecast.utils import is_strictly_hierarchical
     except ImportError as exc:
         return {
             "status": "UNAVAILABLE",
             "method": method,
+            "actual_execution": False,
             "error": f"{type(exc).__name__}: {exc}",
             "remedy": "uv sync --extra full",
         }
+
     if not hasattr(hfm, method):
-        raise ValueError(f"hierarchicalforecast has no method {method!r}")
+        raise ValueError(f"installed hierarchicalforecast has no method {method!r}")
 
-    reconciler_class = getattr(hfm, method)
-
+    tags = _hierarchy_tags(hierarchy)
+    s_dense = np.asarray(hierarchy.summing_matrix, dtype=float)
     try:
-        # hierarchicalforecast 1.x requires an explicit reconciliation
-        # strategy for MinTrace. OLS does not require residual forecasts.
-        if method == "MinTrace":
-            reconciler = reconciler_class(method="ols")
-            upstream_method = "ols"
-        else:
-            reconciler = reconciler_class()
-            upstream_method = None
-    except (TypeError, ValueError) as exc:
+        hierarchy_is_strict = bool(is_strictly_hierarchical(s_dense, tags))
+    except Exception as exc:
         return {
-            "status": "UNAVAILABLE",
+            "status": "VALIDATION_FAILED",
             "method": method,
+            "actual_execution": False,
             "error": f"{type(exc).__name__}: {exc}",
-            "remedy": (
-                "Check the installed hierarchicalforecast API and "
-                "select a supported reconciliation method."
+        }
+    reconciler_class = getattr(hfm, method)
+    strict_only = bool(
+        getattr(reconciler_class, "is_strictly_hierarchical", False)
+    )
+    if strict_only and not hierarchy_is_strict:
+        return {
+            "status": "UNSUPPORTED_HIERARCHY",
+            "method": method,
+            "actual_execution": False,
+            "hierarchy_is_strict": False,
+            "error": (
+                f"{method} requires a strictly hierarchical tree, but the number hierarchy "
+                "contains grouped parity and decade aggregations"
             ),
         }
 
-    result: dict[str, object] = {
-        "status": "AVAILABLE",
-        "method": method,
-        "reconciler": repr(reconciler),
+    options = dict(_UPSTREAM_DEFAULT_OPTIONS[method])
+    options.update(method_options or {})
+    if method in {"MiddleOut", "MiddleOutSparse"} and "middle_level" not in options:
+        return {
+            "status": "CONFIGURATION_REQUIRED",
+            "method": method,
+            "actual_execution": False,
+            "hierarchy_is_strict": hierarchy_is_strict,
+            "error": "middle_level is required for MiddleOut reconciliation",
+        }
+
+    try:
+        reconciler = reconciler_class(**options)
+    except (TypeError, ValueError) as exc:
+        return {
+            "status": "CONFIGURATION_ERROR",
+            "method": method,
+            "actual_execution": False,
+            "hierarchy_is_strict": hierarchy_is_strict,
+            "upstream_options": options,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+
+    requires_insample = bool(getattr(reconciler, "insample", False))
+    if requires_insample and (actuals is None or fitted is None):
+        return {
+            "status": "REQUIRES_INSAMPLE",
+            "method": method,
+            "actual_execution": False,
+            "hierarchy_is_strict": hierarchy_is_strict,
+            "requires_insample": True,
+            "upstream_options": options,
+            "error": "selected reconciliation method requires in-sample actuals and forecasts",
+        }
+
+    upstream_s: object = s_dense
+    if bool(getattr(reconciler, "is_sparse_method", False)):
+        try:
+            from scipy import sparse
+        except ImportError as exc:
+            return {
+                "status": "UNAVAILABLE",
+                "method": method,
+                "actual_execution": False,
+                "error": f"{type(exc).__name__}: {exc}",
+                "remedy": "uv sync --extra full",
+            }
+        upstream_s = sparse.csr_matrix(s_dense)
+
+    call_values: dict[str, object] = {
+        "S": upstream_s,
+        "y_hat": base,
+        "y_insample": actuals,
+        "y_hat_insample": fitted,
+        "tags": tags,
     }
-    if upstream_method is not None:
-        result["upstream_method"] = upstream_method
-    return result
+    try:
+        raw_result = reconciler.fit_predict(
+            **_filtered_call_kwargs(reconciler.fit_predict, call_values)
+        )
+    except Exception as exc:  # upstream methods raise several library-specific exception types
+        return {
+            "status": "EXECUTION_FAILED",
+            "method": method,
+            "actual_execution": True,
+            "hierarchy_is_strict": hierarchy_is_strict,
+            "requires_insample": requires_insample,
+            "upstream_options": options,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+
+    reconciled_value = raw_result.get("mean") if isinstance(raw_result, dict) else raw_result
+    try:
+        reconciled = _as_forecast_matrix(
+            np.asarray(reconciled_value),
+            hierarchy,
+            name="reconciled_forecasts",
+        )
+    except (TypeError, ValueError) as exc:
+        return {
+            "status": "VALIDATION_FAILED",
+            "method": method,
+            "actual_execution": True,
+            "hierarchy_is_strict": hierarchy_is_strict,
+            "requires_insample": requires_insample,
+            "upstream_options": options,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+
+    bottom = reconciled[-hierarchy.n_bottom :]
+    error = coherence_error(reconciled, bottom, hierarchy)
+    status = "VERIFIED" if error <= coherence_tolerance else "VALIDATION_FAILED"
+    return {
+        "status": status,
+        "method": method,
+        "actual_execution": True,
+        "upstream_version": getattr(hierarchicalforecast, "__version__", "UNKNOWN"),
+        "hierarchy_is_strict": hierarchy_is_strict,
+        "requires_insample": requires_insample,
+        "upstream_options": options,
+        "reconciler": repr(reconciler),
+        "bottom": bottom,
+        "reconciled": reconciled,
+        "finite": bool(np.isfinite(reconciled).all()),
+        "shape": list(reconciled.shape),
+        "coherence_error": error,
+        "coherence_tolerance": coherence_tolerance,
+        "base_incoherence": coherence_error(
+            base,
+            base[-hierarchy.n_bottom :],
+            hierarchy,
+        ),
+    }
