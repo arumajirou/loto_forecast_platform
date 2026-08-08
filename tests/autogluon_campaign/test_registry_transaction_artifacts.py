@@ -6,6 +6,9 @@ from pathlib import Path
 
 import pytest
 
+from loto.autogluon_campaign.approval_authorization_contract import (
+    ApprovalAuthorizationError,
+)
 from loto.autogluon_campaign.approval_authorization_io import (
     tree_sha256,
     write_evidence,
@@ -256,7 +259,7 @@ def test_output_file_tamper_is_detected(tmp_path: Path) -> None:
         path.read_text(encoding="utf-8").replace("NOT_DEPLOYED", "DEPLOYED"),
         encoding="utf-8",
     )
-    with pytest.raises(Exception):
+    with pytest.raises((ApprovalAuthorizationError, RegistryTransactionError)):
         verify_registry_transaction(output)
 
 
@@ -349,7 +352,7 @@ def test_p18_semantic_tamper_blocks_before_registry_mutation(tmp_path: Path) -> 
     ]
     write_evidence(p18, names)
     before = registry.read_bytes()
-    with pytest.raises(Exception):
+    with pytest.raises((ApprovalAuthorizationError, RegistryTransactionError)):
         create_registry_transaction(
             p18_evidence_dir=p18,
             registry_path=registry,

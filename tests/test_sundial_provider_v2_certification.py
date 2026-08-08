@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import importlib.util
 import sys
 from pathlib import Path
@@ -46,9 +47,9 @@ def _response(device: str = "cuda", num_samples: int = 3) -> dict[str, Any]:
 
 def test_parse_counts_rejects_duplicates_and_out_of_range() -> None:
     assert HARNESS.parse_counts("1,3,20") == (1, 3, 20)
-    with pytest.raises(Exception):
+    with pytest.raises(argparse.ArgumentTypeError):
         HARNESS.parse_counts("1,1")
-    with pytest.raises(Exception):
+    with pytest.raises(argparse.ArgumentTypeError):
         HARNESS.parse_counts("0")
 
 

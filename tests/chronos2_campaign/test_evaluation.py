@@ -290,7 +290,7 @@ def test_oof_preserves_raw_and_reconciles_point_predictions() -> None:
     result = run_oof_evaluation(_history(), _config(), predictor)
     rows = result.predictions[result.predictions["candidate"] == "chronos2"]
     assert rows["raw_point"].isin([5.2, 5.3, 5.4]).all()
-    for (_, _, horizon_step), group in rows.groupby(["fold_id", "seed", "horizon_step"]):
+    for (_, _, _horizon_step), group in rows.groupby(["fold_id", "seed", "horizon_step"]):
         points = group.sort_values("position")["point"].tolist()
         assert points == sorted(points)
         assert len(points) == len(set(points))

@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 
 import pytest
 from conftest import OBSERVED_AT, continuity
+from pydantic import ValidationError
 
 from loto.clock_health import (
     ChronycAdapter,
@@ -105,7 +106,7 @@ def test_duplicate_tracking_field_becomes_parser_error(
 
 def test_continuity_hash_rejects_tamper(policy) -> None:
     evidence = continuity(policy)
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError):
         ClockContinuityEvidence.model_validate(
             {**evidence.model_dump(mode="python"), "wall_delta_ns": 2_000_000_000},
             strict=True,
