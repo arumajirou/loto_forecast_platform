@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from enum import Enum
+from enum import StrEnum
 from urllib.parse import urlsplit
 
 from pydantic import ConfigDict
@@ -32,7 +32,7 @@ _FLOATING_VERSION_NAMES = {"dev", "head", "latest", "main", "master", "nightly"}
 _VERSION_OPERATOR_CHARACTERS = frozenset("<>=!~*,^|&")
 
 
-class IntakeStatus(str, Enum):
+class IntakeStatus(StrEnum):
     VERIFIED_FOR_INTAKE = "VERIFIED_FOR_INTAKE"
     CONDITIONAL = "CONDITIONAL"
     REMOTE_CODE_REVIEW_REQUIRED = "REMOTE_CODE_REVIEW_REQUIRED"
@@ -42,32 +42,32 @@ class IntakeStatus(str, Enum):
     BLOCKED = "BLOCKED"
 
 
-class SourceKind(str, Enum):
+class SourceKind(StrEnum):
     MODEL = "MODEL"
     METHOD = "METHOD"
 
 
-class ReleaseStatus(str, Enum):
+class ReleaseStatus(StrEnum):
     AVAILABLE = "AVAILABLE"
     NOT_RELEASED = "NOT_RELEASED"
     UNKNOWN = "UNKNOWN"
 
 
-class CommercialEligibility(str, Enum):
+class CommercialEligibility(StrEnum):
     ELIGIBLE = "ELIGIBLE"
     INELIGIBLE = "INELIGIBLE"
     UNKNOWN = "UNKNOWN"
     LICENSE_REVIEW_REQUIRED = "LICENSE_REVIEW_REQUIRED"
 
 
-class ReviewStatus(str, Enum):
+class ReviewStatus(StrEnum):
     NOT_REQUIRED = "NOT_REQUIRED"
     VERIFIED = "VERIFIED"
     UNVERIFIED = "UNVERIFIED"
     REMOTE_CODE_REVIEW_REQUIRED = "REMOTE_CODE_REVIEW_REQUIRED"
 
 
-class ContaminationRisk(str, Enum):
+class ContaminationRisk(StrEnum):
     LOW = "LOW"
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"

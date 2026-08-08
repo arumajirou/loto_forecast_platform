@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 
-class EvidenceStatus(str, Enum):
+class EvidenceStatus(StrEnum):
     NOT_PROVIDED = "NOT_PROVIDED"
     OPERATOR_ASSERTED = "OPERATOR_ASSERTED"
     LOCALLY_TIMESTAMPED = "LOCALLY_TIMESTAMPED"
@@ -19,7 +19,7 @@ class EvidenceStatus(str, Enum):
     REVOKED = "REVOKED"
 
 
-class TimestampAuthority(str, Enum):
+class TimestampAuthority(StrEnum):
     NONE = "NONE"
     OPERATOR = "OPERATOR"
     LOCAL_SYSTEM = "LOCAL_SYSTEM"
@@ -29,7 +29,7 @@ class TimestampAuthority(str, Enum):
     OTHER_EXTERNAL = "OTHER_EXTERNAL"
 
 
-class SignatureKind(str, Enum):
+class SignatureKind(StrEnum):
     NONE = "NONE"
     HMAC = "HMAC"
     PUBLIC_KEY = "PUBLIC_KEY"
@@ -37,7 +37,7 @@ class SignatureKind(str, Enum):
     OTHER = "OTHER"
 
 
-class PublicVerifiability(str, Enum):
+class PublicVerifiability(StrEnum):
     NONE = "NONE"
     SHARED_SECRET_ONLY = "SHARED_SECRET_ONLY"
     PUBLIC_KEY = "PUBLIC_KEY"
@@ -45,7 +45,7 @@ class PublicVerifiability(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
-class RevisionKind(str, Enum):
+class RevisionKind(StrEnum):
     NONE = "NONE"
     ETAG = "ETAG"
     LAST_MODIFIED = "LAST_MODIFIED"
@@ -55,13 +55,13 @@ class RevisionKind(str, Enum):
     OTHER = "OTHER"
 
 
-class VerificationDomain(str, Enum):
+class VerificationDomain(StrEnum):
     TRUSTED_TIME = "TRUSTED_TIME"
     SIGNATURE = "SIGNATURE"
     ACTUAL_SOURCE = "ACTUAL_SOURCE"
 
 
-class OfflineVerificationStatus(str, Enum):
+class OfflineVerificationStatus(StrEnum):
     VERIFIED = "VERIFIED"
     UNVERIFIED = "UNVERIFIED"
     FAILED = "FAILED"

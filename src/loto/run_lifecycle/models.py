@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -33,7 +33,7 @@ class StrictFrozenModel(BaseModel):
     )
 
 
-class RunPhase(str, Enum):
+class RunPhase(StrEnum):
     PLAN = "PLAN"
     DATA = "DATA"
     TRAIN = "TRAIN"
@@ -47,7 +47,7 @@ class RunPhase(str, Enum):
     COMPLETE = "COMPLETE"
 
 
-class RunStatus(str, Enum):
+class RunStatus(StrEnum):
     PENDING = "PENDING"
     RUNNING = "RUNNING"
     SUCCEEDED = "SUCCEEDED"
@@ -58,7 +58,7 @@ class RunStatus(str, Enum):
     TERMINAL_FAILURE = "TERMINAL_FAILURE"
 
 
-class RunCommandType(str, Enum):
+class RunCommandType(StrEnum):
     START = "START"
     MARK_SUCCEEDED = "MARK_SUCCEEDED"
     MARK_RETRYABLE_FAILURE = "MARK_RETRYABLE_FAILURE"
@@ -70,7 +70,7 @@ class RunCommandType(str, Enum):
     CANCEL = "CANCEL"
 
 
-class FindingSeverity(str, Enum):
+class FindingSeverity(StrEnum):
     ERROR = "ERROR"
     WARNING = "WARNING"
     INFO = "INFO"

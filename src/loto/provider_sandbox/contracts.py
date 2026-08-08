@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -34,26 +34,26 @@ class StrictFrozenModel(BaseModel):
     )
 
 
-class SandboxBackend(str, Enum):
+class SandboxBackend(StrEnum):
     BUBBLEWRAP = "BUBBLEWRAP"
     ROOTLESS_OCI = "ROOTLESS_OCI"
     NONE = "NONE"
 
 
-class NetworkMode(str, Enum):
+class NetworkMode(StrEnum):
     DISABLED = "DISABLED"
 
 
-class RootFilesystemMode(str, Enum):
+class RootFilesystemMode(StrEnum):
     READ_ONLY = "READ_ONLY"
 
 
-class MountMode(str, Enum):
+class MountMode(StrEnum):
     READ_ONLY = "READ_ONLY"
     READ_WRITE_TMP = "READ_WRITE_TMP"
 
 
-class MountKind(str, Enum):
+class MountKind(StrEnum):
     RUNTIME = "RUNTIME"
     REPOSITORY = "REPOSITORY"
     MODEL_SNAPSHOT = "MODEL_SNAPSHOT"
@@ -62,13 +62,13 @@ class MountKind(str, Enum):
     TMPFS = "TMPFS"
 
 
-class VerificationStatus(str, Enum):
+class VerificationStatus(StrEnum):
     VERIFIED = "VERIFIED"
     MISMATCH = "MISMATCH"
     INCOMPLETE = "INCOMPLETE"
 
 
-class ProcessOutcome(str, Enum):
+class ProcessOutcome(StrEnum):
     SUCCEEDED = "SUCCEEDED"
     NONZERO_EXIT = "NONZERO_EXIT"
     TIMED_OUT = "TIMED_OUT"

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class Game(str, Enum):
+class Game(StrEnum):
     NUMBERS3 = "numbers3"
     NUMBERS4 = "numbers4"
     MINILOTO = "miniloto"

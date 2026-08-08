@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -23,7 +23,7 @@ class StrictModel(BaseModel):
     )
 
 
-class TemporalClass(str, Enum):
+class TemporalClass(StrEnum):
     TARGET_HISTORY = "TARGET_HISTORY"
     PAST_ONLY = "PAST_ONLY"
     KNOWN_FUTURE = "KNOWN_FUTURE"
@@ -31,14 +31,14 @@ class TemporalClass(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
-class DataSplit(str, Enum):
+class DataSplit(StrEnum):
     TRAIN = "TRAIN"
     VALIDATION = "VALIDATION"
     HOLDOUT = "HOLDOUT"
     PROSPECTIVE = "PROSPECTIVE"
 
 
-class MissingPolicy(str, Enum):
+class MissingPolicy(StrEnum):
     ERROR = "ERROR"
     DROP_ROW = "DROP_ROW"
     IMPUTE_TRAIN_ONLY = "IMPUTE_TRAIN_ONLY"
@@ -46,7 +46,7 @@ class MissingPolicy(str, Enum):
     ALLOW_NULL = "ALLOW_NULL"
 
 
-class PreprocessorKind(str, Enum):
+class PreprocessorKind(StrEnum):
     SCALER = "SCALER"
     ENCODER = "ENCODER"
     SELECTOR = "SELECTOR"

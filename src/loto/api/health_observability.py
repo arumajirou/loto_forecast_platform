@@ -9,7 +9,7 @@ import uuid
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Protocol, runtime_checkable
 
 from fastapi import APIRouter, FastAPI, Request
@@ -30,7 +30,7 @@ class StrictModel(BaseModel):
     )
 
 
-class DependencyName(str, Enum):
+class DependencyName(StrEnum):
     REGISTRY_DATABASE = "registry_database"
     POSTGRESQL = "postgresql"
     MLFLOW = "mlflow"
@@ -41,7 +41,7 @@ class DependencyName(str, Enum):
     JOB_QUEUE = "job_queue"
 
 
-class DependencyState(str, Enum):
+class DependencyState(StrEnum):
     CONFIGURED_AND_READY = "CONFIGURED_AND_READY"
     CONFIGURED_BUT_UNAVAILABLE = "CONFIGURED_BUT_UNAVAILABLE"
     NOT_CONFIGURED = "NOT_CONFIGURED"
@@ -49,12 +49,12 @@ class DependencyState(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
-class DependencyCriticality(str, Enum):
+class DependencyCriticality(StrEnum):
     REQUIRED = "REQUIRED"
     OPTIONAL = "OPTIONAL"
 
 
-class ReadinessStatus(str, Enum):
+class ReadinessStatus(StrEnum):
     READY = "READY"
     DEGRADED = "DEGRADED"
     UNREADY = "UNREADY"

@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path, PurePosixPath
 from typing import Any, Literal
 
@@ -147,7 +147,7 @@ class SnapshotVerification(BaseModel):
         return value
 
 
-class ArchitectureProfile(str, Enum):
+class ArchitectureProfile(StrEnum):
     COMPACT = "compact"
     BALANCED = "balanced"
     WIDE = "wide"

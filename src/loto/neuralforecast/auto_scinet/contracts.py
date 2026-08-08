@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -24,13 +24,13 @@ SCINET_CAUSAL_BLOCKS_PER_SCI_BLOCK = 4
 SCINET_MAX_INPUT_SIZE = 256
 
 
-class ArchitectureProfile(str, Enum):
+class ArchitectureProfile(StrEnum):
     COMPACT = "compact"
     BALANCED = "balanced"
     WIDE = "wide"
 
 
-class TrainingProfile(str, Enum):
+class TrainingProfile(StrEnum):
     SMOKE = "smoke"
     STANDARD = "standard"
     EXTENDED = "extended"

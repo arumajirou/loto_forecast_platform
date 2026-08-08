@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Literal
 
 from .contracts import PromotionStatus, StrictModel
 
 
-class LegacySource(str, Enum):
+class LegacySource(StrEnum):
     MAIN_PROMOTION = "MAIN_PROMOTION"
     PLATFORM_REGISTRY = "PLATFORM_REGISTRY"
     SKTIME_P6 = "SKTIME_P6"
@@ -23,7 +23,7 @@ class LegacySource(str, Enum):
     PROVIDER_LOCAL = "PROVIDER_LOCAL"
 
 
-class MappingConfidence(str, Enum):
+class MappingConfidence(StrEnum):
     EXACT = "EXACT"
     CONSERVATIVE = "CONSERVATIVE"
     BLOCKED_MISSING_EVIDENCE = "BLOCKED_MISSING_EVIDENCE"

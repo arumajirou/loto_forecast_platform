@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import Field
 
@@ -15,7 +15,7 @@ from .contracts import (
 )
 
 
-class ValidationIssueCode(str, Enum):
+class ValidationIssueCode(StrEnum):
     AVAILABLE_AFTER_PREDICTION_CUTOFF = "AVAILABLE_AFTER_PREDICTION_CUTOFF"
     MATERIALIZED_AFTER_PREDICTION_CUTOFF = "MATERIALIZED_AFTER_PREDICTION_CUTOFF"
     UNKNOWN_REVISION = "UNKNOWN_REVISION"

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 from pydantic import (
@@ -27,17 +27,17 @@ from loto.toto2_campaign.model_manifest import (
 NumericScalar = StrictFloat | StrictInt
 
 
-class Operation(str, Enum):
+class Operation(StrEnum):
     IDENTITY = "identity"
     PREDICT = "predict"
 
 
-class TimeSemantics(str, Enum):
+class TimeSemantics(StrEnum):
     DRAW_SEQUENCE = "draw_sequence"
     CALENDAR_TIME = "calendar_time"
 
 
-class SeriesLayout(str, Enum):
+class SeriesLayout(StrEnum):
     POSITION_UNIVARIATE = "position_univariate"
     POSITION_MULTIVARIATE = "position_multivariate"
 
