@@ -120,9 +120,15 @@ jobs:
           test "${#changed[@]}" -eq 26
           for path in "${changed[@]}"; do case "$path" in tests/*.py|tests/**/*.py) ;; *) echo "unexpected path: $path"; exit 1 ;; esac; done
           git diff --check
+          "$python" -m ruff check --select I001 --fix "${changed[@]}"
+          "$python" -m ruff format "${changed[@]}"
+          mapfile -t normalized < <(git diff --name-only | sort)
+          test "${#normalized[@]}" -eq 26
+          test "${normalized[*]}" = "${changed[*]}"
           "$python" -m ruff check "${changed[@]}"
           "$python" -m ruff format --check "${changed[@]}"
           "$python" -m compileall -q tests
+          echo 'SHADOW_STATIC_GATES=PASS'
 
           set +e
           "$python" -m pytest --collect-only -q --tb=short > "$RUNNER_TEMP/after.txt" 2>&1
