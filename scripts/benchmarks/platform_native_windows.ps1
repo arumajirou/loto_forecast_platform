@@ -10,6 +10,8 @@ $Repo = "arumajirou/loto_forecast_platform"
 $TargetBranch = "fix/windows-portability-verification-v1"
 $ExpectedBase = "f5f5c5e1feb97042fe9a3c947a9a97aac2281dac"
 $ExpectedMain = "5926ad6d00314c7ba5ec7133bb377dd5beb1316c"
+$UvVersion = "0.11.21"
+$PythonVersion = "3.12.13"
 
 $RepoRoot = (git rev-parse --show-toplevel).Trim()
 if ($LASTEXITCODE -ne 0 -or -not $RepoRoot) {
@@ -21,7 +23,10 @@ $RunId = "platform-bench-windows-native-$Stamp"
 $RelOut = "benchmark-results/$RunId"
 $Out = Join-Path $RepoRoot $RelOut
 $Target = Join-Path $env:TEMP "loto-target-$PID"
+$UvInstallRoot = Join-Path $env:TEMP "loto-bench-uv-$UvVersion-$PID"
 $Phase = "startup"
+$UvExe = $null
+$SystemUvVersion = $null
 
 New-Item -ItemType Directory -Force -Path $Out | Out-Null
 
@@ -68,6 +73,41 @@ function Get-SystemSample {
     }
 }
 
+function Install-ExactUv {
+    param(
+        [Parameter(Mandatory)][string]$Version,
+        [Parameter(Mandatory)][string]$InstallRoot
+    )
+
+    if (Test-Path $InstallRoot) {
+        Remove-Item -Recurse -Force $InstallRoot
+    }
+    New-Item -ItemType Directory -Force -Path $InstallRoot | Out-Null
+
+    $archive = Join-Path $InstallRoot "uv-x86_64-pc-windows-msvc.zip"
+    $extract = Join-Path $InstallRoot "bin"
+    $uri = "https://github.com/astral-sh/uv/releases/download/$Version/uv-x86_64-pc-windows-msvc.zip"
+
+    Invoke-WebRequest -Uri $uri -OutFile $archive
+    Expand-Archive -Path $archive -DestinationPath $extract -Force
+
+    $candidate = Get-ChildItem -Path $extract -Filter "uv.exe" -File -Recurse |
+        Select-Object -First 1
+    if (-not $candidate) {
+        throw "Exact uv executable not found after extracting $uri"
+    }
+
+    $actual = (& $candidate.FullName --version).Trim()
+    if ($LASTEXITCODE -ne 0) {
+        throw "Bootstrapped uv could not execute."
+    }
+    if ($actual -ne "uv $Version") {
+        throw "Unexpected bootstrapped uv version: $actual"
+    }
+
+    return $candidate.FullName
+}
+
 $Metrics = [System.Collections.Generic.List[object]]::new()
 
 function Measure-Stage {
@@ -105,29 +145,11 @@ function Measure-Stage {
     }
 }
 
-try {
-    $Phase = "capability"
-    foreach ($cmd in @("gh", "git", "uv")) {
-        if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) {
-            throw "Missing tool: $cmd"
-        }
-    }
-    if ($env:WSL_DISTRO_NAME) {
-        throw "WSL detected; Native Windows required."
-    }
+function Write-PlatformRecord {
+    param(
+        [Parameter(Mandatory)][string]$BenchmarkUvVersion
+    )
 
-    $Phase = "remote_guard"
-    $pr = gh api "repos/$Repo/pulls/$TargetPr" | ConvertFrom-Json
-    if ($LASTEXITCODE -ne 0) { throw "Failed to read PR #$TargetPr" }
-    $main = gh api "repos/$Repo/git/ref/heads/main" | ConvertFrom-Json
-    if ($LASTEXITCODE -ne 0) { throw "Failed to read main ref" }
-
-    if ($pr.head.sha -ne $TargetSha) { throw "PR head moved: $($pr.head.sha)" }
-    if ($pr.base.sha -ne $ExpectedBase) { throw "PR base moved: $($pr.base.sha)" }
-    if ($main.object.sha -ne $ExpectedMain) { throw "main moved: $($main.object.sha)" }
-    if (-not $pr.draft) { throw "PR #$TargetPr must remain Draft." }
-
-    $Phase = "platform"
     $os = Get-CimInstance Win32_OperatingSystem
     $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1
     $cs = Get-CimInstance Win32_ComputerSystem
@@ -144,7 +166,9 @@ try {
                 $gpuDriver = $parts[1].Trim()
             }
             $smiHeader = (& nvidia-smi.exe | Select-Object -First 3) -join " "
-            if ($smiHeader -match "CUDA Version:\s*([0-9.]+)") { $cudaReported = $Matches[1] }
+            if ($smiHeader -match "CUDA Version:\s*([0-9.]+)") {
+                $cudaReported = $Matches[1]
+            }
         }
         catch {}
     }
@@ -171,13 +195,64 @@ try {
         gpu_driver = $gpuDriver
         cuda_reported_by_driver = $cudaReported
         powershell = $PSVersionTable.PSVersion.ToString()
-        uv = (uv --version)
+        system_uv = $SystemUvVersion
+        benchmark_uv = $BenchmarkUvVersion
+        benchmark_python = $PythonVersion
         git = (git --version)
         target_pr = $TargetPr
         target_sha = $TargetSha
         base_sha = $ExpectedBase
         main_sha = $ExpectedMain
     }) -Path (Join-Path $Out "platform.json")
+}
+
+try {
+    $Phase = "capability"
+    foreach ($cmd in @("gh", "git", "pwsh")) {
+        if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) {
+            throw "Missing tool: $cmd"
+        }
+    }
+    if ($env:WSL_DISTRO_NAME) {
+        throw "WSL detected; Native Windows required."
+    }
+
+    if (Get-Command uv -ErrorAction SilentlyContinue) {
+        try { $SystemUvVersion = (uv --version).Trim() }
+        catch { $SystemUvVersion = "UNAVAILABLE" }
+    }
+    else {
+        $SystemUvVersion = "NOT_INSTALLED"
+    }
+
+    $Phase = "remote_guard"
+    $pr = gh api "repos/$Repo/pulls/$TargetPr" | ConvertFrom-Json
+    if ($LASTEXITCODE -ne 0) { throw "Failed to read PR #$TargetPr" }
+    $main = gh api "repos/$Repo/git/ref/heads/main" | ConvertFrom-Json
+    if ($LASTEXITCODE -ne 0) { throw "Failed to read main ref" }
+
+    if ($pr.head.sha -ne $TargetSha) { throw "PR head moved: $($pr.head.sha)" }
+    if ($pr.base.sha -ne $ExpectedBase) { throw "PR base moved: $($pr.base.sha)" }
+    if ($main.object.sha -ne $ExpectedMain) { throw "main moved: $($main.object.sha)" }
+    if (-not $pr.draft) { throw "PR #$TargetPr must remain Draft." }
+
+    $Phase = "uv_bootstrap"
+    Measure-Stage -Name "uv_bootstrap_exact" -Body {
+        $script:UvExe = Install-ExactUv -Version $UvVersion -InstallRoot $UvInstallRoot
+    }
+    if (-not $UvExe -or -not (Test-Path $UvExe)) {
+        throw "Exact benchmark uv executable unavailable."
+    }
+    $BenchmarkUvVersion = (& $UvExe --version).Trim()
+    if ($LASTEXITCODE -ne 0 -or $BenchmarkUvVersion -ne "uv $UvVersion") {
+        throw "Exact benchmark uv version check failed: $BenchmarkUvVersion"
+    }
+
+    $Phase = "platform"
+    Write-PlatformRecord -BenchmarkUvVersion $BenchmarkUvVersion
+    Write-Host "SYSTEM_UV=$SystemUvVersion"
+    Write-Host "BENCHMARK_UV=$BenchmarkUvVersion"
+    Write-Host "BENCHMARK_PYTHON=$PythonVersion"
 
     $Phase = "target_fetch"
     Invoke-Native -File "git" -ArgumentList @(
@@ -198,27 +273,33 @@ try {
 
     $Phase = "python"
     Measure-Stage -Name "uv_python_312_ready" -Body {
-        Invoke-Native -File "uv" -ArgumentList @("python", "install", "3.12.13")
+        Invoke-Native -File $UvExe -ArgumentList @("python", "install", $PythonVersion)
     }
-    $py = (uv python find 3.12.13).Trim()
-    if ($LASTEXITCODE -ne 0 -or -not (Test-Path $py)) { throw "Python 3.12.13 unavailable." }
+    $py = (& $UvExe python find $PythonVersion).Trim()
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path $py)) {
+        throw "Python $PythonVersion unavailable."
+    }
+    $actualPython = (& $py --version).Trim()
+    if ($LASTEXITCODE -ne 0 -or $actualPython -ne "Python $PythonVersion") {
+        throw "Unexpected benchmark Python version: $actualPython"
+    }
 
     $Phase = "lock"
     Measure-Stage -Name "uv_lock_check" -Body {
         Push-Location $Target
-        try { Invoke-Native -File "uv" -ArgumentList @("lock", "--check") }
+        try { Invoke-Native -File $UvExe -ArgumentList @("lock", "--check") }
         finally { Pop-Location }
     }
 
     $Phase = "resolve"
     Measure-Stage -Name "windows_resolve_first" -Body {
         Push-Location $Target
-        try { Invoke-Native -File "uv" -ArgumentList @("sync", "--dry-run", "--locked", "--python", "3.12.13") }
+        try { Invoke-Native -File $UvExe -ArgumentList @("sync", "--dry-run", "--locked", "--python", $PythonVersion) }
         finally { Pop-Location }
     }
     Measure-Stage -Name "windows_resolve_second" -Body {
         Push-Location $Target
-        try { Invoke-Native -File "uv" -ArgumentList @("sync", "--dry-run", "--locked", "--python", "3.12.13") }
+        try { Invoke-Native -File $UvExe -ArgumentList @("sync", "--dry-run", "--locked", "--python", $PythonVersion) }
         finally { Pop-Location }
     }
 
@@ -227,7 +308,7 @@ try {
     Measure-Stage -Name "windows_dependency_tree" -Body {
         Push-Location $Target
         try {
-            & uv tree --locked --python-version 3.12 --python-platform x86_64-pc-windows-msvc |
+            & $UvExe tree --locked --python-version 3.12 --python-platform x86_64-pc-windows-msvc |
                 Tee-Object -FilePath $tree
             if ($LASTEXITCODE -ne 0) { throw "uv tree failed" }
         }
@@ -249,7 +330,7 @@ try {
     New-Item -ItemType Directory -Force -Path $dist | Out-Null
     Measure-Stage -Name "wheel_build" -Body {
         Push-Location $Target
-        try { Invoke-Native -File "uv" -ArgumentList @("build", "--wheel", "--out-dir", $dist) }
+        try { Invoke-Native -File $UvExe -ArgumentList @("build", "--wheel", "--out-dir", $dist) }
         finally { Pop-Location }
     }
     $wheel = Get-ChildItem $dist -Filter "*.whl" | Select-Object -First 1
@@ -260,9 +341,9 @@ try {
     Measure-Stage -Name "wheel_install_import_312" -Body {
         Push-Location $Target
         try {
-            Invoke-Native -File "uv" -ArgumentList @("venv", $venv, "--python", "3.12.13")
+            Invoke-Native -File $UvExe -ArgumentList @("venv", $venv, "--python", $PythonVersion)
             $venvPy = Join-Path $venv "Scripts\python.exe"
-            Invoke-Native -File "uv" -ArgumentList @("pip", "install", "--python", $venvPy, "--no-deps", $wheel.FullName)
+            Invoke-Native -File $UvExe -ArgumentList @("pip", "install", "--python", $venvPy, "--no-deps", $wheel.FullName)
             Invoke-Native -File $venvPy -ArgumentList @("-c", "import loto; print('loto_version=' + loto.__version__)")
         }
         finally { Pop-Location }
@@ -278,6 +359,8 @@ try {
         platform = "Native Windows"
         target_sha = $TargetSha
         target_pr = $TargetPr
+        benchmark_uv = $BenchmarkUvVersion
+        benchmark_python = $PythonVersion
         triton_selected = $false
         all_stages_pass = $true
         stages = $Metrics
@@ -317,5 +400,8 @@ catch {
 finally {
     if (Test-Path $Target) {
         git -C $RepoRoot worktree remove --force $Target 2>$null | Out-Null
+    }
+    if (Test-Path $UvInstallRoot) {
+        Remove-Item -Recurse -Force $UvInstallRoot -ErrorAction SilentlyContinue
     }
 }
