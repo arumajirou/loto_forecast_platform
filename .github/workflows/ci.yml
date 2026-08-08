@@ -50,7 +50,7 @@ jobs:
           set -Eeuo pipefail
           message="$(git log -1 --pretty=%s)"
           echo "head_message=$message"
-          if [[ "$message" == "ci: run Ruff small manual repairs (#200)" ]]; then
+          if [[ "$message" == "ci: retry Ruff small manual repairs with focused paths (#200)" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -112,7 +112,6 @@ jobs:
                   raise SystemExit(f"{path}: expected {expected} matches, got {count}: {old!r}")
               p.write_text(text.replace(old, new), encoding="utf-8")
 
-          # UP022: capture stdout/stderr exactly as bytes with the dedicated subprocess flag.
           for path in (
               "src/loto/autogluon_campaign/approval_authorization_contract.py",
               "src/loto/sktime_campaign/approval_authorization.py",
@@ -123,7 +122,6 @@ jobs:
                   "                capture_output=True,\n                check=False,",
               )
 
-          # B904: preserve the original exception while making the causal chain explicit.
           replace_once(
               "src/loto/autogluon_campaign/registry_transaction_io.py",
               "        except FileNotFoundError:\n            if is_leaf and allow_missing_leaf:\n                return\n            raise RegistryTransactionError(\"PATH_COMPONENT_MISSING\", str(current))",
@@ -134,15 +132,11 @@ jobs:
               "    except FileExistsError:\n        if not sidecar.is_file() or sidecar.is_symlink():\n            raise PackageIntegrityError(f\"existing sidecar is not a regular file: {sidecar}\")\n        if sidecar.read_text(encoding=\"utf-8\") != expected:\n            raise PackageIntegrityError(\"existing ZIP sidecar does not match package digest\")",
               "    except FileExistsError as exc:\n        if not sidecar.is_file() or sidecar.is_symlink():\n            raise PackageIntegrityError(\n                f\"existing sidecar is not a regular file: {sidecar}\"\n            ) from exc\n        if sidecar.read_text(encoding=\"utf-8\") != expected:\n            raise PackageIntegrityError(\n                \"existing ZIP sidecar does not match package digest\"\n            ) from exc",
           )
-
-          # E501: wrap only the diagnostic string.
           replace_once(
               "src/loto/sktime_campaign/verification.py",
               "            f\"sktime version evidence mismatch: expected={expected_version}, actual={actual_version}\"",
               "            \"sktime version evidence mismatch: \"\n            f\"expected={expected_version}, actual={actual_version}\"",
           )
-
-          # B007: mark intentionally unused loop components explicitly.
           replace_once(
               "tests/auto_campaign/test_prospective_scoring_metrics.py",
               "    for position, unique_id in enumerate(NUMBER_COLUMNS, start=1):",
@@ -153,8 +147,6 @@ jobs:
               "    for (_, _, horizon_step), group in rows.groupby([\"fold_id\", \"seed\", \"horizon_step\"]):",
               "    for (_, _, _horizon_step), group in rows.groupby([\"fold_id\", \"seed\", \"horizon_step\"]):",
           )
-
-          # B017: narrow blind Exception assertions to the concrete contract exceptions.
           replace_once(
               "tests/autogluon_campaign/test_registry_transaction_artifacts.py",
               "import pytest\n\nfrom loto.autogluon_campaign.approval_authorization_io import (",
@@ -187,8 +179,6 @@ jobs:
               "    with pytest.raises(argparse.ArgumentTypeError):",
               2,
           )
-
-          # E731: named local functions preserve the exact callable behavior used by the tests.
           replace_once(
               "tests/statsforecast/test_runtime_lane_end_to_end_hardening.py",
               "    custom_inspector = lambda *_args, **_kwargs: {}\n    custom_writer = lambda *_args, **_kwargs: {}",
@@ -268,6 +258,7 @@ jobs:
         run: |
           set -Eeuo pipefail
           python="$CI_VENV/bin/python"
+          export PYTHONPATH="tests/clock_health:tests/sktime_campaign${PYTHONPATH:+:$PYTHONPATH}"
           "$python" -m pytest -q \
             tests/auto_campaign/test_prospective_scoring_metrics.py \
             tests/autogluon_campaign/test_registry_transaction_artifacts.py \
