@@ -61,13 +61,11 @@ jobs:
           uv pip check --python "$python"
           test "$("$python" -m ruff --version)" = 'ruff 0.16.0'
 
-          "$python" -m ruff check src scripts tests
+          "$python" -m ruff check --select I001 --fix src/loto/auto_campaign/model_factory.py
           "$python" -m ruff format src/loto/auto_campaign/model_factory.py
           mapfile -t formatted < <(git diff --name-only | sort)
-          test "${#formatted[@]}" -le 1
-          if [[ "${#formatted[@]}" -eq 1 ]]; then
-            test "${formatted[0]}" = 'src/loto/auto_campaign/model_factory.py'
-          fi
+          test "${#formatted[@]}" -eq 1
+          test "${formatted[0]}" = 'src/loto/auto_campaign/model_factory.py'
           git diff --check
           "$python" -m ruff check src scripts tests
           "$python" -m ruff format --check src/loto/auto_campaign/model_factory.py
