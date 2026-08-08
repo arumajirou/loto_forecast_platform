@@ -3,10 +3,12 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import platform
 import tempfile
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 PREFLIGHT_SCHEMA = "merlion-bootstrap-preflight-v1"
 PLAN_SCHEMA = "merlion-bootstrap-resume-plan-v1"
@@ -69,6 +71,7 @@ def build_resume_plan(
     *,
     run_id: str,
     managed_python_dir: Path | None = None,
+    platform_system: str | None = None,
 ) -> dict[str, Any]:
     if preflight.get("schema_version") != PREFLIGHT_SCHEMA:
         raise ValueError("unsupported preflight schema")
@@ -87,20 +90,24 @@ def build_resume_plan(
 
     network = _network_map(preflight)
     github_ready = network.get("github.com", False)
-    index_ready = network.get("pypi.org", False) and network.get(
-        "files.pythonhosted.org", False
-    )
+    index_ready = network.get("pypi.org", False) and network.get("files.pythonhosted.org", False)
     blockers: list[str] = []
     steps: list[dict[str, Any]] = []
     environment: dict[str, str] = {}
     python_path = python.get("path") if python.get("found") else None
+    host_platform = (platform_system or platform.system()).strip() or "UNKNOWN"
+    native_windows = host_platform.casefold() == "windows"
 
     if not uv.get("found"):
         blockers.append("UV_NOT_AVAILABLE")
     if not index_ready:
         blockers.append("PACKAGE_INDEX_DNS_UNAVAILABLE")
+    if native_windows:
+        blockers.append("NATIVE_WINDOWS_BOOTSTRAP_ADAPTER_UNAVAILABLE")
 
-    if python_path:
+    if native_windows:
+        strategy = "BLOCKED_NATIVE_WINDOWS_BOOTSTRAP_ADAPTER_UNAVAILABLE"
+    elif python_path:
         strategy = "USE_EXISTING_PYTHON_311"
         steps.append(
             {

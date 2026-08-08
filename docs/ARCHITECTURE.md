@@ -1,84 +1,145 @@
-# 基本設計書（arc42構成）
+# Architecture
 
-## 1. はじめにと目標
+## Status
 
-信頼できる予測評価、将来予測の改ざん防止、モデル交換可能性、他くじへの拡張性を優先する。
+`CURRENT`
 
-## 2. 制約
+This document describes the repository-wide architectural contract. Feature-specific documents may add stricter requirements, but they must not silently weaken the constraints below.
 
-- 本番正本はLinux単一ホスト
-- RTX 5070 Ti 16GBを想定し、GPU深層trialは原則同時1件
-- 現在のLoto7履歴は約687抽選であり、複雑モデルの探索過適合を強く警戒
-- 多変量系列を正式トラックにせず、単変量/位置別/候補分類と外生変数を分離
+## 1. Goals
 
-## 3. コンテキストとスコープ
+The platform prioritizes reproducible time-series research, leakage-resistant evaluation, immutable prospective prediction evidence, provider/model exchangeability, operational auditability, and portability across supported development environments.
 
-外部: 公式抽選情報、第二取得元、MLflow、Prometheus/Grafana、管理者ブラウザ。
-内部: data, features, models, calibration, decoding, evaluation, registry, sealing, orchestration, API。
+A model being listed as available is not sufficient evidence of runtime success. Formal runtime evidence must distinguish catalog availability from verified loading and inference.
 
-## 4. 解決戦略
+## 2. Forecasting and evaluation contract
 
-- 契約駆動モジュラーモノリス
-- Lottery PluginでLoto7固有ルールを隔離
-- 全モデルをAdapter化
-- 論理契約をPydantic、物理形式をJSON/CSV/Parquetで分離
-- 予測とReleaseをハッシュ・署名で不変化
+The primary forecasting metric is **Hit@±1**: the fraction of predictions whose absolute error is at most 1.
 
-## 5. ビルディングブロック
+Required companion metrics are:
+
+- MAE;
+- MSE;
+- RMSE;
+- per-position Hit@±1;
+- all-position/row Hit@±1;
+- dispersion across folds/seeds where applicable.
+
+Set-overlap metrics such as Hits@k may be reported for select-family games, but they do not replace Hit@±1 as the primary positional forecasting metric.
+
+Every serious comparison must include appropriate baselines such as Random, fixed value, mean, median, most-recent value, frequency-based methods, and statistical models when applicable.
+
+The game-agnostic implementation in `src/loto/evaluation/metrics_general.py` derives positional dimensions from `GameGeometry` and supports MAE/MSE/RMSE together with element, row, and per-position tolerance metrics.
+
+## 3. Time ordering and leakage boundary
+
+Research data is divided in time order. The repository uses staged development/evaluation paths including validation/OOF, Holdout, and Prospective phases.
+
+The architectural rules are:
+
+- training precedes validation/OOF;
+- Holdout is not used for candidate tuning;
+- Prospective predictions are created before their actual outcomes are known;
+- scalers, encoders, feature selection, and hyperparameter search are fitted or selected only from data available to the permitted training/development boundary;
+- future information, order violations, duplicates, and missing-value handling are explicitly audited rather than silently repaired across time boundaries.
+
+`src/loto/auto_campaign/contracts.py` exposes separate OOF, Holdout, and Prospective campaign stages. `src/loto/evaluation/splits.py` implements chronological rolling/development-holdout split primitives.
+
+## 4. Data governance
+
+Raw source data is an immutable evidence layer. A correction creates a new data/versioned artifact rather than overwriting the previous raw source in place.
+
+Time-aware data contracts distinguish event/draw time from availability time. External variables whose availability cannot be established for the prediction timestamp are not eligible for formal leakage-safe use.
+
+Current data-contract details are indexed from [DATA_CONTRACTS.md](DATA_CONTRACTS.md) and feature-specific governance documents.
+
+## 5. Forecast tracks and model comparison
+
+The architecture supports comparison of multiple forecasting approaches under the same evaluation protocol, including:
+
+- univariate models;
+- models with eligible exogenous variables;
+- per-position models;
+- shared/joint models where the experiment contract permits them;
+- ensembles;
+- statistical, machine-learning, deep-learning, and time-series foundation-model adapters.
+
+Promotion is evidence-driven. Selecting only the single best random seed without reporting multi-seed behavior is not an acceptable adoption rule.
+
+## 6. Prediction locking
+
+Prospective prediction values are fixed before actual outcomes are introduced.
+
+The prediction-lock path binds prospective outputs to configuration/data/lineage evidence and SHA-256 records. Lock evidence includes a timestamp and verifies that actual-bearing artifacts were not present at lock time.
+
+`src/loto/auto_campaign/prediction_lock.py` implements campaign-level prediction locking and verification. Portable-bundle verification re-evaluates the embedded lock after relocation.
+
+A prediction lock proves integrity/order properties of the recorded artifact. It does not prove forecast accuracy.
+
+## 7. Runtime certification
+
+Runtime certification is provider-neutral and separate from model catalog availability.
+
+A formal success claim requires evidence for the relevant execution path, including as applicable:
+
+- model/package/revision identity;
+- load success;
+- input acceptance;
+- inference execution;
+- output shape/contract;
+- finite output values;
+- device evidence;
+- GPU process/device/VRAM evidence for GPU-certified runs;
+- explicit CPU fallback status.
+
+`src/loto/runtime_certification/` provides the provider-neutral certification SDK foundation. Provider-specific adapters may add stricter checks.
+
+Unavailable or unexecuted runtime checks must not be represented as PASS.
+
+## 8. Reproducibility and run evidence
+
+Experiments should be bound to stable identities and hashes such as Run ID, resolved configuration, data hash/snapshot, code hash/Git commit, model ID/revision, seed, predictions, actuals, metrics, runtime logs, and device information.
+
+OOF and multi-seed evidence should retain aggregate behavior, dispersion, and adverse/worst observations rather than only the best trial.
+
+Persistence backends may include files/Parquet and operational stores such as PostgreSQL, DuckDB, or MLflow depending on the workflow. Storage availability does not change the evidence contract.
+
+## 9. Building blocks
+
+The repository is a modular Python platform whose responsibilities include, among others:
 
 ```text
-loto/
-├── data             Canonical化・品質検査
-├── features         As-of特徴量
-├── models           baseline / classification / position / neuralforecast
-├── calibration      Platt / Temperature
-├── decoding         制約付きDP
-├── evaluation       指標・bootstrap・昇格ゲート
-├── sealing          予測封印
-├── registry         SQLite台帳・Release Bundle
-├── observability    Prometheus・GPU証跡
-├── orchestration    Trusted Vertical Slice
-├── api              FastAPI
-└── events           JSONLイベント
+data / provenance             acquisition, canonicalization, availability and lineage
+features                      as-of feature generation
+models / provider adapters    baselines and forecasting implementations
+evaluation                    metrics, splits, uncertainty and promotion evidence
+auto_campaign                 staged search/OOF/Holdout/Prospective workflows
+sealing / prediction lock     immutable prospective evidence
+registry / persistence        artifact and operational records
+runtime_certification         verified load/inference evidence
+telemetry / observability     metrics, traces and runtime evidence
+orchestration                 end-to-end workflow coordination
+api                           service boundary
 ```
 
-## 6. ランタイムビュー
+Directory-name symmetry with documentation is not required; semantic ownership is documented instead.
 
-```text
-INGEST → VALIDATE → CANONICALIZE → BUILD_FEATURES → TRAIN
-→ CALIBRATE → DECODE → EVALUATE → SEAL_FORECAST → REGISTER
-```
+## 10. Portability and deployment
 
-各Stageは台帳とイベントへ追記され、成功済み成果物は不変Artifactとして扱う。
+Windows and Linux are explicit engineering/verification targets for portable repository operations. Filesystem paths, subprocess execution, line endings, temporary directories, case sensitivity, optional GPU stacks, and shell assumptions must be treated as portability concerns.
 
-## 7. デプロイビュー
+Production or hardware certification can remain environment-specific, but a platform document must not treat successful execution on one OS/device as proof for another.
 
-- Linux: Python/uv環境、systemd user service/timer、API、Prometheus
-- 認定: OCIコンテナdigest固定
-- Windows/WSL: 補助検証、成果物はLinux認定ゲート後のみ採用
+Environment-specific service managers such as systemd belong to deployment adapters rather than the cross-platform core contract.
 
-## 8. 横断的概念
+## 11. Safety and promotion
 
-- 共通ID: run_id, trial_id, model_id, forecast_id, release_id
-- 時刻: event_timeとavailable_atを分離
-- 再現性: resolved config, environment fingerprint, seed
-- 安全: append-only, quarantine, atomic write, rollback record
+The platform fails closed on evidence that can invalidate scientific or operational claims, including future-data leakage, destructive Raw mutation, invalid prediction-lock evidence, non-finite inference output, or missing mandatory runtime identity.
 
-## 9. アーキテクチャ判断
+Holdout/Prospective access, production binding, promotion, and irreversible migrations are separate controlled operations. Documentation changes do not authorize any of them.
 
-- ADR-001 Linux本番正本
-- ADR-002 Optuna標準/Ray限定
-- ADR-003 Hits@7主指標と校正ゲート
-- ADR-004 片側e-processは逆棄却に使わない
+## 12. Documentation authority
 
-## 10. 品質要件
+Current repository-wide documentation is governed by [DOCUMENTATION_CONTRACT.md](DOCUMENTATION_CONTRACT.md).
 
-再現性、監査可能性、リーク耐性、可用性、3時間SLO、拡張性、最小権限。
-
-## 11. リスク
-
-データ量不足、探索過適合、外部データ公開時刻不明、GPU/ライブラリ数値差、将来Shadow蓄積に時間が必要。
-
-## 12. 用語
-
-Champion: 正式本番モデル。Shadow: 本番出力に使わない将来評価。Release Bundle: 本番構成全体の不変単位。
+Dated verification/design snapshots are preserved as historical evidence. Their old test counts, model counts, merge state, hardware assumptions, or implementation status must not be silently promoted to current platform claims.

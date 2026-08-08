@@ -1,8 +1,14 @@
-# モデル在庫（自動生成 / 手編集禁止）
+# Model Inventory Snapshot
 
-`loto3 catalog --counts` が唯一の正。ドキュメント中の件数は本ファイル経由でのみ引用してください。
+## Status
 
-| library | 件数 | 一次情報 |
+`GENERATED_SNAPSHOT / NOT_CURRENT_BY_DEFAULT`
+
+The table below is preserved as generated repository evidence from an earlier catalog snapshot. It must not be treated as the current model total without regenerating the catalog from the current code/revision.
+
+`loto3 catalog --counts` is the intended runtime source for current catalog counts. A documentation table containing a number does not override the executable catalog.
+
+| library | count in this snapshot | upstream/source note |
 |---|---:|---|
 | autogluon | 1 | — |
 | builtin | 4 | — |
@@ -19,9 +25,10 @@
 | sklearn | 7 | — |
 | sktime | 1 | — |
 | statsforecast | 41 | github.com/Nixtla/statsforecast @ main:python/statsforecast/models.py |
-| tsfm | 21 | huggingface.co/models?pipeline_tag=time-series-forecasting (2026-07-30) |
+| tsfm | 21 | huggingface.co/models?pipeline_tag=time-series-forecasting (snapshot note: 2026-07-30) |
 | xgboost | 1 | — |
-| **合計** | **174** | — |
+| **snapshot total** | **174** | historical/generated value; regenerate before a current claim |
 
-- revision 未固定の TSFM: **21** 件（`loto3 catalog --unpinned`）
-- 未固定は捏造SHAを入れず `UNPINNED` と明示します。protocol_hash の再現性を偽らないためです。
+This snapshot also recorded 21 TSFM entries as `UNPINNED`. Do not fabricate immutable revisions to make a catalog appear reproducible. Current pinning state must be queried from the current catalog/evidence.
+
+For documentation-authority rules, see [DOCUMENTATION_CONTRACT.md](DOCUMENTATION_CONTRACT.md).

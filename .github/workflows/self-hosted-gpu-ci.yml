@@ -16,6 +16,22 @@ on:
         required: true
         default: true
         type: boolean
+      actions_only:
+        description: Run the lightweight Actions compatibility smoke only
+        required: true
+        default: false
+        type: boolean
+      dependency_profile:
+        description: Run a focused dependency validation profile
+        required: true
+        default: none
+        type: choice
+        options:
+          - none
+          - postgres
+          - ray-core
+          - ray-optimization
+          - routine
 
 permissions:
   contents: read
@@ -25,9 +41,445 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  actions-smoke:
+    name: Local Actions compatibility smoke
+    if: ${{ github.actor == github.repository_owner && inputs.actions_only }}
+    runs-on: [self-hosted, linux, x64, loto-ci]
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@v7
+        with:
+          clean: true
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python 3.13 with setup-python v7
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Verify Actions compatibility
+        run: |
+          set -Eeuo pipefail
+          python --version
+          python - <<'PY'
+          import platform
+          import sys
+
+          assert sys.version_info[:2] == (3, 13), sys.version
+          print(f"python={sys.version}")
+          print(f"platform={platform.platform()}")
+          PY
+          test -f pyproject.toml
+          test -f uv.lock
+          git diff --exit-code
+          git diff --cached --exit-code
+
+  dependency-smoke:
+    name: Local dependency smoke (${{ inputs.dependency_profile }})
+    if: ${{ github.actor == github.repository_owner && !inputs.actions_only && inputs.dependency_profile != 'none' }}
+    runs-on: [self-hosted, linux, x64, loto-ci]
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@v7
+        with:
+          clean: true
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Configure uv cache
+        run: |
+          set -Eeuo pipefail
+          echo "UV_CACHE_DIR=$RUNNER_TEMP/uv-dependency-cache" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/uv-dependency-cache"
+
+      - name: Verify locked dependency graph
+        run: |
+          set -Eeuo pipefail
+          command -v uv
+          uv --version
+          uv lock --check
+
+      - name: Postgres dependency smoke
+        if: ${{ inputs.dependency_profile == 'postgres' }}
+        run: |
+          set -Eeuo pipefail
+
+          uv sync --frozen --python "3.13" --extra postgres
+
+          uv pip check --python .venv/bin/python
+
+          uv run --frozen python - <<'PY'
+          import psycopg
+          from importlib.metadata import version
+
+          installed = version("psycopg")
+          print(f"psycopg={installed}")
+          print(f"psycopg_module={psycopg.__name__}")
+
+          assert installed, "psycopg version metadata missing"
+          PY
+
+      - name: Ray dependency environment
+        if: ${{ startsWith(inputs.dependency_profile, 'ray-') }}
+        run: |
+          set -Eeuo pipefail
+          uv sync --frozen --python "3.13" --extra full
+          uv pip check --python .venv/bin/python
+          uv run --frozen python - <<'PY'
+          import re
+          from importlib.metadata import version
+
+          ray_version = version("ray")
+          print(f"ray={ray_version}")
+
+          match = re.match(r"^(\d+)\.(\d+)\.(\d+)", ray_version)
+          assert match is not None, ray_version
+          assert tuple(map(int, match.groups())) >= (2, 56, 1), ray_version
+          PY
+
+      - name: Ray core Tune smoke
+        if: ${{ inputs.dependency_profile == 'ray-core' }}
+        run: |
+          set -Eeuo pipefail
+          uv run --frozen python - <<'PY'
+          import tempfile
+          import warnings
+
+          import ray
+          from ray import tune
+
+          def trainable(config):
+              del config
+              tune.report({"score": 1.0})
+
+          ray.shutdown()
+
+          try:
+              with tempfile.TemporaryDirectory() as storage:
+                  with warnings.catch_warnings(record=True) as caught:
+                      warnings.simplefilter("always")
+
+                      tuner = tune.Tuner(
+                          tune.with_resources(
+                              trainable,
+                              {"cpu": 1.0, "gpu": 0.0},
+                          ),
+                          tune_config=tune.TuneConfig(
+                              num_samples=1,
+                              metric="score",
+                              mode="max",
+                          ),
+                          run_config=tune.RunConfig(
+                              storage_path=storage,
+                          ),
+                      )
+
+                      results = tuner.fit()
+
+                  bad = [
+                      str(item.message)
+                      for item in caught
+                      if (
+                          "RunConfig" in str(item.message)
+                          and "ray.tune" in str(item.message)
+                      )
+                  ]
+
+                  assert not bad, bad
+
+                  best = results.get_best_result(
+                      metric="score",
+                      mode="max",
+                  )
+
+                  assert float(best.metrics["score"]) == 1.0
+                  print("RAY_CORE_TUNE_SMOKE=PASS")
+          finally:
+              ray.shutdown()
+          PY
+
+      - name: Repository Ray optimization smoke
+        if: ${{ inputs.dependency_profile == 'ray-optimization' }}
+        run: |
+          set -Eeuo pipefail
+          uv run --frozen python - <<'PY'
+          import tempfile
+          import warnings
+
+          import ray
+
+          from loto.optimization.search import optimize_ray
+
+          ray.shutdown()
+
+          try:
+              with tempfile.TemporaryDirectory() as storage:
+                  with warnings.catch_warnings(record=True) as caught:
+                      warnings.simplefilter("always")
+
+                      result = optimize_ray(
+                          "__ray_compat_smoke__",
+                          lambda config: 1.0,
+                          trials=1,
+                          timeout_seconds=120,
+                          cpus_per_trial=1.0,
+                          gpus_per_trial=0.0,
+                          output_dir=storage,
+                      )
+
+                  bad = [
+                      str(item.message)
+                      for item in caught
+                      if (
+                          "RunConfig" in str(item.message)
+                          and "ray.tune" in str(item.message)
+                      )
+                  ]
+
+                  assert not bad, bad
+                  assert result.backend == "ray"
+                  assert float(result.best_value) == 1.0
+
+                  print("RAY_OPTIMIZATION_SMOKE=PASS")
+          finally:
+              ray.shutdown()
+          PY
+
+      - name: Routine dependency environment
+        if: ${{ inputs.dependency_profile == 'routine' }}
+        run: |
+          set -Eeuo pipefail
+
+          uv sync \
+            --frozen \
+            --python "3.13" \
+            --extra api \
+            --extra dev \
+            --extra frameworks \
+            --extra mlflow
+
+          uv pip check --python .venv/bin/python
+
+          uv run \
+            --frozen \
+            --extra api \
+            --extra dev \
+            --extra frameworks \
+            --extra mlflow \
+            python - <<'PY'
+          from importlib.metadata import version
+
+          for package in (
+              "uvicorn",
+              "hypothesis",
+              "ruff",
+              "gluonts",
+              "mlflow",
+              "mlflow-skinny",
+              "mlflow-tracing",
+          ):
+              print(
+                  "ROUTINE_PACKAGE_VERSION="
+                  f"{package}={version(package)}"
+              )
+
+          print("ROUTINE_DEPENDENCY_ENVIRONMENT=PASS")
+          PY
+
+      - name: GluonTS real inference smoke
+        if: ${{ inputs.dependency_profile == 'routine' }}
+        run: |
+          set -Eeuo pipefail
+
+          uv run \
+            --frozen \
+            --extra api \
+            --extra dev \
+            --extra frameworks \
+            --extra mlflow \
+            python - <<'PY'
+          import numpy as np
+          import pandas as pd
+
+          from gluonts.model.seasonal_naive import (
+              SeasonalNaivePredictor,
+          )
+
+          item = {
+              "start": pd.Period("2025-01-01", freq="D"),
+              "target": np.asarray(
+                  [1, 2, 3, 4, 5, 6],
+                  dtype=np.float32,
+              ),
+          }
+
+          predictor = SeasonalNaivePredictor(
+              prediction_length=2,
+              season_length=2,
+          )
+
+          forecast = predictor.predict_item(item)
+          mean = np.asarray(forecast.mean, dtype=float)
+
+          print(f"GLUONTS_OUTPUT_SHAPE={mean.shape}")
+          print(f"GLUONTS_OUTPUT={mean.tolist()}")
+
+          assert mean.shape == (2,)
+          assert np.isfinite(mean).all()
+          assert np.allclose(mean, [5.0, 6.0])
+
+          print("GLUONTS_RUNTIME_SMOKE=PASS")
+          PY
+
+      - name: MLflow local tracking smoke
+        if: ${{ inputs.dependency_profile == 'routine' }}
+        run: |
+          set -Eeuo pipefail
+
+          uv run \
+            --frozen \
+            --extra api \
+            --extra dev \
+            --extra frameworks \
+            --extra mlflow \
+            python - <<'PY'
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+
+          from mlflow import MlflowClient
+
+          with TemporaryDirectory() as tmp:
+              root = Path(tmp).resolve()
+              db_path = root / "mlflow.db"
+              artifacts = root / "artifacts"
+
+              tracking_uri = f"sqlite:///{db_path}"
+              artifact_uri = artifacts.as_uri()
+
+              client = MlflowClient(
+                  tracking_uri=tracking_uri
+              )
+
+              experiment_id = client.create_experiment(
+                  "routine-dependency-smoke",
+                  artifact_location=artifact_uri,
+              )
+
+              run = client.create_run(
+                  experiment_id=experiment_id
+              )
+
+              client.log_metric(
+                  run.info.run_id,
+                  "dependency_smoke",
+                  1.0,
+              )
+
+              client.set_terminated(
+                  run.info.run_id,
+                  status="FINISHED",
+              )
+
+              runs = client.search_runs(
+                  experiment_ids=[experiment_id]
+              )
+
+              assert len(runs) == 1
+              assert (
+                  runs[0].data.metrics["dependency_smoke"]
+                  == 1.0
+              )
+              assert runs[0].info.status == "FINISHED"
+
+          print("MLFLOW_TRACKING_BACKEND=SQLITE")
+          print("MLFLOW_RUNTIME_SMOKE=PASS")
+          PY
+
+      - name: Uvicorn and Hypothesis runtime smoke
+        if: ${{ inputs.dependency_profile == 'routine' }}
+        run: |
+          set -Eeuo pipefail
+
+          uv run \
+            --frozen \
+            --extra api \
+            --extra dev \
+            --extra frameworks \
+            --extra mlflow \
+            python - <<'PY'
+          from fastapi import FastAPI
+          from hypothesis import (
+              given,
+              settings,
+              strategies as st,
+          )
+          import uvicorn
+
+          app = FastAPI()
+
+          config = uvicorn.Config(
+              app,
+              host="127.0.0.1",
+              port=0,
+              log_level="warning",
+          )
+
+          assert config.app is app
+
+          @settings(
+              max_examples=8,
+              derandomize=True,
+          )
+          @given(st.integers())
+          def identity(value: int) -> None:
+              assert value == value
+
+          identity()
+
+          print("UVICORN_CONFIG_SMOKE=PASS")
+          print("HYPOTHESIS_RUNTIME_SMOKE=PASS")
+          PY
+
+      - name: Routine dependency smoke result
+        if: ${{ inputs.dependency_profile == 'routine' }}
+        run: |
+          set -Eeuo pipefail
+          echo "ROUTINE_DEPENDENCY_SMOKE=PASS"
+
+      - name: Verify tracked files stayed clean
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          git diff --exit-code
+          git diff --cached --exit-code
+
   gpu-ci:
     name: Local GPU CI (${{ inputs.suite }})
-    if: ${{ github.actor == github.repository_owner }}
+    if: ${{ github.actor == github.repository_owner && !inputs.actions_only && inputs.dependency_profile == 'none' }}
     runs-on: [self-hosted, linux, x64, loto-ci, gpu, cuda]
     timeout-minutes: 360
 
@@ -43,7 +495,7 @@ jobs:
 
     steps:
       - name: Checkout without persistent credentials
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           clean: true
           fetch-depth: 1
