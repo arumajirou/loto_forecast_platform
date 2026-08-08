@@ -20,20 +20,27 @@ jobs:
           test "$RUNNER_OS" = "Linux"
           test "$RUNNER_ARCH" = "X64"
 
-      - name: Checkout repair branch
+      - name: Checkout compatibility branch
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           ref: fix/basicts-contract-restore-v1
           persist-credentials: false
           fetch-depth: 2
 
-      - name: Verify exact recovered blobs
+      - name: Verify focused source scope
         shell: bash
         run: |
           set -Eeuo pipefail
-          test "$(git rev-parse HEAD:src/loto/basicts_campaign/dataset.py)" = "5895515581445df732b44f327cb07cef5bd9823a"
-          test "$(git rev-parse HEAD:src/loto/basicts_campaign/security.py)" = "d431e1e97d7ec02d0bfc1323cfbd3332a61b6c71"
-          echo 'RECOVERED_BASICTS_BLOBS=PASS'
+          git fetch origin main --depth=1
+          mapfile -t changed < <(git diff --name-only origin/main...HEAD | sort)
+          printf 'BRANCH_CHANGED\t%s\n' "${changed[@]}"
+          allowed=(
+            .github/workflows/basicts-contract-restore-verify.yml
+            src/loto/basicts_campaign/dataset.py
+            src/loto/basicts_campaign/metrics.py
+            src/loto/basicts_campaign/security.py
+          )
+          test "${changed[*]}" = "${allowed[*]}"
 
       - name: Install exact uv
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
@@ -41,13 +48,13 @@ jobs:
           version: '0.11.21'
           enable-cache: false
 
-      - name: Verify collection and BasicTS focused tests
+      - name: Verify collection and BasicTS compatibility
         shell: bash
         run: |
           set -Eeuo pipefail
           uv python install 3.13
-          venv="$RUNNER_TEMP/loto-basicts-restore-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          cache="$RUNNER_TEMP/loto-basicts-restore-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          venv="$RUNNER_TEMP/loto-basicts-compat-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-basicts-compat-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           rm -rf -- "$venv" "$cache"
           mkdir -p "$cache"
           uv venv "$venv" --python 3.13
@@ -63,31 +70,13 @@ jobs:
           uv pip check --python "$python"
           test "$("$python" -m ruff --version)" = 'ruff 0.16.0'
 
-          "$python" - <<'PY'
-          from pathlib import Path
-          path=Path('src/loto/basicts_campaign/dataset.py')
-          text=path.read_text(encoding='utf-8')
-          old='zip(draw_numbers, draw_numbers[1:])'
-          new='zip(draw_numbers, draw_numbers[1:], strict=False)'
-          assert text.count(old)==1,text.count(old)
-          path.write_text(text.replace(old,new),encoding='utf-8')
-          print('B905_SEMANTICS=strict_false')
-          PY
-
-          "$python" -m ruff format src/loto/basicts_campaign/dataset.py src/loto/basicts_campaign/security.py
-          mapfile -t formatted < <(git diff --name-only | sort)
-          test "${#formatted[@]}" -ge 1
-          test "${#formatted[@]}" -le 2
-          for path in "${formatted[@]}"; do
-            case "$path" in
-              src/loto/basicts_campaign/dataset.py|src/loto/basicts_campaign/security.py) ;;
-              *) echo "unexpected formatter path: $path"; exit 1 ;;
-            esac
-          done
-          git diff --check
           "$python" -m ruff check src scripts tests
-          "$python" -m ruff format --check src/loto/basicts_campaign/dataset.py src/loto/basicts_campaign/security.py
+          "$python" -m ruff format --check \
+            src/loto/basicts_campaign/dataset.py \
+            src/loto/basicts_campaign/metrics.py \
+            src/loto/basicts_campaign/security.py
           "$python" -m compileall -q src scripts tests
+          git diff --check
           echo 'STATIC_GATES=PASS'
 
           set +e
@@ -120,43 +109,85 @@ jobs:
           echo 'FOCUSED_BASICTS_TESTS=PASS'
 
           "$python" - <<'PY'
+          import torch.optim
+          from loto.basicts_campaign.contracts import DatasetPayload, ImportReference, SafeConfig
+          from loto.basicts_campaign.dataset import (
+              GEOMETRIES,
+              GameGeometry,
+              build_windows,
+              compile_basic_ts_dataset,
+              compile_wide_rows,
+              split_chronologically,
+          )
+          from loto.basicts_campaign.metrics import evaluate_predictions
+          from loto.basicts_campaign.security import (
+              ConfigImportRejected,
+              UnsafeImportReference,
+              resolve_import_reference,
+              validate_import_reference,
+              validate_safe_config,
+          )
           import numpy as np
-          from loto.basicts_campaign.dataset import GameGeometry, build_windows, compile_wide_rows
-          from loto.basicts_campaign.protocol import ImportReference
-          from loto.basicts_campaign.security import ConfigImportRejected, resolve_import_reference, validate_import_reference
+          from pathlib import Path
+          import tempfile
 
-          geometry=GameGeometry('numbers3',('N1','N2','N3'),0,9)
+          assert ConfigImportRejected is UnsafeImportReference
+          current=GEOMETRIES['numbers3']
+          assert (current.game,current.positions,current.minimum,current.maximum)==('numbers3',3,0,9)
+          legacy=GameGeometry(
+              game_id='numbers3',
+              position_columns=('n1','n2','n3'),
+              minimum_value=0,
+              maximum_value=9,
+          )
+          assert (legacy.game,legacy.positions,legacy.minimum,legacy.maximum)==('numbers3',3,0,9)
           rows=[
-              {'draw_no':1,'N1':1,'N2':2,'N3':3},
-              {'draw_no':2,'N1':2,'N2':3,'N3':4},
-              {'draw_no':3,'N1':3,'N2':4,'N3':5},
-              {'draw_no':4,'N1':4,'N2':5,'N3':6},
+              {'draw_no':1,'n1':1,'n2':2,'n3':3},
+              {'draw_no':2,'n1':2,'n2':3,'n3':4},
+              {'draw_no':3,'n1':3,'n2':4,'n3':5},
+              {'draw_no':4,'n1':4,'n2':5,'n3':6},
           ]
-          values,identity=compile_wide_rows(rows,geometry)
+          values,identity=compile_wide_rows(rows,legacy)
           windows=build_windows(values,identity,input_len=2,output_len=1)
           assert windows.inputs.shape==(2,2,3)
           assert windows.targets.shape==(2,1,3)
           assert windows.sample_identity[0]['target_draw_nos']==[3]
+
+          payload=DatasetPayload.model_validate({
+              'game':'numbers3',
+              'rows':[{'draw_no':i,'values':[i%10,(i+1)%10,(i+2)%10]} for i in range(1,9)],
+              'validation_size':2,
+              'holdout_size':2,
+          })
+          split=split_chronologically(payload)
+          assert split.train_draw_no==(1,2,3,4)
+          with tempfile.TemporaryDirectory() as tmp:
+              evidence=compile_basic_ts_dataset(payload,Path(tmp))
+              assert evidence['formal_holdout_materialized'] is False
+
           ref=ImportReference(module='torch.optim',name='Adam')
           validate_import_reference(ref)
-          evidence=resolve_import_reference(ref)
-          assert evidence['qualified_name']=='torch.optim.Adam'
+          assert resolve_import_reference(ref) is torch.optim.Adam
+          resolved=validate_safe_config(SafeConfig(),resolve=False)
+          assert resolved['optimizer']=='torch.optim.Adam'
           try:
               validate_import_reference(ImportReference(module='os',name='system'))
           except ConfigImportRejected:
               pass
           else:
               raise AssertionError('unsafe import did not fail closed')
-          assert np.isfinite(values).all()
-          print('BASICTS_CONTRACT_SMOKE=PASS')
+
+          actual=np.asarray([[1.0,5.0],[4.0,8.0]])
+          predicted=np.asarray([[2.0,7.0],[4.0,7.0]])
+          metrics=evaluate_predictions(actual,predicted)
+          assert metrics['hit_at_1']==metrics['hit_at_plus_minus_1']==0.75
+          assert metrics['all_position_hit_at_1']==metrics['all_position_hit_at_plus_minus_1']==0.5
+          assert metrics['position_hit_at_1']==metrics['position_hit_at_plus_minus_1']==[1.0,0.5]
+          print('BASICTS_CURRENT_AND_LEGACY_CONTRACT_SMOKE=PASS')
           PY
 
       - name: Cleanup
         if: always()
         shell: bash
         run: |
-          set +e
-          git reset --hard HEAD
-          git clean -ffdx
-          test -z "$(git status --porcelain)"
           rm -rf -- "${venv:-}" "${cache:-}" "$RUNNER_TEMP/collection.txt" || true
