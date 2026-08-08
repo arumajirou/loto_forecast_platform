@@ -63,8 +63,15 @@ jobs:
           test "$("$python" -m ruff --version)" = 'ruff 0.16.0'
 
           "$python" -m ruff check src scripts tests
+          "$python" -m ruff format src/loto/reconciliation/hierarchy.py
+          mapfile -t formatted < <(git diff --name-only | sort)
+          test "${#formatted[@]}" -eq 1
+          test "${formatted[0]}" = 'src/loto/reconciliation/hierarchy.py'
+          git diff --check
+          "$python" -m ruff check src scripts tests
           "$python" -m ruff format --check src/loto/reconciliation/hierarchy.py
           "$python" -m compileall -q src scripts tests
+          echo 'SHADOW_FORMAT_ONLY=PASS'
           echo 'STATIC_GATES=PASS'
 
           set +e
@@ -138,4 +145,8 @@ jobs:
         if: always()
         shell: bash
         run: |
+          set +e
+          git reset --hard HEAD
+          git clean -ffdx
+          test -z "$(git status --porcelain)"
           rm -rf -- "${venv:-}" "${cache:-}" "$RUNNER_TEMP/collection.txt" || true
