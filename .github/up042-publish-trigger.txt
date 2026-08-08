@@ -1,1 +1,0 @@
-One-shot trigger for the verified UP042 publisher. This file is temporary and will be removed before merge.
