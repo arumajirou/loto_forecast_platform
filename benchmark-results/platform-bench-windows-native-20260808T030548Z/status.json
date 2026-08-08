@@ -1,0 +1,10 @@
+{
+  "run_id": "platform-bench-windows-native-20260808T030548Z",
+  "overall_status": "FAILED",
+  "phase": "target_fetch",
+  "error": "Native Windows benchmark harness stopped before measured stages: Invoke-Native passed no effective git arguments because its parameter name collided with PowerShell's automatic $Args variable; git exited with 1 and printed usage.",
+  "valid_for_performance_comparison": false,
+  "target_sha": "f13ebf6dd4b5495eb0bd47f27375c7e47c17ce60",
+  "remote_result_commit": "dcbc914d718ff4d55654e0d97f71cda34b02cd7e",
+  "notes": "platform.json is environment inventory only. No metrics.csv or summary.json from a successful benchmark exists for this run. Later manually printed PASS lines are not benchmark evidence."
+}
