@@ -8,14 +8,14 @@ permissions:
   contents: write
 
 concurrency:
-  group: ruff-undefined-symbols-${{ github.event.pull_request.number }}
+  group: ruff-undefined-symbols-repair-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
 jobs:
   test:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-lint-undefined-symbols-v1' }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 30
+    timeout-minutes: 180
     defaults:
       run:
         shell: bash
@@ -24,7 +24,8 @@ jobs:
       UV_VERSION: "0.11.21"
       UV_PYTHON: "3.13"
       EXPECTED_RUFF_VERSION: "0.16.0"
-      RESULT_PATH: .github/ruff-undefined-symbols-inventory.txt
+      BASELINE_COLLECTION_ERRORS: "34"
+      RESULT_PATH: .github/ruff-undefined-symbols-repair.txt
 
     steps:
       - name: Verify runner
@@ -42,12 +43,13 @@ jobs:
           fetch-depth: 1
           clean: true
 
-      - name: Gate inventory commit
+      - name: Gate repair commit
         id: gate
         run: |
           set -Eeuo pipefail
           message="$(git log -1 --pretty=%s)"
-          if [[ "$message" == "ci: fix undefined-symbol inventory environment (#200)" ]]; then
+          echo "head_message=$message"
+          if [[ "$message" == "ci: apply and verify undefined-symbol repairs (#200)" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -60,17 +62,23 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
 
-      - name: Inventory F821 and F822
+      - name: Prepare isolated verification environment
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
+          actual="$(uv --version)"
+          case "$actual" in "uv $UV_VERSION"*) ;; *) exit 1 ;; esac
           uv python install "$UV_PYTHON"
-          venv="$RUNNER_TEMP/loto-ruff-undefined-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          venv="$RUNNER_TEMP/loto-ruff-undefined-repair-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-ruff-undefined-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           case "$venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
-          rm -rf -- "$venv"
+          case "$cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          rm -rf -- "$venv" "$cache"
+          mkdir -p "$cache"
           uv venv "$venv" --python "$UV_PYTHON"
-          python="$venv/bin/python"
           echo "CI_VENV=$venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$cache" >> "$GITHUB_ENV"
+          python="$venv/bin/python"
           ruff_version="$("$python" - <<'PY'
           import tomllib
           with open('uv.lock','rb') as f:
@@ -82,48 +90,237 @@ jobs:
           PY
           )"
           test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
-          uv pip install --quiet --python "$python" "ruff==$ruff_version"
-          set +e
-          "$python" -m ruff check --select F821,F822 --output-format=json src scripts tests > "$RUNNER_TEMP/findings.json"
-          lint_rc=$?
-          set -e
-          LINT_RC="$lint_rc" "$python" - "$RUNNER_TEMP/findings.json" "$RESULT_PATH" <<'PY'
-          import collections, json, os, sys
-          from pathlib import Path
-          rows=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8') or '[]')
-          counts=collections.Counter(row.get('code','UNKNOWN') for row in rows)
-          out=[
-              'RUFF_UNDEFINED_SYMBOLS_INVENTORY_VERSION=1',
-              f"RUN_ID={os.environ['GITHUB_RUN_ID']}",
-              f"RUFF_VERSION={os.environ.get('EXPECTED_RUFF_VERSION')}",
-              f"LINT_RC={os.environ.get('LINT_RC')}",
-              f"FINDING_COUNT={len(rows)}",
-              'RULE_COUNTS='+','.join(f'{k}:{v}' for k,v in sorted(counts.items())),
-              '--- FINDINGS ---',
-          ]
-          for row in rows:
-              loc=row.get('location') or {}
-              out.append(f"{row.get('code')}\t{row.get('filename')}:{loc.get('row')}:{loc.get('column')}\t{row.get('message')}")
-          Path(sys.argv[2]).write_text('\n'.join(out)+'\n',encoding='utf-8')
-          PY
-          "$python" -m compileall -q src scripts tests
+          echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
 
-      - name: Persist inventory
-        if: ${{ always() && steps.gate.outputs.run == 'true' }}
+      - name: Apply deterministic source repairs in worktree
+        if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
-          test -f "$RESULT_PATH"
+          "$CI_VENV/bin/python" - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one match, got {count}: {old!r}")
+              p.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          replace_once(
+              "src/loto/chronos2_campaign/calibration_runner.py",
+              "canonical_shaa256(",
+              "canonical_sha256(",
+          )
+          replace_once(
+              "src/loto/moirai2_campaign/target_execution_validators.py",
+              "    sha256_file,\n    verify_sha256_manifest,",
+              "    sha256_file,\n    sha256_payload,\n    verify_sha256_manifest,",
+          )
+          replace_once(
+              "src/loto/orchestration/pipeline_staged.py",
+              "    EXPECTED_PIPELINE_BLOB_SHA,\n    PipelineComponents,",
+              "    EXPECTED_PIPELINE_BLOB_SHA,\n    Clock,\n    PipelineComponents,",
+          )
+
+          declarations = {
+              "src/loto/neuralforecast/auto_frets/runtime.py": (
+                  '_REQUIRED_MODULES = ("neuralforecast", "optuna", "ray", "torch")\n\n',
+                  '_REQUIRED_MODULES = ("neuralforecast", "optuna", "ray", "torch")\n\nFreTS: type[Any]\nAutoFreTS: type[Any]\n\n',
+              ),
+              "src/loto/neuralforecast/auto_scinet/runtime.py": (
+                  '_REQUIRED_MODULES = ("neuralforecast", "optuna", "ray", "torch")\n\n',
+                  '_REQUIRED_MODULES = ("neuralforecast", "optuna", "ray", "torch")\n\nSCINet: type[Any]\nAutoSCINet: type[Any]\n\n',
+              ),
+              "src/loto/neuralforecast/auto_segrnn/runtime.py": (
+                  '_REQUIRED_MODULES = ("neuralforecast", "optuna", "ray", "torch")\n\n',
+                  '_REQUIRED_MODULES = ("neuralforecast", "optuna", "ray", "torch")\n\nSegRNN: type[Any]\nAutoSegRNN: type[Any]\n\n',
+              ),
+              "src/loto/neuralforecast/auto_timellm/runtime.py": (
+                  '_REQUIRED_MODULES = ("neuralforecast", "ray", "transformers")\n\n',
+                  '_REQUIRED_MODULES = ("neuralforecast", "ray", "transformers")\n\nPinnedTimeLLM: type[Any]\nAutoTimeLLM: type[Any]\n\n',
+              ),
+          }
+          for path, (old, new) in declarations.items():
+              replace_once(path, old, new)
+          PY
+          mapfile -t changed < <(git diff --name-only | sort)
+          printf '%s\n' "${changed[@]}"
+          expected=(
+            src/loto/chronos2_campaign/calibration_runner.py
+            src/loto/moirai2_campaign/target_execution_validators.py
+            src/loto/neuralforecast/auto_frets/runtime.py
+            src/loto/neuralforecast/auto_scinet/runtime.py
+            src/loto/neuralforecast/auto_segrnn/runtime.py
+            src/loto/neuralforecast/auto_timellm/runtime.py
+            src/loto/orchestration/pipeline_staged.py
+          )
+          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
+          test "${#changed[@]}" -eq "${#expected_sorted[@]}"
+          diff -u <(printf '%s\n' "${expected_sorted[@]}") <(printf '%s\n' "${changed[@]}")
+          git diff --check
+
+      - name: Verify undefined-symbol lint and lazy export contract
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          "$python" -m ruff check --select F821,F822 src scripts tests
+          "$python" -m ruff format --check \
+            src/loto/chronos2_campaign/calibration_runner.py \
+            src/loto/moirai2_campaign/target_execution_validators.py \
+            src/loto/neuralforecast/auto_frets/runtime.py \
+            src/loto/neuralforecast/auto_scinet/runtime.py \
+            src/loto/neuralforecast/auto_segrnn/runtime.py \
+            src/loto/neuralforecast/auto_timellm/runtime.py \
+            src/loto/orchestration/pipeline_staged.py
+          "$python" -m compileall -q src scripts tests
+          PYTHONPATH=src "$python" - <<'PY'
+          from loto.neuralforecast.auto_frets import runtime as frets
+          from loto.neuralforecast.auto_scinet import runtime as scinet
+          from loto.neuralforecast.auto_segrnn import runtime as segrnn
+          from loto.neuralforecast.auto_timellm import runtime as timellm
+
+          checks = (
+              (frets, ("FreTS", "AutoFreTS")),
+              (scinet, ("SCINet", "AutoSCINet")),
+              (segrnn, ("SegRNN", "AutoSegRNN")),
+              (timellm, ("PinnedTimeLLM", "AutoTimeLLM")),
+          )
+          for module, names in checks:
+              module._reset_runtime_classes_for_tests()
+              for name in names:
+                  assert name in module.__all__, (module.__name__, name)
+                  assert name not in module.__dict__, (module.__name__, name)
+          PY
+          echo "STATIC_RC=0" >> "$GITHUB_ENV"
+
+      - name: Install project dependencies
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" "ruff==$EXPECTED_RUFF_VERSION"
+          uv pip check --python "$python"
+          "$python" - <<'PY'
+          import torch
+          assert torch.__version__.startswith("2.9.1"), torch.__version__
+          assert torch.version.cuda is None, torch.version.cuda
+          PY
+          echo "DEPS_RC=0" >> "$GITHUB_ENV"
+
+      - name: Run focused subsystem tests
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          "$python" -m pytest -q \
+            tests/chronos2_campaign/test_calibration_core.py \
+            tests/chronos2_campaign/test_calibration_validation.py \
+            tests/moirai2_campaign/test_p8d_scripts.py \
+            tests/moirai2_campaign/test_target_execution_artifacts.py \
+            tests/moirai2_campaign/test_target_execution_integrity.py \
+            tests/moirai2_campaign/test_target_execution_state.py \
+            tests/neuralforecast/auto_frets/test_runtime_factory.py \
+            tests/neuralforecast/auto_scinet/test_runtime_factory.py \
+            tests/neuralforecast/auto_segrnn/test_runtime_factory.py \
+            tests/neuralforecast/auto_timellm/test_runtime_factory.py \
+            tests/test_pipeline_staged_runner.py
+          echo "FOCUSED_RC=0" >> "$GITHUB_ENV"
+
+      - name: Verify full collection parity and residual lint count
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          set +e
+          "$python" -m pytest -q > "$RUNNER_TEMP/pytest.log" 2>&1
+          PYTEST_RC=$?
+          "$python" -m ruff check --output-format=json src scripts tests > "$RUNNER_TEMP/all-lint.json"
+          ALL_LINT_RC=$?
+          set -e
+          if grep -Fq "Interrupted: $BASELINE_COLLECTION_ERRORS errors during collection" "$RUNNER_TEMP/pytest.log"; then
+            COLLECTION_PARITY=1
+          else
+            COLLECTION_PARITY=0
+          fi
+          echo "PYTEST_RC=$PYTEST_RC" >> "$GITHUB_ENV"
+          echo "COLLECTION_PARITY=$COLLECTION_PARITY" >> "$GITHUB_ENV"
+          echo "ALL_LINT_RC=$ALL_LINT_RC" >> "$GITHUB_ENV"
+          "$python" - "$RUNNER_TEMP/all-lint.json" <<'PY' >> "$GITHUB_ENV"
+          import collections, json, sys
+          from pathlib import Path
+          rows=json.loads(Path(sys.argv[1]).read_text(encoding="utf-8") or "[]")
+          counts=collections.Counter(row.get("code", "UNKNOWN") for row in rows)
+          print(f"REMAINING_LINT_COUNT={len(rows)}")
+          print("REMAINING_RULE_COUNTS=" + ",".join(f"{k}:{v}" for k,v in sorted(counts.items())))
+          PY
+          test "$COLLECTION_PARITY" -eq 1
+
+      - name: Commit verified source repair
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          before="$(git rev-parse HEAD)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/loto/chronos2_campaign/calibration_runner.py \
+            src/loto/moirai2_campaign/target_execution_validators.py \
+            src/loto/neuralforecast/auto_frets/runtime.py \
+            src/loto/neuralforecast/auto_scinet/runtime.py \
+            src/loto/neuralforecast/auto_segrnn/runtime.py \
+            src/loto/neuralforecast/auto_timellm/runtime.py \
+            src/loto/orchestration/pipeline_staged.py
+          git diff --cached --check
+          git commit -m "fix: repair Ruff undefined symbols and exports (#200)"
+          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$remote_before" = "$before"
+          git push origin "HEAD:$TARGET_BRANCH"
+          echo "REPAIRED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Persist verification evidence
+        if: ${{ always() && steps.gate.outputs.run == 'true' && env.REPAIRED_HEAD != '' }}
+        run: |
+          set -Eeuo pipefail
+          cat > "$RESULT_PATH" <<EOF
+          RUFF_UNDEFINED_SYMBOLS_REPAIR_VERSION=1
+          RUN_ID=$GITHUB_RUN_ID
+          RUFF_VERSION=${RUFF_VERSION:-UNKNOWN}
+          REPAIRED_HEAD=${REPAIRED_HEAD:-UNKNOWN}
+          STATIC_RC=${STATIC_RC:-UNKNOWN}
+          DEPS_RC=${DEPS_RC:-UNKNOWN}
+          FOCUSED_RC=${FOCUSED_RC:-UNKNOWN}
+          PYTEST_RC=${PYTEST_RC:-UNKNOWN}
+          COLLECTION_PARITY=${COLLECTION_PARITY:-UNKNOWN}
+          REMAINING_LINT_COUNT=${REMAINING_LINT_COUNT:-UNKNOWN}
+          REMAINING_RULE_COUNTS=${REMAINING_RULE_COUNTS:-UNKNOWN}
+          EOF
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$RESULT_PATH"
           git diff --cached --check
-          git commit -m "chore: capture Ruff undefined-symbol inventory (#200)"
+          git commit -m "chore: capture Ruff undefined-symbol repair evidence (#200)"
           remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
           test "$remote_before" = "$(git rev-parse HEAD^)"
           git push origin "HEAD:$TARGET_BRANCH"
+
+      - name: Enforce repair gates
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          test "${STATIC_RC:-99}" -eq 0
+          test "${DEPS_RC:-99}" -eq 0
+          test "${FOCUSED_RC:-99}" -eq 0
+          test "${COLLECTION_PARITY:-0}" -eq 1
 
       - name: Cleanup
         if: ${{ always() }}
         run: |
           set -Eeuo pipefail
           [[ -z "${CI_VENV:-}" ]] || { case "$CI_VENV" in "$RUNNER_TEMP"/*) rm -rf "$CI_VENV" ;; *) exit 1 ;; esac; }
+          [[ -z "${UV_CACHE_DIR:-}" ]] || { case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf "$UV_CACHE_DIR" ;; *) exit 1 ;; esac; }
