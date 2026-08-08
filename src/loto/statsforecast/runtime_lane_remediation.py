@@ -5,10 +5,11 @@ import json
 import os
 import subprocess
 import zipfile
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, Callable
+from typing import Any
 
 _RETRYABLE = {
     "CONFIGURATION",
@@ -35,7 +36,7 @@ class RemediationExecutionResult:
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _atomic_write(path: Path, content: bytes) -> None:
@@ -218,7 +219,7 @@ def _write_deterministic_zip(source: Path, archive: Path) -> tuple[Path, Path]:
             info.external_attr = 0o100644 << 16
             bundle.writestr(info, path.read_bytes())
     sidecar = archive.with_suffix(archive.suffix + ".sha256")
-    _atomic_write(sidecar, f"{_sha256_file(archive)}  {archive.name}\n".encode("utf-8"))
+    _atomic_write(sidecar, f"{_sha256_file(archive)}  {archive.name}\n".encode())
     return archive, sidecar
 
 
@@ -279,9 +280,7 @@ def execute_bounded_remediation(
     source_dir = _resolve_source_dir(triage_dir, classification, source_end_to_end_dir)
     source_classification = str(classification.get("primary_classification"))
 
-    run_id = run_id or datetime.now(timezone.utc).strftime(
-        "statsforecast-remediation-%Y%m%d-%H%M%S"
-    )
+    run_id = run_id or datetime.now(UTC).strftime("statsforecast-remediation-%Y%m%d-%H%M%S")
     output_root.mkdir(parents=True, exist_ok=True)
     output_dir = output_root / run_id
     output_dir.mkdir(parents=False, exist_ok=False)

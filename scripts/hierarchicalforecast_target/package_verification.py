@@ -9,7 +9,6 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 from .constants import (
-    CertificationError,
     FORMAL_HORIZON,
     FORMAL_INSAMPLE_SIZE,
     FORMAL_SEED,
@@ -18,6 +17,7 @@ from .constants import (
     PACKAGE_MANIFEST,
     REQUIRED,
     TARGET_VERSION,
+    CertificationError,
 )
 from .integrity import (
     canonical,

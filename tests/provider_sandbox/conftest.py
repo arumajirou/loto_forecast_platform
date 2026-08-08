@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -26,7 +26,7 @@ from loto.provider_sandbox import (  # noqa: E402
 from loto.provider_sandbox.canonical import sha256_bytes  # noqa: E402
 
 ZERO = "0" * 64
-NOW = datetime(2026, 8, 6, 9, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 6, 9, 0, tzinfo=UTC)
 
 
 @pytest.fixture

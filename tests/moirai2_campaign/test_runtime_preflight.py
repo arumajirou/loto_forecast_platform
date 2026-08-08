@@ -18,7 +18,6 @@ from loto.moirai2_campaign.runtime_preflight import (
     validate_lane_files,
 )
 
-
 PYPROJECT = """
 [project]
 name = "test-lane"

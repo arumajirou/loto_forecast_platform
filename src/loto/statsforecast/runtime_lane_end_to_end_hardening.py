@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from .runtime_lane_admission import write_admission_artifacts
 from .runtime_lane_admission_hardening import inspect_target_host_archive

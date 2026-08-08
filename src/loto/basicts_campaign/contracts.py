@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 from pathlib import PurePosixPath
-from typing import Any, Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 

@@ -8,7 +8,6 @@ from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator, model_validator
 
-
 REPOSITORY_NAME_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 LOGIN_RE = re.compile(r"^[A-Za-z0-9-]{1,100}$")
 GIT_REF_RE = re.compile(r"^refs/[A-Za-z0-9._/\-]{1,240}$")
@@ -77,7 +76,7 @@ class ReceiverPolicy(StrictModel):
     forensic_raw_payload_enabled: Literal[False]
 
     @model_validator(mode="after")
-    def validate_policy(self) -> "ReceiverPolicy":
+    def validate_policy(self) -> ReceiverPolicy:
         if set(self.allowed_actions) != set(EventType):
             raise ValueError("allowed_actions must declare every supported event")
         if self.max_backoff_seconds < self.base_backoff_seconds:

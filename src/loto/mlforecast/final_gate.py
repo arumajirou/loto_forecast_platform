@@ -13,7 +13,6 @@ from typing import Any
 from loto.mlforecast.artifacts import atomic_write_text, sha256_file
 from loto.mlforecast.handoff_guard import verify_guarded_handoff
 
-
 DIGEST = re.compile(r"^[0-9a-f]{64}$")
 RUN_ID = re.compile(r"^mlforecast-final-[0-9]{8}-[0-9]{6}-[0-9]+-[0-9a-f]{12}$")
 REQUIRED_HANDOFF_FILES = {

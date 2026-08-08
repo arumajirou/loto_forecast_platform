@@ -3,7 +3,8 @@ from __future__ import annotations
 import pytest
 
 hypothesis = pytest.importorskip("hypothesis")
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from loto.run_lifecycle import canonical_json, sha256_canonical
 

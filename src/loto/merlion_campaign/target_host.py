@@ -6,9 +6,10 @@ import json
 import os
 import re
 import tempfile
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Literal, Sequence
+from typing import Any, Literal
 
 from loto.adapters.merlion.adapter import MerlionProviderAdapter
 from loto.merlion_campaign.certification import CertificationResult, certify_core_model

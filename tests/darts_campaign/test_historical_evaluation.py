@@ -21,7 +21,6 @@ from loto.darts_campaign.historical_evaluation import (
     expected_origins,
 )
 
-
 POSITIONS = ("N1", "N2")
 
 

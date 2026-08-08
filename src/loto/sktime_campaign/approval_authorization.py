@@ -11,7 +11,6 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-
 _REQUIRED_RISKS = [
     "REAL_PROSPECTIVE_ACCURACY_REVIEWED",
     "BASELINE_COMPARISON_REVIEWED",
@@ -91,7 +90,7 @@ class ApprovalPolicy(BaseModel):
     one_time_use: Literal[True] = True
 
     @model_validator(mode="after")
-    def validate_policy(self) -> "ApprovalPolicy":
+    def validate_policy(self) -> ApprovalPolicy:
         if set(self.required_roles) != {
             "model_owner",
             "independent_reviewer",
@@ -121,7 +120,7 @@ class HumanApproval(BaseModel):
     rationale: str = Field(min_length=20, max_length=2000)
 
     @model_validator(mode="after")
-    def validate_approval(self) -> "HumanApproval":
+    def validate_approval(self) -> HumanApproval:
         _parse_utc(self.approved_at_utc, label="approved_at_utc")
         if len(self.risk_acknowledgements) != len(set(self.risk_acknowledgements)):
             raise ValueError("risk acknowledgements must be unique")
@@ -151,7 +150,7 @@ class ApprovalAuthorizationRequest(BaseModel):
     automatic_retraining: Literal[False] = False
 
     @model_validator(mode="after")
-    def validate_request(self) -> "ApprovalAuthorizationRequest":
+    def validate_request(self) -> ApprovalAuthorizationRequest:
         requested = _parse_utc(
             self.approval_requested_at_utc,
             label="approval_requested_at_utc",
@@ -408,7 +407,7 @@ class AuthorizationConsumptionLedger(BaseModel):
     consumed_transaction_nonces: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def validate_ledger(self) -> "AuthorizationConsumptionLedger":
+    def validate_ledger(self) -> AuthorizationConsumptionLedger:
         if len(self.consumed_authorization_ids) != len(set(self.consumed_authorization_ids)):
             raise ValueError("consumed authorization IDs must be unique")
         if len(self.consumed_transaction_nonces) != len(set(self.consumed_transaction_nonces)):

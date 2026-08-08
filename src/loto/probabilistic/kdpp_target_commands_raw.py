@@ -4,7 +4,6 @@ from typing import Any
 
 from loto.probabilistic.kdpp_target_contracts import TargetExecutionPlan
 
-
 _RAW_CONFIRMATIONS = [
     "--confirm-source-query",
     "--confirm-database-snapshot",

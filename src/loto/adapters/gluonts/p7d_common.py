@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 from typing import Any, BinaryIO
 
@@ -23,7 +23,7 @@ class P7DBundleError(RuntimeError):
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
 
 def sha256_file(path: Path) -> str:

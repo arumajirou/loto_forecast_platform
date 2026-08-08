@@ -70,7 +70,7 @@ def compute_interval_metrics(
         coverage_gap=empirical - nominal,
         mean_width=float(widths.mean()),
         median_width=float(np.median(widths)),
-        per_position_coverage=tuple((float(value) for value in covered.mean(axis=1))),
+        per_position_coverage=tuple(float(value) for value in covered.mean(axis=1)),
         all_position_coverage=float(covered.all(axis=0).mean()),
     )
 
@@ -85,7 +85,7 @@ def certify_conformal_quantiles(
     atol: float = 1e-12,
 ) -> ConformalCertification:
     expected = tuple(config.quantiles)
-    observed_keys = tuple(sorted((float(key) for key in quantile_predictions)))
+    observed_keys = tuple(sorted(float(key) for key in quantile_predictions))
     if observed_keys != expected:
         raise CertificationError("observed quantile keys differ from requested quantiles")
     arrays = [_as_position_horizon(quantile_predictions[key]) for key in expected]

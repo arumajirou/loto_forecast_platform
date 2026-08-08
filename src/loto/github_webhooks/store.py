@@ -14,7 +14,6 @@ from loto.github_webhooks.contracts import (
     StoreOutcome,
 )
 
-
 ERROR_CODE_RE = re.compile(r"^[A-Z0-9_]{1,64}$")
 
 

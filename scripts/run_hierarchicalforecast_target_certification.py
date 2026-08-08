@@ -3,6 +3,5 @@
 
 from hierarchicalforecast_target.operator import main
 
-
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -4,17 +4,10 @@ import json
 from pathlib import Path
 from typing import Any
 
-import pytest
-
 from loto.moirai2_campaign.runtime_evidence_gate import (
     EXPECTED_QUANTILE_KEYS,
-    FORMAL_CASE_NAMES,
-    RuntimeEvidenceGateError,
     sha256_file,
     sha256_payload,
-    verify_campaign,
-    verify_runtime_evidence_pair,
-    write_sha256_manifest,
 )
 
 MODEL_REVISION = "30f43ff08c8494f4943ae1521e9d4e94a0fbb389"

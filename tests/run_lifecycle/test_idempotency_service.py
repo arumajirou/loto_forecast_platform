@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import timedelta
 
 import pytest
+from conftest import make_command
 
 from loto.run_lifecycle import (
     CanonicalJsonObject,
@@ -10,13 +11,10 @@ from loto.run_lifecycle import (
     HashBinding,
     IdempotencyConflictError,
     RunCommandType,
-    RunPhase,
     RunStatus,
     TransitionRejected,
     compute_semantic_idempotency_key,
 )
-
-from conftest import make_command
 
 
 def test_semantic_key_excludes_timestamp_command_id_and_lease_fields() -> None:

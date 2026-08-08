@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import subprocess
+from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any
 
 from loto.merlion_campaign.bootstrap_resume import (
     _canonical_sha256,

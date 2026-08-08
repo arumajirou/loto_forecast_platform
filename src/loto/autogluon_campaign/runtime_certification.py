@@ -7,11 +7,12 @@ import os
 import platform
 import subprocess
 import sys
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from pydantic import ValidationError
 
@@ -378,7 +379,7 @@ def _scenario_status(return_code: int | None, errors: list[str]) -> str:
 def run_runtime_certification(
     config: RuntimeCertificationConfig,
 ) -> RuntimeCertificationReport:
-    started = datetime.now(timezone.utc)
+    started = datetime.now(UTC)
     run_id = started.strftime("autogluon-p5-%Y%m%dT%H%M%SZ")
     if not config.provider_command:
         raise ValueError("provider_command must not be empty")
@@ -415,7 +416,7 @@ def run_runtime_certification(
                 None,
             )
             if dependency is None or dependency.status != CertificationStatus.VERIFIED.value:
-                now = datetime.now(timezone.utc).isoformat()
+                now = datetime.now(UTC).isoformat()
                 message = f"scenario dependency not verified: {scenario.depends_on}"
                 stdout_path.write_text("", encoding="utf-8")
                 stderr_path.write_text(message + "\n", encoding="utf-8")
@@ -449,7 +450,7 @@ def run_runtime_certification(
         ]
         environment = os.environ.copy()
         environment.update(scenario.environment)
-        scenario_started = datetime.now(timezone.utc)
+        scenario_started = datetime.now(UTC)
         return_code: int | None = None
         errors: list[str] = []
         response_payload: dict[str, Any] | None = None
@@ -498,7 +499,7 @@ def run_runtime_certification(
         response_status = response_payload.get("status") if response_payload else None
         predictions = response_payload.get("predictions") if response_payload else None
         metadata = response_payload.get("metadata") if response_payload else None
-        scenario_finished = datetime.now(timezone.utc)
+        scenario_finished = datetime.now(UTC)
         results.append(
             ScenarioResult(
                 scenario_id=scenario.scenario_id,
@@ -534,7 +535,7 @@ def run_runtime_certification(
     else:
         status = CertificationStatus.FAILED
 
-    finished = datetime.now(timezone.utc)
+    finished = datetime.now(UTC)
     report_without_hash = {
         "schema_version": 1,
         "run_id": run_id,

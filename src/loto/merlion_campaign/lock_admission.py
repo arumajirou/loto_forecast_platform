@@ -5,9 +5,10 @@ import json
 import os
 import tempfile
 import zipfile
+from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any
 
 from loto.merlion_campaign.bootstrap_evidence_verify import verify_bootstrap_evidence_zip
 from loto.merlion_campaign.git_provenance import (

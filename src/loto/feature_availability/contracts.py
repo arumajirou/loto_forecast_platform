@@ -97,7 +97,7 @@ class FeatureDefinition(StrictModel):
     _timezone = field_validator("timezone")(_validate_timezone)
 
     @model_validator(mode="after")
-    def validate_lag_semantics(self) -> "FeatureDefinition":
+    def validate_lag_semantics(self) -> FeatureDefinition:
         if self.temporal_class is TemporalClass.TARGET_HISTORY and self.lag < 1:
             raise ValueError("TARGET_HISTORY requires lag >= 1")
         return self
@@ -231,7 +231,7 @@ class SplitWindow(StrictModel):
     _end_at = field_validator("end_at")(_validate_aware)
 
     @model_validator(mode="after")
-    def validate_bounds(self) -> "SplitWindow":
+    def validate_bounds(self) -> SplitWindow:
         if self.start_at >= self.end_at:
             raise ValueError("split start_at must be earlier than end_at")
         if self.row_start >= self.row_end:

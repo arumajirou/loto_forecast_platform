@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import stat
 import zipfile
 from pathlib import Path
@@ -12,8 +11,8 @@ from loto.adapters.gluonts.p7d_bundle import (
     P7DBundleError,
     create_evidence_bundle,
     sha256_file,
-    verify_evidence_bundle,
     verify_and_extract_bundle,
+    verify_evidence_bundle,
 )
 from loto.adapters.gluonts.p7d_contract import (
     P7DBundleEntry,

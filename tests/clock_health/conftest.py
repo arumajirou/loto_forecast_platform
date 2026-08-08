@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -13,7 +13,7 @@ from loto.clock_health import (
 )
 
 FIXTURES = Path(__file__).parent / "fixtures"
-OBSERVED_AT = datetime(2026, 8, 6, 9, 0, 0, tzinfo=timezone.utc)
+OBSERVED_AT = datetime(2026, 8, 6, 9, 0, 0, tzinfo=UTC)
 
 
 @pytest.fixture

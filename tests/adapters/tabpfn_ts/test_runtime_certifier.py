@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from loto.adapters.tabpfn_ts.manifests import V2_WEIGHT_SHA256
 from loto.adapters.tabpfn_ts.runtime_certifier import (
     GPUProcessSample,
     ProviderRunEvidence,
@@ -17,7 +18,6 @@ from loto.adapters.tabpfn_ts.runtime_certifier import (
     parse_nvidia_compute_apps,
     validate_provider_response,
 )
-from loto.adapters.tabpfn_ts.manifests import V2_WEIGHT_SHA256
 
 
 def _gpu_response(*, pid: int = 123, cpu_fallback: bool = False) -> dict[str, object]:
@@ -295,8 +295,8 @@ args.response.write_text(json.dumps(response), encoding='utf-8')
 def test_certify_runtime_blocks_before_process_when_checkpoint_is_missing(tmp_path: Path) -> None:
     import sys
 
-    from loto.adapters.tabpfn_ts.runtime_certifier import certify_runtime
     from loto.adapters.tabpfn_ts.manifests import V2_REVISION
+    from loto.adapters.tabpfn_ts.runtime_certifier import certify_runtime
 
     provider_script = tmp_path / "provider.py"
     provider_script.write_text("raise SystemExit('must not run')\n", encoding="utf-8")

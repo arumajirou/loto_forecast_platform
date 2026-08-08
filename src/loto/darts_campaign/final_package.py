@@ -6,9 +6,9 @@ import json
 import os
 import tempfile
 import zipfile
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
-from typing import Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -49,7 +49,7 @@ class FinalPackageConfig(BaseModel):
     compression_level: int = Field(default=9, ge=0, le=9)
 
     @model_validator(mode="after")
-    def validate_contract(self) -> "FinalPackageConfig":
+    def validate_contract(self) -> FinalPackageConfig:
         if self.required_documents != REQUIRED_DOCUMENTS:
             raise ValueError("required_documents must exactly match the final handoff contract")
         if self.output_zip.suffix.lower() != ".zip":

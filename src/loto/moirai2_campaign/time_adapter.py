@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
-from typing import Iterable
+from datetime import UTC, datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -46,7 +46,7 @@ def build_draw_sequence_axis(
     expected_draws = list(range(draws[0], draws[0] + length))
     if draws != expected_draws:
         raise ValueError("draw_numbers must be unique, increasing, and gap-free")
-    start = datetime(2000, 1, 1, tzinfo=timezone.utc)
+    start = datetime(2000, 1, 1, tzinfo=UTC)
     mapping = [
         {
             "draw_no": draw,

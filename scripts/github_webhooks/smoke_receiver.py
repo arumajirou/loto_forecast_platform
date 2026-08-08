@@ -14,7 +14,6 @@ from loto.github_webhooks.security import SecretKey, SecretRing
 from loto.github_webhooks.service import ReceiverService
 from loto.github_webhooks.store import WebhookStore
 
-
 DELIVERY_ID = UUID("11111111-2222-4333-8444-555555555555")
 FIXTURE_SECRET = hashlib.sha256(b"github-webhook-foundation-fixture").digest()
 

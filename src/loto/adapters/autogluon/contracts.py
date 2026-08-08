@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any, Literal
 
@@ -50,9 +50,7 @@ class StrictModel(BaseModel):
 class TimelinePolicy(StrictModel):
     mode: Literal["synthetic_regular"] = "synthetic_regular"
     frequency: Literal["D"] = "D"
-    base_timestamp: datetime = Field(
-        default_factory=lambda: datetime(2000, 1, 1, tzinfo=timezone.utc)
-    )
+    base_timestamp: datetime = Field(default_factory=lambda: datetime(2000, 1, 1, tzinfo=UTC))
     source_order_field: str = "draw_no"
     source_timestamp_field: str = "draw_date"
 

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from loto.autogluon_campaign.holdout_prospective import (
     HoldoutProspectiveError,
@@ -68,7 +69,7 @@ def create_promotion_eligibility(
     )
     candidate_id = holdout["selected_candidate_id"]
     root = _empty(output_dir)
-    created_at = now or datetime.now(timezone.utc)
+    created_at = now or datetime.now(UTC)
     payloads = {
         "REQUEST_METADATA.json": {
             "schema_version": PROMOTION_SCHEMA,

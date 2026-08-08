@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
+from test_registry_transaction import request, subject
 
 from loto.sktime_campaign.registry_artifacts import (
     P8VerificationError,
@@ -11,7 +12,6 @@ from loto.sktime_campaign.registry_artifacts import (
     verify_p8,
 )
 from loto.sktime_campaign.registry_transaction import bootstrap_registry
-from test_registry_transaction import request, subject
 
 
 def run_case(tmp_path: Path):

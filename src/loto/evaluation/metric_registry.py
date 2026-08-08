@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Final, Iterable, Mapping
+from typing import Final
 
 
 class MetricDirection(StrEnum):

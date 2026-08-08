@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime, time, timezone
+from datetime import UTC, date, datetime, time
 from typing import Any
 
 from pydantic import ValidationError
@@ -13,7 +13,8 @@ from .api_contract import (
 from .contracts import ProviderRequestV2
 from .covariates import ProviderRequestV2Covariates, has_covariate_payload
 from .execution import ExecutionPlanError, build_execution_plan
-from .provider import ProviderRuntime, _error_response, run_provider_v2 as _run_provider_v2
+from .provider import ProviderRuntime, _error_response
+from .provider import run_provider_v2 as _run_provider_v2
 
 
 class StrictPreflightError(ValueError):
@@ -61,7 +62,7 @@ def _source_timestamp(value: Any, *, row_index: int, field: str) -> datetime:
             "must be a date, datetime, or ISO-8601 string",
         )
     if parsed.tzinfo is not None and parsed.utcoffset() is not None:
-        parsed = parsed.astimezone(timezone.utc).replace(tzinfo=None)
+        parsed = parsed.astimezone(UTC).replace(tzinfo=None)
     return parsed
 
 

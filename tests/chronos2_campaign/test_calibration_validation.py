@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 from pathlib import Path
 
 import numpy as np
@@ -11,7 +10,6 @@ from pydantic import ValidationError
 
 from loto.chronos2_campaign.calibration import (
     CalibrationConfig,
-    persist_calibration_result,
     run_calibration_evaluation,
 )
 from loto.chronos2_campaign.calibration_methods import (
@@ -20,7 +18,6 @@ from loto.chronos2_campaign.calibration_methods import (
     quantile_residual_correction,
     rearrange_quantiles,
 )
-
 
 LEVELS = (0.05, 0.1, 0.5, 0.9, 0.95)
 

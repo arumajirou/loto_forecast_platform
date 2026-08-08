@@ -14,10 +14,10 @@ from .contract import (
 )
 from .geometry import geometry_for
 from .manifests import (
-    CheckpointLane,
     V2_REPO_ID,
     V2_REVISION,
     V2_WEIGHT_FILENAME,
+    CheckpointLane,
 )
 
 LEGACY_V1_ALLOWED_KEYS = {

@@ -6,7 +6,7 @@ from typing import Any, Literal, Protocol
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field
 
-from .ensemble_conformal_contract import P10CampaignConfig, P10_MODEL_IDENTITIES
+from .ensemble_conformal_contract import P10_MODEL_IDENTITIES, P10CampaignConfig
 
 
 class MatrixTask(BaseModel):
@@ -31,12 +31,10 @@ class MatrixRuntime(Protocol):
 
 def run_p10_matrix(config: P10CampaignConfig, runtime: MatrixRuntime) -> tuple[MatrixResult, ...]:
     tasks = tuple(
-        (
-            MatrixTask(public_name=public_name, seed=seed, fold_id=fold_id)
-            for public_name in P10_MODEL_IDENTITIES
-            for seed in config.seeds
-            for fold_id in config.fold_ids
-        )
+        MatrixTask(public_name=public_name, seed=seed, fold_id=fold_id)
+        for public_name in P10_MODEL_IDENTITIES
+        for seed in config.seeds
+        for fold_id in config.fold_ids
     )
     results: list[MatrixResult] = []
     for task in tasks:

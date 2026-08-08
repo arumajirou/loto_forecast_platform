@@ -53,7 +53,7 @@ class ProspectiveWindowEvidence(BaseModel):
     baseline_metrics: dict[str, CandidateMetrics] = Field(min_length=1)
 
     @model_validator(mode="after")
-    def validate_window(self) -> "ProspectiveWindowEvidence":
+    def validate_window(self) -> ProspectiveWindowEvidence:
         sealed = _parse_utc(self.sealed_at_utc, label="sealed_at_utc")
         revealed = _parse_utc(self.revealed_at_utc, label="revealed_at_utc")
         if revealed <= sealed:
@@ -113,7 +113,7 @@ class PromotionGateRequest(BaseModel):
     human_approval_granted: Literal[False] = False
 
     @model_validator(mode="after")
-    def validate_request(self) -> "PromotionGateRequest":
+    def validate_request(self) -> PromotionGateRequest:
         required = {"p0", "p1", "p2", "p3", "p4"}
         if set(self.upstream_artifact_sha256) != required:
             raise ValueError("upstream artifact inventory must be exactly P0-P4")

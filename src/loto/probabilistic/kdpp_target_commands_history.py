@@ -4,7 +4,6 @@ from typing import Any
 
 from loto.probabilistic.kdpp_target_contracts import TargetExecutionPlan
 
-
 _KDPP_CONFIRMATIONS = [
     "--confirm-source-read-only",
     "--confirm-train-only",

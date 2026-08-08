@@ -16,7 +16,6 @@ from loto.moirai2_campaign.lock_review import (
     validate_installed_review,
 )
 
-
 PYPROJECT = """
 [project]
 name = "test-lane"

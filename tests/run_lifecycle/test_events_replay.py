@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import timedelta
 
 import pytest
+from conftest import make_command
 
 from loto.run_lifecycle import (
     EffectResult,
@@ -15,8 +16,6 @@ from loto.run_lifecycle import (
     validate_lifecycle,
     verify_event_chain,
 )
-
-from conftest import make_command
 
 
 def _three_events(service, repository, clock):

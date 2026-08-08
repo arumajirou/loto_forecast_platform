@@ -7,11 +7,11 @@ from enum import Enum
 from pydantic import Field
 
 from .contracts import (
+    UNKNOWN_REVISIONS,
     DataSplit,
     FeatureManifest,
     StrictModel,
     TemporalClass,
-    UNKNOWN_REVISIONS,
 )
 
 

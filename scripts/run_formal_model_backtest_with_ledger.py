@@ -11,6 +11,5 @@ if str(SRC) not in sys.path:
 
 from loto.orchestration.formal_backtest_main import main
 
-
 if __name__ == "__main__":
     main()

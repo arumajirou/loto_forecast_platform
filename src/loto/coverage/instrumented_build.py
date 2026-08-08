@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from loto.coverage.instrumented_build_finalize import finalize_build
 from loto.coverage.instrumented_common import (
@@ -17,7 +18,6 @@ from loto.coverage.instrumented_common import (
 from loto.coverage.ledger import (
     CoverageLedgerPreflightError,
     CoverageLedgerRecorder,
-    atomic_write_json,
     require_empty_output,
     require_regular_file,
 )

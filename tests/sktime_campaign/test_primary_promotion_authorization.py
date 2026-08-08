@@ -1,23 +1,21 @@
 from __future__ import annotations
 
-from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from p11_helpers import (
+    build_request,
+    failing_verifier,
+    fake_verifier,
+)
 from pydantic import ValidationError
 
 from loto.sktime_campaign.primary_promotion_authorization import (
     PrimaryPromotionAuthorizationRequest,
     PrimaryPromotionTransactionRequest,
-    canonical_sha256,
     issue_primary_promotion_authorization,
     validate_primary_promotion_transaction,
     verify_authorization_seal,
-)
-from p11_helpers import (
-    build_request,
-    failing_verifier,
-    fake_verifier,
 )
 
 

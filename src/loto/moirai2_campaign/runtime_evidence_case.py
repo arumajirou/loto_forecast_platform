@@ -4,9 +4,9 @@ from pathlib import Path
 from typing import Any
 
 from loto.moirai2_campaign.runtime_evidence_common import (
-    CaseVerification,
     EXPECTED_QUANTILE_KEYS,
     EXPECTED_SAVE_LOAD_STATUS,
+    CaseVerification,
     RuntimeEvidenceGateError,
     _required_file,
     canonical_json_bytes,

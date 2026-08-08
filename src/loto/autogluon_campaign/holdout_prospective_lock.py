@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from loto.autogluon_campaign.holdout_prospective import (
     LOCK_SCHEMA,
@@ -80,7 +81,7 @@ def create_prediction_lock(
         "schema_version": LOCK_SCHEMA,
         "stage": stage,
         "run_id": run_id,
-        "locked_at": (now or datetime.now(timezone.utc)).isoformat(),
+        "locked_at": (now or datetime.now(UTC)).isoformat(),
         "timestamp_authority": "LOCAL_SYSTEM_UTC",
         "actual_known": False,
         "evaluation_status": "NOT_SCORED",

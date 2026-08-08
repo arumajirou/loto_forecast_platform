@@ -91,7 +91,7 @@ class CanonicalJsonObject(StrictFrozenModel):
         return value
 
     @classmethod
-    def from_object(cls, value: dict[str, object]) -> "CanonicalJsonObject":
+    def from_object(cls, value: dict[str, object]) -> CanonicalJsonObject:
         return cls(text=canonical_json(value))
 
     def as_object(self) -> dict[str, object]:
@@ -139,7 +139,7 @@ class RunCommand(StrictFrozenModel):
         return _require_utc(value)
 
     @model_validator(mode="after")
-    def lease_fields_are_all_or_none(self) -> "RunCommand":
+    def lease_fields_are_all_or_none(self) -> RunCommand:
         provided = (
             self.lease_id is not None,
             self.lease_owner_id is not None,
@@ -201,7 +201,7 @@ class RunEvent(StrictFrozenModel):
         return _require_utc(value)
 
     @model_validator(mode="after")
-    def event_sequence_contract(self) -> "RunEvent":
+    def event_sequence_contract(self) -> RunEvent:
         if self.revision != self.sequence:
             raise ValueError("event revision must equal sequence")
         if self.expected_revision != self.revision - 1:
@@ -231,7 +231,7 @@ class RunLease(StrictFrozenModel):
         return _require_utc(value)
 
     @model_validator(mode="after")
-    def lease_time_order(self) -> "RunLease":
+    def lease_time_order(self) -> RunLease:
         if self.heartbeat_at < self.acquired_at:
             raise ValueError("heartbeat_at cannot precede acquired_at")
         if self.expires_at <= self.heartbeat_at:
@@ -258,7 +258,7 @@ class RunAggregate(StrictFrozenModel):
         return _require_utc(value)
 
     @model_validator(mode="after")
-    def aggregate_consistency(self) -> "RunAggregate":
+    def aggregate_consistency(self) -> RunAggregate:
         if self.revision == 0 and self.last_event_sha256 is not None:
             raise ValueError("revision zero cannot have an event-chain head")
         if self.revision > 0 and self.last_event_sha256 is None:
@@ -275,7 +275,7 @@ class RunAggregate(StrictFrozenModel):
         return self
 
     @classmethod
-    def initial(cls, run_id: str) -> "RunAggregate":
+    def initial(cls, run_id: str) -> RunAggregate:
         return cls(run_id=run_id)
 
 
@@ -307,7 +307,7 @@ class IdempotencyRecord(StrictFrozenModel):
         return _require_utc(value)
 
     @model_validator(mode="after")
-    def duplicate_count_matches_observations(self) -> "IdempotencyRecord":
+    def duplicate_count_matches_observations(self) -> IdempotencyRecord:
         if self.duplicate_count != len(self.duplicate_observations):
             raise ValueError("duplicate_count must equal duplicate_observations length")
         return self
@@ -328,7 +328,7 @@ class LifecycleValidationReport(StrictFrozenModel):
     chain_head_sha256: Sha256 | None
 
     @model_validator(mode="after")
-    def valid_flag_matches_findings(self) -> "LifecycleValidationReport":
+    def valid_flag_matches_findings(self) -> LifecycleValidationReport:
         has_error = any(item.severity == FindingSeverity.ERROR for item in self.findings)
         if self.valid == has_error:
             raise ValueError("valid must be the inverse of ERROR findings")
@@ -356,7 +356,7 @@ class LifecycleSnapshot(StrictFrozenModel):
         event_count: int,
         idempotency_record_count: int,
         captured_at: datetime,
-    ) -> "LifecycleSnapshot":
+    ) -> LifecycleSnapshot:
         payload = {
             "schema_version": SCHEMA_VERSION,
             "aggregate": aggregate,

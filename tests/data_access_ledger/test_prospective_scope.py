@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from datetime import timedelta
 
+from conftest import ORIGIN, make_event, make_ledger, make_slice, make_state
+
 from loto.data_access_ledger import (
     AccessDecision,
     AccessOperation,
@@ -11,8 +13,6 @@ from loto.data_access_ledger import (
     StateKind,
     validate_ledger,
 )
-
-from conftest import BASE, ORIGIN, make_event, make_ledger, make_slice, make_state
 
 
 def codes(ledger) -> set[FindingCode]:

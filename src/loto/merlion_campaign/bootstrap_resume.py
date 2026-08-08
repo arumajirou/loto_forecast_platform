@@ -4,9 +4,10 @@ import hashlib
 import json
 import os
 import tempfile
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 PREFLIGHT_SCHEMA = "merlion-bootstrap-preflight-v1"
 PLAN_SCHEMA = "merlion-bootstrap-resume-plan-v1"

@@ -3,8 +3,9 @@ from __future__ import annotations
 import json
 import stat
 import zipfile
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import pytest
 

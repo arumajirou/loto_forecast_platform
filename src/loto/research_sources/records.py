@@ -1,17 +1,16 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Literal
 
-from datetime import datetime
-
-from pydantic import AwareDatetime, BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .common import (
-    STRICT_CONFIG,
     _DATE_RE,
     _SENTINELS,
     _SHA256_RE,
     _VERSION_SENTINELS,
+    STRICT_CONFIG,
     CommercialEligibility,
     ContaminationRisk,
     IntakeStatus,

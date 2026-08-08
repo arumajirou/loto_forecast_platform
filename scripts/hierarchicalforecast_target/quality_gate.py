@@ -6,9 +6,9 @@ import argparse
 import json
 import os
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from collections.abc import Callable, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Callable, Sequence
 
 from .constants import CertificationError
 from .dependency_contract import verify_dependency_contract
@@ -46,7 +46,7 @@ MYPY_SCOPE = (
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def parse_junit(path: Path, *, expected_tests: int | None = None) -> dict[str, int]:
@@ -118,7 +118,7 @@ def execute(
         raise CertificationError(f"repository root must not be a symbolic link: {root}")
     root = root.resolve()
     evidence_root = resolve_requested_root(root, evidence_root, "quality evidence root")
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
     run_id = f"hierarchicalforecast-quality-{stamp}-{os.getpid()}"
     directory = evidence_root / run_id
     report: dict[str, object] = {

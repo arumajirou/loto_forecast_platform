@@ -89,7 +89,7 @@ class RuntimeProbeEvidence(BaseModel):
     fallback_reason: str | None = None
 
     @model_validator(mode="after")
-    def validate_probe(self) -> "RuntimeProbeEvidence":
+    def validate_probe(self) -> RuntimeProbeEvidence:
         _parse_utc(self.probed_at_utc, label="probed_at_utc")
         if self.expected_output_shape != self.actual_output_shape:
             raise ValueError("runtime probe output shape mismatch")
@@ -148,7 +148,7 @@ class DeploymentHistoryRecord(BaseModel):
     record_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
-    def validate_record(self) -> "DeploymentHistoryRecord":
+    def validate_record(self) -> DeploymentHistoryRecord:
         _parse_utc(self.committed_at_utc, label="committed_at_utc")
         payload = self.model_dump(mode="json", exclude={"record_sha256"})
         if canonical_sha256(payload) != self.record_sha256:
@@ -171,7 +171,7 @@ class DeploymentState(BaseModel):
     state_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
-    def validate_state(self) -> "DeploymentState":
+    def validate_state(self) -> DeploymentState:
         if len(self.consumed_activation_ids) != len(set(self.consumed_activation_ids)):
             raise ValueError("consumed activation IDs must be unique")
         if len(self.consumed_activation_nonces) != len(set(self.consumed_activation_nonces)):
@@ -210,7 +210,7 @@ class CanaryActivationRequest(BaseModel):
     policy: CanaryPolicy = Field(default_factory=CanaryPolicy)
 
     @model_validator(mode="after")
-    def validate_request(self) -> "CanaryActivationRequest":
+    def validate_request(self) -> CanaryActivationRequest:
         _parse_utc(self.requested_at_utc, label="requested_at_utc")
         subject = self.p8.subject
         probe = self.runtime_probe

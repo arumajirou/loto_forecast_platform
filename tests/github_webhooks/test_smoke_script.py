@@ -6,7 +6,6 @@ import json
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts" / "github_webhooks" / "smoke_receiver.py"
 POLICY = ROOT / "configs" / "github_webhooks" / "receiver_v1.yaml"

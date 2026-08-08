@@ -15,6 +15,7 @@ from loto.adapters.tabpfn_ts import (
     rank_candidate_scores,
     validate_calibrated_probabilities,
 )
+
 from .conftest import (
     build_candidate_response,
     build_position_response,

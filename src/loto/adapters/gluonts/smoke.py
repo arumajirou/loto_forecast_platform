@@ -7,7 +7,7 @@ import math
 import os
 import random
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any, Literal
 
@@ -171,7 +171,7 @@ def _blocked_result(
         lane=lane,
         outcome=SmokeOutcome.BLOCKED,
         started_at_utc=started_at,
-        finished_at_utc=datetime.now(timezone.utc).isoformat(),
+        finished_at_utc=datetime.now(UTC).isoformat(),
         duration_seconds=time.monotonic() - started,
         process_id=os.getpid(),
         seed=seed,
@@ -208,7 +208,7 @@ def run_deepar_cpu_smoke(
     """Run one tiny DeepAR training and prediction entirely on CPU."""
 
     started = time.monotonic()
-    started_at = datetime.now(timezone.utc).isoformat()
+    started_at = datetime.now(UTC).isoformat()
     versions = runtime_versions()
     if os.environ.get("LOTO_GLUONTS_SKIP_DEEPAR_SMOKE") == "1":
         return _blocked_result(
@@ -313,7 +313,7 @@ def run_deepar_cpu_smoke(
             lane=lane,
             outcome=outcome,
             started_at_utc=started_at,
-            finished_at_utc=datetime.now(timezone.utc).isoformat(),
+            finished_at_utc=datetime.now(UTC).isoformat(),
             duration_seconds=time.monotonic() - started,
             process_id=os.getpid(),
             seed=seed,
@@ -343,7 +343,7 @@ def run_deepar_cpu_smoke(
             lane=lane,
             outcome=SmokeOutcome.FAILED,
             started_at_utc=started_at,
-            finished_at_utc=datetime.now(timezone.utc).isoformat(),
+            finished_at_utc=datetime.now(UTC).isoformat(),
             duration_seconds=time.monotonic() - started,
             process_id=os.getpid(),
             seed=seed,

@@ -30,7 +30,7 @@ class FieldSpec(StrictModel):
     options: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def validate_options(self) -> "FieldSpec":
+    def validate_options(self) -> FieldSpec:
         if self.data_type == "SINGLE_SELECT" and not self.options:
             raise ValueError(f"single-select field {self.name!r} requires options")
         if self.data_type != "SINGLE_SELECT" and self.options:
@@ -78,7 +78,7 @@ class GovernanceSpec(StrictModel):
     evidence: EvidenceSpec
 
     @model_validator(mode="after")
-    def validate_governance_contract(self) -> "GovernanceSpec":
+    def validate_governance_contract(self) -> GovernanceSpec:
         field_names = [field.name for field in self.fields]
         if len(field_names) != len(set(field_names)):
             raise ValueError("field names must be unique")

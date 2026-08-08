@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from loto.autogluon_campaign.approval_authorization_contract import (
     ApprovalAuthorizationError,
@@ -12,7 +13,6 @@ from loto.autogluon_campaign.approval_authorization_contract import (
     HumanApproval,
     RegistrySubject,
     SignatureVerifier,
-    canonical_sha256,
     issue_registry_authorization,
     make_approval_intent,
     make_ssh_signature_verifier,
@@ -122,7 +122,7 @@ def create_approval_authorization(
         signature_verifier=signature_verifier,
     )
     root = empty_output_dir(output_dir)
-    created_at = datetime.now(timezone.utc).isoformat()
+    created_at = datetime.now(UTC).isoformat()
     payloads = {
         "REQUEST_METADATA.json": {
             "schema_version": "autogluon-p18-request-v1",

@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pandas as pd
@@ -148,7 +148,7 @@ def _validate_history(request: Chronos2RequestV2) -> None:
 
 def compile_chronos_input(request: Chronos2RequestV2) -> CompiledChronosInput:
     _validate_history(request)
-    base = datetime(2000, 1, 1, tzinfo=timezone.utc)
+    base = datetime(2000, 1, 1, tzinfo=UTC)
     timestamps = [base + timedelta(days=index) for index in range(len(request.history))]
     past_covariates = request.past_covariates or tuple({} for _ in request.history)
 

@@ -3,8 +3,9 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 

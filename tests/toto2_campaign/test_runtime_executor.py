@@ -135,7 +135,7 @@ def test_prepare_and_forecast_with_injected_model(
             self.output_head = OutputHead()
 
         @classmethod
-        def from_pretrained(cls, path: str) -> "Toto2Model":
+        def from_pretrained(cls, path: str) -> Toto2Model:
             assert path
             return cls()
 

@@ -5,12 +5,13 @@ import json
 from pathlib import Path
 from typing import Any
 
+from build_sktime_p7_request import _load_json, _p6_evidence, _sha256
+
 from loto.sktime_campaign.approval_authorization import (
     ApprovalAuthorizationRequest,
     approval_intent_payload,
     canonical_sha256,
 )
-from build_sktime_p7_request import _load_json, _p6_evidence, _sha256
 
 
 def _dummy_approvals(

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -68,7 +68,8 @@ def test_local_health_cannot_generate_trusted_evidence(
 
 @pytest.fixture
 def healthy_decision(policy, tracking_bytes, sources_bytes):
-    from conftest import OBSERVED_AT, observation_from_bytes
+    from conftest import observation_from_bytes
+
     from loto.clock_health import evaluate_clock_health
 
     observation = observation_from_bytes(policy, tracking_bytes, sources_bytes)
@@ -76,7 +77,7 @@ def healthy_decision(policy, tracking_bytes, sources_bytes):
         observation,
         policy,
         decision_id="healthy-decision-v1",
-        evaluated_at_utc=datetime(2026, 8, 6, 9, 0, tzinfo=timezone.utc),
+        evaluated_at_utc=datetime(2026, 8, 6, 9, 0, tzinfo=UTC),
     )
 
 

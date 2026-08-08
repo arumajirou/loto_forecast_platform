@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import json
 import math
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest
 from pydantic import ValidationError
 
 from loto.telemetry import (
+    PROTECTED_ACTUAL,
+    REDACTED,
     BoundedTelemetryBuffer,
     Component,
     EmitStatus,
@@ -17,8 +19,6 @@ from loto.telemetry import (
     MetricDefinition,
     MetricKind,
     MetricRegistry,
-    PROTECTED_ACTUAL,
-    REDACTED,
     RevealState,
     Severity,
     Stage,
@@ -32,7 +32,7 @@ from loto.telemetry import (
     redact_mapping,
 )
 
-NOW = datetime(2026, 8, 6, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 6, tzinfo=UTC)
 
 
 def _event(**updates: object) -> TelemetryEvent:

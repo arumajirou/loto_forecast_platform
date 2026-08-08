@@ -4,7 +4,7 @@ import hashlib
 import json
 import math
 import shutil
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 from typing import Any, Literal
 
@@ -54,7 +54,7 @@ def parse_utc(value: object) -> object:
 
 
 def require_utc(value: datetime, field: str) -> datetime:
-    if value.tzinfo is None or value.utcoffset() != timezone.utc.utcoffset(value):
+    if value.tzinfo is None or value.utcoffset() != UTC.utcoffset(value):
         raise ValueError(f"{field} must be UTC")
     return value
 

@@ -113,7 +113,7 @@ class ArtifactEvidence(StrictModel):
         return value
 
     @model_validator(mode="after")
-    def verified_requires_real_origin(self) -> "ArtifactEvidence":
+    def verified_requires_real_origin(self) -> ArtifactEvidence:
         if self.status is EvidenceStatus.VERIFIED and self.origin is not EvidenceOrigin.REAL:
             raise ValueError("synthetic or injected evidence cannot be VERIFIED")
         return self
@@ -132,7 +132,7 @@ class OOFEvidence(StrictModel):
     best_seed_only_selection: Literal[False] = False
 
     @model_validator(mode="after")
-    def validate_seed_inventory(self) -> "OOFEvidence":
+    def validate_seed_inventory(self) -> OOFEvidence:
         if len(set(self.seeds)) != len(self.seeds):
             raise ValueError("OOF seeds must be unique")
         if self.artifact.status is EvidenceStatus.VERIFIED and len(self.seeds) < 2:
@@ -148,7 +148,7 @@ class HoldoutEvidence(StrictModel):
     best_seed_only_selection: Literal[False] = False
 
     @model_validator(mode="after")
-    def validate_seed_count(self) -> "HoldoutEvidence":
+    def validate_seed_count(self) -> HoldoutEvidence:
         if self.artifact.status is EvidenceStatus.VERIFIED and self.seed_count < 2:
             raise ValueError("verified Holdout promotion evidence requires multiple seeds")
         return self
@@ -171,7 +171,7 @@ class ProspectiveWindowEvidence(StrictModel):
         return value
 
     @model_validator(mode="after")
-    def validate_window(self) -> "ProspectiveWindowEvidence":
+    def validate_window(self) -> ProspectiveWindowEvidence:
         started_offset = self.window_started_at.utcoffset()
         ended_offset = self.window_ended_at.utcoffset()
         if started_offset is None or ended_offset is None:
@@ -190,7 +190,7 @@ class BaselineComparisonEvidence(StrictModel):
     all_required_baselines_compared: bool
 
     @model_validator(mode="after")
-    def validate_baselines(self) -> "BaselineComparisonEvidence":
+    def validate_baselines(self) -> BaselineComparisonEvidence:
         if len(set(self.baseline_ids)) != len(self.baseline_ids):
             raise ValueError("baseline IDs must be unique")
         return self
@@ -215,7 +215,7 @@ class RuntimeCertificationEvidence(StrictModel):
     cpu_fallback: bool
 
     @model_validator(mode="after")
-    def validate_runtime(self) -> "RuntimeCertificationEvidence":
+    def validate_runtime(self) -> RuntimeCertificationEvidence:
         checks = (
             self.subject_identity_match,
             self.model_load_verified,
@@ -240,7 +240,7 @@ class LicenseEligibilityEvidence(StrictModel):
     automatic_license_override: Literal[False] = False
 
     @model_validator(mode="after")
-    def validate_license(self) -> "LicenseEligibilityEvidence":
+    def validate_license(self) -> LicenseEligibilityEvidence:
         expected = self.eligibility is LicenseEligibility.PRODUCTION_ELIGIBLE
         if self.production_eligible != expected:
             raise ValueError("license eligibility and production_eligible disagree")
@@ -288,7 +288,7 @@ class PromotionSubject(StrictModel):
         return value
 
     @model_validator(mode="after")
-    def validate_subject(self) -> "PromotionSubject":
+    def validate_subject(self) -> PromotionSubject:
         if self.oof_evidence.protocol_hash != self.protocol_hash:
             raise ValueError("OOF protocol hash differs from subject")
         if self.holdout_evidence.protocol_hash != self.protocol_hash:
@@ -322,7 +322,7 @@ class HumanApprovalEvidence(StrictModel):
     automatically_generated: Literal[False] = False
 
     @model_validator(mode="after")
-    def validate_approval(self) -> "HumanApprovalEvidence":
+    def validate_approval(self) -> HumanApprovalEvidence:
         if self.granted_at.tzinfo is None or self.granted_at.utcoffset() is None:
             raise ValueError("approval timestamp must be timezone-aware")
         if len(set(self.approver_ids)) != len(self.approver_ids):
@@ -340,7 +340,7 @@ class RegistryEvidence(StrictModel):
     registry_write_executed: bool = False
 
     @model_validator(mode="after")
-    def validate_registry(self) -> "RegistryEvidence":
+    def validate_registry(self) -> RegistryEvidence:
         if self.status is RegistryAxis.REGISTERED:
             if not self.registry_write_executed or self.registry_receipt_sha256 is None:
                 raise ValueError("REGISTERED requires a committed registry receipt")
@@ -363,7 +363,7 @@ class DeploymentEvidence(StrictModel):
     primary_binding_changed: bool = False
 
     @model_validator(mode="after")
-    def validate_deployment(self) -> "DeploymentEvidence":
+    def validate_deployment(self) -> DeploymentEvidence:
         if self.status is DeploymentAxis.NOT_DEPLOYED:
             if self.shadow_binding_changed or self.primary_binding_changed:
                 raise ValueError("NOT_DEPLOYED cannot change a binding")
@@ -417,7 +417,7 @@ class PromotionTransitionRequest(StrictModel):
         return value
 
     @model_validator(mode="after")
-    def validate_timestamp(self) -> "PromotionTransitionRequest":
+    def validate_timestamp(self) -> PromotionTransitionRequest:
         if self.requested_at.tzinfo is None or self.requested_at.utcoffset() is None:
             raise ValueError("transition timestamp must be timezone-aware")
         return self

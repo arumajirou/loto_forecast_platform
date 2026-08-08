@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parents[2]
 PROVIDER_SRC = ROOT / "environments" / "gluonts-compat" / "src"
 sys.path.insert(0, str(PROVIDER_SRC))
 
-from loto.adapters.gluonts.p6_registry import model_specs
 from loto_gluonts_provider import p6_fit_runtime, p6_reload_runtime, p6_runtime
 from loto_gluonts_provider.p6_contract import (
     FailureCategory,
@@ -20,6 +19,8 @@ from loto_gluonts_provider.p6_contract import (
     P6ProviderRequest,
     P6Status,
 )
+
+from loto.adapters.gluonts.p6_registry import model_specs
 
 
 class FakeTorch:
@@ -66,7 +67,7 @@ class FakePredictor:
         )
 
     @classmethod
-    def deserialize(cls, path: Path) -> "FakePredictor":
+    def deserialize(cls, path: Path) -> FakePredictor:
         assert (path / "predictor.json").exists()
         return cls()
 

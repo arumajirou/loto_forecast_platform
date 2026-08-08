@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from .runtime_lane_end_to_end_hardening import run_end_to_end_certification
 from .runtime_lane_remediation import (
     RemediationExecutionResult,
-    execute_bounded_remediation as _execute_bounded_remediation,
     verify_triage_evidence,
+)
+from .runtime_lane_remediation import (
+    execute_bounded_remediation as _execute_bounded_remediation,
 )
 
 

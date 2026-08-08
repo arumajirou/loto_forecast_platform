@@ -5,11 +5,11 @@ from typing import Any
 
 from loto.moirai2_campaign.runtime_evidence_case import verify_case
 from loto.moirai2_campaign.runtime_evidence_common import (
-    CampaignVerification,
-    FORMAL_CASE_NAMES,
-    RuntimeEvidenceGateError,
     _GIT_OBJECT_PATTERN,
     _SHA256_PATTERN,
+    FORMAL_CASE_NAMES,
+    CampaignVerification,
+    RuntimeEvidenceGateError,
     _required_file,
     _safe_relative_path,
     canonical_json_bytes,

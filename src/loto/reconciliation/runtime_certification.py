@@ -25,8 +25,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from loto.game.geometry import geometry_for
 from loto.reconciliation.hierarchy import (
-    Hierarchy,
     UPSTREAM_METHODS,
+    Hierarchy,
     build_number_hierarchy,
     reconcile_with_hierarchicalforecast,
 )

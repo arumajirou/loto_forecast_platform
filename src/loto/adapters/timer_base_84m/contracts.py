@@ -99,7 +99,7 @@ class TimerRequest(StrictModel):
     artifact_paths: ArtifactPaths
 
     @model_validator(mode="after")
-    def validate_timer_contract(self) -> "TimerRequest":
+    def validate_timer_contract(self) -> TimerRequest:
         if not 96 <= self.context_length <= 2880:
             raise ValueError("context_length must be within 96..2880")
         if self.context_length % 96 != 0:

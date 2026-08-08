@@ -7,7 +7,6 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-
 SIGNATURE_RE = re.compile(r"^sha256=([0-9a-fA-F]{64})$")
 
 

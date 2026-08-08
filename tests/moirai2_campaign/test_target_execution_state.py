@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -13,17 +12,10 @@ from loto.moirai2_campaign.target_execution import (
     SUPPORTED_LANE,
     TargetExecutionError,
     append_event,
-    artifact_tree_sha256,
     build_initial_state,
-    candidate_summary_for_lane,
-    event_type_for,
     expected_next_event,
-    load_json_object,
     sha256_file,
-    validate_candidate_artifact,
-    validate_installation_artifact,
     validate_state,
-    verify_recorded_artifacts,
 )
 
 

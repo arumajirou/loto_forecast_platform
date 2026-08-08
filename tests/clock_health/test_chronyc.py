@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 import pytest
+from conftest import OBSERVED_AT, continuity
 
 from loto.clock_health import (
     ChronycAdapter,
@@ -10,8 +12,6 @@ from loto.clock_health import (
     parse_chronyc_observation,
     verify_raw_observation,
 )
-
-from conftest import OBSERVED_AT, continuity
 
 
 class FakeRunner:
@@ -25,7 +25,7 @@ class FakeRunner:
         stdout = self.tracking if argv[-1] == "tracking" else self.sources
         return CommandResult(
             argv=argv,
-            started_at_utc=datetime(2026, 8, 6, 9, 0, tzinfo=timezone.utc),
+            started_at_utc=datetime(2026, 8, 6, 9, 0, tzinfo=UTC),
             duration_seconds=0.01,
             exit_code=0,
             timed_out=False,

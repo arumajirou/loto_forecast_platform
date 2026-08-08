@@ -4,15 +4,14 @@ import hashlib
 import json
 import subprocess
 import zipfile
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable
 
 import pytest
 
 from loto.mlforecast.handoff import (
     OPTIONAL_DOCUMENTS,
     REQUIRED_DOCUMENTS,
-    REQUIRED_PROVENANCE_DOCUMENTS,
     _zip_info,
 )
 from loto.mlforecast.handoff_guard import (
@@ -24,7 +23,6 @@ from loto.mlforecast.handoff_guard import (
     verify_guarded_handoff,
 )
 from loto.mlforecast.provenance import upstream_contract
-
 
 EntryList = list[tuple[str, bytes]]
 

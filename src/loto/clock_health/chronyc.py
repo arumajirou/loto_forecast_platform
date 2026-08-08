@@ -6,7 +6,7 @@ import re
 import subprocess
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
@@ -46,7 +46,7 @@ class SubprocessCommandRunner:
     """Execute fixed argv without shell interpolation."""
 
     def run(self, argv: tuple[str, ...], timeout_seconds: float) -> CommandResult:
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
         started = time.monotonic()
         try:
             completed = subprocess.run(
@@ -101,10 +101,10 @@ class ChronycAdapter:
     ) -> ChronycProbeArtifacts:
         wall_start = time.time_ns()
         monotonic_start = time.monotonic_ns()
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
         tracking = self._runner.run(_TRACKING_ARGV, timeout_seconds)
         sources = self._runner.run(_SOURCES_ARGV, timeout_seconds)
-        ended_at = datetime.now(timezone.utc)
+        ended_at = datetime.now(UTC)
         wall_end = time.time_ns()
         monotonic_end = time.monotonic_ns()
         continuity = ClockContinuityEvidence.create(
@@ -380,7 +380,7 @@ def _parse_reference_time(value: str) -> datetime:
     )
     for pattern in formats:
         try:
-            return datetime.strptime(normalized, pattern).replace(tzinfo=timezone.utc)
+            return datetime.strptime(normalized, pattern).replace(tzinfo=UTC)
         except ValueError:
             continue
     raise ValueError("unsupported reference time")

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import json
 from pathlib import Path
 
@@ -8,7 +7,7 @@ import pytest
 from pydantic import ValidationError
 
 from loto.research_sources.models import ResearchSourceRegistry
-from loto.research_sources.registry import DuplicateJsonKeyError, load_registry
+from loto.research_sources.registry import load_registry
 
 REGISTRY = Path("configs/research_sources/registry.v1.json")
 

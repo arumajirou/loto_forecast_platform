@@ -5,10 +5,11 @@ import os
 import random
 import sys
 import tempfile
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Iterator
+from typing import Any
 
 import numpy as np
 

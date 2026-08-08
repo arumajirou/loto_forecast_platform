@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from run_sktime_p5_monitor import load_request
+
 from loto.sktime_campaign.prospective_artifacts import (
     verify_prospective_monitor,
 )

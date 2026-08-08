@@ -8,7 +8,6 @@ import pytest
 
 from loto.orchestration.pipeline_downstream_commit import (
     DownstreamCommitConflict,
-    DownstreamCommitPreflightError,
     DownstreamCommitRetryable,
     execute_downstream_commit,
 )
@@ -252,7 +251,6 @@ def test_default_effects_are_idempotent_with_local_backends(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
-    import sqlite3
 
     from loto.orchestration.pipeline_downstream_effects import (
         DefaultDownstreamEffects,
@@ -295,10 +293,6 @@ def test_platform_model_conflict_blocks_candidate_registration(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
-    from loto.orchestration.pipeline_downstream_effects import (
-        DefaultDownstreamEffects,
-        DownstreamCommitConfig,
-    )
     from loto.registry.full import PlatformRegistry
 
     root = tmp_path / "run"

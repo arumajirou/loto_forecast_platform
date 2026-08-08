@@ -8,7 +8,6 @@ from pydantic import ValidationError
 
 from loto.timer_s1_campaign.model_manifest import TimerS1ModelManifest, load_manifest
 
-
 ROOT = Path(__file__).resolve().parents[2]
 
 

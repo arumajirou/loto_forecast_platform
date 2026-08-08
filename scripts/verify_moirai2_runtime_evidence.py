@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from loto.moirai2_campaign.runtime_evidence_gate import (  # noqa: E402
-    RuntimeEvidenceGateError,
     verify_runtime_evidence_pair,
     write_sha256_manifest,
 )

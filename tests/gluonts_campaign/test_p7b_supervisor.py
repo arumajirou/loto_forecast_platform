@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 
-
 ENVIRONMENTS = Path(__file__).resolve().parents[2] / "environments"
 sys.path.insert(0, str(ENVIRONMENTS))
 import gluonts_p7b as supervisor

@@ -5,7 +5,7 @@ import json
 import os
 import shutil
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +24,6 @@ from loto.moirai2_campaign.lock_review import (  # noqa: E402
     validate_installed_review,
     write_sha256_manifest,
 )
-
 
 RUNTIME_LANES = {
     "supported-py311": ROOT / "environments" / "moirai2-supported-py311",
@@ -147,7 +146,7 @@ def install_candidate(
     return {
         **plan,
         "status": "INSTALLED",
-        "installed_at": datetime.now(timezone.utc).isoformat(),
+        "installed_at": datetime.now(UTC).isoformat(),
         "backup_dir": str(backup_dir.resolve()) if backup_dir else None,
         "installed_review": evidence,
     }

@@ -4,7 +4,6 @@ from pathlib import Path
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = ROOT / ".github" / "dependabot.yml"
 SENSITIVE_PYTHON_DEPENDENCIES = {

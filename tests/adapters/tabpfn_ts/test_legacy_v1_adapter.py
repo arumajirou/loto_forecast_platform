@@ -13,6 +13,7 @@ from loto.adapters.tabpfn_ts.manifests import (
     V2_REVISION,
     V2_WEIGHT_FILENAME,
 )
+
 from .conftest import build_candidate_response
 
 

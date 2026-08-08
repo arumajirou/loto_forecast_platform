@@ -7,7 +7,6 @@ from dataclasses import asdict, dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-
 FORMAL_CASE_NAMES = (
     "draw-target-only",
     "draw-past-only",

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -36,9 +36,9 @@ def test_calendar_time_preserves_real_timestamps() -> None:
         name="N1",
         values=[2.0, 3.0, 4.0],
         timestamps=[
-            datetime(2026, 1, 1, tzinfo=timezone.utc),
-            datetime(2026, 1, 8, tzinfo=timezone.utc),
-            datetime(2026, 1, 15, tzinfo=timezone.utc),
+            datetime(2026, 1, 1, tzinfo=UTC),
+            datetime(2026, 1, 8, tzinfo=UTC),
+            datetime(2026, 1, 15, tzinfo=UTC),
         ],
     )
     compiled = compile_series(payload, TimeSemantics.CALENDAR_TIME)

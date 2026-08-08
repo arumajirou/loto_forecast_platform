@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from loto.autogluon_campaign.holdout_prospective import _canon, _digest
 from loto.autogluon_campaign.promotion_eligibility_contract import (

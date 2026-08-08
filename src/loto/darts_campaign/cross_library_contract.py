@@ -4,7 +4,7 @@ import hashlib
 import json
 import re
 from collections import defaultdict
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator

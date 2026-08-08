@@ -24,7 +24,7 @@ def _delegate(
         print(f"{program} {__version__}")
         return 0
     module = importlib.import_module(module_name)
-    target: Callable[[list[str] | None], Any] = getattr(module, "main")
+    target: Callable[[list[str] | None], Any] = module.main
     result = target(arguments)
     return int(result or 0)
 

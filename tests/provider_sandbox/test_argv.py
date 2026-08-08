@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from loto.provider_sandbox import (
     BackendEvidence,
@@ -40,7 +40,7 @@ def test_rootless_oci_plan_has_required_controls(policy, execution_request) -> N
         executable_sha256=ZERO,
         version="podman fixture",
         rootless=True,
-        detected_at=datetime.now(timezone.utc),
+        detected_at=datetime.now(UTC),
     )
     request_values = execution_request.model_dump(mode="python")
     request_values["requested_gpu_devices"] = ("GPU-TEST",)

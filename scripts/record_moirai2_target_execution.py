@@ -4,7 +4,7 @@ import argparse
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -118,7 +118,7 @@ def _record(
     else:
         raise TargetExecutionError(f"unsupported record kind: {kind}")
     event_type = event_type_for(kind, runtime_lane)
-    recorded_at = datetime.now(timezone.utc).isoformat()
+    recorded_at = datetime.now(UTC).isoformat()
     updated = append_event(
         state,
         event_type=event_type,

@@ -4,13 +4,13 @@ import json
 from pathlib import Path
 
 import pytest
+from test_holdout_scoring import _lock, _request
 
 from loto.sktime_campaign.holdout_artifacts import (
     P4VerificationError,
     persist_p4,
     verify_p4,
 )
-from test_holdout_scoring import _lock, _request
 
 
 def test_persist_and_verify_p4_bundle(tmp_path: Path):

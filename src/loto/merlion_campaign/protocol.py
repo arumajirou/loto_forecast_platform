@@ -36,7 +36,7 @@ class SeriesPayload(BaseModel):
     timestamps: list[datetime] | None = None
 
     @model_validator(mode="after")
-    def validate_lengths(self) -> "SeriesPayload":
+    def validate_lengths(self) -> SeriesPayload:
         expected = len(self.values)
         if self.draw_numbers is not None and len(self.draw_numbers) != expected:
             raise ValueError("draw_numbers and values must have equal length")
@@ -75,7 +75,7 @@ class ProviderRequest(BaseModel):
         return value
 
     @model_validator(mode="after")
-    def validate_operation_payload(self) -> "ProviderRequest":
+    def validate_operation_payload(self) -> ProviderRequest:
         lifecycle = {Operation.TRAIN_SAVE, Operation.LOAD_PREDICT}
         if self.operation in lifecycle and self.model_name is None:
             raise ValueError("model_name is required for lifecycle operations")

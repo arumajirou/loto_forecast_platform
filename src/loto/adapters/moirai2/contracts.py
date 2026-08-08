@@ -21,7 +21,6 @@ from loto.moirai2_campaign.model_manifest import (
     REPO_ID,
 )
 
-
 NumericScalar = StrictFloat | StrictInt
 
 
@@ -45,7 +44,7 @@ class GameGeometry(BaseModel):
     strictly_increasing: bool
 
     @model_validator(mode="after")
-    def validate_domain(self) -> "GameGeometry":
+    def validate_domain(self) -> GameGeometry:
         if self.candidate_min >= self.candidate_max:
             raise ValueError("candidate_min must be smaller than candidate_max")
         domain_size = self.candidate_max - self.candidate_min + 1
@@ -117,7 +116,7 @@ class Moirai2ProviderRequest(BaseModel):
         return normalized
 
     @model_validator(mode="after")
-    def validate_payload(self) -> "Moirai2ProviderRequest":
+    def validate_payload(self) -> Moirai2ProviderRequest:
         if len(self.position_columns) != self.game_geometry.position_count:
             raise ValueError("position_columns must match game_geometry.position_count")
         if self.series_layout == "position_univariate" and len(self.position_columns) != 1:

@@ -5,7 +5,6 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-
 METRIC_NAMES = ("hit_at_1", "all_position_hit_at_1", "mae", "mse", "rmse")
 
 

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Iterable, Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
+from typing import Any
 
 from loto.moirai2_campaign.runtime_evidence_common import (
+    _SHA256_PATTERN,
     EXPECTED_QUANTILE_KEYS,
     RuntimeEvidenceGateError,
-    _SHA256_PATTERN,
     canonical_json_bytes,
     sha256_payload,
 )

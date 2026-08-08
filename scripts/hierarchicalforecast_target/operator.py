@@ -7,11 +7,11 @@ import json
 import os
 import subprocess
 import time
-from datetime import datetime, timezone
+from collections.abc import Callable, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Callable, Sequence
 
-from .constants import CertificationError, TARGET_VERSION
+from .constants import TARGET_VERSION, CertificationError
 from .integrity import (
     atomic_write,
     canonical,
@@ -23,7 +23,7 @@ from .package_verification import verify_formal
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def run_command(
@@ -119,7 +119,7 @@ def execute(
     root = root.resolve()
     output_root = resolve_requested_root(root, output_root, "output root")
     operator_root = resolve_requested_root(root, operator_root, "operator root")
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
     run_id = f"hierarchicalforecast-target-{stamp}-{os.getpid()}"
     directory = operator_root / run_id
     report: dict[str, object] = {

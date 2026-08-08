@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 import yaml
-
 from coverage_test_support import (
     FakeRunner,
     PandasProxy,
@@ -14,6 +13,7 @@ from coverage_test_support import (
     corrupt_protected_rows,
     make_csv,
 )
+
 from loto.coverage.instrumented import run_coverage_experiment_with_ledger
 from loto.coverage.ledger import CoverageLedgerPreflightError, git_blob_sha
 

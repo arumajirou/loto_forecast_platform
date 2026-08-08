@@ -2,34 +2,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import numpy as np
-
 import pandas as pd
-
 import pytest
 
-from pydantic import ValidationError
-
 from loto.darts_campaign.ensemble_conformal import (
+    P10_MODEL_IDENTITIES,
     BaseModelEvidence,
-    CertificationError,
     ConformalConfig,
-    DependencyUnavailableError,
     EnsembleConfig,
     ForecastPoint,
     P10CampaignConfig,
-    P10ContractError,
-    P10_MODEL_IDENTITIES,
-    StackingEvidence,
     TemporalPartition,
     assert_frame_unchanged,
-    build_ensemble_plan,
     canonical_sha256,
-    certify_conformal_quantiles,
-    certify_naive_average,
-    certify_stacking_evidence,
-    compute_interval_metrics,
-    p10_identity_sha256,
     run_p10_matrix,
 )
 
@@ -106,16 +91,16 @@ def test_matrix_retains_all_failures_without_stopping() -> None:
     @dataclass
     class Runtime:
         def execute(self, task: object) -> dict[str, object]:
-            if getattr(task, "public_name") == "RegressionEnsembleModel":
+            if task.public_name == "RegressionEnsembleModel":
                 raise RuntimeError("regressor unavailable")
-            return {"task": getattr(task, "public_name")}
+            return {"task": task.public_name}
 
     results = run_p10_matrix(config, Runtime())
     assert len(results) == 16
     failed = [item for item in results if item.status == "FAILED"]
     assert len(failed) == 4
     assert {item.task.public_name for item in failed} == {"RegressionEnsembleModel"}
-    assert all((item.failure_class == "RuntimeError" for item in failed))
+    assert all(item.failure_class == "RuntimeError" for item in failed)
 
 
 def test_hash_tamper_sensitivity_and_raw_frame_immutability() -> None:

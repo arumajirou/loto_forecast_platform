@@ -18,7 +18,6 @@ from loto.sktime_campaign.primary_promotion_authorization import (
     primary_promotion_intent,
 )
 
-
 HEX_A = "a" * 64
 HEX_B = "b" * 64
 HEX_C = "c" * 64

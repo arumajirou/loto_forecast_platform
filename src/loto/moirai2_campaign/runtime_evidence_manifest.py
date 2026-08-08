@@ -3,9 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from loto.moirai2_campaign.runtime_evidence_common import (
+    _SHA256_PATTERN,
     ManifestVerification,
     RuntimeEvidenceGateError,
-    _SHA256_PATTERN,
     _required_file,
     _safe_relative_path,
     load_json_object,

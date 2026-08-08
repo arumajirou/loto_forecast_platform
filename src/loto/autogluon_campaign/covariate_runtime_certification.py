@@ -8,11 +8,12 @@ import os
 import platform
 import subprocess
 import sys
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from loto.adapters.autogluon.covariate_capabilities import (
     CovariateRole,
@@ -270,7 +271,7 @@ def scenarios_for_profile(profile: str) -> tuple[CovariateCertificationScenario,
 
 
 def _history(rows: int = 48) -> list[dict[str, Any]]:
-    start = datetime(2025, 1, 1, tzinfo=timezone.utc)
+    start = datetime(2025, 1, 1, tzinfo=UTC)
     history: list[dict[str, Any]] = []
     for index in range(rows):
         offset = index % 3
@@ -529,7 +530,7 @@ def run_covariate_runtime_certification(
         raise ValueError("provider_command must not be empty")
     if config.timeout_seconds <= 0:
         raise ValueError("timeout_seconds must be positive")
-    started = datetime.now(timezone.utc)
+    started = datetime.now(UTC)
     run_id = started.strftime("autogluon-p15-%Y%m%dT%H%M%SZ")
     output_dir = _prepare_output_directory(config.output_dir)
     scenarios = scenarios_for_profile(config.profile)
@@ -559,7 +560,7 @@ def run_covariate_runtime_certification(
                 None,
             )
             if dependency is None or dependency.status != CovariateCertificationStatus.VERIFIED:
-                now = datetime.now(timezone.utc).isoformat()
+                now = datetime.now(UTC).isoformat()
                 message = f"scenario dependency not verified: {scenario.depends_on}"
                 stdout_path.write_text("", encoding="utf-8")
                 stderr_path.write_text(message + "\n", encoding="utf-8")
@@ -591,7 +592,7 @@ def run_covariate_runtime_certification(
             "--response",
             str(response_path),
         ]
-        scenario_started = datetime.now(timezone.utc)
+        scenario_started = datetime.now(UTC)
         return_code: int | None = None
         errors: list[str] = []
         response_payload: dict[str, Any] | None = None
@@ -651,7 +652,7 @@ def run_covariate_runtime_certification(
             provider_error_code=provider_error_code,
             errors=errors,
         )
-        scenario_finished = datetime.now(timezone.utc)
+        scenario_finished = datetime.now(UTC)
         results.append(
             CovariateScenarioResult(
                 scenario_id=scenario.scenario_id,
@@ -680,7 +681,7 @@ def run_covariate_runtime_certification(
         item.status == CovariateCertificationStatus.BLOCKED_RUNTIME.value for item in results
     )
     failed_count = sum(item.status == CovariateCertificationStatus.FAILED.value for item in results)
-    finished = datetime.now(timezone.utc)
+    finished = datetime.now(UTC)
     report_without_hash = {
         "schema_version": 1,
         "run_id": run_id,

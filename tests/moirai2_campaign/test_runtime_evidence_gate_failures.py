@@ -13,7 +13,6 @@ from loto.moirai2_campaign.runtime_evidence_gate import (
 )
 from tests.moirai2_campaign.p8c_evidence_fixtures import _campaign
 from tests.moirai2_campaign.p8c_evidence_fixtures_core import (
-    SOURCE_COMMIT,
     _write_json,
 )
 from tests.moirai2_campaign.p8c_evidence_mutations import (

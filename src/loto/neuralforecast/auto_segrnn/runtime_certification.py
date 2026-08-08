@@ -7,10 +7,11 @@ import json
 import os
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Callable
+from typing import Any
 
 from .contracts import MODEL_ID
 from .runtime_contracts import (

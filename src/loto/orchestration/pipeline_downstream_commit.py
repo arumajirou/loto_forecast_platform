@@ -5,8 +5,8 @@ from pathlib import Path
 from loto.orchestration.pipeline_downstream_journal import (
     STEP_ORDER,
     DownstreamEffects,
-    _CommitLock,
     _atomic_write_json,
+    _CommitLock,
     _initial_state,
     _load_receipt,
     _load_state,

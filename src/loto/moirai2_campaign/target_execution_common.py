@@ -3,10 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
-
+from typing import Any
 
 SCHEMA_VERSION = "moirai2-p8d-target-execution-v1"
 STATE_FILENAME = "P8D_EXECUTION_STATE.json"

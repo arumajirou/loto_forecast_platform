@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +25,7 @@ from loto.autogluon_campaign.registry_transaction_contract import (
     validate_registry_target_matches_path,
 )
 from loto.autogluon_campaign.registry_transaction_io import (
+    atomic_write_registry_state,
     load_registry_state,
     read_p18_authorization,
     registry_lock,
@@ -33,7 +33,6 @@ from loto.autogluon_campaign.registry_transaction_io import (
     validate_registry_path,
     verify_transaction_evidence_files,
     write_transaction_evidence,
-    atomic_write_registry_state,
 )
 
 

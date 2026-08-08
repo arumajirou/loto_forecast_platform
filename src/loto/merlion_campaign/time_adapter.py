@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -44,7 +44,7 @@ def compile_series(payload: SeriesPayload, semantics: TimeSemantics) -> Compiled
             raise ValueError("draw numbers must be strictly increasing and unique")
         if any(right - left != 1 for left, right in zip(draws, draws[1:])):
             raise ValueError("draw numbers must be gap-free")
-        base = datetime(2000, 1, 1, tzinfo=timezone.utc)
+        base = datetime(2000, 1, 1, tzinfo=UTC)
         index = [base + timedelta(days=offset) for offset in range(len(draws))]
         mapping = [
             {
@@ -61,7 +61,7 @@ def compile_series(payload: SeriesPayload, semantics: TimeSemantics) -> Compiled
             for timestamp in payload.timestamps
         ):
             raise ValueError("calendar timestamps must be timezone-aware")
-        index = [timestamp.astimezone(timezone.utc) for timestamp in payload.timestamps]
+        index = [timestamp.astimezone(UTC) for timestamp in payload.timestamps]
         if index != sorted(index) or len(set(index)) != len(index):
             raise ValueError("timestamps must be strictly increasing and unique")
         mapping = [{"calendar_timestamp": timestamp.isoformat()} for timestamp in index]

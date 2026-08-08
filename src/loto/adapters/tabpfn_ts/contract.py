@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from enum import StrEnum
-from typing import Annotated, Any, Literal
+from typing import Annotated, Literal
 
 from pydantic import (
     BaseModel,
@@ -18,10 +18,10 @@ from .geometry import GameGeometry
 from .manifests import (
     PACKAGE_MANIFEST,
     TABPFN_TS_PACKAGE_VERSION,
-    CheckpointLane,
-    ExecutionStatus,
     V2_REPO_ID,
     V2_REVISION,
+    CheckpointLane,
+    ExecutionStatus,
     lane_manifest,
 )
 

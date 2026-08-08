@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+from conftest import HASH_C, make_event, make_ledger, make_slice, make_state
+
 from loto.data_access_ledger import (
     AccessOperation,
     FindingCode,
     StateKind,
     validate_ledger,
 )
-
-from conftest import HASH_C, make_event, make_ledger, make_slice, make_state
 
 
 def codes(ledger) -> set[FindingCode]:

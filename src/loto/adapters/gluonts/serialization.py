@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from typing import Any, Literal
@@ -73,7 +73,7 @@ class PredictorArtifactManifest(BaseModel):
     serialization_format: Literal["gluonts-predictor-directory-v1"] = (
         "gluonts-predictor-directory-v1"
     )
-    created_at_utc: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at_utc: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
     fit_process_id: int = Field(ge=1)
     seed: int
     freq: str = Field(min_length=1)

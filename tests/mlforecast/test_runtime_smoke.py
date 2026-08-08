@@ -17,7 +17,6 @@ from loto.mlforecast.factory import (
 )
 from loto.mlforecast.provenance import MLFORECAST_REQUIRED_VERSION
 
-
 pytest.importorskip("mlforecast")
 if metadata.version("mlforecast") != MLFORECAST_REQUIRED_VERSION:
     pytest.skip("runtime smoke requires the frozen MLForecast version", allow_module_level=True)

@@ -5,9 +5,10 @@ import json
 import os
 import subprocess
 import tempfile
+from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any
 
 LOCK_COMMIT_SCHEMA = "merlion-lock-commit-certification-v1"
 ADMISSION_SCHEMA = "merlion-lock-admission-v1"

@@ -7,7 +7,6 @@ from pathlib import Path
 
 from loto.moirai2_campaign.runtime_evidence_gate import verify_campaign_manifest
 
-
 ROOT = Path(__file__).resolve().parents[2]
 
 

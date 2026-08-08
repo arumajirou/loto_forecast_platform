@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from loto.models.neuralforecast_search_space_artifacts import (
     MANIFEST_NAME,

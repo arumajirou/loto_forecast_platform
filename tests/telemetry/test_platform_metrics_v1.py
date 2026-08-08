@@ -7,7 +7,7 @@ import pytest
 from prometheus_client import REGISTRY, CollectorRegistry
 from pydantic import ValidationError
 
-from loto.telemetry import EventStatus, MetricKind, PROHIBITED_LABELS, Stage
+from loto.telemetry import PROHIBITED_LABELS, EventStatus, MetricKind, Stage
 from loto.telemetry.prometheus import (
     MetricUpdate,
     PrometheusMetricSet,

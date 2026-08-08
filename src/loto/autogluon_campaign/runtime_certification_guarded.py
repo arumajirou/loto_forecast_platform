@@ -6,9 +6,10 @@ import json
 import os
 import re
 import stat
-from datetime import datetime, timezone
+from collections.abc import Sequence
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, Sequence
+from typing import Any
 
 from loto.autogluon_campaign.runtime_certification import (
     CertificationStatus,
@@ -161,8 +162,7 @@ def finalize_guarded_output(output_dir: Path) -> dict[str, Any]:
     payload["status"] = _effective_status(payload, tree_errors)
     payload["p11_evidence_errors"] = tree_errors
     payload["p11_verification_id"] = (
-        datetime.now(timezone.utc).strftime("autogluon-p11-%Y%m%dT%H%M%S.%fZ")
-        + f"-pid{os.getpid()}"
+        datetime.now(UTC).strftime("autogluon-p11-%Y%m%dT%H%M%S.%fZ") + f"-pid{os.getpid()}"
     )
     payload["p11_guard_schema_version"] = 1
     payload["report_sha256"] = _sha256_bytes(_canonical_json(payload))

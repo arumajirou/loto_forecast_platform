@@ -63,7 +63,7 @@ def write_feature_manifest(
     assert_feature_manifest_valid(manifest)
     payload = canonical_manifest_bytes(manifest)
     digest = hashlib.sha256(payload).hexdigest()
-    sidecar_payload = f"{digest}  {target.name}\n".encode("utf-8")
+    sidecar_payload = f"{digest}  {target.name}\n".encode()
     _atomic_write(target, payload)
     try:
         _atomic_write(sidecar, sidecar_payload)

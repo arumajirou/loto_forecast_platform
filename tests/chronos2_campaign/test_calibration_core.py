@@ -21,7 +21,6 @@ from loto.chronos2_campaign.calibration_methods import (
     rearrange_quantiles,
 )
 
-
 LEVELS = (0.05, 0.1, 0.5, 0.9, 0.95)
 
 

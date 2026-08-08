@@ -3,9 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 
 class RuntimeCertificationError(RuntimeError):

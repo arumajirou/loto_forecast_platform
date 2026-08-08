@@ -4,10 +4,11 @@ import argparse
 import json
 import platform
 import sys
-from datetime import datetime, timezone
+from collections.abc import Iterable
+from datetime import UTC, datetime
 from importlib import import_module, metadata
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from .certification_io import (
     sha256_file,
@@ -92,7 +93,7 @@ def certify_installed_runtime(
     unknown = sorted(set(chosen).difference(MODEL_NAMES))
     if unknown:
         raise ValueError(f"unknown model names: {unknown}")
-    run_id = run_id or datetime.now(timezone.utc).strftime("statsforecast-runtime-%Y%m%d-%H%M%S")
+    run_id = run_id or datetime.now(UTC).strftime("statsforecast-runtime-%Y%m%d-%H%M%S")
     run_dir = Path(output_root) / run_id
     run_dir.mkdir(parents=True, exist_ok=False)
     write_json(
@@ -117,7 +118,7 @@ def certify_installed_runtime(
     results = []
     if package["status"] == RuntimeStatus.VERIFIED.value:
         models_module = models_module or import_module("statsforecast.models")
-        core_class = core_class or getattr(import_module("statsforecast"), "StatsForecast")
+        core_class = core_class or import_module("statsforecast").StatsForecast
         inventory = discover_runtime_inventory(models_module)
         for model_name in chosen:
             results.append(

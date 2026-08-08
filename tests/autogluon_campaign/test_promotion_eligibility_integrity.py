@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -116,7 +116,7 @@ def test_fixed_time_output_is_deterministic(tmp_path: Path) -> None:
     second_root = tmp_path / "second"
     first_holdout, first_prospective = valid_sources(first_root)
     second_holdout, second_prospective = valid_sources(second_root)
-    fixed_time = datetime(2026, 8, 5, 10, 0, tzinfo=timezone.utc)
+    fixed_time = datetime(2026, 8, 5, 10, 0, tzinfo=UTC)
     first = create_promotion_eligibility(
         holdout_score_dir=first_holdout,
         prospective_score_dirs=first_prospective,

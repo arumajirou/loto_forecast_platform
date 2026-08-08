@@ -5,7 +5,7 @@ import json
 import subprocess
 import tempfile
 from collections.abc import Callable, Mapping, Sequence
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
 
@@ -50,7 +50,7 @@ def parse_utc(value: str, *, label: str) -> datetime:
             "UTC_TIMESTAMP_INVALID",
             f"{label} must use YYYY-MM-DDTHH:MM:SSZ",
         ) from exc
-    return parsed.replace(tzinfo=timezone.utc)
+    return parsed.replace(tzinfo=UTC)
 
 
 class P17EligibilityEvidence(BaseModel):
@@ -110,7 +110,7 @@ class ApprovalPolicy(BaseModel):
     automatic_retraining: Literal[False] = False
 
     @model_validator(mode="after")
-    def validate_inventory(self) -> "ApprovalPolicy":
+    def validate_inventory(self) -> ApprovalPolicy:
         if self.required_roles != REQUIRED_ROLES:
             raise ValueError("required role order and inventory must remain fixed")
         if self.required_risk_acknowledgements != REQUIRED_RISKS:
@@ -141,7 +141,7 @@ class ApprovalIntent(BaseModel):
     intent_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
-    def validate_intent(self) -> "ApprovalIntent":
+    def validate_intent(self) -> ApprovalIntent:
         requested = parse_utc(
             self.approval_requested_at_utc,
             label="approval_requested_at_utc",
@@ -181,7 +181,7 @@ class ApprovalDraft(BaseModel):
     signed_payload_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @model_validator(mode="after")
-    def validate_draft(self) -> "ApprovalDraft":
+    def validate_draft(self) -> ApprovalDraft:
         parse_utc(self.approved_at_utc, label="approved_at_utc")
         if self.risk_acknowledgements != REQUIRED_RISKS:
             raise ValueError("approval risk acknowledgement inventory mismatch")

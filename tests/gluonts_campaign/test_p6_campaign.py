@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from loto.adapters.gluonts.p6_campaign import StageInvocation, run_p6_campaign
 from loto.adapters.gluonts.p6_contract import (

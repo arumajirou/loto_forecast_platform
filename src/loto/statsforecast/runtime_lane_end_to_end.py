@@ -5,10 +5,11 @@ import json
 import os
 import subprocess
 import traceback
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -24,7 +25,7 @@ class EndToEndResult:
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _atomic_write(path: Path, content: bytes) -> None:
@@ -155,7 +156,7 @@ def run_end_to_end_certification(
     if horizon < 1:
         raise ValueError("horizon must be positive")
 
-    run_id = run_id or datetime.now(timezone.utc).strftime("statsforecast-e2e-%Y%m%d-%H%M%S")
+    run_id = run_id or datetime.now(UTC).strftime("statsforecast-e2e-%Y%m%d-%H%M%S")
     output_root.mkdir(parents=True, exist_ok=True)
     output_dir = output_root / run_id
     output_dir.mkdir(parents=False, exist_ok=False)

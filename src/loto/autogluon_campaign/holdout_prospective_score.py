@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import json
 import statistics as stats
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from loto.autogluon_campaign.holdout_prospective import (
     REQUIRED_BASELINES,
@@ -169,7 +170,7 @@ def score_prediction_lock(
         if row["candidate_id"] in REQUIRED_BASELINES
     ]
     root = _empty(output_dir)
-    observed_at = actual_observed_at or datetime.now(timezone.utc)
+    observed_at = actual_observed_at or datetime.now(UTC)
     payloads = {
         "ACTUALS_SNAPSHOT.json": {
             "source_label": actual_source_label,

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import importlib.util
-import json
 from pathlib import Path
 
 import pytest
@@ -16,7 +15,6 @@ from loto.moirai2_campaign.target_execution import (
     validate_state,
     write_json_atomic,
 )
-
 
 ROOT = Path(__file__).resolve().parents[2]
 

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import asdict, dataclass
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Mapping, Sequence
 
 import numpy as np
 import pandas as pd

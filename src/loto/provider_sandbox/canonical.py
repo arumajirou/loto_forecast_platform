@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import PurePosixPath
 from typing import Any
@@ -46,7 +46,7 @@ def _normalize(value: Any) -> Any:
     if isinstance(value, Enum):
         return value.value
     if isinstance(value, datetime):
-        if value.tzinfo is None or value.utcoffset() != timezone.utc.utcoffset(value):
+        if value.tzinfo is None or value.utcoffset() != UTC.utcoffset(value):
             raise CanonicalizationError("datetime must be timezone-aware UTC")
         return value.isoformat().replace("+00:00", "Z")
     if isinstance(value, PurePosixPath):

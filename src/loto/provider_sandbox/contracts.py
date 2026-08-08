@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
+import re
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import Annotated, Literal
-
-import re
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -87,7 +86,7 @@ class SandboxMount(StrictFrozenModel):
     required: bool = True
 
     @model_validator(mode="after")
-    def validate_kind_mode(self) -> "SandboxMount":
+    def validate_kind_mode(self) -> SandboxMount:
         writable = {MountKind.OUTPUT, MountKind.TMPFS}
         if self.kind in writable and self.mode != MountMode.READ_WRITE_TMP:
             raise ValueError("OUTPUT and TMPFS mounts must be READ_WRITE_TMP")
@@ -129,7 +128,7 @@ class SandboxPolicy(StrictFrozenModel):
     policy_sha256: Sha256
 
     @model_validator(mode="after")
-    def policy_consistency(self) -> "SandboxPolicy":
+    def policy_consistency(self) -> SandboxPolicy:
         if self.untrusted_remote_code and self.backend == SandboxBackend.NONE:
             raise ValueError("backend NONE is forbidden for untrusted remote code")
         if len({item.mount_id for item in self.mounts}) != len(self.mounts):
@@ -163,7 +162,7 @@ class SandboxPolicy(StrictFrozenModel):
         return sha256_canonical(self.model_dump(mode="python", exclude={"policy_sha256"}))
 
     @classmethod
-    def create(cls, **values: object) -> "SandboxPolicy":
+    def create(cls, **values: object) -> SandboxPolicy:
         payload = {
             "schema_version": SCHEMA_VERSION,
             "network_mode": NetworkMode.DISABLED,
@@ -195,7 +194,7 @@ class SandboxExecutionRequest(StrictFrozenModel):
         return value
 
     @model_validator(mode="after")
-    def validate_arguments(self) -> "SandboxExecutionRequest":
+    def validate_arguments(self) -> SandboxExecutionRequest:
         if len(set(self.requested_gpu_devices)) != len(self.requested_gpu_devices):
             raise ValueError("requested GPU devices must be unique")
         for argument in self.arguments:
@@ -229,7 +228,7 @@ class BackendEvidence(StrictFrozenModel):
         return value
 
     @model_validator(mode="after")
-    def evidence_consistency(self) -> "BackendEvidence":
+    def evidence_consistency(self) -> BackendEvidence:
         if self.available and (self.executable_path is None or self.executable_sha256 is None):
             raise ValueError("available backend requires executable path and hash")
         if not self.available and any(
@@ -254,7 +253,7 @@ class SandboxArgvPlan(StrictFrozenModel):
     plan_sha256: Sha256
 
     @model_validator(mode="after")
-    def verify_plan_hash(self) -> "SandboxArgvPlan":
+    def verify_plan_hash(self) -> SandboxArgvPlan:
         expected = sha256_canonical(self.model_dump(mode="python", exclude={"plan_sha256"}))
         if self.plan_sha256 != expected:
             raise ValueError("plan_sha256 mismatch")
@@ -267,7 +266,7 @@ class SandboxArgvPlan(StrictFrozenModel):
         backend: SandboxBackend,
         argv: tuple[str, ...],
         environment_keys: tuple[str, ...],
-    ) -> "SandboxArgvPlan":
+    ) -> SandboxArgvPlan:
         payload = {
             "schema_version": SCHEMA_VERSION,
             "backend": backend,
@@ -307,14 +306,14 @@ class EffectiveSandboxEvidence(StrictFrozenModel):
         return value
 
     @model_validator(mode="after")
-    def verify_hash(self) -> "EffectiveSandboxEvidence":
+    def verify_hash(self) -> EffectiveSandboxEvidence:
         expected = sha256_canonical(self.model_dump(mode="python", exclude={"evidence_sha256"}))
         if self.evidence_sha256 != expected:
             raise ValueError("effective evidence hash mismatch")
         return self
 
     @classmethod
-    def create(cls, **values: object) -> "EffectiveSandboxEvidence":
+    def create(cls, **values: object) -> EffectiveSandboxEvidence:
         payload = {"schema_version": SCHEMA_VERSION, **values}
         return cls(evidence_sha256=sha256_canonical(payload), **payload)
 
@@ -330,7 +329,7 @@ class SandboxVerificationReport(StrictFrozenModel):
     report_sha256: Sha256
 
     @model_validator(mode="after")
-    def verify_report(self) -> "SandboxVerificationReport":
+    def verify_report(self) -> SandboxVerificationReport:
         if self.verified != (self.status == VerificationStatus.VERIFIED):
             raise ValueError("verified flag must match status")
         if self.status == VerificationStatus.VERIFIED and (self.missing_checks or self.mismatches):
@@ -356,7 +355,7 @@ class SandboxProcessResult(StrictFrozenModel):
     result_sha256: Sha256
 
     @model_validator(mode="after")
-    def verify_result_hash(self) -> "SandboxProcessResult":
+    def verify_result_hash(self) -> SandboxProcessResult:
         if self.outcome == ProcessOutcome.TIMED_OUT and not self.timed_out:
             raise ValueError("TIMED_OUT result requires timed_out=true")
         expected = sha256_canonical(self.model_dump(mode="python", exclude={"result_sha256"}))

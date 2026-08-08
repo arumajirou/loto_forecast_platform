@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import json
 import os
 import tempfile
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from .canonical import canonical_json, parse_json_object, sha256_bytes
 from .argv import build_argv_plan
+from .canonical import canonical_json, parse_json_object, sha256_bytes
 from .contracts import (
     BackendEvidence,
     EffectiveSandboxEvidence,

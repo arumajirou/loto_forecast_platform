@@ -4,11 +4,12 @@ import argparse
 import json
 from pathlib import Path
 
+from run_sktime_p4_holdout_score import load_inputs
+
 from loto.sktime_campaign.holdout_artifacts import (
     P4VerificationError,
     verify_p4,
 )
-from run_sktime_p4_holdout_score import load_inputs
 
 
 def parse_args() -> argparse.Namespace:

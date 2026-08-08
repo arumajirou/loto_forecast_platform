@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from loto.adapters.timer_s1.contracts import TimerS1Request, UNPINNED
+from loto.adapters.timer_s1.contracts import UNPINNED, TimerS1Request
 from loto.timer_s1_campaign.model_manifest import TimerS1ModelManifest, load_manifest
 
 

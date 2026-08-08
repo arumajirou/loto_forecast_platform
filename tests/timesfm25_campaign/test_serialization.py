@@ -3,8 +3,8 @@ from __future__ import annotations
 from loto.adapters.timesfm25.contracts import (
     ArtifactReference,
     Backend,
-    GPUExecutionEvidence,
     GameGeometry,
+    GPUExecutionEvidence,
     ModelIdentity,
     RuntimeEvidence,
     TimesFM25Request,
