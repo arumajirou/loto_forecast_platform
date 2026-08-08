@@ -37,6 +37,7 @@ jobs:
           printf 'BRANCH_CHANGED\t%s\n' "${changed[@]}"
           allowed=(
             .github/workflows/basicts-contract-restore-verify.yml
+            scripts/run_basicts_provider.py
             src/loto/basicts_campaign/dataset.py
             src/loto/basicts_campaign/metrics.py
             src/loto/basicts_campaign/security.py
@@ -72,6 +73,7 @@ jobs:
 
           "$python" -m ruff check src scripts tests
           "$python" -m ruff format --check \
+            scripts/run_basicts_provider.py \
             src/loto/basicts_campaign/dataset.py \
             src/loto/basicts_campaign/metrics.py \
             src/loto/basicts_campaign/security.py
