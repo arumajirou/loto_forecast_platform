@@ -373,11 +373,11 @@ def _prediction_rows(rows: Sequence[Mapping[str, Any]]) -> tuple[PredictionRow, 
     return tuple(PredictionRow.model_validate(row) for row in rows)
 
 
-from loto.autogluon_campaign.holdout_prospective_lock import (  # noqa: E402
-    create_prediction_lock,
-    verify_prediction_lock,
+from loto.autogluon_campaign.holdout_prospective_lock import (  # noqa: E402, I001
+    create_prediction_lock as create_prediction_lock,
+    verify_prediction_lock as verify_prediction_lock,
 )
 from loto.autogluon_campaign.holdout_prospective_score import (  # noqa: E402
-    score_prediction_lock,
-    verify_scoring_output,
+    score_prediction_lock as score_prediction_lock,
+    verify_scoring_output as verify_scoring_output,
 )
