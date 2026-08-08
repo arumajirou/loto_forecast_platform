@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """Synthetic sealed evidence used by target-certification tests."""
 
 from __future__ import annotations
