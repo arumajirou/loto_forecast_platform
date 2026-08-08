@@ -11,7 +11,6 @@ from loto.models.neuralforecast_search_policy import (
     instantiate_search_algorithm,
     resolve_search_policy,
 )
-
 from loto.models.neuralforecast_search_space import (
     SearchSpaceProfile,
     profile_fixed_config,
@@ -25,7 +24,6 @@ from .data_tracks import hint_summing_matrix
 from .domains import freeze_config
 from .registry import get_auto_class, get_default_config
 from .trial_persistence import persistent_auto_class
-
 
 
 def _search_space_evidence_root(trial_root: Path) -> Path:
@@ -81,6 +79,7 @@ def _persist_search_space_profile(
             "trial_root": str(trial_root),
         },
     )
+
 
 def _ray_options(config: CampaignConfig):
     from neuralforecast.common._base_auto import RayOptions
@@ -383,12 +382,16 @@ def _hint_model(
     model.search_policy_decision = search_policy.model_dump(mode="json")
     model.search_space_profile = search_space_profile.model_dump(mode="json")
     model.search_space_artifacts = search_space_artifacts
-    return model, config_value, _artifact_kwargs(
-        kwargs,
-        ledger,
-        search_policy,
-        search_space_profile=search_space_profile,
-        search_space_artifacts=search_space_artifacts,
+    return (
+        model,
+        config_value,
+        _artifact_kwargs(
+            kwargs,
+            ledger,
+            search_policy,
+            search_space_profile=search_space_profile,
+            search_space_artifacts=search_space_artifacts,
+        ),
     )
 
 
@@ -463,7 +466,9 @@ def build_auto_model(
         )
         requested = config_value
 
-    fixed_values = requested if isinstance(requested, dict) and (fixed_config is not None or smoke) else None
+    fixed_values = (
+        requested if isinstance(requested, dict) and (fixed_config is not None or smoke) else None
+    )
     search_space_profile = _search_space_profile(
         model_name=model_name,
         backend=backend,
@@ -506,10 +511,14 @@ def build_auto_model(
     model.search_policy_decision = search_policy.model_dump(mode="json")
     model.search_space_profile = search_space_profile.model_dump(mode="json")
     model.search_space_artifacts = search_space_artifacts
-    return model, requested, _artifact_kwargs(
-        kwargs,
-        ledger,
-        search_policy,
-        search_space_profile=search_space_profile,
-        search_space_artifacts=search_space_artifacts,
+    return (
+        model,
+        requested,
+        _artifact_kwargs(
+            kwargs,
+            ledger,
+            search_policy,
+            search_space_profile=search_space_profile,
+            search_space_artifacts=search_space_artifacts,
+        ),
     )
