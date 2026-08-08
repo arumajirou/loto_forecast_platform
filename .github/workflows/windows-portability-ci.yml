@@ -163,7 +163,7 @@ jobs:
     name: Temporary TAJ-8 OpenTelemetry lock publisher
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fix/pytest-opentelemetry-dev-deps-v1' }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 120
+    timeout-minutes: 45
     permissions:
       contents: write
 
@@ -194,7 +194,7 @@ jobs:
           message="$(git log -1 --pretty=%s)"
           echo "event_head=$EVENT_HEAD"
           echo "head_message=$message"
-          if [[ "$message" == "ci: arm OpenTelemetry lock repair via existing workflow (#201)" ]]; then
+          if [[ "$message" == "ci: rearm OpenTelemetry lock repair via existing workflow (#201)" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -249,8 +249,8 @@ jobs:
           PY
 
           uv python install 3.13
-          venv="$RUNNER_TEMP/loto-otel-devdeps-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          cache="$RUNNER_TEMP/loto-otel-devdeps-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          venv="$RUNNER_TEMP/loto-otel-publish-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-otel-publish-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           rm -rf -- "$venv" "$cache"
           mkdir -p "$cache"
           uv venv "$venv" --python 3.13
@@ -284,20 +284,6 @@ jobs:
           "$python" -m pytest -q tests/telemetry
           echo 'TELEMETRY_SUITE=PASS'
 
-          set +e
-          "$python" -m pytest -q --tb=short > "$RUNNER_TEMP/otel-full-pytest.txt" 2>&1
-          full_rc=$?
-          set -e
-          cat "$RUNNER_TEMP/otel-full-pytest.txt"
-          test "$full_rc" -ne 2
-          test "$full_rc" -ne 3
-          test "$full_rc" -ne 4
-          test "$full_rc" -ne 5
-          ! grep -q 'ERROR collecting' "$RUNNER_TEMP/otel-full-pytest.txt"
-          ! grep -Eq '[0-9]+ errors? during collection' "$RUNNER_TEMP/otel-full-pytest.txt"
-          echo "FULL_PYTEST_RC=$full_rc"
-          echo 'FULL_PYTEST_REACHED_EXECUTION=PASS'
-
           git fetch origin main fix/pytest-opentelemetry-dev-deps-v1
           test "$(git rev-parse origin/main)" = "$BASE_SHA"
           test "$(git rev-parse origin/fix/pytest-opentelemetry-dev-deps-v1)" = "$EVENT_HEAD"
@@ -315,5 +301,87 @@ jobs:
 
           rm -rf -- "$venv" "$cache" \
             "$RUNNER_TEMP/otel-uv.lock.before" \
-            "$RUNNER_TEMP/otel-collection.txt" \
+            "$RUNNER_TEMP/otel-collection.txt"
+
+  otel-full-pytest-verify:
+    name: Temporary TAJ-8 full pytest execution verifier
+    needs: otel-devdeps-publish
+    if: ${{ always() && needs.otel-devdeps-publish.result == 'success' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fix/pytest-opentelemetry-dev-deps-v1' }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 120
+
+    steps:
+      - name: Verify trusted Linux runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout exact event head without persistent credentials
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: '0.11.21'
+          enable-cache: false
+
+      - name: Verify final dependency boundary and full pytest execution
+        shell: bash
+        env:
+          BASE_SHA: aab3d68f6b1557dce3d5b52dcac425f273efb82d
+        run: |
+          set -Eeuo pipefail
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$BASE_SHA"
+          uv lock --check
+
+          uv python install 3.13
+          venv="$RUNNER_TEMP/loto-otel-verify-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/loto-otel-verify-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$venv" "$cache"
+          mkdir -p "$cache"
+          uv venv "$venv" --python 3.13
+          python="$venv/bin/python"
+
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu 'torch==2.9.1'
+          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" -e '.[api,dev,postgres]'
+          uv pip check --python "$python"
+
+          "$python" -m ruff check src scripts tests
+          "$python" -m ruff format --check src scripts tests
+          "$python" -m compileall -q src scripts tests
+
+          "$python" -m pytest --collect-only -q --tb=short > "$RUNNER_TEMP/otel-final-collection.txt" 2>&1
+          cat "$RUNNER_TEMP/otel-final-collection.txt"
+          ! grep -q 'ERROR collecting' "$RUNNER_TEMP/otel-final-collection.txt"
+          ! grep -Eq '[0-9]+ errors? during collection' "$RUNNER_TEMP/otel-final-collection.txt"
+          echo 'PYTEST_COLLECTION_ERRORS=0'
+
+          "$python" -m pytest -q tests/telemetry
+          echo 'TELEMETRY_SUITE=PASS'
+
+          set +e
+          "$python" -m pytest -q --tb=short > "$RUNNER_TEMP/otel-full-pytest.txt" 2>&1
+          full_rc=$?
+          set -e
+          cat "$RUNNER_TEMP/otel-full-pytest.txt"
+          test "$full_rc" -ne 2
+          test "$full_rc" -ne 3
+          test "$full_rc" -ne 4
+          test "$full_rc" -ne 5
+          ! grep -q 'ERROR collecting' "$RUNNER_TEMP/otel-full-pytest.txt"
+          ! grep -Eq '[0-9]+ errors? during collection' "$RUNNER_TEMP/otel-full-pytest.txt"
+          echo "FULL_PYTEST_RC=$full_rc"
+          echo 'FULL_PYTEST_REACHED_EXECUTION=PASS'
+
+          rm -rf -- "$venv" "$cache" \
+            "$RUNNER_TEMP/otel-final-collection.txt" \
             "$RUNNER_TEMP/otel-full-pytest.txt"
