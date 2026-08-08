@@ -50,7 +50,7 @@ jobs:
           set -Eeuo pipefail
           message="$(git log -1 --pretty=%s)"
           echo "head_message=$message"
-          if [[ "$message" == "ci: apply and verify Ruff state/default safety repairs (#200)" ]]; then
+          if [[ "$message" == "ci: verify state/default contracts through public facades (#200)" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -185,12 +185,15 @@ jobs:
           python="$CI_VENV/bin/python"
           "$python" - <<'PY'
           import inspect
-          from loto.autogluon_campaign import holdout_prospective_score as score
+          import sys
+
+          from loto.autogluon_campaign import holdout_prospective as holdout
           from loto.autogluon_campaign import promotion_eligibility as promotion
           from loto.telemetry import context as telemetry_context
 
+          score = sys.modules["loto.autogluon_campaign.holdout_prospective_score"]
           assert score.DriftPolicy.__dataclass_params__.frozen
-          assert inspect.signature(score.score_prediction_lock).parameters["drift_policy"].default is score._DEFAULT_DRIFT_POLICY
+          assert inspect.signature(holdout.score_prediction_lock).parameters["drift_policy"].default is score._DEFAULT_DRIFT_POLICY
           assert promotion.PromotionPolicy.model_config.get("frozen") is True
           assert inspect.signature(promotion.create_promotion_eligibility).parameters["policy"].default is promotion._DEFAULT_PROMOTION_POLICY
           assert telemetry_context.TelemetryContext.__dataclass_params__.frozen
