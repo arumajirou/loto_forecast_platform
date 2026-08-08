@@ -1,312 +1,70 @@
 name: ci
 
 on:
+  push:
   pull_request:
-    branches: [main]
-
-permissions:
-  contents: write
-
-concurrency:
-  group: ruff-b905-repair-${{ github.event.pull_request.number }}
-  cancel-in-progress: false
 
 jobs:
   test:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-lint-b905-zip-semantics-v1' }}
-    runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 180
-    defaults:
-      run:
-        shell: bash
-    env:
-      TARGET_BRANCH: fix/ruff-lint-b905-zip-semantics-v1
-      UV_VERSION: "0.11.21"
-      UV_PYTHON: "3.13"
-      EXPECTED_RUFF_VERSION: "0.16.0"
-      BASELINE_COLLECTION_ERRORS: "34"
-      EXPECTED_REMAINING_LINT: "143"
-      RESULT_PATH: .github/ruff-b905-repair.txt
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Verify trusted runner
-        run: |
-          set -Eeuo pipefail
-          test "$RUNNER_NAME" = "az-loto-gpu"
-          test "$RUNNER_OS" = "Linux"
-          test "$RUNNER_ARCH" = "X64"
+      - uses: actions/checkout@v6
 
-      - name: Checkout trusted branch
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@v6
         with:
-          ref: fix/ruff-lint-b905-zip-semantics-v1
-          persist-credentials: true
-          fetch-depth: 1
-          clean: true
+          python-version: "3.13"
 
-      - name: Gate repair trigger
-        id: gate
+      - name: Show disk usage before install
+        run: df -h
+
+      - name: Free runner disk space
         run: |
-          set -Eeuo pipefail
-          message="$(git log -1 --pretty=%s)"
-          echo "head_message=$message"
-          if [[ "$message" == "ci: retry B905 repairs with current BasicTS smoke (#200)" ]]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          docker system prune --all --force || true
+          df -h
 
-      - name: Install exact uv
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          version: ${{ env.UV_VERSION }}
-          enable-cache: false
-
-      - name: Prepare environment and apply classified B905 repairs
-        if: ${{ steps.gate.outputs.run == 'true' }}
+      - name: Install matching CPU-only PyTorch
         run: |
-          set -Eeuo pipefail
-          case "$(uv --version)" in "uv $UV_VERSION"*) ;; *) exit 1 ;; esac
-          uv python install "$UV_PYTHON"
-          venv="$RUNNER_TEMP/loto-b905-repair-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          cache="$RUNNER_TEMP/loto-b905-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          case "$venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
-          case "$cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
-          rm -rf -- "$venv" "$cache"
-          mkdir -p "$cache"
-          uv venv "$venv" --python "$UV_PYTHON"
-          echo "CI_VENV=$venv" >> "$GITHUB_ENV"
-          echo "UV_CACHE_DIR=$cache" >> "$GITHUB_ENV"
-          python="$venv/bin/python"
-          ruff_version="$("$python" - <<'PY'
-          import tomllib
-          with open('uv.lock','rb') as f:
-              lock=tomllib.load(f)
-          versions=[p['version'] for p in lock['package'] if p.get('name')=='ruff']
-          if len(versions)!=1:
-              raise SystemExit(versions)
-          print(versions[0])
-          PY
-          )"
-          test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
-          echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
-          UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
-          "$python" .github/b905_repair.py
-          changed=(
-            scripts/certify_sundial_provider_v2.py
-            scripts/verify_sundial_provider_v2_evidence.py
-            src/loto/adapters/timesfm25/contracts.py
-            src/loto/autogluon_campaign/holdout_prospective.py
-            src/loto/basicts_campaign/dataset.py
-            src/loto/coverage/instrumented_common.py
-            src/loto/darts_campaign/conformal_certification.py
-            src/loto/darts_campaign/ensemble_conformal_contract.py
-            src/loto/merlion_campaign/time_adapter.py
-            src/loto/neuralforecast/auto_frets/runtime_worker.py
-            src/loto/neuralforecast/auto_segrnn/runtime_worker.py
-            src/loto/neuralforecast/auto_timellm/runtime_worker.py
-            src/loto/probabilistic/kdpp_history_source.py
-            src/loto/sktime_campaign/benchmark.py
-            src/loto/sktime_campaign/prospective.py
-            src/loto/toto2_campaign/request_factory.py
-            tests/test_coverage_ledger.py
-            tests/test_pipeline_ledger_staged.py
-            tests/timesfm25_campaign/test_postprocess.py
-          )
-          "$python" -m ruff format "${changed[@]}"
-          mapfile -t observed < <(git diff --name-only | sort)
-          mapfile -t expected < <(printf '%s\n' "${changed[@]}" | sort)
-          test "${#observed[@]}" -eq 19
-          diff -u <(printf '%s\n' "${expected[@]}") <(printf '%s\n' "${observed[@]}")
-          git diff --check
+          python -m pip install --upgrade pip
+          python -m pip install \
+            --no-cache-dir \
+            --index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.9.1"
 
-      - name: Verify static gates
-        if: ${{ steps.gate.outputs.run == 'true' }}
+      - name: Install project and test dependencies
         run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          "$python" -m ruff check --select B905 src scripts tests
-          "$python" -m ruff format --check \
-            scripts/certify_sundial_provider_v2.py \
-            scripts/verify_sundial_provider_v2_evidence.py \
-            src/loto/adapters/timesfm25/contracts.py \
-            src/loto/autogluon_campaign/holdout_prospective.py \
-            src/loto/basicts_campaign/dataset.py \
-            src/loto/coverage/instrumented_common.py \
-            src/loto/darts_campaign/conformal_certification.py \
-            src/loto/darts_campaign/ensemble_conformal_contract.py \
-            src/loto/merlion_campaign/time_adapter.py \
-            src/loto/neuralforecast/auto_frets/runtime_worker.py \
-            src/loto/neuralforecast/auto_segrnn/runtime_worker.py \
-            src/loto/neuralforecast/auto_timellm/runtime_worker.py \
-            src/loto/probabilistic/kdpp_history_source.py \
-            src/loto/sktime_campaign/benchmark.py \
-            src/loto/sktime_campaign/prospective.py \
-            src/loto/toto2_campaign/request_factory.py \
-            tests/test_coverage_ledger.py \
-            tests/test_pipeline_ledger_staged.py \
-            tests/timesfm25_campaign/test_postprocess.py
-          "$python" -m compileall -q src scripts tests
-          echo "STATIC_RC=0" >> "$GITHUB_ENV"
+          python -m pip install \
+            --no-cache-dir \
+            -e ".[api,dev,postgres]"
 
-      - name: Install project dependencies
-        if: ${{ steps.gate.outputs.run == 'true' }}
+      - name: Verify CPU-only PyTorch remains selected
         run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" \
-            --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
-          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
-          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" "ruff==$EXPECTED_RUFF_VERSION"
-          uv pip check --python "$python"
-          "$python" - <<'PY'
+          python - <<'PY'
           import torch
+
           assert torch.__version__.startswith("2.9.1"), torch.__version__
           assert torch.version.cuda is None, torch.version.cuda
+          print(f"torch_version={torch.__version__}")
+          print("torch_cuda_runtime=NONE")
           PY
-          echo "DEPS_RC=0" >> "$GITHUB_ENV"
+          python -m pip check
 
-      - name: Verify strictness contracts and focused tests
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          export PYTHONPATH="tests/sktime_campaign${PYTHONPATH:+:$PYTHONPATH}"
-          "$python" - <<'PY'
-          from loto.basicts_campaign.contracts import DatasetPayload, DatasetRow
-          from loto.basicts_campaign.dataset import validate_dataset
+      - name: Show disk usage after install
+        run: df -h
 
-          try:
-              list(zip((1, 2), (1,), strict=True))
-          except ValueError:
-              pass
-          else:
-              raise SystemExit("strict=True mismatch did not fail")
-          assert list(zip((1, 2, 3), (2, 3), strict=False)) == [(1, 2), (2, 3)]
+      - name: Run Ruff format check
+        run: python -m ruff format --check src scripts tests
 
-          rows = [DatasetRow(draw_no=i, values=[1, 2, 3]) for i in range(1, 6)]
-          payload = DatasetPayload(game="numbers3", rows=rows, validation_size=1, holdout_size=1)
-          values, draw_numbers, _ = validate_dataset(payload)
-          assert values.shape == (5, 3)
-          assert draw_numbers == (1, 2, 3, 4, 5)
-          bad_rows = [
-              DatasetRow(draw_no=i, values=[1, 2, 3]) for i in (1, 2, 4, 5, 6)
-          ]
-          bad = DatasetPayload(game="numbers3", rows=bad_rows, validation_size=1, holdout_size=1)
-          try:
-              validate_dataset(bad)
-          except ValueError as exc:
-              assert "gap-free" in str(exc)
-          else:
-              raise SystemExit("BasicTS gap mismatch was not rejected")
-          PY
-          "$python" -m pytest -q \
-            tests/test_sundial_provider_v2_certification.py \
-            tests/timesfm25_campaign/test_postprocess.py \
-            tests/autogluon_campaign/test_holdout_prospective.py \
-            tests/test_coverage_ledger.py \
-            tests/darts_campaign \
-            tests/merlion_campaign \
-            tests/neuralforecast/auto_frets \
-            tests/neuralforecast/auto_segrnn \
-            tests/neuralforecast/auto_timellm \
-            tests/probabilistic \
-            tests/sktime_campaign \
-            tests/toto2_campaign \
-            tests/test_pipeline_ledger_staged.py
-          echo "FOCUSED_RC=0" >> "$GITHUB_ENV"
+      - name: Run Ruff lint
+        run: python -m ruff check src scripts tests
 
-      - name: Verify collection parity and exact residual lint
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          set +e
-          "$python" -m pytest -q > "$RUNNER_TEMP/pytest.log" 2>&1
-          PYTEST_RC=$?
-          "$python" -m ruff check --output-format=json src scripts tests > "$RUNNER_TEMP/all-lint.json"
-          ALL_LINT_RC=$?
-          set -e
-          if grep -Fq "Interrupted: $BASELINE_COLLECTION_ERRORS errors during collection" "$RUNNER_TEMP/pytest.log"; then
-            COLLECTION_PARITY=1
-          else
-            COLLECTION_PARITY=0
-          fi
-          lint_env="$RUNNER_TEMP/lint-env.txt"
-          "$python" - "$RUNNER_TEMP/all-lint.json" <<'PY' > "$lint_env"
-          import collections, json, sys
-          from pathlib import Path
-          rows=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8') or '[]')
-          counts=collections.Counter(row.get('code','UNKNOWN') for row in rows)
-          print(f"REMAINING_LINT_COUNT={len(rows)}")
-          print("REMAINING_RULE_COUNTS=" + ",".join(f"{k}:{v}" for k,v in sorted(counts.items())))
-          PY
-          source "$lint_env"
-          cat "$lint_env" >> "$GITHUB_ENV"
-          echo "PYTEST_RC=$PYTEST_RC" >> "$GITHUB_ENV"
-          echo "COLLECTION_PARITY=$COLLECTION_PARITY" >> "$GITHUB_ENV"
-          echo "ALL_LINT_RC=$ALL_LINT_RC" >> "$GITHUB_ENV"
-          cat "$lint_env"
-          test "$COLLECTION_PARITY" -eq 1
-          test "$REMAINING_LINT_COUNT" -eq "$EXPECTED_REMAINING_LINT"
+      - name: Compile Python sources
+        run: python -m compileall -q src scripts tests
 
-      - name: Commit verified B905 repairs
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          before="$(git rev-parse HEAD)"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add scripts src tests
-          git diff --cached --check
-          git commit -m "fix: make zip strictness explicit for Ruff B905 (#200)"
-          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
-          test "$remote_before" = "$before"
-          git push origin "HEAD:$TARGET_BRANCH"
-          echo "REPAIRED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-
-      - name: Persist verification evidence
-        if: ${{ always() && steps.gate.outputs.run == 'true' && env.REPAIRED_HEAD != '' }}
-        run: |
-          set -Eeuo pipefail
-          cat > "$RESULT_PATH" <<EOF
-          RUFF_B905_REPAIR_VERSION=1
-          RUN_ID=$GITHUB_RUN_ID
-          RUFF_VERSION=${RUFF_VERSION:-UNKNOWN}
-          REPAIRED_HEAD=${REPAIRED_HEAD:-UNKNOWN}
-          STRICT_TRUE=18
-          STRICT_FALSE=13
-          STATIC_RC=${STATIC_RC:-UNKNOWN}
-          DEPS_RC=${DEPS_RC:-UNKNOWN}
-          FOCUSED_RC=${FOCUSED_RC:-UNKNOWN}
-          PYTEST_RC=${PYTEST_RC:-UNKNOWN}
-          COLLECTION_PARITY=${COLLECTION_PARITY:-UNKNOWN}
-          REMAINING_LINT_COUNT=${REMAINING_LINT_COUNT:-UNKNOWN}
-          REMAINING_RULE_COUNTS=${REMAINING_RULE_COUNTS:-UNKNOWN}
-          EOF
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$RESULT_PATH"
-          git diff --cached --check
-          git commit -m "chore: capture Ruff B905 repair evidence (#200)"
-          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
-          test "$remote_before" = "$(git rev-parse HEAD^)"
-          git push origin "HEAD:$TARGET_BRANCH"
-
-      - name: Enforce repair gates
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          test "${STATIC_RC:-99}" -eq 0
-          test "${DEPS_RC:-99}" -eq 0
-          test "${FOCUSED_RC:-99}" -eq 0
-          test "${COLLECTION_PARITY:-0}" -eq 1
-          test "${REMAINING_LINT_COUNT:-999}" -eq "$EXPECTED_REMAINING_LINT"
-
-      - name: Cleanup
-        if: ${{ always() }}
-        run: |
-          set -Eeuo pipefail
-          [[ -z "${CI_VENV:-}" ]] || { case "$CI_VENV" in "$RUNNER_TEMP"/*) rm -rf "$CI_VENV" ;; *) exit 1 ;; esac; }
-          [[ -z "${UV_CACHE_DIR:-}" ]] || { case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf "$UV_CACHE_DIR" ;; *) exit 1 ;; esac; }
+      - name: Run tests
+        run: python -m pytest -q
