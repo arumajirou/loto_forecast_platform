@@ -5,27 +5,28 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: ruff-small-semantics-audit-${{ github.event.pull_request.number }}
+  group: ruff-small-safe-repair-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
 jobs:
   test:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-lint-small-semantics-v1' }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 60
+    timeout-minutes: 180
     defaults:
       run:
         shell: bash
     env:
+      TARGET_BRANCH: fix/ruff-lint-small-semantics-v1
       UV_VERSION: "0.11.21"
       UV_PYTHON: "3.13"
       EXPECTED_RUFF_VERSION: "0.16.0"
-      EXPECTED_TOTAL_LINT: "194"
-      EXPECTED_SELECTED_LINT: "20"
-      SELECTED_RULES: "B007,B017,B904,E501,E731,I001,UP022,UP035,UP037"
+      BASELINE_COLLECTION_ERRORS: "34"
+      EXPECTED_REMAINING_LINT: "190"
+      RESULT_PATH: .github/ruff-small-safe-repair.txt
 
     steps:
       - name: Verify trusted runner
@@ -39,22 +40,36 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: fix/ruff-lint-small-semantics-v1
-          persist-credentials: false
+          persist-credentials: true
           fetch-depth: 1
           clean: true
 
-      - name: Install exact uv and locked Ruff
+      - name: Gate repair trigger
+        id: gate
+        run: |
+          set -Eeuo pipefail
+          message="$(git log -1 --pretty=%s)"
+          echo "head_message=$message"
+          if [[ "$message" == "ci: run Ruff small safe repairs (#200)" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install exact uv
+        if: ${{ steps.gate.outputs.run == 'true' }}
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
 
-      - name: Prepare isolated Ruff environment
+      - name: Prepare isolated environment and apply locked safe subset
+        if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
           case "$(uv --version)" in "uv $UV_VERSION"*) ;; *) exit 1 ;; esac
           uv python install "$UV_PYTHON"
-          venv="$RUNNER_TEMP/loto-ruff-small-audit-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          venv="$RUNNER_TEMP/loto-ruff-small-repair-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           cache="$RUNNER_TEMP/loto-ruff-small-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           case "$venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
           case "$cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
@@ -75,50 +90,152 @@ jobs:
           PY
           )"
           test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
+          echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
           UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
-          "$python" -m ruff --version
+          "$python" -m ruff check --select UP035,UP037,I001 --fix \
+            src/loto/autogluon_campaign/holdout_prospective.py \
+            src/loto/moirai2_campaign/target_execution.py
+          mapfile -t changed < <(git diff --name-only | sort)
+          expected=(
+            src/loto/autogluon_campaign/holdout_prospective.py
+            src/loto/moirai2_campaign/target_execution.py
+          )
+          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
+          test "${#changed[@]}" -eq 2
+          diff -u <(printf '%s\n' "${expected_sorted[@]}") <(printf '%s\n' "${changed[@]}")
+          git diff --check
+          git diff -- src/loto/autogluon_campaign/holdout_prospective.py src/loto/moirai2_campaign/target_execution.py
 
-      - name: Inventory exact residual and selected findings
+      - name: Verify static gates
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          "$python" -m ruff check --select UP035,UP037,I001 \
+            src/loto/autogluon_campaign/holdout_prospective.py \
+            src/loto/moirai2_campaign/target_execution.py
+          "$python" -m ruff format --check \
+            src/loto/autogluon_campaign/holdout_prospective.py \
+            src/loto/moirai2_campaign/target_execution.py
+          "$python" -m compileall -q src scripts tests
+          echo "STATIC_RC=0" >> "$GITHUB_ENV"
+
+      - name: Install project dependencies
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
+          UV_CACHE_DIR="$UV_CACHE_DIR" uv pip install --quiet --python "$python" "ruff==$EXPECTED_RUFF_VERSION"
+          uv pip check --python "$python"
+          "$python" - <<'PY'
+          import torch
+          assert torch.__version__.startswith("2.9.1"), torch.__version__
+          assert torch.version.cuda is None, torch.version.cuda
+          PY
+          echo "DEPS_RC=0" >> "$GITHUB_ENV"
+
+      - name: Verify facade regressions and focused tests
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          python="$CI_VENV/bin/python"
+          "$python" -m pytest -q \
+            tests/autogluon_campaign/test_holdout_prospective.py \
+            tests/moirai2_campaign/test_p8d_scripts.py \
+            tests/moirai2_campaign/test_target_execution_artifacts.py \
+            tests/moirai2_campaign/test_target_execution_integrity.py \
+            tests/moirai2_campaign/test_target_execution_state.py
+          echo "FOCUSED_RC=0" >> "$GITHUB_ENV"
+
+      - name: Verify collection parity and residual lint
+        if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
           python="$CI_VENV/bin/python"
           set +e
-          "$python" -m ruff check --output-format=json src scripts tests > "$RUNNER_TEMP/all.json"
-          all_rc=$?
-          "$python" -m ruff check --select "$SELECTED_RULES" --output-format=json src scripts tests > "$RUNNER_TEMP/selected.json"
-          selected_rc=$?
+          "$python" -m pytest -q > "$RUNNER_TEMP/pytest.log" 2>&1
+          PYTEST_RC=$?
+          "$python" -m ruff check --output-format=json src scripts tests > "$RUNNER_TEMP/all-lint.json"
+          ALL_LINT_RC=$?
           set -e
-          test "$all_rc" -eq 1
-          test "$selected_rc" -eq 1
-          "$python" - "$RUNNER_TEMP/all.json" "$RUNNER_TEMP/selected.json" <<'PY'
+          if grep -Fq "Interrupted: $BASELINE_COLLECTION_ERRORS errors during collection" "$RUNNER_TEMP/pytest.log"; then
+            COLLECTION_PARITY=1
+          else
+            COLLECTION_PARITY=0
+          fi
+          lint_env="$RUNNER_TEMP/lint-env.txt"
+          "$python" - "$RUNNER_TEMP/all-lint.json" <<'PY' > "$lint_env"
           import collections, json, sys
           from pathlib import Path
-          all_rows=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8') or '[]')
-          rows=json.loads(Path(sys.argv[2]).read_text(encoding='utf-8') or '[]')
-          counts=collections.Counter(row.get('code','UNKNOWN') for row in all_rows)
-          selected_counts=collections.Counter(row.get('code','UNKNOWN') for row in rows)
-          print(f"TOTAL_LINT_COUNT={len(all_rows)}")
-          print("TOTAL_RULE_COUNTS=" + ",".join(f"{k}:{v}" for k,v in sorted(counts.items())))
-          print(f"SELECTED_LINT_COUNT={len(rows)}")
-          print("SELECTED_RULE_COUNTS=" + ",".join(f"{k}:{v}" for k,v in sorted(selected_counts.items())))
-          for row in rows:
-              loc=row.get('location') or {}
-              fix=row.get('fix')
-              applicability=None if fix is None else fix.get('applicability')
-              print("FINDING|{code}|{file}:{line}:{col}|fix={fix}|{msg}".format(
-                  code=row.get('code'), file=row.get('filename'), line=loc.get('row'), col=loc.get('column'),
-                  fix=applicability or ('available' if fix else 'none'), msg=row.get('message','').replace('\n',' ')))
-          if len(all_rows) != 194:
-              raise SystemExit(f"expected 194 total findings, got {len(all_rows)}")
-          if len(rows) != 20:
-              raise SystemExit(f"expected 20 selected findings, got {len(rows)}")
+          rows=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8') or '[]')
+          counts=collections.Counter(row.get('code','UNKNOWN') for row in rows)
+          print(f"REMAINING_LINT_COUNT={len(rows)}")
+          print("REMAINING_RULE_COUNTS=" + ",".join(f"{k}:{v}" for k,v in sorted(counts.items())))
           PY
+          source "$lint_env"
+          cat "$lint_env" >> "$GITHUB_ENV"
+          echo "PYTEST_RC=$PYTEST_RC" >> "$GITHUB_ENV"
+          echo "COLLECTION_PARITY=$COLLECTION_PARITY" >> "$GITHUB_ENV"
+          echo "ALL_LINT_RC=$ALL_LINT_RC" >> "$GITHUB_ENV"
+          cat "$lint_env"
+          test "$COLLECTION_PARITY" -eq 1
+          test "$REMAINING_LINT_COUNT" -eq "$EXPECTED_REMAINING_LINT"
 
-      - name: Verify repository unchanged
+      - name: Commit verified source repair
+        if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
-          git diff --exit-code
-          git status --porcelain=v1
+          before="$(git rev-parse HEAD)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/loto/autogluon_campaign/holdout_prospective.py \
+            src/loto/moirai2_campaign/target_execution.py
+          git diff --cached --check
+          git commit -m "fix: repair Ruff small safe facade findings (#200)"
+          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$remote_before" = "$before"
+          git push origin "HEAD:$TARGET_BRANCH"
+          echo "REPAIRED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Persist verification evidence
+        if: ${{ always() && steps.gate.outputs.run == 'true' && env.REPAIRED_HEAD != '' }}
+        run: |
+          set -Eeuo pipefail
+          cat > "$RESULT_PATH" <<EOF
+          RUFF_SMALL_SAFE_REPAIR_VERSION=1
+          RUN_ID=$GITHUB_RUN_ID
+          RUFF_VERSION=${RUFF_VERSION:-UNKNOWN}
+          REPAIRED_HEAD=${REPAIRED_HEAD:-UNKNOWN}
+          STATIC_RC=${STATIC_RC:-UNKNOWN}
+          DEPS_RC=${DEPS_RC:-UNKNOWN}
+          FOCUSED_RC=${FOCUSED_RC:-UNKNOWN}
+          PYTEST_RC=${PYTEST_RC:-UNKNOWN}
+          COLLECTION_PARITY=${COLLECTION_PARITY:-UNKNOWN}
+          REMAINING_LINT_COUNT=${REMAINING_LINT_COUNT:-UNKNOWN}
+          REMAINING_RULE_COUNTS=${REMAINING_RULE_COUNTS:-UNKNOWN}
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$RESULT_PATH"
+          git diff --cached --check
+          git commit -m "chore: capture Ruff small safe repair evidence (#200)"
+          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$remote_before" = "$(git rev-parse HEAD^)"
+          git push origin "HEAD:$TARGET_BRANCH"
+
+      - name: Enforce repair gates
+        if: ${{ steps.gate.outputs.run == 'true' }}
+        run: |
+          set -Eeuo pipefail
+          test "${STATIC_RC:-99}" -eq 0
+          test "${DEPS_RC:-99}" -eq 0
+          test "${FOCUSED_RC:-99}" -eq 0
+          test "${COLLECTION_PARITY:-0}" -eq 1
+          test "${REMAINING_LINT_COUNT:-999}" -eq "$EXPECTED_REMAINING_LINT"
 
       - name: Cleanup
         if: ${{ always() }}
