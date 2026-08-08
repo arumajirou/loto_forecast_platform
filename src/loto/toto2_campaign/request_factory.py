@@ -88,7 +88,9 @@ def _validate_values(
         normalized[column] = float(integer)
         ordered.append(float(integer))
     if geometry.strictly_increasing:
-        if any(current <= previous for previous, current in zip(ordered, ordered[1:])):
+        if any(
+            current <= previous for previous, current in zip(ordered, ordered[1:], strict=False)
+        ):
             raise ValueError(f"row {row_index} positions must be strictly increasing")
     return normalized
 

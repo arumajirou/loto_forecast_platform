@@ -71,7 +71,7 @@ def test_valid_fold_order_seals_with_foundation(tmp_path: Path) -> None:
         "SCORE",
     ]
     times = [event.occurred_at for event in recorder.events]
-    assert all(left < right for left, right in zip(times, times[1:]))
+    assert all(left < right for left, right in zip(times, times[1:], strict=False))
 
 
 def test_actual_before_prediction_is_rejected(tmp_path: Path) -> None:

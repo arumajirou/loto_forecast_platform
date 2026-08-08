@@ -42,7 +42,7 @@ def compile_series(payload: SeriesPayload, semantics: TimeSemantics) -> Compiled
             raise ValueError("draw numbers must be integers, not booleans")
         if draws != sorted(draws) or len(set(draws)) != len(draws):
             raise ValueError("draw numbers must be strictly increasing and unique")
-        if any(right - left != 1 for left, right in zip(draws, draws[1:])):
+        if any(right - left != 1 for left, right in zip(draws, draws[1:], strict=False)):
             raise ValueError("draw numbers must be gap-free")
         base = datetime(2000, 1, 1, tzinfo=UTC)
         index = [base + timedelta(days=offset) for offset in range(len(draws))]

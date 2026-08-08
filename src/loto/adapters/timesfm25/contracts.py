@@ -191,7 +191,7 @@ class TimesFM25Response(StrictModel):
         for series_index in range(series_count):
             for step in range(horizon):
                 values = [self.quantiles[key][series_index][step] for key in QUANTILE_KEYS]
-                if any(left > right for left, right in zip(values, values[1:])):
+                if any(left > right for left, right in zip(values, values[1:], strict=False)):
                     raise ValueError("quantile crossing detected")
                 if not math.isclose(
                     self.median_forecast[series_index][step],

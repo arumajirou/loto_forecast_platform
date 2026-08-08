@@ -107,7 +107,7 @@ def certify_conformal_quantiles(
             raise CertificationError("conformal median differs from base median")
     intervals: list[IntervalMetric] = []
     half = len(expected) // 2
-    for lower_q, upper_q in zip(expected[:half], reversed(expected[half + 1 :])):
+    for lower_q, upper_q in zip(expected[:half], reversed(expected[half + 1 :]), strict=True):
         intervals.append(
             compute_interval_metrics(
                 actual,

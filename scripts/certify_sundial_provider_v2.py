@@ -364,12 +364,14 @@ def compare_replays(left: dict[str, Any], right: dict[str, Any]) -> dict[str, An
     if len(a) != len(b):
         return {"classification": "SHAPE_MISMATCH", "passed": False}
     exact = a == b
-    close = all(math.isclose(x, y, rel_tol=1e-6, abs_tol=1e-7) for x, y in zip(a, b))
+    close = all(math.isclose(x, y, rel_tol=1e-6, abs_tol=1e-7) for x, y in zip(a, b, strict=True))
     return {
         "classification": "EXACT" if exact else "NUMERIC_CLOSE" if close else "DIVERGENT",
         "passed": exact or close,
         "sample_count": len(a),
-        "maximum_absolute_difference": max((abs(x - y) for x, y in zip(a, b)), default=0.0),
+        "maximum_absolute_difference": max(
+            (abs(x - y) for x, y in zip(a, b, strict=True)), default=0.0
+        ),
     }
 
 

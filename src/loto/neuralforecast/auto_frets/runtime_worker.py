@@ -75,9 +75,15 @@ def _maximum_difference(
     first: tuple[tuple[float, ...], ...],
     second: tuple[tuple[float, ...], ...],
 ) -> float:
-    if len(first) != len(second) or any(len(a) != len(b) for a, b in zip(first, second)):
+    if len(first) != len(second) or any(
+        len(a) != len(b) for a, b in zip(first, second, strict=True)
+    ):
         raise RuntimeError("pre-save and post-load prediction shapes differ")
-    return max(abs(a - b) for row_a, row_b in zip(first, second) for a, b in zip(row_a, row_b))
+    return max(
+        abs(a - b)
+        for row_a, row_b in zip(first, second, strict=True)
+        for a, b in zip(row_a, row_b, strict=True)
+    )
 
 
 def parse_nvidia_smi_output(

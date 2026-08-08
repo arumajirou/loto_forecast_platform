@@ -77,7 +77,7 @@ def make_evidence(
     if "draw_date" not in frame.columns:
         raise CoverageLedgerPreflightError(f"{game}: instrumented lane requires a draw_date column")
     observed_times = tuple(utc(value) for value in frame["draw_date"].tolist())
-    if any(left >= right for left, right in zip(observed_times, observed_times[1:])):
+    if any(left >= right for left, right in zip(observed_times, observed_times[1:], strict=False)):
         raise CoverageLedgerPreflightError(f"{game}: draw_date must be strictly increasing")
     return CoverageDatasetEvidence(
         dataset_id=dataset_id,

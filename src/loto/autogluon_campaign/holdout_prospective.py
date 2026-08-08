@@ -274,9 +274,13 @@ def _history(
         if isinstance(draw_id, bool) or not isinstance(draw_id, int):
             raise HoldoutProspectiveError("HISTORY_DRAW_ID_INVALID", str(draw_id))
         values = _vector(row, geometry)
-        output.append({"draw_id": draw_id, **dict(zip(geometry.position_columns, values))})
+        output.append(
+            {"draw_id": draw_id, **dict(zip(geometry.position_columns, values, strict=True))}
+        )
         draw_ids.append(draw_id)
-    if len(rows) < 3 or any(right <= left for left, right in zip(draw_ids, draw_ids[1:])):
+    if len(rows) < 3 or any(
+        right <= left for left, right in zip(draw_ids, draw_ids[1:], strict=False)
+    ):
         raise HoldoutProspectiveError("HISTORY_ORDER_INVALID", str(draw_ids))
     return tuple(output)
 
@@ -284,7 +288,7 @@ def _history(
 def compute_metrics(prediction: Sequence[float], actual: Sequence[float]) -> MetricResult:
     if len(prediction) != len(actual) or not prediction:
         raise HoldoutProspectiveError("METRIC_SHAPE_MISMATCH", "prediction/actual")
-    errors = [float(left) - float(right) for left, right in zip(prediction, actual)]
+    errors = [float(left) - float(right) for left, right in zip(prediction, actual, strict=True)]
     hits = tuple(float(abs(error) <= 1.0) for error in errors)
     mse = stats.fmean(error * error for error in errors)
     return MetricResult(
@@ -316,7 +320,10 @@ def _ar1(vectors: Sequence[tuple[float, ...]]) -> tuple[float, ...]:
         if denominator == 0:
             result.append(values[-1])
             continue
-        slope = sum((x - mean_left) * (y - mean_right) for x, y in zip(left, right)) / denominator
+        slope = (
+            sum((x - mean_left) * (y - mean_right) for x, y in zip(left, right, strict=True))
+            / denominator
+        )
         result.append(mean_right - slope * mean_left + slope * values[-1])
     return tuple(result)
 

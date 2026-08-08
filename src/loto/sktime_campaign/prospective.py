@@ -65,7 +65,9 @@ class ObservedHistory(BaseModel):
             raise ValueError("history draw_no must be sorted")
         if len(set(self.draw_no)) != len(self.draw_no):
             raise ValueError("history draw_no must be unique")
-        if any(right != left + 1 for left, right in zip(self.draw_no, self.draw_no[1:])):
+        if any(
+            right != left + 1 for left, right in zip(self.draw_no, self.draw_no[1:], strict=False)
+        ):
             raise ValueError("history draw_no must be gap-free")
         if len(self.legal_min) != width or len(self.legal_max) != width:
             raise ValueError("legal bounds must match position count")
@@ -116,8 +118,7 @@ class ProspectiveRequest(BaseModel):
         if any(
             right != left + 1
             for left, right in zip(
-                self.prospective_draw_no,
-                self.prospective_draw_no[1:],
+                self.prospective_draw_no, self.prospective_draw_no[1:], strict=False
             )
         ):
             raise ValueError("prospective draw IDs must be gap-free")

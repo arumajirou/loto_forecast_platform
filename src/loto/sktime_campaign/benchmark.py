@@ -68,7 +68,10 @@ class GameMatrix(BaseModel):
             raise ValueError("legal_max must be >= legal_min")
         if self.draw_no != sorted(self.draw_no) or len(set(self.draw_no)) != len(self.draw_no):
             raise ValueError("draw_no must be strictly increasing and unique")
-        if any(next_no != current + 1 for current, next_no in zip(self.draw_no, self.draw_no[1:])):
+        if any(
+            next_no != current + 1
+            for current, next_no in zip(self.draw_no, self.draw_no[1:], strict=False)
+        ):
             raise ValueError("draw_no must be gap-free")
         for row_index, row in enumerate(self.values):
             if len(row) != width:
