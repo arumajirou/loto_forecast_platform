@@ -71,11 +71,15 @@ def _publish_sidecar(zip_path: Path, digest: str) -> None:
     expected = _expected_sidecar(zip_path, digest)
     try:
         _write_exclusive(sidecar, expected.encode("utf-8"))
-    except FileExistsError:
+    except FileExistsError as exc:
         if not sidecar.is_file() or sidecar.is_symlink():
-            raise PackageIntegrityError(f"existing sidecar is not a regular file: {sidecar}")
+            raise PackageIntegrityError(
+                f"existing sidecar is not a regular file: {sidecar}"
+            ) from exc
         if sidecar.read_text(encoding="utf-8") != expected:
-            raise PackageIntegrityError("existing ZIP sidecar does not match package digest")
+            raise PackageIntegrityError(
+                "existing ZIP sidecar does not match package digest"
+            ) from exc
 
 
 def _verify_existing_output(

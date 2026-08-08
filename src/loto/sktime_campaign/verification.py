@@ -186,7 +186,8 @@ def _require_pass_response(directory: Path, operation: str) -> dict[str, Any]:
     actual_version = response.get("actual_sktime_version")
     if expected_version != "1.0.1" or actual_version != expected_version:
         raise VerificationError(
-            f"sktime version evidence mismatch: expected={expected_version}, actual={actual_version}"
+            "sktime version evidence mismatch: "
+            f"expected={expected_version}, actual={actual_version}"
         )
     return response
 

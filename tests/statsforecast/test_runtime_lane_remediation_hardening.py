@@ -18,7 +18,9 @@ def test_default_injects_hardened_end_to_end(monkeypatch) -> None:
 
 def test_explicit_end_to_end_override_is_preserved(monkeypatch) -> None:
     captured = {}
-    custom_runner = lambda *_args, **_kwargs: None
+
+    def custom_runner(*_args, **_kwargs):
+        return None
 
     def base(*_args, **kwargs):
         captured.update(kwargs)

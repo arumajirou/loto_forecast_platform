@@ -25,8 +25,12 @@ def test_default_injects_hardened_admission(monkeypatch, tmp_path) -> None:
 
 def test_explicit_admission_overrides_are_preserved(monkeypatch, tmp_path) -> None:
     captured = {}
-    custom_inspector = lambda *_args, **_kwargs: {}
-    custom_writer = lambda *_args, **_kwargs: {}
+
+    def custom_inspector(*_args, **_kwargs):
+        return {}
+
+    def custom_writer(*_args, **_kwargs):
+        return {}
 
     def base(_repo_root, _output_root, **kwargs):
         captured.update(kwargs)

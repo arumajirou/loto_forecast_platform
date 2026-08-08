@@ -73,7 +73,7 @@ def test_complete_candidate_reports_priority_and_all_position_metrics() -> None:
 
 def test_local_candidates_are_combined_only_when_all_positions_exist() -> None:
     parts = []
-    for position, unique_id in enumerate(NUMBER_COLUMNS, start=1):
+    for position, _unique_id in enumerate(NUMBER_COLUMNS, start=1):
         row = _complete_candidate().iloc[[position - 1]].copy()
         row["candidate_id"] = f"local-{position}"
         row["task_path"] = f"task-local-{position}"

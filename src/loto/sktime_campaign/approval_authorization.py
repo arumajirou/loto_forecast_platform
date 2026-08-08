@@ -252,8 +252,7 @@ def make_ssh_signature_verifier(
                     str(signature_path),
                 ],
                 input=payload,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                capture_output=True,
                 check=False,
             )
         return completed.returncode == 0

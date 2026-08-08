@@ -60,10 +60,10 @@ def assert_no_symlink_components(path: Path, *, allow_missing_leaf: bool) -> Non
         is_leaf = index == len(parts) - 1
         try:
             mode = current.lstat().st_mode
-        except FileNotFoundError:
+        except FileNotFoundError as exc:
             if is_leaf and allow_missing_leaf:
                 return
-            raise RegistryTransactionError("PATH_COMPONENT_MISSING", str(current))
+            raise RegistryTransactionError("PATH_COMPONENT_MISSING", str(current)) from exc
         if stat.S_ISLNK(mode):
             raise RegistryTransactionError("SYMLINK_FORBIDDEN", str(current))
         if not is_leaf and not stat.S_ISDIR(mode):
