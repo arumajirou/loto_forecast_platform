@@ -49,7 +49,7 @@ jobs:
           set -Eeuo pipefail
           message="$(git log -1 --pretty=%s)"
           echo "head_message=$message"
-          if [[ "$message" == "ci: apply and verify undefined-symbol repairs (#200)" ]]; then
+          if [[ "$message" == "ci: verify lazy exports after dependency setup (#200)" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -62,7 +62,7 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
 
-      - name: Prepare isolated verification environment
+      - name: Prepare isolated environment and deterministic repairs
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
@@ -92,12 +92,7 @@ jobs:
           test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
           echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
           UV_CACHE_DIR="$cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
-
-      - name: Apply deterministic source repairs in worktree
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          "$CI_VENV/bin/python" - <<'PY'
+          "$python" - <<'PY'
           from pathlib import Path
 
           def replace_once(path: str, old: str, new: str) -> None:
@@ -123,7 +118,6 @@ jobs:
               "    EXPECTED_PIPELINE_BLOB_SHA,\n    PipelineComponents,",
               "    EXPECTED_PIPELINE_BLOB_SHA,\n    Clock,\n    PipelineComponents,",
           )
-
           declarations = {
               "src/loto/neuralforecast/auto_frets/runtime.py": (
                   '_REQUIRED_MODULES = ("neuralforecast", "optuna", "ray", "torch")\n\n',
@@ -146,7 +140,6 @@ jobs:
               replace_once(path, old, new)
           PY
           mapfile -t changed < <(git diff --name-only | sort)
-          printf '%s\n' "${changed[@]}"
           expected=(
             src/loto/chronos2_campaign/calibration_runner.py
             src/loto/moirai2_campaign/target_execution_validators.py
@@ -161,7 +154,7 @@ jobs:
           diff -u <(printf '%s\n' "${expected_sorted[@]}") <(printf '%s\n' "${changed[@]}")
           git diff --check
 
-      - name: Verify undefined-symbol lint and lazy export contract
+      - name: Verify static gates
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
@@ -176,24 +169,6 @@ jobs:
             src/loto/neuralforecast/auto_timellm/runtime.py \
             src/loto/orchestration/pipeline_staged.py
           "$python" -m compileall -q src scripts tests
-          PYTHONPATH=src "$python" - <<'PY'
-          from loto.neuralforecast.auto_frets import runtime as frets
-          from loto.neuralforecast.auto_scinet import runtime as scinet
-          from loto.neuralforecast.auto_segrnn import runtime as segrnn
-          from loto.neuralforecast.auto_timellm import runtime as timellm
-
-          checks = (
-              (frets, ("FreTS", "AutoFreTS")),
-              (scinet, ("SCINet", "AutoSCINet")),
-              (segrnn, ("SegRNN", "AutoSegRNN")),
-              (timellm, ("PinnedTimeLLM", "AutoTimeLLM")),
-          )
-          for module, names in checks:
-              module._reset_runtime_classes_for_tests()
-              for name in names:
-                  assert name in module.__all__, (module.__name__, name)
-                  assert name not in module.__dict__, (module.__name__, name)
-          PY
           echo "STATIC_RC=0" >> "$GITHUB_ENV"
 
       - name: Install project dependencies
@@ -213,11 +188,29 @@ jobs:
           PY
           echo "DEPS_RC=0" >> "$GITHUB_ENV"
 
-      - name: Run focused subsystem tests
+      - name: Verify lazy export contract and focused tests
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
           python="$CI_VENV/bin/python"
+          "$python" - <<'PY'
+          from loto.neuralforecast.auto_frets import runtime as frets
+          from loto.neuralforecast.auto_scinet import runtime as scinet
+          from loto.neuralforecast.auto_segrnn import runtime as segrnn
+          from loto.neuralforecast.auto_timellm import runtime as timellm
+
+          checks = (
+              (frets, ("FreTS", "AutoFreTS")),
+              (scinet, ("SCINet", "AutoSCINet")),
+              (segrnn, ("SegRNN", "AutoSegRNN")),
+              (timellm, ("PinnedTimeLLM", "AutoTimeLLM")),
+          )
+          for module, names in checks:
+              module._reset_runtime_classes_for_tests()
+              for name in names:
+                  assert name in module.__all__, (module.__name__, name)
+                  assert name not in module.__dict__, (module.__name__, name)
+          PY
           "$python" -m pytest -q \
             tests/chronos2_campaign/test_calibration_core.py \
             tests/chronos2_campaign/test_calibration_validation.py \
@@ -232,7 +225,7 @@ jobs:
             tests/test_pipeline_staged_runner.py
           echo "FOCUSED_RC=0" >> "$GITHUB_ENV"
 
-      - name: Verify full collection parity and residual lint count
+      - name: Verify collection parity and residual lint
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
