@@ -126,9 +126,10 @@ def run_provider_process(
 
     started_at = utc_now()
     samples: list[GPUProcessSample] = []
-    with stdout_path.open("w", encoding="utf-8") as stdout_stream, stderr_path.open(
-        "w", encoding="utf-8"
-    ) as stderr_stream:
+    with (
+        stdout_path.open("w", encoding="utf-8") as stdout_stream,
+        stderr_path.open("w", encoding="utf-8") as stderr_stream,
+    ):
         process = subprocess.Popen(
             command,
             cwd=config.repo_root,

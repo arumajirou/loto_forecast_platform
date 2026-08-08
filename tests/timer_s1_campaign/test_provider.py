@@ -143,9 +143,7 @@ def pinned_payload(tmp_path, **overrides: object) -> dict[str, object]:
             "model_revision": manifest.model_revision,
             "source_revision": manifest.source_revision,
             "config_sha256": manifest.artifact_sha256("config.json"),
-            "weight_manifest_sha256": manifest.artifact_sha256(
-                "model.safetensors.index.json"
-            ),
+            "weight_manifest_sha256": manifest.artifact_sha256("model.safetensors.index.json"),
             "weight_sha256": manifest.weight_set_sha256,
             "manifest_path": str(path.resolve()),
         }
@@ -162,18 +160,14 @@ def test_complete_manifest_binds_all_request_hashes(tmp_path) -> None:
 
 def test_config_hash_must_match_manifest(tmp_path) -> None:
     response = handle_request(
-        TimerS1Request.model_validate(
-            pinned_payload(tmp_path, config_sha256="f" * 64)
-        )
+        TimerS1Request.model_validate(pinned_payload(tmp_path, config_sha256="f" * 64))
     )
     assert response.error_code == "CONFIG_SHA256_MISMATCH"
 
 
 def test_weight_set_hash_must_match_manifest(tmp_path) -> None:
     response = handle_request(
-        TimerS1Request.model_validate(
-            pinned_payload(tmp_path, weight_sha256="f" * 64)
-        )
+        TimerS1Request.model_validate(pinned_payload(tmp_path, weight_sha256="f" * 64))
     )
     assert response.error_code == "WEIGHT_SHA256_MISMATCH"
 

@@ -76,8 +76,7 @@ def _validate_repo(repo_root: Path) -> tuple[str, str, str]:
     status = _run_git(root, "status", "--porcelain", "--", *SCOPED_PATHS)
     if status:
         raise RuntimeError(
-            "MLForecast handoff scope is dirty; commit or clean these paths first:\n"
-            f"{status}"
+            f"MLForecast handoff scope is dirty; commit or clean these paths first:\n{status}"
         )
     commit = _run_git(root, "rev-parse", "HEAD")
     branch = _run_git(root, "rev-parse", "--abbrev-ref", "HEAD")
@@ -132,9 +131,7 @@ def _tracked_scope_files(repo_root: Path) -> list[str]:
         if isinstance(detail, bytes):
             detail = detail.decode("utf-8", errors="replace")
         message = str(detail).strip()
-        raise RuntimeError(
-            f"unable to list tracked MLForecast files: {message}"
-        ) from exc
+        raise RuntimeError(f"unable to list tracked MLForecast files: {message}") from exc
     values = [value.decode("utf-8") for value in payload.split(b"\0") if value]
     if not values:
         raise RuntimeError("no tracked MLForecast files were found")
@@ -154,9 +151,7 @@ def _payload_files(
 
     records: list[tuple[str, Path]] = []
     top_level_docs = (
-        set(REQUIRED_DOCUMENTS)
-        | set(REQUIRED_PROVENANCE_DOCUMENTS)
-        | set(OPTIONAL_DOCUMENTS)
+        set(REQUIRED_DOCUMENTS) | set(REQUIRED_PROVENANCE_DOCUMENTS) | set(OPTIONAL_DOCUMENTS)
     )
     if tracked_paths is None:
         for relative_dir in ("configs/mlforecast", "src/loto/mlforecast", "tests/mlforecast"):
@@ -226,9 +221,9 @@ def _build_entries(
             }
         )
 
-    frozen_base = (repo_root / "docs" / "mlforecast" / "FROZEN_BASE_SHA").read_text(
-        encoding="utf-8"
-    ).strip()
+    frozen_base = (
+        (repo_root / "docs" / "mlforecast" / "FROZEN_BASE_SHA").read_text(encoding="utf-8").strip()
+    )
     provenance = {
         "handoff_format": HANDOFF_FORMAT,
         "source_commit": source_commit,
@@ -260,9 +255,9 @@ def _build_entries(
         "artifacts": manifest_records,
     }
     entries.append(("ARTIFACT_MANIFEST.json", _canonical_json(manifest)))
-    sums = "".join(
-        f"{record['sha256']}  {record['path']}\n" for record in manifest_records
-    ).encode("utf-8")
+    sums = "".join(f"{record['sha256']}  {record['path']}\n" for record in manifest_records).encode(
+        "utf-8"
+    )
     entries.append(("SHA256SUMS", sums))
     return sorted(entries)
 
@@ -305,8 +300,7 @@ def build_handoff_bundle(
         allowed = repo_root / "artifacts" / "mlforecast-handoff"
         if output_dir != allowed.resolve():
             raise RuntimeError(
-                "handoff output inside the repository must use "
-                "artifacts/mlforecast-handoff"
+                "handoff output inside the repository must use artifacts/mlforecast-handoff"
             )
     output_dir.mkdir(parents=True, exist_ok=True)
     short = source_commit[:12]
@@ -365,12 +359,16 @@ def verify_handoff_bundle(zip_path: Path, sha256_path: Path) -> dict[str, Any]:
                 raise RuntimeError(f"encrypted handoff ZIP member: {info.filename}")
             if info.date_time != FIXED_ZIP_DATETIME:
                 raise RuntimeError(f"non-deterministic ZIP timestamp: {info.filename}")
-        required_names = set(REQUIRED_DOCUMENTS) | set(REQUIRED_PROVENANCE_DOCUMENTS) | {
-            "ARTIFACT_MANIFEST.json",
-            "SHA256SUMS",
-            "SOURCE_PROVENANCE.json",
-            "VERSION",
-        }
+        required_names = (
+            set(REQUIRED_DOCUMENTS)
+            | set(REQUIRED_PROVENANCE_DOCUMENTS)
+            | {
+                "ARTIFACT_MANIFEST.json",
+                "SHA256SUMS",
+                "SOURCE_PROVENANCE.json",
+                "VERSION",
+            }
+        )
         missing = sorted(required_names - set(names))
         if missing:
             raise RuntimeError(f"handoff ZIP missing required artifacts: {missing}")

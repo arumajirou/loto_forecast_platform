@@ -305,9 +305,7 @@ def run_p6_campaign(
         "registry_sha256": registry_sha256(),
         "campaign_result_sha256": result_sha,
         "campaign_payload_sha256": sha256_json(campaign.model_dump(mode="json")),
-        "model_statuses": {
-            model.model_class: model.status.value for model in ordered
-        },
+        "model_statuses": {model.model_class: model.status.value for model in ordered},
     }
     atomic_write_json(artifact_root / "p6_campaign_manifest.json", manifest)
     return campaign

@@ -81,8 +81,7 @@ class CalibrationConfig(StrictModel):
         missing = sorted(required_levels - set(self.quantile_levels))
         if missing:
             raise ValueError(
-                "quantile_levels must contain median and interval endpoints: "
-                f"{missing}"
+                f"quantile_levels must contain median and interval endpoints: {missing}"
             )
         if self.position_ranges:
             if set(self.position_ranges) != set(self.position_columns):

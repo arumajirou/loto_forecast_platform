@@ -169,9 +169,7 @@ def _validate_reference(
     parsed = urlsplit(target)
     if parsed.scheme in {"http", "https"}:
         host = (parsed.hostname or "").lower()
-        allowed = (
-            policy.external_embed_hosts if kind == "embed" else policy.external_link_hosts
-        )
+        allowed = policy.external_embed_hosts if kind == "embed" else policy.external_link_hosts
         if host not in allowed:
             return Finding(
                 code="EXTERNAL_HOST_NOT_ALLOWED",

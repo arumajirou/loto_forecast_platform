@@ -56,9 +56,7 @@ def verify_sha256sums(directory: Path) -> str:
         if not path.is_file() or file_sha256(path) != expected:
             raise ValueError(f"SHA-256 mismatch: {directory}/{name}")
     expected_files = {
-        path.name
-        for path in directory.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path.name for path in directory.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     }
     if seen != expected_files:
         raise ValueError(f"SHA256SUMS coverage mismatch: {directory}")
@@ -109,11 +107,7 @@ def build_window(
         raise ValueError("P5 drift report enabled automatic promotion")
 
     shadow = next(
-        (
-            row
-            for row in aggregates
-            if row.get("candidate_id") == shadow_candidate_id
-        ),
+        (row for row in aggregates if row.get("candidate_id") == shadow_candidate_id),
         None,
     )
     if shadow is None or shadow.get("status") != "PASS":
@@ -121,8 +115,7 @@ def build_window(
     baseline_rows = {
         str(row["candidate_id"]): extract_candidate_metrics(row)
         for row in aggregates
-        if row.get("candidate_kind") == "baseline"
-        and row.get("status") == "PASS"
+        if row.get("candidate_kind") == "baseline" and row.get("status") == "PASS"
     }
     if not baseline_rows:
         raise ValueError("P5 monitor has no passing baseline aggregates")
@@ -158,28 +151,17 @@ def main() -> int:
         "p3": Path(args.p3_dir),
         "p4": Path(args.p4_dir),
     }
-    upstream_hashes = {
-        key: verify_sha256sums(path)
-        for key, path in upstream_dirs.items()
-    }
+    upstream_hashes = {key: verify_sha256sums(path) for key, path in upstream_dirs.items()}
 
     p4_response = load_json(upstream_dirs["p4"] / "response.json")
     if p4_response.get("status") != "PASS":
         raise ValueError("P4 status is not PASS")
-    if p4_response.get("promotion_status") != (
-        "HOLDOUT_SCORED_NOT_PROMOTED_PROSPECTIVE_REQUIRED"
-    ):
+    if p4_response.get("promotion_status") != ("HOLDOUT_SCORED_NOT_PROMOTED_PROSPECTIVE_REQUIRED"):
         raise ValueError("P4 promotion boundary mismatch")
     shadow_candidate_id = str(p4_response["selected_oof_candidate_id"])
-    p4_aggregates = load_json(
-        upstream_dirs["p4"] / "HOLDOUT_CANDIDATE_AGGREGATES.json"
-    )
+    p4_aggregates = load_json(upstream_dirs["p4"] / "HOLDOUT_CANDIDATE_AGGREGATES.json")
     holdout_shadow = next(
-        (
-            row
-            for row in p4_aggregates
-            if row.get("candidate_id") == shadow_candidate_id
-        ),
+        (row for row in p4_aggregates if row.get("candidate_id") == shadow_candidate_id),
         None,
     )
     if holdout_shadow is None or holdout_shadow.get("status") != "PASS":
@@ -204,16 +186,13 @@ def main() -> int:
         "data_quality_status": "PASS",
         "seed_policy_status": "PASS",
         "preactual_lock_status": "PASS",
-        "holdout_reference_metrics": extract_candidate_metrics(
-            holdout_shadow
-        ),
+        "holdout_reference_metrics": extract_candidate_metrics(holdout_shadow),
         "windows": windows,
         "policy": policy,
         "human_approval_granted": False,
     }
     Path(args.output).write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
-        + "\n",
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
     print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))

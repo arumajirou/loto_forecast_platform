@@ -9,14 +9,14 @@ from datetime import datetime
 from pathlib import Path
 
 PROJECT_MARKER = 'name = "loto-forecast-platform"'
-HARNESS_BLOCK = '''harness = [
+HARNESS_BLOCK = """harness = [
   "fastapi>=0.115,<1", "httpx>=0.27,<1", "uvicorn>=0.34,<1",
   "mcp>=1.28,<2", "psycopg[binary]>=3.2,<4", "sqlalchemy>=2,<3",
   "alembic>=1,<2", "pgvector>=0.3,<1", "psutil>=6,<8",
   "structlog>=25,<26", "opentelemetry-sdk>=1.30,<2",
   "opentelemetry-exporter-otlp>=1.30,<2",
 ]
-'''
+"""
 SCRIPT_LINE = 'loto-harness = "loto.harness.cli:main"\n'
 
 
@@ -87,8 +87,10 @@ def main() -> int:
         destination = target / relative
         source_sha = sha256_file(source)
         destination_sha = sha256_file(destination) if destination.is_file() else None
-        action = "unchanged" if source_sha == destination_sha else (
-            "replace" if destination.exists() else "create"
+        action = (
+            "unchanged"
+            if source_sha == destination_sha
+            else ("replace" if destination.exists() else "create")
         )
         manifest.append(
             {

@@ -102,12 +102,8 @@ def _spec(class_name: str = "AutoDLinear"):
 def test_facade_persists_planning_and_runtime_profiles_and_restores_hooks(
     tmp_path: Path,
 ) -> None:
-    planning = profile_fixed_config(
-        {"input_size": 8}, backend="optuna", model_name="AutoDLinear"
-    )
-    runtime = profile_fixed_config(
-        {"input_size": 16}, backend="optuna", model_name="AutoDLinear"
-    )
+    planning = profile_fixed_config({"input_size": 8}, backend="optuna", model_name="AutoDLinear")
+    runtime = profile_fixed_config({"input_size": 16}, backend="optuna", model_name="AutoDLinear")
     plan = SimpleNamespace(
         search_space_profile=planning,
         backend="optuna",
@@ -158,9 +154,7 @@ def test_facade_persists_planning_and_runtime_profiles_and_restores_hooks(
 def test_constructor_failure_keeps_planning_evidence_and_restores_hooks(
     tmp_path: Path,
 ) -> None:
-    planning = profile_fixed_config(
-        {"input_size": 8}, backend="optuna", model_name="AutoDLinear"
-    )
+    planning = profile_fixed_config({"input_size": 8}, backend="optuna", model_name="AutoDLinear")
     plan = SimpleNamespace(
         search_space_profile=planning,
         backend="optuna",
@@ -285,9 +279,7 @@ def test_autohint_persists_unavailable_then_ray_profile_before_constructor(
 
 
 def test_campaign_plan_and_summary_are_additive(tmp_path: Path) -> None:
-    profile = profile_fixed_config(
-        {"input_size": 4}, backend="optuna", model_name="AutoDLinear"
-    )
+    profile = profile_fixed_config({"input_size": 4}, backend="optuna", model_name="AutoDLinear")
     evidence = facade.persist_database_search_space_evidence(
         tmp_path / "models" / "nf-auto-dlinear",
         profile,

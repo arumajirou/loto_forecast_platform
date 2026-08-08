@@ -93,13 +93,9 @@ def _regular_file_within(root: Path, relative: PurePosixPath) -> Path:
     for part in relative.parts:
         current = current / part
         if current.is_symlink():
-            raise RuntimeError(
-                f"artifact path traverses a symlink: {relative.as_posix()}"
-            )
+            raise RuntimeError(f"artifact path traverses a symlink: {relative.as_posix()}")
     if not current.is_file():
-        raise RuntimeError(
-            f"manifest artifact is not a regular file: {relative.as_posix()}"
-        )
+        raise RuntimeError(f"manifest artifact is not a regular file: {relative.as_posix()}")
     resolved = current.resolve(strict=True)
     try:
         resolved.relative_to(root)
@@ -132,9 +128,7 @@ def _parse_manifest_payload(payload: dict[str, Any]) -> list[dict[str, Any]]:
         if not isinstance(size_value, int) or isinstance(size_value, bool) or size_value < 0:
             raise RuntimeError(f"invalid artifact size for {canonical}")
         digest = _validate_digest(digest_value, label=canonical)
-        normalized.append(
-            {"path": canonical, "size_bytes": size_value, "sha256": digest}
-        )
+        normalized.append({"path": canonical, "size_bytes": size_value, "sha256": digest})
     return sorted(normalized, key=lambda record: record["path"])
 
 
@@ -161,24 +155,19 @@ def _parse_sha256sums(path: Path) -> dict[str, str]:
         raise RuntimeError(f"unable to read SHA256SUMS: {path}") from exc
 
 
-def _validate_terminal_report(
-    report: dict[str, Any], *, expected_run_id: str
-) -> str:
+def _validate_terminal_report(report: dict[str, Any], *, expected_run_id: str) -> str:
     run_id = report.get("run_id")
     status = report.get("status")
     if run_id != expected_run_id:
         raise RuntimeError(
-            "runtime report run_id mismatch: "
-            f"report={run_id!r}, expected={expected_run_id!r}"
+            f"runtime report run_id mismatch: report={run_id!r}, expected={expected_run_id!r}"
         )
     if status not in {"RUNTIME_CERTIFIED", "FAILED"}:
         raise RuntimeError(f"runtime report has non-terminal status: {status!r}")
     return str(status)
 
 
-def _validate_certified_artifacts(
-    status: str, manifest_paths: set[str]
-) -> None:
+def _validate_certified_artifacts(status: str, manifest_paths: set[str]) -> None:
     if status != "RUNTIME_CERTIFIED":
         return
     required_artifacts = (
@@ -199,9 +188,7 @@ def _validate_certified_artifacts(
 def verify_run_directory(run_dir: Path) -> dict[str, Any]:
     raw_run_dir = run_dir.absolute()
     if raw_run_dir.is_symlink():
-        raise RuntimeError(
-            f"runtime certification directory must not be a symlink: {raw_run_dir}"
-        )
+        raise RuntimeError(f"runtime certification directory must not be a symlink: {raw_run_dir}")
     run_dir = _resolve_directory(raw_run_dir, label="runtime certification directory")
     if RUN_ID_PATTERN.fullmatch(run_dir.name) is None:
         raise RuntimeError(f"invalid runtime certification directory name: {run_dir.name}")
@@ -213,12 +200,8 @@ def verify_run_directory(run_dir: Path) -> dict[str, Any]:
                 f"{candidate.relative_to(run_dir).as_posix()}"
             )
 
-    report_path = _regular_file_within(
-        run_dir, PurePosixPath("RUNTIME_CERTIFICATION.json")
-    )
-    manifest_path = _regular_file_within(
-        run_dir, PurePosixPath("ARTIFACT_MANIFEST.json")
-    )
+    report_path = _regular_file_within(run_dir, PurePosixPath("RUNTIME_CERTIFICATION.json"))
+    manifest_path = _regular_file_within(run_dir, PurePosixPath("ARTIFACT_MANIFEST.json"))
     sums_path = _regular_file_within(run_dir, PurePosixPath("SHA256SUMS"))
 
     report = _load_json(report_path)
@@ -238,10 +221,7 @@ def verify_run_directory(run_dir: Path) -> dict[str, Any]:
             )
 
     sums_records = _parse_sha256sums(sums_path)
-    expected_sums = {
-        str(record["path"]): str(record["sha256"])
-        for record in manifest_records
-    }
+    expected_sums = {str(record["path"]): str(record["sha256"]) for record in manifest_records}
     if sums_records != expected_sums:
         raise RuntimeError("SHA256SUMS does not exactly match ARTIFACT_MANIFEST.json")
 
@@ -253,9 +233,7 @@ def verify_run_directory(run_dir: Path) -> dict[str, Any]:
         "ARTIFACT_MANIFEST.json",
         "SHA256SUMS",
     }
-    actual_source_paths = {
-        path.relative_to(run_dir).as_posix() for path in source_files
-    }
+    actual_source_paths = {path.relative_to(run_dir).as_posix() for path in source_files}
     if actual_source_paths != expected_source_paths:
         extra = sorted(actual_source_paths - expected_source_paths)
         missing = sorted(expected_source_paths - actual_source_paths)
@@ -317,9 +295,9 @@ def bundle_run(run_dir: Path, output_dir: Path) -> BundleResult:
         "source_manifest_sha256": verified["manifest_sha256"],
         "source_sha256sums_sha256": verified["sums_sha256"],
     }
-    bundle_report_bytes = (
-        json.dumps(bundle_report, indent=2, sort_keys=True) + "\n"
-    ).encode("utf-8")
+    bundle_report_bytes = (json.dumps(bundle_report, indent=2, sort_keys=True) + "\n").encode(
+        "utf-8"
+    )
 
     entries = [
         (
@@ -378,9 +356,7 @@ def _archive_file_map(
 ) -> tuple[str, dict[str, zipfile.ZipInfo], int]:
     infos = archive.infolist()
     if not infos or len(infos) > max_files:
-        raise RuntimeError(
-            f"invalid bundle entry count: observed={len(infos)}, max={max_files}"
-        )
+        raise RuntimeError(f"invalid bundle entry count: observed={len(infos)}, max={max_files}")
     if archive.testzip() is not None:
         raise RuntimeError("bundle ZIP CRC verification failed")
 
@@ -438,16 +414,13 @@ def verify_bundle_archive(
     if sha256_path is not None:
         raw_sidecar = sha256_path.absolute()
         if raw_sidecar.is_symlink() or not raw_sidecar.is_file():
-            raise FileNotFoundError(
-                f"bundle SHA-256 sidecar is not a regular file: {raw_sidecar}"
-            )
+            raise FileNotFoundError(f"bundle SHA-256 sidecar is not a regular file: {raw_sidecar}")
         expected_digest = _read_sidecar(
             raw_sidecar.resolve(strict=True), expected_filename=zip_path.name
         )
         if digest != expected_digest:
             raise RuntimeError(
-                "bundle ZIP SHA-256 mismatch: "
-                f"expected={expected_digest}, actual={digest}"
+                f"bundle ZIP SHA-256 mismatch: expected={expected_digest}, actual={digest}"
             )
 
     try:
@@ -470,21 +443,15 @@ def verify_bundle_archive(
         }
         missing_required = sorted(required_names - set(files))
         if missing_required:
-            raise RuntimeError(
-                f"bundle is missing required entries: {missing_required}"
-            )
+            raise RuntimeError(f"bundle is missing required entries: {missing_required}")
 
         bundle_report_bytes = archive.read(files[f"{prefix}BUNDLE_VERIFICATION.json"])
         runtime_report_bytes = archive.read(files[f"{prefix}RUNTIME_CERTIFICATION.json"])
         manifest_bytes = archive.read(files[f"{prefix}ARTIFACT_MANIFEST.json"])
         sums_bytes = archive.read(files[f"{prefix}SHA256SUMS"])
 
-        bundle_report = _load_json_bytes(
-            bundle_report_bytes, label="BUNDLE_VERIFICATION.json"
-        )
-        runtime_report = _load_json_bytes(
-            runtime_report_bytes, label="RUNTIME_CERTIFICATION.json"
-        )
+        bundle_report = _load_json_bytes(bundle_report_bytes, label="BUNDLE_VERIFICATION.json")
+        runtime_report = _load_json_bytes(runtime_report_bytes, label="RUNTIME_CERTIFICATION.json")
         manifest_records = _parse_manifest_payload(
             _load_json_bytes(manifest_bytes, label="ARTIFACT_MANIFEST.json")
         )
@@ -495,14 +462,10 @@ def verify_bundle_archive(
         sums_records = _parse_sha256sums_text(sums_text)
 
         if bundle_report.get("bundle_format") != BUNDLE_FORMAT:
-            raise RuntimeError(
-                f"unsupported bundle format: {bundle_report.get('bundle_format')!r}"
-            )
+            raise RuntimeError(f"unsupported bundle format: {bundle_report.get('bundle_format')!r}")
         if bundle_report.get("run_id") != run_id:
             raise RuntimeError("bundle report run_id mismatch")
-        source_status = _validate_terminal_report(
-            runtime_report, expected_run_id=run_id
-        )
+        source_status = _validate_terminal_report(runtime_report, expected_run_id=run_id)
         if bundle_report.get("source_status") != source_status:
             raise RuntimeError("bundle source status disagrees with runtime report")
         if bundle_report.get("source_manifest_sha256") != sha256_bytes(manifest_bytes):
@@ -510,18 +473,11 @@ def verify_bundle_archive(
         if bundle_report.get("source_sha256sums_sha256") != sha256_bytes(sums_bytes):
             raise RuntimeError("bundle source SHA256SUMS digest mismatch")
 
-        expected_sums = {
-            str(record["path"]): str(record["sha256"])
-            for record in manifest_records
-        }
+        expected_sums = {str(record["path"]): str(record["sha256"]) for record in manifest_records}
         if sums_records != expected_sums:
-            raise RuntimeError(
-                "bundled SHA256SUMS does not exactly match bundled manifest"
-            )
+            raise RuntimeError("bundled SHA256SUMS does not exactly match bundled manifest")
 
-        expected_names = {
-            f"{prefix}{record['path']}" for record in manifest_records
-        } | {
+        expected_names = {f"{prefix}{record['path']}" for record in manifest_records} | {
             f"{prefix}ARTIFACT_MANIFEST.json",
             f"{prefix}SHA256SUMS",
             f"{prefix}BUNDLE_VERIFICATION.json",
@@ -530,8 +486,7 @@ def verify_bundle_archive(
             extra = sorted(set(files) - expected_names)
             missing = sorted(expected_names - set(files))
             raise RuntimeError(
-                "bundle file set differs from manifest contract: "
-                f"extra={extra}, missing={missing}"
+                f"bundle file set differs from manifest contract: extra={extra}, missing={missing}"
             )
 
         source_file_count = bundle_report.get("source_file_count")
@@ -553,9 +508,7 @@ def verify_bundle_archive(
                 raise RuntimeError(f"bundled artifact size mismatch: {record['path']}")
             actual_digest = sha256_bytes(payload)
             if actual_digest != record["sha256"]:
-                raise RuntimeError(
-                    f"bundled artifact SHA-256 mismatch: {record['path']}"
-                )
+                raise RuntimeError(f"bundled artifact SHA-256 mismatch: {record['path']}")
 
         _validate_certified_artifacts(source_status, set(expected_sums))
 

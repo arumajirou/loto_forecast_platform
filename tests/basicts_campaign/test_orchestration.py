@@ -97,9 +97,7 @@ def test_portable_bundle_hashes_nested_files(tmp_path: Path) -> None:
         {"schema_version": "1.0", "status": "FAILED", "run_id": "run-1"},
     )
 
-    manifest = json.loads(
-        (tmp_path / "P0_RUN_MANIFEST.json").read_text(encoding="utf-8")
-    )
+    manifest = json.loads((tmp_path / "P0_RUN_MANIFEST.json").read_text(encoding="utf-8"))
     paths = {entry["path"] for entry in manifest["files"]}
     assert "nested/evidence.txt" in paths
     checksum_lines = (tmp_path / "SHA256SUMS").read_text(encoding="utf-8").splitlines()

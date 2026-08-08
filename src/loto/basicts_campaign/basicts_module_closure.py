@@ -112,15 +112,11 @@ def _module_record_evidence(
 ) -> dict[str, Any]:
     loaded_file = getattr(module, "__file__", None)
     if not isinstance(loaded_file, str) or not loaded_file:
-        raise InstalledProvenanceError(
-            f"loaded BasicTS module file is missing: {module_name}"
-        )
+        raise InstalledProvenanceError(f"loaded BasicTS module file is missing: {module_name}")
     loaded_path = Path(loaded_file)
     _reject_symlink_chain(loaded_path, raw_root, label=module_name)
     if not loaded_path.is_file():
-        raise InstalledProvenanceError(
-            f"loaded BasicTS module file is unsafe: {module_name}"
-        )
+        raise InstalledProvenanceError(f"loaded BasicTS module file is unsafe: {module_name}")
     resolved = loaded_path.resolve(strict=True)
     if not resolved.is_relative_to(resolved_root):
         raise InstalledProvenanceError(
@@ -150,9 +146,7 @@ def _module_record_evidence(
     spec_path = Path(spec.origin)
     _reject_symlink_chain(spec_path, raw_root, label=module_name)
     if not spec_path.is_file() or spec_path.resolve(strict=True) != resolved:
-        raise InstalledProvenanceError(
-            f"loaded BasicTS module spec is shadowed: {module_name}"
-        )
+        raise InstalledProvenanceError(f"loaded BasicTS module spec is shadowed: {module_name}")
     return {
         "module_name": module_name,
         "distribution_entry": relative_path,
@@ -173,11 +167,7 @@ def _loaded_module_evidence(
     raw_root: Path,
     resolved_root: Path,
 ) -> list[dict[str, Any]]:
-    names = sorted(
-        name
-        for name in sys.modules
-        if name == "basicts" or name.startswith("basicts.")
-    )
+    names = sorted(name for name in sys.modules if name == "basicts" or name.startswith("basicts."))
     if not names:
         raise InstalledProvenanceError("DLinear import loaded no BasicTS modules")
     return [
@@ -217,9 +207,7 @@ def _dependency_bindings() -> dict[str, Any]:
             "DLinearConfig module base dependency is not bound to model_config"
         )
     if getattr(configs_package, "BasicTSModelConfig", None) is not basic_config:
-        raise InstalledProvenanceError(
-            "basicts.configs export is not bound to model_config"
-        )
+        raise InstalledProvenanceError("basicts.configs export is not bound to model_config")
     dlinear_config = getattr(config, "DLinearConfig", None)
     if not isinstance(dlinear_config, type) or len(dlinear_config.__mro__) < 2:
         raise InstalledProvenanceError("DLinearConfig class hierarchy is invalid")
@@ -230,13 +218,10 @@ def _dependency_bindings() -> dict[str, Any]:
     return {
         "dlinear_dependency_binding_status": "PASS",
         "dlinear_dependency_bindings": {
-            "decomposition_symbol": (
-                f"{moving_average.__module__}.{moving_average.__name__}"
-            ),
+            "decomposition_symbol": (f"{moving_average.__module__}.{moving_average.__name__}"),
             "config_base_symbol": f"{basic_config.__module__}.{basic_config.__name__}",
             "dlinear_config_direct_base": (
-                f"{dlinear_config.__mro__[1].__module__}."
-                f"{dlinear_config.__mro__[1].__name__}"
+                f"{dlinear_config.__mro__[1].__module__}.{dlinear_config.__mro__[1].__name__}"
             ),
             "arch_decomposition_object_identity": True,
             "config_model_config_object_identity": True,
@@ -250,9 +235,7 @@ def verify_dlinear_import_closure() -> dict[str, Any]:
     """Bind the complete loaded BasicTS closure for DLinear to distribution RECORD."""
 
     preloaded = sorted(
-        name
-        for name in sys.modules
-        if name == "basicts" or name.startswith("basicts.")
+        name for name in sys.modules if name == "basicts" or name.startswith("basicts.")
     )
     if preloaded:
         raise InstalledProvenanceError(

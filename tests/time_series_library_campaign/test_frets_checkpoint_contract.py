@@ -6,7 +6,8 @@ import sys
 from pathlib import Path
 
 
-FAKE_FRETS = """
+FAKE_FRETS = (
+    """
 import torch
 from torch import nn
 
@@ -41,15 +42,13 @@ class Model(nn.Module):
         batch, _, channels = x_enc.shape
         embedded = x_enc.permute(0, 2, 1).unsqueeze(-1) * self.embeddings
         return self.fc(embedded.reshape(batch, channels, -1)).permute(0, 2, 1)
-""".strip() + "\n"
+""".strip()
+    + "\n"
+)
 
 
 def _script() -> Path:
-    return (
-        Path(__file__).resolve().parents[2]
-        / "scripts"
-        / "run_time_series_library_provider.py"
-    )
+    return Path(__file__).resolve().parents[2] / "scripts" / "run_time_series_library_provider.py"
 
 
 def _write_fake_source(root: Path) -> None:

@@ -487,9 +487,9 @@ class WebhookStore:
     def outbox_count(self) -> int:
         with self._connect() as connection:
             return int(
-                connection.execute(
-                    "SELECT COUNT(*) AS n FROM github_webhook_outbox"
-                ).fetchone()["n"]
+                connection.execute("SELECT COUNT(*) AS n FROM github_webhook_outbox").fetchone()[
+                    "n"
+                ]
             )
 
     def dead_letter_count(self) -> int:

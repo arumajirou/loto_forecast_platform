@@ -79,7 +79,5 @@ def test_prediction_verification_is_skipped_when_base_portable_fails(
     result = portable.verify_portable_bundle_with_prediction_lock(tmp_path / "broken.zip")
 
     assert result["status"] == "FAIL"
-    assert result["prediction_lock_verification"]["status"] == (
-        "NOT_RUN_BASE_PORTABLE_FAILED"
-    )
+    assert result["prediction_lock_verification"]["status"] == ("NOT_RUN_BASE_PORTABLE_FAILED")
     assert called is False

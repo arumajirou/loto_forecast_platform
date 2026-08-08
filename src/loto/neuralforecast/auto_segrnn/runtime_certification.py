@@ -185,9 +185,7 @@ def _gpu_pid_absent(provider_pid: int) -> bool:
     if completed.returncode != 0:
         return False
     active_pids = {
-        int(line.strip())
-        for line in completed.stdout.splitlines()
-        if line.strip().isdigit()
+        int(line.strip()) for line in completed.stdout.splitlines() if line.strip().isdigit()
     }
     return provider_pid not in active_pids
 
@@ -286,13 +284,16 @@ def _prepare_output_root(output_root: Path, working_directory: Path) -> Path:
 
 
 def _atomic_write_request(path: Path, request: AutoSegRNNRuntimeRequest) -> None:
-    content = json.dumps(
-        canonical_request_payload(request),
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-        allow_nan=False,
-    ) + "\n"
+    content = (
+        json.dumps(
+            canonical_request_payload(request),
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n"
+    )
     temporary = path.with_name(f".{path.name}.tmp")
     try:
         with temporary.open("w", encoding="utf-8") as handle:
@@ -346,9 +347,7 @@ def certify_auto_segrnn(
     real_executor = executor or resolved_sdk.runner.SubprocessExecutor()
     try:
         report = resolved_sdk.root.execute_two_process_certification(
-            certification_id=(
-                f"auto-segrnn-{request.execution_mode}-{request.run_id}"
-            ),
+            certification_id=(f"auto-segrnn-{request.execution_mode}-{request.run_id}"),
             profile=profile,
             evidence_origin=resolved_sdk.statuses.EvidenceOrigin.REAL,
             request=identities["request"],

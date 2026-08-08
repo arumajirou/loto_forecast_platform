@@ -12,7 +12,7 @@ from loto.time_series_library_campaign import ProviderRequest
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts" / "run_time_series_library_provider.py"
 
-FAKE_TIDE = '''
+FAKE_TIDE = """
 import torch
 from torch import nn
 
@@ -59,7 +59,7 @@ class Model(nn.Module):
     def forward(self, x_enc, x_mark_enc, x_dec, batch_y_mark, mask=None):
         values = [self.residual_proj(x_enc[:, :, index]) for index in range(x_enc.shape[-1])]
         return torch.stack(values, dim=-1)
-'''.strip()
+""".strip()
 
 
 def write_fake_source(root: Path) -> None:

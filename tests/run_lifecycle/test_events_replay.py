@@ -29,9 +29,7 @@ def _three_events(service, repository, clock):
             phase=RunPhase.PLAN,
             expected_revision=1,
         ),
-        lambda _: EffectResult(
-            sealed_outputs=(HashBinding(name="plan-output", sha256="1" * 64),)
-        ),
+        lambda _: EffectResult(sealed_outputs=(HashBinding(name="plan-output", sha256="1" * 64),)),
     )
     clock.advance(timedelta(seconds=1))
     service.execute(
@@ -51,9 +49,7 @@ def test_event_chain_and_replay_preserve_sealed_outputs(service, repository, clo
     aggregate = replay_events(events)
     assert aggregate.revision == 3
     assert aggregate.phase == RunPhase.DATA
-    assert aggregate.immutable_output_hashes == (
-        HashBinding(name="plan-output", sha256="1" * 64),
-    )
+    assert aggregate.immutable_output_hashes == (HashBinding(name="plan-output", sha256="1" * 64),)
     report = validate_lifecycle(events)
     assert report.valid
     assert report.validated_event_count == 3
@@ -87,11 +83,7 @@ def test_phase_tamper_detected_even_after_rehash(service, repository, clock) -> 
     changed = events[1].model_copy(update={"phase": RunPhase.TRAIN})
     changed = changed.model_copy(update={"event_sha256": calculate_event_sha256(changed)})
     events[1] = changed
-    events[2] = events[2].model_copy(
-        update={"previous_event_sha256": changed.event_sha256}
-    )
-    events[2] = events[2].model_copy(
-        update={"event_sha256": calculate_event_sha256(events[2])}
-    )
+    events[2] = events[2].model_copy(update={"previous_event_sha256": changed.event_sha256})
+    events[2] = events[2].model_copy(update={"event_sha256": calculate_event_sha256(events[2])})
     with pytest.raises(EventChainError, match="phase/status"):
         verify_event_chain(events)

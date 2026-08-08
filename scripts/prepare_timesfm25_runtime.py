@@ -58,9 +58,7 @@ def main() -> None:
     if args.output.exists() and not args.force:
         parser.error(f"output already exists: {args.output}; use --force to replace it")
 
-    request = TimesFM25Request.model_validate_json(
-        args.request.read_text(encoding="utf-8")
-    )
+    request = TimesFM25Request.model_validate_json(args.request.read_text(encoding="utf-8"))
     lock_generation = None
     if args.generate_lock:
         lock_generation = _generate_lock(args.environment, args.timeout)

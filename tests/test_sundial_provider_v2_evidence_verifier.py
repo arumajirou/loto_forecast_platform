@@ -151,9 +151,7 @@ def _build_run(tmp_path: Path) -> Path:
         encoding="utf-8",
     )
     files = sorted(
-        path
-        for path in run_dir.rglob("*")
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in run_dir.rglob("*") if path.is_file() and path.name != "SHA256SUMS"
     )
     (run_dir / "SHA256SUMS").write_text(
         "\n".join(f"{VERIFIER.sha256(path)}  {path.relative_to(run_dir)}" for path in files) + "\n",
@@ -187,9 +185,7 @@ def test_cpu_fallback_fails_verification(tmp_path: Path) -> None:
     response["gpu_evidence"]["cpu_fallback"] = True
     _write_json(response_path, response)
     files = sorted(
-        path
-        for path in run_dir.rglob("*")
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in run_dir.rglob("*") if path.is_file() and path.name != "SHA256SUMS"
     )
     (run_dir / "SHA256SUMS").write_text(
         "\n".join(f"{VERIFIER.sha256(path)}  {path.relative_to(run_dir)}" for path in files) + "\n",

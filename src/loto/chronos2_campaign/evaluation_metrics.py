@@ -112,9 +112,7 @@ def _probabilistic_metrics(
             upper_values = quantiles[upper]
             inside = (actual >= lower_values) & (actual <= upper_values)
             result[f"coverage_{label}"] = float(inside.mean())
-            result[f"interval_width_{label}"] = float(
-                (upper_values - lower_values).mean()
-            )
+            result[f"interval_width_{label}"] = float((upper_values - lower_values).mean())
         else:
             result[f"coverage_{label}"] = None
             result[f"interval_width_{label}"] = None

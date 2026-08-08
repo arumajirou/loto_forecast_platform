@@ -62,9 +62,7 @@ def test_smoke_script_main_creates_secret_free_evidence(
     assert report["outbox_count"] == 1
     assert report["secret_persisted"] is False
     combined = "\n".join(
-        path.read_text(encoding="utf-8")
-        for path in output.iterdir()
-        if path.is_file()
+        path.read_text(encoding="utf-8") for path in output.iterdir() if path.is_file()
     )
     assert "sha256=" not in combined
     assert module.FIXTURE_SECRET.hex() not in combined

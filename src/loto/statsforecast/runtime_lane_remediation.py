@@ -49,12 +49,15 @@ def _atomic_write(path: Path, content: bytes) -> None:
 
 
 def _write_json(path: Path, payload: Any) -> None:
-    content = json.dumps(
-        payload,
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-    ).encode("utf-8") + b"\n"
+    content = (
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        ).encode("utf-8")
+        + b"\n"
+    )
     _atomic_write(path, content)
 
 
@@ -386,9 +389,7 @@ def execute_bounded_remediation(
         "decision": decision,
         "formal_pass": formal_pass,
         "source_classification": source_classification,
-        "source_classification_sha256": _sha256_file(
-            triage_dir / "FAILURE_CLASSIFICATION.json"
-        ),
+        "source_classification_sha256": _sha256_file(triage_dir / "FAILURE_CLASSIFICATION.json"),
         "attempts": attempts,
         "failures": failures,
         "commands_from_triage_executed": False,

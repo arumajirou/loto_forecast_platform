@@ -147,9 +147,7 @@ def _verify_scoring_sha256s(root: Path) -> list[str]:
         if path.is_file() and not path.is_symlink() and path.name != "SHA256SUMS"
     }
     failures.extend(f"SHA256SUMS unlisted: {item}" for item in sorted(actual - listed))
-    failures.extend(
-        f"SHA256SUMS listed-but-missing: {item}" for item in sorted(listed - actual)
-    )
+    failures.extend(f"SHA256SUMS listed-but-missing: {item}" for item in sorted(listed - actual))
     return failures
 
 
@@ -221,8 +219,7 @@ def _normalize_input_table(
         label=f"{label} draw_index",
     )
     number_sources = [
-        _resolve_column(columns, [name], label=f"{label} {name}")
-        for name in number_columns
+        _resolve_column(columns, [name], label=f"{label} {name}") for name in number_columns
     ]
 
     normalized = pd.DataFrame(
@@ -253,8 +250,7 @@ def _normalize_input_table(
     number_matrix = normalized[number_columns].to_numpy(dtype=int)
     if np.any(number_matrix < LOWER_BOUND) or np.any(number_matrix > UPPER_BOUND):
         raise ValueError(
-            f"{label} values must be within Mini Loto bounds "
-            f"[{LOWER_BOUND}, {UPPER_BOUND}]"
+            f"{label} values must be within Mini Loto bounds [{LOWER_BOUND}, {UPPER_BOUND}]"
         )
     if np.any(np.diff(number_matrix, axis=1) <= 0):
         raise ValueError(f"{label} number positions must be strictly increasing")

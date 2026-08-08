@@ -159,33 +159,76 @@ def test_cli_intent_prepare_and_finalize(tmp_path: Path, capsys) -> None:
     write_json(subject, intent.subject.model_dump(mode="json"))
     write_json(policy, intent.policy.model_dump(mode="json"))
     intent_path = tmp_path / "intent.json"
-    assert main([
-        "intent", "--p17", str(p17), "--subject", str(subject),
-        "--policy", str(policy), "--allowed-signers", str(signers),
-        "--run-id", intent.run_id, "--git-commit", intent.git_commit,
-        "--requested-at-utc", intent.approval_requested_at_utc,
-        "--expires-at-utc", intent.authorization_expires_at_utc,
-        "--authorization-nonce", intent.authorization_nonce,
-        "--output", str(intent_path),
-    ]) == 0
+    assert (
+        main(
+            [
+                "intent",
+                "--p17",
+                str(p17),
+                "--subject",
+                str(subject),
+                "--policy",
+                str(policy),
+                "--allowed-signers",
+                str(signers),
+                "--run-id",
+                intent.run_id,
+                "--git-commit",
+                intent.git_commit,
+                "--requested-at-utc",
+                intent.approval_requested_at_utc,
+                "--expires-at-utc",
+                intent.authorization_expires_at_utc,
+                "--authorization-nonce",
+                intent.authorization_nonce,
+                "--output",
+                str(intent_path),
+            ]
+        )
+        == 0
+    )
     owner_dir = tmp_path / "owner"
-    assert main([
-        "prepare-approval", "--intent", str(intent_path),
-        "--role", "model_owner", "--approver-id", "owner@example",
-        "--signer-identity", "owner@example",
-        "--approved-at-utc", "2026-08-05T10:10:00Z",
-        "--rationale", "Reviewed all prospective and evidence integrity requirements.",
-        "--output-dir", str(owner_dir),
-    ]) == 0
+    assert (
+        main(
+            [
+                "prepare-approval",
+                "--intent",
+                str(intent_path),
+                "--role",
+                "model_owner",
+                "--approver-id",
+                "owner@example",
+                "--signer-identity",
+                "owner@example",
+                "--approved-at-utc",
+                "2026-08-05T10:10:00Z",
+                "--rationale",
+                "Reviewed all prospective and evidence integrity requirements.",
+                "--output-dir",
+                str(owner_dir),
+            ]
+        )
+        == 0
+    )
     signature = owner_dir / "approval-signing-payload.bin.sig"
     signature.write_text(
         "-----BEGIN SSH SIGNATURE-----\nfake-signature-material\n-----END SSH SIGNATURE-----"
     )
     approval = owner_dir / "approval.json"
-    assert main([
-        "finalize-approval", "--draft", str(owner_dir / "approval-draft.json"),
-        "--signature", str(signature), "--output", str(approval),
-    ]) == 0
+    assert (
+        main(
+            [
+                "finalize-approval",
+                "--draft",
+                str(owner_dir / "approval-draft.json"),
+                "--signature",
+                str(signature),
+                "--output",
+                str(approval),
+            ]
+        )
+        == 0
+    )
     assert json.loads(capsys.readouterr().out.splitlines()[-1])["status"] == "PASS"
 
 
@@ -212,13 +255,28 @@ def test_cli_authorize_and_verify_with_injected_verifier(
         lambda _path: always_verify,
     )
     output = tmp_path / "p18"
-    assert main([
-        "authorize", "--p17", str(p17), "--intent", str(intent_path),
-        "--approval", str(approval_paths[0]), "--approval", str(approval_paths[1]),
-        "--allowed-signers", str(signers),
-        "--issued-at-utc", "2026-08-05T10:30:00Z",
-        "--output", str(output),
-    ]) == 0
+    assert (
+        main(
+            [
+                "authorize",
+                "--p17",
+                str(p17),
+                "--intent",
+                str(intent_path),
+                "--approval",
+                str(approval_paths[0]),
+                "--approval",
+                str(approval_paths[1]),
+                "--allowed-signers",
+                str(signers),
+                "--issued-at-utc",
+                "2026-08-05T10:30:00Z",
+                "--output",
+                str(output),
+            ]
+        )
+        == 0
+    )
     assert main(["verify", "--run", str(output)]) == 0
 
 

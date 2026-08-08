@@ -128,9 +128,7 @@ def test_build_is_deterministic_and_contains_no_unapproved_files(tmp_path: Path)
     assert (first / ".nojekyll").is_file()
     assert (first / "SHA256SUMS").read_text() == (second / "SHA256SUMS").read_text()
     output_files = {
-        path.relative_to(first).as_posix()
-        for path in first.rglob("*")
-        if path.is_file()
+        path.relative_to(first).as_posix() for path in first.rglob("*") if path.is_file()
     }
     assert output_files == {
         *policy.required_files,

@@ -43,9 +43,7 @@ def main() -> int:
         json.dumps(draft, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    (args.output_dir / "approval-signing-payload.bin").write_bytes(
-        canonical_json_bytes(intent)
-    )
+    (args.output_dir / "approval-signing-payload.bin").write_bytes(canonical_json_bytes(intent))
     print(args.output_dir)
     return 0
 

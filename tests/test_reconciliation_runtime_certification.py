@@ -217,9 +217,7 @@ def test_incoherent_runtime_result_fails_closed(
 
     assert result["status"] == "FAILED_RUNTIME"
     assert result["summary"]["failed_cases"] == len(rc.DEFAULT_GAMES)
-    method_payload = json.loads(
-        (Path(result["run_directory"]) / "METHOD_RESULTS.json").read_text()
-    )
+    method_payload = json.loads((Path(result["run_directory"]) / "METHOD_RESULTS.json").read_text())
     failures = [row for row in method_payload["results"] if row["case_status"] == "FAIL"]
     assert {row["method"] for row in failures} == {"MinTrace"}
     assert all(row["checks"]["coherence"] is False for row in failures)
@@ -248,16 +246,13 @@ def test_unexpected_method_exception_is_persisted_and_remaining_cases_continue(
     assert result["status"] == "FAILED_RUNTIME"
     assert result["summary"]["executed_cases"] == 40
     assert result["summary"]["failed_cases"] == len(rc.DEFAULT_GAMES)
-    payload = json.loads(
-        (Path(result["run_directory"]) / "METHOD_RESULTS.json").read_text()
-    )
+    payload = json.loads((Path(result["run_directory"]) / "METHOD_RESULTS.json").read_text())
     crashes = [row for row in payload["results"] if row["method"] == "MinTrace"]
     assert len(crashes) == len(rc.DEFAULT_GAMES)
     assert all(row["result"]["status"] == "HARNESS_EXCEPTION" for row in crashes)
     assert all("RuntimeError" in row["result"]["traceback"] for row in crashes)
     assert any(
-        row["method"] == "ERM" and row["case_status"] == "PASS"
-        for row in payload["results"]
+        row["method"] == "ERM" and row["case_status"] == "PASS" for row in payload["results"]
     )
 
 

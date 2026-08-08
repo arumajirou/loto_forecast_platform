@@ -36,13 +36,9 @@ def utc(value: Any) -> datetime:
     if hasattr(value, "to_pydatetime"):
         value = value.to_pydatetime()
     if not isinstance(value, datetime):
-        raise CoverageLedgerPreflightError(
-            "draw_date must contain datetime values"
-        )
+        raise CoverageLedgerPreflightError("draw_date must contain datetime values")
     if value.tzinfo is None or value.utcoffset() is None:
-        raise CoverageLedgerPreflightError(
-            "draw_date values must be timezone-aware"
-        )
+        raise CoverageLedgerPreflightError("draw_date values must be timezone-aware")
     return value.astimezone(UTC)
 
 
@@ -50,9 +46,7 @@ def draw_ids(frame: Any, game: str) -> tuple[str, ...]:
     if "draw_id" in frame.columns:
         return tuple(str(value) for value in frame["draw_id"].tolist())
     if "draw_no" in frame.columns:
-        return tuple(
-            f"{game}-{int(value)}" for value in frame["draw_no"].tolist()
-        )
+        return tuple(f"{game}-{int(value)}" for value in frame["draw_no"].tolist())
     return tuple(f"{game}-row-{index + 1}" for index in range(len(frame)))
 
 
@@ -66,8 +60,7 @@ def source_pin(*, source: Path, expected: str, label: str) -> None:
     observed = git_blob_sha(source)
     if observed != expected:
         raise CoverageLedgerPreflightError(
-            f"{label} source pin mismatch: expected={expected} "
-            f"observed={observed}"
+            f"{label} source pin mismatch: expected={expected} observed={observed}"
         )
 
 
@@ -82,14 +75,10 @@ def make_evidence(
     count: int,
 ) -> CoverageDatasetEvidence:
     if "draw_date" not in frame.columns:
-        raise CoverageLedgerPreflightError(
-            f"{game}: instrumented lane requires a draw_date column"
-        )
+        raise CoverageLedgerPreflightError(f"{game}: instrumented lane requires a draw_date column")
     observed_times = tuple(utc(value) for value in frame["draw_date"].tolist())
     if any(left >= right for left, right in zip(observed_times, observed_times[1:])):
-        raise CoverageLedgerPreflightError(
-            f"{game}: draw_date must be strictly increasing"
-        )
+        raise CoverageLedgerPreflightError(f"{game}: draw_date must be strictly increasing")
     return CoverageDatasetEvidence(
         dataset_id=dataset_id,
         dataset_sha256=dataset_sha256,

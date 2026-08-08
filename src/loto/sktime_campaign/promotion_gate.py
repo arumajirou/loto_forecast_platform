@@ -35,12 +35,8 @@ class ProspectiveWindowEvidence(BaseModel):
     monitor_bundle_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     prediction_lock_seal_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     actuals_source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    sealed_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
-    revealed_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    sealed_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+    revealed_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     draw_no: list[int] = Field(min_length=1)
     shadow_candidate_id: str = Field(min_length=1)
     integrity_status: Literal["PASS"] = "PASS"
@@ -98,9 +94,7 @@ class PromotionGateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal["1.0"] = "1.0"
-    operation: Literal["prospective_promotion_gate"] = (
-        "prospective_promotion_gate"
-    )
+    operation: Literal["prospective_promotion_gate"] = "prospective_promotion_gate"
     output_dir: str = Field(min_length=1)
     run_id: str = Field(pattern=r"^[A-Za-z0-9._-]+$", min_length=1)
     git_commit: str = Field(pattern=r"^[0-9a-f]{7,40}$")
@@ -124,9 +118,7 @@ class PromotionGateRequest(BaseModel):
         if set(self.upstream_artifact_sha256) != required:
             raise ValueError("upstream artifact inventory must be exactly P0-P4")
         for value in self.upstream_artifact_sha256.values():
-            if len(value) != 64 or any(
-                char not in "0123456789abcdef" for char in value
-            ):
+            if len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
                 raise ValueError("upstream artifact SHA-256 is invalid")
         window_ids = [item.window_id for item in self.windows]
         if len(window_ids) != len(set(window_ids)):
@@ -172,11 +164,7 @@ def _aggregate_metric(
     weights = np.asarray([len(item.draw_no) for item in windows], dtype=float)
     summaries: list[MetricSummary] = []
     for item in windows:
-        metrics = (
-            item.shadow_metrics
-            if baseline_id is None
-            else item.baseline_metrics[baseline_id]
-        )
+        metrics = item.shadow_metrics if baseline_id is None else item.baseline_metrics[baseline_id]
         summaries.append(getattr(metrics, metric_name))
     means = np.asarray([item.mean for item in summaries], dtype=float)
     weighted_mean = float(np.average(means, weights=weights))
@@ -223,15 +211,9 @@ def aggregate_all_evidence(
         "shadow_candidate_id": request.shadow_candidate_id,
         "window_count": len(request.windows),
         "total_draw_count": sum(len(item.draw_no) for item in request.windows),
-        "stable_window_count": sum(
-            item.drift_status == "STABLE" for item in request.windows
-        ),
-        "warning_window_count": sum(
-            item.drift_status == "WARNING" for item in request.windows
-        ),
-        "critical_window_count": sum(
-            item.drift_status == "CRITICAL" for item in request.windows
-        ),
+        "stable_window_count": sum(item.drift_status == "STABLE" for item in request.windows),
+        "warning_window_count": sum(item.drift_status == "WARNING" for item in request.windows),
+        "critical_window_count": sum(item.drift_status == "CRITICAL" for item in request.windows),
         "shadow_metrics": aggregate_candidate_metrics(request.windows).model_dump(),
         "baseline_metrics": {
             baseline_id: aggregate_candidate_metrics(
@@ -241,9 +223,7 @@ def aggregate_all_evidence(
             for baseline_id in baseline_ids
         },
         "window_ids": [item.window_id for item in request.windows],
-        "draw_no": [
-            draw_no for item in request.windows for draw_no in item.draw_no
-        ],
+        "draw_no": [draw_no for item in request.windows for draw_no in item.draw_no],
     }
 
 
@@ -300,19 +280,13 @@ def evaluate_rules(
         ),
         _rule(
             "WARNING_WINDOW_LIMIT",
-            passed=(
-                aggregate["warning_window_count"]
-                <= policy.maximum_warning_windows
-            ),
+            passed=(aggregate["warning_window_count"] <= policy.maximum_warning_windows),
             observed=aggregate["warning_window_count"],
             threshold=policy.maximum_warning_windows,
         ),
         _rule(
             "CRITICAL_WINDOW_LIMIT",
-            passed=(
-                aggregate["critical_window_count"]
-                <= policy.maximum_critical_windows
-            ),
+            passed=(aggregate["critical_window_count"] <= policy.maximum_critical_windows),
             observed=aggregate["critical_window_count"],
             threshold=policy.maximum_critical_windows,
         ),
@@ -324,10 +298,7 @@ def evaluate_rules(
         ),
         _rule(
             "WORST_WINDOW_HIT_AT_1_TARGET",
-            passed=(
-                shadow.hit_at_1.worst
-                >= policy.minimum_worst_window_hit_at_1
-            ),
+            passed=(shadow.hit_at_1.worst >= policy.minimum_worst_window_hit_at_1),
             observed=shadow.hit_at_1.worst,
             threshold=policy.minimum_worst_window_hit_at_1,
         ),
@@ -370,9 +341,7 @@ def _decision_from_rules(rules: list[dict[str, Any]]) -> str:
     }
     first_failed = next((item for item in rules if not item["passed"]), None)
     return (
-        "ELIGIBLE_FOR_HUMAN_APPROVAL"
-        if first_failed is None
-        else mapping[first_failed["rule_id"]]
+        "ELIGIBLE_FOR_HUMAN_APPROVAL" if first_failed is None else mapping[first_failed["rule_id"]]
     )
 
 
@@ -389,9 +358,7 @@ def run_promotion_gate(request: PromotionGateRequest) -> dict[str, Any]:
         "aggregated_metrics": aggregate,
         "rule_evaluation": rules,
         "decision": decision,
-        "eligible_for_human_approval": (
-            decision == "ELIGIBLE_FOR_HUMAN_APPROVAL"
-        ),
+        "eligible_for_human_approval": (decision == "ELIGIBLE_FOR_HUMAN_APPROVAL"),
         "human_approval_required": True,
         "human_approval_granted": False,
         "automatic_promotion": False,

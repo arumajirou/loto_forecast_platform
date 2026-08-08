@@ -24,8 +24,7 @@ def test_recursive_sha_ignores_only_declared_volatile_outputs(tmp_path: Path) ->
     (tmp_path / "verification.log").write_text("still growing\n", encoding="utf-8")
     (tmp_path / "exit_code.txt").write_text("0\n", encoding="utf-8")
     (tmp_path / "SHA256SUMS").write_text(
-        f"{_sha256(nested_sha)}  inventory/SHA256SUMS\n"
-        f"{_sha256(stable)}  stable.json\n",
+        f"{_sha256(nested_sha)}  inventory/SHA256SUMS\n{_sha256(stable)}  stable.json\n",
         encoding="utf-8",
     )
 

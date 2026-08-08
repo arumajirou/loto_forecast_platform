@@ -157,9 +157,7 @@ def test_reload_rejects_same_process(tmp_path: Path, monkeypatch) -> None:
     )
     assert fit.outcome is LifecycleOutcome.VERIFIED
 
-    load_request = request(tmp_path).model_copy(
-        update={"operation": "load_predict", "dataset": []}
-    )
+    load_request = request(tmp_path).model_copy(update={"operation": "load_predict", "dataset": []})
     result, _ = runtime.load_predict_serialized(
         load_request,
         "compat",
@@ -182,9 +180,7 @@ def test_reload_rejects_tampered_artifact(tmp_path: Path, monkeypatch) -> None:
     (tmp_path / "predictor" / "model.json").write_text("tampered", encoding="utf-8")
 
     monkeypatch.setattr(runtime.os, "getpid", lambda: 202)
-    load_request = request(tmp_path).model_copy(
-        update={"operation": "load_predict", "dataset": []}
-    )
+    load_request = request(tmp_path).model_copy(update={"operation": "load_predict", "dataset": []})
     result, _ = runtime.load_predict_serialized(
         load_request,
         "compat",

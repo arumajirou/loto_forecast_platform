@@ -53,9 +53,7 @@ def _matching_history_record(
     authorization_id: str,
     transaction_nonce: str,
 ) -> RegistryHistoryRecord | None:
-    authorization_rows = [
-        row for row in state.history if row.authorization_id == authorization_id
-    ]
+    authorization_rows = [row for row in state.history if row.authorization_id == authorization_id]
     nonce_rows = [row for row in state.history if row.transaction_nonce == transaction_nonce]
     if not authorization_rows and not nonce_rows:
         return None
@@ -88,8 +86,7 @@ def _record_matches_retry(
             record.authorization_id == authorization["authorization_id"],
             record.authorization_seal_sha256 == authorization["seal_sha256"],
             record.transaction_nonce == request.transaction_nonce,
-            record.expected_pre_state_sha256
-            == request.expected_current_state_sha256,
+            record.expected_pre_state_sha256 == request.expected_current_state_sha256,
             record.new_binding == subject,
         )
     )
@@ -382,12 +379,8 @@ def verify_registry_transaction(root: Path) -> dict[str, Any]:
     if plan.get("expected_pre_state_sha256") != request.expected_current_state_sha256:
         raise RegistryTransactionError("TRANSACTION_PLAN_PRE_STATE_MISMATCH", str(evidence))
 
-    pre_state = RegistryState.model_validate(
-        load_json(evidence / "PRE_REGISTRY_STATE.json")
-    )
-    post_state = RegistryState.model_validate(
-        load_json(evidence / "POST_REGISTRY_STATE.json")
-    )
+    pre_state = RegistryState.model_validate(load_json(evidence / "PRE_REGISTRY_STATE.json"))
+    post_state = RegistryState.model_validate(load_json(evidence / "POST_REGISTRY_STATE.json"))
     receipt = load_json(evidence / "TRANSACTION_RECEIPT.json")
     record = RegistryHistoryRecord.model_validate(receipt["original_commit_record"])
     _verify_history_membership(post_state, record)

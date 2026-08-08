@@ -53,9 +53,7 @@ def _reject_symlink_components(root: Path, candidate: Path) -> None:
     for part in relative.parts:
         current = current / part
         if current.is_symlink():
-            raise SourceIdentityError(
-                f"source path contains a symlink: {relative.as_posix()}"
-            )
+            raise SourceIdentityError(f"source path contains a symlink: {relative.as_posix()}")
 
 
 def collect_source_inventory(
@@ -74,13 +72,10 @@ def collect_source_inventory(
             resolved.relative_to(root)
         except (OSError, ValueError) as exc:
             raise SourceIdentityError(
-                "required source file is missing or escapes the repository: "
-                f"{relative_path}"
+                f"required source file is missing or escapes the repository: {relative_path}"
             ) from exc
         if not resolved.is_file():
-            raise SourceIdentityError(
-                f"required source is not a regular file: {relative_path}"
-            )
+            raise SourceIdentityError(f"required source is not a regular file: {relative_path}")
         records.append(
             SourceFileRecord(
                 relative_path=relative_path,
@@ -173,9 +168,7 @@ def materialize_source_snapshot(
     parent = output_parent.expanduser().resolve(strict=True)
     destination = parent / source_revision
     if destination.exists():
-        raise SourceIdentityError(
-            f"source snapshot already exists: {destination}"
-        )
+        raise SourceIdentityError(f"source snapshot already exists: {destination}")
     temporary = parent / f".{source_revision}.tmp-{os.getpid()}"
     if temporary.exists():
         shutil.rmtree(temporary)
@@ -186,13 +179,9 @@ def materialize_source_snapshot(
             target = temporary / item.relative_path
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target, follow_symlinks=False)
-            if (
-                target.stat().st_size != item.size_bytes
-                or _sha256_file(target) != item.sha256
-            ):
+            if target.stat().st_size != item.size_bytes or _sha256_file(target) != item.sha256:
                 raise SourceIdentityError(
-                    "source snapshot copy verification failed: "
-                    f"{item.relative_path}"
+                    f"source snapshot copy verification failed: {item.relative_path}"
                 )
         os.replace(temporary, destination)
     finally:

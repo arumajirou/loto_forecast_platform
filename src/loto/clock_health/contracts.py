@@ -197,9 +197,7 @@ class ClockContinuityEvidence(StrictFrozenModel):
         }
         return cls(
             **payload,
-            continuity_sha256=sha256_canonical(
-                {"schema_version": SCHEMA_VERSION, **payload}
-            ),
+            continuity_sha256=sha256_canonical({"schema_version": SCHEMA_VERSION, **payload}),
         )
 
 

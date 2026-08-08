@@ -184,10 +184,9 @@ class ProcessExecution(StrictModel):
     def validate_process_state(self) -> ProcessExecution:
         if self.started_at_utc.utcoffset() is None or self.finished_at_utc.utcoffset() is None:
             raise ValueError("process timestamps must be timezone-aware")
-        if (
-            self.started_at_utc.utcoffset() != timedelta(0)
-            or self.finished_at_utc.utcoffset() != timedelta(0)
-        ):
+        if self.started_at_utc.utcoffset() != timedelta(
+            0
+        ) or self.finished_at_utc.utcoffset() != timedelta(0):
             raise ValueError("process timestamps must be UTC")
         if self.finished_at_utc < self.started_at_utc:
             raise ValueError("process finish time precedes start time")
@@ -241,9 +240,7 @@ class OutputEvidence(StrictModel):
 
 class GPUProcessSample(StrictModel):
     provider_pid: int = Field(ge=1)
-    provider_process_identity_sha256: str | None = Field(
-        default=None, pattern=SHA256_PATTERN
-    )
+    provider_process_identity_sha256: str | None = Field(default=None, pattern=SHA256_PATTERN)
     gpu_uuid: str = Field(min_length=1, max_length=256)
     used_memory_bytes: int = Field(gt=0)
     observed_at_utc: datetime
@@ -263,9 +260,7 @@ class DeviceEvidence(StrictModel):
     effective_device: Literal["cpu", "cuda"]
     cpu_fallback: bool
     provider_pid: int = Field(ge=1)
-    provider_process_identity_sha256: str | None = Field(
-        default=None, pattern=SHA256_PATTERN
-    )
+    provider_process_identity_sha256: str | None = Field(default=None, pattern=SHA256_PATTERN)
     provider_gpu_pid: int | None = Field(default=None, ge=1)
     gpu_uuid: str | None = Field(default=None, min_length=1, max_length=256)
     peak_vram_bytes: int = Field(default=0, ge=0)

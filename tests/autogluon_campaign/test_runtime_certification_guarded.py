@@ -12,7 +12,7 @@ from loto.autogluon_campaign.runtime_certification_guarded import (
     verify_guarded_output,
 )
 
-FAKE_PROVIDER = r'''
+FAKE_PROVIDER = r"""
 import argparse
 import json
 import os
@@ -75,7 +75,7 @@ response = {
 }
 args.response.parent.mkdir(parents=True, exist_ok=True)
 args.response.write_text(json.dumps(response) + "\n")
-'''
+"""
 
 
 def _provider(tmp_path: Path) -> Path:
@@ -96,9 +96,7 @@ def _config(tmp_path: Path, output: Path, scenarios: tuple[str, ...]) -> Runtime
 
 def test_guarded_output_passes_independent_verification(tmp_path) -> None:
     output = tmp_path / "pass"
-    payload = run_guarded_certification(
-        _config(tmp_path, output, ("explicit-naive-fit",))
-    )
+    payload = run_guarded_certification(_config(tmp_path, output, ("explicit-naive-fit",)))
     assert payload["status"] == CertificationStatus.VERIFIED.value
     assert payload["p11_guard_schema_version"] == 1
     assert verify_guarded_output(output) == ()

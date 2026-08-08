@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Static, fail-closed validation for the local LGTM deployment assets."""
+
 from __future__ import annotations
 
 import argparse
@@ -124,11 +125,7 @@ def validate() -> dict[str, Any]:
         "Prometheus rule file inventory mismatch",
     )
     rules = load_yaml(DEPLOY / "prometheus/rules/platform-alerts.yml")
-    alerts = {
-        rule["alert"]
-        for group in rules.get("groups", [])
-        for rule in group.get("rules", [])
-    }
+    alerts = {rule["alert"] for group in rules.get("groups", []) for rule in group.get("rules", [])}
     require(
         alerts
         == {
@@ -154,7 +151,7 @@ def validate() -> dict[str, Any]:
     require("otelcol.receiver.otlp" in alloy_text, "Alloy OTLP receiver missing")
     require("otelcol.exporter.otlp" in alloy_text, "Alloy Tempo exporter missing")
     require("loki.source.file" in alloy_text, "Alloy JSONL source missing")
-    label_block = alloy_text.split('stage.labels {', 1)[1].split('}', 1)[0]
+    label_block = alloy_text.split("stage.labels {", 1)[1].split("}", 1)[0]
     require(
         "run_id" not in label_block and "trace_id" not in label_block,
         "high-cardinality Loki label",

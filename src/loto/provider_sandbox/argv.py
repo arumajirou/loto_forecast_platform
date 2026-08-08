@@ -118,9 +118,7 @@ def build_argv_plan(
         argv = (request.executable, *request.arguments)
     elif backend.backend == SandboxBackend.BUBBLEWRAP:
         if request.requested_gpu_devices:
-            raise ValueError(
-                "BUBBLEWRAP GPU isolation is not proven by environment filtering"
-            )
+            raise ValueError("BUBBLEWRAP GPU isolation is not proven by environment filtering")
         argv = _bwrap_plan(policy, request, backend)
     elif backend.backend == SandboxBackend.ROOTLESS_OCI:
         argv = _oci_plan(policy, request, backend)

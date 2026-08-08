@@ -3,8 +3,7 @@ from pathlib import Path
 
 def script_text() -> str:
     return (
-        Path(__file__).parents[2]
-        / "docs/mlforecast/run_final_verification_portable.sh"
+        Path(__file__).parents[2] / "docs/mlforecast/run_final_verification_portable.sh"
     ).read_text(encoding="utf-8")
 
 

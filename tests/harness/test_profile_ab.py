@@ -46,12 +46,16 @@ class ProfileSensitiveEngine(InferenceEngine):
     async def chat(self, request: ChatRequest) -> ChatResponse:
         candidate = request.profile_mode != "generic"
         if request.tools:
-            calls = [
-                {
-                    "type": "function",
-                    "function": {"name": "profile_echo", "arguments": {"value": 7}},
-                }
-            ] if candidate else []
+            calls = (
+                [
+                    {
+                        "type": "function",
+                        "function": {"name": "profile_echo", "arguments": {"value": 7}},
+                    }
+                ]
+                if candidate
+                else []
+            )
             return ChatResponse(model=request.model or "m", tool_calls=calls)
         if request.response_format:
             content = json.dumps({"status": "VERIFIED", "value": 7}) if candidate else "bad"
@@ -188,10 +192,7 @@ def test_profile_ab_tie_prefers_generic() -> None:
         assert result["best_mode"] == "generic"
         assert result["acceptance"]["candidate_beats_generic"] is False
         assert result["acceptance"]["best_mode_meets_gate"] is True
-        assert all(
-            mode == "generic"
-            for mode in result["recommended_mode_by_task"].values()
-        )
+        assert all(mode == "generic" for mode in result["recommended_mode_by_task"].values())
 
     asyncio.run(run())
 

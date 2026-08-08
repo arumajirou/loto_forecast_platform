@@ -203,9 +203,7 @@ def build_execution_plan(request: ProviderRequestV2) -> ExecutionPlan:
             "model_ids",
             request.model_ids,
             request.model_ids,
-            ArgumentStatus.ACCEPTED
-            if request.model_ids
-            else ArgumentStatus.NOT_APPLICABLE,
+            ArgumentStatus.ACCEPTED if request.model_ids else ArgumentStatus.NOT_APPLICABLE,
         ),
     ]
     predictor = request.predictor
@@ -257,9 +255,7 @@ def build_execution_plan(request: ProviderRequestV2) -> ExecutionPlan:
             )
         )
     if predictor.eval_metric_seasonal_period is not None:
-        predictor_kwargs["eval_metric_seasonal_period"] = (
-            predictor.eval_metric_seasonal_period
-        )
+        predictor_kwargs["eval_metric_seasonal_period"] = predictor.eval_metric_seasonal_period
     ledger.append(
         _ledger(
             "predictor.eval_metric_seasonal_period",

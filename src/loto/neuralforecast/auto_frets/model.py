@@ -95,24 +95,14 @@ def build_frets_class(
             self.scale = architecture.scale
             self.channel_independence = FRETS_CHANNEL_INDEPENDENCE
             self.embeddings = nn.Parameter(torch.randn(1, self.embed_size))
-            self.r1 = nn.Parameter(
-                self.scale * torch.randn(self.embed_size, self.embed_size)
-            )
-            self.i1 = nn.Parameter(
-                self.scale * torch.randn(self.embed_size, self.embed_size)
-            )
+            self.r1 = nn.Parameter(self.scale * torch.randn(self.embed_size, self.embed_size))
+            self.i1 = nn.Parameter(self.scale * torch.randn(self.embed_size, self.embed_size))
             self.rb1 = nn.Parameter(self.scale * torch.randn(self.embed_size))
             self.ib1 = nn.Parameter(self.scale * torch.randn(self.embed_size))
-            self.r2 = nn.Parameter(
-                self.scale * torch.randn(self.embed_size, self.embed_size)
-            )
-            self.i2 = nn.Parameter(
-                self.scale * torch.randn(self.embed_size, self.embed_size)
-            )
+            self.r2 = nn.Parameter(self.scale * torch.randn(self.embed_size, self.embed_size))
+            self.i2 = nn.Parameter(self.scale * torch.randn(self.embed_size, self.embed_size))
             self.rb2 = nn.Parameter(self.scale * torch.randn(self.embed_size))
-            self.ib2 = nn.Parameter(
-                self.scale * torch.randn(self.embed_size)
-            )
+            self.ib2 = nn.Parameter(self.scale * torch.randn(self.embed_size))
             self.fc = nn.Sequential(
                 nn.Linear(self.input_size * self.embed_size, self.hidden_size),
                 nn.LeakyReLU(),
@@ -159,9 +149,7 @@ def build_frets_class(
         def forward(self, windows_batch: dict[str, Any]) -> Any:
             insample_y = windows_batch["insample_y"]
             if insample_y.ndim != 3 or insample_y.shape[-1] != 1:
-                raise ValueError(
-                    "FreTS expects insample_y shape [batch, input_size, 1]"
-                )
+                raise ValueError("FreTS expects insample_y shape [batch, input_size, 1]")
             if insample_y.shape[1] != self.input_size:
                 raise ValueError("FreTS input_size does not match the training window")
             if insample_y.dtype != torch.float32:

@@ -217,8 +217,7 @@ def test_non_ed25519_allowed_signer_is_rejected(tmp_path: Path) -> None:
     p17 = make_p17_bundle(tmp_path / "p17")
     signers = tmp_path / "allowed_signers"
     signers.write_text(
-        "owner@example ssh-rsa b3duZXIta2V5\n"
-        "reviewer@example ssh-ed25519 cmV2aWV3ZXIta2V5\n",
+        "owner@example ssh-rsa b3duZXIta2V5\nreviewer@example ssh-ed25519 cmV2aWV3ZXIta2V5\n",
         encoding="utf-8",
     )
     with pytest.raises(ApprovalAuthorizationError) as exc_info:
@@ -240,8 +239,7 @@ def test_duplicate_allowed_signer_key_is_rejected(tmp_path: Path) -> None:
     p17 = make_p17_bundle(tmp_path / "p17")
     signers = tmp_path / "allowed_signers"
     signers.write_text(
-        "owner@example ssh-ed25519 c2FtZS1rZXk=\n"
-        "reviewer@example ssh-ed25519 c2FtZS1rZXk=\n",
+        "owner@example ssh-ed25519 c2FtZS1rZXk=\nreviewer@example ssh-ed25519 c2FtZS1rZXk=\n",
         encoding="utf-8",
     )
     with pytest.raises(ApprovalAuthorizationError) as exc_info:

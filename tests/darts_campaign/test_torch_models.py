@@ -286,9 +286,7 @@ def test_cpu_fallback_is_rejected_and_does_not_stop_other_models() -> None:
     )
     assert results[0].status == "FAILED"
     assert results[0].failure_class == "CPU_FALLBACK_REJECTED"
-    assert results[0].device_certifications[0]["status"] == (
-        "GPU_REQUESTED_BUT_CPU_FALLBACK"
-    )
+    assert results[0].device_certifications[0]["status"] == ("GPU_REQUESTED_BUT_CPU_FALLBACK")
     assert results[1].status == "SUCCEEDED"
 
 

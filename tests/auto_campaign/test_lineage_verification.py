@@ -134,9 +134,7 @@ def test_standard_report_embeds_promotion_lineage_and_seal_results(
     result = verification.verify_run_with_lineage(tmp_path)
 
     assert result["status"] == "PASS"
-    report = json.loads(
-        (tmp_path / "VERIFICATION_REPORT.json").read_text(encoding="utf-8")
-    )
+    report = json.loads((tmp_path / "VERIFICATION_REPORT.json").read_text(encoding="utf-8"))
     assert report["promotion_gate_verification"]["status"] == "PASS"
     assert report["lineage_verification"]["chain_sha256"] == "abc"
     assert report["verification_seal"]["status"] == "PASS"

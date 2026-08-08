@@ -10,9 +10,7 @@ from loto.merlion_campaign.dependency_gate import (
     audit_uv_lock,
 )
 
-_CLAUSE_PATTERN = re.compile(
-    r"^(~=|==|!=|<=|>=|<|>)(\d+(?:\.\d+){0,2})(\.\*)?$"
-)
+_CLAUSE_PATTERN = re.compile(r"^(~=|==|!=|<=|>=|<|>)(\d+(?:\.\d+){0,2})(\.\*)?$")
 _BASE_CANDIDATES = {
     (0, 0, 0),
     (2, 0, 0),
@@ -161,9 +159,7 @@ def audit_uv_lock_semantic(lock_path: Path, pyproject_path: Path) -> dict[str, A
     lock_constraint = report.get("requires_python")
 
     blockers = [str(value) for value in report.get("blockers", [])]
-    mismatch = [
-        value for value in blockers if value.startswith(_requires_python_mismatch_prefix())
-    ]
+    mismatch = [value for value in blockers if value.startswith(_requires_python_mismatch_prefix())]
 
     equivalent = False
     semantic_error: str | None = None

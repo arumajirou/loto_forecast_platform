@@ -101,9 +101,7 @@ def validate_lane_files(
         name for name in REQUIRED_SNAPSHOT_FILES if not (snapshot_path / name).is_file()
     ]
     if missing_snapshot:
-        raise RuntimePreflightError(
-            f"snapshot required files are missing: {missing_snapshot}"
-        )
+        raise RuntimePreflightError(f"snapshot required files are missing: {missing_snapshot}")
     dependencies = parse_exact_dependencies(pyproject_path)
     mismatches = {
         name: {"expected": version, "actual": dependencies.get(name)}
@@ -128,8 +126,7 @@ def validate_lane_files(
         "lock_review": review_evidence,
         "snapshot_path": str(snapshot_path.resolve()),
         "snapshot_files": {
-            name: sha256_file(snapshot_path / name)
-            for name in REQUIRED_SNAPSHOT_FILES
+            name: sha256_file(snapshot_path / name) for name in REQUIRED_SNAPSHOT_FILES
         },
         "dependency_pins": dependencies,
         "locked_versions": {

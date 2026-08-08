@@ -28,7 +28,6 @@ P17_REQUIRED_FILES = {
 }
 
 
-
 def read_allowed_signers_inventory(path: Path) -> tuple[str, ...]:
     resolved = path.resolve()
     if not resolved.is_file() or resolved.is_symlink():
@@ -91,6 +90,7 @@ def read_allowed_signers_inventory(path: Path) -> tuple[str, ...]:
             str(identities),
         )
     return tuple(identities)
+
 
 def file_sha256(path: Path) -> str:
     digest = hashlib.sha256()

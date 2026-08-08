@@ -44,12 +44,8 @@ class PrometheusMetricSet:
         *,
         registry: CollectorRegistry | None = None,
     ) -> None:
-        self.catalog = (
-            catalog if catalog is not None else default_platform_metric_catalog()
-        )
-        self.registry = (
-            registry if registry is not None else CollectorRegistry(auto_describe=True)
-        )
+        self.catalog = catalog if catalog is not None else default_platform_metric_catalog()
+        self.registry = registry if registry is not None else CollectorRegistry(auto_describe=True)
         self._collectors: dict[str, Counter | Gauge | Histogram] = {}
         for spec in self.catalog.specs():
             definition = spec.definition
@@ -87,9 +83,7 @@ class PrometheusMetricSet:
     ) -> tuple[Any, float]:
         spec = self.catalog.get(name)
         if spec.definition.kind is not expected:
-            raise ValueError(
-                f"metric {name} is {spec.definition.kind}, not {expected}"
-            )
+            raise ValueError(f"metric {name} is {spec.definition.kind}, not {expected}")
         self.catalog.validate_labels(name, labels)
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise TypeError("metric value must be int or float")
@@ -98,13 +92,9 @@ class PrometheusMetricSet:
             raise ValueError("metric value must be finite")
         policy = spec.value_policy
         if policy.minimum is not None and numeric < policy.minimum:
-            raise ValueError(
-                f"metric {name} is below minimum {policy.minimum}"
-            )
+            raise ValueError(f"metric {name} is below minimum {policy.minimum}")
         if policy.maximum is not None and numeric > policy.maximum:
-            raise ValueError(
-                f"metric {name} exceeds maximum {policy.maximum}"
-            )
+            raise ValueError(f"metric {name} exceeds maximum {policy.maximum}")
         if policy.integer_only and not numeric.is_integer():
             raise ValueError(f"metric {name} requires an integer value")
         return self._collectors[name], numeric

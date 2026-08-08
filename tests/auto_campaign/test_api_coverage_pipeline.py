@@ -103,9 +103,7 @@ def test_pipeline_records_resolver_failure_without_losing_api_results(
     assert result["gpu_runtime_status"] == "EXECUTION_PENDING"
     assert result["coverage_state_path"] == "coverage_state_failure.json"
     assert (run_root / "API_ARGUMENT_COVERAGE_RESULT.parquet").is_file()
-    failure = json.loads(
-        (run_root / "coverage_state_failure.json").read_text(encoding="utf-8")
-    )
+    failure = json.loads((run_root / "coverage_state_failure.json").read_text(encoding="utf-8"))
     assert failure["failed_phase"] == "coverage_state_resolution"
     assert failure["error_type"] == "RuntimeError"
     assert "inventory mismatch" in failure["error"]

@@ -6,7 +6,8 @@ import sys
 from pathlib import Path
 
 
-FAKE_LIGHTTS = """
+FAKE_LIGHTTS = (
+    """
 import torch
 from torch import nn
 
@@ -29,7 +30,9 @@ class Model(nn.Module):
                 dim=1,
             )
         return self.linear(x_enc.permute(0, 2, 1)).permute(0, 2, 1)
-""".strip() + "\n"
+""".strip()
+    + "\n"
+)
 
 
 def _script() -> Path:

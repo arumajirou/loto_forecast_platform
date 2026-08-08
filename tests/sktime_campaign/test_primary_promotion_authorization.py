@@ -38,9 +38,7 @@ def transaction_from(authorization: dict) -> PrimaryPromotionTransactionRequest:
         transaction_nonce="d4" * 32,
         requested_at_utc="2026-08-05T10:26:00Z",
         deployment_target=authorization["deployment_target"],
-        expected_deployment_state_sha256=(
-            authorization["expected_deployment_state_sha256"]
-        ),
+        expected_deployment_state_sha256=(authorization["expected_deployment_state_sha256"]),
         expected_primary_before=authorization["expected_primary_before"],
         expected_canary_before=authorization["expected_canary_before"],
         target_primary=authorization["target_primary"],
@@ -50,9 +48,7 @@ def transaction_from(authorization: dict) -> PrimaryPromotionTransactionRequest:
 
 def test_issue_success(tmp_path):
     request, authorization = issue(tmp_path)
-    assert authorization["decision"] == (
-        "AUTHORIZED_FOR_ONE_PRIMARY_PROMOTION_TRANSACTION"
-    )
+    assert authorization["decision"] == ("AUTHORIZED_FOR_ONE_PRIMARY_PROMOTION_TRANSACTION")
     assert authorization["primary_promotion_authorized"] is True
     assert authorization["primary_promotion_executed"] is False
     assert authorization["target_primary"]["mode"] == "primary"
@@ -105,9 +101,7 @@ def test_duplicate_approvers_rejected(tmp_path):
 def test_duplicate_signers_rejected(tmp_path):
     request = build_request(tmp_path)
     payload = request.model_dump(mode="json")
-    payload["approvals"][1]["signer_identity"] = (
-        payload["approvals"][0]["signer_identity"]
-    )
+    payload["approvals"][1]["signer_identity"] = payload["approvals"][0]["signer_identity"]
     with pytest.raises(ValidationError, match="signer identities must be distinct"):
         PrimaryPromotionAuthorizationRequest.model_validate(payload)
 
@@ -159,9 +153,7 @@ def test_transaction_guard_success(tmp_path):
         transaction,
         consumed_authorization_ids=set(),
         consumed_transaction_nonces=set(),
-        observed_deployment_state_sha256=(
-            authorization["expected_deployment_state_sha256"]
-        ),
+        observed_deployment_state_sha256=(authorization["expected_deployment_state_sha256"]),
         now_utc="2026-08-05T10:27:00Z",
     )
 
@@ -189,9 +181,7 @@ def test_transaction_guard_consumed_authorization_rejected(tmp_path):
             transaction,
             consumed_authorization_ids={authorization["authorization_id"]},
             consumed_transaction_nonces=set(),
-            observed_deployment_state_sha256=(
-                authorization["expected_deployment_state_sha256"]
-            ),
+            observed_deployment_state_sha256=(authorization["expected_deployment_state_sha256"]),
             now_utc="2026-08-05T10:27:00Z",
         )
 
@@ -205,9 +195,7 @@ def test_transaction_guard_consumed_nonce_rejected(tmp_path):
             transaction,
             consumed_authorization_ids=set(),
             consumed_transaction_nonces={transaction.transaction_nonce},
-            observed_deployment_state_sha256=(
-                authorization["expected_deployment_state_sha256"]
-            ),
+            observed_deployment_state_sha256=(authorization["expected_deployment_state_sha256"]),
             now_utc="2026-08-05T10:27:00Z",
         )
 
@@ -221,9 +209,7 @@ def test_transaction_guard_expired_rejected(tmp_path):
             transaction,
             consumed_authorization_ids=set(),
             consumed_transaction_nonces=set(),
-            observed_deployment_state_sha256=(
-                authorization["expected_deployment_state_sha256"]
-            ),
+            observed_deployment_state_sha256=(authorization["expected_deployment_state_sha256"]),
             now_utc="2026-08-05T10:41:00Z",
         )
 
@@ -253,8 +239,6 @@ def test_transaction_exact_binding_rejected(
             transaction,
             consumed_authorization_ids=set(),
             consumed_transaction_nonces=set(),
-            observed_deployment_state_sha256=(
-                authorization["expected_deployment_state_sha256"]
-            ),
+            observed_deployment_state_sha256=(authorization["expected_deployment_state_sha256"]),
             now_utc="2026-08-05T10:27:00Z",
         )

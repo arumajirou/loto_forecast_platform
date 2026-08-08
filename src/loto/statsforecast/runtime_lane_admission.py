@@ -30,8 +30,10 @@ def _eq(failures: list[str], label: str, actual: Any, expected: Any) -> None:
 
 
 def _sha256(value: Any) -> bool:
-    return isinstance(value, str) and len(value) == 64 and all(
-        char in "0123456789abcdef" for char in value
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(char in "0123456789abcdef" for char in value)
     )
 
 
@@ -221,10 +223,7 @@ def inspect_target_host_archive(
     try:
         with zipfile.ZipFile(archive) as bundle:
             failures.extend(_special_member_failures(bundle))
-            data = {
-                key: _load_json(bundle, suffix)
-                for key, suffix in _REQUIRED_JSON.items()
-            }
+            data = {key: _load_json(bundle, suffix) for key, suffix in _REQUIRED_JSON.items()}
     except (OSError, zipfile.BadZipFile, KeyError, ValueError) as exc:
         failures.append(f"archive parse failed: {type(exc).__name__}: {exc}")
         return _final(archive, package_report, len(names), 0, failures)

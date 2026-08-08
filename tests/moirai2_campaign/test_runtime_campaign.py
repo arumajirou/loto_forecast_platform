@@ -137,8 +137,7 @@ def test_changed_reload_flag_fails_campaign() -> None:
     )
     assert summary["status"] == "FAILED"
     assert any(
-        failure["reason"] == "exact_prediction_match is not true"
-        for failure in summary["failures"]
+        failure["reason"] == "exact_prediction_match is not true" for failure in summary["failures"]
     )
 
 

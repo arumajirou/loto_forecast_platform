@@ -128,9 +128,7 @@ def verify_sha256sums(directory: Path, *, recursive: bool = False) -> list[dict[
     if seen != actual_files:
         missing = sorted(actual_files - seen)
         stale = sorted(seen - actual_files)
-        raise VerificationError(
-            f"SHA256SUMS coverage mismatch: unhashed={missing}, stale={stale}"
-        )
+        raise VerificationError(f"SHA256SUMS coverage mismatch: unhashed={missing}, stale={stale}")
     if not records:
         raise VerificationError(f"SHA256SUMS contains no records: {sums_path}")
     return records
@@ -215,9 +213,7 @@ def verify_inventory_bundle(directory: Path) -> dict[str, Any]:
     discovered = len(rows)
     importable = sum(row.get("import_status") == "IMPORTABLE" for row in rows)
     core = sum(row.get("dependency_state") == "CORE_COMPATIBLE" for row in rows)
-    optional = sum(
-        row.get("dependency_state") == "OPTIONAL_DEPENDENCY_DECLARED" for row in rows
-    )
+    optional = sum(row.get("dependency_state") == "OPTIONAL_DEPENDENCY_DECLARED" for row in rows)
     expected_counts = {
         "discovered": discovered,
         "importable": importable,
@@ -227,8 +223,7 @@ def verify_inventory_bundle(directory: Path) -> dict[str, Any]:
     for key, expected in expected_counts.items():
         if int(summary.get(key, -1)) != expected:
             raise VerificationError(
-                f"inventory summary mismatch for {key}: expected {expected}, "
-                f"got {summary.get(key)}"
+                f"inventory summary mismatch for {key}: expected {expected}, got {summary.get(key)}"
             )
     if summary.get("count_source") != "sktime.registry.all_estimators('forecaster')":
         raise VerificationError("inventory count source is not the sktime registry")
@@ -303,13 +298,8 @@ def verify_naive_bundle(directory: Path) -> dict[str, Any]:
 
 
 def _write_recursive_sha256sums(run_dir: Path) -> None:
-    files = sorted(
-        path for path in run_dir.rglob("*") if _is_recursive_evidence(run_dir, path)
-    )
-    lines = [
-        f"{_sha256(path)}  {path.relative_to(run_dir).as_posix()}"
-        for path in files
-    ]
+    files = sorted(path for path in run_dir.rglob("*") if _is_recursive_evidence(run_dir, path))
+    lines = [f"{_sha256(path)}  {path.relative_to(run_dir).as_posix()}" for path in files]
     _atomic_write_text(run_dir / "SHA256SUMS", "\n".join(lines) + "\n")
 
 

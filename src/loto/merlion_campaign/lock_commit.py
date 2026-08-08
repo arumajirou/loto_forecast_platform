@@ -195,9 +195,7 @@ def evaluate_lock_commit(
     evidence_zip = evidence_zip.absolute()
     license_review = license_review.absolute()
     blockers: list[str] = []
-    if len(expected_head) != 40 or any(
-        value not in "0123456789abcdef" for value in expected_head
-    ):
+    if len(expected_head) != 40 or any(value not in "0123456789abcdef" for value in expected_head):
         blockers.append("EXPECTED_HEAD_INVALID")
 
     admission, admission_bytes = _read_json_object(
@@ -245,11 +243,14 @@ def evaluate_lock_commit(
         workspace_lock_sha256 = sha256_bytes(lock_path.read_bytes())
 
     if parent is not None:
-        parent_has_lock = _run_git(
-            root,
-            ["cat-file", "-e", f"{parent}:{ALLOWED_LOCK_PATH}"],
-            check=False,
-        ).returncode == 0
+        parent_has_lock = (
+            _run_git(
+                root,
+                ["cat-file", "-e", f"{parent}:{ALLOWED_LOCK_PATH}"],
+                check=False,
+            ).returncode
+            == 0
+        )
         if parent_has_lock:
             blockers.append("LOCK_ALREADY_PRESENT_IN_PARENT")
 

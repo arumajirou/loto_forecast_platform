@@ -64,10 +64,7 @@ class ObservedHistory(BaseModel):
             raise ValueError("history draw_no must be sorted")
         if len(set(self.draw_no)) != len(self.draw_no):
             raise ValueError("history draw_no must be unique")
-        if any(
-            right != left + 1
-            for left, right in zip(self.draw_no, self.draw_no[1:])
-        ):
+        if any(right != left + 1 for left, right in zip(self.draw_no, self.draw_no[1:])):
             raise ValueError("history draw_no must be gap-free")
         if len(self.legal_min) != width or len(self.legal_max) != width:
             raise ValueError("legal bounds must match position count")
@@ -98,9 +95,7 @@ class ProspectiveRequest(BaseModel):
     p4_promotion_status: Literal["NOT_PROMOTED"] = "NOT_PROMOTED"
     history: ObservedHistory
     prospective_draw_no: list[int] = Field(min_length=1)
-    baseline_ids: list[BaselineId] = Field(
-        default_factory=lambda: list(FORMAL_BASELINES)
-    )
+    baseline_ids: list[BaselineId] = Field(default_factory=lambda: list(FORMAL_BASELINES))
     model_ids: list[SmokeModelId] = Field(default_factory=lambda: list(FORMAL_MODELS))
     random_seeds: list[int] = Field(default_factory=lambda: [1, 2, 3], min_length=3)
     season_length: int = Field(default=7, ge=1)
@@ -152,11 +147,7 @@ def expected_candidate_seed_keys(
 ) -> list[tuple[str, str, int]]:
     keys: list[tuple[str, str, int]] = []
     for baseline in request.baseline_ids:
-        seeds = (
-            request.random_seeds
-            if baseline is BaselineId.RANDOM_UNIFORM
-            else [1]
-        )
+        seeds = request.random_seeds if baseline is BaselineId.RANDOM_UNIFORM else [1]
         keys.extend(("baseline", baseline.value, seed) for seed in seeds)
     keys.extend(("sktime", model.value, 1) for model in request.model_ids)
     return keys
@@ -319,9 +310,7 @@ def verify_prospective_lock(lock: dict[str, Any]) -> None:
             prediction = np.asarray(row.get("predictions"), dtype=float)
             if prediction.ndim != 2 or not np.isfinite(prediction).all():
                 raise ValueError("Prospective prediction shape or finite check failed")
-            if row.get("prediction_sha256") != canonical_sha256(
-                row.get("predictions")
-            ):
+            if row.get("prediction_sha256") != canonical_sha256(row.get("predictions")):
                 raise ValueError("Prospective prediction row SHA-256 mismatch")
 
 
@@ -337,8 +326,7 @@ def run_prospective_lock(
     rows_by_key: dict[tuple[str, str, int], dict[str, Any]] = {}
     with ThreadPoolExecutor(max_workers=request.max_workers) as executor:
         futures = {
-            executor.submit(_predict_one, key, request, history, predictor): key
-            for key in keys
+            executor.submit(_predict_one, key, request, history, predictor): key for key in keys
         }
         for future in as_completed(futures):
             key = futures[future]
@@ -369,9 +357,7 @@ def run_prospective_lock(
         "legal_min": request.history.legal_min,
         "legal_max": request.history.legal_max,
         "prospective_draw_no": request.prospective_draw_no,
-        "prospective_draw_no_sha256": canonical_sha256(
-            request.prospective_draw_no
-        ),
+        "prospective_draw_no_sha256": canonical_sha256(request.prospective_draw_no),
         "max_workers": request.max_workers,
         "thread_limits": {
             name: os.environ.get(name)
@@ -392,17 +378,11 @@ def run_prospective_lock(
 
     all_pass = bool(rows) and all(row.get("status") == "PASS" for row in rows)
     any_pass = any(row.get("status") == "PASS" for row in rows)
-    all_unavailable = bool(rows) and all(
-        row.get("status") == "UNAVAILABLE" for row in rows
-    )
+    all_unavailable = bool(rows) and all(row.get("status") == "UNAVAILABLE" for row in rows)
     status = (
         "PASS"
         if all_pass
-        else (
-            "PARTIAL"
-            if any_pass
-            else ("UNAVAILABLE" if all_unavailable else "FAILED")
-        )
+        else ("PARTIAL" if any_pass else ("UNAVAILABLE" if all_unavailable else "FAILED"))
     )
     return {
         "schema_version": "1.0",
@@ -456,9 +436,7 @@ class DriftPolicy(BaseModel):
         if self.critical_hit_drop < self.warning_hit_drop:
             raise ValueError("critical_hit_drop must be >= warning_hit_drop")
         if self.critical_mae_increase < self.warning_mae_increase:
-            raise ValueError(
-                "critical_mae_increase must be >= warning_mae_increase"
-            )
+            raise ValueError("critical_mae_increase must be >= warning_mae_increase")
         return self
 
 
@@ -488,9 +466,7 @@ class ProspectiveMonitoringRequest(BaseModel):
             raise ValueError("Prospective actual reveal must follow prediction seal")
         if self.actuals.draw_no != self.prediction_lock.get("prospective_draw_no"):
             raise ValueError("Prospective actual draw identities differ from lock")
-        if self.actuals.position_names != self.prediction_lock.get(
-            "position_names"
-        ):
+        if self.actuals.position_names != self.prediction_lock.get("position_names"):
             raise ValueError("Prospective actual positions differ from lock")
         return self
 
@@ -528,9 +504,7 @@ def _aggregate_scored_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 item["metrics"][metric] = {
                     "mean": float(values.mean()),
                     "variance": float(values.var()),
-                    "worst": float(
-                        values.min() if "hit" in metric else values.max()
-                    ),
+                    "worst": float(values.min() if "hit" in metric else values.max()),
                 }
         output.append(item)
     return output
@@ -538,11 +512,7 @@ def _aggregate_scored_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def _leaderboard(aggregates: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(
-        [
-            row
-            for row in aggregates
-            if row.get("status") == "PASS" and "metrics" in row
-        ],
+        [row for row in aggregates if row.get("status") == "PASS" and "metrics" in row],
         key=lambda row: (
             -row["metrics"]["hit_at_1"]["mean"],
             -row["metrics"]["all_position_hit_at_1"]["mean"],
@@ -628,9 +598,7 @@ def monitor_prospective(
                 {
                     "code": "HIT_AT_1_DROP",
                     "severity": (
-                        "CRITICAL"
-                        if hit_drop >= request.policy.critical_hit_drop
-                        else "WARNING"
+                        "CRITICAL" if hit_drop >= request.policy.critical_hit_drop else "WARNING"
                     ),
                     "value": hit_drop,
                 }

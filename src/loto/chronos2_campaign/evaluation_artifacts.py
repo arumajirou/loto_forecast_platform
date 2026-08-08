@@ -25,9 +25,7 @@ def persist_oof_result(result: EvaluationResult, output_dir: str | Path) -> dict
     if root.exists():
         root.rmdir()
     root.parent.mkdir(parents=True, exist_ok=True)
-    staging = Path(
-        tempfile.mkdtemp(prefix=f".{root.name}.staging-", dir=root.parent)
-    )
+    staging = Path(tempfile.mkdtemp(prefix=f".{root.name}.staging-", dir=root.parent))
     try:
         tables = {
             "CHRONOS2_OOF_FOLDS": result.folds,

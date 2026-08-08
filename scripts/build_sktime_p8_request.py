@@ -29,17 +29,13 @@ def load_json(path: Path):
 
 def verify_sha256sums(directory: Path) -> None:
     seen: set[str] = set()
-    for line in (directory / "SHA256SUMS").read_text(
-        encoding="utf-8"
-    ).splitlines():
+    for line in (directory / "SHA256SUMS").read_text(encoding="utf-8").splitlines():
         expected, name = line.split("  ", 1)
         if name in seen or file_sha256(directory / name) != expected:
             raise ValueError(f"P7 SHA256SUMS mismatch: {name}")
         seen.add(name)
     expected = {
-        path.name
-        for path in directory.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path.name for path in directory.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     }
     if seen != expected:
         raise ValueError("P7 SHA256SUMS coverage mismatch")
@@ -70,9 +66,7 @@ def main() -> int:
         raise ValueError("P7 already claims a registry write")
     authorization = load_json(p7_dir / "REGISTRY_AUTHORIZATION.json")
     verify_registry_authorization(authorization)
-    requirements = load_json(
-        p7_dir / "REGISTRY_TRANSACTION_REQUIREMENTS.json"
-    )
+    requirements = load_json(p7_dir / "REGISTRY_TRANSACTION_REQUIREMENTS.json")
     if requirements.get("authorization_id") != authorization["authorization_id"]:
         raise ValueError("P7 transaction requirements changed authorization ID")
     if requirements.get("authorization_seal_sha256") != authorization["seal_sha256"]:
@@ -80,9 +74,7 @@ def main() -> int:
     if requirements.get("subject") != authorization["subject"]:
         raise ValueError("P7 transaction requirements changed registry subject")
 
-    registry_state = FileRegistryState.model_validate(
-        load_json(args.registry_state.resolve())
-    )
+    registry_state = FileRegistryState.model_validate(load_json(args.registry_state.resolve()))
     transaction = RegistryTransactionRequest(
         authorization_id=authorization["authorization_id"],
         authorization_seal_sha256=authorization["seal_sha256"],

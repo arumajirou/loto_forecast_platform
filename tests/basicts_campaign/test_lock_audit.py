@@ -72,9 +72,7 @@ def _metadata() -> dict[str, object]:
     return {
         "schema": {"version": "preview"},
         "requires_python": ">=3.11,<3.12",
-        "environment": {
-            "python": {"version": "3.11.13", "implementation": "cpython"}
-        },
+        "environment": {"python": {"version": "3.11.13", "implementation": "cpython"}},
         "conflicts": {"sets": []},
         "resolution": resolution,
     }

@@ -44,10 +44,7 @@ def _metadata_payloads(
         f"COMMIT_SHA={manifest.source_commit_sha}\n"
         f"P8_ELIGIBLE={str(manifest.p8_eligible).lower()}\n"
     ).encode("utf-8")
-    lines = [
-        f"{entry.sha256}  {entry.path}"
-        for entry in manifest.entries
-    ]
+    lines = [f"{entry.sha256}  {entry.path}" for entry in manifest.entries]
     lines.extend(
         (
             f"{sha256_bytes(manifest_bytes)}  {MANIFEST_NAME}",
@@ -86,17 +83,11 @@ def create_evidence_bundle(
         run_id=context["run_id"],
         source_commit_sha=context["commit_sha"],
         created_at_utc=utc_now(),
-        p7b_execution_manifest_sha256=context[
-            "execution_manifest_sha256"
-        ],
-        p7b_execution_checksum_sha256=context[
-            "execution_checksum_sha256"
-        ],
+        p7b_execution_manifest_sha256=context["execution_manifest_sha256"],
+        p7b_execution_checksum_sha256=context["execution_checksum_sha256"],
         p7c_manifest_sha256=context["manifest_sha256"],
         p7c_checksum_sha256=context["checksum_sha256"],
-        orchestration_checksum_sha256=context[
-            "orchestration_checksum_sha256"
-        ],
+        orchestration_checksum_sha256=context["orchestration_checksum_sha256"],
         audit_sha256=context["audit_sha256"],
         failure_matrix_sha256=context["failure_matrix_sha256"],
         p7b_return_code=context["p7b_return_code"],
@@ -141,5 +132,3 @@ def create_evidence_bundle(
         f"{archive_sha}  {archive_path.name}\n".encode("utf-8"),
     )
     return manifest, archive_sha
-
-

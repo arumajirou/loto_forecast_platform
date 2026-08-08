@@ -214,9 +214,7 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
         files = source_task.get("files")
         locked_record = files.get("prediction_before") if isinstance(files, Mapping) else None
         locked_sha = (
-            str(locked_record.get("sha256") or "")
-            if isinstance(locked_record, Mapping)
-            else ""
+            str(locked_record.get("sha256") or "") if isinstance(locked_record, Mapping) else ""
         )
         if item.get("source_prediction_sha256") != locked_sha:
             failures.append(f"prediction map locked SHA mismatch: {task_path}")
@@ -284,9 +282,7 @@ def verify_prospective_scoring(root: Path) -> dict[str, Any]:
             "worst_seed_hit_pm1",
             "seed_count",
         }
-        if seed_summary.empty or not required_summary_columns.issubset(
-            seed_summary.columns
-        ):
+        if seed_summary.empty or not required_summary_columns.issubset(seed_summary.columns):
             failures.append("SEED_SUMMARY.parquet is missing seed aggregates")
         if ranking.empty or "rank" not in ranking.columns:
             failures.append("RANKING.parquet is empty or missing rank")

@@ -161,9 +161,7 @@ def materialize_kdpp_history(
             checksums,
             "".join(
                 f"{sha256_file(temporary / name)}  {name}\n"
-                for name in sorted(
-                    ("history_manifest.json", "item_ids.json", "training.npz")
-                )
+                for name in sorted(("history_manifest.json", "item_ids.json", "training.npz"))
             ),
         )
         output_root.parent.mkdir(parents=True, exist_ok=True)

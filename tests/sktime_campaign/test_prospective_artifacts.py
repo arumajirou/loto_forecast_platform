@@ -99,11 +99,7 @@ def make_lock_bundle(tmp_path: Path, monkeypatch):
         sealed_at_utc="2026-08-05T00:00:00Z",
         model_predictor=model_predictor,
     )
-    lock = json.loads(
-        (output_dir / "PROSPECTIVE_PREDICTION_LOCK.json").read_text(
-            encoding="utf-8"
-        )
-    )
+    lock = json.loads((output_dir / "PROSPECTIVE_PREDICTION_LOCK.json").read_text(encoding="utf-8"))
     return output_dir, request, lock
 
 
@@ -147,9 +143,7 @@ def test_persist_and_verify_formal_lock_bundle(tmp_path, monkeypatch) -> None:
 
 def test_lock_bundle_redacts_history_values(tmp_path, monkeypatch) -> None:
     output_dir, _, _ = make_lock_bundle(tmp_path, monkeypatch)
-    metadata = json.loads(
-        (output_dir / "REQUEST_METADATA.json").read_text(encoding="utf-8")
-    )
+    metadata = json.loads((output_dir / "REQUEST_METADATA.json").read_text(encoding="utf-8"))
     assert metadata["history"]["values"].startswith("REDACTED")
 
 
@@ -190,9 +184,7 @@ def test_critical_drift_still_produces_verified_evidence(tmp_path, monkeypatch) 
     report = verify_prospective_monitor(output_dir, request, formal=True)
     assert response["drift_status"] == "CRITICAL"
     assert report["status"] == "PASS"
-    assert report["recommendation"] == (
-        "BLOCK_PROMOTION_RETRAIN_REVIEW_REQUIRED"
-    )
+    assert report["recommendation"] == ("BLOCK_PROMOTION_RETRAIN_REVIEW_REQUIRED")
 
 
 def test_monitor_bundle_detects_metric_tamper(tmp_path, monkeypatch) -> None:
@@ -213,9 +205,7 @@ def test_monitor_never_records_automatic_promotion(tmp_path, monkeypatch) -> Non
     output_dir = tmp_path / "no-promotion"
     request = make_monitor_request(lock)
     persist_prospective_monitor(request, output_dir)
-    response = json.loads(
-        (output_dir / "response.json").read_text(encoding="utf-8")
-    )
+    response = json.loads((output_dir / "response.json").read_text(encoding="utf-8"))
     assert response["automatic_promotion"] is False
     assert response["automatic_retraining"] is False
     assert response["promotion_status"] == "NOT_PROMOTED"

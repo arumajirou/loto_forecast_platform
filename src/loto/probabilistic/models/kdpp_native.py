@@ -124,9 +124,9 @@ class KDPPFixedKConfig(StrictContract):
     supported_prediction_lengths: tuple[Literal[1, 2, 5], ...] = (1, 2, 5)
     requested_device: Literal["cpu"] = "cpu"
     quantiles_supported: Literal[False] = False
-    default_point_forecast_semantics: Literal[
+    default_point_forecast_semantics: Literal[KDPPPointForecastSemantics.SEEDED_EXACT_SAMPLE] = (
         KDPPPointForecastSemantics.SEEDED_EXACT_SAMPLE
-    ] = KDPPPointForecastSemantics.SEEDED_EXACT_SAMPLE
+    )
 
     @field_validator("supported_games", mode="before")
     @classmethod
@@ -149,9 +149,7 @@ class KDPPFixedKConfig(StrictContract):
 
     @field_validator("supported_prediction_lengths")
     @classmethod
-    def validate_horizons(
-        cls, value: tuple[Literal[1, 2, 5], ...]
-    ) -> tuple[Literal[1, 2, 5], ...]:
+    def validate_horizons(cls, value: tuple[Literal[1, 2, 5], ...]) -> tuple[Literal[1, 2, 5], ...]:
         if tuple(value) != (1, 2, 5):
             raise ValueError("supported_prediction_lengths must be exactly (1, 2, 5)")
         return value
@@ -287,9 +285,7 @@ class KDPPFixedKResponse(StrictContract):
     marginal_inclusion_probabilities: tuple[tuple[float, ...], ...]
     exact_cardinality_check: Literal[True]
     duplicate_check: Literal[True]
-    point_forecast_semantics: Literal[
-        KDPPPointForecastSemantics.SEEDED_EXACT_SAMPLE
-    ]
+    point_forecast_semantics: Literal[KDPPPointForecastSemantics.SEEDED_EXACT_SAMPLE]
 
     @field_validator("source_revision")
     @classmethod
@@ -345,8 +341,7 @@ class KDPPFixedKResponse(StrictContract):
             if len(probabilities) != candidate_count:
                 raise ValueError("marginal probability width must match item_ids")
             if any(
-                not math.isfinite(value) or value < 0.0 or value > 1.0
-                for value in probabilities
+                not math.isfinite(value) or value < 0.0 or value > 1.0 for value in probabilities
             ):
                 raise ValueError("marginal probabilities must be finite values in [0, 1]")
             if not math.isclose(sum(probabilities), self.cardinality, abs_tol=1e-8):
@@ -365,8 +360,7 @@ class KDPPFixedKResponse(StrictContract):
             raise ValueError("kernel_rank must be at least cardinality")
         expected_degeneracy = (
             KDPPDegeneracyStatus.DEGENERATE
-            if self.kernel_off_diagonal_norm == 0.0
-            or self.kernel_off_diagonal_ratio == 0.0
+            if self.kernel_off_diagonal_norm == 0.0 or self.kernel_off_diagonal_ratio == 0.0
             else KDPPDegeneracyStatus.DIVERSE_KERNEL
         )
         if self.degeneracy_status != expected_degeneracy:

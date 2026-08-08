@@ -195,8 +195,7 @@ class P7TargetMachineAudit(BaseModel):
 
 def canonical_json_bytes(payload: Any) -> bytes:
     return (
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n"
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     ).encode("utf-8")
 
 

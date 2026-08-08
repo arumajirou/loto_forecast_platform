@@ -25,8 +25,7 @@ class PersistenceMatrixResult(BaseModel):
 
 
 class PersistenceRuntime(Protocol):
-    def execute(self, task: PersistenceTask, spec: PersistenceSpec) -> PersistenceEvidence:
-        ...
+    def execute(self, task: PersistenceTask, spec: PersistenceSpec) -> PersistenceEvidence: ...
 
 
 def build_persistence_tasks(config: PersistenceCampaignConfig) -> tuple[PersistenceTask, ...]:
@@ -66,15 +65,9 @@ def run_persistence_matrix(
         results.append(
             PersistenceMatrixResult(
                 task=task,
-                status=(
-                    "CERTIFIED"
-                    if report.status == "PERSISTENCE_CERTIFIED"
-                    else "FAILED"
-                ),
+                status=("CERTIFIED" if report.status == "PERSISTENCE_CERTIFIED" else "FAILED"),
                 failure_class=(
-                    None
-                    if report.status == "PERSISTENCE_CERTIFIED"
-                    else "CERTIFICATION_FAILED"
+                    None if report.status == "PERSISTENCE_CERTIFIED" else "CERTIFICATION_FAILED"
                 ),
                 failure_message=(
                     None

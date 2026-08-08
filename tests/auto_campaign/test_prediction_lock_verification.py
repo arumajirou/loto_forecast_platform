@@ -121,9 +121,7 @@ def test_prediction_lock_pass_is_embedded_in_final_report(
     result = verification.verify_run_with_lineage(tmp_path)
 
     assert result["status"] == "PASS"
-    report = json.loads(
-        (tmp_path / "VERIFICATION_REPORT.json").read_text(encoding="utf-8")
-    )
+    report = json.loads((tmp_path / "VERIFICATION_REPORT.json").read_text(encoding="utf-8"))
     assert report["prediction_lock_verification"]["status"] == "PASS"
     assert report["prediction_lock_verification"]["task_count"] == 36
 
@@ -144,7 +142,5 @@ def test_verification_seal_binds_prediction_lock_hash(tmp_path: Path) -> None:
     payload = write_verification_seal(tmp_path, result)
 
     assert payload is not None
-    assert payload["prediction_lock_sha256"] == sha256_file(
-        tmp_path / "PREDICTION_LOCK.json"
-    )
+    assert payload["prediction_lock_sha256"] == sha256_file(tmp_path / "PREDICTION_LOCK.json")
     assert payload["components"]["prediction_lock_status"] == "PASS"

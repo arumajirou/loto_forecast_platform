@@ -138,9 +138,7 @@ class PromotionPolicy(BaseModel):
         if self.required_roles != REQUIRED_ROLES:
             raise ValueError("required roles must match the formal P11 inventory")
         if self.required_acknowledgements != ACKNOWLEDGEMENTS:
-            raise ValueError(
-                "required acknowledgements must match the formal P11 inventory"
-            )
+            raise ValueError("required acknowledgements must match the formal P11 inventory")
         return self
 
 
@@ -173,9 +171,7 @@ class PrimaryPromotionAuthorizationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal["1.0"] = "1.0"
-    operation: Literal["authorize_primary_promotion"] = (
-        "authorize_primary_promotion"
-    )
+    operation: Literal["authorize_primary_promotion"] = "authorize_primary_promotion"
     output_dir: str = Field(min_length=1)
     run_id: str = Field(pattern=r"^[A-Za-z0-9._-]+$", min_length=1)
     git_commit: str = Field(pattern=r"^[0-9a-f]{7,40}$")
@@ -245,9 +241,7 @@ def primary_promotion_intent(
             if deployment.primary_binding
             else None
         ),
-        "expected_canary_before": deployment.canary_binding.model_dump(
-            mode="json"
-        ),
+        "expected_canary_before": deployment.canary_binding.model_dump(mode="json"),
         "target_primary": deployment.canary_binding.model_copy(
             update={"mode": "primary"}
         ).model_dump(mode="json"),
@@ -258,15 +252,9 @@ def primary_promotion_intent(
             else None
         ),
         "monitoring": {
-            "minimum_post_promotion_draws": (
-                request.policy.minimum_post_promotion_draws
-            ),
-            "minimum_post_promotion_hit_at_1": (
-                request.policy.minimum_post_promotion_hit_at_1
-            ),
-            "maximum_post_promotion_mae": (
-                request.policy.maximum_post_promotion_mae
-            ),
+            "minimum_post_promotion_draws": (request.policy.minimum_post_promotion_draws),
+            "minimum_post_promotion_hit_at_1": (request.policy.minimum_post_promotion_hit_at_1),
+            "maximum_post_promotion_mae": (request.policy.maximum_post_promotion_mae),
             "automatic_rollback": False,
         },
         "allowed_signers_sha256": request.allowed_signers_sha256,
@@ -340,9 +328,7 @@ def _authorization_payload(
         "intent_sha256": intent_sha,
         "p10_bundle_sha256": request.p10.p10_bundle_sha256,
         "deployment_target": request.deployment.deployment_target,
-        "expected_deployment_state_sha256": (
-            request.deployment.deployment_state_sha256
-        ),
+        "expected_deployment_state_sha256": (request.deployment.deployment_state_sha256),
         "expected_primary_before": intent["expected_primary_before"],
         "expected_canary_before": intent["expected_canary_before"],
         "target_primary": intent["target_primary"],
@@ -402,9 +388,7 @@ def issue_primary_promotion_authorization(
             }
         )
         if not ok:
-            raise ValueError(
-                f"signature verification failed for role {approval.role}"
-            )
+            raise ValueError(f"signature verification failed for role {approval.role}")
     authorization = _authorization_payload(
         request,
         issued_at_utc=issued_at_utc,
@@ -460,9 +444,7 @@ def validate_primary_promotion_transaction(
     now_utc: str,
 ) -> None:
     verify_authorization_seal(authorization)
-    if authorization.get("decision") != (
-        "AUTHORIZED_FOR_ONE_PRIMARY_PROMOTION_TRANSACTION"
-    ):
+    if authorization.get("decision") != ("AUTHORIZED_FOR_ONE_PRIMARY_PROMOTION_TRANSACTION"):
         raise ValueError("authorization decision mismatch")
     if authorization.get("primary_promotion_authorized") is not True:
         raise ValueError("primary promotion is not authorized")
@@ -483,9 +465,7 @@ def validate_primary_promotion_transaction(
         "authorization_id": authorization["authorization_id"],
         "authorization_seal_sha256": authorization["seal_sha256"],
         "deployment_target": authorization["deployment_target"],
-        "expected_deployment_state_sha256": (
-            authorization["expected_deployment_state_sha256"]
-        ),
+        "expected_deployment_state_sha256": (authorization["expected_deployment_state_sha256"]),
         "expected_primary_before": authorization["expected_primary_before"],
         "expected_canary_before": authorization["expected_canary_before"],
         "target_primary": authorization["target_primary"],
@@ -495,10 +475,7 @@ def validate_primary_promotion_transaction(
     for label, expected in exact.items():
         if transaction_payload[label] != expected:
             raise ValueError(f"primary promotion transaction changed {label}")
-    if (
-        transaction.expected_deployment_state_sha256
-        != observed_deployment_state_sha256
-    ):
+    if transaction.expected_deployment_state_sha256 != observed_deployment_state_sha256:
         raise ValueError("deployment state compare-and-swap precondition failed")
     if transaction.authorization_id in consumed_authorization_ids:
         raise ValueError("authorization ID already consumed")

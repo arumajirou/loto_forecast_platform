@@ -202,9 +202,6 @@ def test_non_finite_reload_prediction_is_rejected() -> None:
             expected_shape=[1],
             prediction_values=[math.inf],
             artifact_manifest_sha256="4" * 64,
-            checks={
-                name: LifecycleCheckState.FAIL
-                for name in reload_checks()
-            },
+            checks={name: LifecycleCheckState.FAIL for name in reload_checks()},
             errors=["non-finite"],
         )

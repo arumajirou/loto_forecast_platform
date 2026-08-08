@@ -134,9 +134,7 @@ def inside(path: Path, root: Path, label: str) -> Path:
     for part in relative.parts:
         current /= part
         if current.is_symlink():
-            raise CertificationError(
-                f"{label} contains a symbolic-link path component: {current}"
-            )
+            raise CertificationError(f"{label} contains a symbolic-link path component: {current}")
     resolved = lexical.resolve()
     if resolved != lexical:
         raise CertificationError(f"{label} is not a direct path: {lexical}")
@@ -152,14 +150,18 @@ def resolve_requested_root(repo_root: Path, requested: Path, label: str) -> Path
 
 
 def valid_sha256(value: object) -> bool:
-    return isinstance(value, str) and len(value) == 64 and all(
-        character in "0123456789abcdef" for character in value
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
     )
 
 
 def finite_number(value: object) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(
-        float(value)
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(float(value))
     )
 
 

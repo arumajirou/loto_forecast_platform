@@ -92,8 +92,7 @@ def test_uncalibrated_values_cannot_enter_probability_field() -> None:
 def test_position_response_rejects_candidate_score_payload() -> None:
     payload = build_position_response().model_dump(mode="json")
     payload["raw_candidate_scores"] = [
-        {"candidate": index, "raw_candidate_regression_score": 0.0}
-        for index in range(10)
+        {"candidate": index, "raw_candidate_regression_score": 0.0} for index in range(10)
     ]
     with pytest.raises(ValidationError, match="must not contain candidate scores"):
         TabPFNTSResponseV2.model_validate(payload)

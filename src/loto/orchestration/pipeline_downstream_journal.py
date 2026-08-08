@@ -28,6 +28,7 @@ STEP_ORDER = (
     "event_publication",
 )
 
+
 class DownstreamEffects(Protocol):
     def ensure_release(
         self,
@@ -66,9 +67,7 @@ def _utc_now() -> datetime:
 
 def _atomic_write_json(path: Path, payload: Any) -> None:
     if path.is_symlink():
-        raise DownstreamCommitConflict(
-            f"transaction artifact is a symlink: {path}"
-        )
+        raise DownstreamCommitConflict(f"transaction artifact is a symlink: {path}")
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     if temporary.exists() or temporary.is_symlink():
         temporary.unlink()
@@ -96,34 +95,22 @@ def _load_state(path: Path) -> DownstreamCommitState | None:
     if not path.exists():
         return None
     if path.is_symlink() or not path.is_file():
-        raise DownstreamCommitConflict(
-            "downstream commit state is not a regular file"
-        )
+        raise DownstreamCommitConflict("downstream commit state is not a regular file")
     try:
-        return DownstreamCommitState.model_validate_json(
-            path.read_text(encoding="utf-8")
-        )
+        return DownstreamCommitState.model_validate_json(path.read_text(encoding="utf-8"))
     except Exception as exc:
-        raise DownstreamCommitConflict(
-            "downstream commit state is invalid"
-        ) from exc
+        raise DownstreamCommitConflict("downstream commit state is invalid") from exc
 
 
 def _load_receipt(path: Path) -> DownstreamCommitReceipt | None:
     if not path.exists():
         return None
     if path.is_symlink() or not path.is_file():
-        raise DownstreamCommitConflict(
-            "downstream commit receipt is not a regular file"
-        )
+        raise DownstreamCommitConflict("downstream commit receipt is not a regular file")
     try:
-        return DownstreamCommitReceipt.model_validate_json(
-            path.read_text(encoding="utf-8")
-        )
+        return DownstreamCommitReceipt.model_validate_json(path.read_text(encoding="utf-8"))
     except Exception as exc:
-        raise DownstreamCommitConflict(
-            "downstream commit receipt is invalid"
-        ) from exc
+        raise DownstreamCommitConflict("downstream commit receipt is invalid") from exc
 
 
 class _CommitLock:

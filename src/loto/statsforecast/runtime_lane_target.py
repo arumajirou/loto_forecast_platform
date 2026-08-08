@@ -68,10 +68,7 @@ def collect_target_host_preflight(
     for host in ("pypi.org", "files.pythonhosted.org"):
         try:
             addresses = sorted(
-                {
-                    item[4][0]
-                    for item in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
-                }
+                {item[4][0] for item in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)}
             )
             dns[host] = {"status": "PASS", "addresses": addresses}
         except OSError as exc:
@@ -109,9 +106,7 @@ def collect_target_host_preflight(
         "working_tree_clean": not bool(git_status.get("stdout")),
         "status": (
             "PASS"
-            if python_ok
-            and uv_version.get("returncode") == 0
-            and git_head.get("returncode") == 0
+            if python_ok and uv_version.get("returncode") == 0 and git_head.get("returncode") == 0
             else "FAILED"
         ),
     }
@@ -205,14 +200,10 @@ def verify_target_host_package(archive: Path) -> dict[str, Any]:
                         try:
                             item_digest, relative = raw.split("  ", 1)
                         except ValueError:
-                            failures.append(
-                                f"SHA256SUMS line {line_number} is malformed"
-                            )
+                            failures.append(f"SHA256SUMS line {line_number} is malformed")
                             continue
                         if not _safe_member_name(relative):
-                            failures.append(
-                                f"SHA256SUMS line {line_number} has unsafe path"
-                            )
+                            failures.append(f"SHA256SUMS line {line_number} has unsafe path")
                             continue
                         member = f"{prefix}/{relative}"
                         expected.add(member)
@@ -223,9 +214,7 @@ def verify_target_host_package(archive: Path) -> dict[str, Any]:
                             failures.append(f"archive member digest mismatch: {relative}")
                     extras = set(names).difference(expected)
                     if extras:
-                        failures.append(
-                            f"archive contains unchecksummed members: {sorted(extras)}"
-                        )
+                        failures.append(f"archive contains unchecksummed members: {sorted(extras)}")
     except (OSError, zipfile.BadZipFile, UnicodeDecodeError) as exc:
         failures.append(f"archive verification error: {type(exc).__name__}: {exc}")
     return {
@@ -255,9 +244,7 @@ def run_target_host_certification(
         raise ValueError("offline target-host execution requires --wheelhouse")
     if prepare_offline and wheelhouse is None:
         raise ValueError("--prepare-offline requires --wheelhouse")
-    run_id = run_id or datetime.now(timezone.utc).strftime(
-        "statsforecast-target-%Y%m%d-%H%M%S"
-    )
+    run_id = run_id or datetime.now(timezone.utc).strftime("statsforecast-target-%Y%m%d-%H%M%S")
     output_root.mkdir(parents=True, exist_ok=True)
     controller_dir = output_root / run_id
     controller_dir.mkdir(parents=False, exist_ok=False)
@@ -278,8 +265,7 @@ def run_target_host_certification(
             wheelhouse_report = verify_offline_bundle(wheelhouse)
             if offline and wheelhouse_report["status"] != "PASS":
                 raise RuntimeError(
-                    f"offline wheelhouse verification failed: "
-                    f"{wheelhouse_report['failures']}"
+                    f"offline wheelhouse verification failed: {wheelhouse_report['failures']}"
                 )
         runtime_dir = execute_fn(
             repo_root,
@@ -348,15 +334,12 @@ def run_target_host_certification(
     checksum_report = verify_portable_sha256sums(controller_dir)
     if checksum_report["status"] != "PASS":
         raise RuntimeError(
-            f"target-host evidence checksum verification failed: "
-            f"{checksum_report['failures']}"
+            f"target-host evidence checksum verification failed: {checksum_report['failures']}"
         )
     archive = create_deterministic_zip(controller_dir)
     package_report = verify_target_host_package(archive)
     if package_report["status"] != "PASS":
-        raise RuntimeError(
-            f"target-host package verification failed: {package_report['failures']}"
-        )
+        raise RuntimeError(f"target-host package verification failed: {package_report['failures']}")
     return TargetHostResult(
         controller_dir=controller_dir,
         archive_path=archive,

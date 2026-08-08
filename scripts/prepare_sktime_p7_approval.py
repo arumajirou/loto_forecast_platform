@@ -40,16 +40,12 @@ def main() -> None:
         approval_intent_sha256=intent_sha256,
         signed_payload_sha256="0" * 64,
         signature="UNSIGNED-PLACEHOLDER-01234567890123456789",
-        risk_acknowledgements=intent["policy"][
-            "required_risk_acknowledgements"
-        ],
+        risk_acknowledgements=intent["policy"]["required_risk_acknowledgements"],
         rationale=args.rationale,
     )
     signing_payload = approval_signing_payload(approval)
     signed_payload_sha256 = canonical_sha256(signing_payload)
-    approval = approval.model_copy(
-        update={"signed_payload_sha256": signed_payload_sha256}
-    )
+    approval = approval.model_copy(update={"signed_payload_sha256": signed_payload_sha256})
     args.output_dir.mkdir(parents=True, exist_ok=False)
     draft_path = args.output_dir / "approval-draft.json"
     payload_path = args.output_dir / "approval-signing-payload.bin"

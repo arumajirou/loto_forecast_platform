@@ -51,9 +51,7 @@ class InferenceEngine(ABC):
     async def raw_post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError("engine does not support raw forwarding")
 
-    async def stream_raw(
-        self, path: str, payload: dict[str, Any]
-    ) -> AsyncIterator[bytes]:
+    async def stream_raw(self, path: str, payload: dict[str, Any]) -> AsyncIterator[bytes]:
         raise NotImplementedError("engine does not support raw streaming")
         yield b""  # pragma: no cover
 

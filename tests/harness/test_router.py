@@ -38,9 +38,7 @@ def test_router_uses_capability_and_quality() -> None:
     registry = ModelRegistry([make_model("weak", 0.4, True), make_model("strong", 0.9, True)])
     decision = ModelRouter(registry).route(
         RouteRequest(
-            required_capabilities=frozenset(
-                {Capability.CHAT, Capability.TOOLS}
-            ),
+            required_capabilities=frozenset({Capability.CHAT, Capability.TOOLS}),
             role="coder",
         )
     )

@@ -118,9 +118,7 @@ def _matrix_bundle(directory: Path) -> None:
             "series_rows": len(FORMAL_P1_SERIES),
             "series_sha256": _canonical_sha256(list(FORMAL_P1_SERIES)),
             "forecast_horizon": list(FORMAL_P1_FORECAST_HORIZON),
-            "forecast_horizon_sha256": _canonical_sha256(
-                list(FORMAL_P1_FORECAST_HORIZON)
-            ),
+            "forecast_horizon_sha256": _canonical_sha256(list(FORMAL_P1_FORECAST_HORIZON)),
         },
         "requested_model_ids": list(FORMAL_P1_MODEL_IDS),
         "summary": {

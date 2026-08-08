@@ -73,9 +73,7 @@ def main() -> int:
         return 2
 
     config = DownstreamCommitConfig(
-        registry_path=Path(
-            args.registry_path or root / "registry.sqlite3"
-        ).expanduser().resolve(),
+        registry_path=Path(args.registry_path or root / "registry.sqlite3").expanduser().resolve(),
         platform_registry_url=(
             args.platform_registry_url
             or os.environ.get(
@@ -83,12 +81,10 @@ def main() -> int:
                 str(root / "platform.sqlite3"),
             )
         ),
-        artifact_store_root=Path(
-            args.artifact_store or root / "artifact_store"
-        ).expanduser().resolve(),
-        events_path=Path(
-            args.events_path or root / "events.jsonl"
-        ).expanduser().resolve(),
+        artifact_store_root=Path(args.artifact_store or root / "artifact_store")
+        .expanduser()
+        .resolve(),
+        events_path=Path(args.events_path or root / "events.jsonl").expanduser().resolve(),
         mlflow_tracking_uri=args.mlflow_tracking_uri,
         mlflow_experiment_name=args.mlflow_experiment_name,
     )

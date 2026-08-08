@@ -175,9 +175,7 @@ def test_runner_requires_checked_in_review_to_match_request(tmp_path: Path) -> N
     }
     path = tmp_path / "remote-code-review.json"
     path.write_text(json.dumps(review), encoding="utf-8")
-    assert RUNNER._load_reviewed_remote_code_sha256(path) == {
-        "modeling_sundial.py": "a" * 64
-    }
+    assert RUNNER._load_reviewed_remote_code_sha256(path) == {"modeling_sundial.py": "a" * 64}
     review["revision"] = "wrong"
     path.write_text(json.dumps(review), encoding="utf-8")
     with pytest.raises(RUNNER.SundialProviderRuntimeError):
@@ -194,9 +192,7 @@ def test_remote_code_review_loader_requires_approved_identity(tmp_path: Path) ->
     }
     path = tmp_path / "remote-code-review.json"
     path.write_text(json.dumps(review), encoding="utf-8")
-    assert ADAPTER._load_remote_code_allowlist(path) == {
-        "modeling_sundial.py": "a" * 64
-    }
+    assert ADAPTER._load_remote_code_allowlist(path) == {"modeling_sundial.py": "a" * 64}
     review["review_status"] = "PENDING"
     path.write_text(json.dumps(review), encoding="utf-8")
     with pytest.raises(ADAPTER.FoundationProviderError):

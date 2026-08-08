@@ -108,8 +108,7 @@ def _prediction_values(
     if isinstance(prediction, pd.DataFrame):
         if prediction.shape[1] != 1:
             raise RuntimeError(
-                "prediction must contain exactly one target column, "
-                f"got shape {prediction.shape}"
+                f"prediction must contain exactly one target column, got shape {prediction.shape}"
             )
         values = prediction.iloc[:, 0].to_numpy(dtype=float)
         index = prediction.index
@@ -124,8 +123,7 @@ def _prediction_values(
 
     if values.shape != (len(expected_index),):
         raise RuntimeError(
-            f"prediction shape mismatch: expected {(len(expected_index),)}, "
-            f"got {values.shape}"
+            f"prediction shape mismatch: expected {(len(expected_index),)}, got {values.shape}"
         )
     if not np.isfinite(values).all():
         raise RuntimeError("prediction contains NaN or Inf")
@@ -133,8 +131,7 @@ def _prediction_values(
     actual_index = [int(value) for value in index.tolist()]
     if actual_index != expected_index:
         raise RuntimeError(
-            f"prediction index mismatch: expected {expected_index}, "
-            f"got {actual_index}"
+            f"prediction index mismatch: expected {expected_index}, got {actual_index}"
         )
     return values
 
@@ -181,9 +178,7 @@ def _failure(
         payload["error"] = {
             "type": type(exc).__name__,
             "message": str(exc),
-            "traceback": "".join(
-                traceback.format_exception(type(exc), exc, exc.__traceback__)
-            ),
+            "traceback": "".join(traceback.format_exception(type(exc), exc, exc.__traceback__)),
         }
     return payload
 
@@ -201,9 +196,7 @@ def run_model_smoke(
     spec = active_specs[model_id]
     phases = _phase_defaults()
 
-    dependency_versions, missing_dependencies = _distribution_versions(
-        spec.required_distributions
-    )
+    dependency_versions, missing_dependencies = _distribution_versions(spec.required_distributions)
     if missing_dependencies:
         phases["dependency_status"] = "UNAVAILABLE"
         return _failure(

@@ -99,9 +99,7 @@ def aggregate_candidate_rows(
                 "candidate_id": candidate_id,
                 "seed": seed,
                 "draw_count": len({int(row["draw_id"]) for row in values}),
-                "mean_hit_at_1": stats.fmean(
-                    float(row["hit_at_1"]) for row in values
-                ),
+                "mean_hit_at_1": stats.fmean(float(row["hit_at_1"]) for row in values),
                 "mean_all_position_hit_at_1": stats.fmean(
                     float(row["all_position_hit_at_1"]) for row in values
                 ),
@@ -125,25 +123,16 @@ def aggregate_candidate_rows(
                 "seed_count": len(values),
                 "draw_count": max(int(row["draw_count"]) for row in values),
                 "mean_hit_at_1": stats.fmean(hits),
-                "variance_hit_at_1": (
-                    stats.pvariance(hits) if len(hits) > 1 else 0.0
-                ),
+                "variance_hit_at_1": (stats.pvariance(hits) if len(hits) > 1 else 0.0),
                 "worst_seed_hit_at_1": min(hits),
                 "mean_all_position_hit_at_1": stats.fmean(
-                    float(row["mean_all_position_hit_at_1"])
-                    for row in values
+                    float(row["mean_all_position_hit_at_1"]) for row in values
                 ),
                 "mean_mae": stats.fmean(maes),
-                "variance_mae": (
-                    stats.pvariance(maes) if len(maes) > 1 else 0.0
-                ),
+                "variance_mae": (stats.pvariance(maes) if len(maes) > 1 else 0.0),
                 "worst_seed_mae": max(maes),
-                "mean_mse": stats.fmean(
-                    float(row["mean_mse"]) for row in values
-                ),
-                "mean_rmse": stats.fmean(
-                    float(row["mean_rmse"]) for row in values
-                ),
+                "mean_mse": stats.fmean(float(row["mean_mse"]) for row in values),
+                "mean_rmse": stats.fmean(float(row["mean_rmse"]) for row in values),
             }
         )
     return summaries

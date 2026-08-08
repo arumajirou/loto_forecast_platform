@@ -230,9 +230,7 @@ class PostgresMemoryStore:
             verified_claim_count = 0
         else:
             claim_count = int(counts.get("claim_count") or 0)
-            verified_claim_count = int(
-                counts.get("verified_claim_count") or 0
-            )
+            verified_claim_count = int(counts.get("verified_claim_count") or 0)
         return {
             "task": task,
             "claim_count": claim_count,

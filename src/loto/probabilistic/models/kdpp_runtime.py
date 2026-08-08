@@ -150,10 +150,7 @@ class KDPPState:
             self.kernel_sha256,
             self.state_sha256,
         )
-        if any(
-            len(value) != 64 or not set(value) <= set("0123456789abcdef")
-            for value in hashes
-        ):
+        if any(len(value) != 64 or not set(value) <= set("0123456789abcdef") for value in hashes):
             raise ValueError("state hashes must be lowercase SHA-256")
         if self.model_id != MODEL_ID or self.model_revision != MODEL_REVISION:
             raise ValueError("state model identity mismatch")
@@ -194,11 +191,7 @@ def _features(
 ) -> FloatMatrix:
     if supplied is not None:
         values = np.asarray(supplied, dtype=np.float64)
-        if (
-            values.ndim != 2
-            or values.shape[0] != training.shape[1]
-            or values.shape[1] < 1
-        ):
+        if values.ndim != 2 or values.shape[0] != training.shape[1] or values.shape[1] < 1:
             raise ValueError("item_features shape must be (item_count, feature_count >= 1)")
         if not np.isfinite(values).all():
             raise ValueError("item_features must be finite")
@@ -224,9 +217,9 @@ def _rbf(item_features: FloatMatrix, gamma: float) -> FloatMatrix:
     if not math.isfinite(gamma) or gamma <= 0.0:
         raise ValueError("rbf_gamma must be finite and positive")
     scale = item_features.std(axis=0, keepdims=True)
-    standardized = (
-        item_features - item_features.mean(axis=0, keepdims=True)
-    ) / np.where(scale > 0.0, scale, 1.0)
+    standardized = (item_features - item_features.mean(axis=0, keepdims=True)) / np.where(
+        scale > 0.0, scale, 1.0
+    )
     norms = np.sum(standardized * standardized, axis=1)
     distances = np.maximum(
         norms[:, None] + norms[None, :] - 2.0 * standardized @ standardized.T,
@@ -283,13 +276,9 @@ def kdpp_marginal_inclusion_probabilities(
                 prepared.cardinality - 1,
             )
             coefficients[index] = math.exp(
-                math.log(float(eigenvalue))
-                + excluding
-                - prepared.log_normalizer
+                math.log(float(eigenvalue)) + excluding - prepared.log_normalizer
             )
-    marginal_kernel = (
-        prepared.eigenvectors * coefficients
-    ) @ prepared.eigenvectors.T
+    marginal_kernel = (prepared.eigenvectors * coefficients) @ prepared.eigenvectors.T
     marginals = np.clip(
         np.diag(marginal_kernel),
         0.0,
@@ -380,9 +369,7 @@ class KDPPFixedKPrivateRuntime:
         psd_tolerance: float = 1e-10,
     ) -> KDPPFixedKPrivateRuntime:
         if target_layout is KDPPTargetLayout.POSITION_QUALIFIED_SHARED:
-            raise ValueError(
-                "shared layout requires a partition-constrained sampler"
-            )
+            raise ValueError("shared layout requires a partition-constrained sampler")
         training, cardinality = _training_matrix(
             training_indicators,
             len(item_ids),
@@ -398,9 +385,7 @@ class KDPPFixedKPrivateRuntime:
             raise ValueError("chronology train range must exactly match training rows")
         feature_hash = feature_evidence_sha256(training, item_features)
         if chronology_evidence.feature_matrix_sha256 != feature_hash:
-            raise ValueError(
-                "chronology feature_matrix_sha256 does not match fit inputs"
-            )
+            raise ValueError("chronology feature_matrix_sha256 does not match fit inputs")
         features = _features(training, item_features)
         quality = _quality(training, quality_pseudocount)
         if kernel_mode is KDPPKernelMode.HISTORICAL_RBF:
@@ -448,9 +433,7 @@ class KDPPFixedKPrivateRuntime:
         psd_tolerance: float = 1e-10,
     ) -> KDPPFixedKPrivateRuntime:
         if target_layout is KDPPTargetLayout.POSITION_QUALIFIED_SHARED:
-            raise ValueError(
-                "shared layout requires a partition-constrained sampler"
-            )
+            raise ValueError("shared layout requires a partition-constrained sampler")
         values = np.asarray(kernel, dtype=np.float64)
         if values.shape != (len(item_ids), len(item_ids)):
             raise ValueError("precomputed kernel shape must match item_ids")
@@ -528,9 +511,7 @@ class KDPPFixedKPrivateRuntime:
             quality,
             features,
         )
-        state = KDPPState.from_dict(
-            {**payload, "state_sha256": state_hash}
-        )
+        state = KDPPState.from_dict({**payload, "state_sha256": state_hash})
         return cls(state, kernel, quality, features)
 
     @property
@@ -553,8 +534,7 @@ class KDPPFixedKPrivateRuntime:
             request.context_length == state.context_length,
             request.kernel_sha256 == state.kernel_sha256,
             request.kernel_shape == state.kernel_shape,
-            request.chronology_evidence.feature_matrix_sha256
-            == state.feature_matrix_sha256,
+            request.chronology_evidence.feature_matrix_sha256 == state.feature_matrix_sha256,
             request.chronology_evidence.feature_cutoff == state.feature_cutoff,
             request.weight_sha256 in {None, state.state_sha256},
         }
@@ -569,10 +549,7 @@ class KDPPFixedKPrivateRuntime:
             seed_sequence = np.random.SeedSequence([request.seed, horizon])
             rng = np.random.default_rng(seed_sequence)
             samples = tuple(
-                tuple(
-                    state.item_ids[index]
-                    for index in sample_kdpp(self.prepared, rng=rng)
-                )
+                tuple(state.item_ids[index] for index in sample_kdpp(self.prepared, rng=rng))
                 for _ in range(samples_per_horizon)
             )
             points.append(samples[0])
@@ -625,14 +602,11 @@ class KDPPFixedKPrivateRuntime:
             kernel_off_diagonal_ratio=state.kernel_off_diagonal_ratio,
             degeneracy_status=state.degeneracy_status,
             marginal_inclusion_probabilities=tuple(
-                marginal_row
-                for _ in range(request.prediction_length)
+                marginal_row for _ in range(request.prediction_length)
             ),
             exact_cardinality_check=True,
             duplicate_check=True,
-            point_forecast_semantics=(
-                KDPPPointForecastSemantics.SEEDED_EXACT_SAMPLE
-            ),
+            point_forecast_semantics=(KDPPPointForecastSemantics.SEEDED_EXACT_SAMPLE),
         )
 
     def save(self, directory: str | Path) -> KDPPSavedArtifacts:
@@ -675,10 +649,7 @@ class KDPPFixedKPrivateRuntime:
             artifacts.manifest_json.name: _file_sha(artifacts.manifest_json),
         }
         artifacts.sha256sums.write_text(
-            "".join(
-                f"{value}  {name}\n"
-                for name, value in sorted(records.items())
-            ),
+            "".join(f"{value}  {name}\n" for name, value in sorted(records.items())),
             encoding="utf-8",
         )
         _verify_inventory(artifacts)

@@ -25,12 +25,8 @@ EXPECTED_REMOTE_CODE_SHA256 = {
         "1a79b4265d7a7feabb1fadc336c2c7580157ededd7cc58655f007213447eb7e4"
     ),
     "flow_loss.py": "fb33d3c3988015124c9f4e05728127d85afee8b416930c0e6d5097e4ced2ecf8",
-    "modeling_sundial.py": (
-        "4a7ce7defa6578d0ae84593587d164afb933cfa6e52aee53f709f236b00b85e4"
-    ),
-    "ts_generation_mixin.py": (
-        "789577dafbd9605d4c1b2d8930ff2861277090b004b6e7ddef6011b79444942e"
-    ),
+    "modeling_sundial.py": ("4a7ce7defa6578d0ae84593587d164afb933cfa6e52aee53f709f236b00b85e4"),
+    "ts_generation_mixin.py": ("789577dafbd9605d4c1b2d8930ff2861277090b004b6e7ddef6011b79444942e"),
 }
 EXPECTED_CASES = (
     "cpu-smoke-ns001",
@@ -108,9 +104,7 @@ def verify_snapshot(snapshot: Path, repo_root: Path | None) -> list[str]:
         elif sha256(path) != expected_hash:
             reasons.append(f"SNAPSHOT_HASH_MISMATCH:{name}")
     weight_names = {
-        path.name
-        for pattern in ("*.safetensors", "*.bin")
-        for path in snapshot.glob(pattern)
+        path.name for pattern in ("*.safetensors", "*.bin") for path in snapshot.glob(pattern)
     }
     if weight_names != set(EXPECTED_WEIGHT_SHA256):
         reasons.append("SNAPSHOT_WEIGHT_SET_MISMATCH")

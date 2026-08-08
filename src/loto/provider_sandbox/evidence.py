@@ -101,11 +101,10 @@ def write_evidence_bundle(
     _write_atomic(output_dir / "SHA256SUMS", sums.encode("utf-8"))
 
 
-
-
 def _load_strict_model(path: Path, model_type: type):
     data = parse_json_object(path.read_text(encoding="utf-8"))
     return model_type.model_validate_json(canonical_json(data))
+
 
 def _safe_name(value: str) -> str:
     parsed = PurePosixPath(value)
@@ -151,27 +150,22 @@ def verify_evidence_bundle(output_dir: Path) -> dict[str, object]:
     for name, digest in sums.items():
         if sha256_bytes((output_dir / name).read_bytes()) != digest:
             raise ValueError(f"SHA256SUMS mismatch: {name}")
-    if any(manifest.get(key) is not False for key in (
-        "kernel_isolation_certified",
-        "runtime_certified",
-        "security_certified",
-    )):
+    if any(
+        manifest.get(key) is not False
+        for key in (
+            "kernel_isolation_certified",
+            "runtime_certified",
+            "security_certified",
+        )
+    ):
         raise ValueError("foundation bundle cannot claim certification")
     backend = _load_strict_model(output_dir / "backend.json", BackendEvidence)
-    effective = _load_strict_model(
-        output_dir / "effective.json", EffectiveSandboxEvidence
-    )
+    effective = _load_strict_model(output_dir / "effective.json", EffectiveSandboxEvidence)
     plan = _load_strict_model(output_dir / "plan.json", SandboxArgvPlan)
     policy = _load_strict_model(output_dir / "policy.json", SandboxPolicy)
-    process_result = _load_strict_model(
-        output_dir / "process_result.json", SandboxProcessResult
-    )
-    request = _load_strict_model(
-        output_dir / "request.json", SandboxExecutionRequest
-    )
-    verification = _load_strict_model(
-        output_dir / "verification.json", SandboxVerificationReport
-    )
+    process_result = _load_strict_model(output_dir / "process_result.json", SandboxProcessResult)
+    request = _load_strict_model(output_dir / "request.json", SandboxExecutionRequest)
+    verification = _load_strict_model(output_dir / "verification.json", SandboxVerificationReport)
     validate_request(policy, request)
     expected_plan = build_argv_plan(policy, request, backend)
     if plan != expected_plan:

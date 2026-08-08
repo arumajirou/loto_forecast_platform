@@ -60,9 +60,7 @@ def _approval(
         rationale="Reviewed evidence, risks, rollback, and exact registry subject.",
     )
     payload_sha256 = canonical_sha256(approval_signing_payload(provisional))
-    return provisional.model_copy(
-        update={"signed_payload_sha256": payload_sha256}
-    )
+    return provisional.model_copy(update={"signed_payload_sha256": payload_sha256})
 
 
 def make_request(**updates: object) -> ApprovalAuthorizationRequest:
@@ -104,9 +102,7 @@ def make_request(**updates: object) -> ApprovalAuthorizationRequest:
                 "signed_payload_sha256": "0" * 64,
                 "signature": "VALID-SSH-SIGNATURE-BLOCK-1234567890",
                 "risk_acknowledgements": RISKS,
-                "rationale": (
-                    "Reviewed evidence, risks, rollback, and exact subject."
-                ),
+                "rationale": ("Reviewed evidence, risks, rollback, and exact subject."),
             },
             {
                 "role": "independent_reviewer",
@@ -117,9 +113,7 @@ def make_request(**updates: object) -> ApprovalAuthorizationRequest:
                 "signed_payload_sha256": "0" * 64,
                 "signature": "VALID-SSH-SIGNATURE-BLOCK-0987654321",
                 "risk_acknowledgements": RISKS,
-                "rationale": (
-                    "Independently reviewed metrics, integrity, and rollback."
-                ),
+                "rationale": ("Independently reviewed metrics, integrity, and rollback."),
             },
         ],
     }
@@ -165,9 +159,7 @@ def test_distinct_approvers_are_required() -> None:
     request = make_request()
     approvals = [
         request.approvals[0],
-        request.approvals[1].model_copy(
-            update={"approver_id": request.approvals[0].approver_id}
-        ),
+        request.approvals[1].model_copy(update={"approver_id": request.approvals[0].approver_id}),
     ]
     with pytest.raises(ValidationError, match="approvers must be distinct"):
         ApprovalAuthorizationRequest.model_validate(
@@ -200,13 +192,9 @@ def test_exact_role_inventory_is_required() -> None:
 
 def test_subject_cannot_change_shadow_candidate() -> None:
     request = make_request()
-    subject = request.subject.model_copy(
-        update={"shadow_candidate_id": "other"}
-    )
+    subject = request.subject.model_copy(update={"shadow_candidate_id": "other"})
     with pytest.raises(ValidationError, match="changed P6 shadow candidate"):
-        ApprovalAuthorizationRequest.model_validate(
-            {**request.model_dump(), "subject": subject}
-        )
+        ApprovalAuthorizationRequest.model_validate({**request.model_dump(), "subject": subject})
 
 
 def test_authorization_lifetime_cannot_exceed_policy() -> None:
@@ -217,9 +205,7 @@ def test_authorization_lifetime_cannot_exceed_policy() -> None:
 def test_approval_timestamp_must_be_inside_window() -> None:
     request = make_request()
     approvals = [
-        request.approvals[0].model_copy(
-            update={"approved_at_utc": "2026-08-05T08:59:59Z"}
-        ),
+        request.approvals[0].model_copy(update={"approved_at_utc": "2026-08-05T08:59:59Z"}),
         request.approvals[1],
     ]
     with pytest.raises(ValidationError, match="outside ceremony window"):
@@ -231,9 +217,7 @@ def test_approval_timestamp_must_be_inside_window() -> None:
 def test_approval_intent_mismatch_fails_closed() -> None:
     request = make_request()
     approvals = [
-        request.approvals[0].model_copy(
-            update={"approval_intent_sha256": OTHER_HASH}
-        ),
+        request.approvals[0].model_copy(update={"approval_intent_sha256": OTHER_HASH}),
         request.approvals[1],
     ]
     request = request.model_copy(update={"approvals": approvals})
@@ -248,9 +232,7 @@ def test_approval_intent_mismatch_fails_closed() -> None:
 def test_risk_acknowledgement_mismatch_fails_closed() -> None:
     request = make_request()
     approvals = [
-        request.approvals[0].model_copy(
-            update={"risk_acknowledgements": RISKS[:-1] + ["OTHER"]}
-        ),
+        request.approvals[0].model_copy(update={"risk_acknowledgements": RISKS[:-1] + ["OTHER"]}),
         request.approvals[1],
     ]
     request = request.model_copy(update={"approvals": approvals})
@@ -265,9 +247,7 @@ def test_risk_acknowledgement_mismatch_fails_closed() -> None:
 def test_signed_payload_hash_mismatch_fails_closed() -> None:
     request = make_request()
     approvals = [
-        request.approvals[0].model_copy(
-            update={"signed_payload_sha256": OTHER_HASH}
-        ),
+        request.approvals[0].model_copy(update={"signed_payload_sha256": OTHER_HASH}),
         request.approvals[1],
     ]
     request = request.model_copy(update={"approvals": approvals})
@@ -334,9 +314,7 @@ def test_automatic_promotion_cannot_be_enabled() -> None:
     )["authorization"]
     tampered = deepcopy(authorization)
     tampered["automatic_promotion"] = True
-    payload = {
-        key: value for key, value in tampered.items() if key != "seal_sha256"
-    }
+    payload = {key: value for key, value in tampered.items() if key != "seal_sha256"}
     tampered["seal_sha256"] = canonical_sha256(payload)
     with pytest.raises(ValueError, match="automatic promotion"):
         verify_registry_authorization(tampered)
@@ -377,9 +355,7 @@ def test_transaction_authorization_id_must_match() -> None:
         issued_at_utc=ISSUED,
         signature_verifier=verifier,
     )["authorization"]
-    transaction = _transaction(authorization).model_copy(
-        update={"authorization_id": OTHER_HASH}
-    )
+    transaction = _transaction(authorization).model_copy(update={"authorization_id": OTHER_HASH})
     with pytest.raises(ValueError, match="authorization ID mismatch"):
         validate_registry_transaction_request(
             authorization,
@@ -461,6 +437,4 @@ def test_transaction_after_expiry_is_rejected() -> None:
 
 def test_duplicate_ledger_entries_are_rejected() -> None:
     with pytest.raises(ValidationError, match="authorization IDs must be unique"):
-        AuthorizationConsumptionLedger(
-            consumed_authorization_ids=[HASH, HASH]
-        )
+        AuthorizationConsumptionLedger(consumed_authorization_ids=[HASH, HASH])

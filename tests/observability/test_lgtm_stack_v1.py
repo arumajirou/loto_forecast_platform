@@ -95,9 +95,7 @@ def test_tempo_uses_local_evaluation_storage_and_seven_day_retention() -> None:
 
 def test_grafana_datasources_are_file_provisioned_and_not_editable() -> None:
     config = yaml.safe_load(
-        (DEPLOY / "grafana/provisioning/datasources/datasources.yml").read_text(
-            encoding="utf-8"
-        )
+        (DEPLOY / "grafana/provisioning/datasources/datasources.yml").read_text(encoding="utf-8")
     )
     assert config["prune"] is True
     by_uid = {item["uid"]: item for item in config["datasources"]}
@@ -121,9 +119,7 @@ def test_dashboard_has_stable_uid_and_no_high_cardinality_selectors() -> None:
 
 
 def test_prometheus_scrape_inventory_is_fixed() -> None:
-    config = yaml.safe_load(
-        (DEPLOY / "prometheus/prometheus.yml").read_text(encoding="utf-8")
-    )
+    config = yaml.safe_load((DEPLOY / "prometheus/prometheus.yml").read_text(encoding="utf-8"))
     assert {item["job_name"] for item in config["scrape_configs"]} == {
         "prometheus",
         "alloy",
@@ -151,11 +147,10 @@ def test_secret_and_runtime_files_are_gitignored() -> None:
 
 def test_restore_requires_explicit_destructive_confirmation() -> None:
     text = (ROOT / "scripts/observability/backup_restore.sh").read_text(encoding="utf-8")
-    assert 'CONFIRM_RESTORE:-NO' in text
-    assert 'RESTORE_STATUS=PASS' in text
-    assert 'AUTO_START=false' in text
+    assert "CONFIRM_RESTORE:-NO" in text
+    assert "RESTORE_STATUS=PASS" in text
+    assert "AUTO_START=false" in text
     assert "sha256sum -c SHA256SUMS" in text
-
 
 
 def test_prometheus_alert_rules_are_bounded_and_link_to_runbook() -> None:

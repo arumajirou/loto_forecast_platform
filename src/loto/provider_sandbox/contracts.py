@@ -255,9 +255,7 @@ class SandboxArgvPlan(StrictFrozenModel):
 
     @model_validator(mode="after")
     def verify_plan_hash(self) -> "SandboxArgvPlan":
-        expected = sha256_canonical(
-            self.model_dump(mode="python", exclude={"plan_sha256"})
-        )
+        expected = sha256_canonical(self.model_dump(mode="python", exclude={"plan_sha256"}))
         if self.plan_sha256 != expected:
             raise ValueError("plan_sha256 mismatch")
         return self
@@ -310,9 +308,7 @@ class EffectiveSandboxEvidence(StrictFrozenModel):
 
     @model_validator(mode="after")
     def verify_hash(self) -> "EffectiveSandboxEvidence":
-        expected = sha256_canonical(
-            self.model_dump(mode="python", exclude={"evidence_sha256"})
-        )
+        expected = sha256_canonical(self.model_dump(mode="python", exclude={"evidence_sha256"}))
         if self.evidence_sha256 != expected:
             raise ValueError("effective evidence hash mismatch")
         return self
@@ -337,13 +333,9 @@ class SandboxVerificationReport(StrictFrozenModel):
     def verify_report(self) -> "SandboxVerificationReport":
         if self.verified != (self.status == VerificationStatus.VERIFIED):
             raise ValueError("verified flag must match status")
-        if self.status == VerificationStatus.VERIFIED and (
-            self.missing_checks or self.mismatches
-        ):
+        if self.status == VerificationStatus.VERIFIED and (self.missing_checks or self.mismatches):
             raise ValueError("verified report cannot contain gaps")
-        expected = sha256_canonical(
-            self.model_dump(mode="python", exclude={"report_sha256"})
-        )
+        expected = sha256_canonical(self.model_dump(mode="python", exclude={"report_sha256"}))
         if self.report_sha256 != expected:
             raise ValueError("verification report hash mismatch")
         return self
@@ -367,9 +359,7 @@ class SandboxProcessResult(StrictFrozenModel):
     def verify_result_hash(self) -> "SandboxProcessResult":
         if self.outcome == ProcessOutcome.TIMED_OUT and not self.timed_out:
             raise ValueError("TIMED_OUT result requires timed_out=true")
-        expected = sha256_canonical(
-            self.model_dump(mode="python", exclude={"result_sha256"})
-        )
+        expected = sha256_canonical(self.model_dump(mode="python", exclude={"result_sha256"}))
         if self.result_sha256 != expected:
             raise ValueError("process result hash mismatch")
         return self

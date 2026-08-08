@@ -68,9 +68,9 @@ def write_artifact_manifest(directory: Path) -> tuple[Path, Path]:
     manifest_path = directory / "ARTIFACT_MANIFEST.json"
     atomic_write_json(manifest_path, {"schema_version": "artifact-manifest-v1", "files": entries})
 
-    checksum_lines = [
-        f"{entry['sha256']}  {entry['path']}" for entry in entries
-    ] + [f"{sha256_file(manifest_path)}  ARTIFACT_MANIFEST.json"]
+    checksum_lines = [f"{entry['sha256']}  {entry['path']}" for entry in entries] + [
+        f"{sha256_file(manifest_path)}  ARTIFACT_MANIFEST.json"
+    ]
     checksum_path = directory / "SHA256SUMS"
     atomic_write_bytes(checksum_path, ("\n".join(checksum_lines) + "\n").encode("utf-8"))
     return manifest_path, checksum_path

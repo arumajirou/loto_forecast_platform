@@ -48,6 +48,5 @@ class ResourceScheduler:
 
     def snapshot(self) -> dict[str, dict[str, int]]:
         return {
-            key: {"active": self._active[key], "peak": self._peaks[key]}
-            for key in self._semaphores
+            key: {"active": self._active[key], "peak": self._peaks[key]} for key in self._semaphores
         }

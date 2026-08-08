@@ -99,9 +99,7 @@ def evaluate_clock_health(
 def _check_parser(observation: ClockObservation) -> ClockCheckResult:
     evidence = observation.parser_evidence
     command_failures = [
-        command
-        for command in evidence.commands
-        if command.timed_out or command.exit_code != 0
+        command for command in evidence.commands if command.timed_out or command.exit_code != 0
     ]
     if evidence.parse_errors or command_failures:
         return _result(

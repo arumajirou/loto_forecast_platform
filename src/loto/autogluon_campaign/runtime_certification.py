@@ -317,8 +317,7 @@ def _validate_response(
     expected_count = 3
     if len(response.predictions) != expected_count:
         errors.append(
-            f"prediction count mismatch: expected {expected_count}, got "
-            f"{len(response.predictions)}"
+            f"prediction count mismatch: expected {expected_count}, got {len(response.predictions)}"
         )
     if response.metadata.get("finite") is not True:
         errors.append("metadata.finite must be true")
@@ -364,9 +363,7 @@ def _validate_response(
             errors.append(f"missing persisted artifact: {name}")
             continue
         if not _path_is_within(artifact_path, artifact_dir):
-            errors.append(
-                f"persisted artifact escapes artifact_dir: {name}={artifact_path}"
-            )
+            errors.append(f"persisted artifact escapes artifact_dir: {name}={artifact_path}")
     return errors, response
 
 

@@ -12,9 +12,7 @@ def main() -> int:
     parser.add_argument("--request", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
-    request = CanaryEvaluationRequest.model_validate_json(
-        args.request.read_text(encoding="utf-8")
-    )
+    request = CanaryEvaluationRequest.model_validate_json(args.request.read_text(encoding="utf-8"))
     verify_p10(request, args.output)
     print("P10_VERIFICATION=PASS")
     return 0

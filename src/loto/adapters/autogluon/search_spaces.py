@@ -113,7 +113,5 @@ def materialize_search_spaces(value: Any, *, space_module: Any) -> Any:
     if isinstance(value, list):
         return [materialize_search_spaces(item, space_module=space_module) for item in value]
     if isinstance(value, tuple):
-        return tuple(
-            materialize_search_spaces(item, space_module=space_module) for item in value
-        )
+        return tuple(materialize_search_spaces(item, space_module=space_module) for item in value)
     return value

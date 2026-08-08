@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import json
@@ -217,10 +216,7 @@ def _scoring_artifact(tmp_path: Path) -> Path:
     )
     files = []
     for path in sorted(root.rglob("*")):
-        if (
-            path.is_file()
-            and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
-        ):
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}:
             files.append(
                 {
                     "path": path.relative_to(root).as_posix(),
@@ -347,9 +343,7 @@ def test_register_dual_backend_is_self_contained_and_source_immutable(
     verified = verify_prospective_registry(output)
     assert verified["status"] == "PASS"
     assert verified["registration_status"] == "PASS"
-    payload = json.loads(
-        (output / "REGISTRY_PAYLOAD.json").read_text(encoding="utf-8")
-    )
+    payload = json.loads((output / "REGISTRY_PAYLOAD.json").read_text(encoding="utf-8"))
     assert payload["metric_policy"]["priority_metric"] == "hit_pm1"
     assert payload["metric_policy"]["best_seed_only_selection"] is False
     assert payload["counts"]["candidate_count"] == 2
@@ -382,9 +376,7 @@ def test_mlflow_failure_marks_postgres_blocked(
 
     def failing_mlflow(*args: Any, **kwargs: Any) -> dict[str, Any]:
         calls.append("mlflow")
-        raise RuntimeError(
-            "cannot reach http://token:supersecret@mlflow.local"
-        )
+        raise RuntimeError("cannot reach http://token:supersecret@mlflow.local")
 
     backends = RegistryBackendFunctions(
         prepare_postgres=base.prepare_postgres,

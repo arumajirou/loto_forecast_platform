@@ -37,9 +37,7 @@ def _verify_sha256sums(directory: Path) -> None:
         if not artifact.is_file() or _sha256(artifact) != expected:
             raise RuntimeError(f"SHA-256 mismatch: {artifact}")
     expected_files = {
-        item.name
-        for item in directory.iterdir()
-        if item.is_file() and item.name != "SHA256SUMS"
+        item.name for item in directory.iterdir() if item.is_file() and item.name != "SHA256SUMS"
     }
     if seen != expected_files:
         raise RuntimeError("P6 SHA256SUMS coverage mismatch")

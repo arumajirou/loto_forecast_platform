@@ -47,10 +47,7 @@ def _read_json_object(path: Path, failures: list[str], label: str) -> dict[str, 
 
 def _requires_gpu(config: CampaignConfig) -> bool:
     resources = config.resources
-    return bool(
-        resources.accelerator == "gpu"
-        or resources.gpus_per_trial > 0
-    )
+    return bool(resources.accelerator == "gpu" or resources.gpus_per_trial > 0)
 
 
 def _cuda_device(snapshot: Mapping[str, Any]) -> bool:
@@ -93,8 +90,7 @@ def _coverage_decision(coverage_run: Path) -> tuple[dict[str, Any], list[str]]:
     if manifest:
         artifact_verification = verify_coverage_state_artifacts(coverage_run, manifest)
         failures.extend(
-            f"coverage artifact: {failure}"
-            for failure in artifact_verification.get("failures", [])
+            f"coverage artifact: {failure}" for failure in artifact_verification.get("failures", [])
         )
         if manifest.get("status") != "PASS":
             failures.append(f"coverage manifest status is not PASS: {manifest.get('status')}")
@@ -184,9 +180,7 @@ def _runtime_decision(
         certification = raw.get("runtime_certification")
         checks = {
             "model_status": raw.get("status") == "SUCCEEDED",
-            "model_certification_status": (
-                raw.get("certification_status") == "RUNTIME_CERTIFIED"
-            ),
+            "model_certification_status": (raw.get("certification_status") == "RUNTIME_CERTIFIED"),
             "certification_object": isinstance(certification, Mapping),
         }
         if isinstance(certification, Mapping):
@@ -204,9 +198,7 @@ def _runtime_decision(
                     "pre_save_cuda": (
                         certification.get("cuda_pre_save_inference_evidence") is True
                     ),
-                    "reload_cuda": (
-                        certification.get("cuda_reload_inference_evidence") is True
-                    ),
+                    "reload_cuda": (certification.get("cuda_reload_inference_evidence") is True),
                     "combined_cuda": certification.get("cuda_execution_evidence") is True,
                     "no_cpu_fallback": certification.get("cpu_fallback") is False,
                     "loaded": certification.get("loaded") is True,
@@ -215,9 +207,7 @@ def _runtime_decision(
                     "key_match": certification.get("key_match") is True,
                     "finite": certification.get("finite") is True,
                     "prediction_match": certification.get("prediction_match") is True,
-                    "state_before_finite": (
-                        certification.get("state_before_finite") is True
-                    ),
+                    "state_before_finite": (certification.get("state_before_finite") is True),
                     "state_after_finite": certification.get("state_after_finite") is True,
                     "training_evidence_present": bool(certification.get("training_evidence")),
                     "pre_save_device_cuda": (
@@ -233,8 +223,7 @@ def _runtime_decision(
                         isinstance(reload_runtime, Mapping) and _vram_evidence(reload_runtime)
                     ),
                     "pre_save_gpu_pid": (
-                        isinstance(pre_gpu, Mapping)
-                        and pre_gpu.get("gpu_pid_verified") is True
+                        isinstance(pre_gpu, Mapping) and pre_gpu.get("gpu_pid_verified") is True
                     ),
                     "reload_gpu_pid": (
                         isinstance(reload_gpu, Mapping)

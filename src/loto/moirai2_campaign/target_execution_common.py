@@ -151,9 +151,7 @@ def parse_sha256_manifest(path: Path) -> dict[str, str]:
         if not line:
             continue
         if "  " not in line:
-            raise TargetExecutionError(
-                f"invalid SHA256SUMS line {line_number}: {line!r}"
-            )
+            raise TargetExecutionError(f"invalid SHA256SUMS line {line_number}: {line!r}")
         digest, relative = line.split("  ", 1)
         if len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
             raise TargetExecutionError(f"invalid SHA-256 at line {line_number}")
@@ -179,18 +177,12 @@ def verify_sha256_manifest(root: Path) -> dict[str, Any]:
             raise TargetExecutionError(
                 f"SHA-256 mismatch for {relative}: expected={expected} actual={actual}"
             )
-    actual_files = {
-        path.relative_to(root).as_posix()
-        for path in root.rglob("*")
-        if path.is_file()
-    }
+    actual_files = {path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file()}
     expected_files = set(entries) | {SHA_FILENAME}
     if actual_files != expected_files:
         missing = sorted(expected_files - actual_files)
         extra = sorted(actual_files - expected_files)
-        raise TargetExecutionError(
-            f"manifest file set differs: missing={missing} extra={extra}"
-        )
+        raise TargetExecutionError(f"manifest file set differs: missing={missing} extra={extra}")
     return {
         "entry_count": len(entries),
         "manifest_sha256": sha256_file(manifest),
@@ -213,5 +205,3 @@ def verify_control_integrity(control_dir: Path) -> dict[str, Any]:
     if set(entries) != expected:
         raise TargetExecutionError("control artifact manifest and SHA256SUMS differ")
     return verification
-
-

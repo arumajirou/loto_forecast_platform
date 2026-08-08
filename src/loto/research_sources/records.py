@@ -33,6 +33,7 @@ from .contracts import (
     SourceVerificationReport,
 )
 
+
 class ResearchSourceRecord(BaseModel):
     model_config = STRICT_CONFIG
 
@@ -111,8 +112,7 @@ class ResearchSourceRecord(BaseModel):
             raise ValueError("NOT_RELEASED intake status requires release_status=NOT_RELEASED")
         if self.verification.status == IntakeStatus.REMOTE_CODE_REVIEW_REQUIRED and not (
             self.remote_code_policy.trust_remote_code
-            and self.remote_code_policy.review_status
-            == ReviewStatus.REMOTE_CODE_REVIEW_REQUIRED
+            and self.remote_code_policy.review_status == ReviewStatus.REMOTE_CODE_REVIEW_REQUIRED
         ):
             raise ValueError("remote-code intake status requires a pending remote-code review")
         if self.verification.status == IntakeStatus.VERIFIED_FOR_INTAKE:
@@ -189,8 +189,7 @@ class ResearchSourceRecord(BaseModel):
             if (
                 self.contamination.evidence_status != "VERIFIED"
                 or self.contamination.pretraining_disclosure in _SENTINELS
-                or self.contamination.benchmark_contamination_risk
-                == ContaminationRisk.UNKNOWN
+                or self.contamination.benchmark_contamination_risk == ContaminationRisk.UNKNOWN
             ):
                 raise ValueError("verified intake requires resolved contamination evidence")
             unresolved_licenses = _SENTINELS | {""}
@@ -220,9 +219,7 @@ class ResearchSourceRecord(BaseModel):
             }
             if isinstance(self.official_model_repository, RepositoryIdentity):
                 expected_urls.add(self.official_model_repository.url)
-            expected_urls.update(
-                package.source for package in self.runtime_compatibility.packages
-            )
+            expected_urls.update(package.source for package in self.runtime_compatibility.packages)
             if not expected_urls <= checked_urls:
                 raise ValueError("verified intake is missing official URL verification evidence")
             if not self.remote_code_policy.trust_remote_code and (
@@ -254,5 +251,3 @@ class ResearchSourceRecord(BaseModel):
         if self.superseded_by_source_id == self.source_id:
             raise ValueError("source cannot supersede itself")
         return self
-
-

@@ -72,8 +72,7 @@ def summarize_seed_metric(
         missing = sorted(set(expected_seeds).difference(by_seed))
         unexpected = sorted(set(by_seed).difference(expected_seeds))
         raise ValueError(
-            "all approved seeds are required; "
-            f"missing={missing}, unexpected={unexpected}"
+            f"all approved seeds are required; missing={missing}, unexpected={unexpected}"
         )
     ordered = [(seed, by_seed[seed]) for seed in expected_seeds]
     numeric_values = [value for _, value in ordered]

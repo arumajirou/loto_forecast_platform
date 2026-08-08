@@ -53,9 +53,7 @@ def test_rootless_oci_plan_has_required_controls(policy, execution_request) -> N
     assert oci_policy.oci_image in plan.argv
 
 
-def test_bubblewrap_gpu_request_fails_closed(
-    policy, execution_request, backend
-) -> None:
+def test_bubblewrap_gpu_request_fails_closed(policy, execution_request, backend) -> None:
     import pytest
 
     values = execution_request.model_dump(mode="python")

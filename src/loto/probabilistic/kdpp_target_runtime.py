@@ -104,8 +104,7 @@ def _validate_cpu_formal(
             seal.get("prediction_sha256") != runtime["prediction_sha256"]
             or seal.get("state_sha256") != runtime["state_sha256"]
             or seal.get("actuals_used") is not False
-            or sha256_file(root / "external_prediction_seal.json")
-            != record.prediction_seal_sha256
+            or sha256_file(root / "external_prediction_seal.json") != record.prediction_seal_sha256
         ):
             raise ValueError("external prediction seal verification failed")
     if approval.reviewer != preparation.get("reviewer"):
@@ -122,5 +121,3 @@ def _validate_cpu_formal(
         "state_sha256": runtime_a["state_sha256"],
         "report_sha256": sha256_file(report_path),
     }
-
-

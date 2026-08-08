@@ -52,9 +52,7 @@ def test_seal_output_injects_source_and_rebuilds_manifest(tmp_path: Path) -> Non
     config = json.loads((output / "campaign_config.json").read_text(encoding="utf-8"))
     assert config["source_identity"] == source
     assert config["formal_entrypoint"].endswith("run_moirai2_runtime_campaign_p8c.py")
-    launch = json.loads(
-        (output / "P8C_LAUNCH_EVIDENCE.json").read_text(encoding="utf-8")
-    )
+    launch = json.loads((output / "P8C_LAUNCH_EVIDENCE.json").read_text(encoding="utf-8"))
     assert launch["return_code"] == 0
     assert launch["source_identity"] == source
     verification = verify_campaign_manifest(output)

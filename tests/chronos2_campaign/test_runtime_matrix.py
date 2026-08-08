@@ -64,10 +64,7 @@ def _executor(request: dict) -> dict:
                 float(value) for value in row.values() if isinstance(value, (int, float))
             )
     covariate_effect *= 1e-6
-    point = [
-        [float(index + 1) + covariate_effect] * horizon
-        for index in range(len(positions))
-    ]
+    point = [[float(index + 1) + covariate_effect] * horizon for index in range(len(positions))]
     quantiles = {
         str(level): [
             [float(index + 1) + covariate_effect + float(level) - 0.5] * horizon
@@ -231,9 +228,7 @@ def test_persist_runtime_matrix_writes_sha256(tmp_path: Path) -> None:
     assert report["real_runtime_required_for_formal_pass"] is True
     scenario_root = Path(artifacts["report"]).parent / "scenarios"
     assert (scenario_root / "z0-local-h1" / "control_request.json").is_file()
-    assert (
-        scenario_root / "z4-known-future-h2" / "perturbed_response.json"
-    ).is_file()
+    assert (scenario_root / "z4-known-future-h2" / "perturbed_response.json").is_file()
 
 
 def test_persist_runtime_matrix_refuses_nonempty_output(tmp_path: Path) -> None:

@@ -37,9 +37,7 @@ def _build_rules() -> tuple[TransitionRule, ...]:
                     description="Start pending phase execution.",
                 )
             )
-            target_phase = (
-                RunPhase.COMPLETE if phase == RunPhase.PROMOTE else _next_phase(phase)
-            )
+            target_phase = RunPhase.COMPLETE if phase == RunPhase.PROMOTE else _next_phase(phase)
             target_status = (
                 RunStatus.SUCCEEDED if target_phase == RunPhase.COMPLETE else RunStatus.PENDING
             )

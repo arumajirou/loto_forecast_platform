@@ -35,10 +35,7 @@ def _nested_material_failures(
             verify_materials(
                 source.publication_time_evidence.verification_materials,
                 material_root=material_root,
-                label=(
-                    "source-publication-time:"
-                    f"{source.publication_time_evidence.evidence_id}"
-                ),
+                label=(f"source-publication-time:{source.publication_time_evidence.evidence_id}"),
             )
         )
     if source.signature is not None:
@@ -81,9 +78,7 @@ def verify_evidence_bundle(
             decide_trusted_time(evidence, material_root=material_root, registry=registry)
         )
     for evidence in bundle.signatures:
-        decisions.append(
-            decide_signature(evidence, material_root=material_root, registry=registry)
-        )
+        decisions.append(decide_signature(evidence, material_root=material_root, registry=registry))
     if bundle.actual_source is not None:
         decisions.append(
             decide_actual_source(
@@ -122,8 +117,7 @@ def verify_evidence_bundle(
         bundle.corrections[-1].status == EvidenceStatus.REVOKED
     )
     source_revoked = (
-        bundle.actual_source is not None
-        and bundle.actual_source.status == EvidenceStatus.REVOKED
+        bundle.actual_source is not None and bundle.actual_source.status == EvidenceStatus.REVOKED
     )
     if not integrity_verified or not correction_chain_verified:
         status = OfflineVerificationStatus.FAILED

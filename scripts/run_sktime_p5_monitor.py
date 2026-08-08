@@ -33,9 +33,7 @@ def load_request(args: argparse.Namespace) -> ProspectiveMonitoringRequest:
     if args.revealed_at_utc:
         actuals_payload["revealed_at_utc"] = args.revealed_at_utc
     lock = json.loads(Path(args.prediction_lock).read_text(encoding="utf-8"))
-    reference = json.loads(
-        Path(args.holdout_reference_metrics).read_text(encoding="utf-8")
-    )
+    reference = json.loads(Path(args.holdout_reference_metrics).read_text(encoding="utf-8"))
     return ProspectiveMonitoringRequest(
         run_id=args.run_id,
         prediction_lock=lock,

@@ -72,14 +72,12 @@ class RegistrySubject(BaseModel):
 class ApprovalPolicy(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    required_roles: list[Literal["model_owner", "independent_reviewer"]] = (
-        Field(
-            default_factory=lambda: [
-                "model_owner",
-                "independent_reviewer",
-            ],
-            min_length=2,
-        )
+    required_roles: list[Literal["model_owner", "independent_reviewer"]] = Field(
+        default_factory=lambda: [
+            "model_owner",
+            "independent_reviewer",
+        ],
+        min_length=2,
     )
     required_risk_acknowledgements: list[str] = Field(
         default_factory=lambda: list(_REQUIRED_RISKS),
@@ -113,9 +111,7 @@ class HumanApproval(BaseModel):
     role: Literal["model_owner", "independent_reviewer"]
     approver_id: str = Field(pattern=r"^[A-Za-z0-9._@-]+$", min_length=2)
     signer_identity: str = Field(pattern=r"^[A-Za-z0-9._@-]+$", min_length=2)
-    approved_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    approved_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     decision: Literal["APPROVE"] = "APPROVE"
     approval_intent_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     signed_payload_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -127,9 +123,7 @@ class HumanApproval(BaseModel):
     @model_validator(mode="after")
     def validate_approval(self) -> "HumanApproval":
         _parse_utc(self.approved_at_utc, label="approved_at_utc")
-        if len(self.risk_acknowledgements) != len(
-            set(self.risk_acknowledgements)
-        ):
+        if len(self.risk_acknowledgements) != len(set(self.risk_acknowledgements)):
             raise ValueError("risk acknowledgements must be unique")
         return self
 
@@ -138,21 +132,15 @@ class ApprovalAuthorizationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal["1.0"] = "1.0"
-    operation: Literal["issue_registry_authorization"] = (
-        "issue_registry_authorization"
-    )
+    operation: Literal["issue_registry_authorization"] = "issue_registry_authorization"
     output_dir: str = Field(min_length=1)
     run_id: str = Field(pattern=r"^[A-Za-z0-9._-]+$", min_length=1)
     git_commit: str = Field(pattern=r"^[0-9a-f]{7,40}$")
     code_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     config_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     allowed_signers_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    approval_requested_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
-    authorization_expires_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    approval_requested_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+    authorization_expires_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     authorization_nonce: str = Field(pattern=r"^[0-9a-f]{64}$")
     p6: P6EligibilityEvidence
     subject: RegistrySubject
@@ -183,14 +171,10 @@ class ApprovalAuthorizationRequest(BaseModel):
         if sorted(roles) != sorted(self.policy.required_roles):
             raise ValueError("approval role inventory mismatch")
         approvers = [approval.approver_id for approval in self.approvals]
-        if self.policy.require_distinct_approvers and len(set(approvers)) != len(
-            approvers
-        ):
+        if self.policy.require_distinct_approvers and len(set(approvers)) != len(approvers):
             raise ValueError("approvers must be distinct")
         signers = [approval.signer_identity for approval in self.approvals]
-        if self.policy.require_distinct_signers and len(set(signers)) != len(
-            signers
-        ):
+        if self.policy.require_distinct_signers and len(set(signers)) != len(signers):
             raise ValueError("signers must be distinct")
         for approval in self.approvals:
             approved = _parse_utc(
@@ -327,11 +311,7 @@ def verify_approval_ceremony(
 
 def verify_registry_authorization(authorization: dict[str, Any]) -> None:
     seal = str(authorization.get("seal_sha256", ""))
-    payload = {
-        key: value
-        for key, value in authorization.items()
-        if key != "seal_sha256"
-    }
+    payload = {key: value for key, value in authorization.items() if key != "seal_sha256"}
     if len(seal) != 64 or canonical_sha256(payload) != seal:
         raise ValueError("registry authorization seal mismatch")
     if authorization.get("registry_write_authorized") is not True:
@@ -416,9 +396,7 @@ class RegistryTransactionRequest(BaseModel):
     authorization_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     authorization_seal_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     transaction_nonce: str = Field(pattern=r"^[0-9a-f]{64}$")
-    requested_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    requested_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     expected_registry_state_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     subject: RegistrySubject
 
@@ -431,13 +409,9 @@ class AuthorizationConsumptionLedger(BaseModel):
 
     @model_validator(mode="after")
     def validate_ledger(self) -> "AuthorizationConsumptionLedger":
-        if len(self.consumed_authorization_ids) != len(
-            set(self.consumed_authorization_ids)
-        ):
+        if len(self.consumed_authorization_ids) != len(set(self.consumed_authorization_ids)):
             raise ValueError("consumed authorization IDs must be unique")
-        if len(self.consumed_transaction_nonces) != len(
-            set(self.consumed_transaction_nonces)
-        ):
+        if len(self.consumed_transaction_nonces) != len(set(self.consumed_transaction_nonces)):
             raise ValueError("consumed transaction nonces must be unique")
         return self
 
@@ -481,9 +455,7 @@ def validate_registry_transaction_request(
         "decision": "REGISTRY_TRANSACTION_ALLOWED_ONCE",
         "authorization_id": transaction.authorization_id,
         "transaction_nonce": transaction.transaction_nonce,
-        "expected_registry_state_sha256": (
-            transaction.expected_registry_state_sha256
-        ),
+        "expected_registry_state_sha256": (transaction.expected_registry_state_sha256),
         "registry_write_executed": False,
         "next_action": "P8_COMPARE_AND_SWAP_REGISTRY_WRITE",
     }

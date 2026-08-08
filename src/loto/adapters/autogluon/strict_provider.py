@@ -72,8 +72,7 @@ def validate_protocol_v2_preflight(request: ProviderRequestV2) -> None:
     if request.predictor.target != "target":
         raise StrictPreflightError(
             "TARGET_COLUMN_NOT_IMPLEMENTED",
-            "predictor.target must be 'target' until custom target-column mapping "
-            "is implemented",
+            "predictor.target must be 'target' until custom target-column mapping is implemented",
         )
     if request.predictor.freq != geometry.timeline.frequency:
         raise StrictPreflightError(

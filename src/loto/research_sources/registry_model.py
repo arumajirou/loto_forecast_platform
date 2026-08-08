@@ -7,6 +7,7 @@ from pydantic import AwareDatetime, BaseModel, model_validator
 from .common import STRICT_CONFIG
 from .records import ResearchSourceRecord
 
+
 class ResearchSourceRegistry(BaseModel):
     model_config = STRICT_CONFIG
 
@@ -38,4 +39,3 @@ class ResearchSourceRegistry(BaseModel):
                 seen.add(current)
                 current = records_by_id[current].superseded_by_source_id
         return self
-

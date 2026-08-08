@@ -109,9 +109,7 @@ def test_resume_records_event_but_does_not_regenerate_sealed_output(
 ) -> None:
     service.execute(
         make_command(command_id="start"),
-        lambda _: EffectResult(
-            sealed_outputs=(HashBinding(name="checkpoint", sha256="b" * 64),)
-        ),
+        lambda _: EffectResult(sealed_outputs=(HashBinding(name="checkpoint", sha256="b" * 64),)),
     )
     clock.advance(timedelta(seconds=1))
     service.execute(
@@ -126,9 +124,7 @@ def test_resume_records_event_but_does_not_regenerate_sealed_output(
     def should_not_run(_):
         nonlocal calls
         calls += 1
-        return EffectResult(
-            sealed_outputs=(HashBinding(name="checkpoint", sha256="c" * 64),)
-        )
+        return EffectResult(sealed_outputs=(HashBinding(name="checkpoint", sha256="c" * 64),))
 
     clock.advance(timedelta(seconds=1))
     resumed = service.execute(

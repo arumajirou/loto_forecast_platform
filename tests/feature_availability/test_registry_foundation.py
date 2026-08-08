@@ -270,18 +270,14 @@ def test_changed_source_hash_fails_closed() -> None:
 
 def test_unknown_temporal_class_fails_closed() -> None:
     manifest = valid_manifest()
-    definition = replace_model(
-        manifest.definitions[0], temporal_class=TemporalClass.UNKNOWN, lag=1
-    )
+    definition = replace_model(manifest.definitions[0], temporal_class=TemporalClass.UNKNOWN, lag=1)
     changed = replace_model(manifest, definitions=(definition,))
     assert ValidationIssueCode.UNKNOWN_TEMPORAL_CLASS in issue_codes(changed)
 
 
 def test_not_known_at_prediction_time_fails_closed() -> None:
     manifest = valid_manifest()
-    availability = replace_model(
-        manifest.availabilities[0], known_at_prediction_time=False
-    )
+    availability = replace_model(manifest.availabilities[0], known_at_prediction_time=False)
     changed = replace_model(manifest, availabilities=(availability,))
     assert ValidationIssueCode.NOT_KNOWN_AT_PREDICTION_TIME in issue_codes(changed)
 

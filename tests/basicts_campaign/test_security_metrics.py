@@ -9,9 +9,7 @@ from loto.basicts_campaign.security import ConfigImportRejected, validate_import
 
 
 def test_config_import_allowlist() -> None:
-    validate_import_reference(
-        ImportReference(module="basicts.models.DLinear", name="DLinear")
-    )
+    validate_import_reference(ImportReference(module="basicts.models.DLinear", name="DLinear"))
     validate_import_reference(ImportReference(module="torch.optim", name="Adam"))
 
 

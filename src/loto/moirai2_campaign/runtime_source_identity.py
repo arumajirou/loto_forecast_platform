@@ -28,9 +28,7 @@ def _git(repo_root: Path, *arguments: str) -> str:
     )
     if process.returncode != 0:
         message = process.stderr.strip() or process.stdout.strip()
-        raise RuntimeSourceIdentityError(
-            f"git {' '.join(arguments)} failed: {message}"
-        )
+        raise RuntimeSourceIdentityError(f"git {' '.join(arguments)} failed: {message}")
     return process.stdout.strip()
 
 
@@ -60,13 +58,8 @@ def capture_source_identity(
         raise RuntimeSourceIdentityError("principal source paths are required")
     missing = [path for path in paths if not (root / path).is_file()]
     if missing:
-        raise RuntimeSourceIdentityError(
-            f"principal source files are missing: {missing}"
-        )
-    file_hashes = {
-        path: sha256_file(root / path)
-        for path in paths
-    }
+        raise RuntimeSourceIdentityError(f"principal source files are missing: {missing}")
+    file_hashes = {path: sha256_file(root / path) for path in paths}
     return {
         "schema_version": "moirai2-source-identity-v1",
         "repo_root": str(root),

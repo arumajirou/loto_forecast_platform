@@ -61,8 +61,7 @@ def _write_manifest_and_sha(output_dir: Path) -> None:
     files = sorted(
         path
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     manifest = {
         "schema_version": "1.0",
@@ -79,9 +78,7 @@ def _write_manifest_and_sha(output_dir: Path) -> None:
     }
     _write_json(output_dir / "ARTIFACT_MANIFEST.json", manifest)
     hashed = sorted(
-        path
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     )
     _atomic_write_text(
         output_dir / "SHA256SUMS",
@@ -188,8 +185,7 @@ def _verify_manifest(output_dir: Path) -> None:
     expected = {
         path.name
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     }
     if seen != expected:
         raise P10VerificationError("manifest coverage mismatch")
@@ -210,9 +206,7 @@ def _verify_sha256sums(output_dir: Path) -> None:
         if not target.is_file() or _sha256(target) != expected:
             raise P10VerificationError(f"SHA256SUMS mismatch: {name}")
     expected_names = {
-        item.name
-        for item in output_dir.iterdir()
-        if item.is_file() and item.name != "SHA256SUMS"
+        item.name for item in output_dir.iterdir() if item.is_file() and item.name != "SHA256SUMS"
     }
     if seen != expected_names:
         raise P10VerificationError("SHA256SUMS coverage mismatch")

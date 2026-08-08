@@ -53,5 +53,3 @@ def _final_report_payload(
         "public_registration_performed": False,
         "oof_executed": False,
     }
-
-

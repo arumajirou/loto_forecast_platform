@@ -30,8 +30,8 @@ def run_instrumented_fold(
     started = time.perf_counter()
     before = module.collect_gpu_evidence(gpu_required=may_use_gpu)
     before_mib = before.get("vram_allocated_bytes", 0) / (1024 * 1024)
-    candidate_probs, pos_pred, resolved_device, fallback_reason = (
-        module.run_model_fold_internal(spec, train_df, params, seed, device, precision)
+    candidate_probs, pos_pred, resolved_device, fallback_reason = module.run_model_fold_internal(
+        spec, train_df, params, seed, device, precision
     )
     duration = time.perf_counter() - started
     gpu = module.collect_gpu_evidence(gpu_required=may_use_gpu)
@@ -48,9 +48,7 @@ def run_instrumented_fold(
         "fallback_reason": fallback_reason,
     }
     if candidate_probs.shape != (37,):
-        raise ValueError(
-            f"Normalized probabilities shape mismatch: {candidate_probs.shape}"
-        )
+        raise ValueError(f"Normalized probabilities shape mismatch: {candidate_probs.shape}")
     if not module.np.isfinite(candidate_probs).all():
         raise ValueError("Normalized probabilities contain NaN or Inf")
     if (candidate_probs < 0.0).any():

@@ -167,6 +167,7 @@ def verify_model_geometry(model: Any, geometry: dict[str, Any]) -> None:
 
 def runtime_evidence() -> dict[str, Any]:
     import torch
+
     return {
         "process_id": os.getpid(),
         "python": platform.python_version(),

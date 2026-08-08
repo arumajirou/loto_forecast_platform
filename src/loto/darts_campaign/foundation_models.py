@@ -148,9 +148,7 @@ class FoundationModelConfig(BaseModel):
         if self.public_name == "TiRexModel" and self.finetuning:
             tirex = self.model_args.get("tirex_kwargs")
             if not isinstance(tirex, dict) or tirex.get("backend") != "torch":
-                raise ValueError(
-                    "TiRex fine-tuning requires tirex_kwargs.backend=torch"
-                )
+                raise ValueError("TiRex fine-tuning requires tirex_kwargs.backend=torch")
         return self
 
 
@@ -189,18 +187,14 @@ class FoundationCampaignConfig(BaseModel):
                 raise ValueError("input_chunk_length must be positive")
             return value
         if len(value) != 2 or value[0] < 1 or value[1] < value[0]:
-            raise ValueError(
-                "input_chunk_length tuple must be (min, max) with 1 <= min <= max"
-            )
+            raise ValueError("input_chunk_length tuple must be (min, max) with 1 <= min <= max")
         return value
 
     @model_validator(mode="after")
     def validate_campaign(self) -> FoundationCampaignConfig:
         names = [item.public_name for item in self.models]
         if not names or len(names) != len(set(names)):
-            raise ValueError(
-                "foundation model identities must be non-empty and unique"
-            )
+            raise ValueError("foundation model identities must be non-empty and unique")
         input_max = (
             self.input_chunk_length
             if isinstance(self.input_chunk_length, int)
@@ -211,9 +205,7 @@ class FoundationCampaignConfig(BaseModel):
             if self.track == "zero_shot" and enabled:
                 raise ValueError("zero_shot track requires finetuning=False")
             if self.track == "fine_tune" and not enabled:
-                raise ValueError(
-                    "fine_tune track requires finetuning=True or partial config"
-                )
+                raise ValueError("fine_tune track requires finetuning=True or partial config")
             capability = FOUNDATION_CAPABILITIES[item.public_name]
             if (
                 capability.max_input_chunk_length is not None
@@ -235,9 +227,7 @@ class FoundationCampaignConfig(BaseModel):
         if self.output_chunk_shift and self.horizon > self.output_chunk_length:
             raise ValueError("output_chunk_shift prohibits autoregressive horizon")
         if self.predict_likelihood_parameters and self.num_samples != 1:
-            raise ValueError(
-                "likelihood parameter prediction requires num_samples=1"
-            )
+            raise ValueError("likelihood parameter prediction requires num_samples=1")
         return self
 
 
@@ -335,9 +325,7 @@ def certify_source(
                 "FOUNDATION_ARTIFACT_MISSING",
                 "local model directory does not exist",
             )
-        elif len(digest) != 64 or any(
-            item not in "0123456789abcdef" for item in digest
-        ):
+        elif len(digest) != 64 or any(item not in "0123456789abcdef" for item in digest):
             failure = (
                 "FOUNDATION_ARTIFACT_UNVERIFIED",
                 "local manifest SHA-256 is missing",
@@ -393,18 +381,14 @@ def certify_capabilities(
         "supports_multivariate",
         "supports_probabilistic_prediction",
     )
-    runtime = {
-        name: _runtime_capability_value(model, name)
-        for name in names
-    }
+    runtime = {name: _runtime_capability_value(model, name) for name in names}
     drift = {
         name: {
             "expected": getattr(expected, name),
             "runtime": runtime[name],
         }
         for name in names
-        if runtime[name] is None
-        or runtime[name] != getattr(expected, name)
+        if runtime[name] is None or runtime[name] != getattr(expected, name)
     }
     failure: tuple[str, str] | None = None
     if drift:
@@ -422,10 +406,7 @@ def certify_capabilities(
             "COVARIATE_UNSUPPORTED",
             "future covariates are not supported",
         )
-    elif (
-        series_layout == "position_multivariate"
-        and not expected.supports_multivariate
-    ):
+    elif series_layout == "position_multivariate" and not expected.supports_multivariate:
         failure = (
             "MULTIVARIATE_UNSUPPORTED",
             "multivariate input is not supported",
@@ -495,9 +476,7 @@ def _constructor_args(
         "pl_trainer_kwargs": campaign.device.trainer_kwargs(),
         **model.model_args,
     }
-    if FOUNDATION_CAPABILITIES[
-        model.public_name
-    ].requires_license_acceptance:
+    if FOUNDATION_CAPABILITIES[model.public_name].requires_license_acceptance:
         payload["accept_license"] = model.accept_license
     return payload
 
@@ -534,11 +513,7 @@ def _normalize_sequence(
     positions: int,
     horizon: int,
 ) -> tuple[tuple[float, ...], ...]:
-    blocks = (
-        list(predictions)
-        if isinstance(predictions, (list, tuple))
-        else [predictions]
-    )
+    blocks = list(predictions) if isinstance(predictions, (list, tuple)) else [predictions]
     if len(blocks) != positions:
         raise ValueError("prediction position count mismatch")
     rows: list[tuple[float, ...]] = []
@@ -673,10 +648,12 @@ def run_foundation_matrix(
         device_records: list[dict[str, Any]] = []
         try:
             if not item.source.revision_is_resolved:
-                raise FoundationCertificationError({
-                    "failure_class": "FOUNDATION_REVISION_UNRESOLVED",
-                    "message": "model revision is not pinned",
-                })
+                raise FoundationCertificationError(
+                    {
+                        "failure_class": "FOUNDATION_REVISION_UNRESOLVED",
+                        "message": "model revision is not pinned",
+                    }
+                )
             source_record = certify_source(
                 item.source,
                 source_probe(item, None),
@@ -710,12 +687,8 @@ def run_foundation_matrix(
                         current_model,
                         config,
                         single_series,
-                        None
-                        if past_covariates is None
-                        else past_covariates[position],
-                        None
-                        if future_covariates is None
-                        else future_covariates[position],
+                        None if past_covariates is None else past_covariates[position],
+                        None if future_covariates is None else future_covariates[position],
                     )
                     extra_ledger.extend(current_ledger)
                     rows.append(
@@ -780,10 +753,12 @@ def run_foundation_matrix(
                         None,
                     ),
                 )
-                device_records.append({
-                    "position": None,
-                    **device_record,
-                })
+                device_records.append(
+                    {
+                        "position": None,
+                        **device_record,
+                    }
+                )
                 if not device_record["passed"]:
                     raise FoundationCertificationError(device_record)
                 track_record = certify_track(
@@ -793,72 +768,82 @@ def run_foundation_matrix(
                 if not track_record["passed"]:
                     raise FoundationCertificationError(track_record)
 
-            results.append(FoundationModelResult(
-                model_name=item.public_name,
-                status="PASS",
-                predictions=predictions,
-                failure_class=None,
-                message=None,
-                argument_ledger=ledger,
-                capability_certification=capability_record,
-                source_certification=source_record,
-                track_certification=track_record,
-                device_certifications=tuple(device_records),
-                metadata={
-                    "track": config.track,
-                    "hub_model_name": item.source.hub_model_name,
-                    "hub_model_revision": item.source.hub_model_revision,
-                    "capability_matrix_sha256": capability_matrix_sha256(),
-                },
-            ))
+            results.append(
+                FoundationModelResult(
+                    model_name=item.public_name,
+                    status="PASS",
+                    predictions=predictions,
+                    failure_class=None,
+                    message=None,
+                    argument_ledger=ledger,
+                    capability_certification=capability_record,
+                    source_certification=source_record,
+                    track_certification=track_record,
+                    device_certifications=tuple(device_records),
+                    metadata={
+                        "track": config.track,
+                        "hub_model_name": item.source.hub_model_name,
+                        "hub_model_revision": item.source.hub_model_revision,
+                        "capability_matrix_sha256": capability_matrix_sha256(),
+                    },
+                )
+            )
         except FoundationCertificationError as error:
-            results.append(_failed_result(
-                item,
-                config,
-                error.record["failure_class"],
-                error.record["message"],
-                ledger=ledger,
-                capability=capability_record,
-                source=source_record,
-                track=track_record,
-                devices=tuple(device_records),
-            ))
+            results.append(
+                _failed_result(
+                    item,
+                    config,
+                    error.record["failure_class"],
+                    error.record["message"],
+                    ledger=ledger,
+                    capability=capability_record,
+                    source=source_record,
+                    track=track_record,
+                    devices=tuple(device_records),
+                )
+            )
         except AttributeError as error:
-            results.append(_failed_result(
-                item,
-                config,
-                "DEPENDENCY_MISSING",
-                str(error),
-                ledger=ledger,
-                capability=capability_record,
-                source=source_record,
-                track=track_record,
-                devices=tuple(device_records),
-            ))
+            results.append(
+                _failed_result(
+                    item,
+                    config,
+                    "DEPENDENCY_MISSING",
+                    str(error),
+                    ledger=ledger,
+                    capability=capability_record,
+                    source=source_record,
+                    track=track_record,
+                    devices=tuple(device_records),
+                )
+            )
         except ValueError as error:
-            results.append(_failed_result(
-                item,
-                config,
-                "INVALID_REQUEST",
-                str(error),
-                ledger=ledger,
-                capability=capability_record,
-                source=source_record,
-                track=track_record,
-                devices=tuple(device_records),
-            ))
+            results.append(
+                _failed_result(
+                    item,
+                    config,
+                    "INVALID_REQUEST",
+                    str(error),
+                    ledger=ledger,
+                    capability=capability_record,
+                    source=source_record,
+                    track=track_record,
+                    devices=tuple(device_records),
+                )
+            )
         except Exception as error:
-            results.append(_failed_result(
-                item,
-                config,
-                "RUNTIME_FAILED",
-                str(error),
-                ledger=ledger,
-                capability=capability_record,
-                source=source_record,
-                track=track_record,
-                devices=tuple(device_records),
-            ))
+            results.append(
+                _failed_result(
+                    item,
+                    config,
+                    "RUNTIME_FAILED",
+                    str(error),
+                    ledger=ledger,
+                    capability=capability_record,
+                    source=source_record,
+                    track=track_record,
+                    devices=tuple(device_records),
+                )
+            )
     if not frame.equals(source_frame):
         raise RuntimeError("raw frame was mutated")
     return tuple(results)

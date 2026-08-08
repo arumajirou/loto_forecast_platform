@@ -272,9 +272,7 @@ def test_prospective_rejects_candidate_change(tmp_path: Path) -> None:
         actual_source_label="holdout fixture",
     )
     changed = selection().model_copy(update={"selected_candidate_id": "DeepAR-known-static"})
-    changed_rows = [
-        {**row, "candidate_id": "DeepAR-known-static"} for row in model_predictions()
-    ]
+    changed_rows = [{**row, "candidate_id": "DeepAR-known-static"} for row in model_predictions()]
     with pytest.raises(HoldoutProspectiveError) as exc_info:
         create_prediction_lock(
             output_dir=tmp_path / "prospective",

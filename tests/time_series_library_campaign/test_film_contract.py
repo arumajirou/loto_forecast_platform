@@ -13,7 +13,7 @@ from loto.time_series_library_campaign.film_runtime import ensure_cpu_only_runti
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts" / "run_time_series_library_provider.py"
 
-FAKE_FILM = '''
+FAKE_FILM = """
 import torch
 from torch import nn
 
@@ -57,7 +57,7 @@ class Model(nn.Module):
         stacked = torch.stack([base, base, base], dim=-1)
         mixed = self.mlp(stacked).squeeze(-1)
         return mixed.repeat(1, self.pred_len, 1)
-'''.strip()
+""".strip()
 
 
 def write_fake_source(root: Path) -> None:
@@ -116,13 +116,13 @@ def test_film_rejects_unverified_geometry(
         ProviderRequest(**payload)
 
 
-
 def test_film_rejects_cuda_visible_cpu_lane(monkeypatch: pytest.MonkeyPatch) -> None:
     import torch
 
     monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
     with pytest.raises(ValueError, match="requires CUDA unavailable"):
         ensure_cpu_only_runtime()
+
 
 def test_film_pinned_policy_rejects_fixture(tmp_path: Path) -> None:
     source = tmp_path / "source"

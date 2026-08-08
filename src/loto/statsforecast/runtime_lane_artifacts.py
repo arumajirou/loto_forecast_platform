@@ -174,8 +174,7 @@ def fetch_release_artifact(
     actual = sha256_bytes(artifact_bytes)
     if actual != selected["sha256"]:
         raise ValueError(
-            f"downloaded artifact SHA-256 mismatch: "
-            f"expected {selected['sha256']}, got {actual}"
+            f"downloaded artifact SHA-256 mismatch: expected {selected['sha256']}, got {actual}"
         )
     artifact_path = wheelhouse / selected["filename"]
     atomic_write(artifact_path, artifact_bytes)
@@ -246,14 +245,10 @@ def verify_portable_sha256sums(
         seen.add(normalized)
         path = root.joinpath(*posix.parts)
         if not path.is_file() or path.is_symlink():
-            failures.append(
-                f"line {line_number}: missing or symlinked file {normalized!r}"
-            )
+            failures.append(f"line {line_number}: missing or symlinked file {normalized!r}")
             continue
         if sha256_file(path) != digest:
-            failures.append(
-                f"line {line_number}: digest mismatch for {normalized!r}"
-            )
+            failures.append(f"line {line_number}: digest mismatch for {normalized!r}")
             continue
         verified += 1
     return {
@@ -300,9 +295,7 @@ def verify_offline_bundle(wheelhouse: Path) -> dict[str, Any]:
         digest = str(selected.get("sha256", ""))
         selected_path = packages / filename
         if not selected_path.is_file():
-            failures.append(
-                f"selected StatsForecast artifact is missing: {filename}"
-            )
+            failures.append(f"selected StatsForecast artifact is missing: {filename}")
         elif sha256_file(selected_path) != digest:
             failures.append("selected StatsForecast artifact digest mismatch")
     return {
@@ -322,12 +315,7 @@ def prepare_offline_bundle(
     wheelhouse.mkdir(parents=True, exist_ok=False)
     project = wheelhouse / "project"
     project.mkdir()
-    template = (
-        repo_root
-        / "environments"
-        / "statsforecast-py313"
-        / "pyproject.toml"
-    )
+    template = repo_root / "environments" / "statsforecast-py313" / "pyproject.toml"
     shutil.copy2(template, project / "pyproject.toml")
     logs = wheelhouse / "build-logs"
     logs.mkdir()
@@ -416,14 +404,10 @@ def prepare_offline_bundle(
     selected, metadata_bytes = fetch_release_metadata(opener=opener)
     selected_path = packages / selected["filename"]
     if not selected_path.is_file():
-        raise RuntimeError(
-            "pip download did not produce the selected StatsForecast wheel"
-        )
+        raise RuntimeError("pip download did not produce the selected StatsForecast wheel")
     actual = sha256_file(selected_path)
     if actual != selected["sha256"]:
-        raise RuntimeError(
-            "downloaded StatsForecast wheel does not match PyPI SHA-256"
-        )
+        raise RuntimeError("downloaded StatsForecast wheel does not match PyPI SHA-256")
     write_json(
         wheelhouse / "PYPI_RELEASE_SELECTION.json",
         {
@@ -437,9 +421,7 @@ def prepare_offline_bundle(
             "prepared_at_utc": utc_now(),
         },
     )
-    package_count = len(
-        [path for path in packages.iterdir() if path.is_file()]
-    )
+    package_count = len([path for path in packages.iterdir() if path.is_file()])
     write_json(
         wheelhouse / "OFFLINE_BUNDLE_REPORT.json",
         {
@@ -456,9 +438,7 @@ def prepare_offline_bundle(
     verification = verify_offline_bundle(wheelhouse)
     if verification["status"] != "PASS":
         failures = verification["failures"]
-        raise RuntimeError(
-            f"offline bundle verification failed: {failures}"
-        )
+        raise RuntimeError(f"offline bundle verification failed: {failures}")
     return wheelhouse
 
 

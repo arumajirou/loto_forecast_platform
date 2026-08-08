@@ -36,12 +36,8 @@ def select_champion(
             status="NO_CHAMPION",
             reason="no successful canonical algorithm execution",
         )
-    baseline_mean_hit = max(
-        baseline.metrics.mean.hit_at_plus_minus_1 for baseline in baselines
-    )
-    baseline_worst_hit = max(
-        baseline.metrics.worst.hit_at_plus_minus_1 for baseline in baselines
-    )
+    baseline_mean_hit = max(baseline.metrics.mean.hit_at_plus_minus_1 for baseline in baselines)
+    baseline_worst_hit = max(baseline.metrics.worst.hit_at_plus_minus_1 for baseline in baselines)
     eligible = [
         result
         for result in canonical
@@ -52,8 +48,7 @@ def select_champion(
         return ChampionDecision(
             status="NO_CHAMPION",
             reason=(
-                "no canonical algorithm improves baseline mean Hit@±1 without "
-                "worst-seed regression"
+                "no canonical algorithm improves baseline mean Hit@±1 without worst-seed regression"
             ),
         )
     eligible.sort(
@@ -95,9 +90,7 @@ def build_cross_library_report(
         if current.status == "FAILED":
             failed_provider_ids.append(provider.provider_id)
             continue
-        provider_results.append(
-            evaluate_execution(provider, current, config.fairness)
-        )
+        provider_results.append(evaluate_execution(provider, current, config.fairness))
     metrics_by_provider = {result.provider_id: result for result in provider_results}
     wrapper_comparisons = compare_wrapper_variants(
         config,
@@ -105,20 +98,14 @@ def build_cross_library_report(
         metrics_by_provider,
     )
     canonical_algorithm_count = len(
-        {
-            result.algorithm_key
-            for result in provider_results
-            if result.canonical_for_algorithm
-        }
+        {result.algorithm_key for result in provider_results if result.canonical_for_algorithm}
     )
     champion = select_champion(provider_results, baselines)
     payload = {
         "fairness_sha256": config.fairness.contract_sha256(),
         "provider_results": [item.model_dump(mode="json") for item in provider_results],
         "failed_provider_ids": failed_provider_ids,
-        "wrapper_comparisons": [
-            item.model_dump(mode="json") for item in wrapper_comparisons
-        ],
+        "wrapper_comparisons": [item.model_dump(mode="json") for item in wrapper_comparisons],
         "canonical_algorithm_count": canonical_algorithm_count,
         "execution_count": len(evidence),
         "champion": champion.model_dump(mode="json"),

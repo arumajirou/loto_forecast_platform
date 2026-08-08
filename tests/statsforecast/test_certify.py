@@ -67,9 +67,7 @@ class FakeStatsForecast:
         for unique_id, group in df.groupby("unique_id", sort=False):
             last_ds = int(group["ds"].max())
             for step in range(1, h + 1):
-                rows.append(
-                    {"unique_id": unique_id, "ds": last_ds + step, "Naive": 1.0}
-                )
+                rows.append({"unique_id": unique_id, "ds": last_ds + step, "Naive": 1.0})
         return pd.DataFrame(rows)
 
 

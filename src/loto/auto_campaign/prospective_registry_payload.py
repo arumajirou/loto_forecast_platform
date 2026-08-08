@@ -100,8 +100,7 @@ def _read_registry_tables(scoring_root: Path) -> dict[str, pd.DataFrame]:
             frame = pd.read_parquet(path)
         except (OSError, ValueError) as exc:
             raise ValueError(
-                f"registry table unreadable: {filename}: "
-                f"{type(exc).__name__}: {exc}"
+                f"registry table unreadable: {filename}: {type(exc).__name__}: {exc}"
             ) from exc
         if frame.empty:
             raise ValueError(f"required registry table is empty: {filename}")
@@ -154,9 +153,7 @@ def _candidate_frame(
             "hit_pm1_var": _optional_float(raw.get("hit_pm1_var")),
             "hit_pm1_min": float(raw["hit_pm1_min"]),
             "hit_pm1_max": float(raw["hit_pm1_max"]),
-            "all_positions_hit_pm1_mean": _optional_float(
-                raw.get("all_positions_hit_pm1_mean")
-            ),
+            "all_positions_hit_pm1_mean": _optional_float(raw.get("all_positions_hit_pm1_mean")),
             "mae_mean": float(raw["mae_mean"]),
             "mse_mean": float(raw["mse_mean"]),
             "rmse_mean": float(raw["rmse_mean"]),
@@ -215,9 +212,7 @@ def _seed_metric_frame(
                 "baseline_name": _json_safe(raw.get("baseline_name")),
                 "track": _json_safe(raw.get("track")),
                 "hit_pm1": float(raw["hit_pm1"]),
-                "all_positions_hit_pm1": _optional_float(
-                    raw.get("all_positions_hit_pm1")
-                ),
+                "all_positions_hit_pm1": _optional_float(raw.get("all_positions_hit_pm1")),
                 "mae": float(raw["mae"]),
                 "mse": float(raw["mse"]),
                 "rmse": float(raw["rmse"]),
@@ -258,10 +253,7 @@ def _position_metric_frame(
         )
     rows: list[dict[str, Any]] = []
     for raw in frame.to_dict(orient="records"):
-        normalized = {
-            key: _json_safe(value)
-            for key, value in raw.items()
-        }
+        normalized = {key: _json_safe(value) for key, value in raw.items()}
         seed_token = _seed_token(normalized.get("seed"))
         row_identity = {
             "candidate_key": _candidate_key(normalized),
@@ -365,19 +357,13 @@ def _build_payload(
     created_at = str(scoring_report.get("created_at") or "").strip()
     if not created_at:
         raise ValueError("scoring report created_at is missing")
-    safe_mlflow_uri = redact_uri(
-        options.mlflow_uri or os.getenv(options.mlflow_uri_env, "")
-    )
+    safe_mlflow_uri = redact_uri(options.mlflow_uri or os.getenv(options.mlflow_uri_env, ""))
     stable_identity = {
         "schema_version": REGISTRY_SCHEMA_VERSION,
         "registry_namespace": options.registry_namespace,
         "scoring_id": scoring_id,
-        "scoring_report_sha256": sha256_file(
-            scoring_root / "SCORING_REPORT.json"
-        ),
-        "artifact_manifest_sha256": sha256_file(
-            scoring_root / "ARTIFACT_MANIFEST.json"
-        ),
+        "scoring_report_sha256": sha256_file(scoring_root / "SCORING_REPORT.json"),
+        "artifact_manifest_sha256": sha256_file(scoring_root / "ARTIFACT_MANIFEST.json"),
         "scoring_sha256s_sha256": sha256_file(scoring_root / "SHA256SUMS"),
         "mlflow_tracking_uri": safe_mlflow_uri,
         "mlflow_experiment": options.mlflow_experiment,
@@ -409,31 +395,20 @@ def _build_payload(
         "source_run_id": scoring_report.get("source_run_id"),
         "scoring_id": scoring_id,
         "prediction_lock_sha256": scoring_report["prediction_lock_sha256"],
-        "verification_seal_sha256": scoring_report[
-            "verification_seal_sha256"
-        ],
+        "verification_seal_sha256": scoring_report["verification_seal_sha256"],
         "history_sha256": scoring_report["history_sha256"],
         "actuals_sha256": scoring_report["actuals_sha256"],
         "scoring_code_sha256": scoring_report["scoring_code_sha256"],
         "scoring_report_sha256": stable_identity["scoring_report_sha256"],
-        "artifact_manifest_sha256": stable_identity[
-            "artifact_manifest_sha256"
-        ],
-        "scoring_sha256s_sha256": stable_identity[
-            "scoring_sha256s_sha256"
-        ],
-        "actuals_lock_sha256": sha256_file(
-            scoring_root / "ACTUALS_LOCK.json"
-        ),
+        "artifact_manifest_sha256": stable_identity["artifact_manifest_sha256"],
+        "scoring_sha256s_sha256": stable_identity["scoring_sha256s_sha256"],
+        "actuals_lock_sha256": sha256_file(scoring_root / "ACTUALS_LOCK.json"),
         "source_code_sha256": source_manifest.get("code_sha256")
         or source_manifest.get("code_hash"),
         "source_data_sha256": source_manifest.get("data_sha256")
         or source_manifest.get("data_hash"),
-        "source_lineage_chain_sha256": source_manifest.get(
-            "lineage_chain_sha256"
-        ),
-        "source_git_commit": source_manifest.get("git_commit")
-        or source_manifest.get("git_sha"),
+        "source_lineage_chain_sha256": source_manifest.get("lineage_chain_sha256"),
+        "source_git_commit": source_manifest.get("git_commit") or source_manifest.get("git_sha"),
     }
     payload: dict[str, Any] = {
         "schema_version": REGISTRY_SCHEMA_VERSION,

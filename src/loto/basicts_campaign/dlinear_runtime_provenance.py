@@ -169,9 +169,7 @@ def verify_dlinear_runtime_modules() -> dict[str, Any]:
                 f"{label} module does not expose required symbol {required_symbol}"
             )
         if getattr(symbol, "__module__", None) != module_name:
-            raise InstalledProvenanceError(
-                f"{label} required symbol is defined by another module"
-            )
+            raise InstalledProvenanceError(f"{label} required symbol is defined by another module")
         evidence.append(
             {
                 **item,

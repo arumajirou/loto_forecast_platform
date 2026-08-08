@@ -115,9 +115,7 @@ def test_eligible_result_never_promotes_automatically(tmp_path: Path) -> None:
 
 
 def test_insufficient_windows_are_blocked(tmp_path: Path) -> None:
-    result = run_promotion_gate(
-        request(tmp_path, windows=[window(0), window(1)])
-    )
+    result = run_promotion_gate(request(tmp_path, windows=[window(0), window(1)]))
     assert result["decision"] == "BLOCKED_INSUFFICIENT_WINDOWS"
 
 
@@ -139,9 +137,7 @@ def test_warning_drift_is_blocked(tmp_path: Path) -> None:
 def test_critical_drift_is_blocked(tmp_path: Path) -> None:
     windows = [window(0), window(1, drift="CRITICAL"), window(2)]
     policy = PromotionPolicy(maximum_warning_windows=1)
-    result = run_promotion_gate(
-        request(tmp_path, windows=windows, policy=policy)
-    )
+    result = run_promotion_gate(request(tmp_path, windows=windows, policy=policy))
     assert result["decision"] == "BLOCKED_CRITICAL_DRIFT"
 
 
@@ -154,9 +150,7 @@ def test_hit_target_is_blocked(tmp_path: Path) -> None:
 def test_worst_case_is_blocked(tmp_path: Path) -> None:
     windows = [window(0, hit=0.89), window(1), window(2)]
     policy = PromotionPolicy(minimum_weighted_hit_at_1=0.80)
-    result = run_promotion_gate(
-        request(tmp_path, windows=windows, policy=policy)
-    )
+    result = run_promotion_gate(request(tmp_path, windows=windows, policy=policy))
     assert result["decision"] == "BLOCKED_WORST_CASE"
 
 
@@ -167,18 +161,14 @@ def test_holdout_hit_regression_is_blocked(tmp_path: Path) -> None:
         minimum_worst_window_hit_at_1=0.80,
         maximum_hit_drop_from_holdout=0.01,
     )
-    result = run_promotion_gate(
-        request(tmp_path, windows=windows, policy=policy)
-    )
+    result = run_promotion_gate(request(tmp_path, windows=windows, policy=policy))
     assert result["decision"] == "BLOCKED_HOLDOUT_REGRESSION"
 
 
 def test_holdout_mae_regression_is_blocked(tmp_path: Path) -> None:
     windows = [window(0, mae=1.0), window(1, mae=1.0), window(2, mae=1.0)]
     policy = PromotionPolicy(maximum_mae_increase_from_holdout=0.10)
-    result = run_promotion_gate(
-        request(tmp_path, windows=windows, policy=policy)
-    )
+    result = run_promotion_gate(request(tmp_path, windows=windows, policy=policy))
     assert result["decision"] == "BLOCKED_HOLDOUT_REGRESSION"
 
 
@@ -216,9 +206,7 @@ def test_duplicate_lock_seals_are_rejected(tmp_path: Path) -> None:
     first = window(0)
     second = window(1)
     payload = second.model_dump()
-    payload["prediction_lock_seal_sha256"] = (
-        first.prediction_lock_seal_sha256
-    )
+    payload["prediction_lock_seal_sha256"] = first.prediction_lock_seal_sha256
     with pytest.raises(ValueError, match="seals"):
         request(
             tmp_path,

@@ -34,9 +34,7 @@ def validate_provenance(request: TimerS1Request) -> TimerS1ModelManifest:
         raise ProvenanceError("REQUEST_PROVENANCE_UNPINNED")
     try:
         config_sha256 = manifest.artifact_sha256("config.json")
-        weight_manifest_sha256 = manifest.artifact_sha256(
-            "model.safetensors.index.json"
-        )
+        weight_manifest_sha256 = manifest.artifact_sha256("model.safetensors.index.json")
         weight_sha256 = manifest.weight_set_sha256
         if weight_sha256 is None:
             raise ValueError("weight set hash is incomplete")

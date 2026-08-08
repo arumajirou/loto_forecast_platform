@@ -155,9 +155,7 @@ def test_prediction_timestamp_must_be_timezone_aware_utc() -> None:
         _chronology(prediction_created_at=datetime(2026, 8, 6, 2, 30))
     with pytest.raises(ValidationError):
         _chronology(
-            prediction_created_at=datetime(
-                2026, 8, 6, 11, 30, tzinfo=timezone(timedelta(hours=9))
-            )
+            prediction_created_at=datetime(2026, 8, 6, 11, 30, tzinfo=timezone(timedelta(hours=9)))
         )
 
 
@@ -306,9 +304,7 @@ def test_unsafe_or_noncanonical_artifact_paths_are_rejected(artifact_path: str) 
 
 def test_config_schema_and_sha256_are_deterministic() -> None:
     first = load_bct_config(str(CONFIG_PATH))
-    second = BayesianContextTreeConfigV1.model_validate(
-        deepcopy(first.model_dump(mode="python"))
-    )
+    second = BayesianContextTreeConfigV1.model_validate(deepcopy(first.model_dump(mode="python")))
     assert first.active_catalog_registration is False
     assert first.implementation_status == "CONTRACT_ONLY"
     digest = bct_config_sha256(first)

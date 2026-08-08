@@ -132,13 +132,8 @@ def test_snapshot_hash_and_file_set_are_pinned(tmp_path: Path, monkeypatch: Any)
     monkeypatch.setattr(
         VERIFIER,
         "EXPECTED_REMOTE_CODE_SHA256",
-        {
-            name: VERIFIER.sha256(snapshot / name)
-            for name in VERIFIER.EXPECTED_REMOTE_CODE_SHA256
-        },
+        {name: VERIFIER.sha256(snapshot / name) for name in VERIFIER.EXPECTED_REMOTE_CODE_SHA256},
     )
     assert VERIFIER.verify_snapshot(snapshot, None) == []
     (snapshot / "model.safetensors").write_bytes(b"tampered")
-    assert "SNAPSHOT_HASH_MISMATCH:model.safetensors" in VERIFIER.verify_snapshot(
-        snapshot, None
-    )
+    assert "SNAPSHOT_HASH_MISMATCH:model.safetensors" in VERIFIER.verify_snapshot(snapshot, None)

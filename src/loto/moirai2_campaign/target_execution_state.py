@@ -34,8 +34,7 @@ def verify_recorded_artifacts(state: Mapping[str, Any]) -> None:
         actual = artifact_tree_sha256(artifact_dir)
         if actual != expected:
             raise TargetExecutionError(
-                f"recorded artifact tree changed: key={key} "
-                f"expected={expected} actual={actual}"
+                f"recorded artifact tree changed: key={key} expected={expected} actual={actual}"
             )
 
 
@@ -98,9 +97,7 @@ def validate_state(state: Mapping[str, Any]) -> None:
             raise TargetExecutionError("execution event order differs")
         if event.get("previous_event_sha256") != previous_sha:
             raise TargetExecutionError("execution event hash chain differs")
-        event_payload = {
-            key: value for key, value in event.items() if key != "event_sha256"
-        }
+        event_payload = {key: value for key, value in event.items() if key != "event_sha256"}
         expected_sha = sha256_payload(event_payload)
         if event.get("event_sha256") != expected_sha:
             raise TargetExecutionError("execution event SHA-256 differs")

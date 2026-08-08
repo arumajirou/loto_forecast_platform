@@ -87,9 +87,7 @@ def build_resume_plan(
 
     network = _network_map(preflight)
     github_ready = network.get("github.com", False)
-    index_ready = network.get("pypi.org", False) and network.get(
-        "files.pythonhosted.org", False
-    )
+    index_ready = network.get("pypi.org", False) and network.get("files.pythonhosted.org", False)
     blockers: list[str] = []
     steps: list[dict[str, Any]] = []
     environment: dict[str, str] = {}

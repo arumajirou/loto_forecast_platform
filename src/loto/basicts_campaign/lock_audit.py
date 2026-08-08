@@ -22,10 +22,7 @@ EXPECTED_RESOLVED_VERSIONS = {
     "transformers": "4.40.1",
 }
 EXPECTED_DIRECT_DEPENDENCIES = {
-    (
-        "basicts@git+https://github.com/gestaltcogteam/basicts.git@"
-        f"{EXPECTED_UPSTREAM_REVISION}"
-    ),
+    (f"basicts@git+https://github.com/gestaltcogteam/basicts.git@{EXPECTED_UPSTREAM_REVISION}"),
     "numpy==1.24.4",
     "pydantic>=2.10,<3",
     "torch==2.9.1",
@@ -182,8 +179,7 @@ def verify_workspace_metadata(path: Path) -> dict[str, Any]:
     for node in basicts_nodes:
         source_text = _source_text(node.get("source"))
         repository_matches = (
-            expected_repository in source_text
-            or f"{expected_repository}.git" in source_text
+            expected_repository in source_text or f"{expected_repository}.git" in source_text
         )
         if not repository_matches:
             raise LockAuditError("BasicTS resolved source is not the frozen GitHub repository")

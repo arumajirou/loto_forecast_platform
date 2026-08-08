@@ -34,17 +34,19 @@ def _aggregate(rows: Sequence[dict[str, Any]]) -> tuple[list[dict], list[dict]]:
         grouped.setdefault((row["candidate_id"], row["seed"]), []).append(row)
     per_seed = []
     for (candidate, seed), values in sorted(grouped.items()):
-        per_seed.append({
-            "candidate_id": candidate,
-            "seed": seed,
-            "hit_at_1": stats.fmean(row["hit_at_1"] for row in values),
-            "all_position_hit_at_1": stats.fmean(
-                row["all_position_hit_at_1"] for row in values
-            ),
-            "mae": stats.fmean(row["mae"] for row in values),
-            "mse": stats.fmean(row["mse"] for row in values),
-            "rmse": stats.fmean(row["rmse"] for row in values),
-        })
+        per_seed.append(
+            {
+                "candidate_id": candidate,
+                "seed": seed,
+                "hit_at_1": stats.fmean(row["hit_at_1"] for row in values),
+                "all_position_hit_at_1": stats.fmean(
+                    row["all_position_hit_at_1"] for row in values
+                ),
+                "mae": stats.fmean(row["mae"] for row in values),
+                "mse": stats.fmean(row["mse"] for row in values),
+                "rmse": stats.fmean(row["rmse"] for row in values),
+            }
+        )
     candidates: dict[str, list[dict]] = {}
     for row in per_seed:
         candidates.setdefault(row["candidate_id"], []).append(row)
@@ -52,21 +54,23 @@ def _aggregate(rows: Sequence[dict[str, Any]]) -> tuple[list[dict], list[dict]]:
     for candidate, values in sorted(candidates.items()):
         hits = [row["hit_at_1"] for row in values]
         maes = [row["mae"] for row in values]
-        summaries.append({
-            "candidate_id": candidate,
-            "seed_count": len(values),
-            "mean_hit_at_1": stats.fmean(hits),
-            "variance_hit_at_1": stats.pvariance(hits) if len(hits) > 1 else 0.0,
-            "worst_hit_at_1": min(hits),
-            "mean_all_position_hit_at_1": stats.fmean(
-                row["all_position_hit_at_1"] for row in values
-            ),
-            "mean_mae": stats.fmean(maes),
-            "variance_mae": stats.pvariance(maes) if len(maes) > 1 else 0.0,
-            "worst_mae": max(maes),
-            "mean_mse": stats.fmean(row["mse"] for row in values),
-            "mean_rmse": stats.fmean(row["rmse"] for row in values),
-        })
+        summaries.append(
+            {
+                "candidate_id": candidate,
+                "seed_count": len(values),
+                "mean_hit_at_1": stats.fmean(hits),
+                "variance_hit_at_1": stats.pvariance(hits) if len(hits) > 1 else 0.0,
+                "worst_hit_at_1": min(hits),
+                "mean_all_position_hit_at_1": stats.fmean(
+                    row["all_position_hit_at_1"] for row in values
+                ),
+                "mean_mae": stats.fmean(maes),
+                "variance_mae": stats.pvariance(maes) if len(maes) > 1 else 0.0,
+                "worst_mae": max(maes),
+                "mean_mse": stats.fmean(row["mse"] for row in values),
+                "mean_rmse": stats.fmean(row["rmse"] for row in values),
+            }
+        )
     return per_seed, summaries
 
 
@@ -79,18 +83,28 @@ def _drift(current: Mapping[str, Any], reference: Mapping[str, Any], policy: Dri
         state, action = "WARNING", "CONTINUE_SHADOW_REVIEW_REQUIRED"
     else:
         state, action = "STABLE", "CONTINUE_SHADOW"
-    return {"state": state, "action": action, "hit_at_1_drop": hit_drop,
-            "mae_increase": mae_increase, "automatic_retraining": False}
+    return {
+        "state": state,
+        "action": action,
+        "hit_at_1_drop": hit_drop,
+        "mae_increase": mae_increase,
+        "automatic_retraining": False,
+    }
 
 
 def verify_scoring_output(root: Path) -> dict[str, Any]:
     root = root.resolve()
     required = {
-        "ACTUALS_SNAPSHOT.json", "SOURCE_LINEAGE.json",
-        "PER_PREDICTION_METRICS.json", "PER_SEED_METRICS.json",
-        "CANDIDATE_AGGREGATES.json", "LEADERBOARD.json",
-        "BASELINE_COMPARISON.json", "SCORING_REPORT.json",
-        "ARTIFACT_MANIFEST.json", "SHA256SUMS",
+        "ACTUALS_SNAPSHOT.json",
+        "SOURCE_LINEAGE.json",
+        "PER_PREDICTION_METRICS.json",
+        "PER_SEED_METRICS.json",
+        "CANDIDATE_AGGREGATES.json",
+        "LEADERBOARD.json",
+        "BASELINE_COMPARISON.json",
+        "SCORING_REPORT.json",
+        "ARTIFACT_MANIFEST.json",
+        "SHA256SUMS",
     }
     observed = _verify_hashes(root, "SCORE")
     if not required.issubset(observed) or observed - required - {"DRIFT_REPORT.json"}:
@@ -120,9 +134,7 @@ def score_prediction_lock(
     source = lock_dir.resolve()
     lock = verify_prediction_lock(source)
     before = _tree_hash(source)
-    geometry = GeometryContract.model_validate(
-        json.loads((source / "GEOMETRY.json").read_text())
-    )
+    geometry = GeometryContract.model_validate(json.loads((source / "GEOMETRY.json").read_text()))
     actuals = {int(row["draw_id"]): _vector(row, geometry) for row in actual_rows}
     if set(actuals) != set(lock["future_draw_ids"]) or len(actuals) != len(actual_rows):
         raise HoldoutProspectiveError("ACTUAL_DRAW_SET_MISMATCH", str(actuals))
@@ -131,16 +143,17 @@ def score_prediction_lock(
         rows.extend(_prediction_rows(json.loads((source / name).read_text())["rows"]))
     metric_rows = []
     for row in rows:
-        metric_rows.append({
-            "candidate_id": row.candidate_id,
-            "seed": row.seed,
-            "draw_id": row.draw_id,
-            **asdict(compute_metrics(row.values, actuals[row.draw_id])),
-        })
+        metric_rows.append(
+            {
+                "candidate_id": row.candidate_id,
+                "seed": row.seed,
+                "draw_id": row.draw_id,
+                **asdict(compute_metrics(row.values, actuals[row.draw_id])),
+            }
+        )
     per_seed, candidates = _aggregate(metric_rows)
     selected = next(
-        row for row in candidates
-        if row["candidate_id"] == lock["selected_candidate_id"]
+        row for row in candidates if row["candidate_id"] == lock["selected_candidate_id"]
     )
     leaderboard = sorted(
         candidates,
@@ -152,7 +165,8 @@ def score_prediction_lock(
             "hit_at_1_delta": selected["mean_hit_at_1"] - row["mean_hit_at_1"],
             "mae_delta": selected["mean_mae"] - row["mean_mae"],
         }
-        for row in candidates if row["candidate_id"] in REQUIRED_BASELINES
+        for row in candidates
+        if row["candidate_id"] in REQUIRED_BASELINES
     ]
     root = _empty(output_dir)
     observed_at = actual_observed_at or datetime.now(timezone.utc)
@@ -205,6 +219,10 @@ def score_prediction_lock(
         raise HoldoutProspectiveError("SOURCE_LOCK_MUTATED", str(source))
     verify_scoring_output(root)
     return ScoreResult(
-        str(root), str(root / "SCORING_REPORT.json"), "PASS", lock["stage"],
-        lock["selected_candidate_id"], operational,
+        str(root),
+        str(root / "SCORING_REPORT.json"),
+        "PASS",
+        lock["stage"],
+        lock["selected_candidate_id"],
+        operational,
     )

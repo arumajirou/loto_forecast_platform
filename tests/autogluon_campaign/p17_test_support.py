@@ -112,9 +112,7 @@ def score_bundle(
         "PER_SEED_METRICS.json": {"rows": []},
         "CANDIDATE_AGGREGATES.json": {"rows": []},
         "LEADERBOARD.json": {"rows": []},
-        "BASELINE_COMPARISON.json": {
-            "rows": [{"baseline_id": item} for item in BASELINES]
-        },
+        "BASELINE_COMPARISON.json": {"rows": [{"baseline_id": item} for item in BASELINES]},
     }
     if stage == "prospective":
         payloads["DRIFT_REPORT.json"] = {"state": drift_state}

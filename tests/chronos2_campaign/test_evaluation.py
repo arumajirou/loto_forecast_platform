@@ -165,9 +165,7 @@ def test_random_baseline_is_reproducible_across_runs() -> None:
         first_random.reset_index(drop=True),
         second_random.reset_index(drop=True),
     )
-    assert first.report["prediction_values_sha256"] == second.report[
-        "prediction_values_sha256"
-    ]
+    assert first.report["prediction_values_sha256"] == second.report["prediction_values_sha256"]
 
 
 def test_oof_rejects_prediction_shape_mismatch() -> None:

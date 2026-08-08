@@ -82,9 +82,7 @@ def build_auto_scinet_class(
                 "architecture_profile": tune.choice(
                     [profile.value for profile in ArchitectureProfile]
                 ),
-                "training_profile": tune.choice(
-                    [profile.value for profile in TrainingProfile]
-                ),
+                "training_profile": tune.choice([profile.value for profile in TrainingProfile]),
                 "learning_rate": tune.loguniform(1e-5, 1e-2),
                 "batch_size": tune.choice([16, 32, 64]),
                 "windows_batch_size": tune.choice([64, 128, 256]),

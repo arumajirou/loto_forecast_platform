@@ -99,9 +99,7 @@ def _verify_identity(request: ProviderRequest) -> tuple[str, str, dict[str, Any]
         raise RuntimeError("BasicTS package __init__.py RECORD integrity was not verified")
     if provenance.get("import_origin_status") != "PASS":
         raise RuntimeError("BasicTS import origin was not verified")
-    if provenance.get("import_spec_origin") != provenance.get(
-        "distribution_package_init"
-    ):
+    if provenance.get("import_spec_origin") != provenance.get("distribution_package_init"):
         raise RuntimeError("BasicTS import origin differs from the installed distribution")
     if revision != request.expected_upstream_revision:
         raise RuntimeError(
@@ -181,9 +179,7 @@ def _verify_dlinear_module_evidence(evidence: dict[str, Any]) -> None:
         raise RuntimeError("DLinear dependency object bindings were not verified")
     expected_base = f"{MODEL_CONFIG_MODULE}.BasicTSModelConfig"
     expected_bindings = {
-        "decomposition_symbol": (
-            f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"
-        ),
+        "decomposition_symbol": (f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"),
         "config_base_symbol": expected_base,
         "dlinear_config_direct_base": expected_base,
         "arch_decomposition_object_identity": True,
@@ -244,9 +240,7 @@ def run_dlinear_smoke(request: ProviderRequest, output_dir: Path) -> dict[str, A
         raise RuntimeError(f"unexpected prediction shape: {tuple(before.shape)}")
     if not torch.isfinite(before).all():
         raise RuntimeError("prediction contains NaN or Inf")
-    state_finite = all(
-        torch.isfinite(value).all().item() for value in model.state_dict().values()
-    )
+    state_finite = all(torch.isfinite(value).all().item() for value in model.state_dict().values())
     if not state_finite:
         raise RuntimeError("state_dict contains NaN or Inf")
 
@@ -357,8 +351,7 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
             }
         elif request.operation is ProviderOperation.VALIDATE_CONFIG:
             resolved = [
-                resolve_import_reference(reference)
-                for reference in request.import_references
+                resolve_import_reference(reference) for reference in request.import_references
             ]
             evidence = {
                 "config_import_policy": "ALLOWLIST",

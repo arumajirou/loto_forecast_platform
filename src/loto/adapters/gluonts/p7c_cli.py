@@ -13,9 +13,7 @@ from .p7c_analysis import (
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Analyze immutable GluonTS P7B evidence"
-    )
+    parser = argparse.ArgumentParser(description="Analyze immutable GluonTS P7B evidence")
     parser.add_argument("--p7b-output", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     return parser.parse_args()

@@ -84,10 +84,7 @@ def test_catalog_cardinality_bound_is_deterministic_and_below_budget() -> None:
     second = default_platform_metric_catalog().total_series_upper_bound()
     assert first == second
     assert first < 25_000
-    maximum = max(
-        catalog.series_upper_bound(spec.definition.name)
-        for spec in catalog.specs()
-    )
+    maximum = max(catalog.series_upper_bound(spec.definition.name) for spec in catalog.specs())
     assert maximum < 5_000
     with pytest.raises(ValueError, match="exceeds"):
         catalog.assert_budget(maximum_total_series=1, maximum_metric_series=5_000)
@@ -119,10 +116,7 @@ def test_counter_gauge_and_histogram_render_with_approved_labels() -> None:
     )
     rendered = metrics.render().decode()
     assert 'loto_pipeline_runs_total{stage="PREDICT",status="PASS"} 1.0' in rendered
-    expected = (
-        'loto_evaluation_hit_at_1{game="numbers4",position="N1",'
-        'split="validation"} 0.75'
-    )
+    expected = 'loto_evaluation_hit_at_1{game="numbers4",position="N1",split="validation"} 0.75'
     assert expected in rendered
     assert "loto_model_inference_duration_seconds_count" in rendered
 
@@ -213,9 +207,7 @@ def test_metric_update_is_strict_and_batch_validates_before_mutation() -> None:
     )
     before = metrics.render()
     with pytest.raises(ValueError):
-        metrics.apply_updates(
-            ((MetricKind.COUNTER, good), (MetricKind.COUNTER, bad))
-        )
+        metrics.apply_updates(((MetricKind.COUNTER, good), (MetricKind.COUNTER, bad)))
     assert metrics.render() == before
     with pytest.raises(ValidationError):
         MetricUpdate(name="x", value="1", labels={})
@@ -224,9 +216,7 @@ def test_metric_update_is_strict_and_batch_validates_before_mutation() -> None:
 def test_histogram_buckets_are_reviewed_unique_and_increasing() -> None:
     catalog = default_platform_metric_catalog()
     histograms = [
-        spec.definition
-        for spec in catalog.specs()
-        if spec.definition.kind is MetricKind.HISTOGRAM
+        spec.definition for spec in catalog.specs() if spec.definition.kind is MetricKind.HISTOGRAM
     ]
     assert {item.name for item in histograms} == {
         "loto_pipeline_stage_duration_seconds",
@@ -257,10 +247,7 @@ def test_touched_series_are_lazy_not_preinitialized_for_all_combinations() -> No
     assert baseline == 1
     metrics.increment("loto_model_cpu_fallback_total", labels={"provider": "builtin"})
     assert metrics.touched_series_count() > baseline
-    assert (
-        metrics.touched_series_count()
-        < metrics.catalog.total_series_upper_bound()
-    )
+    assert metrics.touched_series_count() < metrics.catalog.total_series_upper_bound()
 
 
 def test_full_allowlist_stress_stays_within_declared_series_budget() -> None:
@@ -284,8 +271,4 @@ def test_full_allowlist_stress_stays_within_declared_series_budget() -> None:
                 metrics.set_gauge(definition.name, 1, labels=labels)
             else:
                 metrics.observe(definition.name, 0.01, labels=labels)
-    assert (
-        metrics.touched_series_count()
-        <= metrics.catalog.total_series_upper_bound()
-    )
-
+    assert metrics.touched_series_count() <= metrics.catalog.total_series_upper_bound()

@@ -10,7 +10,8 @@ import pytest
 from loto.time_series_library_campaign import ProviderRequest
 
 
-FAKE_LIGHTTS = """
+FAKE_LIGHTTS = (
+    """
 import torch
 from torch import nn
 
@@ -43,15 +44,13 @@ class Model(nn.Module):
             )
         x = x_enc.permute(0, 2, 1)
         return self.linear(x).permute(0, 2, 1)
-""".strip() + "\n"
+""".strip()
+    + "\n"
+)
 
 
 def _script() -> Path:
-    return (
-        Path(__file__).resolve().parents[2]
-        / "scripts"
-        / "run_time_series_library_provider.py"
-    )
+    return Path(__file__).resolve().parents[2] / "scripts" / "run_time_series_library_provider.py"
 
 
 def _write_fake_source(root: Path) -> None:

@@ -335,8 +335,7 @@ def inspect_lock(
     for package in inventory:
         source_counts[package.source_kind] = source_counts.get(package.source_kind, 0) + 1
     direct_payload = [
-        requirement.as_dict()
-        for _, requirement in sorted(project["dependencies"].items())
+        requirement.as_dict() for _, requirement in sorted(project["dependencies"].items())
     ]
     report = {
         "schema_version": REVIEW_SCHEMA,

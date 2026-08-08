@@ -13,9 +13,7 @@ from loto.autogluon_campaign import inventory_cli
 
 
 def _fake_runtime():
-    classes = {
-        spec.class_name: type(spec.class_name, (), {}) for spec in SOURCE_MODEL_SPECS
-    }
+    classes = {spec.class_name: type(spec.class_name, (), {}) for spec in SOURCE_MODEL_SPECS}
 
     class FakeRegistry:
         @classmethod
@@ -83,12 +81,7 @@ def test_cli_error_remains_nonzero_with_allow_partial(monkeypatch, tmp_path) -> 
         "discover_runtime_inventory",
         lambda **_: _inventory(InventoryStatus.ERROR),
     )
-    assert (
-        inventory_cli.main(
-            ["--output", str(tmp_path / "error.json"), "--allow-partial"]
-        )
-        == 2
-    )
+    assert inventory_cli.main(["--output", str(tmp_path / "error.json"), "--allow-partial"]) == 2
 
 
 def test_source_contract_constants_are_imported() -> None:

@@ -118,9 +118,7 @@ def validate_request(policy: SandboxPolicy, request: SandboxExecutionRequest) ->
     for key in request.environment:
         if any(re.search(pattern, key, flags=re.IGNORECASE) for pattern in deny_patterns):
             raise ValueError(f"secret-bearing environment key forbidden: {key}")
-    unauthorized_gpu = sorted(
-        set(request.requested_gpu_devices) - set(policy.gpu_device_allowlist)
-    )
+    unauthorized_gpu = sorted(set(request.requested_gpu_devices) - set(policy.gpu_device_allowlist))
     if unauthorized_gpu:
         raise ValueError(f"GPU devices are not allowlisted: {unauthorized_gpu}")
 

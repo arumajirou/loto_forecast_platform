@@ -24,22 +24,15 @@ _POINT_CPU_EXPECTATIONS: tuple[tuple[str, Any], ...] = (
 def _matrix_rows(archive: Path) -> list[Mapping[str, Any]]:
     with zipfile.ZipFile(archive) as bundle:
         names = sorted(
-            name
-            for name in bundle.namelist()
-            if name.endswith("/MODEL_RUNTIME_MATRIX.json")
+            name for name in bundle.namelist() if name.endswith("/MODEL_RUNTIME_MATRIX.json")
         )
         if len(names) != 1:
-            raise ValueError(
-                "expected exactly one MODEL_RUNTIME_MATRIX.json member, "
-                f"got {names}"
-            )
+            raise ValueError(f"expected exactly one MODEL_RUNTIME_MATRIX.json member, got {names}")
         info = bundle.getinfo(names[0])
         if info.file_size > _MAX_MATRIX_BYTES:
             raise ValueError("MODEL_RUNTIME_MATRIX.json is too large")
         payload = json.loads(bundle.read(names[0]).decode("utf-8"))
-    if not isinstance(payload, list) or not all(
-        isinstance(row, Mapping) for row in payload
-    ):
+    if not isinstance(payload, list) or not all(isinstance(row, Mapping) for row in payload):
         raise ValueError("MODEL_RUNTIME_MATRIX.json must be an array of objects")
     return list(payload)
 
@@ -51,9 +44,7 @@ def _hardening_failures(rows: Iterable[Mapping[str, Any]]) -> list[str]:
         for key, expected in _POINT_CPU_EXPECTATIONS:
             actual = row.get(key)
             if actual != expected:
-                failures.append(
-                    f"model {name} {key}: expected {expected!r}, got {actual!r}"
-                )
+                failures.append(f"model {name} {key}: expected {expected!r}, got {actual!r}")
     return failures
 
 

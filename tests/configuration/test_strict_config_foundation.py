@@ -39,9 +39,7 @@ def test_example_loads_with_required_safe_defaults() -> None:
     assert resolved.config.split_policy.holdout.auto_open_actuals is False
     assert resolved.config.split_policy.prospective.auto_run is False
     assert resolved.config.evaluation.metrics.primary_metric == "Hit@±1"
-    assert {"MAE", "MSE", "RMSE"}.issubset(
-        resolved.config.evaluation.metrics.report_metrics
-    )
+    assert {"MAE", "MSE", "RMSE"}.issubset(resolved.config.evaluation.metrics.report_metrics)
     assert resolved.config.evaluation.seed_policy.best_seed_only_selection is False
 
 
@@ -105,9 +103,7 @@ def test_exact_neuralforecast_mlflow_environment_key_is_supported() -> None:
         },
     )
 
-    assert resolved.config.observability.mlflow.tracking_uri == (
-        "https://mlflow.example.invalid"
-    )
+    assert resolved.config.observability.mlflow.tracking_uri == ("https://mlflow.example.invalid")
     assert resolved.overrides[0].env_var == "NEURALFORECAST_MLFLOW_TRACKING_URI"
     assert resolved.overrides[0].target == "observability.mlflow.tracking_uri"
 

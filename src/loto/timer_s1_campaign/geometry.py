@@ -67,8 +67,7 @@ def compile_history(
         separators=(",", ":"),
     ).encode("utf-8")
     native_input = tuple(
-        tuple(float(row.values[position]) for row in selected)
-        for position in range(position_count)
+        tuple(float(row.values[position]) for row in selected) for position in range(position_count)
     )
     return CompiledGeometry(
         game=game,

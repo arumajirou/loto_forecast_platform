@@ -16,6 +16,7 @@ from loto.orchestration.pipeline_downstream_preflight import (
 )
 from loto.orchestration.pipeline_downstream_types import PreparedDownstreamCommit
 
+
 class StorageEffectsMixin:
     def ensure_release(
         self,
@@ -28,24 +29,16 @@ class StorageEffectsMixin:
 
         _reject_symlink_components(prepared.root, label="staged output")
         output = prepared.root / "release_bundle.json"
-        paths = [
-            prepared.root / item.relative_path for item in prepared.artifacts
-        ]
+        paths = [prepared.root / item.relative_path for item in prepared.artifacts]
         if output.exists():
             if output.is_symlink() or not output.is_file():
-                raise DownstreamCommitConflict(
-                    "release_bundle.json is not a regular file"
-                )
+                raise DownstreamCommitConflict("release_bundle.json is not a regular file")
             try:
                 bundle = json.loads(output.read_text(encoding="utf-8"))
             except Exception as exc:
-                raise DownstreamCommitConflict(
-                    "existing release bundle is invalid JSON"
-                ) from exc
+                raise DownstreamCommitConflict("existing release bundle is invalid JSON") from exc
             if bundle.get("release_id") != prepared.release_id:
-                raise DownstreamCommitConflict(
-                    "existing release bundle has another release_id"
-                )
+                raise DownstreamCommitConflict("existing release bundle has another release_id")
             expected = {
                 str(path.resolve()): (
                     next(
@@ -57,17 +50,12 @@ class StorageEffectsMixin:
                 for path in paths
             }
             observed = {
-                str(item["path"]): str(item["sha256"])
-                for item in bundle.get("artifacts", [])
+                str(item["path"]): str(item["sha256"]) for item in bundle.get("artifacts", [])
             }
             if observed != expected:
-                raise DownstreamCommitConflict(
-                    "existing release bundle artifact set conflicts"
-                )
+                raise DownstreamCommitConflict("existing release bundle artifact set conflicts")
             if not verify_release_bundle(bundle):
-                raise DownstreamCommitConflict(
-                    "existing release bundle verification failed"
-                )
+                raise DownstreamCommitConflict("existing release bundle verification failed")
         else:
             bundle = create_release_bundle(
                 prepared.release_id,
@@ -75,9 +63,7 @@ class StorageEffectsMixin:
                 output,
             )
             if not verify_release_bundle(bundle):
-                raise DownstreamCommitConflict(
-                    "new release bundle verification failed"
-                )
+                raise DownstreamCommitConflict("new release bundle verification failed")
         return {
             "release_id": prepared.release_id,
             "bundle_sha256": str(bundle["bundle_sha256"]),
@@ -95,21 +81,16 @@ class StorageEffectsMixin:
             label="artifact store",
         )
         store = ArtifactStore(self.config.artifact_store_root)
-        source_paths = [
-            prepared.root / item.relative_path for item in prepared.artifacts
-        ]
+        source_paths = [prepared.root / item.relative_path for item in prepared.artifacts]
         source_paths.append(prepared.root / "release_bundle.json")
         index = {
-            path.name: store.put_file(path, namespace=prepared.run_id)
-            for path in source_paths
+            path.name: store.put_file(path, namespace=prepared.run_id) for path in source_paths
         }
         for source in source_paths:
             entry = index[source.name]
             stored = _file_uri_path(str(entry["uri"]))
             if not stored.is_file():
-                raise DownstreamCommitRetryable(
-                    f"artifact store object is missing: {source.name}"
-                )
+                raise DownstreamCommitRetryable(f"artifact store object is missing: {source.name}")
             if store.sha256(stored) != str(entry["sha256"]):
                 raise DownstreamCommitConflict(
                     f"artifact store object hash mismatch: {source.name}"
@@ -117,9 +98,7 @@ class StorageEffectsMixin:
         output = prepared.root / "artifact_index.json"
         if output.exists():
             if output.is_symlink() or not output.is_file():
-                raise DownstreamCommitConflict(
-                    "artifact_index.json is not a regular file"
-                )
+                raise DownstreamCommitConflict("artifact_index.json is not a regular file")
             current = json.loads(output.read_text(encoding="utf-8"))
             if not _json_equal(current, index):
                 raise DownstreamCommitConflict(
@@ -144,20 +123,13 @@ class StorageEffectsMixin:
 
         try:
             mlflow.set_tracking_uri(self.config.mlflow_tracking_uri)
-            experiment = mlflow.get_experiment_by_name(
-                self.config.mlflow_experiment_name
-            )
+            experiment = mlflow.get_experiment_by_name(self.config.mlflow_experiment_name)
             experiment_id = (
-                mlflow.create_experiment(
-                    self.config.mlflow_experiment_name
-                )
+                mlflow.create_experiment(self.config.mlflow_experiment_name)
                 if experiment is None
                 else experiment.experiment_id
             )
-            filter_string = (
-                "tags.loto_commit_id = "
-                f"'{prepared.commit_id}'"
-            )
+            filter_string = f"tags.loto_commit_id = '{prepared.commit_id}'"
             existing = mlflow.search_runs(
                 experiment_ids=[experiment_id],
                 filter_string=filter_string,
@@ -165,16 +137,13 @@ class StorageEffectsMixin:
                 output_format="list",
             )
             if len(existing) > 1:
-                raise DownstreamCommitConflict(
-                    "multiple MLflow runs use the same commit_id"
-                )
+                raise DownstreamCommitConflict("multiple MLflow runs use the same commit_id")
             if existing:
                 run = existing[0]
                 tags = dict(getattr(run.data, "tags", {}))
                 if (
                     tags.get("loto_run_id") != prepared.run_id
-                    or tags.get("loto_ledger_sha256")
-                    != prepared.ledger_sha256
+                    or tags.get("loto_ledger_sha256") != prepared.ledger_sha256
                 ):
                     raise DownstreamCommitConflict(
                         "existing MLflow run conflicts with commit evidence"
@@ -187,10 +156,7 @@ class StorageEffectsMixin:
                     "experiment_name": self.config.mlflow_experiment_name,
                 }
 
-            artifacts = [
-                prepared.root / item.relative_path
-                for item in prepared.artifacts
-            ]
+            artifacts = [prepared.root / item.relative_path for item in prepared.artifacts]
             artifacts.extend(
                 [
                     prepared.root / "release_bundle.json",

@@ -198,19 +198,27 @@ class ProviderRequestV2(StrictModel):
             raise ValueError(f"{self.operation.value} requires non-empty history")
         if needs_history and self.geometry is None:
             raise ValueError(f"{self.operation.value} requires geometry")
-        if self.operation in {
-            ProviderOperation.FIT_PREDICT_SAVE,
-            ProviderOperation.LOAD_PREDICT,
-            ProviderOperation.RUNTIME_CERTIFY,
-        } and not self.artifact_dir:
+        if (
+            self.operation
+            in {
+                ProviderOperation.FIT_PREDICT_SAVE,
+                ProviderOperation.LOAD_PREDICT,
+                ProviderOperation.RUNTIME_CERTIFY,
+            }
+            and not self.artifact_dir
+        ):
             raise ValueError(f"{self.operation.value} requires artifact_dir")
 
-        if self.execution_mode in {
-            ExecutionMode.EXPLICIT_SINGLE_MODEL,
-            ExecutionMode.HPO_SINGLE_MODEL,
-            ExecutionMode.ZERO_SHOT_FOUNDATION,
-            ExecutionMode.FINE_TUNE_FOUNDATION,
-        } and len(self.model_ids) != 1:
+        if (
+            self.execution_mode
+            in {
+                ExecutionMode.EXPLICIT_SINGLE_MODEL,
+                ExecutionMode.HPO_SINGLE_MODEL,
+                ExecutionMode.ZERO_SHOT_FOUNDATION,
+                ExecutionMode.FINE_TUNE_FOUNDATION,
+            }
+            and len(self.model_ids) != 1
+        ):
             raise ValueError(f"{self.execution_mode.value} requires exactly one model_id")
         if self.execution_mode is ExecutionMode.EXPLICIT_MULTI_MODEL and len(self.model_ids) < 2:
             raise ValueError("explicit_multi_model requires at least two model_ids")

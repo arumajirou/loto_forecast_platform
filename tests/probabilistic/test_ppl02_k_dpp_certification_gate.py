@@ -34,8 +34,7 @@ SCRIPT = ROOT / "scripts" / "run_kdpp_fixed_k_target_host.py"
 def _inventory(root: Path, name: str, paths: list[Path]) -> None:
     (root / name).write_text(
         "".join(
-            f"{sha256_file(path)}  {path.relative_to(root).as_posix()}\n"
-            for path in sorted(paths)
+            f"{sha256_file(path)}  {path.relative_to(root).as_posix()}\n" for path in sorted(paths)
         ),
         encoding="utf-8",
     )

@@ -43,12 +43,8 @@ def test_register_scoring_routes_configless_options(
     result = cli._run_portable_command(args, project)
 
     assert result == {"status": "PASS", "registry_id": "registry-1"}
-    assert captured["scoring_root"] == (
-        project / "artifacts/scoring/run-1"
-    ).resolve()
-    assert captured["output"] == (
-        project / "artifacts/registry/run-1"
-    ).resolve()
+    assert captured["scoring_root"] == (project / "artifacts/scoring/run-1").resolve()
+    assert captured["output"] == (project / "artifacts/registry/run-1").resolve()
     options = captured["options"]
     assert options.registry_namespace == "shadow"
     assert options.postgres_dsn_env == "TEST_POSTGRES_DSN"

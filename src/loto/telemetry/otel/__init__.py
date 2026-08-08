@@ -1,4 +1,5 @@
 """Optional OpenTelemetry integration. Requires the repository ``full`` extra."""
+
 from .asgi import OpenTelemetryASGIMiddleware, instrument_fastapi_app
 from .config import OtlpProtocol, TracingConfig, TracingRuntimeStatus
 from .exporters import ExporterSnapshot, TrackingSpanExporter

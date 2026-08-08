@@ -70,9 +70,7 @@ def persist_database_search_space_evidence(
     artifacts = persist_search_space_artifacts(root, profile, context=context)
     verification = verify_search_space_artifacts(root)
     if verification["status"] != "PASS":
-        raise RuntimeError(
-            f"database search-space evidence verification failed: {verification}"
-        )
+        raise RuntimeError(f"database search-space evidence verification failed: {verification}")
     return DatabaseSearchSpaceEvidence(
         phase=phase,
         profile=profile,

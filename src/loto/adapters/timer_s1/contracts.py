@@ -119,8 +119,7 @@ def _validate_matrix(
     for row_index, row in enumerate(matrix):
         if len(row) != expected_columns:
             raise ValueError(
-                f"{name} series {row_index} must contain exactly "
-                f"{expected_columns} horizon values"
+                f"{name} series {row_index} must contain exactly {expected_columns} horizon values"
             )
         if any(not math.isfinite(value) for value in row):
             raise ValueError(f"{name} must contain only finite values")
@@ -214,12 +213,8 @@ class TimerS1Request(StrictModel):
     weight_manifest_sha256: str
     license: Literal["Apache-2.0"] = "Apache-2.0"
     game: Game
-    target_layout: Literal[TargetLayout.POSITION_UNIVARIATE] = (
-        TargetLayout.POSITION_UNIVARIATE
-    )
-    batch_semantics: Literal[BatchSemantics.INDEPENDENT_SERIES] = (
-        BatchSemantics.INDEPENDENT_SERIES
-    )
+    target_layout: Literal[TargetLayout.POSITION_UNIVARIATE] = TargetLayout.POSITION_UNIVARIATE
+    batch_semantics: Literal[BatchSemantics.INDEPENDENT_SERIES] = BatchSemantics.INDEPENDENT_SERIES
     joint_multivariate: Literal[False] = False
     timeline_mode: TimelineMode
     context_length: int = Field(gt=0, le=11_520)
@@ -427,13 +422,8 @@ class TimerS1Response(StrictModel):
             raise ValueError("point_forecast must equal q0.5")
         for series_index in range(expected_series):
             for step in range(self.prediction_length):
-                ordered = [
-                    self.quantiles[key][series_index][step] for key in QUANTILE_KEYS
-                ]
-                if any(
-                    left > right
-                    for left, right in zip(ordered, ordered[1:], strict=False)
-                ):
+                ordered = [self.quantiles[key][series_index][step] for key in QUANTILE_KEYS]
+                if any(left > right for left, right in zip(ordered, ordered[1:], strict=False)):
                     raise ValueError("quantile values must be monotone at every cell")
         chronology = self.chronology_evidence
         if chronology.row_count != self.context_length:

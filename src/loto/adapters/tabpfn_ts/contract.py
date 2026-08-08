@@ -189,9 +189,7 @@ class TabPFNTSRequestV2(StrictModel):
                     "legacy candidate_score contract supports prediction_length=1 only"
                 )
 
-        covariate_keys = [
-            (row.series_id, row.horizon_step) for row in self.known_future_covariates
-        ]
+        covariate_keys = [(row.series_id, row.horizon_step) for row in self.known_future_covariates]
         if len(covariate_keys) != len(set(covariate_keys)):
             raise ValueError("known-future covariate rows must be unique per series/horizon")
 
@@ -459,13 +457,10 @@ class TabPFNTSResponseV2(StrictModel):
             if len(self.series_identity) != geometry.position_count:
                 raise ValueError("position response series count does not match game geometry")
             point_pairs = {(item.series_id, item.horizon_step) for item in self.point_forecast}
-            if (
-                point_pairs != self._expected_pairs()
-                or len(self.point_forecast) != len(point_pairs)
+            if point_pairs != self._expected_pairs() or len(self.point_forecast) != len(
+                point_pairs
             ):
-                raise ValueError(
-                    "point forecast must cover every series/horizon pair exactly once"
-                )
+                raise ValueError("point forecast must cover every series/horizon pair exactly once")
             if self.raw_candidate_scores is not None:
                 raise ValueError("position response must not contain candidate scores")
         else:
@@ -482,9 +477,7 @@ class TabPFNTSResponseV2(StrictModel):
             if self.raw_candidate_scores is None:
                 raise ValueError("candidate-score response requires raw_candidate_scores")
             candidates = [item.candidate for item in self.raw_candidate_scores]
-            expected_candidates = list(
-                range(geometry.candidate_min, geometry.candidate_max + 1)
-            )
+            expected_candidates = list(range(geometry.candidate_min, geometry.candidate_max + 1))
             if sorted(candidates) != expected_candidates or len(set(candidates)) != len(candidates):
                 raise ValueError("raw candidate scores must cover the full candidate universe")
 
@@ -492,21 +485,17 @@ class TabPFNTSResponseV2(StrictModel):
                 probability_candidates = [
                     item.candidate for item in self.calibrated_candidate_probabilities
                 ]
-                if (
-                    sorted(probability_candidates) != expected_candidates
-                    or len(set(probability_candidates)) != len(probability_candidates)
-                ):
+                if sorted(probability_candidates) != expected_candidates or len(
+                    set(probability_candidates)
+                ) != len(probability_candidates):
                     raise ValueError(
                         "calibrated probabilities must cover the candidate universe exactly once"
                     )
                 total = sum(
-                    item.calibrated_probability
-                    for item in self.calibrated_candidate_probabilities
+                    item.calibrated_probability for item in self.calibrated_candidate_probabilities
                 )
                 if not math.isclose(total, geometry.selection_count, abs_tol=1e-3):
-                    raise ValueError(
-                        "calibrated probability sum must approximate selection_count"
-                    )
+                    raise ValueError("calibrated probability sum must approximate selection_count")
 
             if self.selected_candidates is not None:
                 if self.selected_candidates != sorted(self.selected_candidates):
@@ -528,13 +517,11 @@ class TabPFNTSResponseV2(StrictModel):
         by_level: dict[float, dict[tuple[str, int], float]] = {}
         for quantile in self.quantiles:
             mapping = {
-                (value.series_id, value.horizon_step): value.value
-                for value in quantile.values
+                (value.series_id, value.horizon_step): value.value for value in quantile.values
             }
             if set(mapping) != expected_pairs or len(quantile.values) != len(mapping):
                 raise ValueError(
-                    "quantile forecast shape does not match series/horizon identity "
-                    "exactly once"
+                    "quantile forecast shape does not match series/horizon identity exactly once"
                 )
             by_level[quantile.level] = mapping
 

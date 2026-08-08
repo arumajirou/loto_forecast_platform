@@ -23,6 +23,7 @@ from tests.moirai2_campaign.p8c_evidence_mutations import (
     _rewrite_response_and_evidence,
 )
 
+
 def test_cuda_gpu_uuid_is_required(tmp_path: Path) -> None:
     cuda = _campaign(
         tmp_path / "cuda",

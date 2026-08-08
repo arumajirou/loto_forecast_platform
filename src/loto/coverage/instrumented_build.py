@@ -50,13 +50,9 @@ def build_walk_forward(
         points = np_module.vstack(
             [runner_module._point_forecast(history, method) for method in methods]
         )
-        prediction = np_module.rint(
-            np_module.median(points, axis=0)
-        ).astype(int)
+        prediction = np_module.rint(np_module.median(points, axis=0)).astype(int)
         for position in range(1, prediction.shape[0]):
-            prediction[position] = max(
-                prediction[position], prediction[position - 1] + 1
-            )
+            prediction[position] = max(prediction[position], prediction[position - 1] + 1)
         recorder.record_prediction(fold_id=fold_id)
         target = data[index].copy()
         recorder.record_actual(fold_id=fold_id)
@@ -92,9 +88,7 @@ def run_coverage_experiment_with_ledger(
     output = absolute(raw.get("output", "runs/coverage-90-ledger"))
     require_regular_file(input_path, label="coverage input")
     root = Path(__file__).resolve().parents[3]
-    audited = absolute(
-        runner_source or root / "src/loto/coverage/runner.py"
-    )
+    audited = absolute(runner_source or root / "src/loto/coverage/runner.py")
     source_pin(
         source=audited,
         expected=expected_runner_blob_sha,
@@ -129,9 +123,7 @@ def run_coverage_experiment_with_ledger(
         )
 
     dataset_sha = str(getattr(manifest, "sha256", frame_hash(frame)))
-    data_version = str(
-        getattr(manifest, "data_version", f"coverage-prefix-{dataset_sha[:16]}")
-    )
+    data_version = str(getattr(manifest, "data_version", f"coverage-prefix-{dataset_sha[:16]}"))
     evidence = make_evidence(
         frame=frame,
         dataset_id="coverage-loto7-accessible-prefix",
@@ -149,9 +141,7 @@ def run_coverage_experiment_with_ledger(
         expected_seeds=[0],
         clock=clock,
     )
-    methods = list(
-        raw.get("models", ["median", "historic-average", "recent-median"])
-    )
+    methods = list(raw.get("models", ["median", "historic-average", "recent-median"]))
     cal_actual, cal_pred = build_walk_forward(
         data=data,
         start=calibration_start,
@@ -192,5 +182,3 @@ def run_coverage_experiment_with_ledger(
         data_version=data_version,
         current_run_id=current_run_id,
     )
-
-

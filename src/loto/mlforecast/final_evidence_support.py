@@ -11,9 +11,11 @@ from typing import Any
 FIXED_TIME = (1980, 1, 1, 0, 0, 0)
 DIGEST = re.compile(r"^[0-9a-f]{64}$")
 RUN_ID = re.compile(r"^mlforecast-final-\d{8}-\d{6}-\d+-[0-9a-f]{12}$")
-WINDOWS_RESERVED = {"con", "prn", "aux", "nul"} | {
-    f"com{number}" for number in range(1, 10)
-} | {f"lpt{number}" for number in range(1, 10)}
+WINDOWS_RESERVED = (
+    {"con", "prn", "aux", "nul"}
+    | {f"com{number}" for number in range(1, 10)}
+    | {f"lpt{number}" for number in range(1, 10)}
+)
 FINAL_STATUSES = {
     "FINAL_VERIFICATION_PASSED",
     "FINAL_VERIFICATION_BLOCKED",

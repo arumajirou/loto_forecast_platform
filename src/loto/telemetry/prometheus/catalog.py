@@ -203,15 +203,11 @@ class PlatformMetricCatalog:
             game = labels["game"]
             position = labels["position"]
             if position not in GAME_POSITION_ALLOWLIST[game]:
-                raise ValueError(
-                    f"metric {name} position {position} is invalid for game {game}"
-                )
+                raise ValueError(f"metric {name} position {position} is invalid for game {game}")
 
     def series_upper_bound(self, name: str) -> int:
         definition = self.get(name).definition
-        label_product = prod(
-            len(values) for values in definition.label_allowlist.values()
-        )
+        label_product = prod(len(values) for values in definition.label_allowlist.values())
         if not definition.label_allowlist:
             label_product = 1
         if definition.kind is MetricKind.COUNTER:
@@ -224,9 +220,7 @@ class PlatformMetricCatalog:
         return label_product * multiplier
 
     def total_series_upper_bound(self) -> int:
-        return sum(
-            self.series_upper_bound(spec.definition.name) for spec in self.specs()
-        )
+        return sum(self.series_upper_bound(spec.definition.name) for spec in self.specs())
 
     def assert_budget(
         self,
@@ -238,14 +232,11 @@ class PlatformMetricCatalog:
             raise ValueError("series budgets must be positive")
         total = self.total_series_upper_bound()
         if total > maximum_total_series:
-            raise ValueError(
-                f"catalog series bound {total} exceeds {maximum_total_series}"
-            )
+            raise ValueError(f"catalog series bound {total} exceeds {maximum_total_series}")
         offenders = {
             spec.definition.name: self.series_upper_bound(spec.definition.name)
             for spec in self.specs()
-            if self.series_upper_bound(spec.definition.name)
-            > maximum_metric_series
+            if self.series_upper_bound(spec.definition.name) > maximum_metric_series
         }
         if offenders:
             raise ValueError(f"per-metric series bound exceeded: {offenders}")
@@ -524,10 +515,7 @@ def default_platform_metric_catalog() -> PlatformMetricCatalog:
     device = tuple(item.value for item in DeviceLabel)
     split = tuple(item.value for item in SplitLabel)
     horizon = tuple(item.value for item in HorizonLabel)
-    specs = [
-        PlatformMetricSpec(item)
-        for item in default_telemetry_metric_registry().definitions()
-    ]
+    specs = [PlatformMetricSpec(item) for item in default_telemetry_metric_registry().definitions()]
     specs.extend(
         _platform_specs(
             status=status,

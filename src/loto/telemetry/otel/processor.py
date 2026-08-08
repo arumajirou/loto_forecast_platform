@@ -1,4 +1,5 @@
 """Non-blocking bounded span processor with explicit queue-drop evidence."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

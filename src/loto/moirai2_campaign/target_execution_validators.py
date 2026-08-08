@@ -100,9 +100,7 @@ def validate_installation_artifact(
         "candidate_lock_sha256": expected_lock,
         "reviewer": reviewer,
         "reviewed_at": reviewed_at,
-        "installation_evidence_sha256": sha256_file(
-            root / "INSTALLATION_EVIDENCE.json"
-        ),
+        "installation_evidence_sha256": sha256_file(root / "INSTALLATION_EVIDENCE.json"),
         "manifest": manifest,
     }
 
@@ -174,5 +172,3 @@ def validate_pair_artifact(
         "report_sha256": sha256_file(root / "P8C_RUNTIME_EVIDENCE_REPORT.json"),
         "manifest": manifest,
     }
-
-

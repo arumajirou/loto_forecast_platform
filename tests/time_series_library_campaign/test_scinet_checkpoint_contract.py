@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-FAKE_SCINET = '''
+FAKE_SCINET = """
 import torch
 from torch import nn
 
@@ -22,7 +22,7 @@ class Model(nn.Module):
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         forecast = self.linear(x_enc.permute(0, 2, 1)).permute(0, 2, 1)
         return torch.cat([torch.zeros_like(x_enc), torch.zeros_like(x_enc), forecast], dim=1)
-'''.strip()
+""".strip()
 
 
 def _script() -> Path:

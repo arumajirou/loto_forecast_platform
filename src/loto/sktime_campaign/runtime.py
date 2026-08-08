@@ -110,8 +110,7 @@ def _validate_prediction(
     values = prediction.to_numpy(dtype=float)
     if values.shape != (len(expected_index),):
         raise RuntimeError(
-            f"prediction shape mismatch: expected {(len(expected_index),)}, "
-            f"got {values.shape}"
+            f"prediction shape mismatch: expected {(len(expected_index),)}, got {values.shape}"
         )
     if not np.isfinite(values).all():
         raise RuntimeError("prediction contains NaN or Inf")
@@ -288,9 +287,7 @@ def execute_request(request: ProviderRequest) -> ProviderResponse:
     except Exception as exc:
         unavailable = "not installed" in str(exc) or "unable to import" in str(exc)
         response = ProviderResponse(
-            status=(
-                ProviderStatus.UNAVAILABLE if unavailable else ProviderStatus.FAILED
-            ),
+            status=(ProviderStatus.UNAVAILABLE if unavailable else ProviderStatus.FAILED),
             operation=request.operation,
             environment_lane=request.environment_lane,
             expected_sktime_version=request.expected_sktime_version,

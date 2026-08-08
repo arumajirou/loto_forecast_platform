@@ -200,15 +200,11 @@ class _BayesianContextTreeIdentityV1(_StrictModel):
         if self.actuals_used:
             maximum_actual_index = self.actuals_used[-1]
             if maximum_actual_index != actuals_used_through_index:
-                raise ValueError(
-                    "actuals_used must end at actuals_used_through_index"
-                )
+                raise ValueError("actuals_used must end at actuals_used_through_index")
             if maximum_actual_index >= self.chronology_evidence.prediction_index:
                 raise ValueError("future actual leakage detected")
         elif actuals_used_through_index != -1:
-            raise ValueError(
-                "empty actuals_used requires actuals_used_through_index=-1"
-            )
+            raise ValueError("empty actuals_used requires actuals_used_through_index=-1")
         return self
 
 
@@ -230,9 +226,7 @@ class BayesianContextTreeRequestV1(_BayesianContextTreeIdentityV1):
         if self.context_length != len(self.history):
             raise ValueError("context_length must equal history length")
         illegal = [
-            token
-            for token in self.history
-            if token is not None and token not in self.alphabet
+            token for token in self.history if token is not None and token not in self.alphabet
         ]
         if illegal:
             raise ValueError("history contains symbols outside the declared alphabet")

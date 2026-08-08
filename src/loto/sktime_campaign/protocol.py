@@ -104,9 +104,7 @@ class ProviderRequest(BaseModel):
             self.operation is ProviderOperation.SMOKE_MATRIX
             and self.environment_lane != "classic-py312"
         ):
-            raise ValueError(
-                "smoke_matrix requires the isolated classic-py312 environment lane"
-            )
+            raise ValueError("smoke_matrix requires the isolated classic-py312 environment lane")
         return self
 
 

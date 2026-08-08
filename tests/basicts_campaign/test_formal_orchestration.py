@@ -60,8 +60,6 @@ def test_write_formal_bundle_hashes_nested_evidence(tmp_path: Path) -> None:
         {"schema_version": "1.0", "status": "FAILED", "run_id": "run-1"},
     )
 
-    manifest = json.loads(
-        (tmp_path / "FORMAL_P0_MANIFEST.json").read_text(encoding="utf-8")
-    )
+    manifest = json.loads((tmp_path / "FORMAL_P0_MANIFEST.json").read_text(encoding="utf-8"))
     assert "core/evidence.json" in {item["path"] for item in manifest["files"]}
     assert (tmp_path / "SHA256SUMS").is_file()

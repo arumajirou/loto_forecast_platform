@@ -90,5 +90,3 @@ def _recheck_repository(identity: RepositoryIdentity) -> None:
     )
     if current != identity:
         raise ValueError(f"{identity.role} repository identity changed")
-
-

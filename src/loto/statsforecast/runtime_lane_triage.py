@@ -36,10 +36,7 @@ def _atomic_write(path: Path, content: bytes) -> None:
 def _write_json(path: Path, payload: Any) -> None:
     _atomic_write(
         path,
-        (
-            json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
-            + "\n"
-        ).encode("utf-8"),
+        (json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8"),
     )
 
 
@@ -56,9 +53,7 @@ def _write_sums(root: Path) -> Path:
     rows = []
     for path in sorted(root.rglob("*")):
         if path.is_file() and not path.is_symlink() and path != checksum_path:
-            rows.append(
-                f"{_sha256_file(path)}  {path.relative_to(root).as_posix()}"
-            )
+            rows.append(f"{_sha256_file(path)}  {path.relative_to(root).as_posix()}")
     _atomic_write(checksum_path, ("\n".join(rows) + "\n").encode("utf-8"))
     return checksum_path
 
@@ -105,9 +100,7 @@ def _classify(
 
     def add(code: str, severity: str, evidence: list[str]) -> None:
         if not any(item["code"] == code for item in findings):
-            findings.append(
-                {"code": code, "severity": severity, "evidence": evidence}
-            )
+            findings.append({"code": code, "severity": severity, "evidence": evidence})
 
     if report.get("formal_pass") is True and report.get("decision") == "RUNTIME_CERTIFIED":
         add("NO_FAILURE", "INFO", ["end-to-end formal pass is true"])
@@ -176,12 +169,13 @@ def _classify(
         failed_models = [
             str(row.get("model_name"))
             for row in model_matrix
-            if row.get("status")
-            not in {"VERIFIED", "EXPECTED_NEGATIVE_PASS"}
+            if row.get("status") not in {"VERIFIED", "EXPECTED_NEGATIVE_PASS"}
         ]
-    if failed_models or (
-        runtime and runtime.get("certification_returncode") not in {None, 0}
-    ) or (verification and verification.get("formal_pass") is False):
+    if (
+        failed_models
+        or (runtime and runtime.get("certification_returncode") not in {None, 0})
+        or (verification and verification.get("formal_pass") is False)
+    ):
         add(
             "MODEL_RUNTIME",
             "BLOCKING",
@@ -254,7 +248,7 @@ def _remediation_steps(
             [
                 "git status --short",
                 "git rev-parse HEAD",
-                f"test \"$(git rev-parse HEAD)\" = \"{commit}\"",
+                f'test "$(git rev-parse HEAD)" = "{commit}"',
             ],
         )
     if "CONFIGURATION" in codes:
@@ -282,7 +276,7 @@ def _remediation_steps(
             "Inspect failed model rows and certification logs",
             [
                 "find . -name MODEL_RUNTIME_MATRIX.json -o -name certification.stderr.log",
-                "grep -R \"EXECUTION_FAILED\\|CONSTRUCTION_FAILED\" .",
+                'grep -R "EXECUTION_FAILED\\|CONSTRUCTION_FAILED" .',
             ],
         )
     if "EVIDENCE_INTEGRITY" in codes:

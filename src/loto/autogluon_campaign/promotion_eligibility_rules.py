@@ -58,32 +58,17 @@ def evaluate_promotion_rules(
     holdout_by_id = {str(row["candidate_id"]): row for row in holdout_summaries}
     holdout_selected = holdout_by_id[candidate_id]
 
-    draw_ids = sorted(
-        {
-            int(draw_id)
-            for window in prospective
-            for draw_id in window["draw_ids"]
-        }
-    )
+    draw_ids = sorted({int(draw_id) for window in prospective for draw_id in window["draw_ids"]})
     worst_window_hit = min(
-        float(window["selected_metrics"]["mean_hit_at_1"])
-        for window in window_summaries
+        float(window["selected_metrics"]["mean_hit_at_1"]) for window in window_summaries
     )
-    hit_drop = (
-        float(holdout_selected["mean_hit_at_1"])
-        - float(selected["mean_hit_at_1"])
-    )
-    mae_increase = (
-        float(selected["mean_mae"])
-        - float(holdout_selected["mean_mae"])
-    )
+    hit_drop = float(holdout_selected["mean_hit_at_1"]) - float(selected["mean_hit_at_1"])
+    mae_increase = float(selected["mean_mae"]) - float(holdout_selected["mean_mae"])
 
     baseline_results = []
     for baseline_id in REQUIRED_BASELINES:
         baseline = summary_by_id[baseline_id]
-        hit_pass = float(selected["mean_hit_at_1"]) >= float(
-            baseline["mean_hit_at_1"]
-        )
+        hit_pass = float(selected["mean_hit_at_1"]) >= float(baseline["mean_hit_at_1"])
         mae_pass = float(selected["mean_mae"]) <= float(baseline["mean_mae"])
         baseline_results.append(
             {

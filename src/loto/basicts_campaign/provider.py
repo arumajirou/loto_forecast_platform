@@ -32,11 +32,16 @@ def _identity() -> tuple[BasicTSStatus, bool, str | None, dict[str, Any]]:
         and module_version == EXPECTED_BASICTS_VERSION
         else BasicTSStatus.FAILED
     )
-    return status, True, package_version, {
-        "distribution_version": package_version,
-        "module_version": module_version,
-        "expected_version": EXPECTED_BASICTS_VERSION,
-    }
+    return (
+        status,
+        True,
+        package_version,
+        {
+            "distribution_version": package_version,
+            "module_version": module_version,
+            "expected_version": EXPECTED_BASICTS_VERSION,
+        },
+    )
 
 
 def _construct_forward_save_load_smoke(
@@ -117,18 +122,22 @@ def _construct_forward_save_load_smoke(
 
     config_path = artifact_dir / "effective_config.json"
     atomic_write_json(config_path, json.loads(str(cfg)))
-    return package_version, {
-        "resolved_imports": resolved,
-        "basic_ts_config_md5": cfg.md5,
-        "prediction_shape": list(before.shape),
-        "prediction_finite": True,
-        "save_load_prediction_equal": True,
-        "device": "cpu",
-        "training_executed": False,
-        "smoke_scope": "config_construct_forward_save_load",
-        "eval_after_train": cfg.eval_after_train,
-        "test_interval": cfg.test_interval,
-    }, [model_path.name, config_path.name]
+    return (
+        package_version,
+        {
+            "resolved_imports": resolved,
+            "basic_ts_config_md5": cfg.md5,
+            "prediction_shape": list(before.shape),
+            "prediction_finite": True,
+            "save_load_prediction_equal": True,
+            "device": "cpu",
+            "training_executed": False,
+            "smoke_scope": "config_construct_forward_save_load",
+            "eval_after_train": cfg.eval_after_train,
+            "test_interval": cfg.test_interval,
+        },
+        [model_path.name, config_path.name],
+    )
 
 
 def process_request(request: BasicTSProviderRequest) -> BasicTSProviderResponse:

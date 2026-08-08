@@ -258,10 +258,7 @@ def certify_device_use(
         used = observation.torch_cuda_available
         used &= observation.effective_accelerator == "gpu"
         used &= bool(observation.model_parameter_devices)
-        used &= all(
-            item.lower().startswith("cuda")
-            for item in observation.model_parameter_devices
-        )
+        used &= all(item.lower().startswith("cuda") for item in observation.model_parameter_devices)
         used &= observation.prediction_device.lower().startswith("cuda")
         status = "GPU_REQUESTED_AND_USED"
         if not used:
@@ -281,8 +278,10 @@ def certify_device_use(
             observation.cuda_allocated_bytes,
             observation.cuda_reserved_bytes,
         )
-        if failure is None and contract.require_vram_evidence and any(
-            item is None for item in memory
+        if (
+            failure is None
+            and contract.require_vram_evidence
+            and any(item is None for item in memory)
         ):
             failure = ("VRAM_EVIDENCE_MISSING", "VRAM/CUDA memory evidence is required")
             status = "GPU_EVIDENCE_INCOMPLETE"

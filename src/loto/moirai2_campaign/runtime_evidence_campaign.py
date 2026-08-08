@@ -22,6 +22,7 @@ from loto.moirai2_campaign.runtime_evidence_prediction import (
     _require_true,
 )
 
+
 def _source_identity(config: dict[str, Any]) -> dict[str, Any]:
     value = config.get("source_identity")
     if not isinstance(value, dict):
@@ -41,9 +42,7 @@ def _source_identity(config: dict[str, Any]) -> dict[str, Any]:
     for relative, digest in hashes.items():
         _safe_relative_path(str(relative))
         if not _SHA256_PATTERN.fullmatch(str(digest)):
-            raise RuntimeEvidenceGateError(
-                f"principal source file SHA is invalid: {relative}"
-            )
+            raise RuntimeEvidenceGateError(f"principal source file SHA is invalid: {relative}")
     return value
 
 
@@ -135,9 +134,7 @@ def verify_campaign(
             f"P8C launch {key} differs",
         )
     _require_equal(
-        _required_file(root, "p8c_campaign.exit_code.txt").read_text(
-            encoding="utf-8"
-        ).strip(),
+        _required_file(root, "p8c_campaign.exit_code.txt").read_text(encoding="utf-8").strip(),
         "0",
         "P8C campaign exit code artifact differs",
     )
@@ -215,9 +212,7 @@ def verify_campaign(
         raise RuntimeEvidenceGateError("snapshot file evidence is missing")
     config_sha = str(snapshot_files.get("config.json", ""))
     weight_sha = str(snapshot_files.get("model.safetensors", ""))
-    if not _SHA256_PATTERN.fullmatch(config_sha) or not _SHA256_PATTERN.fullmatch(
-        weight_sha
-    ):
+    if not _SHA256_PATTERN.fullmatch(config_sha) or not _SHA256_PATTERN.fullmatch(weight_sha):
         raise RuntimeEvidenceGateError("snapshot file SHA evidence is invalid")
     cases = tuple(
         verify_case(
@@ -229,10 +224,7 @@ def verify_campaign(
         )
         for case_name in FORMAL_CASE_NAMES
     )
-    artifact_ids = {
-        (case.model_revision, case.config_sha256, case.weight_sha256)
-        for case in cases
-    }
+    artifact_ids = {(case.model_revision, case.config_sha256, case.weight_sha256) for case in cases}
     if len(artifact_ids) != 1:
         raise RuntimeEvidenceGateError("model artifact identity changes across cases")
     case_artifact = next(iter(artifact_ids))
@@ -259,5 +251,3 @@ def verify_campaign(
         manifest=manifest,
         cases=cases,
     )
-
-

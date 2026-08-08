@@ -102,9 +102,7 @@ def test_cpu_commands_hide_cuda_and_use_argv(tmp_path: Path) -> None:
         python_executable="/usr/bin/python3",
     )
     assert first.argv[0] == "/usr/bin/python3"
-    assert first.argv[2] == (
-        "loto.neuralforecast.auto_frets.runtime_worker"
-    )
+    assert first.argv[2] == ("loto.neuralforecast.auto_frets.runtime_worker")
     assert first.environment["CUDA_VISIBLE_DEVICES"] == ""
     assert second.argv[-1] == "run-b"
 
@@ -146,13 +144,7 @@ def test_observation_loader_maps_cpu_response(
         parameter_count=590_513,
         expected_parameter_count=590_513,
     )
-    path = (
-        tmp_path
-        / "output"
-        / "processes"
-        / "run-a"
-        / "WORKER_RESPONSE.json"
-    )
+    path = tmp_path / "output" / "processes" / "run-a" / "WORKER_RESPONSE.json"
     path.parent.mkdir(parents=True)
     path.write_text(
         json.dumps(response.model_dump(mode="json")),

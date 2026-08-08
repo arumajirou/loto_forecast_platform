@@ -1,4 +1,5 @@
 """FastAPI/ASGI request tracing without taking ownership of request-ID generation."""
+
 from __future__ import annotations
 
 import re

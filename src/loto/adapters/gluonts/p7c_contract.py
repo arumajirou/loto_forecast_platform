@@ -105,9 +105,7 @@ class P7CRemediationPlan(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal[1] = 1
-    phase: Literal["P7C_RESULT_TRIAGE_AND_REMEDIATION"] = (
-        "P7C_RESULT_TRIAGE_AND_REMEDIATION"
-    )
+    phase: Literal["P7C_RESULT_TRIAGE_AND_REMEDIATION"] = "P7C_RESULT_TRIAGE_AND_REMEDIATION"
     source: P7CInputIdentity
     evidence_state: str = Field(min_length=1)
     certification_status: str = Field(min_length=1)
@@ -125,8 +123,7 @@ class P7CRemediationPlan(BaseModel):
             raise ValueError("P7C remediation item IDs must be unique")
         model_items = [item for item in self.items if item.lane != "cross_lane"]
         verified_count = sum(
-            item.remediation_class is P7CRemediationClass.VERIFIED
-            for item in model_items
+            item.remediation_class is P7CRemediationClass.VERIFIED for item in model_items
         )
         if verified_count != self.verified_model_lifecycles:
             raise ValueError("verified lifecycle count does not match remediation rows")
@@ -135,10 +132,7 @@ class P7CRemediationPlan(BaseModel):
             and self.certification_status == "VERIFIED"
             and self.verified_model_lifecycles == 18
             and len(model_items) == 18
-            and all(
-                item.remediation_class is P7CRemediationClass.VERIFIED
-                for item in model_items
-            )
+            and all(item.remediation_class is P7CRemediationClass.VERIFIED for item in model_items)
             and not any(item.lane == "cross_lane" for item in self.items)
         )
         if self.p8_eligible != eligible:
@@ -155,8 +149,7 @@ class P7CRemediationPlan(BaseModel):
 
 def canonical_json_bytes(payload: Any) -> bytes:
     return (
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n"
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     ).encode("utf-8")
 
 

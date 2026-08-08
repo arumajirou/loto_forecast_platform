@@ -47,6 +47,7 @@ def promote_first_model_to_verified(data: dict[str, object]) -> dict[str, object
     record["verification"]["blockers"] = []
     return record
 
+
 def test_initial_registry_is_valid() -> None:
     registry = load_registry(REGISTRY)
     assert len(registry.records) == 11

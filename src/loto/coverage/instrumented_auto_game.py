@@ -43,9 +43,7 @@ def run_game(**ctx: Any) -> tuple[dict[str, Any], bool]:
     )
     count, _ = auto.GAME_GEOMETRY[game]
     columns = [f"n{index}" for index in range(1, count + 1)]
-    data = frame[columns].apply(
-        pd.to_numeric, errors="raise"
-    ).to_numpy(dtype=int)
+    data = frame[columns].apply(pd.to_numeric, errors="raise").to_numpy(dtype=int)
     evidence = make_evidence(
         frame=frame,
         dataset_id=f"coverage-{game}-accessible-prefix",
@@ -93,15 +91,10 @@ def run_game(**ctx: Any) -> tuple[dict[str, Any], bool]:
         ctx["state"]["completed"][proposal.experiment_id] = record
         atomic_write_json(output / "state.json", ctx["state"])
         if record["status"] == "FAILED":
-            recorder.mark_gap(
-                f"EXPERIMENT_FAILED:{proposal.experiment_id}"
-            )
+            recorder.mark_gap(f"EXPERIMENT_FAILED:{proposal.experiment_id}")
             game_blocked = True
             break
-        target_met = (
-            record["validation"]["row_within_tolerance"]
-            >= budget.target_coverage
-        )
+        target_met = record["validation"]["row_within_tolerance"] >= budget.target_coverage
         if target_met and budget.stop_when_target_met:
             break
     successful = [item for item in results if item["status"] == "SUCCEEDED"]
@@ -162,19 +155,10 @@ def execute_proposal(**ctx: Any) -> dict[str, Any]:
             cal_pred=cal_pred,
             val_pred=val_pred,
         )
-        calibration = ctx["auto"]._evaluate_general(
-            cal_actual, selected, ctx["budget"].tolerance
-        )
-        validation = ctx["auto"]._evaluate_general(
-            val_actual, selected, ctx["budget"].tolerance
-        )
-        candidate_path = (
-            ctx["output"]
-            / f"{proposal.game}-{proposal.experiment_id}-candidates.csv"
-        )
-        ctx["pd"].DataFrame(selected, columns=ctx["columns"]).to_csv(
-            candidate_path, index=False
-        )
+        calibration = ctx["auto"]._evaluate_general(cal_actual, selected, ctx["budget"].tolerance)
+        validation = ctx["auto"]._evaluate_general(val_actual, selected, ctx["budget"].tolerance)
+        candidate_path = ctx["output"] / f"{proposal.game}-{proposal.experiment_id}-candidates.csv"
+        ctx["pd"].DataFrame(selected, columns=ctx["columns"]).to_csv(candidate_path, index=False)
         record.update(
             {
                 "status": "SUCCEEDED",
@@ -246,9 +230,7 @@ def game_summary(**ctx: Any) -> dict[str, Any]:
     return {
         "status": (
             "TARGET_MET"
-            if best
-            and best["validation"]["row_within_tolerance"]
-            >= budget.target_coverage
+            if best and best["validation"]["row_within_tolerance"] >= budget.target_coverage
             else "TARGET_NOT_MET"
         ),
         "run_id": ctx["current_run_id"],
@@ -265,7 +247,5 @@ def game_summary(**ctx: Any) -> dict[str, Any]:
         "protected_test_materialized": False,
         "data_access_status": None if ledger is None else ledger.status,
         "data_access_ledger": None if ledger is None else str(ledger.ledger_path),
-        "data_access_ledger_sha256": (
-            None if ledger is None else ledger.ledger_sha256
-        ),
+        "data_access_ledger_sha256": (None if ledger is None else ledger.ledger_sha256),
     }

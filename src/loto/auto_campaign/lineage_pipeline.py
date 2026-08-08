@@ -25,9 +25,7 @@ def _verified_run_failures(path: Path, label: str) -> list[str]:
         try:
             report = json.loads(report_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
-            failures.append(
-                f"{label} verification report unreadable: {type(exc).__name__}: {exc}"
-            )
+            failures.append(f"{label} verification report unreadable: {type(exc).__name__}: {exc}")
         else:
             if not isinstance(report, dict) or report.get("status") != "PASS":
                 failures.append(
@@ -36,10 +34,7 @@ def _verified_run_failures(path: Path, label: str) -> list[str]:
                 )
 
     seal = verify_verification_seal(path)
-    failures.extend(
-        f"{label} verification seal: {failure}"
-        for failure in seal.get("failures", [])
-    )
+    failures.extend(f"{label} verification seal: {failure}" for failure in seal.get("failures", []))
     for failure in verify_sha256s(path):
         failures.append(f"{label} SHA256: {failure}")
     return failures

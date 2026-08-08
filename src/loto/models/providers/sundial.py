@@ -331,9 +331,7 @@ class SundialProvider(FoundationProvider):
 
     def _run_provider(self, history: pd.DataFrame) -> dict[str, Any]:
         self.validate_environment()
-        num_samples, quantile_levels, revin, point_strategy = (
-            self._effective_request_options()
-        )
+        num_samples, quantile_levels, revin, point_strategy = self._effective_request_options()
         request = {
             "schema_version": 1,
             "model_id": self.spec.model_id,
@@ -349,9 +347,7 @@ class SundialProvider(FoundationProvider):
             "point_strategy": point_strategy,
             "revin": revin,
             "seed": self.seed,
-            "approved_remote_code_sha256": _load_remote_code_allowlist(
-                SUNDIAL_REMOTE_CODE_REVIEW
-            ),
+            "approved_remote_code_sha256": _load_remote_code_allowlist(SUNDIAL_REMOTE_CODE_REVIEW),
         }
         validate_provider_request(request)
         with tempfile.TemporaryDirectory(prefix="loto-sundial-") as tmp:
@@ -454,9 +450,7 @@ class SundialProvider(FoundationProvider):
                 "ARTIFACT_MISSING",
                 f"provider artifact missing: {path / 'provider.json'}",
             )
-        self.saved_reference = json.loads(
-            (path / "provider.json").read_text(encoding="utf-8")
-        )
+        self.saved_reference = json.loads((path / "provider.json").read_text(encoding="utf-8"))
         return self.load()
 
     def inspect_properties(self) -> dict[str, Any]:

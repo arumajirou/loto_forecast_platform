@@ -178,8 +178,6 @@ def test_sha256_manifest_excludes_itself(tmp_path) -> None:
 
 def test_cuda_device_mismatch_fails_closed() -> None:
     response = _response(pid=902, device="cuda")
-    response["effective_arguments"]["forward_device_evidence"][
-        "input_tensor_devices"
-    ] = ["cpu"]
+    response["effective_arguments"]["forward_device_evidence"]["input_tensor_devices"] = ["cpu"]
     with pytest.raises(RuntimeCertificationError, match="does not stay on cuda"):
         validate_provider_device_evidence(response)

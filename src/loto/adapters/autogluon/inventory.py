@@ -115,12 +115,8 @@ class AutoGluonRuntimeInventory:
             "runtime_importable_model_count": sum(
                 entry.runtime_importable for entry in self.models
             ),
-            "runtime_certified_model_count": sum(
-                entry.runtime_certified for entry in self.models
-            ),
-            "source_ensemble_name_count": sum(
-                entry.source_declared for entry in self.ensembles
-            ),
+            "runtime_certified_model_count": sum(entry.runtime_certified for entry in self.models),
+            "source_ensemble_name_count": sum(entry.source_declared for entry in self.ensembles),
             "source_unique_ensemble_class_count": len(
                 {entry.expected_class_name for entry in self.ensembles}
             ),
@@ -424,15 +420,9 @@ def discover_runtime_inventory(
         "unknown_runtime_model_aliases": unknown_aliases,
         "failures": tuple(failures),
         "source_model_count": len(model_entries),
-        "runtime_discovered_model_count": sum(
-            entry.runtime_discovered for entry in model_entries
-        ),
-        "runtime_importable_model_count": sum(
-            entry.runtime_importable for entry in model_entries
-        ),
-        "runtime_certified_model_count": sum(
-            entry.runtime_certified for entry in model_entries
-        ),
+        "runtime_discovered_model_count": sum(entry.runtime_discovered for entry in model_entries),
+        "runtime_importable_model_count": sum(entry.runtime_importable for entry in model_entries),
+        "runtime_certified_model_count": sum(entry.runtime_certified for entry in model_entries),
         "source_ensemble_name_count": len(ensemble_entries),
         "source_unique_ensemble_class_count": len(
             {entry.expected_class_name for entry in ensemble_entries}

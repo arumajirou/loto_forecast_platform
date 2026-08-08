@@ -114,16 +114,14 @@ def _verify_formal_request(run_dir: Path) -> dict[str, Any]:
     for key, expected in expected_fields.items():
         if request.get(key) != expected:
             raise VerificationError(
-                f"formal P1 request mismatch for {key}: "
-                f"expected={expected}, got={request.get(key)}"
+                f"formal P1 request mismatch for {key}: expected={expected}, got={request.get(key)}"
             )
 
     expected_output = (run_dir / "smoke-matrix").resolve()
     actual_output = Path(str(request.get("output_dir", ""))).resolve()
     if actual_output != expected_output:
         raise VerificationError(
-            "formal P1 output_dir mismatch: "
-            f"expected={expected_output}, got={actual_output}"
+            f"formal P1 output_dir mismatch: expected={expected_output}, got={actual_output}"
         )
     return request
 
@@ -184,8 +182,7 @@ def _verify_pass_result(
     ):
         if result.get(phase) != "PASS":
             raise VerificationError(
-                f"matrix phase is not PASS for {model_id}: "
-                f"{phase}={result.get(phase)}"
+                f"matrix phase is not PASS for {model_id}: {phase}={result.get(phase)}"
             )
 
     if result.get("prediction_finite") is not True:
@@ -197,13 +194,8 @@ def _verify_pass_result(
         raise VerificationError(f"matrix prediction is missing: {model_id}")
     if before != after:
         raise VerificationError(f"matrix save/load prediction changed: {model_id}")
-    if not all(
-        isinstance(value, (int, float)) and math.isfinite(float(value))
-        for value in before
-    ):
-        raise VerificationError(
-            f"matrix prediction contains non-finite values: {model_id}"
-        )
+    if not all(isinstance(value, (int, float)) and math.isfinite(float(value)) for value in before):
+        raise VerificationError(f"matrix prediction contains non-finite values: {model_id}")
     if result.get("prediction_shape") != [len(before)]:
         raise VerificationError(f"matrix prediction shape mismatch: {model_id}")
 
@@ -218,19 +210,13 @@ def _verify_pass_result(
     if not isinstance(save_load, dict) or save_load.get("status") != "PASS":
         raise VerificationError(f"matrix save/load status is not PASS: {model_id}")
     if save_load.get("exact_prediction_match") is not True:
-        raise VerificationError(
-            f"matrix exact prediction match is not true: {model_id}"
-        )
+        raise VerificationError(f"matrix exact prediction match is not true: {model_id}")
     archive_name = str(save_load.get("artifact", ""))
     archive = _safe_relative_path(directory, archive_name)
     if not archive.is_file() or archive.stat().st_size <= 0:
-        raise VerificationError(
-            f"matrix model archive is missing or empty: {model_id}"
-        )
+        raise VerificationError(f"matrix model archive is missing or empty: {model_id}")
     if save_load.get("artifact_sha256") != _sha256(archive):
-        raise VerificationError(
-            f"matrix model archive SHA-256 mismatch: {model_id}"
-        )
+        raise VerificationError(f"matrix model archive SHA-256 mismatch: {model_id}")
 
 
 def verify_matrix_bundle(directory: Path) -> dict[str, Any]:
@@ -256,9 +242,7 @@ def verify_matrix_bundle(directory: Path) -> dict[str, Any]:
         "series_rows": len(FORMAL_P1_SERIES),
         "series_sha256": _canonical_sha256(list(FORMAL_P1_SERIES)),
         "forecast_horizon": list(FORMAL_P1_FORECAST_HORIZON),
-        "forecast_horizon_sha256": _canonical_sha256(
-            list(FORMAL_P1_FORECAST_HORIZON)
-        ),
+        "forecast_horizon_sha256": _canonical_sha256(list(FORMAL_P1_FORECAST_HORIZON)),
     }
     if matrix.get("input_contract") != expected_input_contract:
         raise VerificationError(
@@ -269,8 +253,7 @@ def verify_matrix_bundle(directory: Path) -> dict[str, Any]:
     requested = matrix.get("requested_model_ids")
     if requested != list(FORMAL_P1_MODEL_IDS):
         raise VerificationError(
-            "formal P1 model IDs mismatch: "
-            f"expected={list(FORMAL_P1_MODEL_IDS)}, got={requested}"
+            f"formal P1 model IDs mismatch: expected={list(FORMAL_P1_MODEL_IDS)}, got={requested}"
         )
 
     results = matrix.get("results")
@@ -315,9 +298,7 @@ def verify_matrix_bundle(directory: Path) -> dict[str, Any]:
         raise VerificationError("formal P1 all-model pass flag is not true")
 
     if response.get("matrix") != matrix:
-        raise VerificationError(
-            "matrix response evidence differs from persisted SMOKE_MATRIX.json"
-        )
+        raise VerificationError("matrix response evidence differs from persisted SMOKE_MATRIX.json")
 
     verify_manifest(directory)
     sha_records = verify_sha256sums(directory)

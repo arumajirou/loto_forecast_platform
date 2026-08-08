@@ -53,9 +53,7 @@ def _load_object(path: Path) -> dict[str, Any]:
 
 def _validate_columns(columns: Any, geometry: GameGeometry) -> tuple[str, ...]:
     if not isinstance(columns, list) or len(columns) != geometry.position_count:
-        raise ValueError(
-            f"position_columns must contain {geometry.position_count} names"
-        )
+        raise ValueError(f"position_columns must contain {geometry.position_count} names")
     normalized = tuple(columns)
     if len(set(normalized)) != len(normalized):
         raise ValueError("position_columns must be unique")
@@ -154,10 +152,7 @@ def build_request(
     geometry = geometry_for_game(history.game_id)
     return {
         "schema_version": 2,
-        "run_id": (
-            f"toto2-4m-{case_id}-d{history.last_draw_no}-"
-            f"{history.source_sha256[:12]}"
-        ),
+        "run_id": (f"toto2-4m-{case_id}-d{history.last_draw_no}-{history.source_sha256[:12]}"),
         "operation": "predict",
         "model_id": MODEL_ID,
         "repo_id": REPO_ID,

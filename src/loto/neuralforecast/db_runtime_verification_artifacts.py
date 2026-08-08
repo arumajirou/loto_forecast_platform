@@ -37,10 +37,7 @@ def _atomic_write(path: Path, data: bytes) -> None:
 
 
 def _write_json(path: Path, payload: Mapping[str, Any]) -> None:
-    data = (
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2).encode("utf-8")
-        + b"\n"
-    )
+    data = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2).encode("utf-8") + b"\n"
     _atomic_write(path, data)
 
 

@@ -97,9 +97,7 @@ def test_incomplete_hpo_dictionary_fails_before_runtime(monkeypatch) -> None:
     payload["execution_mode"] = "hpo_single_model"
     payload["model_ids"] = ["SeasonalNaive"]
     payload["fit"]["hyperparameters"] = {
-        "SeasonalNaive": {
-            "seasonal_period": {"__space__": "categorical", "choices": [1, 2]}
-        }
+        "SeasonalNaive": {"seasonal_period": {"__space__": "categorical", "choices": [1, 2]}}
     }
     payload["fit"]["hyperparameter_tune_kwargs"] = {"num_trials": 2}
     called = False
@@ -121,9 +119,7 @@ def test_documented_hpo_dictionary_reaches_provider(monkeypatch) -> None:
     payload["execution_mode"] = "hpo_single_model"
     payload["model_ids"] = ["SeasonalNaive"]
     payload["fit"]["hyperparameters"] = {
-        "SeasonalNaive": {
-            "seasonal_period": {"__space__": "categorical", "choices": [1, 2]}
-        }
+        "SeasonalNaive": {"seasonal_period": {"__space__": "categorical", "choices": [1, 2]}}
     }
     payload["fit"]["hyperparameter_tune_kwargs"] = {
         "num_trials": 2,

@@ -85,8 +85,7 @@ def validate_lightts_config(config: dict[str, Any]) -> dict[str, Any]:
     padding_length = padded_seq_len - seq_len
     if padding_length and not allow_padding:
         raise ValueError(
-            "LightTS padding requires lightts_allow_padding=true: "
-            f"padding_length={padding_length}"
+            f"LightTS padding requires lightts_allow_padding=true: padding_length={padding_length}"
         )
     return {
         "input_seq_len": seq_len,
@@ -266,8 +265,7 @@ def load_predict(request: ProviderRequest) -> ProviderResponse:
     expected_input = (2, geometry["input_seq_len"], geometry["channels"])
     if tuple(x.shape) != expected_input:
         raise ValueError(
-            "invalid LightTS input shape: "
-            f"expected {expected_input}, got {tuple(x.shape)}"
+            f"invalid LightTS input shape: expected {expected_input}, got {tuple(x.shape)}"
         )
     with torch.no_grad():
         prediction = model(x, None, None, None).cpu().numpy()

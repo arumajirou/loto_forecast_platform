@@ -112,8 +112,6 @@ def test_missing_score_blocks_and_persists_report(tmp_path: Path) -> None:
     with pytest.raises(CoverageLedgerBlocked, match="FOLD_SCORE_MISSING"):
         recorder.close()
 
-    report = json.loads(
-        (tmp_path / "coverage_data_access_report.json").read_text(encoding="utf-8")
-    )
+    report = json.loads((tmp_path / "coverage_data_access_report.json").read_text(encoding="utf-8"))
     assert report["status"] == "BLOCKED"
     assert any("FOLD_SCORE_MISSING" in item for item in report["coverage_gaps"])

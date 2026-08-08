@@ -104,12 +104,8 @@ class DatasetItem(BaseModel):
 
     @field_validator("feat_dynamic_real", "past_feat_dynamic_real")
     @classmethod
-    def validate_finite_matrix(
-        cls, values: list[list[float]] | None
-    ) -> list[list[float]] | None:
-        if values is not None and not all(
-            math.isfinite(value) for row in values for value in row
-        ):
+    def validate_finite_matrix(cls, values: list[list[float]] | None) -> list[list[float]] | None:
+        if values is not None and not all(math.isfinite(value) for row in values for value in row):
             raise ValueError("numeric matrices must contain only finite values")
         return values
 

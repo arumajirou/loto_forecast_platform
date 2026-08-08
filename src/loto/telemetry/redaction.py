@@ -35,13 +35,9 @@ _PROTECTED_ACTUAL_KEYS = {
     "winning_numbers",
     "y_true",
 }
-_URI_USERINFO_RE = re.compile(
-    r"(?i)([a-z][a-z0-9+.-]*://)([^/@\s:]+):([^/@\s]+)@"
-)
+_URI_USERINFO_RE = re.compile(r"(?i)([a-z][a-z0-9+.-]*://)([^/@\s:]+):([^/@\s]+)@")
 _BEARER_RE = re.compile(r"(?i)\bbearer\s+[A-Za-z0-9._~+/=-]+")
-_QUERY_SECRET_RE = re.compile(
-    r"(?i)([?&](?:api_key|apikey|password|secret|token)=)[^&#\s]+"
-)
+_QUERY_SECRET_RE = re.compile(r"(?i)([?&](?:api_key|apikey|password|secret|token)=)[^&#\s]+")
 
 
 class RevealState(StrEnum):

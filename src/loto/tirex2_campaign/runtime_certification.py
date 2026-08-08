@@ -71,8 +71,7 @@ def compare_responses(
 ) -> RuntimeCertificationResult:
     checks = {
         "distinct_provider_pids": (
-            response_a.runtime_evidence.provider_pid
-            != response_b.runtime_evidence.provider_pid
+            response_a.runtime_evidence.provider_pid != response_b.runtime_evidence.provider_pid
         ),
         "model_identity_match": response_a.model_identity == response_b.model_identity,
         "artifact_identity_match": (
@@ -84,8 +83,7 @@ def compare_responses(
             == _canonical_sha256(response_b.point_forecast)
         ),
         "all_quantiles_match": (
-            _canonical_sha256(response_a.quantiles)
-            == _canonical_sha256(response_b.quantiles)
+            _canonical_sha256(response_a.quantiles) == _canonical_sha256(response_b.quantiles)
         ),
         "series_identity_match": response_a.series_identity == response_b.series_identity,
         "prediction_index_match": response_a.prediction_index == response_b.prediction_index,
@@ -96,8 +94,7 @@ def compare_responses(
             == response_b.runtime_evidence.effective_device
         ),
         "no_cpu_fallback": not (
-            response_a.runtime_evidence.cpu_fallback
-            or response_b.runtime_evidence.cpu_fallback
+            response_a.runtime_evidence.cpu_fallback or response_b.runtime_evidence.cpu_fallback
         ),
     }
     blockers = [name for name, passed in checks.items() if not passed]

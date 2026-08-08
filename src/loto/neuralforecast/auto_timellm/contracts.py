@@ -328,9 +328,7 @@ def resolve_architecture(h: int, profile: ArchitectureProfile | str) -> Architec
         ArchitectureProfile.BALANCED: (64, 8, 16, 8, 64, 32, 8, 5),
         ArchitectureProfile.WIDE: (96, 16, 16, 8, 128, 64, 8, 5),
     }
-    minimum, multiplier, patch_len, stride, d_ff, d_model, n_heads, top_k = settings[
-        selected
-    ]
+    minimum, multiplier, patch_len, stride, d_ff, d_model, n_heads, top_k = settings[selected]
     return ArchitectureSpec(
         profile=selected,
         input_size=max(minimum, h * multiplier),

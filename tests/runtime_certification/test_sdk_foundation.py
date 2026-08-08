@@ -159,9 +159,7 @@ def _gpu_device(pid: int, origin: EvidenceOrigin) -> DeviceEvidence:
         external_gpu_samples=[
             GPUProcessSample(
                 provider_pid=pid,
-                provider_process_identity_sha256=(
-                    HEX if origin == EvidenceOrigin.REAL else None
-                ),
+                provider_process_identity_sha256=(HEX if origin == EvidenceOrigin.REAL else None),
                 gpu_uuid="GPU-FAKE-UUID",
                 used_memory_bytes=1024,
                 observed_at_utc=NOW,
@@ -213,11 +211,14 @@ def test_request_and_package_identity_are_verifiable_with_injected_metadata(
     wheel = tmp_path / "fake-provider.whl"
     wheel.write_bytes(b"wheel-bytes")
     package = _package(artifact_sha256=sha256_file(wheel))
-    assert verify_package_identity(
-        package,
-        artifact_path=wheel,
-        version_reader=lambda name: "1.0.0",
-    ) == "1.0.0"
+    assert (
+        verify_package_identity(
+            package,
+            artifact_path=wheel,
+            version_reader=lambda name: "1.0.0",
+        )
+        == "1.0.0"
+    )
     with pytest.raises(IdentityVerificationError, match="version mismatch"):
         verify_package_identity(package, version_reader=lambda name: "2.0.0")
 

@@ -183,8 +183,7 @@ def _validate_success_mode(
         failures.append(f"nonfailed coverage state is invalid: {state}")
     if manifest.get("status") != "PASS":
         failures.append(
-            "nonfailed coverage state requires root status=PASS: "
-            f"{manifest.get('status')}"
+            f"nonfailed coverage state requires root status=PASS: {manifest.get('status')}"
         )
     if str(manifest.get("coverage_state_path")) != "coverage-state/manifest.json":
         failures.append("nonfailed coverage state must point to coverage-state/manifest.json")
@@ -223,11 +222,7 @@ def _validate_success_mode(
         failures,
         "constructor contract matrix",
     )
-    names = [
-        str(row.get("name") or "")
-        for row in constructor_rows
-        if isinstance(row, Mapping)
-    ]
+    names = [str(row.get("name") or "") for row in constructor_rows if isinstance(row, Mapping)]
     if len(constructor_rows) != 36:
         failures.append(
             f"constructor matrix row count mismatch: expected=36, actual={len(constructor_rows)}"
@@ -258,8 +253,7 @@ def _validate_success_mode(
     argument_count = summary.get("argument_count")
     if argument_count != len(resolved_rows):
         failures.append(
-            "resolved argument count mismatch: "
-            f"summary={argument_count}, rows={len(resolved_rows)}"
+            f"resolved argument count mismatch: summary={argument_count}, rows={len(resolved_rows)}"
         )
     if summary.get("overall_status") != state:
         failures.append("coverage summary and root verification states differ")
@@ -276,10 +270,7 @@ def _validate_success_mode(
         try:
             result_rows = len(pd.read_parquet(result_path))
         except Exception as exc:  # pragma: no cover - backend-specific message
-            failures.append(
-                "API coverage result parquet unreadable: "
-                f"{type(exc).__name__}: {exc}"
-            )
+            failures.append(f"API coverage result parquet unreadable: {type(exc).__name__}: {exc}")
     if result_rows == 0:
         failures.append("API coverage result parquet must not be empty")
     if result_rows is not None and nested_manifest.get("api_result_count") != result_rows:
@@ -405,17 +396,10 @@ def verify_run_with_coverage(run_root: Path) -> dict[str, Any]:
 
     coverage_result = verify_coverage_state_artifacts(run_root, manifest)
     failures = list(base_result.get("failures") or [])
-    failures.extend(
-        f"coverage-state:{failure}"
-        for failure in coverage_result.get("failures", [])
-    )
+    failures.extend(f"coverage-state:{failure}" for failure in coverage_result.get("failures", []))
     result = {
         **base_result,
-        "status": (
-            "PASS"
-            if not failures and manifest.get("status") == "PASS"
-            else "FAIL"
-        ),
+        "status": ("PASS" if not failures and manifest.get("status") == "PASS" else "FAIL"),
         "coverage_state_verification": coverage_result,
         "failures": failures,
     }

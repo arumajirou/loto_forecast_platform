@@ -2,10 +2,9 @@ from pathlib import Path
 
 
 def script_text() -> str:
-    return (
-        Path(__file__).parents[2]
-        / "docs/mlforecast/run_final_verification.sh"
-    ).read_text(encoding="utf-8")
+    return (Path(__file__).parents[2] / "docs/mlforecast/run_final_verification.sh").read_text(
+        encoding="utf-8"
+    )
 
 
 def test_script_is_fail_closed() -> None:

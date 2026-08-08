@@ -118,7 +118,6 @@ def _verify_sha256sums(root: Path) -> None:
         assert actual == expected
 
 
-
 def test_source_hashes_are_stable() -> None:
     predictions, folds = _inputs()
     first = run_calibration_evaluation(predictions, folds, _config()).report

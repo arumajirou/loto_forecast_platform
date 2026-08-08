@@ -9,7 +9,7 @@ import pytest
 
 from loto.time_series_library_campaign import ProviderRequest
 
-FAKE_SCINET = '''
+FAKE_SCINET = """
 import torch
 from torch import nn
 
@@ -27,7 +27,7 @@ class Model(nn.Module):
         forecast = self.linear(x_enc.permute(0, 2, 1)).permute(0, 2, 1)
         middle = torch.zeros_like(x_enc)
         return torch.cat([torch.zeros_like(x_enc), middle, forecast], dim=1)
-'''.strip()
+""".strip()
 
 
 def _script() -> Path:

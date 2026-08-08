@@ -12,9 +12,7 @@ from run_sktime_p4_holdout_score import load_inputs
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Verify a sktime P4 sealed Holdout score bundle."
-    )
+    parser = argparse.ArgumentParser(description="Verify a sktime P4 sealed Holdout score bundle.")
     parser.add_argument("--actuals-config", required=True)
     parser.add_argument("--prediction-lock", required=True)
     parser.add_argument("--p3-sha256sums", required=True)

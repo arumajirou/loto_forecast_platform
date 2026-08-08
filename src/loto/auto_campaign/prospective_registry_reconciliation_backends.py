@@ -28,10 +28,7 @@ def query_postgres(dsn: str, expected: dict[str, Any]) -> dict[str, Any]:
     try:
         with engine.connect() as connection:
             run_rows = connection.execute(
-                text(
-                    "SELECT * FROM nf_prospective_registry_runs "
-                    "WHERE registry_id = :registry_id"
-                ),
+                text("SELECT * FROM nf_prospective_registry_runs WHERE registry_id = :registry_id"),
                 {"registry_id": registry_id},
             ).fetchall()
             queries = {
@@ -81,10 +78,7 @@ def _runs(client: Any, experiment_id: str, registry_id: str, role: str) -> list[
     return list(
         client.search_runs(
             [experiment_id],
-            filter_string=(
-                f"tags.registry_id = '{registry_id}' AND "
-                f"tags.registry_role = '{role}'"
-            ),
+            filter_string=(f"tags.registry_id = '{registry_id}' AND tags.registry_role = '{role}'"),
             max_results=100000,
         )
     )
@@ -97,10 +91,7 @@ def _run_snapshot(run: Any) -> dict[str, Any]:
         "experiment_id": str(run.info.experiment_id),
         "tags": dict(run.data.tags),
         "params": dict(run.data.params),
-        "metrics": {
-            key: float(value)
-            for key, value in run.data.metrics.items()
-        },
+        "metrics": {key: float(value) for key, value in run.data.metrics.items()},
     }
 
 

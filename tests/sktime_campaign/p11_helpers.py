@@ -173,9 +173,7 @@ def build_request(tmp_path: Path) -> PrimaryPromotionAuthorizationRequest:
             signature_base64=signature,
         ),
     ]
-    return PrimaryPromotionAuthorizationRequest.model_validate(
-        {**common, "approvals": approvals}
-    )
+    return PrimaryPromotionAuthorizationRequest.model_validate({**common, "approvals": approvals})
 
 
 def fake_verifier(*args):

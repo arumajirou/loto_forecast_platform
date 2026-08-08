@@ -34,9 +34,7 @@ class GameGeometry(BaseModel):
     def validate_positions(self, values: Iterable[int]) -> tuple[int, ...]:
         positions = tuple(values)
         if len(positions) != self.position_count:
-            raise ValueError(
-                f"expected {self.position_count} positions, received {len(positions)}"
-            )
+            raise ValueError(f"expected {self.position_count} positions, received {len(positions)}")
         for value in positions:
             if not self.candidate_min <= value <= self.candidate_max:
                 raise ValueError(

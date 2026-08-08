@@ -123,8 +123,8 @@ def validate_inventory_coverage() -> None:
     if source != capability:
         raise CovariateCapabilityError(
             "COVARIATE_CAPABILITY_INVENTORY_MISMATCH",
-            f"source/capability inventory mismatch missing={sorted(source-capability)} "
-            f"unexpected={sorted(capability-source)}",
+            f"source/capability inventory mismatch missing={sorted(source - capability)} "
+            f"unexpected={sorted(capability - source)}",
         )
 
 

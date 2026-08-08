@@ -73,9 +73,7 @@ class PredictorArtifactManifest(BaseModel):
     serialization_format: Literal["gluonts-predictor-directory-v1"] = (
         "gluonts-predictor-directory-v1"
     )
-    created_at_utc: str = Field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
-    )
+    created_at_utc: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     fit_process_id: int = Field(ge=1)
     seed: int
     freq: str = Field(min_length=1)
@@ -92,10 +90,7 @@ class PredictorArtifactManifest(BaseModel):
         relative_paths = [entry.relative_path for entry in self.files]
         if len(relative_paths) != len(set(relative_paths)):
             raise ValueError("predictor artifact manifest contains duplicate paths")
-        if any(
-            path.startswith("/") or ".." in Path(path).parts
-            for path in relative_paths
-        ):
+        if any(path.startswith("/") or ".." in Path(path).parts for path in relative_paths):
             raise ValueError("predictor artifact paths must be safe relative paths")
         calculated = artifact_tree_sha256(self.files)
         if self.tree_sha256 != calculated:
@@ -146,10 +141,7 @@ class PredictorFitSerializeResult(BaseModel):
             return self
         if self.errors:
             raise ValueError("VERIFIED fit/serialize results cannot contain errors")
-        if any(
-            self.checks[name] is not LifecycleCheckState.PASS
-            for name in FIT_REQUIRED_CHECKS
-        ):
+        if any(self.checks[name] is not LifecycleCheckState.PASS for name in FIT_REQUIRED_CHECKS):
             raise ValueError("VERIFIED fit/serialize requires every check to PASS")
         if self.observed_shape != self.expected_shape:
             raise ValueError("fit/serialize shape mismatch")
@@ -209,8 +201,7 @@ class PredictorReloadResult(BaseModel):
         if self.errors:
             raise ValueError("VERIFIED reload results cannot contain errors")
         if any(
-            self.checks[name] is not LifecycleCheckState.PASS
-            for name in RELOAD_REQUIRED_CHECKS
+            self.checks[name] is not LifecycleCheckState.PASS for name in RELOAD_REQUIRED_CHECKS
         ):
             raise ValueError("VERIFIED reload requires every check to PASS")
         if self.artifact_manifest_sha256 is None:
@@ -256,8 +247,7 @@ class PredictorLifecycleResult(BaseModel):
             if self.fit.artifact_manifest_sha256 != self.artifact_manifest_sha256:
                 raise ValueError("fit manifest identity mismatch")
             if self.reload is not None and (
-                self.reload.artifact_manifest_sha256
-                != self.artifact_manifest_sha256
+                self.reload.artifact_manifest_sha256 != self.artifact_manifest_sha256
             ):
                 raise ValueError("reload manifest identity mismatch")
         if self.outcome is LifecycleOutcome.VERIFIED:
@@ -280,8 +270,7 @@ class PredictorLifecycleResult(BaseModel):
 
 def canonical_json_bytes(payload: Any) -> bytes:
     return (
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n"
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     ).encode("utf-8")
 
 

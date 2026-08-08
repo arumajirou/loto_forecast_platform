@@ -14,6 +14,7 @@ from loto.orchestration.pipeline_downstream_preflight import (
 )
 from loto.orchestration.pipeline_downstream_types import PreparedDownstreamCommit
 
+
 class PlatformRegistryEffectsMixin:
     @staticmethod
     def _platform_row(
@@ -36,13 +37,8 @@ class PlatformRegistryEffectsMixin:
         if hasattr(row, "keys"):
             return dict(row)
         if description is None:
-            raise DownstreamCommitConflict(
-                f"cannot inspect PlatformRegistry {table} columns"
-            )
-        names = [
-            str(getattr(item, "name", item[0]))
-            for item in description
-        ]
+            raise DownstreamCommitConflict(f"cannot inspect PlatformRegistry {table} columns")
+        names = [str(getattr(item, "name", item[0])) for item in description]
         return dict(zip(names, row, strict=True))
 
     def ensure_platform_registry(
@@ -51,18 +47,14 @@ class PlatformRegistryEffectsMixin:
     ) -> dict[str, Any]:
         from loto.registry.full import PlatformRegistry
 
-        local_platform_path = _platform_local_path(
-            self.config.platform_registry_url
-        )
+        local_platform_path = _platform_local_path(self.config.platform_registry_url)
         if local_platform_path is not None:
             _reject_symlink_components(
                 local_platform_path,
                 label="platform registry",
             )
         artifact_index = json.loads(
-            (prepared.root / "artifact_index.json").read_text(
-                encoding="utf-8"
-            )
+            (prepared.root / "artifact_index.json").read_text(encoding="utf-8")
         )
         release_uri = artifact_index["release_bundle.json"]["uri"]
         platform = PlatformRegistry(self.config.platform_registry_url)
@@ -90,9 +82,7 @@ class PlatformRegistryEffectsMixin:
         else:
             config_hash = str(run.get("config_hash") or "")
             if config_hash not in {"", prepared.ledger_sha256}:
-                raise DownstreamCommitConflict(
-                    "PlatformRegistry run config_hash conflicts"
-                )
+                raise DownstreamCommitConflict("PlatformRegistry run config_hash conflicts")
 
         platform.update_run(
             prepared.run_id,
@@ -121,9 +111,7 @@ class PlatformRegistryEffectsMixin:
             prepared.forecast_id,
         )
         if forecast is None:
-            raise DownstreamCommitRetryable(
-                "PlatformRegistry forecast was not persisted"
-            )
+            raise DownstreamCommitRetryable("PlatformRegistry forecast was not persisted")
         if (
             str(forecast.get("run_id")) != prepared.run_id
             or str(forecast.get("draw_id")) != prepared.draw_id
@@ -133,9 +121,7 @@ class PlatformRegistryEffectsMixin:
                 prepared.sealed_forecast,
             )
         ):
-            raise DownstreamCommitConflict(
-                "PlatformRegistry forecast conflicts"
-            )
+            raise DownstreamCommitConflict("PlatformRegistry forecast conflicts")
 
         model_metadata = {
             "run_id": prepared.run_id,
@@ -160,9 +146,7 @@ class PlatformRegistryEffectsMixin:
             prepared.model_id,
         )
         if model is None:
-            raise DownstreamCommitRetryable(
-                "PlatformRegistry model was not persisted"
-            )
+            raise DownstreamCommitRetryable("PlatformRegistry model was not persisted")
         if (
             str(model.get("artifact_uri")) != release_uri
             or str(model.get("status")) != "CANDIDATE"
@@ -212,9 +196,7 @@ class PlatformRegistryEffectsMixin:
             ):
                 audit_matches.append(value)
         if len(audit_matches) > 1:
-            raise DownstreamCommitConflict(
-                "duplicate PlatformRegistry commit audits exist"
-            )
+            raise DownstreamCommitConflict("duplicate PlatformRegistry commit audits exist")
         if not audit_matches:
             platform.audit(
                 "system",

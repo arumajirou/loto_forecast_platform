@@ -274,9 +274,10 @@ def run_case(
     if device == "cpu":
         env["CUDA_VISIBLE_DEVICES"] = ""
     started = time.monotonic()
-    with (case_dir / "stdout.log").open("w") as stdout, (
-        case_dir / "stderr.log"
-    ).open("w") as stderr:
+    with (
+        (case_dir / "stdout.log").open("w") as stdout,
+        (case_dir / "stderr.log").open("w") as stderr,
+    ):
         proc = subprocess.Popen(
             [
                 str(python),
@@ -475,8 +476,7 @@ def main() -> int:
         )
 
     replay_paths = [
-        output / "cases" / name / "response.json"
-        for name in ("cuda-replay-a", "cuda-replay-b")
+        output / "cases" / name / "response.json" for name in ("cuda-replay-a", "cuda-replay-b")
     ]
     if all(path.is_file() for path in replay_paths):
         try:

@@ -71,9 +71,7 @@ def reject_symlink_components(path: Path, *, label: str) -> None:
 def require_regular_file(path: Path, *, label: str) -> None:
     reject_symlink_components(path, label=label)
     if not path.is_file():
-        raise DownstreamCommitPreflightError(
-            f"{label} is not a regular file: {path}"
-        )
+        raise DownstreamCommitPreflightError(f"{label} is not a regular file: {path}")
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -81,9 +79,7 @@ def load_json(path: Path) -> dict[str, Any]:
         result: dict[str, Any] = {}
         for key, value in values:
             if key in result:
-                raise DownstreamCommitPreflightError(
-                    f"duplicate JSON key in {path.name}: {key}"
-                )
+                raise DownstreamCommitPreflightError(f"duplicate JSON key in {path.name}: {key}")
             result[key] = value
         return result
 
@@ -96,9 +92,7 @@ def load_json(path: Path) -> dict[str, Any]:
             f"invalid JSON artifact {path.name}: {type(exc).__name__}"
         ) from exc
     if not isinstance(value, dict):
-        raise DownstreamCommitPreflightError(
-            f"JSON artifact must contain an object: {path.name}"
-        )
+        raise DownstreamCommitPreflightError(f"JSON artifact must contain an object: {path.name}")
     return value
 
 

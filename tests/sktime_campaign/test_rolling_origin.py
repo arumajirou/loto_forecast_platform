@@ -98,23 +98,16 @@ def test_oof_and_lock_cover_all_baseline_seeds(tmp_path: Path) -> None:
     assert len(result["folds"]) == 4
     assert len(result["oof_results"]) == 36
     assert len(result["holdout_prediction_lock"]["prediction_rows"]) == 9
-    assert all(
-        row["fit_scope"] == "OOF_TRAIN_PREFIX_ONLY"
-        for row in result["oof_results"]
-    )
+    assert all(row["fit_scope"] == "OOF_TRAIN_PREFIX_ONLY" for row in result["oof_results"])
     assert all("metrics" in row for row in result["oof_results"])
 
 
 def test_seed_aggregation_retains_mean_variance_and_worst(tmp_path: Path) -> None:
     result = run_p3(_request(tmp_path), sealed_at_utc="2026-08-05T07:00:00Z")
     seed_metrics, aggregates = aggregate_oof_results(result["oof_results"])
-    random_seeds = [
-        row for row in seed_metrics if row["candidate_id"] == "random_uniform"
-    ]
+    random_seeds = [row for row in seed_metrics if row["candidate_id"] == "random_uniform"]
     assert [row["seed"] for row in random_seeds] == [1, 2, 3]
-    random_aggregate = next(
-        row for row in aggregates if row["candidate_id"] == "random_uniform"
-    )
+    random_aggregate = next(row for row in aggregates if row["candidate_id"] == "random_uniform")
     assert random_aggregate["seed_count"] == 3
     assert set(random_aggregate["metrics"]["hit_at_1"]) == {
         "mean",

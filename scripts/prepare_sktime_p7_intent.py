@@ -96,10 +96,7 @@ def main() -> None:
         intent_sha256 + "\n",
         encoding="utf-8",
     )
-    print(
-        f"SKTIME_P7_APPROVAL_INTENT="
-        f"{args.output_dir / 'APPROVAL_INTENT.json'}"
-    )
+    print(f"SKTIME_P7_APPROVAL_INTENT={args.output_dir / 'APPROVAL_INTENT.json'}")
     print(f"SKTIME_P7_APPROVAL_INTENT_SHA256={intent_sha256}")
 
 

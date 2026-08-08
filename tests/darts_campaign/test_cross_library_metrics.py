@@ -55,9 +55,7 @@ def test_execution_rejects_duplicate_and_incomplete_position_keys() -> None:
     config = _config()
     provider = config.providers[0]
     evidence = _evidence(provider, config.fairness)
-    duplicate = evidence.model_copy(
-        update={"records": evidence.records + (evidence.records[0],)}
-    )
+    duplicate = evidence.model_copy(update={"records": evidence.records + (evidence.records[0],)})
     with pytest.raises(CrossLibraryCertificationError, match="duplicate forecast"):
         evaluate_execution(provider, duplicate, config.fairness)
     incomplete = evidence.model_copy(update={"records": evidence.records[:-1]})
@@ -78,11 +76,7 @@ def test_wrapper_variants_are_compared_but_not_counted_as_algorithms() -> None:
     config = _config()
     evidence = []
     for provider in config.providers:
-        offset = (
-            0.1
-            if provider.provider_id in {"darts-nf-nhits", "darts-sf-autoarima"}
-            else 0.0
-        )
+        offset = 0.1 if provider.provider_id in {"darts-nf-nhits", "darts-sf-autoarima"} else 0.0
         offset = 0.2 if provider.provider_id == "autogluon-chronos2" else offset
         evidence.append(_evidence(provider, config.fairness, offset=offset))
     report = build_cross_library_report(config, tuple(evidence), _baselines())
@@ -108,9 +102,7 @@ def test_required_wrapper_prediction_parity_rejects_drift() -> None:
 
 def test_champion_gate_uses_only_canonical_algorithms_and_all_baselines() -> None:
     config = _config()
-    evidence = tuple(
-        _evidence(provider, config.fairness) for provider in config.providers
-    )
+    evidence = tuple(_evidence(provider, config.fairness) for provider in config.providers)
     report = build_cross_library_report(
         config,
         evidence,
@@ -118,9 +110,7 @@ def test_champion_gate_uses_only_canonical_algorithms_and_all_baselines() -> Non
     )
     assert report.champion.status == "CHAMPION"
     canonical_ids = {
-        provider.provider_id
-        for provider in config.providers
-        if provider.canonical_for_algorithm
+        provider.provider_id for provider in config.providers if provider.canonical_for_algorithm
     }
     assert report.champion.provider_id in canonical_ids
     assert report.champion.provider_id not in {

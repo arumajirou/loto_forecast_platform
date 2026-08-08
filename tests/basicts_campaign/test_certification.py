@@ -83,10 +83,7 @@ def _dlinear_module_evidence(
         )
     closure_names = sorted(RUNTIME_CRITICAL_MODULES | {"basicts"})
     expected_base = f"{MODEL_CONFIG_MODULE}.BasicTSModelConfig"
-    closure = [
-        _closure_item(module_name, index)
-        for index, module_name in enumerate(closure_names)
-    ]
+    closure = [_closure_item(module_name, index) for index, module_name in enumerate(closure_names)]
     return {
         "dlinear_module_provenance_status": "PASS",
         "dlinear_runtime_modules": modules,
@@ -96,9 +93,7 @@ def _dlinear_module_evidence(
         "loaded_basicts_modules": closure,
         "dlinear_dependency_binding_status": "PASS",
         "dlinear_dependency_bindings": {
-            "decomposition_symbol": (
-                f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"
-            ),
+            "decomposition_symbol": (f"{DECOMPOSITION_MODULE}.MovingAverageDecomposition"),
             "config_base_symbol": expected_base,
             "dlinear_config_direct_base": expected_base,
             "arch_decomposition_object_identity": dependency_identity,
@@ -215,9 +210,7 @@ def _write_bundle(
         ],
     }
     _write_json(directory / "ARTIFACT_MANIFEST.json", manifest)
-    hashed = sorted(
-        path for path in directory.iterdir() if path.name != "SHA256SUMS"
-    )
+    hashed = sorted(path for path in directory.iterdir() if path.name != "SHA256SUMS")
     (directory / "SHA256SUMS").write_text(
         "".join(f"{_sha256(path)}  {path.name}\n" for path in hashed),
         encoding="utf-8",

@@ -28,8 +28,8 @@ def test_hierarchicalforecast_certification_console_target_resolves() -> None:
     certification_module, certification_attribute = (
         "loto.reconciliation.portable_package_certification:main".split(":", maxsplit=1)
     )
-    verifier_module, verifier_attribute = (
-        "loto.reconciliation.package_verifier:main".split(":", maxsplit=1)
+    verifier_module, verifier_attribute = "loto.reconciliation.package_verifier:main".split(
+        ":", maxsplit=1
     )
 
     certification_callable = getattr(

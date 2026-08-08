@@ -73,10 +73,7 @@ def require_strict_gpu_success(evidence: GPUEvidence) -> None:
 
 
 def _point_mapping(response: TabPFNTSResponseV2) -> dict[tuple[str, int], float]:
-    return {
-        (item.series_id, item.horizon_step): item.value
-        for item in response.point_forecast
-    }
+    return {(item.series_id, item.horizon_step): item.value for item in response.point_forecast}
 
 
 def _quantile_mapping(

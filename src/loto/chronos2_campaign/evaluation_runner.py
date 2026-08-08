@@ -111,9 +111,7 @@ def _aggregate_seed_metrics(metrics: pd.DataFrame) -> pd.DataFrame:
             "fold_count": int(group["fold_id"].nunique()),
             "best_seed_only_selection": False,
             "seed_hit_at_1_mean": float(seed_hit.mean()) if not seed_hit.empty else None,
-            "seed_hit_at_1_variance": (
-                float(seed_hit.var(ddof=0)) if not seed_hit.empty else None
-            ),
+            "seed_hit_at_1_variance": (float(seed_hit.var(ddof=0)) if not seed_hit.empty else None),
             "seed_hit_at_1_minimum": float(seed_hit.min()) if not seed_hit.empty else None,
             "seed_hit_at_1_maximum": float(seed_hit.max()) if not seed_hit.empty else None,
             "worst_seed_hit_at_1": float(seed_hit.min()) if not seed_hit.empty else None,
@@ -122,9 +120,7 @@ def _aggregate_seed_metrics(metrics: pd.DataFrame) -> pd.DataFrame:
         for column in numeric:
             values = pd.to_numeric(group[column], errors="coerce").dropna()
             row[f"{column}_mean"] = float(values.mean()) if not values.empty else None
-            row[f"{column}_variance"] = (
-                float(values.var(ddof=0)) if not values.empty else None
-            )
+            row[f"{column}_variance"] = float(values.var(ddof=0)) if not values.empty else None
             row[f"{column}_minimum"] = float(values.min()) if not values.empty else None
             row[f"{column}_maximum"] = float(values.max()) if not values.empty else None
         rows.append(row)
@@ -154,9 +150,7 @@ def _baseline_comparison(seed_summary: pd.DataFrame) -> pd.DataFrame:
                 "baseline": baseline["candidate"],
                 "chronos2_hit_at_1": champion["hit_at_1_mean"],
                 "baseline_hit_at_1": baseline["hit_at_1_mean"],
-                "delta_hit_at_1": (
-                    champion["hit_at_1_mean"] - baseline["hit_at_1_mean"]
-                ),
+                "delta_hit_at_1": (champion["hit_at_1_mean"] - baseline["hit_at_1_mean"]),
                 "chronos2_mae": champion["mae_mean"],
                 "baseline_mae": baseline["mae_mean"],
                 "delta_mae": baseline["mae_mean"] - champion["mae_mean"],

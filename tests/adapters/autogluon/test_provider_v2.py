@@ -209,9 +209,7 @@ def test_fit_predict_save_executes_explicit_model_and_persists_contract(tmp_path
     predictor = FakePredictor.instances[0]
     assert predictor.init_kwargs["prediction_length"] == 2
     assert predictor.init_kwargs["horizon_weight"] == [1.0, 0.5]
-    assert predictor.fit_kwargs["hyperparameters"] == {
-        "Naive": {"seasonal_period": 1}
-    }
+    assert predictor.fit_kwargs["hyperparameters"] == {"Naive": {"seasonal_period": 1}}
     assert "presets" not in predictor.fit_kwargs
     assert predictor.fit_kwargs["enable_ensemble"] is False
     assert predictor.fit_kwargs["random_seed"] == 1

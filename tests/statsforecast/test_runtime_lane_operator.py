@@ -125,9 +125,7 @@ def test_commit_mismatch_blocks_before_end_to_end(tmp_path) -> None:
             "head": "b" * 40,
             "working_tree_clean": True,
         },
-        end_to_end_runner=lambda *_args, **_kwargs: pytest.fail(
-            "must not execute"
-        ),
+        end_to_end_runner=lambda *_args, **_kwargs: pytest.fail("must not execute"),
     )
 
     assert result.formal_pass is False
@@ -159,9 +157,7 @@ def test_notification_failure_does_not_change_runtime_pass(tmp_path) -> None:
     )
 
     assert result.formal_pass is True
-    notification = json.loads(
-        result.notification_report_path.read_text(encoding="utf-8")
-    )
+    notification = json.loads(result.notification_report_path.read_text(encoding="utf-8"))
     assert notification["affects_runtime_decision"] is False
 
 
@@ -261,9 +257,7 @@ def test_notification_exception_is_evidence_only(tmp_path) -> None:
     )
 
     assert result.formal_pass is True
-    notification = json.loads(
-        result.notification_report_path.read_text(encoding="utf-8")
-    )
+    notification = json.loads(result.notification_report_path.read_text(encoding="utf-8"))
     assert [row["status"] for row in notification["results"]] == [
         "FAILED",
         "FAILED",
@@ -291,9 +285,7 @@ def test_invalid_smtp_environment_is_evidence_only(tmp_path) -> None:
     )
 
     assert result.formal_pass is True
-    notification = json.loads(
-        result.notification_report_path.read_text(encoding="utf-8")
-    )
+    notification = json.loads(result.notification_report_path.read_text(encoding="utf-8"))
     email = next(row for row in notification["results"] if row["channel"] == "email")
     assert email["status"] == "FAILED"
     assert email["error_type"] == "ValueError"

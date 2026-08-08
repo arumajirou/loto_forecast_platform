@@ -31,11 +31,7 @@ def source_path(source_root: Path) -> Iterator[None]:
         if sys.path and sys.path[0] == source:
             sys.path.pop(0)
         for prefix in ("models", "layers"):
-            names = [
-                key
-                for key in sys.modules
-                if key == prefix or key.startswith(f"{prefix}.")
-            ]
+            names = [key for key in sys.modules if key == prefix or key.startswith(f"{prefix}.")]
             for name in names:
                 sys.modules.pop(name, None)
 
@@ -68,7 +64,6 @@ def dlinear_config(request: ProviderRequest) -> dict[str, Any]:
         "moving_avg": max(1, moving_avg),
         "num_class": 1,
     }
-
 
 
 def source_evidence(request: ProviderRequest) -> dict[str, Any]:

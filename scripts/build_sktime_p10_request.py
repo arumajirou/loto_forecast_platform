@@ -28,9 +28,7 @@ def verify_sha256sums(directory: Path) -> None:
             raise ValueError(f"P9 SHA mismatch: {name}")
         seen.add(name)
     expected_names = {
-        item.name
-        for item in directory.iterdir()
-        if item.is_file() and item.name != "SHA256SUMS"
+        item.name for item in directory.iterdir() if item.is_file() and item.name != "SHA256SUMS"
     }
     if seen != expected_names:
         raise ValueError("P9 SHA256SUMS coverage mismatch")
@@ -52,12 +50,8 @@ def main() -> int:
 
     verify_sha256sums(args.p9_dir)
     response = json.loads((args.p9_dir / "response.json").read_text())
-    receipt = json.loads(
-        (args.p9_dir / "ACTIVATION_RECEIPT.json").read_text()
-    )
-    post_state = json.loads(
-        (args.p9_dir / "POST_DEPLOYMENT_STATE.json").read_text()
-    )
+    receipt = json.loads((args.p9_dir / "ACTIVATION_RECEIPT.json").read_text())
+    post_state = json.loads((args.p9_dir / "POST_DEPLOYMENT_STATE.json").read_text())
     if response.get("status") != "PASS":
         raise ValueError("P9 status is not PASS")
     if response.get("decision") != "SHADOW_CANARY_ACTIVATED":
@@ -77,12 +71,8 @@ def main() -> int:
     p9 = {
         "schema_version": "1.0",
         "p9_bundle_sha256": sha256(args.p9_dir / "SHA256SUMS"),
-        "p9_receipt_sha256": sha256(
-            args.p9_dir / "ACTIVATION_RECEIPT.json"
-        ),
-        "p9_post_state_sha256": sha256(
-            args.p9_dir / "POST_DEPLOYMENT_STATE.json"
-        ),
+        "p9_receipt_sha256": sha256(args.p9_dir / "ACTIVATION_RECEIPT.json"),
+        "p9_post_state_sha256": sha256(args.p9_dir / "POST_DEPLOYMENT_STATE.json"),
         "activation_id": receipt["activation_id"],
         "decision": response["decision"],
         "promotion_status": response["promotion_status"],
@@ -102,10 +92,7 @@ def main() -> int:
         "evaluated_at_utc": args.evaluated_at_utc,
         "p9": p9,
         "policy": json.loads(args.policy.read_text(encoding="utf-8")),
-        "windows": [
-            json.loads(path.read_text(encoding="utf-8"))
-            for path in args.window
-        ],
+        "windows": [json.loads(path.read_text(encoding="utf-8")) for path in args.window],
     }
     request = CanaryEvaluationRequest.model_validate(payload)
     args.output.parent.mkdir(parents=True, exist_ok=True)

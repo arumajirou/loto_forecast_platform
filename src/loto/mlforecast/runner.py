@@ -176,9 +176,7 @@ def run(
 
     report = {
         "status": (
-            "RUNTIME_CERTIFIED"
-            if certification["status"] == "RUNTIME_CERTIFIED"
-            else "EXECUTED"
+            "RUNTIME_CERTIFIED" if certification["status"] == "RUNTIME_CERTIFIED" else "EXECUTED"
         ),
         "run_id": run_id,
         "started_from_data_sha256": _canonical_frame_hash(
@@ -214,9 +212,7 @@ def run_from_paths(
     prospective_exogenous_path: Path | None = None,
 ) -> RunResult:
     prospective = (
-        load_frame(prospective_exogenous_path)
-        if prospective_exogenous_path is not None
-        else None
+        load_frame(prospective_exogenous_path) if prospective_exogenous_path is not None else None
     )
     return run(
         load_frame(data_path),

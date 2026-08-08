@@ -144,8 +144,7 @@ def test_blocked_final_gate_preserves_integrity_without_runtime(
 
 def test_complete_wrapper_calls_source_and_finalizer() -> None:
     script = (
-        Path(__file__).parents[2]
-        / "docs/mlforecast/run_final_verification_complete.sh"
+        Path(__file__).parents[2] / "docs/mlforecast/run_final_verification_complete.sh"
     ).read_text(encoding="utf-8")
     assert "run_final_verification.sh" in script
     assert "loto.mlforecast.final_gate" in script

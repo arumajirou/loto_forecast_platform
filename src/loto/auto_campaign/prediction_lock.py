@@ -160,16 +160,14 @@ def _task_records(run_root: Path) -> tuple[list[dict[str, Any]], list[str]]:
 
         if task_manifest.get("status") != "PASS":
             task_failures.append(
-                f"{task_relative} manifest status is not PASS: "
-                f"{task_manifest.get('status')}"
+                f"{task_relative} manifest status is not PASS: {task_manifest.get('status')}"
             )
         task_payload = task_manifest.get("task")
         if not isinstance(task_payload, Mapping):
             task_failures.append(f"{task_relative} task manifest payload missing")
         elif task_payload.get("stage") != _PROSPECTIVE_STAGE:
             task_failures.append(
-                f"{task_relative} task stage is not prospective: "
-                f"{task_payload.get('stage')}"
+                f"{task_relative} task stage is not prospective: {task_payload.get('stage')}"
             )
 
         if freeze.get("actual_known") is not False:
@@ -211,8 +209,7 @@ def _task_records(run_root: Path) -> tuple[list[dict[str, Any]], list[str]]:
                 files[name] = _file_record(run_root, task_root / relative)
             except (OSError, ValueError) as exc:
                 task_failures.append(
-                    f"{task_relative} {name} unavailable: "
-                    f"{type(exc).__name__}: {exc}"
+                    f"{task_relative} {name} unavailable: {type(exc).__name__}: {exc}"
                 )
 
         before = files.get("prediction_before")
@@ -317,8 +314,7 @@ def freeze_prospective_predictions(run_root: Path) -> dict[str, Any]:
         result = verify_prediction_lock(run_root, manifest)
         if result.get("status") != "PASS":
             raise ValueError(
-                "existing prediction lock is invalid: "
-                + "; ".join(result.get("failures", []))
+                "existing prediction lock is invalid: " + "; ".join(result.get("failures", []))
             )
         return {
             "status": "PASS",
@@ -449,8 +445,7 @@ def _verify_file_record(
     actual_sha = sha256_file(path)
     if record.get("sha256") != actual_sha:
         failures.append(
-            f"{label} SHA256 mismatch: recorded={record.get('sha256')}, "
-            f"actual={actual_sha}"
+            f"{label} SHA256 mismatch: recorded={record.get('sha256')}, actual={actual_sha}"
         )
     if record.get("size_bytes") != path.stat().st_size:
         failures.append(f"{label} size mismatch: {relative_text}")
@@ -512,8 +507,7 @@ def verify_prediction_lock(
     for key, expected in manifest_expectations.items():
         if manifest.get(key) != expected:
             failures.append(
-                f"run manifest {key} mismatch: "
-                f"expected={expected}, actual={manifest.get(key)}"
+                f"run manifest {key} mismatch: expected={expected}, actual={manifest.get(key)}"
             )
 
     run_record = lock.get("run")
@@ -611,9 +605,7 @@ def verify_prediction_lock(
                     failures.append(f"task {task_path} freeze actual_known must be false")
                 if isinstance(before_record, Mapping):
                     if freeze.get("prediction_sha256") != before_record.get("sha256"):
-                        failures.append(
-                            f"task {task_path} freeze prediction SHA mismatch"
-                        )
+                        failures.append(f"task {task_path} freeze prediction SHA mismatch")
 
     failures.extend(_actual_artifact_failures(run_root))
     return {

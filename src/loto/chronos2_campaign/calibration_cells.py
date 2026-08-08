@@ -16,6 +16,7 @@ from .calibration_methods import (
 )
 from .evaluation_metrics import _point_metrics, _probabilistic_metrics
 
+
 def _cell_rows(
     selected: pd.DataFrame,
     *,
@@ -82,9 +83,7 @@ def _target_matrices(
     seed: int,
     config: CalibrationConfig,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict[float, np.ndarray]]:
-    rows = selected.loc[
-        (selected["fold_id"] == fold_id) & (selected["seed"] == seed)
-    ].copy()
+    rows = selected.loc[(selected["fold_id"] == fold_id) & (selected["seed"] == seed)].copy()
     position_order = {name: index for index, name in enumerate(config.position_columns)}
     rows["_position_order"] = rows["position"].map(position_order)
     rows = rows.sort_values(["_position_order", "horizon_step"], kind="stable")
@@ -131,9 +130,7 @@ def _prediction_rows(
                 "conformal_fold_count": conformal_fold_count,
             }
             for level, matrix in quantiles.items():
-                row[_quantile_column(level)] = float(
-                    matrix[position_index, horizon_index]
-                )
+                row[_quantile_column(level)] = float(matrix[position_index, horizon_index])
             rows.append(row)
     return rows
 
@@ -157,9 +154,7 @@ def _metric_row(
 
 
 def _comparison(seed_summary: pd.DataFrame) -> pd.DataFrame:
-    baseline_rows = seed_summary.loc[
-        seed_summary["candidate"] == "chronos2_uncalibrated"
-    ]
+    baseline_rows = seed_summary.loc[seed_summary["candidate"] == "chronos2_uncalibrated"]
     if len(baseline_rows) != 1:
         raise RuntimeError("uncalibrated summary row is missing")
     baseline = baseline_rows.iloc[0]
@@ -179,4 +174,3 @@ def _comparison(seed_summary: pd.DataFrame) -> pd.DataFrame:
             }
         )
     return pd.DataFrame(rows)
-

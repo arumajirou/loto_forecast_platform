@@ -126,9 +126,7 @@ def discover_forecasters() -> list[dict[str, Any]]:
 def summarize_inventory(rows: list[dict[str, Any]]) -> dict[str, Any]:
     """Compute counts rather than maintaining hand-written model totals."""
 
-    optional = sum(
-        row["dependency_state"] == "OPTIONAL_DEPENDENCY_DECLARED" for row in rows
-    )
+    optional = sum(row["dependency_state"] == "OPTIONAL_DEPENDENCY_DECLARED" for row in rows)
     return {
         "discovered": len(rows),
         "importable": sum(row["import_status"] == "IMPORTABLE" for row in rows),

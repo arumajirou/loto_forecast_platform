@@ -25,6 +25,7 @@ from .common import (
     _validate_url_or_sentinel,
 )
 
+
 class RepositoryIdentity(BaseModel):
     model_config = STRICT_CONFIG
 
@@ -293,4 +294,3 @@ class NonClaims(BaseModel):
                 "Research Source Registry records cannot claim execution or eligibility"
             )
         return self
-

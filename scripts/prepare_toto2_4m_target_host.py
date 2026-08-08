@@ -79,9 +79,7 @@ def _verify_git(expected_head: str) -> dict[str, Any]:
 
 def _verify_snapshot(snapshot: Path) -> dict[str, Any]:
     if snapshot.name != MODEL_REVISION:
-        raise ValueError(
-            f"snapshot directory must equal pinned revision: {MODEL_REVISION}"
-        )
+        raise ValueError(f"snapshot directory must equal pinned revision: {MODEL_REVISION}")
     files: dict[str, Any] = {}
     for name, expected_hash in ARTIFACT_SHA256.items():
         path = snapshot / name
@@ -180,8 +178,7 @@ def prepare(args: argparse.Namespace) -> dict[str, Any]:
         approved_history_root,
     )
     histories = {
-        game: load_history_export(approved_history_root / f"{game}.json")
-        for game in FORMAL_GAMES
+        game: load_history_export(approved_history_root / f"{game}.json") for game in FORMAL_GAMES
     }
     requests_root = args.output_root / "requests"
     request_manifest = write_request_set(
@@ -213,18 +210,12 @@ def prepare(args: argparse.Namespace) -> dict[str, Any]:
         "gpu_inventory": gpu_inventory,
         "lock_path": str(lock_path.resolve()),
         "lock_sha256": lock_sha256,
-        "request_manifest_path": str(
-            (requests_root / "REQUEST_MANIFEST.json").resolve()
-        ),
+        "request_manifest_path": str((requests_root / "REQUEST_MANIFEST.json").resolve()),
         "request_count": request_manifest["request_count"],
-        "history_handoff_path": str(
-            (approved_history_root / "HISTORY_HANDOFF.json").resolve()
-        ),
+        "history_handoff_path": str((approved_history_root / "HISTORY_HANDOFF.json").resolve()),
         "history_approval_sha256": history_handoff["approval_sha256"],
         "history_verification_sha256": history_handoff["verification_sha256"],
-        "history_export_manifest_sha256": history_handoff[
-            "export_manifest_sha256"
-        ],
+        "history_export_manifest_sha256": history_handoff["export_manifest_sha256"],
         "history_reviewer": history_handoff["reviewer"],
         "history_reviewed_at": history_handoff["reviewed_at"],
         "lock_review_path": str(lock_review_path.resolve()),

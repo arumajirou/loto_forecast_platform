@@ -319,19 +319,13 @@ class GeminiEngine(InferenceEngine):
             tool_calls=tool_calls,
             usage=Usage(
                 prompt_tokens=int(
-                    usage_raw.get("input_tokens")
-                    or usage_raw.get("prompt_token_count")
-                    or 0
+                    usage_raw.get("input_tokens") or usage_raw.get("prompt_token_count") or 0
                 ),
                 completion_tokens=int(
-                    usage_raw.get("output_tokens")
-                    or usage_raw.get("candidates_token_count")
-                    or 0
+                    usage_raw.get("output_tokens") or usage_raw.get("candidates_token_count") or 0
                 ),
                 total_tokens=int(
-                    usage_raw.get("total_tokens")
-                    or usage_raw.get("total_token_count")
-                    or 0
+                    usage_raw.get("total_tokens") or usage_raw.get("total_token_count") or 0
                 ),
                 cached_tokens=int(
                     usage_raw.get("total_cached_tokens")

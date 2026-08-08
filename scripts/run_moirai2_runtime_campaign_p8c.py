@@ -59,8 +59,7 @@ def _artifact_manifest(output_dir: Path) -> dict[str, Any]:
     files = sorted(
         path.relative_to(output_dir).as_posix()
         for path in output_dir.rglob("*")
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     return {
         "schema_version": "moirai2-p8-runtime-campaign-artifacts-v1",
@@ -92,9 +91,7 @@ def _seal_output(
         config = json.loads(config_path.read_text(encoding="utf-8"))
         if not isinstance(config, dict):
             raise RuntimeError("campaign_config.json is not an object")
-        config["formal_entrypoint"] = (
-            "scripts/run_moirai2_runtime_campaign_p8c.py"
-        )
+        config["formal_entrypoint"] = "scripts/run_moirai2_runtime_campaign_p8c.py"
         config["source_identity"] = source_identity
         _write_json(config_path, config)
     launch_evidence = {
@@ -109,9 +106,7 @@ def _seal_output(
         "stdout_sha256": sha256_file(stdout_path),
         "stderr_sha256": sha256_file(stderr_path),
         "exit_code_sha256": sha256_file(exit_path),
-        "campaign_config_sha256": (
-            sha256_file(config_path) if config_path.is_file() else None
-        ),
+        "campaign_config_sha256": (sha256_file(config_path) if config_path.is_file() else None),
     }
     _write_json(output_dir / "P8C_LAUNCH_EVIDENCE.json", launch_evidence)
     (output_dir / "SHA256SUMS").unlink(missing_ok=True)
@@ -157,10 +152,7 @@ def _command(arguments: argparse.Namespace) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description=(
-            "Run and seal a Moirai 2.0 runtime campaign with clean-tree "
-            "source identity"
-        )
+        description=("Run and seal a Moirai 2.0 runtime campaign with clean-tree source identity")
     )
     parser.add_argument("--campaign-id", required=True)
     parser.add_argument("--snapshot-path", required=True, type=Path)

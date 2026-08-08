@@ -35,8 +35,7 @@ def verify_materials(
             continue
         if path.is_symlink() or not resolved.is_file():
             failures.append(
-                f"{label} material must be a regular non-symlink file: "
-                f"{material.relative_path}"
+                f"{label} material must be a regular non-symlink file: {material.relative_path}"
             )
             continue
         try:

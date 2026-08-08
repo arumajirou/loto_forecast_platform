@@ -47,6 +47,7 @@ def promote_first_model_to_verified(data: dict[str, object]) -> dict[str, object
     record["verification"]["blockers"] = []
     return record
 
+
 def test_package_version_range_rejected() -> None:
     data = payload()
     first_record(data)["runtime_compatibility"]["packages"][0]["version"] = ">=1,<2"

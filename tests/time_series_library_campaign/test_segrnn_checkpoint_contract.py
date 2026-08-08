@@ -7,11 +7,7 @@ from pathlib import Path
 
 
 def _script() -> Path:
-    return (
-        Path(__file__).resolve().parents[2]
-        / "scripts"
-        / "run_time_series_library_provider.py"
-    )
+    return Path(__file__).resolve().parents[2] / "scripts" / "run_time_series_library_provider.py"
 
 
 def _write_fake_source(root: Path) -> None:

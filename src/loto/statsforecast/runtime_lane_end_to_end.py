@@ -38,12 +38,15 @@ def _atomic_write(path: Path, content: bytes) -> None:
 
 
 def _write_json(path: Path, payload: Any) -> None:
-    content = json.dumps(
-        payload,
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-    ).encode("utf-8") + b"\n"
+    content = (
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        ).encode("utf-8")
+        + b"\n"
+    )
     _atomic_write(path, content)
 
 
@@ -152,9 +155,7 @@ def run_end_to_end_certification(
     if horizon < 1:
         raise ValueError("horizon must be positive")
 
-    run_id = run_id or datetime.now(timezone.utc).strftime(
-        "statsforecast-e2e-%Y%m%d-%H%M%S"
-    )
+    run_id = run_id or datetime.now(timezone.utc).strftime("statsforecast-e2e-%Y%m%d-%H%M%S")
     output_root.mkdir(parents=True, exist_ok=True)
     output_dir = output_root / run_id
     output_dir.mkdir(parents=False, exist_ok=False)

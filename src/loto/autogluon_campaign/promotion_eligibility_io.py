@@ -73,20 +73,14 @@ def read_scoring_window(root: Path) -> dict[str, Any]:
     if report.get("automatic_retraining") is not False:
         raise PromotionEligibilityError("UPSTREAM_AUTO_RETRAIN_INVALID", str(root))
 
-    selected_rows = [
-        row for row in normalized_rows if row["candidate_id"] == candidate_id
-    ]
+    selected_rows = [row for row in normalized_rows if row["candidate_id"] == candidate_id]
     if not selected_rows:
         raise PromotionEligibilityError("SELECTED_METRICS_MISSING", str(root))
     selected_seeds = {int(row["seed"]) for row in selected_rows}
     if len(selected_seeds) < 3:
         raise PromotionEligibilityError("SELECTED_SEED_COUNT_INSUFFICIENT", str(root))
-    selected_coverage = {
-        (int(row["seed"]), int(row["draw_id"])) for row in selected_rows
-    }
-    expected_coverage = {
-        (seed, draw_id) for seed in selected_seeds for draw_id in draw_ids
-    }
+    selected_coverage = {(int(row["seed"]), int(row["draw_id"])) for row in selected_rows}
+    expected_coverage = {(seed, draw_id) for seed in selected_seeds for draw_id in draw_ids}
     if selected_coverage != expected_coverage:
         raise PromotionEligibilityError("SELECTED_SEED_DRAW_COVERAGE_MISMATCH", str(root))
     available_ids = {row["candidate_id"] for row in normalized_rows}

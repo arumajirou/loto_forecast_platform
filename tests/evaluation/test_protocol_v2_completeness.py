@@ -183,9 +183,7 @@ def test_resource_budget_changes_budget_hash() -> None:
     left = _protocol()
     right = left.model_copy(
         update={
-            "resource_budget": left.resource_budget.model_copy(
-                update={"wall_time_seconds": 7200}
-            )
+            "resource_budget": left.resource_budget.model_copy(update={"wall_time_seconds": 7200})
         }
     )
     assert left.comparison_budget_hash != right.comparison_budget_hash

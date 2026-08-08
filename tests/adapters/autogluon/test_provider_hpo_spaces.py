@@ -132,9 +132,7 @@ def test_hpo_descriptor_is_materialized_inside_provider(monkeypatch, tmp_path) -
     response = run_provider_v2(_request(tmp_path), runtime=_runtime())
 
     assert response["status"] == "OK"
-    descriptor = FakePredictor.fit_kwargs["hyperparameters"]["SeasonalNaive"][
-        "seasonal_period"
-    ]
+    descriptor = FakePredictor.fit_kwargs["hyperparameters"]["SeasonalNaive"]["seasonal_period"]
     assert descriptor["space"] == "Categorical"
     assert descriptor["args"] == (1, 2)
 

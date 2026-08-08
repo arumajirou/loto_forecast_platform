@@ -141,8 +141,10 @@ def verify_cases(
         hierarchy = row.get("hierarchy")
         if row.get("expected_status") != expected or row.get("case_status") != "PASS":
             raise CertificationError(f"formal case state mismatch: {key}")
-        if not isinstance(checks, dict) or not checks or not all(
-            value is True for value in checks.values()
+        if (
+            not isinstance(checks, dict)
+            or not checks
+            or not all(value is True for value in checks.values())
         ):
             raise CertificationError(f"formal checks failed: {key}")
         if not isinstance(result, dict) or result.get("status") != expected:

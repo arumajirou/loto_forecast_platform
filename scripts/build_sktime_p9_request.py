@@ -50,12 +50,8 @@ def main() -> int:
 
     verify_sha256sums(args.p8_dir)
     response = json.loads((args.p8_dir / "response.json").read_text())
-    receipt = json.loads(
-        (args.p8_dir / "TRANSACTION_RECEIPT.json").read_text()
-    )
-    post_state = json.loads(
-        (args.p8_dir / "POST_REGISTRY_STATE.json").read_text()
-    )
+    receipt = json.loads((args.p8_dir / "TRANSACTION_RECEIPT.json").read_text())
+    post_state = json.loads((args.p8_dir / "POST_REGISTRY_STATE.json").read_text())
     if response.get("decision") != "REGISTRY_TRANSACTION_COMMITTED":
         raise ValueError("P8 did not commit a new registry transaction")
     if response.get("promotion_status") != "REGISTERED_NOT_DEPLOYED":

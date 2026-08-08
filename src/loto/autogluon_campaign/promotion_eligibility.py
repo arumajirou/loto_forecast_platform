@@ -55,8 +55,7 @@ def create_promotion_eligibility(
         raise PromotionEligibilityError("HOLDOUT_STAGE_REQUIRED", str(holdout["stage"]))
 
     prospective_pairs = [
-        (path.resolve(), read_scoring_window(path))
-        for path in prospective_score_dirs
+        (path.resolve(), read_scoring_window(path)) for path in prospective_score_dirs
     ]
     prospective_pairs.sort(key=lambda pair: min(pair[1]["draw_ids"]))
     prospective = [item for _, item in prospective_pairs]
@@ -111,17 +110,11 @@ def create_promotion_eligibility(
 
     source_hashes_after = {
         holdout["source_run_id"]: _tree_hash(holdout_score_dir.resolve()),
-        **{
-            item["source_run_id"]: _tree_hash(path)
-            for path, item in prospective_pairs
-        },
+        **{item["source_run_id"]: _tree_hash(path) for path, item in prospective_pairs},
     }
     expected_hashes = {
         holdout["source_run_id"]: holdout["source_tree_sha256"],
-        **{
-            item["source_run_id"]: item["source_tree_sha256"]
-            for item in prospective
-        },
+        **{item["source_run_id"]: item["source_tree_sha256"] for item in prospective},
     }
     if source_hashes_after != expected_hashes:
         raise PromotionEligibilityError("UPSTREAM_SOURCE_MUTATED", str(source_hashes_after))

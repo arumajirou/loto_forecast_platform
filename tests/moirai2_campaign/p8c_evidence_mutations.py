@@ -10,15 +10,12 @@ from loto.moirai2_campaign.runtime_evidence_gate import (
 )
 from tests.moirai2_campaign.p8c_evidence_fixtures_core import _write_json
 
+
 def _reseal(root: Path) -> None:
     (root / "SHA256SUMS").unlink(missing_ok=True)
     manifest_path = root / "ARTIFACT_MANIFEST.json"
     manifest_path.unlink(missing_ok=True)
-    files = sorted(
-        path.relative_to(root).as_posix()
-        for path in root.rglob("*")
-        if path.is_file()
-    )
+    files = sorted(path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file())
     _write_json(
         manifest_path,
         {
@@ -44,5 +41,3 @@ def _rewrite_response_and_evidence(
     evidence["response"] = response
     evidence["response_sha256"] = sha256_file(response_path)
     _write_json(evidence_path, evidence)
-
-

@@ -37,8 +37,7 @@ def _history_payload(game: str, draws: int = 8) -> dict[str, object]:
     for draw_no in range(1, draws + 1):
         if game in {"numbers3", "numbers4"}:
             values = {
-                column: minimum + ((draw_no + index) % span)
-                for index, column in enumerate(columns)
+                column: minimum + ((draw_no + index) % span) for index, column in enumerate(columns)
             }
         else:
             start = minimum + ((draw_no - 1) % (maximum - positions + 1))
@@ -220,5 +219,3 @@ def _prepared(tmp_path: Path) -> tuple[Path, Path, Path]:
         config_sha256=SHA,
     )
     return workspace, exporter, kdpp
-
-

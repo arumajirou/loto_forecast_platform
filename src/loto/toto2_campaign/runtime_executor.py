@@ -92,9 +92,7 @@ def verify_snapshot(snapshot_path: Path) -> dict[str, Any]:
                 f"snapshot SHA-256 mismatch for {name}: expected {expected_digest}, "
                 f"got {actual_digest}"
             )
-        files[name] = asdict(
-            SnapshotFileEvidence(str(path), size, actual_digest)
-        )
+        files[name] = asdict(SnapshotFileEvidence(str(path), size, actual_digest))
     return {"snapshot_path": str(snapshot), "revision": MODEL_REVISION, "files": files}
 
 
@@ -104,10 +102,7 @@ def history_to_numpy(request: Toto2ProviderRequest) -> np.ndarray:
     if request.decode_block_size < 32 or request.decode_block_size % 32:
         raise RuntimeExecutionError("decode_block_size must be a positive multiple of 32")
     rows = request.history[-request.context_length :]
-    values = [
-        [float(row[column]) for row in rows]
-        for column in request.position_columns
-    ]
+    values = [[float(row[column]) for row in rows] for column in request.position_columns]
     target = np.asarray(values, dtype=np.float32)[None, :, :]
     expected = (1, request.game_geometry.position_count, request.context_length)
     if target.shape != expected:
@@ -279,9 +274,7 @@ def forecast_prepared(
     if cpu_fallback:
         raise RuntimeExecutionError("CUDA request fell back to CPU")
     peak_vram = (
-        int(torch.cuda.max_memory_allocated(prepared.device))
-        if request.device == "cuda"
-        else 0
+        int(torch.cuda.max_memory_allocated(prepared.device)) if request.device == "cuda" else 0
     )
     native_output = output.detach().to("cpu", dtype=torch.float32).numpy()
     evidence = RuntimeEvidence(

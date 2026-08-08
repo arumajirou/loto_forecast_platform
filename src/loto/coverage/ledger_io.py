@@ -28,17 +28,13 @@ def reject_symlink_components(path: Path, *, label: str) -> None:
 def require_regular_file(path: Path, *, label: str) -> None:
     reject_symlink_components(path, label=label)
     if not path.is_file():
-        raise CoverageLedgerPreflightError(
-            f"{label} is not a regular file: {path}"
-        )
+        raise CoverageLedgerPreflightError(f"{label} is not a regular file: {path}")
 
 
 def require_empty_output(path: Path) -> None:
     reject_symlink_components(path, label="output")
     if path.exists() and not path.is_dir():
-        raise CoverageLedgerPreflightError(
-            f"output is not a directory: {path}"
-        )
+        raise CoverageLedgerPreflightError(f"output is not a directory: {path}")
     if path.exists() and any(path.iterdir()):
         raise CoverageLedgerPreflightError(
             "instrumented coverage requires a new empty output directory"

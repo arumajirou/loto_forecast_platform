@@ -389,9 +389,7 @@ def _run_case(
         "hierarchy": {
             "n_total": inputs.hierarchy.n_total,
             "n_bottom": inputs.hierarchy.n_bottom,
-            "labels_sha256": _sha256_bytes(
-                "\n".join(inputs.hierarchy.labels).encode("utf-8")
-            ),
+            "labels_sha256": _sha256_bytes("\n".join(inputs.hierarchy.labels).encode("utf-8")),
         },
         "inputs": inputs.evidence,
         "result": _sanitize_result(result),
@@ -417,9 +415,7 @@ def _exception_case(
         "hierarchy": {
             "n_total": inputs.hierarchy.n_total,
             "n_bottom": inputs.hierarchy.n_bottom,
-            "labels_sha256": _sha256_bytes(
-                "\n".join(inputs.hierarchy.labels).encode("utf-8")
-            ),
+            "labels_sha256": _sha256_bytes("\n".join(inputs.hierarchy.labels).encode("utf-8")),
         },
         "inputs": inputs.evidence,
         "result": {
@@ -439,9 +435,7 @@ def _runtime_evidence() -> dict[str, object]:
     source_sha256 = {
         "runtime_certification": _source_sha256(module_path),
         "hierarchy": (
-            _source_sha256(hierarchy_path)
-            if hierarchy_path is not None
-            else "UNAVAILABLE"
+            _source_sha256(hierarchy_path) if hierarchy_path is not None else "UNAVAILABLE"
         ),
     }
     return {
@@ -497,9 +491,7 @@ def _write_artifacts(
     _write_json(manifest_path, manifest)
 
     checksum_paths = (*primary_paths, manifest_path)
-    checksums = "".join(
-        f"{_sha256_file(path)}  {path.name}\n" for path in checksum_paths
-    )
+    checksums = "".join(f"{_sha256_file(path)}  {path.name}\n" for path in checksum_paths)
     _atomic_write_text(run_dir / "SHA256SUMS", checksums)
 
 

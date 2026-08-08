@@ -59,7 +59,5 @@ def calculate_token_geometry(
             f"prediction token count {prediction_tokens} exceeds {NUM_PREDICT_TOKENS}"
         )
     if total_tokens > MAX_SEQUENCE_TOKENS:
-        raise TokenGeometryError(
-            f"total token count {total_tokens} exceeds {MAX_SEQUENCE_TOKENS}"
-        )
+        raise TokenGeometryError(f"total token count {total_tokens} exceeds {MAX_SEQUENCE_TOKENS}")
     return geometry

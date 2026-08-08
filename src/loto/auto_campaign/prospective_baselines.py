@@ -25,9 +25,7 @@ def _repeat(vector: np.ndarray, horizon: int) -> np.ndarray:
 
 def _reconcile_rows(values: np.ndarray, *, lower: int, upper: int) -> np.ndarray:
     matrix = np.asarray(values, dtype=float)
-    return np.vstack(
-        [nearest_unique_sorted(row, lower=lower, upper=upper) for row in matrix]
-    )
+    return np.vstack([nearest_unique_sorted(row, lower=lower, upper=upper) for row in matrix])
 
 
 def _fixed_center_vector(

@@ -47,9 +47,7 @@ def _uv_version(result: CommandResult) -> str:
         raise FormalP0Error(f"uv --version returned an unexpected value: {value!r}")
     version = match.group("version")
     if version != EXPECTED_UV_VERSION:
-        raise FormalP0Error(
-            f"uv version mismatch: expected {EXPECTED_UV_VERSION}, got {version}"
-        )
+        raise FormalP0Error(f"uv version mismatch: expected {EXPECTED_UV_VERSION}, got {version}")
     return version
 
 
@@ -93,8 +91,7 @@ def _write_formal_bundle(staging_dir: Path, payload: dict[str, Any]) -> None:
     _atomic_write_text(
         staging_dir / "SHA256SUMS",
         "".join(
-            f"{_sha256(path)}  {path.relative_to(staging_dir).as_posix()}\n"
-            for path in hashed
+            f"{_sha256(path)}  {path.relative_to(staging_dir).as_posix()}\n" for path in hashed
         ),
     )
 
@@ -251,9 +248,7 @@ def run_formal_p0(
         )
         if _sha256(lockfile) != lock_sha256:
             raise FormalP0Error("uv.lock changed between preflight and core P0")
-        core_status = json.loads(
-            (core_dir / "P0_RUN_STATUS.json").read_text(encoding="utf-8")
-        )
+        core_status = json.loads((core_dir / "P0_RUN_STATUS.json").read_text(encoding="utf-8"))
         if core_status.get("status") != "PASS":
             raise FormalP0Error("core P0 did not record PASS")
         core_report = core_dir / "P0_CERTIFICATION_REPORT.json"

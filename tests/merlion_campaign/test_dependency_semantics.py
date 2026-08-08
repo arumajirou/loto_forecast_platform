@@ -50,9 +50,7 @@ def _base_report(lock_constraint: str) -> dict[str, object]:
         "schema_version": "merlion-uv-lock-audit-v1",
         "status": "BLOCKED",
         "requires_python": lock_constraint,
-        "blockers": [
-            f"REQUIRES_PYTHON_MISMATCH:{lock_constraint}:>=3.11,<3.12"
-        ],
+        "blockers": [f"REQUIRES_PYTHON_MISMATCH:{lock_constraint}:>=3.11,<3.12"],
         "warnings": [],
         "inventory": [],
     }
@@ -103,6 +101,4 @@ def test_semantic_audit_keeps_real_mismatch(
     report = audit_uv_lock_semantic(lock, _pyproject(tmp_path))
     assert report["status"] == "BLOCKED"
     assert report["requires_python_equivalent"] is False
-    assert report["blockers"] == [
-        "REQUIRES_PYTHON_MISMATCH:>=3.10,<3.12:>=3.11,<3.12"
-    ]
+    assert report["blockers"] == ["REQUIRES_PYTHON_MISMATCH:>=3.10,<3.12:>=3.11,<3.12"]

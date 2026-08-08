@@ -102,27 +102,20 @@ def load_manifest(data_path: Path) -> dict[str, Any]:
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise FormalBacktestEntrypointError(
-            f"cannot read data manifest: {manifest_path}"
-        ) from exc
+        raise FormalBacktestEntrypointError(f"cannot read data manifest: {manifest_path}") from exc
     required = {"canonical_data_sha256", "row_count", "validation_status"}
     missing = sorted(required - set(manifest))
     if missing:
-        raise FormalBacktestEntrypointError(
-            f"data manifest is missing required fields: {missing}"
-        )
+        raise FormalBacktestEntrypointError(f"data manifest is missing required fields: {missing}")
     if manifest["validation_status"] != "PASS":
         raise FormalBacktestEntrypointError(
-            "data manifest validation_status is not PASS: "
-            f"{manifest['validation_status']}"
+            f"data manifest validation_status is not PASS: {manifest['validation_status']}"
         )
     canonical_sha = str(manifest["canonical_data_sha256"])
     if len(canonical_sha) != 64 or any(
         character not in "0123456789abcdef" for character in canonical_sha
     ):
-        raise FormalBacktestEntrypointError(
-            "canonical_data_sha256 is not lowercase SHA-256"
-        )
+        raise FormalBacktestEntrypointError("canonical_data_sha256 is not lowercase SHA-256")
     return manifest
 
 
@@ -141,8 +134,7 @@ def resolve_data_path(explicit: str | None) -> Path:
     found = [item for item in candidates if item.is_file() and not item.is_symlink()]
     if len(found) != 1:
         raise FormalBacktestEntrypointError(
-            "exactly one canonical data path must exist or --data must be supplied; "
-            f"found={found}"
+            f"exactly one canonical data path must exist or --data must be supplied; found={found}"
         )
     return found[0]
 

@@ -63,8 +63,7 @@ def _write_manifest_and_sha(output_dir: Path) -> None:
     files = sorted(
         path
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     manifest = {
         "schema_version": "1.0",
@@ -81,9 +80,7 @@ def _write_manifest_and_sha(output_dir: Path) -> None:
     }
     _write_json(output_dir / "ARTIFACT_MANIFEST.json", manifest)
     hashed = sorted(
-        path
-        for path in output_dir.iterdir()
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output_dir.iterdir() if path.is_file() and path.name != "SHA256SUMS"
     )
     _atomic_write_text(
         output_dir / "SHA256SUMS",
@@ -132,9 +129,7 @@ def persist_p11(
         "authorization_id": authorization["authorization_id"],
         "authorization_seal_sha256": authorization["seal_sha256"],
         "deployment_target": authorization["deployment_target"],
-        "expected_deployment_state_sha256": (
-            authorization["expected_deployment_state_sha256"]
-        ),
+        "expected_deployment_state_sha256": (authorization["expected_deployment_state_sha256"]),
         "expected_primary_before": authorization["expected_primary_before"],
         "expected_canary_before": authorization["expected_canary_before"],
         "target_primary": authorization["target_primary"],
@@ -214,9 +209,7 @@ def _verify_manifest(output_dir: Path) -> None:
     manifest = _load_json(output_dir / "ARTIFACT_MANIFEST.json")
     if manifest.get("status") != "PASS":
         raise P11VerificationError("manifest status mismatch")
-    if manifest.get("scope") != (
-        "sktime-p11-primary-promotion-authorization"
-    ):
+    if manifest.get("scope") != ("sktime-p11-primary-promotion-authorization"):
         raise P11VerificationError("manifest scope mismatch")
     seen: set[str] = set()
     for record in manifest.get("files", []):
@@ -232,8 +225,7 @@ def _verify_manifest(output_dir: Path) -> None:
     expected = {
         path.name
         for path in output_dir.iterdir()
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     }
     if seen != expected:
         raise P11VerificationError("manifest coverage mismatch")
@@ -254,9 +246,7 @@ def _verify_sha256sums(output_dir: Path) -> None:
             raise P11VerificationError(f"SHA-256 mismatch: {name}")
         seen.add(name)
     expected_files = {
-        item.name
-        for item in output_dir.iterdir()
-        if item.is_file() and item.name != "SHA256SUMS"
+        item.name for item in output_dir.iterdir() if item.is_file() and item.name != "SHA256SUMS"
     }
     if seen != expected_files:
         raise P11VerificationError("SHA256SUMS coverage mismatch")
@@ -269,9 +259,7 @@ def verify_p11(
     response = _load_json(output_dir / "response.json")
     if response.get("status") != "PASS":
         raise P11VerificationError("P11 response status mismatch")
-    if response.get("decision") != (
-        "AUTHORIZED_FOR_ONE_PRIMARY_PROMOTION_TRANSACTION"
-    ):
+    if response.get("decision") != ("AUTHORIZED_FOR_ONE_PRIMARY_PROMOTION_TRANSACTION"):
         raise P11VerificationError("P11 decision mismatch")
     if response.get("primary_promotion_authorized") is not True:
         raise P11VerificationError("P11 did not authorize promotion")
@@ -288,9 +276,7 @@ def verify_p11(
             raise P11VerificationError(f"P11 changed forbidden field: {field}")
     if response.get("promotion_status") != "APPROVED_NOT_PRIMARY":
         raise P11VerificationError("P11 promotion status mismatch")
-    if _load_json(output_dir / "P10_LINEAGE.json") != request.p10.model_dump(
-        mode="json"
-    ):
+    if _load_json(output_dir / "P10_LINEAGE.json") != request.p10.model_dump(mode="json"):
         raise P11VerificationError("P10 lineage mismatch")
     if _load_json(output_dir / "DEPLOYMENT_PRECONDITION.json") != (
         request.deployment.model_dump(mode="json")
@@ -300,19 +286,13 @@ def verify_p11(
     if intent != primary_promotion_intent(request):
         raise P11VerificationError("primary promotion intent mismatch")
     approvals = _load_json(output_dir / "APPROVALS.json")
-    expected_approvals = [
-        item.model_dump(mode="json") for item in request.approvals
-    ]
+    expected_approvals = [item.model_dump(mode="json") for item in request.approvals]
     if approvals != expected_approvals:
         raise P11VerificationError("approvals mismatch")
     verification = _load_json(output_dir / "SIGNATURE_VERIFICATION.json")
-    if len(verification) != 3 or not all(
-        item.get("verified") is True for item in verification
-    ):
+    if len(verification) != 3 or not all(item.get("verified") is True for item in verification):
         raise P11VerificationError("signature verification evidence mismatch")
-    authorization = _load_json(
-        output_dir / "PRIMARY_PROMOTION_AUTHORIZATION.json"
-    )
+    authorization = _load_json(output_dir / "PRIMARY_PROMOTION_AUTHORIZATION.json")
     try:
         verify_authorization_seal(authorization)
     except ValueError as exc:
@@ -340,9 +320,7 @@ def verify_p11(
     return {
         "schema_version": "1.0",
         "status": "PASS",
-        "certification_scope": (
-            "sktime-p11-primary-promotion-authorization"
-        ),
+        "certification_scope": ("sktime-p11-primary-promotion-authorization"),
         "decision": response["decision"],
         "promotion_status": "APPROVED_NOT_PRIMARY",
         "primary_promotion_executed": False,

@@ -105,9 +105,7 @@ def score_locked_prospective_run(
         )
 
     contract = json.loads((run_root / "data_contract.json").read_text(encoding="utf-8"))
-    campaign_config = json.loads(
-        (run_root / "campaign_config.json").read_text(encoding="utf-8")
-    )
+    campaign_config = json.loads((run_root / "campaign_config.json").read_text(encoding="utf-8"))
     number_columns = [str(value) for value in contract.get("number_columns") or []]
     if len(number_columns) != 5:
         raise ValueError(f"Mini Loto scoring requires five positions: {number_columns}")
@@ -274,9 +272,7 @@ def score_locked_prospective_run(
             "ingested_at": datetime.now(UTC).isoformat(),
             "actual_known": True,
             "actual_source_label": options.actual_source_label,
-            "actual_published_at": (
-                published_at.isoformat() if published_at is not None else None
-            ),
+            "actual_published_at": (published_at.isoformat() if published_at is not None else None),
             "actual_publication_time_provided": published_at is not None,
             "actual_publication_time_verified": False,
             "prediction_locked_at": prediction_lock.get("locked_at"),

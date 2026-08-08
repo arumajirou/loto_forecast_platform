@@ -140,18 +140,14 @@ def test_unknown_field_is_rejected() -> None:
 
 @pytest.mark.parametrize("prediction_length", [1, 2, 5])
 def test_supported_prediction_lengths(prediction_length: int) -> None:
-    request = KDPPFixedKRequest.model_validate(
-        request_payload(prediction_length=prediction_length)
-    )
+    request = KDPPFixedKRequest.model_validate(request_payload(prediction_length=prediction_length))
     assert request.prediction_length == prediction_length
 
 
 @pytest.mark.parametrize("prediction_length", [0, 3, 4, 6])
 def test_unsupported_prediction_lengths_are_rejected(prediction_length: int) -> None:
     with pytest.raises(ValidationError):
-        KDPPFixedKRequest.model_validate(
-            request_payload(prediction_length=prediction_length)
-        )
+        KDPPFixedKRequest.model_validate(request_payload(prediction_length=prediction_length))
 
 
 def test_cpu_only_device_and_actuals_contract() -> None:
@@ -169,9 +165,7 @@ def test_nan_and_inf_are_rejected() -> None:
     with pytest.raises(ValidationError):
         KDPPFixedKRequest.model_validate(request_payload(psd_tolerance=math.nan))
     with pytest.raises(ValidationError):
-        KDPPFixedKResponse.model_validate(
-            response_payload(minimum_eigenvalue=math.inf)
-        )
+        KDPPFixedKResponse.model_validate(response_payload(minimum_eigenvalue=math.inf))
 
 
 def test_numbers3_position_qualified_duplicates_are_not_global_digit_duplicates() -> None:
@@ -221,9 +215,7 @@ def test_numbers4_position_local_requires_one_position_and_k_one() -> None:
         (KDPPGame.LOTO7, 37, 7),
     ],
 )
-def test_unordered_game_geometry(
-    game: KDPPGame, candidate_count: int, cardinality: int
-) -> None:
+def test_unordered_game_geometry(game: KDPPGame, candidate_count: int, cardinality: int) -> None:
     request = KDPPFixedKRequest.model_validate(
         request_payload(
             game=game,
@@ -251,9 +243,7 @@ def test_response_quantiles_semantics_and_safe_paths() -> None:
     with pytest.raises(ValidationError):
         KDPPFixedKResponse.model_validate(response_payload(quantiles={"0.5": [1]}))
     with pytest.raises(ValidationError):
-        KDPPFixedKResponse.model_validate(
-            response_payload(artifact_paths=("../escape.json",))
-        )
+        KDPPFixedKResponse.model_validate(response_payload(artifact_paths=("../escape.json",)))
     with pytest.raises(ValidationError):
         KDPPFixedKResponse.model_validate(
             response_payload(point_forecast=(("1", "1", "2", "3", "4"),))

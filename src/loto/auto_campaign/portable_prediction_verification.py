@@ -49,10 +49,7 @@ def _verify_extracted_prediction_lock(root: Path) -> dict[str, Any]:
     except (OSError, ValueError) as exc:
         return {
             "status": "FAIL",
-            "failures": [
-                f"portable target cannot be resolved safely: "
-                f"{type(exc).__name__}: {exc}"
-            ],
+            "failures": [f"portable target cannot be resolved safely: {type(exc).__name__}: {exc}"],
         }
     manifest_file = target / "manifest.json"
     try:
@@ -60,9 +57,7 @@ def _verify_extracted_prediction_lock(root: Path) -> dict[str, Any]:
     except (OSError, json.JSONDecodeError) as exc:
         return {
             "status": "FAIL",
-            "failures": [
-                f"portable target manifest unreadable: {type(exc).__name__}: {exc}"
-            ],
+            "failures": [f"portable target manifest unreadable: {type(exc).__name__}: {exc}"],
         }
     if not isinstance(run_manifest, dict):
         return {
@@ -97,23 +92,21 @@ def verify_portable_bundle_with_prediction_lock(bundle: Path) -> dict[str, Any]:
     except (OSError, ValueError) as exc:
         prediction = {
             "status": "FAIL",
-            "failures": [
-                f"portable prediction verification failed: "
-                f"{type(exc).__name__}: {exc}"
-            ],
+            "failures": [f"portable prediction verification failed: {type(exc).__name__}: {exc}"],
         }
 
     failures = list(base.get("failures") or [])
-    failures.extend(
-        f"prediction-lock:{failure}"
-        for failure in prediction.get("failures", [])
-    )
+    failures.extend(f"prediction-lock:{failure}" for failure in prediction.get("failures", []))
     return {
         **base,
-        "status": "PASS" if not failures and prediction.get("status") in {
+        "status": "PASS"
+        if not failures
+        and prediction.get("status")
+        in {
             "PASS",
             "NOT_APPLICABLE",
-        } else "FAIL",
+        }
+        else "FAIL",
         "prediction_lock_verification": prediction,
         "failures": failures,
     }

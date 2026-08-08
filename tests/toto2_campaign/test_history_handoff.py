@@ -248,10 +248,15 @@ def test_materialization_copies_only_approved_inputs_and_evidence(
     assert handoff["status"] == "MATERIALIZED_APPROVED_HISTORY"
     assert handoff["future_actuals_used"] is False
     for game_id in FORMAL_GAMES:
-        assert sha256_file(destination / f"{game_id}.json") == build_export_binding(
-            export_root,
-            verification,
-        ).games[game_id].json_sha256
+        assert (
+            sha256_file(destination / f"{game_id}.json")
+            == build_export_binding(
+                export_root,
+                verification,
+            )
+            .games[game_id]
+            .json_sha256
+        )
 
 
 def test_approval_and_verification_cannot_be_inside_export_root(

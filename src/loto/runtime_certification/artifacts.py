@@ -74,13 +74,16 @@ def _atomic_write_text(path: Path, content: str, *, overwrite: bool = False) -> 
 
 
 def atomic_write_json(path: Path, payload: Any, *, overwrite: bool = False) -> None:
-    content = json.dumps(
-        payload,
-        ensure_ascii=False,
-        indent=2,
-        sort_keys=True,
-        allow_nan=False,
-    ) + "\n"
+    content = (
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n"
+    )
     _atomic_write_text(path, content, overwrite=overwrite)
 
 

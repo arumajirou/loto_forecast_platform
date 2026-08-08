@@ -80,8 +80,7 @@ def validate_forecast_output(
     shape_ok = len(prediction) == expected_rows and bool(value_columns)
     duplicate_keys = bool(identity_ok and prediction.duplicated(["unique_id", "ds"]).any())
     finite = bool(
-        value_columns
-        and np.isfinite(prediction[value_columns].to_numpy(dtype=float)).all()
+        value_columns and np.isfinite(prediction[value_columns].to_numpy(dtype=float)).all()
     )
 
     series_horizon_ok = True
@@ -96,17 +95,11 @@ def validate_forecast_output(
 
     if contract.expected_status is ExpectedStatus.EXPECTED_NEGATIVE_PASS:
         passed = (
-            identity_ok
-            and shape_ok
-            and not finite
-            and not duplicate_keys
-            and series_horizon_ok
+            identity_ok and shape_ok and not finite and not duplicate_keys and series_horizon_ok
         )
         return {
             "status": (
-                RuntimeStatus.EXPECTED_NEGATIVE_PASS
-                if passed
-                else RuntimeStatus.VALIDATION_FAILED
+                RuntimeStatus.EXPECTED_NEGATIVE_PASS if passed else RuntimeStatus.VALIDATION_FAILED
             ),
             "finite": finite,
             "shape_ok": shape_ok,
@@ -142,16 +135,12 @@ def _validate_model_data_preconditions(
     elif isinstance(season_length, (list, tuple)) and season_length:
         seasonalities = tuple(season_length)
         if any(
-            not isinstance(value, int)
-            or isinstance(value, bool)
-            or value < 1
+            not isinstance(value, int) or isinstance(value, bool) or value < 1
             for value in seasonalities
         ):
             raise ValueError("season_length values must be positive integers")
     else:
-        raise ValueError(
-            f"model {model_name} requires integer or non-empty sequence season_length"
-        )
+        raise ValueError(f"model {model_name} requires integer or non-empty sequence season_length")
     if any(value < 1 for value in seasonalities):
         raise ValueError("season_length values must be positive")
     required_rows = contract.minimum_seasons * max(seasonalities)

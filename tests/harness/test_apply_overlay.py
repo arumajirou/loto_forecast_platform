@@ -4,13 +4,13 @@ from pathlib import Path
 
 
 def base_pyproject() -> str:
-    return '''[project]
+    return """[project]
 name = "loto-forecast-platform"
 [project.optional-dependencies]
 postgres = ["psycopg[binary]>=3.2", "sqlalchemy>=2.0"]
 [project.scripts]
 loto-integrity = "loto.verify.integrity:main"
-'''
+"""
 
 
 def make_overlay(root: Path) -> Path:

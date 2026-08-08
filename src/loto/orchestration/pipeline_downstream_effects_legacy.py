@@ -15,6 +15,7 @@ from loto.orchestration.pipeline_downstream_preflight import (
 )
 from loto.orchestration.pipeline_downstream_types import PreparedDownstreamCommit
 
+
 class LegacyRegistryEffectsMixin:
     def ensure_legacy_registry(
         self,
@@ -29,8 +30,7 @@ class LegacyRegistryEffectsMixin:
         registry = Registry(self.config.registry_path)
         with sqlite3.connect(registry.path) as connection:
             row = connection.execute(
-                "SELECT run_id,sealed_json,verified FROM forecasts "
-                "WHERE forecast_id=?",
+                "SELECT run_id,sealed_json,verified FROM forecasts WHERE forecast_id=?",
                 (prepared.forecast_id,),
             ).fetchone()
         if row is None:
@@ -45,14 +45,11 @@ class LegacyRegistryEffectsMixin:
                 pass
             with sqlite3.connect(registry.path) as connection:
                 row = connection.execute(
-                    "SELECT run_id,sealed_json,verified FROM forecasts "
-                    "WHERE forecast_id=?",
+                    "SELECT run_id,sealed_json,verified FROM forecasts WHERE forecast_id=?",
                     (prepared.forecast_id,),
                 ).fetchone()
         if row is None:
-            raise DownstreamCommitRetryable(
-                "legacy registry forecast row was not persisted"
-            )
+            raise DownstreamCommitRetryable("legacy registry forecast row was not persisted")
         if (
             str(row[0]) != prepared.run_id
             or int(row[2]) != 1
@@ -75,14 +72,10 @@ class LegacyRegistryEffectsMixin:
             ):
                 stage_matches.append(item)
         if len(stage_matches) > 1:
-            raise DownstreamCommitConflict(
-                "duplicate downstream commit stage events exist"
-            )
+            raise DownstreamCommitConflict("duplicate downstream commit stage events exist")
         if stage_matches:
             if stage_matches[0].get("status") != "SUCCEEDED":
-                raise DownstreamCommitConflict(
-                    "existing downstream commit stage is not SUCCEEDED"
-                )
+                raise DownstreamCommitConflict("existing downstream commit stage is not SUCCEEDED")
         else:
             registry.record_stage(
                 prepared.run_id,

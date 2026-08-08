@@ -40,8 +40,7 @@ def _compare_record_maps(
 ) -> list[str]:
     failures: list[str] = []
     expected_map = {
-        tuple(_normalize(row.get(field)) for field in key_fields): row
-        for row in expected
+        tuple(_normalize(row.get(field)) for field in key_fields): row for row in expected
     }
     actual_map: dict[tuple[Any, ...], dict[str, Any]] = {}
     for row in actual:
@@ -224,8 +223,7 @@ def _compare_mlflow(
             )
 
     expected_children = {
-        (str(row["candidate_key"]), str(row["seed_token"])): row
-        for row in expected["seed_metrics"]
+        (str(row["candidate_key"]), str(row["seed_token"])): row for row in expected["seed_metrics"]
     }
     actual_children: dict[tuple[str, str], dict[str, Any]] = {}
     for child in list(snapshot.get("child_runs") or []):
@@ -272,4 +270,3 @@ def _compare_mlflow(
             )
         )
     return failures
-

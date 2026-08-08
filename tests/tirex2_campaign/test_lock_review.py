@@ -25,7 +25,7 @@ TIREX_HASH = sorted(EXPECTED_TIREX_ARTIFACT_HASHES)[0]
 
 def _write_project(path: Path) -> None:
     path.write_text(
-        '''[project]
+        """[project]
 name = "loto-tirex2-supported"
 version = "0.1.0"
 requires-python = ">=3.12,<3.13"
@@ -36,7 +36,7 @@ dependencies = [
   "huggingface-hub==0.36.2",
   "pydantic>=2.10,<3",
 ]
-''',
+""",
         encoding="utf-8",
     )
 
@@ -60,11 +60,11 @@ def _write_lock(
 ) -> None:
     torch_block = _package("torch", "2.9.1")
     if not include_torch_hash:
-        torch_block = '''[[package]]
+        torch_block = """[[package]]
 name = "torch"
 version = "2.9.1"
 source = { registry = "https://pypi.org/simple" }
-'''
+"""
     path.write_text(
         f'''version = 1
 revision = 3

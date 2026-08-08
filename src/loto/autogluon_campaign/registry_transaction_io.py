@@ -212,12 +212,8 @@ def read_p18_authorization(
         "authorization": authorization,
         "requirements": requirements,
         "source_tree_sha256": tree_sha256(source),
-        "authorization_file_sha256": file_sha256(
-            source / "REGISTRY_AUTHORIZATION.json"
-        ),
-        "requirements_file_sha256": file_sha256(
-            source / "REGISTRY_TRANSACTION_REQUIREMENTS.json"
-        ),
+        "authorization_file_sha256": file_sha256(source / "REGISTRY_AUTHORIZATION.json"),
+        "requirements_file_sha256": file_sha256(source / "REGISTRY_TRANSACTION_REQUIREMENTS.json"),
     }
 
 

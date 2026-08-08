@@ -222,15 +222,11 @@ def _write_portable_sums(root: Path) -> None:
         (
             path
             for path in root.rglob("*")
-            if path.is_file()
-            and path.relative_to(root).as_posix() != PORTABLE_SUMS
+            if path.is_file() and path.relative_to(root).as_posix() != PORTABLE_SUMS
         ),
         key=lambda path: path.relative_to(root).as_posix(),
     )
-    lines = [
-        f"{sha256_file(path)}  {path.relative_to(root).as_posix()}"
-        for path in paths
-    ]
+    lines = [f"{sha256_file(path)}  {path.relative_to(root).as_posix()}" for path in paths]
     target = root / PORTABLE_SUMS
     target.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -273,17 +269,10 @@ def _verify_portable_sums(root: Path) -> list[str]:
     actual = {
         item.relative_to(root).as_posix()
         for item in root.rglob("*")
-        if item.is_file()
-        and item.relative_to(root).as_posix() != PORTABLE_SUMS
+        if item.is_file() and item.relative_to(root).as_posix() != PORTABLE_SUMS
     }
-    failures.extend(
-        f"portable-sums unlisted:{item}"
-        for item in sorted(actual - listed)
-    )
-    failures.extend(
-        f"portable-sums listed-but-missing:{item}"
-        for item in sorted(listed - actual)
-    )
+    failures.extend(f"portable-sums unlisted:{item}" for item in sorted(actual - listed))
+    failures.extend(f"portable-sums listed-but-missing:{item}" for item in sorted(listed - actual))
     return failures
 
 
@@ -299,11 +288,7 @@ def _canonical_sha256(payload: Mapping[str, Any]) -> str:
 
 
 def _manifest_content_sha256(manifest: Mapping[str, Any]) -> str:
-    payload = {
-        key: value
-        for key, value in manifest.items()
-        if key != "manifest_content_sha256"
-    }
+    payload = {key: value for key, value in manifest.items() if key != "manifest_content_sha256"}
     return _canonical_sha256(payload)
 
 
@@ -320,10 +305,7 @@ def _resolve_recorded_path(
             continue
         if key == original:
             matches.append((len(original), entry, ""))
-        elif (
-            str(entry.get("kind")) == "directory"
-            and key.startswith(original + "/")
-        ):
+        elif str(entry.get("kind")) == "directory" and key.startswith(original + "/"):
             matches.append((len(original), entry, key[len(original) + 1 :]))
     if not matches:
         return None
@@ -375,9 +357,7 @@ def _verify_recorded_file(
         return None
     actual = sha256_file(resolved)
     if actual != expected:
-        failures.append(
-            f"{label} SHA256 mismatch: expected={expected}, actual={actual}"
-        )
+        failures.append(f"{label} SHA256 mismatch: expected={expected}, actual={actual}")
     return resolved
 
 
@@ -419,14 +399,9 @@ def _verify_relocated_run(
             failures,
             f"{label} LINEAGE",
         )
-    failures.extend(
-        f"{label} current SHA256: {item}"
-        for item in verify_sha256s(relocated)
-    )
+    failures.extend(f"{label} current SHA256: {item}" for item in verify_sha256s(relocated))
     seal = verify_verification_seal(relocated)
-    failures.extend(
-        f"{label} seal: {item}" for item in seal.get("failures", [])
-    )
+    failures.extend(f"{label} seal: {item}" for item in seal.get("failures", []))
     current_failures: list[str] = []
     current = _read_json(
         relocated / "manifest.json",
@@ -472,9 +447,7 @@ def _verify_relocated_lineage(
     if manifest.get("lineage_sha256") != sha256_file(lineage_path):
         failures.append("relocated LINEAGE.json hash differs from manifest")
     core = {
-        key: value
-        for key, value in lineage.items()
-        if key not in {"created_at", "chain_sha256"}
+        key: value for key, value in lineage.items() if key not in {"created_at", "chain_sha256"}
     }
     chain = _canonical_sha256(core)
     if lineage.get("chain_sha256") != chain:
@@ -548,9 +521,7 @@ def _verify_manifest_identity(
     elif manifest.get("target_verification_seal_sha256") != sha256_file(seal_path):
         failures.append("portable target verification seal SHA256 mismatch")
     expected_relocation = {
-        _path_key(str(entry.get("original_path") or "")): str(
-            entry.get("relative_path") or ""
-        )
+        _path_key(str(entry.get("original_path") or "")): str(entry.get("relative_path") or "")
         for entry in entries
     }
     if manifest.get("relocation_map") != expected_relocation:
@@ -635,14 +606,8 @@ def _verify_portable_directory(root: Path) -> dict[str, Any]:
             target_entry = entry
         if kind == "directory" and set(roles) & _VERIFIED_ROLES:
             seal = verify_verification_seal(path)
-            failures.extend(
-                f"entry {index} seal: {item}"
-                for item in seal.get("failures", [])
-            )
-            failures.extend(
-                f"entry {index} SHA256: {item}"
-                for item in verify_sha256s(path)
-            )
+            failures.extend(f"entry {index} seal: {item}" for item in seal.get("failures", []))
+            failures.extend(f"entry {index} SHA256: {item}" for item in verify_sha256s(path))
             if (path / "LINEAGE.json").is_file():
                 relocated_lineage_roots.append(path)
     if target_root is None or not target_root.is_dir():
@@ -655,9 +620,7 @@ def _verify_portable_directory(root: Path) -> dict[str, Any]:
         failures,
     )
     for lineage_root in relocated_lineage_roots:
-        failures.extend(
-            _verify_relocated_lineage(lineage_root, entries, root)
-        )
+        failures.extend(_verify_relocated_lineage(lineage_root, entries, root))
     return {
         "status": "PASS" if not failures else "FAIL",
         "schema_version": PORTABLE_SCHEMA_VERSION,
@@ -755,9 +718,7 @@ def export_portable_bundle(run_root: Path, output: Path) -> dict[str, Any]:
     for entry in entries:
         source = entry["path"]
         if source.is_dir() and (output == source or source in output.parents):
-            raise ValueError(
-                f"portable output must not be inside a source run: {source}"
-            )
+            raise ValueError(f"portable output must not be inside a source run: {source}")
     output.parent.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory(
@@ -818,13 +779,10 @@ def export_portable_bundle(run_root: Path, output: Path) -> dict[str, Any]:
             "exported_from_sealed_at": seal.get("sealed_at"),
             "target_original_path": _path_key(run_root),
             "target_relative_path": "payload/target",
-            "target_verification_seal_sha256": sha256_file(
-                run_root / "VERIFICATION_SEAL.json"
-            ),
+            "target_verification_seal_sha256": sha256_file(run_root / "VERIFICATION_SEAL.json"),
             "entries": manifest_entries,
             "relocation_map": {
-                entry["original_path"]: entry["relative_path"]
-                for entry in manifest_entries
+                entry["original_path"]: entry["relative_path"] for entry in manifest_entries
             },
         }
         manifest["manifest_content_sha256"] = _manifest_content_sha256(manifest)
@@ -841,10 +799,7 @@ def export_portable_bundle(run_root: Path, output: Path) -> dict[str, Any]:
         _write_portable_sums(package_root)
         verification = _verify_portable_directory(package_root)
         if verification["status"] != "PASS":
-            raise ValueError(
-                "portable staging verification failed: "
-                f"{verification['failures']}"
-            )
+            raise ValueError(f"portable staging verification failed: {verification['failures']}")
         partial = output.with_name(output.name + ".partial")
         if partial.exists():
             partial.unlink()
@@ -894,9 +849,7 @@ def verify_portable_bundle(bundle: Path) -> dict[str, Any]:
             "schema_version": PORTABLE_SCHEMA_VERSION,
             "entry_count": 0,
             "target_relative_path": None,
-            "failures": [
-                f"portable bundle unreadable: {type(exc).__name__}: {exc}"
-            ],
+            "failures": [f"portable bundle unreadable: {type(exc).__name__}: {exc}"],
         }
     return {
         **result,

@@ -69,9 +69,7 @@ class LMStudioEngine(OpenAICompatibleEngine):
                 continue
             model_type = item.get("type")
             capabilities = (
-                {Capability.EMBEDDING}
-                if model_type == "embedding"
-                else {Capability.CHAT}
+                {Capability.EMBEDDING} if model_type == "embedding" else {Capability.CHAT}
             )
             capability_data = item.get("capabilities")
             if isinstance(capability_data, dict):
@@ -102,16 +100,12 @@ class LMStudioEngine(OpenAICompatibleEngine):
                 ModelDescriptor(
                     key=str(item["key"]),
                     display_name=(
-                        str(item["display_name"])
-                        if item.get("display_name") is not None
-                        else None
+                        str(item["display_name"]) if item.get("display_name") is not None else None
                     ),
                     engine=self.kind,
                     endpoint=self.endpoint,
                     architecture=(
-                        str(item["architecture"])
-                        if item.get("architecture") is not None
-                        else None
+                        str(item["architecture"]) if item.get("architecture") is not None else None
                     ),
                     quantization=str(quant_name) if quant_name else None,
                     declared_context=int(item.get("max_context_length") or 8192),
@@ -145,9 +139,7 @@ class LMStudioEngine(OpenAICompatibleEngine):
         config: dict[str, Any] = raw_config if isinstance(raw_config, dict) else {}
         raw_load_seconds = payload.get("load_time_seconds")
         load_seconds = (
-            float(raw_load_seconds)
-            if isinstance(raw_load_seconds, int | float)
-            else None
+            float(raw_load_seconds) if isinstance(raw_load_seconds, int | float) else None
         )
         return LoadedModel(
             model=request.model,

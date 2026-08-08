@@ -131,9 +131,7 @@ def test_historical_fit_is_psd_finite_and_train_only() -> None:
 
 def test_chronology_hash_mismatch_fails_closed() -> None:
     training = miniloto_training()
-    evidence = chronology(training).model_copy(
-        update={"feature_matrix_sha256": "c" * 64}
-    )
+    evidence = chronology(training).model_copy(update={"feature_matrix_sha256": "c" * 64})
     with pytest.raises(ValueError, match="feature_matrix_sha256"):
         KDPPFixedKPrivateRuntime.fit(
             training,
@@ -152,11 +150,7 @@ def test_shared_position_runtime_fails_closed_until_partition_sampler_exists() -
         training[row, row % 10] = 1
         training[row, 10 + ((row + 1) % 10)] = 1
         training[row, 20 + ((row + 2) % 10)] = 1
-    item_ids = tuple(
-        f"n{position}:{digit}"
-        for position in range(1, 4)
-        for digit in range(10)
-    )
+    item_ids = tuple(f"n{position}:{digit}" for position in range(1, 4) for digit in range(10))
     evidence = KDPPChronologyEvidence(
         train_start=0,
         train_end=11,
@@ -183,9 +177,7 @@ def test_shared_position_runtime_fails_closed_until_partition_sampler_exists() -
 def test_diagonal_control_matches_conditional_bernoulli_marginals() -> None:
     runtime, _, _ = fit_runtime(kernel_mode=KDPPKernelMode.DIAGONAL_CONTROL)
     diagonal = np.diag(runtime.kernel)
-    expected = fixed_cardinality_marginals(
-        np.log(diagonal), runtime.metadata.cardinality
-    )
+    expected = fixed_cardinality_marginals(np.log(diagonal), runtime.metadata.cardinality)
     assert runtime.metadata.degeneracy_status is KDPPDegeneracyStatus.DEGENERATE
     assert runtime.metadata.kernel_off_diagonal_norm == 0.0
     assert np.allclose(runtime.marginals, expected, atol=1e-10, rtol=1e-10)

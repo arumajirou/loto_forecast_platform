@@ -75,9 +75,7 @@ class SplitContract(BaseModel):
     @model_validator(mode="after")
     def validate_boundaries(self) -> SplitContract:
         if not (
-            self.train_end_exclusive
-            < self.validation_end_exclusive
-            <= self.holdout_end_exclusive
+            self.train_end_exclusive < self.validation_end_exclusive <= self.holdout_end_exclusive
         ):
             raise ValueError("required order: train_end < validation_end <= holdout_end")
         return self
@@ -239,9 +237,7 @@ class ProviderRequest(BaseModel):
                 raise ValueError("FiLM certified lane requires e_layers=1")
             if self.dropout != 0.0:
                 raise ValueError("FiLM certified lane requires dropout=0.0")
-        if self.operation in load_ops and (
-            self.checkpoint_path is None or self.input_path is None
-        ):
+        if self.operation in load_ops and (self.checkpoint_path is None or self.input_path is None):
             raise ValueError("load/predict requires checkpoint_path and input_path")
         if self.operation == Operation.VERIFY_ROUNDTRIP and (
             self.before_prediction_path is None or self.after_prediction_path is None

@@ -105,10 +105,7 @@ def map_legacy_status(
             mapped = PromotionStatus.REGISTERED_NOT_DEPLOYED
             missing.append("verified shadow binding")
             confidence = MappingConfidence.BLOCKED_MISSING_EVIDENCE
-    elif (
-        source is LegacySource.SKTIME_P10
-        and key == "ELIGIBLE_FOR_PRIMARY_PROMOTION_REVIEW"
-    ):
+    elif source is LegacySource.SKTIME_P10 and key == "ELIGIBLE_FOR_PRIMARY_PROMOTION_REVIEW":
         if primary_review_evidence_verified:
             mapped = PromotionStatus.PRIMARY_REVIEW_ELIGIBLE
             confidence = MappingConfidence.EXACT

@@ -73,13 +73,9 @@ def _publish_sidecar(zip_path: Path, digest: str) -> None:
         _write_exclusive(sidecar, expected.encode("utf-8"))
     except FileExistsError:
         if not sidecar.is_file() or sidecar.is_symlink():
-            raise PackageIntegrityError(
-                f"existing sidecar is not a regular file: {sidecar}"
-            )
+            raise PackageIntegrityError(f"existing sidecar is not a regular file: {sidecar}")
         if sidecar.read_text(encoding="utf-8") != expected:
-            raise PackageIntegrityError(
-                "existing ZIP sidecar does not match package digest"
-            )
+            raise PackageIntegrityError("existing ZIP sidecar does not match package digest")
 
 
 def _verify_existing_output(
@@ -92,13 +88,9 @@ def _verify_existing_output(
     if not zip_path.exists() and not sidecar.exists():
         return False
     if not zip_path.is_file() or zip_path.is_symlink():
-        raise PackageIntegrityError(
-            f"existing ZIP path is not a regular file: {zip_path}"
-        )
+        raise PackageIntegrityError(f"existing ZIP path is not a regular file: {zip_path}")
     if _sha256_file(zip_path) != expected_digest:
-        raise PackageIntegrityError(
-            "existing ZIP differs from deterministic package bytes"
-        )
+        raise PackageIntegrityError("existing ZIP differs from deterministic package bytes")
     _verify_zip(zip_path, package_manifest=package_manifest)
     _publish_sidecar(zip_path, expected_digest)
     return True
@@ -123,10 +115,13 @@ def _copy_exclusive(
     try:
         descriptor = os.open(zip_path, flags, 0o644)
         created = True
-        with temporary_path.open("rb") as source, os.fdopen(
-            descriptor,
-            "wb",
-        ) as destination:
+        with (
+            temporary_path.open("rb") as source,
+            os.fdopen(
+                descriptor,
+                "wb",
+            ) as destination,
+        ):
             descriptor = None
             _copy_stream(source, destination)
             destination.flush()
@@ -135,9 +130,7 @@ def _copy_exclusive(
             raise PackageIntegrityError("exclusive-copy ZIP digest mismatch")
         return "exclusive_copy"
     except FileExistsError as exc:
-        raise PackageIntegrityError(
-            f"ZIP appeared concurrently: {zip_path}"
-        ) from exc
+        raise PackageIntegrityError(f"ZIP appeared concurrently: {zip_path}") from exc
     except Exception as exc:
         if descriptor is not None:
             os.close(descriptor)
@@ -145,9 +138,7 @@ def _copy_exclusive(
             zip_path.unlink(missing_ok=True)
         if isinstance(exc, PackageIntegrityError):
             raise
-        raise PackageIntegrityError(
-            f"cannot publish immutable ZIP by copy: {exc}"
-        ) from exc
+        raise PackageIntegrityError(f"cannot publish immutable ZIP by copy: {exc}") from exc
 
 
 def _promote_new_zip(
@@ -160,9 +151,7 @@ def _promote_new_zip(
     try:
         os.link(temporary_path, zip_path)
     except FileExistsError as exc:
-        raise PackageIntegrityError(
-            f"ZIP appeared concurrently: {zip_path}"
-        ) from exc
+        raise PackageIntegrityError(f"ZIP appeared concurrently: {zip_path}") from exc
     except OSError:
         return _copy_exclusive(temporary_path, zip_path, expected_digest)
 

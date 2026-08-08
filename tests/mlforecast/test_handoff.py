@@ -122,8 +122,7 @@ def test_handoff_manifest_and_sums_agree(tmp_path: Path) -> None:
         sums = {
             name: digest
             for digest, name in (
-                line.split("  ", 1)
-                for line in archive.read("SHA256SUMS").decode().splitlines()
+                line.split("  ", 1) for line in archive.read("SHA256SUMS").decode().splitlines()
             )
         }
     expected = {record["path"]: record["sha256"] for record in manifest["artifacts"]}
@@ -154,8 +153,7 @@ def test_git_backed_handoff_uses_only_tracked_files(tmp_path: Path) -> None:
     result = build_handoff_bundle(root, tmp_path / "out-git")
     with zipfile.ZipFile(result.zip_path) as archive:
         assert not any(
-            "__pycache__" in name or name.endswith(".pyc")
-            for name in archive.namelist()
+            "__pycache__" in name or name.endswith(".pyc") for name in archive.namelist()
         )
 
 

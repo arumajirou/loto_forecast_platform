@@ -16,9 +16,7 @@ def main() -> int:
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     payload = json.loads(args.request_base.read_text(encoding="utf-8"))
-    payload["approvals"] = [
-        json.loads(path.read_text(encoding="utf-8")) for path in args.approval
-    ]
+    payload["approvals"] = [json.loads(path.read_text(encoding="utf-8")) for path in args.approval]
     request = PrimaryPromotionAuthorizationRequest.model_validate(payload)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

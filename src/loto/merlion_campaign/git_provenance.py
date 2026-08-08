@@ -61,11 +61,15 @@ def probe_git_state(
 ) -> dict[str, Any]:
     root = root.resolve()
     head = _run_git(root, ["rev-parse", "HEAD"], runner=runner).decode("ascii").strip()
-    branch = _run_git(
-        root,
-        ["rev-parse", "--abbrev-ref", "HEAD"],
-        runner=runner,
-    ).decode("utf-8").strip()
+    branch = (
+        _run_git(
+            root,
+            ["rev-parse", "--abbrev-ref", "HEAD"],
+            runner=runner,
+        )
+        .decode("utf-8")
+        .strip()
+    )
     status = _run_git(
         root,
         ["status", "--porcelain=v1", "-z", "--untracked-files=all"],

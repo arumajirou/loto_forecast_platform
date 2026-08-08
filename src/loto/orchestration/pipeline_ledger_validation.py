@@ -86,9 +86,7 @@ def seal_and_validate(
     validation = validate_ledger(ledger)
     status = (
         "PASS"
-        if complete
-        and not coverage_gaps
-        and validation.status is AccessDecision.PASS
+        if complete and not coverage_gaps and validation.status is AccessDecision.PASS
         else "BLOCKED"
     )
     ledger_path = output_dir / "pipeline_data_access_ledger.json"

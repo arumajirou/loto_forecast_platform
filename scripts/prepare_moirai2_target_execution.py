@@ -36,16 +36,9 @@ def _outside_repo(path: Path) -> bool:
 
 def _write_sha256_manifest(root: Path) -> None:
     output = root / SHA_FILENAME
-    paths = sorted(
-        path
-        for path in root.rglob("*")
-        if path.is_file() and path != output
-    )
+    paths = sorted(path for path in root.rglob("*") if path.is_file() and path != output)
     output.write_text(
-        "".join(
-            f"{sha256_file(path)}  {path.relative_to(root).as_posix()}\n"
-            for path in paths
-        ),
+        "".join(f"{sha256_file(path)}  {path.relative_to(root).as_posix()}\n" for path in paths),
         encoding="utf-8",
     )
 
@@ -54,8 +47,7 @@ def _write_artifact_manifest(root: Path) -> None:
     files = sorted(
         path.relative_to(root).as_posix()
         for path in root.rglob("*")
-        if path.is_file()
-        and path.name not in {MANIFEST_FILENAME, SHA_FILENAME}
+        if path.is_file() and path.name not in {MANIFEST_FILENAME, SHA_FILENAME}
     )
     write_json_atomic(
         root / MANIFEST_FILENAME,
@@ -124,10 +116,10 @@ def _commands(plan: dict[str, Any], control_dir: Path) -> str:
         (
             "print(json.load(open("
             f'"{supported_candidate}/CANDIDATE_RESULT.json"'
-            "))[\"candidate_lock_sha256\"])"
+            '))["candidate_lock_sha256"])'
         ),
         "PY",
-        ")\"",
+        ')"',
         "",
         "# 2. Supported dry-run and human-approved install",
         ': "${SUPPORTED_REVIEWER:?Set SUPPORTED_REVIEWER after human review}"',
@@ -181,10 +173,10 @@ def _commands(plan: dict[str, Any], control_dir: Path) -> str:
         (
             "print(json.load(open("
             f'"{cuda_candidate}/CANDIDATE_RESULT.json"'
-            "))[\"candidate_lock_sha256\"])"
+            '))["candidate_lock_sha256"])'
         ),
         "PY",
-        ")\"",
+        ')"',
         "",
         "# 5. CUDA dry-run and human-approved install",
         ': "${CUDA_REVIEWER:?Set CUDA_REVIEWER after independent human review}"',
@@ -234,12 +226,13 @@ def _commands(plan: dict[str, Any], control_dir: Path) -> str:
         f'  --control-dir "$CONTROL_DIR" {b}',
         f'  --artifact-dir "{pair_verification}"',
         "",
-        "cat \"$CONTROL_DIR/P8D_EXECUTION_STATE.json\"",
+        'cat "$CONTROL_DIR/P8D_EXECUTION_STATE.json"',
         'read -r -p "Enterキーで終了します..." _',
         "```",
         "",
     ]
     return "\n".join(lines)
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(

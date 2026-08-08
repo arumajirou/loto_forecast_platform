@@ -251,10 +251,7 @@ def _vector(row: Mapping[str, Any], geometry: GeometryContract) -> tuple[float, 
         raise HoldoutProspectiveError("VECTOR_INVALID", str(exc)) from exc
     if any(not math.isfinite(item) for item in result):
         raise HoldoutProspectiveError("VECTOR_INVALID", str(result))
-    if any(
-        item < geometry.candidate_min or item > geometry.candidate_max
-        for item in result
-    ):
+    if any(item < geometry.candidate_min or item > geometry.candidate_max for item in result):
         raise HoldoutProspectiveError("VECTOR_OUT_OF_RANGE", str(result))
     if not geometry.allow_duplicates and len(set(result)) != len(result):
         raise HoldoutProspectiveError("VECTOR_DUPLICATE", str(result))
@@ -318,9 +315,7 @@ def _ar1(vectors: Sequence[tuple[float, ...]]) -> tuple[float, ...]:
         if denominator == 0:
             result.append(values[-1])
             continue
-        slope = sum(
-            (x - mean_left) * (y - mean_right) for x, y in zip(left, right)
-        ) / denominator
+        slope = sum((x - mean_left) * (y - mean_right) for x, y in zip(left, right)) / denominator
         result.append(mean_right - slope * mean_left + slope * values[-1])
     return tuple(result)
 
@@ -335,10 +330,7 @@ def build_baseline_predictions(
     positions = range(geometry.selection_count)
     width = geometry.candidate_max - geometry.candidate_min
     fixed = tuple(
-        float(
-            geometry.candidate_min
-            + round((index + 1) * width / (geometry.selection_count + 1))
-        )
+        float(geometry.candidate_min + round((index + 1) * width / (geometry.selection_count + 1)))
         for index in positions
     )
     deterministic = {
@@ -356,8 +348,11 @@ def build_baseline_predictions(
         for draw_id in future_draw_ids:
             sampled = rng.sample(list(domain), geometry.selection_count)
             values = tuple(float(item) for item in sorted(sampled))
-            rows.append(PredictionRow(candidate_id="baseline_random", seed=seed,
-                                      draw_id=draw_id, values=values))
+            rows.append(
+                PredictionRow(
+                    candidate_id="baseline_random", seed=seed, draw_id=draw_id, values=values
+                )
+            )
     for candidate, values in deterministic.items():
         rows.extend(
             PredictionRow(candidate_id=candidate, seed=0, draw_id=draw_id, values=values)

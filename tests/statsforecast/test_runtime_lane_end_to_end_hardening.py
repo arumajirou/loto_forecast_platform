@@ -47,7 +47,4 @@ def test_explicit_admission_overrides_are_preserved(monkeypatch, tmp_path) -> No
 
 
 def test_public_runtime_lane_exports_hardened_wrapper() -> None:
-    assert (
-        runtime_lane.run_end_to_end_certification
-        is hardening.run_end_to_end_certification
-    )
+    assert runtime_lane.run_end_to_end_certification is hardening.run_end_to_end_certification

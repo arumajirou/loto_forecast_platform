@@ -12,9 +12,7 @@ def main() -> int:
     parser.add_argument("--request", required=True, type=Path)
     parser.add_argument("--committed-at-utc", required=True)
     args = parser.parse_args()
-    request = CanaryActivationRequest.model_validate_json(
-        args.request.read_text(encoding="utf-8")
-    )
+    request = CanaryActivationRequest.model_validate_json(args.request.read_text(encoding="utf-8"))
     response = persist_p9(request, committed_at_utc=args.committed_at_utc)
     print(response)
     return 0

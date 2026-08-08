@@ -31,10 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _request(lane: str, run_id: str) -> GluonTSProviderRequest:
-    target = [
-        float((index % 9) + (index / 50.0))
-        for index in range(48)
-    ]
+    target = [float((index % 9) + (index / 50.0)) for index in range(48)]
     return GluonTSProviderRequest(
         request_id=f"{run_id}-fit-serialize",
         run_id=run_id,

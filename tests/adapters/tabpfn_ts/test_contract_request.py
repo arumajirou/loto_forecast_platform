@@ -116,8 +116,7 @@ def _candidate_request_payload(
     candidate_max = 5 if strictly_increasing else 9
     selection_count = 2 if strictly_increasing else 3
     series_ids = [
-        f"candidate-{candidate:02d}"
-        for candidate in range(candidate_min, candidate_max + 1)
+        f"candidate-{candidate:02d}" for candidate in range(candidate_min, candidate_max + 1)
     ]
     payload["task_formulation"] = TaskFormulation.CANDIDATE_SCORE.value
     payload["game_geometry"] = {

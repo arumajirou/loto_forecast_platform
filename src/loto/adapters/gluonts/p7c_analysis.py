@@ -82,9 +82,7 @@ def _load_json(path: Path) -> dict[str, Any]:
     try:
         payload = json.loads(path.read_text("utf-8"))
     except Exception as exc:
-        raise P7CInputError(
-            f"failed to read JSON {path}: {type(exc).__name__}: {exc}"
-        ) from exc
+        raise P7CInputError(f"failed to read JSON {path}: {type(exc).__name__}: {exc}") from exc
     if not isinstance(payload, dict):
         raise P7CInputError(f"JSON root must be an object: {path}")
     return payload
@@ -111,9 +109,7 @@ def verify_checksum_inventory(root: Path, checksum_name: str) -> str:
             continue
         parts = line.split(maxsplit=1)
         if len(parts) != 2 or len(parts[0]) != 64:
-            raise P7CInputError(
-                f"invalid checksum line {line_number}: {checksum_name}"
-            )
+            raise P7CInputError(f"invalid checksum line {line_number}: {checksum_name}")
         digest, token = parts
         path = _safe_checksum_path(root, token.strip().lstrip("*"))
         if path in entries:
@@ -127,20 +123,13 @@ def verify_checksum_inventory(root: Path, checksum_name: str) -> str:
     if checksum_name == "P7B_EXECUTION_SHA256SUMS":
         excluded.add("P7B_EXECUTION_SHA256SUMS")
     observed = {
-        path.resolve()
-        for path in root.rglob("*")
-        if path.is_file() and path.name not in excluded
+        path.resolve() for path in root.rglob("*") if path.is_file() and path.name not in excluded
     }
     if set(entries) != observed:
-        missing = sorted(
-            str(path.relative_to(root)) for path in observed - set(entries)
-        )
-        stale = sorted(
-            str(path.relative_to(root)) for path in set(entries) - observed
-        )
+        missing = sorted(str(path.relative_to(root)) for path in observed - set(entries))
+        stale = sorted(str(path.relative_to(root)) for path in set(entries) - observed)
         raise P7CInputError(
-            f"checksum inventory mismatch for {checksum_name}: "
-            f"missing={missing}, stale={stale}"
+            f"checksum inventory mismatch for {checksum_name}: missing={missing}, stale={stale}"
         )
     for path, expected in entries.items():
         if not path.is_file() or sha256_file(path) != expected:
@@ -209,10 +198,7 @@ def verify_p7b_input(
         raise P7CInputError("P7 audit SHA-256 mismatch")
     if audit_manifest.get("failure_matrix_sha256") != matrix_sha:
         raise P7CInputError("P7 failure matrix SHA-256 mismatch")
-    if (
-        audit.get("run_id") != marker["RUN_ID"]
-        or matrix.get("run_id") != marker["RUN_ID"]
-    ):
+    if audit.get("run_id") != marker["RUN_ID"] or matrix.get("run_id") != marker["RUN_ID"]:
         raise P7CInputError("P7/P7B run identity mismatch")
     source = P7CInputIdentity(
         p7b_output_directory=str(root),
@@ -262,25 +248,13 @@ def _classification(
 
 def _action(remediation: P7CRemediationClass, lane: str, model: str) -> str:
     if remediation is P7CRemediationClass.EVIDENCE_REPAIR:
-        return (
-            "Discard the affected certification claim and create a new "
-            "immutable P7B run."
-        )
+        return "Discard the affected certification claim and create a new immutable P7B run."
     if remediation is P7CRemediationClass.ENVIRONMENT_REPAIR:
-        return (
-            f"Repair the isolated {lane} environment, then run a new "
-            f"{lane} campaign."
-        )
+        return f"Repair the isolated {lane} environment, then run a new {lane} campaign."
     if remediation is P7CRemediationClass.IMPLEMENTATION_REPAIR:
-        return (
-            f"Reproduce and fix {model} in the {lane} provider before a "
-            "new lane campaign."
-        )
+        return f"Reproduce and fix {model} in the {lane} provider before a new lane campaign."
     if remediation is P7CRemediationClass.TRANSIENT_RETRY:
-        return (
-            f"Inspect resource and process logs, then retry the immutable "
-            f"{lane} campaign."
-        )
+        return f"Inspect resource and process logs, then retry the immutable {lane} campaign."
     return f"Manually classify {model} in {lane}; do not promote it to available."
 
 
@@ -289,17 +263,14 @@ def _commands(lane: str, model: str) -> list[str]:
         (
             "jq '.rows[] | select(.lane==\""
             + lane
-            + "\" and .model_class==\""
+            + '" and .model_class=="'
             + model
-            + "\")' \"${P7B_OUT}/audit/p7_failure_matrix.json\""
+            + '")\' "${P7B_OUT}/audit/p7_failure_matrix.json"'
         ),
+        (f"grep -R --line-number --fixed-strings '{model}' \"${{P7B_OUT}}/{lane}\" | head -200"),
         (
-            f"grep -R --line-number --fixed-strings '{model}' "
-            f"\"${{P7B_OUT}}/{lane}\" | head -200"
-        ),
-        (
-            "RUN_ID=\"gluonts-p7c-rerun-$(date -u +%Y%m%dT%H%M%SZ)\" "
-            "bash environments/gluonts-p7b-target-machine.sh \"${NEW_OUT}\""
+            'RUN_ID="gluonts-p7c-rerun-$(date -u +%Y%m%dT%H%M%SZ)" '
+            'bash environments/gluonts-p7b-target-machine.sh "${NEW_OUT}"'
         ),
     ]
 
@@ -321,14 +292,8 @@ def _model_item(row: dict[str, Any]) -> P7CRemediationItem:
             priority=P7CPriority.P4,
             rerun_scope=P7CRerunScope.NONE,
             preserve_verified=True,
-            action=(
-                "Keep this model-lane lifecycle immutable and do not rerun "
-                "it for diagnosis."
-            ),
-            reason=(
-                "P7 contains valid VERIFIED fit, reload, artifact, and "
-                "distinct-PID evidence."
-            ),
+            action=("Keep this model-lane lifecycle immutable and do not rerun it for diagnosis."),
+            reason=("P7 contains valid VERIFIED fit, reload, artifact, and distinct-PID evidence."),
             evidence_paths=["audit/p7_failure_matrix.json"],
             artifact_manifest_sha256=row.get("artifact_manifest_sha256"),
         )
@@ -363,14 +328,9 @@ def _model_item(row: dict[str, Any]) -> P7CRemediationItem:
 def _evidence_item(audit: dict[str, Any]) -> P7CRemediationItem:
     state = str(audit.get("evidence_state", "INVALID"))
     status = str(audit.get("certification_status", "NOT_EVALUATED"))
-    errors = [
-        str(error)
-        for error in audit.get("errors") or ["cross-lane evidence is not valid"]
-    ]
+    errors = [str(error) for error in audit.get("errors") or ["cross-lane evidence is not valid"]]
     category = (
-        "CHECKSUM_OR_MANIFEST_INVALID"
-        if state == "INVALID"
-        else "MISSING_OR_INCOMPLETE_EVIDENCE"
+        "CHECKSUM_OR_MANIFEST_INVALID" if state == "INVALID" else "MISSING_OR_INCOMPLETE_EVIDENCE"
     )
     return P7CRemediationItem(
         item_id="cross_lane:evidence",
@@ -383,10 +343,7 @@ def _evidence_item(audit: dict[str, Any]) -> P7CRemediationItem:
         priority=P7CPriority.P0,
         rerun_scope=P7CRerunScope.FULL_CROSS_LANE,
         preserve_verified=True,
-        action=(
-            "Do not use the affected run for model claims; produce a new "
-            "immutable P7B run."
-        ),
+        action=("Do not use the affected run for model claims; produce a new immutable P7B run."),
         reason=f"P7 evidence state is {state}, so model-level results are not trustworthy.",
         errors=errors,
         evidence_paths=[
@@ -395,11 +352,11 @@ def _evidence_item(audit: dict[str, Any]) -> P7CRemediationItem:
             "audit/p7_target_machine_audit.json",
         ],
         commands=[
-            "sha256sum -c \"${P7B_OUT}/P7B_EXECUTION_SHA256SUMS\"",
+            'sha256sum -c "${P7B_OUT}/P7B_EXECUTION_SHA256SUMS"',
             (
-                "RUN_ID=\"gluonts-p7c-evidence-rerun-"
-                "$(date -u +%Y%m%dT%H%M%SZ)\" "
-                "bash environments/gluonts-p7b-target-machine.sh \"${NEW_OUT}\""
+                'RUN_ID="gluonts-p7c-evidence-rerun-'
+                '$(date -u +%Y%m%dT%H%M%SZ)" '
+                'bash environments/gluonts-p7b-target-machine.sh "${NEW_OUT}"'
             ),
         ],
     )
@@ -408,9 +365,7 @@ def _evidence_item(audit: dict[str, Any]) -> P7CRemediationItem:
 def build_remediation_plan(root: Path) -> P7CRemediationPlan:
     source, audit, matrix = verify_p7b_input(root)
     evidence_state = str(audit.get("evidence_state", "INVALID"))
-    certification_status = str(
-        audit.get("certification_status", "NOT_EVALUATED")
-    )
+    certification_status = str(audit.get("certification_status", "NOT_EVALUATED"))
     rows = matrix.get("rows")
     if not isinstance(rows, list):
         raise P7CInputError("P7 failure matrix rows are missing")
@@ -418,23 +373,10 @@ def build_remediation_plan(root: Path) -> P7CRemediationPlan:
     if evidence_state != "VALID":
         items.append(_evidence_item(audit))
     else:
-        identities = [
-            (str(row.get("lane")), str(row.get("model_class")))
-            for row in rows
-        ]
-        expected = {
-            (lane, model)
-            for lane in ("compat", "latest")
-            for model in EXPECTED_MODELS
-        }
-        if (
-            len(rows) != 18
-            or set(identities) != expected
-            or len(set(identities)) != 18
-        ):
-            raise P7CInputError(
-                "valid P7 evidence requires exactly 18 unique model-lane rows"
-            )
+        identities = [(str(row.get("lane")), str(row.get("model_class"))) for row in rows]
+        expected = {(lane, model) for lane in ("compat", "latest") for model in EXPECTED_MODELS}
+        if len(rows) != 18 or set(identities) != expected or len(set(identities)) != 18:
+            raise P7CInputError("valid P7 evidence requires exactly 18 unique model-lane rows")
         items.extend(_model_item(row) for row in rows)
     verified = sum(
         item.remediation_class is P7CRemediationClass.VERIFIED
@@ -443,36 +385,22 @@ def build_remediation_plan(root: Path) -> P7CRemediationPlan:
     )
     audit_verified = audit.get("verified_model_lifecycles")
     if evidence_state == "VALID" and audit_verified != verified:
-        raise P7CInputError(
-            "P7 verified lifecycle count does not match the failure matrix"
-        )
+        raise P7CInputError("P7 verified lifecycle count does not match the failure matrix")
     if certification_status == "VERIFIED" and verified != 18:
-        raise P7CInputError(
-            "P7 VERIFIED certification requires 18 verified lifecycle rows"
-        )
+        raise P7CInputError("P7 VERIFIED certification requires 18 verified lifecycle rows")
     counts = Counter(item.remediation_class.value for item in items)
     if evidence_state != "VALID":
         next_action = (
-            "Repair evidence production and create a new immutable P7B run "
-            "before model triage."
+            "Repair evidence production and create a new immutable P7B run before model triage."
         )
     elif verified == 18 and certification_status == "VERIFIED":
-        next_action = (
-            "All 18 lifecycles are verified; P8 chronological evaluation may begin."
-        )
+        next_action = "All 18 lifecycles are verified; P8 chronological evaluation may begin."
     elif counts[P7CRemediationClass.ENVIRONMENT_REPAIR.value]:
-        next_action = (
-            "Repair isolated runtime environments before changing model code."
-        )
+        next_action = "Repair isolated runtime environments before changing model code."
     elif counts[P7CRemediationClass.IMPLEMENTATION_REPAIR.value]:
-        next_action = (
-            "Fix P1 implementation failures, then create a new immutable P7B run."
-        )
+        next_action = "Fix P1 implementation failures, then create a new immutable P7B run."
     elif counts[P7CRemediationClass.TRANSIENT_RETRY.value]:
-        next_action = (
-            "Inspect process and resource evidence, then retry in a new "
-            "immutable run."
-        )
+        next_action = "Inspect process and resource evidence, then retry in a new immutable run."
     else:
         next_action = "Complete manual classification; P8 remains blocked."
     plan = P7CRemediationPlan(
@@ -481,9 +409,7 @@ def build_remediation_plan(root: Path) -> P7CRemediationPlan:
         certification_status=certification_status,
         verified_model_lifecycles=verified,
         p8_eligible=(
-            evidence_state == "VALID"
-            and certification_status == "VERIFIED"
-            and verified == 18
+            evidence_state == "VALID" and certification_status == "VERIFIED" and verified == 18
         ),
         counts=dict(sorted(counts.items())),
         items=items,
@@ -497,9 +423,7 @@ def _validate_output_location(input_root: Path, output_dir: Path) -> None:
     source = input_root.resolve()
     output = output_dir.resolve()
     if output == source or source in output.parents:
-        raise ValueError(
-            "P7C output must not be inside the immutable P7B input directory"
-        )
+        raise ValueError("P7C output must not be inside the immutable P7B input directory")
     if output.exists() and any(output.iterdir()):
         raise ValueError("P7C output directory must be absent or empty")
 
@@ -550,10 +474,7 @@ def _write_markdown(path: Path, plan: P7CRemediationPlan) -> None:
         f"- Commit: `{plan.source.commit_sha}`",
         f"- Evidence: `{plan.evidence_state}`",
         f"- Certification: `{plan.certification_status}`",
-        (
-            "- Verified model-lane lifecycles: "
-            f"**{plan.verified_model_lifecycles}/18**"
-        ),
+        (f"- Verified model-lane lifecycles: **{plan.verified_model_lifecycles}/18**"),
         f"- P8 eligible: **{str(plan.p8_eligible).upper()}**",
         "",
         "## Recommended next action",
@@ -605,12 +526,8 @@ def write_remediation_outputs(
         "phase": plan.phase,
         "run_id": plan.source.run_id,
         "source_commit_sha": plan.source.commit_sha,
-        "source_execution_manifest_sha256": (
-            plan.source.execution_manifest_sha256
-        ),
-        "source_execution_checksum_sha256": (
-            plan.source.execution_checksum_sha256
-        ),
+        "source_execution_manifest_sha256": (plan.source.execution_manifest_sha256),
+        "source_execution_checksum_sha256": (plan.source.execution_checksum_sha256),
         "source_audit_sha256": plan.source.audit_sha256,
         "source_failure_matrix_sha256": plan.source.failure_matrix_sha256,
         "plan_sha256": plan_sha,

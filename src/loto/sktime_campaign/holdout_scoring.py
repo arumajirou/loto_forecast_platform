@@ -25,9 +25,7 @@ class HoldoutActuals(BaseModel):
 
     schema_version: Literal["1.0"] = "1.0"
     game_id: str = Field(min_length=1)
-    revealed_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    revealed_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     source_id: str = Field(min_length=1)
     source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     draw_no: list[int] = Field(min_length=1)
@@ -82,9 +80,7 @@ class HoldoutScoringRequest(BaseModel):
     prediction_lock_file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     expected_lock_seal_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     p3_sha256sums_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    scored_at_utc: str = Field(
-        pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
-    )
+    scored_at_utc: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     actuals: HoldoutActuals
 
     @model_validator(mode="after")
@@ -152,10 +148,7 @@ def validate_lock_for_scoring(
     if revealed <= sealed:
         raise ValueError("actual reveal must occur after prediction sealing")
     selected = lock.get("selected_oof_candidate_id")
-    candidate_ids = {
-        str(row.get("candidate_id"))
-        for row in lock.get("prediction_rows", [])
-    }
+    candidate_ids = {str(row.get("candidate_id")) for row in lock.get("prediction_rows", [])}
     if selected is None or str(selected) not in candidate_ids:
         raise ValueError("selected OOF candidate is absent from prediction lock")
     keys = lock_row_keys(lock)
@@ -197,9 +190,7 @@ def score_locked_rows(
                 raise ValueError("locked prediction and Holdout actual shape mismatch")
             if not np.isfinite(prediction).all():
                 raise ValueError("locked prediction contains NaN or Inf")
-            if canonical_sha256(locked.get("predictions")) != locked.get(
-                "prediction_sha256"
-            ):
+            if canonical_sha256(locked.get("predictions")) != locked.get("prediction_sha256"):
                 raise ValueError("locked prediction row SHA-256 mismatch")
             row["predictions"] = locked["predictions"]
             row["metrics"] = compute_metrics(
@@ -255,10 +246,7 @@ def aggregate_holdout_rows(
             item["position_hit_at_1"] = {}
             for position in position_names:
                 values = np.asarray(
-                    [
-                        row["metrics"]["position_hit_at_1"][position]
-                        for row in passed
-                    ],
+                    [row["metrics"]["position_hit_at_1"][position] for row in passed],
                     dtype=float,
                 )
                 item["position_hit_at_1"][position] = {
@@ -273,11 +261,7 @@ def aggregate_holdout_rows(
 def build_holdout_leaderboard(
     aggregates: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    eligible = [
-        row
-        for row in aggregates
-        if row.get("status") == "PASS" and "metrics" in row
-    ]
+    eligible = [row for row in aggregates if row.get("status") == "PASS" and "metrics" in row]
     return sorted(
         eligible,
         key=lambda row: (
@@ -323,24 +307,16 @@ def build_baseline_comparison(
                 "status": "PASS",
                 "delta_selected_minus_baseline": {
                     "hit_at_1": (
-                        selected_metrics["hit_at_1"]["mean"]
-                        - metrics["hit_at_1"]["mean"]
+                        selected_metrics["hit_at_1"]["mean"] - metrics["hit_at_1"]["mean"]
                     ),
                     "all_position_hit_at_1": (
                         selected_metrics["all_position_hit_at_1"]["mean"]
                         - metrics["all_position_hit_at_1"]["mean"]
                     ),
-                    "mae_improvement": (
-                        metrics["mae"]["mean"]
-                        - selected_metrics["mae"]["mean"]
-                    ),
-                    "mse_improvement": (
-                        metrics["mse"]["mean"]
-                        - selected_metrics["mse"]["mean"]
-                    ),
+                    "mae_improvement": (metrics["mae"]["mean"] - selected_metrics["mae"]["mean"]),
+                    "mse_improvement": (metrics["mse"]["mean"] - selected_metrics["mse"]["mean"]),
                     "rmse_improvement": (
-                        metrics["rmse"]["mean"]
-                        - selected_metrics["rmse"]["mean"]
+                        metrics["rmse"]["mean"] - selected_metrics["rmse"]["mean"]
                     ),
                 },
             }
@@ -395,9 +371,7 @@ def score_holdout(
             "lock_run_id": lock["run_id"],
             "lock_sealed_at_utc": lock["sealed_at_utc"],
             "lock_seal_sha256": lock["seal_sha256"],
-            "prediction_lock_file_sha256": (
-                request.prediction_lock_file_sha256
-            ),
+            "prediction_lock_file_sha256": (request.prediction_lock_file_sha256),
             "p3_sha256sums_sha256": request.p3_sha256sums_sha256,
         },
         "actuals_identity": {
@@ -405,9 +379,7 @@ def score_holdout(
             "revealed_at_utc": request.actuals.revealed_at_utc,
             "source_id": request.actuals.source_id,
             "source_sha256": request.actuals.source_sha256,
-            "actuals_sha256": canonical_sha256(
-                request.actuals.model_dump(mode="json")
-            ),
+            "actuals_sha256": canonical_sha256(request.actuals.model_dump(mode="json")),
             "draw_no": request.actuals.draw_no,
         },
         "holdout_results": rows,
@@ -415,7 +387,5 @@ def score_holdout(
         "leaderboard": leaderboard,
         "baseline_comparison": comparison,
         "selected_oof_candidate_id": selected,
-        "promotion_status": (
-            "HOLDOUT_SCORED_NOT_PROMOTED_PROSPECTIVE_REQUIRED"
-        ),
+        "promotion_status": ("HOLDOUT_SCORED_NOT_PROMOTED_PROSPECTIVE_REQUIRED"),
     }

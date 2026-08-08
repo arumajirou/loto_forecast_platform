@@ -168,9 +168,7 @@ def test_subprocess_executor_records_real_process_pid(tmp_path: Path) -> None:
         assert execution.process_identity_sha256 is not None
     assert execution.exit_code == 0
     assert execution.timed_out is False
-    assert execution.stdout_sha256 == hashlib.sha256(
-        b"runtime-certification\n"
-    ).hexdigest()
+    assert execution.stdout_sha256 == hashlib.sha256(b"runtime-certification\n").hexdigest()
 
 
 @pytest.mark.parametrize(

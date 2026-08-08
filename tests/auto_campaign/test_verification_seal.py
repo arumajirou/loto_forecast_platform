@@ -100,9 +100,7 @@ def test_seal_payload_is_nonempty_json(tmp_path: Path) -> None:
     root = _run_root(tmp_path)
     write_verification_seal(root, _pass_result())
 
-    payload = json.loads(
-        (root / "VERIFICATION_SEAL.json").read_text(encoding="utf-8")
-    )
+    payload = json.loads((root / "VERIFICATION_SEAL.json").read_text(encoding="utf-8"))
 
     assert payload["status"] == "PASS"
     assert payload["schema_version"] == "all-auto-verification-seal-v1"

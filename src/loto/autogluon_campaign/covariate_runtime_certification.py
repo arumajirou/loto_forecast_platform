@@ -516,8 +516,7 @@ def _overall_status(
     ):
         return CovariateCertificationStatus.VERIFIED
     if results and all(
-        item.status == CovariateCertificationStatus.BLOCKED_RUNTIME.value
-        for item in results
+        item.status == CovariateCertificationStatus.BLOCKED_RUNTIME.value for item in results
     ):
         return CovariateCertificationStatus.BLOCKED_RUNTIME
     return CovariateCertificationStatus.PARTIALLY_VERIFIED
@@ -624,9 +623,7 @@ def run_covariate_runtime_certification(
                     expected_run_id=payload["run_id"],
                     expected_prediction_sha256=expected_prediction_hash,
                 )
-                validation_errors, prediction_hash, capability_hash, provider_error_code = (
-                    validated
-                )
+                validation_errors, prediction_hash, capability_hash, provider_error_code = validated
                 errors.extend(validation_errors)
             else:
                 errors.append("provider did not create response JSON")
@@ -665,9 +662,7 @@ def run_covariate_runtime_certification(
                 stdout_path=str(stdout_path),
                 stderr_path=str(stderr_path),
                 request_sha256=_sha256_file(request_path),
-                response_sha256=(
-                    _sha256_file(response_path) if response_path.is_file() else None
-                ),
+                response_sha256=(_sha256_file(response_path) if response_path.is_file() else None),
                 prediction_sha256=prediction_hash,
                 capability_sha256=capability_hash,
                 provider_error_code=provider_error_code,
@@ -682,12 +677,9 @@ def run_covariate_runtime_certification(
         item.status == CovariateCertificationStatus.VERIFIED.value for item in results
     )
     blocked_count = sum(
-        item.status == CovariateCertificationStatus.BLOCKED_RUNTIME.value
-        for item in results
+        item.status == CovariateCertificationStatus.BLOCKED_RUNTIME.value for item in results
     )
-    failed_count = sum(
-        item.status == CovariateCertificationStatus.FAILED.value for item in results
-    )
+    failed_count = sum(item.status == CovariateCertificationStatus.FAILED.value for item in results)
     finished = datetime.now(timezone.utc)
     report_without_hash = {
         "schema_version": 1,

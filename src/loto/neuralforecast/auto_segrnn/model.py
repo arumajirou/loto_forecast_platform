@@ -98,9 +98,7 @@ def build_segrnn_class(
                 batch_first=True,
                 bidirectional=False,
             )
-            self.position_embedding = nn.Parameter(
-                torch.randn(self.seg_num_y, self.d_model // 2)
-            )
+            self.position_embedding = nn.Parameter(torch.randn(self.seg_num_y, self.d_model // 2))
             self.channel_embedding = nn.Parameter(torch.randn(1, self.d_model // 2))
             self.output_projection = nn.Sequential(
                 nn.Dropout(dropout),
@@ -114,13 +112,9 @@ def build_segrnn_class(
         def forward(self, windows_batch: dict[str, Any]) -> Any:
             insample_y = windows_batch["insample_y"]
             if insample_y.ndim != 3 or insample_y.shape[-1] != 1:
-                raise ValueError(
-                    "SegRNN expects insample_y shape [batch, input_size, 1]"
-                )
+                raise ValueError("SegRNN expects insample_y shape [batch, input_size, 1]")
             if insample_y.shape[1] != self.input_size:
-                raise ValueError(
-                    "SegRNN input_size does not match the training window"
-                )
+                raise ValueError("SegRNN input_size does not match the training window")
 
             x = insample_y.squeeze(-1)
             batch_size = x.shape[0]

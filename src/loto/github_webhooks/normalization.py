@@ -231,11 +231,7 @@ def normalize_delivery(
         head_sha = None
     else:
         normalized = _workflow_run(payload, action)
-        ref = (
-            f"refs/heads/{normalized.head_branch}"
-            if normalized.head_branch is not None
-            else None
-        )
+        ref = f"refs/heads/{normalized.head_branch}" if normalized.head_branch is not None else None
         head_sha = normalized.head_sha
 
     timestamp = received_at or datetime.now(UTC)

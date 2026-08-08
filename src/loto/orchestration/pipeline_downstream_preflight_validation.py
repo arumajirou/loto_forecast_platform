@@ -24,8 +24,7 @@ def default_ledger_validator(
     if fresh.status is not AccessDecision.PASS:
         codes = [item.code.value for item in fresh.findings]
         raise DownstreamCommitPreflightError(
-            "fresh Data Access Ledger validation did not PASS: "
-            + ",".join(codes)
+            "fresh Data Access Ledger validation did not PASS: " + ",".join(codes)
         )
     if canonical_json_bytes(fresh_payload) != canonical_json_bytes(saved_validation):
         raise DownstreamCommitPreflightError(
@@ -59,7 +58,5 @@ def float_metrics(
             continue
         metrics[f"{champion}_{key}"] = float(value)
     if not metrics:
-        raise DownstreamCommitPreflightError(
-            "champion evaluation contains no numeric metrics"
-        )
+        raise DownstreamCommitPreflightError("champion evaluation contains no numeric metrics")
     return metrics
