@@ -8,14 +8,14 @@ permissions:
   contents: write
 
 concurrency:
-  group: ruff-safe-fix-recovery-${{ github.event.pull_request.number }}
+  group: ruff-safe-fix-reexport-audit-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
 jobs:
   test:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/ruff-lint-safe-autofix-v1' }}
     runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 180
+    timeout-minutes: 60
     defaults:
       run:
         shell: bash
@@ -23,11 +23,8 @@ jobs:
       TARGET_BRANCH: fix/ruff-lint-safe-autofix-v1
       UV_VERSION: "0.11.21"
       UV_PYTHON: "3.13"
-      EXPECTED_RUFF_VERSION: "0.16.0"
-      SUMMARY_PATH: .github/ruff-safe-fix-recovery-summary.txt
-      REMAINING_PATH: .github/ruff-safe-fix-recovery-remaining.txt
-      PYTEST_PATH: .github/ruff-safe-fix-recovery-pytest.txt
-      BASELINE_COLLECTION_ERRORS: "34"
+      BASE_SHA: cd4b77f1baf526a696c01122d9ce3b0ecd415141
+      RESULT_PATH: .github/ruff-safe-fix-reexport-audit.txt
 
     steps:
       - name: Verify runner
@@ -45,193 +42,212 @@ jobs:
           fetch-depth: 0
           clean: true
 
-      - name: Gate recovery commit
+      - name: Gate audit commit
         id: gate
         run: |
           set -Eeuo pipefail
           message="$(git log -1 --pretty=%s)"
           echo "head_message=$message"
-          if [[ "$message" == "ci: recover Ruff safe-fix export regressions (#200)" ]]; then
+          if [[ "$message" == "ci: audit Ruff safe-fix re-export parity (#200)" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Restore known public re-export contracts
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          before="$(git rev-parse HEAD)"
-          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
-          test "$(git rev-parse origin/main)" = "cd4b77f1baf526a696c01122d9ce3b0ecd415141"
-          git checkout origin/main -- \
-            src/loto/moirai2_campaign/target_execution.py \
-            src/loto/autogluon_campaign/holdout_prospective.py
-          git diff --check
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            src/loto/moirai2_campaign/target_execution.py \
-            src/loto/autogluon_campaign/holdout_prospective.py
-          git commit -m "fix: preserve intentional re-export contracts (#200)"
-          remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
-          test "$remote_before" = "$before"
-          git push origin "HEAD:$TARGET_BRANCH"
-          echo "RECOVERED_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-
-      - name: Install exact uv and Python
+      - name: Install exact Python
         if: ${{ steps.gate.outputs.run == 'true' }}
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
 
-      - name: Prepare verification environment
+      - name: Audit removed import export references
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
-          actual="$(uv --version)"
-          case "$actual" in "uv $UV_VERSION"*) ;; *) exit 1 ;; esac
           uv python install "$UV_PYTHON"
-          ci_venv="$RUNNER_TEMP/loto-ruff-recovery-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          uv_cache="$RUNNER_TEMP/loto-ruff-recovery-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          case "$ci_venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
-          case "$uv_cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
-          rm -rf -- "$ci_venv" "$uv_cache"
-          mkdir -p "$uv_cache"
-          echo "CI_VENV=$ci_venv" >> "$GITHUB_ENV"
-          echo "UV_CACHE_DIR=$uv_cache" >> "$GITHUB_ENV"
-          UV_CACHE_DIR="$uv_cache" uv venv "$ci_venv" --python "$UV_PYTHON"
-          python="$ci_venv/bin/python"
-          ruff_version="$("$python" - <<'PY'
-          import tomllib
-          with open('uv.lock','rb') as f:
-              lock=tomllib.load(f)
-          versions=[p['version'] for p in lock['package'] if p.get('name')=='ruff']
-          if len(versions)!=1:
-              raise SystemExit(versions)
-          print(versions[0])
-          PY
-          )"
-          test "$ruff_version" = "$EXPECTED_RUFF_VERSION"
-          echo "RUFF_VERSION=$ruff_version" >> "$GITHUB_ENV"
-          UV_CACHE_DIR="$uv_cache" uv pip install --quiet --python "$python" "ruff==$ruff_version"
-          UV_CACHE_DIR="$uv_cache" uv pip install --quiet --python "$python" --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
-          UV_CACHE_DIR="$uv_cache" uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
-          uv pip check --python "$python"
-          echo "DEPS_RC=0" >> "$GITHUB_ENV"
+          python="$(uv python find "$UV_PYTHON")"
+          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
+          test "$(git rev-parse origin/main)" = "$BASE_SHA"
+          "$python" - "$BASE_SHA" "$RESULT_PATH" <<'PY'
+          from __future__ import annotations
 
-      - name: Verify format compile and residual lint
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          "$python" -m ruff format --check src scripts tests
-          "$python" -m compileall -q src scripts tests
-          echo "COMPILE_RC=0" >> "$GITHUB_ENV"
-          set +e
-          "$python" -m ruff check --output-format=json src scripts tests > "$RUNNER_TEMP/remaining.json"
-          LINT_RC=$?
-          set -e
-          echo "LINT_RC=$LINT_RC" >> "$GITHUB_ENV"
-          "$python" - "$RUNNER_TEMP/remaining.json" "$REMAINING_PATH" <<'PY'
-          import collections, json, os, sys
+          import ast
+          import os
+          import subprocess
+          import sys
           from pathlib import Path
-          rows=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8') or '[]')
-          rules=collections.Counter(r.get('code','UNKNOWN') for r in rows)
-          files=collections.Counter(r.get('filename','UNKNOWN') for r in rows)
-          out=[
-              'RUFF_SAFE_FIX_RECOVERY_REMAINING_VERSION=1',
-              f"RUN_ID={os.environ['GITHUB_RUN_ID']}",
-              f"RUFF_VERSION={os.environ.get('RUFF_VERSION')}",
-              f"REMAINING_FINDINGS={len(rows)}",
-              'RULE_COUNTS='+','.join(f'{k}:{v}' for k,v in sorted(rules.items())),
-              'TOP_FILES='+','.join(f'{k}:{v}' for k,v in files.most_common(50)),
+
+          base_sha, result_path = sys.argv[1:]
+          root = Path.cwd()
+
+          def module_names(path: str) -> set[str]:
+              p = Path(path)
+              names: set[str] = set()
+              if path.startswith("src/") and p.suffix == ".py":
+                  parts = list(p.with_suffix("").parts[1:])
+                  if parts and parts[-1] == "__init__":
+                      parts.pop()
+                  if parts:
+                      names.add(".".join(parts))
+              elif p.suffix == ".py":
+                  parts = list(p.with_suffix("").parts)
+                  if parts and parts[-1] == "__init__":
+                      parts.pop()
+                  if parts:
+                      names.add(".".join(parts))
+                      names.add(parts[-1])
+              return names
+
+          def imports(tree: ast.AST) -> dict[str, str]:
+              out: dict[str, str] = {}
+              for node in getattr(tree, "body", []):
+                  if isinstance(node, ast.Import):
+                      for alias in node.names:
+                          bound = alias.asname or alias.name.split(".")[0]
+                          out[bound] = alias.name
+                  elif isinstance(node, ast.ImportFrom):
+                      prefix = "." * node.level + (node.module or "")
+                      for alias in node.names:
+                          if alias.name == "*":
+                              continue
+                          bound = alias.asname or alias.name
+                          out[bound] = f"{prefix}:{alias.name}"
+              return out
+
+          def explicit_all(tree: ast.AST) -> set[str]:
+              result: set[str] = set()
+              for node in getattr(tree, "body", []):
+                  if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+                      continue
+                  targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                  if not any(isinstance(t, ast.Name) and t.id == "__all__" for t in targets):
+                      continue
+                  value = node.value
+                  if isinstance(value, (ast.List, ast.Tuple, ast.Set)):
+                      for elt in value.elts:
+                          if isinstance(elt, ast.Constant) and isinstance(elt.value, str):
+                              result.add(elt.value)
+              return result
+
+          all_files = subprocess.check_output(
+              ["git", "ls-files", "*.py"], text=True
+          ).splitlines()
+          import_from_edges: dict[tuple[str, str], set[str]] = {}
+          attr_edges: dict[tuple[str, str], set[str]] = {}
+
+          for consumer in all_files:
+              try:
+                  text = Path(consumer).read_text(encoding="utf-8")
+                  tree = ast.parse(text, filename=consumer)
+              except Exception:
+                  continue
+              aliases: dict[str, str] = {}
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                      for alias in node.names:
+                          if alias.name != "*":
+                              import_from_edges.setdefault((node.module, alias.name), set()).add(consumer)
+                  elif isinstance(node, ast.Import):
+                      for alias in node.names:
+                          bound = alias.asname or alias.name.split(".")[-1]
+                          aliases[bound] = alias.name
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+                      module = aliases.get(node.value.id)
+                      if module:
+                          attr_edges.setdefault((module, node.attr), set()).add(consumer)
+
+          changed = subprocess.check_output(
+              ["git", "diff", "--name-only", f"{base_sha}..HEAD", "--", "src", "scripts", "tests"],
+              text=True,
+          ).splitlines()
+
+          suspects: list[str] = []
+          removed_total = 0
+          checked_files = 0
+          for path in changed:
+              if not path.endswith(".py") or not Path(path).is_file():
+                  continue
+              try:
+                  before_text = subprocess.check_output(["git", "show", f"{base_sha}:{path}"]).decode("utf-8")
+                  after_text = Path(path).read_text(encoding="utf-8")
+                  before_tree = ast.parse(before_text, filename=path)
+                  after_tree = ast.parse(after_text, filename=path)
+              except Exception:
+                  continue
+              checked_files += 1
+              before_imports = imports(before_tree)
+              after_imports = imports(after_tree)
+              removed = sorted(set(before_imports) - set(after_imports))
+              removed_total += len(removed)
+              if not removed:
+                  continue
+              modules = module_names(path)
+              all_names = explicit_all(before_tree)
+              for name in removed:
+                  if name.startswith("_"):
+                      continue
+                  refs: set[str] = set()
+                  for module in modules:
+                      refs |= import_from_edges.get((module, name), set())
+                      refs |= attr_edges.get((module, name), set())
+                  refs.discard(path)
+                  source = before_imports[name]
+                  local_source = source.startswith(".") or source.startswith("loto.") or source.startswith("loto:")
+                  init_export = path.endswith("/__init__.py") and local_source
+                  explicit_export = name in all_names
+                  if refs or init_export or explicit_export:
+                      reasons = []
+                      if refs:
+                          reasons.append("referenced_by=" + ",".join(sorted(refs)[:20]))
+                      if init_export:
+                          reasons.append("package_init")
+                      if explicit_export:
+                          reasons.append("explicit___all__")
+                      suspects.append(
+                          f"{path}\t{name}\t{source}\t" + ";".join(reasons)
+                      )
+
+          lines = [
+              "RUFF_SAFE_FIX_REEXPORT_AUDIT_VERSION=1",
+              f"RUN_ID={os.environ.get('GITHUB_RUN_ID','UNKNOWN')}",
+              f"BASE_SHA={base_sha}",
+              f"HEAD_SHA={subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()}",
+              f"CHANGED_PY_FILES_CHECKED={checked_files}",
+              f"REMOVED_IMPORT_BINDINGS={removed_total}",
+              f"SUSPECT_REEXPORT_COUNT={len(suspects)}",
+              "STATUS=PASS" if not suspects else "STATUS=FAIL",
           ]
-          Path(sys.argv[2]).write_text('\n'.join(out)+'\n',encoding='utf-8')
+          if suspects:
+              lines.append("--- SUSPECT_REEXPORTS ---")
+              lines.extend(suspects)
+          Path(result_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
+          print("\n".join(lines[:8]))
           PY
 
-      - name: Run focused regression tests
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          "$python" -m pytest -q \
-            tests/autogluon_campaign/test_holdout_prospective.py \
-            tests/moirai2_campaign/test_p8d_scripts.py \
-            tests/moirai2_campaign/test_target_execution_artifacts.py \
-            tests/moirai2_campaign/test_target_execution_integrity.py \
-            tests/moirai2_campaign/test_target_execution_state.py
-          echo "FOCUSED_RC=0" >> "$GITHUB_ENV"
-
-      - name: Verify full pytest collection parity
-        if: ${{ steps.gate.outputs.run == 'true' }}
-        run: |
-          set -Eeuo pipefail
-          python="$CI_VENV/bin/python"
-          set +e
-          "$python" -m pytest -q > "$RUNNER_TEMP/pytest.log" 2>&1
-          PYTEST_RC=$?
-          set -e
-          echo "PYTEST_RC=$PYTEST_RC" >> "$GITHUB_ENV"
-          if grep -Fq "Interrupted: $BASELINE_COLLECTION_ERRORS errors during collection" "$RUNNER_TEMP/pytest.log"; then
-            COLLECTION_PARITY=1
-          else
-            COLLECTION_PARITY=0
-          fi
-          echo "COLLECTION_PARITY=$COLLECTION_PARITY" >> "$GITHUB_ENV"
-          "$python" - "$RUNNER_TEMP/pytest.log" "$PYTEST_PATH" <<'PY'
-          import os,sys
-          from pathlib import Path
-          lines=Path(sys.argv[1]).read_text(encoding='utf-8',errors='backslashreplace').splitlines()
-          out=[
-              'RUFF_SAFE_FIX_RECOVERY_PYTEST_VERSION=1',
-              f"RUN_ID={os.environ['GITHUB_RUN_ID']}",
-              f"PYTEST_RC={os.environ.get('PYTEST_RC')}",
-              f"COLLECTION_PARITY={os.environ.get('COLLECTION_PARITY')}",
-              '--- LAST_180_LINES ---',
-              *lines[-180:],
-          ]
-          Path(sys.argv[2]).write_text('\n'.join(out)+'\n',encoding='utf-8')
-          PY
-
-      - name: Persist recovery evidence
+      - name: Persist audit evidence
         if: ${{ always() && steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
-          cat > "$SUMMARY_PATH" <<EOF
-          RUFF_SAFE_FIX_RECOVERY_SUMMARY_VERSION=1
-          RUN_ID=$GITHUB_RUN_ID
-          RUFF_VERSION=${RUFF_VERSION:-UNKNOWN}
-          RECOVERED_HEAD=${RECOVERED_HEAD:-UNKNOWN}
-          LINT_RC=${LINT_RC:-UNKNOWN}
-          COMPILE_RC=${COMPILE_RC:-UNKNOWN}
-          DEPS_RC=${DEPS_RC:-UNKNOWN}
-          FOCUSED_RC=${FOCUSED_RC:-UNKNOWN}
-          PYTEST_RC=${PYTEST_RC:-UNKNOWN}
-          COLLECTION_PARITY=${COLLECTION_PARITY:-UNKNOWN}
-          EOF
+          test -f "$RESULT_PATH"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$SUMMARY_PATH" "$REMAINING_PATH" "$PYTEST_PATH"
+          git add "$RESULT_PATH"
           git diff --cached --check
-          git commit -m "chore: capture Ruff safe-fix recovery evidence (#200)"
+          git commit -m "chore: capture Ruff re-export parity audit (#200)"
           remote_before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
           test "$remote_before" = "$(git rev-parse HEAD^)"
           git push origin "HEAD:$TARGET_BRANCH"
 
-      - name: Enforce recovery gates
+      - name: Enforce audit
         if: ${{ steps.gate.outputs.run == 'true' }}
         run: |
           set -Eeuo pipefail
-          test "${COMPILE_RC:-99}" -eq 0
-          test "${DEPS_RC:-99}" -eq 0
-          test "${FOCUSED_RC:-99}" -eq 0
-          test "${COLLECTION_PARITY:-0}" -eq 1
+          grep -Fxq 'STATUS=PASS' "$RESULT_PATH"
 
       - name: Cleanup
         if: ${{ always() }}
         run: |
           set -Eeuo pipefail
-          [[ -z "${CI_VENV:-}" ]] || { case "$CI_VENV" in "$RUNNER_TEMP"/*) rm -rf "$CI_VENV" ;; *) exit 1 ;; esac; }
-          [[ -z "${UV_CACHE_DIR:-}" ]] || { case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf "$UV_CACHE_DIR" ;; *) exit 1 ;; esac; }
+          true
