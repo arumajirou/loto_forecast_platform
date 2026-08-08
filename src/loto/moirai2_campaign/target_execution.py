@@ -33,8 +33,8 @@ from loto.moirai2_campaign.target_execution_state import (
     event_type_for,
     expected_next_event,
     validate_state,
-    verify_recorded_artifacts,
     validator_for,
+    verify_recorded_artifacts,
 )
 from loto.moirai2_campaign.target_execution_validators import (
     validate_campaign_artifact,
