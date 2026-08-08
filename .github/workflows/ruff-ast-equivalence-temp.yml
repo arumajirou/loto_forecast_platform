@@ -1,3 +1,4 @@
+# isolated retrigger after retiring other temporary writers
 name: ruff-ast-equivalence-temp
 
 on:
@@ -81,13 +82,11 @@ jobs:
           from pathlib import Path
 
           main_sha, head_sha, result_path = sys.argv[1:]
-
           diff = subprocess.check_output(
               ["git", "diff", "--name-status", f"{main_sha}..{head_sha}", "--", "src", "scripts", "tests"],
               text=True,
           ).splitlines()
 
-          records: list[str] = []
           changed: list[tuple[str, str]] = []
           unexpected_status: list[str] = []
           non_python: list[str] = []
@@ -112,48 +111,38 @@ jobs:
               try:
                   before = subprocess.check_output(["git", "show", f"{main_sha}:{path}"])
                   after = Path(path).read_bytes()
-                  before_text = before.decode("utf-8")
-                  after_text = after.decode("utf-8")
-                  before_ast = ast.dump(ast.parse(before_text, filename=path), include_attributes=False)
-                  after_ast = ast.dump(ast.parse(after_text, filename=path), include_attributes=False)
-              except Exception as exc:  # evidence capture
+                  before_ast = ast.dump(ast.parse(before.decode("utf-8"), filename=path), include_attributes=False)
+                  after_ast = ast.dump(ast.parse(after.decode("utf-8"), filename=path), include_attributes=False)
+              except Exception as exc:
                   parse_failures.append(f"{path}: {type(exc).__name__}: {exc}")
                   continue
               if before_ast != after_ast:
                   mismatches.append(path)
 
-          records.extend(
-              [
-                  "RUFF_AST_EQUIVALENCE_VERSION=1",
-                  f"RUN_ID={os.environ.get('GITHUB_RUN_ID', 'UNKNOWN')}",
-                  f"MAIN_SHA={main_sha}",
-                  f"SOURCE_HEAD={head_sha}",
-                  f"CHANGED_TARGET_FILES={len(changed)}",
-                  f"UNEXPECTED_STATUS_COUNT={len(unexpected_status)}",
-                  f"NON_PYTHON_COUNT={len(non_python)}",
-                  f"AST_MISMATCH_COUNT={len(mismatches)}",
-                  f"PARSE_FAILURE_COUNT={len(parse_failures)}",
-                  "STATUS=PASS"
-                  if not unexpected_status and not non_python and not mismatches and not parse_failures
-                  else "STATUS=FAIL",
-              ]
-          )
+          status = "PASS" if not unexpected_status and not non_python and not mismatches and not parse_failures else "FAIL"
+          records = [
+              "RUFF_AST_EQUIVALENCE_VERSION=1",
+              f"RUN_ID={os.environ.get('GITHUB_RUN_ID', 'UNKNOWN')}",
+              f"MAIN_SHA={main_sha}",
+              f"SOURCE_HEAD={head_sha}",
+              f"CHANGED_TARGET_FILES={len(changed)}",
+              f"UNEXPECTED_STATUS_COUNT={len(unexpected_status)}",
+              f"NON_PYTHON_COUNT={len(non_python)}",
+              f"AST_MISMATCH_COUNT={len(mismatches)}",
+              f"PARSE_FAILURE_COUNT={len(parse_failures)}",
+              f"STATUS={status}",
+          ]
           if unexpected_status:
-              records.append("--- UNEXPECTED_STATUS ---")
-              records.extend(unexpected_status)
+              records += ["--- UNEXPECTED_STATUS ---", *unexpected_status]
           if non_python:
-              records.append("--- NON_PYTHON ---")
-              records.extend(non_python)
+              records += ["--- NON_PYTHON ---", *non_python]
           if mismatches:
-              records.append("--- AST_MISMATCHES ---")
-              records.extend(mismatches)
+              records += ["--- AST_MISMATCHES ---", *mismatches]
           if parse_failures:
-              records.append("--- PARSE_FAILURES ---")
-              records.extend(parse_failures)
-
+              records += ["--- PARSE_FAILURES ---", *parse_failures]
           Path(result_path).write_text("\n".join(records) + "\n", encoding="utf-8")
           print("\n".join(records[:10]))
-          if records[9] != "STATUS=PASS":
+          if status != "PASS":
               raise SystemExit(1)
           PY
 
