@@ -42,6 +42,18 @@ function Invoke-Native {
     }
 }
 
+function Assert-UvVersion {
+    param(
+        [Parameter(Mandatory)][string]$Output,
+        [Parameter(Mandatory)][string]$Expected
+    )
+
+    $tokens = @($Output.Trim() -split '\s+')
+    if ($tokens.Count -lt 2 -or $tokens[0] -ne "uv" -or $tokens[1] -ne $Expected) {
+        throw "Unexpected uv version: $Output (expected semantic version $Expected)"
+    }
+}
+
 function Write-JsonAtomic {
     param(
         [Parameter(Mandatory)]$Object,
@@ -101,9 +113,7 @@ function Install-ExactUv {
     if ($LASTEXITCODE -ne 0) {
         throw "Bootstrapped uv could not execute."
     }
-    if ($actual -ne "uv $Version") {
-        throw "Unexpected bootstrapped uv version: $actual"
-    }
+    Assert-UvVersion -Output $actual -Expected $Version
 
     return $candidate.FullName
 }
@@ -244,9 +254,10 @@ try {
         throw "Exact benchmark uv executable unavailable."
     }
     $BenchmarkUvVersion = (& $UvExe --version).Trim()
-    if ($LASTEXITCODE -ne 0 -or $BenchmarkUvVersion -ne "uv $UvVersion") {
-        throw "Exact benchmark uv version check failed: $BenchmarkUvVersion"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Exact benchmark uv could not execute: $BenchmarkUvVersion"
     }
+    Assert-UvVersion -Output $BenchmarkUvVersion -Expected $UvVersion
 
     $Phase = "platform"
     Write-PlatformRecord -BenchmarkUvVersion $BenchmarkUvVersion
