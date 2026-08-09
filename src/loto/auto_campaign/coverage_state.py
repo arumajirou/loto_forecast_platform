@@ -285,13 +285,23 @@ def _load_results(path: Path | None) -> list[dict[str, Any]]:
 
 
 def _tabular_frame(rows: Sequence[Mapping[str, Any]]) -> pd.DataFrame:
-    """Convert nested audit values to deterministic JSON strings for Parquet/CSV."""
+    """Convert nested or heterogeneous audit values to deterministic JSON strings."""
+
+    json_columns: set[str] = set()
+    scalar_types: dict[str, set[type[Any]]] = defaultdict(set)
+    for source in rows:
+        for key, value in source.items():
+            if isinstance(value, (dict, list, tuple, set)):
+                json_columns.add(key)
+            elif value is not None:
+                scalar_types[key].add(type(value))
+    json_columns.update(key for key, types in scalar_types.items() if len(types) > 1)
 
     normalized: list[dict[str, Any]] = []
     for source in rows:
         row: dict[str, Any] = {}
         for key, value in source.items():
-            if isinstance(value, (dict, list, tuple, set)):
+            if key in json_columns:
                 row[key] = json.dumps(
                     value,
                     ensure_ascii=False,
