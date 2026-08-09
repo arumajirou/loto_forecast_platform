@@ -4,11 +4,11 @@ import hashlib
 import importlib
 import inspect
 import json
+from collections.abc import Callable
 from enum import StrEnum
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-
 
 EXPECTED_ESTIMATORS = (
     "DeepNPTSEstimator",
@@ -255,15 +255,12 @@ def validate_registry() -> None:
 
 def canonical_json_bytes(payload: Any) -> bytes:
     return (
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n"
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     ).encode("utf-8")
 
 
 def matrix_sha256(matrix: P6ConstructorMatrix) -> str:
-    return hashlib.sha256(
-        canonical_json_bytes(matrix.model_dump(mode="json"))
-    ).hexdigest()
+    return hashlib.sha256(canonical_json_bytes(matrix.model_dump(mode="json"))).hexdigest()
 
 
 def constructor_kwargs(
@@ -424,6 +421,7 @@ def inspect_estimator(
             constructor_state=ConstructorState.FAIL,
             constructor_signature=str(signature),
             planned_kwargs=planned,
+            rejected_arguments=rejected,
             formal_state=FormalState.FAILED,
             errors=[f"{type(exc).__name__}: {exc}"],
         )
