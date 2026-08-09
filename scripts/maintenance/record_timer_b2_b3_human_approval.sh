@@ -38,7 +38,7 @@ git fetch origin "$HEAD_REF" main
 REMOTE_BASE="$(git rev-parse "origin/$HEAD_REF")"
 git merge --ff-only "origin/$HEAD_REF" || fail 'local worktree cannot fast-forward to PR branch'
 [[ "$(git rev-parse HEAD)" == "$REMOTE_BASE" ]] || fail 'local worktree did not reach remote PR head'
-[[ -z "$(git status --porcelain)" ]] || fail 'worktree is not clean before approval recording'
+[[ -z "$(git status --porcelain --untracked-files=all)" ]] || fail 'worktree is not clean before approval recording'
 echo "PASS PR_HEAD=$REMOTE_BASE"
 
 printf '\n=== 2. Reverify exact review packet, lock, and executable bytes ===\n'
@@ -189,7 +189,16 @@ EXPECTED="$(printf '%s\n' "$REMOTE_REVIEW" "$DEP_REVIEW" "$APPROVAL_RECORD" | LC
   printf '%s\n' "$STAGED"
   fail 'approval staged-scope mismatch'
 }
-[[ -z "$(git status --porcelain | grep -vE '^(M |A |\?\? )' || true)" ]] || fail 'unexpected worktree state'
+UNSTAGED="$(git diff --name-only)"
+UNTRACKED="$(git ls-files --others --exclude-standard)"
+[[ -z "$UNSTAGED" ]] || {
+  printf '%s\n' "$UNSTAGED"
+  fail 'unexpected unstaged tracked changes after approval staging'
+}
+[[ -z "$UNTRACKED" ]] || {
+  printf '%s\n' "$UNTRACKED"
+  fail 'unexpected untracked files after approval staging'
+}
 echo 'PASS APPROVAL_STAGED_SCOPE'
 
 printf '\n=== 6. Commit, race-check, and push ===\n'
