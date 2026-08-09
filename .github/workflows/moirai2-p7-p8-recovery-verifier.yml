@@ -44,6 +44,7 @@ jobs:
             src/loto/adapters/moirai2/adapter.py
             src/loto/adapters/moirai2/contracts.py
             src/loto/moirai2_campaign/token_geometry.py
+            tests/adapters/moirai2/test_runner_scope.py
             tests/moirai2_campaign/test_p7_covariates.py
           )
           mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
