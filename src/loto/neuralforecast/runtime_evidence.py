@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 
 from loto.auto_campaign.runtime import gpu_process_snapshot, torch_runtime_snapshot
+from loto.neuralforecast.training_worker_evidence import TrainingWorkerEvidence
 
 
 def fitted_inner_model(neuralforecast: Any) -> Any | None:
@@ -78,11 +79,33 @@ def extract_training_evidence(neuralforecast: Any) -> dict[str, Any] | None:
 
 
 def formal_training_cuda(training_evidence: dict[str, Any] | None) -> bool:
+    """Accept only the versioned in-training callback contract, never driver guesses."""
+
     if not training_evidence:
         return False
+    try:
+        evidence = TrainingWorkerEvidence.model_validate(training_evidence)
+    except Exception:
+        return False
     return bool(
-        training_evidence.get("formal_training_proof") is True
-        and training_evidence.get("cuda_execution_evidence") is True
+        evidence.status == "PASS"
+        and evidence.require_gpu
+        and evidence.formal_training_proof
+        and evidence.cuda_execution_evidence
+        and evidence.observed_fit_start
+        and evidence.observed_train_start
+        and evidence.observed_train_batch
+        and evidence.observed_train_end
+        and evidence.device_cuda
+        and evidence.vram_positive
+        and evidence.gpu_pid_verified
+        and evidence.runtime_pid_match
+        and evidence.gpu_pid_match
+        and evidence.worker_pid > 0
+        and evidence.runtime.get("pid") == evidence.worker_pid
+        and evidence.gpu_process.get("pid") == evidence.worker_pid
+        and not evidence.cpu_fallback
+        and not evidence.failed_checks
     )
 
 
