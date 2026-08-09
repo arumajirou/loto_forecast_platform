@@ -26,6 +26,7 @@ CANONICAL_AXIS = TimeAxis.DRAW_SEQUENCE
 CANONICAL_HORIZON = 5
 CANONICAL_LAYOUT = "position_panel_batched_univariate"
 CANONICAL_SEED = 1
+CUBLAS_WORKSPACE_CONFIG = ":4096:8"
 
 
 def sha256_bytes(value: bytes) -> str:
@@ -52,9 +53,15 @@ def main() -> int:
     args.out_dir.mkdir(parents=True, exist_ok=True)
     started_at = datetime.now(timezone.utc).isoformat()
 
+    current_cublas = os.environ.get("CUBLAS_WORKSPACE_CONFIG")
+    if current_cublas != CUBLAS_WORKSPACE_CONFIG:
+        raise RuntimeError(
+            f"CUBLAS_WORKSPACE_CONFIG must be {CUBLAS_WORKSPACE_CONFIG}, got {current_cublas!r}"
+        )
+
     torch.manual_seed(CANONICAL_SEED)
     torch.set_grad_enabled(False)
-    torch.use_deterministic_algorithms(True, warn_only=True)
+    torch.use_deterministic_algorithms(True)
 
     if args.device == "cuda":
         if not torch.cuda.is_available():
@@ -189,6 +196,8 @@ def main() -> int:
         "cuda_device_name": cuda_device_name,
         "torch_peak_memory_allocated_bytes": peak_allocated,
         "torch_peak_memory_reserved_bytes": peak_reserved,
+        "cublas_workspace_config": current_cublas,
+        "deterministic_algorithms": True,
         "network_policy": "HF/Transformers offline + local_files_only + Python socket deny guard",
         "synthetic_input_only": True,
         "holdout_accessed": False,
