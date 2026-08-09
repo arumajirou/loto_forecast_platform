@@ -87,7 +87,9 @@ reports/
 # Python runtime caches
 *$py.class
 # Local audit evidence and backups
-audit/
+audit/*
+!audit/local-runs/
+!audit/local-runs/**
 
 # Generated model artifacts
 runs/**/models/
