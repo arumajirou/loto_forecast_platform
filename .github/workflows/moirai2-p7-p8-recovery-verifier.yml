@@ -1,0 +1,164 @@
+name: moirai2-p7-p8-recovery-verifier
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify Moirai2 P7/P8 source recovery
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 90
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
+      EXPECTED_MAIN: "d79136b300c866620ef218cec25d5849e1b13039"
+    steps:
+      - name: Verify trusted runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Verify exact main and recovery scope
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
+          mapfile -t changed < <(git diff --name-only "$EXPECTED_MAIN"...HEAD | sort)
+          expected=(
+            .github/workflows/moirai2-p7-p8-recovery-verifier.yml
+            scripts/run_moirai2_provider.py
+            src/loto/adapters/moirai2/adapter.py
+            src/loto/adapters/moirai2/contracts.py
+            src/loto/moirai2_campaign/token_geometry.py
+            tests/moirai2_campaign/test_p7_covariates.py
+          )
+          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
+          diff -u <(printf '%s\n' "${expected_sorted[@]}") <(printf '%s\n' "${changed[@]}")
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: "0.11.21"
+          enable-cache: false
+
+      - name: Prepare isolated verifier environment
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          uv python install "$UV_PYTHON"
+          venv="$RUNNER_TEMP/moirai2-recovery-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/moirai2-recovery-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$venv" "$cache"
+          mkdir -p -- "$cache"
+          echo "VERIFIER_VENV=$venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$cache" >> "$GITHUB_ENV"
+          UV_CACHE_DIR="$cache" uv venv "$venv" --python "$UV_PYTHON"
+
+      - name: Install project dependencies
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python="$VERIFIER_VENV/bin/python"
+          uv lock --check
+          uv pip install --quiet --python "$python" --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
+          uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
+          ruff_version="$("$python" - <<'PY'
+          import tomllib
+          with open('uv.lock', 'rb') as stream:
+              lock = tomllib.load(stream)
+          versions = [p['version'] for p in lock['package'] if p.get('name') == 'ruff']
+          if len(versions) != 1:
+              raise SystemExit(versions)
+          print(versions[0])
+          PY
+          )"
+          uv pip install --quiet --python "$python" "ruff==$ruff_version"
+          uv pip check --python "$python"
+
+      - name: Run standard static gates
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python="$VERIFIER_VENV/bin/python"
+          "$python" -m ruff format --check src scripts tests
+          "$python" -m ruff check src scripts tests
+          "$python" -m compileall -q src scripts tests
+
+      - name: Verify focused Moirai2 suites
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          "$VERIFIER_VENV/bin/python" -m pytest -q tests/adapters/moirai2 tests/moirai2_campaign
+
+      - name: Verify collection remains zero-error
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          "$VERIFIER_VENV/bin/python" -m pytest --collect-only -q >/dev/null
+
+      - name: Verify full pytest is fully green
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python="$VERIFIER_VENV/bin/python"
+          out="$RUNNER_TEMP/moirai2-recovery-full-pytest-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.txt"
+          echo "FULL_PYTEST_ARTIFACT=$out" >> "$GITHUB_ENV"
+          set +e
+          "$python" -m pytest -q >"$out" 2>&1
+          rc=$?
+          set -e
+          failed_count="$(grep -c '^FAILED ' "$out" || true)"
+          echo "FULL_PYTEST_RC=$rc"
+          echo "FULL_PYTEST_FAILED_COUNT=$failed_count"
+          grep '^FAILED ' "$out" || true
+          test "$rc" -eq 0
+          test "$failed_count" -eq 0
+          ! grep -Fq 'tests/moirai2_campaign/test_p7_covariates.py::test_contract_rejects_collisions_and_counts_covariate_tokens' "$out"
+          ! grep -Fq 'tests/moirai2_campaign/test_p7_covariates.py::test_adapter_rejects_changed_covariate_identity' "$out"
+          ! grep -Fq 'tests/moirai2_campaign/test_p7_covariates.py::test_runner_wires_native_fields_and_univariate_shape' "$out"
+          ! grep -Fq 'tests/moirai2_campaign/test_p8_runner_fake_boundary.py::test_runner_records_real_forward_device_boundary' "$out"
+
+      - name: Recheck main and repository cleanliness
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Upload full pytest artifact
+        if: always() && env.FULL_PYTEST_ARTIFACT != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: moirai2-recovery-full-pytest-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FULL_PYTEST_ARTIFACT }}
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Remove verifier-owned environment
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if [[ -n "${VERIFIER_VENV:-}" ]]; then
+            case "$VERIFIER_VENV" in "$RUNNER_TEMP"/*) rm -rf -- "$VERIFIER_VENV" ;; *) exit 1 ;; esac
+          fi
+          if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+            case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf -- "$UV_CACHE_DIR" ;; *) exit 1 ;; esac
+          fi
