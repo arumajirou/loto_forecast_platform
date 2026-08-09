@@ -55,19 +55,19 @@ echo "PASS CONFIG_SHA256=$CURRENT_CONFIG_SHA"
 
 printf '\n=== 3. Focused root static/unit verification ===\n'
 command -v uv >/dev/null 2>&1 || fail 'uv is required for repository verification'
-uv run --frozen ruff format --check \
+uv run --frozen --extra dev ruff format --check \
   src/loto/adapters/timer_base_84m/contracts.py \
   src/loto/adapters/timer_base_84m/provider.py \
   src/loto/timer_base_84m_campaign/provenance.py \
   tests/unit/test_timer_base_84m_runtime_provider.py \
   >"$OUT/ruff-format.txt" 2>&1 || { cat "$OUT/ruff-format.txt"; fail 'focused ruff format failed'; }
-uv run --frozen ruff check \
+uv run --frozen --extra dev ruff check \
   src/loto/adapters/timer_base_84m/contracts.py \
   src/loto/adapters/timer_base_84m/provider.py \
   src/loto/timer_base_84m_campaign/provenance.py \
   tests/unit/test_timer_base_84m_runtime_provider.py \
   >"$OUT/ruff-check.txt" 2>&1 || { cat "$OUT/ruff-check.txt"; fail 'focused ruff check failed'; }
-uv run --frozen pytest -q tests/unit/test_timer_base_84m_runtime_provider.py \
+uv run --frozen --extra dev pytest -q tests/unit/test_timer_base_84m_runtime_provider.py \
   >"$OUT/pytest.txt" 2>&1 || { cat "$OUT/pytest.txt"; fail 'focused provider pytest failed'; }
 echo 'PASS FOCUSED_ROOT_VERIFICATION'
 cat "$OUT/pytest.txt"
