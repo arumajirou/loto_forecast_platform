@@ -1,0 +1,159 @@
+name: gluonts-spec-pollution-diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/gluonts-spec-pollution-diagnostic.yml
+      - src/**
+      - tests/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gluonts-spec-pollution-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    name: Diagnose first gluonts spec polluter
+    if: ${{ github.event_name != 'pull_request' || github.head_ref == 'fix/formal-backtest-gluonts-spec-v1' }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
+      EXPECTED_MAIN: "d4cf2b9ddced6038b75e061d12bc470f8ca7923f"
+
+    steps:
+      - name: Verify trusted runner
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Verify exact main and diagnostic-only scope
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
+          mapfile -t changed < <(git diff --name-only "$EXPECTED_MAIN"...HEAD | sort)
+          expected=(.github/workflows/gluonts-spec-pollution-diagnostic.yml)
+          diff -u <(printf '%s\n' "${expected[@]}") <(printf '%s\n' "${changed[@]}")
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+
+      - name: Prepare isolated diagnostic environment
+        run: |
+          set -Eeuo pipefail
+          case "$(uv --version)" in "uv $UV_VERSION"*) ;; *) exit 1 ;; esac
+          uv python install "$UV_PYTHON"
+          venv="$RUNNER_TEMP/gluonts-spec-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/gluonts-spec-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          case "$venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          case "$cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          rm -rf -- "$venv" "$cache"
+          mkdir -p -- "$cache"
+          echo "DIAG_VENV=$venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$cache" >> "$GITHUB_ENV"
+          UV_CACHE_DIR="$cache" uv venv "$venv" --python "$UV_PYTHON"
+
+      - name: Install project dependencies
+        run: |
+          set -Eeuo pipefail
+          python="$DIAG_VENV/bin/python"
+          uv lock --check
+          uv pip install --quiet --python "$python" --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
+          uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
+          uv pip check --python "$python"
+
+      - name: Prove target test behavior in a fresh process
+        run: |
+          set -Eeuo pipefail
+          "$DIAG_VENV/bin/python" -m pytest -q \
+            tests/test_formal_backtest.py::test_formal_backtest_smoke_catalog_no_drift
+
+      - name: Install runtime pollution watcher
+        run: |
+          set -Eeuo pipefail
+          cat > "$RUNNER_TEMP/gluonts_spec_watch.py" <<'PY'
+          from __future__ import annotations
+
+          import sys
+          import pytest
+
+          def _bad_state() -> tuple[bool, str]:
+              module = sys.modules.get("gluonts")
+              if module is None:
+                  return False, "ABSENT"
+              spec = getattr(module, "__spec__", None)
+              return spec is None, repr(module)
+
+          @pytest.hookimpl(trylast=True)
+          def pytest_runtest_logreport(report: pytest.TestReport) -> None:
+              if report.when != "teardown":
+                  return
+              bad, module_repr = _bad_state()
+              if not bad:
+                  return
+              print(
+                  f"GLUONTS_SPEC_NONE_AFTER={report.nodeid} module={module_repr}",
+                  flush=True,
+              )
+              pytest.exit(f"first gluonts spec polluter: {report.nodeid}", returncode=86)
+          PY
+
+      - name: Find the first full-suite polluter
+        run: |
+          set -Eeuo pipefail
+          out="$RUNNER_TEMP/gluonts-spec-pollution-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.txt"
+          echo "DIAG_OUTPUT=$out" >> "$GITHUB_ENV"
+          set +e
+          PYTHONPATH="$RUNNER_TEMP${PYTHONPATH:+:$PYTHONPATH}" \
+            "$DIAG_VENV/bin/python" -m pytest -q -p gluonts_spec_watch --tb=short 2>&1 | tee "$out"
+          rc="${PIPESTATUS[0]}"
+          set -e
+          echo "WATCH_RC=$rc"
+          grep -F 'GLUONTS_SPEC_NONE_AFTER=' "$out"
+          test "$rc" -eq 86
+
+      - name: Recheck main and repository cleanliness
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Upload diagnostic evidence
+        if: ${{ always() && env.DIAG_OUTPUT != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gluonts-spec-pollution-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.DIAG_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Remove diagnostic environment
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          if [[ -n "${DIAG_VENV:-}" ]]; then case "$DIAG_VENV" in "$RUNNER_TEMP"/*) rm -rf -- "$DIAG_VENV" ;; *) exit 1 ;; esac; fi
+          if [[ -n "${UV_CACHE_DIR:-}" ]]; then case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf -- "$UV_CACHE_DIR" ;; *) exit 1 ;; esac; fi
