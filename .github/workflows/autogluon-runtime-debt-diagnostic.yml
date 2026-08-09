@@ -1,0 +1,147 @@
+name: autogluon-runtime-debt-diagnostic
+
+on:
+  push:
+    branches: [diag/autogluon-runtime-debt-v1]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    name: Diagnose AutoGluon residual provider errors
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 30
+    env:
+      UV_PYTHON: "3.13"
+      EXPECTED_MAIN: "9d4eead4375aa64de9c83a8e7b42d71a131ab0e1"
+    steps:
+      - name: Verify trusted runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Verify exact base and scope
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
+          mapfile -t changed < <(git diff --name-only "$EXPECTED_MAIN"...HEAD | sort)
+          printf '%s\n' "${changed[@]}"
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = ".github/workflows/autogluon-runtime-debt-diagnostic.yml"
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: "0.11.21"
+          enable-cache: false
+
+      - name: Prepare isolated diagnostic environment
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          uv python install "$UV_PYTHON"
+          venv="$RUNNER_TEMP/autogluon-diag-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/autogluon-diag-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$venv" "$cache"
+          mkdir -p -- "$cache"
+          echo "DIAG_VENV=$venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$cache" >> "$GITHUB_ENV"
+          UV_CACHE_DIR="$cache" uv venv "$venv" --python "$UV_PYTHON"
+          uv pip install --quiet --python "$venv/bin/python" -e ".[api,dev,postgres]"
+
+      - name: Capture exact provider responses
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python="$DIAG_VENV/bin/python"
+          "$python" - <<'PY'
+          import json
+          import runpy
+          import sys
+          import tempfile
+          from pathlib import Path
+          from types import ModuleType, SimpleNamespace
+
+          cov = runpy.run_path("tests/adapters/autogluon/test_covariate_provider.py")
+          with tempfile.TemporaryDirectory() as td:
+              response = cov["run_provider_v2_strict"](
+                  cov["_payload"](Path(td)), runtime=cov["_runtime"]()
+              )
+              print("=== COVARIATE_STRICT_RESPONSE ===")
+              print(json.dumps(response, indent=2, sort_keys=True, default=str))
+
+          hpo = runpy.run_path("tests/adapters/autogluon/test_provider_hpo_spaces.py")
+          common = ModuleType("autogluon.common")
+          common.space = SimpleNamespace(
+              Categorical=hpo["SpaceConstructor"]("Categorical"),
+              Int=hpo["SpaceConstructor"]("Int"),
+              Real=hpo["SpaceConstructor"]("Real"),
+          )
+          package = ModuleType("autogluon")
+          package.common = common
+          old_package = sys.modules.get("autogluon")
+          old_common = sys.modules.get("autogluon.common")
+          sys.modules["autogluon"] = package
+          sys.modules["autogluon.common"] = common
+          try:
+              with tempfile.TemporaryDirectory() as td:
+                  response = hpo["run_provider_v2"](
+                      hpo["_request"](Path(td)), runtime=hpo["_runtime"]()
+                  )
+                  print("=== HPO_RESPONSE ===")
+                  print(json.dumps(response, indent=2, sort_keys=True, default=str))
+          finally:
+              if old_package is None:
+                  sys.modules.pop("autogluon", None)
+              else:
+                  sys.modules["autogluon"] = old_package
+              if old_common is None:
+                  sys.modules.pop("autogluon.common", None)
+              else:
+                  sys.modules["autogluon.common"] = old_common
+          PY
+
+      - name: Reproduce exact target tests
+        shell: bash
+        run: |
+          set +e
+          "$DIAG_VENV/bin/python" -m pytest -vv \
+            tests/adapters/autogluon/test_covariate_provider.py::test_strict_router_dispatches_covariate_payload \
+            tests/adapters/autogluon/test_provider_hpo_spaces.py::test_hpo_descriptor_is_materialized_inside_provider
+          rc=$?
+          echo "TARGET_PYTEST_RC=$rc"
+          exit 0
+
+      - name: Recheck main and cleanliness
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Remove diagnostic environment
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if [[ -n "${DIAG_VENV:-}" ]]; then
+            case "$DIAG_VENV" in "$RUNNER_TEMP"/*) rm -rf -- "$DIAG_VENV" ;; *) exit 1 ;; esac
+          fi
+          if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+            case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf -- "$UV_CACHE_DIR" ;; *) exit 1 ;; esac
+          fi
