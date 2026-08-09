@@ -1,0 +1,221 @@
+{
+  "artifact_count": 43,
+  "artifacts": [
+    {
+      "path": "cpu-a/ended_at_utc.txt",
+      "sha256": "684dc2d41424fc2dcb4a1c18edc11d5c6d11e1bfa2c395989c6e868d7842f376",
+      "size_bytes": 21
+    },
+    {
+      "path": "cpu-a/exitcode.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "size_bytes": 2
+    },
+    {
+      "path": "cpu-a/request.json",
+      "sha256": "fd421fac8606f0cf2b8d9f632acab18e85d9093e08698b8d6d0ea32403e2cd52",
+      "size_bytes": 8419
+    },
+    {
+      "path": "cpu-a/result.json",
+      "sha256": "0aa91c9ec97a075a38bf2a58ab499d4ba6536c7885c20d7d0078573ad44cb498",
+      "size_bytes": 3030
+    },
+    {
+      "path": "cpu-a/started_at_utc.txt",
+      "sha256": "6ea7f9f1b097046e637ce3096e910023b3a53ad21b8b0e8c7c252341d9e0d118",
+      "size_bytes": 21
+    },
+    {
+      "path": "cpu-a/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "cpu-a/stdout.txt",
+      "sha256": "1dab1ea4dacae807d122dfcd49cfc2266235d9646ffee1872efa6d3669d3e17a",
+      "size_bytes": 2770
+    },
+    {
+      "path": "cpu-b/ended_at_utc.txt",
+      "sha256": "0aca55e21af732fa42e44979533170277a324d694f1b391bf2d717fb36dfc213",
+      "size_bytes": 21
+    },
+    {
+      "path": "cpu-b/exitcode.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "size_bytes": 2
+    },
+    {
+      "path": "cpu-b/request.json",
+      "sha256": "fd421fac8606f0cf2b8d9f632acab18e85d9093e08698b8d6d0ea32403e2cd52",
+      "size_bytes": 8419
+    },
+    {
+      "path": "cpu-b/result.json",
+      "sha256": "672bb1606d18ccc4d26123bb2dabeca5398f3b7ab3f4c67780311a129f5f8c12",
+      "size_bytes": 3030
+    },
+    {
+      "path": "cpu-b/started_at_utc.txt",
+      "sha256": "684dc2d41424fc2dcb4a1c18edc11d5c6d11e1bfa2c395989c6e868d7842f376",
+      "size_bytes": 21
+    },
+    {
+      "path": "cpu-b/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "cpu-b/stdout.txt",
+      "sha256": "1c035ac5a08b27878fb6047d76ee55f4410c7766339f3f5d5e101d97f78a1bb4",
+      "size_bytes": 2770
+    },
+    {
+      "path": "cuda-a/ended_at_utc.txt",
+      "sha256": "df52ede585ab3c4c9c4f76bb251735e41dd88b39659b759d1ab29887c3230c71",
+      "size_bytes": 21
+    },
+    {
+      "path": "cuda-a/exitcode.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "size_bytes": 2
+    },
+    {
+      "path": "cuda-a/external-gpu-evidence.json",
+      "sha256": "e8da7a0af62e1db30974bcc7cbf517eaa2ed3cd755ff736f1e419aa214219588",
+      "size_bytes": 360
+    },
+    {
+      "path": "cuda-a/gpu-after.csv",
+      "sha256": "68eca201550fe0bb5fadac82685ec194bbb170dca75afa444b78517fe50cfb3a",
+      "size_bytes": 100
+    },
+    {
+      "path": "cuda-a/gpu-before.csv",
+      "sha256": "68eca201550fe0bb5fadac82685ec194bbb170dca75afa444b78517fe50cfb3a",
+      "size_bytes": 100
+    },
+    {
+      "path": "cuda-a/nvidia-smi-compute-after.txt",
+      "sha256": "7614fa6d3f742b8b021ed38179580f676643ad5601f9c71cab711037236adbaa",
+      "size_bytes": 54
+    },
+    {
+      "path": "cuda-a/nvidia-smi-compute-poll.log",
+      "sha256": "4dbf770fdfafd851d4878baf20acb78be3f6d9fa6f8bce6913dec7d17a2128ea",
+      "size_bytes": 1193
+    },
+    {
+      "path": "cuda-a/provider-pid.txt",
+      "sha256": "d4cc978e92d10f7d7d780291c6ddc0901bb88fd4db3c2856d2ad32f767f6800f",
+      "size_bytes": 7
+    },
+    {
+      "path": "cuda-a/request.json",
+      "sha256": "08476980d87f5e5a57659f2a401bdc119ebb9f58756efa8dc459a2deae475f36",
+      "size_bytes": 8421
+    },
+    {
+      "path": "cuda-a/result.json",
+      "sha256": "a9570238f2e4ea29da76f94aa8b097d1337f712e88e3abb62ea49769445368b9",
+      "size_bytes": 3119
+    },
+    {
+      "path": "cuda-a/started_at_utc.txt",
+      "sha256": "221941ead7843fe165f62aba0f5fad836f01e0a5d7da6393864333536b410d15",
+      "size_bytes": 21
+    },
+    {
+      "path": "cuda-a/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "cuda-a/stdout.txt",
+      "sha256": "beb7c6dbbc639338d6cddd7a7e58458b924377e4e3f9c7e29537a752bf1116da",
+      "size_bytes": 2859
+    },
+    {
+      "path": "cuda-b/ended_at_utc.txt",
+      "sha256": "e6c5eedf87ccba447a716346c553ea89fb3e53eb050ccd491cc592e048688427",
+      "size_bytes": 21
+    },
+    {
+      "path": "cuda-b/exitcode.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "size_bytes": 2
+    },
+    {
+      "path": "cuda-b/external-gpu-evidence.json",
+      "sha256": "630ac63b86b873f832dcaae2ce9db4e96859325e970fa6d4198165277ec17365",
+      "size_bytes": 360
+    },
+    {
+      "path": "cuda-b/gpu-after.csv",
+      "sha256": "68eca201550fe0bb5fadac82685ec194bbb170dca75afa444b78517fe50cfb3a",
+      "size_bytes": 100
+    },
+    {
+      "path": "cuda-b/gpu-before.csv",
+      "sha256": "68eca201550fe0bb5fadac82685ec194bbb170dca75afa444b78517fe50cfb3a",
+      "size_bytes": 100
+    },
+    {
+      "path": "cuda-b/nvidia-smi-compute-after.txt",
+      "sha256": "7614fa6d3f742b8b021ed38179580f676643ad5601f9c71cab711037236adbaa",
+      "size_bytes": 54
+    },
+    {
+      "path": "cuda-b/nvidia-smi-compute-poll.log",
+      "sha256": "2d2368594581a10f415afd2c274b3ac979a241f4e8f1813adb5a889f4ec67db7",
+      "size_bytes": 1475
+    },
+    {
+      "path": "cuda-b/provider-pid.txt",
+      "sha256": "74456fd80f9966d015978873486c31211b015df95b055faec6b2bb8980c44e46",
+      "size_bytes": 7
+    },
+    {
+      "path": "cuda-b/request.json",
+      "sha256": "08476980d87f5e5a57659f2a401bdc119ebb9f58756efa8dc459a2deae475f36",
+      "size_bytes": 8421
+    },
+    {
+      "path": "cuda-b/result.json",
+      "sha256": "63a9620638249f00ce2c0b57005b0905d813c21d02d57cfb17b7a0ca8665dc20",
+      "size_bytes": 3119
+    },
+    {
+      "path": "cuda-b/started_at_utc.txt",
+      "sha256": "f159d001973453cea27fe14135d0db599ed21419768107127d78ea0f6e0063e3",
+      "size_bytes": 21
+    },
+    {
+      "path": "cuda-b/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "cuda-b/stdout.txt",
+      "sha256": "e705fce7b64f97c796cc2c1276586e3b30afd10818146cfd5ef5bd1a3a3b106b",
+      "size_bytes": 2859
+    },
+    {
+      "path": "replay-summary.json",
+      "sha256": "e77afec03bfc6b13d0abe0f51dbbe43013ed444b897bd8cf15b8cd299307104c",
+      "size_bytes": 1519
+    },
+    {
+      "path": "snapshot-verify.txt",
+      "sha256": "51a29c1b0cdfb8ad777912cce5a3a5a744ad403fc78f779ab34f0a8bd018dcff",
+      "size_bytes": 174
+    },
+    {
+      "path": "snapshot.sha256",
+      "sha256": "d3adeb44bbe722d1ad1cc5a38195c8f30d4ac409b27e8520a8e5a77b42d43f30",
+      "size_bytes": 670
+    }
+  ],
+  "schema_version": "timer-base-84m.replay-artifact-manifest.v1"
+}

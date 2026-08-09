@@ -1,0 +1,41 @@
+{
+  "all_provider_pids_distinct": true,
+  "cpu_replay": {
+    "distinct_pids": true,
+    "exact_replay": true,
+    "input_sha256_equal": true,
+    "pid_a": 390284,
+    "pid_b": 390393,
+    "prediction_sha256": "fcdb5aa0f1c306bb1fce7613ad58a5e89601e5b1b46472ff7a74a502b272be83",
+    "prediction_sha256_equal": true,
+    "request_sha256_equal": true,
+    "run_a": "cpu-a",
+    "run_b": "cpu-b"
+  },
+  "cuda_replay": {
+    "distinct_pids": true,
+    "exact_replay": true,
+    "input_sha256_equal": true,
+    "pid_a": 390561,
+    "pid_b": 390842,
+    "prediction_sha256": "d6b54e3f2bed42d7d81f0cbef200c7bf11ed72506472061d7b6b10a825ec8817",
+    "prediction_sha256_equal": true,
+    "request_sha256_equal": true,
+    "run_a": "cuda-a",
+    "run_b": "cuda-b"
+  },
+  "dependency_lock_sha256": "5349b4ae2a1c16a0b27b4fe3cf7b77a3d8bd6d0a22329b8b66691c5e3e63efe0",
+  "formal_runner_sha256": "df4d0630b3b79ee52e1f0c03ca8564f14f8d1b4ce5a57fa60e1901fdb50762f9",
+  "holdout_accessed": false,
+  "numerical_tolerance_used": false,
+  "process_count": 4,
+  "prospective_accessed": false,
+  "replay_runner_sha256": "c13311bb0c7105dce35ad511927247d16e40bd97ff5aeae55c63cf0347ec7666",
+  "same_device_exact_prediction_sha_required": true,
+  "schema_version": "timer-base-84m.separate-process-replay.v1",
+  "serialized_model_state": false,
+  "shell_sha256": "c587bbe886ece80b42095c60b3393241f8ef4dd0e8f87f66ecaee4000f774c43",
+  "source_head_sha": "4906c74784783785948c86a1e72efcffb3baac0a",
+  "status": "PASS",
+  "synthetic_input_only": true
+}
