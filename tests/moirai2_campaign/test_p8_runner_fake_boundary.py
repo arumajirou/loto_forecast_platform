@@ -107,29 +107,33 @@ class _Model(torch.nn.Module):
         return _Predictor(self)
 
 
-def _install_module(name: str, **attributes) -> None:
+def _install_module(monkeypatch, name: str, **attributes) -> None:
     module = types.ModuleType(name)
     for key, value in attributes.items():
         setattr(module, key, value)
-    sys.modules[name] = module
+    monkeypatch.setitem(sys.modules, name, module)
 
 
 def _load_runner(monkeypatch):
     _install_module(
+        monkeypatch,
         "loto.adapters.moirai2.contracts",
         Moirai2ProviderRequest=object,
         Moirai2ProviderResponse=_Response,
     )
     _install_module(
+        monkeypatch,
         "loto.moirai2_campaign.covariates",
         attach_covariates=lambda entry, _covariates: entry,
         compile_covariates=lambda **_kwargs: _Covariates(),
     )
     _install_module(
+        monkeypatch,
         "loto.moirai2_campaign.license_policy",
         evaluate_license_lane=lambda _lane: _License(),
     )
     _install_module(
+        monkeypatch,
         "loto.moirai2_campaign.model_manifest",
         MODEL_ID="moirai-2.0-r-small",
         MODEL_REVISION="revision",
@@ -138,6 +142,7 @@ def _load_runner(monkeypatch):
         UNI2TS_VERSION="2.0.0",
     )
     _install_module(
+        monkeypatch,
         "loto.moirai2_campaign.provenance",
         verify_snapshot=lambda _path: {
             "model_revision": "revision",
@@ -146,6 +151,7 @@ def _load_runner(monkeypatch):
         },
     )
     _install_module(
+        monkeypatch,
         "loto.moirai2_campaign.quantiles",
         extract_native_quantiles=lambda *_args, **_kwargs: {
             "0.1": [[0.1]],
@@ -155,20 +161,27 @@ def _load_runner(monkeypatch):
         median_point_forecast=lambda quantiles: quantiles["0.5"],
     )
     _install_module(
+        monkeypatch,
         "loto.moirai2_campaign.time_adapter",
         build_calendar_time_axis=lambda *_args, **_kwargs: _TimeAxis(),
         build_draw_sequence_axis=lambda *_args, **_kwargs: _TimeAxis(),
     )
     _install_module(
+        monkeypatch,
         "loto.moirai2_campaign.token_geometry",
         calculate_token_geometry=lambda **_kwargs: _Geometry(),
     )
-    _install_module("gluonts")
-    _install_module("gluonts.dataset")
-    _install_module("gluonts.dataset.common", ListDataset=lambda entries, **_kwargs: entries)
-    _install_module("uni2ts")
-    _install_module("uni2ts.model")
+    _install_module(monkeypatch, "gluonts")
+    _install_module(monkeypatch, "gluonts.dataset")
     _install_module(
+        monkeypatch,
+        "gluonts.dataset.common",
+        ListDataset=lambda entries, **_kwargs: entries,
+    )
+    _install_module(monkeypatch, "uni2ts")
+    _install_module(monkeypatch, "uni2ts.model")
+    _install_module(
+        monkeypatch,
         "uni2ts.model.moirai2",
         Moirai2Forecast=_Model,
         Moirai2Module=_Module,
