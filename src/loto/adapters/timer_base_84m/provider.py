@@ -29,6 +29,7 @@ from loto.timer_base_84m_campaign.provenance import (
 
 DEPENDENCY_LOCK_SHA256 = "5349b4ae2a1c16a0b27b4fe3cf7b77a3d8bd6d0a22329b8b66691c5e3e63efe0"
 TORCH_VERSION = "2.9.1+cu128"
+CUBLAS_WORKSPACE_CONFIG = ":4096:8"
 
 
 class TimerProviderError(RuntimeError):
@@ -62,6 +63,7 @@ class TimerBase84MProvider:
             "python_lane": PYTHON_LANE,
             "license": LICENSE,
             "dependency_lock_sha256": DEPENDENCY_LOCK_SHA256,
+            "cublas_workspace_config": CUBLAS_WORKSPACE_CONFIG,
             "runtime_status": "RUNTIME_CERTIFIED",
         }
 
@@ -117,6 +119,7 @@ class TimerBase84MProvider:
             ],
             "supported_horizons": [1, 2, 5],
             "cpu_fallback_allowed": False,
+            "deterministic_algorithms_required": True,
         }
 
     def _snapshot_path(self) -> Path:
@@ -154,6 +157,17 @@ class TimerBase84MProvider:
             )
 
     @staticmethod
+    def _configure_deterministic_runtime() -> None:
+        current = os.environ.get("CUBLAS_WORKSPACE_CONFIG")
+        if current not in {None, CUBLAS_WORKSPACE_CONFIG}:
+            raise TimerProviderError(
+                "UNSUPPORTED_RUNTIME_LANE",
+                "CUBLAS_WORKSPACE_CONFIG must be "
+                f"{CUBLAS_WORKSPACE_CONFIG}, got {current!r}",
+            )
+        os.environ["CUBLAS_WORKSPACE_CONFIG"] = CUBLAS_WORKSPACE_CONFIG
+
+    @staticmethod
     def _gpu_process_evidence(pid: int) -> tuple[str | None, int | None]:
         try:
             result = subprocess.run(
@@ -184,6 +198,7 @@ class TimerBase84MProvider:
         self.resolve_snapshot_manifest()
         snapshot = self._verify_snapshot_bytes()
         self._require_certified_python_lane()
+        self._configure_deterministic_runtime()
 
         os.environ["HF_HUB_OFFLINE"] = "1"
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
@@ -261,7 +276,7 @@ class TimerBase84MProvider:
         torch = self._torch
         torch.manual_seed(request.seed)
         torch.set_grad_enabled(False)
-        torch.use_deterministic_algorithms(True, warn_only=True)
+        torch.use_deterministic_algorithms(True)
 
         if request.requested_device == "cuda":
             if not torch.cuda.is_available():
