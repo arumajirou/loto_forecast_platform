@@ -41,6 +41,7 @@ jobs:
           expected=(
             .github/workflows/neuralforecast-db-persistence-verifier.yml
             src/loto/neuralforecast/__init__.py
+            src/loto/neuralforecast/db_automodel_facade.py
           )
           mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
           diff -u <(printf '%s\n' "${expected_sorted[@]}") <(printf '%s\n' "${changed[@]}")
@@ -101,7 +102,7 @@ jobs:
           python="$VERIFIER_VENV/bin/python"
           "$python" -m pytest -q tests/test_neuralforecast_db_search_space_persistence.py
 
-      - name: Diagnose stable core runtime compatibility
+      - name: Verify stable core runtime compatibility
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -147,6 +148,7 @@ jobs:
           test "$rc" -ne 0
           test "$failed_count" -eq 11
           ! grep -Fq 'tests/test_neuralforecast_db_search_space_persistence.py::test_package_exports_keep_stable_core_class_identity' "$out"
+          ! grep -Fq 'tests/test_neuralforecast_db_automodel.py::test_single_automodel_passes_core_fit_and_runtime_certification' "$out"
 
       - name: Recheck main and repository cleanliness
         if: always()
