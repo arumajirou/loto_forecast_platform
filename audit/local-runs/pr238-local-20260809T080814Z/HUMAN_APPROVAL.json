@@ -1,0 +1,20 @@
+{
+  "decision": "APPROVED",
+  "dependency_lock_sha256": "5349b4ae2a1c16a0b27b4fe3cf7b77a3d8bd6d0a22329b8b66691c5e3e63efe0",
+  "executable_sha256": {
+    "configuration_timer.py": "bec2d7ed868b57d7046f097cad166d8e935920aa082cc6e9bb2cc53b9b626173",
+    "modeling_timer.py": "a625da46370e044609f1cd601eb2899aaf8a8e2dd5966bcfadc9d7f89a5092ad",
+    "ts_generation_mixin.py": "357d4aa6fd24f107bef5665f82fe2c7df278f4ff151c4493dbaa9f43655b55a1"
+  },
+  "forecast_accuracy_certified": false,
+  "model_revision": "70077a71acce1b4c00d98332fcaabc694255d8e5",
+  "pr_head_before_approval_commit": "d3d0d314915796bad45be3a1ccc2ff67ed554e84",
+  "repo_id": "thuml/timer-base-84m",
+  "review_packet_sha256": "0d7800ae8b70274b034cc5a37893ae806b21f0bee8da5854a470ffe257491512",
+  "reviewed_at_utc": "2026-08-09T09:10:50Z",
+  "reviewer": "arumajirou",
+  "runtime_certified": false,
+  "schema_version": "timer-base-84m.human-approval.v1",
+  "snapshot_manifest_sha256": "0cc9cd7d341e7a103f7c6bc4e3067af97dd4940576719d1bdd7ebcf3b3c54c2a",
+  "weight_sha256": "9c3d18f12ffe1ea7d4fa70eb3304b26e3841164a6a265fbae4f7a05cd213aa3d"
+}

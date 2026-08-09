@@ -1,9 +1,9 @@
 {
   "artifact_count": 204,
   "artifacts_without_hash": [],
-  "decision": "LOCK_GRAPH_PARSED_PENDING_HUMAN_REVIEW",
+  "decision": "HUMAN_REVIEW_APPROVED",
   "generated_at_utc": "2026-08-09T08:10:09.637474+00:00",
-  "human_approved": false,
+  "human_approved": true,
   "lock_sha256": "5349b4ae2a1c16a0b27b4fe3cf7b77a3d8bd6d0a22329b8b66691c5e3e63efe0",
   "non_registry_dependencies": [],
   "package_count": 46,
@@ -333,7 +333,9 @@
   ],
   "project_sha256": "da7b4c19e4a90f35d5f63aa3ffc5a1332a73a75b438d1311cd4928c29fc3ec9b",
   "python_lane": ">=3.10,<3.11",
-  "reviewer": null,
+  "review_artifact_sha256": "0d7800ae8b70274b034cc5a37893ae806b21f0bee8da5854a470ffe257491512",
+  "reviewed_at_utc": "2026-08-09T09:10:50Z",
+  "reviewer": "arumajirou",
   "schema_version": "timer-base-84m.dependency-lock-review.local.v1",
   "selected_packages": {
     "torch": {
