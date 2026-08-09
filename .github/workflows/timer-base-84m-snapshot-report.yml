@@ -1,0 +1,128 @@
+name: timer-base-84m-snapshot-report
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/timer-base-84m-snapshot-report.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_REPO_ID: "thuml/timer-base-84m"
+      HF_REVISION: "70077a71acce1b4c00d98332fcaabc694255d8e5"
+    steps:
+      - name: Verify trusted runner
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: "0.11.21"
+          enable-cache: false
+      - name: Print exact pinned file hashes and static scan
+        run: |
+          set -Eeuo pipefail
+          uv python install 3.13
+          venv="$RUNNER_TEMP/timer-base-report-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          snapshot="$RUNNER_TEMP/timer-base-report-snapshot-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          uv venv "$venv" --python 3.13
+          uv pip install --quiet --python "$venv/bin/python" "huggingface-hub==0.36.2"
+          "$venv/bin/python" - "$snapshot" <<'PY'
+          import ast
+          import hashlib
+          import json
+          import os
+          import sys
+          from pathlib import Path
+          from huggingface_hub import HfApi, hf_hub_download
+
+          repo = os.environ["HF_REPO_ID"]
+          revision = os.environ["HF_REVISION"]
+          root = Path(sys.argv[1])
+          api = HfApi()
+          info = api.model_info(repo, revision=revision)
+          assert info.sha == revision, (info.sha, revision)
+          files = sorted(api.list_repo_files(repo_id=repo, revision=revision))
+          records = []
+          for relative in files:
+              local = Path(hf_hub_download(repo, relative, revision=revision, local_dir=str(root)))
+              data = local.read_bytes()
+              records.append((relative, len(data), hashlib.sha256(data).hexdigest()))
+          print("=== TIMER_BASE_PINNED_FILES ===")
+          for relative, size, digest in records:
+              print(f"{digest}  {size:>12}  {relative}")
+          print("=== END_TIMER_BASE_PINNED_FILES ===")
+
+          print("=== TIMER_BASE_REMOTE_CODE_SCAN ===")
+          for relative in ("configuration_timer.py", "modeling_timer.py", "ts_generation_mixin.py"):
+              source = (root / relative).read_text(encoding="utf-8")
+              tree = ast.parse(source, filename=relative)
+              imports = []
+              flagged = []
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.Import):
+                      imports.extend(alias.name for alias in node.names)
+                  elif isinstance(node, ast.ImportFrom):
+                      imports.append(node.module or "")
+                  elif isinstance(node, ast.Call):
+                      if isinstance(node.func, ast.Name):
+                          name = node.func.id
+                      elif isinstance(node.func, ast.Attribute):
+                          parts = []
+                          cur = node.func
+                          while isinstance(cur, ast.Attribute):
+                              parts.append(cur.attr)
+                              cur = cur.value
+                          if isinstance(cur, ast.Name):
+                              parts.append(cur.id)
+                          name = ".".join(reversed(parts))
+                      else:
+                          continue
+                      if name in {"eval", "exec", "compile", "__import__"} or any(
+                          marker in name.lower()
+                          for marker in (
+                              "subprocess", "system", "popen", "socket", "requests",
+                              "http", "urlopen", "download", "torch.load", "pickle"
+                          )
+                      ):
+                          flagged.append({"line": getattr(node, "lineno", None), "call": name})
+              print(json.dumps({
+                  "path": relative,
+                  "imports": sorted(set(imports)),
+                  "flagged_calls": flagged,
+              }, sort_keys=True))
+          print("=== END_TIMER_BASE_REMOTE_CODE_SCAN ===")
+          print("trust_remote_code_executed=false")
+          print("model_import_executed=false")
+          print("human_approval=false")
+          PY
+      - name: Cleanup
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          for path in "$RUNNER_TEMP/timer-base-report-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" "$RUNNER_TEMP/timer-base-report-snapshot-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"; do
+            case "$path" in
+              "$RUNNER_TEMP"/*) rm -rf -- "$path" ;;
+              *) exit 1 ;;
+            esac
+          done
