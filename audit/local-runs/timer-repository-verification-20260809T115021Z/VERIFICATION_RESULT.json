@@ -1,0 +1,18 @@
+{
+  "cleanup_verified": true,
+  "final_matrix_artifact_hashes": "PASS",
+  "final_matrix_replay_semantics": "PASS",
+  "final_replay_artifact_hashes": "PASS",
+  "focused_mypy": "PASS",
+  "focused_ruff": "PASS",
+  "focused_timer_tests": "PASS",
+  "full_pytest_executed": false,
+  "holdout_accessed": false,
+  "prospective_accessed": false,
+  "python_3_10_compile": "PASS",
+  "root_dependency_files_unchanged": true,
+  "run_id": "timer-repository-verification-20260809T115021Z",
+  "schema_version": "timer-base-84m.repository-verification.v1",
+  "source_head_sha": "d96798b2c708fced51134e42be9bdaa3ceeb50d5",
+  "status": "PASS"
+}

@@ -14,7 +14,7 @@ def test_environment_requires_reviewed_lock(tmp_path: Path) -> None:
     provider = TimerBase84MProvider(env, tmp_path / "review.json")
     with pytest.raises(TimerProviderError) as exc:
         provider.validate_environment()
-    assert exc.value.status == "DEPENDENCY_LOCK_PENDING"
+    assert exc.value.status == "DEPENDENCY_LOCK_INVALID"
 
 
 def test_snapshot_manifest_requires_approved_review(tmp_path: Path) -> None:
@@ -39,7 +39,7 @@ def test_load_and_predict_fail_closed(tmp_path: Path) -> None:
     provider = TimerBase84MProvider(tmp_path, tmp_path / "review.json")
     with pytest.raises(TimerProviderError) as load_exc:
         provider.load()
-    assert load_exc.value.status == "CHECKPOINT_LOAD_PENDING"
+    assert load_exc.value.status == "DEPENDENCY_LOCK_INVALID"
     with pytest.raises(TimerProviderError) as predict_exc:
         provider.predict(None)  # type: ignore[arg-type]
-    assert predict_exc.value.status == "RUNTIME_NOT_CERTIFIED"
+    assert predict_exc.value.status == "MODEL_NOT_LOADED"

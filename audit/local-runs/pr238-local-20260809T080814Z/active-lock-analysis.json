@@ -1,0 +1,469 @@
+{
+  "active_packages": [
+    "annotated-types",
+    "certifi",
+    "charset-normalizer",
+    "filelock",
+    "fsspec",
+    "hf-xet",
+    "huggingface-hub",
+    "idna",
+    "jinja2",
+    "markupsafe",
+    "mpmath",
+    "networkx",
+    "numpy",
+    "nvidia-cublas-cu12",
+    "nvidia-cuda-cupti-cu12",
+    "nvidia-cuda-nvrtc-cu12",
+    "nvidia-cuda-runtime-cu12",
+    "nvidia-cudnn-cu12",
+    "nvidia-cufft-cu12",
+    "nvidia-cufile-cu12",
+    "nvidia-curand-cu12",
+    "nvidia-cusolver-cu12",
+    "nvidia-cusparse-cu12",
+    "nvidia-cusparselt-cu12",
+    "nvidia-nccl-cu12",
+    "nvidia-nvjitlink-cu12",
+    "nvidia-nvshmem-cu12",
+    "nvidia-nvtx-cu12",
+    "packaging",
+    "pydantic",
+    "pydantic-core",
+    "pyyaml",
+    "regex",
+    "requests",
+    "safetensors",
+    "sympy",
+    "tokenizers",
+    "torch",
+    "tqdm",
+    "transformers",
+    "triton",
+    "typing-extensions",
+    "typing-inspection",
+    "urllib3"
+  ],
+  "active_registry_count": 44,
+  "dependency_edges": [
+    {
+      "active": true,
+      "child": "huggingface-hub",
+      "marker": null,
+      "parent": "loto-timer-base-84m-provider"
+    },
+    {
+      "active": true,
+      "child": "numpy",
+      "marker": null,
+      "parent": "loto-timer-base-84m-provider"
+    },
+    {
+      "active": true,
+      "child": "pydantic",
+      "marker": null,
+      "parent": "loto-timer-base-84m-provider"
+    },
+    {
+      "active": true,
+      "child": "safetensors",
+      "marker": null,
+      "parent": "loto-timer-base-84m-provider"
+    },
+    {
+      "active": true,
+      "child": "torch",
+      "marker": null,
+      "parent": "loto-timer-base-84m-provider"
+    },
+    {
+      "active": true,
+      "child": "transformers",
+      "marker": null,
+      "parent": "loto-timer-base-84m-provider"
+    },
+    {
+      "active": true,
+      "child": "filelock",
+      "marker": null,
+      "parent": "huggingface-hub"
+    },
+    {
+      "active": true,
+      "child": "fsspec",
+      "marker": null,
+      "parent": "huggingface-hub"
+    },
+    {
+      "active": true,
+      "child": "hf-xet",
+      "marker": "platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64'",
+      "parent": "huggingface-hub"
+    },
+    {
+      "active": true,
+      "child": "packaging",
+      "marker": null,
+      "parent": "huggingface-hub"
+    },
+    {
+      "active": true,
+      "child": "pyyaml",
+      "marker": null,
+      "parent": "huggingface-hub"
+    },
+    {
+      "active": true,
+      "child": "requests",
+      "marker": null,
+      "parent": "huggingface-hub"
+    },
+    {
+      "active": true,
+      "child": "tqdm",
+      "marker": null,
+      "parent": "huggingface-hub"
+    },
+    {
+      "active": true,
+      "child": "typing-extensions",
+      "marker": null,
+      "parent": "huggingface-hub"
+    },
+    {
+      "active": true,
+      "child": "annotated-types",
+      "marker": null,
+      "parent": "pydantic"
+    },
+    {
+      "active": true,
+      "child": "pydantic-core",
+      "marker": null,
+      "parent": "pydantic"
+    },
+    {
+      "active": true,
+      "child": "typing-extensions",
+      "marker": null,
+      "parent": "pydantic"
+    },
+    {
+      "active": true,
+      "child": "typing-inspection",
+      "marker": null,
+      "parent": "pydantic"
+    },
+    {
+      "active": true,
+      "child": "filelock",
+      "marker": null,
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "fsspec",
+      "marker": null,
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "jinja2",
+      "marker": null,
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "networkx",
+      "marker": null,
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cublas-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cuda-cupti-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cuda-nvrtc-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cuda-runtime-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cudnn-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cufft-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cufile-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-curand-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cusolver-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cusparse-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cusparselt-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-nccl-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-nvjitlink-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-nvshmem-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "nvidia-nvtx-cu12",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "sympy",
+      "marker": null,
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "triton",
+      "marker": "sys_platform == 'linux'",
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "typing-extensions",
+      "marker": null,
+      "parent": "torch"
+    },
+    {
+      "active": true,
+      "child": "filelock",
+      "marker": null,
+      "parent": "transformers"
+    },
+    {
+      "active": true,
+      "child": "huggingface-hub",
+      "marker": null,
+      "parent": "transformers"
+    },
+    {
+      "active": true,
+      "child": "numpy",
+      "marker": null,
+      "parent": "transformers"
+    },
+    {
+      "active": true,
+      "child": "packaging",
+      "marker": null,
+      "parent": "transformers"
+    },
+    {
+      "active": true,
+      "child": "pyyaml",
+      "marker": null,
+      "parent": "transformers"
+    },
+    {
+      "active": true,
+      "child": "regex",
+      "marker": null,
+      "parent": "transformers"
+    },
+    {
+      "active": true,
+      "child": "requests",
+      "marker": null,
+      "parent": "transformers"
+    },
+    {
+      "active": true,
+      "child": "safetensors",
+      "marker": null,
+      "parent": "transformers"
+    },
+    {
+      "active": true,
+      "child": "tokenizers",
+      "marker": null,
+      "parent": "transformers"
+    },
+    {
+      "active": true,
+      "child": "tqdm",
+      "marker": null,
+      "parent": "transformers"
+    },
+    {
+      "active": true,
+      "child": "certifi",
+      "marker": null,
+      "parent": "requests"
+    },
+    {
+      "active": true,
+      "child": "charset-normalizer",
+      "marker": null,
+      "parent": "requests"
+    },
+    {
+      "active": true,
+      "child": "idna",
+      "marker": null,
+      "parent": "requests"
+    },
+    {
+      "active": true,
+      "child": "urllib3",
+      "marker": null,
+      "parent": "requests"
+    },
+    {
+      "active": false,
+      "child": "colorama",
+      "marker": "sys_platform == 'win32'",
+      "parent": "tqdm"
+    },
+    {
+      "active": true,
+      "child": "typing-extensions",
+      "marker": null,
+      "parent": "pydantic-core"
+    },
+    {
+      "active": true,
+      "child": "typing-extensions",
+      "marker": null,
+      "parent": "typing-inspection"
+    },
+    {
+      "active": true,
+      "child": "markupsafe",
+      "marker": null,
+      "parent": "jinja2"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cublas-cu12",
+      "marker": null,
+      "parent": "nvidia-cudnn-cu12"
+    },
+    {
+      "active": true,
+      "child": "nvidia-nvjitlink-cu12",
+      "marker": null,
+      "parent": "nvidia-cufft-cu12"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cublas-cu12",
+      "marker": null,
+      "parent": "nvidia-cusolver-cu12"
+    },
+    {
+      "active": true,
+      "child": "nvidia-cusparse-cu12",
+      "marker": null,
+      "parent": "nvidia-cusolver-cu12"
+    },
+    {
+      "active": true,
+      "child": "nvidia-nvjitlink-cu12",
+      "marker": null,
+      "parent": "nvidia-cusolver-cu12"
+    },
+    {
+      "active": true,
+      "child": "nvidia-nvjitlink-cu12",
+      "marker": null,
+      "parent": "nvidia-cusparse-cu12"
+    },
+    {
+      "active": true,
+      "child": "mpmath",
+      "marker": null,
+      "parent": "sympy"
+    },
+    {
+      "active": true,
+      "child": "huggingface-hub",
+      "marker": null,
+      "parent": "tokenizers"
+    }
+  ],
+  "inactive_lock_only_packages": [
+    "colorama"
+  ],
+  "installed_count": 44,
+  "lock_package_count": 46,
+  "missing_active_packages": [],
+  "registry_lock_count": 45,
+  "schema_version": "timer-base-84m.active-lock-analysis.v1",
+  "target_environment": {
+    "implementation_name": "cpython",
+    "implementation_version": "3.13.13",
+    "os_name": "posix",
+    "platform_machine": "x86_64",
+    "platform_python_implementation": "CPython",
+    "platform_release": "7.0.0-29-generic",
+    "platform_system": "Linux",
+    "platform_version": "#29-Ubuntu SMP PREEMPT_DYNAMIC Fri Jul 17 20:52:35 UTC 2026",
+    "python_full_version": "3.10.19",
+    "python_version": "3.10",
+    "sys_platform": "linux"
+  },
+  "unexpected_installed_packages": []
+}

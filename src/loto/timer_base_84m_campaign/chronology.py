@@ -3,8 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import date, timedelta
-from enum import StrEnum
 
+from loto.timer_base_84m_campaign._compat import StrEnum
 from loto.timer_base_84m_campaign.geometry import Game, geometry_for
 
 

@@ -1,0 +1,70 @@
+{
+  "schema_version": "timer-base-84m.snapshot-provenance.v1",
+  "status": "VERIFIED",
+  "repo_id": "thuml/timer-base-84m",
+  "requested_revision": "70077a71acce1b4c00d98332fcaabc694255d8e5",
+  "resolved_revision": "70077a71acce1b4c00d98332fcaabc694255d8e5",
+  "file_count": 8,
+  "manifest_sha256": "0cc9cd7d341e7a103f7c6bc4e3067af97dd4940576719d1bdd7ebcf3b3c54c2a",
+  "audit_evidence": {
+    "workflow_run": 31300800925,
+    "job": 93213125137,
+    "artifact": 9034418795,
+    "artifact_digest": "sha256:cca0ed50fe761b36df2821c56fcc190aaad90dd5532684667e117905838e7bc2",
+    "hash_report_run": 31300879321,
+    "hash_report_job": 93213322041
+  },
+  "files": [
+    {
+      "path": ".gitattributes",
+      "size_bytes": 1519,
+      "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 4014,
+      "sha256": "da6dcfdebb53e79e97e159ca605942b7c8c580d4c816c60016349d5c5b0ed9bb"
+    },
+    {
+      "path": "config.json",
+      "size_bytes": 682,
+      "sha256": "8cf274b6192f6114a0988d1e70277c69531db3611866ae7d4c6f82819c469c7e"
+    },
+    {
+      "path": "configuration_timer.py",
+      "size_bytes": 1370,
+      "sha256": "bec2d7ed868b57d7046f097cad166d8e935920aa082cc6e9bb2cc53b9b626173"
+    },
+    {
+      "path": "generation_config.json",
+      "size_bytes": 73,
+      "sha256": "f6f95f062b96cc8c5d0954c6540beff706aa6d0982b5474925c6639bc3b5def9"
+    },
+    {
+      "path": "model.safetensors",
+      "size_bytes": 336580760,
+      "sha256": "9c3d18f12ffe1ea7d4fa70eb3304b26e3841164a6a265fbae4f7a05cd213aa3d"
+    },
+    {
+      "path": "modeling_timer.py",
+      "size_bytes": 23962,
+      "sha256": "a625da46370e044609f1cd601eb2899aaf8a8e2dd5966bcfadc9d7f89a5092ad"
+    },
+    {
+      "path": "ts_generation_mixin.py",
+      "size_bytes": 13353,
+      "sha256": "357d4aa6fd24f107bef5665f82fe2c7df278f4ff151c4493dbaa9f43655b55a1"
+    }
+  ],
+  "path_checks": {
+    "regular_files_only": true,
+    "symlink_free": true,
+    "path_containment_verified": true
+  },
+  "execution_boundary": {
+    "trust_remote_code_executed": false,
+    "remote_code_imported": false,
+    "model_loaded": false,
+    "inference_executed": false
+  }
+}

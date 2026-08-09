@@ -1,0 +1,146 @@
+{
+  "artifact_count": 28,
+  "artifacts": [
+    {
+      "path": "cpu-ended_at_utc.txt",
+      "sha256": "73e2df47a7073616ce3228ab075920aa41e1f2cc6b0c59af5042b0e8673d7005",
+      "size_bytes": 21
+    },
+    {
+      "path": "cpu-exitcode.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "size_bytes": 2
+    },
+    {
+      "path": "cpu-requests.jsonl",
+      "sha256": "cd8e207e6110b7e8fd71d60f20582869aaf491087352240be52f51e593cf0923",
+      "size_bytes": 1447476
+    },
+    {
+      "path": "cpu-results.jsonl",
+      "sha256": "19bf1d9934d7ae8c3756342b90fb6e7f4b47e9874503659ab68f21608f0a4db7",
+      "size_bytes": 271666
+    },
+    {
+      "path": "cpu-started_at_utc.txt",
+      "sha256": "6883171417a3fd3644931726111882d60487fbf0962a99a700ec0ccffc3ba66a",
+      "size_bytes": 21
+    },
+    {
+      "path": "cpu-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "cpu-stdout.txt",
+      "sha256": "173348c3c448b2520ac07de4cc8a8ae6a573f3d98ff257ec684716736cc6d45b",
+      "size_bytes": 1846
+    },
+    {
+      "path": "cpu-summary.json",
+      "sha256": "4aa8f2ab799de1f00faf56ba75e3b90633d6e2a6ae9c394dce9ce9f26980f6a6",
+      "size_bytes": 2008
+    },
+    {
+      "path": "cpu-summary.raw.json",
+      "sha256": "4aa8f2ab799de1f00faf56ba75e3b90633d6e2a6ae9c394dce9ce9f26980f6a6",
+      "size_bytes": 2008
+    },
+    {
+      "path": "cross-device-comparison.json",
+      "sha256": "668e4278678af777860c0cafe0fd9c9ba34285d708a059dec7479ed8d9accc3d",
+      "size_bytes": 44750
+    },
+    {
+      "path": "cuda-ended_at_utc.txt",
+      "sha256": "aba7a3fe3624e8912edacc784e8c753d89f1c5e587c7c93cf7997462870b3d05",
+      "size_bytes": 21
+    },
+    {
+      "path": "cuda-exitcode.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "size_bytes": 2
+    },
+    {
+      "path": "cuda-nvidia-smi-compute-after.txt",
+      "sha256": "7614fa6d3f742b8b021ed38179580f676643ad5601f9c71cab711037236adbaa",
+      "size_bytes": 54
+    },
+    {
+      "path": "cuda-nvidia-smi-compute-poll.log",
+      "sha256": "4d1ae8f95a2d68efef60bbf1e7bf898632c9af7084fcb2e2826a297307f667c8",
+      "size_bytes": 2038
+    },
+    {
+      "path": "cuda-provider-pid.txt",
+      "sha256": "6067747f34b43026d97717aa78d4a8b4056a02a58d2174f408bdad58a1bf3e26",
+      "size_bytes": 7
+    },
+    {
+      "path": "cuda-requests.jsonl",
+      "sha256": "7e29eeafc0c8c71857454e52ecefb5334bfeb02e67f1a0ae48c093c9d86cbcee",
+      "size_bytes": 1447716
+    },
+    {
+      "path": "cuda-results.jsonl",
+      "sha256": "2903da75881b8ef05474265ceec56eb220487f0603173068c50cf5700cc0c8e7",
+      "size_bytes": 304241
+    },
+    {
+      "path": "cuda-started_at_utc.txt",
+      "sha256": "60286de01114bc32bc5c9b840883d8892551cb01281028e358e3b6b3925448ee",
+      "size_bytes": 21
+    },
+    {
+      "path": "cuda-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "cuda-stdout.txt",
+      "sha256": "62280a716eb093e0646203016f7db87b195dde48cc14b387a5e252c8bcbf185c",
+      "size_bytes": 1928
+    },
+    {
+      "path": "cuda-summary.json",
+      "sha256": "84db145b560dd114fe2edbaff62027224ee6783195df731c66b0e603bf1965f1",
+      "size_bytes": 2342
+    },
+    {
+      "path": "cuda-summary.raw.json",
+      "sha256": "2373709e8eab3574b5ab4186e269196cca2d60b54fecd54c3340d3ef962506e6",
+      "size_bytes": 2090
+    },
+    {
+      "path": "gpu-after.csv",
+      "sha256": "68eca201550fe0bb5fadac82685ec194bbb170dca75afa444b78517fe50cfb3a",
+      "size_bytes": 100
+    },
+    {
+      "path": "gpu-before.csv",
+      "sha256": "68eca201550fe0bb5fadac82685ec194bbb170dca75afa444b78517fe50cfb3a",
+      "size_bytes": 100
+    },
+    {
+      "path": "layout-comparison.json",
+      "sha256": "0721caf59c9c580e7c13285d71b13a712b0a385c3661c1bd87d1d88f97cf5bdb",
+      "size_bytes": 35250
+    },
+    {
+      "path": "matrix-summary.json",
+      "sha256": "de542d651ff676ea3193905add8bded663c77b472c03bfcef21f546f629c1bbc",
+      "size_bytes": 1238
+    },
+    {
+      "path": "snapshot-verify.txt",
+      "sha256": "51a29c1b0cdfb8ad777912cce5a3a5a744ad403fc78f779ab34f0a8bd018dcff",
+      "size_bytes": 174
+    },
+    {
+      "path": "snapshot.sha256",
+      "sha256": "d3adeb44bbe722d1ad1cc5a38195c8f30d4ac409b27e8520a8e5a77b42d43f30",
+      "size_bytes": 670
+    }
+  ],
+  "schema_version": "timer-base-84m.formal-matrix-artifact-manifest.v1"
+}

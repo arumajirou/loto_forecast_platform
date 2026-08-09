@@ -1,0 +1,46 @@
+{
+  "best_seed_selected": false,
+  "cpu_case_count": 120,
+  "cpu_status": "PASS",
+  "cross_device_comparison_status": "RECORDED_NOT_REPLAY_GATE",
+  "cross_device_max_abs_diff": 1.430511474609375e-06,
+  "cuda_case_count": 120,
+  "cuda_provider_pid_released_after_exit": true,
+  "cuda_provider_pid_visible_in_nvidia_smi": true,
+  "cuda_status": "PASS",
+  "cuda_vram_released": true,
+  "dependency_lock_sha256": "5349b4ae2a1c16a0b27b4fe3cf7b77a3d8bd6d0a22329b8b66691c5e3e63efe0",
+  "games": [
+    "numbers3",
+    "numbers4",
+    "miniloto",
+    "loto6",
+    "loto7"
+  ],
+  "holdout_accessed": false,
+  "horizons": [
+    1,
+    2,
+    5
+  ],
+  "layouts": [
+    "position_univariate",
+    "position_panel_batched_univariate"
+  ],
+  "prospective_accessed": false,
+  "runner_sha256": "df4d0630b3b79ee52e1f0c03ca8564f14f8d1b4ce5a57fa60e1901fdb50762f9",
+  "schema_version": "timer-base-84m.formal-runtime-matrix.v1",
+  "seeds": [
+    1,
+    7
+  ],
+  "shell_sha256": "af52aa1ff2953969e974c61ded6d98ecd7b3da66cda9fe690aff25aebf1e896b",
+  "source_head_sha": "ee9d3e7000211da897dc3ae16b04041b26af4b4e",
+  "status": "PASS",
+  "synthetic_contract_matrix": true,
+  "time_axes": [
+    "draw_sequence",
+    "calendar_time"
+  ],
+  "total_case_count": 240
+}

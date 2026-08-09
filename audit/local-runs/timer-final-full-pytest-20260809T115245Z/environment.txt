@@ -1,0 +1,7 @@
+run_id=timer-final-full-pytest-20260809T115245Z
+source_head=0d962372a9e3239b52fe5d8dd7f1c41c8e127c7f
+branch=feat/timer-base-84m-runtime-certification-v1
+started_at_utc=2026-08-09T11:52:47Z
+uv=uv 0.11.32 (x86_64-unknown-linux-gnu)
+host_python=Python 3.14.4
+test_python_requested=3.13

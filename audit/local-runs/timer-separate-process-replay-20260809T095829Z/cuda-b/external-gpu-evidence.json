@@ -1,0 +1,12 @@
+{
+  "gpu_uuid": "GPU-fac07577-072e-c021-9ac4-d7dc9b9711af",
+  "label": "cuda-b",
+  "provider_pid": 309293,
+  "provider_pid_released_after_exit": true,
+  "provider_pid_visible_in_nvidia_smi": true,
+  "vram_after_total_mib": 14394,
+  "vram_before_total_mib": 14394,
+  "vram_peak_provider_mib": 722,
+  "vram_release_tolerance_mib": 256,
+  "vram_released": true
+}

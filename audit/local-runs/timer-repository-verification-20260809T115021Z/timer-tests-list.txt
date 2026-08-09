@@ -1,0 +1,5 @@
+tests/adapters/timer_base_84m/test_contracts.py
+tests/adapters/timer_base_84m/test_provider.py
+tests/timer_base_84m_campaign/test_chronology.py
+tests/timer_base_84m_campaign/test_provenance.py
+tests/unit/test_timer_base_84m_runtime_provider.py

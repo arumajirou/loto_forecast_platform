@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Isolated fail-closed Timer Base 84M provider contract lane"
 requires-python = ">=3.10,<3.11"
 dependencies = [
+  "torch==2.9.1",
   "transformers==4.40.1",
   "huggingface-hub>=0.24,<1",
   "safetensors>=0.4,<1",
@@ -11,5 +12,14 @@ dependencies = [
   "pydantic>=2.10,<3",
 ]
 
-# PR-A intentionally omits torch and uv.lock. PR-B must select and review an exact
-# compatible torch version before any checkpoint load or inference is permitted.
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+# PR-B candidate selection only. The lock and exact artifact graph must be reviewed
+# before any install/import/model load is permitted. Timer remote-code approval remains
+# false until a named human review is bound to the exact pinned source bytes.

@@ -1,0 +1,1 @@
+UV_PYTHON=3.13 CUBLAS_WORKSPACE_CONFIG=:4096:8 uv run --frozen --extra api --extra dev --extra postgres python -m pytest -q

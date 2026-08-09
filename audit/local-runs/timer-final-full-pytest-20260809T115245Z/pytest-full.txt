@@ -1,0 +1,94 @@
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........s............................................................... [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+...................s.................................................... [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+..............................................ss........................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+............................................s........................... [ 76%]
+........................................................................ [ 78%]
+........s............................................................... [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+....................                                                     [100%]
+=============================== warnings summary ===============================
+tests/auto_campaign/test_runner_automodel_identity.py::test_neuralforecast_deep_copies_models_on_construction
+tests/auto_campaign/test_runner_automodel_identity.py::test_neuralforecast_deep_copies_models_on_construction
+tests/runtime_validation/test_runtime_validation_contracts.py::test_autohint_worker_fixed_hint_predicts_7_positions
+  /home/az/worktrees/pr238-local-20260809T080814Z/.venv/lib/python3.13/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:433: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=31` in the `DataLoader` to improve performance.
+
+tests/auto_campaign/test_runner_automodel_identity.py::test_neuralforecast_deep_copies_models_on_construction
+tests/auto_campaign/test_runner_automodel_identity.py::test_neuralforecast_deep_copies_models_on_construction
+tests/runtime_validation/test_runtime_validation_contracts.py::test_autohint_worker_fixed_hint_predicts_7_positions
+  /home/az/worktrees/pr238-local-20260809T080814Z/.venv/lib/python3.13/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:433: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=31` in the `DataLoader` to improve performance.
+
+tests/auto_campaign/test_runner_automodel_identity.py::test_save_best_model_bundle_fails_on_original_but_passes_on_fitted
+tests/runtime_validation/test_runtime_validation_contracts.py::test_autohint_worker_fixed_hint_predicts_7_positions
+  /home/az/worktrees/pr238-local-20260809T080814Z/.venv/lib/python3.13/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:433: The 'predict_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=31` in the `DataLoader` to improve performance.
+
+tests/auto_campaign/test_search_policy_integration.py::test_campaign_uses_the_shared_optuna_policy
+tests/test_neuralforecast_search_policy.py::test_optuna_materialization_preserves_seed_and_tpe_contract
+  /home/az/worktrees/pr238-local-20260809T080814Z/src/loto/models/neuralforecast_search_policy.py:176: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+    algorithm = cls(**decision.algorithm_kwargs)
+
+tests/auto_campaign/test_search_policy_integration.py::test_campaign_uses_the_shared_optuna_policy
+tests/test_neuralforecast_search_policy.py::test_optuna_materialization_preserves_seed_and_tpe_contract
+  /home/az/worktrees/pr238-local-20260809T080814Z/src/loto/models/neuralforecast_search_policy.py:176: ExperimentalWarning: Argument ``group`` is an experimental feature. The interface can change in the future.
+    algorithm = cls(**decision.algorithm_kwargs)
+
+tests/gluonts_campaign/test_p7d.py::test_duplicate_member_is_rejected
+  /home/az/.local/share/uv/python/cpython-3.13.13-linux-x86_64-gnu/lib/python3.13/zipfile/__init__.py:1655: UserWarning: Duplicate name: 'run/RUN_ID'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+tests/runtime_validation/test_runtime_validation_contracts.py::test_autohint_worker_fixed_hint_predicts_7_positions
+tests/runtime_validation/test_runtime_validation_contracts.py::test_autohint_worker_fixed_hint_predicts_7_positions
+  /home/az/worktrees/pr238-local-20260809T080814Z/.venv/lib/python3.13/site-packages/pytorch_lightning/trainer/setup.py:166: GPU available but not used. You can set it by doing `Trainer(accelerator='gpu')`.
+
+tests/test_integrated_full_features.py::test_api_exposes_runs_events_resources_and_games
+tests/test_neuralforecast_adapter.py::test_timesnet_fft_forces_full_precision
+tests/test_neuralforecast_adapter.py::test_early_stop_is_placed_inside_model_config_not_constructor_kwargs
+tests/test_neuralforecast_db_automodel.py::test_official_320_resources_use_ray_options_not_removed_legacy_arguments
+  /home/az/worktrees/pr238-local-20260809T080814Z/src/loto/models/neuralforecast_adapter.py:103: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+    optuna.samplers.TPESampler(seed=seed, multivariate=True),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html

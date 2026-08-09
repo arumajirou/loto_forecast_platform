@@ -75,15 +75,15 @@ class TimerRequest(StrictModel):
         "load",
         "predict",
     ]
-    model_id: Literal[MODEL_ID]
-    repo_id: Literal[REPO_ID]
-    package_version: Literal[TRANSFORMERS_VERSION]
-    source_revision: Literal[SOURCE_REVISION]
-    observed_source_head: Literal[OBSERVED_SOURCE_HEAD]
-    model_revision: Literal[MODEL_REVISION]
-    config_sha256: Literal[CONFIG_SHA256]
-    weight_sha256: Literal[WEIGHT_SHA256]
-    license: Literal[LICENSE]
+    model_id: Literal[MODEL_ID]  # type: ignore[valid-type]
+    repo_id: Literal[REPO_ID]  # type: ignore[valid-type]
+    package_version: Literal[TRANSFORMERS_VERSION]  # type: ignore[valid-type]
+    source_revision: Literal[SOURCE_REVISION]  # type: ignore[valid-type]
+    observed_source_head: Literal[OBSERVED_SOURCE_HEAD]  # type: ignore[valid-type]
+    model_revision: Literal[MODEL_REVISION]  # type: ignore[valid-type]
+    config_sha256: Literal[CONFIG_SHA256]  # type: ignore[valid-type]
+    weight_sha256: Literal[WEIGHT_SHA256]  # type: ignore[valid-type]
+    license: Literal[LICENSE]  # type: ignore[valid-type]
     game: Game
     target_layout: Literal["position_univariate", "position_panel_batched_univariate"]
     context_length: int
@@ -139,38 +139,45 @@ class TimerResponse(StrictModel):
         "VALIDATED",
         "ENVIRONMENT_VALIDATED",
         "SNAPSHOT_MANIFEST_VALIDATED",
-        "EXECUTION_PENDING",
+        "LOADED",
+        "PREDICTED",
         "RUNTIME_NOT_CERTIFIED",
-        "CHECKPOINT_LOAD_PENDING",
-        "DEPENDENCY_LOCK_PENDING",
+        "DEPENDENCY_LOCK_INVALID",
         "REMOTE_CODE_REVIEW_REQUIRED",
+        "SNAPSHOT_HASH_MISMATCH",
+        "UNSUPPORTED_RUNTIME_LANE",
+        "MODEL_NOT_LOADED",
+        "CUDA_UNAVAILABLE",
     ]
-    model_id: Literal[MODEL_ID]
-    repo_id: Literal[REPO_ID]
-    package_version: Literal[TRANSFORMERS_VERSION]
-    source_revision: Literal[SOURCE_REVISION]
-    observed_source_head: Literal[OBSERVED_SOURCE_HEAD]
-    model_revision: Literal[MODEL_REVISION]
-    config_sha256: Literal[CONFIG_SHA256]
-    weight_sha256: Literal[WEIGHT_SHA256]
-    license: Literal[LICENSE]
+    model_id: Literal[MODEL_ID]  # type: ignore[valid-type]
+    repo_id: Literal[REPO_ID]  # type: ignore[valid-type]
+    package_version: Literal[TRANSFORMERS_VERSION]  # type: ignore[valid-type]
+    source_revision: Literal[SOURCE_REVISION]  # type: ignore[valid-type]
+    observed_source_head: Literal[OBSERVED_SOURCE_HEAD]  # type: ignore[valid-type]
+    model_revision: Literal[MODEL_REVISION]  # type: ignore[valid-type]
+    config_sha256: Literal[CONFIG_SHA256]  # type: ignore[valid-type]
+    weight_sha256: Literal[WEIGHT_SHA256]  # type: ignore[valid-type]
+    license: Literal[LICENSE]  # type: ignore[valid-type]
     game: Game
     target_layout: Literal["position_univariate", "position_panel_batched_univariate"]
     context_length: int
     prediction_length: Literal[1, 2, 5]
     seed: int
     requested_device: Literal["cpu", "cuda"]
-    effective_device: None
+    effective_device: Literal["cpu", "cuda:0"]
     cpu_fallback: Literal[False]
     input_shape: tuple[int, int]
-    output_shape: None
-    point_forecast: None
+    output_shape: tuple[int, int]
+    point_forecast: tuple[tuple[float, ...], ...]
     quantiles: None
     samples: None
-    finite_check: None
+    finite_check: Literal[True]
     chronology_evidence: ChronologyEvidence
     actuals_used: Literal[False]
-    runtime_pid: None
-    gpu_uuid: None
-    gpu_process_vram_bytes: None
+    runtime_pid: int = Field(ge=1)
+    gpu_uuid: str | None
+    gpu_process_vram_bytes: int | None = Field(default=None, ge=0)
+    input_series_sha256_f32: str = Field(pattern=r"^[0-9a-f]{64}$")
+    prediction_sha256_f32: str = Field(pattern=r"^[0-9a-f]{64}$")
+    chronology_mapping_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     artifact_paths: ArtifactPaths
