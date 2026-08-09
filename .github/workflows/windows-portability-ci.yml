@@ -130,14 +130,14 @@ jobs:
             test "$actual" = "$expected"
           done
           "$VERIFIER_VENV/bin/loto-auto-campaign" --help >/dev/null
-          "$VERIFIER_VENV/bin/loto-build-info" --json > "$RUNNER_TEMP/loto-build-info.json"
+          "$VERIFIER_VENV/bin/loto-build-info" --output "$RUNNER_TEMP/loto-build-info.json" >/dev/null
           "$VERIFIER_VENV/bin/python" - "$RUNNER_TEMP/loto-build-info.json" "$version" <<'PY'
           import json
           import sys
           from pathlib import Path
           payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-          assert payload["version"] == sys.argv[2], payload
-          print(f"build_info_version={payload['version']}")
+          assert payload["package_version"] == sys.argv[2], payload
+          print(f"build_info_version={payload['package_version']}")
           PY
 
       - name: Build wheel and verify dynamic package metadata
