@@ -45,7 +45,14 @@ def _history(position_count: int, rows: int = 24) -> pd.DataFrame:
 
 
 @pytest.mark.parametrize(
-    ("game_id", "position_count", "candidate_min", "candidate_max", "allow_duplicates", "sort_policy"),
+    (
+        "game_id",
+        "position_count",
+        "candidate_min",
+        "candidate_max",
+        "allow_duplicates",
+        "sort_policy",
+    ),
     [
         ("numbers3", 3, 0, 9, True, "preserve"),
         ("numbers4", 4, 0, 9, True, "preserve"),
@@ -428,10 +435,7 @@ def test_load_predict_requires_and_preserves_artifact_dir(tmp_path: Path) -> Non
 
 
 def _runtime_inventory():
-    model_attrs = {
-        spec.class_name: type(spec.class_name, (), {})
-        for spec in SOURCE_MODEL_SPECS
-    }
+    model_attrs = {spec.class_name: type(spec.class_name, (), {}) for spec in SOURCE_MODEL_SPECS}
 
     class ModelRegistry:
         @staticmethod
