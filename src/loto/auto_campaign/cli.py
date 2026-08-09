@@ -222,9 +222,7 @@ def _run_portable_command(
                 mlflow_uri=args.mlflow_uri,
                 mlflow_uri_env=args.mlflow_uri_env,
                 float_tolerance=args.float_tolerance,
-                require_remote_artifacts=(
-                    not args.skip_remote_artifact_check
-                ),
+                require_remote_artifacts=(not args.skip_remote_artifact_check),
             )
             return reconcile_prospective_registry(
                 receipt_root=_resolve_path(args.run, project),
@@ -250,21 +248,13 @@ def main() -> None:
     if portable_result is not None:
         result = portable_result
     else:
-        config_path = (
-            args.config
-            if args.config.is_absolute()
-            else project / args.config
-        )
+        config_path = args.config if args.config.is_absolute() else project / args.config
         config = load_config(config_path)
         data_path = (
-            config.data_path
-            if config.data_path.is_absolute()
-            else project / config.data_path
+            config.data_path if config.data_path.is_absolute() else project / config.data_path
         )
         output_root = (
-            config.output_root
-            if config.output_root.is_absolute()
-            else project / config.output_root
+            config.output_root if config.output_root.is_absolute() else project / config.output_root
         )
         config = config.model_copy(
             update={
