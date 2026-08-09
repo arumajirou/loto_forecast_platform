@@ -114,15 +114,18 @@ jobs:
           set -Eeuo pipefail
           python="$VERIFIER_VENV/bin/python"
           out="$RUNNER_TEMP/nf-db-persistence-full-pytest-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.txt"
+          echo "FULL_PYTEST_ARTIFACT=$out" >> "$GITHUB_ENV"
           set +e
           "$python" -m pytest -q >"$out" 2>&1
           rc=$?
           set -e
-          test "$rc" -ne 0
           failed_count="$(grep -c '^FAILED ' "$out" || true)"
+          echo "FULL_PYTEST_RC=$rc"
+          echo "FULL_PYTEST_FAILED_COUNT=$failed_count"
+          grep '^FAILED ' "$out" || true
+          test "$rc" -ne 0
           test "$failed_count" -eq 11
           ! grep -Fq 'tests/test_neuralforecast_db_search_space_persistence.py::test_package_exports_keep_stable_core_class_identity' "$out"
-          echo "FULL_PYTEST_ARTIFACT=$out" >> "$GITHUB_ENV"
 
       - name: Recheck main and repository cleanliness
         if: always()
