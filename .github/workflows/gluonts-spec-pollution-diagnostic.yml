@@ -109,20 +109,38 @@ jobs:
         run: |
           set -uo pipefail
           out="$RUNNER_TEMP/gluonts-spec-focused-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.txt"
+          xml="$RUNNER_TEMP/gluonts-spec-focused-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.xml"
           set +e
-          "$VERIFIER_VENV/bin/python" -m pytest -q --tb=short \
+          "$VERIFIER_VENV/bin/python" -m pytest -q --tb=short --junitxml="$xml" \
             tests/moirai2_campaign/test_p8_runner_fake_boundary.py::test_runner_records_real_forward_device_boundary \
             tests/test_formal_backtest.py::test_formal_backtest_smoke_catalog_no_drift \
             2>&1 | tee "$out"
           rc="${PIPESTATUS[0]}"
           set -e
           test "$rc" -eq 1
-          grep -F 'FAILED tests/moirai2_campaign/test_p8_runner_fake_boundary.py::test_runner_records_real_forward_device_boundary' "$out"
-          if grep -F 'FAILED tests/test_formal_backtest.py::test_formal_backtest_smoke_catalog_no_drift' "$out"; then
-            echo 'formal backtest still fails after polluter cleanup' >&2
-            exit 1
-          fi
-          grep -E '1 failed, 1 passed' "$out"
+          "$VERIFIER_VENV/bin/python" - "$xml" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+
+          root = ET.parse(sys.argv[1]).getroot()
+          suite = root if root.tag == "testsuite" else root.find("testsuite")
+          if suite is None:
+              raise SystemExit("missing testsuite")
+          cases = suite.findall("testcase")
+          if len(cases) != 2:
+              raise SystemExit(f"expected 2 testcases, got {len(cases)}")
+          failed = [case for case in cases if case.find("failure") is not None]
+          if len(failed) != 1:
+              raise SystemExit(f"expected exactly 1 existing failure, got {len(failed)}")
+          name = failed[0].attrib.get("name", "")
+          if name != "test_runner_records_real_forward_device_boundary":
+              raise SystemExit(f"unexpected failed testcase: {name}")
+          formal = [case for case in cases if case.attrib.get("name") == "test_formal_backtest_smoke_catalog_no_drift"]
+          if len(formal) != 1 or formal[0].find("failure") is not None or formal[0].find("error") is not None:
+              raise SystemExit("formal backtest did not pass after polluter teardown")
+          print("focused_existing_p8_failure=1")
+          print("focused_formal_backtest_pass=1")
+          PY
 
       - name: Verify collection remains zero-error
         run: |
