@@ -159,13 +159,6 @@ class TimerBase84MProvider:
             )
 
     @staticmethod
-    def _hash_tensor_f32(tensor: Any) -> str:
-        value = tensor.detach().to("cpu").contiguous().to(dtype=tensor.new_empty((), dtype=None).dtype)
-        value = value.to(dtype=value.float().dtype)
-        raw = value.numpy().astype("<f4", copy=False).tobytes()
-        return hashlib.sha256(raw).hexdigest()
-
-    @staticmethod
     def _gpu_process_evidence(pid: int) -> tuple[str | None, int | None]:
         try:
             result = subprocess.run(
@@ -373,10 +366,7 @@ class TimerBase84MProvider:
         self._model = None
         self._loaded_snapshot = None
         if model is not None:
-            try:
-                model.to("cpu")
-            except Exception:
-                pass
+            model.to("cpu")
             del model
         if torch is not None and torch.cuda.is_available():
             torch.cuda.empty_cache()
