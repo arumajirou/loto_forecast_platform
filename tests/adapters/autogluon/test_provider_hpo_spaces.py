@@ -24,6 +24,7 @@ class SpaceConstructor:
 
 class FakePredictor:
     fit_kwargs = None
+    predict_kwargs = None
 
     def __init__(self, **kwargs):
         self.path = kwargs["path"]
@@ -34,7 +35,8 @@ class FakePredictor:
 
         Path(self.path, "model.txt").write_text("fake\n", encoding="utf-8")
 
-    def predict(self, _time_series):
+    def predict(self, _time_series, **kwargs):
+        type(self).predict_kwargs = kwargs
         rows = []
         for index in range(1, 4):
             rows.append(
@@ -135,6 +137,7 @@ def test_hpo_descriptor_is_materialized_inside_provider(monkeypatch, tmp_path) -
     descriptor = FakePredictor.fit_kwargs["hyperparameters"]["SeasonalNaive"]["seasonal_period"]
     assert descriptor["space"] == "Categorical"
     assert descriptor["args"] == (1, 2)
+    assert FakePredictor.predict_kwargs == {"random_seed": 1}
 
 
 def test_non_hpo_mode_rejects_search_space_before_runtime(tmp_path) -> None:
