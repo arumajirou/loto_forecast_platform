@@ -1,0 +1,380 @@
+name: autogluon-shared-integration-builder
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/autogluon-shared-integration-builder.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    env:
+      EXPECTED_MAIN_SHA: "1a0b7b60a11923bc442a129071280219dcf80111"
+      UV_VERSION: "0.11.21"
+    steps:
+      - name: Verify trusted runner
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout writable PR branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
+          fetch-depth: 0
+          clean: true
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+
+      - name: Verify base and patch shared files
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN_SHA"
+          python3 - <<'PY'
+          from pathlib import Path
+
+          workers_path = Path("src/loto/models/workers.py")
+          workers = workers_path.read_text(encoding="utf-8")
+          import_anchor = "from loto.models.providers import FoundationProviderError, get_foundation_provider\n"
+          import_block = """from loto.models.autogluon_shared import (\n    AutoGluonSharedContractError,\n    adapt_autogluon_provider_response,\n    build_autogluon_provider_request,\n)\nfrom loto.models.providers import FoundationProviderError, get_foundation_provider\n"""
+          if "from loto.models.autogluon_shared import" not in workers:
+              if workers.count(import_anchor) != 1:
+                  raise SystemExit("unexpected workers import anchor count")
+              workers = workers.replace(import_anchor, import_block, 1)
+
+          start_marker = "    def _invoke_autogluon_subprocess(self, request: dict[str, Any]) -> dict[str, Any]:\n"
+          end_marker = "    def _darts(self, history: pd.DataFrame) -> WorkerOutput:\n"
+          start = workers.find(start_marker)
+          end = workers.find(end_marker, start)
+          if start < 0 or end < 0:
+              raise SystemExit("AutoGluon worker replacement markers not found")
+
+          replacement = '''    def _invoke_autogluon_subprocess(self, request: dict[str, Any]) -> dict[str, Any]:
+              if not AUTOGLUON_ENV.exists():
+                  raise WorkerSubprocessError(
+                      "DEPENDENCY_MISSING",
+                      f"missing AutoGluon-TimeSeries environment: {AUTOGLUON_ENV}",
+                  )
+              if not (AUTOGLUON_ENV / "uv.lock").exists():
+                  raise WorkerSubprocessError(
+                      "DEPENDENCY_MISSING",
+                      f"missing AutoGluon-TimeSeries lockfile: {AUTOGLUON_ENV / 'uv.lock'}",
+                  )
+              if not AUTOGLUON_RUNNER.exists():
+                  raise WorkerSubprocessError(
+                      "PROVIDER_NOT_IMPLEMENTED",
+                      f"missing AutoGluon-TimeSeries runner: {AUTOGLUON_RUNNER}",
+                  )
+              with tempfile.TemporaryDirectory(prefix="loto-autogluon-ts-") as tmp:
+                  request_path = Path(tmp) / "provider_request.json"
+                  response_path = Path(tmp) / "provider_response.json"
+                  request_path.write_text(json.dumps(request, ensure_ascii=False), encoding="utf-8")
+                  proc = subprocess.run(
+                      [
+                          "uv",
+                          "run",
+                          "--project",
+                          str(AUTOGLUON_ENV),
+                          "--locked",
+                          "python",
+                          str(AUTOGLUON_RUNNER),
+                          "--request",
+                          str(request_path),
+                          "--response",
+                          str(response_path),
+                      ],
+                      cwd=ROOT,
+                      capture_output=True,
+                      text=True,
+                      timeout=int(self.params.get("provider_timeout", 900)),
+                      check=False,
+                  )
+                  if proc.returncode != 0:
+                      raise WorkerSubprocessError(
+                          "ERROR",
+                          "AutoGluon-TimeSeries subprocess failed "
+                          f"rc={proc.returncode}: {proc.stderr[-2000:] or proc.stdout[-2000:]}",
+                      )
+                  try:
+                      response = json.loads(response_path.read_text(encoding="utf-8"))
+                  except json.JSONDecodeError as exc:
+                      raise WorkerSubprocessError(
+                          "ERROR",
+                          f"AutoGluon-TimeSeries provider returned invalid JSON: {exc}",
+                      ) from exc
+              if response.get("status") != "OK":
+                  if int(request.get("schema_version", 1)) == 2:
+                      error = response.get("error") or {}
+                      code = str(error.get("code") or response.get("status") or "ERROR")
+                      message = str(
+                          error.get("message")
+                          or response.get("message")
+                          or "AutoGluon-TimeSeries provider failed"
+                      )
+                  else:
+                      code = str(response.get("status", "ERROR"))
+                      message = str(
+                          response.get("message", "AutoGluon-TimeSeries provider failed")
+                      )
+                  raise WorkerSubprocessError(code, message)
+
+              if int(request.get("schema_version", 1)) == 1:
+                  predictions = np.asarray(response.get("predictions"), dtype=float)
+                  expected = len(request.get("position_columns", []))
+                  if expected <= 0:
+                      raise WorkerSubprocessError(
+                          "INVALID_REQUEST",
+                          "provider request has no position columns",
+                      )
+                  if predictions.shape != (expected,) or not np.isfinite(predictions).all():
+                      raise WorkerSubprocessError(
+                          "PREDICTION_MISMATCH",
+                          "AutoGluon-TimeSeries provider returned invalid "
+                          f"predictions shape={predictions.shape}",
+                      )
+              return response
+
+          def _autogluon_v1_compat(self, history: pd.DataFrame) -> WorkerOutput:
+              columns = [*self._columns(history), "draw_date"]
+              payload = history[columns].copy()
+              payload["draw_date"] = payload["draw_date"].astype(str)
+              artifact_dir = tempfile.mkdtemp(prefix="loto-autogluon-artifact-")
+              request = {
+                  "schema_version": 1,
+                  "model_id": self.spec.model_id,
+                  "mode": "fit_predict_save",
+                  "artifact_dir": artifact_dir,
+                  "history": payload.to_dict(orient="records"),
+                  "position_columns": self._columns(history),
+                  "presets": self.params.get("presets", "fast_training"),
+                  "time_limit": self.params.get("time_limit", 120),
+                  "prediction_length": 1,
+                  "eval_metric": "MAE",
+                  "seed": self.seed,
+                  "device": self.device if self.device != "auto" else "cpu",
+              }
+              response = self._invoke_autogluon_subprocess(request)
+              values = np.asarray(response["predictions"], dtype=float)
+              properties = response.get("properties", {})
+              return WorkerOutput(
+                  values,
+                  {
+                      "library": "autogluon",
+                      "protocol_version": 1,
+                      "compatibility_path": True,
+                      "model_best": properties.get("model_best"),
+                      "presets": properties.get("presets"),
+                  },
+                  model_artifact_payload={
+                      "library": "autogluon",
+                      "artifact_dir": artifact_dir,
+                      "request": request,
+                      "response": response,
+                  },
+              )
+
+          def _autogluon(self, history: pd.DataFrame) -> WorkerOutput:
+              protocol_version = int(self.params.get("protocol_version", 2))
+              if protocol_version == 1:
+                  return self._autogluon_v1_compat(history)
+              if protocol_version != 2:
+                  raise WorkerSubprocessError(
+                      "PROTOCOL_VERSION_UNSUPPORTED",
+                      f"unsupported AutoGluon protocol_version={protocol_version}",
+                  )
+
+              operation = str(self.params.get("operation", "fit_predict_save"))
+              configured_artifact_dir = self.params.get("artifact_dir")
+              if operation == "load_predict" and not configured_artifact_dir:
+                  raise WorkerSubprocessError(
+                      "ARTIFACT_MISSING",
+                      "AutoGluon load_predict requires params['artifact_dir']",
+                  )
+              if configured_artifact_dir:
+                  artifact_dir = str(Path(str(configured_artifact_dir)).resolve())
+              else:
+                  artifact_dir = tempfile.mkdtemp(prefix="loto-autogluon-artifact-")
+
+              requested_device = (
+                  self.device
+                  if self.device != "auto"
+                  else str(self.params.get("requested_device", "cpu"))
+              )
+              try:
+                  request = build_autogluon_provider_request(
+                      history,
+                      position_columns=self._columns(history),
+                      params=self.params,
+                      requested_device=requested_device,
+                      artifact_dir=artifact_dir,
+                  )
+                  response = self._invoke_autogluon_subprocess(request)
+                  result = adapt_autogluon_provider_response(
+                      request,
+                      response,
+                      params=self.params,
+                  )
+              except AutoGluonSharedContractError as exc:
+                  raise WorkerSubprocessError(exc.code, str(exc)) from exc
+
+              return WorkerOutput(
+                  np.asarray(result.position_values, dtype=float),
+                  result.metadata,
+                  model_artifact_payload={
+                      "library": "autogluon",
+                      "artifact_dir": artifact_dir,
+                      "request": request,
+                      "response": response,
+                  },
+              )
+
+'''
+          workers = workers[:start] + replacement + workers[end:]
+          workers_path.write_text(workers, encoding="utf-8")
+
+          catalog_path = Path("src/loto/models/catalog_full.py")
+          catalog = catalog_path.read_text(encoding="utf-8")
+          typing_anchor = "from dataclasses import dataclass, field\nfrom typing import Any, Literal\n"
+          typing_replacement = """from collections.abc import Iterable\nfrom dataclasses import dataclass, field\nfrom typing import Any, Literal\n\nfrom loto.adapters.autogluon.inventory import (\n    AutoGluonRuntimeInventory,\n    SOURCE_MODEL_SPECS as AUTOGLUON_SOURCE_MODEL_SPECS,\n)\n"""
+          if "AutoGluonRuntimeInventory" not in catalog:
+              if catalog.count(typing_anchor) != 1:
+                  raise SystemExit("unexpected catalog import anchor count")
+              catalog = catalog.replace(typing_anchor, typing_replacement, 1)
+
+          all_anchor = '    "PRIMARY_SOURCES",\n]'
+          if '    "autogluon_runtime_catalog",' not in catalog:
+              if catalog.count(all_anchor) != 1:
+                  raise SystemExit("unexpected catalog __all__ anchor count")
+              catalog = catalog.replace(
+                  all_anchor,
+                  '    "PRIMARY_SOURCES",\n    "autogluon_runtime_catalog",\n]',
+                  1,
+              )
+
+          source_anchor = '    "tsfm": "huggingface.co/models?pipeline_tag=time-series-forecasting (2026-07-30)",\n}'
+          if '    "autogluon":' not in catalog.split("PRIMARY_SOURCES", 1)[1].split("}", 1)[0]:
+              if catalog.count(source_anchor) != 1:
+                  raise SystemExit("unexpected PRIMARY_SOURCES anchor count")
+              catalog = catalog.replace(
+                  source_anchor,
+                  '    "tsfm": "huggingface.co/models?pipeline_tag=time-series-forecasting (2026-07-30)",\n'
+                  '    "autogluon": "autogluon.timeseries 1.5.0 runtime model registry",\n}',
+                  1,
+              )
+
+          function_anchor = "\ndef catalog_counts() -> dict[str, int]:\n"
+          runtime_function = '''
+def autogluon_runtime_catalog(
+    inventory: AutoGluonRuntimeInventory | None = None,
+    *,
+    certified_aliases: Iterable[str] = (),
+) -> list[dict[str, Any]]:
+    """Return AutoGluon model availability without promoting static declaration to runtime success.
+
+    ``build_catalog()`` intentionally keeps one stable provider entry. This runtime-backed
+    projection expands the 29 source aliases only when a caller asks for availability evidence.
+    Certification must be supplied explicitly from retained runtime evidence; discovery/importability
+    alone never becomes certification.
+    """
+    by_alias = {entry.alias: entry for entry in inventory.models} if inventory is not None else {}
+    source_aliases = {spec.alias for spec in AUTOGLUON_SOURCE_MODEL_SPECS}
+    certified = {str(alias) for alias in certified_aliases}
+    unknown_certified = sorted(certified - source_aliases)
+    if unknown_certified:
+        raise ValueError(f"unknown certified AutoGluon aliases: {unknown_certified}")
+
+    rows: list[dict[str, Any]] = []
+    for spec in AUTOGLUON_SOURCE_MODEL_SPECS:
+        state = by_alias.get(spec.alias)
+        runtime_discovered = bool(state and state.runtime_discovered)
+        runtime_importable = bool(state and state.runtime_importable)
+        runtime_certified = bool(state and state.runtime_certified) or spec.alias in certified
+        if runtime_certified and not (runtime_discovered and runtime_importable):
+            raise ValueError(
+                f"cannot certify AutoGluon alias {spec.alias!r} without discovered/importable runtime evidence"
+            )
+        failure = state.failure if state is not None else None
+        rows.append(
+            {
+                "model_id": f"autogluon-{spec.alias.lower()}",
+                "alias": spec.alias,
+                "class_name": spec.class_name,
+                "category": spec.category,
+                "source_declared": True,
+                "runtime_discovered": runtime_discovered,
+                "runtime_importable": runtime_importable,
+                "runtime_certified": runtime_certified,
+                "runtime_class_name": state.runtime_class_name if state is not None else None,
+                "failure": (
+                    None
+                    if failure is None
+                    else {
+                        "category": failure.category.value,
+                        "subject": failure.subject,
+                        "message": failure.message,
+                        "dependency": failure.dependency,
+                        "error_type": failure.error_type,
+                    }
+                ),
+                "inventory_sha256": inventory.inventory_sha256 if inventory is not None else None,
+            }
+        )
+    return rows
+
+'''
+          if "def autogluon_runtime_catalog(" not in catalog:
+              if catalog.count(function_anchor) != 1:
+                  raise SystemExit("unexpected catalog function anchor count")
+              catalog = catalog.replace(function_anchor, runtime_function + function_anchor, 1)
+
+          provider_caps = '            capabilities=("position", "probability", "automl"),\n            supports_probabilistic=True,\n'
+          provider_caps_new = '            capabilities=("position", "probability", "automl", "protocol_v2"),\n            supports_probabilistic=True,\n            notes="stable shared provider; runtime model states come from autogluon_runtime_catalog",\n'
+          if provider_caps in catalog:
+              catalog = catalog.replace(provider_caps, provider_caps_new, 1)
+          catalog_path.write_text(catalog, encoding="utf-8")
+          PY
+
+          uvx --from ruff==0.16.0 ruff format \
+            src/loto/models/autogluon_shared.py \
+            src/loto/models/workers.py \
+            src/loto/models/catalog_full.py
+          python3 -m compileall -q \
+            src/loto/models/autogluon_shared.py \
+            src/loto/models/workers.py \
+            src/loto/models/catalog_full.py
+
+      - name: Commit source changes to PR branch
+        run: |
+          set -Eeuo pipefail
+          git status --short
+          git diff --check
+          git add \
+            src/loto/models/autogluon_shared.py \
+            src/loto/models/workers.py \
+            src/loto/models/catalog_full.py
+          if git diff --cached --quiet; then
+            echo "no source changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "feat(autogluon): wire shared protocol-v2 worker"
+          git push origin "HEAD:${GITHUB_HEAD_REF}"
