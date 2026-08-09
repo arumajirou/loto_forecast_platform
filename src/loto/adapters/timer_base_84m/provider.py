@@ -227,7 +227,8 @@ class TimerBase84MProvider:
             torch_dtype=torch.float32,
         )
         model.eval()
-        model.to("cpu")
+        # Transformers 4.40.1 AutoModel typing does not model trust_remote_code accurately.
+        model.to("cpu")  # type: ignore[arg-type]
         params = list(model.parameters())
         buffers = list(model.buffers())
         if not params:

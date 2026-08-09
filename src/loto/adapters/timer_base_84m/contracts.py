@@ -75,15 +75,15 @@ class TimerRequest(StrictModel):
         "load",
         "predict",
     ]
-    model_id: Literal[MODEL_ID]
-    repo_id: Literal[REPO_ID]
-    package_version: Literal[TRANSFORMERS_VERSION]
-    source_revision: Literal[SOURCE_REVISION]
-    observed_source_head: Literal[OBSERVED_SOURCE_HEAD]
-    model_revision: Literal[MODEL_REVISION]
-    config_sha256: Literal[CONFIG_SHA256]
-    weight_sha256: Literal[WEIGHT_SHA256]
-    license: Literal[LICENSE]
+    model_id: Literal[MODEL_ID]  # type: ignore[valid-type]
+    repo_id: Literal[REPO_ID]  # type: ignore[valid-type]
+    package_version: Literal[TRANSFORMERS_VERSION]  # type: ignore[valid-type]
+    source_revision: Literal[SOURCE_REVISION]  # type: ignore[valid-type]
+    observed_source_head: Literal[OBSERVED_SOURCE_HEAD]  # type: ignore[valid-type]
+    model_revision: Literal[MODEL_REVISION]  # type: ignore[valid-type]
+    config_sha256: Literal[CONFIG_SHA256]  # type: ignore[valid-type]
+    weight_sha256: Literal[WEIGHT_SHA256]  # type: ignore[valid-type]
+    license: Literal[LICENSE]  # type: ignore[valid-type]
     game: Game
     target_layout: Literal["position_univariate", "position_panel_batched_univariate"]
     context_length: int
@@ -149,15 +149,15 @@ class TimerResponse(StrictModel):
         "MODEL_NOT_LOADED",
         "CUDA_UNAVAILABLE",
     ]
-    model_id: Literal[MODEL_ID]
-    repo_id: Literal[REPO_ID]
-    package_version: Literal[TRANSFORMERS_VERSION]
-    source_revision: Literal[SOURCE_REVISION]
-    observed_source_head: Literal[OBSERVED_SOURCE_HEAD]
-    model_revision: Literal[MODEL_REVISION]
-    config_sha256: Literal[CONFIG_SHA256]
-    weight_sha256: Literal[WEIGHT_SHA256]
-    license: Literal[LICENSE]
+    model_id: Literal[MODEL_ID]  # type: ignore[valid-type]
+    repo_id: Literal[REPO_ID]  # type: ignore[valid-type]
+    package_version: Literal[TRANSFORMERS_VERSION]  # type: ignore[valid-type]
+    source_revision: Literal[SOURCE_REVISION]  # type: ignore[valid-type]
+    observed_source_head: Literal[OBSERVED_SOURCE_HEAD]  # type: ignore[valid-type]
+    model_revision: Literal[MODEL_REVISION]  # type: ignore[valid-type]
+    config_sha256: Literal[CONFIG_SHA256]  # type: ignore[valid-type]
+    weight_sha256: Literal[WEIGHT_SHA256]  # type: ignore[valid-type]
+    license: Literal[LICENSE]  # type: ignore[valid-type]
     game: Game
     target_layout: Literal["position_univariate", "position_panel_batched_univariate"]
     context_length: int
