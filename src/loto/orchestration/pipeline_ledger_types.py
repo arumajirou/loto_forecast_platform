@@ -129,7 +129,7 @@ def atomic_write_json(path: Path, payload: Any) -> None:
     if path.is_symlink():
         raise PipelineLedgerBlocked(f"ledger artifact is a symlink: {path}")
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
-    if temporary.exists() or temporary.is_symink():
+    if temporary.exists() or temporary.is_symlink():
         temporary.unlink()
     text = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
     try:
