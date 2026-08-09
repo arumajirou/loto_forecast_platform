@@ -65,13 +65,15 @@ def test_every_record_retains_explicit_non_claims() -> None:
 
 
 def test_registry_does_not_import_active_catalogs() -> None:
-    load_registry(REGISTRY)
     forbidden = {
         "loto.models.catalog",
         "loto.models.catalog_full",
         "loto.probabilistic.catalog",
     }
-    assert forbidden.isdisjoint(sys.modules)
+    modules_before = set(sys.modules)
+    load_registry(REGISTRY)
+    imported = set(sys.modules) - modules_before
+    assert forbidden.isdisjoint(imported)
 
 
 def test_cli_writes_valid_report(tmp_path: Path) -> None:
