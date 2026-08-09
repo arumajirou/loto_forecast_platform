@@ -1,0 +1,61 @@
+name: autogluon-mypyfix
+
+on:
+  push:
+    branches:
+      - feat/autogluon-shared-integration-v1
+    paths:
+      - .github/workflows/autogluon-mypyfix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Verify trusted runner
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+      - name: Checkout branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: feat/autogluon-shared-integration-v1
+          persist-credentials: true
+          fetch-depth: 0
+          clean: true
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: "0.11.21"
+          enable-cache: false
+      - name: Patch and validate helper
+        run: |
+          set -Eeuo pipefail
+          python3 .github/autogluon_mypyfix.py
+          uvx --from ruff==0.16.0 ruff format src/loto/models/autogluon_shared.py
+          uvx --from ruff==0.16.0 ruff check src/loto/models/autogluon_shared.py
+          uv python install 3.13
+          venv="$RUNNER_TEMP/autogluon-mypyfix-${GITHUB_RUN_ID}"
+          uv venv "$venv" --python 3.13
+          uv pip install --quiet --python "$venv/bin/python" -e ".[api,dev,postgres]"
+          "$venv/bin/python" -m mypy src/loto/models/autogluon_shared.py
+          git diff --check
+          mapfile -t changed < <(git diff --name-only)
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = "src/loto/models/autogluon_shared.py"
+      - name: Commit and push source fix
+        run: |
+          set -Eeuo pipefail
+          git add src/loto/models/autogluon_shared.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix(autogluon): make shared request builder mypy-clean"
+          git push origin HEAD:feat/autogluon-shared-integration-v1
