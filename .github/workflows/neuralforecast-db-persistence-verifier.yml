@@ -101,6 +101,27 @@ jobs:
           python="$VERIFIER_VENV/bin/python"
           "$python" -m pytest -q tests/test_neuralforecast_db_search_space_persistence.py
 
+      - name: Diagnose stable core runtime compatibility
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python="$VERIFIER_VENV/bin/python"
+          set +e
+          "$python" -m pytest -q \
+            tests/test_neuralforecast_db_automodel.py::test_single_automodel_passes_core_fit_and_runtime_certification
+          rc=$?
+          set -e
+          if [[ "$rc" -ne 0 ]]; then
+            root="${TMPDIR:-/tmp}/pytest-of-${USER}"
+            echo "=== campaign reports ==="
+            find "$root" -type f -path '*test_single_automodel_passes_c*/campaign/campaign_report.json' \
+              -print -exec cat {} \; 2>/dev/null || true
+            echo "=== model run reports ==="
+            find "$root" -type f -path '*test_single_automodel_passes_c*/campaign/models/*/run_report.json' \
+              -print -exec cat {} \; 2>/dev/null || true
+            exit "$rc"
+          fi
+
       - name: Verify collection remains zero-error
         shell: bash
         run: |
