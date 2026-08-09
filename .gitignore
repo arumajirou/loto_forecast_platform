@@ -90,6 +90,9 @@ reports/
 audit/*
 !audit/local-runs/
 !audit/local-runs/**
+!audit/tsfm-runtime/
+!audit/tsfm-runtime/timer-base-84m/
+!audit/tsfm-runtime/timer-base-84m/remote-code-review.json
 
 # Generated model artifacts
 runs/**/models/
