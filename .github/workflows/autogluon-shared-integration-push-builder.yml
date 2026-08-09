@@ -1,0 +1,71 @@
+name: autogluon-shared-integration-push-builder
+
+on:
+  push:
+    branches:
+      - feat/autogluon-shared-integration-v1
+    paths:
+      - .github/workflows/autogluon-shared-integration-push-builder.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    env:
+      EXPECTED_MAIN_SHA: "1a0b7b60a11923bc442a129071280219dcf80111"
+    steps:
+      - name: Verify trusted runner
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout writable branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: feat/autogluon-shared-integration-v1
+          persist-credentials: true
+          fetch-depth: 0
+          clean: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.11.21"
+          enable-cache: false
+
+      - name: Apply and format source patch
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN_SHA"
+          python3 .github/autogluon_shared_builder.py
+          uvx --from ruff==0.16.0 ruff format \
+            src/loto/models/autogluon_shared.py \
+            src/loto/models/workers.py \
+            src/loto/models/catalog_full.py
+          python3 -m compileall -q \
+            src/loto/models/autogluon_shared.py \
+            src/loto/models/workers.py \
+            src/loto/models/catalog_full.py
+          git diff --check
+
+      - name: Commit and push source patch
+        run: |
+          set -Eeuo pipefail
+          git add \
+            src/loto/models/autogluon_shared.py \
+            src/loto/models/workers.py \
+            src/loto/models/catalog_full.py
+          test ! -z "$(git diff --cached --name-only)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "feat(autogluon): wire shared protocol-v2 worker"
+          git push origin HEAD:feat/autogluon-shared-integration-v1
