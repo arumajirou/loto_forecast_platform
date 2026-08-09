@@ -138,8 +138,7 @@ class Moirai2Adapter:
                 "past covariate matrix SHA-256 is required",
             )
         if expected_future and (
-            evidence.known_future.sha256 is None
-            or evidence.known_future_tail_sha256 is None
+            evidence.known_future.sha256 is None or evidence.known_future_tail_sha256 is None
         ):
             raise Moirai2AdapterError(
                 "COVARIATE_HASH_MISSING",
