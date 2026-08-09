@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any, Literal
 
@@ -96,7 +96,7 @@ class RuntimeInventory(BaseModel):
 
     schema_version: Literal[1] = 1
     lane: Literal["compat", "latest"]
-    generated_at_utc: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    generated_at_utc: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
     runtime_versions: dict[str, Any] = Field(default_factory=dict)
     entries: list[RuntimeInventoryEntry] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
