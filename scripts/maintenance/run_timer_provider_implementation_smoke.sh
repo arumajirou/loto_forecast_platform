@@ -23,7 +23,6 @@ fail() {
 source "$CTX"
 cd "$WORKTREE" || fail "cannot enter worktree: $WORKTREE"
 
-BASE_RUN_ID="$(basename "$EVIDENCE")"
 REVIEW="audit/tsfm-runtime/timer-base-84m/remote-code-review.json"
 LOCK="environments/timer-base-84m-supported-py310/uv.lock"
 ENV_DIR="environments/timer-base-84m-supported-py310"
@@ -81,6 +80,7 @@ export HF_DATASETS_OFFLINE=1
 export TOKENIZERS_PARALLELISM=false
 export PYTHONHASHSEED=1
 
+set +e
 WORKTREE="$WORKTREE" ENV_DIR="$ENV_DIR" REVIEW="$REVIEW" SNAP="$SNAP" \
 EXPECTED_CPU_SHA="$EXPECTED_CPU_SHA" EXPECTED_CUDA_SHA="$EXPECTED_CUDA_SHA" \
 PYTHONPATH="$WORKTREE/src:$WORKTREE/scripts/maintenance" "$VENV/bin/python" - <<'PY' \
@@ -145,6 +145,7 @@ provider.close()
 print(json.dumps({'status': 'PASS', 'load': load_info, 'results': results}, indent=2, sort_keys=True))
 PY
 RC=$?
+set -e
 [[ "$RC" == '0' ]] || { cat "$OUT/provider-smoke.stderr"; fail "provider implementation smoke failed rc=$RC" "$RC"; }
 [[ ! -s "$OUT/provider-smoke.stderr" ]] || { cat "$OUT/provider-smoke.stderr"; fail 'provider smoke emitted stderr'; }
 echo 'PASS CERTIFIED_PROVIDER_IMPLEMENTATION_SMOKE'
