@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
 
@@ -107,7 +108,20 @@ def test_runtime_events_precede_leakage_check() -> None:
 
 
 def test_target_materialization_occurs_after_instrumented_fold() -> None:
-    source = MAIN_SOURCE.read_text(encoding="utf-8")
-    fold_call = source.index("= run_instrumented_fold(")
-    target_read = source.index("actual_pos = test_row[")
+    tree = ast.parse(MAIN_SOURCE.read_text(encoding="utf-8"))
+    fold_call = next(
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "run_instrumented_fold"
+    )
+    target_read = next(
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name) and target.id == "actual_pos" for target in node.targets
+        )
+    )
     assert fold_call < target_read
