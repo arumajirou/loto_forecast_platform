@@ -67,7 +67,7 @@ echo "PASS EVIDENCE_HASHES"
 
 printf '\n=== 3. Verify no unrelated worktree changes ===\n'
 ALLOWED_REGEX="^(\\?\\? |A  |M  )(${ENV_DIR}/uv\\.lock|${OUT}/(EXECUTION_RESULT\\.json|SHA256SUMS|active-lock-analysis\\.json|dependency-license-review\\.json|dependency-lock-review\\.json|gpu-inventory\\.txt|uv-pip-check\\.txt))$"
-BAD_STATUS="$(git status --porcelain | grep -Ev "$ALLOWED_REGEX" || true)"
+BAD_STATUS="$(git status --porcelain --untracked-files=all | grep -Ev "$ALLOWED_REGEX" || true)"
 if [[ -n "$BAD_STATUS" ]]; then
   printf '%s\n' "$BAD_STATUS"
   fail "unexpected local worktree changes detected"
