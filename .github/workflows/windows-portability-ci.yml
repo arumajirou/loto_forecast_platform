@@ -86,15 +86,14 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
-          pyproject = Path("pyproject.toml")
-          text = pyproject.read_text(encoding="utf-8")
-
           def replace_once(source: str, old: str, new: str) -> str:
               count = source.count(old)
               if count != 1:
                   raise SystemExit(f"expected exactly one occurrence of {old!r}, got {count}")
               return source.replace(old, new, 1)
 
+          pyproject = Path("pyproject.toml")
+          text = pyproject.read_text(encoding="utf-8")
           text = replace_once(text, 'version = "3.2.0"', 'dynamic = ["version"]')
           replacements = (
               ('loto-auto-campaign = "loto.auto_campaign.cli:main"', 'loto-auto-campaign = "loto.entrypoints:auto_campaign_main"'),
@@ -105,16 +104,13 @@ jobs:
           )
           for old, new in replacements:
               text = replace_once(text, old, new)
-
           if 'loto-build-info = "loto.version:main"' not in text:
               anchor = 'loto-github-audit = "loto.github_audit.cli:main"\n'
               text = replace_once(text, anchor, anchor + 'loto-build-info = "loto.version:main"\n')
-
           if "[tool.setuptools.dynamic]" not in text:
               anchor = "[tool.setuptools.packages.find]\n"
               insertion = '[tool.setuptools.dynamic]\nversion = {attr = "loto.version.__version__"}\n\n'
               text = replace_once(text, anchor, insertion + anchor)
-
           pyproject.write_text(text, encoding="utf-8")
 
           version = Path("src/loto/version.py")
@@ -122,11 +118,7 @@ jobs:
           old = '''def _environment_commit() -> str | None:\n    for name in ("LOTO_BUILD_GIT_COMMIT", "GITHUB_SHA"):\n        value = os.environ.get(name, "").strip()\n        if value and _GIT_SHA_PATTERN.fullmatch(value):\n            return value.lower()\n    return None\n'''
           new = '''def _environment_commit(repo_root: str | Path | None = None) -> str | None:\n    explicit = os.environ.get("LOTO_BUILD_GIT_COMMIT", "").strip()\n    if explicit and _GIT_SHA_PATTERN.fullmatch(explicit):\n        return explicit.lower()\n\n    github_sha = os.environ.get("GITHUB_SHA", "").strip()\n    if not github_sha or not _GIT_SHA_PATTERN.fullmatch(github_sha):\n        return None\n    if repo_root is None:\n        return github_sha.lower()\n\n    workspace = os.environ.get("GITHUB_WORKSPACE", "").strip()\n    if not workspace:\n        return None\n    if Path(repo_root).resolve() != Path(workspace).resolve():\n        return None\n    return github_sha.lower()\n'''
           text = replace_once(text, old, new)
-          text = replace_once(
-              text,
-              "    environment_value = _environment_commit()\n",
-              "    environment_value = _environment_commit(repo_root)\n",
-          )
+          text = replace_once(text, "    environment_value = _environment_commit()\n", "    environment_value = _environment_commit(repo_root)\n")
           version.write_text(text, encoding="utf-8")
 
           cli = Path("src/loto/auto_campaign/cli.py")
@@ -150,10 +142,9 @@ jobs:
           src/loto/verify/integrity.py
           src/loto/version.py
           EOF
-          git diff --name-only | sort > "$actual"
+          git diff HEAD --name-only | sort > "$actual"
           diff -u "$expected" "$actual"
-          git diff --check
-
+          git diff HEAD --check
           uv lock --check
 
       - name: Commit source repair to PR branch
