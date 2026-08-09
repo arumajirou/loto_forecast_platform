@@ -169,17 +169,10 @@ jobs:
           set -Eeuo pipefail
           "$CI_VENV/bin/python" -m compileall -q src scripts tests
 
-      - name: Run tests and capture temporary diagnostic
+      - name: Run tests
         run: |
-          set -uo pipefail
-          pytest_output="$RUNNER_TEMP/pytest-runtime-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.txt"
-          echo "PYTEST_OUTPUT=$pytest_output" >> "$GITHUB_ENV"
-          set +e
-          "$CI_VENV/bin/python" -m pytest -q --tb=short 2>&1 | tee "$pytest_output"
-          pytest_rc="${PIPESTATUS[0]}"
-          set -e
-          echo "PYTEST_RC=$pytest_rc" >> "$GITHUB_ENV"
-          exit "$pytest_rc"
+          set -Eeuo pipefail
+          "$CI_VENV/bin/python" -m pytest -q
 
       - name: Verify repository stayed clean
         if: ${{ always() }}
@@ -204,12 +197,3 @@ jobs:
               *) echo "refusing to remove unsafe UV_CACHE_DIR=$UV_CACHE_DIR" >&2; exit 1 ;;
             esac
           fi
-
-      - name: Upload temporary pytest runtime diagnostic
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: pytest-runtime-diagnostic-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ env.PYTEST_OUTPUT }}
-          if-no-files-found: error
-          retention-days: 1
