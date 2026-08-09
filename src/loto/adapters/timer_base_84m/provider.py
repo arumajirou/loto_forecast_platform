@@ -259,7 +259,9 @@ class TimerBase84MProvider:
         if self._model is None or self._torch is None:
             raise TimerProviderError("MODEL_NOT_LOADED", "call load() before predict()")
         if request.operation != "predict":
-            raise TimerProviderError("RUNTIME_NOT_CERTIFIED", "predict() requires operation='predict'")
+            raise TimerProviderError(
+                "RUNTIME_NOT_CERTIFIED", "predict() requires operation='predict'"
+            )
 
         torch = self._torch
         torch.manual_seed(request.seed)
