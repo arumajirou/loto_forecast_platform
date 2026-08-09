@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
 import loto.adapters.timer_base_84m.provider as provider_module
 from loto.adapters.timer_base_84m.provider import TimerBase84MProvider, TimerProviderError
-from loto.timer_base_84m_campaign.provenance import CONFIG_SHA256
+from loto.timer_base_84m_campaign.provenance import (
+    CONFIG_SHA256,
+    ProvenanceError,
+    load_review,
+    validate_remote_code_review,
+)
 
 
 def make_provider(tmp_path: Path) -> TimerBase84MProvider:
@@ -17,6 +23,16 @@ def make_provider(tmp_path: Path) -> TimerBase84MProvider:
         environment_dir=environment_dir,
         review_path=review_path,
         snapshot_dir=tmp_path / "snapshot",
+    )
+
+
+def approved_review_path() -> Path:
+    return (
+        Path(__file__).resolve().parents[2]
+        / "audit"
+        / "tsfm-runtime"
+        / "timer-base-84m"
+        / "remote-code-review.json"
     )
 
 
@@ -82,3 +98,22 @@ def test_inspect_properties_declares_no_cpu_fallback(tmp_path: Path) -> None:
         "position_panel_batched_univariate",
     ]
     assert properties["supported_horizons"] == [1, 2, 5]
+
+
+def test_committed_human_approval_review_schema_is_accepted() -> None:
+    review = load_review(approved_review_path())
+
+    validate_remote_code_review(review)
+
+    assert review["review_status"] == "HUMAN_REVIEW_APPROVED"
+    assert review["approved"] is True
+    assert review["trust_remote_code_allowed"] is True
+    assert review["reviewer"] == "arumajirou"
+
+
+def test_human_approval_record_preserves_pre_execution_boundary() -> None:
+    review = deepcopy(load_review(approved_review_path()))
+    review["execution_boundary"]["checkpoint_load_executed"] = True
+
+    with pytest.raises(ProvenanceError, match="pre-execution boundary"):
+        validate_remote_code_review(review)
