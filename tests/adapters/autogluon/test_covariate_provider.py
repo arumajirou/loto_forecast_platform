@@ -17,12 +17,13 @@ class _FakeTimeSeriesDataFrame:
 
 class _FakePredictor:
     last = None
+    model_name = "Naive"
 
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         self.fit_args = None
         self.predict_args = None
-        self.model_best = "Naive"
+        self.model_best = type(self).model_name
         _FakePredictor.last = self
 
     def fit(self, data, **kwargs):
@@ -48,7 +49,7 @@ class _FakePredictor:
         return pd.DataFrame(rows).set_index(["item_id", "timestamp"])
 
     def model_names(self):
-        return ["Naive"]
+        return [type(self).model_name]
 
     @classmethod
     def load(cls, path):
@@ -150,9 +151,14 @@ def test_missing_future_values_fail_before_runtime(tmp_path) -> None:
     assert response["error"]["code"] == "FUTURE_KNOWN_HORIZON_MISMATCH"
 
 
-def test_strict_router_dispatches_covariate_payload(tmp_path) -> None:
-    response = run_provider_v2_strict(_payload(tmp_path), runtime=_runtime())
+def test_strict_router_dispatches_covariate_payload(tmp_path, monkeypatch) -> None:
+    payload = _payload(tmp_path)
+    payload["model_ids"] = ["TemporalFusionTransformer"]
+    monkeypatch.setattr(_FakePredictor, "model_name", "TemporalFusionTransformer")
+    response = run_provider_v2_strict(payload, runtime=_runtime())
     assert response["status"] == "OK"
+    decision = response["metadata"]["covariate_capability_decision"]
+    assert decision["selected_model_ids"] == ["TemporalFusionTransformer"]
 
 
 def test_strict_router_preserves_non_covariate_base_path(tmp_path, monkeypatch) -> None:
