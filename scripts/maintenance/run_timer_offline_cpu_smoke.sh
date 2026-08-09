@@ -32,14 +32,14 @@ VENV="$HOME/.cache/loto/timer-base-84m/venvs/$EXPECTED_LOCK_SHA"
 RUN_ID="timer-cpu-smoke-$(date -u '+%Y%m%dT%H%M%SZ')"
 OUT="audit/local-runs/$RUN_ID"
 LOCAL_OUT="$EVIDENCE/$RUN_ID"
-mkdir -p "$OUT" "$LOCAL_OUT"
+mkdir -p "$LOCAL_OUT"
 
 printf '=== 1. Synchronize and bind exact source head ===\n'
 git fetch origin "$HEAD_REF" main
 SOURCE_HEAD="$(git rev-parse "origin/$HEAD_REF")"
 git merge --ff-only "origin/$HEAD_REF" || fail 'local worktree cannot fast-forward to PR branch'
 [[ "$(git rev-parse HEAD)" == "$SOURCE_HEAD" ]] || fail 'local worktree did not reach remote PR head'
-[[ -z "$(git status --porcelain)" ]] || fail 'worktree is not clean before CPU smoke'
+[[ -z "$(git status --porcelain --untracked-files=all)" ]] || fail 'worktree is not clean before CPU smoke'
 echo "SOURCE_HEAD=$SOURCE_HEAD"
 
 printf '\n=== 2. Enforce named-human approval gate ===\n'
@@ -112,7 +112,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 import os
 import platform
 import socket
@@ -220,6 +219,7 @@ echo 'PASS OFFLINE_CPU_SMOKE'
 cat "$LOCAL_OUT/runtime.json"
 
 printf '\n=== 5. Promote compact evidence into repository ===\n'
+mkdir -p "$OUT"
 cp "$LOCAL_OUT/runtime.json" "$OUT/runtime.json"
 cp "$LOCAL_OUT/stdout.txt" "$OUT/stdout.txt"
 cp "$LOCAL_OUT/stderr.txt" "$OUT/stderr.txt"
@@ -247,6 +247,10 @@ while IFS= read -r path; do
     *) fail "unexpected staged path: $path" ;;
   esac
 done <<< "$STAGED"
+UNSTAGED="$(git diff --name-only)"
+UNTRACKED="$(git ls-files --others --exclude-standard)"
+[[ -z "$UNSTAGED" ]] || fail 'unexpected unstaged tracked changes before CPU smoke commit'
+[[ -z "$UNTRACKED" ]] || fail 'unexpected untracked files before CPU smoke commit'
 # No root dependency mutation is permitted.
 git diff --exit-code "origin/main" -- pyproject.toml uv.lock || fail 'root dependency files changed'
 git commit -m 'evidence(timer): add offline CPU runtime smoke'
