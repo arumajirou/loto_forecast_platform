@@ -1,0 +1,12 @@
+{
+  "cublas_workspace_config": ":4096:8",
+  "full_pytest_executed": true,
+  "holdout_accessed": false,
+  "prospective_accessed": false,
+  "pytest_exit_code": 0,
+  "pytest_status": "PASS",
+  "python_lane": "3.13",
+  "run_id": "timer-final-full-pytest-20260809T115245Z",
+  "schema_version": "timer-base-84m.full-pytest.v2",
+  "source_head_sha": "0d962372a9e3239b52fe5d8dd7f1c41c8e127c7f"
+}

@@ -1,0 +1,14 @@
+audit/local-runs/timer-repository-verification-20260809T115021Z/SHA256SUMS
+audit/local-runs/timer-repository-verification-20260809T115021Z/VERIFICATION_RESULT.json
+audit/local-runs/timer-repository-verification-20260809T115021Z/changed-file-size-scan.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/compileall-py310.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/evidence-semantics.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/git-diff-check.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/mypy.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/pytest-timer.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/root-dependency-diff.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/ruff-check.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/ruff-format.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/timer-formal-matrix-20260809T103953Z-sha256-check.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/timer-separate-process-replay-20260809T104240Z-sha256-check.txt
+audit/local-runs/timer-repository-verification-20260809T115021Z/timer-tests-list.txt
