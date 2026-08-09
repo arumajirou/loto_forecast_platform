@@ -79,18 +79,29 @@ def _run_git(repo_root: Path, *arguments: str) -> str | None:
     return result.stdout.strip()
 
 
-def _environment_commit() -> str | None:
-    for name in ("LOTO_BUILD_GIT_COMMIT", "GITHUB_SHA"):
-        value = os.environ.get(name, "").strip()
-        if value and _GIT_SHA_PATTERN.fullmatch(value):
-            return value.lower()
-    return None
+def _environment_commit(repo_root: str | Path | None = None) -> str | None:
+    explicit = os.environ.get("LOTO_BUILD_GIT_COMMIT", "").strip()
+    if explicit and _GIT_SHA_PATTERN.fullmatch(explicit):
+        return explicit.lower()
+
+    github_sha = os.environ.get("GITHUB_SHA", "").strip()
+    if not github_sha or not _GIT_SHA_PATTERN.fullmatch(github_sha):
+        return None
+    if repo_root is None:
+        return github_sha.lower()
+
+    workspace = os.environ.get("GITHUB_WORKSPACE", "").strip()
+    if not workspace:
+        return None
+    if Path(repo_root).resolve() != Path(workspace).resolve():
+        return None
+    return github_sha.lower()
 
 
 def resolve_git_commit(repo_root: str | Path | None = None) -> str:
     """Resolve Git identity without confusing absence with an empty commit."""
 
-    environment_value = _environment_commit()
+    environment_value = _environment_commit(repo_root)
     if environment_value is not None:
         return environment_value
     root = Path(repo_root or Path.cwd()).resolve()

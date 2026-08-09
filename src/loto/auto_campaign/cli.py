@@ -241,8 +241,8 @@ def _run_portable_command(
     return None
 
 
-def main() -> None:
-    args = build_parser().parse_args()
+def main(argv: list[str] | None = None) -> None:
+    args = build_parser().parse_args(argv)
     project = args.project_root.resolve()
     portable_result = _run_portable_command(args, project)
     if portable_result is not None:
