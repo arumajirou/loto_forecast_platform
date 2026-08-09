@@ -65,17 +65,7 @@ fi
 
 echo "PASS EVIDENCE_HASHES"
 
-printf '\n=== 3. Verify no unrelated worktree changes ===\n'
-ALLOWED_REGEX="^(\\?\\? |A  |M  )(${ENV_DIR}/uv\\.lock|${OUT}/(EXECUTION_RESULT\\.json|SHA256SUMS|active-lock-analysis\\.json|dependency-license-review\\.json|dependency-lock-review\\.json|gpu-inventory\\.txt|uv-pip-check\\.txt))$"
-BAD_STATUS="$(git status --porcelain --untracked-files=all | grep -Ev "$ALLOWED_REGEX" || true)"
-if [[ -n "$BAD_STATUS" ]]; then
-  printf '%s\n' "$BAD_STATUS"
-  fail "unexpected local worktree changes detected"
-fi
-
-echo "PASS WORKTREE_SCOPE"
-
-printf '\n=== 4. Stage strict allowlist ===\n'
+printf '\n=== 3. Stage strict allowlist ===\n'
 git add \
   "$LOCK" \
   "$OUT/EXECUTION_RESULT.json" \
@@ -100,6 +90,24 @@ while IFS= read -r path; do
 done <<< "$STAGED"
 
 echo "PASS STAGED_SCOPE"
+
+printf '\n=== 4. Verify no unrelated remaining changes ===\n'
+UNSTAGED_TRACKED="$(git diff --name-only)"
+UNTRACKED="$(git ls-files --others --exclude-standard)"
+
+if [[ -n "$UNSTAGED_TRACKED" ]]; then
+  echo "UNEXPECTED_UNSTAGED_TRACKED:"
+  printf '%s\n' "$UNSTAGED_TRACKED"
+  fail "unexpected unstaged tracked changes detected"
+fi
+
+if [[ -n "$UNTRACKED" ]]; then
+  echo "UNEXPECTED_UNTRACKED:"
+  printf '%s\n' "$UNTRACKED"
+  fail "unexpected untracked files detected"
+fi
+
+echo "PASS WORKTREE_SCOPE"
 
 printf '\n=== 5. Protect root dependency files ===\n'
 git diff --exit-code "origin/main" -- pyproject.toml uv.lock || fail "root dependency files changed"
