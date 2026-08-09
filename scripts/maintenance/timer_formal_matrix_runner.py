@@ -46,6 +46,7 @@ HORIZONS = (1, 2, 5)
 LAYOUTS = ("position_univariate", "position_panel_batched_univariate")
 SEEDS = (1, 7)
 CONTEXT_LENGTH = 96
+CUBLAS_WORKSPACE_CONFIG = ":4096:8"
 
 
 def sha256_bytes(value: bytes) -> str:
@@ -185,10 +186,16 @@ def main() -> int:
     results_path = args.out_dir / f"{args.device}-results.jsonl"
     summary_path = args.out_dir / f"{args.device}-summary.raw.json"
 
+    current_cublas = os.environ.get("CUBLAS_WORKSPACE_CONFIG")
+    if current_cublas != CUBLAS_WORKSPACE_CONFIG:
+        raise RuntimeError(
+            f"CUBLAS_WORKSPACE_CONFIG must be {CUBLAS_WORKSPACE_CONFIG}, got {current_cublas!r}"
+        )
+
     started_at = datetime.now(timezone.utc).isoformat()
     torch.manual_seed(1)
     torch.set_grad_enabled(False)
-    torch.use_deterministic_algorithms(True, warn_only=True)
+    torch.use_deterministic_algorithms(True)
 
     if args.device == "cuda":
         if not torch.cuda.is_available():
@@ -320,6 +327,8 @@ def main() -> int:
                                 "provider_pid": provider_pid,
                                 "cpu_fallback": False,
                                 "gpu_uuid": args.gpu_uuid if args.device == "cuda" else None,
+                                "cublas_workspace_config": current_cublas,
+                                "deterministic_algorithms": True,
                                 "case_started_at_utc": case_started,
                                 "case_ended_at_utc": datetime.now(timezone.utc).isoformat(),
                             }
@@ -378,6 +387,8 @@ def main() -> int:
         "snapshot_manifest_sha256": args.snapshot_manifest_sha256,
         "runner_sha256": args.runner_sha256,
         "shell_sha256": args.shell_sha256,
+        "cublas_workspace_config": current_cublas,
+        "deterministic_algorithms": True,
         "network_policy": "HF/Transformers offline + local_files_only + Python socket deny guard",
         "synthetic_contract_matrix": True,
         "holdout_accessed": False,
