@@ -139,11 +139,15 @@ class TimerResponse(StrictModel):
         "VALIDATED",
         "ENVIRONMENT_VALIDATED",
         "SNAPSHOT_MANIFEST_VALIDATED",
-        "EXECUTION_PENDING",
+        "LOADED",
+        "PREDICTED",
         "RUNTIME_NOT_CERTIFIED",
-        "CHECKPOINT_LOAD_PENDING",
-        "DEPENDENCY_LOCK_PENDING",
+        "DEPENDENCY_LOCK_INVALID",
         "REMOTE_CODE_REVIEW_REQUIRED",
+        "SNAPSHOT_HASH_MISMATCH",
+        "UNSUPPORTED_RUNTIME_LANE",
+        "MODEL_NOT_LOADED",
+        "CUDA_UNAVAILABLE",
     ]
     model_id: Literal[MODEL_ID]
     repo_id: Literal[REPO_ID]
@@ -160,17 +164,20 @@ class TimerResponse(StrictModel):
     prediction_length: Literal[1, 2, 5]
     seed: int
     requested_device: Literal["cpu", "cuda"]
-    effective_device: None
+    effective_device: Literal["cpu", "cuda:0"]
     cpu_fallback: Literal[False]
     input_shape: tuple[int, int]
-    output_shape: None
-    point_forecast: None
+    output_shape: tuple[int, int]
+    point_forecast: tuple[tuple[float, ...], ...]
     quantiles: None
     samples: None
-    finite_check: None
+    finite_check: Literal[True]
     chronology_evidence: ChronologyEvidence
     actuals_used: Literal[False]
-    runtime_pid: None
-    gpu_uuid: None
-    gpu_process_vram_bytes: None
+    runtime_pid: int = Field(ge=1)
+    gpu_uuid: str | None
+    gpu_process_vram_bytes: int | None = Field(default=None, ge=0)
+    input_series_sha256_f32: str = Field(pattern=r"^[0-9a-f]{64}$")
+    prediction_sha256_f32: str = Field(pattern=r"^[0-9a-f]{64}$")
+    chronology_mapping_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     artifact_paths: ArtifactPaths
