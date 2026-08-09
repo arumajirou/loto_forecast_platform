@@ -19,9 +19,7 @@ def _load_string_fixture(path: Path, name: str) -> str:
     for node in tree.body:
         if not isinstance(node, ast.Assign):
             continue
-        if not any(
-            isinstance(target, ast.Name) and target.id == name for target in node.targets
-        ):
+        if not any(isinstance(target, ast.Name) and target.id == name for target in node.targets):
             continue
         value = node.value
         if (
