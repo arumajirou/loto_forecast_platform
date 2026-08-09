@@ -9,11 +9,8 @@ on:
       - main
   workflow_dispatch:
 
-# TEMPORARY DIAGNOSTIC ONLY: contents: write is required solely for the
-# one-shot branch-local pytest diagnostic publisher below. This is reverted
-# before PR #217 can become mergeable/ready.
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -208,38 +205,11 @@ jobs:
             esac
           fi
 
-      - name: Publish one-shot pytest runtime diagnostic
-        if: ${{ failure() && github.event_name == 'pull_request' && github.head_ref == 'fix/self-hosted-zero-cost-ci-main-v3' }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          set -Eeuo pipefail
-
-          diagnostic=".github/pytest-runtime-diagnostic.txt"
-          if git cat-file -e "HEAD:${diagnostic}" 2>/dev/null; then
-            echo "diagnostic already committed; refusing repeat publish"
-            exit 0
-          fi
-
-          test -n "${PYTEST_OUTPUT:-}"
-          test -f "$PYTEST_OUTPUT"
-          test -n "${PYTEST_RC:-}"
-
-          {
-            echo "TEMPORARY_PYTEST_RUNTIME_DIAGNOSTIC=1"
-            echo "SOURCE_HEAD=$(git rev-parse HEAD)"
-            echo "RUN_ID=$GITHUB_RUN_ID"
-            echo "RUN_ATTEMPT=$GITHUB_RUN_ATTEMPT"
-            echo "RUNNER_NAME=$RUNNER_NAME"
-            echo "PYTEST_RC=$PYTEST_RC"
-            echo "OUTPUT_LINES=$(wc -l < "$PYTEST_OUTPUT")"
-            echo
-            echo "===== PYTEST OUTPUT (last 4000 lines) ====="
-            tail -n 4000 "$PYTEST_OUTPUT"
-          } > "$diagnostic"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$diagnostic"
-          git commit -m "chore(ci): capture temporary pytest runtime diagnostic"
-          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_HEAD_REF}"
+      - name: Upload temporary pytest runtime diagnostic
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pytest-runtime-diagnostic-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.PYTEST_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 1
