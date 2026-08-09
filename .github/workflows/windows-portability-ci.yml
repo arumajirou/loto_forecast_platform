@@ -26,11 +26,9 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: write
-
     defaults:
       run:
         shell: bash
-
     env:
       UV_VERSION: "0.11.21"
       EXPECTED_MAIN: "c5e822c15080becd4156639bcdb94735b1a8e7a5"
@@ -50,7 +48,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Verify exact main and pre-repair consumer blobs
+      - name: Verify exact current and historical blobs
         run: |
           set -Eeuo pipefail
           git fetch --no-tags origin main
@@ -59,17 +57,6 @@ jobs:
           test "$(git rev-parse HEAD:src/loto/api/app.py)" = "03f0c600a6197dea1f0b147deae88cf28e2528e2"
           test "$(git rev-parse HEAD:src/loto/verify/integrity.py)" = "d0352520e1d6545336f9ab9727b2d6bdc25e3d7e"
           test "$(git rev-parse HEAD:README.md)" = "e12df6a1f5eb6edc3b294450631204f9d6684269"
-
-      - name: Install exact uv
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          version: ${{ env.UV_VERSION }}
-          enable-cache: false
-
-      - name: Restore audited consumers and apply guarded current-tree patches
-        run: |
-          set -Eeuo pipefail
-
           git fetch --no-tags origin "pull/178/head:refs/remotes/origin/pr178-version-contract"
           test "$(git rev-parse refs/remotes/origin/pr178-version-contract)" = "$PR178_HEAD"
           test "$(git rev-parse refs/remotes/origin/pr178-version-contract:src/loto/__init__.py)" = "58f3ace6c03d093337c9fa417ccbe8bc267b6c69"
@@ -77,77 +64,71 @@ jobs:
           test "$(git rev-parse refs/remotes/origin/pr178-version-contract:src/loto/verify/integrity.py)" = "8550cbe7b78d8fcc1e7fa94ffcebba26493d1f63"
           test "$(git rev-parse refs/remotes/origin/pr178-version-contract:README.md)" = "304e037cd6fd3f6b9331d498299187468fd17674"
 
-          git checkout refs/remotes/origin/pr178-version-contract -- \
-            src/loto/__init__.py \
-            src/loto/api/app.py \
-            src/loto/verify/integrity.py \
-            README.md
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
 
+      - name: Construct guarded repair
+        run: |
+          set -Eeuo pipefail
+          git checkout refs/remotes/origin/pr178-version-contract -- \
+            src/loto/__init__.py src/loto/api/app.py src/loto/verify/integrity.py README.md
           python3 - <<'PY'
           from pathlib import Path
 
-          def replace_once(source: str, old: str, new: str) -> str:
-              count = source.count(old)
+          def once(text: str, old: str, new: str) -> str:
+              count = text.count(old)
               if count != 1:
-                  raise SystemExit(f"expected exactly one occurrence of {old!r}, got {count}")
-              return source.replace(old, new, 1)
+                  raise SystemExit(f"expected one {old!r}, got {count}")
+              return text.replace(old, new, 1)
 
-          pyproject = Path("pyproject.toml")
-          text = pyproject.read_text(encoding="utf-8")
-          text = replace_once(text, 'version = "3.2.0"', 'dynamic = ["version"]')
-          replacements = (
+          p = Path("pyproject.toml")
+          text = p.read_text(encoding="utf-8")
+          text = once(text, 'version = "3.2.0"', 'dynamic = ["version"]')
+          for old, new in (
               ('loto-auto-campaign = "loto.auto_campaign.cli:main"', 'loto-auto-campaign = "loto.entrypoints:auto_campaign_main"'),
               ('loto-lab = "loto.kpi_lab.cli:main"', 'loto-lab = "loto.entrypoints:kpi_lab_main"'),
               ('loto = "loto.cli:main"', 'loto = "loto.entrypoints:loto_main"'),
               ('loto3 = "loto.cli_v3:main"', 'loto3 = "loto.entrypoints:loto3_main"'),
               ('loto-integrity = "loto.verify.integrity:main"', 'loto-integrity = "loto.entrypoints:integrity_main"'),
-          )
-          for old, new in replacements:
-              text = replace_once(text, old, new)
+          ):
+              text = once(text, old, new)
           if 'loto-build-info = "loto.version:main"' not in text:
-              anchor = 'loto-github-audit = "loto.github_audit.cli:main"\n'
-              text = replace_once(text, anchor, anchor + 'loto-build-info = "loto.version:main"\n')
+              a = 'loto-github-audit = "loto.github_audit.cli:main"\n'
+              text = once(text, a, a + 'loto-build-info = "loto.version:main"\n')
           if "[tool.setuptools.dynamic]" not in text:
-              anchor = "[tool.setuptools.packages.find]\n"
-              insertion = '[tool.setuptools.dynamic]\nversion = {attr = "loto.version.__version__"}\n\n'
-              text = replace_once(text, anchor, insertion + anchor)
-          pyproject.write_text(text, encoding="utf-8")
+              a = "[tool.setuptools.packages.find]\n"
+              text = once(text, a, '[tool.setuptools.dynamic]\nversion = {attr = "loto.version.__version__"}\n\n' + a)
+          p.write_text(text, encoding="utf-8")
 
-          version = Path("src/loto/version.py")
-          text = version.read_text(encoding="utf-8")
-          old = '''def _environment_commit() -> str | None:\n    for name in ("LOTO_BUILD_GIT_COMMIT", "GITHUB_SHA"):\n        value = os.environ.get(name, "").strip()\n        if value and _GIT_SHA_PATTERN.fullmatch(value):\n            return value.lower()\n    return None\n'''
-          new = '''def _environment_commit(repo_root: str | Path | None = None) -> str | None:\n    explicit = os.environ.get("LOTO_BUILD_GIT_COMMIT", "").strip()\n    if explicit and _GIT_SHA_PATTERN.fullmatch(explicit):\n        return explicit.lower()\n\n    github_sha = os.environ.get("GITHUB_SHA", "").strip()\n    if not github_sha or not _GIT_SHA_PATTERN.fullmatch(github_sha):\n        return None\n    if repo_root is None:\n        return github_sha.lower()\n\n    workspace = os.environ.get("GITHUB_WORKSPACE", "").strip()\n    if not workspace:\n        return None\n    if Path(repo_root).resolve() != Path(workspace).resolve():\n        return None\n    return github_sha.lower()\n'''
-          text = replace_once(text, old, new)
-          text = replace_once(text, "    environment_value = _environment_commit()\n", "    environment_value = _environment_commit(repo_root)\n")
-          version.write_text(text, encoding="utf-8")
-
-          cli = Path("src/loto/auto_campaign/cli.py")
-          text = cli.read_text(encoding="utf-8")
-          text = replace_once(
+          p = Path("src/loto/version.py")
+          text = p.read_text(encoding="utf-8")
+          text = once(
               text,
-              "def main() -> None:\n    args = build_parser().parse_args()\n",
-              "def main(argv: list[str] | None = None) -> None:\n    args = build_parser().parse_args(argv)\n",
+              'def _environment_commit() -> str | None:\n    for name in ("LOTO_BUILD_GIT_COMMIT", "GITHUB_SHA"):\n        value = os.environ.get(name, "").strip()\n        if value and _GIT_SHA_PATTERN.fullmatch(value):\n            return value.lower()\n    return None\n',
+              'def _environment_commit(repo_root: str | Path | None = None) -> str | None:\n    explicit = os.environ.get("LOTO_BUILD_GIT_COMMIT", "").strip()\n    if explicit and _GIT_SHA_PATTERN.fullmatch(explicit):\n        return explicit.lower()\n\n    github_sha = os.environ.get("GITHUB_SHA", "").strip()\n    if not github_sha or not _GIT_SHA_PATTERN.fullmatch(github_sha):\n        return None\n    if repo_root is None:\n        return github_sha.lower()\n\n    workspace = os.environ.get("GITHUB_WORKSPACE", "").strip()\n    if not workspace:\n        return None\n    if Path(repo_root).resolve() != Path(workspace).resolve():\n        return None\n    return github_sha.lower()\n',
           )
-          cli.write_text(text, encoding="utf-8")
+          text = once(text, "    environment_value = _environment_commit()\n", "    environment_value = _environment_commit(repo_root)\n")
+          p.write_text(text, encoding="utf-8")
+
+          p = Path("src/loto/auto_campaign/cli.py")
+          text = p.read_text(encoding="utf-8")
+          text = once(text, "def main() -> None:\n    args = build_parser().parse_args()\n", "def main(argv: list[str] | None = None) -> None:\n    args = build_parser().parse_args(argv)\n")
+          p.write_text(text, encoding="utf-8")
           PY
 
-          expected="$RUNNER_TEMP/version-files.txt"
-          actual="$RUNNER_TEMP/version-files.actual.txt"
-          cat > "$expected" <<'EOF'
-          README.md
-          pyproject.toml
-          src/loto/__init__.py
-          src/loto/api/app.py
-          src/loto/auto_campaign/cli.py
-          src/loto/verify/integrity.py
-          src/loto/version.py
-          EOF
-          git diff HEAD --name-only | sort > "$actual"
-          diff -u "$expected" "$actual"
+          printf '%s\n' \
+            README.md pyproject.toml src/loto/__init__.py src/loto/api/app.py \
+            src/loto/auto_campaign/cli.py src/loto/verify/integrity.py src/loto/version.py \
+            | sort > "$RUNNER_TEMP/expected.txt"
+          git diff HEAD --name-only | sort > "$RUNNER_TEMP/actual.txt"
+          diff -u "$RUNNER_TEMP/expected.txt" "$RUNNER_TEMP/actual.txt"
           git diff HEAD --check
           uv lock --check
 
-      - name: Commit source repair to PR branch
+      - name: Commit repair to PR branch
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -156,13 +137,7 @@ jobs:
           test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- \
-            README.md \
-            pyproject.toml \
-            src/loto/__init__.py \
-            src/loto/api/app.py \
-            src/loto/auto_campaign/cli.py \
-            src/loto/verify/integrity.py \
-            src/loto/version.py
+          git add -- README.md pyproject.toml src/loto/__init__.py src/loto/api/app.py \
+            src/loto/auto_campaign/cli.py src/loto/verify/integrity.py src/loto/version.py
           git commit -m "fix(version): restore canonical single-source contract"
           git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_HEAD_REF}"
