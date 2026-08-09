@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import json
 import subprocess
 import sys
@@ -12,15 +13,36 @@ SCRIPT = ROOT / "scripts" / "run_time_series_library_provider.py"
 CONTRACT_TEST = ROOT / "tests" / "time_series_library_campaign" / "test_film_contract.py"
 
 
+def _load_string_fixture(path: Path, name: str) -> str:
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        if not any(isinstance(target, ast.Name) and target.id == name for target in node.targets):
+            continue
+        value = node.value
+        if (
+            isinstance(value, ast.Call)
+            and isinstance(value.func, ast.Attribute)
+            and value.func.attr == "strip"
+            and isinstance(value.func.value, ast.Constant)
+            and isinstance(value.func.value.value, str)
+            and not value.args
+            and not value.keywords
+        ):
+            return value.func.value.value.strip()
+        if isinstance(value, ast.Constant) and isinstance(value.value, str):
+            return value.value
+        raise AssertionError(f"{name} is not a supported string fixture")
+    raise AssertionError(f"{name} not found in {path}")
+
+
 def write_fake_source(root: Path) -> None:
-    source = CONTRACT_TEST.read_text(encoding="utf-8")
-    marker = "FAKE_FILM = '''\n"
-    start = source.index(marker) + len(marker)
-    end = source.index("\n'''.strip()", start)
+    source = _load_string_fixture(CONTRACT_TEST, "FAKE_FILM")
     models = root / "models"
     models.mkdir(parents=True)
     (models / "__init__.py").write_text("", encoding="utf-8")
-    (models / "FiLM.py").write_text(source[start:end], encoding="utf-8")
+    (models / "FiLM.py").write_text(source, encoding="utf-8")
 
 
 def run_request(request: Path, response: Path) -> subprocess.CompletedProcess[str]:
