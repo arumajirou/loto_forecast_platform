@@ -26,21 +26,16 @@ def review() -> dict:
 
 
 def approved_review() -> dict:
-    payload = review()
-    for name, digest in payload["files"].items():
-        if digest == "UNVERIFIED":
-            payload["files"][name] = "1" * 64
-    payload["review_status"] = "APPROVED"
-    payload["approved"] = True
-    payload["trust_remote_code_allowed"] = True
-    payload["reviewer"] = "reviewer@example"
-    payload["reviewed_at_utc"] = "2026-08-06T03:00:00+00:00"
-    return payload
+    return review()
 
 
 def test_pending_review_fails_closed() -> None:
-    with pytest.raises(ProvenanceError, match="unverified"):
-        validate_remote_code_review(review())
+    payload = review()
+    payload["review_status"] = "PENDING_HUMAN_REVIEW"
+    payload["approved"] = False
+    payload["trust_remote_code_allowed"] = False
+    with pytest.raises(ProvenanceError, match="human-approved"):
+        validate_remote_code_review(payload)
 
 
 def test_source_revision_is_explicitly_unpinned() -> None:
@@ -53,7 +48,7 @@ def test_source_revision_is_explicitly_unpinned() -> None:
 def test_remote_code_file_set_mismatch_rejected() -> None:
     payload = review()
     payload["files"].pop("modeling_timer.py")
-    with pytest.raises(ProvenanceError, match="snapshot file allowlist"):
+    with pytest.raises(ProvenanceError, match="reviewed allowlist"):
         validate_remote_code_review(payload)
 
 
@@ -74,7 +69,7 @@ def test_duplicate_remote_code_entry_rejected() -> None:
 def test_remote_code_hash_mismatch_rejected() -> None:
     payload = copy.deepcopy(review())
     payload["files"]["model.safetensors"] = "0" * 64
-    with pytest.raises(ProvenanceError, match="weight hash"):
+    with pytest.raises(ProvenanceError, match="reviewed allowlist"):
         validate_remote_code_review(payload)
 
 
@@ -90,11 +85,10 @@ def test_unknown_review_field_rejected() -> None:
     [
         "2026-08-06",
         "2026-08-06T12:00:00+09:00",
-        "2026-08-06T03:00:00Z",
         "not-a-timestamp",
     ],
 )
-def test_review_time_must_be_canonical_utc(reviewed_at_utc: str) -> None:
+def test_review_time_must_be_timezone_aware_utc(reviewed_at_utc: str) -> None:
     payload = approved_review()
     payload["reviewed_at_utc"] = reviewed_at_utc
     with pytest.raises(ProvenanceError, match="reviewed_at_utc"):

@@ -140,7 +140,13 @@ cat "$OUT/evidence-semantics.txt"
 
 printf '\n=== 4. Focused Ruff format/check ===\n'
 command -v uv >/dev/null 2>&1 || fail 'uv is required'
-mapfile -t TIMER_TESTS < <(find tests -type f -name '*timer*' -name '*.py' -print | LC_ALL=C sort)
+mapfile -t TIMER_TESTS < <(
+  find tests -type f -name 'test_*.py' \( \
+    -path 'tests/adapters/timer_base_84m/*' -o \
+    -path 'tests/timer_base_84m_campaign/*' -o \
+    -name '*timer*.py' \
+  \) -print | LC_ALL=C sort -u
+)
 (( ${#TIMER_TESTS[@]} > 0 )) || fail 'no Timer tests found'
 RUFF_TARGETS=(
   src/loto/adapters/timer_base_84m
@@ -148,6 +154,8 @@ RUFF_TARGETS=(
   src/loto/version.py
   scripts/maintenance/timer_formal_matrix_runner.py
   scripts/maintenance/timer_separate_process_replay_runner.py
+  tests/adapters/timer_base_84m
+  tests/timer_base_84m_campaign
   tests/unit/test_timer_base_84m_runtime_provider.py
 )
 uv run --frozen --extra dev ruff format --check "${RUFF_TARGETS[@]}" >"$OUT/ruff-format.txt" 2>&1 || {

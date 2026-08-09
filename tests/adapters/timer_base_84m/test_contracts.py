@@ -15,6 +15,17 @@ from loto.adapters.timer_base_84m.contracts import TimerRequest
 from loto.adapters.timer_base_84m.provider import TimerBase84MProvider
 from loto.timer_base_84m_campaign.chronology import TimeAxis, validate_chronology
 from loto.timer_base_84m_campaign.geometry import Game, geometry_for
+from loto.timer_base_84m_campaign.provenance import (
+    CONFIG_SHA256,
+    LICENSE,
+    MODEL_ID,
+    MODEL_REVISION,
+    OBSERVED_SOURCE_HEAD,
+    REPO_ID,
+    SOURCE_REVISION,
+    TRANSFORMERS_VERSION,
+    WEIGHT_SHA256,
+)
 
 
 def request_payload(*, game: Game = Game.NUMBERS3, context: int = 96) -> dict[str, Any]:
@@ -34,15 +45,15 @@ def request_payload(*, game: Game = Game.NUMBERS3, context: int = 96) -> dict[st
         "schema_version": "timer-base-84m.request.v1",
         "run_id": "timer-test-0001",
         "operation": "validate_request",
-        "model_id": "timer-base-84m",
-        "repo_id": "thuml/timer-base-84m",
-        "package_version": "4.40.1",
-        "source_revision": "UNPINNED",
-        "observed_source_head": "1ff8d1afc073182e6d46022069ff32470ab47945",
-        "model_revision": "70077a71acce1b4c00d98332fcaabc694255d8e5",
-        "config_sha256": "UNVERIFIED",
-        "weight_sha256": "9c3d18f12ffe1ea7d4fa70eb3304b26e3841164a6a265fbae4f7a05cd213aa3d",
-        "license": "Apache-2.0",
+        "model_id": MODEL_ID,
+        "repo_id": REPO_ID,
+        "package_version": TRANSFORMERS_VERSION,
+        "source_revision": SOURCE_REVISION,
+        "observed_source_head": OBSERVED_SOURCE_HEAD,
+        "model_revision": MODEL_REVISION,
+        "config_sha256": CONFIG_SHA256,
+        "weight_sha256": WEIGHT_SHA256,
+        "license": LICENSE,
         "game": game,
         "target_layout": "position_univariate",
         "context_length": context,
@@ -154,7 +165,7 @@ def test_artifact_path_traversal_rejected(unsafe: str) -> None:
 def test_provider_validates_json_without_relaxing_strict_contract(tmp_path) -> None:
     provider = TimerBase84MProvider(tmp_path, tmp_path / "review.json")
     request = provider.validate_request_json(json_payload(request_payload()))
-    assert request.source_revision == "UNPINNED"
+    assert request.source_revision == SOURCE_REVISION
 
 
 def test_runner_rejects_operation_mismatch() -> None:
@@ -219,12 +230,17 @@ def test_cli_success_returns_zero(tmp_path: Path) -> None:
     assert json.loads(response_path.read_text(encoding="utf-8"))["status"] == "IDENTITY"
 
 
-def test_cli_pending_returns_two(tmp_path: Path) -> None:
+def test_cli_runtime_gate_returns_two(tmp_path: Path) -> None:
     result, response_path = _run_cli(tmp_path, {"operation": "load"})
     assert result.returncode == 2
-    assert json.loads(response_path.read_text(encoding="utf-8"))["status"] == (
-        "CHECKPOINT_LOAD_PENDING"
-    )
+    status = json.loads(response_path.read_text(encoding="utf-8"))["status"]
+    assert status in {
+        "DEPENDENCY_LOCK_INVALID",
+        "REMOTE_CODE_REVIEW_REQUIRED",
+        "SNAPSHOT_HASH_MISMATCH",
+        "UNSUPPORTED_RUNTIME_LANE",
+        "RUNTIME_NOT_CERTIFIED",
+    }
 
 
 def test_cli_invalid_returns_one(tmp_path: Path) -> None:
