@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import torch
 from pydantic import ValidationError
 
 from loto.adapters.moirai2.adapter import Moirai2Adapter, Moirai2AdapterError
@@ -206,24 +207,33 @@ def test_runner_wires_native_fields_and_univariate_shape(monkeypatch) -> None:
             return np.full((2, 1), level, dtype=np.float64)
 
     class FakePredictor:
+        device = "cpu"
+
+        def __init__(self, model):
+            self.model = model
+
         def predict(self, dataset):
             captured["dataset_at_predict"] = dataset
+            self.model(torch.ones(1, 3))
             return iter([FakeForecast()])
 
-    class FakeForecastModel:
+    class FakeForecastModel(torch.nn.Module):
         def __init__(self, **kwargs):
+            super().__init__()
             captured["model_kwargs"] = kwargs
 
+        def forward(self, value):
+            return value + 1
+
         def create_predictor(self, batch_size: int, device: str):
-            return FakePredictor()
+            return FakePredictor(self)
 
     class FakeListDataset(list):
         def __init__(self, entries, *, freq: str, one_dim_target: bool):
             super().__init__(entries)
             captured["dataset_args"] = (freq, one_dim_target)
 
-    torch = types.ModuleType("torch")
-    torch.cuda = types.SimpleNamespace(is_available=lambda: False)
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
     common = types.ModuleType("gluonts.dataset.common")
     common.ListDataset = FakeListDataset
     dataset = types.ModuleType("gluonts.dataset")
@@ -238,7 +248,6 @@ def test_runner_wires_native_fields_and_univariate_shape(monkeypatch) -> None:
     uni2ts = types.ModuleType("uni2ts")
     uni2ts.model = model
     for name, module in {
-        "torch": torch,
         "gluonts": gluonts,
         "gluonts.dataset": dataset,
         "gluonts.dataset.common": common,
@@ -269,3 +278,7 @@ def test_runner_wires_native_fields_and_univariate_shape(monkeypatch) -> None:
     assert model_kwargs["past_feat_dynamic_real_dim"] == 1
     assert model_kwargs["feat_dynamic_real_dim"] == 1
     assert response["covariate_evidence"]["actuals_used"] is False
+    forward = response["effective_arguments"]["forward_device_evidence"]
+    assert forward["forward_call_count"] == 1
+    assert forward["input_tensor_devices"] == ["cpu"]
+    assert forward["output_tensor_devices"] == ["cpu"]
