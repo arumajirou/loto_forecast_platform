@@ -1,0 +1,244 @@
+name: autogluon-p5-runtime-certification
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/autogluon-p5-runtime-certification.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autogluon-p5-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  certify:
+    name: AutoGluon TimeSeries P5 runtime certification
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 120
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.12"
+      HARNESS_PYTHON: "3.13"
+      EXPECTED_MAIN_SHA: "1a0b7b60a11923bc442a129071280219dcf80111"
+
+    steps:
+      - name: Verify expected self-hosted runner
+        run: |
+          set -Eeuo pipefail
+          echo "runner_name=$RUNNER_NAME"
+          echo "runner_os=$RUNNER_OS"
+          echo "runner_arch=$RUNNER_ARCH"
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          clean: true
+
+      - name: Install exact uv without cache
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+
+      - name: Verify exact main and verifier-only scope
+        run: |
+          set -Eeuo pipefail
+          actual_uv="$(uv --version)"
+          case "$actual_uv" in
+            "uv $UV_VERSION"*) ;;
+            *) echo "unexpected uv version: $actual_uv" >&2; exit 1 ;;
+          esac
+
+          git fetch --no-tags --depth=1 origin main
+          actual_main="$(git rev-parse origin/main)"
+          echo "expected_main=$EXPECTED_MAIN_SHA"
+          echo "actual_main=$actual_main"
+          test "$actual_main" = "$EXPECTED_MAIN_SHA"
+
+          mapfile -t changed < <(git diff --name-only "$EXPECTED_MAIN_SHA" HEAD)
+          printf 'changed=%s\n' "${changed[@]:-}"
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = ".github/workflows/autogluon-p5-runtime-certification.yml"
+
+      - name: Prepare isolated harness and provider environments
+        run: |
+          set -Eeuo pipefail
+          uv python install "$HARNESS_PYTHON" "$UV_PYTHON"
+
+          harness_venv="$RUNNER_TEMP/autogluon-p5-harness-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          provider_venv="$RUNNER_TEMP/autogluon-p5-provider-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          bundle_dir="$RUNNER_TEMP/autogluon-p5-bundle-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          evidence_dir="$bundle_dir/evidence"
+          tar_path="$RUNNER_TEMP/autogluon-p5-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.tar"
+
+          for path in "$harness_venv" "$provider_venv" "$bundle_dir" "$tar_path"; do
+            case "$path" in
+              "$RUNNER_TEMP"/*) ;;
+              *) echo "unsafe RUNNER_TEMP path: $path" >&2; exit 1 ;;
+            esac
+          done
+
+          rm -rf -- "$harness_venv" "$provider_venv" "$bundle_dir" "$tar_path"
+          mkdir -p -- "$bundle_dir"
+
+          echo "HARNESS_VENV=$harness_venv" >> "$GITHUB_ENV"
+          echo "PROVIDER_VENV=$provider_venv" >> "$GITHUB_ENV"
+          echo "P5_BUNDLE_DIR=$bundle_dir" >> "$GITHUB_ENV"
+          echo "P5_EVIDENCE_DIR=$evidence_dir" >> "$GITHUB_ENV"
+          echo "P5_TAR=$tar_path" >> "$GITHUB_ENV"
+
+          uv venv "$harness_venv" --python "$HARNESS_PYTHON"
+          pydantic_version="$("$harness_venv/bin/python" - <<'PY'
+          import tomllib
+          with open("uv.lock", "rb") as stream:
+              lock = tomllib.load(stream)
+          versions = [
+              package["version"]
+              for package in lock["package"]
+              if package.get("name") == "pydantic"
+          ]
+          if len(versions) != 1:
+              raise SystemExit(f"expected one pydantic version, got {versions!r}")
+          print(versions[0])
+          PY
+          )"
+          echo "locked_pydantic_version=$pydantic_version"
+          uv pip install --quiet --python "$harness_venv/bin/python" "pydantic==$pydantic_version"
+
+          UV_PROJECT_ENVIRONMENT="$provider_venv" \
+            uv run --project environments/autogluon-timeseries --locked python - <<'PY'
+          import importlib.metadata as metadata
+          import autogluon.timeseries
+          import torch
+
+          version = metadata.version("autogluon.timeseries")
+          print(f"autogluon_timeseries_version={version}")
+          print(f"provider_torch_version={torch.__version__}")
+          print(f"provider_cuda_available={torch.cuda.is_available()}")
+          assert version == "1.5.0", version
+          PY
+
+          "$harness_venv/bin/python" --version
+          "$provider_venv/bin/python" --version
+
+      - name: Run seven-scenario P5 certification
+        id: certification
+        run: |
+          set -Eeuo pipefail
+          test ! -e "$P5_EVIDENCE_DIR"
+
+          set +e
+          PYTHONPATH="$GITHUB_WORKSPACE/src" \
+          UV_PROJECT_ENVIRONMENT="$PROVIDER_VENV" \
+            "$HARNESS_VENV/bin/python" \
+            -m loto.autogluon_campaign.runtime_certification \
+            --repo-root "$GITHUB_WORKSPACE" \
+            --output-dir "$P5_EVIDENCE_DIR" \
+            --timeout-seconds 900 \
+            2>&1 | tee "$P5_BUNDLE_DIR/console.log"
+          rc="${PIPESTATUS[0]}"
+          set -e
+
+          printf '%s\n' "$rc" > "$P5_BUNDLE_DIR/HARNESS_EXIT_CODE.txt"
+          echo "cert_rc=$rc" >> "$GITHUB_OUTPUT"
+          echo "certification_exit_code=$rc"
+
+      - name: Verify certification report and SHA-256 evidence
+        run: |
+          set -Eeuo pipefail
+          test "${{ steps.certification.outputs.cert_rc }}" = "0"
+          test -f "$P5_EVIDENCE_DIR/RUNTIME_CERTIFICATION_REPORT.json"
+          test -f "$P5_EVIDENCE_DIR/SHA256SUMS"
+
+          (
+            cd "$P5_EVIDENCE_DIR"
+            sha256sum -c SHA256SUMS
+          ) | tee "$P5_BUNDLE_DIR/sha256-check.log"
+
+          "$HARNESS_VENV/bin/python" - "$P5_EVIDENCE_DIR/RUNTIME_CERTIFICATION_REPORT.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          report = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          assert report["status"] == "VERIFIED", report["status"]
+          assert report["scenario_count"] == 7, report["scenario_count"]
+          assert report["verified_count"] == 7, report["verified_count"]
+          assert report["failed_count"] == 0, report["failed_count"]
+          assert report["blocked_count"] == 0, report["blocked_count"]
+          assert len(report["report_sha256"]) == 64, report["report_sha256"]
+          scenario_ids = {item["scenario_id"] for item in report["scenarios"]}
+          expected = {
+              "explicit-naive-fit",
+              "explicit-naive-load",
+              "explicit-theta-fit",
+              "preset-fast-training",
+              "multi-naive-theta",
+              "hpo-seasonal-naive",
+              "forced-cpu-fallback",
+          }
+          assert scenario_ids == expected, (scenario_ids, expected)
+          for item in report["scenarios"]:
+              assert item["status"] == "VERIFIED", item
+              evidence = item["runtime_evidence"]
+              assert isinstance(evidence, dict), item
+              assert int(evidence["pid"]) > 0, evidence
+          print(f"AUTOGLUON_P5_REPORT_STATUS={report['status']}")
+          print(f"AUTOGLUON_P5_REPORT_SHA256={report['report_sha256']}")
+          print("AUTOGLUON_P5_SCENARIOS=7/7")
+          PY
+
+      - name: Verify repository stayed clean
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          git diff --exit-code
+          git diff --cached --exit-code
+          test -z "$(git status --porcelain)"
+
+      - name: Package retained evidence
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          test -d "$P5_BUNDLE_DIR"
+          tar -C "$P5_BUNDLE_DIR" -cf "$P5_TAR" .
+          sha256sum "$P5_TAR" | tee "$P5_TAR.sha256"
+
+      - name: Upload P5 evidence artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: autogluon-p5-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.P5_TAR }}
+            ${{ env.P5_TAR }}.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Remove verifier-owned temporary environments
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          for path in "${HARNESS_VENV:-}" "${PROVIDER_VENV:-}" "${P5_BUNDLE_DIR:-}" "${P5_TAR:-}" "${P5_TAR:-}.sha256"; do
+            [[ -z "$path" ]] && continue
+            case "$path" in
+              "$RUNNER_TEMP"/*) rm -rf -- "$path" ;;
+              *) echo "refusing unsafe cleanup path: $path" >&2; exit 1 ;;
+            esac
+          done
