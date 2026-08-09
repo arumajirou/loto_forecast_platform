@@ -1,0 +1,156 @@
+name: research-source-import-isolation-verifier
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify research-source registry import isolation
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 90
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
+      EXPECTED_MAIN: "9c4fd6902ea2c2950c8a476993f1e246bb3b35e9"
+    steps:
+      - name: Verify trusted runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Verify exact main and repair scope
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
+          mapfile -t changed < <(git diff --name-only "$EXPECTED_MAIN"...HEAD | sort)
+          expected=(
+            .github/workflows/research-source-import-isolation-verifier.yml
+            tests/research_sources/test_registry.py
+          )
+          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
+          diff -u <(printf '%s\n' "${expected_sorted[@]}") <(printf '%s\n' "${changed[@]}")
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: "0.11.21"
+          enable-cache: false
+
+      - name: Prepare isolated verifier environment
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          uv python install "$UV_PYTHON"
+          venv="$RUNNER_TEMP/research-source-import-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/research-source-import-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$venv" "$cache"
+          mkdir -p -- "$cache"
+          echo "VERIFIER_VENV=$venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$cache" >> "$GITHUB_ENV"
+          UV_CACHE_DIR="$cache" uv venv "$venv" --python "$UV_PYTHON"
+
+      - name: Install project dependencies
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python="$VERIFIER_VENV/bin/python"
+          uv lock --check
+          uv pip install --quiet --python "$python" --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
+          uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
+          ruff_version="$("$python" - <<'PY'
+          import tomllib
+          with open('uv.lock', 'rb') as stream:
+              lock = tomllib.load(stream)
+          versions = [p['version'] for p in lock['package'] if p.get('name') == 'ruff']
+          if len(versions) != 1:
+              raise SystemExit(versions)
+          print(versions[0])
+          PY
+          )"
+          uv pip install --quiet --python "$python" "ruff==$ruff_version"
+          uv pip check --python "$python"
+
+      - name: Run standard static gates
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python="$VERIFIER_VENV/bin/python"
+          "$python" -m ruff format --check src scripts tests
+          "$python" -m ruff check src scripts tests
+          "$python" -m compileall -q src scripts tests
+
+      - name: Verify fresh-process registry contract
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python="$VERIFIER_VENV/bin/python"
+          "$python" -m pytest -q tests/research_sources/test_registry.py
+
+      - name: Verify collection remains zero-error
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python="$VERIFIER_VENV/bin/python"
+          "$python" -m pytest --collect-only -q >/dev/null
+
+      - name: Re-measure full pytest runtime debt
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python="$VERIFIER_VENV/bin/python"
+          out="$RUNNER_TEMP/research-source-full-pytest-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.txt"
+          set +e
+          "$python" -m pytest -q >"$out" 2>&1
+          rc=$?
+          set -e
+          test "$rc" -ne 0
+          failed_count="$(grep -c '^FAILED ' "$out" || true)"
+          test "$failed_count" -eq 15
+          ! grep -Fq 'tests/research_sources/test_registry.py::test_registry_does_not_import_active_catalogs' "$out"
+          echo "FULL_PYTEST_ARTIFACT=$out" >> "$GITHUB_ENV"
+
+      - name: Recheck main and repository cleanliness
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Upload full pytest comparison artifact
+        if: always() && env.FULL_PYTEST_ARTIFACT != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: research-source-full-pytest-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FULL_PYTEST_ARTIFACT }}
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Remove verifier-owned environment
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if [[ -n "${VERIFIER_VENV:-}" ]]; then
+            case "$VERIFIER_VENV" in "$RUNNER_TEMP"/*) rm -rf -- "$VERIFIER_VENV" ;; *) exit 1 ;; esac
+          fi
+          if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+            case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf -- "$UV_CACHE_DIR" ;; *) exit 1 ;; esac
+          fi
