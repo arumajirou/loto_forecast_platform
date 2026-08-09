@@ -9,7 +9,7 @@ from typing import Any
 MODEL_ID = "timer-base-84m"
 REPO_ID = "thuml/timer-base-84m"
 MODEL_REVISION = "70077a71acce1b4c00d98332fcaabc694255d8e5"
-CONFIG_SHA256 = "UNVERIFIED"
+CONFIG_SHA256 = "8cf274b6192f6114a0988d1e70277c69531db3611866ae7d4c6f82819c469c7e"
 WEIGHT_SHA256 = "9c3d18f12ffe1ea7d4fa70eb3304b26e3841164a6a265fbae4f7a05cd213aa3d"
 SOURCE_REPOSITORY = "https://github.com/thuml/Large-Time-Series-Model"
 SOURCE_REVISION = "UNPINNED"
@@ -17,6 +17,16 @@ OBSERVED_SOURCE_HEAD = "1ff8d1afc073182e6d46022069ff32470ab47945"
 TRANSFORMERS_VERSION = "4.40.1"
 PYTHON_LANE = ">=3.10,<3.11"
 LICENSE = "Apache-2.0"
+SNAPSHOT_FILE_SHA256S = {
+    ".gitattributes": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+    "README.md": "da6dcfdebb53e79e97e159ca605942b7c8c580d4c816c60016349d5c5b0ed9bb",
+    "config.json": CONFIG_SHA256,
+    "configuration_timer.py": "bec2d7ed868b57d7046f097cad166d8e935920aa082cc6e9bb2cc53b9b626173",
+    "generation_config.json": "f6f95f062b96cc8c5d0954c6540beff706aa6d0982b5474925c6639bc3b5def9",
+    "model.safetensors": WEIGHT_SHA256,
+    "modeling_timer.py": "a625da46370e044609f1cd601eb2899aaf8a8e2dd5966bcfadc9d7f89a5092ad",
+    "ts_generation_mixin.py": "357d4aa6fd24f107bef5665f82fe2c7df278f4ff151c4493dbaa9f43655b55a1",
+}
 EXPECTED_SNAPSHOT_FILES = frozenset(
     {
         "README.md",
@@ -138,7 +148,7 @@ def validate_remote_code_review(review: dict[str, Any]) -> None:
         raise ProvenanceError("remote-code execution allowlist mismatch")
     if files.get("model.safetensors") != WEIGHT_SHA256:
         raise ProvenanceError("model weight hash mismatch")
-    if CONFIG_SHA256 != "UNVERIFIED" and files.get("config.json") != CONFIG_SHA256:
+    if files.get("config.json") != CONFIG_SHA256:
         raise ProvenanceError("config hash mismatch")
 
     unresolved = [name for name, digest in files.items() if digest in {"UNVERIFIED", "NOT_PRESENT"}]
