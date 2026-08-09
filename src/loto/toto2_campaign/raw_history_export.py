@@ -14,6 +14,16 @@ from typing import Any
 import pandas as pd
 
 FORMAL_GAMES = ("numbers3", "numbers4", "miniloto", "loto6", "loto7")
+
+PHYSICAL_GAME_TO_LOGICAL: dict[str, str] = {
+    "numbers3": "numbers3",
+    "numbers4": "numbers4",
+    "mini": "miniloto",
+    "loto6": "loto6",
+    "loto7": "loto7",
+}
+PHYSICAL_GAME_IDS = tuple(PHYSICAL_GAME_TO_LOGICAL)
+
 MIN_HISTORY_ROWS = 512
 SOURCE_SCHEMA = "dataset"
 SOURCE_TABLE = "loto_y_ts_unified"
@@ -63,6 +73,11 @@ def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     atomic_write_bytes(path, canonical_json_bytes(payload))
 
 
+def normalize_game_id(value: object) -> str:
+    normalized = str(value).strip().lower()
+    return PHYSICAL_GAME_TO_LOGICAL.get(normalized, normalized)
+
+
 def position_number(unique_id: str) -> int:
     match = _POSITION_RE.search(unique_id.strip())
     if match is None:
@@ -100,7 +115,7 @@ def build_game_export(game_id: str, source: pd.DataFrame) -> GameExport:
     position_count, candidate_min, candidate_max, strictly_increasing = _GAME_SPECS[game_id]
 
     frame = source.copy()
-    frame["game_id"] = frame["game_id"].astype(str).str.lower()
+    frame["game_id"] = frame["game_id"].map(normalize_game_id)
     if set(frame["game_id"].unique()) != {game_id}:
         raise ValueError(f"source frame does not contain only {game_id}")
     parsed_ds = pd.to_datetime(frame["ds"], errors="coerce", utc=True)
@@ -189,7 +204,7 @@ def build_game_export(game_id: str, source: pd.DataFrame) -> GameExport:
 
 def build_exports(source: pd.DataFrame) -> dict[str, GameExport]:
     _required_columns(source)
-    normalized_games = source["game_id"].astype(str).str.lower()
+    normalized_games = source["game_id"].map(normalize_game_id)
     actual_games = set(normalized_games.unique())
     if actual_games != set(FORMAL_GAMES):
         raise ValueError(

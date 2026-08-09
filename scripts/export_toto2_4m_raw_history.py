@@ -15,6 +15,8 @@ if str(SRC) not in sys.path:
 
 from loto.toto2_campaign.raw_history_export import (  # noqa: E402
     FORMAL_GAMES,
+    PHYSICAL_GAME_IDS,
+    PHYSICAL_GAME_TO_LOGICAL,
     SOURCE_SCHEMA,
     SOURCE_TABLE,
     SOURCE_TS_TYPE,
@@ -22,15 +24,26 @@ from loto.toto2_campaign.raw_history_export import (  # noqa: E402
     write_export_bundle,
 )
 
-QUERY_TEXT = """SELECT
-    LOWER(loto)::text AS game_id,
+_PHYSICAL_GAME_SQL = ", ".join(f"'{game_id}'" for game_id in PHYSICAL_GAME_IDS)
+
+_GAME_ALIAS_CASES = "\n".join(
+    f"        WHEN '{physical}' THEN '{logical}'"
+    for physical, logical in PHYSICAL_GAME_TO_LOGICAL.items()
+    if physical != logical
+)
+
+QUERY_TEXT = f"""SELECT
+    CASE LOWER(TRIM(loto::text))
+{_GAME_ALIAS_CASES}
+        ELSE LOWER(TRIM(loto::text))
+    END::text AS game_id,
     ds::date AS ds,
     unique_id::text AS unique_id,
     y::double precision AS y
 FROM dataset.loto_y_ts_unified
-WHERE LOWER(loto) IN ('numbers3', 'numbers4', 'miniloto', 'loto6', 'loto7')
-  AND LOWER(ts_type) = 'raw'
-ORDER BY LOWER(loto), ds, unique_id;
+WHERE LOWER(TRIM(loto::text)) IN ({_PHYSICAL_GAME_SQL})
+  AND LOWER(TRIM(ts_type::text)) = 'raw'
+ORDER BY game_id, ds, unique_id;
 """
 
 SCHEMA_QUERY = """SELECT column_name, data_type
@@ -110,6 +123,8 @@ def export(output_root: Path) -> dict[str, Any]:
         "source_table": SOURCE_TABLE,
         "source_ts_type": SOURCE_TS_TYPE,
         "formal_games": list(FORMAL_GAMES),
+        "physical_game_ids": list(PHYSICAL_GAME_IDS),
+        "physical_game_to_logical": dict(PHYSICAL_GAME_TO_LOGICAL),
         "transaction_isolation": str(snapshot_row["transaction_isolation"]).lower(),
         "transaction_read_only": bool(snapshot_row["transaction_read_only"]),
         "transaction_snapshot": str(snapshot_row["transaction_snapshot"]),

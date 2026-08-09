@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import runpy
 from pathlib import Path
 
 import pandas as pd
@@ -8,8 +9,11 @@ import pytest
 from loto.toto2_campaign import raw_history_export, raw_history_verify
 from loto.toto2_campaign.raw_history_export import (
     FORMAL_GAMES,
+    PHYSICAL_GAME_IDS,
+    PHYSICAL_GAME_TO_LOGICAL,
     build_exports,
     build_game_export,
+    normalize_game_id,
     parse_checksum_lines,
     position_number,
 )
@@ -48,6 +52,52 @@ def test_position_number_accepts_current_and_qualified_ids() -> None:
     assert position_number("loto7::raw::n7") == 7
     with pytest.raises(ValueError):
         position_number("position-seven")
+
+
+def test_physical_game_id_contract_maps_mini_to_miniloto() -> None:
+    assert PHYSICAL_GAME_TO_LOGICAL["mini"] == "miniloto"
+    assert tuple(PHYSICAL_GAME_TO_LOGICAL) == PHYSICAL_GAME_IDS
+    assert normalize_game_id("mini") == "miniloto"
+    assert normalize_game_id(" Mini ") == "miniloto"
+
+    logical_games = {normalize_game_id(game_id) for game_id in PHYSICAL_GAME_IDS}
+
+    assert logical_games == set(FORMAL_GAMES)
+
+
+def test_build_exports_accepts_physical_mini_identifier() -> None:
+    source = pd.concat(
+        [make_game_frame(game) for game in FORMAL_GAMES],
+        ignore_index=True,
+    )
+
+    source.loc[
+        source["game_id"] == "miniloto",
+        "game_id",
+    ] = "mini"
+
+    exports = build_exports(source)
+
+    assert list(exports) == list(FORMAL_GAMES)
+    assert exports["miniloto"].statistics["draw_count"] == 512
+    assert exports["miniloto"].json_payload["game_id"] == "miniloto"
+
+
+def test_db_export_query_uses_physical_mini_and_logical_miniloto() -> None:
+    root = Path(__file__).resolve().parents[2]
+    namespace = runpy.run_path(
+        str(root / "scripts" / "export_toto2_4m_raw_history.py"),
+        run_name="toto2_raw_history_export_script",
+    )
+
+    query = namespace["QUERY_TEXT"]
+
+    assert "WHEN 'mini' THEN 'miniloto'" in query
+    assert (
+        "WHERE LOWER(TRIM(loto::text)) IN "
+        "('numbers3', 'numbers4', 'mini', 'loto6', 'loto7')" in query
+    )
+    assert "LOWER(TRIM(ts_type::text)) = 'raw'" in query
 
 
 def test_build_game_export_creates_gap_free_ordinal_draws() -> None:
