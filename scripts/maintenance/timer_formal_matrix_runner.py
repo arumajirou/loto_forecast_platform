@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Network deny guard must execute before third-party/model imports.
+# timezone.utc is retained for the certified Python 3.10 Timer runtime.
+# ruff: noqa: E402, UP017
 from __future__ import annotations
 
 import argparse
@@ -117,7 +120,9 @@ def synthetic_series(game: Game, axis: TimeAxis, seed: int) -> tuple[tuple[float
     return tuple(rows)
 
 
-def build_request(*, game: Game, axis: TimeAxis, horizon: int, layout: str, seed: int, device: str) -> TimerRequest:
+def build_request(
+    *, game: Game, axis: TimeAxis, horizon: int, layout: str, seed: int, device: str
+) -> TimerRequest:
     geometry = geometry_for(game)
     series = synthetic_series(game, axis, seed)
     case_id = f"{device}-{game.value}-{axis.value}-h{horizon}-{layout}-s{seed}"
@@ -156,7 +161,9 @@ def build_request(*, game: Game, axis: TimeAxis, horizon: int, layout: str, seed
     return TimerRequest.model_validate(payload)
 
 
-def prediction_for_layout(model: torch.nn.Module, x: torch.Tensor, *, layout: str, horizon: int) -> torch.Tensor:
+def prediction_for_layout(
+    model: torch.nn.Module, x: torch.Tensor, *, layout: str, horizon: int
+) -> torch.Tensor:
     if layout == "position_panel_batched_univariate":
         return model.generate(x, max_new_tokens=horizon)
     outputs: list[torch.Tensor] = []
@@ -224,7 +231,9 @@ def main() -> int:
     parameter_count = sum(p.numel() for p in params)
     effective_device = str(params[0].device) if params else str(target)
     finite_parameters = all(bool(torch.isfinite(p).all().item()) for p in params)
-    finite_buffers = all(bool(torch.isfinite(b).all().item()) for b in buffers if b.is_floating_point())
+    finite_buffers = all(
+        bool(torch.isfinite(b).all().item()) for b in buffers if b.is_floating_point()
+    )
     if not finite_parameters or not finite_buffers:
         raise RuntimeError("non-finite model parameter/buffer detected")
     if args.device == "cuda" and not effective_device.startswith("cuda"):
@@ -238,7 +247,10 @@ def main() -> int:
     request_hashes: list[str] = []
     prediction_hashes: list[str] = []
 
-    with requests_path.open("w", encoding="utf-8") as requests_file, results_path.open("w", encoding="utf-8") as results_file:
+    with (
+        requests_path.open("w", encoding="utf-8") as requests_file,
+        results_path.open("w", encoding="utf-8") as results_file,
+    ):
         for game in GAMES:
             geometry = geometry_for(game)
             series_ids = [f"{game.value}:position:{i + 1}" for i in range(geometry.position_count)]
@@ -264,7 +276,14 @@ def main() -> int:
                             if args.device == "cuda":
                                 torch.cuda.manual_seed_all(seed)
                             x = torch.tensor(request.series, dtype=torch.float32, device=target)
-                            input_raw = x.detach().to("cpu").contiguous().numpy().astype("<f4", copy=False).tobytes()
+                            input_raw = (
+                                x.detach()
+                                .to("cpu")
+                                .contiguous()
+                                .numpy()
+                                .astype("<f4", copy=False)
+                                .tobytes()
+                            )
                             input_sha = sha256_bytes(input_raw)
 
                             with torch.inference_mode():
@@ -274,11 +293,15 @@ def main() -> int:
 
                             expected_shape = (geometry.position_count, horizon)
                             if tuple(y.shape) != expected_shape:
-                                raise RuntimeError(f"{request.run_id}: output shape {tuple(y.shape)} != {expected_shape}")
+                                raise RuntimeError(
+                                    f"{request.run_id}: output shape {tuple(y.shape)} != {expected_shape}"  # noqa: E501
+                                )
                             if not bool(torch.isfinite(y).all().item()):
                                 raise RuntimeError(f"{request.run_id}: non-finite prediction")
                             if args.device == "cuda" and not str(y.device).startswith("cuda"):
-                                raise RuntimeError(f"{request.run_id}: CUDA output is on {y.device}")
+                                raise RuntimeError(
+                                    f"{request.run_id}: CUDA output is on {y.device}"
+                                )
                             if args.device == "cpu" and str(y.device) != "cpu":
                                 raise RuntimeError(f"{request.run_id}: CPU output is on {y.device}")
 
@@ -305,7 +328,7 @@ def main() -> int:
                                 "input_series_sha256_f32": input_sha,
                                 "prediction_sha256_f32": prediction_sha,
                                 "request_sha256": request_sha,
-                                "chronology_mapping_sha256": request.chronology_evidence.mapping_sha256,
+                                "chronology_mapping_sha256": request.chronology_evidence.mapping_sha256,  # noqa: E501
                                 "actuals_used": False,
                                 "holdout_accessed": False,
                                 "prospective_accessed": False,

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Preserve reviewed import side effects during repository-finalization lint cleanup.
+# timezone.utc is retained for the certified Python 3.10 Timer runtime.
+# ruff: noqa: I001, UP017
 from __future__ import annotations
 
 import argparse
@@ -109,7 +112,9 @@ def main() -> int:
         raise RuntimeError(f"model is not on CPU: {effective_device}")
 
     finite_parameters = all(bool(torch.isfinite(p).all().item()) for p in params)
-    finite_buffers = all(bool(torch.isfinite(b).all().item()) for b in buffers if b.is_floating_point())
+    finite_buffers = all(
+        bool(torch.isfinite(b).all().item()) for b in buffers if b.is_floating_point()
+    )
     if not finite_parameters or not finite_buffers:
         raise RuntimeError("non-finite model parameter/buffer detected")
 
