@@ -75,7 +75,7 @@ def _resolve_interceptor(request: Any) -> Any:
     if context is None:
         raise RuntimeError("search-space resolve interceptor has no execution context")
     plan = context.resolve_delegate(request)
-    profile = plan.search_space_profile
+    profile = getattr(plan, "search_space_profile", None)
     if profile is None:
         profile = unavailable_search_space_profile(
             backend=plan.backend,
@@ -91,7 +91,7 @@ def _construct_interceptor(plan: Any) -> Any:
     if context is None:
         raise RuntimeError("search-space construct interceptor has no execution context")
     model = context.construct_delegate(plan)
-    fallback = context.planning_profile or plan.search_space_profile
+    fallback = context.planning_profile or getattr(plan, "search_space_profile", None)
     if fallback is None:
         raise RuntimeError("planning search-space profile is unavailable")
     runtime_profile = runtime_profile_for_model(
