@@ -121,8 +121,7 @@ def test_target_materialization_occurs_after_instrumented_fold() -> None:
         for node in ast.walk(tree)
         if isinstance(node, ast.Assign)
         and any(
-            isinstance(target, ast.Name) and target.id == "actual_pos"
-            for target in node.targets
+            isinstance(target, ast.Name) and target.id == "actual_pos" for target in node.targets
         )
     )
     assert fold_call < target_read
