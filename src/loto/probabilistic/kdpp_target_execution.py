@@ -9,9 +9,13 @@ from loto.probabilistic.kdpp_certification_gate import (
 )
 from loto.probabilistic.kdpp_history_source import validate_materialized_raw_history
 from loto.probabilistic.kdpp_target_contracts import (
-    ExecutionEvent,
     _EXPORTER_FILES as _EXPORTER_FILES,
+)
+from loto.probabilistic.kdpp_target_contracts import (
     _KDPP_FILES as _KDPP_FILES,
+)
+from loto.probabilistic.kdpp_target_contracts import (
+    ExecutionEvent,
     _write_json,
 )
 from loto.probabilistic.kdpp_target_event_core import _event_path as _event_path
