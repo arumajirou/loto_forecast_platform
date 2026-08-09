@@ -122,15 +122,16 @@ jobs:
       - name: Verify canonical console entrypoints
         run: |
           set -Eeuo pipefail
-          expected="$("$VERIFIER_VENV/bin/python" -c 'from loto.version import __version__; print(__version__)')"
+          version="$("$VERIFIER_VENV/bin/python" -c 'from loto.version import __version__; print(__version__)')"
           for command in loto loto3 loto-auto-campaign loto-lab loto-integrity; do
             actual="$("$VERIFIER_VENV/bin/$command" --version)"
+            expected="$command $version"
             echo "$command=$actual"
             test "$actual" = "$expected"
           done
           "$VERIFIER_VENV/bin/loto-auto-campaign" --help >/dev/null
           "$VERIFIER_VENV/bin/loto-build-info" --json > "$RUNNER_TEMP/loto-build-info.json"
-          "$VERIFIER_VENV/bin/python" - "$RUNNER_TEMP/loto-build-info.json" "$expected" <<'PY'
+          "$VERIFIER_VENV/bin/python" - "$RUNNER_TEMP/loto-build-info.json" "$version" <<'PY'
           import json
           import sys
           from pathlib import Path
