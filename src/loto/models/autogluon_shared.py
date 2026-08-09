@@ -131,6 +131,7 @@ def _model_ids(params: dict[str, Any]) -> tuple[str, ...]:
         raw = (params["model_id"],)
     if raw is None:
         return ()
+    values: tuple[str, ...]
     if isinstance(raw, str):
         values = (raw,)
     else:
@@ -248,46 +249,48 @@ def build_autogluon_provider_request(
     quantile_levels = tuple(
         float(value) for value in params.get("quantile_levels", (0.1, 0.5, 0.9))
     )
-    request = ProviderRequestV2(
-        run_id=_worker_run_id(identity_payload),
-        operation=operation,
-        execution_mode=mode,
-        model_ids=model_ids,
-        artifact_dir=str(Path(artifact_dir).resolve()),
-        history=tuple(records),
-        geometry={
-            "game_id": profile.game_id,
-            "position_columns": columns,
-            "candidate_min": profile.candidate_min,
-            "candidate_max": profile.candidate_max,
-            "selection_count": profile.position_count,
-            "horizon": horizon,
-            "allow_duplicates": profile.allow_duplicates,
-            "sort_policy": profile.sort_policy,
-        },
-        predictor={
-            "target": "target",
-            "prediction_length": horizon,
-            "freq": "D",
-            "eval_metric": str(params.get("eval_metric", "MAE")),
-            "quantile_levels": quantile_levels,
-            "cache_predictions": bool(params.get("cache_predictions", True)),
-        },
-        fit={
-            "time_limit_seconds": int(
-                params.get("time_limit_seconds", params.get("time_limit", 120))
-            ),
-            "presets": params.get("presets", "fast_training"),
-            "hyperparameters": params.get("hyperparameters"),
-            "hyperparameter_tune_kwargs": params.get("hyperparameter_tune_kwargs"),
-            "num_val_windows": params.get("num_val_windows", 1),
-            "refit_every_n_windows": params.get("refit_every_n_windows", 1),
-            "refit_full": bool(params.get("refit_full", False)),
-            "enable_ensemble": bool(params.get("enable_ensemble", True)),
-            "skip_model_selection": bool(params.get("skip_model_selection", False)),
-        },
-        seed=seed,
-        requested_device=device,
+    request = ProviderRequestV2.model_validate(
+        {
+            "run_id": _worker_run_id(identity_payload),
+            "operation": operation,
+            "execution_mode": mode,
+            "model_ids": model_ids,
+            "artifact_dir": str(Path(artifact_dir).resolve()),
+            "history": tuple(records),
+            "geometry": {
+                "game_id": profile.game_id,
+                "position_columns": columns,
+                "candidate_min": profile.candidate_min,
+                "candidate_max": profile.candidate_max,
+                "selection_count": profile.position_count,
+                "horizon": horizon,
+                "allow_duplicates": profile.allow_duplicates,
+                "sort_policy": profile.sort_policy,
+            },
+            "predictor": {
+                "target": "target",
+                "prediction_length": horizon,
+                "freq": "D",
+                "eval_metric": str(params.get("eval_metric", "MAE")),
+                "quantile_levels": quantile_levels,
+                "cache_predictions": bool(params.get("cache_predictions", True)),
+            },
+            "fit": {
+                "time_limit_seconds": int(
+                    params.get("time_limit_seconds", params.get("time_limit", 120))
+                ),
+                "presets": params.get("presets", "fast_training"),
+                "hyperparameters": params.get("hyperparameters"),
+                "hyperparameter_tune_kwargs": params.get("hyperparameter_tune_kwargs"),
+                "num_val_windows": params.get("num_val_windows", 1),
+                "refit_every_n_windows": params.get("refit_every_n_windows", 1),
+                "refit_full": bool(params.get("refit_full", False)),
+                "enable_ensemble": bool(params.get("enable_ensemble", True)),
+                "skip_model_selection": bool(params.get("skip_model_selection", False)),
+            },
+            "seed": seed,
+            "requested_device": device,
+        }
     )
     return request.model_dump(mode="json")
 
