@@ -162,8 +162,7 @@ class TimerBase84MProvider:
         if current not in {None, CUBLAS_WORKSPACE_CONFIG}:
             raise TimerProviderError(
                 "UNSUPPORTED_RUNTIME_LANE",
-                "CUBLAS_WORKSPACE_CONFIG must be "
-                f"{CUBLAS_WORKSPACE_CONFIG}, got {current!r}",
+                f"CUBLAS_WORKSPACE_CONFIG must be {CUBLAS_WORKSPACE_CONFIG}, got {current!r}",
             )
         os.environ["CUBLAS_WORKSPACE_CONFIG"] = CUBLAS_WORKSPACE_CONFIG
 
