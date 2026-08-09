@@ -29,7 +29,6 @@ jobs:
     env:
       UV_VERSION: "0.11.21"
       UV_PYTHON: "3.12"
-      HARNESS_PYTHON: "3.13"
       EXPECTED_MAIN_SHA: "1a0b7b60a11923bc442a129071280219dcf80111"
 
     steps:
@@ -76,65 +75,55 @@ jobs:
           test "${#changed[@]}" -eq 1
           test "${changed[0]}" = ".github/workflows/autogluon-p5-runtime-certification.yml"
 
-      - name: Prepare isolated harness and provider environments
+      - name: Prepare locked AutoGluon provider and harness environment
         run: |
           set -Eeuo pipefail
-          uv python install "$HARNESS_PYTHON" "$UV_PYTHON"
+          uv python install "$UV_PYTHON"
 
-          harness_venv="$RUNNER_TEMP/autogluon-p5-harness-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           provider_venv="$RUNNER_TEMP/autogluon-p5-provider-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           bundle_dir="$RUNNER_TEMP/autogluon-p5-bundle-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           evidence_dir="$bundle_dir/evidence"
           tar_path="$RUNNER_TEMP/autogluon-p5-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.tar"
 
-          for path in "$harness_venv" "$provider_venv" "$bundle_dir" "$tar_path"; do
+          for path in "$provider_venv" "$bundle_dir" "$tar_path"; do
             case "$path" in
               "$RUNNER_TEMP"/*) ;;
               *) echo "unsafe RUNNER_TEMP path: $path" >&2; exit 1 ;;
             esac
           done
 
-          rm -rf -- "$harness_venv" "$provider_venv" "$bundle_dir" "$tar_path"
+          rm -rf -- "$provider_venv" "$bundle_dir" "$tar_path"
           mkdir -p -- "$bundle_dir"
 
-          echo "HARNESS_VENV=$harness_venv" >> "$GITHUB_ENV"
           echo "PROVIDER_VENV=$provider_venv" >> "$GITHUB_ENV"
           echo "P5_BUNDLE_DIR=$bundle_dir" >> "$GITHUB_ENV"
           echo "P5_EVIDENCE_DIR=$evidence_dir" >> "$GITHUB_ENV"
           echo "P5_TAR=$tar_path" >> "$GITHUB_ENV"
 
-          uv venv "$harness_venv" --python "$HARNESS_PYTHON"
-          pydantic_version="$("$harness_venv/bin/python" - <<'PY'
-          import tomllib
-          with open("uv.lock", "rb") as stream:
-              lock = tomllib.load(stream)
-          versions = [
-              package["version"]
-              for package in lock["package"]
-              if package.get("name") == "pydantic"
-          ]
-          if len(versions) != 1:
-              raise SystemExit(f"expected one pydantic version, got {versions!r}")
-          print(versions[0])
-          PY
-          )"
-          echo "locked_pydantic_version=$pydantic_version"
-          uv pip install --quiet --python "$harness_venv/bin/python" "pydantic==$pydantic_version"
-
           UV_PROJECT_ENVIRONMENT="$provider_venv" \
             uv run --project environments/autogluon-timeseries --locked python - <<'PY'
           import importlib.metadata as metadata
           import autogluon.timeseries
+          import numpy
+          import pandas
           import torch
 
           version = metadata.version("autogluon.timeseries")
           print(f"autogluon_timeseries_version={version}")
+          print(f"numpy_version={numpy.__version__}")
+          print(f"pandas_version={pandas.__version__}")
           print(f"provider_torch_version={torch.__version__}")
           print(f"provider_cuda_available={torch.cuda.is_available()}")
           assert version == "1.5.0", version
           PY
 
-          "$harness_venv/bin/python" --version
+          PYTHONPATH="$GITHUB_WORKSPACE/src" \
+          UV_PROJECT_ENVIRONMENT="$provider_venv" \
+            "$provider_venv/bin/python" - <<'PY'
+          import loto.autogluon_campaign.runtime_certification as certification
+          print(f"harness_import={certification.__name__}")
+          PY
+
           "$provider_venv/bin/python" --version
 
       - name: Run seven-scenario P5 certification
@@ -146,7 +135,7 @@ jobs:
           set +e
           PYTHONPATH="$GITHUB_WORKSPACE/src" \
           UV_PROJECT_ENVIRONMENT="$PROVIDER_VENV" \
-            "$HARNESS_VENV/bin/python" \
+            "$PROVIDER_VENV/bin/python" \
             -m loto.autogluon_campaign.runtime_certification \
             --repo-root "$GITHUB_WORKSPACE" \
             --output-dir "$P5_EVIDENCE_DIR" \
@@ -171,7 +160,7 @@ jobs:
             sha256sum -c SHA256SUMS
           ) | tee "$P5_BUNDLE_DIR/sha256-check.log"
 
-          "$HARNESS_VENV/bin/python" - "$P5_EVIDENCE_DIR/RUNTIME_CERTIFICATION_REPORT.json" <<'PY'
+          "$PROVIDER_VENV/bin/python" - "$P5_EVIDENCE_DIR/RUNTIME_CERTIFICATION_REPORT.json" <<'PY'
           import json
           import sys
           from pathlib import Path
@@ -235,7 +224,7 @@ jobs:
         if: ${{ always() }}
         run: |
           set -Eeuo pipefail
-          for path in "${HARNESS_VENV:-}" "${PROVIDER_VENV:-}" "${P5_BUNDLE_DIR:-}" "${P5_TAR:-}" "${P5_TAR:-}.sha256"; do
+          for path in "${PROVIDER_VENV:-}" "${P5_BUNDLE_DIR:-}" "${P5_TAR:-}" "${P5_TAR:-}.sha256"; do
             [[ -z "$path" ]] && continue
             case "$path" in
               "$RUNNER_TEMP"/*) rm -rf -- "$path" ;;
