@@ -2,11 +2,20 @@ name: windows-portability-ci
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
     paths:
       - pyproject.toml
       - uv.lock
-      - README.md
+      - src/**
+      - docs/WINDOWS_INSTALL.md
+      - .github/workflows/windows-portability-ci.yml
+  push:
+    branches:
+      - main
+    paths:
+      - pyproject.toml
+      - uv.lock
       - src/**
       - .github/workflows/windows-portability-ci.yml
   workflow_dispatch:
@@ -15,196 +24,137 @@ permissions:
   contents: read
 
 concurrency:
-  group: version-verifier-${{ github.workflow }}-${{ github.ref }}
+  group: windows-portability-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  version-single-source-verifier:
-    name: Temporary version single-source verifier
-    if: ${{ github.event_name == 'pull_request' && github.head_ref == 'fix/runtime-version-single-source-v2' }}
-    runs-on: [self-hosted, Linux, X64, loto-ci]
-    timeout-minutes: 120
+  windows-portability:
+    name: Native Windows dependency and package smoke
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: [self-hosted, Windows, X64]
+    timeout-minutes: 45
+
     defaults:
       run:
-        shell: bash
+        shell: pwsh
+
     env:
       UV_VERSION: "0.11.21"
-      UV_PYTHON: "3.13"
-      EXPECTED_MAIN: "c5e822c15080becd4156639bcdb94735b1a8e7a5"
-      VERIFIED_SOURCE_COMMIT: "e56b636a818faa735688d82c3239494b9bbf1c65"
+      UV_PYTHON: "3.12.13"
 
     steps:
-      - name: Verify trusted runner
+      - name: Verify expected native Windows self-hosted runner
         run: |
-          set -Eeuo pipefail
-          test "$RUNNER_NAME" = "az-loto-gpu"
-          test "$RUNNER_OS" = "Linux"
-          test "$RUNNER_ARCH" = "X64"
+          Write-Host "runner_name=${{ runner.name }}"
+          Write-Host "runner_os=${{ runner.os }}"
+          Write-Host "runner_arch=${{ runner.arch }}"
+          if ("${{ runner.name }}" -ne "az-loto-windows") {
+            throw "unexpected self-hosted runner: ${{ runner.name }}"
+          }
+          if ("${{ runner.os }}" -ne "Windows") {
+            throw "unexpected runner OS: ${{ runner.os }}"
+          }
+          if ("${{ runner.arch }}" -ne "X64") {
+            throw "unexpected runner architecture: ${{ runner.arch }}"
+          }
+          Write-Host "native_windows_self_hosted_runner=PASS"
 
       - name: Checkout without persistent credentials
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
-          fetch-depth: 0
-
-      - name: Verify main race and source identity
-        run: |
-          set -Eeuo pipefail
-          git fetch --no-tags origin main
-          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
-          git cat-file -e "$VERIFIED_SOURCE_COMMIT^{commit}"
-          git diff --exit-code "$VERIFIED_SOURCE_COMMIT" -- \
-            README.md pyproject.toml uv.lock src/loto/__init__.py src/loto/api/app.py \
-            src/loto/auto_campaign/cli.py src/loto/verify/integrity.py src/loto/version.py
+          fetch-depth: 1
 
       - name: Install exact uv
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           version: ${{ env.UV_VERSION }}
-          enable-cache: false
 
-      - name: Prepare isolated verifier environment
+      - name: Verify uv and install managed Python
         run: |
-          set -Eeuo pipefail
-          case "$(uv --version)" in "uv $UV_VERSION"*) ;; *) exit 1 ;; esac
-          uv python install "$UV_PYTHON"
-          venv="$RUNNER_TEMP/version-venv-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          cache="$RUNNER_TEMP/version-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          case "$venv" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
-          case "$cache" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
-          rm -rf -- "$venv" "$cache"
-          mkdir -p -- "$cache"
-          echo "VERIFIER_VENV=$venv" >> "$GITHUB_ENV"
-          echo "UV_CACHE_DIR=$cache" >> "$GITHUB_ENV"
-          UV_CACHE_DIR="$cache" uv venv "$venv" --python "$UV_PYTHON"
-          "$venv/bin/python" --version
+          $actual = (uv --version).Trim()
+          Write-Host "uv_version=$actual"
+          $parts = @($actual -split '\s+')
+          if ($parts.Count -lt 2 -or $parts[0] -ne "uv" -or $parts[1] -ne $env:UV_VERSION) {
+            throw "unexpected uv version: $actual"
+          }
 
-      - name: Verify lock and install dependencies
+          uv python install $env:UV_PYTHON
+          $python = (uv python find $env:UV_PYTHON).Trim()
+          Write-Host "python_path=$python"
+          & $python --version
+
+      - name: Validate committed universal lock
         run: |
-          set -Eeuo pipefail
           uv lock --check
-          python="$VERIFIER_VENV/bin/python"
-          uv pip install --quiet --python "$python" --index-url https://download.pytorch.org/whl/cpu "torch==2.9.1"
-          uv pip install --quiet --python "$python" -e ".[api,dev,postgres]"
-          ruff_version="$("$python" - <<'PY'
+
+          $python = (uv python find $env:UV_PYTHON).Trim()
+          @'
           import tomllib
+
           with open("uv.lock", "rb") as stream:
               lock = tomllib.load(stream)
-          versions = [p["version"] for p in lock["package"] if p.get("name") == "ruff"]
-          if len(versions) != 1:
-              raise SystemExit(versions)
-          print(versions[0])
-          PY
-          )"
-          uv pip install --quiet --python "$python" "ruff==$ruff_version"
-          uv pip check --python "$python"
-          "$python" - <<'PY'
-          import torch
-          assert torch.__version__.startswith("2.9.1"), torch.__version__
-          assert torch.version.cuda is None, torch.version.cuda
-          print(f"torch_version={torch.__version__}")
-          print("torch_cuda_runtime=NONE")
-          PY
 
-      - name: Run repository static gates
+          packages = lock.get("package", [])
+          root = next(p for p in packages if p.get("name") == "loto-forecast-platform")
+          root_dependencies = root.get("dependencies", [])
+          assert not any(d.get("name") == "triton" for d in root_dependencies), root_dependencies
+
+          root_metadata = root.get("metadata", {})
+          requires_dist = root_metadata.get("requires-dist", [])
+          assert not any(d.get("name") == "triton" for d in requires_dist), requires_dist
+
+          torch = next(
+              p for p in packages
+              if p.get("name") == "torch" and p.get("version") == "2.9.1"
+          )
+          triton_edges = [
+              d for d in torch.get("dependencies", [])
+              if d.get("name") == "triton"
+          ]
+          expected_marker = "platform_machine == 'x86_64' and sys_platform == 'linux'"
+          assert len(triton_edges) == 1, triton_edges
+          assert triton_edges[0].get("marker") == expected_marker, triton_edges
+
+          print("root_direct_triton=false")
+          print("torch_triton_linux_x86_64_marker=PASS")
+          '@ | & $python -
+
+      - name: Resolve native Windows dependencies without installation
         run: |
-          set -Eeuo pipefail
-          python="$VERIFIER_VENV/bin/python"
-          "$python" -m ruff format --check src scripts tests
-          "$python" -m ruff check src scripts tests
-          "$python" -m compileall -q src scripts tests
+          uv sync --dry-run --locked --python $env:UV_PYTHON
+          uv tree --locked `
+            --python-version 3.12 `
+            --python-platform x86_64-pc-windows-msvc `
+            | Tee-Object -FilePath windows-tree.txt
 
-      - name: Run canonical version contract tests
+          $triton = Select-String -Path windows-tree.txt -Pattern '(?i)\btriton\b'
+          if ($triton) {
+            $triton | ForEach-Object { Write-Host $_.Line }
+            throw "native Windows dependency tree unexpectedly selects Triton"
+          }
+          Write-Host "windows_triton_selected=false"
+
+      - name: Build wheel on native Windows
         run: |
-          set -Eeuo pipefail
-          "$VERIFIER_VENV/bin/python" -m pytest -q tests/test_version.py
+          uv build --wheel
+          $wheels = @(Get-ChildItem -Path dist -Filter *.whl)
+          if ($wheels.Count -ne 1) {
+            throw "expected exactly one wheel, found $($wheels.Count)"
+          }
+          Write-Host "wheel=$($wheels[0].FullName)"
 
-      - name: Verify canonical console entrypoints
+      - name: Install wheel without dependencies and import package
         run: |
-          set -Eeuo pipefail
-          version="$("$VERIFIER_VENV/bin/python" -c 'from loto.version import __version__; print(__version__)')"
-          for command in loto loto3 loto-auto-campaign loto-lab loto-integrity; do
-            actual="$("$VERIFIER_VENV/bin/$command" --version)"
-            expected="$command $version"
-            echo "$command=$actual"
-            test "$actual" = "$expected"
-          done
-          "$VERIFIER_VENV/bin/loto-auto-campaign" --help >/dev/null
-          "$VERIFIER_VENV/bin/loto-build-info" --output "$RUNNER_TEMP/loto-build-info.json" >/dev/null
-          "$VERIFIER_VENV/bin/python" - "$RUNNER_TEMP/loto-build-info.json" "$version" <<'PY'
-          import json
-          import sys
-          from pathlib import Path
-          payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-          assert payload["package_version"] == sys.argv[2], payload
-          print(f"build_info_version={payload['package_version']}")
-          PY
+          uv venv .venv-portability --python $env:UV_PYTHON
+          $python = ".venv-portability\Scripts\python.exe"
+          $wheel = (Get-ChildItem -Path dist -Filter *.whl | Select-Object -First 1).FullName
 
-      - name: Build wheel and verify dynamic package metadata
-        run: |
-          set -Eeuo pipefail
-          out="$RUNNER_TEMP/version-wheel-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          mkdir -p "$out"
-          uv build --wheel --out-dir "$out"
-          "$VERIFIER_VENV/bin/python" - "$out" <<'PY'
-          import email.parser
-          import sys
-          import zipfile
-          from pathlib import Path
-          from loto.version import __version__
-          wheels = list(Path(sys.argv[1]).glob("*.whl"))
-          assert len(wheels) == 1, wheels
-          with zipfile.ZipFile(wheels[0]) as archive:
-              names = [n for n in archive.namelist() if n.endswith(".dist-info/METADATA")]
-              assert len(names) == 1, names
-              raw = archive.read(names[0]).decode("utf-8")
-          metadata = email.parser.Parser().parsestr(raw)
-          assert metadata["Version"] == __version__, (metadata["Version"], __version__)
-          print(f"wheel={wheels[0].name}")
-          print(f"wheel_version={metadata['Version']}")
-          PY
+          uv pip install --python $python --no-deps $wheel
+          & $python -c "import loto; print(f'loto_version={loto.__version__}')"
 
-      - name: Verify collection remains zero-error
-        run: |
-          set -Eeuo pipefail
-          "$VERIFIER_VENV/bin/python" -m pytest --collect-only -q >/dev/null
-
-      - name: Re-measure full pytest runtime debt
-        run: |
-          set -uo pipefail
-          out="$RUNNER_TEMP/version-full-pytest-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.txt"
-          echo "FULL_PYTEST_OUTPUT=$out" >> "$GITHUB_ENV"
-          set +e
-          "$VERIFIER_VENV/bin/python" -m pytest -q --tb=short 2>&1 | tee "$out"
-          rc="${PIPESTATUS[0]}"
-          set -e
-          echo "FULL_PYTEST_RC=$rc" >> "$GITHUB_ENV"
-          if [[ "$rc" -ne 0 && "$rc" -ne 1 ]]; then exit "$rc"; fi
-
-      - name: Recheck main and source identity
+      - name: Verify tracked files stayed clean
         if: ${{ always() }}
         run: |
-          set -Eeuo pipefail
-          git fetch --no-tags origin main
-          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
-          git diff --exit-code "$VERIFIED_SOURCE_COMMIT" -- \
-            README.md pyproject.toml uv.lock src/loto/__init__.py src/loto/api/app.py \
-            src/loto/auto_campaign/cli.py src/loto/verify/integrity.py src/loto/version.py
           git diff --exit-code
           git diff --cached --exit-code
-
-      - name: Upload temporary full-pytest comparison artifact
-        if: ${{ always() && env.FULL_PYTEST_OUTPUT != '' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: version-full-pytest-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ env.FULL_PYTEST_OUTPUT }}
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Remove verifier-owned environment
-        if: ${{ always() }}
-        run: |
-          set -Eeuo pipefail
-          if [[ -n "${VERIFIER_VENV:-}" ]]; then case "$VERIFIER_VENV" in "$RUNNER_TEMP"/*) rm -rf -- "$VERIFIER_VENV" ;; *) exit 1 ;; esac; fi
-          if [[ -n "${UV_CACHE_DIR:-}" ]]; then case "$UV_CACHE_DIR" in "$RUNNER_TEMP"/*) rm -rf -- "$UV_CACHE_DIR" ;; *) exit 1 ;; esac; fi
