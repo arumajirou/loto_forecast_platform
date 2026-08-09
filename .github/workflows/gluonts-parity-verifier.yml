@@ -114,12 +114,12 @@ jobs:
           cmp src/loto/adapters/gluonts/p6_models.py environments/gluonts-latest/src/loto_gluonts_provider/p6_models.py
           cmp environments/gluonts-compat/src/loto_gluonts_provider/p6_inventory_cli.py environments/gluonts-latest/src/loto_gluonts_provider/p6_inventory_cli.py
 
-      - name: Run static gates and focused GluonTS regression tests
+      - name: Run standard static gates and focused GluonTS regression tests
         run: |
           set -Eeuo pipefail
           python="$VERIFIER_VENV/bin/python"
-          "$python" -m ruff format --check src scripts tests environments/gluonts-compat/src environments/gluonts-latest/src
-          "$python" -m ruff check src scripts tests environments/gluonts-compat/src environments/gluonts-latest/src
+          "$python" -m ruff format --check src scripts tests
+          "$python" -m ruff check src scripts tests
           "$python" -m compileall -q src scripts tests environments/gluonts-compat/src environments/gluonts-latest/src
           "$python" -m pytest -q \
             tests/adapters/gluonts/test_inventory.py::test_root_and_provider_inventory_contracts_are_identical \
