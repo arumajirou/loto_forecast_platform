@@ -63,7 +63,9 @@ _GAME_ALIASES = {
     "loto_7": "loto7",
     "loto-7": "loto7",
 }
-_POSITION_COUNT_TO_GAME = {profile.position_count: game_id for game_id, profile in AUTOGLUON_GAME_PROFILES.items()}
+_POSITION_COUNT_TO_GAME = {
+    profile.position_count: game_id for game_id, profile in AUTOGLUON_GAME_PROFILES.items()
+}
 
 AUTOGLUON_CONCURRENCY_LIMITS = {
     "outer_workers": 8,
@@ -242,7 +244,9 @@ def build_autogluon_provider_request(
         "seed": seed,
         "artifact_dir": str(Path(artifact_dir).resolve()),
     }
-    quantile_levels = tuple(float(value) for value in params.get("quantile_levels", (0.1, 0.5, 0.9)))
+    quantile_levels = tuple(
+        float(value) for value in params.get("quantile_levels", (0.1, 0.5, 0.9))
+    )
     request = ProviderRequestV2(
         run_id=_worker_run_id(identity_payload),
         operation=operation,
@@ -269,7 +273,9 @@ def build_autogluon_provider_request(
             "cache_predictions": bool(params.get("cache_predictions", True)),
         },
         fit={
-            "time_limit_seconds": int(params.get("time_limit_seconds", params.get("time_limit", 120))),
+            "time_limit_seconds": int(
+                params.get("time_limit_seconds", params.get("time_limit", 120))
+            ),
             "presets": params.get("presets", "fast_training"),
             "hyperparameters": params.get("hyperparameters"),
             "hyperparameter_tune_kwargs": params.get("hyperparameter_tune_kwargs"),
@@ -393,10 +399,14 @@ def adapt_autogluon_provider_response(
     if response.status != "OK":
         error = response.error
         code = error.code if error is not None else "PROVIDER_ERROR"
-        message = error.message if error is not None else "AutoGluon provider returned non-OK status"
+        message = (
+            error.message if error is not None else "AutoGluon provider returned non-OK status"
+        )
         raise AutoGluonSharedContractError(code, message)
     assert request.geometry is not None
-    expected_items = tuple(f"position-{index}" for index in range(1, request.geometry.selection_count + 1))
+    expected_items = tuple(
+        f"position-{index}" for index in range(1, request.geometry.selection_count + 1)
+    )
     if len(response.predictions) != len(expected_items):
         raise AutoGluonSharedContractError(
             "PREDICTION_SHAPE_MISMATCH",
@@ -492,7 +502,9 @@ def adapt_autogluon_provider_response(
             "game_id": request.geometry.game_id,
             "position_columns": list(request.geometry.position_columns),
             "runtime_evidence": evidence.model_dump(mode="json"),
-            "argument_ledger": [entry.model_dump(mode="json") for entry in response.argument_ledger],
+            "argument_ledger": [
+                entry.model_dump(mode="json") for entry in response.argument_ledger
+            ],
             "artifacts": dict(response.artifacts),
             "concurrency": concurrency,
             "gpu_certified": gpu_certified,
