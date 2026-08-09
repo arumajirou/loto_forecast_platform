@@ -126,12 +126,7 @@ class TimerBase84MProvider:
         if explicit:
             return Path(explicit).expanduser().resolve()
         return (
-            Path.home()
-            / ".cache"
-            / "loto"
-            / "timer-base-84m"
-            / "snapshots"
-            / MODEL_REVISION
+            Path.home() / ".cache" / "loto" / "timer-base-84m" / "snapshots" / MODEL_REVISION
         ).resolve()
 
     def _verify_snapshot_bytes(self) -> Path:
