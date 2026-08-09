@@ -1,0 +1,34 @@
+{
+  "dependency_lock": {
+    "active_registry_packages": 44,
+    "inactive_lock_only_packages": [
+      "colorama"
+    ],
+    "license_warning_count": 16,
+    "missing_active_packages": [],
+    "python": "3.10.19",
+    "sha256": "5349b4ae2a1c16a0b27b4fe3cf7b77a3d8bd6d0a22329b8b66691c5e3e63efe0",
+    "torch": "2.9.1+cu128",
+    "transformers": "4.40.1"
+  },
+  "generated_at_utc": "2026-08-09T08:30:24.721812+00:00",
+  "host": {
+    "machine": "x86_64",
+    "release": "7.0.0-29-generic",
+    "system": "Linux"
+  },
+  "phase": "timer-base-84m-phase-b3",
+  "pull_request": 238,
+  "repository": "arumajirou/loto_forecast_platform",
+  "run_id": "pr238-local-20260809T080814Z",
+  "runtime_execution": {
+    "checkpoint_loaded": false,
+    "cpu_inference_executed": false,
+    "cuda_inference_executed": false,
+    "remote_code_imported": false
+  },
+  "schema_version": "loto.local-runtime-result.v1",
+  "source_head_sha": "94162095efe7ed550538e352849ef9ca2646ca62",
+  "source_main_sha": "704845f26dc527d0c341c1bf0cf8b1b9a6355dd5",
+  "status": "TECHNICAL_VALIDATION_PASS_HUMAN_APPROVAL_PENDING"
+}
