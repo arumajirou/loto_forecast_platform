@@ -421,7 +421,6 @@ def inspect_estimator(
             constructor_state=ConstructorState.FAIL,
             constructor_signature=str(signature),
             planned_kwargs=planned,
-            rejected_arguments=rejected,
             formal_state=FormalState.FAILED,
             errors=[f"{type(exc).__name__}: {exc}"],
         )
