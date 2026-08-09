@@ -133,7 +133,7 @@ def build_request(*, game: Game, axis: TimeAxis, horizon: int, layout: str, seed
         "config_sha256": CONFIG_SHA256,
         "weight_sha256": WEIGHT_SHA256,
         "license": LICENSE,
-        "game": game.value,
+        "game": game,
         "target_layout": layout,
         "context_length": CONTEXT_LENGTH,
         "prediction_length": horizon,
@@ -143,14 +143,14 @@ def build_request(*, game: Game, axis: TimeAxis, horizon: int, layout: str, seed
         "series": series,
         "past_covariates": None,
         "known_future_covariates": None,
-        "chronology_evidence": chronology_for(game, axis).model_dump(mode="json"),
+        "chronology_evidence": chronology_for(game, axis),
         "actuals_used": False,
         "artifact_paths": ArtifactPaths(
             request_path="matrix/requests.jsonl",
             response_path="matrix/results.jsonl",
             snapshot_path="snapshot",
             manifest_path="matrix/manifest.json",
-        ).model_dump(mode="json"),
+        ),
     }
     return TimerRequest.model_validate(payload)
 
