@@ -1,0 +1,168 @@
+name: timer-base-84m-lock-parser-diagnostic
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/timer-base-84m-lock-parser-diagnostic.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    name: Timer Base 84M lock parser diagnostic
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    env:
+      EXPECTED_MAIN_SHA: "704845f26dc527d0c341c1bf0cf8b1b9a6355dd5"
+      UV_VERSION: "0.11.21"
+      SOURCE_ENV: "environments/timer-base-84m-supported-py310"
+    steps:
+      - name: Verify trusted runner
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          clean: true
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+
+      - name: Verify exact main and prepare read-only diagnostic copy
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN_SHA"
+          uv python install 3.10 3.13
+          project="$RUNNER_TEMP/timer-base-lock-project-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          evidence="$RUNNER_TEMP/timer-base-lock-parser-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          case "$project" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          case "$evidence" in "$RUNNER_TEMP"/*) ;; *) exit 1 ;; esac
+          rm -rf -- "$project" "$evidence"
+          mkdir -p -- "$project" "$evidence"
+          cp "$SOURCE_ENV/pyproject.toml" "$project/pyproject.toml"
+          echo "DIAG_PROJECT=$project" >> "$GITHUB_ENV"
+          echo "EVIDENCE_DIR=$evidence" >> "$GITHUB_ENV"
+
+      - name: Resolve Python 3.10 lock without install
+        run: |
+          set -Eeuo pipefail
+          uv lock --project "$DIAG_PROJECT" --python 3.10 -v \
+            2>&1 | tee "$EVIDENCE_DIR/uv-lock.log"
+          test -s "$DIAG_PROJECT/uv.lock"
+          cp "$DIAG_PROJECT/uv.lock" "$EVIDENCE_DIR/uv.lock"
+          echo "dependency_install_executed=false"
+          echo "package_import_executed=false"
+
+      - name: Prove Python 3.10 parser behavior
+        run: |
+          set -Eeuo pipefail
+          py310="$(uv python find 3.10)"
+          "$py310" - <<'PY' | tee "$EVIDENCE_DIR/python310-tomllib.txt"
+          import sys
+          print(f"python={sys.version}")
+          try:
+              import tomllib  # noqa: F401
+          except Exception as exc:
+              print(f"tomllib_import_status=FAILED")
+              print(f"tomllib_error_type={type(exc).__name__}")
+              print(f"tomllib_error={exc}")
+          else:
+              print("tomllib_import_status=PASS")
+          PY
+
+      - name: Parse the exact same lock with Python 3.13
+        run: |
+          set -Eeuo pipefail
+          py313="$(uv python find 3.13)"
+          "$py313" - "$EVIDENCE_DIR/uv.lock" <<'PY' \
+            | tee "$EVIDENCE_DIR/python313-lock-inspection.txt"
+          import hashlib
+          import json
+          import sys
+          import tomllib
+          import traceback
+          from pathlib import Path
+
+          path = Path(sys.argv[1])
+          try:
+              print(f"python={sys.version}")
+              print(f"lock_exists={path.is_file()}")
+              print(f"lock_size={path.stat().st_size if path.exists() else None}")
+              with path.open("rb") as stream:
+                  lock = tomllib.load(stream)
+              packages = lock.get("package", [])
+              print(f"package_count={len(packages)}")
+              for wanted in ("loto-timer-base-84m-provider", "torch", "transformers"):
+                  rows = [row for row in packages if row.get("name") == wanted]
+                  concise = [
+                      {
+                          "name": row.get("name"),
+                          "version": row.get("version"),
+                          "source": row.get("source"),
+                      }
+                      for row in rows
+                  ]
+                  print(f"selected_{wanted}={json.dumps(concise, sort_keys=True)}")
+              non_registry = [
+                  {"name": row.get("name"), "source": row.get("source")}
+                  for row in packages
+                  if row.get("name") != "loto-timer-base-84m-provider"
+                  and "registry" not in (row.get("source") or {})
+              ]
+              print(f"non_registry_source_count={len(non_registry)}")
+              if non_registry:
+                  print(f"non_registry_sources={json.dumps(non_registry, sort_keys=True)}")
+              print(f"uv_lock_sha256={hashlib.sha256(path.read_bytes()).hexdigest()}")
+              print("lock_parse_status=PASS")
+          except Exception:
+              print("lock_parse_status=FAILED")
+              traceback.print_exc()
+              raise
+          PY
+
+      - name: Verify no executable Timer work occurred
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          echo "trust_remote_code_executed=false"
+          echo "remote_code_import_executed=false"
+          echo "checkpoint_load_executed=false"
+          echo "inference_executed=false"
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Upload diagnostic evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: timer-base-lock-parser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.EVIDENCE_DIR }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Cleanup
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          for path in "${DIAG_PROJECT:-}" "${EVIDENCE_DIR:-}"; do
+            [[ -z "$path" ]] && continue
+            case "$path" in "$RUNNER_TEMP"/*) rm -rf -- "$path" ;; *) exit 1 ;; esac
+          done
