@@ -23,8 +23,16 @@ reviewed external step; the platform never guesses a commit.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any, Literal
+
+from loto.adapters.autogluon.inventory import (
+    SOURCE_MODEL_SPECS as AUTOGLUON_SOURCE_MODEL_SPECS,
+)
+from loto.adapters.autogluon.inventory import (
+    AutoGluonRuntimeInventory,
+)
 
 __all__ = [
     "ModelEntry",
@@ -38,6 +46,7 @@ __all__ = [
     "catalog_counts",
     "catalog_by_library",
     "PRIMARY_SOURCES",
+    "autogluon_runtime_catalog",
 ]
 
 Task = Literal[
@@ -53,6 +62,7 @@ PRIMARY_SOURCES: dict[str, str] = {
         "github.com/Nixtla/hierarchicalforecast @ main:hierarchicalforecast/methods.py"
     ),
     "tsfm": "huggingface.co/models?pipeline_tag=time-series-forecasting (2026-07-30)",
+    "autogluon": "autogluon.timeseries 1.5.0 runtime model registry",
 }
 
 
@@ -753,8 +763,9 @@ def _framework_tier() -> list[ModelEntry]:
             "position_series",
             "TimeSeriesPredictor",
             package="autogluon",
-            capabilities=("position", "probability", "automl"),
+            capabilities=("position", "probability", "automl", "protocol_v2"),
             supports_probabilistic=True,
+            notes="stable provider; runtime states use autogluon_runtime_catalog",
         ),
         ModelEntry(
             "darts-ensemble",
@@ -927,6 +938,59 @@ def build_catalog() -> list[ModelEntry]:
             raise AssertionError(f"duplicate model_id in catalog: {entry.model_id}")
         seen.add(entry.model_id)
     return entries
+
+
+def autogluon_runtime_catalog(
+    inventory: AutoGluonRuntimeInventory | None = None,
+    *,
+    certified_aliases: Iterable[str] = (),
+) -> list[dict[str, Any]]:
+    """Project source/runtime AutoGluon availability without inventing runtime success."""
+    by_alias = {entry.alias: entry for entry in inventory.models} if inventory is not None else {}
+    source_aliases = {spec.alias for spec in AUTOGLUON_SOURCE_MODEL_SPECS}
+    certified = {str(alias) for alias in certified_aliases}
+    unknown_certified = sorted(certified - source_aliases)
+    if unknown_certified:
+        raise ValueError(f"unknown certified AutoGluon aliases: {unknown_certified}")
+
+    rows: list[dict[str, Any]] = []
+    for spec in AUTOGLUON_SOURCE_MODEL_SPECS:
+        state = by_alias.get(spec.alias)
+        runtime_discovered = bool(state and state.runtime_discovered)
+        runtime_importable = bool(state and state.runtime_importable)
+        runtime_certified = bool(state and state.runtime_certified) or spec.alias in certified
+        if runtime_certified and not (runtime_discovered and runtime_importable):
+            raise ValueError(
+                f"cannot certify AutoGluon alias {spec.alias!r} without "
+                "discovered/importable runtime evidence"
+            )
+        failure = state.failure if state is not None else None
+        rows.append(
+            {
+                "model_id": f"autogluon-{spec.alias.lower()}",
+                "alias": spec.alias,
+                "class_name": spec.class_name,
+                "category": spec.category,
+                "source_declared": True,
+                "runtime_discovered": runtime_discovered,
+                "runtime_importable": runtime_importable,
+                "runtime_certified": runtime_certified,
+                "runtime_class_name": state.runtime_class_name if state is not None else None,
+                "failure": (
+                    None
+                    if failure is None
+                    else {
+                        "category": failure.category.value,
+                        "subject": failure.subject,
+                        "message": failure.message,
+                        "dependency": failure.dependency,
+                        "error_type": failure.error_type,
+                    }
+                ),
+                "inventory_sha256": inventory.inventory_sha256 if inventory is not None else None,
+            }
+        )
+    return rows
 
 
 def catalog_counts() -> dict[str, int]:

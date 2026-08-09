@@ -13,6 +13,11 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from loto.models.autogluon_shared import (
+    AutoGluonSharedContractError,
+    adapt_autogluon_provider_response,
+    build_autogluon_provider_request,
+)
 from loto.models.catalog import ModelSpec
 from loto.models.neuralforecast_adapter import (
     AutoModelRequest,
@@ -650,7 +655,8 @@ class PositionSeriesWorker:
     def _invoke_autogluon_subprocess(self, request: dict[str, Any]) -> dict[str, Any]:
         if not AUTOGLUON_ENV.exists():
             raise WorkerSubprocessError(
-                "DEPENDENCY_MISSING", f"missing AutoGluon-TimeSeries environment: {AUTOGLUON_ENV}"
+                "DEPENDENCY_MISSING",
+                f"missing AutoGluon-TimeSeries environment: {AUTOGLUON_ENV}",
             )
         if not (AUTOGLUON_ENV / "uv.lock").exists():
             raise WorkerSubprocessError(
@@ -672,6 +678,7 @@ class PositionSeriesWorker:
                     "run",
                     "--project",
                     str(AUTOGLUON_ENV),
+                    "--locked",
                     "python",
                     str(AUTOGLUON_RUNNER),
                     "--request",
@@ -688,34 +695,47 @@ class PositionSeriesWorker:
             if proc.returncode != 0:
                 raise WorkerSubprocessError(
                     "ERROR",
-                    f"AutoGluon-TimeSeries subprocess failed rc={proc.returncode}: {proc.stderr[-2000:] or proc.stdout[-2000:]}",
+                    "AutoGluon-TimeSeries subprocess failed "
+                    f"rc={proc.returncode}: {proc.stderr[-2000:] or proc.stdout[-2000:]}",
                 )
             try:
                 response = json.loads(response_path.read_text(encoding="utf-8"))
             except json.JSONDecodeError as exc:
                 raise WorkerSubprocessError(
-                    "ERROR", f"AutoGluon-TimeSeries provider returned invalid JSON: {exc}"
+                    "ERROR",
+                    f"AutoGluon-TimeSeries provider returned invalid JSON: {exc}",
                 ) from exc
         if response.get("status") != "OK":
-            raise WorkerSubprocessError(
-                str(response.get("status", "ERROR")),
-                str(response.get("message", "AutoGluon-TimeSeries provider failed")),
-            )
-        predictions = np.asarray(response.get("predictions"), dtype=float)
-        expected = len(request.get("position_columns", []))
-        if expected <= 0:
-            raise WorkerSubprocessError(
-                "INVALID_REQUEST",
-                "provider request has no position columns",
-            )
-        if predictions.shape != (expected,) or not np.isfinite(predictions).all():
-            raise WorkerSubprocessError(
-                "PREDICTION_MISMATCH",
-                f"AutoGluon-TimeSeries provider returned invalid predictions shape={predictions.shape}",
-            )
+            if int(request.get("schema_version", 1)) == 2:
+                error = response.get("error") or {}
+                code = str(error.get("code") or response.get("status") or "ERROR")
+                message = str(
+                    error.get("message")
+                    or response.get("message")
+                    or "AutoGluon-TimeSeries provider failed"
+                )
+            else:
+                code = str(response.get("status", "ERROR"))
+                message = str(response.get("message", "AutoGluon-TimeSeries provider failed"))
+            raise WorkerSubprocessError(code, message)
+
+        if int(request.get("schema_version", 1)) == 1:
+            predictions = np.asarray(response.get("predictions"), dtype=float)
+            expected = len(request.get("position_columns", []))
+            if expected <= 0:
+                raise WorkerSubprocessError(
+                    "INVALID_REQUEST",
+                    "provider request has no position columns",
+                )
+            if predictions.shape != (expected,) or not np.isfinite(predictions).all():
+                raise WorkerSubprocessError(
+                    "PREDICTION_MISMATCH",
+                    "AutoGluon-TimeSeries provider returned invalid "
+                    f"predictions shape={predictions.shape}",
+                )
         return response
 
-    def _autogluon(self, history: pd.DataFrame) -> WorkerOutput:
+    def _autogluon_v1_compat(self, history: pd.DataFrame) -> WorkerOutput:
         columns = [*self._columns(history), "draw_date"]
         payload = history[columns].copy()
         payload["draw_date"] = payload["draw_date"].astype(str)
@@ -741,9 +761,66 @@ class PositionSeriesWorker:
             values,
             {
                 "library": "autogluon",
+                "protocol_version": 1,
+                "compatibility_path": True,
                 "model_best": properties.get("model_best"),
                 "presets": properties.get("presets"),
             },
+            model_artifact_payload={
+                "library": "autogluon",
+                "artifact_dir": artifact_dir,
+                "request": request,
+                "response": response,
+            },
+        )
+
+    def _autogluon(self, history: pd.DataFrame) -> WorkerOutput:
+        protocol_version = int(self.params.get("protocol_version", 2))
+        if protocol_version == 1:
+            return self._autogluon_v1_compat(history)
+        if protocol_version != 2:
+            raise WorkerSubprocessError(
+                "PROTOCOL_VERSION_UNSUPPORTED",
+                f"unsupported AutoGluon protocol_version={protocol_version}",
+            )
+
+        operation = str(self.params.get("operation", "fit_predict_save"))
+        configured_artifact_dir = self.params.get("artifact_dir")
+        if operation == "load_predict" and not configured_artifact_dir:
+            raise WorkerSubprocessError(
+                "ARTIFACT_MISSING",
+                "AutoGluon load_predict requires params['artifact_dir']",
+            )
+        if configured_artifact_dir:
+            artifact_dir = str(Path(str(configured_artifact_dir)).resolve())
+        else:
+            artifact_dir = tempfile.mkdtemp(prefix="loto-autogluon-artifact-")
+
+        requested_device = (
+            self.device
+            if self.device != "auto"
+            else str(self.params.get("requested_device", "cpu"))
+        )
+        try:
+            request = build_autogluon_provider_request(
+                history,
+                position_columns=self._columns(history),
+                params=self.params,
+                requested_device=requested_device,
+                artifact_dir=artifact_dir,
+            )
+            response = self._invoke_autogluon_subprocess(request)
+            result = adapt_autogluon_provider_response(
+                request,
+                response,
+                params=self.params,
+            )
+        except AutoGluonSharedContractError as exc:
+            raise WorkerSubprocessError(exc.code, str(exc)) from exc
+
+        return WorkerOutput(
+            np.asarray(result.position_values, dtype=float),
+            result.metadata,
             model_artifact_payload={
                 "library": "autogluon",
                 "artifact_dir": artifact_dir,
