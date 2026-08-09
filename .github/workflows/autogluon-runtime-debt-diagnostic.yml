@@ -3,6 +3,8 @@ name: autogluon-runtime-debt-diagnostic
 on:
   push:
     branches: [diag/autogluon-runtime-debt-v1]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
