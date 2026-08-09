@@ -17,6 +17,10 @@ from loto.adapters.moirai2.contracts import (  # noqa: E402
     Moirai2ProviderRequest,
     Moirai2ProviderResponse,
 )
+from loto.moirai2_campaign.covariates import (  # noqa: E402
+    attach_covariates,
+    compile_covariates,
+)
 from loto.moirai2_campaign.license_policy import evaluate_license_lane  # noqa: E402
 from loto.moirai2_campaign.model_manifest import (  # noqa: E402
     MODEL_ID,
@@ -30,6 +34,7 @@ from loto.moirai2_campaign.quantiles import (  # noqa: E402
     extract_native_quantiles,
     median_point_forecast,
 )
+from loto.moirai2_campaign.runtime_observer import ForwardDeviceObserver  # noqa: E402
 from loto.moirai2_campaign.time_adapter import (  # noqa: E402
     build_calendar_time_axis,
     build_draw_sequence_axis,
@@ -84,21 +89,26 @@ def run_provider(request: Moirai2ProviderRequest, *, runtime_lane: str) -> dict[
     if request.operation.value == "identity":
         return _identity_response(request, runtime_lane)
     license_decision = evaluate_license_lane(request.license_lane)
+    past_dim = len(request.past_covariates)
+    known_future_dim = len(request.future_covariates)
     token_geometry = calculate_token_geometry(
         target_dim=request.game_geometry.position_count,
+        feat_dynamic_real_dim=known_future_dim,
+        past_feat_dynamic_real_dim=past_dim,
         context_length=request.context_length,
         prediction_length=request.prediction_length,
     )
-    if request.past_covariates or request.future_covariates:
-        raise RuntimeError(
-            "UNSUPPORTED_ARGUMENT: covariate runtime is deferred to Moirai 2.0 phase P7"
-        )
     requested_device = request.device
     if requested_device == "cpu":
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
     import torch
     from gluonts.dataset.common import ListDataset
     from uni2ts.model.moirai2 import Moirai2Forecast, Moirai2Module
+
+    np.random.seed(request.seed)
+    torch.manual_seed(request.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(request.seed)
 
     package_version = importlib.metadata.version("uni2ts")
     if package_version != UNI2TS_VERSION:
@@ -119,22 +129,36 @@ def run_provider(request: Moirai2ProviderRequest, *, runtime_lane: str) -> dict[
         [[row[column] for row in history] for column in request.position_columns],
         dtype=np.float32,
     )
+    context_timestamps = request.timestamps[-request.context_length :] if request.timestamps else []
     if request.time_semantics.value == "calendar_time":
-        time_axis = build_calendar_time_axis(
-            target,
-            request.timestamps[-request.context_length :],
-        )
+        time_axis = build_calendar_time_axis(target, context_timestamps)
     else:
         draw_numbers = None
-        if request.timestamps:
-            draw_numbers = [int(value) for value in request.timestamps[-request.context_length :]]
+        if context_timestamps:
+            draw_numbers = [int(value) for value in context_timestamps]
         time_axis = build_draw_sequence_axis(target, draw_numbers)
 
-    dataset_entry: dict[str, Any] = {"start": time_axis.start, "target": time_axis.target}
+    covariates = compile_covariates(
+        history_length=len(request.history),
+        context_length=request.context_length,
+        prediction_length=request.prediction_length,
+        past_covariates=request.past_covariates,
+        future_covariates=request.future_covariates,
+        future_covariate_availability=request.future_covariate_availability,
+        time_semantics=request.time_semantics.value,
+        context_timestamps=context_timestamps,
+        target_time_length=time_axis.target.shape[1],
+    )
+    is_univariate = request.game_geometry.position_count == 1
+    dataset_target = time_axis.target[0] if is_univariate else time_axis.target
+    dataset_entry = attach_covariates(
+        {"start": time_axis.start, "target": dataset_target},
+        covariates,
+    )
     dataset = ListDataset(
         [dataset_entry],
         freq=time_axis.frequency,
-        one_dim_target=False,
+        one_dim_target=is_univariate,
     )
     module = Moirai2Module.from_pretrained(str(snapshot_path), local_files_only=True)
     module = module.to(execution_device).eval()
@@ -146,13 +170,37 @@ def run_provider(request: Moirai2ProviderRequest, *, runtime_lane: str) -> dict[
         prediction_length=request.prediction_length,
         context_length=request.context_length,
         target_dim=request.game_geometry.position_count,
-        feat_dynamic_real_dim=0,
-        past_feat_dynamic_real_dim=0,
+        feat_dynamic_real_dim=covariates.known_future_dim,
+        past_feat_dynamic_real_dim=covariates.past_dim,
     )
-    predictor = model.create_predictor(batch_size=request.batch_size, device=execution_device)
-    forecast = next(iter(predictor.predict(dataset)))
+    observer = ForwardDeviceObserver().attach(model)
+    try:
+        predictor = model.create_predictor(
+            batch_size=request.batch_size,
+            device=execution_device,
+        )
+        predictor_device = str(getattr(predictor, "device", execution_device))
+        forecast = next(iter(predictor.predict(dataset)))
+    finally:
+        observer.close()
+    forward_evidence = observer.evidence()
     if execution_device == "cuda":
         torch.cuda.synchronize()
+    expected_prefix = execution_device
+    observed_devices = [
+        str(module_parameter.device),
+        predictor_device,
+        *forward_evidence.input_tensor_devices,
+        *forward_evidence.output_tensor_devices,
+    ]
+    if forward_evidence.forward_call_count < 1:
+        raise RuntimeError("model forward device observation is missing")
+    if not forward_evidence.input_tensor_devices or not forward_evidence.output_tensor_devices:
+        raise RuntimeError("input/output tensor device evidence is incomplete")
+    if any(not device.startswith(expected_prefix) for device in observed_devices):
+        raise RuntimeError(
+            f"tensor device mismatch: expected={expected_prefix}, observed={observed_devices}"
+        )
     quantiles = extract_native_quantiles(
         forecast,
         horizon=request.prediction_length,
@@ -176,16 +224,21 @@ def run_provider(request: Moirai2ProviderRequest, *, runtime_lane: str) -> dict[
             "context_length": request.context_length,
             "prediction_length": request.prediction_length,
             "target_dim": request.game_geometry.position_count,
+            "feat_dynamic_real_dim": covariates.known_future_dim,
+            "past_feat_dynamic_real_dim": covariates.past_dim,
             "quantile_count": len(NATIVE_QUANTILE_LEVELS),
             "sample_support": False,
             "num_samples": None,
+            "seed": request.seed,
+            "predictor_device": predictor_device,
+            "forward_device_evidence": forward_evidence.as_dict(),
             "token_geometry": token_geometry.as_dict(),
             "time_semantics": request.time_semantics.value,
             "frequency_policy": time_axis.frequency_policy,
             "missing_period_policy": time_axis.missing_period_policy,
             "timestamp_mapping_sha256": time_axis.mapping_sha256,
-            "past_covariate_names": sorted(request.past_covariates),
-            "known_future_covariate_names": sorted(request.future_covariates),
+            "past_covariate_names": list(covariates.past.names),
+            "known_future_covariate_names": list(covariates.known_future.names),
             "future_covariate_availability": request.future_covariate_availability,
         },
         point_forecast=point_forecast,
@@ -215,6 +268,7 @@ def run_provider(request: Moirai2ProviderRequest, *, runtime_lane: str) -> dict[
             ),
             "cpu_fallback": False,
         },
+        covariate_evidence=covariates.as_dict(),
         artifact_reference=artifact_reference,
         license_evidence=license_decision.as_dict(),
     ).model_dump(mode="json")
