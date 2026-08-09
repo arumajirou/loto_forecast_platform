@@ -31,7 +31,7 @@ jobs:
       UV_VERSION: "0.11.21"
       UV_PYTHON: "3.13"
       EXPECTED_MAIN: "c5e822c15080becd4156639bcdb94735b1a8e7a5"
-      VERIFIED_SOURCE_COMMIT: "dca159386c11684fc4b19b55e28acb5eed473657"
+      VERIFIED_SOURCE_COMMIT: "e56b636a818faa735688d82c3239494b9bbf1c65"
 
     steps:
       - name: Verify trusted runner
@@ -151,7 +151,6 @@ jobs:
           import zipfile
           from pathlib import Path
           from loto.version import __version__
-
           wheels = list(Path(sys.argv[1]).glob("*.whl"))
           assert len(wheels) == 1, wheels
           with zipfile.ZipFile(wheels[0]) as archive:
