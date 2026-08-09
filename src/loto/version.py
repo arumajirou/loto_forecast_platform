@@ -13,7 +13,7 @@ import re
 import subprocess
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
 
@@ -143,7 +143,7 @@ def _normalize_timestamp(value: str | None, *, label: str) -> str | None:
         raise ValueError(f"{label} must be ISO-8601") from exc
     if parsed.tzinfo is None:
         raise ValueError(f"{label} must include a timezone")
-    return parsed.astimezone(UTC).isoformat()
+    return parsed.astimezone(timezone.utc).isoformat()
 
 
 def collect_build_info(
@@ -160,7 +160,7 @@ def collect_build_info(
     normalized_build_time = _normalize_timestamp(explicit_build_time, label="build_time")
     normalized_generated_at = _normalize_timestamp(generated_at, label="generated_at")
     if normalized_generated_at is None:
-        normalized_generated_at = datetime.now(UTC).isoformat()
+        normalized_generated_at = datetime.now(timezone.utc).isoformat()
     return BuildInfo(
         schema_version=BUILD_INFO_SCHEMA_VERSION,
         package_version=__version__,
