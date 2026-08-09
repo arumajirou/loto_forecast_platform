@@ -45,6 +45,7 @@ def test_identity_exposes_certified_exact_config_and_lock(tmp_path: Path) -> Non
     assert identity["config_sha256"] != "UNVERIFIED"
     assert identity["dependency_lock_sha256"] == provider_module.DEPENDENCY_LOCK_SHA256
     assert identity["python_lane"] == ">=3.10,<3.11"
+    assert identity["cublas_workspace_config"] == ":4096:8"
 
 
 def test_validate_environment_rejects_mutated_lock(tmp_path: Path) -> None:
@@ -93,11 +94,33 @@ def test_inspect_properties_declares_no_cpu_fallback(tmp_path: Path) -> None:
     assert properties["checkpoint_load"] is True
     assert properties["predict"] is True
     assert properties["cpu_fallback_allowed"] is False
+    assert properties["deterministic_algorithms_required"] is True
     assert properties["retained_layouts"] == [
         "position_univariate",
         "position_panel_batched_univariate",
     ]
     assert properties["supported_horizons"] == [1, 2, 5]
+
+
+def test_deterministic_cublas_config_is_set_when_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("CUBLAS_WORKSPACE_CONFIG", raising=False)
+
+    TimerBase84MProvider._configure_deterministic_runtime()
+
+    assert provider_module.os.environ["CUBLAS_WORKSPACE_CONFIG"] == ":4096:8"
+
+
+def test_deterministic_cublas_config_rejects_conflicting_value(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CUBLAS_WORKSPACE_CONFIG", ":16:8")
+
+    with pytest.raises(TimerProviderError) as raised:
+        TimerBase84MProvider._configure_deterministic_runtime()
+
+    assert raised.value.status == "UNSUPPORTED_RUNTIME_LANE"
 
 
 def test_committed_human_approval_review_schema_is_accepted() -> None:
