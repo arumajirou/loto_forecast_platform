@@ -28,8 +28,10 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from loto.adapters.autogluon.inventory import (
-    AutoGluonRuntimeInventory,
     SOURCE_MODEL_SPECS as AUTOGLUON_SOURCE_MODEL_SPECS,
+)
+from loto.adapters.autogluon.inventory import (
+    AutoGluonRuntimeInventory,
 )
 
 __all__ = [

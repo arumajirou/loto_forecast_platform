@@ -13,16 +13,16 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from loto.models.autogluon_shared import (
+    AutoGluonSharedContractError,
+    adapt_autogluon_provider_response,
+    build_autogluon_provider_request,
+)
 from loto.models.catalog import ModelSpec
 from loto.models.neuralforecast_adapter import (
     AutoModelRequest,
     construct_auto_model,
     resolve_auto_model_plan,
-)
-from loto.models.autogluon_shared import (
-    AutoGluonSharedContractError,
-    adapt_autogluon_provider_response,
-    build_autogluon_provider_request,
 )
 from loto.models.providers import FoundationProviderError, get_foundation_provider
 

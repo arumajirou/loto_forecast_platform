@@ -105,7 +105,8 @@ def resolve_game_profile(
     if len(columns) != profile.position_count:
         raise AutoGluonSharedContractError(
             "GAME_GEOMETRY_POSITION_MISMATCH",
-            f"game {profile.game_id!r} requires {profile.position_count} positions, got {len(columns)}",
+            f"game {profile.game_id!r} requires {profile.position_count} positions, "
+            f"got {len(columns)}",
         )
     return profile
 
@@ -373,7 +374,8 @@ def _validate_runtime_evidence(request: ProviderRequestV2, response: ProviderRes
         ):
             raise AutoGluonSharedContractError(
                 "GPU_EXECUTION_UNVERIFIED",
-                "GPU success requires gpu_used=true, CERTIFIED evidence, and positive VRAM evidence",
+                "GPU success requires gpu_used=true, CERTIFIED evidence, "
+                "and positive VRAM evidence",
             )
         return
     if evidence.resolved_device == "unknown":
@@ -410,7 +412,8 @@ def adapt_autogluon_provider_response(
     if len(response.predictions) != len(expected_items):
         raise AutoGluonSharedContractError(
             "PREDICTION_SHAPE_MISMATCH",
-            f"expected {len(expected_items)} horizon-1 predictions, got {len(response.predictions)}",
+            f"expected {len(expected_items)} horizon-1 predictions, "
+            f"got {len(response.predictions)}",
         )
     by_item = {record.item_id: record for record in response.predictions}
     if tuple(sorted(by_item)) != tuple(sorted(expected_items)):
@@ -443,7 +446,8 @@ def adapt_autogluon_provider_response(
     if metadata.get("library_version") != TARGET_AUTOGLUON_VERSION:
         raise AutoGluonSharedContractError(
             "RUNTIME_VERSION_MISMATCH",
-            f"expected AutoGluon {TARGET_AUTOGLUON_VERSION}, got {metadata.get('library_version')!r}",
+            f"expected AutoGluon {TARGET_AUTOGLUON_VERSION}, "
+            f"got {metadata.get('library_version')!r}",
         )
     if metadata.get("selected_model_ids") != list(request.model_ids):
         raise AutoGluonSharedContractError(
