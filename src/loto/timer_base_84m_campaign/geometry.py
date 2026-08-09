@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import StrEnum
+
+from loto.timer_base_84m_campaign._compat import StrEnum
 
 
 class Game(StrEnum):
