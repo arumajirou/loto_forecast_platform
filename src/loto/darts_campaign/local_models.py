@@ -270,7 +270,7 @@ def run_local_model_matrix(
                 )
             model_cls = getattr(models_module, spec.public_name)
             lifecycle_ledger = _validate_lifecycle_arguments(model_cls, request)
-            predictions, constructor_ledger, metadata = execute_fit_predict(
+            predictions, constructor_ledger, metadata, *_ = execute_fit_predict(
                 request,
                 frame,
                 models_module=models_module,

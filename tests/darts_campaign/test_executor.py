@@ -85,7 +85,7 @@ def test_current_ensemble_route_is_reproducible(tmp_path) -> None:
         NaiveDrift=NaiveDrift,
         ExponentialSmoothing=ExponentialSmoothing,
     )
-    predictions, ledger, metadata = execute_fit_predict(
+    predictions, ledger, metadata, metrics, baselines, certification, seal = execute_fit_predict(
         request,
         frame,
         models_module=module,
@@ -94,3 +94,7 @@ def test_current_ensemble_route_is_reproducible(tmp_path) -> None:
     assert predictions == [[6.0], [7.0], [8.0], [9.0]]
     assert all(row["status"] == "ACCEPTED" for row in ledger)
     assert metadata["base_models"] == ["ExponentialSmoothing", "NaiveDrift"]
+    assert metrics is None
+    assert baselines is None
+    assert certification is None
+    assert seal is None
