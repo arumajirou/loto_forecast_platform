@@ -204,6 +204,7 @@ def score_prediction_lock(
         "status": "PASS",
         "stage": lock["stage"],
         "source_run_id": lock["run_id"],
+        "game_id": geometry.game_id,
         "selected_candidate_id": lock["selected_candidate_id"],
         "selected_candidate_metrics": selected,
         "required_baselines": list(REQUIRED_BASELINES),
