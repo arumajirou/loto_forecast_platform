@@ -1,0 +1,11 @@
+{
+  "samples": 62,
+  "cpu_avg_pct": 12.172338709677419,
+  "cpu_peak_pct": 30.125,
+  "memory_peak_bytes": 21490413568.0,
+  "gpu_avg_pct": 0.016129032258064516,
+  "gpu_peak_pct": 1.0,
+  "gpu_vram_peak_mib": 300.0,
+  "gpu_power_peak_w": 54.67,
+  "gpu_temp_peak_c": 44.0
+}

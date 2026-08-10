@@ -1,0 +1,62 @@
+{
+  "bingo5": {
+    "key": "bingo5",
+    "family": "select",
+    "positions": 8,
+    "value_min": 1,
+    "value_max": 40,
+    "universe_size": 40,
+    "bonus_count": 0,
+    "outcome_space": 76904685
+  },
+  "loto6": {
+    "key": "loto6",
+    "family": "select",
+    "positions": 6,
+    "value_min": 1,
+    "value_max": 43,
+    "universe_size": 43,
+    "bonus_count": 1,
+    "outcome_space": 6096454
+  },
+  "loto7": {
+    "key": "loto7",
+    "family": "select",
+    "positions": 7,
+    "value_min": 1,
+    "value_max": 37,
+    "universe_size": 37,
+    "bonus_count": 2,
+    "outcome_space": 10295472
+  },
+  "mini": {
+    "key": "mini",
+    "family": "select",
+    "positions": 5,
+    "value_min": 1,
+    "value_max": 31,
+    "universe_size": 31,
+    "bonus_count": 1,
+    "outcome_space": 169911
+  },
+  "numbers3": {
+    "key": "numbers3",
+    "family": "digits",
+    "positions": 3,
+    "value_min": 0,
+    "value_max": 9,
+    "universe_size": 10,
+    "bonus_count": 0,
+    "outcome_space": 1000
+  },
+  "numbers4": {
+    "key": "numbers4",
+    "family": "digits",
+    "positions": 4,
+    "value_min": 0,
+    "value_max": 9,
+    "universe_size": 10,
+    "bonus_count": 0,
+    "outcome_space": 10000
+  }
+}

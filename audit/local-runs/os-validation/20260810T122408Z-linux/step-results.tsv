@@ -1,0 +1,14 @@
+step	exit_code	seconds
+uv-sync	0	1
+pip-check	0	0
+versions	0	3
+ruff-format	0	0
+ruff-check	1	0
+compileall	0	1
+pytest-collect	0	12
+pytest-full	0	102
+games	0	1
+catalog-counts	0	1
+catalog-export	0	0
+campaign-plan	0	1
+campaign-builtin-all-games	0	4

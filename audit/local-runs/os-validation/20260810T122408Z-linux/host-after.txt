@@ -1,0 +1,19 @@
+DATE_UTC=2026-08-10T12:26:18+00:00
+
+               total        used        free      shared  buff/cache   available
+Mem:     132533547008 18534817792  8104919040  1004486656 107910832128 113998729216
+Swap:    66803638272           0 66803638272
+
+Filesystem     Type         1B-blocks          Used     Available Use% Mounted on
+tmpfs          tmpfs      13253357568       3727360   13249630208   1% /run
+/dev/nvme0n1p4 ext4     1006560526336  736028938240  219325665280  78% /
+tmpfs          tmpfs      66266771456     176926720   66089844736   1% /dev/shm
+efivarfs       efivarfs        262144         30738        226286  12% /sys/firmware/efi/efivars
+/dev/nvme1n1p2 ext4     3936802029568 2760501895168 1176283357184  71% /mnt/e
+tmpfs          tmpfs      66266771456     557699072   65709072384   1% /tmp
+/dev/nvme0n1p1 vfat         100663296      39793664      60869632  40% /boot/efi
+/dev/sda1      exfat    2048391118848 1373813866496  674577252352  68% /mnt/d
+tmpfs          tmpfs      13253353472        180224   13253173248   1% /run/user/1000
+/dev/sdc1      vfat       61947183104      33882112   61913300992   1% /run/media/az/8FFE-8298
+none           tmpfs          1048576             0       1048576   0% /run/credentials/systemd-journald.service
+none           tmpfs          1048576             0       1048576   0% /run/credentials/systemd-resolved.service

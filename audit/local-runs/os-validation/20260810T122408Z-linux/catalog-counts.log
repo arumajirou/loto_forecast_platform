@@ -1,0 +1,22 @@
+{
+  "TOTAL": 174,
+  "_mandatory_controls": 4,
+  "_unpinned_tsfm": 21,
+  "autogluon": 1,
+  "builtin": 4,
+  "catboost": 1,
+  "darts": 1,
+  "gluonts": 1,
+  "hierarchicalforecast": 10,
+  "lightgbm": 2,
+  "mlforecast_auto": 8,
+  "neuralforecast": 37,
+  "neuralforecast_auto": 36,
+  "reservoirpy": 1,
+  "skforecast": 1,
+  "sklearn": 7,
+  "sktime": 1,
+  "statsforecast": 41,
+  "tsfm": 21,
+  "xgboost": 1
+}

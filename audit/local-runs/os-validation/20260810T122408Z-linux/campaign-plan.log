@@ -1,0 +1,6278 @@
+{
+  "status": "PLANNED",
+  "games": [
+    "bingo5",
+    "loto6",
+    "loto7",
+    "mini",
+    "numbers3",
+    "numbers4"
+  ],
+  "model_game_pairs": 1044,
+  "plan": [
+    {
+      "game": "bingo5",
+      "candidate_id": "uniform",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "frequency",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "position-median",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "position-modal",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "ridge",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "elastic-net",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "random-forest",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "extra-trees",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hist-gradient-boosting",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "isotonic-calibrated-logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "lightgbm-classifier",
+      "library": "lightgbm",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "lightgbm-position",
+      "library": "lightgbm",
+      "task": "position"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "xgboost-classifier",
+      "library": "xgboost",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "catboost-classifier",
+      "library": "catboost",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-autoarima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-autoets",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-autoces",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-autotheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-automfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-autotbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-arima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-autoregressive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-simpleexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-simpleexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-seasonalexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-seasonalexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-holt",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-holtwinters",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-historicaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-naive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-randomwalkwithdrift",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-seasonalnaive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-conformalseasonalpool",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-windowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-seasonalwindowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-adida",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-crostonclassic",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-crostonoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-crostonsba",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-imapa",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-tsb",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-mstl",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-mfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-tbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-theta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-optimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-dynamictheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-dynamicoptimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-garch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-arch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-sklearnmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-constantmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-zeromodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-nanmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sf-ucm",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-rnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-gru",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-lstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-tcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-deepar",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-dilatedrnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-mlp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-nhits",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-nbeats",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-nbeatsx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-dlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-nlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-tft",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-vanillatransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-informer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-autoformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-patchtst",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-fedformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-stemgnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-hint",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-timesnet",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-timellm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-tsmixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-tsmixerx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-mlpmultivariate",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-itransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-bitcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-tide",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-deepnpts",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-softs",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-softssharp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-timemixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-kan",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-rmok",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-timexer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-xlstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nf-xlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-rnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-lstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-gru",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-tcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-deepar",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-dilatedrnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-bitcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-xlstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-mlp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-nbeats",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-nbeatsx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-nhits",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-dlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-nlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-tide",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-deepnpts",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-kan",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-tft",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-vanillatransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-informer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-autoformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-fedformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-patchtst",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-itransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-timexer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-timesnet",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-stemgnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-hint",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-tsmixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-tsmixerx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-mlpmultivariate",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-softs",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-softssharp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-timemixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-rmok",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "nfauto-xlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "mfauto-lightgbm",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "mfauto-xgboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "mfauto-catboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "mfauto-linearregression",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "mfauto-ridge",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "mfauto-lasso",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "mfauto-elasticnet",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "mfauto-randomforest",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hf-bottomup",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hf-bottomupsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hf-topdown",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hf-topdownsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hf-middleout",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hf-middleoutsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hf-mintrace",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hf-mintracesparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hf-optimalcombination",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "hf-erm",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "chronos-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "chronos-bolt-tiny",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "chronos-t5-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "chronos-t5-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "timesfm-2.5-transformers",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "granite-ttm-r2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "granite-flowstate-r1",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "granite-patchtst",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "granite-patchtsmixer",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "moirai-2.0-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "moirai-1.0-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "tirex-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "toto-open-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "toto-2.0-4m",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "moment-1-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "moment-1-large",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "lag-llama",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "kronos-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sundial-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "tabpfn-ts",
+      "library": "tsfm",
+      "task": "candidate"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "t0-alpha",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "autogluon-timeseries",
+      "library": "autogluon",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "darts-ensemble",
+      "library": "darts",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "gluonts-deepar",
+      "library": "gluonts",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "reservoir-esn",
+      "library": "reservoirpy",
+      "task": "position"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "sktime-ensemble",
+      "library": "sktime",
+      "task": "position_series"
+    },
+    {
+      "game": "bingo5",
+      "candidate_id": "skforecast-recursive",
+      "library": "skforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "uniform",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "frequency",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "position-median",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "position-modal",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "ridge",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "elastic-net",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "random-forest",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "extra-trees",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hist-gradient-boosting",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "isotonic-calibrated-logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "lightgbm-classifier",
+      "library": "lightgbm",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "lightgbm-position",
+      "library": "lightgbm",
+      "task": "position"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "xgboost-classifier",
+      "library": "xgboost",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "catboost-classifier",
+      "library": "catboost",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-autoarima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-autoets",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-autoces",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-autotheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-automfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-autotbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-arima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-autoregressive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-simpleexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-simpleexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-seasonalexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-seasonalexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-holt",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-holtwinters",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-historicaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-naive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-randomwalkwithdrift",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-seasonalnaive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-conformalseasonalpool",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-windowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-seasonalwindowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-adida",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-crostonclassic",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-crostonoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-crostonsba",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-imapa",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-tsb",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-mstl",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-mfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-tbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-theta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-optimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-dynamictheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-dynamicoptimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-garch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-arch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-sklearnmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-constantmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-zeromodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-nanmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sf-ucm",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-rnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-gru",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-lstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-tcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-deepar",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-dilatedrnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-mlp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-nhits",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-nbeats",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-nbeatsx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-dlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-nlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-tft",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-vanillatransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-informer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-autoformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-patchtst",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-fedformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-stemgnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-hint",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-timesnet",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-timellm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-tsmixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-tsmixerx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-mlpmultivariate",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-itransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-bitcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-tide",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-deepnpts",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-softs",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-softssharp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-timemixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-kan",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-rmok",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-timexer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-xlstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nf-xlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-rnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-lstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-gru",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-tcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-deepar",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-dilatedrnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-bitcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-xlstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-mlp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-nbeats",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-nbeatsx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-nhits",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-dlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-nlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-tide",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-deepnpts",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-kan",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-tft",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-vanillatransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-informer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-autoformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-fedformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-patchtst",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-itransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-timexer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-timesnet",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-stemgnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-hint",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-tsmixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-tsmixerx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-mlpmultivariate",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-softs",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-softssharp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-timemixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-rmok",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "nfauto-xlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "mfauto-lightgbm",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "mfauto-xgboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "mfauto-catboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "mfauto-linearregression",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "mfauto-ridge",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "mfauto-lasso",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "mfauto-elasticnet",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "mfauto-randomforest",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hf-bottomup",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hf-bottomupsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hf-topdown",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hf-topdownsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hf-middleout",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hf-middleoutsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hf-mintrace",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hf-mintracesparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hf-optimalcombination",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "hf-erm",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "chronos-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "chronos-bolt-tiny",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "chronos-t5-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "chronos-t5-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "timesfm-2.5-transformers",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "granite-ttm-r2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "granite-flowstate-r1",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "granite-patchtst",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "granite-patchtsmixer",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "moirai-2.0-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "moirai-1.0-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "tirex-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "toto-open-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "toto-2.0-4m",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "moment-1-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "moment-1-large",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "lag-llama",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "kronos-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sundial-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "tabpfn-ts",
+      "library": "tsfm",
+      "task": "candidate"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "t0-alpha",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "autogluon-timeseries",
+      "library": "autogluon",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "darts-ensemble",
+      "library": "darts",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "gluonts-deepar",
+      "library": "gluonts",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "reservoir-esn",
+      "library": "reservoirpy",
+      "task": "position"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "sktime-ensemble",
+      "library": "sktime",
+      "task": "position_series"
+    },
+    {
+      "game": "loto6",
+      "candidate_id": "skforecast-recursive",
+      "library": "skforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "uniform",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "frequency",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "position-median",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "position-modal",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "ridge",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "elastic-net",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "random-forest",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "extra-trees",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hist-gradient-boosting",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "isotonic-calibrated-logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "lightgbm-classifier",
+      "library": "lightgbm",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "lightgbm-position",
+      "library": "lightgbm",
+      "task": "position"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "xgboost-classifier",
+      "library": "xgboost",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "catboost-classifier",
+      "library": "catboost",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-autoarima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-autoets",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-autoces",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-autotheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-automfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-autotbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-arima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-autoregressive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-simpleexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-simpleexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-seasonalexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-seasonalexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-holt",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-holtwinters",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-historicaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-naive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-randomwalkwithdrift",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-seasonalnaive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-conformalseasonalpool",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-windowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-seasonalwindowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-adida",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-crostonclassic",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-crostonoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-crostonsba",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-imapa",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-tsb",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-mstl",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-mfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-tbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-theta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-optimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-dynamictheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-dynamicoptimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-garch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-arch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-sklearnmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-constantmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-zeromodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-nanmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sf-ucm",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-rnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-gru",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-lstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-tcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-deepar",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-dilatedrnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-mlp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-nhits",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-nbeats",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-nbeatsx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-dlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-nlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-tft",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-vanillatransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-informer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-autoformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-patchtst",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-fedformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-stemgnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-hint",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-timesnet",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-timellm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-tsmixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-tsmixerx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-mlpmultivariate",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-itransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-bitcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-tide",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-deepnpts",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-softs",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-softssharp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-timemixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-kan",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-rmok",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-timexer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-xlstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nf-xlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-rnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-lstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-gru",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-tcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-deepar",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-dilatedrnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-bitcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-xlstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-mlp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-nbeats",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-nbeatsx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-nhits",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-dlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-nlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-tide",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-deepnpts",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-kan",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-tft",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-vanillatransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-informer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-autoformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-fedformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-patchtst",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-itransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-timexer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-timesnet",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-stemgnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-hint",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-tsmixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-tsmixerx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-mlpmultivariate",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-softs",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-softssharp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-timemixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-rmok",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "nfauto-xlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "mfauto-lightgbm",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "mfauto-xgboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "mfauto-catboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "mfauto-linearregression",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "mfauto-ridge",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "mfauto-lasso",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "mfauto-elasticnet",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "mfauto-randomforest",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hf-bottomup",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hf-bottomupsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hf-topdown",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hf-topdownsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hf-middleout",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hf-middleoutsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hf-mintrace",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hf-mintracesparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hf-optimalcombination",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "hf-erm",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "chronos-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "chronos-bolt-tiny",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "chronos-t5-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "chronos-t5-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "timesfm-2.5-transformers",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "granite-ttm-r2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "granite-flowstate-r1",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "granite-patchtst",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "granite-patchtsmixer",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "moirai-2.0-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "moirai-1.0-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "tirex-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "toto-open-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "toto-2.0-4m",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "moment-1-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "moment-1-large",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "lag-llama",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "kronos-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sundial-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "tabpfn-ts",
+      "library": "tsfm",
+      "task": "candidate"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "t0-alpha",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "autogluon-timeseries",
+      "library": "autogluon",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "darts-ensemble",
+      "library": "darts",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "gluonts-deepar",
+      "library": "gluonts",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "reservoir-esn",
+      "library": "reservoirpy",
+      "task": "position"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "sktime-ensemble",
+      "library": "sktime",
+      "task": "position_series"
+    },
+    {
+      "game": "loto7",
+      "candidate_id": "skforecast-recursive",
+      "library": "skforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "uniform",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "frequency",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "position-median",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "position-modal",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "ridge",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "elastic-net",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "random-forest",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "extra-trees",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hist-gradient-boosting",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "isotonic-calibrated-logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "lightgbm-classifier",
+      "library": "lightgbm",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "lightgbm-position",
+      "library": "lightgbm",
+      "task": "position"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "xgboost-classifier",
+      "library": "xgboost",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "catboost-classifier",
+      "library": "catboost",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-autoarima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-autoets",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-autoces",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-autotheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-automfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-autotbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-arima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-autoregressive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-simpleexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-simpleexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-seasonalexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-seasonalexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-holt",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-holtwinters",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-historicaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-naive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-randomwalkwithdrift",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-seasonalnaive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-conformalseasonalpool",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-windowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-seasonalwindowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-adida",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-crostonclassic",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-crostonoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-crostonsba",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-imapa",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-tsb",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-mstl",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-mfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-tbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-theta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-optimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-dynamictheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-dynamicoptimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-garch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-arch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-sklearnmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-constantmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-zeromodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-nanmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sf-ucm",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-rnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-gru",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-lstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-tcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-deepar",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-dilatedrnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-mlp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-nhits",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-nbeats",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-nbeatsx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-dlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-nlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-tft",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-vanillatransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-informer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-autoformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-patchtst",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-fedformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-stemgnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-hint",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-timesnet",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-timellm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-tsmixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-tsmixerx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-mlpmultivariate",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-itransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-bitcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-tide",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-deepnpts",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-softs",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-softssharp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-timemixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-kan",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-rmok",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-timexer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-xlstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nf-xlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-rnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-lstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-gru",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-tcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-deepar",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-dilatedrnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-bitcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-xlstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-mlp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-nbeats",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-nbeatsx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-nhits",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-dlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-nlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-tide",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-deepnpts",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-kan",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-tft",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-vanillatransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-informer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-autoformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-fedformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-patchtst",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-itransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-timexer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-timesnet",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-stemgnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-hint",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-tsmixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-tsmixerx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-mlpmultivariate",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-softs",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-softssharp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-timemixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-rmok",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "nfauto-xlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "mfauto-lightgbm",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "mfauto-xgboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "mfauto-catboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "mfauto-linearregression",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "mfauto-ridge",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "mfauto-lasso",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "mfauto-elasticnet",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "mfauto-randomforest",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hf-bottomup",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hf-bottomupsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hf-topdown",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hf-topdownsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hf-middleout",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hf-middleoutsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hf-mintrace",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hf-mintracesparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hf-optimalcombination",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "hf-erm",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "chronos-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "chronos-bolt-tiny",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "chronos-t5-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "chronos-t5-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "timesfm-2.5-transformers",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "granite-ttm-r2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "granite-flowstate-r1",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "granite-patchtst",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "granite-patchtsmixer",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "moirai-2.0-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "moirai-1.0-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "tirex-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "toto-open-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "toto-2.0-4m",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "moment-1-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "moment-1-large",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "lag-llama",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "kronos-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sundial-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "tabpfn-ts",
+      "library": "tsfm",
+      "task": "candidate"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "t0-alpha",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "autogluon-timeseries",
+      "library": "autogluon",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "darts-ensemble",
+      "library": "darts",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "gluonts-deepar",
+      "library": "gluonts",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "reservoir-esn",
+      "library": "reservoirpy",
+      "task": "position"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "sktime-ensemble",
+      "library": "sktime",
+      "task": "position_series"
+    },
+    {
+      "game": "mini",
+      "candidate_id": "skforecast-recursive",
+      "library": "skforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "uniform",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "frequency",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "position-median",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "position-modal",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "ridge",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "elastic-net",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "random-forest",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "extra-trees",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hist-gradient-boosting",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "isotonic-calibrated-logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "lightgbm-classifier",
+      "library": "lightgbm",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "lightgbm-position",
+      "library": "lightgbm",
+      "task": "position"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "xgboost-classifier",
+      "library": "xgboost",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "catboost-classifier",
+      "library": "catboost",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-autoarima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-autoets",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-autoces",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-autotheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-automfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-autotbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-arima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-autoregressive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-simpleexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-simpleexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-seasonalexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-seasonalexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-holt",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-holtwinters",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-historicaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-naive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-randomwalkwithdrift",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-seasonalnaive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-conformalseasonalpool",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-windowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-seasonalwindowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-adida",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-crostonclassic",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-crostonoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-crostonsba",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-imapa",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-tsb",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-mstl",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-mfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-tbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-theta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-optimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-dynamictheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-dynamicoptimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-garch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-arch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-sklearnmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-constantmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-zeromodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-nanmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sf-ucm",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-rnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-gru",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-lstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-tcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-deepar",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-dilatedrnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-mlp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-nhits",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-nbeats",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-nbeatsx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-dlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-nlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-tft",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-vanillatransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-informer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-autoformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-patchtst",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-fedformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-stemgnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-hint",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-timesnet",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-timellm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-tsmixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-tsmixerx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-mlpmultivariate",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-itransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-bitcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-tide",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-deepnpts",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-softs",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-softssharp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-timemixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-kan",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-rmok",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-timexer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-xlstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nf-xlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-rnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-lstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-gru",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-tcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-deepar",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-dilatedrnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-bitcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-xlstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-mlp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-nbeats",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-nbeatsx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-nhits",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-dlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-nlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-tide",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-deepnpts",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-kan",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-tft",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-vanillatransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-informer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-autoformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-fedformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-patchtst",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-itransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-timexer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-timesnet",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-stemgnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-hint",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-tsmixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-tsmixerx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-mlpmultivariate",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-softs",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-softssharp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-timemixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-rmok",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "nfauto-xlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "mfauto-lightgbm",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "mfauto-xgboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "mfauto-catboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "mfauto-linearregression",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "mfauto-ridge",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "mfauto-lasso",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "mfauto-elasticnet",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "mfauto-randomforest",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hf-bottomup",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hf-bottomupsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hf-topdown",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hf-topdownsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hf-middleout",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hf-middleoutsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hf-mintrace",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hf-mintracesparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hf-optimalcombination",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "hf-erm",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "chronos-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "chronos-bolt-tiny",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "chronos-t5-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "chronos-t5-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "timesfm-2.5-transformers",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "granite-ttm-r2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "granite-flowstate-r1",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "granite-patchtst",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "granite-patchtsmixer",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "moirai-2.0-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "moirai-1.0-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "tirex-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "toto-open-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "toto-2.0-4m",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "moment-1-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "moment-1-large",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "lag-llama",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "kronos-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sundial-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "tabpfn-ts",
+      "library": "tsfm",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "t0-alpha",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "autogluon-timeseries",
+      "library": "autogluon",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "darts-ensemble",
+      "library": "darts",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "gluonts-deepar",
+      "library": "gluonts",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "reservoir-esn",
+      "library": "reservoirpy",
+      "task": "position"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "sktime-ensemble",
+      "library": "sktime",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers3",
+      "candidate_id": "skforecast-recursive",
+      "library": "skforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "uniform",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "frequency",
+      "library": "builtin",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "position-median",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "position-modal",
+      "library": "builtin",
+      "task": "position"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "ridge",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "elastic-net",
+      "library": "sklearn",
+      "task": "position"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "random-forest",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "extra-trees",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hist-gradient-boosting",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "isotonic-calibrated-logistic",
+      "library": "sklearn",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "lightgbm-classifier",
+      "library": "lightgbm",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "lightgbm-position",
+      "library": "lightgbm",
+      "task": "position"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "xgboost-classifier",
+      "library": "xgboost",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "catboost-classifier",
+      "library": "catboost",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-autoarima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-autoets",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-autoces",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-autotheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-automfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-autotbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-arima",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-autoregressive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-simpleexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-simpleexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-seasonalexponentialsmoothing",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-seasonalexponentialsmoothingoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-holt",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-holtwinters",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-historicaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-naive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-randomwalkwithdrift",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-seasonalnaive",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-conformalseasonalpool",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-windowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-seasonalwindowaverage",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-adida",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-crostonclassic",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-crostonoptimized",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-crostonsba",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-imapa",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-tsb",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-mstl",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-mfles",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-tbats",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-theta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-optimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-dynamictheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-dynamicoptimizedtheta",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-garch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-arch",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-sklearnmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-constantmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-zeromodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-nanmodel",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sf-ucm",
+      "library": "statsforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-rnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-gru",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-lstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-tcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-deepar",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-dilatedrnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-mlp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-nhits",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-nbeats",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-nbeatsx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-dlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-nlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-tft",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-vanillatransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-informer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-autoformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-patchtst",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-fedformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-stemgnn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-hint",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-timesnet",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-timellm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-tsmixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-tsmixerx",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-mlpmultivariate",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-itransformer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-bitcn",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-tide",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-deepnpts",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-softs",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-softssharp",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-timemixer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-kan",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-rmok",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-timexer",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-xlstm",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nf-xlinear",
+      "library": "neuralforecast",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-rnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-lstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-gru",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-tcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-deepar",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-dilatedrnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-bitcn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-xlstm",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-mlp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-nbeats",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-nbeatsx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-nhits",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-dlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-nlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-tide",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-deepnpts",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-kan",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-tft",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-vanillatransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-informer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-autoformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-fedformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-patchtst",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-itransformer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-timexer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-timesnet",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-stemgnn",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-hint",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-tsmixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-tsmixerx",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-mlpmultivariate",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-softs",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-softssharp",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-timemixer",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-rmok",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "nfauto-xlinear",
+      "library": "neuralforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "mfauto-lightgbm",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "mfauto-xgboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "mfauto-catboost",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "mfauto-linearregression",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "mfauto-ridge",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "mfauto-lasso",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "mfauto-elasticnet",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "mfauto-randomforest",
+      "library": "mlforecast_auto",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hf-bottomup",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hf-bottomupsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hf-topdown",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hf-topdownsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hf-middleout",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hf-middleoutsparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hf-mintrace",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hf-mintracesparse",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hf-optimalcombination",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "hf-erm",
+      "library": "hierarchicalforecast",
+      "task": "reconciliation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "chronos-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "chronos-bolt-tiny",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "chronos-t5-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "chronos-t5-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "timesfm-2.5-transformers",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "granite-ttm-r2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "granite-flowstate-r1",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "granite-patchtst",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "granite-patchtsmixer",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "moirai-2.0-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "moirai-1.0-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "tirex-2",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "toto-open-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "toto-2.0-4m",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "moment-1-small",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "moment-1-large",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "lag-llama",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "kronos-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sundial-base",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "tabpfn-ts",
+      "library": "tsfm",
+      "task": "candidate"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "t0-alpha",
+      "library": "tsfm",
+      "task": "foundation"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "autogluon-timeseries",
+      "library": "autogluon",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "darts-ensemble",
+      "library": "darts",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "gluonts-deepar",
+      "library": "gluonts",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "reservoir-esn",
+      "library": "reservoirpy",
+      "task": "position"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "sktime-ensemble",
+      "library": "sktime",
+      "task": "position_series"
+    },
+    {
+      "game": "numbers4",
+      "candidate_id": "skforecast-recursive",
+      "library": "skforecast",
+      "task": "position_series"
+    }
+  ]
+}

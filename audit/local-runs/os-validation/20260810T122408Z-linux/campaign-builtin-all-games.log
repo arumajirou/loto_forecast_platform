@@ -1,0 +1,14 @@
+{
+  "status": "PARTIAL",
+  "matrix_complete": true,
+  "catalog_models": 4,
+  "expected_model_game_pairs": 24,
+  "observed_model_game_pairs": 24,
+  "status_counts": {
+    "NOT_ROUTABLE": 24
+  },
+  "primary_metric": "hit_at_1",
+  "holdout_evaluated": false,
+  "prospective_evaluated": false,
+  "output": "audit/local-runs/os-validation/20260810T122408Z-linux/campaign-builtin-all-games"
+}

@@ -1,0 +1,5 @@
+candidate_id,games_requested,games_succeeded,all_games_complete,macro_hit_at_1,macro_mae,statuses
+frequency,6,0,False,,,"{'bingo5': 'NOT_ROUTABLE', 'loto6': 'NOT_ROUTABLE', 'loto7': 'NOT_ROUTABLE', 'mini': 'NOT_ROUTABLE', 'numbers3': 'NOT_ROUTABLE', 'numbers4': 'NOT_ROUTABLE'}"
+position-median,6,0,False,,,"{'bingo5': 'NOT_ROUTABLE', 'loto6': 'NOT_ROUTABLE', 'loto7': 'NOT_ROUTABLE', 'mini': 'NOT_ROUTABLE', 'numbers3': 'NOT_ROUTABLE', 'numbers4': 'NOT_ROUTABLE'}"
+position-modal,6,0,False,,,"{'bingo5': 'NOT_ROUTABLE', 'loto6': 'NOT_ROUTABLE', 'loto7': 'NOT_ROUTABLE', 'mini': 'NOT_ROUTABLE', 'numbers3': 'NOT_ROUTABLE', 'numbers4': 'NOT_ROUTABLE'}"
+uniform,6,0,False,,,"{'bingo5': 'NOT_ROUTABLE', 'loto6': 'NOT_ROUTABLE', 'loto7': 'NOT_ROUTABLE', 'mini': 'NOT_ROUTABLE', 'numbers3': 'NOT_ROUTABLE', 'numbers4': 'NOT_ROUTABLE'}"

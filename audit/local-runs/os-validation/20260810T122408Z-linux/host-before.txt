@@ -1,0 +1,96 @@
+RUN_ID=20260810T122408Z
+BRANCH=verify/linux-batch-20260810t122408z
+MAIN_SHA=1e005f8ba975ec0014827f81b591841f64493472
+DATE_UTC=2026-08-10T12:24:12+00:00
+
+=== uname ===
+Linux az 7.0.0-29-generic #29-Ubuntu SMP PREEMPT_DYNAMIC Fri Jul 17 20:52:35 UTC 2026 x86_64 GNU/Linux
+
+=== os-release ===
+PRETTY_NAME="Ubuntu 26.04 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+VERSION="26.04 LTS (Resolute Raccoon)"
+VERSION_CODENAME=resolute
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=resolute
+LOGO=ubuntu-logo
+
+=== cpu ===
+アーキテクチャ:                      x86_64
+CPU 操作モード:                      32-bit, 64-bit
+アドレスサイズ:                      48 bits physical, 48 bits virtual
+バイト順序:                          Little Endian
+CPU:                                 32
+オンラインになっている CPU のリスト: 0-31
+ベンダー ID:                         AuthenticAMD
+モデル名:                            AMD Ryzen 9 9950X 16-Core Processor
+CPU ファミリー:                      26
+モデル:                              68
+コアあたりのスレッド数:              2
+ソケットあたりのコア数:              16
+ソケット数:                          1
+ステッピング:                        0
+周波数ブースト:                      使用する
+CPU スケーリング MHz:                83%
+CPU 最大 MHz:                        5756.4521
+CPU 最小 MHz:                        624.1940
+BogoMIPS:                            8583.31
+フラグ:                              fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpuid_fault cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx_vnni avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif x2avic v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid bus_lock_detect movdiri movdir64b overflow_recov succor smca fsrm avx512_vp2intersect flush_l1d amd_lbr_pmc_freeze
+仮想化:                              AMD-V
+L1d キャッシュ:                      768 KiB (16 インスタンス)
+L1i キャッシュ:                      512 KiB (16 インスタンス)
+L2 キャッシュ:                       16 MiB (16 インスタンス)
+L3 キャッシュ:                       64 MiB (2 インスタンス)
+NUMA ノード数:                       1
+NUMA ノード 0 CPU:                   0-31
+脆弱性 Gather data sampling:         Not affected
+脆弱性 Ghostwrite:                   Not affected
+脆弱性 Indirect target selection:    Not affected
+脆弱性 Itlb multihit:                Not affected
+脆弱性 L1tf:                         Not affected
+脆弱性 Mds:                          Not affected
+脆弱性 Meltdown:                     Not affected
+脆弱性 Mmio stale data:              Not affected
+脆弱性 Old microcode:                Not affected
+脆弱性 Reg file data sampling:       Not affected
+脆弱性 Retbleed:                     Not affected
+脆弱性 Spec rstack overflow:         Mitigation; IBPB on VMEXIT only
+脆弱性 Spec store bypass:            Mitigation; Speculative Store Bypass disabled via prctl
+脆弱性 Spectre v1:                   Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+脆弱性 Spectre v2:                   Mitigation; Enhanced / Automatic IBRS; IBPB conditional; STIBP always-on; PBRSB-eIBRS Not affected; BHI Not affected
+脆弱性 Srbds:                        Not affected
+脆弱性 Tsa:                          Not affected
+脆弱性 Tsx async abort:              Not affected
+脆弱性 Vmscape:                      Mitigation; IBPB on VMEXIT
+
+=== memory ===
+               total        used        free      shared  buff/cache   available
+Mem:     132533547008 18726965248  9210458112  1018904576 106627571712 113806581760
+Swap:    66803638272           0 66803638272
+
+=== disk ===
+Filesystem     Type         1B-blocks          Used     Available Use% Mounted on
+tmpfs          tmpfs      13253357568       3723264   13249634304   1% /run
+/dev/nvme0n1p4 ext4     1006560526336  735826579456  219528024064  78% /
+tmpfs          tmpfs      66266771456     192684032   66074087424   1% /dev/shm
+efivarfs       efivarfs        262144         30738        226286  12% /sys/firmware/efi/efivars
+/dev/nvme1n1p2 ext4     3936802029568 2760370495488 1176414756864  71% /mnt/e
+tmpfs          tmpfs      66266771456     556298240   65710473216   1% /tmp
+/dev/nvme0n1p1 vfat         100663296      39793664      60869632  40% /boot/efi
+/dev/sda1      exfat    2048391118848 1373813866496  674577252352  68% /mnt/d
+tmpfs          tmpfs      13253353472        180224   13253173248   1% /run/user/1000
+/dev/sdc1      vfat       61947183104      33882112   61913300992   1% /run/media/az/8FFE-8298
+none           tmpfs          1048576             0       1048576   0% /run/credentials/systemd-journald.service
+none           tmpfs          1048576             0       1048576   0% /run/credentials/systemd-resolved.service
+
+=== uv ===
+uv 0.11.32 (x86_64-unknown-linux-gnu)
+
+=== python ===
+Python 3.14.4
