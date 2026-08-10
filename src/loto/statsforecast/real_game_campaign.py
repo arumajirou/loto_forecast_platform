@@ -39,9 +39,7 @@ def primary_univariate_entries(entries: Sequence[ModelEntry]) -> list[ModelEntry
     """Return only models belonging to the primary same-input univariate lane."""
 
     return [
-        entry
-        for entry in entries
-        if lane_for_model(entry.class_name) is RealGameLane.UNIVARIATE
+        entry for entry in entries if lane_for_model(entry.class_name) is RealGameLane.UNIVARIATE
     ]
 
 
