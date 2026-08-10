@@ -142,7 +142,9 @@ def _sha_text(value: str) -> str:
 
 def _resolved_code_hash(config: UnifiedCampaignConfig) -> str:
     if config.code_hash is not None:
-        if len(config.code_hash) != 64 or any(ch not in "0123456789abcdef" for ch in config.code_hash):
+        if len(config.code_hash) != 64 or any(
+            ch not in "0123456789abcdef" for ch in config.code_hash
+        ):
             raise ValueError("code_hash must be a lowercase 64-character SHA-256")
         return config.code_hash
     return _sha_text(f"{config.git_commit}:{ADAPTER_IDENTITY}")
@@ -259,7 +261,12 @@ def _prepare_game(
         bootstrap_repetitions=1000,
         conformal_method="none-development-campaign",
         conformal_alpha=0.1,
-        sentinel_inventory=("chronology", "duplicate_draw_no", "domain", "prediction_before_actual"),
+        sentinel_inventory=(
+            "chronology",
+            "duplicate_draw_no",
+            "domain",
+            "prediction_before_actual",
+        ),
         sentinel_repetitions=1,
         post_processing_identity=IdentityRef(
             identity=POST_PROCESSING_IDENTITY,
@@ -389,13 +396,17 @@ def _slot_candidate_rows(
                 if len(slot_history):
                     row["freq_all"] = float(np.mean(slot_history == candidate))
                     matches = np.flatnonzero(slot_history == candidate)
-                    row["gap_draws"] = float(idx - int(matches[-1])) if len(matches) else float(idx + 1)
+                    row["gap_draws"] = (
+                        float(idx - int(matches[-1])) if len(matches) else float(idx + 1)
+                    )
                 else:
                     row["freq_all"] = 0.0
                     row["gap_draws"] = float(idx + 1)
                 for window in windows:
                     recent = slot_history[max(0, len(slot_history) - window) :]
-                    row[f"freq_w{window}"] = float(np.mean(recent == candidate)) if len(recent) else 0.0
+                    row[f"freq_w{window}"] = (
+                        float(np.mean(recent == candidate)) if len(recent) else 0.0
+                    )
                 rows.append(row)
     return pd.DataFrame(rows)
 
@@ -630,7 +641,11 @@ def _evaluate_seed(
 
     safe_id = candidate_id.replace("/", "_")
     lock = _write_prediction_lock(
-        config.output_dir / "prediction_locks" / prepared.geometry.key / safe_id / f"seed-{seed}.json",
+        config.output_dir
+        / "prediction_locks"
+        / prepared.geometry.key
+        / safe_id
+        / f"seed-{seed}.json",
         protocol_hash=prepared.protocol.protocol_hash,
         game=prepared.geometry.key,
         candidate_id=candidate_id,
@@ -641,9 +656,9 @@ def _evaluate_seed(
     # Target actuals are read only after the durable prediction lock exists.
     actual = np.asarray(
         [
-            prepared.development.iloc[item["draw_index"]][prepared.geometry.column_names()].to_numpy(
-                dtype=float
-            )
+            prepared.development.iloc[item["draw_index"]][
+                prepared.geometry.column_names()
+            ].to_numpy(dtype=float)
             for item in records
         ]
     )
@@ -814,7 +829,9 @@ def build_campaign_plan(config: UnifiedCampaignConfig) -> list[dict[str, str]]:
     ]
 
 
-def _leaderboards(results: list[dict[str, Any]], games: tuple[str, ...]) -> dict[str, list[dict[str, Any]]]:
+def _leaderboards(
+    results: list[dict[str, Any]], games: tuple[str, ...]
+) -> dict[str, list[dict[str, Any]]]:
     boards: dict[str, list[dict[str, Any]]] = {}
     for game in games:
         rows = [row for row in results if row["game"] == game and row["status"] == "SUCCEEDED"]
@@ -954,7 +971,8 @@ def run_unified_campaign(
         "catalog_models": len(entries),
         "expected_model_game_pairs": expected_pairs,
         "observed_model_game_pairs": len(catalog_results),
-        "matrix_complete": len(catalog_results) == expected_pairs and len(pair_keys) == expected_pairs,
+        "matrix_complete": len(catalog_results) == expected_pairs
+        and len(pair_keys) == expected_pairs,
         "status_counts": status_counts,
         "primary_metric": "hit_at_1",
         "required_metrics": list(REQUIRED_POINT_METRICS),
