@@ -5,7 +5,7 @@ import sys
 
 
 def test_decoder_import_does_not_require_yaml() -> None:
-    script = r'''
+    script = r"""
 import builtins
 
 original_import = builtins.__import__
@@ -22,7 +22,7 @@ builtins.__import__ = guarded_import
 from loto.probabilistic.decoder import DecodeObjective
 
 assert DecodeObjective.WITHIN_TAU.value == "within_tau"
-'''
+"""
     result = subprocess.run(
         [sys.executable, "-c", script],
         check=False,
