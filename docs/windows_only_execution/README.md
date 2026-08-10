@@ -1,23 +1,30 @@
-# Windows-only execution status
+# Windows-only execution bundle — historical PR #240 snapshot
 
-Status date: 2026-08-10
+> **Status class:** `HISTORICAL_EVIDENCE`  
+> **Captured:** 2026-08-10 during PR #240 before merge  
+> **Later-known PR state:** PR #240 merged as `0bb4680b2d26cfd32788381f580d86a4acd0fb6d`  
+> **Audited repository state:** [`../STATUS.md`](../STATUS.md)
 
-This directory is the current operator-facing documentation bundle for the period in which only native Windows execution is available.
+This directory preserves the operator-facing documentation created during the period in which the active operator could execute only on native Windows.
 
-## Current facts
+The phrase **Windows-only** describes that execution period. It is **not** a permanent repository support statement and must not be used to infer that Linux or WSL is unavailable in a later session.
+
+## Captured state during PR #240
+
+The bundle originally recorded:
 
 ```text
-operator_environment=native Windows only
-linux_currently_available=false
-wsl_currently_available=false
+operator_environment_at_capture=native Windows only
+linux_available_to_operator_at_capture=false
+wsl_available_to_operator_at_capture=false
 pr=240
-pr_state=open/draft
-last_code_bearing_head=7795c413d295f445dbdcdf8d85894bf6c81db35a
+pr_state_at_capture=open/draft
+last_code_bearing_head_at_capture=7795c413d295f445dbdcdf8d85894bf6c81db35a
 windows_runner=az-loto-windows
 windows_runner_version=2.336.0
 powershell=7.6.4
 windows_ci_run=31353996850
-windows_ci_latest_job=93356157095
+windows_ci_latest_job_at_capture=93356157095
 windows_ci_result=success
 windows_ci_steps=13/13 success
 engineering_gates=7/7 pass
@@ -28,20 +35,45 @@ holdout_opened=false
 prospective_opened=false
 ```
 
+These values are retained because they identify the evidence and operating context of that phase.
+
+## Later-known state
+
+By the documentation audit later on 2026-08-10:
+
+```text
+pr_240_state=merged
+pr_240_merge_sha=0bb4680b2d26cfd32788381f580d86a4acd0fb6d
+formal_oof=false
+timer_inference=false
+holdout_opened=false
+prospective_opened=false
+```
+
+The merge updates the repository state; it does not rewrite the historical execution evidence above and it does not imply scientific completion.
+
 ## Documentation set
 
-- `REQUIREMENTS.md` — current execution requirements and stop conditions
-- `SPECIFICATION.md` — Windows-native formal protocol and OOF specification
-- `ARCHITECTURE.md` — current execution/evidence architecture
+- `REQUIREMENTS.md` — requirements captured for the Windows-only execution phase
+- `SPECIFICATION.md` — phase-specific formal protocol/OOF specification
+- `ARCHITECTURE.md` — execution/evidence architecture for that phase
 - `DATA_CONTRACT.md` — frozen snapshot and leakage boundary
-- `TEST_PLAN.md` — verification sequence before formal OOF
-- `VERIFICATION_REPORT.md` — facts verified as of this status date
-- `RUNBOOK.md` — operator commands and decision flow
-- `HANDOFF.md` — continuation state and next actions
-- `CHANGELOG.md` — documentation/status changes
+- `TEST_PLAN.md` — phase verification sequence
+- `VERIFICATION_REPORT.md` — facts verified in that phase
+- `RUNBOOK.md` — Windows operator commands used/planned in that phase
+- `HANDOFF.md` — continuation state at handoff time
+- `CHANGELOG.md` — bundle changes
 
-## Interpretation
+Treat these as point-in-time phase documents unless a file explicitly defines a portable/stable contract.
 
-Linux-specific artifacts and successful Linux CI remain valid historical evidence for the code-bearing head on which they were produced. They are not evidence that Linux is currently available, and their resource/package identity must not be copied into a new Windows formal protocol.
+## Interpretation rules
 
-The next scientific gate is not model inference. It is Windows-side recovery or availability of the exact frozen development snapshot, SHA-256 verification, final `EvaluationProtocolV2` regeneration, and protocol-set fixation.
+- Historical Linux CI evidence remains valid for the exact SHA/run on which it was produced.
+- Historical Windows CI evidence remains valid for its exact SHA/run.
+- Neither proves a different host is currently available or unavailable.
+- Formal protocol artifacts must bind the actual code/data/resource/package identities measured for the new run.
+- Do not copy old host resource values into a new protocol merely to preserve a previous hash.
+- Do not recreate a missing frozen data snapshot silently from a mutable database.
+- Holdout and Prospective remain governed by their scientific gates.
+
+For current interpretation and freshness rules, use [`../STATUS.md`](../STATUS.md) and [`../DOCUMENTATION_POLICY.md`](../DOCUMENTATION_POLICY.md).

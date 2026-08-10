@@ -1,165 +1,234 @@
 # Loto Forecast Platform
 
+6ゲーム（ミニロト / ロト6 / ロト7 / ビンゴ5 / ナンバーズ3 / ナンバーズ4）を対象に、統計・機械学習・深層学習・時系列基盤モデルを **同一のleakage-safe評価条件で比較する研究＋運用基盤** です。
+
 現在のpackage versionはREADMEへ手書きしません。canonical versionは`loto.version.__version__`、installed CLI、またはpackage metadataから確認してください。
 
-6ゲーム（ミニロト / ロト6 / ロト7 / ビンゴ5 / ナンバーズ3 / ナンバーズ4）を対象に、統計・機械学習・深層学習・時系列基盤モデルを **統計的に正当な手続きで** 比較する研究＋運用基盤です。
+## 最初に読む資料
 
-## Current execution status — 2026-08-10
+- [`docs/STATUS.md`](docs/STATUS.md) — GitHub/Linear/科学進捗を突合した **時点付き監査スナップショット**
+- [`docs/README.md`](docs/README.md) — live design / generated inventory / historical evidenceの読み分け
+- [`docs/DOCUMENTATION_POLICY.md`](docs/DOCUMENTATION_POLICY.md) — stale/current/historical資料の更新規約
+- [`docs/MODEL_INVENTORY.md`](docs/MODEL_INVENTORY.md) — 自動生成モデル在庫。`loto3 catalog --counts`が正本
+- [`docs/evaluation_protocol/PROTOCOL_V2.md`](docs/evaluation_protocol/PROTOCOL_V2.md) — formal評価protocol
 
-この節は「リポジトリが対応しうる全OS」ではなく、**現在このプロジェクトで実際に操作・検証できる実行環境**を記録します。
+固定されたActions run ID、PR状態、main SHA、PCのOS可否などは時間とともに変わります。READMEではそれらを恒久的な「current値」として扱いません。
+
+## Audited project state — 2026-08-10 16:24 JST
+
+この節は監査時点のスナップショットです。live値は[`docs/STATUS.md`](docs/STATUS.md)に記載した再取得方法で確認してください。
 
 ```text
-CURRENT_OPERATOR_EXECUTION_ENVIRONMENT=native Windows only
-LINUX_EXECUTION_CURRENTLY_AVAILABLE=false
-WSL_EXECUTION_CURRENTLY_AVAILABLE=false
-PR_240_STATE=open/draft
-LAST_CODE_BEARING_PR_HEAD=7795c413d295f445dbdcdf8d85894bf6c81db35a
-FORMAL_OOF_RUN=false
+AUDIT_BASE_MAIN=0bb4680b2d26cfd32788381f580d86a4acd0fb6d
+PR_240_STATE_AT_AUDIT=merged
+PR_240_MERGE_SHA=0bb4680b2d26cfd32788381f580d86a4acd0fb6d
+OPEN_PRS_AT_AUDIT=#245 only
+OPEN_GITHUB_ISSUES_AT_AUDIT=#239,#118
+SCIENTIFIC_PROGRESS_FROM_PR_240=18%
+FORMAL_TIMER_OOF_RUN=false
 TIMER_INFERENCE_RUN=false
 HOLDOUT_OPENED=false
 PROSPECTIVE_OPENED=false
+ACCURACY_CLAIM=false
+CHAMPION_CLAIM=false
+PROMOTION=false
 ```
 
-`LAST_CODE_BEARING_PR_HEAD`はドキュメント改定前のコード実装identityです。**現在のPR headはドキュメントcommitで進むため、formal protocol fixation直前にGitHubからlive re-fetchしてください。READMEに固定されたheadを最終実行identityとして流用してはいけません。**
+PR #240でTimer Base 84M leakage-safe OOFの**engineering foundation**は`main`へ統合済みです。ただしformal OOF、Timer inference、Holdout、Prospective、accuracy/champion/promotionは未完了です。
 
-現在のnative Windows self-hosted GitHub Actions runnerは次の状態まで検証済みです。
+Linux/Windows/WSLの「今この端末で使えるか」はセッション固有です。リポジトリの恒久属性ではありません。リポジトリにはself-hosted Linux standard CIとnative Windows portabilityの検証履歴があり、formal runでは実際に使用するhostのresource/package identityを毎回測定・固定します。
+
+## 5分で確認する
+
+`uv`ベースの基本コマンドはWindows/Linuxで共通です。
 
 ```text
-runner_name=az-loto-windows
-runner_version=2.336.0
-runner_service=Running
-runner_service_account=NT AUTHORITY\NETWORK SERVICE
-PowerShell=7.6.4
-windows_portability_run=31353996850
-windows_portability_latest_job=93356157095
-windows_portability_result=SUCCESS
-windows_portability_steps=13/13 success
-```
-
-Windows portability CIでは、runner identity、checkout、exact uv、managed Python、committed universal lock、native Windows dependency resolution、Triton非選択、wheel build、wheel install/import、tracked-files-cleanまでPASSしています。
-
-一方、**正式なTimer Base 84M OOF実行はまだ開始していません**。次工程はWindows上での`EvaluationProtocolV2`最終固定です。過去のLinux上のprotocol fixation evidenceは履歴として保持しますが、現在Linuxを実行できないため、そのresource identityを新しい正式runへコピーしてはいけません。Windows上でcode/data/resource/package identityを再測定してから新しいprotocol hashを固定します。
-
-詳細:
-
-- [`docs/WINDOWS_INSTALL.md`](docs/WINDOWS_INSTALL.md)
-- [`docs/windows_only_execution/README.md`](docs/windows_only_execution/README.md)
-- [`docs/windows_only_execution/RUNBOOK.md`](docs/windows_only_execution/RUNBOOK.md)
-- [`docs/windows_only_execution/HANDOFF.md`](docs/windows_only_execution/HANDOFF.md)
-
-## Scientific acceptance policy
-
-最優先指標は`Hit@±1`です。併記する指標は`MAE`、`MSE`、`RMSE`、位置別`Hit@±1`、全位置`Hit@±1`です。formal比較では最低限、Random、固定値、平均、中央値、直近値、頻度、統計モデルを同一protocolで比較します。
-
-Train / Validation / Holdout / Prospectiveは時間順で分離し、Scaler、Encoder、特徴量選択、HPOはTrain内だけで行います。OOFは複数seedの平均・分散・最悪値を保存し、最良seedだけでは採用しません。予測値は実測参照前にSHA-256と時刻で固定します。
-
-## Repository design sources
-
-v2.1.0 の独立監査で検出された構造的欠陥を修正し、spec-kit の SDD サイクル（constitution → specify → plan → tasks → implement）で再構築しました。
-
-- 仕様: [`specs/001-full-coverage/spec.md`](specs/001-full-coverage/spec.md)
-- 計画・設計判断: [`specs/001-full-coverage/plan.md`](specs/001-full-coverage/plan.md)
-- 一次情報調査ログ: [`specs/001-full-coverage/research.md`](specs/001-full-coverage/research.md)
-- タスク: [`specs/001-full-coverage/tasks.md`](specs/001-full-coverage/tasks.md)
-- 憲章: [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
-
-## 5分で確認する — current Windows path
-
-現在の操作環境ではnative Windowsを標準とします。
-
-```powershell
 uv --version
 uv sync --extra dev
-uv run pytest -q
 uv run loto3 games
 uv run loto3 catalog --counts
+uv run loto3 catalog --unpinned
 uv run loto3 integrity check
 ```
 
-Windows portabilityのdependency-light smokeは次で確認できます。
+GitHubのlive repository stateは、maintainer環境では例えば次で再取得できます。
 
-```powershell
-uv python install 3.12.13
-uv lock --check
-uv sync --dry-run --locked --python 3.12.13
-uv tree --locked --python-version 3.12 --python-platform x86_64-pc-windows-msvc
-uv build --wheel
+```text
+gh pr list -R arumajirou/loto_forecast_platform --state open
+gh issue list -R arumajirou/loto_forecast_platform --state open
+gh run list -R arumajirou/loto_forecast_platform --limit 20
 ```
 
-Linux/bash例が既存資料に残っている場合、それはplatform-specificな履歴または別ターゲット向け手順です。**現在のoperator execution pathとしてLinux/WSLを前提にしてはいけません。**
+## Installation tiers
 
-## 設計上の核心
+正確な依存契約は[`pyproject.toml`](pyproject.toml)と`uv.lock`が正本です。2026-08-10監査時点ではPythonは`>=3.11,<3.14`です。
 
-### 1. ゲーム幾何の単一情報源
+| install | 主な用途 |
+|---|---|
+| `uv sync` | core / NeuralForecast / Torch / Transformers |
+| `uv sync --extra dev` | pytest / Ruff / mypy / Hypothesis / Optuna / telemetry |
+| `uv sync --extra auto-campaign` | Optuna / StatsForecast / resource inspection |
+| `uv sync --extra api` | FastAPI / Uvicorn API lane |
+| `uv sync --extra postgres` | PostgreSQL data source |
+| `uv sync --extra mlflow` | MLflow tracking |
+| `uv sync --extra frameworks` | Darts / GluonTS / Lightning / sktime / skforecast / ReservoirPy |
+| `uv sync --extra tsfm` | Transformers / Accelerate / Chronos forecasting |
+| `uv sync --extra full` | broad research/development dependency set incl. boosting / Nixtla / Ray / telemetry |
 
-`loto.game.GameGeometry` が universe / slot / family を一元管理します。`select` 族（重複なし・昇順）と `digits` 族（重複可・先頭0有意）を別物として扱います。
+Formal runtime certificationでは「依存がlockにある」ことと「対象hostでload/inferenceが成功した」ことを分離します。
 
-### 2. protocol_hash
+## Model inventory
 
-評価条件をSHA-256で固定し、異なるhash同士の比較を拒否します。現在のTimer Base 84M正式OOFでは、最終コードidentity・frozen development snapshot・Windows resource/package identityを固定した**新しい**`EvaluationProtocolV2` hashが必要です。
+モデル件数は[`docs/MODEL_INVENTORY.md`](docs/MODEL_INVENTORY.md)を経由し、最終的には`loto3 catalog --counts`を正とします。
 
-### 3. champion は null になりうる
+2026-08-10監査スナップショット:
 
-`Leaderboard.champion` の型は `LeaderboardRow | None` です。多重比較補正後にベースラインを有意に上回るモデルがなければ `verdict = NO_MODEL_BEATS_BASELINE` / `champion = null` を返します。
+| library | registered count | role |
+|---|---:|---|
+| builtin | 4 | mandatory/simple controls |
+| sklearn | 7 | candidate / position ML baselines |
+| lightgbm | 2 | boosting candidate / position |
+| xgboost | 1 | candidate boosting |
+| catboost | 1 | candidate boosting |
+| statsforecast | 41 | statistical `position_series` forecasting |
+| neuralforecast | 37 | fixed neural `position_series` models |
+| neuralforecast_auto | 36 | HPO-enabled NeuralForecast AutoModels |
+| mlforecast_auto | 8 | lag/exogenous MLForecast Auto models |
+| hierarchicalforecast | 10 | reconciliation methods |
+| tsfm | 21 | pretrained/foundation models |
+| autogluon | 1 | AutoML provider entry |
+| darts | 1 | ensemble framework entry |
+| gluonts | 1 | probabilistic framework entry |
+| sktime | 1 | ensemble framework entry |
+| skforecast | 1 | recursive forecasting framework entry |
+| reservoirpy | 1 | ESN/reservoir entry |
+| **total** | **174** | generated catalog total |
 
-### 4. リークは反証可能
+### Task semantics
 
-研究実行ではラベル置換・時間シフト・厳密因果監査を実施します。Timer Base 84M OOF foundationでは、target contextを対象drawより前に限定し、prediction recordを実測参照前にimmutable write + SHA-256 sealします。
+| task | meaning |
+|---|---|
+| `candidate` | 各候補番号のprobability/ranking |
+| `position` | 各抽選位置を直接回帰 |
+| `position_series` | 各位置を時系列としてforecast |
+| `foundation` | pretrained TSFMへcontextを与えてforecast |
+| `reconciliation` | 既存forecastを階層制約へ整合 |
 
-### 5. Runtime certificationはavailability表示と別物
+### Major model families
 
-モデルが利用可能と表示されるだけでは正式成功ではありません。load、input、inference、output shape、finite values、device、GPU PID/VRAM、CPU fallbackを実測して初めてruntime evidenceとします。
+- **NeuralForecast fixed (37):** RNN/GRU/LSTM/TCN/DeepAR/NHITS/NBEATS/NBEATSx/TFT/PatchTST/iTransformer/xLSTM/XLinearなど。
+- **NeuralForecast Auto (36):** AutoRNN/AutoLSTM/AutoGRU/AutoNHITS/AutoTFT/AutoPatchTST/AutoTimeXer/AutoXLinearなど。search backendはruntime契約として検証します。
+- **StatsForecast (41):** AutoARIMA/AutoETS/SeasonalNaive/HistoricAverage/Croston系/Theta系/TBATS/MSTLなど。mandatory statistical baseline群を含みます。
+- **MLForecast Auto (8):** LightGBM/XGBoost/CatBoost/linear/Ridge/Lasso/ElasticNet/RandomForest。
+- **HierarchicalForecast (10):** BottomUp/TopDown/MiddleOut/MinTrace/OptimalCombination/ERM等。予測器ではなくreconciliation層です。
+- **TSFM (21):** Chronos, TimesFM, Moirai, TiRex, Toto, TTM, Lag-Llama等。登録とrevision/runtime certificationは別です。
 
-## モデル在庫
+TSFM revision未固定状態は捏造SHAで埋めず`UNPINNED`として扱います。formal protocolへ入れる前にrepo/revision/artifact hash/license/package/runtime identityを固定します。
 
-件数は `loto3 catalog --counts` が唯一の正です（[`docs/MODEL_INVENTORY.md`](docs/MODEL_INVENTORY.md)）。README上の古い件数は参考値であり、実行時inventoryを優先してください。
+## “利用可能”を7段階に分ける
 
-## DBからNeuralForecast AutoModelを実行
-
-SQLiteまたはPostgreSQLのテーブルを読み込み、Numbers4の`d1`～`d4`を4系列へ変換して登録済みAutoModelを実行できます。現在のoperator environmentではWindows PowerShell構文を優先してください。formal runの前にはdry-runでDBスキーマと実行計画を確認し、Holdout/Prospectiveを開かないことを確認します。
-
-## 理論限界
-
-[`docs/THEORETICAL_BOUNDS.md`](docs/THEORETICAL_BOUNDS.md)（`loto3 theory` で再生成）。MAE下限と±1上限は別目的であり、同時最適化できない場合があります。formal比較ではPrimary KPIをHit@±1として固定し、MAE/MSE/RMSEを併記します。
-
-## Current certification boundary
-
-現在の事実として確認済み:
-
-- PR #240のcode-bearing head `7795c413d295f445dbdcdf8d85894bf6c81db35a`でWindows focused validation 20/20 PASS
-- 同code-bearing headに対するLinux standard CIは過去にPASS済み。ただし現在Linuxを実行できないため**historical evidence**として扱う
-- native Windows runner `az-loto-windows`復旧済み
-- PowerShell 7.6.4導入済み
-- Windows portability CI run `31353996850` / latest job `93356157095` = SUCCESS, 13/13 steps PASS
-- Holdout actuals opened=false
-- Prospective actuals opened=false
-- formal OOF run=false
-- Timer inference run=false
-
-未完了または未認定:
-
-- final documentation headに対するCI再確認
-- Windows上でのfinal `EvaluationProtocolV2`再固定
-- frozen development snapshotのWindows側存在確認とSHA-256再検証
-- Windows resource/package identityのformal protocolへの固定
-- formal baseline OOF
-- formal Timer Base 84M OOF
-- 複数seedのmean / variance / worst集約
-- Holdout開封とProspective評価
-- champion / promotion
-
-## ライセンスと免責
-
-本ソフトウェアは時系列予測手法の**研究**を目的とします。宝くじの当選を予測する能力は主張しません。正式な性能主張は、固定済みprotocol、リーク検査、baseline比較、multi-seed集約、prediction sealingを通過したevidenceだけを根拠にします。
-
-## v3.2.0: All-model / all-setting bounded auto coverage research
-
-Native Windowsでは次のPowerShell entrypointを使用できます。
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\run_auto_coverage_loop.ps1 -AcquireData
+```text
+1. Registered
+2. Dependency available
+3. Runtime loadable
+4. Inference verified
+5. OOF evaluated
+6. Holdout eligible/evaluated
+7. Promotion eligible/promoted
 ```
 
-The search enumerates every value explicitly listed in `parameter_spaces`, tests declared ensembles, selects the smallest candidate set it can find for the requested ±1 row coverage, and optionally asks an OpenAI-compatible local LLM for additional bounded proposals every N experiments. It never opens the protected test during tuning and never reports 90% unless validation actually reaches it.
+**Level 1だけを見てruntime/accuracy successとは記載しません。**
 
-"all settings" means the complete finite Cartesian product declared in the YAML, not every real-number value or every possible neural architecture.
+Runtime certificationでは最低限、model/revision、load、input、inference、output shape、finite values、effective device、GPU PID/VRAM、CPU fallback、アンロード後のresource解放を実測します。
+
+## Scientific acceptance policy
+
+Primary KPIは`Hit@±1`です。formal比較では併せて以下を保存します。
+
+```text
+hit_at_1
+position_hit_at_1
+all_positions_hit_at_1
+mae
+mse
+rmse
+```
+
+最低限のbaseline:
+
+```text
+random
+fixed
+mean
+median
+last
+frequency
+statistical_ar1
+```
+
+評価規則:
+
+- Train / Validation / Holdout / Prospectiveを時間順で分離する。
+- Scaler、Encoder、特徴量選択、HPO/チューニングはTrain内だけでfitする。
+- OOFは複数seedを全て保持し、mean / population variance / worst value / worst seedを保存する。
+- best-seed-only採用は禁止する。
+- 予測値はtarget actual参照前にimmutable write + SHA-256 + timestampで固定する。
+- 異なる`protocol_hash`の結果を黙って同一leaderboardへ混ぜない。
+- Hit@±1が劣るcandidateをMAEだけで上位採用しない。
+- valid outcomeとして`NO_MODEL_BEATS_BASELINE` / `champion=null`を認める。
+
+## Evaluation Protocol v2
+
+[`docs/evaluation_protocol/PROTOCOL_V2.md`](docs/evaluation_protocol/PROTOCOL_V2.md)はOS固有のprotocolではありません。formal runのhostがWindowsでもLinuxでも、**そのrunで実測した**code/data/resource/package identityを固定します。別hostの過去値をコピーして再現性を装いません。
+
+Timer Base 84Mの正式科学作業はGitHub Issue #239 / Linear TAJ-12で追跡しています。PR #240 mergeはIssue #239の科学完了を意味しません。
+
+## Data contract
+
+Raw dataは上書きせず不変の正本として扱います。formal campaignでは少なくとも次を証拠化します。
+
+1. source identity;
+2. immutable data snapshot + SHA-256;
+3. chronological split manifest + SHA-256;
+4. duplicate / missing / ordering / domain / future-information audit;
+5. feature availability boundary;
+6. prediction-before-actual ordering;
+7. Holdout/Prospectiveの未開封状態または明示的な後段開封記録。
+
+SQLite/PostgreSQL/API接続が成功しただけではformal dataset確定にはなりません。
+
+## Experiment tracking and evidence
+
+Formal Run IDには設定、data hash、code hash、Git commit、model/revision、seed、予測、実測、評価値、ログ、resource/GPU情報を結びます。既存のMLflow/PostgreSQL/DuckDB/Parquet等の契約を優先し、互換性のない並行tracking形式を増やしません。
+
+Evidenceは可能な限り次を保持します。
+
+- protocol/data/split/feature/model/runtime manifests;
+- SHA-256 inventory;
+- stdout/stderr/exit code/timestamps;
+- per-fold/per-seed predictions and metrics;
+- baseline comparison;
+- runtime certification;
+- independent verification report.
+
+## Repository design sources
+
+- [`specs/001-full-coverage/spec.md`](specs/001-full-coverage/spec.md)
+- [`specs/001-full-coverage/plan.md`](specs/001-full-coverage/plan.md)
+- [`specs/001-full-coverage/research.md`](specs/001-full-coverage/research.md)
+- [`specs/001-full-coverage/tasks.md`](specs/001-full-coverage/tasks.md)
+- [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
+
+## Historical reports are not deleted
+
+古い`VERIFICATION_REPORT`、`HANDOFF`、CI run ID、SHA256SUMSは「古いから誤り」なのではなく、**その時点のevidence**です。問題はそれをlive stateと読んでしまうことです。
+
+そのため本リポジトリでは、履歴資料を消去・改竄する代わりに[`docs/DOCUMENTATION_POLICY.md`](docs/DOCUMENTATION_POLICY.md)で分類し、[`docs/STATUS.md`](docs/STATUS.md)から現在の監査スナップショットへ誘導します。
+
+## Theoretical bounds
+
+[`docs/THEORETICAL_BOUNDS.md`](docs/THEORETICAL_BOUNDS.md)を参照してください。MAE下限とHit@±1上限は別目的であり、同時最適化できない場合があります。formal selection priorityはHit@±1を先に固定します。
+
+## License / research disclaimer
+
+本ソフトウェアは時系列予測手法の研究を目的とします。宝くじの当選を予測する能力は主張しません。正式な性能主張は、固定済みprotocol、リーク検査、baseline比較、multi-seed集約、prediction sealing、必要なruntime evidenceを通過した実測結果だけを根拠にします。
