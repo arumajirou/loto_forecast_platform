@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import statistics as stats
 from collections.abc import Mapping, Sequence
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -57,14 +57,14 @@ class PromotionPolicy(BaseModel):
 class PromotionPolicyV2(PromotionPolicy):
     """Theory-aware policy for new evidence without rewriting v1 semantics.
 
-    The default target is zero *excess* over the exact IID-null Hit@±tau reference. Absolute
-    targets above that null reference fail closed unless an alternative hypothesis is explicitly
-    declared. Promotion remains manual and still requires the surrounding prospective/baseline
-    stability evidence.
+    Promotion evidence currently records Hit@±1 only, so V2 deliberately fixes ``tau`` to one.
+    The default target is zero *excess* over the exact IID-null Hit@±1 reference. Absolute targets
+    above that null reference fail closed unless an alternative hypothesis is explicitly declared.
+    Promotion remains manual and still requires the surrounding prospective/baseline evidence.
     """
 
     game: str
-    tau: int = Field(default=1, ge=0)
+    tau: Literal[1] = 1
     hit_at_1_target: float = Field(default=0.0, ge=-1.0, le=1.0)
     hit_at_1_target_semantics: ThresholdSemantics = ThresholdSemantics.EXCESS_VS_IID_NULL
     allow_above_null_ceiling: bool = False
