@@ -10,6 +10,7 @@ from loto.game.geometry import GameGeometry, geometry_for
 from loto.probabilistic.decoder import (
     DecodeObjective,
     build_within_tau_utility,
+    decode_digit_distribution,
     decode_select_distribution,
     decode_select_positions,
 )
@@ -90,8 +91,30 @@ def test_within_tau_decoder_matches_bruteforce_on_small_geometry() -> None:
         )
         candidates.append((score, values))
     best_score = max(score for score, _ in candidates)
-    expected = min(values for score, values in candidates if np.isclose(score, best_score))
+    expected = min(values for score, values in candidates if score == best_score)
     assert tuple(decoded) == expected
+
+
+def test_digit_within_tau_decode_optimises_window_mass_not_point_argmax() -> None:
+    geometry = geometry_for("numbers3")
+    row = np.asarray([0.01, 0.01, 0.01, 0.24, 0.20, 0.23, 0.01, 0.01, 0.01, 0.27])
+    probabilities = np.vstack([row, row, row])
+
+    map_values = decode_digit_distribution(
+        probabilities,
+        geometry,
+        objective=DecodeObjective.MAP,
+    )
+    within_tau_values = decode_digit_distribution(
+        probabilities,
+        geometry,
+        objective=DecodeObjective.WITHIN_TAU,
+        tau=1,
+    )
+
+    assert map_values == [9, 9, 9]
+    assert within_tau_values == [4, 4, 4]
+    geometry.validate_outcome(within_tau_values)
 
 
 def test_map_compatibility_api_keeps_existing_semantics() -> None:
