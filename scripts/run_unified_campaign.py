@@ -50,10 +50,7 @@ def _synthetic(game: str, rows: int, seed: int) -> pd.DataFrame:
 
 def _load_frames(args: argparse.Namespace, games: tuple[str, ...]) -> dict[str, pd.DataFrame]:
     if args.synthetic:
-        return {
-            game: _synthetic(game, args.synthetic_rows, args.synthetic_seed)
-            for game in games
-        }
+        return {game: _synthetic(game, args.synthetic_rows, args.synthetic_seed) for game in games}
     if not args.input_dir:
         raise SystemExit("either --input-dir or --synthetic is required")
     root = Path(args.input_dir)
@@ -79,7 +76,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--synthetic-rows", type=int, default=220)
     parser.add_argument("--synthetic-seed", type=int, default=7)
     parser.add_argument("--games", default=",".join(known_games()))
-    parser.add_argument("--models", default=None, help="comma-separated broad catalog IDs; default=all")
+    parser.add_argument(
+        "--models", default=None, help="comma-separated broad catalog IDs; default=all"
+    )
     parser.add_argument("--seeds", default="42,1729,20260730")
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--test-size", type=int, default=20)
