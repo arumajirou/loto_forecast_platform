@@ -72,32 +72,41 @@ def test_geometry_rejects_impossible_configuration():
         GameGeometry(key="bad", family="select", positions=50, value_min=1, value_max=10)
 
 
-def test_no_hardcoded_geometry_outside_game_package():
-    """Constitution gate IV: universe sizes may not appear as literals outside ``loto.game``.
+def test_no_hardcoded_universe_sizes_in_geometry_sensitive_packages():
+    """Constitution gate IV: production universe sizes come from ``loto.game``.
 
-    Uses the AST rather than a text scan so that prose in docstrings (which legitimately
-    discusses the v2.1.0 hard-coding defect) cannot trip the gate, while an actual integer
-    literal anywhere in the code does.
+    The previous gate scanned seven hand-written files only, so new evaluation/decoder modules
+    could silently reintroduce Loto-specific dimensions. Scan the geometry-sensitive packages
+    recursively. Draw-size literals such as 3/4/5/6/7/8 are intentionally not scanned because
+    they are common algorithmic constants; those are covered by dynamic all-game shape tests.
     """
     forbidden = {31, 37, 40, 43}
     root = Path(__file__).resolve().parents[1] / "src" / "loto"
-    v3_modules = [
-        root / "evaluation" / "theory_general.py",
-        root / "evaluation" / "metrics_general.py",
-        root / "evaluation" / "protocol.py",
-        root / "evaluation" / "leaderboard.py",
-        root / "contracts_general.py",
-        root / "orchestration" / "research_v3.py",
-        root / "reconciliation" / "hierarchy.py",
+    package_roots = [
+        root / "evaluation",
+        root / "decoding",
+        root / "probabilistic",
+        root / "orchestration",
+        root / "reconciliation",
     ]
+    modules = [root / "contracts_general.py"]
+    for package_root in package_roots:
+        assert package_root.is_dir(), f"expected geometry-sensitive package missing: {package_root}"
+        modules.extend(sorted(package_root.rglob("*.py")))
+
     offenders: dict[str, list[tuple[int, int]]] = {}
-    for path in v3_modules:
-        assert path.is_file(), f"expected v3 module missing: {path}"
+    for path in modules:
+        assert path.is_file(), f"expected module missing: {path}"
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
-            if isinstance(node, ast.Constant) and isinstance(node.value, int):
-                if node.value in forbidden and not isinstance(node.value, bool):
-                    offenders.setdefault(path.name, []).append(
-                        (getattr(node, "lineno", -1), node.value)
-                    )
+            if (
+                isinstance(node, ast.Constant)
+                and isinstance(node.value, int)
+                and not isinstance(node.value, bool)
+                and node.value in forbidden
+            ):
+                relative = path.relative_to(root).as_posix()
+                offenders.setdefault(relative, []).append(
+                    (getattr(node, "lineno", -1), node.value)
+                )
     assert not offenders, f"hard-coded geometry literals found: {offenders}"
