@@ -67,6 +67,15 @@ def test_null_relative_target_is_not_mislabeled_as_universal_bound() -> None:
     assert "not a universal bound" in str(assessment["interpretation"])
 
 
+def test_null_relative_target_cannot_imply_probability_above_one() -> None:
+    with pytest.raises(ValidationError, match="TARGET_OUTSIDE_PROBABILITY_RANGE"):
+        TheoryAwareThreshold(
+            game="numbers3",
+            semantics=ThresholdSemantics.EXCESS_VS_IID_NULL,
+            target=0.80,
+        )
+
+
 def test_unknown_game_is_rejected() -> None:
     with pytest.raises(ValidationError, match="unknown game"):
         TheoryAwareThreshold(game="not-a-game")
