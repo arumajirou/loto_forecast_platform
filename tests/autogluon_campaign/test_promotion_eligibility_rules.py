@@ -3,7 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from loto.autogluon_campaign.promotion_eligibility import (
+    PromotionPolicyV2,
     verify_promotion_eligibility,
 )
 from tests.autogluon_campaign.p17_test_support import (
@@ -30,6 +33,43 @@ def test_decision_never_promotes_or_writes_registry(tmp_path: Path) -> None:
     assert decision["automatic_retraining"] is False
     assert decision["registry_write_allowed"] is False
     assert decision["promotion_status"] == "NOT_PROMOTED"
+
+
+def test_v2_null_relative_target_is_evaluated_as_implied_absolute_target(tmp_path: Path) -> None:
+    holdout = score_bundle(
+        tmp_path / "v2-holdout",
+        stage="holdout",
+        run_id="v2-holdout",
+        draw_ids=[60],
+        selected_hit=0.25,
+        baseline_hit=0.10,
+        game_id="numbers3",
+    )
+    prospective = [
+        score_bundle(
+            tmp_path / f"v2-p-{index}",
+            stage="prospective",
+            run_id=f"v2-p-{index}",
+            draw_ids=[60 + index],
+            selected_hit=0.25,
+            baseline_hit=0.10,
+            game_id="numbers3",
+        )
+        for index in (1, 2, 3)
+    ]
+    result = run_gate(
+        tmp_path,
+        holdout=holdout,
+        prospective=prospective,
+        policy=PromotionPolicyV2(game="numbers3"),
+    )
+    assert result.reason_code == "AGGREGATE_HIT_AT_1_TARGET"
+    rule_payload = json.loads((Path(result.output_dir) / "RULE_EVALUATION.json").read_text())
+    target_rule = next(
+        row for row in rule_payload["rules"] if row["rule_id"] == "AGGREGATE_HIT_AT_1_TARGET"
+    )
+    assert target_rule["observed"] == pytest.approx(0.25)
+    assert target_rule["requirement"] == pytest.approx(0.30)
 
 
 def test_minimum_windows_blocks(tmp_path: Path) -> None:
