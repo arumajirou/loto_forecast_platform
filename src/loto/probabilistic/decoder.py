@@ -121,8 +121,10 @@ def decode_digit_distribution(
         raise ValueError("decode_digit_distribution requires a digits-family geometry")
     resolved = DecodeObjective(objective)
     probs = _validate_positional_probabilities(probabilities, geometry)
-    scores = probs if resolved is DecodeObjective.MAP else build_within_tau_utility(
-        probs, geometry, tau=tau
+    scores = (
+        probs
+        if resolved is DecodeObjective.MAP
+        else build_within_tau_utility(probs, geometry, tau=tau)
     )
     indexes = np.argmax(scores, axis=1)
     values = [int(index + geometry.value_min) for index in indexes]
