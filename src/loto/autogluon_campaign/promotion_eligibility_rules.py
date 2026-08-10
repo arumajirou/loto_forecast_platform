@@ -43,13 +43,13 @@ def _policy_context(
     game_ids = [str(window.get("game_id", "")).strip() for window in windows]
     if any(not game_id for game_id in game_ids):
         raise PromotionEligibilityError(
-            "PROMOTION_GAME_EVIDENCE_MISSING",
+            "SCORING_GAME_MISSING",
             "V2 promotion requires sealed game_id on every scored window",
         )
     observed_games = set(game_ids)
     if observed_games != {policy.game}:
         raise PromotionEligibilityError(
-            "PROMOTION_GAME_MISMATCH",
+            "SCORING_GAME_POLICY_MISMATCH",
             f"policy_game={policy.game!r} evidence_games={sorted(observed_games)!r}",
         )
 
@@ -198,7 +198,7 @@ def evaluate_promotion_rules(
         decision_value = "NOT_ELIGIBLE"
         reason_code = str(first_failure["rule_id"])
 
-    core = {
+    core: dict[str, Any] = {
         "schema_version": schema_version,
         "status": "PASS",
         "decision": decision_value,
@@ -211,5 +211,17 @@ def evaluate_promotion_rules(
         "registry_write_allowed": False,
         "promotion_status": "NOT_PROMOTED",
     }
+    if isinstance(policy, PromotionPolicyV2):
+        core["rules"] = [
+            {
+                "rule_id": rule["rule_id"],
+                "passed": rule["passed"],
+                "detail": {
+                    "observed": rule["observed"],
+                    "required": rule["requirement"],
+                },
+            }
+            for rule in rules
+        ]
     decision = {**core, "decision_sha256": _digest(_canon(core))}
     return aggregate, rules, decision
