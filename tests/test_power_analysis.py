@@ -50,5 +50,9 @@ def test_inputs_fail_closed() -> None:
         required_paired_draws(0.01, 0.0)
     with pytest.raises(ValueError, match="positive integer"):
         minimum_detectable_effect(0, 0.2)
+    with pytest.raises(ValueError, match="positive integer"):
+        power_curve((0, 50), 0.2)
+    with pytest.raises(ValueError, match="positive integer"):
+        power_curve((True, 50), 0.2)
     with pytest.raises(ValueError, match="sorted"):
         power_curve((100, 50), 0.2)
