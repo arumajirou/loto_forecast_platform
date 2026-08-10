@@ -99,8 +99,7 @@ def summarize_preflight(
         and failed == 0
         and lane_counts[RealGameLane.UNIVARIATE.value] == expected_univariate
         and lane_counts[RealGameLane.EXOGENOUS.value] == expected_exogenous
-        and lane_counts[RealGameLane.EXPECTED_NEGATIVE_CONTROL.value]
-        == expected_negative_control
+        and lane_counts[RealGameLane.EXPECTED_NEGATIVE_CONTROL.value] == expected_negative_control
         and not failed_models
     )
     return {
