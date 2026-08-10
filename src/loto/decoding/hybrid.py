@@ -45,8 +45,7 @@ def decode_hybrid(
             continue
         index = number - geometry.value_min
         score = (
-            candidate_weight * candidate_scores[index]
-            + position_weight * position_scores[0, index]
+            candidate_weight * candidate_scores[index] + position_weight * position_scores[0, index]
         )
         states[number] = [(float(score), (number,))]
     for position in range(1, geometry.positions):
@@ -64,9 +63,7 @@ def decode_hybrid(
             for previous, paths in states.items():
                 if previous >= number:
                     continue
-                candidates.extend(
-                    (score + float(add), path + (number,)) for score, path in paths
-                )
+                candidates.extend((score + float(add), path + (number,)) for score, path in paths)
             if candidates:
                 candidates.sort(key=lambda item: (-item[0], item[1]))
                 new_states[number] = candidates[:top_k]
