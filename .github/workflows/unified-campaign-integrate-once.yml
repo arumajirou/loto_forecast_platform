@@ -40,6 +40,7 @@ jobs:
           campaign = Path('src/loto/evaluation/unified_campaign.py')
           text = campaign.read_text(encoding='utf-8')
           text = text.replace('import hashlib\nimport json\nimport os\n', 'import hashlib\nimport os\n', 1)
+          text = text.replace('    tau: int = Field(default=1, ge=0)\n', '    tau: Literal[1] = 1\n', 1)
           old = '''            raise _NotRoutable(\n                f"candidate estimator has no unified point-forecast bridge: {spec.library}/{spec.class_name}"\n            )'''
           new = '''            raise _NotRoutable(\n                "candidate estimator has no unified point-forecast bridge: "\n                f"{spec.library}/{spec.class_name}"\n            )'''
           if old not in text:
@@ -83,18 +84,16 @@ jobs:
           print(versions[0])
           PY
           )"
-          uv tool run --from "ruff==$ruff_version" ruff format \
-            src/loto/evaluation/unified_campaign.py \
-            src/loto/evaluation/unified_campaign_cli.py \
-            src/loto/cli_v3.py \
-            scripts/run_unified_campaign.py \
+          files=(
+            src/loto/evaluation/unified_campaign.py
+            src/loto/evaluation/unified_campaign_cli.py
+            src/loto/cli_v3.py
+            scripts/run_unified_campaign.py
             tests/test_unified_campaign.py
-          uv tool run --from "ruff==$ruff_version" ruff check \
-            src/loto/evaluation/unified_campaign.py \
-            src/loto/evaluation/unified_campaign_cli.py \
-            src/loto/cli_v3.py \
-            scripts/run_unified_campaign.py \
-            tests/test_unified_campaign.py
+          )
+          uv tool run --from "ruff==$ruff_version" ruff check --fix "${files[@]}"
+          uv tool run --from "ruff==$ruff_version" ruff format "${files[@]}"
+          uv tool run --from "ruff==$ruff_version" ruff check "${files[@]}"
 
           allowed='^(.github/workflows/unified-campaign-integrate-once.yml|scripts/run_unified_campaign.py|src/loto/cli_v3.py|src/loto/evaluation/unified_campaign.py|src/loto/evaluation/unified_campaign_cli.py|tests/test_unified_campaign.py)$'
           unexpected="$(git diff --name-only | grep -Ev "$allowed" || true)"
