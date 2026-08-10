@@ -1,10 +1,16 @@
-"""Exact additive constrained decoding with optional combination reranking."""
+"""Legacy Loto7 additive constrained decoding with optional combination reranking.
+
+New geometry-general probability decoding lives in :mod:`loto.probabilistic.decoder`. This
+function keeps the historical :class:`loto.contracts.DecodedCombination` contract, but derives
+all Loto7 dimensions from the canonical game geometry instead of duplicating numeric literals.
+"""
 
 from __future__ import annotations
 
 import numpy as np
 
 from loto.contracts import DecodedCombination
+from loto.game.geometry import geometry_for
 
 
 def decode_hybrid(
@@ -17,47 +23,68 @@ def decode_hybrid(
     cooccurrence: np.ndarray | None = None,
     cooccurrence_weight: float = 0.0,
 ) -> list[DecodedCombination]:
+    geometry = geometry_for("loto7")
     candidate_scores = np.asarray(candidate_scores, dtype=float)
     position_scores = np.asarray(position_scores, dtype=float)
-    if candidate_scores.shape != (37,) or position_scores.shape != (7, 37):
-        raise ValueError("expected candidate_scores=(37,), position_scores=(7,37)")
+    candidate_shape = (geometry.universe_size,)
+    position_shape = (geometry.positions, geometry.universe_size)
+    if candidate_scores.shape != candidate_shape or position_scores.shape != position_shape:
+        raise ValueError(
+            f"expected candidate_scores={candidate_shape}, position_scores={position_shape}"
+        )
+    if cooccurrence is not None and np.asarray(cooccurrence).shape != (
+        geometry.universe_size,
+        geometry.universe_size,
+    ):
+        raise ValueError("cooccurrence matrix must match the canonical Loto7 universe")
+
     # states[last_number] = top paths ending in last_number for current position.
     states: dict[int, list[tuple[float, tuple[int, ...]]]] = {}
-    for n in range(1, 38):
-        if 37 - n < 6:
+    for number in geometry.values:
+        if geometry.value_max - number < geometry.positions - 1:
             continue
+        index = number - geometry.value_min
         score = (
-            candidate_weight * candidate_scores[n - 1] + position_weight * position_scores[0, n - 1]
+            candidate_weight * candidate_scores[index] + position_weight * position_scores[0, index]
         )
-        states[n] = [(float(score), (n,))]
-    for pos in range(1, 7):
+        states[number] = [(float(score), (number,))]
+    for position in range(1, geometry.positions):
         new_states: dict[int, list[tuple[float, tuple[int, ...]]]] = {}
-        for n in range(pos + 1, 38):
-            if 37 - n < 6 - pos:
+        minimum_number = geometry.value_min + position
+        for number in range(minimum_number, geometry.value_max + 1):
+            if geometry.value_max - number < geometry.positions - 1 - position:
                 continue
             candidates: list[tuple[float, tuple[int, ...]]] = []
+            index = number - geometry.value_min
             add = (
-                candidate_weight * candidate_scores[n - 1]
-                + position_weight * position_scores[pos, n - 1]
+                candidate_weight * candidate_scores[index]
+                + position_weight * position_scores[position, index]
             )
-            for prev, paths in states.items():
-                if prev >= n:
+            for previous, paths in states.items():
+                if previous >= number:
                     continue
-                candidates.extend((score + float(add), path + (n,)) for score, path in paths)
+                candidates.extend((score + float(add), path + (number,)) for score, path in paths)
             if candidates:
-                candidates.sort(key=lambda x: (-x[0], x[1]))
-                new_states[n] = candidates[:top_k]
+                candidates.sort(key=lambda item: (-item[0], item[1]))
+                new_states[number] = candidates[:top_k]
         states = new_states
     all_paths = [item for paths in states.values() for item in paths]
     rescored: list[tuple[float, tuple[int, ...]]] = []
     for score, path in all_paths:
         if cooccurrence is not None and cooccurrence_weight:
             pair_score = sum(
-                float(cooccurrence[a - 1, b - 1]) for i, a in enumerate(path) for b in path[i + 1 :]
+                float(
+                    cooccurrence[
+                        first - geometry.value_min,
+                        second - geometry.value_min,
+                    ]
+                )
+                for index, first in enumerate(path)
+                for second in path[index + 1 :]
             )
             score += cooccurrence_weight * pair_score
         rescored.append((score, path))
-    rescored.sort(key=lambda x: (-x[0], x[1]))
+    rescored.sort(key=lambda item: (-item[0], item[1]))
     return [
         DecodedCombination(numbers=list(path), score=float(score))
         for score, path in rescored[:top_k]
