@@ -155,7 +155,7 @@ jobs:
         if: ${{ inputs.suite == 'full' }}
         run: |
           set -Eeuo pipefail
-          uv run --frozen pytest -q \
+          uv run --frozen python -m pytest -q \
             2>&1 | tee "$EVIDENCE_DIR/pytest-full.log"
 
       - name: Verify tracked files stayed clean

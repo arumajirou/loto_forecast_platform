@@ -70,7 +70,7 @@ where = ["src"]
 # directories do not collide in sys.modules during collection.
 addopts = "--import-mode=importlib -q"
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = [".", "src"]
 
 [tool.ruff]
 line-length = 100
@@ -78,6 +78,9 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["mlflow"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/loto/api/app.py" = ["B008", "E501"]
