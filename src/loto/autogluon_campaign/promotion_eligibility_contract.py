@@ -8,8 +8,10 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from loto.autogluon_campaign.holdout_prospective import HoldoutProspectiveError
+from loto.evaluation.theory_guard import TheoryAwareThreshold, ThresholdSemantics
 
 PROMOTION_SCHEMA = "autogluon-promotion-eligibility-v1"
+PROMOTION_SCHEMA_V2 = "autogluon-promotion-eligibility-v2"
 REQUIRED_BASELINES = (
     "baseline_random",
     "baseline_fixed",
@@ -26,6 +28,13 @@ class PromotionEligibilityError(HoldoutProspectiveError):
 
 
 class PromotionPolicy(BaseModel):
+    """Historical v1 policy.
+
+    The absolute ``0.90`` default is preserved for compatibility with existing evidence. New
+    result-affecting configuration should use :class:`PromotionPolicyV2`, which makes IID-null
+    semantics explicit and fails closed on an unexplained above-null target.
+    """
+
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     minimum_prospective_windows: int = Field(default=3, ge=1)
@@ -48,6 +57,44 @@ class PromotionPolicy(BaseModel):
         if self.registry_write_allowed:
             raise ValueError("registry writes are forbidden")
         return self
+
+
+class PromotionPolicyV2(PromotionPolicy):
+    """Theory-aware promotion policy for new evidence.
+
+    The default target is a zero *excess* over the exact IID-null Hit@±tau reference, not an
+    unexplained absolute 0.90 threshold. Promotion remains manual and still requires the other
+    prospective/baseline stability evidence enforced by the surrounding contract.
+    """
+
+    game: str
+    tau: int = Field(default=1, ge=0)
+    hit_at_1_target: float = Field(default=0.0, ge=-1.0, le=1.0)
+    hit_at_1_target_semantics: ThresholdSemantics = ThresholdSemantics.EXCESS_VS_IID_NULL
+    allow_above_null_ceiling: bool = False
+    alternative_hypothesis: str | None = None
+
+    @model_validator(mode="after")
+    def validate_theory_target(self) -> PromotionPolicyV2:
+        TheoryAwareThreshold(
+            game=self.game,
+            tau=self.tau,
+            semantics=self.hit_at_1_target_semantics,
+            target=self.hit_at_1_target,
+            allow_above_null_ceiling=self.allow_above_null_ceiling,
+            alternative_hypothesis=self.alternative_hypothesis,
+        )
+        return self
+
+    def theory_assessment(self) -> dict[str, object]:
+        return TheoryAwareThreshold(
+            game=self.game,
+            tau=self.tau,
+            semantics=self.hit_at_1_target_semantics,
+            target=self.hit_at_1_target,
+            allow_above_null_ceiling=self.allow_above_null_ceiling,
+            alternative_hypothesis=self.alternative_hypothesis,
+        ).assessment()
 
 
 def require_finite_metric(value: Any, name: str) -> float:
