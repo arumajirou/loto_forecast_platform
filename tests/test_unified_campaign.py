@@ -121,6 +121,32 @@ def test_non_standalone_reconciliation_is_retained_in_matrix(tmp_path: Path) -> 
     assert summary["observed_model_game_pairs"] == 1
 
 
+def test_loto3_campaign_plan_only_is_wired(capsys: pytest.CaptureFixture[str]) -> None:
+    from loto.cli_v3 import build_parser
+
+    args = build_parser().parse_args(
+        [
+            "campaign",
+            "--output",
+            "unused",
+            "--games",
+            "numbers3",
+            "--models",
+            "logistic",
+            "--seeds",
+            "1",
+            "--git-commit",
+            "1" * 40,
+            "--plan-only",
+        ]
+    )
+    assert args.func(args) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == "PLANNED"
+    assert payload["model_game_pairs"] == 1
+    assert payload["plan"][0]["candidate_id"] == "logistic"
+
+
 def test_output_directory_is_immutable(tmp_path: Path) -> None:
     config = _config(
         tmp_path,
