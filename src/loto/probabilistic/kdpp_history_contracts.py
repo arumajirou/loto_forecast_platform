@@ -4,6 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from loto.game.geometry import geometry_for
 from loto.probabilistic.kdpp_certification_gate import (
     MODEL_ID,
     SCHEMA_VERSION,
@@ -22,13 +23,22 @@ RAW_SOURCE_FILES = {
     "history_approval.json",
     "HISTORY_HANDOFF.json",
 }
+_GAME_IDS = ("numbers3", "numbers4", "miniloto", "loto6", "loto7")
+_CANONICAL_GAME_IDS = {"miniloto": "mini"}
+
+
+def _game_spec(game_id: str) -> tuple[int, int, int, bool]:
+    geometry = geometry_for(_CANONICAL_GAME_IDS.get(game_id, game_id))
+    return (
+        geometry.positions,
+        geometry.value_min,
+        geometry.value_max,
+        geometry.ascending,
+    )
+
 
 _GAME_SPECS: dict[str, tuple[int, int, int, bool]] = {
-    "numbers3": (3, 0, 9, False),
-    "numbers4": (4, 0, 9, False),
-    "miniloto": (5, 1, 31, True),
-    "loto6": (6, 1, 43, True),
-    "loto7": (7, 1, 37, True),
+    game_id: _game_spec(game_id) for game_id in _GAME_IDS
 }
 
 
