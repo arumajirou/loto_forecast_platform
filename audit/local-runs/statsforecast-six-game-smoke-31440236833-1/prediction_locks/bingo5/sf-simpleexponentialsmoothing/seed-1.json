@@ -1,0 +1,1 @@
+{"actuals_known":false,"candidate_id":"sf-simpleexponentialsmoothing","game":"bingo5","predictions":[{"draw_index":431,"draw_no":432,"fold_id":"fold-01","prediction":[3,7,12,19,23,28,34,38]}],"protocol_hash":"928ecee247745ca5148157558ac0324cc83ec0cd5158852e4468b28ab4d3ec17","schema_version":"prediction-lock-v1","sealed_at_utc":"2026-08-10T22:56:10.893567+00:00","seed":1}

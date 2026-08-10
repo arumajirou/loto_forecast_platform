@@ -1,0 +1,1 @@
+{"actuals_known":false,"candidate_id":"sf-ucm","game":"mini","predictions":[{"draw_index":1347,"draw_no":1348,"fold_id":"fold-01","prediction":[5,11,16,21,27]}],"protocol_hash":"3b1c695b18246b3e5af4dd907ed5156922183fe08b81177495156b0cfe9dd00c","schema_version":"prediction-lock-v1","sealed_at_utc":"2026-08-10T22:57:18.403848+00:00","seed":1}

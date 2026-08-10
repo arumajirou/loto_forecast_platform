@@ -1,0 +1,1 @@
+{"actuals_known":false,"candidate_id":"sf-mfles","game":"numbers4","predictions":[{"draw_index":6994,"draw_no":6995,"fold_id":"fold-01","prediction":[6,5,4,3]}],"protocol_hash":"b94042c237d2ad906a3b70d7641e2827dfdc0ea7baa738fc5d11c5f6b0e6c022","schema_version":"prediction-lock-v1","sealed_at_utc":"2026-08-10T23:00:27.850069+00:00","seed":1}
