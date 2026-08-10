@@ -210,6 +210,4 @@ def test_reviewed_geometry_literal_debt_inventory_is_explicit() -> None:
         reason for entries in _REVIEWED_LITERAL_PATTERNS.values() for _, _, reason in entries
     ]
     assert reasons
-    assert all(
-        "migrate separately" in reason or "not geometry" in reason for reason in reasons
-    )
+    assert all("migrate separately" in reason or "not geometry" in reason for reason in reasons)
