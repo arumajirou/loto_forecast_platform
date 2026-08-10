@@ -36,6 +36,8 @@ class PowerPlan(BaseModel):
     def validate_tail(self) -> PowerPlan:
         if self.alternative != "candidate_minus_reference_gt_zero":
             raise ValueError("only the pre-specified one-sided positive alternative is supported")
+        if self.target_power <= self.adjusted_alpha:
+            raise ValueError("target_power must be greater than adjusted_alpha")
         return self
 
 
