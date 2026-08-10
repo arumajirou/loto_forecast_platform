@@ -20,6 +20,8 @@ HOLDOUT_OPENED=false
 PROSPECTIVE_OPENED=false
 ```
 
+`LAST_CODE_BEARING_PR_HEAD`はドキュメント改定前のコード実装identityです。**現在のPR headはドキュメントcommitで進むため、formal protocol fixation直前にGitHubからlive re-fetchしてください。READMEに固定されたheadを最終実行identityとして流用してはいけません。**
+
 現在のnative Windows self-hosted GitHub Actions runnerは次の状態まで検証済みです。
 
 ```text
@@ -136,6 +138,7 @@ SQLiteまたはPostgreSQLのテーブルを読み込み、Numbers4の`d1`～`d4`
 
 未完了または未認定:
 
+- final documentation headに対するCI再確認
 - Windows上でのfinal `EvaluationProtocolV2`再固定
 - frozen development snapshotのWindows側存在確認とSHA-256再検証
 - Windows resource/package identityのformal protocolへの固定
