@@ -53,7 +53,8 @@ class PowerResult(BaseModel):
     minimum_detectable_effect: float | None = None
     required_draws: int | None = None
     assumptions: tuple[str, ...] = (
-        "per-draw paired score differences are independent enough for planning-scale normal approximation",
+        "per-draw paired score differences are independent enough for "
+        "planning-scale normal approximation",
         "score_sd is fixed before the target evaluation window",
         "this result is planning evidence, not a realized p-value or promotion decision",
     )
