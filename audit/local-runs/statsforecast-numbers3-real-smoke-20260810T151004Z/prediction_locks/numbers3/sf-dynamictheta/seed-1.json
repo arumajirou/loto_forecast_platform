@@ -1,0 +1,1 @@
+{"actuals_known":false,"candidate_id":"sf-dynamictheta","game":"numbers3","predictions":[{"draw_index":6994,"draw_no":6995,"fold_id":"fold-01","prediction":[4,6,5]}],"protocol_hash":"b4a7b6367e8b47983433c3b835cdfec44a1a5e89ce441c293c75b832025a7f90","schema_version":"prediction-lock-v1","sealed_at_utc":"2026-08-10T15:11:29.823333+00:00","seed":1}

@@ -1,0 +1,267 @@
+{
+  "artifact_count": 52,
+  "artifacts": [
+    {
+      "path": "STATSFORECAST_LANE_MATRIX.json",
+      "sha256": "c3a5fe6b8625590a658ea54538f9a428530188e53a8c272ed5fa25347793fd17",
+      "size_bytes": 6958
+    },
+    {
+      "path": "STATSFORECAST_REAL_GAME_SUMMARY.json",
+      "sha256": "2b5243b7622257bda67f63b636d65047bbb0bf245969cbeacf7287f7cb736b77",
+      "size_bytes": 642
+    },
+    {
+      "path": "all_game_macro_summary.csv",
+      "sha256": "d852da9bed2e433a53fb2702a72cd94d34b0969df20acfa4bd466c52e34405f1",
+      "size_bytes": 3374
+    },
+    {
+      "path": "campaign_summary.json",
+      "sha256": "49f10ffbe92bae1abc340fe8485c50bb3c4e97d63f82a24ea7af8d3eeafb40d6",
+      "size_bytes": 129315
+    },
+    {
+      "path": "model_game_results.csv",
+      "sha256": "1faee1c6febc3a8b151ab7d7ce0d432035df3658498f60c468e8bd1032515a2d",
+      "size_bytes": 15806
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:fixed/seed-1.json",
+      "sha256": "ab6d8f4c8d098bca3ad6c273deeb96bb9b2e71a4aa8ed3cabd2334a9cd3de125",
+      "size_bytes": 347
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:frequency/seed-1.json",
+      "sha256": "2979ae170d827f117347e7baff9726c3c9e78d1d9eccbf49155c4a5f7cc056aa",
+      "size_bytes": 351
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:last/seed-1.json",
+      "sha256": "dd86a3f6269263501fb278bb057d10c229e9abd266c267eb408f93bdb8c1fdf1",
+      "size_bytes": 346
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:mean/seed-1.json",
+      "sha256": "bbd8a25bdb87e17e309b6ac51f26b1b73583007cb622fbbea1cf994cc7e09e32",
+      "size_bytes": 346
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:median/seed-1.json",
+      "sha256": "89af8ee53164f04d8ced7ade95eed5ec92553b1748be841f45c4993c103f2ffd",
+      "size_bytes": 348
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:random/seed-1.json",
+      "sha256": "63e7b2512808ea49cdd411fb653544f0f5a5e5042d313acde6b4ea0563e6c798",
+      "size_bytes": 348
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:statistical_ar1/seed-1.json",
+      "sha256": "68cafb2361d158784247fff3d30a7a0a3c5530ccce0c4152a97ae18ba6aededc",
+      "size_bytes": 357
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-adida/seed-1.json",
+      "sha256": "f081250dacbba5b1d62cd154f80d873a6aa33add210c60fe8577d3e8d45815c4",
+      "size_bytes": 341
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-arch/seed-1.json",
+      "sha256": "3ac49cec81c92175037ea26aafb33edf56a39519f863eeae1cc1c024c2ae7910",
+      "size_bytes": 340
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-arima/seed-1.json",
+      "sha256": "9d20e296f84951b0eea06ba0f7883f6a00331f1121bd22fc4755793694703ae3",
+      "size_bytes": 341
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autoarima/seed-1.json",
+      "sha256": "c452b5ee782a17d70a2f7e035a3fd26865c3a25c2d55ba5d7ee3fdfbd37a485a",
+      "size_bytes": 345
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autoces/seed-1.json",
+      "sha256": "5b5b96a8f2da6a8d65e4c8d40ebc0b46c7dd6e0acc7a2d381a235108c5fea960",
+      "size_bytes": 343
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autoets/seed-1.json",
+      "sha256": "06d067a875e91bca4921d29f69f58208f4845f43db1442d4a3d247a40251b566",
+      "size_bytes": 343
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-automfles/seed-1.json",
+      "sha256": "ca24e7caaca0814f64fd2cda65432f9a62d36a6df976f2cfa24a003783287ab1",
+      "size_bytes": 345
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autoregressive/seed-1.json",
+      "sha256": "ec7dd17b700a65385ad74735c17693f8a871d7b3ac754586b5ebed0da8bffff5",
+      "size_bytes": 350
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autotbats/seed-1.json",
+      "sha256": "6d27e59896f6eee0802036908971ea3bd5d73dc76746d578cf283c2f9c837733",
+      "size_bytes": 345
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autotheta/seed-1.json",
+      "sha256": "36816d7b422fd92488a1c85590c0cd930aa8a9f498e2ffdcdfc4159162272951",
+      "size_bytes": 345
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "7fa6f18348a119226df7a8b2c03e6d9a4599f380f52aaa8c4650f2ced787a028",
+      "size_bytes": 357
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-constantmodel/seed-1.json",
+      "sha256": "a0637f60b0f26645d8e05db925af83c1dd6665ec19a0215f5aa73ec515778a75",
+      "size_bytes": 349
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-crostonclassic/seed-1.json",
+      "sha256": "17b221dc17545e4c377bb18b09d74fea78a64d83784b7148f768afa98c7f208d",
+      "size_bytes": 350
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-crostonoptimized/seed-1.json",
+      "sha256": "2cbcf544a9fb57550d5de77a6561b6db397c5392991c4bd37645733bc0ed72c5",
+      "size_bytes": 352
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-crostonsba/seed-1.json",
+      "sha256": "f47d202e409c9eb615bb239d3eec4346884514cbec3d68a0a2e9906d275d357b",
+      "size_bytes": 346
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "9c804f81ac3e19209f60d77fa361e95e23ef207c959fd9f071521d563c6cc26a",
+      "size_bytes": 357
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-dynamictheta/seed-1.json",
+      "sha256": "7ebae584379d05c7547d367ac46ae76ad55144028bd0c3d6dd3e614cd49a5a25",
+      "size_bytes": 348
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-garch/seed-1.json",
+      "sha256": "960c3694bad3583dff35a0a28279d2e5e4085eafd17d8faf10f147222caa113a",
+      "size_bytes": 341
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-historicaverage/seed-1.json",
+      "sha256": "a3ed4b34e518745c2f7061d55812cdcdf7b6514a23da57ae5b03f4c939ae25e3",
+      "size_bytes": 351
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-holt/seed-1.json",
+      "sha256": "a370f48e5d1547b18c147cebf9bd598d4e35d7df14518c6fc7dd95e28439c4c9",
+      "size_bytes": 340
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-holtwinters/seed-1.json",
+      "sha256": "2c2867d083309d79d74b6296fc53563be5e7274e7d0003d11ab3007a237573b6",
+      "size_bytes": 347
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-imapa/seed-1.json",
+      "sha256": "28ad4b16ce1fedba4e03510620ee22ce22c797a20ebdbfbbb8a966b158e856b6",
+      "size_bytes": 341
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-mfles/seed-1.json",
+      "sha256": "d2771b144515a7ba5d7694f4e2460cca4ca258145af01754d363473727e1378a",
+      "size_bytes": 341
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-mstl/seed-1.json",
+      "sha256": "4e71af9337f45f6232a726f82ca7c93bfcd9319ad89d66c0940e11c1d44f5195",
+      "size_bytes": 340
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-naive/seed-1.json",
+      "sha256": "bbc50ca70eac52b48b9f255befeaf95e47c9a6bafa141e4d974732a0c48e877d",
+      "size_bytes": 341
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-optimizedtheta/seed-1.json",
+      "sha256": "667e5e8f97998cdee4f43c07aba05337a77d8f5d2d4919881c6c77f8207cf769",
+      "size_bytes": 350
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "c836f0d6ba137d783a20715c02b50d123d11787e31f1a5e6f7f8cd59a79dd3de",
+      "size_bytes": 355
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "b07950bf8717fcd96ec7926cf81d7ceb1895486d0ffe3f9ac345e591df9c11ac",
+      "size_bytes": 364
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "0ed3911d0f05c4ee96a4c890d271482c4b4192889e17219318088c15addfcf9c",
+      "size_bytes": 373
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-seasonalnaive/seed-1.json",
+      "sha256": "d386dde8603f0f70f226f507c2b4ca3926d47180fd59bb473db2306a3f44fb39",
+      "size_bytes": 349
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "e7b72e91e2ce79e0c1a1e1c79f781f03c01341cb17aa2ce57f4cd4c6c814d1d0",
+      "size_bytes": 357
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "3c3816f1b8044351f084af10d438a701ab8743a5f8921cebf0f036af22f14dec",
+      "size_bytes": 362
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "46b1aeb5af417f34ea654032ab89cdfac4c985f9c17575ee45b9615612358b7a",
+      "size_bytes": 371
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-tbats/seed-1.json",
+      "sha256": "c1a78fcdd3cfde7a1e3f87e9d4c54f2e5908a59f44aedd283ed7ee91100e305c",
+      "size_bytes": 341
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-theta/seed-1.json",
+      "sha256": "466535b905263a80954bc847777d875edabfe7c1eb93d751fc9d8f99b263504f",
+      "size_bytes": 341
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-tsb/seed-1.json",
+      "sha256": "e1fe5055116e343fbbbc32540f10f930882e51d8ea61715db9f72363d8ad1d88",
+      "size_bytes": 339
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-ucm/seed-1.json",
+      "sha256": "18de799e90bacbe33f43d1afcefe06ed69fd92ebd0215aa72ac1a0e18ecd52bd",
+      "size_bytes": 339
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-windowaverage/seed-1.json",
+      "sha256": "04dfd82bd3e5052e0a8d6bf2ad54f8a7add0933d24299ff68f9e522c2c76752e",
+      "size_bytes": 349
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-zeromodel/seed-1.json",
+      "sha256": "38ff7806a92ad0795488b6488eb57bd6d57c81536b7e8047576c8143e07a94bb",
+      "size_bytes": 345
+    },
+    {
+      "path": "protocols/numbers3.json",
+      "sha256": "93bb513d0aa4a2cab4f82799661e9233542570908a44ae1fff9334378e06a690",
+      "size_bytes": 2137
+    }
+  ],
+  "created_at_utc": "2026-08-10T15:11:33.985298+00:00",
+  "schema_version": 1
+}
