@@ -53,8 +53,7 @@ def evaluate_outcomes(
         or actual_array.shape[1] != expected_width
     ):
         raise ValueError(
-            "actual and predicted must have shape "
-            f"(n,{expected_width}) for game={resolved.key!r}"
+            f"actual and predicted must have shape (n,{expected_width}) for game={resolved.key!r}"
         )
     for row in actual_array:
         resolved.validate_outcome(row.tolist())
