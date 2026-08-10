@@ -10,6 +10,7 @@ import pytest
 from loto.evaluation.metric_registry import REQUIRED_BASELINE_IDS, REQUIRED_POINT_METRICS
 from loto.evaluation.unified_campaign import (
     UnifiedCampaignConfig,
+    _decode_candidate_probability_matrix,
     build_campaign_plan,
     run_unified_campaign,
 )
@@ -89,7 +90,41 @@ def test_baseline_only_campaign_runs_every_required_metric_and_seal(
             payload = json.loads(lock.read_text(encoding="utf-8"))
             assert payload["actuals_known"] is False
             assert payload["predictions"]
+            metadata = seed_result["runtime_samples"][0]["metadata"]
+            assert metadata["decoder_id"].startswith("baseline-")
+            assert metadata["distribution_source"] == "baseline_native"
     assert (output / "SHA256SUMS").is_file()
+
+
+def test_probability_matrix_routing_uses_family_specific_within_tau_decoders() -> None:
+    digit_geometry = geometry_for("numbers3")
+    digit_row = np.asarray([0.01, 0.01, 0.01, 0.24, 0.20, 0.23, 0.01, 0.01, 0.01, 0.27])
+    digit_matrix = np.vstack([digit_row, digit_row, digit_row])
+    digit_prediction, digit_metadata = _decode_candidate_probability_matrix(
+        digit_matrix,
+        digit_geometry,
+        tau=1,
+    )
+    assert digit_prediction.tolist() == [4, 4, 4]
+    assert digit_metadata == {
+        "distribution_source": "slot_binary_candidate_probabilities",
+        "distribution_adapter_id": "row-normalized-slot-binary-probability-v1",
+        "decoder_id": "within-tau-independent-slot-v1",
+        "decoder_objective": "within_tau",
+        "tau": 1,
+    }
+
+    select_geometry = geometry_for("mini")
+    select_matrix = np.ones((select_geometry.positions, select_geometry.universe_size), dtype=float)
+    select_prediction, select_metadata = _decode_candidate_probability_matrix(
+        select_matrix,
+        select_geometry,
+        tau=1,
+    )
+    select_geometry.validate_outcome(select_prediction.tolist())
+    assert select_metadata["decoder_id"] == "within-tau-constrained-dp-v1"
+    assert select_metadata["distribution_adapter_id"] == "row-normalized-slot-binary-probability-v1"
+    assert select_metadata["decoder_objective"] == "within_tau"
 
 
 def test_candidate_bridge_executes_logistic_for_digit_and_select_games(tmp_path: Path) -> None:
@@ -105,6 +140,17 @@ def test_candidate_bridge_executes_logistic_for_digit_and_select_games(tmp_path:
     assert len(rows) == 2
     assert all(row["status"] == "SUCCEEDED" for row in rows)
     assert all(row["seed_summary"]["hit_at_1"]["count"] == 1 for row in rows)
+
+    by_game = {row["game"]: row for row in rows}
+    digit_metadata = by_game["numbers3"]["seed_results"][0]["runtime_samples"][0]["metadata"]
+    select_metadata = by_game["loto7"]["seed_results"][0]["runtime_samples"][0]["metadata"]
+    assert digit_metadata["decoder_id"] == "within-tau-independent-slot-v1"
+    assert select_metadata["decoder_id"] == "within-tau-constrained-dp-v1"
+    for metadata in (digit_metadata, select_metadata):
+        assert metadata["distribution_source"] == "slot_binary_candidate_probabilities"
+        assert metadata["distribution_adapter_id"] == "row-normalized-slot-binary-probability-v1"
+        assert metadata["decoder_objective"] == "within_tau"
+        assert metadata["tau"] == 1
 
 
 def test_non_standalone_reconciliation_is_retained_in_matrix(tmp_path: Path) -> None:
