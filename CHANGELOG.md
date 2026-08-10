@@ -16,7 +16,11 @@ this file; release headings are historical records.
 - Updated FastAPI to `>=0.141.1,<0.142` with a refreshed lock through PR #243 after exact-head Linux and native Windows verification.
 - Updated the routine dependency group through PR #241: Uvicorn 0.52.1 lane, MLflow 3.15.1 lane, Hypothesis 6.165.2 lane, Ruff 0.16.1 lane, and GluonTS 0.17.0 lane, with a refreshed universal lock.
 - Routed probability-bearing unified-campaign candidate estimators through family-specific Hit@±1/WITHIN_TAU decoding in PR #250 while keeping point-only workers point-only and recording explicit decoder/distribution identities.
-- Refreshed current repository status, handoff, verification, runbook and documentation authority guidance after the merge batch.
+- Generalized legacy outcome metrics across all six canonical game geometries in PR #252, including exact positional hit semantics for Numbers3/Numbers4 and a narrower reviewed geometry-literal exception inventory.
+- Added theory-aware Hit@±1 promotion semantics in PR #253 while preserving historical v1 policy evidence, binding v2 evidence to sealed game identity, and keeping promotion/retraining/registry writes manual-only.
+- Added pre-experiment paired-score power/MDE planning in PR #254 with Bonferroni planning alpha, fail-closed input validation, and explicit normal-approximation method identity.
+- Rewrote the root README around executable capabilities, concrete library/model families, shared versus isolated execution lanes, six-game campaign operation, runtime certification, theory-aware governance and MDE planning.
+- Refreshed current status, requirements, specification, architecture, test plan, execution matrix, handoff, verification, runbook and documentation authority guidance against the post-#254 functional code state.
 
 ### Added
 
@@ -27,3 +31,4 @@ this file; release headings are historical records.
 - Added the merged `uv run loto3 campaign` all-model × all-six-game development evaluation surface through PR #248, including fail-visible coverage rows, Hit@±1-first metrics, mandatory baselines, complete seed summaries and prediction sealing.
 - Added the explicit `MAP` / `WITHIN_TAU` constrained select-game decoder objective through PR #249 while preserving the historical MAP compatibility API.
 - Added `docs/CURRENT_HANDOFF.md`, `docs/CURRENT_VERIFICATION_REPORT.md`, `docs/CURRENT_RUNBOOK.md`, and `docs/CURRENT_MODEL_EXECUTION_ADDENDUM.md` as current-state entry points while retaining older reports as historical evidence.
+- Added `docs/CAPABILITIES_AND_OPERATIONS.md` as a code-grounded model/library/CLI/provider operations reference, including the 174-entry forecast inventory, separate 72-model probabilistic surface, execution-state taxonomy and scientific gate order.
