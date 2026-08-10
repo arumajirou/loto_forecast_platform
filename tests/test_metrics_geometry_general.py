@@ -33,6 +33,25 @@ def test_evaluate_outcomes_accepts_every_canonical_geometry(game: str) -> None:
     assert result["all_positions_within_tau_rate"] == pytest.approx(1.0)
 
 
+def test_digit_mean_hits_preserves_position_and_multiplicity() -> None:
+    actual = np.asarray([[1, 2, 3], [1, 1, 2]], dtype=int)
+    predicted = np.asarray([[3, 2, 1], [1, 2, 1]], dtype=int)
+
+    result = evaluate_outcomes(actual, predicted, "numbers3", tau=1)
+
+    # One exact-position match in each row. Set intersection would incorrectly report 3 and 2.
+    assert result["mean_hits"] == pytest.approx(1.0)
+
+
+def test_select_mean_hits_remains_set_overlap() -> None:
+    actual = np.asarray([[1, 2, 3, 4, 5]], dtype=int)
+    predicted = np.asarray([[2, 3, 4, 5, 6]], dtype=int)
+
+    result = evaluate_outcomes(actual, predicted, "mini", tau=1)
+
+    assert result["mean_hits"] == pytest.approx(4.0)
+
+
 def test_evaluate_outcomes_rejects_geometry_width_mismatch() -> None:
     actual = np.ones((2, 3), dtype=int)
     predicted = actual.copy()
