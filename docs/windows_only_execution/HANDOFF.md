@@ -8,7 +8,10 @@ pr=240
 branch=feat/timer-base-84m-oof-evaluation-v1
 state=open/draft
 last_code_bearing_head_before_docs=7795c413d295f445dbdcdf8d85894bf6c81db35a
+documentation_alignment_head_observed_during_update=66e7aa510d90b8ebca2f323dec62868d2cdb66b8
 ```
+
+This HANDOFF file is itself part of the documentation series, so the actual PR head can advance after the value above. **Always re-fetch the live PR head immediately before final protocol fixation.**
 
 ## Completed
 
@@ -49,7 +52,7 @@ promotion=false
 
 ## Next required work
 
-1. Re-fetch the final PR head after documentation commits.
+1. Re-fetch the final PR head after all documentation commits.
 2. Review applicable CI on that final head.
 3. Find or transfer the exact frozen development snapshot to Windows.
 4. Verify expected snapshot SHA-256 `99c6a9c7fc2c9ce5b5f1b8351841c5ead1aeb48f99e6846c289988af56896053`.
