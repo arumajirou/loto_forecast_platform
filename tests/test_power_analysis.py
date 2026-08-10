@@ -43,6 +43,16 @@ def test_power_plan_rejects_unsupported_two_sided_or_reverse_claims() -> None:
         PowerPlan(alternative="candidate_minus_reference_ne_zero")
 
 
+def test_power_plan_requires_target_power_above_adjusted_alpha() -> None:
+    with pytest.raises(ValidationError, match="greater than adjusted_alpha"):
+        PowerPlan(alpha=0.05, target_power=0.05, multiplicity=1)
+    with pytest.raises(ValidationError, match="greater than adjusted_alpha"):
+        PowerPlan(alpha=0.05, target_power=0.01, multiplicity=1)
+
+    valid = PowerPlan(alpha=0.05, target_power=0.01, multiplicity=10)
+    assert valid.adjusted_alpha == pytest.approx(0.005)
+
+
 def test_inputs_fail_closed() -> None:
     with pytest.raises(ValueError, match="effect"):
         required_paired_draws(0.0, 0.2)
