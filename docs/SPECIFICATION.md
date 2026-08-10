@@ -2,43 +2,63 @@
 
 ```text
 status_class: DESIGN_CONTRACT
-as_of: 2026-08-10T18:59+09:00
+as_of: 2026-08-10T20:23+09:00
 repository: arumajirou/loto_forecast_platform
-audited_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
 ```
 
 ## 1. Scope
 
-本仕様は現在の共通development evaluation、game geometry、model routing、decoder、prediction sealing、artifact出力の外部観測可能な契約を定義する。
+本仕様はcurrent development evaluation、game geometry、model routing、decoder、metrics、prediction sealing、theory-aware target、promotion eligibility、pre-experiment power planningの外部観測可能な契約を定義する。
 
-Formal Holdout、Prospective、production promotionの実行仕様はこのdocumentだけでは開放しない。
+Formal Holdout / Prospective / production bindingはこの仕様の存在だけでは開放しない。
 
 ## 2. Canonical games
 
-`known_games()` が返すcanonical gamesを対象とする。
+| game | family | positions | domain | legality |
+|---|---|---:|---|---|
+| `mini` | select | 5 | 1..31 | distinct + ascending |
+| `loto6` | select | 6 | 1..43 | distinct + ascending |
+| `loto7` | select | 7 | 1..37 | distinct + ascending |
+| `bingo5` | select | 8 | 1..40 | distinct + ascending |
+| `numbers3` | digits | 3 | 0..9 | ordered, repetition allowed |
+| `numbers4` | digits | 4 | 0..9 | ordered, repetition allowed |
 
-| game | family | positions | domain |
-|---|---|---:|---|
-| `mini` | select | 5 | 1..31 |
-| `loto6` | select | 6 | 1..43 |
-| `loto7` | select | 7 | 1..37 |
-| `bingo5` | select | 8 | 1..40 |
-| `numbers3` | digits | 3 | 0..9 |
-| `numbers4` | digits | 4 | 0..9 |
+`loto.game.geometry`を単一のgeometry authorityとする。
 
-Select outcomeはstrict ascending/distinct、digits outcomeはordered/repetition allowed。
+## 3. Model inventory surfaces
 
-## 3. CLI
+### Broad
 
-### 3.1 Plan only
+`loto.models.catalog_full.build_catalog()` / `uv run loto3 catalog`。
+
+Current inventory boundary: 174 entries。
+
+### Shared
+
+`loto.models.catalog.MODEL_SPECS` / `uv run loto models list`。
+
+Shared executionは`factory.py`、`workers.py`、`models/providers/**`へdispatchする。
+
+### Isolated
+
+`environments/**`、`*_campaign/**`、`adapters/**`、`scripts/run_*_provider.py`。
+
+Broad registrationはshared/provider runtime successを意味しない。
+
+### Probabilistic
+
+`loto3 probabilistic`は別の72-model probabilistic catalogを使う。
+
+## 4. Unified campaign CLI
+
+### Plan
 
 ```bash
 uv run loto3 campaign --output unused --plan-only
 ```
 
-要求されたbroad catalog × game pairを列挙し、model inferenceを実行しない。
-
-### 3.2 Development run
+### Real development run
 
 ```bash
 uv run loto3 campaign \
@@ -46,7 +66,7 @@ uv run loto3 campaign \
   --output /path/to/new-run-directory
 ```
 
-### 3.3 Synthetic smoke
+### Bounded smoke
 
 ```bash
 uv run loto3 campaign \
@@ -59,41 +79,37 @@ uv run loto3 campaign \
   --output /tmp/unified-campaign-smoke
 ```
 
-Compatibility script:
+## 5. Campaign configuration
 
-```bash
-uv run python scripts/run_unified_campaign.py ...
+Result-affecting fields include:
+
+```text
+games
+model_ids
+seeds
+folds
+test_size
+min_train_size
+holdout_size
+gap
+device
+precision
+max_trials
+parallel_trials
+max_steps
+wall_time_seconds
+gpu_count
+gpu_memory_bytes
+git_commit
 ```
 
-## 4. Configuration contract
+Current unified primary tolerance is tau=1.
 
-主要result-affecting fields:
+## 6. Matrix coverage
 
-- games
-- model IDs
-- seeds
-- folds
-- test size
-- minimum train size
-- holdout size
-- gap
-- device
-- precision
-- max trials
-- parallel trials
-- max steps
-- wall-time/resource budget
-- Git/code identity
+Every requested broad model × game pair receives exactly one result row.
 
-Primary tolerance `tau` はunified campaignでは1に固定する。
-
-## 5. Matrix coverage contract
-
-Default model inventoryは`catalog_full.build_catalog()`。
-
-各requested model × game pairは**exactly one** catalog result rowを持つ。
-
-許容terminal state例:
+Terminal states may include:
 
 ```text
 SUCCEEDED
@@ -105,52 +121,59 @@ UNSUPPORTED_GAME
 NON_STANDALONE_METHOD
 ```
 
-Failure/non-routeを行ごと削除してcoverageを良く見せてはならない。
+Coverage completeness and execution success are separate fields/interpretations.
 
-Mandatory baseline rowsはcatalog rowsとは別sourceとして保持する。
+## 7. Split contract
 
-## 6. Split contract
+Configured Holdout tail is excluded from development scoring.
 
-Input frameの最後のconfigured Holdout sliceはdevelopment executionから分離する。
-
-Development portionにchronological expanding rolling foldsを作る。
-
-各foldで:
+Development uses chronological expanding/rolling folds satisfying:
 
 ```text
-train indices < test indices
+max(train_indices) < min(test_indices)
 ```
 
-を満たす。
+Holdout and Prospective are not scored by the unified development campaign.
 
-Holdoutはunified campaignでscoringしない。Prospectiveもscoringしない。
+## 8. Metric contract
 
-## 7. Metric contract
-
-Primary metric:
+Primary:
 
 ```text
-hit_at_1
+Hit@±1
 ```
 
-Required point metrics:
+Required companion metrics:
 
 ```text
-hit_at_1
-position_hit_at_1
-all_positions_hit_at_1
-mae
-mse
-rmse
+position Hit@±1
+all-position Hit@±1
+MAE
+MSE
+RMSE
 ```
 
-Per-position詳細をseed resultへ保持する。
+`evaluate_outcomes()` semantics:
 
-Per-game leaderboardの優先順位はHit@±1-firstとする。
+### select
 
-## 8. Baseline contract
+```text
+mean_hits = size(set(actual) ∩ set(predicted))
+```
 
-必須baseline IDs:
+### digits
+
+```text
+mean_hits = count(actual[position] == predicted[position])
+```
+
+This prevents Numbers3/4 order/repetition loss.
+
+All families compute position absolute/squared errors, RMSE, within-tau rate and all-position within-tau rate after geometry legality validation.
+
+## 9. Baseline contract
+
+Required baseline IDs:
 
 ```text
 random
@@ -162,13 +185,13 @@ frequency
 statistical_ar1
 ```
 
-全baselineは対象testより前のhistoryだけを使う。
+Each prediction may use only history preceding its target.
 
-## 9. Seed contract
+## 10. Seed contract
 
-Configured seedはすべて実行・保存対象。
+Every configured seed is retained.
 
-Metric summaryは最低限:
+Minimum summaries:
 
 ```text
 count
@@ -181,80 +204,225 @@ worst_value
 worst_seed
 ```
 
-を含む。
+A candidate missing required seeds is not silently promoted as complete all-seed evidence.
 
-Missing seedがあるcandidateをfull all-seed successとして黙ってrankしない。
+## 11. Candidate routing
 
-## 10. Candidate feature/routing contract
+Shared candidate estimators receive target-free slot-conditioned candidate features.
 
-Candidate estimator routeはslot-conditioned candidate rowsを構築する。
-
-代表field:
-
-- draw identity
-- candidate value
-- slot index
-- candidate scaling
-- slot scaling
-- all-history frequency
-- recent-window frequency
-- gap since occurrence
-- training label
-
-Featureはtarget rowより前のhistoryのみから生成する。
-
-Supported candidate estimator familyはshared `RuntimeModel` contractへ適合させる。
-
-## 11. Position/foundation routing contract
-
-Compatible `ModelSpec`は`PositionSeriesWorker`へ渡す。
-
-`position_columns=geometry.column_names()`を明示し、Loto7固定列を暗黙前提にしない。
-
-Outputは対象geometryのpositions数と一致しfiniteでなければならない。
-
-## 12. Probability decoder contract
-
-Probability-bearing candidate routeはPR #250以降、family-specific WITHIN_TAU decodingを行う。
-
-Distribution identity:
+Probability-capable candidate estimators may emit binary candidate probabilities/scores that are transformed into the explicit bridge identity:
 
 ```text
 row-normalized-slot-binary-probability-v1
 ```
 
+The bridge is not described as a native categorical PMF.
+
+## 12. Position/foundation routing
+
+Compatible shared `ModelSpec` values use `PositionSeriesWorker`.
+
+`geometry.column_names()` must determine expected position columns. Output must be finite and match `geometry.positions`.
+
+Provider-specific runtime can instead use isolated execution contracts.
+
+## 13. Probability decoder
+
 ### Digits
 
-各position candidate probabilityに対し、±1 windowの期待massを最大化するpointを選ぶ。Digit orderを保持する。
+For each position, select the value maximizing expected probability mass within ±tau, preserving digit order.
 
 ### Select
 
-Position × candidate marginalから、strictly increasing legal tupleのexpected WITHIN_TAU utilityを最大化するconstrained decoderを使う。
+Given position × candidate probability/utility, find a legal strictly increasing distinct tuple maximizing the configured WITHIN_TAU utility using constrained dynamic programming.
 
-### Point-only worker
+### Point-only
 
-Probability matrixをfabricateしない。Point routeとしてlegalisationする。
+Do not fabricate a probability matrix. Apply only point-route legality/post-processing.
 
-Decoder objective / distribution identity / post-processing identityをruntime evidenceへ保持する。
+Persist decoder objective, distribution identity and post-processing identity.
 
-## 13. Prediction sealing contract
+## 14. Prediction sealing
 
-各seed評価は次の順序を守る。
+For every evaluated seed:
 
 ```text
 predict
--> serialize prediction evidence (actuals_known=false)
+-> serialize prediction evidence with actuals_known=false
 -> durable write/fsync
 -> SHA-256
--> only then read matching target actuals
+-> read corresponding target actual
 -> score
 ```
 
-既存output directory再利用はfailする。
+Existing output directory reuse must fail.
 
-## 14. Artifact contract
+## 15. Theory threshold schema
 
-Completed runは最低限次を含む。
+`TheoryAwareThreshold` fields:
+
+```text
+game
+tau
+semantics = absolute | excess_vs_iid_null
+target
+allow_above_null_ceiling
+alternative_hypothesis
+```
+
+`assessment()` returns at least:
+
+```text
+game
+tau
+semantics
+target
+iid_null_ceiling
+implied_absolute_target
+status
+alternative_hypothesis
+interpretation
+```
+
+Validation:
+
+- unknown game -> reject;
+- implied absolute target outside [0,1] -> reject;
+- absolute target above null ceiling without approved declaration -> reject;
+- `allow_above_null_ceiling=true` without non-empty alternative hypothesis -> reject.
+
+The reference is exact under the stated IID-null model only.
+
+## 16. Promotion policy schemas
+
+### v1
+
+```text
+autogluon-promotion-eligibility-v1
+```
+
+Historical fixed absolute Hit@±1 target semantics are preserved for existing evidence.
+
+### v2
+
+```text
+autogluon-promotion-eligibility-v2
+```
+
+Adds:
+
+```text
+game
+tau = 1
+hit_at_1_target_semantics
+allow_above_null_ceiling
+alternative_hypothesis
+```
+
+For v2, evaluator:
+
+1. validates Holdout/Prospective evidence;
+2. requires `game_id` on every scored window;
+3. requires all evidence games equal policy game;
+4. computes `implied_absolute_target` from theory semantics;
+5. applies it to aggregate and worst-window Hit@±1 rules;
+6. evaluates Holdout→Prospective hit drop and MAE increase;
+7. compares selected candidate against every mandatory baseline.
+
+Possible automated decisions:
+
+```text
+ELIGIBLE_FOR_HUMAN_APPROVAL
+NOT_ELIGIBLE
+```
+
+Never automatic promotion.
+
+## 17. Promotion safety flags
+
+Promotion decision artifact must retain:
+
+```text
+human_approval_required=true
+human_approval_granted=false
+automatic_promotion=false
+automatic_retraining=false
+registry_write_allowed=false
+promotion_status=NOT_PROMOTED
+```
+
+A later explicit human approval operation is a separate state transition.
+
+## 18. Power planning contract
+
+Method identity:
+
+```text
+paired-score-normal-approximation-v1
+```
+
+`PowerPlan` fields:
+
+```text
+alpha in (0,1)
+target_power in (0,1)
+multiplicity >= 1
+alternative = candidate_minus_reference_gt_zero
+```
+
+Derived:
+
+```text
+adjusted_alpha = alpha / multiplicity
+```
+
+Validation requires:
+
+```text
+target_power > adjusted_alpha
+```
+
+APIs:
+
+```text
+required_paired_draws(effect, score_sd, plan)
+minimum_detectable_effect(n_draws, score_sd, plan)
+power_curve(draw_counts, score_sd, plan)
+```
+
+Input rules:
+
+- effect finite and >0;
+- score_sd finite and >0;
+- n_draws positive integer, bool rejected;
+- power-curve counts non-empty, unique, sorted positive integers.
+
+The result explicitly carries method, alpha, adjusted alpha, target power, multiplicity and score SD. This is planning evidence only.
+
+## 19. Runtime evidence
+
+A successful campaign result row is not by itself a provider certification artifact.
+
+Formal runtime certification should capture applicable:
+
+```text
+model/repo/revision
+artifact hashes
+runtime/package lock
+load
+input
+inference
+shape/finite checks
+requested/effective device
+GPU PID/VRAM
+CPU fallback
+save/reload
+cleanup
+```
+
+## 20. Artifacts
+
+Unified campaign minimum outputs:
 
 ```text
 campaign_summary.json
@@ -265,30 +433,34 @@ prediction_locks/<game>/<candidate>/seed-<seed>.json
 SHA256SUMS
 ```
 
-Cross-game macro summaryはrequested全gameで成功したcandidateだけを対象にする。
+Cross-game summary should include only candidates meeting its requested-game success contract; missing/failed game rows remain available in the detailed matrix.
 
-## 15. Runtime evidence contract
+## 21. Error semantics
 
-Actual model success rowは、routeが生成できたという事実だけでruntime certificationにならない。
+Expected unsupported cases become explicit terminal rows when coverage should continue.
 
-Provider/model certificationで必要な項目は別evidenceとしてload/input/inference/shape/finite/device/GPU/fallback/reload/hash identityを検証する。
+Protocol/data/output integrity errors fail closed.
 
-## 16. Error semantics
+Reject at minimum:
 
-Expected unsupported stateはterminal rowへ変換してcampaign全体のcoverageを保持する。
+- unknown game;
+- invalid geometry/domain;
+- duplicate or non-monotonic identity;
+- non-finite required values;
+- prediction output shape mismatch;
+- invalid probability surfaces;
+- output directory reuse;
+- theory/promotion game mismatch;
+- invalid power planning inputs.
 
-Unexpected data/protocol/output-integrity failureはfail closedする。
+## 22. Non-claims
 
-Output directory reuse、unknown game、invalid domain、non-finite target、duplicate/non-monotonic draw identity等を受け入れない。
+Implementation of this specification does not prove:
 
-## 17. Non-claims
-
-この仕様が実装されていることは次を意味しない。
-
-- real-data full catalog campaign completed
-- all routes succeeded
-- OOF improvement established
-- Holdout evaluated
-- Prospective evaluated
-- champion selected
-- promotion approved
+- complete real-data 174 × 6 execution success;
+- all registered models are runtime-certified;
+- decoder real-data improvement;
+- non-IID lottery structure;
+- Holdout/Prospective completion;
+- champion selection;
+- production promotion.
