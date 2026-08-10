@@ -8,6 +8,7 @@ from loto.autogluon_campaign.promotion_eligibility_contract import (
     PromotionPolicyV2,
 )
 from loto.evaluation.theory_guard import TheoryAwareThreshold, ThresholdSemantics
+from loto.game.geometry import known_games
 
 
 def test_legacy_promotion_policy_keeps_historical_absolute_default() -> None:
@@ -23,6 +24,15 @@ def test_v2_defaults_to_null_relative_target() -> None:
     assert assessment["status"] == "VALID_NULL_RELATIVE"
     assert assessment["iid_null_ceiling"] == pytest.approx(0.3)
     assert assessment["implied_absolute_target"] == pytest.approx(0.3)
+
+
+@pytest.mark.parametrize("game", known_games())
+def test_v2_default_is_valid_for_every_canonical_game(game: str) -> None:
+    assessment = PromotionPolicyV2(game=game).theory_assessment()
+
+    assert assessment["status"] == "VALID_NULL_RELATIVE"
+    assert assessment["implied_absolute_target"] == pytest.approx(assessment["iid_null_ceiling"])
+    assert 0.0 <= float(assessment["implied_absolute_target"]) <= 1.0
 
 
 def test_unexplained_absolute_target_above_iid_null_ceiling_fails_closed() -> None:
