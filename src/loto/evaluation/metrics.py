@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import numpy as np
 
+from loto.game.geometry import GameGeometry, geometry_for
+
 
 def brier_score(targets: np.ndarray, probabilities: np.ndarray) -> float:
     y = np.asarray(targets, dtype=float)
@@ -32,20 +34,64 @@ def expected_calibration_error(
     return float(ece)
 
 
-def evaluate_draws(actual: np.ndarray, predicted: np.ndarray, tau: int = 1) -> dict[str, float]:
-    actual = np.asarray(actual, dtype=int)
-    predicted = np.asarray(predicted, dtype=int)
-    if actual.shape != predicted.shape or actual.ndim != 2 or actual.shape[1] != 7:
-        raise ValueError("actual and predicted must have shape (n,7)")
+def evaluate_outcomes(
+    actual: np.ndarray,
+    predicted: np.ndarray,
+    geometry: GameGeometry | str,
+    tau: int = 1,
+) -> dict[str, float]:
+    """Geometry-general draw evaluation for every canonical game family."""
+    if tau < 0:
+        raise ValueError("tau must be >= 0")
+    resolved = geometry_for(geometry) if isinstance(geometry, str) else geometry
+    actual_array = np.asarray(actual, dtype=int)
+    predicted_array = np.asarray(predicted, dtype=int)
+    expected_width = resolved.positions
+    if (
+        actual_array.shape != predicted_array.shape
+        or actual_array.ndim != 2
+        or actual_array.shape[1] != expected_width
+    ):
+        raise ValueError(
+            "actual and predicted must have shape "
+            f"(n,{expected_width}) for game={resolved.key!r}"
+        )
+    for row in actual_array:
+        resolved.validate_outcome(row.tolist())
+    for row in predicted_array:
+        resolved.validate_outcome(row.tolist())
+
     hits = np.array(
-        [len(set(a) & set(p)) for a, p in zip(actual, predicted, strict=False)], dtype=float
+        [
+            len(set(actual_row) & set(predicted_row))
+            for actual_row, predicted_row in zip(
+                actual_array,
+                predicted_array,
+                strict=True,
+            )
+        ],
+        dtype=float,
     )
-    errors = np.abs(actual - predicted)
+    errors = np.abs(actual_array - predicted_array)
+    within = errors <= tau
     return {
-        "mean_hits_at_7": float(hits.mean()),
+        "mean_hits": float(hits.mean()),
         "position_mae": float(errors.mean()),
         "position_mse": float((errors**2).mean()),
-        "within_1_rate": float((errors <= tau).mean()),
+        "position_rmse": float(np.sqrt((errors**2).mean())),
+        "within_tau_rate": float(within.mean()),
+        "all_positions_within_tau_rate": float(within.all(axis=1).mean()),
+    }
+
+
+def evaluate_draws(actual: np.ndarray, predicted: np.ndarray, tau: int = 1) -> dict[str, float]:
+    """Backward-compatible Loto7 wrapper around :func:`evaluate_outcomes`."""
+    result = evaluate_outcomes(actual, predicted, geometry_for("loto7"), tau=tau)
+    return {
+        "mean_hits_at_7": result["mean_hits"],
+        "position_mae": result["position_mae"],
+        "position_mse": result["position_mse"],
+        "within_1_rate": result["within_tau_rate"],
     }
 
 
