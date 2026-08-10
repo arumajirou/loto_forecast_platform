@@ -20,7 +20,8 @@ def test_required_draws_and_mde_are_algebraic_inverses_up_to_ceiling() -> None:
 
     mde = minimum_detectable_effect(required.required_draws, 0.20, plan=plan)
     assert mde.minimum_detectable_effect is not None
-    assert mde.minimum_detectable_effect <= pytest.approx(0.02, abs=2e-4)
+    assert mde.minimum_detectable_effect <= 0.0202
+    assert mde.minimum_detectable_effect > 0.0
 
 
 def test_more_draws_reduce_minimum_detectable_effect() -> None:
