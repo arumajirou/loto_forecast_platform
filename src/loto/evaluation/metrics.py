@@ -40,7 +40,11 @@ def evaluate_outcomes(
     geometry: GameGeometry | str,
     tau: int = 1,
 ) -> dict[str, float]:
-    """Geometry-general draw evaluation for every canonical game family."""
+    """Geometry-general draw evaluation for every canonical game family.
+
+    ``mean_hits`` follows game semantics: select-family games use set overlap, while digit games
+    count exact positional matches so repeated digits and digit order are preserved.
+    """
     if tau < 0:
         raise ValueError("tau must be >= 0")
     resolved = geometry_for(geometry) if isinstance(geometry, str) else geometry
@@ -60,17 +64,20 @@ def evaluate_outcomes(
     for row in predicted_array:
         resolved.validate_outcome(row.tolist())
 
-    hits = np.array(
-        [
-            len(set(actual_row) & set(predicted_row))
-            for actual_row, predicted_row in zip(
-                actual_array,
-                predicted_array,
-                strict=True,
-            )
-        ],
-        dtype=float,
-    )
+    if resolved.family == "digits":
+        hits = np.sum(actual_array == predicted_array, axis=1, dtype=float)
+    else:
+        hits = np.array(
+            [
+                len(set(actual_row) & set(predicted_row))
+                for actual_row, predicted_row in zip(
+                    actual_array,
+                    predicted_array,
+                    strict=True,
+                )
+            ],
+            dtype=float,
+        )
     errors = np.abs(actual_array - predicted_array)
     within = errors <= tau
     return {
