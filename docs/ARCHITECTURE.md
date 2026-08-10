@@ -2,173 +2,250 @@
 
 ```text
 status_class: DESIGN_CONTRACT
-as_of: 2026-08-10T18:59+09:00
+as_of: 2026-08-10T20:23+09:00
 repository: arumajirou/loto_forecast_platform
-audited_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
 ```
 
-## 1. 設計目標
+## 1. Design goals
 
-本基盤は、予測精度だけでなく次を同時に満たすことを目的とする。
+- leakage-safe chronological evaluation;
+- Hit@±1-first scientific comparison;
+- six-game geometry without duplicated hard-codes;
+- broad inventory and executable routing separation;
+- shared and isolated provider coexistence;
+- runtime evidence separated from forecast-quality evidence;
+- fail-visible model × game coverage;
+- prediction-before-actual sealing;
+- theory-aware target semantics;
+- manual promotion governance;
+- pre-experiment power/MDE planning;
+- immutable evidence lineage.
 
-- leakage-safeな時系列評価
-- Hit@±1-firstの比較可能性
-- model/provider交換可能性
-- six-game geometryへの拡張性
-- runtime evidenceと科学 evidenceの分離
-- prediction-before-actual固定
-- fail-visibleな全model × game coverage
-- 再現可能なRun ID / hash / artifact lineage
-
-## 2. Canonical game geometry
-
-`src/loto/game/geometry.py` をgame shape/legalityの正本とする。
+## 2. Canonical geometry layer
 
 ```text
-mini      select / 5 positions / 1..31
-loto6     select / 6 positions / 1..43
-loto7     select / 7 positions / 1..37
-bingo5    select / 8 positions / 1..40
-numbers3  digits / 3 positions / 0..9
-numbers4  digits / 4 positions / 0..9
+src/loto/game/geometry.py
 ```
 
-Select familyはascending/distinct legalityを保持し、digit familyは位置順序と重複を保持する。
+```text
+mini      select / 5 / 1..31
+loto6     select / 6 / 1..43
+loto7     select / 7 / 1..37
+bingo5    select / 8 / 1..40
+numbers3  digits / 3 / 0..9
+numbers4  digits / 4 / 0..9
+```
 
-## 3. 主要コンポーネント
+Geometry exposes positions, universe, legality and derived outcome properties. Select and digit semantics are deliberately different.
+
+## 3. Major components
 
 ```text
 src/loto/
-├── game/                  canonical game geometry
-├── data/                  canonicalization / validation / dataset access
-├── features/              historical/as-of features
+├── game/
+│   └── geometry.py                game shape/legality authority
+├── data/                           acquisition/canonicalization/access
+├── features/                       as-of historical features
 ├── models/
-│   ├── catalog_full.py    broad generated inventory
-│   ├── catalog.py         shared executable ModelSpec catalog
-│   ├── factory.py         candidate RuntimeModel implementations
-│   ├── workers.py         position/foundation execution worker
-│   └── providers/         shared foundation/provider registry
+│   ├── catalog_full.py             broad 174-entry forecast inventory
+│   ├── catalog.py                  shared ModelSpec catalog
+│   ├── factory.py                  direct candidate estimators
+│   ├── workers.py                  position/foundation execution
+│   └── providers/                  shared foundation providers
 ├── evaluation/
-│   ├── protocol_v2.py     formal result-affecting protocol identity
-│   ├── metrics_general.py geometry-aware metrics
-│   ├── metric_registry.py mandatory metric/baseline registry
-│   ├── seed_summary.py    all-seed aggregation
-│   └── unified_campaign.py broad model × game development campaign
+│   ├── protocol_v2.py              result-affecting protocol identity
+│   ├── metrics.py                  geometry-general outcome metrics
+│   ├── metrics_general.py          campaign metric layer
+│   ├── theory_general.py           exact geometry-aware theory reference
+│   ├── theory_guard.py             theory-aware configured thresholds
+│   ├── power_analysis.py           paired-score MDE/power planning
+│   ├── seed_summary.py             all-seed aggregation
+│   └── unified_campaign.py         broad model × game development campaign
+├── decoding/                        hybrid/legacy geometry-aware decoding
 ├── probabilistic/
-│   └── decoder.py         MAP / WITHIN_TAU family-aware decoding
-├── orchestration/         older/specialized research orchestration
-├── registry/              experiment/release evidence registration
-├── observability/         runtime/resource monitoring
-├── api/                   FastAPI surfaces
-└── events/                structured event/log evidence
+│   ├── decoder.py                  MAP/WITHIN_TAU family-aware decoder
+│   ├── catalog.py                  separate 72-model probabilistic catalog
+│   └── ...                         runner/API/backends/native implementations
+├── autogluon_campaign/
+│   └── promotion_eligibility*      v1/v2 promotion evidence and rules
+├── *_campaign/                      isolated library/provider lanes
+├── orchestration/                   research and trusted vertical slices
+├── registry/                        run/artifact/release/approval state
+├── observability/                   metrics/tracing/resource monitoring
+├── api/                             FastAPI surfaces
+└── events/                          structured audit events
 ```
 
-Provider-specific isolated campaign directories and `environments/**` coexist with the shared worker path. Broad registration is intentionally not the same as shared runtime routing.
+`environments/**` contains version-isolated provider environments and locks.
 
-## 4. Evaluation architecture
-
-Current canonical development comparison path:
+## 4. Catalog architecture
 
 ```text
-canonical game frame
-  -> development/holdout split
-  -> chronological rolling folds
-  -> EvaluationProtocolV2
-  -> mandatory baselines
-  -> broad catalog × game planning
-  -> route classification
-       candidate RuntimeModel
-       PositionSeriesWorker / provider
-       NON_STANDALONE_METHOD
-       NOT_ROUTABLE / UNSUPPORTED / UNAVAILABLE / FAILED
-  -> family-aware legalisation/decoder
-  -> prediction lock write + fsync + SHA-256
-  -> actual read for scoring
-  -> Hit@±1-first metrics
-  -> all-seed summary
-  -> per-game leaderboard / cross-game macro summary
-  -> SHA256SUMS
+catalog_full.py
+  -> broad planning/inventory
+
+catalog.py
+  -> shared executable ModelSpec
+
+factory.py / workers.py / providers/**
+  -> shared runtime
+
+*_campaign/** / adapters/** / environments/**
+  -> isolated provider runtime
+
+probabilistic/catalog.py
+  -> separate Bayesian/probabilistic model universe
 ```
 
-Command surface:
-
-```bash
-uv run loto3 campaign ...
-```
-
-`orchestration/research.py` と `orchestration/research_v3.py` は別の既存research surfaceであり、unified campaignと同一物として扱わない。
-
-## 5. Catalog / routing architecture
-
-### Broad inventory
-
-`catalog_full.py` は広いinventoryを表現する。監査時点のgenerated countは174 entry。
-
-### Shared execution catalog
-
-`catalog.py` は`ModelSpec`を使うshared execution catalog。
-
-### Runtime worker/provider
-
-`factory.py`、`workers.py`、`providers/**` が実行routeを提供する。
-
-したがって:
+Capability stages are not collapsed:
 
 ```text
 REGISTERED
-!= SHARED_ROUTABLE
+!= ROUTABLE
 != RUNTIME_CERTIFIED
 != OOF_EVALUATED
 != PROMOTION_ELIGIBLE
 ```
 
-## 6. Probability/decoder architecture
-
-PR #249でselect-game constrained decoderに`MAP`と`WITHIN_TAU` objectiveを追加した。
-
-PR #250で、確率を持つunified candidate estimator routeをfamily-specific WITHIN_TAU decoderへ接続した。
+## 5. Unified evaluation architecture
 
 ```text
-candidate binary probability matrix
-  -> row normalization per slot
-  -> distribution identity = row-normalized-slot-binary-probability-v1
+canonical game frame
+  -> geometry/data validation
+  -> development/closed-holdout split
+  -> chronological folds
+  -> EvaluationProtocolV2
+  -> mandatory baselines
+  -> broad catalog × game planning
+  -> route classification
+       candidate -> RuntimeModel
+       position/foundation -> PositionSeriesWorker/provider
+       isolated/non-shared -> explicit status/provider contract
+       reconciliation -> NON_STANDALONE_METHOD
+  -> probability decoder or point legalisation
+  -> prediction lock write/fsync/SHA-256
+  -> matching actual read
+  -> geometry-aware Hit@±1-first scoring
+  -> all-seed aggregation
+  -> per-game/cross-game summaries
+  -> artifact manifest/SHA256SUMS
+```
+
+Primary CLI:
+
+```bash
+uv run loto3 campaign ...
+```
+
+`loto experiment research` and `loto3 research` are separate research surfaces and are not aliases for the unified campaign.
+
+## 6. Metrics architecture
+
+`evaluation.metrics.evaluate_outcomes()` accepts a `GameGeometry` and validates both actual and prediction legality before scoring.
+
+```text
+select -> hit count by set overlap
+digits -> hit count by exact position equality
+all -> MAE/MSE/RMSE + within-tau + all-position-within-tau
+```
+
+This is the #252 geometry-general boundary. The compatibility `evaluate_draws()` remains Loto7-oriented and delegates to the general function.
+
+## 7. Decoder architecture
+
+Probability-bearing candidate route:
+
+```text
+candidate binary scores
+  -> per-slot normalization
+  -> distribution identity
   -> family dispatch
-       digits -> positional window-mass WITHIN_TAU decode
-       select -> legality-constrained WITHIN_TAU DP
-  -> legal point prediction
+       digits -> positional window-mass utility
+       select -> legal constrained DP
+  -> legal point forecast
 ```
 
-Point-only workerに擬似確率分布を生成しない。Point-only routeは明示的なpoint legalisationを継続する。
-
-Decoder/distribution/post-processing identityはprotocol/runtime evidenceへ残し、旧campaign evidenceを新decoder契約へ黙って読み替えない。
-
-## 7. Data and time architecture
-
-Dataは少なくとも次の意味層を区別する。
+Current distribution identity:
 
 ```text
-raw immutable source
-validated/canonical development data
-features derived as-of eligible history
-Holdout closed slice
-Prospective future evidence
+row-normalized-slot-binary-probability-v1
 ```
 
-重要な時刻/順序概念:
+Objectives include `MAP` compatibility and `WITHIN_TAU` utility. Point-only workers do not receive fabricated probability distributions.
 
-- source/event time
-- availability time when known
-- ingestion time
-- forecast creation/seal time
-- actual availability/read time
+## 8. Theory architecture
 
-未来情報がeligible training/foldへ侵入しないことを最優先する。
+```text
+theory_general.py
+  -> exact game/tau IID-null reference
 
-## 8. Prediction/evidence architecture
+theory_guard.py
+  -> configured semantics
+       absolute
+       excess_vs_iid_null
+  -> implied absolute target
+  -> fail-closed validation
+```
 
-各runは新しいimmutable output directoryを使う。
+The theory layer constrains interpretation but does not assert that observed lottery data are IID or non-IID.
 
-Unified campaignの主要artifact:
+## 9. Promotion architecture
+
+```text
+sealed Holdout score evidence
++ sealed Prospective window evidence
++ PromotionPolicy / PromotionPolicyV2
+  -> schema-aware parser
+  -> game identity validation (v2)
+  -> theory target resolution (v2)
+  -> aggregate/worst-window rules
+  -> degradation rules
+  -> required baseline comparisons
+  -> immutable decision/rule artifacts
+```
+
+Safety boundary:
+
+```text
+ELIGIBLE_FOR_HUMAN_APPROVAL
+!= PROMOTED
+```
+
+Automatic promotion, retraining and registry write are disabled by contract.
+
+## 10. Power planning architecture
+
+```text
+pre-target score_sd + declared effect/sample count + PowerPlan
+  -> adjusted_alpha = alpha / multiplicity
+  -> one-sided normal critical values
+  -> required_paired_draws OR minimum_detectable_effect
+  -> deterministic planning evidence
+```
+
+Method identity is `paired-score-normal-approximation-v1`. The module intentionally does not pretend Hit@±1 elements are independent Bernoulli trials.
+
+## 11. Data/time architecture
+
+Logical layers:
+
+```text
+immutable raw source
+validated canonical development data
+as-of features
+closed Holdout slice
+sealed future Prospective prediction
+later actual evidence
+```
+
+Relevant times include event/source time, availability time, ingestion time, prediction/seal time and actual read time.
+
+## 12. Prediction/evidence architecture
+
+Each run uses a new output directory.
+
+Unified campaign artifacts:
 
 ```text
 campaign_summary.json
@@ -179,40 +256,61 @@ prediction_locks/<game>/<candidate>/seed-<seed>.json
 SHA256SUMS
 ```
 
-Prediction lockはactual scoring readより先にpersist/fsync/hashする。
+The lock is persisted and hashed before the corresponding scoring actual is read.
 
-## 9. Runtime certification architecture
+## 13. Runtime certification architecture
 
-Runtime certificationはcatalog statusから独立する。
-
-必要な範囲で:
+Formal runtime evidence may include:
 
 ```text
-model identity/revision
-environment identity
+model/revision/artifact identity
+environment/lock identity
 load
 input
 inference
-output shape
-finite values
-requested vs observed device
-GPU PID/VRAM
+shape/finite output
+device request/effective device
+GPU PID/VRAM/utilization
 CPU fallback
-reload/reproducibility
-artifact/code/data hashes
+save/reload
+cleanup/VRAM release
 ```
 
-を証拠化する。
+Runtime certification remains orthogonal to scientific accuracy.
 
-## 10. Deployment / portability
+## 14. Probabilistic architecture
 
-- `uv`, `pyproject.toml`, `uv.lock` をPython environmentの正本とする。
-- Linux self-hosted CIがfull repository test laneを持つ。
-- native Windows portability laneでlock resolution / wheel build / importを検証する。
-- GPU runtime certificationは対象provider/modelごとの実証を必要とする。
-- 特定workstationの一時状態をarchitecture contractへ固定しない。
+Separate 72-model catalog provides model family metadata, native implementation registry, optional backend probing, compatibility decisions, execution profiles and run API.
 
-## 11. Scientific gates
+```text
+catalog -> compatibility -> validate config -> plan -> smoke/run
+       -> status/diagnose/compare
+```
+
+Optional backend families include PyMC, NumPyro/JAX, Pyro/Torch, Stan/CmdStanPy, BlackJAX and TensorFlow Probability.
+
+## 15. API/control plane
+
+The platform has:
+
+- standard `loto` CLI;
+- JSON-oriented `loto3` CLI;
+- authenticated local probabilistic execution API;
+- registry/artifact/approval commands;
+- notification/TTS surfaces;
+- PostgreSQL/MLflow/telemetry optional lanes.
+
+Control-plane availability does not automatically authorize scientific gate transitions.
+
+## 16. Portability
+
+- `uv`, `pyproject.toml`, `uv.lock` are root environment authorities.
+- isolated providers can carry independent locks.
+- Linux exact-head full CI is a repository merge gate.
+- native Windows portability is a separate lane and its queued/cancelled status must not be represented as PASS.
+- CUDA claims require actual effective-device evidence.
+
+## 17. Scientific gate architecture
 
 ```text
 IMPLEMENTED
@@ -221,31 +319,24 @@ IMPLEMENTED
 -> HOLDOUT_EVALUATED
 -> PROSPECTIVE_EVALUATED
 -> PROMOTION_ELIGIBLE
+-> HUMAN APPROVAL
 ```
 
-各gateは独立したevidenceを必要とする。
+A `NO_MODEL_BEATS_BASELINE` or no-champion result is architecturally valid.
 
-Holdout/Prospectiveをunified development campaignが自動で開かない。
+## 18. Quality attributes
 
-## 12. 品質属性
+- reproducibility;
+- auditability;
+- leakage resistance;
+- fail visibility;
+- game-geometry correctness;
+- runtime portability;
+- evidence immutability;
+- explicit unsupported states;
+- conservative governance;
+- least privilege and secret hygiene.
 
-- Reproducibility
-- Auditability
-- Leakage resistance
-- Fail visibility
-- Cross-game comparability
-- Runtime portability
-- Immutable evidence
-- Explicit unsupported-state handling
-- Minimal privilege / secret hygiene
+## 19. Non-claims
 
-## 13. 現在の非主張
-
-Architectureが存在することは以下を意味しない。
-
-- 全174 entryのruntime success
-- 実データ174 × 6 campaign完了
-- decoderによる実OOF改善
-- Holdout/Prospective完了
-- champion存在
-- production promotion
+This architecture does not imply complete 174 × 6 real-data success, universal TSFM GPU support, decoder OOF superiority, Holdout/Prospective completion or production promotion.
