@@ -7,6 +7,7 @@ Winner counts, prize amounts and sales must not become draw-prediction features 
 from loto.data.payouts.contracts import PayoutFact, RawPayoutSnapshot
 from loto.data.payouts.parser import PayoutColumnMap, normalize_payout_dataframe
 from loto.data.payouts.snapshot import materialize_raw_payout_snapshot
+from loto.data.payouts.storage import write_payout_facts
 
 __all__ = [
     "PayoutColumnMap",
@@ -14,4 +15,5 @@ __all__ = [
     "RawPayoutSnapshot",
     "materialize_raw_payout_snapshot",
     "normalize_payout_dataframe",
+    "write_payout_facts",
 ]
