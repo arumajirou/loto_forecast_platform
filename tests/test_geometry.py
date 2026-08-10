@@ -137,7 +137,11 @@ _REVIEWED_LITERAL_PATTERNS: dict[str, tuple[tuple[int, str, str], ...]] = {
         ),
     ),
     "orchestration/research.py": (
-        (37, "values = np.zeros(37, dtype=float)", "legacy Loto7 research lane; migrate separately"),
+        (
+            37,
+            "values = np.zeros(37, dtype=float)",
+            "legacy Loto7 research lane; migrate separately",
+        ),
         (
             37,
             "values = np.clip(np.rint(output.position_values), 1, 37).astype(int)",
@@ -212,6 +216,8 @@ def test_no_new_hardcoded_universe_sizes_in_geometry_sensitive_packages():
 
 def test_reviewed_geometry_literal_debt_inventory_is_explicit() -> None:
     """Keep the remaining game-specific migration debt visible rather than silently excluding it."""
-    reasons = [reason for entries in _REVIEWED_LITERAL_PATTERNS.values() for _, _, reason in entries]
+    reasons = [
+        reason for entries in _REVIEWED_LITERAL_PATTERNS.values() for _, _, reason in entries
+    ]
     assert reasons
     assert all("migrate separately" in reason or "not geometry" in reason for reason in reasons)
