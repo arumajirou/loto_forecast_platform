@@ -15,6 +15,11 @@ from .inventory import model_contract
 from .runtime import StatsForecastRuntimeAdapter
 
 _DEFAULTS: dict[str, dict[str, Any]] = {
+    "AutoMFLES": {
+        "test_size": 4,
+        "season_length": [4],
+        "n_windows": 2,
+    },
     "AutoETS": {"season_length": 4},
     "AutoCES": {"season_length": 4},
     "AutoTBATS": {"season_length": [4]},
@@ -166,13 +171,48 @@ def certify_model(
             raise ValueError(f"unresolved constructor parameters: {unresolved}")
         panel, profile = build_panel(model_name, seed=seed)
         result["data_profile"] = profile
-        adapter = StatsForecastRuntimeAdapter(core_class=core_class, models_module=models_module)
+
+        future_exog = None
+
+        if model_name == "SklearnModel":
+            panel = panel.copy(deep=True)
+
+            # Deterministic exogenous signal independent of y.
+            panel["x1"] = np.sin(panel["ds"].to_numpy(dtype=float) / 5.0)
+
+            future_rows = []
+
+            for unique_id, group in panel.groupby(
+                "unique_id",
+                sort=False,
+            ):
+                last_ds = int(group["ds"].max())
+
+                for step in range(1, horizon + 1):
+                    ds = last_ds + step
+                    future_rows.append(
+                        {
+                            "unique_id": unique_id,
+                            "ds": ds,
+                            "x1": float(np.sin(ds / 5.0)),
+                        }
+                    )
+
+            future_exog = pd.DataFrame(future_rows)
+
+        adapter = StatsForecastRuntimeAdapter(
+            core_class=core_class,
+            models_module=models_module,
+        )
+
         prediction, evidence = adapter.forecast(
             panel,
             model_name=model_name,
             freq=1,
             horizon=horizon,
             parameters=parameters,
+            levels=None,
+            future_exog=future_exog,
         )
         prediction.to_csv(model_dir / "forecast.csv", index=False)
         result.update(
@@ -190,11 +230,27 @@ def certify_model(
             model = model_class(**parameters)
             engine = core_class(models=[model], freq=1, n_jobs=1)
             engine.fit(df=panel.copy(deep=True))
-            before = engine.predict(h=horizon)
+            predict_kwargs: dict[str, Any] = {
+                "h": horizon,
+            }
+
+            if future_exog is not None:
+                predict_kwargs["X_df"] = future_exog.copy(deep=True)
+
+            before = engine.predict(**predict_kwargs)
             bundle = model_dir / "statsforecast.pkl"
             engine.save(path=bundle)
             loaded = core_class.load(bundle)
-            after = loaded.predict(h=horizon)
+            loaded_predict_kwargs: dict[str, Any] = {
+                "h": horizon,
+            }
+
+            if future_exog is not None:
+                loaded_predict_kwargs["X_df"] = future_exog.copy(deep=True)
+
+            after = loaded.predict(
+                **loaded_predict_kwargs,
+            )
             before.to_csv(model_dir / "predict_before_save.csv", index=False)
             after.to_csv(model_dir / "predict_after_load.csv", index=False)
             lifecycle_evidence = compare_predictions(before, after)

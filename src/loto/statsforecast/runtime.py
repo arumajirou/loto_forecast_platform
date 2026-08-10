@@ -186,6 +186,7 @@ class StatsForecastRuntimeAdapter:
         horizon: int,
         parameters: dict[str, Any] | None = None,
         levels: tuple[int, ...] | None = (80, 90),
+        future_exog: pd.DataFrame | None = None,
     ) -> tuple[pd.DataFrame, dict[str, Any]]:
         validate_long_panel(panel)
         if horizon < 1:
@@ -199,11 +200,16 @@ class StatsForecastRuntimeAdapter:
         model = self.build_model(model_name, resolved_parameters)
         engine = self.core_class(models=[model], freq=freq, n_jobs=1)
         level_values = None if levels is None else list(levels)
-        prediction = engine.forecast(
-            df=panel.copy(deep=True),
-            h=horizon,
-            level=level_values,
-        )
+        forecast_kwargs: dict[str, Any] = {
+            "df": panel.copy(deep=True),
+            "h": horizon,
+            "level": level_values,
+        }
+
+        if future_exog is not None:
+            forecast_kwargs["X_df"] = future_exog.copy(deep=True)
+
+        prediction = engine.forecast(**forecast_kwargs)
         unique_ids = {str(value) for value in panel["unique_id"].unique()}
         expected_rows = len(unique_ids) * horizon
         evidence = validate_forecast_output(
