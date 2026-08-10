@@ -2,69 +2,211 @@
 
 ```text
 status_class: DESIGN_CONTRACT
-as_of: 2026-08-10T18:59+09:00
-audited_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
+as_of: 2026-08-10T20:23+09:00
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
 ```
 
-## Purpose
+## 1. Purpose
 
-Use this runbook for repository maintenance and the unified development-only evaluation campaign. It does not authorize Holdout, Prospective or promotion.
+Use this runbook to select model/library execution paths, perform development evaluation, inspect runtime evidence, plan statistical detectability and preserve scientific gates. It does not authorize Holdout, Prospective or promotion by itself.
 
-## Repository preflight
-
-Always start from live state:
+## 2. Repository preflight
 
 ```bash
+cd /absolute/path/to/loto_forecast_platform || exit 1
 git fetch origin
-git switch main
-git pull --ff-only
+git status --short --branch
+git branch --show-current
+git rev-parse HEAD
+git remote -v
 uv lock --check
 ```
 
-For every PR record live main SHA, PR base/head SHA, draft/mergeable state, changed files, ahead/behind relation, exact-head CI, and unresolved review threads. Dependency PRs sharing `pyproject.toml` or `uv.lock` must be merged serially and rebased/recreated after each merge. Use `expected_head_sha`.
+Before a PR merge re-fetch main/head/base, mergeability, changed files, ahead/behind, CI and unresolved threads. Use expected-head guarded merge. Queued/cancelled Actions are not PASS.
 
-Queued, cancelled and failed Actions runs are not PASS.
+## 3. Environment setup
 
-## Repository validation
-
-During implementation prefer focused tests/smokes. At the final gate:
+Repository development:
 
 ```bash
 uv sync --locked --extra dev
-uv run ruff format --check src scripts tests
-uv run ruff check src scripts tests
-uv run python -m compileall -q src scripts tests
-uv run pytest -q
+uv run loto-build-info
+uv run loto system doctor
 ```
 
-## Unified campaign
+Heavy shared libraries:
 
-Plan only:
+```bash
+uv sync --locked --extra full --extra frameworks --extra tsfm
+```
+
+Do not install provider-specific incompatible stacks into root merely for convenience. Use `environments/**` where the provider contract requires isolation.
+
+## 4. Inspect available surfaces
+
+```bash
+uv run loto3 games
+uv run loto3 catalog --counts
+uv run loto models list --format table
+uv run loto3 probabilistic catalog-list
+uv run loto3 probabilistic backends
+```
+
+Interpretation:
+
+```text
+broad catalog -> inventory/planning
+shared catalog -> normal executable specs
+provider campaign -> isolated execution
+runtime audit -> exact identity evidence
+```
+
+## 5. Inspect one model before using it
+
+```bash
+uv run loto models show nf-nhits
+```
+
+Check:
+
+- library/task/class;
+- required package/extra;
+- shared vs provider route;
+- game/layout assumptions;
+- device/precision requirements;
+- exact revision for foundation models;
+- existing runtime evidence;
+- whether OOF evidence exists separately.
+
+## 6. Unified campaign plan
 
 ```bash
 uv run loto3 campaign --output unused --plan-only
 ```
 
-Run:
+Subset:
+
+```bash
+uv run loto3 campaign \
+  --output unused \
+  --games numbers3,numbers4,loto7 \
+  --models logistic,nf-nhits,chronos-2 \
+  --plan-only
+```
+
+Verify expected pair count and retain non-routable entries instead of filtering them away post hoc.
+
+## 7. Prepare real data
+
+For all six games, input directory uses:
+
+```text
+mini.csv
+loto6.csv
+loto7.csv
+bingo5.csv
+numbers3.csv
+numbers4.csv
+```
+
+Before execution:
+
+- freeze immutable snapshot;
+- record SHA-256;
+- verify draw identity/chronology;
+- check missing/duplicate/non-finite data;
+- check geometry legality;
+- reject future-derived features;
+- decide development/Holdout boundary without looking at Holdout results.
+
+## 8. Resource preflight
+
+Measure CPU/RAM/storage/GPU before a long campaign. Record the resolved budget in run config/evidence.
+
+Key campaign controls:
+
+```text
+--device
+--precision
+--max-trials
+--parallel-trials
+--max-steps
+--wall-time-seconds
+--gpu-count
+--gpu-memory-bytes
+```
+
+Do not assume a package supports CUDA because it is installed. Effective device must be measured for runtime certification.
+
+## 9. Run development campaign
 
 ```bash
 RUN_ID="unified-$(date +%Y%m%d-%H%M%S)"
+OUT="artifacts/unified-campaign/${RUN_ID}"
+
 uv run loto3 campaign \
-  --input-dir /path/to/canonical-csv-directory \
-  --output "artifacts/unified-campaign/${RUN_ID}"
+  --input-dir /absolute/path/to/canonical-csv-directory \
+  --output "$OUT" \
+  --seeds 42,1729,20260730 \
+  --folds 5 \
+  --test-size 20 \
+  --min-train-size 100 \
+  --holdout-size 50 \
+  --device auto \
+  --precision 32
 ```
 
-For all six games, expected inputs are `mini.csv`, `loto6.csv`, `loto7.csv`, `bingo5.csv`, `numbers3.csv`, and `numbers4.csv`.
+Never reuse `OUT` from an older run.
 
-Before execution preserve the raw source as an immutable snapshot, record its hash, verify chronology/duplicates/missing/non-finite/domain legality, reject future-derived features, and use a new output directory.
+## 10. Inspect campaign results
 
-## Scientific interpretation
+Required artifacts:
 
-Primary metric: `Hit@±1 / hit_at_1`.
+```text
+campaign_summary.json
+model_game_results.csv
+all_game_macro_summary.csv
+protocols/
+prediction_locks/
+SHA256SUMS
+```
 
-Also inspect per-position Hit@±1, all-position Hit@±1, MAE, MSE, RMSE, every configured seed, population variance/worst-seed statistics, and mandatory baselines.
+Inspect status counts including:
 
-Mandatory baselines:
+```text
+SUCCEEDED
+PARTIAL_SEEDS
+FAILED
+UNAVAILABLE
+NOT_ROUTABLE
+UNSUPPORTED_GAME
+NON_STANDALONE_METHOD
+```
+
+`matrix_complete` is coverage, not universal success.
+
+## 11. Metrics interpretation
+
+Primary: Hit@±1.
+
+Also inspect:
+
+- per-position Hit@±1;
+- all-position Hit@±1;
+- MAE/MSE/RMSE;
+- every seed;
+- variance/std;
+- worst seed;
+- every mandatory baseline.
+
+Geometry rule:
+
+- select hit count = set overlap;
+- digit hit count = exact positional matches.
+
+Do not convert Numbers3/4 to unordered sets.
+
+## 12. Mandatory baselines
 
 ```text
 random
@@ -76,54 +218,211 @@ frequency
 statistical_ar1
 ```
 
-Do not select a model from its best seed only. A complete matrix does not imply universal execution success; preserve `FAILED`, `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `PARTIAL_SEEDS`, and `NON_STANDALONE_METHOD` rows.
+A model has not passed formal comparison if required baseline evidence is missing.
 
-## Prediction lock
+## 13. Prediction-lock audit
 
-For each evaluated game/candidate/seed, verify the prediction lock exists, records `actuals_known=false`, and retains SHA-256/timestamp evidence before the corresponding actual is read for scoring.
-
-Expected campaign artifacts include:
+For each evaluated game/candidate/seed verify:
 
 ```text
-campaign_summary.json
-model_game_results.csv
-all_game_macro_summary.csv
-protocols/
-prediction_locks/
-SHA256SUMS
+actuals_known=false
+prediction payload non-empty
+SHA-256/timestamp present
+lock created before target actual scoring read
 ```
 
-Never overwrite an existing evidence directory.
+Do not repair an old evidence directory in place. Use a new Run ID.
 
-## Decoder/routing behavior
+## 14. Decoder audit
 
-Merged PR #249 provides explicit `MAP` and `WITHIN_TAU` constrained select-game objectives. Merged PR #250 routes probability-bearing unified-campaign candidate estimators through family-specific WITHIN_TAU decoders:
+Probability-bearing candidates should retain:
 
-- digit family: window-mass WITHIN_TAU probability decoding;
-- select family: legal constrained WITHIN_TAU DP;
-- point-only workers: no fabricated PMF; point legalisation remains explicit;
-- candidate adapter: `row-normalized-slot-binary-probability-v1`, not a native categorical PMF;
-- decoder/distribution identities are retained in runtime evidence and sealed evaluation lineage.
+```text
+distribution_identity = row-normalized-slot-binary-probability-v1
+decoder objective
+post-processing identity
+```
 
-Treat this as implementation/routing evidence only. Real OOF improvement must still be measured chronologically.
+Expected family behavior:
 
-## Runtime certification
+```text
+digits -> positional WITHIN_TAU/window-mass
+select -> legal constrained WITHIN_TAU DP
+point-only -> point legalisation, no fake PMF
+```
 
-For any claimed real model execution verify dependency import, load, valid input, inference completion, output shape, finite values, requested/observed device, GPU PID/VRAM when CUDA is claimed, explicit CPU fallback, and reload inference when persistence certification requires it.
+## 15. NeuralForecast AutoModel run
 
-`registered`, `dependency declared`, `runtime certified`, and `forecast accurate` are separate states.
+Example:
 
-## Holdout and Prospective
+```bash
+uv run loto neuralforecast automodel-run \
+  --db-url sqlite:///data/platform.sqlite3 \
+  --table normalized_draws \
+  --game numbers4 \
+  --models nf-auto-dlinear,nf-auto-nhits \
+  --backend optuna \
+  --num-samples 10 \
+  --cpus 8 \
+  --gpus 1 \
+  --parallel-trials 2 \
+  --seed 1 \
+  --output artifacts/nf-auto-run
+```
 
-Default state is closed.
+For Ray use `--backend ray`. Preserve failed trials and exact search/resource identity.
 
-Do not open Holdout until approved development/OOF protocol, multi-seed aggregation, mandatory baseline comparisons, leakage checks and prediction-lock evidence are complete and reviewed. Prospective predictions must be sealed before future actuals exist. Neither gate automatically authorizes promotion.
+## 16. Foundation model run preparation
 
-## Current scientific workstreams
+Before a TSFM/provider run:
 
-- GitHub #239: Timer Base 84M leakage-safe OOF.
-- GitHub #118: Timer-S1 immutable runtime/certification PR-B.
+```bash
+uv run loto3 revisions validate \
+  --manifest configs/tsfm/verified-revisions.json \
+  --require-complete
+```
 
-## Failure handling
+Then verify:
 
-Preserve failure rows/logs, classify the failure, never rewrite old prediction/evidence artifacts, fix on a new branch/run, execute focused validation first, then full CI, and use a new Run ID/output directory.
+- repo/model/revision;
+- local snapshot/artifact hash if required;
+- provider class/isolated runner;
+- package lock;
+- trust-remote-code review where applicable;
+- target game/layout/context/horizon;
+- requested device.
+
+After execution record actual load/inference/output/device evidence separately from OOF metrics.
+
+## 17. Probabilistic models
+
+```bash
+uv run loto3 probabilistic compatibility \
+  --model-id <id> \
+  --game numbers3 \
+  --backend builtin
+
+uv run loto3 probabilistic validate-config --config <config.yaml>
+uv run loto3 probabilistic plan --config <config.yaml>
+uv run loto3 probabilistic smoke --config <config.yaml>
+uv run loto3 probabilistic run --config <config.yaml>
+```
+
+Then use `status`, `diagnose`, `compare` on the run directory.
+
+## 18. Theory-aware target planning
+
+Before interpreting a target such as “Hit@±1 90%”, inspect the game-specific theory reference rather than assuming the same meaning for every geometry.
+
+```bash
+uv run loto3 theory --game loto7 --tau 1
+uv run loto3 theory --game numbers3 --tau 1
+```
+
+For new policy code use `TheoryAwareThreshold` semantics:
+
+```text
+absolute
+excess_vs_iid_null
+```
+
+Targets above an IID-null absolute reference require an explicit alternative-hypothesis declaration to pass the guard.
+
+## 19. MDE/power planning before a target window
+
+Use only a `score_sd` fixed from allowed development/pilot evidence or a declared simulation.
+
+Example Python:
+
+```python
+from loto.evaluation.power_analysis import PowerPlan, minimum_detectable_effect
+
+plan = PowerPlan(alpha=0.05, target_power=0.80, multiplicity=10)
+result = minimum_detectable_effect(500, 0.20, plan=plan)
+print(result.model_dump())
+```
+
+Use the result to decide whether a planned sample can detect the declared effect size. Do not call it a p-value or realized result.
+
+## 20. Holdout gate
+
+Default: closed.
+
+Only open after reviewed OOF/development evidence establishes:
+
+- immutable protocol/data/model identity;
+- leakage checks;
+- all baselines;
+- all seeds;
+- prediction sealing;
+- adequate statistical plan;
+- explicit authorization.
+
+No retuning on Holdout.
+
+## 21. Prospective gate
+
+Prospective prediction must be sealed before future actual is available/read. Later actual ingestion/scoring is separate.
+
+Multiple windows may be required by promotion policy.
+
+## 22. Promotion eligibility audit
+
+Promotion v2 requires:
+
+- policy game;
+- sealed `game_id` on every Holdout/Prospective score window;
+- matching game identity;
+- theory-resolved absolute target;
+- minimum windows/draws;
+- stability where required;
+- baseline comparison;
+- degradation limits.
+
+Even all-pass means:
+
+```text
+ELIGIBLE_FOR_HUMAN_APPROVAL
+```
+
+not automatic promotion.
+
+Verify safety flags remain false for auto promotion/retraining/registry writes.
+
+## 23. Runtime certification
+
+For a runtime claim verify applicable:
+
+```text
+import
+load
+input
+inference
+shape
+finite values
+requested/effective device
+GPU PID/VRAM/utilization
+CPU fallback
+save/reload
+cleanup
+```
+
+Do not infer from catalog availability.
+
+## 24. Final repository validation
+
+After focused tests pass and changes are complete:
+
+```bash
+uv sync --locked --extra dev
+uv run ruff format --check src scripts tests
+uv run ruff check src scripts tests
+uv run python -m compileall -q src scripts tests
+uv run pytest -q
+```
+
+For documentation-only changes, code regression CI remains valuable as a final repository gate but should not be run repeatedly during editing.
+
+## 25. Failure handling
+
+Preserve failure status/logs, classify cause, create a new fix/run identity, execute focused verification first, and never mutate old immutable prediction/protocol evidence to make a failed run appear successful.
