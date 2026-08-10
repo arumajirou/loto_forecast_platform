@@ -1,0 +1,732 @@
+name: statsforecast-phase-c-development
+
+on:
+  push:
+    branches:
+      - feat/statsforecast-real-game-evaluation-v1
+    paths:
+      - ".github/workflows/statsforecast-phase-c-development.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: statsforecast-phase-c-development-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  development:
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 480
+    defaults:
+      run:
+        shell: bash
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
+      BRANCH: feat/statsforecast-real-game-evaluation-v1
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+
+    steps:
+      - name: Verify expected self-hosted runner
+        run: |
+          set -Eeuo pipefail
+          echo "runner_name=$RUNNER_NAME"
+          echo "runner_os=$RUNNER_OS"
+          echo "runner_arch=$RUNNER_ARCH"
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout Phase C branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.BRANCH }}
+          fetch-depth: 0
+          clean: true
+          persist-credentials: true
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+
+      - name: Prepare formal run paths
+        run: |
+          set -Eeuo pipefail
+          uv python install "$UV_PYTHON"
+          run_id="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          data_root="$RUNNER_TEMP/statsforecast-development-data-$run_id"
+          root_venv="$RUNNER_TEMP/loto-root-$run_id"
+          sf_venv="$RUNNER_TEMP/loto-statsforecast-$run_id"
+          property_root="$RUNNER_TEMP/loto-statsforecast-property-$run_id"
+          out="audit/local-runs/statsforecast-six-game-development-$run_id"
+          mkdir -p "$out/games" "$out/runner_logs"
+          printf 'DATA_ROOT=%s\n' "$data_root" >> "$GITHUB_ENV"
+          printf 'ROOT_VENV=%s\n' "$root_venv" >> "$GITHUB_ENV"
+          printf 'SF_VENV=%s\n' "$sf_venv" >> "$GITHUB_ENV"
+          printf 'SF_PYTHON=%s/bin/python\n' "$sf_venv" >> "$GITHUB_ENV"
+          printf 'PROPERTY_ROOT=%s\n' "$property_root" >> "$GITHUB_ENV"
+          printf 'OUT=%s\n' "$out" >> "$GITHUB_ENV"
+          printf 'EVALUATION_COMMIT=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Acquire all six canonical games
+        run: |
+          set -Eeuo pipefail
+          UV_PROJECT_ENVIRONMENT="$ROOT_VENV" \
+          uv run --frozen python -m loto.cli \
+            data acquire \
+            --games all \
+            --output "$DATA_ROOT" \
+            --force \
+            --fail-fast
+
+      - name: Record acquisition evidence
+        run: |
+          set -Eeuo pipefail
+          UV_PROJECT_ENVIRONMENT="$ROOT_VENV" \
+          uv run --frozen python - "$DATA_ROOT" "$OUT/DATA_ACQUISITION_EVIDENCE.json" <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import json
+          import sys
+          from pathlib import Path
+
+          root = Path(sys.argv[1])
+          output = Path(sys.argv[2])
+          expected = ("bingo5", "loto6", "loto7", "mini", "numbers3", "numbers4")
+          summary = json.loads((root / "multi_game_summary.json").read_text(encoding="utf-8"))
+          assert summary["status"] == "SUCCEEDED", summary
+          assert set(summary["requested_games"]) == set(expected), summary
+          assert set(summary["successful_games"]) == set(expected), summary
+          assert summary["failed_games"] == [], summary
+          games = {}
+          for game in expected:
+              csv_path = root / game / "normalized" / f"{game}.csv"
+              quality_path = root / game / "normalized" / f"{game}.quality.json"
+              assert csv_path.is_file(), csv_path
+              assert quality_path.is_file(), quality_path
+              quality = json.loads(quality_path.read_text(encoding="utf-8"))
+              assert quality["status"] == "PASS", quality
+              digest = hashlib.sha256(csv_path.read_bytes()).hexdigest()
+              games[game] = {
+                  "quality_status": quality["status"],
+                  "rows": int(quality["rows"]),
+                  "frame_sha256": quality["frame_sha256"],
+                  "normalized_file_sha256": digest,
+              }
+              print(
+                  f"DATA_OK game={game} rows={quality['rows']} "
+                  f"frame_sha256={quality['frame_sha256']} file_sha256={digest}"
+              )
+          output.write_text(
+              json.dumps(
+                  {
+                      "schema_version": 1,
+                      "acquisition_status": "SUCCEEDED",
+                      "games": games,
+                  },
+                  ensure_ascii=False,
+                  indent=2,
+                  sort_keys=True,
+              )
+              + "\n",
+              encoding="utf-8",
+          )
+          print("RESULT=SIX_GAME_DATA_ACQUISITION_PASS")
+          PY
+
+      - name: Prepare isolated StatsForecast 2.1.1 environment
+        run: |
+          set -Eeuo pipefail
+          uv venv "$SF_VENV" --python "$UV_PYTHON"
+          mapfile -t deps < <(
+            uv run --no-project --python "$UV_PYTHON" python - <<'PY'
+          import tomllib
+
+          with open("environments/statsforecast-py313/pyproject.toml", "rb") as stream:
+              project = tomllib.load(stream)["project"]
+          for dependency in project["dependencies"]:
+              print(dependency)
+          PY
+          )
+          test "${#deps[@]}" -gt 0
+          uv pip install --quiet --python "$SF_PYTHON" "${deps[@]}"
+          PYTHONPATH="$GITHUB_WORKSPACE/src" "$SF_PYTHON" - <<'PY'
+          import statsforecast
+
+          assert statsforecast.__version__ == "2.1.1", statsforecast.__version__
+          print(f"statsforecast_version={statsforecast.__version__}")
+          PY
+
+      - name: Re-verify property lifecycle contract
+        run: |
+          set -Eeuo pipefail
+          set +e
+          PYTHONPATH="$GITHUB_WORKSPACE/src" \
+          "$SF_PYTHON" -m loto.statsforecast.property_certification \
+            --output-root "$PROPERTY_ROOT" \
+            --run-id property \
+            --horizon 1 \
+            --seed 1 \
+            > "$OUT/runner_logs/property-certification.log" 2>&1
+          rc=$?
+          set -e
+          printf '%s\n' "$rc" > "$OUT/PROPERTY_CERTIFICATION_EXIT_CODE.txt"
+          tail -n 120 "$OUT/runner_logs/property-certification.log" || true
+          if [[ -f "$PROPERTY_ROOT/property/PROPERTY_CERTIFICATION_SUMMARY.json" ]]; then
+            cp "$PROPERTY_ROOT/property/PROPERTY_CERTIFICATION_SUMMARY.json" \
+              "$OUT/PROPERTY_CERTIFICATION_SUMMARY.json"
+            cp "$PROPERTY_ROOT/property/PROPERTY_CERTIFICATION_MATRIX.json" \
+              "$OUT/PROPERTY_CERTIFICATION_MATRIX.json"
+          else
+            printf '[]\n' > "$OUT/PROPERTY_CERTIFICATION_MATRIX.json"
+            printf '{"formal_pass":false,"reason":"property certification output missing"}\n' \
+              > "$OUT/PROPERTY_CERTIFICATION_SUMMARY.json"
+          fi
+
+      - name: Run six games in parallel under formal development protocol
+        run: |
+          set -Eeuo pipefail
+          games=(bingo5 loto6 loto7 mini numbers3 numbers4)
+          declare -A pids
+          declare -A logs
+          : > "$OUT/GAME_EXECUTION_STATUS.tsv"
+
+          for game in "${games[@]}"; do
+            log="$OUT/runner_logs/${game}.log"
+            logs[$game]="$log"
+            echo "START game=$game"
+            PYTHONPATH="$GITHUB_WORKSPACE/src" \
+            "$SF_PYTHON" \
+              -m loto.statsforecast.real_game_campaign \
+              --data-root "$DATA_ROOT" \
+              --output "$OUT/games/$game" \
+              --games "$game" \
+              --seed 1 \
+              --folds 5 \
+              --test-size 20 \
+              --min-train-size 100 \
+              --holdout-size 50 \
+              --gap 0 \
+              --device cpu \
+              --precision 32 \
+              --git-commit "$EVALUATION_COMMIT" \
+              > "$log" 2>&1 &
+            pids[$game]=$!
+          done
+
+          for game in "${games[@]}"; do
+            set +e
+            wait "${pids[$game]}"
+            rc=$?
+            set -e
+            printf '%s\t%s\n' "$game" "$rc" >> "$OUT/GAME_EXECUTION_STATUS.tsv"
+            echo "FINISH game=$game rc=$rc"
+            tail -n 100 "${logs[$game]}" || true
+          done
+
+      - name: Aggregate formal evidence and 246-row audit matrix
+        run: |
+          set -Eeuo pipefail
+          PYTHONPATH="$GITHUB_WORKSPACE/src" "$SF_PYTHON" - "$OUT" <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import json
+          import shutil
+          import sys
+          from collections import Counter
+          from pathlib import Path
+
+          import pandas as pd
+
+          from loto.evaluation.splits import rolling_folds
+          from loto.statsforecast.certification_io import sha256_file, write_json
+          from loto.statsforecast.real_game_campaign import build_lane_matrix
+          from loto.statsforecast.real_game_preflight import statsforecast_entries
+
+          run_dir = Path(sys.argv[1])
+          games = ("bingo5", "loto6", "loto7", "mini", "numbers3", "numbers4")
+          seed = 1
+          folds_count = 5
+          test_size = 20
+          min_train_size = 100
+          holdout_size = 50
+          gap = 0
+
+          data_evidence = json.loads(
+              (run_dir / "DATA_ACQUISITION_EVIDENCE.json").read_text(encoding="utf-8")
+          )
+          property_matrix = json.loads(
+              (run_dir / "PROPERTY_CERTIFICATION_MATRIX.json").read_text(encoding="utf-8")
+          )
+          property_summary = json.loads(
+              (run_dir / "PROPERTY_CERTIFICATION_SUMMARY.json").read_text(encoding="utf-8")
+          )
+          prop_by_name = {row.get("model_name"): row for row in property_matrix}
+
+          execution_status = {}
+          for line in (run_dir / "GAME_EXECUTION_STATUS.tsv").read_text(encoding="utf-8").splitlines():
+              if not line.strip():
+                  continue
+              game, rc = line.split("\t", 1)
+              execution_status[game] = int(rc)
+          write_json(
+              run_dir / "GAME_EXECUTION_STATUS.json",
+              {"schema_version": 1, "games": execution_status},
+          )
+
+          entries = statsforecast_entries()
+          if len(entries) != 41:
+              raise AssertionError(f"unexpected StatsForecast inventory: {len(entries)}")
+          lane_rows = build_lane_matrix(games, entries)
+          if len(lane_rows) != 246:
+              raise AssertionError(f"incomplete semantic lane matrix: {len(lane_rows)}")
+          write_json(run_dir / "STATSFORECAST_LANE_MATRIX.json", lane_rows)
+
+          all_frames = []
+          protocol_by_game = {}
+          results_by_game = {}
+          root_protocols = run_dir / "protocols"
+          root_locks = run_dir / "prediction_locks"
+          root_protocols.mkdir(exist_ok=True)
+          root_locks.mkdir(exist_ok=True)
+
+          for game in games:
+              child = run_dir / "games" / game
+              results_path = child / "model_game_results.csv"
+              if results_path.is_file():
+                  frame = pd.read_csv(results_path)
+                  all_frames.append(frame)
+                  results_by_game[game] = frame
+              else:
+                  results_by_game[game] = pd.DataFrame()
+
+              protocol_path = child / "protocols" / f"{game}.json"
+              if protocol_path.is_file():
+                  protocol_payload = json.loads(protocol_path.read_text(encoding="utf-8"))
+                  protocol_by_game[game] = protocol_payload
+                  shutil.copy2(protocol_path, root_protocols / f"{game}.json")
+
+              source_lock_dir = child / "prediction_locks" / game
+              if source_lock_dir.is_dir():
+                  shutil.copytree(
+                      source_lock_dir,
+                      root_locks / game,
+                      dirs_exist_ok=True,
+                  )
+
+          if all_frames:
+              all_results = pd.concat(all_frames, ignore_index=True)
+          else:
+              all_results = pd.DataFrame()
+          all_results.to_csv(run_dir / "model_game_results.csv", index=False)
+
+          def succeeded_rows(frame: pd.DataFrame, *, source: str) -> pd.DataFrame:
+              if frame.empty:
+                  return frame
+              return frame[(frame["source"] == source) & (frame["status"] == "SUCCEEDED")].copy()
+
+          def ranked(frame: pd.DataFrame) -> pd.DataFrame:
+              if frame.empty:
+                  return frame
+              return frame.sort_values(
+                  [
+                      "hit_at_1_mean",
+                      "all_positions_hit_at_1_mean",
+                      "mae_mean",
+                      "candidate_id",
+                  ],
+                  ascending=[False, False, True, True],
+                  kind="mergesort",
+              )
+
+          baseline_comparison = {}
+          best_model_by_game = {}
+          best_baseline_by_game = {}
+          audit_rows = []
+
+          def property_effective(prop: dict) -> dict:
+              constructed = prop.get("constructed") or {}
+              return {
+                  name: evidence.get("effective")
+                  for name, evidence in constructed.items()
+                  if isinstance(evidence, dict)
+              }
+
+          def compact_json(value) -> str:
+              return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+          def failure_class(status: str, reason: str) -> str:
+              if status == "SUCCEEDED":
+                  return ""
+              text = (reason or "").lower()
+              if any(token in text for token in ("module", "import", "dependency")):
+                  return "dependency/import"
+              if any(token in text for token in ("constructor", "parameter", "required argument")):
+                  return "constructor/config"
+              if any(token in text for token in ("history", "train", "insufficient")):
+                  return "insufficient history"
+              if "timeout" in text:
+                  return "timeout"
+              if any(token in text for token in ("memory", "resource")):
+                  return "resource limit"
+              if any(token in text for token in ("nan", "inf", "overflow", "numeric")):
+                  return "numeric instability"
+              if any(token in text for token in ("geometry", "domain", "range")):
+                  return "data geometry mismatch"
+              if any(token in text for token in ("serialize", "pickle", "save", "load")):
+                  return "serialization"
+              if status in {"UNAVAILABLE", "NOT_ROUTABLE", "UNSUPPORTED_GAME"}:
+                  return status.lower()
+              return "StatsForecast runtime exception"
+
+          for game in games:
+              frame = results_by_game[game]
+              sf = ranked(succeeded_rows(frame, source="catalog"))
+              baselines = ranked(succeeded_rows(frame, source="baseline"))
+              best_sf = sf.iloc[0].to_dict() if not sf.empty else None
+              best_baseline = baselines.iloc[0].to_dict() if not baselines.empty else None
+
+              if best_sf:
+                  best_model_by_game[game] = {
+                      "candidate_id": best_sf["candidate_id"],
+                      "hit_at_1": float(best_sf["hit_at_1_mean"]),
+                      "all_positions_hit_at_1": float(best_sf["all_positions_hit_at_1_mean"]),
+                      "mae": float(best_sf["mae_mean"]),
+                      "rmse": float(best_sf["rmse_mean"]),
+                  }
+              if best_baseline:
+                  best_baseline_by_game[game] = {
+                      "candidate_id": best_baseline["candidate_id"],
+                      "hit_at_1": float(best_baseline["hit_at_1_mean"]),
+                      "all_positions_hit_at_1": float(best_baseline["all_positions_hit_at_1_mean"]),
+                      "mae": float(best_baseline["mae_mean"]),
+                      "rmse": float(best_baseline["rmse_mean"]),
+                  }
+
+              if best_sf and best_baseline:
+                  baseline_comparison[game] = {
+                      "best_statsforecast": best_model_by_game[game],
+                      "best_baseline": best_baseline_by_game[game],
+                      "hit_at_1_difference": float(
+                          best_sf["hit_at_1_mean"] - best_baseline["hit_at_1_mean"]
+                      ),
+                      "mae_improvement_baseline_minus_model": float(
+                          best_baseline["mae_mean"] - best_sf["mae_mean"]
+                      ),
+                      "rmse_improvement_baseline_minus_model": float(
+                          best_baseline["rmse_mean"] - best_sf["rmse_mean"]
+                      ),
+                  }
+
+              protocol_payload = protocol_by_game.get(game) or {}
+              protocol_hash = protocol_payload.get("protocol_hash")
+              protocol = protocol_payload.get("protocol") or {}
+              data_snapshot_sha = (protocol.get("data_snapshot") or {}).get("sha256")
+              total_rows = int(data_evidence["games"][game]["rows"])
+              development_rows = total_rows - holdout_size
+              folds = rolling_folds(
+                  development_rows,
+                  folds=folds_count,
+                  test_size=test_size,
+                  min_train_size=min_train_size,
+                  gap=gap,
+                  expanding=True,
+              )
+              train_rows = [int(fold.train_end - fold.train_start) for fold in folds]
+              test_rows = sum(int(fold.test_end - fold.test_start) for fold in folds)
+
+              result_map = {}
+              if not frame.empty:
+                  result_map = {
+                      str(row["candidate_id"]): row
+                      for row in frame.to_dict(orient="records")
+                      if row.get("source") == "catalog"
+                  }
+
+              for lane in [row for row in lane_rows if row["game"] == game]:
+                  model_id = lane["model_id"]
+                  model_name = lane["model_name"]
+                  prop = prop_by_name.get(model_name, {})
+                  result = result_map.get(model_id)
+                  lane_name = lane["lane"]
+
+                  if lane_name == "UNIVARIATE":
+                      if result is None:
+                          overall_status = "EXECUTION_FAILED"
+                          reason = (
+                              f"missing model result; game process exit={execution_status.get(game)}"
+                          )
+                          predict_status = "EXECUTION_FAILED"
+                      else:
+                          overall_status = str(result.get("status") or "EXECUTION_FAILED")
+                          reason = str(result.get("reason") or "")
+                          predict_status = (
+                              "VERIFIED" if overall_status == "SUCCEEDED" else overall_status
+                          )
+                  elif lane_name == "EXOGENOUS":
+                      overall_status = "EXOGENOUS_EVALUATION_DEFERRED"
+                      reason = "primary univariate development protocol does not supply exogenous X_df"
+                      predict_status = "NOT_APPLICABLE_UNIVARIATE"
+                  else:
+                      overall_status = "EXPECTED_NEGATIVE_CONTROL"
+                      reason = "NaNModel is retained as the expected negative control and excluded from ranking"
+                      predict_status = "EXPECTED_NEGATIVE_CONTROL"
+
+                  baseline_mae = float(best_baseline["mae_mean"]) if best_baseline else None
+                  baseline_rmse = float(best_baseline["rmse_mean"]) if best_baseline else None
+                  baseline_hit = float(best_baseline["hit_at_1_mean"]) if best_baseline else None
+                  mae = float(result["mae_mean"]) if result is not None and pd.notna(result.get("mae_mean")) else None
+                  mse = float(result["mse_mean"]) if result is not None and pd.notna(result.get("mse_mean")) else None
+                  rmse = float(result["rmse_mean"]) if result is not None and pd.notna(result.get("rmse_mean")) else None
+                  hit = float(result["hit_at_1_mean"]) if result is not None and pd.notna(result.get("hit_at_1_mean")) else None
+                  pos_hit = float(result["position_hit_at_1_mean"]) if result is not None and pd.notna(result.get("position_hit_at_1_mean")) else None
+                  all_hit = float(result["all_positions_hit_at_1_mean"]) if result is not None and pd.notna(result.get("all_positions_hit_at_1_mean")) else None
+
+                  lock_path = root_locks / game / model_id / f"seed-{seed}.json"
+                  lock_sha = sha256_file(lock_path) if lock_path.is_file() else None
+
+                  audit_rows.append(
+                      {
+                          "game": game,
+                          "library": "statsforecast",
+                          "model_id": model_id,
+                          "model_name": model_name,
+                          "lane": lane_name,
+                          "requested_args_json": compact_json(prop.get("requested_parameters") or {}),
+                          "effective_args_json": compact_json(property_effective(prop)),
+                          "args_match": prop.get("constructed_match"),
+                          "property_status": prop.get("property_status", "NOT_REVERIFIED"),
+                          "fit_status": prop.get("fit_status") or prop.get("fitted_status") or "NOT_CAPTURED",
+                          "fit_seconds": None,
+                          "fit_seconds_status": "NOT_CAPTURED_BY_UNIFIED_CAMPAIGN",
+                          "predict_status": predict_status,
+                          "mae": mae,
+                          "mse": mse,
+                          "rmse": rmse,
+                          "hit_at_1": hit,
+                          "position_hit_at_1": pos_hit,
+                          "all_positions_hit_at_1": all_hit,
+                          "best_baseline_id": (
+                              str(best_baseline["candidate_id"]) if best_baseline else None
+                          ),
+                          "baseline_mae": baseline_mae,
+                          "baseline_rmse": baseline_rmse,
+                          "mae_improvement_vs_baseline": (
+                              baseline_mae - mae if baseline_mae is not None and mae is not None else None
+                          ),
+                          "rmse_improvement_vs_baseline": (
+                              baseline_rmse - rmse if baseline_rmse is not None and rmse is not None else None
+                          ),
+                          "hit_at_1_difference_vs_baseline": (
+                              hit - baseline_hit if baseline_hit is not None and hit is not None else None
+                          ),
+                          "train_rows": compact_json(train_rows),
+                          "test_rows": test_rows,
+                          "holdout_rows": holdout_size,
+                          "seed": seed,
+                          "protocol_hash": protocol_hash,
+                          "data_snapshot_sha256": data_snapshot_sha,
+                          "normalized_file_sha256": data_evidence["games"][game]["normalized_file_sha256"],
+                          "prediction_lock_sha256": lock_sha,
+                          "overall_status": overall_status,
+                          "failure_class": failure_class(overall_status, reason),
+                          "failure_reason": reason,
+                      }
+                  )
+
+          audit = pd.DataFrame(audit_rows)
+          if len(audit) != 246:
+              raise AssertionError(f"audit matrix row count={len(audit)} expected=246")
+          audit.to_csv(run_dir / "STATSFORECAST_MODEL_GAME_AUDIT_MATRIX.csv", index=False)
+
+          primary = audit[audit["lane"] == "UNIVARIATE"]
+          primary_counts = Counter(primary["overall_status"].tolist())
+          semantic_counts = Counter(audit["overall_status"].tolist())
+
+          lock_files = sorted(root_locks.rglob("seed-*.json"))
+          bad_locks = []
+          for lock_path in lock_files:
+              payload = json.loads(lock_path.read_text(encoding="utf-8"))
+              if payload.get("actuals_known") is not False:
+                  bad_locks.append(str(lock_path.relative_to(run_dir)))
+
+          if not all_results.empty:
+              numeric_metrics = [
+                  "hit_at_1_mean",
+                  "position_hit_at_1_mean",
+                  "all_positions_hit_at_1_mean",
+                  "mae_mean",
+                  "mse_mean",
+                  "rmse_mean",
+              ]
+              grouped = (
+                  all_results.groupby(["candidate_id", "source", "library"], as_index=False)
+                  .agg(
+                      game_count=("game", "nunique"),
+                      succeeded_games=("status", lambda values: int((values == "SUCCEEDED").sum())),
+                      **{f"macro_{metric}": (metric, "mean") for metric in numeric_metrics},
+                  )
+              )
+              grouped["cross_game_error_ranking_prohibited"] = True
+              grouped.to_csv(run_dir / "all_game_macro_summary.csv", index=False)
+          else:
+              pd.DataFrame().to_csv(run_dir / "all_game_macro_summary.csv", index=False)
+
+          write_json(
+              run_dir / "BASELINE_COMPARISON.json",
+              {
+                  "schema_version": 1,
+                  "ranking_rule": "hit_at_1 desc, all_positions_hit_at_1 desc, mae asc",
+                  "cross_game_raw_mae_ranking_prohibited": True,
+                  "games": baseline_comparison,
+              },
+          )
+
+          compact_property = []
+          for prop in property_matrix:
+              compact_property.append(
+                  {
+                      "model_name": prop.get("model_name"),
+                      "property_status": prop.get("property_status"),
+                      "requested_parameters": prop.get("requested_parameters"),
+                      "constructed_match": prop.get("constructed_match"),
+                      "fit_status": prop.get("fit_status") or prop.get("fitted_status"),
+                  }
+              )
+          write_json(
+              run_dir / "PROPERTY_CERTIFICATION_REFERENCE.json",
+              {
+                  "schema_version": 1,
+                  "formal_pass": bool(property_summary.get("formal_pass")),
+                  "models": compact_property,
+              },
+          )
+
+          formal_pass = bool(
+              len(audit) == 246
+              and len(primary) == 234
+              and int(primary_counts.get("SUCCEEDED", 0)) == 234
+              and all(execution_status.get(game) == 0 for game in games)
+              and len(lock_files) == 276
+              and not bad_locks
+              and bool(property_summary.get("formal_pass"))
+              and data_evidence.get("acquisition_status") == "SUCCEEDED"
+              and len(protocol_by_game) == 6
+          )
+
+          gate = {
+              "schema_version": 1,
+              "formal_development_pass": formal_pass,
+              "full_semantic_rows": len(audit),
+              "primary_rows": len(primary),
+              "primary_status_counts": dict(primary_counts),
+              "semantic_status_counts": dict(semantic_counts),
+              "prediction_lock_count": len(lock_files),
+              "prediction_lock_bad_count": len(bad_locks),
+              "prediction_lock_bad_paths": bad_locks,
+              "property_certification_pass": bool(property_summary.get("formal_pass")),
+              "game_execution_exit_codes": execution_status,
+              "protocol_count": len(protocol_by_game),
+          }
+          write_json(run_dir / "DEVELOPMENT_GATE.json", gate)
+
+          summary = {
+              "schema_version": 1,
+              "library": "statsforecast",
+              "phase": "development_rolling_formal",
+              "games": list(games),
+              "seed": seed,
+              "folds": folds_count,
+              "test_size": test_size,
+              "min_train_size": min_train_size,
+              "holdout_size": holdout_size,
+              "gap": gap,
+              "statsforecast_models": 41,
+              "primary_univariate_models": 39,
+              "full_model_game_rows": 246,
+              "primary_model_game_rows": 234,
+              "primary_status_counts": dict(primary_counts),
+              "semantic_status_counts": dict(semantic_counts),
+              "primary_matrix_complete": len(primary) == 234,
+              "prediction_lock_count": len(lock_files),
+              "prediction_lock_sentinel_pass": not bad_locks and len(lock_files) == 276,
+              "property_certification_pass": bool(property_summary.get("formal_pass")),
+              "data_acquisition_status": data_evidence.get("acquisition_status"),
+              "best_model_by_game": best_model_by_game,
+              "best_baseline_by_game": best_baseline_by_game,
+              "holdout_evaluated": False,
+              "prospective_evaluated": False,
+              "promotion": False,
+              "exogenous_status": "EXOGENOUS_EVALUATION_DEFERRED",
+              "negative_control_status": "EXPECTED_NEGATIVE_CONTROL",
+              "optional_metrics_not_promoted": ["exact_position_rate", "exact_row_rate"],
+              "fit_seconds_status": "NOT_CAPTURED_BY_UNIFIED_CAMPAIGN",
+              "cross_game_raw_mae_ranking_prohibited": True,
+              "formal_development_pass": formal_pass,
+          }
+          write_json(run_dir / "STATSFORECAST_REAL_GAME_SUMMARY.json", summary)
+          write_json(run_dir / "campaign_summary.json", summary)
+
+          print(json.dumps(gate, ensure_ascii=False, indent=2, sort_keys=True))
+          print(f"PRIMARY_SUCCEEDED={primary_counts.get('SUCCEEDED', 0)}")
+          print(f"PRIMARY_NON_SUCCEEDED={234 - int(primary_counts.get('SUCCEEDED', 0))}")
+          print(f"PREDICTION_LOCK_COUNT={len(lock_files)}")
+          print(f"FORMAL_DEVELOPMENT_PASS={str(formal_pass).lower()}")
+          PY
+
+      - name: Write top-level evidence manifest and verify SHA256
+        run: |
+          set -Eeuo pipefail
+          PYTHONPATH="$GITHUB_WORKSPACE/src" "$SF_PYTHON" - "$OUT" <<'PY'
+          import sys
+          from pathlib import Path
+
+          from loto.statsforecast.certification_io import write_manifest_and_sums
+
+          write_manifest_and_sums(Path(sys.argv[1]))
+          PY
+          (
+            cd "$OUT"
+            sha256sum -c SHA256SUMS
+          )
+          echo "RESULT=DEVELOPMENT_EVIDENCE_SHA256_PASS"
+
+      - name: Commit formal development evidence
+        run: |
+          set -Eeuo pipefail
+          git status --short
+          git add "$OUT"
+          git diff --cached --check
+          test -n "$(git diff --cached --name-only)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "test(statsforecast): record formal six-game development evidence"
+          git push origin "HEAD:$BRANCH"
+          echo "EVIDENCE_COMMIT=$(git rev-parse HEAD)"
+          echo "EVIDENCE=$OUT"
+
+      - name: Enforce formal development gate
+        run: |
+          set -Eeuo pipefail
+          "$SF_PYTHON" - "$OUT/DEVELOPMENT_GATE.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          gate = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          if not gate["formal_development_pass"]:
+              raise SystemExit(
+                  "formal development gate failed: "
+                  + json.dumps(gate, ensure_ascii=False, sort_keys=True)
+              )
+          print("RESULT=STATSFORECAST_PHASE_C_DEVELOPMENT_PASS")
+          PY
