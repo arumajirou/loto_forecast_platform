@@ -1,7 +1,7 @@
 """StatsForecast-specific runtime bridge for real-game evaluation.
 
 This module keeps Phase C on the already-certified constructor parameter contract while
-leaving the generic :class:`loto.models.workers.PositionSeriesWorker` unchanged.  The
+leaving the generic :class:`loto.models.workers.PositionSeriesWorker` unchanged. The
 real-game campaign can therefore resolve every StatsForecast model deterministically before
 handing it to the existing worker implementation.
 """
@@ -53,8 +53,7 @@ def resolve_entry_parameters(
     )
     if unresolved:
         raise ValueError(
-            "unresolved StatsForecast constructor parameters for "
-            f"{entry.class_name}: {unresolved}"
+            f"unresolved StatsForecast constructor parameters for {entry.class_name}: {unresolved}"
         )
     return parameters
 
@@ -89,7 +88,7 @@ def forecast_univariate_entry(
 ) -> WorkerOutput:
     """Forecast one primary univariate StatsForecast entry with certified parameters.
 
-    ``NaNModel`` and ``SklearnModel`` are deliberately not coerced into this lane.  Callers
+    ``NaNModel`` and ``SklearnModel`` are deliberately not coerced into this lane. Callers
     retain their model-game rows and record the semantic lane instead of silently dropping
     or misclassifying them.
     """
