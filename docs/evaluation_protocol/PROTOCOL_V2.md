@@ -1,5 +1,8 @@
 # Evaluation Protocol v2
 
+> **Document class:** `DESIGN_CONTRACT`  
+> **Repository status reference:** [`../STATUS.md`](../STATUS.md)
+
 ## Status
 
 ```text
@@ -7,27 +10,35 @@ IMPLEMENTED_FOUNDATION
 HIT_AT_1_CANONICAL_PRIMARY
 LEGACY_V1_READABLE
 HISTORICAL_ARTIFACTS_IMMUTABLE
-CURRENT_OPERATOR_ENVIRONMENT=NATIVE_WINDOWS_ONLY
-FORMAL_TIMER_OOF_PROTOCOL_REHASH_REQUIRED
+HOST_PORTABLE_PROTOCOL
+FORMAL_TIMER_OOF_PROTOCOL_FIXATION_REQUIRED
 HOLDOUT_CLOSED
 PROSPECTIVE_CLOSED
 ```
 
+PR #240, which added the Timer Base 84M OOF engineering foundation, is merged. That merge does **not** mean formal Timer OOF was executed. The scientific campaign remains tracked separately by GitHub Issue #239 / Linear TAJ-12.
+
 ## Scope
 
-This document defines the common evaluation protocol foundation. It does not open Holdout or Prospective data, change model providers, redefine Runtime Certification or Data Access Ledger, or modify API health endpoints.
+This document defines the common evaluation protocol foundation. It does not:
 
-For the current Timer Base 84M campaign, the operator can execute only on native Windows. This does **not** make the protocol Windows-specific; it means the next formal protocol artifacts must bind the identities actually measured on Windows instead of copying historical Linux resource/package values.
+- open Holdout or Prospective data;
+- change model provider contracts;
+- redefine Runtime Certification or Data Access Ledger;
+- make a workstation OS part of the scientific protocol;
+- claim forecast superiority.
+
+`EvaluationProtocolV2` is host-portable. A formal run may execute on an approved Windows or Linux host, but its protocol must bind the **actual code/data/resource/package identities measured on that host**. Historical values from another host/run must never be copied merely to preserve an old protocol hash.
 
 ## Canonical metric inventory
 
-The canonical primary metric is:
+Primary metric:
 
 ```text
 hit_at_1 = Hit@±1
 ```
 
-Required point-forecast metrics are:
+Required point-forecast metrics:
 
 ```text
 hit_at_1
@@ -38,7 +49,7 @@ mse
 rmse
 ```
 
-The canonical deterministic selection order is:
+Canonical deterministic selection order:
 
 1. higher `hit_at_1`;
 2. higher `all_positions_hit_at_1`;
@@ -46,9 +57,9 @@ The canonical deterministic selection order is:
 4. lower `rmse`;
 5. stable model ID tie break.
 
-Therefore a candidate with better MAE but worse Hit@±1 cannot be selected.
+A candidate with better MAE but worse Hit@±1 cannot be selected ahead of the better-Hit@±1 candidate under this ordering.
 
-## Baseline inventory
+## Required baseline inventory
 
 Every formal protocol must include at least:
 
@@ -62,11 +73,13 @@ frequency
 statistical_ar1
 ```
 
-Additional explicitly identified statistical baselines are allowed and change the protocol hash. Removing any required baseline is rejected.
+Additional explicitly identified statistical baselines are allowed and change the protocol identity. Removing a required baseline is rejected.
 
-## Timer Base 84M current formal design boundary
+All model/baseline candidates must use the same eligible folds, target identities, game geometry, horizon, post-processing/reconciliation contract and metric implementation when they are compared.
 
-Unless intentionally revised and documented before formal execution, the current formal OOF design remains:
+## Timer Base 84M formal OOF design boundary
+
+Unless intentionally revised **before execution** and recorded as a new protocol identity, the current design contract is:
 
 ```text
 formal_games=5
@@ -84,11 +97,11 @@ holdout_opened=false
 prospective_opened=false
 ```
 
-Historical template hashes generated before the final code-bearing changes are **not valid final execution hashes**. They remain evidence of protocol-template verification only.
+Historical template hashes generated before the final execution identity is fixed are not valid final execution hashes. They remain template/evidence artifacts only.
 
 ## Protocol v2 fields
 
-`EvaluationProtocolV2` is a strict, frozen Pydantic v2 contract with unknown-field and non-finite number rejection. Its fields are:
+`EvaluationProtocolV2` is a strict, frozen Pydantic v2 contract with unknown-field and non-finite-number rejection.
 
 ```text
 schema_version
@@ -119,29 +132,29 @@ git_commit
 
 The protocol SHA-256 is calculated from canonical UTF-8 JSON containing every field above.
 
-## Current Windows-native fixation requirements
+## Formal fixation requirements
 
-A formal protocol may be generated on native Windows if and only if the following are satisfied:
+Before a formal OOF run, all of the following must pass:
 
-1. the exact final PR head is fetched and race-guarded;
-2. the worktree used for protocol generation is clean;
-3. `code_hash` is computed from the raw bytes of `git ls-tree -r --full-tree <HEAD>`;
-4. the frozen development snapshot is present on Windows and its expected SHA-256 is verified before any formal OOF read;
-5. no database re-query or data substitution is used to recreate a missing snapshot silently;
-6. Windows CPU/GPU/resource/package values are measured and recorded from the actual formal host;
-7. historical Linux resource/package values are not copied into the Windows protocol;
-8. all 10 protocol artifacts are regenerated with the final `git_commit` and `code_hash`;
-9. all 10 protocol hashes are unique and round-trip readable;
-10. a new `PROTOCOL_SET_SHA256` is calculated from the regenerated set;
-11. Holdout and Prospective remain unopened;
-12. protocol files are written to a new evidence directory and historical artifacts are not overwritten.
+1. re-fetch the exact execution Git commit and protect against branch/PR races;
+2. use a clean worktree/check-out at that exact commit;
+3. compute `code_hash` from raw Git tree bytes, not text-normalized shell output;
+4. locate the approved frozen development snapshot and verify its expected SHA-256;
+5. do not silently recreate a missing snapshot by re-querying a mutable database or API;
+6. verify chronological split/feature manifests and their SHA-256 values;
+7. measure CPU, RAM, disk, GPU/VRAM, device identity and relevant package versions on the actual formal host;
+8. bind that measured resource/package identity into the protocol;
+9. regenerate every game/layout protocol artifact using the exact execution `git_commit` and `code_hash`;
+10. verify protocol artifacts round-trip and have the expected distinct identities;
+11. calculate/fix the protocol-set digest used by the campaign;
+12. keep Holdout and Prospective closed;
+13. write new evidence to a new Run ID/path; never overwrite historical protocol artifacts.
 
-### Windows-safe code hash
+### Cross-platform raw Git-tree hash
 
-PowerShell text pipelines may change encoding or line endings. Use raw subprocess bytes, for example:
+The following Python snippet avoids PowerShell/Bash text-pipeline newline/encoding transformations and works on both Windows and Linux when Git and Python are available:
 
-```powershell
-@'
+```python
 import hashlib
 import subprocess
 
@@ -149,8 +162,31 @@ head = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
 payload = subprocess.check_output(["git", "ls-tree", "-r", "--full-tree", head])
 print("git_commit=" + head)
 print("code_hash=" + hashlib.sha256(payload).hexdigest())
-'@ | python -
 ```
+
+## Chronology and leakage contract
+
+For each formal target/fold:
+
+```text
+BUILD_TRAIN_CONTEXT
+FIT_TRAIN_ONLY_COMPONENTS
+PREDICT_WITHOUT_TARGET_ACTUAL
+PERSIST_AND_SEAL_PREDICTION
+READ_TARGET_ACTUAL_AFTER_PREDICTION
+SCORE
+```
+
+Requirements:
+
+- folds are strictly chronological;
+- target/future actuals are absent from the model request/context;
+- scaler, encoder, feature selector, calibrator and HPO/tuning components fit only on the Train-eligible slice;
+- duplicate target identities are rejected;
+- missing/order/domain/availability violations are rejected or handled only by an explicit reviewed protocol rule;
+- raw source data is not overwritten;
+- a prediction record is immutable and SHA-256 sealed before the corresponding actual is read;
+- pretrained weights are not falsely described as fold-trained weights when no fine-tuning occurs.
 
 ## Comparison budget hash
 
@@ -161,9 +197,9 @@ search_space_identity
 resource_budget
 ```
 
-The resource budget records CPU count, GPU count, GPU memory bytes, wall-time seconds, maximum trials and parallel trials. A resource-budget change changes the comparison budget hash.
+The resource budget records the actual formal-run CPU/GPU/resource limits, wall-time/trial limits and parallelism. Changing a result-affecting resource/search budget changes comparison identity.
 
-Because the current formal host is Windows, its resource budget must be measured again. A previous Linux budget is historical evidence only.
+A resource budget from a historical Windows/Linux run is evidence for that run only.
 
 ## Field-level protocol diff
 
@@ -176,11 +212,13 @@ right_hash
 differences
 ```
 
-Every difference contains `path`, `left`, `right`, and `severity`. Any result-affecting or schema-incompatible difference makes `comparable=false` and causes the assertion API to refuse comparison.
+Every difference contains `path`, `left`, `right`, and `severity`. Any result-affecting or schema-incompatible difference makes `comparable=false` and the comparison API must refuse silent normalization.
 
 ## All-seed aggregation
 
-Every approved seed must be present exactly once. Partial seed sets and best-seed-only input are rejected. Each metric summary stores:
+Every configured/approved seed must be present exactly once. Partial seed sets and best-seed-only input are rejected.
+
+Each metric summary stores:
 
 ```text
 count
@@ -193,30 +231,46 @@ worst_value
 worst_seed
 ```
 
-Worst direction is derived from the metric registry.
+Worst direction is derived from the metric registry. The best seed may be reported diagnostically but cannot stand in for the complete aggregate.
 
 ## Prediction sealing and actual-read boundary
 
-For formal OOF, a prediction record must be persisted and SHA-256 sealed before the corresponding target actual is read. The seal must retain evidence that the target actual had not been read. Prediction mutation or overwrite is rejected.
+For formal OOF, the prediction record must be persisted and SHA-256 sealed before the target actual is read. The seal must preserve evidence that actual access had not occurred at prediction time. Prediction mutation or overwrite is rejected.
 
-For the current Timer Base 84M OOF path:
+For Timer Base 84M:
 
-- context must end strictly before `target_draw_no`;
-- target identity/date must be checked after prediction sealing;
-- Timer request/response must keep `actuals_used=false` during prediction;
-- CPU fallback must not be silently accepted where the protocol requires GPU execution;
-- output shape and finite values must be verified.
+- context ends strictly before `target_draw_no`;
+- target identity/date is verified after prediction sealing;
+- Timer request/response retains `actuals_used=false` during prediction;
+- output shape and finite values are verified;
+- CPU fallback is not presented as GPU success when the protocol requires GPU execution;
+- device/PID/VRAM evidence follows runtime-certification requirements.
+
+## Runtime certification relationship
+
+Runtime certification and forecast-quality evaluation are separate gates.
+
+A catalog entry or importable package does not prove runtime success. Runtime evidence must verify actual model load, input, inference, output shape, finite values, effective device, relevant GPU PID/VRAM/CPU-fallback state and cleanup/reload behavior where required.
+
+A runtime-certified model may still fail to beat mandatory baselines in OOF.
 
 ## Legacy compatibility and historical immutability
 
-`read_protocol_artifact` retains read access to legacy protocol artifacts. Protocol v1 and protocol v2 are not silently comparable.
+Legacy protocol artifacts remain readable for audit/migration where the implementation supports them. Protocol v1 and v2 are not silently comparable.
 
-`write_protocol_artifact` refuses to overwrite an existing path by default and writes new v2 artifacts through a same-directory temporary file, fsync and atomic replace. Historical artifacts remain immutable even when the formal execution environment changes from Linux to Windows.
+New protocol artifacts must use no-clobber/atomic writing behavior. Historical protocol/prediction/evidence artifacts remain immutable even when:
 
-## Current non-claims
+- a PR merges;
+- a later host changes OS;
+- package versions advance;
+- a newer protocol set is generated.
+
+## Current scientific non-claims
+
+As preserved from the PR #240 merge boundary and rechecked during the documentation audit:
 
 ```text
-final_timer_oof_protocol_hashes_fixed=false
+formal_timer_oof_protocol_finalized=false
 formal_baseline_oof_run=false
 formal_timer_oof_run=false
 holdout_accessed=false
@@ -224,7 +278,7 @@ prospective_accessed=false
 accuracy_improvement_claimed=false
 champion_selected=false
 promotion_performed=false
-production_deployment=false
+production_deployment_from_timer_oof=false
 ```
 
-The next required step is Windows-side snapshot availability/hash verification followed by final protocol regeneration. Formal OOF must not start before that gate passes.
+The next scientific work is the Issue #239 OOF campaign under a newly fixed formal execution identity. Holdout and Prospective must not be opened merely because the engineering foundation has merged.
