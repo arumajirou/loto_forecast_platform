@@ -1,3 +1,9 @@
+> **Historical evidence notice — preserved point-in-time report.**  
+> This root report verifies the version-single-source change at its original SHA/time; it is not the current whole-repository status.  
+> Current repository verification: [`docs/CURRENT_VERIFICATION_REPORT.md`](docs/CURRENT_VERIFICATION_REPORT.md).  
+> Current audited status: [`docs/STATUS.md`](docs/STATUS.md).  
+> The original evidence below is intentionally retained unchanged.
+
 # Version Single-Source Verification Report
 
 ## Status
