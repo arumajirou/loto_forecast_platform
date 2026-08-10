@@ -2,10 +2,10 @@
 
 ```text
 status_class: AUDITED_SNAPSHOT
-as_of: 2026-08-10T18:20+09:00
+as_of: 2026-08-10T18:46+09:00
 repository: arumajirou/loto_forecast_platform
-audit_main_sha: cc7ec5473730cfb18100bdfbb5228cf65e571b32
-scope: repository merge batch + current executable/documentation state
+audit_main_sha: cfbe9f1cf379a68b4ad6ca2bc6d7793dbd828300
+scope: repository merge batch + current executable/scientific boundary
 ```
 
 ## Verdict
@@ -14,145 +14,101 @@ scope: repository merge batch + current executable/documentation state
 PR_248_UNIFIED_CAMPAIGN=MERGED_AND_VERIFIED
 PR_244_CHECKOUT_V7=MERGED_AND_VERIFIED
 PR_242_RAY_TUNE_UPDATE=MERGED_AND_VERIFIED
-PR_243_FASTAPI_UPDATE=VERIFICATION_PENDING_AT_SNAPSHOT
-PR_241_GROUPED_UPDATE=REBASE_OR_RECREATE_PENDING_AT_SNAPSHOT
+PR_243_FASTAPI_UPDATE=MERGED_AND_VERIFIED
+PR_249_WITHIN_TAU_DECODER=MERGED
+PR_241_GROUPED_UPDATE=MERGED_AFTER_CURRENT_HEAD_LINUX_FULL_CI
+PR_250_CAMPAIGN_DECODER_ROUTING=CURRENT_BASE_SYNC_AND_CI_PENDING
 HOLDOUT=NOT_OPENED
 PROSPECTIVE=NOT_OPENED
 CHAMPION=NOT_CLAIMED
 PROMOTION=NOT_AUTHORIZED
 ```
 
-## Verified merged changes
+## Merged changes and evidence
 
-### PR #248 — unified all-model × all-game evaluation
+| PR | Merge SHA | Verification summary |
+|---|---|---|
+| #248 | `aae45ba9294499f51cc5f1564de1c6ccf5814230` | premerge head `c7c8a039...`; Linux run `31371724178` SUCCESS; Windows run `31371724143` SUCCESS |
+| #244 | `c12ca27048d25cdc869fa3cbbfa6e31c727eb529` | actions/checkout v7 workflow update; exact-head Linux and Windows SUCCESS |
+| #242 | `cc7ec5473730cfb18100bdfbb5228cf65e571b32` | premerge head `8641a50b...`; Linux `31373320815` SUCCESS; Windows `31373320763` SUCCESS |
+| #243 | `b04f3e40baa1861a5b83da047bdef2655905bd52` | premerge head `0f8a0ec9...`; Linux `31373843737` SUCCESS; Windows `31373843656` SUCCESS |
+| #249 | `83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f` | premerge head `6571ec99...`; Linux `31374883284` SUCCESS; Windows run `31374883286` was queued when last audited |
+| #241 | `cfbe9f1cf379a68b4ad6ca2bc6d7793dbd828300` | current-main premerge head `e5da9364...`; Linux `31376124799` SUCCESS; Windows `31376124812` queued at merge evaluation; GitHub accepted protected expected-head merge |
 
-Merged commit:
+Queued Windows states are recorded literally and are **not** represented as PASS.
 
-```text
-aae45ba9294499f51cc5f1564de1c6ccf5814230
+## PR #248 — unified campaign
+
+The merged feature provides:
+
+```bash
+uv run loto3 campaign
 ```
 
-Exact pre-merge implementation head:
+Verified controls include:
 
-```text
-c7c8a039e7aa1aef34fbfd0af8dc2c41f67945a2
-```
-
-Linux standard CI:
-
-```text
-run=31371724178
-job=93401966841
-conclusion=SUCCESS
-```
-
-Verified stages included repository Ruff format, Ruff lint, compileall, full pytest, clean-tree check and cleanup.
-
-Native Windows portability:
-
-```text
-run=31371724143
-job=93401967447
-conclusion=SUCCESS
-```
-
-Verified stages included universal-lock validation, dependency resolution, wheel build, installed-wheel import and tracked-file cleanliness.
-
-The merged feature provides `uv run loto3 campaign`. It does not establish a full real-data 174 × 6 accuracy result.
-
-### PR #244 — actions/checkout v7
-
-Merged commit:
-
-```text
-c12ca27048d25cdc869fa3cbbfa6e31c727eb529
-```
-
-Exact dependency/workflow head:
-
-```text
-b4ae1d8197ed4e4ed942ee327a75457ba296c046
-```
-
-Linux and native Windows exact-head jobs completed successfully before merge. The change touched the CI/self-hosted/Windows checkout action pin, not model, data or evaluation semantics.
-
-### PR #242 — Ray Tune requirement
-
-Merged commit:
-
-```text
-cc7ec5473730cfb18100bdfbb5228cf65e571b32
-```
-
-Latest rebased pre-merge head:
-
-```text
-8641a50b9881f9fcb9716674dae63b3c8e2d7f2a
-```
-
-Linux exact-head full CI:
-
-```text
-run=31373320815
-conclusion=SUCCESS
-```
-
-Native Windows exact-head portability subsequently completed successfully:
-
-```text
-run=31373320763
-conclusion=SUCCESS
-```
-
-The audited `pyproject.toml` now contains `ray[tune]>=2.56.1` in the `full` extra and the committed `uv.lock` reflects the update.
-
-## Pending PR verification
-
-### PR #243 — FastAPI 0.141.1
-
-The PR was recreated on audited main with head:
-
-```text
-0f8a0ec9d560d19cb4ee370c3fd2cf667801022f
-```
-
-At snapshot time GitHub reported the PR mergeable, but current-head Linux and native Windows workflows were queued. Because this is an API dependency jump, queued checks are not represented as PASS.
-
-### PR #241 — grouped routine dependencies
-
-The PR touches both `pyproject.toml` and `uv.lock` and includes multiple runtime/dev dependency updates. At snapshot time it had not yet completed rebasing/recreation onto the latest Ray-updated main. It is therefore not represented as merge-ready.
-
-## Unified campaign contract verified in code/tests
-
-The merged campaign implements these controls:
-
-- canonical six-game geometry;
+- six canonical game geometries;
 - complete requested broad-catalog × game materialization;
-- explicit fail-visible status for non-routable/unsupported/unavailable/failed combinations;
+- fail-visible unsupported/unavailable/non-routable/failed rows;
 - Hit@±1 primary tolerance;
 - per-position Hit@±1, all-position Hit@±1, MAE, MSE and RMSE;
 - seven mandatory baselines;
-- all configured seeds retained with aggregate statistics including variance and worst seed/value;
-- prediction lock written/fsynced and SHA-256 sealed before actual scoring read;
-- single-use output directory;
-- Holdout and Prospective not evaluated by this campaign.
+- all configured seeds with aggregate mean/population variance/worst statistics;
+- prediction artifact persistence and SHA-256 sealing before actual scoring read;
+- single-use output directories;
+- Holdout/Prospective remain unevaluated.
+
+The merge does not establish a real-data 174 × 6 success result.
+
+## PR #249 — within-tau decoder objective
+
+PR #249 changed only:
+
+```text
+src/loto/probabilistic/decoder.py
+tests/test_hit_at_1_decoder.py
+```
+
+It added explicit `MAP` and `WITHIN_TAU` objectives for legal select-game constrained decoding. Focused tests cover exact IID-null optima, brute-force agreement, legality, MAP compatibility and fail-closed probability validation.
+
+This verifies an implementation/theory contract, not a real OOF improvement and not evidence that lottery draws are non-IID.
+
+## PR #241 — dependency group
+
+The merged current-main head `e5da936410a719bf378302cedb34b8addbbbb2a1` was ahead 1 / behind 0 before merge and changed only `pyproject.toml` and `uv.lock`.
+
+The complete Linux CI passed with the new dependency set after #249 was already in its base. The Windows portability lane was queued, not failed, when the expected-head merge was attempted. GitHub accepted the merge under repository protection rules.
+
+The merged dependency boundary includes the intended grouped updates:
+
+- Uvicorn 0.52.1 lane;
+- MLflow 3.15.1 lane;
+- Hypothesis 6.165.2 lane;
+- Ruff 0.16.1 lane;
+- GluonTS 0.17.0 lane.
+
+## PR #250 — not merged at audit cutoff
+
+PR #250 proposes routing probability-bearing unified campaign candidate distributions through the explicit Hit@±1 decoder while retaining point-only worker behavior.
+
+At audit cutoff its scientific head had been created before #241 merged. A one-shot branch sync was queued to incorporate current main without modifying its four scientific/test files. Exact current-base CI had therefore not completed. It was correctly left unmerged.
 
 ## What this report does not verify
 
 This report does not certify:
 
-- a real six-game data snapshot;
-- every third-party model's availability on the target host;
-- every model's successful runtime on all games;
+- a real six-game immutable data snapshot;
+- every third-party model's successful runtime on all games;
 - all-model GPU execution;
-- full real-data OOF results;
+- a full real-data 174 × 6 campaign;
+- an OOF gain from the within-tau decoder;
 - Holdout results;
 - Prospective results;
 - a champion;
 - promotion eligibility.
 
-Runtime evidence, scientific evidence and documentation evidence remain separate evidence classes.
+Runtime evidence, decoder/theory evidence, scientific evaluation evidence and documentation evidence remain separate classes.
 
 ## Historical report handling
 
-The root `VERIFICATION_REPORT.md` is a historical version-single-source verification snapshot and must not be interpreted as the current whole-repository report. Current readers should use this file plus `docs/STATUS.md`; historical observations are preserved rather than rewritten.
+The root `VERIFICATION_REPORT.md` remains a historical version-single-source verification snapshot. Its original evidence is preserved behind a supersession banner. Current readers should use this file plus `docs/STATUS.md`.
