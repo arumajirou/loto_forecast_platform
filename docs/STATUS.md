@@ -2,62 +2,69 @@
 
 ```text
 status_class: AUDITED_SNAPSHOT
-as_of: 2026-08-10T18:59+09:00
+as_of: 2026-08-10T20:23+09:00
 repository: arumajirou/loto_forecast_platform
-source_of_truth: live GitHub state + code/config + exact-head CI evidence
-base_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
-superseded_by: NONE
+source_of_truth: live GitHub state + current code/config + exact-head CI evidence
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
 ```
 
-This file is the current repository-status entry point. It is a point-in-time audit; live GitHub state takes precedence after the `as_of` time.
+Live GitHub state takes precedence after the timestamp above. The SHA identifies the functional code state audited before this documentation-only branch.
 
 ## Executive status
 
 - Default branch: `main`.
-- Audited main: `8430d9f507ba735bf1df69930e057c974752bfdb`.
-- Unified all-model × all-game development evaluation is merged and callable through `uv run loto3 campaign`.
-- Probability-bearing unified-campaign candidate estimators are now routed through family-specific Hit@±1/WITHIN_TAU decoding by PR #250; point-only workers remain point-only.
-- The broad generated catalog remains a 174-entry inventory at this audit boundary; registration is not equivalent to shared routing, runtime certification, OOF completion, or promotion.
-- Holdout: **CLOSED / NOT EVALUATED by this maintenance or decoder-routing work**.
-- Prospective: **CLOSED / NOT EVALUATED**.
-- Champion/promotion: **NONE AUTHORIZED**.
-- Formal Timer Base 84M OOF work remains open in GitHub Issue #239.
-- Timer-S1 PR-B immutable runtime/certification work remains open in GitHub Issue #118.
+- Functional code audit base: `2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8`.
+- Open PR search at the start of this documentation refresh: **0**.
+- Current open GitHub scientific/runtime issues found in the repository audit: **#118 Timer-S1 PR-B** and **#239 Timer Base 84M OOF**.
+- Canonical six-game geometry is implemented for `mini`, `loto6`, `loto7`, `bingo5`, `numbers3`, `numbers4`.
+- Unified all-model × all-game **development** campaign is callable through `uv run loto3 campaign`.
+- Broad generated forecast inventory remains **174 entries** at this code boundary.
+- Separate probabilistic platform exposes a **72-model** catalog.
+- Hit@±1 remains the primary comparison metric.
+- Geometry-general metrics now preserve select set-overlap semantics and digit positional semantics.
+- Probability-bearing campaign candidates use family-specific Hit@±1/WITHIN_TAU decoding; point-only routes remain point-only.
+- Theory-aware Hit@±1 threshold semantics are implemented for new promotion evidence without rewriting historical v1 evidence.
+- Pre-experiment paired-score MDE/power planning is implemented.
+- Holdout: **CLOSED / NOT CLAIMED AS EVALUATED BY THIS MERGE/DOCUMENTATION SEQUENCE**.
+- Prospective: **CLOSED / NOT CLAIMED AS EVALUATED**.
+- Champion: **NONE AUTHORIZED BY CURRENT DOCUMENTATION**.
+- Automatic promotion/retraining/registry write: **FORBIDDEN by current promotion policy contracts**.
 
-## Merge batch completed on 2026-08-10
+## Recent main sequence
 
-| PR | Result | Main commit | Evidence boundary |
-|---|---|---|---|
-| #248 | MERGED | `aae45ba9294499f51cc5f1564de1c6ccf5814230` | exact pre-merge head passed Linux full CI and native Windows portability; unified campaign added |
-| #244 | MERGED | `c12ca27048d25cdc869fa3cbbfa6e31c727eb529` | actions/checkout v7 workflow update; Linux and Windows exact-head checks passed |
-| #242 | MERGED | `cc7ec5473730cfb18100bdfbb5228cf65e571b32` | Ray Tune updated to `>=2.56.1`; latest rebased head passed Linux and native Windows verification |
-| #243 | MERGED | `b04f3e40baa1861a5b83da047bdef2655905bd52` | FastAPI updated to `>=0.141.1,<0.142`; exact-head Linux and Windows checks passed |
-| #249 | MERGED | `83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f` | explicit MAP/WITHIN_TAU constrained select decoder; Linux exact-head CI passed |
-| #241 | MERGED | `cfbe9f1cf379a68b4ad6ca2bc6d7793dbd828300` | grouped Uvicorn/MLflow/Hypothesis/Ruff/GluonTS update; current-base Linux full CI passed; Windows lane was queued when GitHub accepted expected-head merge |
-| #250 | MERGED | `8430d9f507ba735bf1df69930e057c974752bfdb` | unified candidate probability routing through family-specific WITHIN_TAU decoder; synchronized to current main, exact-head Linux full CI passed, review threads 0 |
+| PR | Main SHA | Result / evidence boundary |
+|---|---|---|
+| #248 | `aae45ba9294499f51cc5f1564de1c6ccf5814230` | unified all-model × all-game development campaign |
+| #249 | `83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f` | explicit MAP/WITHIN_TAU constrained select decoder |
+| #250 | `8430d9f507ba735bf1df69930e057c974752bfdb` | candidate probability routing to family-aware WITHIN_TAU decoder |
+| #251 | `5469410c4af679369ab65241c97ff4c4eaab39f2` | prior documentation alignment snapshot |
+| #252 | `8c87356d6aeb776e47c06635592071a6a54014fd` | geometry-general metrics/hard-code gate; digit positional hit semantics fixed |
+| #253 | `5c44cc866af36f3bbb44582263ff54bf392c3f10` | theory-aware promotion eligibility v2; sealed game identity and schema-aware evidence |
+| #254 | `2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8` | paired-score power/MDE planning; invalid low-power regime fails closed |
 
-GitHub Issue #247 was closed as completed after PR #248 merged.
+PRs #252–#254 were merged serially after exact-head/current-main Linux CI and review-thread gates. #254 final CI used the merge ref `Merge 218fa3b4... into 5c44cc86...` and passed format, lint, compile, full pytest, clean-tree and cleanup before squash merge.
 
-## Open pull requests at audit cutoff
+## Capability interpretation
 
-After the functional/dependency merge batch, the only open PR was the documentation refresh PR #251 itself. No unmerged implementation/dependency PR remained in the live open-PR search at the audit cutoff.
+Do not compress the following stages into a single “available” field:
 
-## Current dependency boundary
+```text
+REGISTERED
+-> DEPENDENCY_DECLARED
+-> IMPLEMENTED
+-> SHARED_ROUTABLE or PROVIDER_ROUTABLE
+-> RUNTIME_CERTIFIED
+-> LOTTERY_COMPATIBLE
+-> OOF_EVALUATED
+-> HOLDOUT_EVALUATED
+-> PROSPECTIVE_EVALUATED
+-> PROMOTION_ELIGIBLE
+-> HUMAN APPROVAL
+```
 
-Audited main includes:
+The 174-entry broad catalog is a planning/inventory layer. It is not 174 proven shared workers or 174 proven winners.
 
-- FastAPI `>=0.141.1,<0.142` where declared;
-- Ray Tune `>=2.56.1` in the `full` extra;
-- Uvicorn 0.52.1 lane;
-- MLflow 3.15.1 lane;
-- Hypothesis 6.165.2 lane;
-- Ruff 0.16.1 lane;
-- GluonTS 0.17.0 lane;
-- the corresponding committed `uv.lock`.
-
-`uv.lock` remains the committed dependency lock and must stay consistent with `pyproject.toml`.
-
-## Unified evaluation campaign
+## Unified campaign state
 
 Primary command:
 
@@ -67,68 +74,148 @@ uv run loto3 campaign \
   --output /path/to/new-run-directory
 ```
 
-Plan-only inventory:
+Plan only:
 
 ```bash
 uv run loto3 campaign --output unused --plan-only
 ```
 
-Canonical games are `mini`, `loto6`, `loto7`, `bingo5`, `numbers3`, and `numbers4`.
+The campaign:
 
-The campaign materializes every requested broad-catalog model × game pair exactly once and deliberately retains fail-visible states such as `FAILED`, `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `PARTIAL_SEEDS`, and `NON_STANDALONE_METHOD`.
+- materializes every requested broad-catalog model × game pair once;
+- keeps `FAILED`, `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `PARTIAL_SEEDS`, `NON_STANDALONE_METHOD` as visible evidence;
+- evaluates seven mandatory baselines;
+- retains every configured seed and summary variance/worst statistics;
+- seals predictions with `actuals_known=false`, fsync and SHA-256 before matching actuals are read by the scoring stage;
+- does not automatically open formal Holdout or Prospective.
 
-The primary tolerance is Hit@±1. Required accompanying metrics include per-position Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE. Mandatory baselines are random, fixed, mean, median, last, frequency, and statistical AR(1). All configured seeds are retained and summarized; best-seed-only selection is not part of the campaign. Prediction records are persisted and SHA-256 sealed with `actuals_known=false` before scoring reads corresponding actuals.
+`matrix_complete=true` means result-row coverage is complete. It does not mean every model/game pair succeeded.
 
-## Decoder and candidate-routing state
+## Geometry-general evaluation state
 
-PR #249 added explicit select-game `DecodeObjective.MAP` and `DecodeObjective.WITHIN_TAU` constrained decoding. PR #250 then connected probability-bearing unified-campaign candidate estimators to family-specific WITHIN_TAU decoding while preserving point-only worker routes and explicit decoder/distribution identities.
+`loto.game.geometry` is the single source of truth for game shape and legality.
 
-The candidate bridge is explicitly identified as a row-normalized slot-binary probability adapter rather than being mislabeled as a native categorical PMF. Decoder/distribution identities are persisted in runtime evidence attached to sealed seed evaluations.
+`loto.evaluation.metrics.evaluate_outcomes()` now evaluates every canonical family using its own semantics:
 
-These are implementation/theory and routing changes. They are **not** evidence that lottery draws are non-IID, not a promise of OOF improvement, and not Holdout/Prospective results.
+- select: `mean_hits` is set overlap;
+- digits: `mean_hits` is exact positional equality, preserving order and repeated digits;
+- all families: position MAE/MSE/RMSE, within-tau rate and all-position within-tau rate are geometry-width aware.
 
-## What has not been established
+The older Loto7 `evaluate_draws()` API remains a compatibility wrapper.
 
-The following claims are **not** supported by this snapshot:
+## Decoder/routing state
 
-- all 174 registered entries successfully execute on all six games;
-- all 174 entries are independent forecast models;
-- all registered entries are runtime-certified on the target host;
-- a complete real-data 174 × 6 accuracy campaign has been executed;
-- the WITHIN_TAU decoder improves every model's real OOF score;
-- a model beats every mandatory baseline;
-- a champion has passed formal Holdout;
-- Prospective evidence authorizes promotion or production binding.
+Probability-bearing candidate route:
 
-A complete campaign matrix means every requested combination has a recorded result row; it does not mean every row succeeded.
+```text
+slot-conditioned binary candidate output
+-> row normalization
+-> distribution identity = row-normalized-slot-binary-probability-v1
+-> digits: positional window-mass WITHIN_TAU
+-> select: legality-constrained WITHIN_TAU dynamic programming
+-> legal point forecast
+```
 
-## Runtime/capability documentation
+Point-only workers do not receive a fabricated PMF.
 
-Use these current/code-grounded references:
+This is code/theory/routing evidence, not real-data evidence that the decoder improves every model.
 
-- `docs/MODEL_EXECUTION_MATRIX.md`
-- `docs/CURRENT_MODEL_EXECUTION_ADDENDUM.md`
-- `docs/LIBRARY_RUNTIME_CAPABILITIES.md`
-- `docs/TSFM_RUNTIME_CAPABILITIES.md`
-- `docs/MODEL_INVENTORY.md`
-- `docs/UNIFIED_EVALUATION_CAMPAIGN.md`
+## Theory-aware threshold state
 
-Historical runtime evidence remains historical evidence. Do not rewrite old observations to match a newer aggregate.
+`TheoryAwareThreshold` supports:
 
-## Scientific work still open
+```text
+absolute
+excess_vs_iid_null
+```
 
-### Timer Base 84M — Issue #239
+The exact IID-null reference is game/tau-specific. An absolute configured target above the IID-null ceiling fails closed unless an explicit alternative hypothesis is declared. The IID-null ceiling is documented as an exact optimum under that null distribution, not a universal bound for every possible biased process.
 
-Status remains OOF-focused. Runtime certification and evaluation infrastructure do not establish that formal leakage-safe real-data OOF has completed. Holdout and Prospective remain closed.
+## Promotion state
 
-### Timer-S1 — Issue #118
+Historical promotion schema v1 remains parseable without reinterpretation.
 
-PR-B immutable provenance, remote-code review, isolated runtime, real inference, GPU evidence, reload reproducibility, and certification remain an open workstream. No OOF/accuracy/promotion claim follows from that issue.
+Promotion v2:
 
-## Documentation interpretation rules
+- requires an explicit game;
+- fixes current promotion evidence tolerance to `tau=1`;
+- resolves theory semantics into an absolute Hit@±1 threshold;
+- requires sealed `game_id` evidence on Holdout and every Prospective window;
+- rejects game mismatch;
+- checks aggregate/worst-window target, degradation and mandatory baselines.
 
-1. Live GitHub state is newer than this snapshot once time advances beyond `as_of`.
-2. Code/config determine executable capability; prose does not create runtime support.
-3. Runtime certification does not establish lottery-domain forecast quality.
-4. OOF does not authorize Holdout; Holdout does not authorize Prospective; Prospective does not automatically authorize promotion.
-5. Historical verification reports remain point-in-time evidence and should be superseded by links rather than rewritten as if they were current runs.
+Even if all rules pass, the automated decision is only `ELIGIBLE_FOR_HUMAN_APPROVAL`.
+
+```text
+human_approval_required=true
+automatic_promotion=false
+automatic_retraining=false
+registry_write_allowed=false
+promotion_status=NOT_PROMOTED
+```
+
+## Power/MDE planning state
+
+`loto.evaluation.power_analysis` implements `paired-score-normal-approximation-v1` for pre-experiment planning.
+
+Capabilities:
+
+- required paired draws for a declared positive effect;
+- minimum detectable effect for a declared sample size;
+- deterministic MDE curves;
+- Bonferroni-adjusted planning alpha for multiplicity;
+- fail-closed invalid effect/SD/draw-count/tail/low-power inputs.
+
+`score_sd` is required from allowed development/pilot evidence or a declared simulation fixed before the target window. The output is planning evidence, not a p-value or promotion result.
+
+## Model/runtime state
+
+For detailed library-by-library routing use:
+
+- `README.md`;
+- `docs/CAPABILITIES_AND_OPERATIONS.md`;
+- `docs/MODEL_EXECUTION_MATRIX.md`.
+
+Current repository TSFM aggregate runtime evidence records 21 models and 19 runtime-certified identities in `audit/tsfm-runtime/runtime-status.json`. Runtime certification remains separate from lottery OOF quality.
+
+## Current dependency boundary
+
+Current `pyproject.toml` includes, among other contracts:
+
+- Python `>=3.11,<3.14`;
+- NeuralForecast `==3.2.0`;
+- Torch `==2.9.1`;
+- Transformers `==4.57.6`;
+- Hugging Face Hub `==0.36.2`;
+- FastAPI `>=0.141.1,<0.142` in API/full lanes;
+- Ray Tune `>=2.56.1` in `full`;
+- Uvicorn `>=0.52.1`;
+- MLflow `>=3.15.1`;
+- Ruff `>=0.16.1` in dev;
+- GluonTS `>=0.17.0` in frameworks.
+
+`uv.lock` is the committed lock authority. Isolated provider environments have independent dependency contracts by design.
+
+## Open scientific/runtime work
+
+### #239 — Timer Base 84M leakage-safe OOF
+
+Runtime certification is not OOF. This issue remains the formal forecast-quality workstream. Required order remains development/OOF first, then separately authorized Holdout, then Prospective.
+
+### #118 — Timer-S1 PR-B runtime/certification
+
+Immutable upstream provenance, remote-code review, isolated runtime, real load/inference, device evidence and reload/reproducibility remain explicit runtime gates. This issue does not authorize OOF or accuracy claims.
+
+## What is not established by this snapshot
+
+- that every one of the 174 broad entries successfully executes on all six games;
+- that a complete real-data 174 × 6 campaign has completed;
+- that all 72 probabilistic models have completed formal lottery OOF;
+- that every TSFM runtime-certified identity beats mandatory baselines;
+- that WITHIN_TAU decoding improves every real OOF run;
+- that lottery draws are non-IID;
+- that Holdout or Prospective has been opened/completed;
+- that a champion is authorized;
+- that promotion has occurred.
+
+A valid formal result can be `NO_MODEL_BEATS_BASELINE` with no champion.
