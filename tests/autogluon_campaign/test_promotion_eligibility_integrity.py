@@ -129,11 +129,16 @@ def test_v2_effective_null_target_is_used_by_actual_rule_evaluation(tmp_path: Pa
     assert result.decision == "NOT_ELIGIBLE"
     decision = json.loads(Path(result.decision_path).read_text(encoding="utf-8"))
     assert decision["reason_code"] == "AGGREGATE_HIT_AT_1_TARGET"
-    hit_rule = next(
-        rule for rule in decision["rules"] if rule["rule_id"] == "AGGREGATE_HIT_AT_1_TARGET"
+    rules_payload = json.loads(
+        (Path(result.output_dir) / "RULE_EVALUATION.json").read_text(encoding="utf-8")
     )
-    assert hit_rule["detail"]["observed"] == pytest.approx(0.25)
-    assert hit_rule["detail"]["required"] == pytest.approx(0.30)
+    hit_rule = next(
+        rule
+        for rule in rules_payload["rules"]
+        if rule["rule_id"] == "AGGREGATE_HIT_AT_1_TARGET"
+    )
+    assert hit_rule["observed"] == pytest.approx(0.25)
+    assert hit_rule["requirement"] == pytest.approx(0.30)
 
 
 def test_v2_artifact_roundtrip_preserves_schema_policy_and_game(tmp_path: Path) -> None:
@@ -168,7 +173,7 @@ def test_v2_rejects_scoring_evidence_from_the_wrong_game(tmp_path: Path) -> None
             policy=PromotionPolicyV2(game="numbers3"),
             run_id="v2-wrong-game",
         )
-    assert exc_info.value.code == "SCORING_GAME_POLICY_MISMATCH"
+    assert exc_info.value.code == "PROMOTION_GAME_MISMATCH"
 
 
 def test_v2_rejects_legacy_score_without_game_identity(tmp_path: Path) -> None:
@@ -181,7 +186,7 @@ def test_v2_rejects_legacy_score_without_game_identity(tmp_path: Path) -> None:
             policy=PromotionPolicyV2(game="numbers3"),
             run_id="v2-missing-game",
         )
-    assert exc_info.value.code == "SCORING_GAME_MISSING"
+    assert exc_info.value.code == "PROMOTION_GAME_EVIDENCE_MISSING"
 
 
 def test_rehashed_semantic_candidate_tamper_is_rejected(tmp_path: Path) -> None:
