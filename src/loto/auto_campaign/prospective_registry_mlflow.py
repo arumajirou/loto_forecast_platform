@@ -117,9 +117,10 @@ def record_mlflow(
 ) -> dict[str, Any]:
     """Create or recover one parent run and per-seed child runs."""
 
+    from mlflow.entities import Metric, Param
+
     import mlflow
     from mlflow import MlflowClient
-    from mlflow.entities import Metric, Param
 
     started = time.perf_counter()
     mlflow.set_tracking_uri(tracking_uri)

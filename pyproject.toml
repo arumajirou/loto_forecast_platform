@@ -70,7 +70,7 @@ where = ["src"]
 # directories do not collide in sys.modules during collection.
 addopts = "--import-mode=importlib -q"
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = [".", "src"]
 
 [tool.ruff]
 line-length = 100
