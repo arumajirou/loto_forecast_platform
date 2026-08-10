@@ -1,84 +1,251 @@
-# 基本設計書（arc42構成）
-
-## 1. はじめにと目標
-
-信頼できる予測評価、将来予測の改ざん防止、モデル交換可能性、他くじへの拡張性を優先する。
-
-## 2. 制約
-
-- 本番正本はLinux単一ホスト
-- RTX 5070 Ti 16GBを想定し、GPU深層trialは原則同時1件
-- 現在のLoto7履歴は約687抽選であり、複雑モデルの探索過適合を強く警戒
-- 多変量系列を正式トラックにせず、単変量/位置別/候補分類と外生変数を分離
-
-## 3. コンテキストとスコープ
-
-外部: 公式抽選情報、第二取得元、MLflow、Prometheus/Grafana、管理者ブラウザ。
-内部: data, features, models, calibration, decoding, evaluation, registry, sealing, orchestration, API。
-
-## 4. 解決戦略
-
-- 契約駆動モジュラーモノリス
-- Lottery PluginでLoto7固有ルールを隔離
-- 全モデルをAdapter化
-- 論理契約をPydantic、物理形式をJSON/CSV/Parquetで分離
-- 予測とReleaseをハッシュ・署名で不変化
-
-## 5. ビルディングブロック
+# 基本設計書 / Architecture
 
 ```text
-loto/
-├── data             Canonical化・品質検査
-├── features         As-of特徴量
-├── models           baseline / classification / position / neuralforecast
-├── calibration      Platt / Temperature
-├── decoding         制約付きDP
-├── evaluation       指標・bootstrap・昇格ゲート
-├── sealing          予測封印
-├── registry         SQLite台帳・Release Bundle
-├── observability    Prometheus・GPU証跡
-├── orchestration    Trusted Vertical Slice
-├── api              FastAPI
-└── events           JSONLイベント
+status_class: DESIGN_CONTRACT
+as_of: 2026-08-10T18:59+09:00
+repository: arumajirou/loto_forecast_platform
+audited_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
 ```
 
-## 6. ランタイムビュー
+## 1. 設計目標
+
+本基盤は、予測精度だけでなく次を同時に満たすことを目的とする。
+
+- leakage-safeな時系列評価
+- Hit@±1-firstの比較可能性
+- model/provider交換可能性
+- six-game geometryへの拡張性
+- runtime evidenceと科学 evidenceの分離
+- prediction-before-actual固定
+- fail-visibleな全model × game coverage
+- 再現可能なRun ID / hash / artifact lineage
+
+## 2. Canonical game geometry
+
+`src/loto/game/geometry.py` をgame shape/legalityの正本とする。
 
 ```text
-INGEST → VALIDATE → CANONICALIZE → BUILD_FEATURES → TRAIN
-→ CALIBRATE → DECODE → EVALUATE → SEAL_FORECAST → REGISTER
+mini      select / 5 positions / 1..31
+loto6     select / 6 positions / 1..43
+loto7     select / 7 positions / 1..37
+bingo5    select / 8 positions / 1..40
+numbers3  digits / 3 positions / 0..9
+numbers4  digits / 4 positions / 0..9
 ```
 
-各Stageは台帳とイベントへ追記され、成功済み成果物は不変Artifactとして扱う。
+Select familyはascending/distinct legalityを保持し、digit familyは位置順序と重複を保持する。
 
-## 7. デプロイビュー
+## 3. 主要コンポーネント
 
-- Linux: Python/uv環境、systemd user service/timer、API、Prometheus
-- 認定: OCIコンテナdigest固定
-- Windows/WSL: 補助検証、成果物はLinux認定ゲート後のみ採用
+```text
+src/loto/
+├── game/                  canonical game geometry
+├── data/                  canonicalization / validation / dataset access
+├── features/              historical/as-of features
+├── models/
+│   ├── catalog_full.py    broad generated inventory
+│   ├── catalog.py         shared executable ModelSpec catalog
+│   ├── factory.py         candidate RuntimeModel implementations
+│   ├── workers.py         position/foundation execution worker
+│   └── providers/         shared foundation/provider registry
+├── evaluation/
+│   ├── protocol_v2.py     formal result-affecting protocol identity
+│   ├── metrics_general.py geometry-aware metrics
+│   ├── metric_registry.py mandatory metric/baseline registry
+│   ├── seed_summary.py    all-seed aggregation
+│   └── unified_campaign.py broad model × game development campaign
+├── probabilistic/
+│   └── decoder.py         MAP / WITHIN_TAU family-aware decoding
+├── orchestration/         older/specialized research orchestration
+├── registry/              experiment/release evidence registration
+├── observability/         runtime/resource monitoring
+├── api/                   FastAPI surfaces
+└── events/                structured event/log evidence
+```
 
-## 8. 横断的概念
+Provider-specific isolated campaign directories and `environments/**` coexist with the shared worker path. Broad registration is intentionally not the same as shared runtime routing.
 
-- 共通ID: run_id, trial_id, model_id, forecast_id, release_id
-- 時刻: event_timeとavailable_atを分離
-- 再現性: resolved config, environment fingerprint, seed
-- 安全: append-only, quarantine, atomic write, rollback record
+## 4. Evaluation architecture
 
-## 9. アーキテクチャ判断
+Current canonical development comparison path:
 
-- ADR-001 Linux本番正本
-- ADR-002 Optuna標準/Ray限定
-- ADR-003 Hits@7主指標と校正ゲート
-- ADR-004 片側e-processは逆棄却に使わない
+```text
+canonical game frame
+  -> development/holdout split
+  -> chronological rolling folds
+  -> EvaluationProtocolV2
+  -> mandatory baselines
+  -> broad catalog × game planning
+  -> route classification
+       candidate RuntimeModel
+       PositionSeriesWorker / provider
+       NON_STANDALONE_METHOD
+       NOT_ROUTABLE / UNSUPPORTED / UNAVAILABLE / FAILED
+  -> family-aware legalisation/decoder
+  -> prediction lock write + fsync + SHA-256
+  -> actual read for scoring
+  -> Hit@±1-first metrics
+  -> all-seed summary
+  -> per-game leaderboard / cross-game macro summary
+  -> SHA256SUMS
+```
 
-## 10. 品質要件
+Command surface:
 
-再現性、監査可能性、リーク耐性、可用性、3時間SLO、拡張性、最小権限。
+```bash
+uv run loto3 campaign ...
+```
 
-## 11. リスク
+`orchestration/research.py` と `orchestration/research_v3.py` は別の既存research surfaceであり、unified campaignと同一物として扱わない。
 
-データ量不足、探索過適合、外部データ公開時刻不明、GPU/ライブラリ数値差、将来Shadow蓄積に時間が必要。
+## 5. Catalog / routing architecture
 
-## 12. 用語
+### Broad inventory
 
-Champion: 正式本番モデル。Shadow: 本番出力に使わない将来評価。Release Bundle: 本番構成全体の不変単位。
+`catalog_full.py` は広いinventoryを表現する。監査時点のgenerated countは174 entry。
+
+### Shared execution catalog
+
+`catalog.py` は`ModelSpec`を使うshared execution catalog。
+
+### Runtime worker/provider
+
+`factory.py`、`workers.py`、`providers/**` が実行routeを提供する。
+
+したがって:
+
+```text
+REGISTERED
+!= SHARED_ROUTABLE
+!= RUNTIME_CERTIFIED
+!= OOF_EVALUATED
+!= PROMOTION_ELIGIBLE
+```
+
+## 6. Probability/decoder architecture
+
+PR #249でselect-game constrained decoderに`MAP`と`WITHIN_TAU` objectiveを追加した。
+
+PR #250で、確率を持つunified candidate estimator routeをfamily-specific WITHIN_TAU decoderへ接続した。
+
+```text
+candidate binary probability matrix
+  -> row normalization per slot
+  -> distribution identity = row-normalized-slot-binary-probability-v1
+  -> family dispatch
+       digits -> positional window-mass WITHIN_TAU decode
+       select -> legality-constrained WITHIN_TAU DP
+  -> legal point prediction
+```
+
+Point-only workerに擬似確率分布を生成しない。Point-only routeは明示的なpoint legalisationを継続する。
+
+Decoder/distribution/post-processing identityはprotocol/runtime evidenceへ残し、旧campaign evidenceを新decoder契約へ黙って読み替えない。
+
+## 7. Data and time architecture
+
+Dataは少なくとも次の意味層を区別する。
+
+```text
+raw immutable source
+validated/canonical development data
+features derived as-of eligible history
+Holdout closed slice
+Prospective future evidence
+```
+
+重要な時刻/順序概念:
+
+- source/event time
+- availability time when known
+- ingestion time
+- forecast creation/seal time
+- actual availability/read time
+
+未来情報がeligible training/foldへ侵入しないことを最優先する。
+
+## 8. Prediction/evidence architecture
+
+各runは新しいimmutable output directoryを使う。
+
+Unified campaignの主要artifact:
+
+```text
+campaign_summary.json
+model_game_results.csv
+all_game_macro_summary.csv
+protocols/<game>.json
+prediction_locks/<game>/<candidate>/seed-<seed>.json
+SHA256SUMS
+```
+
+Prediction lockはactual scoring readより先にpersist/fsync/hashする。
+
+## 9. Runtime certification architecture
+
+Runtime certificationはcatalog statusから独立する。
+
+必要な範囲で:
+
+```text
+model identity/revision
+environment identity
+load
+input
+inference
+output shape
+finite values
+requested vs observed device
+GPU PID/VRAM
+CPU fallback
+reload/reproducibility
+artifact/code/data hashes
+```
+
+を証拠化する。
+
+## 10. Deployment / portability
+
+- `uv`, `pyproject.toml`, `uv.lock` をPython environmentの正本とする。
+- Linux self-hosted CIがfull repository test laneを持つ。
+- native Windows portability laneでlock resolution / wheel build / importを検証する。
+- GPU runtime certificationは対象provider/modelごとの実証を必要とする。
+- 特定workstationの一時状態をarchitecture contractへ固定しない。
+
+## 11. Scientific gates
+
+```text
+IMPLEMENTED
+-> RUNTIME_CERTIFIED
+-> OOF_EVALUATED
+-> HOLDOUT_EVALUATED
+-> PROSPECTIVE_EVALUATED
+-> PROMOTION_ELIGIBLE
+```
+
+各gateは独立したevidenceを必要とする。
+
+Holdout/Prospectiveをunified development campaignが自動で開かない。
+
+## 12. 品質属性
+
+- Reproducibility
+- Auditability
+- Leakage resistance
+- Fail visibility
+- Cross-game comparability
+- Runtime portability
+- Immutable evidence
+- Explicit unsupported-state handling
+- Minimal privilege / secret hygiene
+
+## 13. 現在の非主張
+
+Architectureが存在することは以下を意味しない。
+
+- 全174 entryのruntime success
+- 実データ174 × 6 campaign完了
+- decoderによる実OOF改善
+- Holdout/Prospective完了
+- champion存在
+- production promotion
