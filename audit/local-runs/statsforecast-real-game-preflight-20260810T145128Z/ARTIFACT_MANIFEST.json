@@ -1,0 +1,17 @@
+{
+  "artifact_count": 2,
+  "artifacts": [
+    {
+      "path": "REAL_GAME_PREFLIGHT_MATRIX.json",
+      "sha256": "c6ed75cb817c8f7e862ebfd454c142e3506c145f51831e0c082b7ec76378a8d9",
+      "size_bytes": 13277
+    },
+    {
+      "path": "REAL_GAME_PREFLIGHT_SUMMARY.json",
+      "sha256": "990c5fd03492bdf1090402afb46cbe90534a5f28629cf33e9ebec8d4179a3293",
+      "size_bytes": 313
+    }
+  ],
+  "created_at_utc": "2026-08-10T14:51:29.224512+00:00",
+  "schema_version": 1
+}

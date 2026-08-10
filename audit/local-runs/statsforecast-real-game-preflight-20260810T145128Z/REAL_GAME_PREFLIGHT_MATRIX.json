@@ -1,0 +1,553 @@
+[
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoarima",
+    "model_name": "AutoARIMA",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoets",
+    "model_name": "AutoETS",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "season_length"
+    ],
+    "resolved_parameters": {
+      "season_length": 4
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoces",
+    "model_name": "AutoCES",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "season_length"
+    ],
+    "resolved_parameters": {
+      "season_length": 4
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotheta",
+    "model_name": "AutoTheta",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-automfles",
+    "model_name": "AutoMFLES",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "n_windows",
+      "season_length",
+      "test_size"
+    ],
+    "resolved_parameters": {
+      "n_windows": 2,
+      "season_length": [
+        4
+      ],
+      "test_size": 4
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotbats",
+    "model_name": "AutoTBATS",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "season_length"
+    ],
+    "resolved_parameters": {
+      "season_length": [
+        4
+      ]
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arima",
+    "model_name": "ARIMA",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "order"
+    ],
+    "resolved_parameters": {
+      "order": [
+        1,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoregressive",
+    "model_name": "AutoRegressive",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "lags"
+    ],
+    "resolved_parameters": {
+      "lags": 1
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothing",
+    "model_name": "SimpleExponentialSmoothing",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "alpha"
+    ],
+    "resolved_parameters": {
+      "alpha": 0.3
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothingoptimized",
+    "model_name": "SimpleExponentialSmoothingOptimized",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothing",
+    "model_name": "SeasonalExponentialSmoothing",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "alpha",
+      "season_length"
+    ],
+    "resolved_parameters": {
+      "alpha": 0.3,
+      "season_length": 4
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothingoptimized",
+    "model_name": "SeasonalExponentialSmoothingOptimized",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "season_length"
+    ],
+    "resolved_parameters": {
+      "season_length": 4
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holt",
+    "model_name": "Holt",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holtwinters",
+    "model_name": "HoltWinters",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "season_length"
+    ],
+    "resolved_parameters": {
+      "season_length": 4
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-historicaverage",
+    "model_name": "HistoricAverage",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-naive",
+    "model_name": "Naive",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-randomwalkwithdrift",
+    "model_name": "RandomWalkWithDrift",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalnaive",
+    "model_name": "SeasonalNaive",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "season_length"
+    ],
+    "resolved_parameters": {
+      "season_length": 4
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-conformalseasonalpool",
+    "model_name": "ConformalSeasonalPool",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "n_samples",
+      "season_length"
+    ],
+    "resolved_parameters": {
+      "n_samples": 200,
+      "season_length": 4
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-windowaverage",
+    "model_name": "WindowAverage",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "window_size"
+    ],
+    "resolved_parameters": {
+      "window_size": 3
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalwindowaverage",
+    "model_name": "SeasonalWindowAverage",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "season_length",
+      "window_size"
+    ],
+    "resolved_parameters": {
+      "season_length": 4,
+      "window_size": 2
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-adida",
+    "model_name": "ADIDA",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonclassic",
+    "model_name": "CrostonClassic",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonoptimized",
+    "model_name": "CrostonOptimized",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonsba",
+    "model_name": "CrostonSBA",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-imapa",
+    "model_name": "IMAPA",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tsb",
+    "model_name": "TSB",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "alpha_d",
+      "alpha_p"
+    ],
+    "resolved_parameters": {
+      "alpha_d": 0.3,
+      "alpha_p": 0.3
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mstl",
+    "model_name": "MSTL",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "season_length"
+    ],
+    "resolved_parameters": {
+      "season_length": [
+        4
+      ]
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mfles",
+    "model_name": "MFLES",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tbats",
+    "model_name": "TBATS",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "season_length"
+    ],
+    "resolved_parameters": {
+      "season_length": [
+        4
+      ]
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-theta",
+    "model_name": "Theta",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-optimizedtheta",
+    "model_name": "OptimizedTheta",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamictheta",
+    "model_name": "DynamicTheta",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamicoptimizedtheta",
+    "model_name": "DynamicOptimizedTheta",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-garch",
+    "model_name": "GARCH",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arch",
+    "model_name": "ARCH",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "EXOGENOUS",
+    "model_id": "sf-sklearnmodel",
+    "model_name": "SklearnModel",
+    "primary_univariate_eligible": false,
+    "resolved_parameter_names": [
+      "model"
+    ],
+    "resolved_parameters": {
+      "model": "LinearRegression()"
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-constantmodel",
+    "model_name": "ConstantModel",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [
+      "constant"
+    ],
+    "resolved_parameters": {
+      "constant": 1.0
+    }
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-zeromodel",
+    "model_name": "ZeroModel",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "EXPECTED_NEGATIVE_CONTROL",
+    "model_id": "sf-nanmodel",
+    "model_name": "NaNModel",
+    "primary_univariate_eligible": false,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  },
+  {
+    "construct_status": "VERIFIED",
+    "error": null,
+    "error_type": null,
+    "lane": "UNIVARIATE",
+    "model_id": "sf-ucm",
+    "model_name": "UCM",
+    "primary_univariate_eligible": true,
+    "resolved_parameter_names": [],
+    "resolved_parameters": {}
+  }
+]

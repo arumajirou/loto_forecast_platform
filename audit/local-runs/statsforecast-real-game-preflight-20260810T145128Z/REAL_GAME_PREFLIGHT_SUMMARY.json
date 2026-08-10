@@ -1,0 +1,15 @@
+{
+  "construct_failed": 0,
+  "construct_verified": 41,
+  "failed_models": [],
+  "formal_pass": true,
+  "lane_counts": {
+    "EXOGENOUS": 1,
+    "EXPECTED_NEGATIVE_CONTROL": 1,
+    "UNIVARIATE": 39
+  },
+  "library": "statsforecast",
+  "model_count": 41,
+  "schema_version": 1,
+  "statsforecast_version": "2.1.1"
+}
