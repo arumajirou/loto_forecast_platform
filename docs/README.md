@@ -10,6 +10,10 @@ The repository contains live code, generated inventories, isolated provider lane
 |---|---|
 | What is the project and how do I use it? | [`../README.md`](../README.md) |
 | What repository/project state was last audited? | [`STATUS.md`](STATUS.md) |
+| What is the current handoff for the next engineer/agent? | [`CURRENT_HANDOFF.md`](CURRENT_HANDOFF.md) |
+| What is the current merge/CI verification snapshot? | [`CURRENT_VERIFICATION_REPORT.md`](CURRENT_VERIFICATION_REPORT.md) |
+| What operational runbook should I use now? | [`CURRENT_RUNBOOK.md`](CURRENT_RUNBOOK.md) |
+| How do I run the all-model × all-game development campaign? | [`UNIFIED_EVALUATION_CAMPAIGN.md`](UNIFIED_EVALUATION_CAMPAIGN.md) and `uv run loto3 campaign` |
 | How should stale/current/historical docs be interpreted? | [`DOCUMENTATION_POLICY.md`](DOCUMENTATION_POLICY.md) |
 | How many entries are in the broad generated catalog? | [`MODEL_INVENTORY.md`](MODEL_INVENTORY.md) and `loto3 catalog --counts` |
 | Which models/libraries are actually wired to workers/providers/runtime evidence? | [`MODEL_EXECUTION_MATRIX.md`](MODEL_EXECUTION_MATRIX.md) |
@@ -21,6 +25,26 @@ The repository contains live code, generated inventories, isolated provider lane
 | What was the v3 implementation audit? | [`IMPLEMENTATION_STATUS_V3.md`](IMPLEMENTATION_STATUS_V3.md), historical report |
 | How do I install on native Windows? | [`WINDOWS_INSTALL.md`](WINDOWS_INSTALL.md) |
 | What happened during the Windows-only PR #240 phase? | [`windows_only_execution/README.md`](windows_only_execution/README.md), historical execution bundle |
+
+## Current executable evaluation surface
+
+PR #248 merged the development-only unified campaign onto `main`.
+
+```bash
+uv run loto3 campaign --output unused --plan-only
+```
+
+For a real development run, provide canonical CSVs for all requested games and use a new output directory:
+
+```bash
+uv run loto3 campaign \
+  --input-dir /path/to/canonical-csv-directory \
+  --output /path/to/new-run-directory
+```
+
+The campaign materializes every requested broad-catalog model × game pair exactly once. `matrix_complete=true` means coverage is complete; it does **not** mean every combination succeeded. Unsupported, unavailable, non-routable, failed and non-standalone rows are deliberately retained as evidence.
+
+The primary tolerance is Hit@±1. Required accompanying metrics include per-position Hit@±1, all-position Hit@±1, MAE, MSE and RMSE. Mandatory baseline families and all configured seeds remain part of the evaluation contract. Holdout and Prospective stay closed unless separately authorized by their gates.
 
 ## The model surfaces are deliberately different
 
@@ -36,6 +60,9 @@ catalog.py
 factory.py + workers.py
   normal shared in-process/worker execution
 
+evaluation/unified_campaign.py + evaluation/unified_campaign_cli.py
+  broad inventory × canonical-game fail-visible development campaign
+
 models/providers/**
   shared foundation provider registry
 
@@ -46,9 +73,9 @@ audit/**
   exact point-in-time runtime evidence
 ```
 
-Do not use the 174-entry count as a synonym for “174 models are directly executable by `loto experiment research`”. Conversely, do not assume a provider is absent because it is not counted in the 174-entry broad catalog: BasicTS, Time-Series-Library, Merlion and several local NeuralForecast extensions have separate provider/campaign code.
+Do not use the 174-entry count as a synonym for “174 models are directly executable by one legacy research command”, “174 models are runtime-certified”, or “174 models completed OOF”. Conversely, do not assume a provider is absent because it is not counted in the 174-entry broad catalog: BasicTS, Time-Series-Library, Merlion and several local NeuralForecast extensions have separate provider/campaign code.
 
-For the concrete routing/status matrix, read [`MODEL_EXECUTION_MATRIX.md`](MODEL_EXECUTION_MATRIX.md).
+For the concrete routing/status matrix, read [`MODEL_EXECUTION_MATRIX.md`](MODEL_EXECUTION_MATRIX.md). For the common six-game adapter, read [`UNIFIED_EVALUATION_CAMPAIGN.md`](UNIFIED_EVALUATION_CAMPAIGN.md).
 
 ## Document classes
 
@@ -59,16 +86,18 @@ These should remain useful on the current default branch and avoid volatile work
 - `README.md` at repository root;
 - this `docs/README.md`;
 - `docs/MODEL_EXECUTION_MATRIX.md`;
+- `docs/UNIFIED_EVALUATION_CAMPAIGN.md`;
+- `docs/CURRENT_RUNBOOK.md`;
 - `docs/DOCUMENTATION_POLICY.md`;
 - protocol/design documents whose contracts are still implemented.
 
 ### Audited snapshots
 
-`docs/STATUS.md` is a point-in-time fact-check. It records its verification timestamp and audit base. It is not an auto-updating dashboard.
+`docs/STATUS.md`, `docs/CURRENT_HANDOFF.md` and `docs/CURRENT_VERIFICATION_REPORT.md` are point-in-time fact checks. They record their verification timestamps and audit bases. They are not auto-updating dashboards; live GitHub state takes precedence once time advances beyond their `as_of` value.
 
 ### Generated inventories
 
-`docs/MODEL_INVENTORY.md` is generated and must not be hand-edited. It describes the broad catalog. It does not replace the executable `ModelSpec` catalog, provider registry or runtime evidence.
+`docs/MODEL_INVENTORY.md` is generated and must not be hand-edited. It describes the broad catalog. It does not replace the executable `ModelSpec` catalog, provider registry, unified campaign result matrix or runtime evidence.
 
 ### Runtime evidence
 
@@ -128,12 +157,12 @@ REGISTERED
 
 Never infer a later level from an earlier one.
 
-Examples from current code/evidence:
+Examples from current code/evidence include:
 
-- `sktime` is in the broad catalog and frameworks extra, has a dedicated `sktime_campaign`, but is not a direct `PositionSeriesWorker` branch.
-- `skforecast` is in the broad catalog/frameworks extra, but the audited shared worker has no direct skforecast dispatch.
-- BasicTS and Time-Series-Library have real isolated provider code even though they are not represented as normal entries in the 174-entry broad count.
-- the TSFM aggregate runtime evidence currently records 21 judged models, 19 `CERTIFIED`, 2 `BLOCKED`, while individual certification scopes still differ.
+- `sktime` is in the broad catalog and frameworks extra, has a dedicated `sktime_campaign`, but is not a direct `PositionSeriesWorker` branch;
+- `skforecast` is in the broad catalog/frameworks extra, but the audited shared worker has no direct skforecast dispatch;
+- BasicTS and Time-Series-Library have real isolated provider code even though they are not represented as normal entries in the 174-entry broad count;
+- the TSFM aggregate runtime evidence records 21 judged models, 19 `CERTIFIED`, 2 `BLOCKED`, while individual certification scopes still differ.
 
 ## Scientific interpretation
 
@@ -148,24 +177,6 @@ champion=null
 
 Runtime success and scientific superiority are separate questions.
 
-## Current Timer Base 84M boundary
+## Current scientific boundary
 
-See [`STATUS.md`](STATUS.md) for the audited snapshot. PR #240 is merged, but formal Timer Base 84M OOF, Holdout and Prospective work are not thereby complete.
-
-Active scientific tracking:
-
-- GitHub Issue #239;
-- Linear TAJ-12.
-
-The code-grounded model/library capability audit is tracked in Linear TAJ-14.
-
-## Maintenance rule
-
-When adding or updating a document that contains words such as `current`, `latest`, `today`, `open`, `running`, `available`, `blocked`, `PASS`, `certified`, or a fixed run/SHA/count:
-
-1. decide whether it is a stable contract or a point-in-time fact;
-2. attach `as_of`/exact identity for point-in-time facts;
-3. identify the actual code/evidence source, not only another Markdown file;
-4. distinguish registration, routing, runtime and scientific evidence;
-5. link to the live source or verification command;
-6. follow [`DOCUMENTATION_POLICY.md`](DOCUMENTATION_POLICY.md).
+See [`STATUS.md`](STATUS.md) for the audited snapshot. Formal Timer Base 84M OOF work remains tracked in GitHub Issue #239; Timer-S1 immutable runtime/certification work remains tracked in GitHub Issue #118. Neither the unified campaign merge nor dependency maintenance opens Holdout or Prospective.
