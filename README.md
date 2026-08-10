@@ -6,7 +6,7 @@
 
 > **Code audit basis:** `main@2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8` (2026-08-10)  
 > このSHAは機能コードを監査した基準点です。README自身の更新後はGitの最新commitが文書版を識別します。  
-> package versionはREADMEへ手書きせず、`loto.version.__version__` / installed package metadata / `loto-build-info`を正本とします。
+> 現在のpackage versionはREADMEへ手書きしません。canonical versionは`loto.version.__version__` / installed package metadata / `loto-build-info`を正本とします。
 
 ## 1. このリポジトリでできること
 
