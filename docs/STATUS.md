@@ -2,10 +2,10 @@
 
 ```text
 status_class: AUDITED_SNAPSHOT
-as_of: 2026-08-10T18:20+09:00
+as_of: 2026-08-10T18:46+09:00
 repository: arumajirou/loto_forecast_platform
 source_of_truth: live GitHub state + code/config at audited main SHA
-base_main_sha: cc7ec5473730cfb18100bdfbb5228cf65e571b32
+base_main_sha: 83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f
 superseded_by: NONE
 ```
 
@@ -14,44 +14,45 @@ This file is the current repository-status entry point. It records a point-in-ti
 ## Executive status
 
 - Default branch: `main`.
-- Audited main: `cc7ec5473730cfb18100bdfbb5228cf65e571b32`.
-- Repository visibility: public.
+- Audited main: `83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f`.
 - Unified all-model × all-game development evaluation is merged and callable through `uv run loto3 campaign`.
+- Hit@±1-aware select-game decoding now has an explicit `WITHIN_TAU` constrained objective, merged in PR #249 while preserving the historical MAP compatibility API.
 - The broad generated catalog remains a 174-entry inventory at this audit boundary; registration is not equivalent to shared routing, runtime certification, OOF completion, or promotion.
-- Holdout: **CLOSED / NOT EVALUATED by the unified campaign**.
-- Prospective: **CLOSED / NOT EVALUATED by the unified campaign**.
+- Holdout: **CLOSED / NOT EVALUATED by the unified campaign or decoder change**.
+- Prospective: **CLOSED / NOT EVALUATED**.
 - Champion/promotion: **NONE AUTHORIZED by this documentation update**.
 - Formal Timer Base 84M OOF work remains open in GitHub Issue #239.
 - Timer-S1 PR-B immutable runtime/certification work remains open in GitHub Issue #118.
 
-## Merge batch completed on 2026-08-10
+## Merge batch on 2026-08-10
 
 | PR | Result | Main commit | Evidence boundary |
 |---|---|---|---|
 | #248 | MERGED | `aae45ba9294499f51cc5f1564de1c6ccf5814230` | exact pre-merge head passed Linux full CI and native Windows portability; unified campaign added |
 | #244 | MERGED | `c12ca27048d25cdc869fa3cbbfa6e31c727eb529` | actions/checkout v7 workflow update; Linux and Windows exact-head checks passed |
-| #242 | MERGED | `cc7ec5473730cfb18100bdfbb5228cf65e571b32` | Ray Tune dependency updated to `>=2.56.1`; latest rebased head passed Linux full CI and subsequently native Windows portability |
+| #242 | MERGED | `cc7ec5473730cfb18100bdfbb5228cf65e571b32` | Ray Tune updated to `>=2.56.1`; latest rebased head passed Linux and native Windows verification |
+| #243 | MERGED | `b04f3e40baa1861a5b83da047bdef2655905bd52` | FastAPI updated to `>=0.141.1,<0.142`; exact-head Linux and Windows checks passed |
+| #249 | MERGED | `83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f` | Hit@±1/within-tau constrained decoder objective; Linux exact-head CI passed; no Holdout/Prospective/model/dependency changes |
 
 GitHub Issue #247 was closed as completed after PR #248 merged.
 
 ## Open pull requests at the audit boundary
 
-Two Dependabot PRs remained open when this snapshot was prepared:
+One PR remained open when this snapshot was prepared:
 
 | PR | Scope | State at audit boundary | Merge decision |
 |---|---|---|---|
-| #243 | FastAPI `0.119.1 -> 0.141.1` | recreated on current main; mergeable, latest exact-head CI queued | `VERIFICATION_PENDING`, not force-merged |
-| #241 | uvicorn / MLflow / Hypothesis / Ruff / GluonTS grouped update | rebase/recreate still catching up with current main | `REBASE_OR_RECREATE_PENDING`, not merge-ready |
+| #241 | uvicorn / MLflow / Hypothesis / Ruff / GluonTS grouped dependency update | rebased onto current main with head `e5da936410a719bf378302cedb34b8addbbbb2a1`; Linux exact-head full CI running/pending completion and native Windows exact-head queued | `VERIFICATION_PENDING`, not force-merged |
 
-`mergeable=true` alone is not treated as a sufficient merge gate for a dependency/API update. Current-base identity, relevant CI, and unresolved review state are checked before merge.
+`mergeable=true` alone is not treated as a sufficient merge gate. Current-base identity, exact-head CI and unresolved review state are checked before merge.
 
 ## Current direct dependency boundary
 
-At audited main `cc7ec547...`:
+At audited main `83f72d2...`:
 
 - `ray[tune]>=2.56.1` is merged in the `full` extra.
-- FastAPI remains `>=0.115,<0.120` until #243 completes verification and is merged.
-- The grouped #241 updates are not part of audited main.
+- FastAPI is `>=0.141.1,<0.142` in the relevant API/dev/full lanes.
+- #241's grouped updates are **not** part of audited main until that PR is merged.
 - `uv.lock` is the committed dependency lock and must remain consistent with `pyproject.toml`.
 
 Do not infer a newer dependency state from an open Dependabot branch.
@@ -91,6 +92,19 @@ All configured seeds are retained and summarized; best-seed-only selection is no
 
 See `docs/UNIFIED_EVALUATION_CAMPAIGN.md` for the execution contract.
 
+## Hit@±1 constrained decoder
+
+PR #249 added an explicit select-game decoder objective:
+
+```text
+DecodeObjective.MAP
+DecodeObjective.WITHIN_TAU
+```
+
+`WITHIN_TAU` maximizes additive expected positional Hit@±tau utility subject to the legal strictly increasing select-game constraint. Focused tests cover exact IID-null optima for mini/loto6/loto7/bingo5, brute-force agreement on a reduced geometry, MAP compatibility and fail-closed probability validation.
+
+This is a decoder objective implementation. It is **not** evidence that lottery draws are non-IID, not a promise of OOF improvement, and not a Holdout/Prospective result.
+
 ## What has not been established
 
 The following claims are **not** supported by this repository snapshot:
@@ -99,6 +113,7 @@ The following claims are **not** supported by this repository snapshot:
 - all 174 entries are independent forecast models;
 - all registered entries are runtime-certified on the target host;
 - a complete real-data 174 × 6 accuracy campaign has been executed;
+- the within-tau decoder improves every model's real OOF score;
 - a model beats every mandatory baseline;
 - a champion has passed formal Holdout;
 - Prospective evidence authorizes promotion or production binding.
@@ -107,9 +122,10 @@ A complete campaign matrix means every requested combination has a recorded resu
 
 ## Runtime/capability documentation
 
-Use these current code-grounded references:
+Use these code-grounded/current references:
 
 - `docs/MODEL_EXECUTION_MATRIX.md`
+- `docs/CURRENT_MODEL_EXECUTION_ADDENDUM.md`
 - `docs/LIBRARY_RUNTIME_CAPABILITIES.md`
 - `docs/TSFM_RUNTIME_CAPABILITIES.md`
 - `docs/MODEL_INVENTORY.md`
