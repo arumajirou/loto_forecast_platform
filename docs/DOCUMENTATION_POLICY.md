@@ -151,6 +151,11 @@ Start with:
 - [`../README.md`](../README.md) — stable project overview and usage;
 - [`STATUS.md`](STATUS.md) — latest audited point-in-time state committed by the documentation process;
 - [`README.md`](README.md) — documentation map;
+- [`REQUIREMENTS.md`](REQUIREMENTS.md) — current Hit@±1-first platform requirements;
+- [`SPECIFICATION.md`](SPECIFICATION.md) — current unified campaign/model-routing/decoder specification;
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) — current six-game evaluation/runtime architecture;
+- [`DATA_CONTRACT.md`](DATA_CONTRACT.md) — immutable raw, chronology, split and prediction-data contract;
+- [`TEST_PLAN.md`](TEST_PLAN.md) — current implementation/runtime/scientific test plan;
 - [`CURRENT_HANDOFF.md`](CURRENT_HANDOFF.md) — current handoff snapshot;
 - [`CURRENT_VERIFICATION_REPORT.md`](CURRENT_VERIFICATION_REPORT.md) — current merge/CI verification snapshot;
 - [`CURRENT_RUNBOOK.md`](CURRENT_RUNBOOK.md) — current operational runbook;
