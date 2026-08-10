@@ -1,99 +1,131 @@
 # Unified all-model × all-game evaluation campaign
 
-## Status
-
-`MERGED_ON_MAIN / PROBABILITY_DECODER_ROUTING_MERGED / DEVELOPMENT_ONLY / HOLDOUT_CLOSED / PROSPECTIVE_CLOSED`
-
-This document describes the executable unified campaign introduced by PR #248 and its probability-aware decoder routing added by PR #250. It is a code contract, not evidence that every third-party model succeeds on every game or that the decoder improves real OOF accuracy.
-
-Implementation evidence:
-
 ```text
-PR_248_merge=aae45ba9294499f51cc5f1564de1c6ccf5814230
-PR_248_exact_premerge_head=c7c8a039e7aa1aef34fbfd0af8dc2c41f67945a2
-PR_248_linux_ci=31371724178 SUCCESS
-PR_248_windows=31371724143 SUCCESS
-
-PR_249_merge=83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f
-PR_249_scope=explicit MAP/WITHIN_TAU constrained select decoder
-
-PR_250_merge=8430d9f507ba735bf1df69930e057c974752bfdb
-PR_250_exact_premerge_head=c3cefc9ce465aec9c98d4a0f0deca4a228d2058e
-PR_250_linux_ci=31376812517 SUCCESS
-PR_250_windows=31376812289 QUEUED_AT_AUDIT
+status: MERGED_ON_MAIN / DEVELOPMENT_ONLY
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
+holdout: CLOSED_BY_DEFAULT
+prospective: CLOSED_BY_DEFAULT
 ```
 
-Queued Windows evidence is not represented as PASS.
+## 1. Purpose
 
-## Purpose
+`uv run loto3 campaign`は、requested broad-catalog model × gameについて:
 
-The campaign answers two separate questions:
+1. **coverage** — 全組合せに結果行があるか;
+2. **execution** — 実際にどのrouteが成功したか;
+3. **scientific comparability** — 同じgame内で同一chronology/metrics/baselines/seeds/sealing contractを使ったか;
 
-1. **Coverage:** did every requested broad-catalog model × game combination receive a result row?
-2. **Execution:** which combinations actually executed successfully under the common protocol?
+を分離して記録するdevelopment-only campaignです。
 
-A complete matrix can contain `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `UNAVAILABLE`, `FAILED`, `PARTIAL_SEEDS`, or `NON_STANDALONE_METHOD` rows. Those rows are evidence and must not be hidden.
+## 2. Implementation sequence
 
-## Canonical games
+Relevant merged sequence:
 
-`loto.game.geometry` is the geometry source for:
+```text
+#248 unified model×game campaign
+#249 explicit MAP / WITHIN_TAU constrained select decoder
+#250 probability-bearing candidate routing to family-aware WITHIN_TAU
+#252 geometry-general metrics and digit positional-hit correction
+#253 theory-aware promotion semantics (downstream governance; not campaign auto-promotion)
+#254 pre-experiment MDE/power planning (planning layer; not campaign scoring result)
+```
 
-- `mini`
-- `loto6`
-- `loto7`
-- `bingo5`
-- `numbers3`
-- `numbers4`
+## 3. Canonical games
 
-Select-number games retain strict ascending/distinct legality. Numbers3/Numbers4 retain digit order and repeated digits.
+```text
+mini      select / 5 / 1..31
+loto6     select / 6 / 1..43
+loto7     select / 7 / 1..37
+bingo5    select / 8 / 1..40
+numbers3  digits / 3 / 0..9
+numbers4  digits / 4 / 0..9
+```
 
-## Model inventory
+Select outputs are distinct/ascending. Digit outputs preserve position and repeated digits.
 
-The default plan is generated from `loto.models.catalog_full.build_catalog()`. At the audited inventory boundary this is the broad 174-entry inventory. Registration is not runtime certification and does not imply 174 × 6 successful executions.
+## 4. Model inventory
 
-Every requested catalog-model × game pair must appear exactly once. Reconciliation methods remain `NON_STANDALONE_METHOD` because they transform base forecasts rather than independently create them.
+Default plan uses `loto.models.catalog_full.build_catalog()`.
 
-## Same-condition contract
+Current broad inventory boundary: 174 entries.
 
-Within one game, every executable candidate receives the same development/holdout boundary, chronological rolling folds, test rows, approved seeds, metric/baseline manifest, result-affecting protocol identity, bounded resource/search identity and prediction-before-actual sealing rule.
+Every requested model × game pair appears once. Reconciliation methods can appear as `NON_STANDALONE_METHOD`; unavailable or unsupported routes remain visible.
 
-Across games, `EvaluationProtocolV2` is geometry-aware. Position count, universe and legality differ by game, so forcing a byte-identical protocol across all games would be incorrect.
+## 5. Status semantics
 
-## Metrics
+Examples:
+
+```text
+SUCCEEDED
+PARTIAL_SEEDS
+FAILED
+UNAVAILABLE
+NOT_ROUTABLE
+UNSUPPORTED_GAME
+NON_STANDALONE_METHOD
+```
+
+`matrix_complete=true` means coverage rows are complete. It does not mean all pairs succeeded.
+
+## 6. Same-condition contract
+
+Within each game, comparable candidates receive the same:
+
+- development/Holdout boundary;
+- chronological folds;
+- target rows;
+- game geometry;
+- metric manifest;
+- baseline manifest;
+- configured seed inventory;
+- result-affecting protocol identity;
+- bounded resource/search configuration;
+- prediction-before-actual rule.
+
+Across different games the protocol is geometry-aware, so byte-identical geometry fields are neither required nor correct.
+
+## 7. Metrics
 
 Primary:
 
 ```text
-hit_at_1
+Hit@±1
 ```
 
-Required accompanying metrics:
+Required:
 
 ```text
-position_hit_at_1
-all_positions_hit_at_1
-mae
-mse
-rmse
+per-position Hit@±1
+all-position Hit@±1
+MAE
+MSE
+RMSE
 ```
 
-Per-game leaderboards prioritize Hit@±1 before all-position Hit@±1 and MAE.
+Geometry-general semantic rule:
 
-## Mandatory baselines
+- select `mean_hits`: set overlap;
+- digits `mean_hits`: exact positional equality.
 
-1. `random`
-2. `fixed`
-3. `mean`
-4. `median`
-5. `last`
-6. `frequency`
-7. `statistical_ar1`
+This prevents Numbers3/4 from losing digit order or repeated-digit meaning.
 
-Baseline predictions use only history preceding the target draw.
+## 8. Mandatory baselines
 
-## Seed policy
+```text
+random
+fixed
+mean
+median
+last
+frequency
+statistical_ar1
+```
 
-Default approved seeds:
+Every baseline uses only history preceding the target.
+
+## 9. Seed policy
+
+Default seeds:
 
 ```text
 42
@@ -101,67 +133,98 @@ Default approved seeds:
 20260730
 ```
 
-For each required metric the campaign retains count, mean, population variance, standard deviation, minimum, maximum, worst value and worst seed. Best-seed-only selection is not implemented.
+Each required metric retains count, mean, population variance, standard deviation, min, max, worst value and worst seed. Best-seed-only selection is prohibited.
 
-## Prediction lock order
+## 10. Prediction lock order
 
 For each `game × candidate × seed`:
 
-1. execute development folds from eligible history only;
-2. persist prediction/draw identity with `actuals_known=false`;
-3. fsync the prediction lock;
-4. compute its SHA-256;
-5. only then read the corresponding target actuals for scoring;
-6. calculate metrics.
+```text
+eligible-history fit/predict
+-> persist prediction record with actuals_known=false
+-> fsync
+-> SHA-256
+-> only then load/read matching target actual for scoring
+-> metrics
+```
 
-Output directories are single-use. This is a development/OOF-style seal and does not open Holdout or Prospective.
+Output directories are single-use.
 
-## Routing
+This is development evidence; it does not open formal Holdout or Prospective.
 
-### Point-only position/foundation routes
+## 11. Routing
 
-Compatible catalog entries use `PositionSeriesWorker` with `geometry.column_names()` explicitly. If a route only returns point forecasts, PR #250 does not fabricate a probability distribution for it; the route remains explicit point legalisation.
+### Candidate models
 
-### Probability-bearing candidate route
-
-Supported sklearn/LightGBM/XGBoost/CatBoost candidate estimators use the game-agnostic slot-conditioned binary candidate bridge. PR #250 explicitly identifies this distribution as:
+Shared candidate estimators may produce candidate probability/scores. Probability-bearing routes preserve:
 
 ```text
-row-normalized-slot-binary-probability-v1
+distribution_identity = row-normalized-slot-binary-probability-v1
 ```
 
-It is not mislabeled as a native categorical PMF.
+### Digit decoder
 
-The resulting probability matrix is decoded with the explicit Hit@±1 objective:
+Position-specific ±1 window probability/utility is maximized. Position order remains fixed.
 
-- digit games: digit-family WITHIN_TAU/window-mass decoding;
-- select games: legal constrained WITHIN_TAU dynamic-programming decoding.
+### Select decoder
 
-Decoder objective, distribution identity and post-processing identity are retained in runtime evidence attached to the sealed seed evaluation so historical PR #248 evidence is not silently reinterpreted under the newer decoder protocol.
+A legality-constrained dynamic program chooses a strictly increasing/distinct tuple maximizing WITHIN_TAU utility.
 
-### Explicit non-routes
+### Point-only models
 
-A broad catalog entry remains visible when it cannot safely enter the common point/probability forecast contract. Examples include reconciliation-only methods, isolated libraries without a shared adapter, game-incompatible models, unavailable dependencies or runtime failures.
+No synthetic probability distribution is fabricated. Point forecast legalisation remains explicit.
 
-The correct response is an explicit terminal status, not synthetic success.
+### Non-routes
 
-## Commands
+Broad entries without a safe compatible route produce a terminal status rather than fake success.
 
-Full campaign:
+## 12. Commands
 
-```bash
-uv run loto3 campaign \
-  --input-dir /path/to/canonical-csv-directory \
-  --output /path/to/new-run-directory
-```
-
-Plan only:
+### Plan all
 
 ```bash
 uv run loto3 campaign --output unused --plan-only
 ```
 
-Bounded smoke:
+### Plan subset
+
+```bash
+uv run loto3 campaign \
+  --output unused \
+  --games numbers3,numbers4,loto7 \
+  --models logistic,nf-nhits,chronos-2 \
+  --plan-only
+```
+
+### Real development run
+
+```bash
+RUN_ID="unified-$(date +%Y%m%d-%H%M%S)"
+
+uv run loto3 campaign \
+  --input-dir /absolute/path/to/canonical-csv-directory \
+  --output "artifacts/unified-campaign/${RUN_ID}" \
+  --seeds 42,1729,20260730 \
+  --folds 5 \
+  --test-size 20 \
+  --min-train-size 100 \
+  --holdout-size 50 \
+  --device auto \
+  --precision 32
+```
+
+Expected input names for all games:
+
+```text
+mini.csv
+loto6.csv
+loto7.csv
+bingo5.csv
+numbers3.csv
+numbers4.csv
+```
+
+### Bounded synthetic smoke
 
 ```bash
 uv run loto3 campaign \
@@ -174,15 +237,26 @@ uv run loto3 campaign \
   --output /tmp/unified-campaign-smoke
 ```
 
-Compatibility entrypoint:
+## 13. Resource/search controls
 
-```bash
-uv run python scripts/run_unified_campaign.py ...
+CLI exposes at least:
+
+```text
+--device auto|cpu|cuda
+--precision 32|16-mixed|bf16-mixed
+--max-trials
+--parallel-trials
+--max-steps
+--wall-time-seconds
+--gpu-count
+--gpu-memory-bytes
 ```
 
-## Artifacts
+These are part of result-affecting execution identity where applicable.
 
-A completed run contains at least:
+## 14. Artifacts
+
+Minimum completed-run layout:
 
 ```text
 campaign_summary.json
@@ -193,21 +267,38 @@ prediction_locks/<game>/<candidate>/seed-<seed>.json
 SHA256SUMS
 ```
 
-A model enters the cross-game macro summary only when it succeeds for every requested game.
+Cross-game macro aggregation must not hide a model's failed requested game.
 
-## Non-claims
+## 15. Theory-aware downstream interpretation
 
-The campaign/decoder routing does not imply:
+Campaign Hit@±1 results can later be interpreted through `TheoryAwareThreshold` using:
 
-- every registered model is runtime-certified;
-- every model supports every game;
-- every model successfully runs on all six games;
-- every architecture receives identical internal HPO semantics;
-- a complete real-data 174 × 6 experiment has been executed;
-- the WITHIN_TAU decoder improves real OOF for every model;
+```text
+absolute
+excess_vs_iid_null
+```
+
+The campaign itself does not automatically declare a promotion target or alternative hypothesis.
+
+## 16. Promotion downstream boundary
+
+Promotion v2 can consume authorized Holdout + multiple Prospective score windows and binds them to sealed game identity. It may produce `ELIGIBLE_FOR_HUMAN_APPROVAL`, but campaign completion alone does not satisfy those later gates.
+
+## 17. MDE/power planning boundary
+
+Before a formal target window, `loto.evaluation.power_analysis` can estimate required paired draws or MDE using a pre-fixed paired-score SD and multiplicity-adjusted alpha.
+
+This is planning evidence. It does not change campaign scores and is not a realized significance test.
+
+## 18. Non-claims
+
+This campaign implementation does not imply:
+
+- every registered entry is shared-routable;
+- every model succeeds on all six games;
+- a complete real-data 174 × 6 run has finished;
+- decoder improves every real OOF score;
 - lottery draws are non-IID;
-- Holdout or Prospective has been evaluated;
-- a champion exists;
+- Holdout/Prospective is complete;
+- champion exists;
 - promotion is authorized.
-
-The infrastructure is designed for reproducible, complete and fail-visible empirical comparison. Forecast superiority remains a separate measured result.
