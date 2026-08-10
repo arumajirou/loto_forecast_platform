@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -16,8 +16,10 @@ from loto.autogluon_campaign.holdout_prospective import (
 )
 from loto.autogluon_campaign.promotion_eligibility_contract import (
     PROMOTION_SCHEMA,
+    PROMOTION_SCHEMA_V2,
     PromotionEligibilityError,
     PromotionPolicy,
+    PromotionPolicyV2,
     validate_window_evidence,
 )
 from loto.autogluon_campaign.promotion_eligibility_io import (
@@ -28,6 +30,7 @@ from loto.autogluon_campaign.promotion_eligibility_rules import (
     evaluate_promotion_rules,
 )
 
+PromotionPolicyType = PromotionPolicy | PromotionPolicyV2
 _DEFAULT_PROMOTION_POLICY = PromotionPolicy()
 
 
@@ -41,12 +44,40 @@ class PromotionEligibilityResult:
     selected_candidate_id: str
 
 
+def _schema_for_policy(policy: PromotionPolicyType) -> str:
+    return PROMOTION_SCHEMA_V2 if isinstance(policy, PromotionPolicyV2) else PROMOTION_SCHEMA
+
+
+def promotion_policy_from_payload(
+    payload: Mapping[str, Any],
+    *,
+    schema_version: str | None = None,
+) -> PromotionPolicyType:
+    if schema_version == PROMOTION_SCHEMA:
+        return PromotionPolicy.model_validate(payload)
+    if schema_version == PROMOTION_SCHEMA_V2:
+        return PromotionPolicyV2.model_validate(payload)
+    if schema_version is not None:
+        raise PromotionEligibilityError("PROMOTION_SCHEMA_UNSUPPORTED", schema_version)
+
+    v2_markers = {
+        "game",
+        "tau",
+        "hit_at_1_target_semantics",
+        "allow_above_null_ceiling",
+        "alternative_hypothesis",
+    }
+    if v2_markers.intersection(payload):
+        return PromotionPolicyV2.model_validate(payload)
+    return PromotionPolicy.model_validate(payload)
+
+
 def create_promotion_eligibility(
     *,
     holdout_score_dir: Path,
     prospective_score_dirs: Sequence[Path],
     output_dir: Path,
-    policy: PromotionPolicy = _DEFAULT_PROMOTION_POLICY,
+    policy: PromotionPolicyType = _DEFAULT_PROMOTION_POLICY,
     run_id: str,
     now: datetime | None = None,
 ) -> PromotionEligibilityResult:
@@ -74,7 +105,7 @@ def create_promotion_eligibility(
     created_at = now or datetime.now(UTC)
     payloads = {
         "REQUEST_METADATA.json": {
-            "schema_version": PROMOTION_SCHEMA,
+            "schema_version": _schema_for_policy(policy),
             "run_id": run_id,
             "created_at": created_at.isoformat(),
             "timestamp_authority": "LOCAL_SYSTEM_UTC",
@@ -154,7 +185,11 @@ def verify_promotion_eligibility(root: Path) -> dict[str, Any]:
         raise PromotionEligibilityError("PROMOTION_FILE_SET_MISMATCH", str(observed))
 
     request = load_json(root / "REQUEST_METADATA.json")
-    policy = PromotionPolicy.model_validate(request["policy"])
+    schema_version = str(request.get("schema_version", ""))
+    policy_payload = request.get("policy")
+    if not isinstance(policy_payload, Mapping):
+        raise PromotionEligibilityError("PROMOTION_POLICY_INVALID", str(policy_payload))
+    policy = promotion_policy_from_payload(policy_payload, schema_version=schema_version)
     window_evidence = load_json(root / "WINDOW_EVIDENCE.json")
     aggregate, rules, decision = evaluate_promotion_rules(
         window_evidence=window_evidence,
@@ -190,6 +225,8 @@ __all__ = [
     "PromotionEligibilityError",
     "PromotionEligibilityResult",
     "PromotionPolicy",
+    "PromotionPolicyV2",
     "create_promotion_eligibility",
+    "promotion_policy_from_payload",
     "verify_promotion_eligibility",
 ]
