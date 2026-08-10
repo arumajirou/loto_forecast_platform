@@ -2,29 +2,29 @@
 
 ```text
 status_class: AUDITED_SNAPSHOT
-as_of: 2026-08-10T18:46+09:00
+as_of: 2026-08-10T18:59+09:00
 repository: arumajirou/loto_forecast_platform
-source_of_truth: live GitHub state + code/config at audited main SHA
-base_main_sha: 83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f
+source_of_truth: live GitHub state + code/config + exact-head CI evidence
+base_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
 superseded_by: NONE
 ```
 
-This file is the current repository-status entry point. It records a point-in-time audit; live GitHub state takes precedence after the `as_of` time.
+This file is the current repository-status entry point. It is a point-in-time audit; live GitHub state takes precedence after the `as_of` time.
 
 ## Executive status
 
 - Default branch: `main`.
-- Audited main: `83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f`.
+- Audited main: `8430d9f507ba735bf1df69930e057c974752bfdb`.
 - Unified all-model × all-game development evaluation is merged and callable through `uv run loto3 campaign`.
-- Hit@±1-aware select-game decoding now has an explicit `WITHIN_TAU` constrained objective, merged in PR #249 while preserving the historical MAP compatibility API.
+- Probability-bearing unified-campaign candidate estimators are now routed through family-specific Hit@±1/WITHIN_TAU decoding by PR #250; point-only workers remain point-only.
 - The broad generated catalog remains a 174-entry inventory at this audit boundary; registration is not equivalent to shared routing, runtime certification, OOF completion, or promotion.
-- Holdout: **CLOSED / NOT EVALUATED by the unified campaign or decoder change**.
+- Holdout: **CLOSED / NOT EVALUATED by this maintenance or decoder-routing work**.
 - Prospective: **CLOSED / NOT EVALUATED**.
-- Champion/promotion: **NONE AUTHORIZED by this documentation update**.
+- Champion/promotion: **NONE AUTHORIZED**.
 - Formal Timer Base 84M OOF work remains open in GitHub Issue #239.
 - Timer-S1 PR-B immutable runtime/certification work remains open in GitHub Issue #118.
 
-## Merge batch on 2026-08-10
+## Merge batch completed on 2026-08-10
 
 | PR | Result | Main commit | Evidence boundary |
 |---|---|---|---|
@@ -32,34 +32,34 @@ This file is the current repository-status entry point. It records a point-in-ti
 | #244 | MERGED | `c12ca27048d25cdc869fa3cbbfa6e31c727eb529` | actions/checkout v7 workflow update; Linux and Windows exact-head checks passed |
 | #242 | MERGED | `cc7ec5473730cfb18100bdfbb5228cf65e571b32` | Ray Tune updated to `>=2.56.1`; latest rebased head passed Linux and native Windows verification |
 | #243 | MERGED | `b04f3e40baa1861a5b83da047bdef2655905bd52` | FastAPI updated to `>=0.141.1,<0.142`; exact-head Linux and Windows checks passed |
-| #249 | MERGED | `83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f` | Hit@±1/within-tau constrained decoder objective; Linux exact-head CI passed; no Holdout/Prospective/model/dependency changes |
+| #249 | MERGED | `83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f` | explicit MAP/WITHIN_TAU constrained select decoder; Linux exact-head CI passed |
+| #241 | MERGED | `cfbe9f1cf379a68b4ad6ca2bc6d7793dbd828300` | grouped Uvicorn/MLflow/Hypothesis/Ruff/GluonTS update; current-base Linux full CI passed; Windows lane was queued when GitHub accepted expected-head merge |
+| #250 | MERGED | `8430d9f507ba735bf1df69930e057c974752bfdb` | unified candidate probability routing through family-specific WITHIN_TAU decoder; synchronized to current main, exact-head Linux full CI passed, review threads 0 |
 
 GitHub Issue #247 was closed as completed after PR #248 merged.
 
-## Open pull requests at the audit boundary
+## Open pull requests at audit cutoff
 
-One PR remained open when this snapshot was prepared:
+After the functional/dependency merge batch, the only open PR was the documentation refresh PR #251 itself. No unmerged implementation/dependency PR remained in the live open-PR search at the audit cutoff.
 
-| PR | Scope | State at audit boundary | Merge decision |
-|---|---|---|---|
-| #241 | uvicorn / MLflow / Hypothesis / Ruff / GluonTS grouped dependency update | rebased onto current main with head `e5da936410a719bf378302cedb34b8addbbbb2a1`; Linux exact-head full CI running/pending completion and native Windows exact-head queued | `VERIFICATION_PENDING`, not force-merged |
+## Current dependency boundary
 
-`mergeable=true` alone is not treated as a sufficient merge gate. Current-base identity, exact-head CI and unresolved review state are checked before merge.
+Audited main includes:
 
-## Current direct dependency boundary
+- FastAPI `>=0.141.1,<0.142` where declared;
+- Ray Tune `>=2.56.1` in the `full` extra;
+- Uvicorn 0.52.1 lane;
+- MLflow 3.15.1 lane;
+- Hypothesis 6.165.2 lane;
+- Ruff 0.16.1 lane;
+- GluonTS 0.17.0 lane;
+- the corresponding committed `uv.lock`.
 
-At audited main `83f72d2...`:
-
-- `ray[tune]>=2.56.1` is merged in the `full` extra.
-- FastAPI is `>=0.141.1,<0.142` in the relevant API/dev/full lanes.
-- #241's grouped updates are **not** part of audited main until that PR is merged.
-- `uv.lock` is the committed dependency lock and must remain consistent with `pyproject.toml`.
-
-Do not infer a newer dependency state from an open Dependabot branch.
+`uv.lock` remains the committed dependency lock and must stay consistent with `pyproject.toml`.
 
 ## Unified evaluation campaign
 
-PR #248 introduced the canonical development-only campaign:
+Primary command:
 
 ```bash
 uv run loto3 campaign \
@@ -73,47 +73,29 @@ Plan-only inventory:
 uv run loto3 campaign --output unused --plan-only
 ```
 
-Canonical games:
+Canonical games are `mini`, `loto6`, `loto7`, `bingo5`, `numbers3`, and `numbers4`.
 
-```text
-mini
-loto6
-loto7
-bingo5
-numbers3
-numbers4
-```
+The campaign materializes every requested broad-catalog model × game pair exactly once and deliberately retains fail-visible states such as `FAILED`, `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `PARTIAL_SEEDS`, and `NON_STANDALONE_METHOD`.
 
-The campaign materializes every requested broad-catalog model × game pair exactly once. It does **not** hide unsupported combinations. Terminal states include successful and fail-visible states such as `FAILED`, `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `PARTIAL_SEEDS`, and `NON_STANDALONE_METHOD`.
+The primary tolerance is Hit@±1. Required accompanying metrics include per-position Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE. Mandatory baselines are random, fixed, mean, median, last, frequency, and statistical AR(1). All configured seeds are retained and summarized; best-seed-only selection is not part of the campaign. Prediction records are persisted and SHA-256 sealed with `actuals_known=false` before scoring reads corresponding actuals.
 
-The primary tolerance is fixed at Hit@±1. Required accompanying metrics include per-position Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE. Mandatory baselines are random, fixed, mean, median, last, frequency, and statistical AR(1).
+## Decoder and candidate-routing state
 
-All configured seeds are retained and summarized; best-seed-only selection is not part of the campaign. Prediction records are persisted and SHA-256 sealed with `actuals_known=false` before the scoring stage reads corresponding actuals.
+PR #249 added explicit select-game `DecodeObjective.MAP` and `DecodeObjective.WITHIN_TAU` constrained decoding. PR #250 then connected probability-bearing unified-campaign candidate estimators to family-specific WITHIN_TAU decoding while preserving point-only worker routes and explicit decoder/distribution identities.
 
-See `docs/UNIFIED_EVALUATION_CAMPAIGN.md` for the execution contract.
+The candidate bridge is explicitly identified as a row-normalized slot-binary probability adapter rather than being mislabeled as a native categorical PMF. Decoder/distribution identities are persisted in runtime evidence attached to sealed seed evaluations.
 
-## Hit@±1 constrained decoder
-
-PR #249 added an explicit select-game decoder objective:
-
-```text
-DecodeObjective.MAP
-DecodeObjective.WITHIN_TAU
-```
-
-`WITHIN_TAU` maximizes additive expected positional Hit@±tau utility subject to the legal strictly increasing select-game constraint. Focused tests cover exact IID-null optima for mini/loto6/loto7/bingo5, brute-force agreement on a reduced geometry, MAP compatibility and fail-closed probability validation.
-
-This is a decoder objective implementation. It is **not** evidence that lottery draws are non-IID, not a promise of OOF improvement, and not a Holdout/Prospective result.
+These are implementation/theory and routing changes. They are **not** evidence that lottery draws are non-IID, not a promise of OOF improvement, and not Holdout/Prospective results.
 
 ## What has not been established
 
-The following claims are **not** supported by this repository snapshot:
+The following claims are **not** supported by this snapshot:
 
 - all 174 registered entries successfully execute on all six games;
 - all 174 entries are independent forecast models;
 - all registered entries are runtime-certified on the target host;
 - a complete real-data 174 × 6 accuracy campaign has been executed;
-- the within-tau decoder improves every model's real OOF score;
+- the WITHIN_TAU decoder improves every model's real OOF score;
 - a model beats every mandatory baseline;
 - a champion has passed formal Holdout;
 - Prospective evidence authorizes promotion or production binding.
@@ -122,7 +104,7 @@ A complete campaign matrix means every requested combination has a recorded resu
 
 ## Runtime/capability documentation
 
-Use these code-grounded/current references:
+Use these current/code-grounded references:
 
 - `docs/MODEL_EXECUTION_MATRIX.md`
 - `docs/CURRENT_MODEL_EXECUTION_ADDENDUM.md`
@@ -137,11 +119,11 @@ Historical runtime evidence remains historical evidence. Do not rewrite old obse
 
 ### Timer Base 84M — Issue #239
 
-Status remains OOF-focused. Runtime certification and an evaluation foundation exist, but this status document does not claim that formal leakage-safe real-data OOF has completed. Holdout and Prospective remain closed.
+Status remains OOF-focused. Runtime certification and evaluation infrastructure do not establish that formal leakage-safe real-data OOF has completed. Holdout and Prospective remain closed.
 
 ### Timer-S1 — Issue #118
 
-PR-A is historical/merged, but PR-B immutable provenance, remote-code review, isolated runtime, real inference, GPU evidence, reload reproducibility, and certification remain an open workstream. No OOF/accuracy/promotion claim follows from that issue.
+PR-B immutable provenance, remote-code review, isolated runtime, real inference, GPU evidence, reload reproducibility, and certification remain an open workstream. No OOF/accuracy/promotion claim follows from that issue.
 
 ## Documentation interpretation rules
 
