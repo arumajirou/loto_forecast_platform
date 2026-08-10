@@ -1,0 +1,118 @@
+name: Experiment / evaluation campaign
+about: Define a reproducible, leakage-safe model evaluation or research campaign.
+title: "[experiment] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for result-affecting experiments. Runtime availability alone is not forecast-quality evidence. Holdout and Prospective remain closed unless separately authorized.
+
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game scope
+      options:
+        - mini
+        - loto6
+        - loto7
+        - bingo5
+        - numbers3
+        - numbers4
+        - all-six-games
+        - other-explicit-scope
+    validations:
+      required: true
+
+  - type: input
+    id: model_scope
+    attributes:
+      label: Model / candidate scope
+      description: Model IDs, catalog, provider lane, or explicit generated inventory identity.
+      placeholder: "e.g. all broad catalog entries / logistic / nf-nhits"
+    validations:
+      required: true
+
+  - type: input
+    id: protocol_hash
+    attributes:
+      label: Protocol hash / identity
+      description: Use UNKNOWN only before the protocol artifact is generated.
+      placeholder: "sha256 or UNKNOWN"
+    validations:
+      required: true
+
+  - type: input
+    id: seeds
+    attributes:
+      label: Seed inventory
+      placeholder: "1,42,1729"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Highest phase authorized by this issue
+      options:
+        - Development / OOF only
+        - Holdout (requires separate explicit authorization evidence)
+        - Prospective (requires separate explicit authorization evidence)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: capability
+    attributes:
+      label: Starting capability/evidence level
+      options:
+        - REGISTERED_ONLY
+        - SHARED_ROUTABLE
+        - RUNTIME_VERIFIED
+        - OOF_EVALUATED
+        - OTHER_EXPLICIT
+    validations:
+      required: true
+
+  - type: textarea
+    id: baselines
+    attributes:
+      label: Baselines and comparison contract
+      value: |
+        - random
+        - fixed
+        - mean
+        - median
+        - last
+        - frequency
+        - statistical
+    validations:
+      required: true
+
+  - type: textarea
+    id: leakage
+    attributes:
+      label: Leakage / chronology controls
+      description: Train-only fitting, split identity, negative controls, prediction sealing, actual-access boundary.
+    validations:
+      required: true
+
+  - type: textarea
+    id: outputs
+    attributes:
+      label: Required artifacts
+      description: Run ID, data/code/config hashes, predictions, locks, runtime evidence, metrics, manifests, SHA256SUMS, etc.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: nonclaims
+    attributes:
+      label: Scientific non-claims
+      options:
+        - label: I will not interpret registration/runtime availability as accuracy success.
+          required: true
+        - label: I will retain all configured seeds rather than selecting only the best seed.
+          required: true
+        - label: I will not open Holdout or Prospective beyond the phase authorized above.
+          required: true
