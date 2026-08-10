@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import statistics as stats
 from collections.abc import Mapping, Sequence
-from typing import Any, Literal
+from typing import Any, Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -87,6 +87,59 @@ class PromotionPolicyV2(PromotionPolicy):
 
     def theory_assessment(self) -> dict[str, object]:
         return self._theory_threshold().assessment()
+
+
+PromotionPolicyLike: TypeAlias = PromotionPolicy | PromotionPolicyV2
+
+
+def promotion_schema_for_policy(policy: PromotionPolicyLike) -> str:
+    return PROMOTION_SCHEMA_V2 if isinstance(policy, PromotionPolicyV2) else PROMOTION_SCHEMA
+
+
+def parse_promotion_policy(
+    payload: Mapping[str, Any],
+    *,
+    schema_version: str | None = None,
+) -> PromotionPolicyLike:
+    """Parse a policy without silently reinterpreting historical v1 evidence as v2."""
+    if schema_version == PROMOTION_SCHEMA_V2:
+        return PromotionPolicyV2.model_validate(payload)
+    if schema_version == PROMOTION_SCHEMA:
+        return PromotionPolicy.model_validate(payload)
+    if schema_version is not None:
+        raise PromotionEligibilityError("PROMOTION_SCHEMA_INVALID", schema_version)
+    if "game" in payload or "hit_at_1_target_semantics" in payload:
+        return PromotionPolicyV2.model_validate(payload)
+    return PromotionPolicy.model_validate(payload)
+
+
+def effective_hit_at_1_target(policy: PromotionPolicyLike) -> float:
+    """Resolve the absolute threshold consumed by existing Hit@±1 scoring rules."""
+    if isinstance(policy, PromotionPolicyV2):
+        return float(policy.theory_assessment()["implied_absolute_target"])
+    return float(policy.hit_at_1_target)
+
+
+def validate_policy_window_game(
+    policy: PromotionPolicyLike,
+    window_evidence: Mapping[str, Any],
+) -> None:
+    """Bind theory-aware v2 evidence to the same game used to compute the IID-null reference."""
+    if not isinstance(policy, PromotionPolicyV2):
+        return
+    holdout = window_evidence.get("holdout")
+    prospective = window_evidence.get("prospective")
+    if not isinstance(holdout, Mapping) or not isinstance(prospective, list):
+        raise PromotionEligibilityError("WINDOW_EVIDENCE_INVALID", str(window_evidence))
+    windows = [holdout, *prospective]
+    games = [str(window.get("game_id", "")).strip() for window in windows]
+    if any(not game for game in games):
+        raise PromotionEligibilityError("SCORING_GAME_MISSING", str(games))
+    if set(games) != {policy.game}:
+        raise PromotionEligibilityError(
+            "SCORING_GAME_POLICY_MISMATCH",
+            f"policy={policy.game} evidence={games}",
+        )
 
 
 def require_finite_metric(value: Any, name: str) -> float:
