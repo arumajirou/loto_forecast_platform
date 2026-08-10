@@ -1,0 +1,21 @@
+# Scientific and repository-governance ownership foundation.
+# Enforcement depends on GitHub branch/ruleset settings and must be verified separately.
+
+* @arumajirou
+
+# Scientific contracts and promotion/phase boundaries.
+/src/loto/evaluation/ @arumajirou
+/src/loto/sealing/ @arumajirou
+/src/loto/autogluon_campaign/ @arumajirou
+/src/loto/data_access_ledger.py @arumajirou
+/docs/evaluation_protocol/ @arumajirou
+/docs/DOCUMENTATION_POLICY.md @arumajirou
+
+# Repository automation and dependency policy.
+/.github/ @arumajirou
+/pyproject.toml @arumajirou
+/uv.lock @arumajirou
+
+# Historical/release evidence: review is required even when the correct action is to preserve bytes.
+/audit/ @arumajirou
+/releases/ @arumajirou
