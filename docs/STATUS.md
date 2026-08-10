@@ -1,174 +1,136 @@
-# Repository status snapshot
-
-> **Status class:** audited point-in-time snapshot, not an auto-updating dashboard  
-> **Verified at:** 2026-08-10 16:24 JST  
-> **Repository:** `arumajirou/loto_forecast_platform`  
-> **Audit base:** `main@0bb4680b2d26cfd32788381f580d86a4acd0fb6d`
-
-This document answers “what was actually true when the documentation audit was performed?” without turning volatile GitHub, CI, workstation, or Linear state into permanent repository constants.
-
-For rules on freshness and historical evidence, read [`DOCUMENTATION_POLICY.md`](DOCUMENTATION_POLICY.md).
-
-## 1. Source-of-truth order
-
-When documents disagree, use this precedence:
-
-1. **Live GitHub state** for branch, PR, Issue, review and merge state.
-2. **Versioned repository code/config** for implemented behavior and dependency contracts.
-3. **Exact-SHA CI/runtime evidence** for what was actually executed and verified.
-4. **Linear** for work tracking; GitHub remains authoritative for repository state.
-5. **Point-in-time documentation** for historical context only.
-
-A document saying “current” does not override a later GitHub state.
-
-## 2. GitHub state verified during this audit
-
-| Item | Verified state |
-|---|---|
-| default branch | `main` |
-| main HEAD at audit start | `0bb4680b2d26cfd32788381f580d86a4acd0fb6d` |
-| latest merged change at audit start | PR #240, `feat(timer): add leakage-safe OOF evaluation` |
-| PR #240 | merged; merge SHA `0bb4680b2d26cfd32788381f580d86a4acd0fb6d` |
-| open PRs | exactly one: PR #245 (documentation refresh) |
-| open GitHub Issues | #239 and #118 |
-| repository permissions of connected maintainer | admin / maintain / push / triage available |
-| repository visibility | private |
-
-Recent merged work immediately preceding this audit includes:
-
-- #240 — Timer Base 84M leakage-safe OOF evaluation foundation;
-- #238 — Timer Base 84M pinned snapshot/runtime certification;
-- #237 — AutoGluon protocol-v2/shared worker integration;
-- #235 — standard Linux CI migrated to the self-hosted runner;
-- #234/#233/#232/#230/#229 — provider/runtime/test contract repairs.
-
-This materially supersedes older project summaries that still describe large Open-PR queues, 929 Ruff findings, 34 pytest collection errors, or 52 full-pytest execution failures as current. Those were valid intermediate states but have since been remediated and merged.
-
-## 3. Linear state verified during this audit
-
-Linear team: `Tajimaharu`.
-
-| Issue | State | Interpretation |
-|---|---|---|
-| TAJ-12 | In Progress | Timer Base 84M OOF scientific work remains open |
-| TAJ-11 | Done | Timer Base 84M repository verification/runtime certification work completed |
-| TAJ-10 | Done | 52 full-pytest execution failures remediation completed |
-| TAJ-9 | Done | standard CI self-hosted Linux migration completed |
-| TAJ-8 | Done | pytest collection debt remediation completed |
-| TAJ-7 | Done | Ruff lint debt remediation completed |
-| TAJ-5 / TAJ-6 | Done | formatting and invalid UTF-8 blockers completed |
-| TAJ-13 | In Progress during this audit | repository-wide documentation alignment |
-
-Linear descriptions may contain the GitHub baseline from the moment an issue was created. They must not be used as a substitute for re-fetching GitHub before a merge, release, or scientific run.
-
-## 4. Scientific status
-
-The merge of PR #240 completed the **engineering foundation**, not the forecast-quality experiment.
-
-The scientific boundary preserved by PR #240 at merge time is:
+# Repository Status
 
 ```text
-scientific_progress=18%
-formal_oof_run=false
-timer_inference_run=false
-holdout_actuals_opened=false
-prospective_actuals_opened=false
-accuracy_claim=false
-champion_claim=false
-promotion=false
+status_class: AUDITED_SNAPSHOT
+as_of: 2026-08-10T18:20+09:00
+repository: arumajirou/loto_forecast_platform
+source_of_truth: live GitHub state + code/config at audited main SHA
+base_main_sha: cc7ec5473730cfb18100bdfbb5228cf65e571b32
+superseded_by: NONE
 ```
 
-Therefore:
+This file is the current repository-status entry point. It records a point-in-time audit; live GitHub state takes precedence after the `as_of` time.
 
-- there is no verified Timer Base 84M OOF accuracy result yet;
-- there is no champion/promotion claim;
-- Holdout and Prospective remain closed;
-- a valid future result may still be `NO_MODEL_BEATS_BASELINE` / `champion=null`.
+## Executive status
 
-Primary metric remains `Hit@±1`. Required companion metrics are MAE, MSE, RMSE, position Hit@±1 and all-position Hit@±1. Formal comparisons retain all configured seeds and report mean, variance and worst values.
+- Default branch: `main`.
+- Audited main: `cc7ec5473730cfb18100bdfbb5228cf65e571b32`.
+- Repository visibility: public.
+- Unified all-model × all-game development evaluation is merged and callable through `uv run loto3 campaign`.
+- The broad generated catalog remains a 174-entry inventory at this audit boundary; registration is not equivalent to shared routing, runtime certification, OOF completion, or promotion.
+- Holdout: **CLOSED / NOT EVALUATED by the unified campaign**.
+- Prospective: **CLOSED / NOT EVALUATED by the unified campaign**.
+- Champion/promotion: **NONE AUTHORIZED by this documentation update**.
+- Formal Timer Base 84M OOF work remains open in GitHub Issue #239.
+- Timer-S1 PR-B immutable runtime/certification work remains open in GitHub Issue #118.
 
-## 5. Model inventory
+## Merge batch completed on 2026-08-10
 
-[`MODEL_INVENTORY.md`](MODEL_INVENTORY.md) is generated and explicitly identifies `loto3 catalog --counts` as the source of truth.
+| PR | Result | Main commit | Evidence boundary |
+|---|---|---|---|
+| #248 | MERGED | `aae45ba9294499f51cc5f1564de1c6ccf5814230` | exact pre-merge head passed Linux full CI and native Windows portability; unified campaign added |
+| #244 | MERGED | `c12ca27048d25cdc869fa3cbbfa6e31c727eb529` | actions/checkout v7 workflow update; Linux and Windows exact-head checks passed |
+| #242 | MERGED | `cc7ec5473730cfb18100bdfbb5228cf65e571b32` | Ray Tune dependency updated to `>=2.56.1`; latest rebased head passed Linux full CI and subsequently native Windows portability |
 
-At this audit snapshot it records:
+GitHub Issue #247 was closed as completed after PR #248 merged.
 
-- 174 registered estimators total;
-- NeuralForecast fixed models: 37;
-- NeuralForecast AutoModels: 36;
-- StatsForecast: 41;
-- MLForecast Auto: 8;
-- HierarchicalForecast reconciliation methods: 10;
-- TSFM registrations: 21;
-- all 21 TSFM revisions recorded there as `UNPINNED` until formal fixation.
+## Open pull requests at the audit boundary
 
-Registration is **Level 1 only**. It is not equivalent to dependency availability, runtime loading, inference verification, OOF evaluation, Holdout eligibility, or promotion eligibility.
+Two Dependabot PRs remained open when this snapshot was prepared:
 
-## 6. Dependency/config facts
+| PR | Scope | State at audit boundary | Merge decision |
+|---|---|---|---|
+| #243 | FastAPI `0.119.1 -> 0.141.1` | recreated on current main; mergeable, latest exact-head CI queued | `VERIFICATION_PENDING`, not force-merged |
+| #241 | uvicorn / MLflow / Hypothesis / Ruff / GluonTS grouped update | rebase/recreate still catching up with current main | `REBASE_OR_RECREATE_PENDING`, not merge-ready |
 
-`pyproject.toml` uses dynamic package versioning from `loto.version.__version__`; the README must not hand-maintain a package version.
+`mergeable=true` alone is not treated as a sufficient merge gate for a dependency/API update. Current-base identity, relevant CI, and unresolved review state are checked before merge.
 
-At the audit base, notable root dependencies include:
+## Current direct dependency boundary
 
-- Python `>=3.11,<3.14`;
-- `neuralforecast==3.2.0`;
-- `torch==2.9.1`;
-- `transformers==4.57.6`;
-- `huggingface-hub==0.36.2`;
-- optional groups for `auto-campaign`, `api`, `mlflow`, `postgres`, `full`, `frameworks`, and `tsfm`.
+At audited main `cc7ec547...`:
 
-Always inspect the committed `pyproject.toml` and `uv.lock` rather than copying version values from an old tutorial.
+- `ray[tune]>=2.56.1` is merged in the `full` extra.
+- FastAPI remains `>=0.115,<0.120` until #243 completes verification and is merged.
+- The grouped #241 updates are not part of audited main.
+- `uv.lock` is the committed dependency lock and must remain consistent with `pyproject.toml`.
 
-## 7. CI/runtime evidence boundary
+Do not infer a newer dependency state from an open Dependabot branch.
 
-CI and runtime claims are valid only for the exact SHA/run on which they were observed.
+## Unified evaluation campaign
 
-Verified historical/currently-relevant evidence includes:
-
-- standard Linux CI was migrated to the self-hosted lane by PR #235; its PR-head standard CI completed all intended steps successfully;
-- native Windows portability was merged by PR #194 and was also exercised during the PR #240 work;
-- PR #240 recorded 20/20 focused Windows validation and successful Windows portability evidence on its pre-merge head;
-- the GitHub connector exposed no combined commit-status records on merge commit `0bb4680...` during this audit, so this document does **not** invent a merge-commit CI result.
-
-A workstation being available or unavailable is session-specific. It is **not** a durable repository property. Windows-only or Linux-only statements in older handoff bundles are historical execution context unless re-verified for the current session.
-
-## 8. What was stale and how to read it now
-
-The following patterns are explicitly treated as historical unless re-verified:
-
-- `PR_240_STATE=open/draft` — superseded; PR #240 is merged.
-- `CURRENT_OPERATOR_ENVIRONMENT=native Windows only` — session-specific, not a repository invariant.
-- old Ruff/pytest debt counts — superseded by later remediation PRs and completed Linear issues.
-- old Open PR/Issue totals — point-in-time only.
-- fixed CI run IDs described as “latest” — evidence for those exact runs only.
-- old model counts in prose — use generated inventory / CLI instead.
-
-Historical verification reports, SHA-256 manifests, changelogs and handoffs should normally **not** be rewritten merely because the project advanced; their status scope must instead be made explicit.
-
-## 9. Live verification commands
-
-For a maintainer with `gh` access:
+PR #248 introduced the canonical development-only campaign:
 
 ```bash
-gh repo view arumajirou/loto_forecast_platform --json defaultBranchRef
-gh pr list -R arumajirou/loto_forecast_platform --state open
-gh issue list -R arumajirou/loto_forecast_platform --state open
-gh run list -R arumajirou/loto_forecast_platform --limit 20
+uv run loto3 campaign \
+  --input-dir /path/to/canonical-csv-directory \
+  --output /path/to/new-run-directory
 ```
 
-Repository-derived model/config checks:
+Plan-only inventory:
 
 ```bash
-uv run loto3 games
-uv run loto3 catalog --counts
-uv run loto3 catalog --unpinned
-uv run loto3 integrity check
+uv run loto3 campaign --output unused --plan-only
 ```
 
-Before any formal scientific run, additionally record exact Git commit, clean-tree state, data/split/feature hashes, protocol hash, package/runtime identity, resource measurements and prediction seals.
+Canonical games:
 
-## 10. Next repository/scientific work after this snapshot
+```text
+mini
+loto6
+loto7
+bingo5
+numbers3
+numbers4
+```
 
-Repository documentation work is tracked by PR #245 / TAJ-13.
+The campaign materializes every requested broad-catalog model × game pair exactly once. It does **not** hide unsupported combinations. Terminal states include successful and fail-visible states such as `FAILED`, `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `PARTIAL_SEEDS`, and `NON_STANDALONE_METHOD`.
 
-Scientific work remains tracked by GitHub Issue #239 / Linear TAJ-12. The next scientific step is still leakage-safe Timer Base 84M OOF preparation/execution under the fixed protocol. Holdout and Prospective remain closed until their later gates are explicitly authorized.
+The primary tolerance is fixed at Hit@±1. Required accompanying metrics include per-position Hit@±1, all-position Hit@±1, MAE, MSE, and RMSE. Mandatory baselines are random, fixed, mean, median, last, frequency, and statistical AR(1).
+
+All configured seeds are retained and summarized; best-seed-only selection is not part of the campaign. Prediction records are persisted and SHA-256 sealed with `actuals_known=false` before the scoring stage reads corresponding actuals.
+
+See `docs/UNIFIED_EVALUATION_CAMPAIGN.md` for the execution contract.
+
+## What has not been established
+
+The following claims are **not** supported by this repository snapshot:
+
+- all 174 registered entries successfully execute on all six games;
+- all 174 entries are independent forecast models;
+- all registered entries are runtime-certified on the target host;
+- a complete real-data 174 × 6 accuracy campaign has been executed;
+- a model beats every mandatory baseline;
+- a champion has passed formal Holdout;
+- Prospective evidence authorizes promotion or production binding.
+
+A complete campaign matrix means every requested combination has a recorded result row; it does not mean every row succeeded.
+
+## Runtime/capability documentation
+
+Use these current code-grounded references:
+
+- `docs/MODEL_EXECUTION_MATRIX.md`
+- `docs/LIBRARY_RUNTIME_CAPABILITIES.md`
+- `docs/TSFM_RUNTIME_CAPABILITIES.md`
+- `docs/MODEL_INVENTORY.md`
+- `docs/UNIFIED_EVALUATION_CAMPAIGN.md`
+
+Historical runtime evidence remains historical evidence. Do not rewrite old observations to match a newer aggregate.
+
+## Scientific work still open
+
+### Timer Base 84M — Issue #239
+
+Status remains OOF-focused. Runtime certification and an evaluation foundation exist, but this status document does not claim that formal leakage-safe real-data OOF has completed. Holdout and Prospective remain closed.
+
+### Timer-S1 — Issue #118
+
+PR-A is historical/merged, but PR-B immutable provenance, remote-code review, isolated runtime, real inference, GPU evidence, reload reproducibility, and certification remain an open workstream. No OOF/accuracy/promotion claim follows from that issue.
+
+## Documentation interpretation rules
+
+1. Live GitHub state is newer than this snapshot once time advances beyond `as_of`.
+2. Code/config determine executable capability; prose does not create runtime support.
+3. Runtime certification does not establish lottery-domain forecast quality.
+4. OOF does not authorize Holdout; Holdout does not authorize Prospective; Prospective does not automatically authorize promotion.
+5. Historical verification reports remain point-in-time evidence and should be superseded by links rather than rewritten as if they were current runs.
