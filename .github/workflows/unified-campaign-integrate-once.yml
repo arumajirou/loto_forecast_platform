@@ -1,0 +1,109 @@
+name: unified-campaign-integrate-once
+
+on:
+  push:
+    branches:
+      - agent/unified-all-model-all-game-evaluation-v1
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    if: ${{ !contains(github.event.head_commit.message, '[campaign-integrated]') }}
+    runs-on: [self-hosted, loto-ci]
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: agent/unified-all-model-all-game-evaluation-v1
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: 0.11.21
+          enable-cache: false
+
+      - name: Apply bounded integration patch and self-remove
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          campaign = Path('src/loto/evaluation/unified_campaign.py')
+          text = campaign.read_text(encoding='utf-8')
+          text = text.replace('import hashlib\nimport json\nimport os\n', 'import hashlib\nimport os\n', 1)
+          old = '''            raise _NotRoutable(\n                f"candidate estimator has no unified point-forecast bridge: {spec.library}/{spec.class_name}"\n            )'''
+          new = '''            raise _NotRoutable(\n                "candidate estimator has no unified point-forecast bridge: "\n                f"{spec.library}/{spec.class_name}"\n            )'''
+          if old not in text:
+              raise SystemExit('campaign lint marker not found')
+          text = text.replace(old, new, 1)
+          old_nseries = '''        if spec.class_name in {\n            "TSMixer",\n            "TimeMixer",\n            "iTransformer",\n        }:\n            params.setdefault("n_series", geometry.positions)'''
+          if old_nseries in text:
+              text = text.replace(
+                  old_nseries,
+                  '''        if entry.requires_n_series:\n            params["n_series"] = geometry.positions''',
+                  1,
+              )
+          campaign.write_text(text, encoding='utf-8')
+
+          cli = Path('src/loto/cli_v3.py')
+          text = cli.read_text(encoding='utf-8')
+          command_marker = '\n\ndef _cmd_hierarchy(args: argparse.Namespace) -> int:\n'
+          command = '''\n\ndef _cmd_campaign(args: argparse.Namespace) -> int:\n    from loto.evaluation.unified_campaign_cli import run_campaign_args\n\n    return run_campaign_args(args)\n'''
+          if '_cmd_campaign(' not in text:
+              if command_marker not in text:
+                  raise SystemExit('cli command marker not found')
+              text = text.replace(command_marker, command + command_marker, 1)
+
+          parser_marker = '''    probabilistic = sub.add_parser(\n        "probabilistic", help="probabilistic-programming model catalog and runner"\n    )'''
+          parser_block = '''    campaign = sub.add_parser(\n        "campaign",\n        help="run the unified all-model x all-game development evaluation campaign",\n    )\n    from loto.evaluation.unified_campaign_cli import add_campaign_arguments\n\n    add_campaign_arguments(campaign)\n    campaign.set_defaults(func=_cmd_campaign)\n\n'''
+          if 'sub.add_parser(\n        "campaign"' not in text:
+              if parser_marker not in text:
+                  raise SystemExit('cli parser marker not found')
+              text = text.replace(parser_marker, parser_block + parser_marker, 1)
+          cli.write_text(text, encoding='utf-8')
+          PY
+
+          rm .github/workflows/unified-campaign-integrate-once.yml
+          ruff_version="$(python3 - <<'PY'
+          import tomllib
+          with open('uv.lock', 'rb') as stream:
+              lock = tomllib.load(stream)
+          versions = [p['version'] for p in lock['package'] if p.get('name') == 'ruff']
+          if len(versions) != 1:
+              raise SystemExit(f'unexpected Ruff versions: {versions!r}')
+          print(versions[0])
+          PY
+          )"
+          uv tool run --from "ruff==$ruff_version" ruff format \
+            src/loto/evaluation/unified_campaign.py \
+            src/loto/evaluation/unified_campaign_cli.py \
+            src/loto/cli_v3.py \
+            scripts/run_unified_campaign.py
+          uv tool run --from "ruff==$ruff_version" ruff check \
+            src/loto/evaluation/unified_campaign.py \
+            src/loto/evaluation/unified_campaign_cli.py \
+            src/loto/cli_v3.py \
+            scripts/run_unified_campaign.py
+
+          allowed='^(.github/workflows/unified-campaign-integrate-once.yml|scripts/run_unified_campaign.py|src/loto/cli_v3.py|src/loto/evaluation/unified_campaign.py|src/loto/evaluation/unified_campaign_cli.py)$'
+          unexpected="$(git diff --name-only | grep -Ev "$allowed" || true)"
+          if [[ -n "$unexpected" ]]; then
+            echo "unexpected integration scope:" >&2
+            echo "$unexpected" >&2
+            exit 1
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            .github/workflows/unified-campaign-integrate-once.yml \
+            scripts/run_unified_campaign.py \
+            src/loto/cli_v3.py \
+            src/loto/evaluation/unified_campaign.py \
+            src/loto/evaluation/unified_campaign_cli.py
+          git commit -m 'feat(evaluation): wire loto3 campaign CLI [campaign-integrated]'
+          git push origin HEAD:agent/unified-all-model-all-game-evaluation-v1
