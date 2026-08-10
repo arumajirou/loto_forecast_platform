@@ -12,6 +12,10 @@ this file; release headings are historical records.
 - Made FastAPI metadata, dashboard text, console scripts, and integrity-release defaults consume the
   canonical version.
 - Removed the mutable current-version string from the README title.
+- Updated the validated GitHub Actions checkout pin to actions/checkout v7.0.1 through PR #244.
+- Updated the `full` dependency lane to Ray Tune `>=2.56.1` and refreshed `uv.lock` through PR #242.
+- Updated FastAPI from the `<0.120` lane to `>=0.141.1,<0.142` with a refreshed lock through PR #243 after exact-head Linux and native Windows verification.
+- Refreshed current repository status, handoff, verification, runbook and documentation authority guidance after the merge batch.
 
 ### Added
 
@@ -20,3 +24,5 @@ this file; release headings are historical records.
 - Added fail-safe source-only behavior when installed package metadata is unavailable.
 - Added version-consistency, dashboard, CLI, package-metadata, BUILD_INFO, and README tests.
 - Added `VERSION_DESIGN.md` and `VERIFICATION_REPORT.md` documentation.
+- Added the merged `uv run loto3 campaign` all-model × all-six-game development evaluation surface through PR #248, including fail-visible coverage rows, Hit@±1-first metrics, mandatory baselines, complete seed summaries and prediction sealing.
+- Added `docs/CURRENT_HANDOFF.md`, `docs/CURRENT_VERIFICATION_REPORT.md`, and `docs/CURRENT_RUNBOOK.md` as current-state entry points while retaining older reports as historical evidence.
