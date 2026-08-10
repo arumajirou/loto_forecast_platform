@@ -2,260 +2,350 @@
 
 ```text
 status_class: DESIGN_CONTRACT
-as_of: 2026-08-10T18:59+09:00
+as_of: 2026-08-10T20:23+09:00
 repository: arumajirou/loto_forecast_platform
-audited_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
 ```
 
-## 1. 目的
+## 1. Purpose
 
-本計画は、implementation correctness、data leakage resistance、runtime integrity、scientific evaluation integrity、cross-platform packagingを分離して検証する。
+Implementation correctness、game geometry、leakage resistance、runtime integrity、scientific evaluation、promotion governance、cross-platform packagingを分離して検証する。
 
-「testが通った」をruntime certificationやforecast accuracyへ読み替えない。
+`pytest PASS`をruntime certificationやforecast superiorityへ読み替えない。
 
-## 2. 実装中の基本順序
-
-変更中は対象testとsmokeを優先する。
+## 2. Development order
 
 ```text
 focused unit/contract test
 -> focused smoke
--> Ruff/compile/type where relevant
--> affected integration test
--> full pytest
--> GitHub CI / portability
+-> Ruff / compile / type where relevant
+-> affected integration tests
+-> final full pytest
+-> exact-head/current-main GitHub CI
 ```
 
-重いfull pytestを小変更ごとに反復せず、実装がまとまった最終gateで実行する。
+重いfull CIを小変更ごとに反復しない。
 
-## 3. Commit-level tests
+## 3. Geometry tests
 
-最低限:
+Canonical six-game tableについて:
 
-- Pydantic/contract validation
-- canonical geometry legality
-- feature causality / no-future access
-- decoder invariants
-- prediction-lock serialization/integrity
-- metric calculation
-- seed aggregation
-- output shape/finite checks
-- output directory immutability
+- positions/domain/family;
+- select distinct/ascending legality;
+- digits position order/repeated values;
+- outcome validation;
+- geometry-derived dimensions;
+- new unreviewed game-size/digit-count hard-code rejection.
 
-## 4. Unified campaign focused tests
+#252 regression boundary:
 
-必須coverage:
+- select `mean_hits` uses set overlap;
+- Numbers3/4 `mean_hits` uses exact positional equality;
+- repeated digits and digit order are preserved;
+- shape width must equal `geometry.positions`;
+- legacy Loto7 wrapper remains compatible.
+
+## 4. Unified campaign tests
 
 ### 4.1 Plan completeness
 
-`build_campaign_plan`がrequested broad catalog × known gamesのcardinality/uniquenessを満たす。
+Requested broad catalog × known games cardinality and uniqueness.
 
 ### 4.2 Six-game baseline matrix
 
-各canonical gameで7 mandatory baselineを実行し、required metricsとprediction sealを生成する。
+Every canonical game receives all seven mandatory baselines.
 
-### 4.3 Candidate bridge
+### 4.3 Shared candidate route
 
-少なくともdigit familyとselect familyの双方でcandidate estimatorがshared routeを通る。
+At least one digit and one select game exercise a probability-bearing candidate estimator.
 
-### 4.4 Fail-visible states
+### 4.4 Point-only route
 
-Reconciliation-only、unsupported、non-routable等をmatrixから削除せずterminal statusとして保持する。
+No fabricated PMF is introduced for point-only models.
 
-### 4.5 Seed summary
+### 4.5 Fail-visible coverage
 
-全configured seedを保持し、mean、population variance、std、min/max、worst value/seedを検証する。
+Expected terminal states remain in the result matrix instead of disappearing.
 
-### 4.6 Prediction lock ordering
+### 4.6 Seed summary
 
-Lock artifactの`actuals_known=false`、non-empty predictions、SHA-256 evidence、single-use outputを検証する。
+All configured seeds are retained; mean, population variance, std, min/max and worst values/seeds are correct.
+
+### 4.7 Prediction lock
+
+Prediction evidence is durable and SHA-256 fixed before matching target actual scoring access.
+
+### 4.8 Output immutability
+
+Existing run output directories fail closed.
 
 ## 5. Decoder tests
 
-### 5.1 Select MAP compatibility
+### MAP compatibility
 
-Historical MAP APIとlegal constrained outputを保持する。
+Historical MAP API remains valid.
 
-### 5.2 WITHIN_TAU optimality
+### WITHIN_TAU optimality
 
-Reduced geometryでbrute-force optimumと一致すること。
+Reduced select geometry result matches brute-force optimum.
 
-### 5.3 IID-null exact cases
+### Digit utility
 
-mini/loto6/loto7/bingo5などの既知geometryで理論的fixtureに対する期待optimumを検証する。
+Constructed probability fixtures distinguish MAP and ±tau window-mass decisions while preserving positions.
 
-### 5.4 Digit decoder
+### Unified routing
 
-Crafted probability surfaceでMAPとWITHIN_TAU/window-mass decisionが意図通り異なることを検証する。
+Digits route to digit WITHIN_TAU logic; select route to constrained DP.
 
-### 5.5 Unified routing
+### Invalid input
 
-Numbers3等digit gameはdigit WITHIN_TAU、Loto7等select gameはconstrained WITHIN_TAUを使うこと。
+Reject negative/non-finite/invalid shape/zero-mass probability surfaces as specified.
 
-### 5.6 Point-only route
+Decoder theory tests are not OOF improvement tests.
 
-Point-only workerへ架空のprobability distributionを生成しないこと。
+## 6. Data/leakage tests
 
-### 5.7 Fail closed
+- required target columns;
+- unique draw identity;
+- monotonic chronology;
+- finite targets;
+- game legality;
+- future information sentinel;
+- raw immutability where applicable;
+- development/Holdout separation;
+- prediction-before-actual event order.
 
-Non-finite、negative、invalid shape、zero-mass等のinvalid probability入力を拒否する。
+## 7. Metric tests
 
-Decoder theory testは実データOOF improvement testではない。
-
-## 6. Data contract tests
-
-- required target columns
-- draw identity uniqueness
-- chronological monotonicity
-- finite numeric targets
-- geometry legality
-- future information sentinel
-- raw immutability where workflow applies
-- development/holdout split separation
-
-## 7. Metrics tests
-
-Game geometryに応じて:
-
-- Hit@±1
-- per-position Hit@±1
-- all-position Hit@±1
-- MAE
-- MSE
-- RMSE
-
-を検証する。
-
-Select-only set/ranking metricがdigit gamesへ誤適用されないことも検証する。
-
-## 8. Runtime certification tests
-
-Runtime certification対象ではunit testだけで成功扱いしない。
-
-該当model/providerごとに:
-
-- dependency import
-- model load
-- input construction
-- inference
-- output shape
-- finite values
-- requested/observed device
-- GPU PID/VRAM when CUDA claimed
-- CPU fallback behavior
-- save/reload inference when required
-
-をsmoke/certification artifactとして検証する。
-
-## 9. Dependency/packaging CI
-
-### Linux standard CI
-
-Repository standard gate:
+Verify:
 
 ```text
-locked dependency install
+Hit@±1
+position Hit@±1
+all-position Hit@±1
+MAE
+MSE
+RMSE
+mean_hits family semantics
+```
+
+Select-only set/ranking semantics must not leak into digit-game positional metrics.
+
+## 8. Theory guard tests
+
+For every relevant game/tau fixture:
+
+- exact IID-null reference is finite/in-range;
+- `excess_vs_iid_null` target maps to the expected absolute target;
+- legal absolute target at/below reference is accepted;
+- absolute target above reference without declaration is rejected;
+- explicit alternative hypothesis path is distinguishable;
+- implied target outside [0,1] is rejected;
+- unknown game is rejected.
+
+Interpretation string/documentation must not call the IID-null optimum a universal ceiling for all possible data-generating processes.
+
+## 9. Promotion v1/v2 tests
+
+### Historical compatibility
+
+v1 schema/evidence remains parsed as v1 and is not silently transformed to v2.
+
+### V2 theory target
+
+- v2 uses `implied_absolute_target`, not the raw excess value;
+- aggregate Hit@±1 and worst-window Hit@±1 use the same effective target;
+- current v2 tau is fixed to 1.
+
+### V2 game binding
+
+- missing sealed `game_id` -> fail;
+- Holdout/Prospective game mismatch -> fail;
+- policy/evidence game mismatch -> fail;
+- matching sealed identity -> allowed to continue.
+
+### Rules
+
+Verify minimum windows/draws, drift stability, baseline comparison, degradation thresholds and first-failure reason code.
+
+### Manual-only safety
+
+Regardless of rule outcome:
+
+```text
+automatic_promotion=false
+automatic_retraining=false
+registry_write_allowed=false
+```
+
+All-pass result may be `ELIGIBLE_FOR_HUMAN_APPROVAL` but not `PROMOTED`.
+
+### Artifact/schema roundtrip
+
+V2 artifact generation, verification and CLI loading use v2 schema without being verified as v1.
+
+## 10. Power/MDE tests
+
+For `paired-score-normal-approximation-v1`:
+
+- required-draw and MDE calculations are algebraically consistent up to integer ceiling;
+- MDE decreases as draw count grows;
+- higher multiplicity is conservative via smaller adjusted alpha and greater required sample;
+- unsupported alternative is rejected;
+- effect <=0 rejected;
+- non-finite/non-positive score SD rejected;
+- n_draws <=0 and bool rejected;
+- power curve requires non-empty unique sorted positive integer counts;
+- `target_power <= adjusted_alpha` rejected;
+- valid Bonferroni-adjusted plan accepted when target power exceeds adjusted alpha.
+
+Power tests establish calculation contract, not statistical truth for a future observed sample.
+
+## 11. Runtime certification tests
+
+For each runtime claim, unit tests are insufficient. Exercise applicable:
+
+```text
+dependency import
+model load
+input construction
+inference
+output shape
+finite output
+effective device
+GPU PID/VRAM/utilization if CUDA claimed
+CPU fallback detection
+save/reload inference
+cleanup / VRAM release
+```
+
+Exact model/revision/environment identity must accompany evidence.
+
+## 12. NeuralForecast AutoModel tests
+
+- official AutoModel class resolution;
+- Optuna/Ray policy materialization;
+- seed preservation;
+- resource controls;
+- `n_series` contracts for multivariate classes;
+- model-specific precision guard;
+- failed trial visibility;
+- save/reload where requested.
+
+Local inactive extensions must not be reported as active official AutoModels.
+
+## 13. Isolated provider tests
+
+AutoGluon/BasicTS/Time-Series-Library/Merlion/sktime and other isolated lanes must verify their own:
+
+- locked environment;
+- request/response schema;
+- path containment;
+- provider version/revision;
+- focused load/forward/save/load operations;
+- failure classification.
+
+Do not infer isolated provider success from root `uv sync`.
+
+## 14. Probabilistic platform tests
+
+- 72-model catalog uniqueness/schema;
+- native implementation coverage;
+- backend availability probe;
+- model/game/backend compatibility;
+- config validation;
+- plan/smoke/run state transitions;
+- status/diagnose/compare;
+- API authentication/run profile restrictions;
+- stop/resume behavior where applicable.
+
+## 15. Dependency/packaging CI
+
+### Linux final gate
+
+```text
+locked install
 Ruff format check
 Ruff lint
 compileall
 full pytest
 clean-tree verification
+cleanup
 ```
 
-### Native Windows portability
+### Native Windows
 
-最低限:
+At minimum validate universal lock resolution, wheel build/import and tracked-file cleanliness according to the current Windows workflow.
 
-```text
-universal lock validation
-dependency resolution
-wheel build
-installed-wheel import
-tracked-file cleanliness
-```
+Queued/cancelled jobs are not PASS.
 
-Queued/cancelled jobをPASSと記録しない。
+## 16. Pull Request race gate
 
-## 10. Pull Request merge gate
+Before merge re-fetch:
 
-Merge前に:
+- current main SHA;
+- PR head/base SHA;
+- draft/mergeable state;
+- changed files;
+- ahead/behind relation;
+- latest exact-head/current-base CI;
+- unresolved review threads;
+- security/runtime-sensitive paths.
 
-- current main SHA再取得
-- PR base/head SHA再取得
-- ahead/behind確認
-- changed-file scope確認
-- mergeable/draft state確認
-- exact-head/current-main CI確認
-- unresolved review threads確認
-- security/runtime-sensitive path確認
-- expected-head guard使用
+Use expected-head guarded merge. If head or main changes, prior exact-head proof may be stale.
 
-Dependency PRでlockが重なる場合はserial mergeし、残りをrebase/recreateして再検証する。
+## 17. Formal OOF tests
 
-## 11. Scientific evaluation tests
+- chronological folds;
+- immutable data/split identity;
+- mandatory baselines;
+- every configured seed;
+- train-only fitted components;
+- prediction-before-actual evidence;
+- required metrics;
+- protocol/data/code hashes;
+- worst-seed retention;
+- no best-seed-only selection.
 
-Formal OOF campaignでは:
+## 18. Holdout tests
 
-- chronological folds
-- mandatory baselines
-- full seed inventory
-- leakage checks
-- prediction seal before actual read
-- metric aggregation
-- worst-seed retention
-- protocol/data/code hashes
+Holdout remains unavailable until explicit authorization.
 
-を検証する。
+When authorized verify:
 
-Best seedのみのsuccess testをformal acceptanceにしない。
+- immutable Holdout identity;
+- no prior actual access;
+- pre-existing frozen protocol/model selection;
+- no Holdout retuning;
+- required baselines/metrics;
+- sealed evidence and registry record.
 
-## 12. Holdout gate tests
+## 19. Prospective tests
 
-Holdoutはdevelopment/OOF承認後のみ。
+- prediction exists before future actual availability/read;
+- immutable timestamp/hash;
+- later actual ingestion separated;
+- scoring reproducible;
+- selected candidate identity stable according to policy;
+- multiple window evidence as required.
 
-最低限:
+## 20. Promotion acceptance tests
 
-- immutable Holdout identity
-- Holdout actual unopened before authorization
-- pre-existing prediction/protocol evidence
-- no retuning on Holdout
-- required metrics/baselines
-- result registration
+Promotion requires separately reviewed runtime, OOF, Holdout and Prospective evidence plus policy rules and human approval.
 
-を確認する。
+`champion=null`, `NO_MODEL_BEATS_BASELINE` and `NOT_ELIGIBLE` are valid safe outcomes.
 
-## 13. Prospective gate tests
+## 21. Documentation tests
 
-- prediction created before future actual exists/is read
-- timestamp/hash seal
-- immutable prediction artifact
-- later actual ingestion separated
-- scoring reproducible
-- all-seed/baseline comparison where protocol requires
+Current/live documents should:
 
-## 14. Promotion tests
+- use the same capability-state vocabulary;
+- distinguish broad inventory from executable routing;
+- identify six canonical geometries consistently;
+- document current theory/promotion/power contracts;
+- not rewrite generated `MODEL_INVENTORY.md` or historical verification artifacts;
+- not convert point-in-time runtime evidence into scientific claims.
 
-Promotion/Champion認定は別gateであり、最低限:
+## 22. Non-claims
 
-- approved OOF evidence
-- approved Holdout evidence
-- required Prospective evidence
-- runtime certification
-- artifact/config/code/data identity
-- policy/approval state
-
-を満たす。
-
-`champion=null` を正常結果として扱う。
-
-## 15. Current non-claims
-
-このtest planの存在やCI successだけでは:
-
-- full real-data 174 × 6 campaign success
-- decoder real OOF improvement
-- Holdout success
-- Prospective success
-- promotion
-
-を証明しない。
+CI success does not establish complete real-data 174 × 6 success, all-model OOF superiority, Holdout/Prospective success or production promotion.
