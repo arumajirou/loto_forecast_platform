@@ -74,8 +74,7 @@ def _decode_increasing_additive(scores: np.ndarray, geometry: GameGeometry) -> l
             score = float(matrix[position, index]) + tail_score
             candidate = (index,) + tail
             if score > best_score or (
-                np.isclose(score, best_score)
-                and (not best_indexes or candidate < best_indexes)
+                np.isclose(score, best_score) and (not best_indexes or candidate < best_indexes)
             ):
                 best_score = score
                 best_indexes = candidate
