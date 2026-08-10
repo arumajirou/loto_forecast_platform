@@ -4,13 +4,17 @@ on:
   push:
     branches:
       - agent/unified-all-model-all-game-evaluation-v1
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
 
 jobs:
   integrate:
-    if: ${{ !contains(github.event.head_commit.message, '[campaign-integrated]') }}
+    if: ${{ !contains(github.event.pull_request.head.sha || github.sha, 'never-match') && !contains(github.event.head_commit.message || '', '[campaign-integrated]') }}
     runs-on: [self-hosted, loto-ci]
     steps:
       - name: Checkout branch
@@ -83,14 +87,16 @@ jobs:
             src/loto/evaluation/unified_campaign.py \
             src/loto/evaluation/unified_campaign_cli.py \
             src/loto/cli_v3.py \
-            scripts/run_unified_campaign.py
+            scripts/run_unified_campaign.py \
+            tests/test_unified_campaign.py
           uv tool run --from "ruff==$ruff_version" ruff check \
             src/loto/evaluation/unified_campaign.py \
             src/loto/evaluation/unified_campaign_cli.py \
             src/loto/cli_v3.py \
-            scripts/run_unified_campaign.py
+            scripts/run_unified_campaign.py \
+            tests/test_unified_campaign.py
 
-          allowed='^(.github/workflows/unified-campaign-integrate-once.yml|scripts/run_unified_campaign.py|src/loto/cli_v3.py|src/loto/evaluation/unified_campaign.py|src/loto/evaluation/unified_campaign_cli.py)$'
+          allowed='^(.github/workflows/unified-campaign-integrate-once.yml|scripts/run_unified_campaign.py|src/loto/cli_v3.py|src/loto/evaluation/unified_campaign.py|src/loto/evaluation/unified_campaign_cli.py|tests/test_unified_campaign.py)$'
           unexpected="$(git diff --name-only | grep -Ev "$allowed" || true)"
           if [[ -n "$unexpected" ]]; then
             echo "unexpected integration scope:" >&2
@@ -104,6 +110,7 @@ jobs:
             scripts/run_unified_campaign.py \
             src/loto/cli_v3.py \
             src/loto/evaluation/unified_campaign.py \
-            src/loto/evaluation/unified_campaign_cli.py
+            src/loto/evaluation/unified_campaign_cli.py \
+            tests/test_unified_campaign.py
           git commit -m 'feat(evaluation): wire loto3 campaign CLI [campaign-integrated]'
           git push origin HEAD:agent/unified-all-model-all-game-evaluation-v1
