@@ -213,6 +213,7 @@ def verify_promotion_eligibility(root: Path) -> dict[str, Any]:
     if response != expected_response:
         raise PromotionEligibilityError("PROMOTION_RESPONSE_MISMATCH", str(root))
     return {
+        "schema_version": schema_version,
         "status": decision["status"],
         "decision": decision["decision"],
         "reason_code": decision["reason_code"],
