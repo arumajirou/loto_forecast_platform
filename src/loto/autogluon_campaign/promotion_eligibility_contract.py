@@ -8,8 +8,10 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from loto.autogluon_campaign.holdout_prospective import HoldoutProspectiveError
+from loto.evaluation.theory_guard import TheoryAwareThreshold, ThresholdSemantics
 
 PROMOTION_SCHEMA = "autogluon-promotion-eligibility-v1"
+PROMOTION_SCHEMA_V2 = "autogluon-promotion-eligibility-v2"
 REQUIRED_BASELINES = (
     "baseline_random",
     "baseline_fixed",
@@ -26,6 +28,8 @@ class PromotionEligibilityError(HoldoutProspectiveError):
 
 
 class PromotionPolicy(BaseModel):
+    """Historical v1 policy retained for compatibility with existing evidence."""
+
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     minimum_prospective_windows: int = Field(default=3, ge=1)
@@ -48,6 +52,41 @@ class PromotionPolicy(BaseModel):
         if self.registry_write_allowed:
             raise ValueError("registry writes are forbidden")
         return self
+
+
+class PromotionPolicyV2(PromotionPolicy):
+    """Theory-aware policy for new evidence without rewriting v1 semantics.
+
+    The default target is zero *excess* over the exact IID-null Hit@±tau reference. Absolute
+    targets above that null reference fail closed unless an alternative hypothesis is explicitly
+    declared. Promotion remains manual and still requires the surrounding prospective/baseline
+    stability evidence.
+    """
+
+    game: str
+    tau: int = Field(default=1, ge=0)
+    hit_at_1_target: float = Field(default=0.0, ge=-1.0, le=1.0)
+    hit_at_1_target_semantics: ThresholdSemantics = ThresholdSemantics.EXCESS_VS_IID_NULL
+    allow_above_null_ceiling: bool = False
+    alternative_hypothesis: str | None = None
+
+    @model_validator(mode="after")
+    def validate_theory_target(self) -> PromotionPolicyV2:
+        self._theory_threshold()
+        return self
+
+    def _theory_threshold(self) -> TheoryAwareThreshold:
+        return TheoryAwareThreshold(
+            game=self.game,
+            tau=self.tau,
+            semantics=self.hit_at_1_target_semantics,
+            target=self.hit_at_1_target,
+            allow_above_null_ceiling=self.allow_above_null_ceiling,
+            alternative_hypothesis=self.alternative_hypothesis,
+        )
+
+    def theory_assessment(self) -> dict[str, object]:
+        return self._theory_threshold().assessment()
 
 
 def require_finite_metric(value: Any, name: str) -> float:
