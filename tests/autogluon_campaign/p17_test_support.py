@@ -89,6 +89,7 @@ def score_bundle(
     selected_mae: float = 0.30,
     baseline_hit: float = 0.50,
     baseline_mae: float = 1.50,
+    game_id: str | None = None,
 ) -> Path:
     root.mkdir(parents=True)
     rows = metric_rows(
@@ -134,13 +135,15 @@ def score_bundle(
         "operational_state": "CONTINUE_SHADOW",
         "drift_state": drift_state if stage == "prospective" else "NOT_APPLICABLE",
     }
+    if game_id is not None:
+        core["game_id"] = game_id
     report = {**core, "report_sha256": _digest(_canon(core))}
     _write(root / "SCORING_REPORT.json", report)
     _write_evidence(root, [*payloads, "SCORING_REPORT.json"])
     return root
 
 
-def valid_sources(tmp_path: Path):
+def valid_sources(tmp_path: Path, *, game_id: str | None = None):
     holdout = score_bundle(
         tmp_path / "holdout",
         stage="holdout",
@@ -148,6 +151,7 @@ def valid_sources(tmp_path: Path):
         draw_ids=[10, 11],
         selected_hit=0.96,
         selected_mae=0.25,
+        game_id=game_id,
     )
     prospective = [
         score_bundle(
@@ -157,19 +161,23 @@ def valid_sources(tmp_path: Path):
             draw_ids=[11 + index],
             selected_hit=0.95,
             selected_mae=0.30,
+            game_id=game_id,
         )
         for index in (1, 2, 3)
     ]
     return holdout, prospective
 
 
-def run_gate(tmp_path: Path, *, holdout=None, prospective=None):
+def run_gate(tmp_path: Path, *, holdout=None, prospective=None, policy=None):
     if holdout is None or prospective is None:
         holdout, prospective = valid_sources(tmp_path)
-    return create_promotion_eligibility(
-        holdout_score_dir=holdout,
-        prospective_score_dirs=prospective,
-        output_dir=tmp_path / "promotion",
-        run_id="p17-fixture",
-        now=datetime(2026, 8, 5, 10, 0, tzinfo=UTC),
-    )
+    kwargs = {
+        "holdout_score_dir": holdout,
+        "prospective_score_dirs": prospective,
+        "output_dir": tmp_path / "promotion",
+        "run_id": "p17-fixture",
+        "now": datetime(2026, 8, 5, 10, 0, tzinfo=UTC),
+    }
+    if policy is not None:
+        kwargs["policy"] = policy
+    return create_promotion_eligibility(**kwargs)

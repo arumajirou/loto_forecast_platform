@@ -90,7 +90,7 @@ def read_scoring_window(root: Path) -> dict[str, Any]:
 
     if before != _tree_hash(root):
         raise PromotionEligibilityError("UPSTREAM_SOURCE_MUTATED", str(root))
-    return {
+    result = {
         "stage": str(report.get("stage", "")),
         "source_run_id": str(report.get("source_run_id", "")),
         "source_tree_sha256": before,
@@ -101,3 +101,7 @@ def read_scoring_window(root: Path) -> dict[str, Any]:
         "operational_state": str(report.get("operational_state", "")),
         "metric_rows": normalized_rows,
     }
+    game_id = str(report.get("game_id", "")).strip()
+    if game_id:
+        result["game_id"] = game_id
+    return result

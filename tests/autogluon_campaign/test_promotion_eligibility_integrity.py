@@ -10,6 +10,7 @@ from loto.autogluon_campaign.holdout_prospective import _write, _write_evidence
 from loto.autogluon_campaign.promotion_eligibility import (
     PromotionEligibilityError,
     PromotionPolicy,
+    PromotionPolicyV2,
     create_promotion_eligibility,
     verify_promotion_eligibility,
 )
@@ -89,6 +90,103 @@ def test_policy_rejects_automatic_actions() -> None:
         PromotionPolicy(registry_write_allowed=True)
 
 
+def test_v2_effective_null_target_is_used_by_actual_rule_evaluation(tmp_path: Path) -> None:
+    holdout = score_bundle(
+        tmp_path / "holdout-v2-low",
+        stage="holdout",
+        run_id="holdout-v2-low",
+        draw_ids=[10, 11],
+        selected_hit=0.25,
+        selected_mae=0.2,
+        baseline_hit=0.10,
+        baseline_mae=1.5,
+        game_id="numbers3",
+    )
+    prospective = [
+        score_bundle(
+            tmp_path / f"prospective-v2-low-{index}",
+            stage="prospective",
+            run_id=f"prospective-v2-low-{index}",
+            draw_ids=[20 + index],
+            selected_hit=0.25,
+            selected_mae=0.2,
+            baseline_hit=0.10,
+            baseline_mae=1.5,
+            game_id="numbers3",
+        )
+        for index in (1, 2, 3)
+    ]
+
+    result = create_promotion_eligibility(
+        holdout_score_dir=holdout,
+        prospective_score_dirs=prospective,
+        output_dir=tmp_path / "promotion-v2-low",
+        policy=PromotionPolicyV2(game="numbers3"),
+        run_id="v2-low",
+        now=datetime(2026, 8, 10, 10, 0, tzinfo=UTC),
+    )
+
+    assert result.decision == "NOT_ELIGIBLE"
+    decision = json.loads(Path(result.decision_path).read_text(encoding="utf-8"))
+    assert decision["reason_code"] == "AGGREGATE_HIT_AT_1_TARGET"
+    rules_payload = json.loads(
+        (Path(result.output_dir) / "RULE_EVALUATION.json").read_text(encoding="utf-8")
+    )
+    hit_rule = next(
+        rule for rule in rules_payload["rules"] if rule["rule_id"] == "AGGREGATE_HIT_AT_1_TARGET"
+    )
+    assert hit_rule["observed"] == pytest.approx(0.25)
+    assert hit_rule["requirement"] == pytest.approx(0.30)
+
+
+def test_v2_artifact_roundtrip_preserves_schema_policy_and_game(tmp_path: Path) -> None:
+    holdout, prospective = valid_sources(tmp_path, game_id="numbers3")
+    result = create_promotion_eligibility(
+        holdout_score_dir=holdout,
+        prospective_score_dirs=prospective,
+        output_dir=tmp_path / "promotion-v2-roundtrip",
+        policy=PromotionPolicyV2(game="numbers3"),
+        run_id="v2-roundtrip",
+        now=datetime(2026, 8, 10, 10, 0, tzinfo=UTC),
+    )
+
+    request = json.loads((Path(result.output_dir) / "REQUEST_METADATA.json").read_text())
+    assert request["schema_version"] == "autogluon-promotion-eligibility-v2"
+    assert request["policy"]["game"] == "numbers3"
+    assert request["policy"]["tau"] == 1
+    assert request["policy"]["hit_at_1_target_semantics"] == "excess_vs_iid_null"
+
+    verified = verify_promotion_eligibility(Path(result.output_dir))
+    assert verified["schema_version"] == "autogluon-promotion-eligibility-v2"
+    assert verified["decision"] == "ELIGIBLE_FOR_HUMAN_APPROVAL"
+
+
+def test_v2_rejects_scoring_evidence_from_the_wrong_game(tmp_path: Path) -> None:
+    holdout, prospective = valid_sources(tmp_path, game_id="loto6")
+    with pytest.raises(PromotionEligibilityError) as exc_info:
+        create_promotion_eligibility(
+            holdout_score_dir=holdout,
+            prospective_score_dirs=prospective,
+            output_dir=tmp_path / "promotion-v2-wrong-game",
+            policy=PromotionPolicyV2(game="numbers3"),
+            run_id="v2-wrong-game",
+        )
+    assert exc_info.value.code == "PROMOTION_GAME_MISMATCH"
+
+
+def test_v2_rejects_legacy_score_without_game_identity(tmp_path: Path) -> None:
+    holdout, prospective = valid_sources(tmp_path, game_id=None)
+    with pytest.raises(PromotionEligibilityError) as exc_info:
+        create_promotion_eligibility(
+            holdout_score_dir=holdout,
+            prospective_score_dirs=prospective,
+            output_dir=tmp_path / "promotion-v2-missing-game",
+            policy=PromotionPolicyV2(game="numbers3"),
+            run_id="v2-missing-game",
+        )
+    assert exc_info.value.code == "PROMOTION_GAME_EVIDENCE_MISSING"
+
+
 def test_rehashed_semantic_candidate_tamper_is_rejected(tmp_path: Path) -> None:
     result = run_gate(tmp_path)
     root = Path(result.output_dir)
@@ -159,6 +257,34 @@ def test_cli_create_and_verify_eligible(tmp_path: Path, capsys) -> None:
     assert main(args) == 0
     created = json.loads(capsys.readouterr().out)
     assert created["decision"] == "ELIGIBLE_FOR_HUMAN_APPROVAL"
+    assert main(["verify", "--run", str(output)]) == 0
+
+
+def test_cli_v2_policy_create_and_verify(tmp_path: Path, capsys) -> None:
+    from loto.autogluon_campaign.promotion_eligibility_cli import main
+
+    holdout, prospective = valid_sources(tmp_path, game_id="numbers3")
+    policy_path = tmp_path / "policy-v2.json"
+    policy_path.write_text(PromotionPolicyV2(game="numbers3").model_dump_json(), encoding="utf-8")
+    output = tmp_path / "cli-promotion-v2"
+    args = [
+        "create",
+        "--holdout-score",
+        str(holdout),
+        "--output",
+        str(output),
+        "--run-id",
+        "cli-v2",
+        "--policy",
+        str(policy_path),
+    ]
+    for path in prospective:
+        args.extend(["--prospective-score", str(path)])
+    assert main(args) == 0
+    created = json.loads(capsys.readouterr().out)
+    assert created["decision"] == "ELIGIBLE_FOR_HUMAN_APPROVAL"
+    request = json.loads((output / "REQUEST_METADATA.json").read_text())
+    assert request["schema_version"] == "autogluon-promotion-eligibility-v2"
     assert main(["verify", "--run", str(output)]) == 0
 
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -11,7 +11,9 @@ from pydantic import ValidationError
 from loto.autogluon_campaign.holdout_prospective import HoldoutProspectiveError
 from loto.autogluon_campaign.promotion_eligibility import (
     PromotionPolicy,
+    PromotionPolicyV2,
     create_promotion_eligibility,
+    promotion_policy_from_payload,
     verify_promotion_eligibility,
 )
 
@@ -39,11 +41,13 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _load_policy(path: Path | None) -> PromotionPolicy:
+def _load_policy(path: Path | None) -> PromotionPolicy | PromotionPolicyV2:
     if path is None:
         return PromotionPolicy()
     payload = json.loads(path.read_text(encoding="utf-8"))
-    return PromotionPolicy.model_validate(payload)
+    if not isinstance(payload, Mapping):
+        raise ValueError("promotion policy must be a JSON object")
+    return promotion_policy_from_payload(payload)
 
 
 def main(argv: Sequence[str] | None = None) -> int:

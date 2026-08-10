@@ -6,8 +6,11 @@ from typing import Any
 from loto.autogluon_campaign.holdout_prospective import _canon, _digest
 from loto.autogluon_campaign.promotion_eligibility_contract import (
     PROMOTION_SCHEMA,
+    PROMOTION_SCHEMA_V2,
     REQUIRED_BASELINES,
+    PromotionEligibilityError,
     PromotionPolicy,
+    PromotionPolicyV2,
     aggregate_candidate_rows,
     validate_window_evidence,
 )
@@ -27,12 +30,44 @@ def _rule(
     }
 
 
+def _policy_context(
+    policy: PromotionPolicy,
+    window_evidence: Mapping[str, Any],
+) -> tuple[float, str, dict[str, object] | None]:
+    if not isinstance(policy, PromotionPolicyV2):
+        return float(policy.hit_at_1_target), PROMOTION_SCHEMA, None
+
+    holdout = window_evidence["holdout"]
+    prospective = window_evidence["prospective"]
+    windows = [holdout, *prospective]
+    game_ids = [str(window.get("game_id", "")).strip() for window in windows]
+    if any(not game_id for game_id in game_ids):
+        raise PromotionEligibilityError(
+            "PROMOTION_GAME_EVIDENCE_MISSING",
+            "V2 promotion requires sealed game_id on every scored window",
+        )
+    observed_games = set(game_ids)
+    if observed_games != {policy.game}:
+        raise PromotionEligibilityError(
+            "PROMOTION_GAME_MISMATCH",
+            f"policy_game={policy.game!r} evidence_games={sorted(observed_games)!r}",
+        )
+
+    assessment = policy.theory_assessment()
+    return (
+        float(assessment["implied_absolute_target"]),
+        PROMOTION_SCHEMA_V2,
+        assessment,
+    )
+
+
 def evaluate_promotion_rules(
     *,
     window_evidence: Mapping[str, Any],
     policy: PromotionPolicy,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
     validate_window_evidence(window_evidence)
+    hit_target, schema_version, theory_assessment = _policy_context(policy, window_evidence)
     holdout = dict(window_evidence["holdout"])
     prospective = [dict(item) for item in window_evidence["prospective"]]
     candidate_id = str(holdout["selected_candidate_id"])
@@ -95,6 +130,8 @@ def evaluate_promotion_rules(
         "window_summaries": window_summaries,
         "baseline_results": baseline_results,
     }
+    if theory_assessment is not None:
+        aggregate["theory_assessment"] = theory_assessment
 
     rules = [
         _rule(
@@ -120,15 +157,15 @@ def evaluate_promotion_rules(
         ),
         _rule(
             "AGGREGATE_HIT_AT_1_TARGET",
-            float(selected["mean_hit_at_1"]) >= policy.hit_at_1_target,
+            float(selected["mean_hit_at_1"]) >= hit_target,
             selected["mean_hit_at_1"],
-            policy.hit_at_1_target,
+            hit_target,
         ),
         _rule(
             "WORST_WINDOW_HIT_AT_1_TARGET",
-            worst_window_hit >= policy.hit_at_1_target,
+            worst_window_hit >= hit_target,
             worst_window_hit,
-            policy.hit_at_1_target,
+            hit_target,
         ),
         _rule(
             "HOLDOUT_TO_PROSPECTIVE_HIT_DROP",
@@ -162,7 +199,7 @@ def evaluate_promotion_rules(
         reason_code = str(first_failure["rule_id"])
 
     core = {
-        "schema_version": PROMOTION_SCHEMA,
+        "schema_version": schema_version,
         "status": "PASS",
         "decision": decision_value,
         "reason_code": reason_code,
