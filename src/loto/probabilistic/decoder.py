@@ -9,7 +9,7 @@ from loto.game.geometry import GameGeometry
 
 
 class DecodeObjective(StrEnum):
-    """Explicit objective used by constrained select-game decoding."""
+    """Explicit objective used by probability-aware decoding."""
 
     MAP = "map"
     WITHIN_TAU = "within_tau"
@@ -74,7 +74,7 @@ def _decode_increasing_additive(scores: np.ndarray, geometry: GameGeometry) -> l
             score = float(matrix[position, index]) + tail_score
             candidate = (index,) + tail
             if score > best_score or (
-                np.isclose(score, best_score) and (not best_indexes or candidate < best_indexes)
+                score == best_score and (not best_indexes or candidate < best_indexes)
             ):
                 best_score = score
                 best_indexes = candidate
@@ -93,7 +93,7 @@ def decode_select_distribution(
     objective: DecodeObjective | str = DecodeObjective.MAP,
     tau: int = 1,
 ) -> list[int]:
-    """Decode positional marginals under an explicit scientific objective.
+    """Decode select-game positional marginals under an explicit scientific objective.
 
     ``MAP`` preserves the existing maximum-log-probability constrained decode.
     ``WITHIN_TAU`` maximises expected positional Hit@±``tau`` while keeping the output legal.
@@ -107,6 +107,29 @@ def decode_select_distribution(
     else:
         scores = build_within_tau_utility(probs, geometry, tau=tau)
     return _decode_increasing_additive(scores, geometry)
+
+
+def decode_digit_distribution(
+    probabilities: np.ndarray,
+    geometry: GameGeometry,
+    *,
+    objective: DecodeObjective | str = DecodeObjective.MAP,
+    tau: int = 1,
+) -> list[int]:
+    """Decode digit-game positional marginals independently by slot."""
+    if geometry.family != "digits":
+        raise ValueError("decode_digit_distribution requires a digits-family geometry")
+    resolved = DecodeObjective(objective)
+    probs = _validate_positional_probabilities(probabilities, geometry)
+    scores = (
+        probs
+        if resolved is DecodeObjective.MAP
+        else build_within_tau_utility(probs, geometry, tau=tau)
+    )
+    indexes = np.argmax(scores, axis=1)
+    values = [int(index + geometry.value_min) for index in indexes]
+    geometry.validate_outcome(values)
+    return values
 
 
 def decode_select_positions(probabilities: np.ndarray, geometry: GameGeometry) -> list[int]:

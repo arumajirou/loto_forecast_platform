@@ -45,10 +45,15 @@ from loto.models.catalog import ModelSpec, get_model_spec
 from loto.models.catalog_full import ModelEntry, build_catalog
 from loto.models.factory import RuntimeModel
 from loto.models.workers import PositionSeriesWorker
+from loto.probabilistic.decoder import (
+    DecodeObjective,
+    decode_digit_distribution,
+    decode_select_distribution,
+)
 
 CAMPAIGN_SCHEMA_VERSION = "1.0.0"
 ADAPTER_IDENTITY = "unified-slot-candidate-and-position-worker-v1"
-POST_PROCESSING_IDENTITY = "geometry-legalise-v1"
+POST_PROCESSING_IDENTITY = "explicit-decoder-routing-v2"
 
 Status = Literal[
     "SUCCEEDED",
@@ -146,7 +151,7 @@ def _resolved_code_hash(config: UnifiedCampaignConfig) -> str:
         ):
             raise ValueError("code_hash must be a lowercase 64-character SHA-256")
         return config.code_hash
-    return _sha_text(f"{config.git_commit}:{ADAPTER_IDENTITY}")
+    return _sha_text(f"{config.git_commit}:{ADAPTER_IDENTITY}:{POST_PROCESSING_IDENTITY}")
 
 
 def _normalise_development(frame: pd.DataFrame, geometry: GameGeometry) -> pd.DataFrame:
@@ -434,6 +439,39 @@ def _candidate_model_supported(spec: ModelSpec) -> bool:
     }
 
 
+def _decode_candidate_probability_matrix(
+    matrix: np.ndarray,
+    geometry: GameGeometry,
+    *,
+    tau: int,
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Decode the slot-conditioned binary candidate surface without inventing worker PMFs."""
+    adapter_id = "row-normalized-slot-binary-probability-v1"
+    if geometry.family == "select":
+        values = decode_select_distribution(
+            matrix,
+            geometry,
+            objective=DecodeObjective.WITHIN_TAU,
+            tau=tau,
+        )
+        decoder_id = "within-tau-constrained-dp-v1"
+    else:
+        values = decode_digit_distribution(
+            matrix,
+            geometry,
+            objective=DecodeObjective.WITHIN_TAU,
+            tau=tau,
+        )
+        decoder_id = "within-tau-independent-slot-v1"
+    return np.asarray(values, dtype=int), {
+        "distribution_source": "slot_binary_candidate_probabilities",
+        "distribution_adapter_id": adapter_id,
+        "decoder_id": decoder_id,
+        "decoder_objective": DecodeObjective.WITHIN_TAU.value,
+        "tau": tau,
+    }
+
+
 def _model_prediction(
     entry: ModelEntry,
     history: pd.DataFrame,
@@ -468,12 +506,16 @@ def _model_prediction(
                 f"candidate probabilities must have shape ({expected},), got {probabilities.shape}"
             )
         matrix = probabilities.reshape(geometry.positions, geometry.universe_size)
-        indexes = np.argmax(matrix, axis=1)
-        pred = np.asarray([geometry.value_min + int(index) for index in indexes], dtype=float)
-        return _legalise(pred, geometry), {
+        pred, decoder_metadata = _decode_candidate_probability_matrix(
+            matrix,
+            geometry,
+            tau=config.tau,
+        )
+        return pred, {
             "route": "slot_conditioned_candidate",
             "library": spec.library,
             "class_name": spec.class_name,
+            **decoder_metadata,
         }
 
     if entry.task not in {"position", "position_series", "foundation"}:
@@ -529,6 +571,10 @@ def _model_prediction(
         "route": "position_series_worker",
         "library": spec.library,
         "class_name": spec.class_name,
+        "distribution_source": "none",
+        "distribution_adapter_id": "none",
+        "decoder_id": "point-legalise-v1",
+        "decoder_objective": "point",
         "worker": output.metadata,
     }
 
@@ -611,7 +657,14 @@ def _evaluate_seed(
                     seed=seed,
                     target_index=draw_index,
                 )
-                metadata: dict[str, Any] = {"route": "mandatory_baseline", "baseline": baseline_id}
+                metadata: dict[str, Any] = {
+                    "route": "mandatory_baseline",
+                    "baseline": baseline_id,
+                    "distribution_source": "baseline_native",
+                    "distribution_adapter_id": "none",
+                    "decoder_id": f"baseline-{baseline_id}-v1",
+                    "decoder_objective": "baseline_native",
+                }
             else:
                 if entry is None:
                     raise AssertionError("model entry is required")
