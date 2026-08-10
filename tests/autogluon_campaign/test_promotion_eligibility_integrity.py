@@ -133,9 +133,7 @@ def test_v2_effective_null_target_is_used_by_actual_rule_evaluation(tmp_path: Pa
         (Path(result.output_dir) / "RULE_EVALUATION.json").read_text(encoding="utf-8")
     )
     hit_rule = next(
-        rule
-        for rule in rules_payload["rules"]
-        if rule["rule_id"] == "AGGREGATE_HIT_AT_1_TARGET"
+        rule for rule in rules_payload["rules"] if rule["rule_id"] == "AGGREGATE_HIT_AT_1_TARGET"
     )
     assert hit_rule["observed"] == pytest.approx(0.25)
     assert hit_rule["requirement"] == pytest.approx(0.30)
