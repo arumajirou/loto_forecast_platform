@@ -78,6 +78,7 @@ Generated inventories must identify their generator/source of truth.
 Current examples:
 
 - model counts: `loto3 catalog --counts` → `docs/MODEL_INVENTORY.md`;
+- unified evaluation coverage: `loto3 campaign --plan-only` → requested broad-catalog × game matrix;
 - unpinned TSFM revisions: `loto3 catalog --unpinned`;
 - package version: `loto.version.__version__` / installed package metadata;
 - integrity data: repository integrity command/artifacts.
@@ -96,7 +97,7 @@ Documentation must distinguish these levels:
 6. Holdout eligible/evaluated.
 7. Promotion eligible/promoted.
 
-A model appearing in a catalog is not a runtime or accuracy success.
+A model appearing in a catalog is not a runtime or accuracy success. A complete unified campaign matrix means every requested pair has a terminal result row; it does not mean every pair executed successfully.
 
 Formal forecast-quality claims require, at minimum:
 
@@ -150,5 +151,10 @@ Start with:
 - [`../README.md`](../README.md) — stable project overview and usage;
 - [`STATUS.md`](STATUS.md) — latest audited point-in-time state committed by the documentation process;
 - [`README.md`](README.md) — documentation map;
+- [`CURRENT_HANDOFF.md`](CURRENT_HANDOFF.md) — current handoff snapshot;
+- [`CURRENT_VERIFICATION_REPORT.md`](CURRENT_VERIFICATION_REPORT.md) — current merge/CI verification snapshot;
+- [`CURRENT_RUNBOOK.md`](CURRENT_RUNBOOK.md) — current operational runbook;
+- [`UNIFIED_EVALUATION_CAMPAIGN.md`](UNIFIED_EVALUATION_CAMPAIGN.md) — merged all-model × all-game development campaign contract;
+- [`MODEL_EXECUTION_MATRIX.md`](MODEL_EXECUTION_MATRIX.md) — code-grounded routing/capability matrix;
 - [`MODEL_INVENTORY.md`](MODEL_INVENTORY.md) — generated model inventory;
 - [`evaluation_protocol/PROTOCOL_V2.md`](evaluation_protocol/PROTOCOL_V2.md) — scientific evaluation contract.
