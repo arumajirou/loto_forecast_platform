@@ -1,165 +1,220 @@
 # Documentation freshness and evidence policy
 
-This policy prevents point-in-time operational facts from being mistaken for live repository state.
+```text
+status_class: DESIGN_CONTRACT
+as_of: 2026-08-10T20:23+09:00
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
+```
+
+This policy prevents point-in-time operational facts, catalog registrations and scientific claims from being mistaken for one another.
 
 ## 1. Documentation classes
 
-Every operational document should be interpreted as one of these classes.
-
-| Class | Purpose | May contain fixed dates/SHAs/run IDs? | Update rule |
+| Class | Purpose | Fixed dates/SHAs/run IDs | Update rule |
 |---|---|---:|---|
-| `LIVE_ENTRYPOINT` | navigation and stable project contract | only as clearly labeled snapshot examples | keep aligned with current code and link to live checks |
-| `AUDITED_SNAPSHOT` | point-in-time repository/project state | yes | never call itself auto-updating; record `as_of` and source |
-| `DESIGN_CONTRACT` | requirements/specification/protocol | yes when part of immutable design identity | update when design changes; separate environment facts from protocol facts |
-| `GENERATED_INVENTORY` | machine-derived counts/manifests | yes | regenerate from code; do not hand-edit |
-| `HISTORICAL_EVIDENCE` | verification report, handoff, CI/run evidence | yes | preserve original evidence; add supersession banner rather than rewriting history |
-| `IMMUTABLE_ARTIFACT` | SHA256SUMS, sealed prediction/protocol/evidence artifact | yes | never rewrite in place |
+| `LIVE_ENTRYPOINT` | navigation/current usage | only when clearly labeled | keep aligned with current code |
+| `LIVE_REFERENCE` | detailed current operational reference | yes as audit base | update with relevant code changes |
+| `AUDITED_SNAPSHOT` | point-in-time repository/project state | yes | include `as_of` and evidence source |
+| `DESIGN_CONTRACT` | requirements/specification/protocol | yes when identity matters | update when contract changes |
+| `GENERATED_INVENTORY` | machine-derived counts/manifests | yes | regenerate; do not hand-edit |
+| `HISTORICAL_EVIDENCE` | old verification/handoff/CI evidence | yes | preserve observed result; supersede by link |
+| `IMMUTABLE_ARTIFACT` | prediction/protocol/hash/release evidence | yes | never rewrite in place |
 
-## 2. Canonical source precedence
+## 2. Source precedence
 
 When facts conflict:
 
-1. live GitHub repository state for PR/Issue/branch/merge facts;
-2. checked-in code/config for implementation and dependency contracts;
-3. evidence bound to an exact SHA/run for executed behavior;
-4. Linear for workflow tracking;
-5. prose documentation for explanation and historical context.
+1. live GitHub state for PR/Issue/branch/merge facts;
+2. checked-in executable code/config for implementation/dependency contracts;
+3. evidence bound to an exact SHA/run/model/data identity for executed behavior;
+4. generated inventory for generated counts;
+5. workflow tracker such as Linear for planning state;
+6. prose documentation for explanation/context.
 
-No Markdown file may override a later GitHub merge state simply because it contains the word `current`.
+No Markdown file overrides later live GitHub state merely by saying `current`.
 
 ## 3. Volatile facts
 
-These facts must always include an `as_of` context or be replaced by a live-query instruction:
+These require `as_of` or a live-query instruction:
 
 - main/head SHA;
 - open PR/Issue counts;
 - draft/mergeable/review state;
-- latest Actions run ID or result;
-- local workstation OS/tool availability;
-- runner online/offline state;
-- exact dependency availability on a host;
+- Actions run result;
+- runner online state;
+- workstation/GPU availability;
 - local data/database presence;
-- current scientific progress percentage;
-- current champion/promotion state.
+- dependency availability on a specific machine;
+- current champion/promotion state;
+- scientific progress percentages.
 
-Do not encode workstation availability such as `LINUX_AVAILABLE=false` as a durable repository property.
+## 4. Stable project contracts
 
-## 4. Stable facts
+Examples that may be stated without a volatile timestamp when backed by current code/spec:
 
-Stable project contracts may be documented without a timestamp when they are backed by code/specification, for example:
+- six canonical game keys/geometry source;
+- Hit@±1 is primary evaluation metric;
+- Train-only fitting for learned preprocessing/search components;
+- prediction-before-actual sealing;
+- best-seed-only selection is forbidden;
+- runtime certification requires actual execution evidence;
+- automatic promotion/retraining/registry writes are forbidden by current promotion policy models;
+- package version is derived rather than hard-coded in README.
 
-- primary metric is Hit@±1;
-- Holdout/Prospective separation rules;
-- Train-only fitting of scalers/encoders/feature selection/HPO;
-- prediction-before-actual SHA-256 sealing;
-- `champion` may be null;
-- runtime certification requires actual load/inference/device evidence;
-- package version is derived dynamically rather than hand-written in README.
+If the implementation changes a stable contract, update the design documents in the same PR.
 
-If code/specification changes these contracts, update the corresponding design document in the same PR.
+## 5. Model capability taxonomy
 
-## 5. Historical evidence preservation
+Documentation must not use a single ambiguous `available` label for all model states.
 
-Verification reports, handoffs, CI run IDs, exact model revisions, SHA-256 manifests and executed protocol artifacts are evidence for a specific time/identity.
+Use these stages where relevant:
 
-When they become old:
+```text
+REGISTERED
+DEPENDENCY_DECLARED
+IMPLEMENTED
+SHARED_ROUTABLE
+PROVIDER_ROUTABLE
+RUNTIME_CERTIFIED
+LOTTERY_COMPATIBLE
+OOF_EVALUATED
+HOLDOUT_EVALUATED
+PROSPECTIVE_EVALUATED
+PROMOTION_ELIGIBLE
+HUMAN_APPROVED / PROMOTED
+```
 
-- **do not rewrite their observed result**;
-- add a banner such as `Historical snapshot — see ../STATUS.md for audited project state`;
-- distinguish `captured_state` from `later_known_state`;
-- never replace an old SHA/run ID with a new one inside an immutable evidence record.
+Examples:
 
-This preserves reproducibility and auditability.
+- 174 broad forecast entries = `REGISTERED` planning inventory, not 174 shared successes.
+- 72 probabilistic catalog entries = separate registered/implemented probabilistic surface, not 72 formal OOF winners.
+- TSFM runtime-certified evidence = exact runtime identity evidence, not forecast-quality evidence.
 
-## 6. Generated facts
+## 6. Historical evidence preservation
 
-Generated inventories must identify their generator/source of truth.
+When old verification reports, handoffs, CI runs or model revisions become stale:
 
-Current examples:
+- do not rewrite the observed result;
+- add supersession/current-reference guidance where needed;
+- distinguish captured state from later-known state;
+- never replace an old SHA/run/model identity inside immutable evidence.
 
-- model counts: `loto3 catalog --counts` → `docs/MODEL_INVENTORY.md`;
-- unified evaluation coverage: `loto3 campaign --plan-only` → requested broad-catalog × game matrix;
-- unpinned TSFM revisions: `loto3 catalog --unpinned`;
-- package version: `loto.version.__version__` / installed package metadata;
-- integrity data: repository integrity command/artifacts.
+## 7. Generated facts
 
-README prose may summarize generated facts, but must link back to the generated source and label the value as a snapshot.
+Examples:
 
-## 7. Scientific claims
+```text
+uv run loto3 catalog --counts
+  -> broad model counts
 
-Documentation must distinguish these levels:
+uv run loto3 campaign --output unused --plan-only
+  -> requested model × game coverage plan
 
-1. Registered.
-2. Dependency available.
-3. Runtime loadable.
-4. Inference verified.
-5. OOF evaluated.
-6. Holdout eligible/evaluated.
-7. Promotion eligible/promoted.
+uv run loto3 catalog --unpinned
+  -> broad TSFM entries needing explicit revision binding
 
-A model appearing in a catalog is not a runtime or accuracy success. A complete unified campaign matrix means every requested pair has a terminal result row; it does not mean every pair executed successfully.
+loto.version.__version__ / package metadata
+  -> package version
+```
 
-Formal forecast-quality claims require, at minimum:
+`docs/MODEL_INVENTORY.md` is generated. Do not edit it by hand to represent routing, certification or OOF progress.
+
+## 8. Runtime claims
+
+A runtime claim should identify the exact model/repo/revision/environment and applicable evidence for load, inference, output shape/finite values, effective device, fallback and reload.
+
+`dependency installed` or `class importable` is a weaker claim.
+
+If a provider is CPU-pinned, do not describe registration as CUDA support.
+
+## 9. Scientific claims
+
+Formal forecast-quality claims require at least applicable:
 
 - immutable data/split/protocol identity;
 - leakage checks;
-- required baselines under the same eligible folds;
-- Hit@±1-first metric ordering;
-- MAE/MSE/RMSE plus position/all-position Hit@±1;
-- full configured seed inventory with mean/variance/worst;
+- mandatory baselines under the same eligible folds;
+- Hit@±1-first metric interpretation;
+- MAE/MSE/RMSE and position/all-position Hit@±1;
+- full configured seed inventory and variance/worst statistics;
 - prediction sealing before actual access;
-- runtime evidence where applicable.
+- model/runtime identity;
+- explicit failure retention.
 
-Best-seed-only claims are not accepted.
+`matrix_complete` means every requested pair has a result row, not that every result is success.
 
-## 8. Required metadata for status-like documents
+## 10. Theory claims
 
-A new status/handoff document should state:
+When quoting an IID-null ceiling/reference:
+
+- identify game and tau;
+- state that it is exact under the specified IID-null distribution;
+- do not call it a universal bound for every possible biased process;
+- distinguish an absolute target from excess-vs-null target semantics;
+- require explicit alternative-hypothesis semantics when the code guard requires it.
+
+## 11. Power/MDE claims
+
+Pre-experiment MDE/power output must be labeled planning evidence.
+
+Record method identity and assumptions. `score_sd` must be fixed from allowed pre-target evidence or declared simulation. Do not call planning output a realized p-value, Holdout result or promotion result.
+
+## 12. Promotion claims
+
+Distinguish:
 
 ```text
-status_class=<AUDITED_SNAPSHOT|HISTORICAL_EVIDENCE|...>
-as_of=<timestamp with timezone>
-repository=<owner/name>
-git_identity=<SHA or explicitly UNKNOWN/not applicable>
-source_of_truth=<GitHub/code/evidence/...>
-superseded_by=<path or NONE>
+NOT_ELIGIBLE
+ELIGIBLE_FOR_HUMAN_APPROVAL
+HUMAN_APPROVED
+PROMOTED
 ```
 
-Human-readable prose is fine, but these semantics must be unambiguous.
+Current automatic rules may only establish eligibility. They do not authorize production mutation.
 
-## 9. Review checklist for documentation PRs
+Never rewrite historical v1 promotion evidence as v2 simply to apply newer semantics.
+
+## 13. Required metadata for status-like documents
+
+Recommended:
+
+```text
+status_class=<...>
+as_of=<timestamp with timezone>
+repository=<owner/name>
+code_audit_base_sha=<SHA or UNKNOWN>
+source_of_truth=<...>
+```
+
+For a documentation-only refresh, `code_audit_base_sha` may identify the functional code state that was inspected even though the documentation commit itself will have a later SHA.
+
+## 14. Documentation PR checklist
 
 Before merge:
 
 - [ ] re-fetch default branch/head and PR state;
-- [ ] re-fetch open PRs/issues relevant to the document;
-- [ ] compare generated counts with their generator/source;
-- [ ] verify cited file paths exist;
-- [ ] classify every fixed SHA/run/count as stable contract or point-in-time evidence;
-- [ ] remove `latest/current` wording from run IDs unless a timestamp/source is attached;
-- [ ] avoid workstation assumptions in portable design docs;
-- [ ] preserve historical evidence instead of silently rewriting it;
-- [ ] confirm no scientific status is promoted beyond executed evidence;
-- [ ] inspect exact PR changed-file list and review threads;
-- [ ] run/inspect the appropriate exact-head CI/documentation checks;
-- [ ] merge with an expected-head guard when available.
+- [ ] re-fetch relevant open PRs/issues;
+- [ ] compare broad/generated counts with executable source;
+- [ ] distinguish shared and isolated providers;
+- [ ] verify cited file paths/commands;
+- [ ] classify every fixed SHA/run/count;
+- [ ] preserve generated and immutable evidence;
+- [ ] do not promote scientific status beyond executed evidence;
+- [ ] inspect exact changed-file list;
+- [ ] inspect review threads/submissions;
+- [ ] run/inspect exact-head/current-base CI;
+- [ ] re-check main/head race before merge;
+- [ ] merge with expected-head guard.
 
-## 10. Canonical entry points
+## 15. Canonical entry points
 
-Start with:
-
-- [`../README.md`](../README.md) — stable project overview and usage;
-- [`STATUS.md`](STATUS.md) — latest audited point-in-time state committed by the documentation process;
+- [`../README.md`](../README.md) — detailed project capability/usage guide;
+- [`CAPABILITIES_AND_OPERATIONS.md`](CAPABILITIES_AND_OPERATIONS.md) — model/library/CLI/provider reference;
+- [`STATUS.md`](STATUS.md) — latest audited repository/scientific snapshot;
 - [`README.md`](README.md) — documentation map;
-- [`REQUIREMENTS.md`](REQUIREMENTS.md) — current Hit@±1-first platform requirements;
-- [`SPECIFICATION.md`](SPECIFICATION.md) — current unified campaign/model-routing/decoder specification;
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) — current six-game evaluation/runtime architecture;
-- [`DATA_CONTRACT.md`](DATA_CONTRACT.md) — immutable raw, chronology, split and prediction-data contract;
-- [`TEST_PLAN.md`](TEST_PLAN.md) — current implementation/runtime/scientific test plan;
-- [`CURRENT_HANDOFF.md`](CURRENT_HANDOFF.md) — current handoff snapshot;
-- [`CURRENT_VERIFICATION_REPORT.md`](CURRENT_VERIFICATION_REPORT.md) — current merge/CI verification snapshot;
-- [`CURRENT_RUNBOOK.md`](CURRENT_RUNBOOK.md) — current operational runbook;
-- [`UNIFIED_EVALUATION_CAMPAIGN.md`](UNIFIED_EVALUATION_CAMPAIGN.md) — merged all-model × all-game development campaign contract;
 - [`MODEL_EXECUTION_MATRIX.md`](MODEL_EXECUTION_MATRIX.md) — code-grounded routing/capability matrix;
-- [`MODEL_INVENTORY.md`](MODEL_INVENTORY.md) — generated model inventory;
+- [`UNIFIED_EVALUATION_CAMPAIGN.md`](UNIFIED_EVALUATION_CAMPAIGN.md) — canonical broad development campaign;
+- [`REQUIREMENTS.md`](REQUIREMENTS.md), [`SPECIFICATION.md`](SPECIFICATION.md), [`ARCHITECTURE.md`](ARCHITECTURE.md), [`DATA_CONTRACT.md`](DATA_CONTRACT.md), [`TEST_PLAN.md`](TEST_PLAN.md) — design contracts;
+- [`CURRENT_RUNBOOK.md`](CURRENT_RUNBOOK.md), [`CURRENT_HANDOFF.md`](CURRENT_HANDOFF.md), [`CURRENT_VERIFICATION_REPORT.md`](CURRENT_VERIFICATION_REPORT.md) — current operating snapshots;
+- [`MODEL_INVENTORY.md`](MODEL_INVENTORY.md) — generated inventory;
 - [`evaluation_protocol/PROTOCOL_V2.md`](evaluation_protocol/PROTOCOL_V2.md) — scientific evaluation contract.
