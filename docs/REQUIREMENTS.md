@@ -2,16 +2,16 @@
 
 ```text
 status_class: DESIGN_CONTRACT
-as_of: 2026-08-10T18:59+09:00
+as_of: 2026-08-10T20:23+09:00
 repository: arumajirou/loto_forecast_platform
-audited_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
 ```
 
 ## 1. 目的
 
-数字選択式くじ・数字ゲームを対象に、データ取得、特徴量生成、学習、評価、再学習、予測固定、運用監視までを再現可能かつ監査可能な時系列予測研究基盤として提供する。
+数字選択式くじ・digit gameを対象に、データ取得、特徴量生成、学習、HPO、評価、prediction sealing、runtime certification、Holdout/Prospective governance、promotion eligibilityまでを、再現可能かつ監査可能な研究基盤として提供する。
 
-現在の共通ゲームgeometryは `loto.game.geometry` を正本とし、少なくとも次を扱う。
+Canonical games:
 
 ```text
 mini
@@ -22,130 +22,343 @@ numbers3
 numbers4
 ```
 
-目的は見かけ上の最良seedや単一モデルの最大値を作ることではなく、同一の科学契約で比較可能な証拠を生成することである。
+最重要目的は、見かけ上の最大精度やbest seedを作ることではなく、**同じeligible history・同じmetric・同じbaseline・全seed・明示protocol identityで比較可能な証拠を残すこと**である。
 
-## 2. 最優先成功指標
+## 2. Game geometry要件
 
-正式な主指標は **Hit@±1** とする。
+`loto.game.geometry`をgame shape/legalityの唯一の正本とする。
 
-必須併記指標:
+- select familyはstrict ascending / distinctを保持する。
+- digits familyはposition orderとrepeated digitを保持する。
+- game universe、positions、digit countを評価/decoder/provider側へ新規hard-codeしない。
+- geometry-sensitive literalにはレビュー済み例外inventoryを使い、新規未審査hard-codeをgateで拒否する。
 
-- MAE
-- MSE
-- RMSE
-- 位置別 Hit@±1
-- 全位置 Hit@±1
+## 3. 最優先評価指標
 
-必要に応じて確率予測・ランキング・集合指標を追加してよいが、主指標を置換してはならない。
+Primary metricは **Hit@±1** とする。
 
-## 3. 必須ベースライン
+必須併記:
 
-同一のeligible fold / seed / actualで、最低限次を常時比較する。
+- position Hit@±1;
+- all-position Hit@±1;
+- MAE;
+- MSE;
+- RMSE.
 
-1. Random
-2. 固定値
-3. 平均
-4. 中央値
-5. 直近値
-6. 頻度
-7. 統計モデル
+Geometry-general outcome metricはgame familyを尊重する。
 
-Unified campaignでは統計モデルの基準として `statistical_ar1` を使用する。
+- selectのhit count: set overlap;
+- digitsのhit count: exact positional match;
+- within-tau: position-wise absolute errorに基づく。
 
-## 4. 時系列分割とリーク防止
+Digitsへset semanticsを適用して順序/重複を失ってはならない。
 
-時間順に次を分離する。
+## 4. Mandatory baseline要件
+
+同じeligible fold / target / seed policy / post-processing contractで最低限:
 
 ```text
-Train -> Validation / OOF development -> Holdout -> Prospective
+random
+fixed
+mean
+median
+last
+frequency
+statistical_ar1
 ```
 
-必須要件:
+を常時比較する。
 
-- Scaler、Encoder、特徴量選択、HPOはeligible Train内だけでfitする。
-- foldの未来情報を前処理・特徴量・探索に混入させない。
-- 欠損、重複、順序違反、domain違反、future-derived featureを検査する。
-- Holdoutはdevelopment/OOFの承認前に開かない。
-- Prospectiveは対応する実測が存在する前に予測を固定する。
-- rawデータは不変正本とし、上書きしない。
+Baseline欠落を「比較完了」として扱わない。
 
-## 5. Multi-seed要件
+## 5. Chronology / leakage要件
 
-探索・評価は承認されたseed inventoryを保持する。
+Formal ordering:
 
-最低限保存する集約:
+```text
+Train
+-> Validation / OOF development
+-> authorized Holdout
+-> sealed Prospective prediction
+-> later actual scoring
+```
 
-- count
-- mean
-- population variance
-- standard deviation
-- minimum
-- maximum
-- worst value
-- worst seed
+必須:
 
-最良seedだけを採用根拠にしてはならない。
+- scaler/encoder/feature selector/calibrator/HPOはeligible Train内だけでfitする。
+- target/future actualをprediction生成前に読み込ませない。
+- missing/duplicate/order/domain/future-derived featureを検査する。
+- raw sourceを上書きしない。
+- Holdoutはdevelopment/OOF review前に開かない。
+- Prospective predictionはfuture actualの利用前にimmutableに固定する。
 
-## 6. 予測固定要件
+## 6. Multi-seed要件
 
-実測を読む前に予測artifactを永続化し、SHA-256と時刻で固定する。
+Approved seed inventoryを全て保持する。
 
-Unified campaignでは各 `game × candidate × seed` について、`actuals_known=false` のprediction lockをwrite/fsyncし、SHA-256を計算した後にのみ対応actualをscoring段階で読む。
+最低限の集約:
 
-既存run directoryは再利用・上書きしない。
+```text
+count
+mean
+population variance
+standard deviation
+minimum
+maximum
+worst value
+worst seed
+```
 
-## 7. モデル比較要件
+Best seedだけを採用根拠にしてはならない。
 
-公平な条件で比較対象を区別する。
+## 7. Prediction lock要件
 
-- 単変量
-- 外生変数付き
-- 位置別モデル
-- 共有モデル
-- アンサンブル
-- foundation/TSFM provider
-- candidate estimator
-- reconciliation / calibration / post-processing method
+各`game × candidate × seed`で:
 
-`174 registered` のようなcatalog countを、174個の独立forecaster、174個のshared-routable model、174個のruntime-certified model、174個のOOF済みmodelと読み替えてはならない。
+```text
+predict
+-> persist actuals_known=false
+-> durable write / fsync
+-> SHA-256
+-> only then read matching actual
+-> score
+```
 
-Unified campaignはrequested broad-catalog × gameのcoverage rowを必ず作り、非対応・非route・runtime失敗も明示的statusで残す。
+既存run directoryは再利用しない。
 
-## 8. Decoder要件
+## 8. Model capability要件
 
-select-gameの合法性を保持し、digit-gameの順序と重複を壊さない。
+次の状態を分離する。
 
-Merged PR #249/#250により、確率を持つunified candidate routeはfamily-specific `WITHIN_TAU` decodingを使用する。
+```text
+REGISTERED
+DEPENDENCY_DECLARED
+IMPLEMENTED
+SHARED_ROUTABLE
+PROVIDER_ROUTABLE
+RUNTIME_CERTIFIED
+LOTTERY_COMPATIBLE
+OOF_EVALUATED
+HOLDOUT_EVALUATED
+PROSPECTIVE_EVALUATED
+PROMOTION_ELIGIBLE
+```
 
-- select family: legality制約付きWITHIN_TAU DP
-- digit family: positional window-mass WITHIN_TAU decoding
-- point-only worker: 確率分布を捏造せずpoint legalisationを継続
+Broad catalog countをruntime success countへ読み替えない。
 
-Decoder実装の理論最適性テストは実データOOF改善の証明ではない。
+現在のbroad forecast inventoryは174 entries、probabilistic platformは別に72-model catalogを持つ。両者は別surfaceとして管理する。
 
-## 9. Runtime certification要件
+## 9. Unified all-model × all-game campaign要件
 
-「catalogにある」「dependencyがinstallできる」だけで成功にしない。
+`uv run loto3 campaign`はrequested broad catalog × canonical game matrixをmaterializeする。
 
-正式runtime evidenceでは該当する範囲で次を検証する。
+必須:
 
-- model load
-- input construction
-- inference completion
-- output shape
-- finite values
-- requested/observed device
-- GPU PID
-- VRAM
-- CPU fallback
-- reload inference / persistence reproducibility
-- model revision / artifact hash / code hash / environment identity
+- each requested model × game pair exactly once;
+- fail-visible statesを削除しない;
+- six-game geometryに従う;
+- seven baselines;
+- primary Hit@±1 + required companion metrics;
+- full seed inventory;
+- prediction-before-actual sealing;
+- new output directory;
+- Holdout/Prospectiveを自動評価しない。
+
+`matrix_complete=true`はcoverage completenessでありexecution success率100%ではない。
+
+## 10. Shared / isolated execution要件
+
+Shared execution:
+
+```text
+catalog.py
+-> factory.py / workers.py
+-> providers/**
+```
+
+Isolated execution:
+
+```text
+environments/**
+*_campaign/**
+adapters/**
+scripts/run_*_provider.py
+```
+
+Model-specific dependency conflict、remote code、framework version pinがある場合はisolated laneを使用する。Root environmentへ無理に統合しない。
+
+## 11. NeuralForecast AutoModel要件
+
+Official AutoModel familyはOptuna/Ray backendを選択可能とする。
+
+Result-affecting controlsを記録する。
+
+- backend;
+- search strategy;
+- num samples/trials;
+- CPUs/GPUs;
+- parallel trials;
+- precision;
+- seed;
+- refit policy;
+- model-specific search/config identity.
+
+Trial failureを消さず、best trialのみでall-model evidenceを置換しない。
+
+## 12. Foundation/TSFM要件
+
+Formal TSFM executionは最低限:
+
+- canonical repo/model identity;
+- immutable revision;
+- artifact/snapshot identity;
+- environment identity;
+- provider route;
+- load/inference/output evidence;
+- effective device/fallback;
+
+を記録する。
+
+Broad catalogに`revision=None`がある場合、formal runはreviewed verified-revision manifestを別途bindする。推測SHAを埋めない。
+
+## 13. Runtime certification要件
+
+`import`やcatalog registrationだけでcertifiedにしない。
+
+該当範囲で:
+
+```text
+load
+input construction
+inference
+output shape
+finite checks
+requested/effective device
+GPU PID / VRAM / utilization
+CPU fallback
+save/reload inference
+cleanup / VRAM release
+model/revision/environment/code/config hashes
+```
+
+を証拠化する。
 
 Runtime certificationはforecast accuracyを証明しない。
 
-## 10. Python・品質要件
+## 14. Decoder要件
 
-原則:
+Probability-bearing candidate routeはdistribution identityを明示する。
+
+Current bridge:
+
+```text
+row-normalized-slot-binary-probability-v1
+```
+
+- digits: positional window-mass WITHIN_TAU decode;
+- select: ascending/distinct legality-constrained WITHIN_TAU DP;
+- point-only routes: fake PMFを生成しない。
+
+Decoder objective/distribution/post-processing identityをprotocol/runtime evidenceへ保存する。
+
+## 15. Theory-aware threshold要件
+
+Hit@±tau targetは次のsemanticsを持てること。
+
+```text
+absolute
+excess_vs_iid_null
+```
+
+- game/tau-specific exact IID-null referenceを算出する。
+- semanticsからimplied absolute targetを一意に導出する。
+- implied targetが[0,1]外ならfail closedする。
+- absolute targetがIID-null ceilingを超える場合、明示alternative hypothesisなしではfail closedする。
+- IID-null ceilingを全てのbiased processに対する普遍的上限と表現しない。
+
+## 16. Promotion eligibility要件
+
+Historical v1 evidenceをv2としてsilent reinterpretしない。
+
+Theory-aware v2は:
+
+- gameを必須にする;
+- current Hit@±1 promotion evidenceではtau=1固定;
+- sealed Holdout/Prospective `game_id`とpolicy gameを一致させる;
+- theory semanticsをabsolute thresholdへ解決する;
+- aggregate/worst-window targetを確認する;
+- Holdout→Prospective degradationを確認する;
+- mandatory baselines全件を確認する。
+
+Automatic actionは禁止:
+
+```text
+automatic_promotion=false
+automatic_retraining=false
+registry_write_allowed=false
+```
+
+全rule passでも最大自動decisionは`ELIGIBLE_FOR_HUMAN_APPROVAL`とする。
+
+## 17. MDE / power planning要件
+
+Target window実行前に、検出可能なeffect sizeを設計できること。
+
+Current method:
+
+```text
+paired-score-normal-approximation-v1
+```
+
+最低限:
+
+- alpha;
+- target power;
+- multiplicity;
+- adjusted alpha;
+- positive paired alternative;
+- pre-target `score_sd`;
+- required paired draws;
+- minimum detectable effect;
+- deterministic power curve.
+
+Multiplicityには保守的Bonferroni planning alphaを使う。
+
+Invalid effect, SD, draw count, alternative、`target_power <= adjusted_alpha`をfail closedする。
+
+Power planning resultをp-value、Holdout result、promotion decisionとして扱わない。
+
+## 18. Data/evidence persistence要件
+
+各runにRun IDを持たせ、該当する範囲で:
+
+```text
+config
+data hash
+split hash
+feature hash
+code hash
+Git commit
+model/revision
+seed inventory
+predictions
+actuals
+metrics
+logs
+runtime/device evidence
+protocol identity
+prediction lock
+artifact manifest
+SHA256SUMS
+```
+
+を保存する。
+
+PostgreSQL、DuckDB、Parquet、MLflow、OpenTelemetry等を利用してよいが、runごとのactual store/configをevidenceに残す。
+
+## 19. Python/品質要件
+
+基本構成:
 
 ```text
 uv
@@ -155,52 +368,16 @@ src/
 tests/
 ```
 
-品質ツール:
+Quality gates:
 
-- Ruff
-- mypy
-- pytest
-- pytest-cov
-- Pydantic
+- Ruff format/check;
+- compileall;
+- mypy where applicable;
+- focused pytest during development;
+- full pytest at final integration gate;
+- exact-head/current-main CI before merge.
 
-実装中はfocused testとsmokeを優先し、重いfull pytest / GitHub CIは変更がまとまった最終ゲートで実施する。
-
-## 11. 実験証跡要件
-
-各実験にRun IDを発行し、可能な範囲で次をPostgreSQL、DuckDB、Parquet、MLflow等へ保存する。
-
-- config
-- data hash
-- code hash
-- Git commit
-- model ID / revision
-- seed
-- predictions
-- actuals
-- metrics
-- logs
-- runtime/device/GPU情報
-- protocol identity
-- prediction lock evidence
-
-## 12. Unified campaign受入要件
-
-`uv run loto3 campaign --output unused --plan-only` がrequested model × game matrixをmaterializeできること。
-
-実行時は最低限:
-
-- six-game geometryに従うこと
-- 必須7 baselineを評価すること
-- Hit@±1をprimaryにすること
-- 全seed evidenceを残すこと
-- prediction sealをactual access前に作ること
-- output directoryを上書きしないこと
-- unsupported/unavailable/failed rowを黙って消さないこと
-- Holdout/Prospectiveを開かないこと
-
-## 13. 科学的昇格要件
-
-実装完了、runtime success、OOF success、Holdout success、Prospective success、promotionは別段階である。
+## 20. Scientific gate要件
 
 ```text
 IMPLEMENTED
@@ -209,18 +386,22 @@ IMPLEMENTED
 -> HOLDOUT_EVALUATED
 -> PROSPECTIVE_EVALUATED
 -> PROMOTION_ELIGIBLE
+-> HUMAN APPROVAL
 ```
 
-後段の状態を前段から推測してはならない。`champion=null` は有効な正式結果である。
+後段を前段から推測しない。
 
-## 14. 現在の非主張
+`NO_MODEL_BEATS_BASELINE`、`champion=null`を正常な結論として認める。
 
-この要件定義書は以下を主張しない。
+## 21. Current non-claims
 
-- 全174登録entryが全6ゲームで成功した
-- 実データ174 × 6 campaignが完了した
-- WITHIN_TAU decoderが実OOFを改善した
-- Holdoutが開かれた
-- Prospectiveが完了した
-- championが存在する
-- production promotionが承認された
+このrequirementsの実装は次を自動的には意味しない。
+
+- 174 entries全ての6ゲームruntime success;
+- real-data 174 × 6 campaign完了;
+- 72 probabilistic models全てのformal OOF完了;
+- decoderのreal OOF improvement;
+- lottery drawのnon-IID性;
+- Holdout/Prospective完了;
+- champion存在;
+- production promotion完了。
