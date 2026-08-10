@@ -15,6 +15,7 @@ this file; release headings are historical records.
 - Updated the `full` dependency lane to Ray Tune `>=2.56.1` and refreshed `uv.lock` through PR #242.
 - Updated FastAPI to `>=0.141.1,<0.142` with a refreshed lock through PR #243 after exact-head Linux and native Windows verification.
 - Updated the routine dependency group through PR #241: Uvicorn 0.52.1 lane, MLflow 3.15.1 lane, Hypothesis 6.165.2 lane, Ruff 0.16.1 lane, and GluonTS 0.17.0 lane, with a refreshed universal lock.
+- Routed probability-bearing unified-campaign candidate estimators through family-specific Hit@±1/WITHIN_TAU decoding in PR #250 while keeping point-only workers point-only and recording explicit decoder/distribution identities.
 - Refreshed current repository status, handoff, verification, runbook and documentation authority guidance after the merge batch.
 
 ### Added
