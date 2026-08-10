@@ -106,7 +106,5 @@ def test_no_hardcoded_universe_sizes_in_geometry_sensitive_packages():
                 and node.value in forbidden
             ):
                 relative = path.relative_to(root).as_posix()
-                offenders.setdefault(relative, []).append(
-                    (getattr(node, "lineno", -1), node.value)
-                )
+                offenders.setdefault(relative, []).append((getattr(node, "lineno", -1), node.value))
     assert not offenders, f"hard-coded geometry literals found: {offenders}"
