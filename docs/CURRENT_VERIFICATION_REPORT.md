@@ -2,85 +2,149 @@
 
 ```text
 status_class: AUDITED_SNAPSHOT
-as_of: 2026-08-10T18:59+09:00
+as_of: 2026-08-10T20:23+09:00
 repository: arumajirou/loto_forecast_platform
-audit_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
-scope: repository merge batch + executable/scientific boundary
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
+scope: current functional merge sequence + capability/scientific boundary
 ```
 
 ## Verdict
 
 ```text
-PR_248_UNIFIED_CAMPAIGN=MERGED_AND_VERIFIED
-PR_244_CHECKOUT_V7=MERGED_AND_VERIFIED
-PR_242_RAY_TUNE_UPDATE=MERGED_AND_VERIFIED
-PR_243_FASTAPI_UPDATE=MERGED_AND_VERIFIED
-PR_249_WITHIN_TAU_DECODER=MERGED
-PR_241_GROUPED_UPDATE=MERGED_AFTER_CURRENT_HEAD_LINUX_FULL_CI
-PR_250_CAMPAIGN_DECODER_ROUTING=MERGED_AFTER_CURRENT_BASE_LINUX_FULL_CI
-HOLDOUT=NOT_OPENED
-PROSPECTIVE=NOT_OPENED
+UNIFIED_CAMPAIGN=MERGED
+FAMILY_AWARE_WITHIN_TAU_DECODER=MERGED
+GEOMETRY_GENERAL_METRICS=MERGED_AND_EXACT_HEAD_CI_VERIFIED
+THEORY_AWARE_PROMOTION_V2=MERGED_AND_EXACT_HEAD_CI_VERIFIED
+POWER_MDE_PLANNING=MERGED_AND_EXACT_HEAD_CI_VERIFIED
+HOLDOUT=NOT_OPENED_BY_THIS SEQUENCE
+PROSPECTIVE=NOT_OPENED_BY_THIS_SEQUENCE
+AUTOMATIC_PROMOTION=FORBIDDEN
 CHAMPION=NOT_CLAIMED
-PROMOTION=NOT_AUTHORIZED
 ```
 
-## Merge/CI evidence
+## Recent merge evidence
 
-| PR | Merge SHA | Verification summary |
+| PR | Merge SHA | Verification boundary |
 |---|---|---|
-| #248 | `aae45ba9294499f51cc5f1564de1c6ccf5814230` | premerge head `c7c8a039...`; Linux `31371724178` SUCCESS; Windows `31371724143` SUCCESS |
-| #244 | `c12ca27048d25cdc869fa3cbbfa6e31c727eb529` | actions/checkout v7 update; exact-head Linux and Windows SUCCESS |
-| #242 | `cc7ec5473730cfb18100bdfbb5228cf65e571b32` | premerge head `8641a50b...`; Linux `31373320815` SUCCESS; Windows `31373320763` SUCCESS |
-| #243 | `b04f3e40baa1861a5b83da047bdef2655905bd52` | premerge head `0f8a0ec9...`; Linux `31373843737` SUCCESS; Windows `31373843656` SUCCESS |
-| #249 | `83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f` | premerge head `6571ec99...`; Linux `31374883284` SUCCESS; Windows `31374883286` was queued when last audited |
-| #241 | `cfbe9f1cf379a68b4ad6ca2bc6d7793dbd828300` | current-main premerge head `e5da9364...`; Linux `31376124799` SUCCESS; Windows `31376124812` queued at merge evaluation; GitHub accepted protected expected-head merge |
-| #250 | `8430d9f507ba735bf1df69930e057c974752bfdb` | current-main synchronized head `c3cefc9c...`; Linux `31376812517` SUCCESS through full pytest/clean-tree; review threads 0; Windows `31376812289` queued and not treated as PASS |
+| #248 | `aae45ba9294499f51cc5f1564de1c6ccf5814230` | unified six-game model×game campaign merged |
+| #249 | `83f72d2fab2f5b060f0e42e68b87f8d2c6b4ac7f` | MAP/WITHIN_TAU select decoder merged |
+| #250 | `8430d9f507ba735bf1df69930e057c974752bfdb` | candidate probability family routing merged after current-base Linux full CI |
+| #251 | `5469410c4af679369ab65241c97ff4c4eaab39f2` | prior documentation refresh merged |
+| #252 | `8c87356d6aeb776e47c06635592071a6a54014fd` | geometry-general metrics; review fixes; final exact-head Linux full CI success |
+| #253 | `5c44cc866af36f3bbb44582263ff54bf392c3f10` | promotion v2; sealed game identity; theory target; final current-base Linux full CI success |
+| #254 | `2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8` | power/MDE; final head `218fa3b4...`; Linux run `31382711427` passed all 33 steps against current-base merge ref |
 
-Queued Windows states are recorded literally and are not represented as successful evidence.
+## #252 verification summary
 
-## Unified campaign state
+Review/race gates identified and corrected:
 
-The merged campaign provides `uv run loto3 campaign` and enforces the development-only comparison contract:
+- digit games must count exact positional hits rather than unordered set product;
+- geometry-literal guard exceptions must be explicitly inventoried rather than broadly excluded;
+- Ruff formatting changes were applied before final CI.
 
-- canonical six-game geometry;
-- complete requested broad-catalog × game materialization;
-- fail-visible unsupported/unavailable/non-routable/failed rows;
-- Hit@±1 primary tolerance;
-- per-position Hit@±1, all-position Hit@±1, MAE, MSE and RMSE;
-- seven mandatory baselines;
-- all configured seeds with aggregate variance/worst statistics;
-- prediction persistence and SHA-256 sealing before actual scoring read;
-- single-use output directories;
-- Holdout and Prospective remain unevaluated.
+Final Linux exact-head/current-base CI passed format, lint, compile, full pytest, repository-clean and cleanup before squash merge.
 
-PR #250 now routes probability-bearing candidate estimators through family-specific WITHIN_TAU decoding while leaving point-only workers point-only and preserving explicit distribution/decoder identity in runtime evidence.
+## #253 verification summary
 
-## Decoder evidence boundary
+Review gates identified and corrected:
 
-PR #249 added explicit `MAP` / `WITHIN_TAU` constrained select-game objectives. PR #250 added digit-family WITHIN_TAU probability decoding and connected the unified candidate route to the appropriate family-specific decoder.
+- theory-aware excess target must be converted to `implied_absolute_target` before rule comparison;
+- v2 artifacts must be generated/verified under v2 schema rather than interpreted as v1;
+- sealed scoring evidence must carry game identity and match policy game;
+- current v2 promotion tau remains fixed to 1;
+- automatic promotion/retraining/registry writes remain false.
 
-This verifies code/theory/routing contracts. It does **not** verify a real-data OOF gain, non-IID draws, a Holdout winner, or promotion eligibility.
+Final CI verified the PR merge ref against #252-containing main. All review threads were resolved before squash merge.
 
-## Dependency boundary
+## #254 verification summary
 
-Audited main includes FastAPI `>=0.141.1,<0.142`, Ray Tune `>=2.56.1`, and the grouped #241 Uvicorn/MLflow/Hypothesis/Ruff/GluonTS updates with a committed consistent `uv.lock`.
+Initial CI found an E501 lint failure; it was corrected.
 
-## What this report does not verify
+Review gates then added:
 
-This report does not certify:
+- explicit positive-integer validation for power-curve draw counts, including bool rejection;
+- `target_power > adjusted_alpha` validation so the normal critical-value sum cannot yield an invalid negative MDE planning regime;
+- regression tests for boundary and multiplicity behavior.
 
-- a real six-game immutable data snapshot;
-- every third-party model's successful runtime on all games;
-- all-model GPU execution;
-- a full real-data 174 × 6 campaign;
-- an OOF gain from the WITHIN_TAU decoder;
-- Holdout results;
-- Prospective results;
-- a champion;
-- promotion eligibility.
+Final head:
 
-Runtime evidence, decoder/theory evidence, scientific evaluation evidence and documentation evidence remain separate classes.
+```text
+218fa3b44a0b375b8e6df048f5659d00124e4740
+```
+
+Final Linux run:
+
+```text
+31382711427 = SUCCESS
+```
+
+The job passed all 33 reported steps, including:
+
+```text
+runner identity
+checkout
+uv/Python environment
+CPU PyTorch alignment
+dependency install
+Ruff format
+Ruff lint
+compileall
+full pytest
+repository-clean verification
+cleanup
+```
+
+The checkout log showed the current-base merge ref:
+
+```text
+Merge 218fa3b4... into 5c44cc86...
+```
+
+#254 was then squash merged to `2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8`.
+
+## Current code-grounded capability boundary
+
+Verified by source inspection for this documentation refresh:
+
+- six canonical game geometries;
+- 174-entry broad forecast inventory;
+- narrower shared `ModelSpec` execution catalog;
+- shared candidate/position/foundation provider routing;
+- separate isolated AutoGluon/BasicTS/Time-Series-Library/Merlion/sktime style lanes;
+- 72-model probabilistic catalog and command surface;
+- current unified campaign CLI/resource controls;
+- geometry-general metrics;
+- theory-aware threshold semantics;
+- promotion v1/v2 schema split and manual-only safeguards;
+- paired-score MDE/power planning.
+
+## Runtime evidence boundary
+
+Repository TSFM aggregate file currently records:
+
+```text
+total_models=21
+runtime_certified_models=19
+```
+
+This is point-in-time runtime evidence for exact identities. It is not a six-game OOF result.
+
+## Scientific boundary
+
+This verification report does not certify:
+
+- completion of a real immutable six-game 174 × 6 campaign;
+- universal model/runtime success;
+- all-model GPU success;
+- decoder real-data OOF gain;
+- non-IID lottery structure;
+- Holdout success;
+- Prospective success;
+- champion selection;
+- production promotion.
+
+Runtime, scientific evaluation, promotion governance and documentation verification remain distinct evidence classes.
 
 ## Historical report handling
 
-The root `VERIFICATION_REPORT.md` remains a historical version-single-source verification snapshot. Its original evidence is preserved behind a supersession banner. Current readers should use this file plus `docs/STATUS.md`.
+Root `VERIFICATION_REPORT.md` remains preserved historical evidence. Current readers should use this file and `docs/STATUS.md` for the latest audited documentation snapshot rather than rewriting old observations.
