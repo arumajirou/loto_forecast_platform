@@ -11,7 +11,6 @@ stage. Holdout and Prospective rows are never evaluated by this module.
 from __future__ import annotations
 
 import hashlib
-import json
 import os
 import platform
 import time
@@ -78,7 +77,7 @@ class UnifiedCampaignConfig(BaseModel):
     min_train_size: int = Field(default=100, ge=2)
     holdout_size: int = Field(default=50, ge=0)
     gap: int = Field(default=0, ge=0)
-    tau: int = Field(default=1, ge=0)
+    tau: Literal[1] = 1
     feature_windows: tuple[int, ...] = (5, 10, 20)
     device: Literal["auto", "cpu", "cuda"] = "auto"
     precision: Literal["32", "16-mixed", "bf16-mixed"] = "32"
@@ -455,7 +454,8 @@ def _model_prediction(
     if entry.task == "candidate":
         if not _candidate_model_supported(spec):
             raise _NotRoutable(
-                f"candidate estimator has no unified point-forecast bridge: {spec.library}/{spec.class_name}"
+                "candidate estimator has no unified point-forecast bridge: "
+                f"{spec.library}/{spec.class_name}"
             )
         train = _slot_candidate_rows(history, geometry, config.feature_windows, query_only=False)
         query = _slot_candidate_rows(history, geometry, config.feature_windows, query_only=True)

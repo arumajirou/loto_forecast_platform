@@ -185,6 +185,12 @@ def _cmd_research(args: argparse.Namespace) -> int:
     return 0 if payload["status"] in ("SUCCEEDED", "PARTIALLY_SUCCEEDED") else 1
 
 
+def _cmd_campaign(args: argparse.Namespace) -> int:
+    from loto.evaluation.unified_campaign_cli import run_campaign_args
+
+    return run_campaign_args(args)
+
+
 def _cmd_hierarchy(args: argparse.Namespace) -> int:
     from loto.reconciliation.hierarchy import build_number_hierarchy, reconcile
 
@@ -512,6 +518,15 @@ def build_parser() -> argparse.ArgumentParser:
     research.add_argument("--output", default=None)
     research.add_argument("--verbose", action="store_true")
     research.set_defaults(func=_cmd_research)
+
+    campaign = sub.add_parser(
+        "campaign",
+        help="run the unified all-model x all-game development evaluation campaign",
+    )
+    from loto.evaluation.unified_campaign_cli import add_campaign_arguments
+
+    add_campaign_arguments(campaign)
+    campaign.set_defaults(func=_cmd_campaign)
 
     probabilistic = sub.add_parser(
         "probabilistic", help="probabilistic-programming model catalog and runner"
