@@ -44,13 +44,23 @@ class TheoryAwareThreshold(BaseModel):
         if self.game not in set(known_games()):
             raise ValueError(f"unknown game: {self.game}")
         assessment = assess_threshold(self)
-        if assessment["status"] == TheoryThresholdStatus.EXCEEDS_NULL_CEILING:
+        implied = float(assessment["implied_absolute_target"])
+        if not 0.0 <= implied <= 1.0:
+            raise ValueError(
+                "TARGET_OUTSIDE_PROBABILITY_RANGE: configured semantics imply an absolute "
+                "Hit@±tau target outside [0, 1]"
+            )
+        if assessment["status"] == TheoryThresholdStatus.EXCEEDS_NULL_CEILING.value:
             raise ValueError(
                 "EXCEEDS_NULL_CEILING: absolute Hit@±tau target is above the exact IID-null "
                 "ceiling; declare an alternative hypothesis explicitly or use null-relative "
                 "semantics"
             )
-        if self.allow_above_null_ceiling and not (self.alternative_hypothesis or "").strip():
+        if (
+            self.semantics is ThresholdSemantics.ABSOLUTE
+            and self.allow_above_null_ceiling
+            and not (self.alternative_hypothesis or "").strip()
+        ):
             raise ValueError(
                 "alternative_hypothesis is required when allow_above_null_ceiling=true"
             )
