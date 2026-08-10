@@ -35,6 +35,11 @@ def test_v2_default_is_valid_for_every_canonical_game(game: str) -> None:
     assert 0.0 <= float(assessment["implied_absolute_target"]) <= 1.0
 
 
+def test_v2_rejects_tau_not_recorded_by_promotion_evidence() -> None:
+    with pytest.raises(ValidationError):
+        PromotionPolicyV2(game="numbers3", tau=2)
+
+
 def test_v2_preserves_manual_only_promotion_safety() -> None:
     with pytest.raises(ValidationError, match="automatic promotion is forbidden"):
         PromotionPolicyV2(game="numbers3", automatic_promotion=True)
