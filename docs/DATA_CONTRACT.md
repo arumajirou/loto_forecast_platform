@@ -2,9 +2,9 @@
 
 ```text
 status_class: DESIGN_CONTRACT
-as_of: 2026-08-10T18:59+09:00
+as_of: 2026-08-10T20:23+09:00
 repository: arumajirou/loto_forecast_platform
-audited_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
 ```
 
 ## 1. 原則
@@ -15,6 +15,7 @@ audited_main_sha: 8430d9f507ba735bf1df69930e057c974752bfdb
 - future informationをTrain/OOFへ混入させない。
 - data snapshotとresult-affecting splitをhashで識別可能にする。
 - HoldoutとProspectiveはdevelopment dataから論理的・運用的に分離する。
+- prediction evidenceは対応actualを読む前に固定する。
 
 ## 2. Canonical game targets
 
@@ -29,11 +30,13 @@ Target columnsは`loto.game.geometry`が定義するposition数に一致する�
 | `numbers3` | `n1..n3` | 0..9, ordered, repetition allowed |
 | `numbers4` | `n1..n4` | 0..9, ordered, repetition allowed |
 
-`draw_no`をchronological draw identityとして扱う。入力に無いsynthetic/dev utilityでは内部生成可能だが、正式data snapshotでは取得元のcanonical draw identityを保持する。
+`draw_no`をchronological draw identityとして扱う。Formal data snapshotでは取得元のcanonical identityを保持する。
+
+Digit rowsをsetへ変換してposition order/repetitionを失わない。
 
 ## 3. Unified campaign CSV contract
 
-All-six-game runの標準入力directory:
+All-six-game input directory:
 
 ```text
 mini.csv
@@ -44,75 +47,75 @@ numbers3.csv
 numbers4.csv
 ```
 
-最低限各CSVは:
+最低限:
 
 ```text
 draw_no,target columns...
 ```
 
-を持つ。
-
 Validation:
 
-- required target columns present
-- `draw_no` numeric/integer
-- no duplicate `draw_no`
-- strictly chronological ordering
-- target numeric
-- finite targets only
-- geometry.validate_outcome passes every row
+- required target columns present;
+- `draw_no` integer-compatible;
+- no duplicate `draw_no`;
+- chronological ordering;
+- numeric finite targets;
+- `geometry.validate_outcome()` passes every row.
 
-Invalid rowを黙ってclipしてraw/canonical inputへ書き戻さない。
+Invalid raw/canonical rowsをsilent clipして書き戻さない。
 
 ## 4. Time semantics
 
-利用可能なdata sourceでは次の概念を区別する。
+区別する時刻:
 
-- `event_time` / draw occurrence
-- `available_at` / information became usable
-- `ingested_at`
-- `forecast_created_at`
-- `actual_read_at` when relevant
+```text
+event_time / draw occurrence
+available_at / usable information time
+ingested_at
+forecast_created_at / seal time
+actual_read_at
+```
 
-External featureは原則:
+External featureはformal laneで原則:
 
 ```text
 available_at <= forecast_created_at
 ```
 
-を満たす必要がある。
-
-対応drawのactualはprediction seal後までscoring processへ渡さない。
+対応actualはprediction seal後までscoring processへ渡さない。
 
 ## 5. Split contract
 
-Chronological split order:
-
 ```text
 Train / development folds
--> Holdout
+-> closed Holdout
 -> Prospective
 ```
 
-Unified campaignはconfigured `holdout_size`の末尾sliceをdevelopmentから除外し、Holdoutを評価しない。
+Unified campaignはconfigured Holdout tailをdevelopmentから除外し、Holdoutをscoreしない。
 
-Development foldsはexpanding chronological rolling foldsを使い、test indexはtrain indexより後に限定する。
+Development folds are chronological expanding/rolling folds with train indices strictly before test indices.
 
-Prospective actualが未確定の状態で予測を封印する。
+Prospective prediction is sealed before future actual availability/read.
 
 ## 6. Feature contract
 
-Feature生成は各target時点より前のeligible historyだけを読む。
+Feature generation reads only eligible history preceding each target.
 
-Scaler、Encoder、feature selection、HPOのfit stateはTrain内だけから生成する。
+Train-only fitted components include as applicable:
 
-Candidate bridgeで使用するfrequency/gap/recent-window featureもtarget indexより前のhistoryだけから計算する。
+```text
+scaler
+encoder
+feature selection
+calibration
+learned baseline
+HPO/search state
+```
 
-未来drawのtarget値をfeature generationへ渡してはならない。
+Candidate frequency/gap/recent-window features also use only pre-target history.
 
 ## 7. External data classification
-
-外生情報を使用する場合、最低限次へ分類する。
 
 ```text
 known_future
@@ -121,77 +124,89 @@ static
 prohibited_or_unverifiable
 ```
 
-Availability timestampが不明でleakage riskを解消できないfeatureはformal laneから除外またはquarantineする。
+If availability time cannot be established and leakage risk cannot be bounded, exclude/quarantine the feature from formal evaluation.
 
 ## 8. Data identity / hashes
 
-正式runでは少なくとも次のidentityを保持する。
+Formal runs retain at least applicable:
 
-- source URI / acquisition origin when applicable
-- retrieval/ingestion timestamp
-- row count and schema identity
-- data snapshot SHA-256
-- split manifest SHA-256
-- feature manifest SHA-256
-- Git/code identity
-- protocol hash
+```text
+source/acquisition origin
+retrieval/ingestion timestamp
+row count/schema identity
+data snapshot SHA-256
+split manifest SHA-256
+feature manifest SHA-256
+Git/code identity
+protocol hash
+```
 
-Unified campaignの`EvaluationProtocolV2`はdevelopment data/split/feature identityをresult-affecting protocolへbindする。
+`EvaluationProtocolV2` binds result-affecting data/split/feature identity.
 
 ## 9. Missing / duplicate / order policy
 
-次はfail closedまたは明示的quarantineとする。
+Fail closed or explicitly quarantine:
 
-- duplicate draw identity
-- target missing
-- non-finite target
-- target outside legal domain
-- select-game duplicate/non-ascending outcome
-- non-monotonic chronology
-- unknown game geometry
-- future-derived feature evidence
+- duplicate draw identity;
+- missing target;
+- non-finite target;
+- target outside legal domain;
+- invalid select distinct/order;
+- non-monotonic chronology;
+- unknown game;
+- future-derived feature evidence.
 
-Missing targetを予測対象actualとして補間してformal scoreへ使わない。
+Do not impute a missing formal target actual and score against the imputation as if observed.
 
 ## 10. Raw immutability
 
-Raw sourceをcanonical修正で上書きしない。
-
-推奨layer:
+Recommended layering:
 
 ```text
-raw/             immutable bytes/source snapshot
-validated/       validation result/quarantine
-canonical/       normalized analytic representation
-features/        derived as-of features
+raw/             immutable source bytes
+validated/       validation/quarantine
+canonical/       normalized representation
+features/        as-of derived features
 artifacts/       model/evaluation evidence
 ```
 
-修正が必要な場合、新snapshot/versionを作りlineageを残す。
+Correction creates a new snapshot/version with lineage; it does not overwrite historical raw evidence.
 
 ## 11. Prediction data boundary
 
-Prediction lockはactual dataを含めない。
+Prediction lock contains no target actual.
 
-最低条件:
+Minimum conceptual fields:
 
 ```text
 actuals_known=false
 prediction values
-candidate/game/seed identity
+game/candidate/seed identity
 protocol/runtime identity
 created timestamp
 SHA-256
 ```
 
-Actualはseal後のscoring段階で対応draw identityを使ってjoinする。
+Actual is joined only after sealing, by matching draw identity.
 
-## 12. Holdout / Prospective boundary
+## 12. Theory/power data boundary
 
-Development campaignの成功を理由にHoldoutを自動openしない。
+Theory reference calculations consume game geometry/model assumptions, not Holdout/Prospective actuals.
 
-Holdout actual/read evidenceとProspective actual/read evidenceは別gateで扱う。
+Pre-experiment `score_sd` used by power/MDE planning must come from allowed development/pilot evidence or a declared simulation fixed before the target window. It must not be estimated by looking ahead into the target Holdout/Prospective window and then represented as pre-planned evidence.
 
-## 13. Non-claims
+## 13. Promotion evidence data boundary
 
-このData Contractはrepository内の全歴史data fileが既に完全準拠であることを主張しない。正式runごとにdata audit/hashを実行し、そのrun evidenceで準拠を証明する。
+Theory-aware promotion v2 requires sealed score evidence carrying `game_id` on Holdout and every Prospective window. All scored-window game identities must match the policy game.
+
+Historical v1 evidence is preserved under its original schema rather than silently rewritten.
+
+## 14. Holdout / Prospective boundary
+
+Development success does not automatically open Holdout.
+
+Holdout actual/read evidence and Prospective actual/read evidence are separately authorized and recorded.
+
+## 15. Non-claims
+
+This contract does not claim every historical repository data file is already compliant. Each formal run must establish its own immutable data/split/protocol evidence.
