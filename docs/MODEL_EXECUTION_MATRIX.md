@@ -1,119 +1,151 @@
 # Model and library execution matrix
 
-> **Audit basis:** code and executable evidence on `main@0f7585bca90fe9c1578909018a2dc24fcfdc12cb`  
-> **Audited:** 2026-08-10 16:47 JST  
-> **Purpose:** describe what the repository can actually route, load, execute, or certify. This is not a restatement of the generated 174-entry inventory.
-
-## 1. Why this document exists
-
-The repository has several different model surfaces. Treating them as one list produces incorrect claims.
-
-1. `src/loto/models/catalog_full.py` is the **broad inventory** used by `loto3 catalog`. It currently produces 174 registered entries.
-2. `src/loto/models/catalog.py` is the **shared execution catalog** used by `loto models` and the main `loto experiment research` orchestration path.
-3. `src/loto/models/workers.py` and `src/loto/models/factory.py` contain the **shared executable dispatch**.
-4. `src/loto/models/providers/**` contains the **shared foundation-model provider registry**.
-5. `src/loto/*_campaign/**`, `src/loto/adapters/**`, `scripts/run_*_provider.py`, and `environments/**` contain **isolated/provider-specific execution lanes** that may exist even when the model is not in the shared execution catalog.
-6. `audit/**` contains point-in-time execution evidence. A successful runtime audit is stronger than registration, but it still does not prove lottery forecast accuracy or formal OOF superiority.
-
-Therefore:
-
 ```text
-registered != shared-routable != provider-implemented != runtime-certified != OOF-evaluated != promoted
+status_class: AUDITED_REFERENCE
+code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
+as_of: 2026-08-10T20:23+09:00
+repository: arumajirou/loto_forecast_platform
 ```
 
-## 2. Which CLI reads which catalog
+## 1. Purpose
 
-| command/path | actual source | meaning |
+この資料は**モデル名の在庫ではなく、どのsurfaceが実際にroute/load/execute/certifyできるか**を整理する。
+
+```text
+registered != routable != runtime-certified != lottery-compatible != OOF-evaluated != promoted
+```
+
+## 2. Model surfaces
+
+| Surface | Source | Meaning |
 |---|---|---|
-| `uv run loto3 catalog --counts` | `loto.cli_v3` -> `catalog_full.build_catalog()` | broad 174-entry inventory |
-| `uv run loto3 catalog --unpinned` | `catalog_full` revision metadata | inventory entries whose catalog revision field is not fixed; this is not the same as runtime audit status |
-| `uv run loto models list` | `loto.cli` -> `catalog.list_model_specs()` | shared execution catalog |
-| `uv run loto models show <id>` | `catalog.get_model_spec()` | one shared execution spec |
-| `uv run loto experiment research --config ...` | `orchestration/research.py` -> `catalog.py` -> `RuntimeModel` / `PositionSeriesWorker` | actual shared multi-model research path |
-| `uv run loto3 research ...` | `orchestration/research_v3.py` | separate v3 scientific loop; built-in mandatory predictors plus caller-injected predictors, not automatic execution of all catalog entries |
+| Broad forecast inventory | `src/loto/models/catalog_full.py` | 174-entry planning inventory |
+| Shared execution catalog | `src/loto/models/catalog.py` | normal `ModelSpec` selection boundary |
+| Shared candidate runtime | `models/factory.py` | in-process candidate estimators |
+| Shared position/foundation runtime | `models/workers.py` | position-series/foundation dispatch |
+| Shared foundation registry | `models/providers/registry.py` | concrete provider classes |
+| Isolated campaigns/providers | `*_campaign/**`, `adapters/**`, `environments/**` | version/provider-specific execution |
+| Probabilistic platform | `probabilistic/**` | separate 72-model catalog and runner |
+| Runtime audit | `audit/**` | point-in-time exact identity evidence |
 
-The two research commands are not interchangeable.
+## 3. CLI boundaries
 
-## 3. Shared research execution path
+| Command | Catalog/runtime source | Use |
+|---|---|---|
+| `uv run loto3 catalog --counts` | `catalog_full` | broad inventory |
+| `uv run loto3 catalog --library ...` | `catalog_full` | broad library filter |
+| `uv run loto models list` | `catalog.py` | shared execution specs |
+| `uv run loto models show ID` | `catalog.py` | one shared spec |
+| `uv run loto experiment research --config ...` | `orchestration/research.py` + shared catalog | older shared research path |
+| `uv run loto3 research ...` | `orchestration/research_v3.py` | separate instrumented research cycle |
+| `uv run loto3 campaign ...` | broad planning + compatible shared routes | canonical six-game development campaign |
+| `uv run loto3 probabilistic ...` | probabilistic catalog/runner | Bayesian/probabilistic platform |
 
-`src/loto/orchestration/research.py` performs chronological outer folds and resolves every configured model through `get_model_spec()`.
+The two research commands and the unified campaign are not interchangeable.
 
-Dispatch is task-based:
+## 4. Broad inventory counts
+
+| Library | Count |
+|---|---:|
+| builtin | 4 |
+| sklearn | 7 |
+| lightgbm | 2 |
+| xgboost | 1 |
+| catboost | 1 |
+| statsforecast | 41 |
+| neuralforecast | 37 |
+| neuralforecast_auto | 36 |
+| mlforecast_auto | 8 |
+| hierarchicalforecast | 10 |
+| tsfm | 21 |
+| autogluon | 1 |
+| darts | 1 |
+| gluonts | 1 |
+| sktime | 1 |
+| skforecast | 1 |
+| reservoirpy | 1 |
+| **total** | **174** |
+
+This count is computed inventory, not executable-success evidence.
+
+## 5. Direct candidate estimators
+
+Shared candidate IDs:
+
+| ID | Library/class | Dependency lane | Capabilities |
+|---|---|---|---|
+| `uniform` | builtin UniformCandidateAdapter | core | control/probability |
+| `frequency` | builtin FrequencyCandidateAdapter | core | probability/ranking |
+| `logistic` | sklearn LogisticRegression | core | probability/exogenous |
+| `random-forest` | sklearn RandomForestClassifier | core | probability/exogenous |
+| `extra-trees` | sklearn ExtraTreesClassifier | core | probability/exogenous |
+| `hist-gradient-boosting` | sklearn HistGradientBoostingClassifier | core | probability/exogenous |
+| `lightgbm-classifier` | LightGBM LGBMClassifier | full | probability/ranking/exogenous |
+| `xgboost-classifier` | XGBoost XGBClassifier | full | probability/exogenous |
+| `catboost-classifier` | CatBoost CatBoostClassifier | full | probability/exogenous |
+
+Position IDs additionally include `ridge-position`, `elasticnet-position`, `lightgbm-position`.
+
+`RuntimeModel` removes identity/target fields from model features and normalizes estimator outputs into candidate probabilities/scores.
+
+## 6. StatsForecast
+
+Broad inventory: **41 classes** including AutoARIMA, AutoETS, AutoCES, AutoTheta, ARIMA, AutoRegressive, smoothing/Holt families, baseline families, intermittent-demand models, MSTL/MFLES/TBATS, Theta variants, GARCH/ARCH and UCM.
+
+Shared explicit IDs:
 
 ```text
-candidate
-  -> RuntimeModel.fit_candidate()/predict_candidate()
-
-position_series or foundation
-  -> PositionSeriesWorker.forecast()
-
-other task
-  -> WorkerGateway job document, then explicit provider/plugin is required
+stats-naive
+stats-historic-average
+stats-autoarima
+stats-autoets
+stats-autotheta
+stats-autoces
+stats-croston
+stats-tsb
 ```
 
-The shared research path currently canonicalizes Loto7 data and its prediction helpers use the seven-position/37-candidate contract. Other game-specific providers may support more games, but that does not make this particular orchestration path multi-game automatically.
+Ordinary position-series route imports `statsforecast.models.<class>`, fits `StatsForecast` and predicts h=1. Croston/TSB use candidate-series representation.
 
-## 4. Direct candidate estimators
+**41 broad registrations do not mean 41 shared IDs.**
 
-These are constructed in-process by `src/loto/models/factory.py` when their shared execution specs are selected.
+## 7. MLForecast
 
-| model/library | shared spec | executable code path | dependency |
-|---|---|---|---|
-| Uniform | `uniform` | `UniformCandidateAdapter` | core |
-| Frequency | `frequency` | `FrequencyCandidateAdapter` | core |
-| LogisticRegression | `logistic` | scikit-learn `LogisticRegression` | core |
-| RandomForestClassifier | `random-forest` | scikit-learn | core |
-| ExtraTreesClassifier | `extra-trees` | scikit-learn | core |
-| HistGradientBoostingClassifier | `hist-gradient-boosting` | scikit-learn | core |
-| LightGBM classifier | `lightgbm-classifier` | dynamic `lightgbm.LGBMClassifier` | `full` |
-| XGBoost classifier | `xgboost-classifier` | dynamic `xgboost.XGBClassifier` | `full` |
-| CatBoost classifier | `catboost-classifier` | dynamic `catboost.CatBoostClassifier` | `full` |
+Broad AutoMLForecast inventory:
 
-`RuntimeModel` excludes target/identity columns from numeric feature selection, fits the estimator, and normalizes `predict_proba`, `decision_function`, or `predict` output to candidate probabilities.
+```text
+AutoLightGBM
+AutoXGBoost
+AutoCatboost
+AutoLinearRegression
+AutoRidge
+AutoLasso
+AutoElasticNet
+AutoRandomForest
+```
 
-## 5. StatsForecast
+Direct shared IDs:
 
-### Broad inventory
+```text
+mlforecast-ridge
+mlforecast-lightgbm
+```
 
-`catalog_full.py` registers 41 StatsForecast estimators.
+The shared worker builds lag features and predicts one step with Ridge or LightGBM.
 
-### Shared execution catalog
+## 8. NeuralForecast fixed models
 
-The shared `catalog.py` currently wires these concrete IDs:
+Broad official fixed inventory: 37.
 
-- `stats-naive` -> `Naive`
-- `stats-historic-average` -> `HistoricAverage`
-- `stats-autoarima` -> `AutoARIMA`
-- `stats-autoets` -> `AutoETS`
-- `stats-autotheta` -> `AutoTheta`
-- `stats-autoces` -> `AutoCES`
-- `stats-croston` -> `CrostonClassic` as `candidate_series`
-- `stats-tsb` -> `TSB` as `candidate_series`
+```text
+RNN GRU LSTM TCN DeepAR DilatedRNN MLP NHITS NBEATS NBEATSx
+DLinear NLinear TFT VanillaTransformer Informer Autoformer PatchTST
+FEDformer StemGNN HINT TimesNet TimeLLM TSMixer TSMixerx
+MLPMultivariate iTransformer BiTCN TiDE DeepNPTS SOFTS SOFTSSharp
+TimeMixer KAN RMoK TimeXer xLSTM XLinear
+```
 
-`PositionSeriesWorker._statsforecast()` dynamically imports `statsforecast.models.<class>`, fits `StatsForecast`, and predicts horizon 1. `CrostonClassic` and `TSB` use a separate 37 binary candidate-series representation.
-
-**Important:** 41 registered StatsForecast entries do not mean 41 IDs are currently selectable through `loto experiment research`; the shared execution catalog is the selection boundary for that command.
-
-## 6. MLForecast
-
-### Broad inventory
-
-`catalog_full.py` records 8 `mlforecast_auto` entries.
-
-### Shared execution path
-
-`catalog.py` currently wires two direct `mlforecast` specs:
-
-- `mlforecast-ridge`
-- `mlforecast-lightgbm`
-
-`PositionSeriesWorker._mlforecast()` builds lag features through `MLForecast`, using scikit-learn Ridge or LightGBM and horizon 1.
-
-The eight broad AutoMLForecast registrations and the two shared execution IDs are different surfaces and must not be reported as eight automatically runnable shared-research models.
-
-## 7. NeuralForecast fixed models
-
-The broad inventory contains 37 fixed NeuralForecast models. The shared execution catalog currently contains a narrower directly-routable set:
+Direct shared subset:
 
 ```text
 DLinear
@@ -135,111 +167,102 @@ iTransformer
 VanillaTransformer
 ```
 
-`PositionSeriesWorker._neuralforecast()` dynamically imports the class from `neuralforecast.models`, supplies horizon/input/training defaults, selects CPU/GPU from the requested runtime, fits on a bounded validation window, and calls `NeuralForecast.predict()`.
+The shared worker dynamically imports the class, configures h/input/training/device settings, fits on a chronological validation boundary and predicts.
 
-Known code-level details:
+Known implementation details:
 
-- `TSMixer`, `TimeMixer`, and `iTransformer` receive `n_series=7` in this worker.
-- `TimesNet` is explicitly forced to `32-true` when reduced precision was requested.
-- the shared worker is a Loto7-style position-series path; model availability in NeuralForecast itself is not enough to prove this wrapper works for every class in the 37-entry broad inventory.
+- TimesNet has an explicit full-precision safety path when reduced precision is requested.
+- multiseries classes require coherent `n_series`/layout.
+- upstream class existence alone is insufficient to claim wrapper support for all 37.
 
-## 8. NeuralForecast AutoModels
+## 9. NeuralForecast official AutoModels
 
-The shared execution catalog contains the official AutoModel family and marks backend/search as runtime-resolved. `PositionSeriesWorker._neuralforecast_auto()` builds an `AutoModelRequest`, resolves Optuna/Ray/search policy, constructs the AutoModel, fits a chronological validation window, and predicts.
-
-Runtime controls include:
+Broad official AutoModel inventory: 36.
 
 ```text
-backend
-num_samples
-cpus
-gpus
-parallel_trials
-refit_with_val
-search_strategy
-early_stop_patience_steps
-seed
-precision
-n_series
+AutoRNN AutoLSTM AutoGRU AutoTCN AutoDeepAR AutoDilatedRNN AutoBiTCN
+AutoxLSTM AutoMLP AutoNBEATS AutoNBEATSx AutoNHITS AutoDLinear AutoNLinear
+AutoTiDE AutoDeepNPTS AutoKAN AutoTFT AutoVanillaTransformer AutoInformer
+AutoAutoformer AutoFEDformer AutoPatchTST AutoiTransformer AutoTimeXer
+AutoTimesNet AutoStemGNN AutoHINT AutoTSMixer AutoTSMixerx
+AutoMLPMultivariate AutoSOFTS AutoSOFTSSharp AutoTimeMixer AutoRMoK AutoXLinear
 ```
 
-`AutoHINT` is special-cased: it requires exactly seven coherent position series, creates an explicit total + seven-position hierarchy, uses a DLinear base model with a Normal `DistributionLoss`, and measures coherence error.
+The shared AutoModel path resolves:
 
-### Local extensions outside the shared official AutoModel list
+```text
+Optuna or Ray backend
+search strategy
+num samples/trials
+CPU/GPU resources
+parallel trials/workers
+precision
+seed
+refit policy
+n_series where required
+```
 
-The repository also contains local NeuralForecast extension code:
+`AutoHINT` has dedicated hierarchy/base-model/distribution-loss/coherence handling.
 
-| extension | code exists | shared official AutoModel catalog state |
-|---|---|---|
-| AutoTimeLLM | `src/loto/neuralforecast/auto_timellm/**` | separate fail-closed local extension; do not equate with official shared registration |
-| AutoSCINet | `src/loto/neuralforecast/auto_scinet/**` | local SCINet/AutoSCINet extension; separate from official shared catalog |
-| AutoSegRNN | `src/loto/neuralforecast/auto_segrnn/**` | module explicitly identifies itself as **Inactive** |
-| AutoFreTS | `src/loto/neuralforecast/auto_frets/**` | module explicitly identifies itself as **Inactive** |
+### Local extensions
 
-File presence proves implementation work exists; it does not prove automatic shared-research selection or runtime certification.
+| Extension | Current interpretation |
+|---|---|
+| AutoTimeLLM | fail-closed local extension |
+| AutoSCINet | local extension |
+| AutoSegRNN | explicitly inactive |
+| AutoFreTS | explicitly inactive |
 
-## 9. AutoGluon TimeSeries
+Local code presence does not make a model an official shared AutoModel.
 
-AutoGluon is not executed by importing it into the root Python environment. The shared worker calls an isolated subprocess:
+## 10. AutoGluon TimeSeries
+
+Shared `autogluon-timeseries` does not rely on an unconstrained root import. It calls an isolated environment/provider:
 
 ```text
 environments/autogluon-timeseries/
 scripts/run_autogluon_timeseries_provider.py
 ```
 
-`PositionSeriesWorker` requires the isolated `uv.lock`, invokes:
+Protocol v2 is the current normal path; v1 is compatibility-only.
+
+Existing merged evidence includes real AutoGluon TimeSeries 1.5.0 CPU/fallback certification and a real Naive fit/predict/save + persisted load/predict smoke. It does not establish a positive GPU certification for the same path.
+
+Runtime inventory distinguishes source-declared, runtime-discovered, runtime-importable and runtime-certified states.
+
+## 11. Darts
+
+Shared `darts-ensemble` creates per-position `RegressionEnsembleModel` over:
 
 ```text
-uv run --project environments/autogluon-timeseries --locked python scripts/run_autogluon_timeseries_provider.py ...
+NaiveDrift
+ExponentialSmoothing
 ```
 
-and validates protocol-v2 request/response evidence. Schema v1 exists only as an explicit compatibility path.
+then fits and predicts one step.
 
-Merged integration evidence for PR #237 records a real AutoGluon TimeSeries 1.5.0 CPU/fallback certification and a real shared-worker Naive fit/predict/save + persisted load/predict smoke. Positive GPU certification was not claimed by that integration.
+## 12. GluonTS
 
-The AutoGluon runtime catalog separately tracks:
+Shared `gluonts-deepar` constructs Torch `DeepAREstimator` with Student-T output.
 
-```text
-source_declared
-runtime_discovered
-runtime_importable
-runtime_certified
-```
-
-so source discovery is intentionally not treated as runtime success.
-
-## 10. Darts, GluonTS, ReservoirPy
-
-These three framework entries have concrete shared worker branches.
-
-### Darts
-
-`_darts()` creates per-position `RegressionEnsembleModel` instances over `NaiveDrift()` and `ExponentialSmoothing()`, fits them, and predicts one step.
-
-### GluonTS
-
-`_gluonts()` constructs a Torch `DeepAREstimator` with Student-T output and predicts from `ListDataset` series.
-
-Known limitation in current code: the trainer is explicitly hard-coded to:
+Current shared path explicitly configures:
 
 ```text
 accelerator=cpu
 devices=1
 ```
 
-The source itself contains an audit comment that this has not yet been reconciled with `--device cuda/auto`. Therefore GluonTS shared-worker execution exists, but CUDA requests must not be documented as honored by this path.
+Therefore GluonTS execution code exists, but shared CUDA execution must **not** be claimed from this path.
 
-### ReservoirPy
+## 13. ReservoirPy
 
-`_reservoir_esn()` constructs `Reservoir >> Ridge` per position with deterministic seed offsets and returns one-step position forecasts.
+Shared `reservoir-esn` constructs `Reservoir >> Ridge` per position with deterministic seed offsets and one-step forecast output.
 
-## 11. HierarchicalForecast
+## 14. HierarchicalForecast
 
-HierarchicalForecast is a reconciliation layer, not a normal `PositionSeriesWorker` model.
+This is a reconciliation layer, not an independent predictor.
 
-`src/loto/reconciliation/hierarchy.py` provides:
-
-### Core NumPy reconciliation
+Core NumPy:
 
 ```text
 bottom_up
@@ -249,7 +272,7 @@ wls_struct
 mint_shrink
 ```
 
-### Upstream HierarchicalForecast reconciliation
+Optional upstream methods:
 
 ```text
 BottomUp
@@ -264,61 +287,44 @@ OptimalCombination
 ERM
 ```
 
-`reconcile_with_hierarchicalforecast()` imports the real optional package, constructs the requested method, executes `fit_predict`, checks finite/shape/coherence results, and returns explicit statuses for unavailable dependencies, unsupported hierarchy, missing in-sample data, configuration errors, and execution failures.
+Some methods require strict-tree structure. Registration does not mean every method is valid for every grouped hierarchy.
 
-The repository's number hierarchy is grouped by total/parity/decade/number. Some upstream methods require a strict tree, so registration of all ten methods does not guarantee every method is valid for every hierarchy.
+## 15. sktime
 
-## 12. sktime and skforecast
+No direct `PositionSeriesWorker` branch is treated as the normal shared route.
 
-The broad inventory and `frameworks` extra declare sktime and skforecast, but `PositionSeriesWorker.forecast()` has no direct `sktime` or `skforecast` dispatch branch.
-
-### sktime
-
-There is nevertheless a separate isolated sktime implementation under:
+Separate implementation:
 
 ```text
 src/loto/sktime_campaign/**
 ```
 
-It exposes discovery/runtime/evaluation protocol types, rolling-origin evaluation, validation benchmarks, Holdout scoring and Prospective contracts. This is a provider/campaign lane, not the shared `PositionSeriesWorker` lane.
+It contains provider/campaign contracts for rolling-origin evaluation and later scientific stages. Use that lane explicitly.
 
-### skforecast
+## 16. skforecast
 
-`skforecast` is present in the optional `frameworks` dependency set and broad catalog, but no direct shared worker branch was found in the audited `workers.py`. Do not describe it as automatically runnable through `loto experiment research` without a separate provider path/evidence.
+The optional dependency and broad entry exist, but no current direct shared worker branch was found in the audited execution path. Do not describe it as automatically runnable through `loto experiment research` without separate adapter/provider evidence.
 
-## 13. BasicTS
+## 17. BasicTS
 
-BasicTS is implemented outside the 174-entry shared inventory surface.
-
-Relevant code:
+Outside the 174 broad surface:
 
 ```text
 src/loto/basicts_campaign/**
 scripts/run_basicts_provider.py
 ```
 
-The provider supports version-isolated request/response contracts. Current v1 operations include:
+The isolated provider has identity/config/dataset/runtime-smoke operations and a version-pinned CPU-oriented lane. Existing contract covers Numbers3/Numbers4/Mini/Loto6/Loto7 dataset payloads. Provider existence is not a claim of full OOF completion.
 
-```text
-identity
-validate_config
-compile_dataset
-construct_forward_save_load_smoke
-```
+## 18. Time-Series-Library
 
-The contract pins BasicTS `1.1.0` and upstream revision `c2bb6e31e591167e84459775a21a62e70a5893ce`, defines CPU-only execution for that lane, and supports Numbers3/Numbers4/MiniLoto/Loto6/Loto7 dataset payloads.
-
-This proves a real isolated BasicTS provider surface exists. It does not mean BasicTS models are counted in the 174-entry `catalog_full` or automatically selected by the shared research loop.
-
-## 14. Time-Series-Library
-
-Time-Series-Library also has a dedicated provider/campaign surface outside the 174-entry catalog:
+Dedicated provider/campaign:
 
 ```text
 src/loto/time_series_library_campaign/**
 ```
 
-`execute_request()` currently has explicit fit-save and load-predict operations for:
+Explicit model operations currently include:
 
 ```text
 DLinear
@@ -332,156 +338,180 @@ TiDE
 FiLM
 ```
 
-It also supports upstream model discovery, training-bundle materialization, validation, prediction-file verification, and round-trip verification.
+Operations include upstream discovery, training-bundle materialization, fit-save, load-predict, prediction-file verification and round-trip checks.
 
-These are concrete provider operations, not merely names in documentation. They remain separate from the normal `PositionSeriesWorker` dispatch and should be invoked through their campaign/provider contract.
+## 19. Merlion
 
-## 15. Merlion
-
-The repository has a separate Merlion integration under:
+Separate isolated integration:
 
 ```text
 src/loto/merlion_campaign/**
 ```
 
-The package describes itself as an isolated runtime, provenance and certification contract. It is not part of the current 174-entry `catalog_full` count and is not a direct `PositionSeriesWorker` branch.
+It represents runtime/provenance/certification work and is neither a normal shared worker branch nor part of the current 174 forecast inventory count.
 
-## 16. Foundation-model shared provider registry
+## 20. Shared foundation provider registry
 
-The shared foundation dispatch is real code:
+`models/providers/registry.py` maps:
+
+| ID/family | Provider |
+|---|---|
+| `chronos`, `chronos-bolt-tiny`, `chronos-t5-small`, `chronos-2`, `chronos-2-small` | ChronosProvider |
+| `timesfm`, `timesfm-2.5` | TimesFMProvider |
+| `granite-ttm` | GraniteTTMProvider |
+| `tirex` | TiRexProvider |
+| `moirai` | MoiraiProvider |
+| `sundial` | SundialProvider |
+| `tabpfn-ts` | TabPFNTSProvider |
+
+Unknown provider IDs resolve to a fail-closed `ProviderNotImplemented`, not fake success.
+
+## 21. Broad TSFM inventory
+
+Current 21 broad entries:
 
 ```text
-PositionSeriesWorker._foundation()
-  -> get_foundation_provider(spec)
-  -> provider.load()
-  -> provider.predict(history)
-  -> provider.inspect_properties()
-  -> provider.close()
+chronos-2
+chronos-bolt-tiny
+chronos-t5-small
+chronos-t5-base
+timesfm-2.5-transformers
+granite-ttm-r2
+granite-flowstate-r1
+granite-patchtst
+granite-patchtsmixer
+moirai-2.0-small
+moirai-1.0-base
+tirex-2
+toto-open-base
+toto-2.0-4m
+moment-1-small
+moment-1-large
+lag-llama
+kronos-base
+sundial-base
+tabpfn-ts
+t0-alpha
 ```
 
-`src/loto/models/providers/registry.py` currently registers shared provider classes for:
+Broad declarations intentionally do not invent revisions. Formal execution binds a reviewed revision manifest.
 
-| shared ID/family | provider implementation |
-|---|---|
-| `chronos`, `chronos-bolt-tiny`, `chronos-t5-small`, `chronos-2`, `chronos-2-small` | `ChronosProvider` |
-| `sundial` | `SundialProvider` |
-| `timesfm`, `timesfm-2.5` | `TimesFMProvider` |
-| `granite-ttm` | `GraniteTTMProvider` |
-| `tirex` | `TiRexProvider` |
-| `moirai` | `MoiraiProvider` |
-| `tabpfn-ts` | `TabPFNTSProvider` |
+## 22. TSFM runtime evidence
 
-Unknown IDs fall back to `ProviderNotImplemented`, which raises `PROVIDER_NOT_IMPLEMENTED` rather than silently pretending success.
-
-Chronos is additionally fail-closed around local snapshots: the provider checks required local weight/config files and uses dedicated provider runners for pinned Chronos Bolt Tiny, Chronos T5 Small and Chronos 2 paths.
-
-## 17. TSFM runtime evidence: 21 audited, 19 certified, 2 blocked
-
-The strongest current codebase evidence for the broad 21-model TSFM inventory is:
+Current repository aggregate file:
 
 ```text
 audit/tsfm-runtime/runtime-status.json
-configs/tsfm/verified-revisions.json
 ```
 
-The runtime-status counters on current `main` are:
+records:
 
 ```text
 total_models=21
-certified_models=19
-blocked_models=2
-pending_models=0
-judged_models=21
-judged_progress_percent=100.0
+runtime_certified_models=19
 ```
 
-The two blocked models are:
+Per-model records include model/revision/device/VRAM/PID/output evidence where captured.
 
-| model | current evidence status | reason |
-|---|---|---|
-| `moirai-1.0-base` | BLOCKED | exact pinned snapshot lacks required config/model weights; personal non-commercial license scope |
-| `t0-alpha` | BLOCKED | gated access required |
+Two known broad entries were not counted runtime-certified in this aggregate. Gated/licensing/artifact reasons must be read from the exact per-model record/evidence rather than inferred from the count.
 
-The other 19 entries have `runtime_status=CERTIFIED` in the aggregate audit. This includes Chronos variants, IBM Granite variants, Kronos, Lag-Llama, Moirai 2.0 small, MOMENT variants, Sundial, TabPFN-TS, TimesFM 2.5 Transformers, TiRex 2 and Toto variants.
+Do not translate 19 runtime-certified identities into 19 OOF winners.
 
-### Important certification-scope caveat
-
-`CERTIFIED` here means the recorded runtime certification contract passed for that model. It does **not** uniformly mean “lottery forecast model ready for OOF”. Per-model evidence can be narrower:
-
-- Kronos certification uses its native financial OHLCV/K-line contract and explicitly records `lottery_domain_compatibility_certified=false`.
-- Moirai 2.0 Small records full inference but also `lottery_domain_compatibility_certified=false`, and its license is personal/non-commercial only.
-- MOMENT runtime evidence can be execution-only where a pretrained forecasting head is not available without fine-tuning.
-- runtime certification never proves Hit@±1 improvement or baseline superiority.
-
-Always inspect the per-model `audit/tsfm-runtime/<model>/runtime-certification.json` before promotion to an experiment lane.
-
-### Internal aggregate inconsistency found by this audit
-
-The same `runtime-status.json` stores `certified_models=19` and `total_models=21` but also stores:
+## 23. Verified TSFM revisions
 
 ```text
-formal_certification_rate_percent=42.9
+configs/tsfm/verified-revisions.json
 ```
 
-19 / 21 is approximately 90.5%, so that percentage field is stale or based on an older certification definition. The counters and per-model records are retained as evidence; this document does **not** rewrite the historical audit artifact. Do not quote 42.9% as the current 19/21 arithmetic certification rate without explaining the discrepancy.
+is separate from raw broad-catalog `revision_status`. A catalog entry can show UNPINNED while a reviewed external manifest exists. Conversely a pin does not prove runtime load success.
 
-## 18. Runtime pins versus `loto3 catalog --unpinned`
+## 24. Probabilistic platform
 
-`configs/tsfm/verified-revisions.json` contains explicit immutable revisions for all 21 TSFM audit identities.
-
-This can coexist with `loto3 catalog --unpinned` reporting TSFM entries as `UNPINNED` because the broad catalog's base declarations and the separate verified-revision manifest are different layers. A formal run must bind the verified revision/artifact identity; the raw broad-catalog field alone is insufficient.
-
-Do not interpret:
+Separate 72-model catalog supports families such as:
 
 ```text
-catalog revision_status=UNPINNED
+conjugate
+dynamic_conjugate
+empirical_bayes
+bayesian_regression
+hierarchical
+state_space
+changepoint
+regime_switching
+fixed_subset
+copula
+gaussian_process
+tree_bayesian
+mixture
+nonparametric
+calibration
+decision
+ensemble
+deep_probabilistic
 ```
 
-as “no pinned runtime evidence exists anywhere in the repository”. Conversely, do not interpret a verified-revision manifest as proof of load/inference success; runtime evidence is still required.
+Optional backend mapping includes builtin, PyMC, PyMC-BART, NumPyro/JAX, Pyro/Torch, CmdStanPy, BlackJAX/JAX and TensorFlow Probability.
 
-## 19. What `pyproject.toml` actually installs
-
-| lane | actual dependency intent |
-|---|---|
-| core | NumPy, pandas, Pydantic, scikit-learn, SciPy, NeuralForecast 3.2.0, Torch 2.9.1, Transformers 4.57.6, HF Hub, PyArrow, etc. |
-| `auto-campaign` | Optuna + StatsForecast + psutil |
-| `full` | LightGBM/XGBoost/CatBoost/StatsForecast/MLForecast/HierarchicalForecast/NeuralForecast/Optuna/Ray/telemetry/etc. |
-| `frameworks` | Darts, GluonTS, Lightning, sktime, skforecast, ReservoirPy |
-| `tsfm` | Transformers, Accelerate, Chronos forecasting |
-
-Several heavy/provider-specific integrations use their own `environments/**/pyproject.toml` and lockfiles. Root extras are not evidence that every isolated provider can run under one root environment.
-
-## 20. Capability levels used in this repository
-
-Use these labels when updating documentation:
-
-| level | evidence required |
-|---|---|
-| `REGISTERED` | model/library appears in an inventory/catalog |
-| `DEPENDENCY_DECLARED` | root extra or isolated environment declares package |
-| `IMPLEMENTED` | adapter/provider/worker code exists |
-| `SHARED_ROUTABLE` | normal shared research dispatch can select it |
-| `PROVIDER_ROUTABLE` | isolated provider/campaign entrypoint exists |
-| `RUNTIME_CERTIFIED` | real load/inference/runtime evidence exists for an exact identity |
-| `LOTTERY_COMPATIBLE` | runtime path is verified on the repository's lottery geometry/data contract |
-| `OOF_EVALUATED` | leakage-safe chronological OOF has actually run |
-| `HOLDOUT_EVALUATED` | authorized Holdout gate has run |
-| `PROSPECTIVE_EVALUATED` | prediction was sealed before future actual and then scored |
-| `PROMOTION_ELIGIBLE` | scientific/runtime/license/governance gates all pass |
-
-Never collapse these levels to a single `available=true` claim.
-
-## 21. Current scientific boundary
-
-This capability audit does not execute new model inference or scientific evaluation. In particular it does not change the Timer Base 84M campaign boundary tracked by Issue #239 / Linear TAJ-12:
+Examples of concrete native models in the catalog layer include:
 
 ```text
-formal_timer_oof_run=false
-holdout_opened=false
-prospective_opened=false
-accuracy_claim=false
-champion_claim=false
-promotion=false
+pp-conditional-bernoulli-fixed-k
+pp-multinomial-dglm
+pp-gaussian-copula-categorical
+pp-bocpd-dirichlet-categorical
 ```
 
-The repository contains substantially more executable model/provider code than the 174-entry inventory alone communicates, but scientific use still requires an explicit execution identity, leakage-safe protocol and evidence for the exact path being promoted.
+Use `loto3 probabilistic compatibility` before execution to validate model/game/backend support.
+
+## 25. Unified campaign after #252
+
+The campaign remains the six-game broad comparison adapter, but geometry-general scoring is now explicit:
+
+- select hits preserve set semantics;
+- digit hits preserve exact positions and repeated digits;
+- required position error metrics use geometry width.
+
+This closes the prior risk of treating Numbers3/4 as unordered sets.
+
+## 26. Downstream theory/promotion after #253
+
+New promotion evidence can use theory-aware v2 semantics. This is downstream governance, not a new model runtime route.
+
+V2 requires sealed game identity and derives the actual Hit@±1 rule target from an IID-null-relative or absolute policy. Automatic promotion/retraining/registry write remain disabled.
+
+## 27. Power planning after #254
+
+`evaluation.power_analysis` adds pre-target planning utilities. It does not alter model inventory or routing status.
+
+Use it to estimate whether a planned paired evaluation has enough draws to detect a declared effect size under the stated normal-approximation assumptions.
+
+## 28. Capability labels
+
+Use exactly:
+
+```text
+REGISTERED
+DEPENDENCY_DECLARED
+IMPLEMENTED
+SHARED_ROUTABLE
+PROVIDER_ROUTABLE
+RUNTIME_CERTIFIED
+LOTTERY_COMPATIBLE
+OOF_EVALUATED
+HOLDOUT_EVALUATED
+PROSPECTIVE_EVALUATED
+PROMOTION_ELIGIBLE
+```
+
+Never infer later stages from earlier stages.
+
+## 29. Current scientific boundary
+
+This document audits code/runtime capability. It does not execute a new formal real-data campaign.
+
+Current open workstreams identified in the live repository audit:
+
+- #239 Timer Base 84M leakage-safe OOF;
+- #118 Timer-S1 immutable runtime/certification PR-B.
+
+Holdout/Prospective/promotion remain separate authorized stages.
