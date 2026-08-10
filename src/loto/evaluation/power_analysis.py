@@ -131,6 +131,9 @@ def power_curve(
     """Return a deterministic MDE curve for pre-specified draw counts."""
     if not draw_counts or len(set(draw_counts)) != len(draw_counts):
         raise ValueError("draw_counts must be non-empty and unique")
+    for index, n_draws in enumerate(draw_counts):
+        if isinstance(n_draws, bool) or not isinstance(n_draws, int) or n_draws < 1:
+            raise ValueError(f"draw_counts[{index}] must be a positive integer")
     if tuple(sorted(draw_counts)) != draw_counts:
         raise ValueError("draw_counts must be sorted")
     rows: list[dict[str, float | int | str]] = []
