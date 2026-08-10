@@ -17,28 +17,17 @@ def test_prediction_is_persisted_and_sealed_before_actual(
         tmp_path,
         stem="candidate-seed42",
         record={
-            "schema_version":
-                "test-prediction.v1",
-            "prediction":
-                [1.25, 2.5, 3.75],
-            "target_actual_included":
-                False,
+            "schema_version": "test-prediction.v1",
+            "prediction": [1.25, 2.5, 3.75],
+            "target_actual_included": False,
         },
     )
 
-    verify_sealed_prediction(
-        sealed
-    )
+    verify_sealed_prediction(sealed)
 
-    payload = json.loads(
-        sealed.seal_path.read_text(
-            encoding="utf-8"
-        )
-    )
+    payload = json.loads(sealed.seal_path.read_text(encoding="utf-8"))
 
-    assert payload[
-        "target_actual_read"
-    ] is False
+    assert payload["target_actual_read"] is False
 
 
 def test_mutated_prediction_fails_seal_verification(
@@ -62,9 +51,7 @@ def test_mutated_prediction_fails_seal_verification(
         ValueError,
         match="SHA-256",
     ):
-        verify_sealed_prediction(
-            sealed
-        )
+        verify_sealed_prediction(sealed)
 
 
 def test_prediction_artifact_cannot_be_overwritten(
@@ -81,9 +68,7 @@ def test_prediction_artifact_cannot_be_overwritten(
         record=record,
     )
 
-    with pytest.raises(
-        FileExistsError
-    ):
+    with pytest.raises(FileExistsError):
         seal_prediction_record(
             tmp_path,
             stem="candidate",

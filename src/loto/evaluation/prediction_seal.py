@@ -6,11 +6,11 @@ import hashlib
 import json
 import os
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping
-
+from typing import Any
 
 _SAFE_STEM = re.compile(r"^[A-Za-z0-9._-]+$")
 
@@ -24,9 +24,7 @@ class SealedPrediction:
 
 
 def utc_now() -> str:
-    return datetime.now(UTC).isoformat(
-        timespec="microseconds"
-    ).replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="microseconds").replace("+00:00", "Z")
 
 
 def canonical_json_bytes(payload: Any) -> bytes:
@@ -56,6 +54,11 @@ def sha256_file(path: Path) -> str:
 
 
 def _fsync_directory(path: Path) -> None:
+    """Sync parent-directory metadata where directory descriptors are supported."""
+
+    if os.name == "nt":
+        return
+
     descriptor = os.open(path, os.O_RDONLY)
 
     try:
@@ -66,23 +69,17 @@ def _fsync_directory(path: Path) -> None:
 
 def _atomic_write_once(path: Path, payload: bytes) -> None:
     if path.exists():
-        raise FileExistsError(
-            f"refusing to overwrite immutable artifact: {path}"
-        )
+        raise FileExistsError(f"refusing to overwrite immutable artifact: {path}")
 
     path.parent.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    temporary = path.with_name(
-        f".{path.name}.{os.getpid()}.tmp"
-    )
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
 
     if temporary.exists():
-        raise FileExistsError(
-            f"temporary artifact already exists: {temporary}"
-        )
+        raise FileExistsError(f"temporary artifact already exists: {temporary}")
 
     descriptor = os.open(
         temporary,
@@ -127,25 +124,17 @@ def seal_prediction_record(
     """Persist a target-free prediction, then persist its SHA seal."""
 
     if _SAFE_STEM.fullmatch(stem) is None:
-        raise ValueError(
-            f"unsafe prediction artifact stem: {stem!r}"
-        )
+        raise ValueError(f"unsafe prediction artifact stem: {stem!r}")
 
     if record.get("target_actual_included") is not False:
-        raise ValueError(
-            "prediction record must explicitly set "
-            "target_actual_included=false"
-        )
+        raise ValueError("prediction record must explicitly set target_actual_included=false")
 
     output_dir.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    record_path = (
-        output_dir
-        / f"{stem}.prediction.json"
-    )
+    record_path = output_dir / f"{stem}.prediction.json"
 
     record_sha = write_json_once(
         record_path,
@@ -154,24 +143,16 @@ def seal_prediction_record(
 
     sealed_at = utc_now()
 
-    seal_path = (
-        output_dir
-        / f"{stem}.prediction.seal.json"
-    )
+    seal_path = output_dir / f"{stem}.prediction.seal.json"
 
     write_json_once(
         seal_path,
         {
-            "schema_version":
-                "oof-prediction-seal.v1",
-            "prediction_record":
-                record_path.name,
-            "prediction_record_sha256":
-                record_sha,
-            "sealed_at_utc":
-                sealed_at,
-            "target_actual_read":
-                False,
+            "schema_version": "oof-prediction-seal.v1",
+            "prediction_record": record_path.name,
+            "prediction_record_sha256": record_sha,
+            "sealed_at_utc": sealed_at,
+            "target_actual_read": False,
         },
     )
 
@@ -198,39 +179,20 @@ def verify_sealed_prediction(
     if not sealed.seal_path.is_file():
         raise FileNotFoundError(sealed.seal_path)
 
-    seal = json.loads(
-        sealed.seal_path.read_text(
-            encoding="utf-8"
-        )
-    )
+    seal = json.loads(sealed.seal_path.read_text(encoding="utf-8"))
 
-    if (
-        seal["prediction_record"]
-        != sealed.record_path.name
-    ):
-        raise ValueError(
-            "seal prediction path mismatch"
-        )
+    if seal["prediction_record"] != sealed.record_path.name:
+        raise ValueError("seal prediction path mismatch")
 
-    actual_sha = sha256_file(
-        sealed.record_path
-    )
+    actual_sha = sha256_file(sealed.record_path)
 
-    expected_sha = seal[
-        "prediction_record_sha256"
-    ]
+    expected_sha = seal["prediction_record_sha256"]
 
     if actual_sha != expected_sha:
-        raise ValueError(
-            "prediction record SHA-256 mismatch"
-        )
+        raise ValueError("prediction record SHA-256 mismatch")
 
     if actual_sha != sealed.record_sha256:
-        raise ValueError(
-            "sealed prediction object SHA mismatch"
-        )
+        raise ValueError("sealed prediction object SHA mismatch")
 
     if seal["target_actual_read"] is not False:
-        raise ValueError(
-            "prediction seal is not pre-actual"
-        )
+        raise ValueError("prediction seal is not pre-actual")

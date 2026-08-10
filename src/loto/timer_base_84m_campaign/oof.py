@@ -43,6 +43,8 @@ from loto.timer_base_84m_campaign.chronology import (
 )
 from loto.timer_base_84m_campaign.geometry import (
     Game,
+)
+from loto.timer_base_84m_campaign.geometry import (
     geometry_for as timer_geometry_for,
 )
 from loto.timer_base_84m_campaign.provenance import (
@@ -56,7 +58,6 @@ from loto.timer_base_84m_campaign.provenance import (
     TRANSFORMERS_VERSION,
     WEIGHT_SHA256,
 )
-
 
 _SAFE_ID = re.compile(r"^[A-Za-z0-9._-]+$")
 
@@ -100,9 +101,7 @@ class TargetBundleResult:
 def _position_columns(
     game_id: str,
 ) -> tuple[str, ...]:
-    geometry = timer_geometry_for(
-        Game(game_id)
-    )
+    geometry = timer_geometry_for(Game(game_id))
 
     return tuple(
         f"N{index}"
@@ -120,18 +119,13 @@ class DevelopmentSnapshotReader:
         self,
         snapshot_root: Path,
     ) -> None:
-        self.snapshot_root = (
-            snapshot_root.expanduser().resolve()
-        )
+        self.snapshot_root = snapshot_root.expanduser().resolve()
 
     def _path(
         self,
         game_id: str,
     ) -> Path:
-        path = (
-            self.snapshot_root
-            / f"{game_id}.parquet"
-        )
+        path = self.snapshot_root / f"{game_id}.parquet"
 
         if not path.is_file():
             raise FileNotFoundError(path)
@@ -145,15 +139,10 @@ class DevelopmentSnapshotReader:
         target_draw_no: int,
         context_length: int,
     ) -> pd.DataFrame:
-        first_draw = (
-            target_draw_no
-            - context_length
-        )
+        first_draw = target_draw_no - context_length
 
         if first_draw < 1:
-            raise ValueError(
-                "context extends before draw 1"
-            )
+            raise ValueError("context extends before draw 1")
 
         columns = (
             "game_id",
@@ -190,59 +179,34 @@ class DevelopmentSnapshotReader:
             )
         )
 
-        actual_draws = (
-            frame["draw_no"]
-            .astype(int)
-            .tolist()
-        )
+        actual_draws = frame["draw_no"].astype(int).tolist()
 
         if actual_draws != expected_draws:
-            raise ValueError(
-                "context draw identities are "
-                "missing, duplicated, or unordered"
-            )
+            raise ValueError("context draw identities are missing, duplicated, or unordered")
 
         if len(frame) != context_length:
-            raise ValueError(
-                "context length mismatch"
-            )
+            raise ValueError("context length mismatch")
 
-        if set(
-            frame["game_id"].astype(str)
-        ) != {game_id}:
-            raise ValueError(
-                "context game identity mismatch"
-            )
+        if set(frame["game_id"].astype(str)) != {game_id}:
+            raise ValueError("context game identity mismatch")
 
         dates = pd.to_datetime(
             frame["ds"],
             errors="raise",
         )
 
-        if (
-            not dates.is_monotonic_increasing
-            or dates.duplicated().any()
-        ):
-            raise ValueError(
-                "context dates must be unique "
-                "and strictly increasing"
-            )
+        if not dates.is_monotonic_increasing or dates.duplicated().any():
+            raise ValueError("context dates must be unique and strictly increasing")
 
         values = frame.loc[
             :,
-            list(
-                _position_columns(game_id)
-            ),
+            list(_position_columns(game_id)),
         ].to_numpy(dtype=float)
 
         if not np.isfinite(values).all():
-            raise ValueError(
-                "context contains non-finite values"
-            )
+            raise ValueError("context contains non-finite values")
 
-        return frame.reset_index(
-            drop=True
-        )
+        return frame.reset_index(drop=True)
 
     def read_actual(
         self,
@@ -253,15 +217,10 @@ class DevelopmentSnapshotReader:
         seals: Sequence[SealedPrediction],
     ) -> ActualReveal:
         if not seals:
-            raise ValueError(
-                "actual reveal requires at least "
-                "one prediction seal"
-            )
+            raise ValueError("actual reveal requires at least one prediction seal")
 
         for sealed in seals:
-            verify_sealed_prediction(
-                sealed
-            )
+            verify_sealed_prediction(sealed)
 
         columns = (
             "game_id",
@@ -284,45 +243,25 @@ class DevelopmentSnapshotReader:
         )
 
         if len(frame) != 1:
-            raise ValueError(
-                "target actual identity is not unique"
-            )
+            raise ValueError("target actual identity is not unique")
 
         row = frame.iloc[0]
 
         if str(row["game_id"]) != game_id:
-            raise ValueError(
-                "target actual game mismatch"
-            )
+            raise ValueError("target actual game mismatch")
 
         if int(row["draw_no"]) != target_draw_no:
-            raise ValueError(
-                "target draw identity mismatch"
-            )
+            raise ValueError("target draw identity mismatch")
 
-        target_ds = pd.Timestamp(
-            row["ds"]
-        ).date()
+        target_ds = pd.Timestamp(row["ds"]).date()
 
         if target_ds != expected_target_ds:
-            raise ValueError(
-                "target date identity mismatch"
-            )
+            raise ValueError("target date identity mismatch")
 
-        values = tuple(
-            float(row[column])
-            for column in _position_columns(
-                game_id
-            )
-        )
+        values = tuple(float(row[column]) for column in _position_columns(game_id))
 
-        if not np.isfinite(
-            np.asarray(values, dtype=float)
-        ).all():
-            raise ValueError(
-                "target actual contains "
-                "non-finite values"
-            )
+        if not np.isfinite(np.asarray(values, dtype=float)).all():
+            raise ValueError("target actual contains non-finite values")
 
         return ActualReveal(
             game_id=game_id,
@@ -342,9 +281,7 @@ def canonical_point_metrics(
     dict[str, float],
     dict[str, float],
 ]:
-    geometry = geometry_for_logical_game(
-        game_id
-    )
+    geometry = geometry_for_logical_game(game_id)
 
     actual_matrix = np.asarray(
         actual,
@@ -370,44 +307,29 @@ def canonical_point_metrics(
     )
 
     metrics = {
-        "hit_at_1":
-            float(raw["element_within_1"]),
-        "position_hit_at_1":
-            float(
-                np.mean(
-                    [
-                        raw[
-                            f"position_{index}_within_1"
-                        ]
-                        for index in range(
-                            1,
-                            geometry.positions + 1,
-                        )
-                    ]
-                )
-            ),
-        "all_positions_hit_at_1":
-            float(raw["row_within_1"]),
-        "mae":
-            float(raw["position_mae"]),
-        "mse":
-            float(raw["position_mse"]),
-        "rmse":
-            float(raw["position_rmse"]),
+        "hit_at_1": float(raw["element_within_1"]),
+        "position_hit_at_1": float(
+            np.mean(
+                [
+                    raw[f"position_{index}_within_1"]
+                    for index in range(
+                        1,
+                        geometry.positions + 1,
+                    )
+                ]
+            )
+        ),
+        "all_positions_hit_at_1": float(raw["row_within_1"]),
+        "mae": float(raw["position_mae"]),
+        "mse": float(raw["position_mse"]),
+        "rmse": float(raw["position_rmse"]),
     }
 
     if tuple(metrics) != REQUIRED_POINT_METRICS:
-        raise RuntimeError(
-            "canonical metric inventory mismatch"
-        )
+        raise RuntimeError("canonical metric inventory mismatch")
 
     by_position = {
-        f"N{index}":
-            float(
-                raw[
-                    f"position_{index}_within_1"
-                ]
-            )
+        f"N{index}": float(raw[f"position_{index}_within_1"])
         for index in range(
             1,
             geometry.positions + 1,
@@ -425,29 +347,15 @@ def build_timer_request(
     request_run_id: str,
     artifact_paths: ArtifactPaths,
 ) -> TimerRequest:
-    if _SAFE_ID.fullmatch(
-        request_run_id
-    ) is None:
-        raise ValueError(
-            f"unsafe run id: {request_run_id!r}"
-        )
+    if _SAFE_ID.fullmatch(request_run_id) is None:
+        raise ValueError(f"unsafe run id: {request_run_id!r}")
 
     timer_game = Game(game_id)
     columns = _position_columns(game_id)
 
-    draw_numbers = tuple(
-        int(value)
-        for value in context[
-            "draw_no"
-        ].tolist()
-    )
+    draw_numbers = tuple(int(value) for value in context["draw_no"].tolist())
 
-    dates = tuple(
-        pd.Timestamp(value).date()
-        for value in context[
-            "ds"
-        ].tolist()
-    )
+    dates = tuple(pd.Timestamp(value).date() for value in context["ds"].tolist())
 
     mapping_sha = validate_chronology(
         game=timer_game,
@@ -472,75 +380,40 @@ def build_timer_request(
         gap_free=True,
     )
 
-    series = tuple(
-        tuple(
-            float(value)
-            for value in context[
-                column
-            ].tolist()
-        )
-        for column in columns
-    )
+    series = tuple(tuple(float(value) for value in context[column].tolist()) for column in columns)
 
     payload = {
-        "schema_version":
-            "timer-base-84m.request.v1",
-        "run_id":
-            request_run_id,
-        "operation":
-            "predict",
-        "model_id":
-            MODEL_ID,
-        "repo_id":
-            REPO_ID,
-        "package_version":
-            TRANSFORMERS_VERSION,
-        "source_revision":
-            SOURCE_REVISION,
-        "observed_source_head":
-            OBSERVED_SOURCE_HEAD,
-        "model_revision":
-            MODEL_REVISION,
-        "config_sha256":
-            CONFIG_SHA256,
-        "weight_sha256":
-            WEIGHT_SHA256,
-        "license":
-            LICENSE,
-        "game":
-            timer_game,
-        "target_layout":
-            spec.target_layout,
-        "context_length":
+        "schema_version": "timer-base-84m.request.v1",
+        "run_id": request_run_id,
+        "operation": "predict",
+        "model_id": MODEL_ID,
+        "repo_id": REPO_ID,
+        "package_version": TRANSFORMERS_VERSION,
+        "source_revision": SOURCE_REVISION,
+        "observed_source_head": OBSERVED_SOURCE_HEAD,
+        "model_revision": MODEL_REVISION,
+        "config_sha256": CONFIG_SHA256,
+        "weight_sha256": WEIGHT_SHA256,
+        "license": LICENSE,
+        "game": timer_game,
+        "target_layout": spec.target_layout,
+        "context_length": len(context),
+        "prediction_length": 1,
+        "seed": spec.seed,
+        "requested_device": spec.requested_device,
+        "input_shape": (
+            len(columns),
             len(context),
-        "prediction_length":
-            1,
-        "seed":
-            spec.seed,
-        "requested_device":
-            spec.requested_device,
-        "input_shape":
-            (
-                len(columns),
-                len(context),
-            ),
-        "series":
-            series,
-        "past_covariates":
-            None,
-        "known_future_covariates":
-            None,
-        "chronology_evidence":
-            chronology,
-        "actuals_used":
-            False,
-        "artifact_paths":
-            artifact_paths,
+        ),
+        "series": series,
+        "past_covariates": None,
+        "known_future_covariates": None,
+        "chronology_evidence": chronology,
+        "actuals_used": False,
+        "artifact_paths": artifact_paths,
     }
 
-    return TimerRequest.model_validate(
-        payload
-    )
+    return TimerRequest.model_validate(payload)
 
 
 def _score_payload(
@@ -553,49 +426,27 @@ def _score_payload(
     prediction_id: str,
     predicted: Sequence[float],
 ) -> dict[str, object]:
-    metrics, by_position = (
-        canonical_point_metrics(
-            game_id=game_id,
-            actual=actual.values,
-            predicted=predicted,
-        )
+    metrics, by_position = canonical_point_metrics(
+        game_id=game_id,
+        actual=actual.values,
+        predicted=predicted,
     )
 
-    if (
-        actual.actual_read_at_utc
-        < sealed.sealed_at_utc
-    ):
-        raise RuntimeError(
-            "actual read timestamp precedes "
-            "prediction seal timestamp"
-        )
+    if actual.actual_read_at_utc < sealed.sealed_at_utc:
+        raise RuntimeError("actual read timestamp precedes prediction seal timestamp")
 
     return {
-        "prediction_id":
-            prediction_id,
-        "game_id":
-            game_id,
-        "target_draw_no":
-            target_draw_no,
-        "target_ds":
-            target_ds.isoformat(),
-        "prediction_record_sha256":
-            sealed.record_sha256,
-        "prediction_sealed_at_utc":
-            sealed.sealed_at_utc,
-        "actual_read_at_utc":
-            actual.actual_read_at_utc,
-        "target_actual":
-            list(actual.values),
-        "prediction":
-            [
-                float(value)
-                for value in predicted
-            ],
-        "metrics":
-            metrics,
-        "position_hit_at_1":
-            by_position,
+        "prediction_id": prediction_id,
+        "game_id": game_id,
+        "target_draw_no": target_draw_no,
+        "target_ds": target_ds.isoformat(),
+        "prediction_record_sha256": sealed.record_sha256,
+        "prediction_sealed_at_utc": sealed.sealed_at_utc,
+        "actual_read_at_utc": actual.actual_read_at_utc,
+        "target_actual": list(actual.values),
+        "prediction": [float(value) for value in predicted],
+        "metrics": metrics,
+        "position_hit_at_1": by_position,
     }
 
 
@@ -649,36 +500,21 @@ def run_baseline_target_bundle(
 
     for prediction in predictions:
         record = {
-            "schema_version":
-                "oof-baseline-prediction.v1",
-            "run_id":
-                run_id,
-            "prediction_id":
-                prediction.prediction_id,
-            "candidate_type":
-                "baseline",
-            "baseline_id":
-                prediction.baseline_id,
-            "seed":
-                prediction.seed,
-            "game_id":
-                game_id,
-            "target_draw_no":
-                target_draw_no,
-            "target_ds_identity":
-                target_ds.isoformat(),
-            "context_first_draw_no":
-                int(context.iloc[0]["draw_no"]),
-            "context_last_draw_no":
-                int(context.iloc[-1]["draw_no"]),
-            "prediction":
-                list(prediction.values),
-            "post_processing":
-                "raw_point_no_transform",
-            "reconciliation":
-                "none",
-            "target_actual_included":
-                False,
+            "schema_version": "oof-baseline-prediction.v1",
+            "run_id": run_id,
+            "prediction_id": prediction.prediction_id,
+            "candidate_type": "baseline",
+            "baseline_id": prediction.baseline_id,
+            "seed": prediction.seed,
+            "game_id": game_id,
+            "target_draw_no": target_draw_no,
+            "target_ds_identity": target_ds.isoformat(),
+            "context_first_draw_no": int(context.iloc[0]["draw_no"]),
+            "context_last_draw_no": int(context.iloc[-1]["draw_no"]),
+            "prediction": list(prediction.values),
+            "post_processing": "raw_point_no_transform",
+            "reconciliation": "none",
+            "target_actual_included": False,
         }
 
         sealed = seal_prediction_record(
@@ -694,11 +530,7 @@ def run_baseline_target_bundle(
             )
         )
 
-    seals = tuple(
-        sealed
-        for _, sealed
-        in sealed_pairs
-    )
+    seals = tuple(sealed for _, sealed in sealed_pairs)
 
     actual = reader.read_actual(
         game_id=game_id,
@@ -714,38 +546,25 @@ def run_baseline_target_bundle(
             target_ds=target_ds,
             actual=actual,
             sealed=sealed,
-            prediction_id=
-                prediction.prediction_id,
+            prediction_id=prediction.prediction_id,
             predicted=prediction.values,
         )
-        for prediction, sealed
-        in sealed_pairs
+        for prediction, sealed in sealed_pairs
     ]
 
-    score_path = (
-        output_dir
-        / "SCORES.json"
-    )
+    score_path = output_dir / "SCORES.json"
 
     score_sha = write_json_once(
         score_path,
         {
-            "schema_version":
-                "oof-baseline-target-scores.v1",
-            "run_id":
-                run_id,
-            "game_id":
-                game_id,
-            "target_draw_no":
-                target_draw_no,
-            "target_ds":
-                target_ds.isoformat(),
-            "all_predictions_sealed_before_actual":
-                True,
-            "actual_read_at_utc":
-                actual.actual_read_at_utc,
-            "scores":
-                scores,
+            "schema_version": "oof-baseline-target-scores.v1",
+            "run_id": run_id,
+            "game_id": game_id,
+            "target_draw_no": target_draw_no,
+            "target_ds": target_ds.isoformat(),
+            "all_predictions_sealed_before_actual": True,
+            "actual_read_at_utc": actual.actual_read_at_utc,
+            "scores": scores,
         },
     )
 
@@ -772,9 +591,7 @@ def run_timer_target_bundle(
     """Seal every Timer layout/seed prediction before actual reveal."""
 
     if not specs:
-        raise ValueError(
-            "Timer prediction specs must not be empty"
-        )
+        raise ValueError("Timer prediction specs must not be empty")
 
     if output_dir.exists():
         raise FileExistsError(output_dir)
@@ -799,41 +616,20 @@ def run_timer_target_bundle(
         ]
     ] = []
 
-    for index, spec in enumerate(
-        specs
-    ):
-        if _SAFE_ID.fullmatch(
-            spec.candidate_id
-        ) is None:
-            raise ValueError(
-                "unsafe candidate ID"
-            )
+    for index, spec in enumerate(specs):
+        if _SAFE_ID.fullmatch(spec.candidate_id) is None:
+            raise ValueError("unsafe candidate ID")
 
-        request_run_id = (
-            f"{run_id}-d{target_draw_no}"
-            f"-c{index}-s{spec.seed}"
-        )
+        request_run_id = f"{run_id}-d{target_draw_no}-c{index}-s{spec.seed}"
 
         if len(request_run_id) > 128:
-            raise ValueError(
-                "derived Timer run ID is too long"
-            )
+            raise ValueError("derived Timer run ID is too long")
 
         artifact_paths = ArtifactPaths(
-            request_path=(
-                f"targets/{target_draw_no}/"
-                f"{spec.candidate_id}/request.json"
-            ),
-            response_path=(
-                f"targets/{target_draw_no}/"
-                f"{spec.candidate_id}/response.json"
-            ),
-            snapshot_path=(
-                "runtime/timer-base-84m/snapshot"
-            ),
-            manifest_path=(
-                "runtime/timer-base-84m/manifest.json"
-            ),
+            request_path=(f"targets/{target_draw_no}/{spec.candidate_id}/request.json"),
+            response_path=(f"targets/{target_draw_no}/{spec.candidate_id}/response.json"),
+            snapshot_path=("runtime/timer-base-84m/snapshot"),
+            manifest_path=("runtime/timer-base-84m/manifest.json"),
         )
 
         request = build_timer_request(
@@ -844,49 +640,32 @@ def run_timer_target_bundle(
             artifact_paths=artifact_paths,
         )
 
-        response = predictor(
-            request
-        )
+        response = predictor(request)
 
         if response.status != "PREDICTED":
-            raise RuntimeError(
-                "Timer predictor did not return "
-                "PREDICTED"
-            )
+            raise RuntimeError("Timer predictor did not return PREDICTED")
 
         if response.actuals_used is not False:
-            raise RuntimeError(
-                "Timer response claims actual use"
-            )
+            raise RuntimeError("Timer response claims actual use")
 
         if response.cpu_fallback is not False:
-            raise RuntimeError(
-                "Timer CPU fallback is forbidden"
-            )
+            raise RuntimeError("Timer CPU fallback is forbidden")
 
         prediction_array = np.asarray(
             response.point_forecast,
             dtype=float,
         )
 
-        expected_positions = len(
-            _position_columns(game_id)
-        )
+        expected_positions = len(_position_columns(game_id))
 
         if prediction_array.shape != (
             expected_positions,
             1,
         ):
-            raise RuntimeError(
-                "unexpected Timer prediction shape"
-            )
+            raise RuntimeError("unexpected Timer prediction shape")
 
-        if not np.isfinite(
-            prediction_array
-        ).all():
-            raise RuntimeError(
-                "non-finite Timer prediction"
-            )
+        if not np.isfinite(prediction_array).all():
+            raise RuntimeError("non-finite Timer prediction")
 
         prediction = tuple(
             float(value)
@@ -897,46 +676,25 @@ def run_timer_target_bundle(
         )
 
         record = {
-            "schema_version":
-                "oof-timer-prediction.v1",
-            "run_id":
-                run_id,
-            "prediction_id":
-                spec.candidate_id,
-            "candidate_type":
-                "timer-base-84m",
-            "game_id":
-                game_id,
-            "target_draw_no":
-                target_draw_no,
-            "target_ds_identity":
-                target_ds.isoformat(),
-            "target_layout":
-                spec.target_layout,
-            "seed":
-                spec.seed,
-            "requested_device":
-                spec.requested_device,
-            "prediction":
-                list(prediction),
-            "timer_prediction_sha256_f32":
-                response.prediction_sha256_f32,
-            "timer_response":
-                response.model_dump(
-                    mode="json"
-                ),
-            "post_processing":
-                "raw_point_no_transform",
-            "reconciliation":
-                "none",
-            "target_actual_included":
-                False,
+            "schema_version": "oof-timer-prediction.v1",
+            "run_id": run_id,
+            "prediction_id": spec.candidate_id,
+            "candidate_type": "timer-base-84m",
+            "game_id": game_id,
+            "target_draw_no": target_draw_no,
+            "target_ds_identity": target_ds.isoformat(),
+            "target_layout": spec.target_layout,
+            "seed": spec.seed,
+            "requested_device": spec.requested_device,
+            "prediction": list(prediction),
+            "timer_prediction_sha256_f32": response.prediction_sha256_f32,
+            "timer_response": response.model_dump(mode="json"),
+            "post_processing": "raw_point_no_transform",
+            "reconciliation": "none",
+            "target_actual_included": False,
         }
 
-        stem = (
-            f"{spec.candidate_id}"
-            f"-seed{spec.seed}"
-        )
+        stem = f"{spec.candidate_id}-seed{spec.seed}"
 
         sealed = seal_prediction_record(
             output_dir / "predictions",
@@ -953,10 +711,7 @@ def run_timer_target_bundle(
             )
         )
 
-    seals = tuple(
-        item[3]
-        for item in sealed_predictions
-    )
+    seals = tuple(item[3] for item in sealed_predictions)
 
     actual = reader.read_actual(
         game_id=game_id,
@@ -979,49 +734,31 @@ def run_timer_target_bundle(
             target_ds=target_ds,
             actual=actual,
             sealed=sealed,
-            prediction_id=(
-                f"{spec.candidate_id}"
-                f"-seed{spec.seed}"
-            ),
+            prediction_id=(f"{spec.candidate_id}-seed{spec.seed}"),
             predicted=prediction,
         )
 
-        score[
-            "timer_prediction_sha256_f32"
-        ] = response.prediction_sha256_f32
+        score["timer_prediction_sha256_f32"] = response.prediction_sha256_f32
 
-        score[
-            "target_layout"
-        ] = spec.target_layout
+        score["target_layout"] = spec.target_layout
 
         score["seed"] = spec.seed
 
         scores.append(score)
 
-    score_path = (
-        output_dir
-        / "SCORES.json"
-    )
+    score_path = output_dir / "SCORES.json"
 
     score_sha = write_json_once(
         score_path,
         {
-            "schema_version":
-                "oof-timer-target-scores.v1",
-            "run_id":
-                run_id,
-            "game_id":
-                game_id,
-            "target_draw_no":
-                target_draw_no,
-            "target_ds":
-                target_ds.isoformat(),
-            "all_predictions_sealed_before_actual":
-                True,
-            "actual_read_at_utc":
-                actual.actual_read_at_utc,
-            "scores":
-                scores,
+            "schema_version": "oof-timer-target-scores.v1",
+            "run_id": run_id,
+            "game_id": game_id,
+            "target_draw_no": target_draw_no,
+            "target_ds": target_ds.isoformat(),
+            "all_predictions_sealed_before_actual": True,
+            "actual_read_at_utc": actual.actual_read_at_utc,
+            "scores": scores,
         },
     )
 
@@ -1037,25 +774,10 @@ def verify_target_bundle(
     result: TargetBundleResult,
 ) -> None:
     for sealed in result.seals:
-        verify_sealed_prediction(
-            sealed
-        )
+        verify_sealed_prediction(sealed)
 
-        if (
-            result.actual_reveal
-            .actual_read_at_utc
-            < sealed.sealed_at_utc
-        ):
-            raise ValueError(
-                "actual was read before prediction seal"
-            )
+        if result.actual_reveal.actual_read_at_utc < sealed.sealed_at_utc:
+            raise ValueError("actual was read before prediction seal")
 
-    if (
-        sha256_file(
-            result.score_path
-        )
-        != result.score_sha256
-    ):
-        raise ValueError(
-            "score artifact SHA mismatch"
-        )
+    if sha256_file(result.score_path) != result.score_sha256:
+        raise ValueError("score artifact SHA mismatch")

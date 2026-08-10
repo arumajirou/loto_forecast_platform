@@ -56,9 +56,7 @@ def _validated_history(
     if matrix.shape[0] < 1:
         raise ValueError("history must contain at least one draw")
     if matrix.shape[1] != geometry.positions:
-        raise ValueError(
-            f"history has {matrix.shape[1]} positions; expected {geometry.positions}"
-        )
+        raise ValueError(f"history has {matrix.shape[1]} positions; expected {geometry.positions}")
     if not np.isfinite(matrix).all():
         raise ValueError("history contains non-finite values")
     if not np.equal(matrix, np.rint(matrix)).all():
@@ -155,9 +153,7 @@ def _ar1_prediction(history: np.ndarray) -> np.ndarray:
                 rcond=None,
             )[0]
 
-            prediction = float(
-                intercept + coefficient * values[-1]
-            )
+            prediction = float(intercept + coefficient * values[-1])
 
             if not np.isfinite(prediction):
                 prediction = float(values[-1])
@@ -221,18 +217,13 @@ def predict_raw_baselines(
             RawBaselinePrediction(
                 baseline_id=baseline_id,
                 seed=None,
-                values=tuple(
-                    float(value)
-                    for value in deterministic[baseline_id]
-                ),
+                values=tuple(float(value) for value in deterministic[baseline_id]),
             )
         )
 
     actual_ids = {item.baseline_id for item in predictions}
 
     if actual_ids != set(REQUIRED_BASELINE_IDS):
-        raise RuntimeError(
-            f"baseline inventory mismatch: {sorted(actual_ids)}"
-        )
+        raise RuntimeError(f"baseline inventory mismatch: {sorted(actual_ids)}")
 
     return tuple(predictions)

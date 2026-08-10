@@ -46,32 +46,15 @@ def test_raw_baseline_inventory_and_repeatability() -> None:
     assert left == right
     assert len(left) == 9
 
-    assert {
-        item.baseline_id
-        for item in left
-    } == set(REQUIRED_BASELINE_IDS)
+    assert {item.baseline_id for item in left} == set(REQUIRED_BASELINE_IDS)
 
-    random = [
-        item
-        for item in left
-        if item.baseline_id == "random"
-    ]
+    random = [item for item in left if item.baseline_id == "random"]
 
-    assert [
-        item.seed
-        for item in random
-    ] == list(seeds)
+    assert [item.seed for item in random] == list(seeds)
 
-    deterministic = [
-        item
-        for item in left
-        if item.baseline_id != "random"
-    ]
+    deterministic = [item for item in left if item.baseline_id != "random"]
 
-    assert all(
-        item.seed is None
-        for item in deterministic
-    )
+    assert all(item.seed is None for item in deterministic)
 
 
 def test_fixed_digit_baseline_remains_raw_float() -> None:
@@ -82,11 +65,7 @@ def test_fixed_digit_baseline_remains_raw_float() -> None:
         seeds=(42,),
     )
 
-    fixed = next(
-        item
-        for item in predictions
-        if item.baseline_id == "fixed"
-    )
+    fixed = next(item for item in predictions if item.baseline_id == "fixed")
 
     assert fixed.values == (
         4.5,
