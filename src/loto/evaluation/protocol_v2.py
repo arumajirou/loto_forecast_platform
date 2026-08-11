@@ -229,22 +229,18 @@ class LegacyProtocolV1:
 
 
 def _canonical_json_default(value: Any) -> dict[str, str]:
-    """Encode explicitly supported runtime-evidence objects deterministically.
+    """Encode the observed NeuralForecast MAE runtime-evidence object deterministically.
 
     Formal protocol models are already JSON-native through ``model_dump(mode="json")``.
-    The fallback is intentionally narrow: NeuralForecast loss modules may appear in
-    runtime metadata (for example ``MAE()``) after a successful fit/predict.  Encoding
-    their qualified type and stable module ``repr`` keeps campaign evidence writable
-    without turning arbitrary Python objects into silently accepted protocol content.
+    The fallback remains intentionally narrow: the broad runtime audit demonstrated that
+    ``MAE()`` is copied into worker metadata after successful NeuralForecast fit/predict.
+    No other arbitrary Python object is accepted here.
     """
 
     value_type = type(value)
     module = value_type.__module__
-    if module.startswith("neuralforecast.losses."):
-        return {
-            "__python_type__": f"{module}.{value_type.__qualname__}",
-            "__repr__": repr(value),
-        }
+    if module.startswith("neuralforecast.losses.") and value_type.__qualname__ == "MAE":
+        return {"__python_type__": f"{module}.MAE"}
     raise TypeError(f"Object of type {value_type.__name__} is not JSON serializable")
 
 
