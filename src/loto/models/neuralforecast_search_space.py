@@ -9,6 +9,7 @@ import os
 import uuid
 from collections.abc import Callable
 from enum import StrEnum
+from numbers import Real
 from pathlib import Path
 from typing import Any
 
@@ -155,7 +156,14 @@ def profile_ray_config(
             )
             continue
         low, high = getattr(value, "lower", None), getattr(value, "upper", None)
-        if low is None or high is None:
+        if (
+            low is None
+            or high is None
+            or isinstance(low, bool)
+            or isinstance(high, bool)
+            or not isinstance(low, Real)
+            or not isinstance(high, Real)
+        ):
             dimensions.append(_constant(name, value))
             continue
         integer = "integer" in type(value).__name__.lower()
