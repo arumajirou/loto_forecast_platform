@@ -1,0 +1,358 @@
+{
+  "formal_pass": true,
+  "models": [
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "AutoARIMA",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "AutoETS",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "season_length": 4
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "AutoCES",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "season_length": 4
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "AutoTheta",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "AutoMFLES",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "n_windows": 2,
+        "season_length": [
+          4
+        ],
+        "test_size": 4
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "AutoTBATS",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "season_length": [
+          4
+        ]
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "ARIMA",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "order": [
+          1,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "AutoRegressive",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "lags": 1
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "SimpleExponentialSmoothing",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "alpha": 0.3
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "SimpleExponentialSmoothingOptimized",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "SeasonalExponentialSmoothing",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "alpha": 0.3,
+        "season_length": 4
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "SeasonalExponentialSmoothingOptimized",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "season_length": 4
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "Holt",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "HoltWinters",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "season_length": 4
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "HistoricAverage",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "Naive",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "RandomWalkWithDrift",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "SeasonalNaive",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "season_length": 4
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "ConformalSeasonalPool",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "n_samples": 200,
+        "season_length": 4
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "WindowAverage",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "window_size": 3
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "SeasonalWindowAverage",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "season_length": 4,
+        "window_size": 2
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "ADIDA",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "CrostonClassic",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "CrostonOptimized",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "CrostonSBA",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "IMAPA",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "TSB",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "alpha_d": 0.3,
+        "alpha_p": 0.3
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "MSTL",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "season_length": [
+          4
+        ]
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "MFLES",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "TBATS",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "season_length": [
+          4
+        ]
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "Theta",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "OptimizedTheta",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "DynamicTheta",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "DynamicOptimizedTheta",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "GARCH",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "ARCH",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "SklearnModel",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "model": {
+          "class": "sklearn.linear_model._base.LinearRegression",
+          "params": {
+            "copy_X": true,
+            "fit_intercept": true,
+            "n_jobs": null,
+            "positive": false,
+            "tol": 1e-06
+          }
+        }
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "ConstantModel",
+      "property_status": "VERIFIED",
+      "requested_parameters": {
+        "constant": 1.0
+      }
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "ZeroModel",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "EXPECTED_NOT_APPLICABLE",
+      "model_name": "NaNModel",
+      "property_status": "EXPECTED_NEGATIVE_CONTROL",
+      "requested_parameters": {}
+    },
+    {
+      "constructed_match": true,
+      "fit_status": "VERIFIED",
+      "model_name": "UCM",
+      "property_status": "VERIFIED",
+      "requested_parameters": {}
+    }
+  ],
+  "schema_version": 1
+}

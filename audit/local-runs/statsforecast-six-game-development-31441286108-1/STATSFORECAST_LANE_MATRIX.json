@@ -1,0 +1,1724 @@
+[
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoarima",
+    "model_name": "AutoARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoets",
+    "model_name": "AutoETS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoces",
+    "model_name": "AutoCES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotheta",
+    "model_name": "AutoTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-automfles",
+    "model_name": "AutoMFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotbats",
+    "model_name": "AutoTBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arima",
+    "model_name": "ARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoregressive",
+    "model_name": "AutoRegressive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothing",
+    "model_name": "SimpleExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothingoptimized",
+    "model_name": "SimpleExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothing",
+    "model_name": "SeasonalExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothingoptimized",
+    "model_name": "SeasonalExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holt",
+    "model_name": "Holt",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holtwinters",
+    "model_name": "HoltWinters",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-historicaverage",
+    "model_name": "HistoricAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-naive",
+    "model_name": "Naive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-randomwalkwithdrift",
+    "model_name": "RandomWalkWithDrift",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalnaive",
+    "model_name": "SeasonalNaive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-conformalseasonalpool",
+    "model_name": "ConformalSeasonalPool",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-windowaverage",
+    "model_name": "WindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalwindowaverage",
+    "model_name": "SeasonalWindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-adida",
+    "model_name": "ADIDA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonclassic",
+    "model_name": "CrostonClassic",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonoptimized",
+    "model_name": "CrostonOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonsba",
+    "model_name": "CrostonSBA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-imapa",
+    "model_name": "IMAPA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tsb",
+    "model_name": "TSB",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mstl",
+    "model_name": "MSTL",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mfles",
+    "model_name": "MFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tbats",
+    "model_name": "TBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-theta",
+    "model_name": "Theta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-optimizedtheta",
+    "model_name": "OptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamictheta",
+    "model_name": "DynamicTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamicoptimizedtheta",
+    "model_name": "DynamicOptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-garch",
+    "model_name": "GARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arch",
+    "model_name": "ARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "EXOGENOUS",
+    "model_id": "sf-sklearnmodel",
+    "model_name": "SklearnModel",
+    "planned_status": "DEFER_TO_EXOGENOUS_LANE"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-constantmodel",
+    "model_name": "ConstantModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-zeromodel",
+    "model_name": "ZeroModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "bingo5",
+    "lane": "EXPECTED_NEGATIVE_CONTROL",
+    "model_id": "sf-nanmodel",
+    "model_name": "NaNModel",
+    "planned_status": "EXPECTED_NEGATIVE_CONTROL"
+  },
+  {
+    "game": "bingo5",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-ucm",
+    "model_name": "UCM",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoarima",
+    "model_name": "AutoARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoets",
+    "model_name": "AutoETS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoces",
+    "model_name": "AutoCES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotheta",
+    "model_name": "AutoTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-automfles",
+    "model_name": "AutoMFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotbats",
+    "model_name": "AutoTBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arima",
+    "model_name": "ARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoregressive",
+    "model_name": "AutoRegressive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothing",
+    "model_name": "SimpleExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothingoptimized",
+    "model_name": "SimpleExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothing",
+    "model_name": "SeasonalExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothingoptimized",
+    "model_name": "SeasonalExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holt",
+    "model_name": "Holt",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holtwinters",
+    "model_name": "HoltWinters",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-historicaverage",
+    "model_name": "HistoricAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-naive",
+    "model_name": "Naive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-randomwalkwithdrift",
+    "model_name": "RandomWalkWithDrift",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalnaive",
+    "model_name": "SeasonalNaive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-conformalseasonalpool",
+    "model_name": "ConformalSeasonalPool",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-windowaverage",
+    "model_name": "WindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalwindowaverage",
+    "model_name": "SeasonalWindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-adida",
+    "model_name": "ADIDA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonclassic",
+    "model_name": "CrostonClassic",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonoptimized",
+    "model_name": "CrostonOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonsba",
+    "model_name": "CrostonSBA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-imapa",
+    "model_name": "IMAPA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tsb",
+    "model_name": "TSB",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mstl",
+    "model_name": "MSTL",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mfles",
+    "model_name": "MFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tbats",
+    "model_name": "TBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-theta",
+    "model_name": "Theta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-optimizedtheta",
+    "model_name": "OptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamictheta",
+    "model_name": "DynamicTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamicoptimizedtheta",
+    "model_name": "DynamicOptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-garch",
+    "model_name": "GARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arch",
+    "model_name": "ARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "EXOGENOUS",
+    "model_id": "sf-sklearnmodel",
+    "model_name": "SklearnModel",
+    "planned_status": "DEFER_TO_EXOGENOUS_LANE"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-constantmodel",
+    "model_name": "ConstantModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-zeromodel",
+    "model_name": "ZeroModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto6",
+    "lane": "EXPECTED_NEGATIVE_CONTROL",
+    "model_id": "sf-nanmodel",
+    "model_name": "NaNModel",
+    "planned_status": "EXPECTED_NEGATIVE_CONTROL"
+  },
+  {
+    "game": "loto6",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-ucm",
+    "model_name": "UCM",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoarima",
+    "model_name": "AutoARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoets",
+    "model_name": "AutoETS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoces",
+    "model_name": "AutoCES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotheta",
+    "model_name": "AutoTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-automfles",
+    "model_name": "AutoMFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotbats",
+    "model_name": "AutoTBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arima",
+    "model_name": "ARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoregressive",
+    "model_name": "AutoRegressive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothing",
+    "model_name": "SimpleExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothingoptimized",
+    "model_name": "SimpleExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothing",
+    "model_name": "SeasonalExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothingoptimized",
+    "model_name": "SeasonalExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holt",
+    "model_name": "Holt",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holtwinters",
+    "model_name": "HoltWinters",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-historicaverage",
+    "model_name": "HistoricAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-naive",
+    "model_name": "Naive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-randomwalkwithdrift",
+    "model_name": "RandomWalkWithDrift",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalnaive",
+    "model_name": "SeasonalNaive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-conformalseasonalpool",
+    "model_name": "ConformalSeasonalPool",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-windowaverage",
+    "model_name": "WindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalwindowaverage",
+    "model_name": "SeasonalWindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-adida",
+    "model_name": "ADIDA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonclassic",
+    "model_name": "CrostonClassic",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonoptimized",
+    "model_name": "CrostonOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonsba",
+    "model_name": "CrostonSBA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-imapa",
+    "model_name": "IMAPA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tsb",
+    "model_name": "TSB",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mstl",
+    "model_name": "MSTL",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mfles",
+    "model_name": "MFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tbats",
+    "model_name": "TBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-theta",
+    "model_name": "Theta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-optimizedtheta",
+    "model_name": "OptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamictheta",
+    "model_name": "DynamicTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamicoptimizedtheta",
+    "model_name": "DynamicOptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-garch",
+    "model_name": "GARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arch",
+    "model_name": "ARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "EXOGENOUS",
+    "model_id": "sf-sklearnmodel",
+    "model_name": "SklearnModel",
+    "planned_status": "DEFER_TO_EXOGENOUS_LANE"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-constantmodel",
+    "model_name": "ConstantModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-zeromodel",
+    "model_name": "ZeroModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "loto7",
+    "lane": "EXPECTED_NEGATIVE_CONTROL",
+    "model_id": "sf-nanmodel",
+    "model_name": "NaNModel",
+    "planned_status": "EXPECTED_NEGATIVE_CONTROL"
+  },
+  {
+    "game": "loto7",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-ucm",
+    "model_name": "UCM",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoarima",
+    "model_name": "AutoARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoets",
+    "model_name": "AutoETS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoces",
+    "model_name": "AutoCES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotheta",
+    "model_name": "AutoTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-automfles",
+    "model_name": "AutoMFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotbats",
+    "model_name": "AutoTBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arima",
+    "model_name": "ARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoregressive",
+    "model_name": "AutoRegressive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothing",
+    "model_name": "SimpleExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothingoptimized",
+    "model_name": "SimpleExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothing",
+    "model_name": "SeasonalExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothingoptimized",
+    "model_name": "SeasonalExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holt",
+    "model_name": "Holt",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holtwinters",
+    "model_name": "HoltWinters",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-historicaverage",
+    "model_name": "HistoricAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-naive",
+    "model_name": "Naive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-randomwalkwithdrift",
+    "model_name": "RandomWalkWithDrift",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalnaive",
+    "model_name": "SeasonalNaive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-conformalseasonalpool",
+    "model_name": "ConformalSeasonalPool",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-windowaverage",
+    "model_name": "WindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalwindowaverage",
+    "model_name": "SeasonalWindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-adida",
+    "model_name": "ADIDA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonclassic",
+    "model_name": "CrostonClassic",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonoptimized",
+    "model_name": "CrostonOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonsba",
+    "model_name": "CrostonSBA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-imapa",
+    "model_name": "IMAPA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tsb",
+    "model_name": "TSB",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mstl",
+    "model_name": "MSTL",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mfles",
+    "model_name": "MFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tbats",
+    "model_name": "TBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-theta",
+    "model_name": "Theta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-optimizedtheta",
+    "model_name": "OptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamictheta",
+    "model_name": "DynamicTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamicoptimizedtheta",
+    "model_name": "DynamicOptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-garch",
+    "model_name": "GARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arch",
+    "model_name": "ARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "EXOGENOUS",
+    "model_id": "sf-sklearnmodel",
+    "model_name": "SklearnModel",
+    "planned_status": "DEFER_TO_EXOGENOUS_LANE"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-constantmodel",
+    "model_name": "ConstantModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-zeromodel",
+    "model_name": "ZeroModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "mini",
+    "lane": "EXPECTED_NEGATIVE_CONTROL",
+    "model_id": "sf-nanmodel",
+    "model_name": "NaNModel",
+    "planned_status": "EXPECTED_NEGATIVE_CONTROL"
+  },
+  {
+    "game": "mini",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-ucm",
+    "model_name": "UCM",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoarima",
+    "model_name": "AutoARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoets",
+    "model_name": "AutoETS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoces",
+    "model_name": "AutoCES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotheta",
+    "model_name": "AutoTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-automfles",
+    "model_name": "AutoMFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotbats",
+    "model_name": "AutoTBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arima",
+    "model_name": "ARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoregressive",
+    "model_name": "AutoRegressive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothing",
+    "model_name": "SimpleExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothingoptimized",
+    "model_name": "SimpleExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothing",
+    "model_name": "SeasonalExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothingoptimized",
+    "model_name": "SeasonalExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holt",
+    "model_name": "Holt",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holtwinters",
+    "model_name": "HoltWinters",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-historicaverage",
+    "model_name": "HistoricAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-naive",
+    "model_name": "Naive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-randomwalkwithdrift",
+    "model_name": "RandomWalkWithDrift",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalnaive",
+    "model_name": "SeasonalNaive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-conformalseasonalpool",
+    "model_name": "ConformalSeasonalPool",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-windowaverage",
+    "model_name": "WindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalwindowaverage",
+    "model_name": "SeasonalWindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-adida",
+    "model_name": "ADIDA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonclassic",
+    "model_name": "CrostonClassic",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonoptimized",
+    "model_name": "CrostonOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonsba",
+    "model_name": "CrostonSBA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-imapa",
+    "model_name": "IMAPA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tsb",
+    "model_name": "TSB",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mstl",
+    "model_name": "MSTL",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mfles",
+    "model_name": "MFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tbats",
+    "model_name": "TBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-theta",
+    "model_name": "Theta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-optimizedtheta",
+    "model_name": "OptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamictheta",
+    "model_name": "DynamicTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamicoptimizedtheta",
+    "model_name": "DynamicOptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-garch",
+    "model_name": "GARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arch",
+    "model_name": "ARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "EXOGENOUS",
+    "model_id": "sf-sklearnmodel",
+    "model_name": "SklearnModel",
+    "planned_status": "DEFER_TO_EXOGENOUS_LANE"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-constantmodel",
+    "model_name": "ConstantModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-zeromodel",
+    "model_name": "ZeroModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers3",
+    "lane": "EXPECTED_NEGATIVE_CONTROL",
+    "model_id": "sf-nanmodel",
+    "model_name": "NaNModel",
+    "planned_status": "EXPECTED_NEGATIVE_CONTROL"
+  },
+  {
+    "game": "numbers3",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-ucm",
+    "model_name": "UCM",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoarima",
+    "model_name": "AutoARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoets",
+    "model_name": "AutoETS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoces",
+    "model_name": "AutoCES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotheta",
+    "model_name": "AutoTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-automfles",
+    "model_name": "AutoMFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autotbats",
+    "model_name": "AutoTBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arima",
+    "model_name": "ARIMA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-autoregressive",
+    "model_name": "AutoRegressive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothing",
+    "model_name": "SimpleExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-simpleexponentialsmoothingoptimized",
+    "model_name": "SimpleExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothing",
+    "model_name": "SeasonalExponentialSmoothing",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalexponentialsmoothingoptimized",
+    "model_name": "SeasonalExponentialSmoothingOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holt",
+    "model_name": "Holt",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-holtwinters",
+    "model_name": "HoltWinters",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-historicaverage",
+    "model_name": "HistoricAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-naive",
+    "model_name": "Naive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-randomwalkwithdrift",
+    "model_name": "RandomWalkWithDrift",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalnaive",
+    "model_name": "SeasonalNaive",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-conformalseasonalpool",
+    "model_name": "ConformalSeasonalPool",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-windowaverage",
+    "model_name": "WindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-seasonalwindowaverage",
+    "model_name": "SeasonalWindowAverage",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-adida",
+    "model_name": "ADIDA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonclassic",
+    "model_name": "CrostonClassic",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonoptimized",
+    "model_name": "CrostonOptimized",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-crostonsba",
+    "model_name": "CrostonSBA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-imapa",
+    "model_name": "IMAPA",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tsb",
+    "model_name": "TSB",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mstl",
+    "model_name": "MSTL",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-mfles",
+    "model_name": "MFLES",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-tbats",
+    "model_name": "TBATS",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-theta",
+    "model_name": "Theta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-optimizedtheta",
+    "model_name": "OptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamictheta",
+    "model_name": "DynamicTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-dynamicoptimizedtheta",
+    "model_name": "DynamicOptimizedTheta",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-garch",
+    "model_name": "GARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-arch",
+    "model_name": "ARCH",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "EXOGENOUS",
+    "model_id": "sf-sklearnmodel",
+    "model_name": "SklearnModel",
+    "planned_status": "DEFER_TO_EXOGENOUS_LANE"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-constantmodel",
+    "model_name": "ConstantModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-zeromodel",
+    "model_name": "ZeroModel",
+    "planned_status": "EVALUATE_PRIMARY"
+  },
+  {
+    "game": "numbers4",
+    "lane": "EXPECTED_NEGATIVE_CONTROL",
+    "model_id": "sf-nanmodel",
+    "model_name": "NaNModel",
+    "planned_status": "EXPECTED_NEGATIVE_CONTROL"
+  },
+  {
+    "game": "numbers4",
+    "lane": "UNIVARIATE",
+    "model_id": "sf-ucm",
+    "model_name": "UCM",
+    "planned_status": "EVALUATE_PRIMARY"
+  }
+]

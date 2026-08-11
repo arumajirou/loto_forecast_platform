@@ -1,0 +1,1 @@
+{"actuals_known":false,"candidate_id":"sf-theta","game":"loto6","predictions":[{"draw_index":2076,"draw_no":2077,"fold_id":"fold-01","prediction":[5,13,20,26,32,37]}],"protocol_hash":"8aa9aabfabb650da50887b52cd8ab25fca88e84faccc7bbf9364588fbd0a280b","schema_version":"prediction-lock-v1","sealed_at_utc":"2026-08-10T22:56:47.515268+00:00","seed":1}

@@ -1,0 +1,27 @@
+{
+  "formal_development_pass": true,
+  "full_semantic_rows": 246,
+  "game_execution_exit_codes": {
+    "bingo5": 0,
+    "loto6": 0,
+    "loto7": 0,
+    "mini": 0,
+    "numbers3": 0,
+    "numbers4": 0
+  },
+  "prediction_lock_bad_count": 0,
+  "prediction_lock_bad_paths": [],
+  "prediction_lock_count": 276,
+  "primary_rows": 234,
+  "primary_status_counts": {
+    "SUCCEEDED": 234
+  },
+  "property_certification_pass": true,
+  "protocol_count": 6,
+  "schema_version": 1,
+  "semantic_status_counts": {
+    "EXOGENOUS_EVALUATION_DEFERRED": 6,
+    "EXPECTED_NEGATIVE_CONTROL": 6,
+    "SUCCEEDED": 234
+  }
+}

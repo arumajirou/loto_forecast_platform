@@ -1,0 +1,136 @@
+{
+  "best_baseline_by_game": {
+    "bingo5": {
+      "all_positions_hit_at_1": 0.03,
+      "candidate_id": "baseline:mean",
+      "hit_at_1": 0.5875,
+      "mae": 1.21625,
+      "rmse": 1.428723206222955
+    },
+    "loto6": {
+      "all_positions_hit_at_1": 0.0,
+      "candidate_id": "baseline:fixed",
+      "hit_at_1": 0.2133333333333333,
+      "mae": 5.385,
+      "rmse": 7.045684258229762
+    },
+    "loto7": {
+      "all_positions_hit_at_1": 0.0,
+      "candidate_id": "baseline:fixed",
+      "hit_at_1": 0.2828571428571428,
+      "mae": 4.152857142857143,
+      "rmse": 5.43415126767741
+    },
+    "mini": {
+      "all_positions_hit_at_1": 0.0,
+      "candidate_id": "baseline:fixed",
+      "hit_at_1": 0.286,
+      "mae": 4.096,
+      "rmse": 5.427706698044765
+    },
+    "numbers3": {
+      "all_positions_hit_at_1": 0.02,
+      "candidate_id": "baseline:random",
+      "hit_at_1": 0.3266666666666666,
+      "mae": 3.2,
+      "rmse": 3.9841352052024206
+    },
+    "numbers4": {
+      "all_positions_hit_at_1": 0.01,
+      "candidate_id": "baseline:mean",
+      "hit_at_1": 0.3175,
+      "mae": 2.5125,
+      "rmse": 2.9364093720052047
+    }
+  },
+  "best_model_by_game": {
+    "bingo5": {
+      "all_positions_hit_at_1": 0.02,
+      "candidate_id": "sf-simpleexponentialsmoothing",
+      "hit_at_1": 0.6225,
+      "mae": 1.26625,
+      "rmse": 1.538262006291516
+    },
+    "loto6": {
+      "all_positions_hit_at_1": 0.0,
+      "candidate_id": "sf-autoets",
+      "hit_at_1": 0.1866666666666666,
+      "mae": 4.963333333333333,
+      "rmse": 6.203224967708329
+    },
+    "loto7": {
+      "all_positions_hit_at_1": 0.0,
+      "candidate_id": "sf-simpleexponentialsmoothing",
+      "hit_at_1": 0.2357142857142857,
+      "mae": 4.257142857142857,
+      "rmse": 5.425863986500215
+    },
+    "mini": {
+      "all_positions_hit_at_1": 0.01,
+      "candidate_id": "sf-adida",
+      "hit_at_1": 0.258,
+      "mae": 3.796,
+      "rmse": 4.829492726984896
+    },
+    "numbers3": {
+      "all_positions_hit_at_1": 0.07,
+      "candidate_id": "sf-automfles",
+      "hit_at_1": 0.3233333333333333,
+      "mae": 2.63,
+      "rmse": 3.195309061734092
+    },
+    "numbers4": {
+      "all_positions_hit_at_1": 0.0,
+      "candidate_id": "sf-mstl",
+      "hit_at_1": 0.33,
+      "mae": 2.535,
+      "rmse": 3.026549190084311
+    }
+  },
+  "cross_game_raw_mae_ranking_prohibited": true,
+  "data_acquisition_status": "SUCCEEDED",
+  "exogenous_status": "EXOGENOUS_EVALUATION_DEFERRED",
+  "fit_seconds_status": "NOT_CAPTURED_BY_UNIFIED_CAMPAIGN",
+  "folds": 5,
+  "formal_development_pass": true,
+  "full_model_game_rows": 246,
+  "games": [
+    "bingo5",
+    "loto6",
+    "loto7",
+    "mini",
+    "numbers3",
+    "numbers4"
+  ],
+  "gap": 0,
+  "holdout_evaluated": false,
+  "holdout_size": 50,
+  "library": "statsforecast",
+  "min_train_size": 100,
+  "negative_control_status": "EXPECTED_NEGATIVE_CONTROL",
+  "optional_metrics_not_promoted": [
+    "exact_position_rate",
+    "exact_row_rate"
+  ],
+  "phase": "development_rolling_formal",
+  "prediction_lock_count": 276,
+  "prediction_lock_sentinel_pass": true,
+  "primary_matrix_complete": true,
+  "primary_model_game_rows": 234,
+  "primary_status_counts": {
+    "SUCCEEDED": 234
+  },
+  "primary_univariate_models": 39,
+  "promotion": false,
+  "property_certification_pass": true,
+  "prospective_evaluated": false,
+  "schema_version": 1,
+  "seed": 1,
+  "semantic_status_counts": {
+    "EXOGENOUS_EVALUATION_DEFERRED": 6,
+    "EXPECTED_NEGATIVE_CONTROL": 6,
+    "SUCCEEDED": 234
+  },
+  "statsforecast_models": 41,
+  "test_size": 20
+}

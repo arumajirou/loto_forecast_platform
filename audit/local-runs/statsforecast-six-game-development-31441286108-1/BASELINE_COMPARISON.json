@@ -1,0 +1,121 @@
+{
+  "cross_game_raw_mae_ranking_prohibited": true,
+  "games": {
+    "bingo5": {
+      "best_baseline": {
+        "all_positions_hit_at_1": 0.03,
+        "candidate_id": "baseline:mean",
+        "hit_at_1": 0.5875,
+        "mae": 1.21625,
+        "rmse": 1.428723206222955
+      },
+      "best_statsforecast": {
+        "all_positions_hit_at_1": 0.02,
+        "candidate_id": "sf-simpleexponentialsmoothing",
+        "hit_at_1": 0.6225,
+        "mae": 1.26625,
+        "rmse": 1.538262006291516
+      },
+      "hit_at_1_difference": 0.03500000000000003,
+      "mae_improvement_baseline_minus_model": -0.050000000000000044,
+      "rmse_improvement_baseline_minus_model": -0.10953880006856109
+    },
+    "loto6": {
+      "best_baseline": {
+        "all_positions_hit_at_1": 0.0,
+        "candidate_id": "baseline:fixed",
+        "hit_at_1": 0.2133333333333333,
+        "mae": 5.385,
+        "rmse": 7.045684258229762
+      },
+      "best_statsforecast": {
+        "all_positions_hit_at_1": 0.0,
+        "candidate_id": "sf-autoets",
+        "hit_at_1": 0.1866666666666666,
+        "mae": 4.963333333333333,
+        "rmse": 6.203224967708329
+      },
+      "hit_at_1_difference": -0.0266666666666667,
+      "mae_improvement_baseline_minus_model": 0.42166666666666686,
+      "rmse_improvement_baseline_minus_model": 0.8424592905214325
+    },
+    "loto7": {
+      "best_baseline": {
+        "all_positions_hit_at_1": 0.0,
+        "candidate_id": "baseline:fixed",
+        "hit_at_1": 0.2828571428571428,
+        "mae": 4.152857142857143,
+        "rmse": 5.43415126767741
+      },
+      "best_statsforecast": {
+        "all_positions_hit_at_1": 0.0,
+        "candidate_id": "sf-simpleexponentialsmoothing",
+        "hit_at_1": 0.2357142857142857,
+        "mae": 4.257142857142857,
+        "rmse": 5.425863986500215
+      },
+      "hit_at_1_difference": -0.0471428571428571,
+      "mae_improvement_baseline_minus_model": -0.10428571428571409,
+      "rmse_improvement_baseline_minus_model": 0.008287281177194572
+    },
+    "mini": {
+      "best_baseline": {
+        "all_positions_hit_at_1": 0.0,
+        "candidate_id": "baseline:fixed",
+        "hit_at_1": 0.286,
+        "mae": 4.096,
+        "rmse": 5.427706698044765
+      },
+      "best_statsforecast": {
+        "all_positions_hit_at_1": 0.01,
+        "candidate_id": "sf-adida",
+        "hit_at_1": 0.258,
+        "mae": 3.796,
+        "rmse": 4.829492726984896
+      },
+      "hit_at_1_difference": -0.02799999999999997,
+      "mae_improvement_baseline_minus_model": 0.30000000000000027,
+      "rmse_improvement_baseline_minus_model": 0.5982139710598684
+    },
+    "numbers3": {
+      "best_baseline": {
+        "all_positions_hit_at_1": 0.02,
+        "candidate_id": "baseline:random",
+        "hit_at_1": 0.3266666666666666,
+        "mae": 3.2,
+        "rmse": 3.9841352052024206
+      },
+      "best_statsforecast": {
+        "all_positions_hit_at_1": 0.07,
+        "candidate_id": "sf-automfles",
+        "hit_at_1": 0.3233333333333333,
+        "mae": 2.63,
+        "rmse": 3.195309061734092
+      },
+      "hit_at_1_difference": -0.0033333333333332993,
+      "mae_improvement_baseline_minus_model": 0.5700000000000003,
+      "rmse_improvement_baseline_minus_model": 0.7888261434683286
+    },
+    "numbers4": {
+      "best_baseline": {
+        "all_positions_hit_at_1": 0.01,
+        "candidate_id": "baseline:mean",
+        "hit_at_1": 0.3175,
+        "mae": 2.5125,
+        "rmse": 2.9364093720052047
+      },
+      "best_statsforecast": {
+        "all_positions_hit_at_1": 0.0,
+        "candidate_id": "sf-mstl",
+        "hit_at_1": 0.33,
+        "mae": 2.535,
+        "rmse": 3.026549190084311
+      },
+      "hit_at_1_difference": 0.012500000000000011,
+      "mae_improvement_baseline_minus_model": -0.022499999999999964,
+      "rmse_improvement_baseline_minus_model": -0.09013981807910643
+    }
+  },
+  "ranking_rule": "hit_at_1 desc, all_positions_hit_at_1 desc, mae asc",
+  "schema_version": 1
+}

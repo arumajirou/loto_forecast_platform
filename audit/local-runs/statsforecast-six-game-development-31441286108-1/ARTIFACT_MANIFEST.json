@@ -1,0 +1,3087 @@
+{
+  "artifact_count": 616,
+  "artifacts": [
+    {
+      "path": "BASELINE_COMPARISON.json",
+      "sha256": "642dc181a3440a3b1a1a07760b449482d2b2d73f9a436d224bc13ceff65cda78",
+      "size_bytes": 3957
+    },
+    {
+      "path": "DATA_ACQUISITION_EVIDENCE.json",
+      "sha256": "9858fe881010c5ea473b5df2b0e8a81372950f11152e247234f807199ff3f646",
+      "size_bytes": 1662
+    },
+    {
+      "path": "DEVELOPMENT_GATE.json",
+      "sha256": "307b61183ca9ed1baf41c188f87c2a8dddbcd072269bc072ba93f728aa48957b",
+      "size_bytes": 602
+    },
+    {
+      "path": "GAME_EXECUTION_STATUS.json",
+      "sha256": "2b4c9b4418fb5cb03c1cdcee64687bf8fa346783fc1428a48d5d5493d917bdc3",
+      "size_bytes": 145
+    },
+    {
+      "path": "GAME_EXECUTION_STATUS.tsv",
+      "sha256": "61092b4dbafcc0812e8ef0907afe3cbd7aa488542a2ad7fe39610fa41e4c2299",
+      "size_bytes": 54
+    },
+    {
+      "path": "PROPERTY_CERTIFICATION_EXIT_CODE.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "size_bytes": 2
+    },
+    {
+      "path": "PROPERTY_CERTIFICATION_MATRIX.json",
+      "sha256": "1bccf29ab3e2d0f6714bc08a122eab861ee4be38d21daaf9ae9e96af8f938e39",
+      "size_bytes": 59497
+    },
+    {
+      "path": "PROPERTY_CERTIFICATION_REFERENCE.json",
+      "sha256": "19d25ef5fd4de36514287b4f0678bfa7ef07939c0a92408181c63922dc14d7e5",
+      "size_bytes": 8786
+    },
+    {
+      "path": "PROPERTY_CERTIFICATION_SUMMARY.json",
+      "sha256": "fa00bfab987d6832853be0c24949447679be02768d1a9c03ca8027f5d8b30956",
+      "size_bytes": 267
+    },
+    {
+      "path": "STATSFORECAST_LANE_MATRIX.json",
+      "sha256": "7bddc2688afda036046d80e235a5a73a5d5b1f470632bd22ded14cf288cde65d",
+      "size_bytes": 41241
+    },
+    {
+      "path": "STATSFORECAST_MODEL_GAME_AUDIT_MATRIX.csv",
+      "sha256": "07d57b47d6563fcda67cbb291eba2a084c0800af7de2e4b9de4f4c91ccc5a855",
+      "size_bytes": 158166
+    },
+    {
+      "path": "STATSFORECAST_REAL_GAME_SUMMARY.json",
+      "sha256": "1cf096b747f630e59a06795b34ffaad9c61a6642fed187675838b9cc47c90689",
+      "size_bytes": 3564
+    },
+    {
+      "path": "all_game_macro_summary.csv",
+      "sha256": "b91ca1feedf6481e866af30647b8998606e3d768b0240a0721bf9d3842e9cf21",
+      "size_bytes": 7519
+    },
+    {
+      "path": "campaign_summary.json",
+      "sha256": "1cf096b747f630e59a06795b34ffaad9c61a6642fed187675838b9cc47c90689",
+      "size_bytes": 3564
+    },
+    {
+      "path": "games/bingo5/STATSFORECAST_LANE_MATRIX.json",
+      "sha256": "fc886224eaabfe713cc3b8f59460e226d9d02329ad75d89c0a8737fef8a8683f",
+      "size_bytes": 6876
+    },
+    {
+      "path": "games/bingo5/STATSFORECAST_REAL_GAME_SUMMARY.json",
+      "sha256": "df558a47dd33cd4d357fe0636ca50d20c9a4b501d79a0884c4e79815df2de110",
+      "size_bytes": 640
+    },
+    {
+      "path": "games/bingo5/all_game_macro_summary.csv",
+      "sha256": "336117415e2eb2fa729808a5f7d1312122224a6e73b94d5ba3e8182e1b7d4e9f",
+      "size_bytes": 2566
+    },
+    {
+      "path": "games/bingo5/campaign_summary.json",
+      "sha256": "3e96c4328f4594d619fc3cfda8ff91f82d64caca27ad95fa78141ece0d8dad9e",
+      "size_bytes": 1708203
+    },
+    {
+      "path": "games/bingo5/model_game_results.csv",
+      "sha256": "f5cb612d5666dbbcf05574ad72a736ce23b3cd9bc74cf61ba833e49124c753ee",
+      "size_bytes": 13634
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/baseline:fixed/seed-1.json",
+      "sha256": "1b5d12b8fdea8dc796fe9167cfbae7624a7b0f33308bbae25bce2e8de66d70ab",
+      "size_bytes": 9269
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/baseline:frequency/seed-1.json",
+      "sha256": "367a9b4308705694bfbfd09deb68d7a92ffcf2edfd9dc58bbe8535e5d1316d79",
+      "size_bytes": 9273
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/baseline:last/seed-1.json",
+      "sha256": "fd1c7e0586db1c11d48a67cb136786e0765028482f601b39527e9d3af59b7502",
+      "size_bytes": 9287
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/baseline:mean/seed-1.json",
+      "sha256": "fb02fd0774cf141fdc2e16339916548d626ed6ada093a686a66f240aa0021d35",
+      "size_bytes": 9268
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/baseline:median/seed-1.json",
+      "sha256": "b3bc8e656ab4c9c0cba61589bff3cee0fd9ed5ab9cb50d7769428af40b0ea1bd",
+      "size_bytes": 9270
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/baseline:random/seed-1.json",
+      "sha256": "eb5dbc01e801505082ff137b3a529452eea017d2e714533a2038d4f1c781b6c7",
+      "size_bytes": 9303
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/baseline:statistical_ar1/seed-1.json",
+      "sha256": "bd3fb85f8aaebdd114e6a02095bc3df56d5e62bd5871d33b99a323695f8cbba3",
+      "size_bytes": 9279
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-adida/seed-1.json",
+      "sha256": "f173066da10b8a91be803dee7dd36ba57bc598bcb2940bde83b370c80d260dc3",
+      "size_bytes": 9263
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-arch/seed-1.json",
+      "sha256": "32375b1786c84ee4b0b79fe02b6c77e55a3c9ae452d58aeab5b5ebe8c5f813ac",
+      "size_bytes": 8682
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-arima/seed-1.json",
+      "sha256": "0d0e7fdb95de880491b7571fe7fda5978a3c942bf59d3f44cea21a66a417e384",
+      "size_bytes": 9263
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-autoarima/seed-1.json",
+      "sha256": "5c19f95c57ae3d508b44549f7cb30a90b3fb45cd062cccbc438fb0cf59f63938",
+      "size_bytes": 9267
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-autoces/seed-1.json",
+      "sha256": "4428c6914dcde6f9c061c0c8629525f551b28509e30a7dc4cf7992a6c05b87a8",
+      "size_bytes": 9265
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-autoets/seed-1.json",
+      "sha256": "dc0e36c9be3bc8f102fd00c6e87716a0aa37219983d2a3b18826a9f285f3665a",
+      "size_bytes": 9265
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-automfles/seed-1.json",
+      "sha256": "04f4d9f4025c80f6f3b3e768a18f059916bc33c074480070de8382ff1834ef90",
+      "size_bytes": 9269
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-autoregressive/seed-1.json",
+      "sha256": "5b4d57f85db3554b62d7146f8c6c44c4f1066e84543488d9b630415f1dc16422",
+      "size_bytes": 9272
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-autotbats/seed-1.json",
+      "sha256": "cf88343938489761b936658293d77fbb528640f8f75c4d746da22cc893d1e88e",
+      "size_bytes": 9267
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-autotheta/seed-1.json",
+      "sha256": "9ba0c0fd571fdc5aad2ec979c2823c0d5f47012790d660095ba4e79f5aa10cd5",
+      "size_bytes": 9267
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "3e46602818359bce5f9a458e96e1a9544c982b5b3c4570ebf2e13123c3314dce",
+      "size_bytes": 9298
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-constantmodel/seed-1.json",
+      "sha256": "48802e98ea1cc2a9c076ae24f5ea1e8f27f51188431d1c8d9f7d14feaaffe17c",
+      "size_bytes": 8671
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-crostonclassic/seed-1.json",
+      "sha256": "9cd53ee961de2807c192c6e83fccd7d88dd14485890a13f4af31aa6b0d6f3177",
+      "size_bytes": 9272
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-crostonoptimized/seed-1.json",
+      "sha256": "08b306d9fdb488246b3568370c94be5662f5b9fce25e84786eae95fa15f2699f",
+      "size_bytes": 9274
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-crostonsba/seed-1.json",
+      "sha256": "a16fa57488f567783a4dd5e764a0ced295719e503397b5f630f9b36cca634496",
+      "size_bytes": 9268
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "152ec98f2b9220a77bdcd1a3f297b5a743a55c7a9c95bc490611b52076f9aba9",
+      "size_bytes": 9279
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-dynamictheta/seed-1.json",
+      "sha256": "0edc19045b7d8b7da26ce8f8f5a076231bd199b7cc95ffe40e5358da5bbb2164",
+      "size_bytes": 9270
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-garch/seed-1.json",
+      "sha256": "fb678595d4383a1de351905cc328a0743558afad8ed9bfa4c30ccc2c2b893d46",
+      "size_bytes": 8673
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-historicaverage/seed-1.json",
+      "sha256": "cfcd99d13a8ab47ccdf987332dc990cd37f78a54ec68865a2b2e5eaea9b60c6e",
+      "size_bytes": 9273
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-holt/seed-1.json",
+      "sha256": "46c06e883b2005a9cf1b46ee8d59974f0abc7197c21c0e740f1aa1a9cd8fb372",
+      "size_bytes": 9262
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-holtwinters/seed-1.json",
+      "sha256": "eaf982939ac5e4ec442ccd2f40afa2bc60995b863a2b0fcfa651e412ffb45c40",
+      "size_bytes": 9269
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-imapa/seed-1.json",
+      "sha256": "4398949e3484e1870e62a42152578bf831f8c92ea96ee7f5d9f4500c2ca00fed",
+      "size_bytes": 9263
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-mfles/seed-1.json",
+      "sha256": "842c631876acf2f60558fdc494ec49d5be8ebfa1ac2e07a2f14e37fd1247236b",
+      "size_bytes": 9270
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-mstl/seed-1.json",
+      "sha256": "e45d6fc585252d744d512ccbe6929e29f30237babd7c62238692b8ca56311801",
+      "size_bytes": 9262
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-naive/seed-1.json",
+      "sha256": "8214fd34876aeccef60539e329191f557df19c23af639d540495507237eded52",
+      "size_bytes": 9282
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-optimizedtheta/seed-1.json",
+      "sha256": "558bb2ad0b3e677f0009c77ba35af82f86345c08558d6329980ca28c083fb58a",
+      "size_bytes": 9272
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "3448f552d465093e57d2f38a6069a91de4726679335e21bb199a90dee646f08e",
+      "size_bytes": 9296
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "6baf52326714746811d7f09023f4875219cd41bd93af6119499847cbfdfe98d7",
+      "size_bytes": 9286
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "f32c087c1e1ddde1aa5224e944f37e5b7caf2322ab5db6fa08737932225a68a2",
+      "size_bytes": 9295
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-seasonalnaive/seed-1.json",
+      "sha256": "c4c809ae35dc242b88ec24bc9c91b4e966fa9e31e32192247512800d9580862b",
+      "size_bytes": 9290
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "df3eebf7d3cf3e0bf74e01422c16221d78943d62e7826efd5b6ca8d60263d16b",
+      "size_bytes": 9292
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "4cb9a01dc9771240b58a6854e2eafcf1c5d721bd0b86ed33acb2622c501ce447",
+      "size_bytes": 9284
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "d91264228a596356ef0f1703a7a6c4c4b2a0d8f8f5f57f2899398db8e957588d",
+      "size_bytes": 9293
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-tbats/seed-1.json",
+      "sha256": "5e17b0ee81feb443c0e36e68cb38a8b5abecc8fed0486d11c36b2d6a56cdc9ec",
+      "size_bytes": 9264
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-theta/seed-1.json",
+      "sha256": "5d7c8d505c98ec637433ff9c24981ad6da416255b3a4eaf648ae708637d18eb1",
+      "size_bytes": 9263
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-tsb/seed-1.json",
+      "sha256": "e2934dcba205b8606608a8a3898b1d39423f1c148f59426f1b8fe1421b454b04",
+      "size_bytes": 9261
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-ucm/seed-1.json",
+      "sha256": "2a41d44c3352873814d0a59e54d694c051f2328999f2f933a432898e28f18f4b",
+      "size_bytes": 9261
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-windowaverage/seed-1.json",
+      "sha256": "c4ff5f89b173f7f28604d20a10c9d1d39226e163b7af896c9779779d3c523eb6",
+      "size_bytes": 9274
+    },
+    {
+      "path": "games/bingo5/prediction_locks/bingo5/sf-zeromodel/seed-1.json",
+      "sha256": "c23b4de5b8ff3b7987726aa2313e71d236407daa4b763512e26a45124f9beb9a",
+      "size_bytes": 8667
+    },
+    {
+      "path": "games/bingo5/protocols/bingo5.json",
+      "sha256": "675fe348c5877a93ee01b1468548bd4e959f5c04cdc04c1016f71e8f87be3d68",
+      "size_bytes": 2131
+    },
+    {
+      "path": "games/loto6/STATSFORECAST_LANE_MATRIX.json",
+      "sha256": "dd1caf1acc3043c90cac387c275a421c550b59d99e1c4ae23c05bb8d92ff2583",
+      "size_bytes": 6835
+    },
+    {
+      "path": "games/loto6/STATSFORECAST_REAL_GAME_SUMMARY.json",
+      "sha256": "5f5e4bba86cb3995d2bfa54657c36e0533ca69a5d53cf1c2e2f9be1b762dbe8b",
+      "size_bytes": 639
+    },
+    {
+      "path": "games/loto6/all_game_macro_summary.csv",
+      "sha256": "12582a86ea270952193cc7b8740cc2fca0fe99065979f41788540f0b69fd690c",
+      "size_bytes": 3138
+    },
+    {
+      "path": "games/loto6/campaign_summary.json",
+      "sha256": "5ade025c16ff49d546ea036cb1510d53f8224bb48c6c149fb75b36b536a67c0e",
+      "size_bytes": 1716685
+    },
+    {
+      "path": "games/loto6/model_game_results.csv",
+      "sha256": "800e196a1db3725da9179252a7522c71b4fcce8607c3bbf4841cd126bebaf84a",
+      "size_bytes": 15998
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/baseline:fixed/seed-1.json",
+      "sha256": "777b6dc53d8890f3dddc54bb422e59ec8e538fc9567a8e921af2743689bd57dc",
+      "size_bytes": 8868
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/baseline:frequency/seed-1.json",
+      "sha256": "f387a507a96942134224a4360f5749e798f1f9d28072d11990f27b4eb9df02ab",
+      "size_bytes": 8972
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/baseline:last/seed-1.json",
+      "sha256": "44a3cea978b7d53a7f4682cec924e6735fb32489b80f18b7a0f79dfe53d87f61",
+      "size_bytes": 8951
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/baseline:mean/seed-1.json",
+      "sha256": "cd27564624d17a70dddbedb96ceb28cbdbcc7e7f3baf215ed5c41535441aea8e",
+      "size_bytes": 8967
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/baseline:median/seed-1.json",
+      "sha256": "56a9812c93652b1eacd73dac5f48f47b04d02ba86241ba8de911ca78416d137a",
+      "size_bytes": 8969
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/baseline:random/seed-1.json",
+      "sha256": "1c996fe15db745d7b59bea7af9dbb3732500f0d50b89d71d5e505977ffbb11a6",
+      "size_bytes": 8936
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/baseline:statistical_ar1/seed-1.json",
+      "sha256": "794642e2fefb440d875cb944b6751187a59c37e617fa4e1f65a6f177dd34ba08",
+      "size_bytes": 8978
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-adida/seed-1.json",
+      "sha256": "3084995699d1bd874214fb9ffdd218340fd8b2174166d82c3ba90a72b60a926d",
+      "size_bytes": 8962
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-arch/seed-1.json",
+      "sha256": "6b8e3e0ea22ce44d54718486bde7d988aa2a0d12ad4d079e8f76bb946408c2e8",
+      "size_bytes": 8875
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-arima/seed-1.json",
+      "sha256": "73b99aad357ad77621d18382e01db641e7172ebf482e8c0b01d78d3739641667",
+      "size_bytes": 8962
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-autoarima/seed-1.json",
+      "sha256": "196270108c08ec604ff4e4eafd84144c2593caf2f330d16137aab2afa7589308",
+      "size_bytes": 8966
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-autoces/seed-1.json",
+      "sha256": "01ee8441dd0617f2aa0d1772cbe21e43271552b5404c541654e3579064f76034",
+      "size_bytes": 8964
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-autoets/seed-1.json",
+      "sha256": "39e02733f6084622cfc9e985121ba84e0df6d3ba3ca8b8cec5f5b091be584677",
+      "size_bytes": 8964
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-automfles/seed-1.json",
+      "sha256": "55a6c9e03ca6ea5188d963de15aef2a7a6b0aeebd9a504ee470c2a0d14cd098f",
+      "size_bytes": 8949
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-autoregressive/seed-1.json",
+      "sha256": "ab007ecf5ea832f438feade2aab3bc79eb22fdb96ebc352476f2750fc049aac6",
+      "size_bytes": 8971
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-autotbats/seed-1.json",
+      "sha256": "9702e5a4c29a3168150a969e212eb2bc528b4f0b69470a6357064e027ab7ee43",
+      "size_bytes": 8966
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-autotheta/seed-1.json",
+      "sha256": "3fb9383f14eb99183f98f1e677de47680e8226c1c5097b15859b4c58c213f905",
+      "size_bytes": 8966
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "43aa89c48b1a4ac42c2b69582901a622c973d67f28e516609e68c72288c6ac5d",
+      "size_bytes": 8963
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-constantmodel/seed-1.json",
+      "sha256": "65ac924a6368698232886caa50330c94d780c130ad53453f1fcca5d966c5fd00",
+      "size_bytes": 8470
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-crostonclassic/seed-1.json",
+      "sha256": "93da839fb79b9148aec58ffc71d9f97118d6cedef7b775ddbb5797726cf36a21",
+      "size_bytes": 8971
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-crostonoptimized/seed-1.json",
+      "sha256": "d8cfc80604cba8b6dd66cfd963d619d3dd121443111be52d7cc53130ff6a9512",
+      "size_bytes": 8973
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-crostonsba/seed-1.json",
+      "sha256": "b914fe203bbe6e599060a4205953b327269d8372d430d301fbbf6b555748688d",
+      "size_bytes": 8967
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "86807475b527c81c6a7db513eb0d3ac0072b5aa81d48fc9f27bf639d3044d02d",
+      "size_bytes": 8978
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-dynamictheta/seed-1.json",
+      "sha256": "ed1f34f2a7c0d2cb622c0fee8b62b55e85e4c878acefdbae391d290dcd71dba2",
+      "size_bytes": 8969
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-garch/seed-1.json",
+      "sha256": "c3cfe020acf6c3878e0ee8e98ef21511df8b6382e75cc1c45d007feb9eb6c126",
+      "size_bytes": 8886
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-historicaverage/seed-1.json",
+      "sha256": "ec82d322afd6ac43356cef79b069ab959c2041adfa3ebfc84de71e0951f2d29c",
+      "size_bytes": 8972
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-holt/seed-1.json",
+      "sha256": "1ebbdacc2143bc6d5f01f3d9525bee0cee5621e2e3db7d04f3388b0428ab9e5b",
+      "size_bytes": 8961
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-holtwinters/seed-1.json",
+      "sha256": "b2468f4dfdbf38d59dc24f85dfe180f3d864d8efd422af4230f496108a265d38",
+      "size_bytes": 8968
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-imapa/seed-1.json",
+      "sha256": "a6108379fd9264832d873965c342a238394c67ba260607acd16bc977a290652b",
+      "size_bytes": 8962
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-mfles/seed-1.json",
+      "sha256": "608a74777a7530baf5fcd546627712dbfc1d47985b4ef6bb008a20ce367821b9",
+      "size_bytes": 8953
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-mstl/seed-1.json",
+      "sha256": "237fa4dc7b944f50512e8d111dd92b91c60feff68a1ee61a4678154d0e8912a2",
+      "size_bytes": 8955
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-naive/seed-1.json",
+      "sha256": "88c9c4e5f3dab05127e8252e6f2e831399f218e4748922d4877fd57d491bb2f0",
+      "size_bytes": 8946
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-optimizedtheta/seed-1.json",
+      "sha256": "dc336839d2182244c7fabdbeeb9c640f48cc069df52e3161934070c9abcc05b4",
+      "size_bytes": 8971
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "c5599c7c4657a4851a046c585ebba49dfb3a982d1d1df218775f02eff0747372",
+      "size_bytes": 8960
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "6036f0507fd01c99805649ea2268a43fea1248a5d68e366440462225c8dd0c7b",
+      "size_bytes": 8981
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "c6a435582cd0821fa408f0e6a2db45c34a38f39d41ef1fcc4658bb42ae9ba3fd",
+      "size_bytes": 8994
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-seasonalnaive/seed-1.json",
+      "sha256": "70f60aae382c393f04e63a2eecd79c01b7110e6cd30d1f37c2ce09dab053137c",
+      "size_bytes": 8955
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "5e637087a3188c2d6cf65fb030449d52a3f84b3deade87485cc5e46e80d0e1a5",
+      "size_bytes": 8973
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "599c8d3177ae8900606e82d68d8a502130252ff69706ddf0c9a84fd119502abe",
+      "size_bytes": 8981
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "2978e0944f41d63ed2565a162857cf7197ca596eae37f1e6bd61bc947e14c31e",
+      "size_bytes": 8992
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-tbats/seed-1.json",
+      "sha256": "fc55b845d2a57255b7832013f623d5255593a2a2dc80aa36dca3c85351dff921",
+      "size_bytes": 8962
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-theta/seed-1.json",
+      "sha256": "50bee9b5a074a223d1ab4b3ee38534f53c66672016b810ca01e0b3eda0487c9e",
+      "size_bytes": 8962
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-tsb/seed-1.json",
+      "sha256": "1d009b5a150238cb30c663772bdaa23d3c67994ef5551367b60598dfeb574ac9",
+      "size_bytes": 8958
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-ucm/seed-1.json",
+      "sha256": "dd190225aabf5c133245c21ef17a5ff669763795cf27502961d7dfc91d3e5571",
+      "size_bytes": 8960
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-windowaverage/seed-1.json",
+      "sha256": "1a15b5f504c3904c419d212dc349382c47ad60760977477056bd13b0736d763e",
+      "size_bytes": 8963
+    },
+    {
+      "path": "games/loto6/prediction_locks/loto6/sf-zeromodel/seed-1.json",
+      "sha256": "5240581be99208573e1af140e594360132b043674f6765d7d48d86f643df89c4",
+      "size_bytes": 8466
+    },
+    {
+      "path": "games/loto6/protocols/loto6.json",
+      "sha256": "3a9f1a6e9da400b4c44a0df57a6893d27b5128e0acfbfd46d775cc54dcc0f4b2",
+      "size_bytes": 2128
+    },
+    {
+      "path": "games/loto7/STATSFORECAST_LANE_MATRIX.json",
+      "sha256": "4a5abbec2eaa5cdaf6ecf8fa1e4241fa316106c65dc5ab71be4bff898fb21bed",
+      "size_bytes": 6835
+    },
+    {
+      "path": "games/loto7/STATSFORECAST_REAL_GAME_SUMMARY.json",
+      "sha256": "6fc479bf54b85fba2ad0ab97870844cacd14366e8919207f3b36946f6a7812aa",
+      "size_bytes": 639
+    },
+    {
+      "path": "games/loto7/all_game_macro_summary.csv",
+      "sha256": "8abab7a52799c56678b8fba1cdf663be95be536b2ec4789f32c0f098602e439d",
+      "size_bytes": 3334
+    },
+    {
+      "path": "games/loto7/campaign_summary.json",
+      "sha256": "6850769e4b096ccb2d136be261209c7394c01408867ffc6973120e4f11f31dd7",
+      "size_bytes": 1717531
+    },
+    {
+      "path": "games/loto7/model_game_results.csv",
+      "sha256": "93513d2497dd44d296fb3dfd7db9457e42d9d265e6a89baffee6987873680a0f",
+      "size_bytes": 16970
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/baseline:fixed/seed-1.json",
+      "sha256": "fc5aa0283a6ad624c4e6687e11ebc3f5899f083914e30295e670f6199dcf7821",
+      "size_bytes": 8968
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/baseline:frequency/seed-1.json",
+      "sha256": "be45fcdb153fa9b8eedf4d1a0862421e79037f596fed44eaad2dffb944fadd93",
+      "size_bytes": 8972
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/baseline:last/seed-1.json",
+      "sha256": "34c4f93f7009f230b4f5e580a6d88237dd7de5a59def38ad2cac81fd47091f5b",
+      "size_bytes": 9006
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/baseline:mean/seed-1.json",
+      "sha256": "43128c5e2e82c9d588c230faedac026c2c26d3db51055e66db31913ebb5faa67",
+      "size_bytes": 9067
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/baseline:median/seed-1.json",
+      "sha256": "df71575c8ee795d7c05ccf89ef993103f192b98541256f49733c4ec06887e363",
+      "size_bytes": 8969
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/baseline:random/seed-1.json",
+      "sha256": "04ae9058fd80471e451a4c400732d7f37bf9ca2a3a5fdb77a3e3f53a6507cfcf",
+      "size_bytes": 9031
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/baseline:statistical_ar1/seed-1.json",
+      "sha256": "022235787fccb3b500992db21d4ca30e0530e355b6476d3b4e73b6c2454e34ab",
+      "size_bytes": 9051
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-adida/seed-1.json",
+      "sha256": "9c7727b5f877a6eb935180a1cc4338f0eb46a7973c46e38249c67c61c77873f5",
+      "size_bytes": 9028
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-arch/seed-1.json",
+      "sha256": "7cd2043bedcf3cd85f9f8828ebd6641e58d63be667c5327ba2ab56c89cf37d14",
+      "size_bytes": 8773
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-arima/seed-1.json",
+      "sha256": "665b9cee926a341352fea019598891682d533d1c2262f0de7576f90dfcce3c49",
+      "size_bytes": 9035
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-autoarima/seed-1.json",
+      "sha256": "d8d608bcf7712a6d98f9b870f983534ee1ccc8785c00d86a7cab1a5ff1350872",
+      "size_bytes": 9066
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-autoces/seed-1.json",
+      "sha256": "c502698c1b2bcc754e584b60a07ec7c90f958fd3c71227d7c680cba15f3da8d4",
+      "size_bytes": 9060
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-autoets/seed-1.json",
+      "sha256": "9bd5bd843a5f0d6b9d5d2c7a66dfeccda7a9a8cb65f7d26dde2dd6acf6363369",
+      "size_bytes": 9064
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-automfles/seed-1.json",
+      "sha256": "8c09eba6f1ea7cf69ecd70e1b516ce0ebbde348e950346abc64f217520e6b054",
+      "size_bytes": 9010
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-autoregressive/seed-1.json",
+      "sha256": "26db9e3e147826f56807a389ef116b87684b3ed00b3bf9d49b2a1f60138d1e2b",
+      "size_bytes": 9044
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-autotbats/seed-1.json",
+      "sha256": "385f2cfdef7f5a991444abdb827262d0cfbfe02a02dfcd8416ad89dfc05c2e60",
+      "size_bytes": 8991
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-autotheta/seed-1.json",
+      "sha256": "635a3b45ca256c6ba4247f01dff928e9cb1771f421c46c00dcf34e6ea4d8e9ae",
+      "size_bytes": 9032
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "93f581cd74b0e0c0c60012c4e1e4b104b56057e05f6a2a4dc0e4b74821b21a73",
+      "size_bytes": 9018
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-constantmodel/seed-1.json",
+      "sha256": "f2c8e20ef5f66d6c320f48dba3a9c4a06ab00238cdb3ecebdc0dbec246cc15b7",
+      "size_bytes": 8470
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-crostonclassic/seed-1.json",
+      "sha256": "4a325ef19ec2b7cce08c423468588625d62b72e970a686df3b7f09c8cacd76f5",
+      "size_bytes": 9037
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-crostonoptimized/seed-1.json",
+      "sha256": "ee0973681c8820288afa38f3e0120decc508117a0ae8852a1a36aa9319877fef",
+      "size_bytes": 9039
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-crostonsba/seed-1.json",
+      "sha256": "9e236e8c00603d9a5a0eb925bf68c3590c566f4da7e337b226280394cdffbf24",
+      "size_bytes": 9018
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "ac8ff95a263afedf18c8273a41dba4e0d9a2ef2ee42cee97be220898c4fe755d",
+      "size_bytes": 9044
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-dynamictheta/seed-1.json",
+      "sha256": "f1ae1c66f18a5033cba77425f2db582851f9036ac7c1817da388937cf3898520",
+      "size_bytes": 9035
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-garch/seed-1.json",
+      "sha256": "b18041858e8b086ebf6a6215036b6a4ce0178366852c5142c75ea801865bb3c4",
+      "size_bytes": 8776
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-historicaverage/seed-1.json",
+      "sha256": "57dd34effc31b5f7d16f3f4628117a844f91d40b443170f399c81885b8f742c7",
+      "size_bytes": 9072
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-holt/seed-1.json",
+      "sha256": "6d8249cad5be1b5bc919bb9a0531a5f5e97c2ec9c7a9bd95ce4d54801012a838",
+      "size_bytes": 9061
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-holtwinters/seed-1.json",
+      "sha256": "69a3d0a4d686fa13f8e29b1cceb9efb2098249992167f8b0db6785024e3903b3",
+      "size_bytes": 9068
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-imapa/seed-1.json",
+      "sha256": "72490a3d0c72fb38bb0a2517d3d66e2c343b40bf2bbb861ee270dc78ca3d0586",
+      "size_bytes": 9028
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-mfles/seed-1.json",
+      "sha256": "08d7e1c6d77167aff3b61c8747094412552b20ef689bc19b09060957126e4d14",
+      "size_bytes": 9019
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-mstl/seed-1.json",
+      "sha256": "3aaef20842e2f5f12fa79c16d4f32172780de54a675a21e94331a72e2676e119",
+      "size_bytes": 9016
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-naive/seed-1.json",
+      "sha256": "0daf0bf51f1d5e907044a008679dbcb15190ca20c5d07c79a9714d553eb5e865",
+      "size_bytes": 9001
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-optimizedtheta/seed-1.json",
+      "sha256": "719a06b0780adb14862827baf447de7081587a6bcf2001309305409a7ee6903d",
+      "size_bytes": 9037
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "768cfcd8a7a44c294e49a3db1ef317e3b60c78261e322bdd863753c2c7b0ad9c",
+      "size_bytes": 9015
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "0013e9c97b3c07f37f7f7d756e7cf2fecdcacd0e9f43d9b484d251558c1de277",
+      "size_bytes": 9043
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "5ac1d1246026ca6b853932808a309f44f87f4724ba8c6b922aafca1082e5db10",
+      "size_bytes": 9080
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-seasonalnaive/seed-1.json",
+      "sha256": "afd5a855c2c09402484a20ad4df72bd0effe8f2a202ed84e8f97c2a4b807a009",
+      "size_bytes": 9010
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "c8de8024a8f0502d451fcac376b8b0518e5f5489a37d97fe1da5c551af8a69e7",
+      "size_bytes": 9036
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "696e126f5b66dd0d245d0826588decf9388c7a2041015c8020e4570f76243394",
+      "size_bytes": 9042
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "c7ee83bd4b10110636bcfa868c967adf21f778d491a3f0eddcc16565c47cf945",
+      "size_bytes": 9092
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-tbats/seed-1.json",
+      "sha256": "5a9a5cce2d5561e3e0c6f78ec47a4be8065e1631982f6c72fcec24d49af30c74",
+      "size_bytes": 9008
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-theta/seed-1.json",
+      "sha256": "a3aba272d3a59cffd0dd722f159bea515a947c2dde0f433fb906c76b4f88c603",
+      "size_bytes": 9028
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-tsb/seed-1.json",
+      "sha256": "b93b66f82d3076be78b995b8327d7e9ce177b7c69d9c653f8873bd8b0a8b0675",
+      "size_bytes": 9019
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-ucm/seed-1.json",
+      "sha256": "3d2ca0f2ab17d089b90210889a21fd349d05a80cef9e5b245e0876e92b01db0c",
+      "size_bytes": 9060
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-windowaverage/seed-1.json",
+      "sha256": "1f7f870e6c509dce723d08bc766faab25b5f227fb7245c057d56105d0cd89b94",
+      "size_bytes": 9024
+    },
+    {
+      "path": "games/loto7/prediction_locks/loto7/sf-zeromodel/seed-1.json",
+      "sha256": "245dfff9a20d50a18931267c9c82599c9820d46ec53a26a38f8b34f26d46e004",
+      "size_bytes": 8466
+    },
+    {
+      "path": "games/loto7/protocols/loto7.json",
+      "sha256": "236385a1ab10cbb1dedb8cd79948884c88f59f35d10662d83ab1d9bf4465424a",
+      "size_bytes": 2128
+    },
+    {
+      "path": "games/mini/STATSFORECAST_LANE_MATRIX.json",
+      "sha256": "c20aa1c135d640aebdbe585cccc0a47468fbac1477629ca07171ba39db53d29b",
+      "size_bytes": 6794
+    },
+    {
+      "path": "games/mini/STATSFORECAST_REAL_GAME_SUMMARY.json",
+      "sha256": "f380cb2736e36a19c96ee2c4e6480be3a25a14370e4747ead492173f5e762dc3",
+      "size_bytes": 638
+    },
+    {
+      "path": "games/mini/all_game_macro_summary.csv",
+      "sha256": "9008a629fb19e8044cc399d76e42eb18cb8624165390c27258f950ee88ae4909",
+      "size_bytes": 2388
+    },
+    {
+      "path": "games/mini/campaign_summary.json",
+      "sha256": "706eaad4cb9e076b81d3b6923965e2eaedfc3466f95b7e54327684e8bc25c80a",
+      "size_bytes": 1709040
+    },
+    {
+      "path": "games/mini/model_game_results.csv",
+      "sha256": "41ca9e932a99b099de09202cfe1ff6b90f6f2a61e41ab7bef0a14e23647bc81d",
+      "size_bytes": 13142
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/baseline:fixed/seed-1.json",
+      "sha256": "93dd591b2b53d8610ff3f6c99fc11d4302cdf7bf704c71a32ce0ceb2b3a22dca",
+      "size_bytes": 8567
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/baseline:frequency/seed-1.json",
+      "sha256": "d14341c7775bc9c0d6b0a99ffe2f6188339d5316274998d94583cb8843b4adb6",
+      "size_bytes": 8571
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/baseline:last/seed-1.json",
+      "sha256": "4ea4fa0c8e8ee593a825432773404bae35589c1750855ab4537ebf6708edb790",
+      "size_bytes": 8631
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/baseline:mean/seed-1.json",
+      "sha256": "4141a02eaef388225a9b7de0b3c5043940d410837b9e825699c91773b2eb6e42",
+      "size_bytes": 8666
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/baseline:median/seed-1.json",
+      "sha256": "cd04811776d83860879eb1d19f56d5fe226b85346d6b4084d01bf0e32f8d75fa",
+      "size_bytes": 8668
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/baseline:random/seed-1.json",
+      "sha256": "6684a286f4e4e765b1473d2bc7b54fb0b8a43981cb0e63f1214cf34f46ba10e1",
+      "size_bytes": 8639
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/baseline:statistical_ar1/seed-1.json",
+      "sha256": "5ce406f133653fb531be0181e3e2605787440d9d762e11d6606120f2eb48b28a",
+      "size_bytes": 8677
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-adida/seed-1.json",
+      "sha256": "a7bf3dd745a1ddb3a41ff6b666cc3ada24658cf91ba6a24fff56f62c037883b6",
+      "size_bytes": 8648
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-arch/seed-1.json",
+      "sha256": "63e98408c951747ae5d6c944d679f6b5cc50956b79acc9fe2b5006dd5562c1dd",
+      "size_bytes": 8460
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-arima/seed-1.json",
+      "sha256": "578b4694e2d94f1550ad598a76f5dea91b962a2fea650550790453eca5b313f2",
+      "size_bytes": 8661
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-autoarima/seed-1.json",
+      "sha256": "199dd1ed54714b06b67ca0d08eb886f47969f8120f9735b0e881eeb916d1027c",
+      "size_bytes": 8665
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-autoces/seed-1.json",
+      "sha256": "5470d8334d48f1b9251f9217f5c9b16af81fcce1529743f08722b23954d872bf",
+      "size_bytes": 8663
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-autoets/seed-1.json",
+      "sha256": "ab4704a130be3e0731be00ad4936b06bebbacb4ade00d1c5ad46ad4871c8086f",
+      "size_bytes": 8663
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-automfles/seed-1.json",
+      "sha256": "22b3b5546bab7eb03b91dbf708bae65c51d7151e4f62482daef34df4c68309d3",
+      "size_bytes": 8633
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-autoregressive/seed-1.json",
+      "sha256": "2d404953e91992e12856a6682bf50546e60ec5fcaa1a94fb4ab6ae6a9b89eecb",
+      "size_bytes": 8670
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-autotbats/seed-1.json",
+      "sha256": "6ee30ccbcb7118c19f531d9e9ddfba5ee0a1bbe169e9a6f4badf1874c76c49a0",
+      "size_bytes": 8652
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-autotheta/seed-1.json",
+      "sha256": "025c7795c3f4cfb65af57bdcd0542c21fcd717aa49fb60e95bbb5c4dd22f1c30",
+      "size_bytes": 8652
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "682c6c8c28062166005f05a5b762bd6e055ebe6f0064328946779ca037a9481d",
+      "size_bytes": 8644
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-constantmodel/seed-1.json",
+      "sha256": "564199ca94a3b0be6fd984a59ef63c92d6df01dba087b58c40b5ca8738d17335",
+      "size_bytes": 8269
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-crostonclassic/seed-1.json",
+      "sha256": "60c581f7190310a39df86e27b2011632c84c1d949d4a4769844060e7b9f7692b",
+      "size_bytes": 8657
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-crostonoptimized/seed-1.json",
+      "sha256": "77387fc4ac14d6022f62b6d709c1791ee5eeb7d50e6bb5c95827078ad16ce93c",
+      "size_bytes": 8659
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-crostonsba/seed-1.json",
+      "sha256": "c6535115ced9600b260db101730529f7fc825a0949a461d2091a83ce6ecbc93d",
+      "size_bytes": 8645
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "6d48d04493b884b3994a80cd96055eacbf6dcd0c956f12f633b0f817c4e692bc",
+      "size_bytes": 8664
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-dynamictheta/seed-1.json",
+      "sha256": "8a949f6512843360eae8cdb623addf6c11a3aebc8e8030fd72f63ebafcda6b49",
+      "size_bytes": 8655
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-garch/seed-1.json",
+      "sha256": "41581d09df0d03256742f0cdc2c02275cffd94a5c406961101c08659d969db97",
+      "size_bytes": 8461
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-historicaverage/seed-1.json",
+      "sha256": "9c0f9b2a99aaf837a952768a4218cda69a31745805e845818415cbdfde7b8042",
+      "size_bytes": 8671
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-holt/seed-1.json",
+      "sha256": "27fd1d750be964d92032fbe8f6168b12adf5f116a9949ad8773aa7b93a73b8d5",
+      "size_bytes": 8660
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-holtwinters/seed-1.json",
+      "sha256": "f1157e0e7369c63b7dc72837a482bc48884b1981a45e7b8b7e852871ad6f8fbf",
+      "size_bytes": 8667
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-imapa/seed-1.json",
+      "sha256": "0431cea97a7a6252fd63d7c6ea923f8a487a8399b75233dc114633c5458ee7d7",
+      "size_bytes": 8648
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-mfles/seed-1.json",
+      "sha256": "3c0d49a36d84ef444c60905454909f9db0f68cd4c5df64c7c83a7a2914019af0",
+      "size_bytes": 8637
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-mstl/seed-1.json",
+      "sha256": "72ba1a9b767682f5cd90a638eaf73859479f7fd7b280c8f4c14865b5bbe8d3d2",
+      "size_bytes": 8629
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-naive/seed-1.json",
+      "sha256": "7523f883255ed60643a3737d6f515496df4dd7054c58598e381941ff4862453c",
+      "size_bytes": 8626
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-optimizedtheta/seed-1.json",
+      "sha256": "4441983a1b68b16ede36b0ac170cf2554688372aeb1a23d612d3ac89c376e189",
+      "size_bytes": 8657
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "1053b6eed862718c16a15008a6a415831d75ca1e9b9e1013c4c73c31068c3298",
+      "size_bytes": 8640
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "004cbc50c218839983bcc3713ea6273bc5fd8821ff3fa76f875e285b07bf8feb",
+      "size_bytes": 8657
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "6e1def10502c8ca1645f086c541f847ffa42fd8b6679eedafee9d3f0760da7ec",
+      "size_bytes": 8686
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-seasonalnaive/seed-1.json",
+      "sha256": "21b91768da4ce04e33816a69071cce4cc3d357febcc00f1ec56e111009d65c4e",
+      "size_bytes": 8636
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "8921764bc317a97d6c369c398018d5a48f7aa1242841fd670a97a885f8232486",
+      "size_bytes": 8650
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "11afe189bf31120fc0f0a6787d2aa54ea8c9057efd43641c6d8715ddc64dcb8d",
+      "size_bytes": 8662
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "73ba00b862e7302721df4c1f5374655e39bc0a26a3b617603b7062e4a87f60ba",
+      "size_bytes": 8681
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-tbats/seed-1.json",
+      "sha256": "c1c8228aa376c942b0682c9bcff285b846ed82510cf4cfa3ffe57296fddf93e3",
+      "size_bytes": 8635
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-theta/seed-1.json",
+      "sha256": "573c29d06bdaa698da8da9fb11dcb7a1fdc27cbd2148ca618adfbcdd519178ea",
+      "size_bytes": 8648
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-tsb/seed-1.json",
+      "sha256": "8a72b2cf612916459eb03317e56f70605d625ace435c76a080e7fdade93b3932",
+      "size_bytes": 8639
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-ucm/seed-1.json",
+      "sha256": "0f9745a5fbed5e1cfa8ff22d75ff8b549c8c12e5235d12a4ec596dbf28b957be",
+      "size_bytes": 8659
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-windowaverage/seed-1.json",
+      "sha256": "42cd551ce5a8dc4545d93112b0b331c84ee8e0fc055b48d190d62ccf911d2150",
+      "size_bytes": 8645
+    },
+    {
+      "path": "games/mini/prediction_locks/mini/sf-zeromodel/seed-1.json",
+      "sha256": "1101c8ad219cda51138013e1d81f7fc2f49e7a898124cb00706151d4a2db7468",
+      "size_bytes": 8265
+    },
+    {
+      "path": "games/mini/protocols/mini.json",
+      "sha256": "73da897a7e8ff4dd7718d8d9840f67ea7271bf322b7f871c6d69f52436a5a30a",
+      "size_bytes": 2125
+    },
+    {
+      "path": "games/numbers3/STATSFORECAST_LANE_MATRIX.json",
+      "sha256": "c3a5fe6b8625590a658ea54538f9a428530188e53a8c272ed5fa25347793fd17",
+      "size_bytes": 6958
+    },
+    {
+      "path": "games/numbers3/STATSFORECAST_REAL_GAME_SUMMARY.json",
+      "sha256": "f666577a0de78771cbf8a7ced626d136b348332151bcb6901305a5d6ce5ce44c",
+      "size_bytes": 642
+    },
+    {
+      "path": "games/numbers3/all_game_macro_summary.csv",
+      "sha256": "9b794dcd0b5169ecb1ed4a5ba7dd4e264c8f13600671153125eb5cc8443e299a",
+      "size_bytes": 3299
+    },
+    {
+      "path": "games/numbers3/campaign_summary.json",
+      "sha256": "e685af19e2d594ba375b7342f7767f79b994c7443fcaa9e0dacf8ffad26e179f",
+      "size_bytes": 1716813
+    },
+    {
+      "path": "games/numbers3/model_game_results.csv",
+      "sha256": "a97515d2b724b2d0718e91162bb85e5fa6f9035c03aca2c5402fbfa44feb6cf2",
+      "size_bytes": 16432
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/baseline:fixed/seed-1.json",
+      "sha256": "01869b705dc35c076484f68bb7330290e5794221e8ea93eb4e8c05f178ea5703",
+      "size_bytes": 7871
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/baseline:frequency/seed-1.json",
+      "sha256": "d89f16adeeac57dced08be68a34fb1c3ba84498f951602d64123285d4a16900f",
+      "size_bytes": 7875
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/baseline:last/seed-1.json",
+      "sha256": "c129a87000dab1f282ea7dbd06ea4847cfa852e9cc71cfb329f32eda83c9e6d8",
+      "size_bytes": 7870
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/baseline:mean/seed-1.json",
+      "sha256": "318c0e20e465c9babbe9fbdf1d0141a0fc578462333453f6db41977d896d1fb6",
+      "size_bytes": 7870
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/baseline:median/seed-1.json",
+      "sha256": "1f87ad0f6d5ed777f8dcf0594d21c949bf94d4f7df4252ad8497dc488251587d",
+      "size_bytes": 7872
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/baseline:random/seed-1.json",
+      "sha256": "50ed58ad68240709ec61ce07dcd32d6f1e55079ab3ddda40b1263ab25b64768f",
+      "size_bytes": 7872
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/baseline:statistical_ar1/seed-1.json",
+      "sha256": "91a89276ad88ce4f34ce215f8755c494359f0a3d6ce3b51457a683edf4b9529c",
+      "size_bytes": 7881
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-adida/seed-1.json",
+      "sha256": "eed0a4e8f67a7950b49cffcd37845cdb3170bfa2f13802c9d341d00e0049d432",
+      "size_bytes": 7865
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-arch/seed-1.json",
+      "sha256": "117a6e40fed1b2fe787c56273f3abe78240b596fe3d13c2f93eb07d5fb135b9c",
+      "size_bytes": 7864
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-arima/seed-1.json",
+      "sha256": "fe09285f97caa03fa4272f4d6ded4814a026486e4c4853cfceed5e008d027b63",
+      "size_bytes": 7865
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-autoarima/seed-1.json",
+      "sha256": "53e6a79e025f7917b76f537fef5b00edb29a5784240ff59ad1255edd98d9012b",
+      "size_bytes": 7869
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-autoces/seed-1.json",
+      "sha256": "045120dbbe70c1a56d6aa3083c28b8310373ce7418e1ed7372d541e3afc101da",
+      "size_bytes": 7867
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-autoets/seed-1.json",
+      "sha256": "2ec9d446e124ff30b6b2f208728f3288cd2929c91ec43b2e968a8d4d45df5aab",
+      "size_bytes": 7867
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-automfles/seed-1.json",
+      "sha256": "233e7b680c33191f6f6a5605e5606e452ee059cbe516c44d031d5c605fbea200",
+      "size_bytes": 7869
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-autoregressive/seed-1.json",
+      "sha256": "4302807a8bc8f983b91fb384689e9957b0308dffca1308481414e83a09e4c6f4",
+      "size_bytes": 7874
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-autotbats/seed-1.json",
+      "sha256": "0f0eed3001296937c42a22f559ccdd6b967be731a2b3bb43e47ae8314eb4cc23",
+      "size_bytes": 7869
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-autotheta/seed-1.json",
+      "sha256": "e207af5755f22f4f7b75335d1aa31265837d6563510fe025984b35ce7946a56e",
+      "size_bytes": 7869
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "e810db4187c87b886e1a3ba8cc7fb9acbc29fa41dc68d0204ca41af013da5f34",
+      "size_bytes": 7881
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-constantmodel/seed-1.json",
+      "sha256": "5264b191b53e28f7167ce3e23caed52e1039ff4f94e076061d9e0742280d1beb",
+      "size_bytes": 7873
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-crostonclassic/seed-1.json",
+      "sha256": "a4d3057021bf4d973775be45e41bb2dc9f701491024d724090c2608683231c5c",
+      "size_bytes": 7874
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-crostonoptimized/seed-1.json",
+      "sha256": "c8f2c18a400d04a82f10ef029c27f8b812b2b13aa270dd9aa1ebd03f27eeb97a",
+      "size_bytes": 7876
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-crostonsba/seed-1.json",
+      "sha256": "03c9a742c9554ed00319afcbd3fa0a271d28bccb360c01f13ca66d605d2e7aab",
+      "size_bytes": 7870
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "c1599a15039a89a985f84795139b5fde3ffb04ce5abe6ddf723d08de16704f18",
+      "size_bytes": 7881
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-dynamictheta/seed-1.json",
+      "sha256": "a9ef99cc97edd8e68b49b852938ad9972b2988bc41727c57e0323d548404701f",
+      "size_bytes": 7872
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-garch/seed-1.json",
+      "sha256": "c1ab6109fdb62be0dfb73a87e55ac9bb75972eee93a66871a0ef17f701cae8c7",
+      "size_bytes": 7865
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-historicaverage/seed-1.json",
+      "sha256": "514a8c1168e464173974c149058df8cac1310f3fa9fa01dd83d60af02a8ae278",
+      "size_bytes": 7875
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-holt/seed-1.json",
+      "sha256": "2af7be8c6047e6df687c3abed64356e6eb92a0c725bc04fb2eb003bf012ec219",
+      "size_bytes": 7864
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-holtwinters/seed-1.json",
+      "sha256": "8d0971cf2b5bc85e4d36af452d864429e3e66290af2819c6dd3de719c9ab7a2c",
+      "size_bytes": 7871
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-imapa/seed-1.json",
+      "sha256": "5b7eb9c95608afc26e08752bec9f6d7299dc827ef38df7f56a16d1231d4808ec",
+      "size_bytes": 7865
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-mfles/seed-1.json",
+      "sha256": "45591c9cca0f431ccf9278493f48e360e59b6b33e7b8de793a8fdff5651f25b5",
+      "size_bytes": 7865
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-mstl/seed-1.json",
+      "sha256": "856fdecb8cdfe33149bd02beb3c88781b751c489a498e432ec3c0c3f63852c87",
+      "size_bytes": 7864
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-naive/seed-1.json",
+      "sha256": "fd41c9827d4146d686bd37f7e7d465dc68d87b08fc82515a2ec9edf2c21e467f",
+      "size_bytes": 7865
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-optimizedtheta/seed-1.json",
+      "sha256": "702ee33e964bdd7d43115f0ca1b651644f0c22c3daba8e6f1dc669eb87c66ed1",
+      "size_bytes": 7874
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "22949c37acb4cf778535c7bd0771beacdd7d3a25160119a2ce31f5cfa4271078",
+      "size_bytes": 7879
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "1c49346ae419df402602bb92217fa8f2574aed35c26b7ded8c915808c21f1aa5",
+      "size_bytes": 7888
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "87803f747bc20126d0f2cb77943188f9122f6e82cad3b9c0a52a286daf9a25c3",
+      "size_bytes": 7897
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-seasonalnaive/seed-1.json",
+      "sha256": "b6c943302988d1bf9bf957957b05001f60fc75b5ca89b6d792e1f090d474abb3",
+      "size_bytes": 7873
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "71c26d519e77d6ddd8c10ff07761edc5a3d8e47f7b2832746225e8d514bb3733",
+      "size_bytes": 7881
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "637b52e2f25c9246a87fd37d0fda0b098772bc6ea8fe5d1932b6d8f2f22da111",
+      "size_bytes": 7886
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "81f7797eee307abdee6741d35dc2753b48b68f7c1c6c455f13c943a3862e3200",
+      "size_bytes": 7895
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-tbats/seed-1.json",
+      "sha256": "af3102620ed54adc8d2df181b0739ba7737fd572c6717942284e2b3446001a95",
+      "size_bytes": 7865
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-theta/seed-1.json",
+      "sha256": "a4613e09175d96c400eae2180bdfc17da9a251d33a58617f567f12de8873c3e8",
+      "size_bytes": 7865
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-tsb/seed-1.json",
+      "sha256": "2099675fbb5b07caf712dc3a1470a74c10fc6b45d48537848edf7897185be02d",
+      "size_bytes": 7863
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-ucm/seed-1.json",
+      "sha256": "691485bae8223c8d0666df98c4cf870106ebfa676fa0d79e2eff3740762c86f9",
+      "size_bytes": 7863
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-windowaverage/seed-1.json",
+      "sha256": "193c78b1ca40233f1ea26a843a08de3e806680bebcfc31523b1f162a1fa0ca00",
+      "size_bytes": 7873
+    },
+    {
+      "path": "games/numbers3/prediction_locks/numbers3/sf-zeromodel/seed-1.json",
+      "sha256": "2090cdd47f0f4f0b359cc02325650f5d65f1cc0d30bf31269cadd8063178f23d",
+      "size_bytes": 7869
+    },
+    {
+      "path": "games/numbers3/protocols/numbers3.json",
+      "sha256": "294cdf5e0a539c464c418cbef1adb16297445647be5f08e25381c6da434afb28",
+      "size_bytes": 2137
+    },
+    {
+      "path": "games/numbers4/STATSFORECAST_LANE_MATRIX.json",
+      "sha256": "54d67da17f054c65466e222ff6b755e4c0a100e39a942fc3205e1d2aa883b005",
+      "size_bytes": 6958
+    },
+    {
+      "path": "games/numbers4/STATSFORECAST_REAL_GAME_SUMMARY.json",
+      "sha256": "aef1febcad32f3870da0c9843866cf2e1aba71cb0b308a5a216670862c33b69a",
+      "size_bytes": 642
+    },
+    {
+      "path": "games/numbers4/all_game_macro_summary.csv",
+      "sha256": "cb1d22c6607a7c102a8e660c3a171d03037b948c0b23a1d9715f86528e6d16af",
+      "size_bytes": 2578
+    },
+    {
+      "path": "games/numbers4/campaign_summary.json",
+      "sha256": "e616a58afdcf3bf92914ace225ff612e520d4bda76ac6eaced7f2d9bf5a903a9",
+      "size_bytes": 1706759
+    },
+    {
+      "path": "games/numbers4/model_game_results.csv",
+      "sha256": "0f0e26d59953947f8a45302cf1908e6ebd1ffbab0ce4539836d61d7e2e582d89",
+      "size_bytes": 13048
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/baseline:fixed/seed-1.json",
+      "sha256": "7078ba4185d0b52bc179a5bf63405e01ff3fa419c1a9ad3417b878f46ded8b17",
+      "size_bytes": 8071
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/baseline:frequency/seed-1.json",
+      "sha256": "dadecee13526de4b423d0da897b1ec0cfc4aedcbf0719ec94e08fc4d04328f56",
+      "size_bytes": 8075
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/baseline:last/seed-1.json",
+      "sha256": "8b0e21a87bdd97bc9de03099d4c15bf6acbb748ff0eb56fe6fbebbe3f84e63e2",
+      "size_bytes": 8070
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/baseline:mean/seed-1.json",
+      "sha256": "4b2abfbbb2f243ce28b2658e3f3d12a280b4caebb6e16ca21f60313de593ff00",
+      "size_bytes": 8070
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/baseline:median/seed-1.json",
+      "sha256": "087846b7f2dd312522e38a4782d7ec218413199146df7b3cd40bf97a07d310a1",
+      "size_bytes": 8072
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/baseline:random/seed-1.json",
+      "sha256": "af280e0a3aa9f5c3b370d09ad299d0f4f0b4764bf025482eaeef3eaf9e5b0394",
+      "size_bytes": 8072
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/baseline:statistical_ar1/seed-1.json",
+      "sha256": "7571f471451e738aae14ea28925bb95ceac8eb5c4e22aec6333be18e828d7069",
+      "size_bytes": 8081
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-adida/seed-1.json",
+      "sha256": "b5b969d973959413096de22185de55a8ac99eb829319211079e399d2cf6789fd",
+      "size_bytes": 8065
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-arch/seed-1.json",
+      "sha256": "c41ca7be378c53ce8b1132304b907b02d810bf81686d8557df6cc3541542a2d5",
+      "size_bytes": 8064
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-arima/seed-1.json",
+      "sha256": "84792f8203966cc4857007485ebc222be5098bdbb6576e491ee1704f8782b186",
+      "size_bytes": 8065
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-autoarima/seed-1.json",
+      "sha256": "b7ef734447904543b35dbfd574318cda8aa326ddc394562cb19ae96a798a61de",
+      "size_bytes": 8069
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-autoces/seed-1.json",
+      "sha256": "dcf70c371101a3c9edbee4d178400296be7b6b6e4a15358c2aaf550f77ddb738",
+      "size_bytes": 8067
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-autoets/seed-1.json",
+      "sha256": "9a7848f3265dad8dacd3b12d3d4584b0c8de5182cb8c7890ba9c03d93d9f1b6b",
+      "size_bytes": 8067
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-automfles/seed-1.json",
+      "sha256": "94a1d7dd48c6cad15115f6a41386ee2d49820a44efc5d1d7dacfc7be56e422c8",
+      "size_bytes": 8069
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-autoregressive/seed-1.json",
+      "sha256": "f725aa7ddb0ad8d906327fa725cc3e4ab3b75d6ab977e8c744ff686ce528e276",
+      "size_bytes": 8074
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-autotbats/seed-1.json",
+      "sha256": "33bda4e5380ee83b278b76c5e33309d2ba840add66f6a48891a38269d1387bfe",
+      "size_bytes": 8069
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-autotheta/seed-1.json",
+      "sha256": "c172f24a6703b2a36c7898555c6a15418a1f9829d110eb3deeb98f562915594b",
+      "size_bytes": 8069
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "ff559ff3f4cadbc93784e7e8e0b948f1cc23d90f7707867eb67ce146a9f85717",
+      "size_bytes": 8081
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-constantmodel/seed-1.json",
+      "sha256": "6252ca42dd113f16c0ae13b50e05838ef8852bb6be75d2d76d002ef0278ae76e",
+      "size_bytes": 8073
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-crostonclassic/seed-1.json",
+      "sha256": "03bf38d970cb22571cb2f1c759548c0f2813bf14ea6c8b3bda6f14c67519c487",
+      "size_bytes": 8074
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-crostonoptimized/seed-1.json",
+      "sha256": "15103cbcdde7e81a39dd9aaed1bf0152a50982eca19e5c74b74b960883d375d2",
+      "size_bytes": 8076
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-crostonsba/seed-1.json",
+      "sha256": "5781ea1efb5bf48521f8d87ab9d20404ea6ff9a3622cc38bf99a931a975ab549",
+      "size_bytes": 8070
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "4a37e8fe0b26ebaa1185908ddfb661ba5bd442872103ae2dd3830ecb13881434",
+      "size_bytes": 8081
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-dynamictheta/seed-1.json",
+      "sha256": "a272cf3edc77f6a7238f0149c5ea84f6a1ec842ef3fd2f8877054ee5e57073ed",
+      "size_bytes": 8072
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-garch/seed-1.json",
+      "sha256": "bb006d256d22e418740a83c11d5629f5dd26ac7119fc59c435dbe3a1b09435fb",
+      "size_bytes": 8065
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-historicaverage/seed-1.json",
+      "sha256": "5182099ea2872dbce0489da5e2a31efcee161ae46b925126fa9af32fe4429fa5",
+      "size_bytes": 8075
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-holt/seed-1.json",
+      "sha256": "a13ea07d6b3cd4e097f9487da204e71869b030d67195753fdc10a31d266822a8",
+      "size_bytes": 8064
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-holtwinters/seed-1.json",
+      "sha256": "9017123cf8e426aa4fed7c06e56c23ffd0db4cc5678ab553273e65367f4a4f33",
+      "size_bytes": 8071
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-imapa/seed-1.json",
+      "sha256": "0707685d6a1554cef4b137850ad25d09723493a45fcaffa81bf209ab1efe999b",
+      "size_bytes": 8065
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-mfles/seed-1.json",
+      "sha256": "f2498b88fe22097ea126f721064870fd5310fbad8f45bff6e4dfd8e1f5a900d1",
+      "size_bytes": 8065
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-mstl/seed-1.json",
+      "sha256": "15436f86a5109cc358c1cce2e1a86f7ba5c64dcea4b5234b52b0d9f81a4ee70b",
+      "size_bytes": 8064
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-naive/seed-1.json",
+      "sha256": "e2c9bbd1a0e96477a0b909b7670374593a5d3d760dbefa4c1a8e1f2ca5dbcece",
+      "size_bytes": 8065
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-optimizedtheta/seed-1.json",
+      "sha256": "4f67a3ac13b6980b9e83bd96b4fa7c33fbea4f88f5157f9739ffddd1b97b63a1",
+      "size_bytes": 8074
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "929114975943e0e9b053c1e38566648891c1540e95eb6df74365ac9381b0d9cb",
+      "size_bytes": 8079
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "33b7bab4a8c343d2da34cda606daada41db13ec7f778060ed8e9008592a3b374",
+      "size_bytes": 8088
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "fb4b61efc67fd79e4c178ebaa00ec5f9e5d3cfd17dac1e3525f258d5d3b7d55b",
+      "size_bytes": 8097
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-seasonalnaive/seed-1.json",
+      "sha256": "be4b926bdea13dc5d459bb5ba91dd3ad3d78ffbba3798525a9eee274225b927f",
+      "size_bytes": 8073
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "9e4ac1dd1f0a6108c4592ce5c67b078bd508083bb1ebec897b0550d3415df14b",
+      "size_bytes": 8081
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "1fe4b12017f26ee44faf3f038b89cd331db3829664e1c477f847f54ccf9da1bb",
+      "size_bytes": 8086
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "2d5bc95b0dd56264ab08c0d7633df9c15962273787c3f3f497bcda2ce22a2e8b",
+      "size_bytes": 8095
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-tbats/seed-1.json",
+      "sha256": "b4a43e9777ceb7ec825904fb71413bee0adc8ea66ca48fc6641214cffe3c831a",
+      "size_bytes": 8065
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-theta/seed-1.json",
+      "sha256": "c0bd88924b1a62f72134a84bdac1e2c48f32a97ab7955f75bf842d572b6cdad5",
+      "size_bytes": 8065
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-tsb/seed-1.json",
+      "sha256": "76126af74d2bc4fdd68e2dc91f60893de70db9b59280432460b29323c169ab01",
+      "size_bytes": 8063
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-ucm/seed-1.json",
+      "sha256": "d6506ac3a7259e8b613b686fdc99e2b7161113626dfb4c54ec7b631d6a8572b3",
+      "size_bytes": 8063
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-windowaverage/seed-1.json",
+      "sha256": "f6f585b5187b5a85d650bba968f87bcc2c09d046e688a1a32b4ba7e836436719",
+      "size_bytes": 8073
+    },
+    {
+      "path": "games/numbers4/prediction_locks/numbers4/sf-zeromodel/seed-1.json",
+      "sha256": "be422ab13ecb110bdb4f8c149eb227e921c542b5c757df91e120c64fa79fa5d4",
+      "size_bytes": 8069
+    },
+    {
+      "path": "games/numbers4/protocols/numbers4.json",
+      "sha256": "5e0a536c66420b427cffb941d36412905e5530659cc27c24014560ad33d9a047",
+      "size_bytes": 2137
+    },
+    {
+      "path": "model_game_results.csv",
+      "sha256": "99521636101c4c28c4a214dffc213b64c3540932718b8f3ff5d7c5dd41305739",
+      "size_bytes": 85522
+    },
+    {
+      "path": "prediction_locks/bingo5/baseline:fixed/seed-1.json",
+      "sha256": "1b5d12b8fdea8dc796fe9167cfbae7624a7b0f33308bbae25bce2e8de66d70ab",
+      "size_bytes": 9269
+    },
+    {
+      "path": "prediction_locks/bingo5/baseline:frequency/seed-1.json",
+      "sha256": "367a9b4308705694bfbfd09deb68d7a92ffcf2edfd9dc58bbe8535e5d1316d79",
+      "size_bytes": 9273
+    },
+    {
+      "path": "prediction_locks/bingo5/baseline:last/seed-1.json",
+      "sha256": "fd1c7e0586db1c11d48a67cb136786e0765028482f601b39527e9d3af59b7502",
+      "size_bytes": 9287
+    },
+    {
+      "path": "prediction_locks/bingo5/baseline:mean/seed-1.json",
+      "sha256": "fb02fd0774cf141fdc2e16339916548d626ed6ada093a686a66f240aa0021d35",
+      "size_bytes": 9268
+    },
+    {
+      "path": "prediction_locks/bingo5/baseline:median/seed-1.json",
+      "sha256": "b3bc8e656ab4c9c0cba61589bff3cee0fd9ed5ab9cb50d7769428af40b0ea1bd",
+      "size_bytes": 9270
+    },
+    {
+      "path": "prediction_locks/bingo5/baseline:random/seed-1.json",
+      "sha256": "eb5dbc01e801505082ff137b3a529452eea017d2e714533a2038d4f1c781b6c7",
+      "size_bytes": 9303
+    },
+    {
+      "path": "prediction_locks/bingo5/baseline:statistical_ar1/seed-1.json",
+      "sha256": "bd3fb85f8aaebdd114e6a02095bc3df56d5e62bd5871d33b99a323695f8cbba3",
+      "size_bytes": 9279
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-adida/seed-1.json",
+      "sha256": "f173066da10b8a91be803dee7dd36ba57bc598bcb2940bde83b370c80d260dc3",
+      "size_bytes": 9263
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-arch/seed-1.json",
+      "sha256": "32375b1786c84ee4b0b79fe02b6c77e55a3c9ae452d58aeab5b5ebe8c5f813ac",
+      "size_bytes": 8682
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-arima/seed-1.json",
+      "sha256": "0d0e7fdb95de880491b7571fe7fda5978a3c942bf59d3f44cea21a66a417e384",
+      "size_bytes": 9263
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-autoarima/seed-1.json",
+      "sha256": "5c19f95c57ae3d508b44549f7cb30a90b3fb45cd062cccbc438fb0cf59f63938",
+      "size_bytes": 9267
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-autoces/seed-1.json",
+      "sha256": "4428c6914dcde6f9c061c0c8629525f551b28509e30a7dc4cf7992a6c05b87a8",
+      "size_bytes": 9265
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-autoets/seed-1.json",
+      "sha256": "dc0e36c9be3bc8f102fd00c6e87716a0aa37219983d2a3b18826a9f285f3665a",
+      "size_bytes": 9265
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-automfles/seed-1.json",
+      "sha256": "04f4d9f4025c80f6f3b3e768a18f059916bc33c074480070de8382ff1834ef90",
+      "size_bytes": 9269
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-autoregressive/seed-1.json",
+      "sha256": "5b4d57f85db3554b62d7146f8c6c44c4f1066e84543488d9b630415f1dc16422",
+      "size_bytes": 9272
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-autotbats/seed-1.json",
+      "sha256": "cf88343938489761b936658293d77fbb528640f8f75c4d746da22cc893d1e88e",
+      "size_bytes": 9267
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-autotheta/seed-1.json",
+      "sha256": "9ba0c0fd571fdc5aad2ec979c2823c0d5f47012790d660095ba4e79f5aa10cd5",
+      "size_bytes": 9267
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "3e46602818359bce5f9a458e96e1a9544c982b5b3c4570ebf2e13123c3314dce",
+      "size_bytes": 9298
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-constantmodel/seed-1.json",
+      "sha256": "48802e98ea1cc2a9c076ae24f5ea1e8f27f51188431d1c8d9f7d14feaaffe17c",
+      "size_bytes": 8671
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-crostonclassic/seed-1.json",
+      "sha256": "9cd53ee961de2807c192c6e83fccd7d88dd14485890a13f4af31aa6b0d6f3177",
+      "size_bytes": 9272
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-crostonoptimized/seed-1.json",
+      "sha256": "08b306d9fdb488246b3568370c94be5662f5b9fce25e84786eae95fa15f2699f",
+      "size_bytes": 9274
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-crostonsba/seed-1.json",
+      "sha256": "a16fa57488f567783a4dd5e764a0ced295719e503397b5f630f9b36cca634496",
+      "size_bytes": 9268
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "152ec98f2b9220a77bdcd1a3f297b5a743a55c7a9c95bc490611b52076f9aba9",
+      "size_bytes": 9279
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-dynamictheta/seed-1.json",
+      "sha256": "0edc19045b7d8b7da26ce8f8f5a076231bd199b7cc95ffe40e5358da5bbb2164",
+      "size_bytes": 9270
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-garch/seed-1.json",
+      "sha256": "fb678595d4383a1de351905cc328a0743558afad8ed9bfa4c30ccc2c2b893d46",
+      "size_bytes": 8673
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-historicaverage/seed-1.json",
+      "sha256": "cfcd99d13a8ab47ccdf987332dc990cd37f78a54ec68865a2b2e5eaea9b60c6e",
+      "size_bytes": 9273
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-holt/seed-1.json",
+      "sha256": "46c06e883b2005a9cf1b46ee8d59974f0abc7197c21c0e740f1aa1a9cd8fb372",
+      "size_bytes": 9262
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-holtwinters/seed-1.json",
+      "sha256": "eaf982939ac5e4ec442ccd2f40afa2bc60995b863a2b0fcfa651e412ffb45c40",
+      "size_bytes": 9269
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-imapa/seed-1.json",
+      "sha256": "4398949e3484e1870e62a42152578bf831f8c92ea96ee7f5d9f4500c2ca00fed",
+      "size_bytes": 9263
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-mfles/seed-1.json",
+      "sha256": "842c631876acf2f60558fdc494ec49d5be8ebfa1ac2e07a2f14e37fd1247236b",
+      "size_bytes": 9270
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-mstl/seed-1.json",
+      "sha256": "e45d6fc585252d744d512ccbe6929e29f30237babd7c62238692b8ca56311801",
+      "size_bytes": 9262
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-naive/seed-1.json",
+      "sha256": "8214fd34876aeccef60539e329191f557df19c23af639d540495507237eded52",
+      "size_bytes": 9282
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-optimizedtheta/seed-1.json",
+      "sha256": "558bb2ad0b3e677f0009c77ba35af82f86345c08558d6329980ca28c083fb58a",
+      "size_bytes": 9272
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "3448f552d465093e57d2f38a6069a91de4726679335e21bb199a90dee646f08e",
+      "size_bytes": 9296
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "6baf52326714746811d7f09023f4875219cd41bd93af6119499847cbfdfe98d7",
+      "size_bytes": 9286
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "f32c087c1e1ddde1aa5224e944f37e5b7caf2322ab5db6fa08737932225a68a2",
+      "size_bytes": 9295
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-seasonalnaive/seed-1.json",
+      "sha256": "c4c809ae35dc242b88ec24bc9c91b4e966fa9e31e32192247512800d9580862b",
+      "size_bytes": 9290
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "df3eebf7d3cf3e0bf74e01422c16221d78943d62e7826efd5b6ca8d60263d16b",
+      "size_bytes": 9292
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "4cb9a01dc9771240b58a6854e2eafcf1c5d721bd0b86ed33acb2622c501ce447",
+      "size_bytes": 9284
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "d91264228a596356ef0f1703a7a6c4c4b2a0d8f8f5f57f2899398db8e957588d",
+      "size_bytes": 9293
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-tbats/seed-1.json",
+      "sha256": "5e17b0ee81feb443c0e36e68cb38a8b5abecc8fed0486d11c36b2d6a56cdc9ec",
+      "size_bytes": 9264
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-theta/seed-1.json",
+      "sha256": "5d7c8d505c98ec637433ff9c24981ad6da416255b3a4eaf648ae708637d18eb1",
+      "size_bytes": 9263
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-tsb/seed-1.json",
+      "sha256": "e2934dcba205b8606608a8a3898b1d39423f1c148f59426f1b8fe1421b454b04",
+      "size_bytes": 9261
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-ucm/seed-1.json",
+      "sha256": "2a41d44c3352873814d0a59e54d694c051f2328999f2f933a432898e28f18f4b",
+      "size_bytes": 9261
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-windowaverage/seed-1.json",
+      "sha256": "c4ff5f89b173f7f28604d20a10c9d1d39226e163b7af896c9779779d3c523eb6",
+      "size_bytes": 9274
+    },
+    {
+      "path": "prediction_locks/bingo5/sf-zeromodel/seed-1.json",
+      "sha256": "c23b4de5b8ff3b7987726aa2313e71d236407daa4b763512e26a45124f9beb9a",
+      "size_bytes": 8667
+    },
+    {
+      "path": "prediction_locks/loto6/baseline:fixed/seed-1.json",
+      "sha256": "777b6dc53d8890f3dddc54bb422e59ec8e538fc9567a8e921af2743689bd57dc",
+      "size_bytes": 8868
+    },
+    {
+      "path": "prediction_locks/loto6/baseline:frequency/seed-1.json",
+      "sha256": "f387a507a96942134224a4360f5749e798f1f9d28072d11990f27b4eb9df02ab",
+      "size_bytes": 8972
+    },
+    {
+      "path": "prediction_locks/loto6/baseline:last/seed-1.json",
+      "sha256": "44a3cea978b7d53a7f4682cec924e6735fb32489b80f18b7a0f79dfe53d87f61",
+      "size_bytes": 8951
+    },
+    {
+      "path": "prediction_locks/loto6/baseline:mean/seed-1.json",
+      "sha256": "cd27564624d17a70dddbedb96ceb28cbdbcc7e7f3baf215ed5c41535441aea8e",
+      "size_bytes": 8967
+    },
+    {
+      "path": "prediction_locks/loto6/baseline:median/seed-1.json",
+      "sha256": "56a9812c93652b1eacd73dac5f48f47b04d02ba86241ba8de911ca78416d137a",
+      "size_bytes": 8969
+    },
+    {
+      "path": "prediction_locks/loto6/baseline:random/seed-1.json",
+      "sha256": "1c996fe15db745d7b59bea7af9dbb3732500f0d50b89d71d5e505977ffbb11a6",
+      "size_bytes": 8936
+    },
+    {
+      "path": "prediction_locks/loto6/baseline:statistical_ar1/seed-1.json",
+      "sha256": "794642e2fefb440d875cb944b6751187a59c37e617fa4e1f65a6f177dd34ba08",
+      "size_bytes": 8978
+    },
+    {
+      "path": "prediction_locks/loto6/sf-adida/seed-1.json",
+      "sha256": "3084995699d1bd874214fb9ffdd218340fd8b2174166d82c3ba90a72b60a926d",
+      "size_bytes": 8962
+    },
+    {
+      "path": "prediction_locks/loto6/sf-arch/seed-1.json",
+      "sha256": "6b8e3e0ea22ce44d54718486bde7d988aa2a0d12ad4d079e8f76bb946408c2e8",
+      "size_bytes": 8875
+    },
+    {
+      "path": "prediction_locks/loto6/sf-arima/seed-1.json",
+      "sha256": "73b99aad357ad77621d18382e01db641e7172ebf482e8c0b01d78d3739641667",
+      "size_bytes": 8962
+    },
+    {
+      "path": "prediction_locks/loto6/sf-autoarima/seed-1.json",
+      "sha256": "196270108c08ec604ff4e4eafd84144c2593caf2f330d16137aab2afa7589308",
+      "size_bytes": 8966
+    },
+    {
+      "path": "prediction_locks/loto6/sf-autoces/seed-1.json",
+      "sha256": "01ee8441dd0617f2aa0d1772cbe21e43271552b5404c541654e3579064f76034",
+      "size_bytes": 8964
+    },
+    {
+      "path": "prediction_locks/loto6/sf-autoets/seed-1.json",
+      "sha256": "39e02733f6084622cfc9e985121ba84e0df6d3ba3ca8b8cec5f5b091be584677",
+      "size_bytes": 8964
+    },
+    {
+      "path": "prediction_locks/loto6/sf-automfles/seed-1.json",
+      "sha256": "55a6c9e03ca6ea5188d963de15aef2a7a6b0aeebd9a504ee470c2a0d14cd098f",
+      "size_bytes": 8949
+    },
+    {
+      "path": "prediction_locks/loto6/sf-autoregressive/seed-1.json",
+      "sha256": "ab007ecf5ea832f438feade2aab3bc79eb22fdb96ebc352476f2750fc049aac6",
+      "size_bytes": 8971
+    },
+    {
+      "path": "prediction_locks/loto6/sf-autotbats/seed-1.json",
+      "sha256": "9702e5a4c29a3168150a969e212eb2bc528b4f0b69470a6357064e027ab7ee43",
+      "size_bytes": 8966
+    },
+    {
+      "path": "prediction_locks/loto6/sf-autotheta/seed-1.json",
+      "sha256": "3fb9383f14eb99183f98f1e677de47680e8226c1c5097b15859b4c58c213f905",
+      "size_bytes": 8966
+    },
+    {
+      "path": "prediction_locks/loto6/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "43aa89c48b1a4ac42c2b69582901a622c973d67f28e516609e68c72288c6ac5d",
+      "size_bytes": 8963
+    },
+    {
+      "path": "prediction_locks/loto6/sf-constantmodel/seed-1.json",
+      "sha256": "65ac924a6368698232886caa50330c94d780c130ad53453f1fcca5d966c5fd00",
+      "size_bytes": 8470
+    },
+    {
+      "path": "prediction_locks/loto6/sf-crostonclassic/seed-1.json",
+      "sha256": "93da839fb79b9148aec58ffc71d9f97118d6cedef7b775ddbb5797726cf36a21",
+      "size_bytes": 8971
+    },
+    {
+      "path": "prediction_locks/loto6/sf-crostonoptimized/seed-1.json",
+      "sha256": "d8cfc80604cba8b6dd66cfd963d619d3dd121443111be52d7cc53130ff6a9512",
+      "size_bytes": 8973
+    },
+    {
+      "path": "prediction_locks/loto6/sf-crostonsba/seed-1.json",
+      "sha256": "b914fe203bbe6e599060a4205953b327269d8372d430d301fbbf6b555748688d",
+      "size_bytes": 8967
+    },
+    {
+      "path": "prediction_locks/loto6/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "86807475b527c81c6a7db513eb0d3ac0072b5aa81d48fc9f27bf639d3044d02d",
+      "size_bytes": 8978
+    },
+    {
+      "path": "prediction_locks/loto6/sf-dynamictheta/seed-1.json",
+      "sha256": "ed1f34f2a7c0d2cb622c0fee8b62b55e85e4c878acefdbae391d290dcd71dba2",
+      "size_bytes": 8969
+    },
+    {
+      "path": "prediction_locks/loto6/sf-garch/seed-1.json",
+      "sha256": "c3cfe020acf6c3878e0ee8e98ef21511df8b6382e75cc1c45d007feb9eb6c126",
+      "size_bytes": 8886
+    },
+    {
+      "path": "prediction_locks/loto6/sf-historicaverage/seed-1.json",
+      "sha256": "ec82d322afd6ac43356cef79b069ab959c2041adfa3ebfc84de71e0951f2d29c",
+      "size_bytes": 8972
+    },
+    {
+      "path": "prediction_locks/loto6/sf-holt/seed-1.json",
+      "sha256": "1ebbdacc2143bc6d5f01f3d9525bee0cee5621e2e3db7d04f3388b0428ab9e5b",
+      "size_bytes": 8961
+    },
+    {
+      "path": "prediction_locks/loto6/sf-holtwinters/seed-1.json",
+      "sha256": "b2468f4dfdbf38d59dc24f85dfe180f3d864d8efd422af4230f496108a265d38",
+      "size_bytes": 8968
+    },
+    {
+      "path": "prediction_locks/loto6/sf-imapa/seed-1.json",
+      "sha256": "a6108379fd9264832d873965c342a238394c67ba260607acd16bc977a290652b",
+      "size_bytes": 8962
+    },
+    {
+      "path": "prediction_locks/loto6/sf-mfles/seed-1.json",
+      "sha256": "608a74777a7530baf5fcd546627712dbfc1d47985b4ef6bb008a20ce367821b9",
+      "size_bytes": 8953
+    },
+    {
+      "path": "prediction_locks/loto6/sf-mstl/seed-1.json",
+      "sha256": "237fa4dc7b944f50512e8d111dd92b91c60feff68a1ee61a4678154d0e8912a2",
+      "size_bytes": 8955
+    },
+    {
+      "path": "prediction_locks/loto6/sf-naive/seed-1.json",
+      "sha256": "88c9c4e5f3dab05127e8252e6f2e831399f218e4748922d4877fd57d491bb2f0",
+      "size_bytes": 8946
+    },
+    {
+      "path": "prediction_locks/loto6/sf-optimizedtheta/seed-1.json",
+      "sha256": "dc336839d2182244c7fabdbeeb9c640f48cc069df52e3161934070c9abcc05b4",
+      "size_bytes": 8971
+    },
+    {
+      "path": "prediction_locks/loto6/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "c5599c7c4657a4851a046c585ebba49dfb3a982d1d1df218775f02eff0747372",
+      "size_bytes": 8960
+    },
+    {
+      "path": "prediction_locks/loto6/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "6036f0507fd01c99805649ea2268a43fea1248a5d68e366440462225c8dd0c7b",
+      "size_bytes": 8981
+    },
+    {
+      "path": "prediction_locks/loto6/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "c6a435582cd0821fa408f0e6a2db45c34a38f39d41ef1fcc4658bb42ae9ba3fd",
+      "size_bytes": 8994
+    },
+    {
+      "path": "prediction_locks/loto6/sf-seasonalnaive/seed-1.json",
+      "sha256": "70f60aae382c393f04e63a2eecd79c01b7110e6cd30d1f37c2ce09dab053137c",
+      "size_bytes": 8955
+    },
+    {
+      "path": "prediction_locks/loto6/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "5e637087a3188c2d6cf65fb030449d52a3f84b3deade87485cc5e46e80d0e1a5",
+      "size_bytes": 8973
+    },
+    {
+      "path": "prediction_locks/loto6/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "599c8d3177ae8900606e82d68d8a502130252ff69706ddf0c9a84fd119502abe",
+      "size_bytes": 8981
+    },
+    {
+      "path": "prediction_locks/loto6/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "2978e0944f41d63ed2565a162857cf7197ca596eae37f1e6bd61bc947e14c31e",
+      "size_bytes": 8992
+    },
+    {
+      "path": "prediction_locks/loto6/sf-tbats/seed-1.json",
+      "sha256": "fc55b845d2a57255b7832013f623d5255593a2a2dc80aa36dca3c85351dff921",
+      "size_bytes": 8962
+    },
+    {
+      "path": "prediction_locks/loto6/sf-theta/seed-1.json",
+      "sha256": "50bee9b5a074a223d1ab4b3ee38534f53c66672016b810ca01e0b3eda0487c9e",
+      "size_bytes": 8962
+    },
+    {
+      "path": "prediction_locks/loto6/sf-tsb/seed-1.json",
+      "sha256": "1d009b5a150238cb30c663772bdaa23d3c67994ef5551367b60598dfeb574ac9",
+      "size_bytes": 8958
+    },
+    {
+      "path": "prediction_locks/loto6/sf-ucm/seed-1.json",
+      "sha256": "dd190225aabf5c133245c21ef17a5ff669763795cf27502961d7dfc91d3e5571",
+      "size_bytes": 8960
+    },
+    {
+      "path": "prediction_locks/loto6/sf-windowaverage/seed-1.json",
+      "sha256": "1a15b5f504c3904c419d212dc349382c47ad60760977477056bd13b0736d763e",
+      "size_bytes": 8963
+    },
+    {
+      "path": "prediction_locks/loto6/sf-zeromodel/seed-1.json",
+      "sha256": "5240581be99208573e1af140e594360132b043674f6765d7d48d86f643df89c4",
+      "size_bytes": 8466
+    },
+    {
+      "path": "prediction_locks/loto7/baseline:fixed/seed-1.json",
+      "sha256": "fc5aa0283a6ad624c4e6687e11ebc3f5899f083914e30295e670f6199dcf7821",
+      "size_bytes": 8968
+    },
+    {
+      "path": "prediction_locks/loto7/baseline:frequency/seed-1.json",
+      "sha256": "be45fcdb153fa9b8eedf4d1a0862421e79037f596fed44eaad2dffb944fadd93",
+      "size_bytes": 8972
+    },
+    {
+      "path": "prediction_locks/loto7/baseline:last/seed-1.json",
+      "sha256": "34c4f93f7009f230b4f5e580a6d88237dd7de5a59def38ad2cac81fd47091f5b",
+      "size_bytes": 9006
+    },
+    {
+      "path": "prediction_locks/loto7/baseline:mean/seed-1.json",
+      "sha256": "43128c5e2e82c9d588c230faedac026c2c26d3db51055e66db31913ebb5faa67",
+      "size_bytes": 9067
+    },
+    {
+      "path": "prediction_locks/loto7/baseline:median/seed-1.json",
+      "sha256": "df71575c8ee795d7c05ccf89ef993103f192b98541256f49733c4ec06887e363",
+      "size_bytes": 8969
+    },
+    {
+      "path": "prediction_locks/loto7/baseline:random/seed-1.json",
+      "sha256": "04ae9058fd80471e451a4c400732d7f37bf9ca2a3a5fdb77a3e3f53a6507cfcf",
+      "size_bytes": 9031
+    },
+    {
+      "path": "prediction_locks/loto7/baseline:statistical_ar1/seed-1.json",
+      "sha256": "022235787fccb3b500992db21d4ca30e0530e355b6476d3b4e73b6c2454e34ab",
+      "size_bytes": 9051
+    },
+    {
+      "path": "prediction_locks/loto7/sf-adida/seed-1.json",
+      "sha256": "9c7727b5f877a6eb935180a1cc4338f0eb46a7973c46e38249c67c61c77873f5",
+      "size_bytes": 9028
+    },
+    {
+      "path": "prediction_locks/loto7/sf-arch/seed-1.json",
+      "sha256": "7cd2043bedcf3cd85f9f8828ebd6641e58d63be667c5327ba2ab56c89cf37d14",
+      "size_bytes": 8773
+    },
+    {
+      "path": "prediction_locks/loto7/sf-arima/seed-1.json",
+      "sha256": "665b9cee926a341352fea019598891682d533d1c2262f0de7576f90dfcce3c49",
+      "size_bytes": 9035
+    },
+    {
+      "path": "prediction_locks/loto7/sf-autoarima/seed-1.json",
+      "sha256": "d8d608bcf7712a6d98f9b870f983534ee1ccc8785c00d86a7cab1a5ff1350872",
+      "size_bytes": 9066
+    },
+    {
+      "path": "prediction_locks/loto7/sf-autoces/seed-1.json",
+      "sha256": "c502698c1b2bcc754e584b60a07ec7c90f958fd3c71227d7c680cba15f3da8d4",
+      "size_bytes": 9060
+    },
+    {
+      "path": "prediction_locks/loto7/sf-autoets/seed-1.json",
+      "sha256": "9bd5bd843a5f0d6b9d5d2c7a66dfeccda7a9a8cb65f7d26dde2dd6acf6363369",
+      "size_bytes": 9064
+    },
+    {
+      "path": "prediction_locks/loto7/sf-automfles/seed-1.json",
+      "sha256": "8c09eba6f1ea7cf69ecd70e1b516ce0ebbde348e950346abc64f217520e6b054",
+      "size_bytes": 9010
+    },
+    {
+      "path": "prediction_locks/loto7/sf-autoregressive/seed-1.json",
+      "sha256": "26db9e3e147826f56807a389ef116b87684b3ed00b3bf9d49b2a1f60138d1e2b",
+      "size_bytes": 9044
+    },
+    {
+      "path": "prediction_locks/loto7/sf-autotbats/seed-1.json",
+      "sha256": "385f2cfdef7f5a991444abdb827262d0cfbfe02a02dfcd8416ad89dfc05c2e60",
+      "size_bytes": 8991
+    },
+    {
+      "path": "prediction_locks/loto7/sf-autotheta/seed-1.json",
+      "sha256": "635a3b45ca256c6ba4247f01dff928e9cb1771f421c46c00dcf34e6ea4d8e9ae",
+      "size_bytes": 9032
+    },
+    {
+      "path": "prediction_locks/loto7/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "93f581cd74b0e0c0c60012c4e1e4b104b56057e05f6a2a4dc0e4b74821b21a73",
+      "size_bytes": 9018
+    },
+    {
+      "path": "prediction_locks/loto7/sf-constantmodel/seed-1.json",
+      "sha256": "f2c8e20ef5f66d6c320f48dba3a9c4a06ab00238cdb3ecebdc0dbec246cc15b7",
+      "size_bytes": 8470
+    },
+    {
+      "path": "prediction_locks/loto7/sf-crostonclassic/seed-1.json",
+      "sha256": "4a325ef19ec2b7cce08c423468588625d62b72e970a686df3b7f09c8cacd76f5",
+      "size_bytes": 9037
+    },
+    {
+      "path": "prediction_locks/loto7/sf-crostonoptimized/seed-1.json",
+      "sha256": "ee0973681c8820288afa38f3e0120decc508117a0ae8852a1a36aa9319877fef",
+      "size_bytes": 9039
+    },
+    {
+      "path": "prediction_locks/loto7/sf-crostonsba/seed-1.json",
+      "sha256": "9e236e8c00603d9a5a0eb925bf68c3590c566f4da7e337b226280394cdffbf24",
+      "size_bytes": 9018
+    },
+    {
+      "path": "prediction_locks/loto7/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "ac8ff95a263afedf18c8273a41dba4e0d9a2ef2ee42cee97be220898c4fe755d",
+      "size_bytes": 9044
+    },
+    {
+      "path": "prediction_locks/loto7/sf-dynamictheta/seed-1.json",
+      "sha256": "f1ae1c66f18a5033cba77425f2db582851f9036ac7c1817da388937cf3898520",
+      "size_bytes": 9035
+    },
+    {
+      "path": "prediction_locks/loto7/sf-garch/seed-1.json",
+      "sha256": "b18041858e8b086ebf6a6215036b6a4ce0178366852c5142c75ea801865bb3c4",
+      "size_bytes": 8776
+    },
+    {
+      "path": "prediction_locks/loto7/sf-historicaverage/seed-1.json",
+      "sha256": "57dd34effc31b5f7d16f3f4628117a844f91d40b443170f399c81885b8f742c7",
+      "size_bytes": 9072
+    },
+    {
+      "path": "prediction_locks/loto7/sf-holt/seed-1.json",
+      "sha256": "6d8249cad5be1b5bc919bb9a0531a5f5e97c2ec9c7a9bd95ce4d54801012a838",
+      "size_bytes": 9061
+    },
+    {
+      "path": "prediction_locks/loto7/sf-holtwinters/seed-1.json",
+      "sha256": "69a3d0a4d686fa13f8e29b1cceb9efb2098249992167f8b0db6785024e3903b3",
+      "size_bytes": 9068
+    },
+    {
+      "path": "prediction_locks/loto7/sf-imapa/seed-1.json",
+      "sha256": "72490a3d0c72fb38bb0a2517d3d66e2c343b40bf2bbb861ee270dc78ca3d0586",
+      "size_bytes": 9028
+    },
+    {
+      "path": "prediction_locks/loto7/sf-mfles/seed-1.json",
+      "sha256": "08d7e1c6d77167aff3b61c8747094412552b20ef689bc19b09060957126e4d14",
+      "size_bytes": 9019
+    },
+    {
+      "path": "prediction_locks/loto7/sf-mstl/seed-1.json",
+      "sha256": "3aaef20842e2f5f12fa79c16d4f32172780de54a675a21e94331a72e2676e119",
+      "size_bytes": 9016
+    },
+    {
+      "path": "prediction_locks/loto7/sf-naive/seed-1.json",
+      "sha256": "0daf0bf51f1d5e907044a008679dbcb15190ca20c5d07c79a9714d553eb5e865",
+      "size_bytes": 9001
+    },
+    {
+      "path": "prediction_locks/loto7/sf-optimizedtheta/seed-1.json",
+      "sha256": "719a06b0780adb14862827baf447de7081587a6bcf2001309305409a7ee6903d",
+      "size_bytes": 9037
+    },
+    {
+      "path": "prediction_locks/loto7/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "768cfcd8a7a44c294e49a3db1ef317e3b60c78261e322bdd863753c2c7b0ad9c",
+      "size_bytes": 9015
+    },
+    {
+      "path": "prediction_locks/loto7/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "0013e9c97b3c07f37f7f7d756e7cf2fecdcacd0e9f43d9b484d251558c1de277",
+      "size_bytes": 9043
+    },
+    {
+      "path": "prediction_locks/loto7/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "5ac1d1246026ca6b853932808a309f44f87f4724ba8c6b922aafca1082e5db10",
+      "size_bytes": 9080
+    },
+    {
+      "path": "prediction_locks/loto7/sf-seasonalnaive/seed-1.json",
+      "sha256": "afd5a855c2c09402484a20ad4df72bd0effe8f2a202ed84e8f97c2a4b807a009",
+      "size_bytes": 9010
+    },
+    {
+      "path": "prediction_locks/loto7/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "c8de8024a8f0502d451fcac376b8b0518e5f5489a37d97fe1da5c551af8a69e7",
+      "size_bytes": 9036
+    },
+    {
+      "path": "prediction_locks/loto7/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "696e126f5b66dd0d245d0826588decf9388c7a2041015c8020e4570f76243394",
+      "size_bytes": 9042
+    },
+    {
+      "path": "prediction_locks/loto7/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "c7ee83bd4b10110636bcfa868c967adf21f778d491a3f0eddcc16565c47cf945",
+      "size_bytes": 9092
+    },
+    {
+      "path": "prediction_locks/loto7/sf-tbats/seed-1.json",
+      "sha256": "5a9a5cce2d5561e3e0c6f78ec47a4be8065e1631982f6c72fcec24d49af30c74",
+      "size_bytes": 9008
+    },
+    {
+      "path": "prediction_locks/loto7/sf-theta/seed-1.json",
+      "sha256": "a3aba272d3a59cffd0dd722f159bea515a947c2dde0f433fb906c76b4f88c603",
+      "size_bytes": 9028
+    },
+    {
+      "path": "prediction_locks/loto7/sf-tsb/seed-1.json",
+      "sha256": "b93b66f82d3076be78b995b8327d7e9ce177b7c69d9c653f8873bd8b0a8b0675",
+      "size_bytes": 9019
+    },
+    {
+      "path": "prediction_locks/loto7/sf-ucm/seed-1.json",
+      "sha256": "3d2ca0f2ab17d089b90210889a21fd349d05a80cef9e5b245e0876e92b01db0c",
+      "size_bytes": 9060
+    },
+    {
+      "path": "prediction_locks/loto7/sf-windowaverage/seed-1.json",
+      "sha256": "1f7f870e6c509dce723d08bc766faab25b5f227fb7245c057d56105d0cd89b94",
+      "size_bytes": 9024
+    },
+    {
+      "path": "prediction_locks/loto7/sf-zeromodel/seed-1.json",
+      "sha256": "245dfff9a20d50a18931267c9c82599c9820d46ec53a26a38f8b34f26d46e004",
+      "size_bytes": 8466
+    },
+    {
+      "path": "prediction_locks/mini/baseline:fixed/seed-1.json",
+      "sha256": "93dd591b2b53d8610ff3f6c99fc11d4302cdf7bf704c71a32ce0ceb2b3a22dca",
+      "size_bytes": 8567
+    },
+    {
+      "path": "prediction_locks/mini/baseline:frequency/seed-1.json",
+      "sha256": "d14341c7775bc9c0d6b0a99ffe2f6188339d5316274998d94583cb8843b4adb6",
+      "size_bytes": 8571
+    },
+    {
+      "path": "prediction_locks/mini/baseline:last/seed-1.json",
+      "sha256": "4ea4fa0c8e8ee593a825432773404bae35589c1750855ab4537ebf6708edb790",
+      "size_bytes": 8631
+    },
+    {
+      "path": "prediction_locks/mini/baseline:mean/seed-1.json",
+      "sha256": "4141a02eaef388225a9b7de0b3c5043940d410837b9e825699c91773b2eb6e42",
+      "size_bytes": 8666
+    },
+    {
+      "path": "prediction_locks/mini/baseline:median/seed-1.json",
+      "sha256": "cd04811776d83860879eb1d19f56d5fe226b85346d6b4084d01bf0e32f8d75fa",
+      "size_bytes": 8668
+    },
+    {
+      "path": "prediction_locks/mini/baseline:random/seed-1.json",
+      "sha256": "6684a286f4e4e765b1473d2bc7b54fb0b8a43981cb0e63f1214cf34f46ba10e1",
+      "size_bytes": 8639
+    },
+    {
+      "path": "prediction_locks/mini/baseline:statistical_ar1/seed-1.json",
+      "sha256": "5ce406f133653fb531be0181e3e2605787440d9d762e11d6606120f2eb48b28a",
+      "size_bytes": 8677
+    },
+    {
+      "path": "prediction_locks/mini/sf-adida/seed-1.json",
+      "sha256": "a7bf3dd745a1ddb3a41ff6b666cc3ada24658cf91ba6a24fff56f62c037883b6",
+      "size_bytes": 8648
+    },
+    {
+      "path": "prediction_locks/mini/sf-arch/seed-1.json",
+      "sha256": "63e98408c951747ae5d6c944d679f6b5cc50956b79acc9fe2b5006dd5562c1dd",
+      "size_bytes": 8460
+    },
+    {
+      "path": "prediction_locks/mini/sf-arima/seed-1.json",
+      "sha256": "578b4694e2d94f1550ad598a76f5dea91b962a2fea650550790453eca5b313f2",
+      "size_bytes": 8661
+    },
+    {
+      "path": "prediction_locks/mini/sf-autoarima/seed-1.json",
+      "sha256": "199dd1ed54714b06b67ca0d08eb886f47969f8120f9735b0e881eeb916d1027c",
+      "size_bytes": 8665
+    },
+    {
+      "path": "prediction_locks/mini/sf-autoces/seed-1.json",
+      "sha256": "5470d8334d48f1b9251f9217f5c9b16af81fcce1529743f08722b23954d872bf",
+      "size_bytes": 8663
+    },
+    {
+      "path": "prediction_locks/mini/sf-autoets/seed-1.json",
+      "sha256": "ab4704a130be3e0731be00ad4936b06bebbacb4ade00d1c5ad46ad4871c8086f",
+      "size_bytes": 8663
+    },
+    {
+      "path": "prediction_locks/mini/sf-automfles/seed-1.json",
+      "sha256": "22b3b5546bab7eb03b91dbf708bae65c51d7151e4f62482daef34df4c68309d3",
+      "size_bytes": 8633
+    },
+    {
+      "path": "prediction_locks/mini/sf-autoregressive/seed-1.json",
+      "sha256": "2d404953e91992e12856a6682bf50546e60ec5fcaa1a94fb4ab6ae6a9b89eecb",
+      "size_bytes": 8670
+    },
+    {
+      "path": "prediction_locks/mini/sf-autotbats/seed-1.json",
+      "sha256": "6ee30ccbcb7118c19f531d9e9ddfba5ee0a1bbe169e9a6f4badf1874c76c49a0",
+      "size_bytes": 8652
+    },
+    {
+      "path": "prediction_locks/mini/sf-autotheta/seed-1.json",
+      "sha256": "025c7795c3f4cfb65af57bdcd0542c21fcd717aa49fb60e95bbb5c4dd22f1c30",
+      "size_bytes": 8652
+    },
+    {
+      "path": "prediction_locks/mini/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "682c6c8c28062166005f05a5b762bd6e055ebe6f0064328946779ca037a9481d",
+      "size_bytes": 8644
+    },
+    {
+      "path": "prediction_locks/mini/sf-constantmodel/seed-1.json",
+      "sha256": "564199ca94a3b0be6fd984a59ef63c92d6df01dba087b58c40b5ca8738d17335",
+      "size_bytes": 8269
+    },
+    {
+      "path": "prediction_locks/mini/sf-crostonclassic/seed-1.json",
+      "sha256": "60c581f7190310a39df86e27b2011632c84c1d949d4a4769844060e7b9f7692b",
+      "size_bytes": 8657
+    },
+    {
+      "path": "prediction_locks/mini/sf-crostonoptimized/seed-1.json",
+      "sha256": "77387fc4ac14d6022f62b6d709c1791ee5eeb7d50e6bb5c95827078ad16ce93c",
+      "size_bytes": 8659
+    },
+    {
+      "path": "prediction_locks/mini/sf-crostonsba/seed-1.json",
+      "sha256": "c6535115ced9600b260db101730529f7fc825a0949a461d2091a83ce6ecbc93d",
+      "size_bytes": 8645
+    },
+    {
+      "path": "prediction_locks/mini/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "6d48d04493b884b3994a80cd96055eacbf6dcd0c956f12f633b0f817c4e692bc",
+      "size_bytes": 8664
+    },
+    {
+      "path": "prediction_locks/mini/sf-dynamictheta/seed-1.json",
+      "sha256": "8a949f6512843360eae8cdb623addf6c11a3aebc8e8030fd72f63ebafcda6b49",
+      "size_bytes": 8655
+    },
+    {
+      "path": "prediction_locks/mini/sf-garch/seed-1.json",
+      "sha256": "41581d09df0d03256742f0cdc2c02275cffd94a5c406961101c08659d969db97",
+      "size_bytes": 8461
+    },
+    {
+      "path": "prediction_locks/mini/sf-historicaverage/seed-1.json",
+      "sha256": "9c0f9b2a99aaf837a952768a4218cda69a31745805e845818415cbdfde7b8042",
+      "size_bytes": 8671
+    },
+    {
+      "path": "prediction_locks/mini/sf-holt/seed-1.json",
+      "sha256": "27fd1d750be964d92032fbe8f6168b12adf5f116a9949ad8773aa7b93a73b8d5",
+      "size_bytes": 8660
+    },
+    {
+      "path": "prediction_locks/mini/sf-holtwinters/seed-1.json",
+      "sha256": "f1157e0e7369c63b7dc72837a482bc48884b1981a45e7b8b7e852871ad6f8fbf",
+      "size_bytes": 8667
+    },
+    {
+      "path": "prediction_locks/mini/sf-imapa/seed-1.json",
+      "sha256": "0431cea97a7a6252fd63d7c6ea923f8a487a8399b75233dc114633c5458ee7d7",
+      "size_bytes": 8648
+    },
+    {
+      "path": "prediction_locks/mini/sf-mfles/seed-1.json",
+      "sha256": "3c0d49a36d84ef444c60905454909f9db0f68cd4c5df64c7c83a7a2914019af0",
+      "size_bytes": 8637
+    },
+    {
+      "path": "prediction_locks/mini/sf-mstl/seed-1.json",
+      "sha256": "72ba1a9b767682f5cd90a638eaf73859479f7fd7b280c8f4c14865b5bbe8d3d2",
+      "size_bytes": 8629
+    },
+    {
+      "path": "prediction_locks/mini/sf-naive/seed-1.json",
+      "sha256": "7523f883255ed60643a3737d6f515496df4dd7054c58598e381941ff4862453c",
+      "size_bytes": 8626
+    },
+    {
+      "path": "prediction_locks/mini/sf-optimizedtheta/seed-1.json",
+      "sha256": "4441983a1b68b16ede36b0ac170cf2554688372aeb1a23d612d3ac89c376e189",
+      "size_bytes": 8657
+    },
+    {
+      "path": "prediction_locks/mini/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "1053b6eed862718c16a15008a6a415831d75ca1e9b9e1013c4c73c31068c3298",
+      "size_bytes": 8640
+    },
+    {
+      "path": "prediction_locks/mini/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "004cbc50c218839983bcc3713ea6273bc5fd8821ff3fa76f875e285b07bf8feb",
+      "size_bytes": 8657
+    },
+    {
+      "path": "prediction_locks/mini/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "6e1def10502c8ca1645f086c541f847ffa42fd8b6679eedafee9d3f0760da7ec",
+      "size_bytes": 8686
+    },
+    {
+      "path": "prediction_locks/mini/sf-seasonalnaive/seed-1.json",
+      "sha256": "21b91768da4ce04e33816a69071cce4cc3d357febcc00f1ec56e111009d65c4e",
+      "size_bytes": 8636
+    },
+    {
+      "path": "prediction_locks/mini/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "8921764bc317a97d6c369c398018d5a48f7aa1242841fd670a97a885f8232486",
+      "size_bytes": 8650
+    },
+    {
+      "path": "prediction_locks/mini/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "11afe189bf31120fc0f0a6787d2aa54ea8c9057efd43641c6d8715ddc64dcb8d",
+      "size_bytes": 8662
+    },
+    {
+      "path": "prediction_locks/mini/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "73ba00b862e7302721df4c1f5374655e39bc0a26a3b617603b7062e4a87f60ba",
+      "size_bytes": 8681
+    },
+    {
+      "path": "prediction_locks/mini/sf-tbats/seed-1.json",
+      "sha256": "c1c8228aa376c942b0682c9bcff285b846ed82510cf4cfa3ffe57296fddf93e3",
+      "size_bytes": 8635
+    },
+    {
+      "path": "prediction_locks/mini/sf-theta/seed-1.json",
+      "sha256": "573c29d06bdaa698da8da9fb11dcb7a1fdc27cbd2148ca618adfbcdd519178ea",
+      "size_bytes": 8648
+    },
+    {
+      "path": "prediction_locks/mini/sf-tsb/seed-1.json",
+      "sha256": "8a72b2cf612916459eb03317e56f70605d625ace435c76a080e7fdade93b3932",
+      "size_bytes": 8639
+    },
+    {
+      "path": "prediction_locks/mini/sf-ucm/seed-1.json",
+      "sha256": "0f9745a5fbed5e1cfa8ff22d75ff8b549c8c12e5235d12a4ec596dbf28b957be",
+      "size_bytes": 8659
+    },
+    {
+      "path": "prediction_locks/mini/sf-windowaverage/seed-1.json",
+      "sha256": "42cd551ce5a8dc4545d93112b0b331c84ee8e0fc055b48d190d62ccf911d2150",
+      "size_bytes": 8645
+    },
+    {
+      "path": "prediction_locks/mini/sf-zeromodel/seed-1.json",
+      "sha256": "1101c8ad219cda51138013e1d81f7fc2f49e7a898124cb00706151d4a2db7468",
+      "size_bytes": 8265
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:fixed/seed-1.json",
+      "sha256": "01869b705dc35c076484f68bb7330290e5794221e8ea93eb4e8c05f178ea5703",
+      "size_bytes": 7871
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:frequency/seed-1.json",
+      "sha256": "d89f16adeeac57dced08be68a34fb1c3ba84498f951602d64123285d4a16900f",
+      "size_bytes": 7875
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:last/seed-1.json",
+      "sha256": "c129a87000dab1f282ea7dbd06ea4847cfa852e9cc71cfb329f32eda83c9e6d8",
+      "size_bytes": 7870
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:mean/seed-1.json",
+      "sha256": "318c0e20e465c9babbe9fbdf1d0141a0fc578462333453f6db41977d896d1fb6",
+      "size_bytes": 7870
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:median/seed-1.json",
+      "sha256": "1f87ad0f6d5ed777f8dcf0594d21c949bf94d4f7df4252ad8497dc488251587d",
+      "size_bytes": 7872
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:random/seed-1.json",
+      "sha256": "50ed58ad68240709ec61ce07dcd32d6f1e55079ab3ddda40b1263ab25b64768f",
+      "size_bytes": 7872
+    },
+    {
+      "path": "prediction_locks/numbers3/baseline:statistical_ar1/seed-1.json",
+      "sha256": "91a89276ad88ce4f34ce215f8755c494359f0a3d6ce3b51457a683edf4b9529c",
+      "size_bytes": 7881
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-adida/seed-1.json",
+      "sha256": "eed0a4e8f67a7950b49cffcd37845cdb3170bfa2f13802c9d341d00e0049d432",
+      "size_bytes": 7865
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-arch/seed-1.json",
+      "sha256": "117a6e40fed1b2fe787c56273f3abe78240b596fe3d13c2f93eb07d5fb135b9c",
+      "size_bytes": 7864
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-arima/seed-1.json",
+      "sha256": "fe09285f97caa03fa4272f4d6ded4814a026486e4c4853cfceed5e008d027b63",
+      "size_bytes": 7865
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autoarima/seed-1.json",
+      "sha256": "53e6a79e025f7917b76f537fef5b00edb29a5784240ff59ad1255edd98d9012b",
+      "size_bytes": 7869
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autoces/seed-1.json",
+      "sha256": "045120dbbe70c1a56d6aa3083c28b8310373ce7418e1ed7372d541e3afc101da",
+      "size_bytes": 7867
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autoets/seed-1.json",
+      "sha256": "2ec9d446e124ff30b6b2f208728f3288cd2929c91ec43b2e968a8d4d45df5aab",
+      "size_bytes": 7867
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-automfles/seed-1.json",
+      "sha256": "233e7b680c33191f6f6a5605e5606e452ee059cbe516c44d031d5c605fbea200",
+      "size_bytes": 7869
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autoregressive/seed-1.json",
+      "sha256": "4302807a8bc8f983b91fb384689e9957b0308dffca1308481414e83a09e4c6f4",
+      "size_bytes": 7874
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autotbats/seed-1.json",
+      "sha256": "0f0eed3001296937c42a22f559ccdd6b967be731a2b3bb43e47ae8314eb4cc23",
+      "size_bytes": 7869
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-autotheta/seed-1.json",
+      "sha256": "e207af5755f22f4f7b75335d1aa31265837d6563510fe025984b35ce7946a56e",
+      "size_bytes": 7869
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "e810db4187c87b886e1a3ba8cc7fb9acbc29fa41dc68d0204ca41af013da5f34",
+      "size_bytes": 7881
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-constantmodel/seed-1.json",
+      "sha256": "5264b191b53e28f7167ce3e23caed52e1039ff4f94e076061d9e0742280d1beb",
+      "size_bytes": 7873
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-crostonclassic/seed-1.json",
+      "sha256": "a4d3057021bf4d973775be45e41bb2dc9f701491024d724090c2608683231c5c",
+      "size_bytes": 7874
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-crostonoptimized/seed-1.json",
+      "sha256": "c8f2c18a400d04a82f10ef029c27f8b812b2b13aa270dd9aa1ebd03f27eeb97a",
+      "size_bytes": 7876
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-crostonsba/seed-1.json",
+      "sha256": "03c9a742c9554ed00319afcbd3fa0a271d28bccb360c01f13ca66d605d2e7aab",
+      "size_bytes": 7870
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "c1599a15039a89a985f84795139b5fde3ffb04ce5abe6ddf723d08de16704f18",
+      "size_bytes": 7881
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-dynamictheta/seed-1.json",
+      "sha256": "a9ef99cc97edd8e68b49b852938ad9972b2988bc41727c57e0323d548404701f",
+      "size_bytes": 7872
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-garch/seed-1.json",
+      "sha256": "c1ab6109fdb62be0dfb73a87e55ac9bb75972eee93a66871a0ef17f701cae8c7",
+      "size_bytes": 7865
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-historicaverage/seed-1.json",
+      "sha256": "514a8c1168e464173974c149058df8cac1310f3fa9fa01dd83d60af02a8ae278",
+      "size_bytes": 7875
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-holt/seed-1.json",
+      "sha256": "2af7be8c6047e6df687c3abed64356e6eb92a0c725bc04fb2eb003bf012ec219",
+      "size_bytes": 7864
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-holtwinters/seed-1.json",
+      "sha256": "8d0971cf2b5bc85e4d36af452d864429e3e66290af2819c6dd3de719c9ab7a2c",
+      "size_bytes": 7871
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-imapa/seed-1.json",
+      "sha256": "5b7eb9c95608afc26e08752bec9f6d7299dc827ef38df7f56a16d1231d4808ec",
+      "size_bytes": 7865
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-mfles/seed-1.json",
+      "sha256": "45591c9cca0f431ccf9278493f48e360e59b6b33e7b8de793a8fdff5651f25b5",
+      "size_bytes": 7865
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-mstl/seed-1.json",
+      "sha256": "856fdecb8cdfe33149bd02beb3c88781b751c489a498e432ec3c0c3f63852c87",
+      "size_bytes": 7864
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-naive/seed-1.json",
+      "sha256": "fd41c9827d4146d686bd37f7e7d465dc68d87b08fc82515a2ec9edf2c21e467f",
+      "size_bytes": 7865
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-optimizedtheta/seed-1.json",
+      "sha256": "702ee33e964bdd7d43115f0ca1b651644f0c22c3daba8e6f1dc669eb87c66ed1",
+      "size_bytes": 7874
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "22949c37acb4cf778535c7bd0771beacdd7d3a25160119a2ce31f5cfa4271078",
+      "size_bytes": 7879
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "1c49346ae419df402602bb92217fa8f2574aed35c26b7ded8c915808c21f1aa5",
+      "size_bytes": 7888
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "87803f747bc20126d0f2cb77943188f9122f6e82cad3b9c0a52a286daf9a25c3",
+      "size_bytes": 7897
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-seasonalnaive/seed-1.json",
+      "sha256": "b6c943302988d1bf9bf957957b05001f60fc75b5ca89b6d792e1f090d474abb3",
+      "size_bytes": 7873
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "71c26d519e77d6ddd8c10ff07761edc5a3d8e47f7b2832746225e8d514bb3733",
+      "size_bytes": 7881
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "637b52e2f25c9246a87fd37d0fda0b098772bc6ea8fe5d1932b6d8f2f22da111",
+      "size_bytes": 7886
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "81f7797eee307abdee6741d35dc2753b48b68f7c1c6c455f13c943a3862e3200",
+      "size_bytes": 7895
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-tbats/seed-1.json",
+      "sha256": "af3102620ed54adc8d2df181b0739ba7737fd572c6717942284e2b3446001a95",
+      "size_bytes": 7865
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-theta/seed-1.json",
+      "sha256": "a4613e09175d96c400eae2180bdfc17da9a251d33a58617f567f12de8873c3e8",
+      "size_bytes": 7865
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-tsb/seed-1.json",
+      "sha256": "2099675fbb5b07caf712dc3a1470a74c10fc6b45d48537848edf7897185be02d",
+      "size_bytes": 7863
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-ucm/seed-1.json",
+      "sha256": "691485bae8223c8d0666df98c4cf870106ebfa676fa0d79e2eff3740762c86f9",
+      "size_bytes": 7863
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-windowaverage/seed-1.json",
+      "sha256": "193c78b1ca40233f1ea26a843a08de3e806680bebcfc31523b1f162a1fa0ca00",
+      "size_bytes": 7873
+    },
+    {
+      "path": "prediction_locks/numbers3/sf-zeromodel/seed-1.json",
+      "sha256": "2090cdd47f0f4f0b359cc02325650f5d65f1cc0d30bf31269cadd8063178f23d",
+      "size_bytes": 7869
+    },
+    {
+      "path": "prediction_locks/numbers4/baseline:fixed/seed-1.json",
+      "sha256": "7078ba4185d0b52bc179a5bf63405e01ff3fa419c1a9ad3417b878f46ded8b17",
+      "size_bytes": 8071
+    },
+    {
+      "path": "prediction_locks/numbers4/baseline:frequency/seed-1.json",
+      "sha256": "dadecee13526de4b423d0da897b1ec0cfc4aedcbf0719ec94e08fc4d04328f56",
+      "size_bytes": 8075
+    },
+    {
+      "path": "prediction_locks/numbers4/baseline:last/seed-1.json",
+      "sha256": "8b0e21a87bdd97bc9de03099d4c15bf6acbb748ff0eb56fe6fbebbe3f84e63e2",
+      "size_bytes": 8070
+    },
+    {
+      "path": "prediction_locks/numbers4/baseline:mean/seed-1.json",
+      "sha256": "4b2abfbbb2f243ce28b2658e3f3d12a280b4caebb6e16ca21f60313de593ff00",
+      "size_bytes": 8070
+    },
+    {
+      "path": "prediction_locks/numbers4/baseline:median/seed-1.json",
+      "sha256": "087846b7f2dd312522e38a4782d7ec218413199146df7b3cd40bf97a07d310a1",
+      "size_bytes": 8072
+    },
+    {
+      "path": "prediction_locks/numbers4/baseline:random/seed-1.json",
+      "sha256": "af280e0a3aa9f5c3b370d09ad299d0f4f0b4764bf025482eaeef3eaf9e5b0394",
+      "size_bytes": 8072
+    },
+    {
+      "path": "prediction_locks/numbers4/baseline:statistical_ar1/seed-1.json",
+      "sha256": "7571f471451e738aae14ea28925bb95ceac8eb5c4e22aec6333be18e828d7069",
+      "size_bytes": 8081
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-adida/seed-1.json",
+      "sha256": "b5b969d973959413096de22185de55a8ac99eb829319211079e399d2cf6789fd",
+      "size_bytes": 8065
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-arch/seed-1.json",
+      "sha256": "c41ca7be378c53ce8b1132304b907b02d810bf81686d8557df6cc3541542a2d5",
+      "size_bytes": 8064
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-arima/seed-1.json",
+      "sha256": "84792f8203966cc4857007485ebc222be5098bdbb6576e491ee1704f8782b186",
+      "size_bytes": 8065
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-autoarima/seed-1.json",
+      "sha256": "b7ef734447904543b35dbfd574318cda8aa326ddc394562cb19ae96a798a61de",
+      "size_bytes": 8069
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-autoces/seed-1.json",
+      "sha256": "dcf70c371101a3c9edbee4d178400296be7b6b6e4a15358c2aaf550f77ddb738",
+      "size_bytes": 8067
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-autoets/seed-1.json",
+      "sha256": "9a7848f3265dad8dacd3b12d3d4584b0c8de5182cb8c7890ba9c03d93d9f1b6b",
+      "size_bytes": 8067
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-automfles/seed-1.json",
+      "sha256": "94a1d7dd48c6cad15115f6a41386ee2d49820a44efc5d1d7dacfc7be56e422c8",
+      "size_bytes": 8069
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-autoregressive/seed-1.json",
+      "sha256": "f725aa7ddb0ad8d906327fa725cc3e4ab3b75d6ab977e8c744ff686ce528e276",
+      "size_bytes": 8074
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-autotbats/seed-1.json",
+      "sha256": "33bda4e5380ee83b278b76c5e33309d2ba840add66f6a48891a38269d1387bfe",
+      "size_bytes": 8069
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-autotheta/seed-1.json",
+      "sha256": "c172f24a6703b2a36c7898555c6a15418a1f9829d110eb3deeb98f562915594b",
+      "size_bytes": 8069
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-conformalseasonalpool/seed-1.json",
+      "sha256": "ff559ff3f4cadbc93784e7e8e0b948f1cc23d90f7707867eb67ce146a9f85717",
+      "size_bytes": 8081
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-constantmodel/seed-1.json",
+      "sha256": "6252ca42dd113f16c0ae13b50e05838ef8852bb6be75d2d76d002ef0278ae76e",
+      "size_bytes": 8073
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-crostonclassic/seed-1.json",
+      "sha256": "03bf38d970cb22571cb2f1c759548c0f2813bf14ea6c8b3bda6f14c67519c487",
+      "size_bytes": 8074
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-crostonoptimized/seed-1.json",
+      "sha256": "15103cbcdde7e81a39dd9aaed1bf0152a50982eca19e5c74b74b960883d375d2",
+      "size_bytes": 8076
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-crostonsba/seed-1.json",
+      "sha256": "5781ea1efb5bf48521f8d87ab9d20404ea6ff9a3622cc38bf99a931a975ab549",
+      "size_bytes": 8070
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-dynamicoptimizedtheta/seed-1.json",
+      "sha256": "4a37e8fe0b26ebaa1185908ddfb661ba5bd442872103ae2dd3830ecb13881434",
+      "size_bytes": 8081
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-dynamictheta/seed-1.json",
+      "sha256": "a272cf3edc77f6a7238f0149c5ea84f6a1ec842ef3fd2f8877054ee5e57073ed",
+      "size_bytes": 8072
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-garch/seed-1.json",
+      "sha256": "bb006d256d22e418740a83c11d5629f5dd26ac7119fc59c435dbe3a1b09435fb",
+      "size_bytes": 8065
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-historicaverage/seed-1.json",
+      "sha256": "5182099ea2872dbce0489da5e2a31efcee161ae46b925126fa9af32fe4429fa5",
+      "size_bytes": 8075
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-holt/seed-1.json",
+      "sha256": "a13ea07d6b3cd4e097f9487da204e71869b030d67195753fdc10a31d266822a8",
+      "size_bytes": 8064
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-holtwinters/seed-1.json",
+      "sha256": "9017123cf8e426aa4fed7c06e56c23ffd0db4cc5678ab553273e65367f4a4f33",
+      "size_bytes": 8071
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-imapa/seed-1.json",
+      "sha256": "0707685d6a1554cef4b137850ad25d09723493a45fcaffa81bf209ab1efe999b",
+      "size_bytes": 8065
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-mfles/seed-1.json",
+      "sha256": "f2498b88fe22097ea126f721064870fd5310fbad8f45bff6e4dfd8e1f5a900d1",
+      "size_bytes": 8065
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-mstl/seed-1.json",
+      "sha256": "15436f86a5109cc358c1cce2e1a86f7ba5c64dcea4b5234b52b0d9f81a4ee70b",
+      "size_bytes": 8064
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-naive/seed-1.json",
+      "sha256": "e2c9bbd1a0e96477a0b909b7670374593a5d3d760dbefa4c1a8e1f2ca5dbcece",
+      "size_bytes": 8065
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-optimizedtheta/seed-1.json",
+      "sha256": "4f67a3ac13b6980b9e83bd96b4fa7c33fbea4f88f5157f9739ffddd1b97b63a1",
+      "size_bytes": 8074
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-randomwalkwithdrift/seed-1.json",
+      "sha256": "929114975943e0e9b053c1e38566648891c1540e95eb6df74365ac9381b0d9cb",
+      "size_bytes": 8079
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-seasonalexponentialsmoothing/seed-1.json",
+      "sha256": "33b7bab4a8c343d2da34cda606daada41db13ec7f778060ed8e9008592a3b374",
+      "size_bytes": 8088
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-seasonalexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "fb4b61efc67fd79e4c178ebaa00ec5f9e5d3cfd17dac1e3525f258d5d3b7d55b",
+      "size_bytes": 8097
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-seasonalnaive/seed-1.json",
+      "sha256": "be4b926bdea13dc5d459bb5ba91dd3ad3d78ffbba3798525a9eee274225b927f",
+      "size_bytes": 8073
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-seasonalwindowaverage/seed-1.json",
+      "sha256": "9e4ac1dd1f0a6108c4592ce5c67b078bd508083bb1ebec897b0550d3415df14b",
+      "size_bytes": 8081
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-simpleexponentialsmoothing/seed-1.json",
+      "sha256": "1fe4b12017f26ee44faf3f038b89cd331db3829664e1c477f847f54ccf9da1bb",
+      "size_bytes": 8086
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-simpleexponentialsmoothingoptimized/seed-1.json",
+      "sha256": "2d5bc95b0dd56264ab08c0d7633df9c15962273787c3f3f497bcda2ce22a2e8b",
+      "size_bytes": 8095
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-tbats/seed-1.json",
+      "sha256": "b4a43e9777ceb7ec825904fb71413bee0adc8ea66ca48fc6641214cffe3c831a",
+      "size_bytes": 8065
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-theta/seed-1.json",
+      "sha256": "c0bd88924b1a62f72134a84bdac1e2c48f32a97ab7955f75bf842d572b6cdad5",
+      "size_bytes": 8065
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-tsb/seed-1.json",
+      "sha256": "76126af74d2bc4fdd68e2dc91f60893de70db9b59280432460b29323c169ab01",
+      "size_bytes": 8063
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-ucm/seed-1.json",
+      "sha256": "d6506ac3a7259e8b613b686fdc99e2b7161113626dfb4c54ec7b631d6a8572b3",
+      "size_bytes": 8063
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-windowaverage/seed-1.json",
+      "sha256": "f6f585b5187b5a85d650bba968f87bcc2c09d046e688a1a32b4ba7e836436719",
+      "size_bytes": 8073
+    },
+    {
+      "path": "prediction_locks/numbers4/sf-zeromodel/seed-1.json",
+      "sha256": "be422ab13ecb110bdb4f8c149eb227e921c542b5c757df91e120c64fa79fa5d4",
+      "size_bytes": 8069
+    },
+    {
+      "path": "protocols/bingo5.json",
+      "sha256": "675fe348c5877a93ee01b1468548bd4e959f5c04cdc04c1016f71e8f87be3d68",
+      "size_bytes": 2131
+    },
+    {
+      "path": "protocols/loto6.json",
+      "sha256": "3a9f1a6e9da400b4c44a0df57a6893d27b5128e0acfbfd46d775cc54dcc0f4b2",
+      "size_bytes": 2128
+    },
+    {
+      "path": "protocols/loto7.json",
+      "sha256": "236385a1ab10cbb1dedb8cd79948884c88f59f35d10662d83ab1d9bf4465424a",
+      "size_bytes": 2128
+    },
+    {
+      "path": "protocols/mini.json",
+      "sha256": "73da897a7e8ff4dd7718d8d9840f67ea7271bf322b7f871c6d69f52436a5a30a",
+      "size_bytes": 2125
+    },
+    {
+      "path": "protocols/numbers3.json",
+      "sha256": "294cdf5e0a539c464c418cbef1adb16297445647be5f08e25381c6da434afb28",
+      "size_bytes": 2137
+    },
+    {
+      "path": "protocols/numbers4.json",
+      "sha256": "5e0a536c66420b427cffb941d36412905e5530659cc27c24014560ad33d9a047",
+      "size_bytes": 2137
+    },
+    {
+      "path": "runner_logs/bingo5.log",
+      "sha256": "ec2996b25ebe1d971191bda6c0afcc8b3fa68524164e989ab0635e68afc4f88d",
+      "size_bytes": 1780
+    },
+    {
+      "path": "runner_logs/loto6.log",
+      "sha256": "5f5e4bba86cb3995d2bfa54657c36e0533ca69a5d53cf1c2e2f9be1b762dbe8b",
+      "size_bytes": 639
+    },
+    {
+      "path": "runner_logs/loto7.log",
+      "sha256": "6fc479bf54b85fba2ad0ab97870844cacd14366e8919207f3b36946f6a7812aa",
+      "size_bytes": 639
+    },
+    {
+      "path": "runner_logs/mini.log",
+      "sha256": "3cc6a0fdd5a11f64c10fd2ddaa42abc8b134fada1b16931c54f3ec91d4b7d458",
+      "size_bytes": 923
+    },
+    {
+      "path": "runner_logs/numbers3.log",
+      "sha256": "3036054b46060130c6ff08fdd45d9bf6c8137e3ab50b0e81cf1233509b0b149d",
+      "size_bytes": 403962
+    },
+    {
+      "path": "runner_logs/numbers4.log",
+      "sha256": "14c32d2f7a1004776f22fc3b378b597c78e84d7bead79eaeff7f954d07b62d65",
+      "size_bytes": 582642
+    },
+    {
+      "path": "runner_logs/property-certification.log",
+      "sha256": "21084d2a06dd163a3d378e101247ba7ee3a44ab1ebd833aac753706a8db3e048",
+      "size_bytes": 2974
+    }
+  ],
+  "created_at_utc": "2026-08-11T01:50:28.490881+00:00",
+  "schema_version": 1
+}

@@ -1,0 +1,1 @@
+{"actuals_known":false,"candidate_id":"sf-seasonalwindowaverage","game":"numbers3","predictions":[{"draw_index":6994,"draw_no":6995,"fold_id":"fold-01","prediction":[6,6,4]}],"protocol_hash":"7fb064fd1b79dce009177fd846b67f667cbc2a7ac9b1cba550d27b6e721f2ef9","schema_version":"prediction-lock-v1","sealed_at_utc":"2026-08-10T22:58:43.540476+00:00","seed":1}

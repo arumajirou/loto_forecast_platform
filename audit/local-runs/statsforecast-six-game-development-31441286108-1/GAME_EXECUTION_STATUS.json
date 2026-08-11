@@ -1,0 +1,11 @@
+{
+  "games": {
+    "bingo5": 0,
+    "loto6": 0,
+    "loto7": 0,
+    "mini": 0,
+    "numbers3": 0,
+    "numbers4": 0
+  },
+  "schema_version": 1
+}
