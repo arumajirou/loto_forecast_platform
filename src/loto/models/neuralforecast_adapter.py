@@ -132,6 +132,7 @@ def _merge_default_config_overrides(
         merged.update(frozen)
         return merged
     if callable(default_config):
+
         def merged_config(trial: Any, base=default_config, fixed=frozen) -> dict[str, Any]:
             resolved = dict(base(trial))
             resolved.update(fixed)
