@@ -12,8 +12,9 @@ and precision, and then overlays only the requested parameter values.
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, replace
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 from loto.models.neuralforecast_adapter import (
     AutoModelPlan,
