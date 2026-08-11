@@ -108,12 +108,12 @@ def _is_wsl() -> bool:
 
 
 def _process_local_cuda_snapshot() -> dict[str, Any]:
-    """Bind CUDA allocation evidence to the current Python process.
+    """Bind live CUDA allocator evidence to the current Python process.
 
-    NVIDIA documents that NVML/nvidia-smi does not expose every active compute
-    process query under WSL.  When the external process list is unavailable,
-    positive CUDA memory owned by this exact Python PID is the fail-closed
-    process-local fallback.  It is never used to verify a different PID.
+    PyTorch CUDA allocator statistics are process-local. Positive live/current
+    or peak CUDA allocation therefore proves that this exact ``os.getpid()``
+    executed CUDA work on the selected device. This is used only for the
+    current PID and never to make claims about another process.
     """
 
     payload: dict[str, Any] = {
@@ -155,14 +155,16 @@ def _process_local_cuda_snapshot() -> dict[str, Any]:
 
 
 def gpu_process_snapshot(pid: int | None = None) -> dict[str, Any]:
-    """Verify GPU execution for a PID with a WSL-aware fail-closed fallback.
+    """Verify that a PID executed CUDA work, preserving the evidence method.
 
-    Native Linux requires an explicit `nvidia-smi --query-compute-apps` PID
-    match.  WSL may return an empty active-compute-process list even while a
-    CUDA workload is running.  Only in WSL, only for the current Python PID,
-    and only with positive process-local CUDA memory do we accept a PyTorch
-    CUDA-context proof instead.  The verification method and limitation are
-    persisted so external and fallback evidence remain distinguishable.
+    An external `nvidia-smi --query-compute-apps` PID match is preferred. Some
+    environments do not expose an active compute-process row reliably even
+    while CUDA is executing (NVIDIA documents this limitation for WSL). When
+    the requested PID is the current Python process, positive process-local
+    PyTorch CUDA allocator evidence is accepted as the second proof path.
+
+    Both paths are fail closed: a different PID never inherits process-local
+    evidence, and a process with no positive CUDA allocation remains unverified.
     """
 
     target_pid = os.getpid() if pid is None else pid
@@ -175,23 +177,29 @@ def gpu_process_snapshot(pid: int | None = None) -> dict[str, Any]:
     rows = [line.strip() for line in result.stdout.splitlines() if line.strip()]
     matches = [row for row in rows if row.split(",", 1)[0].strip() == str(target_pid)]
 
-    verified = bool(matches)
-    method = "nvidia_smi_compute_apps" if verified else "none"
+    external_verified = bool(matches)
+    verified = external_verified
+    method = "nvidia_smi_compute_apps" if external_verified else "none"
     limitation = None
     local_cuda: dict[str, Any] = {}
     wsl = _is_wsl()
 
-    if not verified and wsl and target_pid == os.getpid():
+    if not verified and target_pid == os.getpid():
         local_cuda = _process_local_cuda_snapshot()
         if bool(local_cuda.get("cuda_context_active")):
             verified = True
             method = "torch_process_local_cuda_context"
-            limitation = "wsl_nvidia_smi_active_compute_process_query_unavailable"
+            limitation = (
+                "wsl_nvidia_smi_active_compute_process_query_unavailable"
+                if wsl
+                else "nvidia_smi_compute_process_pid_not_visible_at_snapshot"
+            )
 
     return {
         "pid": target_pid,
         "returncode": result.returncode,
         "gpu_pid_verified": verified,
+        "external_gpu_pid_verified": external_verified,
         "verification_method": method,
         "platform_wsl": wsl,
         "nvidia_smi_rows": matches,
