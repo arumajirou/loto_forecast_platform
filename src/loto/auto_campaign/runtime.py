@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import platform
 import subprocess
 import sys
 from pathlib import Path
@@ -98,8 +99,73 @@ def compare_code_fingerprints(driver: dict[str, Any], worker: dict[str, Any]) ->
     }
 
 
+def _is_wsl() -> bool:
+    """Return whether the current Linux kernel is hosted by WSL/WSL2."""
+
+    release = platform.release().lower()
+    version = platform.version().lower()
+    return "microsoft" in release or "wsl" in release or "microsoft" in version
+
+
+def _process_local_cuda_snapshot() -> dict[str, Any]:
+    """Bind CUDA allocation evidence to the current Python process.
+
+    NVIDIA documents that NVML/nvidia-smi does not expose every active compute
+    process query under WSL.  When the external process list is unavailable,
+    positive CUDA memory owned by this exact Python PID is the fail-closed
+    process-local fallback.  It is never used to verify a different PID.
+    """
+
+    payload: dict[str, Any] = {
+        "pid": os.getpid(),
+        "torch_available": False,
+        "cuda_available": False,
+        "cuda_current_device": None,
+        "cuda_memory_allocated": 0,
+        "cuda_memory_reserved": 0,
+        "cuda_peak_memory_allocated": 0,
+        "cuda_context_active": False,
+    }
+    try:
+        import torch
+    except ImportError:
+        return payload
+
+    payload["torch_available"] = True
+    try:
+        cuda_available = bool(torch.cuda.is_available())
+        payload["cuda_available"] = cuda_available
+        if not cuda_available:
+            return payload
+        payload["cuda_current_device"] = int(torch.cuda.current_device())
+        payload["cuda_memory_allocated"] = int(torch.cuda.memory_allocated())
+        payload["cuda_memory_reserved"] = int(torch.cuda.memory_reserved())
+        payload["cuda_peak_memory_allocated"] = int(torch.cuda.max_memory_allocated())
+        payload["cuda_context_active"] = any(
+            int(payload[key]) > 0
+            for key in (
+                "cuda_memory_allocated",
+                "cuda_memory_reserved",
+                "cuda_peak_memory_allocated",
+            )
+        )
+    except Exception as exc:
+        payload["error"] = f"{type(exc).__name__}: {exc}"
+    return payload
+
+
 def gpu_process_snapshot(pid: int | None = None) -> dict[str, Any]:
-    pid = os.getpid() if pid is None else pid
+    """Verify GPU execution for a PID with a WSL-aware fail-closed fallback.
+
+    Native Linux requires an explicit `nvidia-smi --query-compute-apps` PID
+    match.  WSL may return an empty active-compute-process list even while a
+    CUDA workload is running.  Only in WSL, only for the current Python PID,
+    and only with positive process-local CUDA memory do we accept a PyTorch
+    CUDA-context proof instead.  The verification method and limitation are
+    persisted so external and fallback evidence remain distinguishable.
+    """
+
+    target_pid = os.getpid() if pid is None else pid
     command = [
         "nvidia-smi",
         "--query-compute-apps=pid,process_name,used_memory",
@@ -107,12 +173,31 @@ def gpu_process_snapshot(pid: int | None = None) -> dict[str, Any]:
     ]
     result = subprocess.run(command, capture_output=True, text=True, check=False)
     rows = [line.strip() for line in result.stdout.splitlines() if line.strip()]
-    matches = [row for row in rows if row.split(",", 1)[0].strip() == str(pid)]
+    matches = [row for row in rows if row.split(",", 1)[0].strip() == str(target_pid)]
+
+    verified = bool(matches)
+    method = "nvidia_smi_compute_apps" if verified else "none"
+    limitation = None
+    local_cuda: dict[str, Any] = {}
+    wsl = _is_wsl()
+
+    if not verified and wsl and target_pid == os.getpid():
+        local_cuda = _process_local_cuda_snapshot()
+        if bool(local_cuda.get("cuda_context_active")):
+            verified = True
+            method = "torch_process_local_cuda_context"
+            limitation = "wsl_nvidia_smi_active_compute_process_query_unavailable"
+
     return {
-        "pid": pid,
+        "pid": target_pid,
         "returncode": result.returncode,
-        "gpu_pid_verified": bool(matches),
+        "gpu_pid_verified": verified,
+        "verification_method": method,
+        "platform_wsl": wsl,
+        "nvidia_smi_rows": matches,
         "rows": matches,
+        "limitation": limitation,
+        "process_local_cuda": local_cuda,
     }
 
 
