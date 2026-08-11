@@ -204,7 +204,10 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
     }
     needs_n_series = request.model_name in MODELS_REQUIRING_N_SERIES
     if needs_n_series and request.n_series is not None:
-        constructor_kwargs["n_series"] = int(request.n_series)
+        resolved_n_series = int(request.n_series)
+        constructor_kwargs["n_series"] = resolved_n_series
+        if custom_config:
+            config.setdefault("n_series", resolved_n_series)
 
     default_config_overrides: dict[str, Any] = {}
     if custom_config:

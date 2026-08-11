@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from types import ModuleType
+from types import ModuleType, SimpleNamespace
 from typing import Any
 
 from .training_worker_evidence import (
@@ -20,6 +20,12 @@ def _instrument_instance(model: Any) -> Any:
     breaks constructor MRO. Construct the official class first, then switch only the
     resulting instance to the pickle-addressable instrumentation subclass before fit.
     """
+
+    # Dependency-light persistence tests use SimpleNamespace as a model proxy.
+    # Do not attempt __class__ instrumentation on that proxy, while preserving
+    # instrumentation for real AutoModels and lightweight AutoModel test doubles.
+    if isinstance(model, SimpleNamespace):
+        return model
 
     instrumented = training_evidence_auto_class(type(model))
     if not isinstance(model, instrumented):

@@ -17,6 +17,7 @@ from .runtime_evidence import (
     extract_training_evidence,
     fitted_inner_model,
     formal_training_cuda,
+    runtime_has_cuda,
     state_dict_finite,
     torch_runtime_snapshot,
 )
@@ -234,7 +235,7 @@ def certify_saved_runtime(
                 "gpu_pre_save_inference": gpu_pre,
                 "cuda_pre_save_phase_evidence": pre_phase,
                 "cuda_pre_save_inference_evidence": pre_cuda,
-                "cuda_training_evidence": pre_cuda,
+                "cuda_training_evidence": runtime_has_cuda(runtime_pre),
                 "formal_cuda_training_evidence": formal_training_cuda(resolved_training),
             }
         )
