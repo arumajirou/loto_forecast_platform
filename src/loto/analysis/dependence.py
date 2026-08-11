@@ -32,6 +32,11 @@ def _nonconstant(array: np.ndarray, *, name: str) -> None:
         raise ValueError(f"{name} must not be constant")
 
 
+def _correlation_bound(value: float) -> float:
+    """Clamp harmless floating-point overshoot at the mathematical [-1, 1] boundary."""
+    return max(-1.0, min(1.0, value))
+
+
 def pearson_association(
     x: Sequence[float],
     y: Sequence[float],
@@ -46,7 +51,7 @@ def pearson_association(
     _nonconstant(left, name="x")
     _nonconstant(right, name="y")
     result = stats.pearsonr(left, right)
-    statistic = float(result.statistic)
+    statistic = _correlation_bound(float(result.statistic))
     p_value = float(result.pvalue)
     if not math.isfinite(statistic) or not math.isfinite(p_value):
         raise ValueError("Pearson result must be finite")
@@ -73,7 +78,7 @@ def spearman_association(
     _nonconstant(left, name="x")
     _nonconstant(right, name="y")
     result = stats.spearmanr(left, right)
-    statistic = float(result.statistic)
+    statistic = _correlation_bound(float(result.statistic))
     p_value = float(result.pvalue)
     if not math.isfinite(statistic) or not math.isfinite(p_value):
         raise ValueError("Spearman result must be finite")
@@ -97,7 +102,7 @@ def lag_autocorrelation(values: Sequence[float], lag: int) -> float:
     right = array[lag:]
     _nonconstant(left, name="lagged left series")
     _nonconstant(right, name="lagged right series")
-    correlation = float(np.corrcoef(left, right)[0, 1])
+    correlation = _correlation_bound(float(np.corrcoef(left, right)[0, 1]))
     if not math.isfinite(correlation):
         raise ValueError("lag autocorrelation must be finite")
     return correlation
@@ -122,7 +127,7 @@ def ljung_box_test(values: Sequence[float], lags: int) -> SerialDependenceResult
     autocorrelations: list[float] = []
     for lag in range(1, lags + 1):
         numerator = float(np.dot(centered[lag:], centered[:-lag]))
-        autocorrelations.append(numerator / denominator)
+        autocorrelations.append(_correlation_bound(numerator / denominator))
 
     n = int(array.size)
     q_statistic = n * (n + 2.0) * sum(
