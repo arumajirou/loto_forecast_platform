@@ -207,6 +207,7 @@ def _run_task(
         timeout=max(args.timeout, args.timellm_timeout if task.resource_class == "EXCLUSIVE_GPU" else 0),
     )
     started = time.perf_counter()
+    result: dict[str, Any] | None = None
     try:
         if task.model.model_id == "nf-timellm":
             execution_contract = "timellm-reduced-gpu-runtime-smoke-v1"
@@ -263,9 +264,7 @@ def _run_task(
             ]
             timeout_seconds = args.timeout
 
-        (attempt / "COMMAND.txt").write_text(
-            shlex.join(command) + "\n", encoding="utf-8"
-        )
+        (attempt / "COMMAND.txt").write_text(shlex.join(command) + "\n", encoding="utf-8")
         try:
             proc = subprocess.run(
                 command,
@@ -336,10 +335,14 @@ def _run_task(
             "prospective_evaluated": False,
             "promotion": False,
         }
-        _atomic_json(final_path, result)
-        return result
     finally:
         scheduler.release(lease)
+
+    if result is None:
+        raise RuntimeError(f"task completed without a result payload: {task.key}")
+    result["lease"] = lease.to_dict()
+    _atomic_json(final_path, result)
+    return result
 
 
 def _write_sha256s(output_root: Path) -> None:
