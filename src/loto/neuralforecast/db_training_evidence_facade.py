@@ -55,17 +55,32 @@ def _record_resolved_certification_parameters(
     random_seed: int | None = None,
     precision: str | None = None,
 ) -> None:
-    """Persist the effective model controls for the later certification call."""
+    """Persist effective model controls when the execution context exposes them."""
 
     context = facade._CONTEXT.get()
     if context is None:
         return
 
-    resolved_seed = int(context.config.random_seed if random_seed is None else random_seed)
-    resolved_precision = str(context.config.precision if precision is None else precision)
+    config = getattr(context, "config", None)
+    config_seed = getattr(config, "random_seed", None)
+    config_precision = getattr(config, "precision", None)
+
+    resolved_seed: int | None = None
+    seed_candidate = random_seed if random_seed is not None else config_seed
+    if seed_candidate is not None:
+        try:
+            resolved_seed = int(seed_candidate)
+        except (TypeError, ValueError):
+            resolved_seed = None
+
+    precision_candidate = precision if precision is not None else config_precision
+    resolved_precision = None if precision_candidate is None else str(precision_candidate)
 
     if plan is not None:
-        resolved_precision = str(getattr(plan, "precision", resolved_precision))
+        plan_precision = getattr(plan, "precision", None)
+        if plan_precision is not None:
+            resolved_precision = str(plan_precision)
+
         plan_config = getattr(plan, "config", None)
         if isinstance(plan_config, dict) and "random_seed" in plan_config:
             try:
@@ -73,8 +88,10 @@ def _record_resolved_certification_parameters(
             except (TypeError, ValueError):
                 pass
 
-    context._loto_resolved_random_seed = resolved_seed
-    context._loto_resolved_precision = resolved_precision
+    if resolved_seed is not None:
+        context._loto_resolved_random_seed = resolved_seed
+    if resolved_precision is not None:
+        context._loto_resolved_precision = resolved_precision
 
 
 def _install_certification_parameter_bridge(facade: ModuleType) -> None:
@@ -88,18 +105,20 @@ def _install_certification_parameter_bridge(facade: ModuleType) -> None:
     def certify_saved_runtime(*args: Any, **kwargs: Any) -> Any:
         context = facade._CONTEXT.get()
         if context is not None:
-            resolved_seed = getattr(
-                context,
-                "_loto_resolved_random_seed",
-                int(context.config.random_seed),
-            )
-            resolved_precision = getattr(
-                context,
-                "_loto_resolved_precision",
-                str(context.config.precision),
-            )
-            kwargs.setdefault("random_seed", int(resolved_seed))
-            kwargs.setdefault("precision", str(resolved_precision))
+            config = getattr(context, "config", None)
+
+            resolved_seed = getattr(context, "_loto_resolved_random_seed", None)
+            if resolved_seed is None:
+                resolved_seed = getattr(config, "random_seed", None)
+            if resolved_seed is not None:
+                kwargs.setdefault("random_seed", int(resolved_seed))
+
+            resolved_precision = getattr(context, "_loto_resolved_precision", None)
+            if resolved_precision is None:
+                resolved_precision = getattr(config, "precision", None)
+            if resolved_precision is not None:
+                kwargs.setdefault("precision", str(resolved_precision))
+
         return original(*args, **kwargs)
 
     core._loto_certification_parameter_bridge_original = original
@@ -128,8 +147,8 @@ def install(facade: ModuleType) -> None:
     def construct_auto_hint(config: Any, panel: Any):
         _record_resolved_certification_parameters(
             facade,
-            random_seed=int(config.random_seed),
-            precision=str(config.precision),
+            random_seed=getattr(config, "random_seed", None),
+            precision=getattr(config, "precision", None),
         )
         result = original_hint(config, panel)
         model, *remaining = result
