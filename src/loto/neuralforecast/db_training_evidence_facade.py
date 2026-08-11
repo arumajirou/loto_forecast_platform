@@ -48,8 +48,37 @@ def _context_values(facade: ModuleType, *, backend: str, model_name: str) -> dic
     }
 
 
+def _record_resolved_certification_parameters(
+    facade: ModuleType,
+    *,
+    plan: Any | None = None,
+    random_seed: int | None = None,
+    precision: str | None = None,
+) -> None:
+    """Persist the effective model controls for the later certification call."""
+
+    context = facade._CONTEXT.get()
+    if context is None:
+        return
+
+    resolved_seed = int(context.config.random_seed if random_seed is None else random_seed)
+    resolved_precision = str(context.config.precision if precision is None else precision)
+
+    if plan is not None:
+        resolved_precision = str(getattr(plan, "precision", resolved_precision))
+        plan_config = getattr(plan, "config", None)
+        if isinstance(plan_config, dict) and "random_seed" in plan_config:
+            try:
+                resolved_seed = int(plan_config["random_seed"])
+            except (TypeError, ValueError):
+                pass
+
+    context._loto_resolved_random_seed = resolved_seed
+    context._loto_resolved_precision = resolved_precision
+
+
 def _install_certification_parameter_bridge(facade: ModuleType) -> None:
-    """Propagate campaign seed/precision into formal runtime-certification evidence."""
+    """Propagate resolved model seed/precision into runtime-certification evidence."""
 
     core = getattr(facade, "_CORE", None)
     if core is None or getattr(core, "_loto_certification_parameter_bridge_installed", False):
@@ -59,8 +88,18 @@ def _install_certification_parameter_bridge(facade: ModuleType) -> None:
     def certify_saved_runtime(*args: Any, **kwargs: Any) -> Any:
         context = facade._CONTEXT.get()
         if context is not None:
-            kwargs.setdefault("random_seed", int(context.config.random_seed))
-            kwargs.setdefault("precision", str(context.config.precision))
+            resolved_seed = getattr(
+                context,
+                "_loto_resolved_random_seed",
+                int(context.config.random_seed),
+            )
+            resolved_precision = getattr(
+                context,
+                "_loto_resolved_precision",
+                str(context.config.precision),
+            )
+            kwargs.setdefault("random_seed", int(resolved_seed))
+            kwargs.setdefault("precision", str(resolved_precision))
         return original(*args, **kwargs)
 
     core._loto_certification_parameter_bridge_original = original
@@ -79,6 +118,7 @@ def install(facade: ModuleType) -> None:
 
     def construct_interceptor(plan: Any) -> Any:
         model_name = str(plan.model_name)
+        _record_resolved_certification_parameters(facade, plan=plan)
         model = _instrument_instance(original_construct(plan))
         return configure_training_evidence(
             model,
@@ -86,6 +126,11 @@ def install(facade: ModuleType) -> None:
         )
 
     def construct_auto_hint(config: Any, panel: Any):
+        _record_resolved_certification_parameters(
+            facade,
+            random_seed=int(config.random_seed),
+            precision=str(config.precision),
+        )
         result = original_hint(config, panel)
         model, *remaining = result
         configured = configure_training_evidence(
