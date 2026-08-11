@@ -184,9 +184,10 @@ def run_monitored_process(
 
     started_at = time.time()
     started_monotonic = time.monotonic()
-    with tempfile.TemporaryFile(mode="w+b") as stdout_file, tempfile.TemporaryFile(
-        mode="w+b"
-    ) as stderr_file:
+    with (
+        tempfile.TemporaryFile(mode="w+b") as stdout_file,
+        tempfile.TemporaryFile(mode="w+b") as stderr_file,
+    ):
         proc = subprocess.Popen(
             list(command),
             cwd=Path(cwd),
