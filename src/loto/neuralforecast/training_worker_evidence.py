@@ -268,13 +268,40 @@ def build_training_worker_callback(
     return TrainingWorkerCallback()
 
 
+_CLASS_CACHE: dict[type, type] = {}
+_ORIGINAL_CLASS_BY_INSTRUMENTED: dict[type, type] = {}
+_CLASS_LOCK = RLock()
+
+
+def restore_official_auto_class(model: Any) -> Any:
+    """Restore a temporary evidence wrapper to its official NeuralForecast class."""
+
+    original = _ORIGINAL_CLASS_BY_INSTRUMENTED.get(type(model))
+    if original is None:
+        return model
+    try:
+        model.__class__ = original
+    except TypeError as exc:
+        raise RuntimeError(
+            "NeuralForecast AutoModel instance cannot be restored to its official class"
+        ) from exc
+    return model
+
+
 class TrainingWorkerEvidenceMixin:
-    """Inject the evidence callback into every BaseAuto trial and final refit."""
+    """Inject evidence during AutoModel fitting and remove the wrapper before persistence."""
 
     training_evidence_backend: str = "unknown"
     training_evidence_model_name: str = "unknown"
     training_evidence_model_id: str | None = None
     training_evidence_require_gpu: bool = False
+
+    def fit(self, *args: Any, **kwargs: Any):
+        """Run the complete official AutoModel fit, then restore save-compatible class identity."""
+
+        result = super().fit(*args, **kwargs)
+        restore_official_auto_class(self)
+        return result
 
     def _fit_model(
         self,
@@ -309,11 +336,6 @@ class TrainingWorkerEvidenceMixin:
         return model
 
 
-_CLASS_CACHE: dict[type, type] = {}
-_ORIGINAL_CLASS_BY_INSTRUMENTED: dict[type, type] = {}
-_CLASS_LOCK = RLock()
-
-
 def training_evidence_auto_class(auto_cls: type) -> type:
     """Return a stable pickle-addressable AutoModel subclass."""
 
@@ -331,26 +353,6 @@ def training_evidence_auto_class(auto_cls: type) -> type:
         _CLASS_CACHE[auto_cls] = created
         _ORIGINAL_CLASS_BY_INSTRUMENTED[created] = auto_cls
         return created
-
-
-def restore_official_auto_class(model: Any) -> Any:
-    """Restore a training-instrumented wrapper to its official NeuralForecast class.
-
-    NeuralForecast ``save`` validates supported wrapper classes by class identity/name.
-    Training evidence lives on the fitted inner model, so the temporary mixin is no
-    longer needed after ``fit`` and must not leak into persistence.
-    """
-
-    original = _ORIGINAL_CLASS_BY_INSTRUMENTED.get(type(model))
-    if original is None:
-        return model
-    try:
-        model.__class__ = original
-    except TypeError as exc:
-        raise RuntimeError(
-            "NeuralForecast AutoModel instance cannot be restored to its official class"
-        ) from exc
-    return model
 
 
 def configure_training_evidence(
