@@ -101,7 +101,9 @@ def _sample_process_tree(root_pid: int) -> tuple[list[ProcessTreeNode], float | 
     return nodes, rss_mib
 
 
-def _query_gpu_process_memory(process_pids: set[int]) -> tuple[bool, dict[int, float]]:
+def _query_gpu_process_memory(
+    process_pids: set[int],
+) -> tuple[bool, set[int], dict[int, float]]:
     try:
         proc = subprocess.run(
             [
@@ -115,23 +117,29 @@ def _query_gpu_process_memory(process_pids: set[int]) -> tuple[bool, dict[int, f
             check=False,
         )
     except (OSError, subprocess.SubprocessError):
-        return False, {}
+        return False, set(), {}
     if proc.returncode != 0:
-        return False, {}
+        return False, set(), {}
 
-    matched: dict[int, float] = {}
+    matched_pids: set[int] = set()
+    matched_memory: dict[int, float] = {}
     for line in proc.stdout.splitlines():
         if not line.strip():
             continue
         try:
             pid_text, memory_text = line.split(",", maxsplit=1)
             pid = int(pid_text.strip())
-            memory = float(memory_text.strip())
         except (ValueError, TypeError):
             continue
-        if pid in process_pids:
-            matched[pid] = memory
-    return True, matched
+        if pid not in process_pids:
+            continue
+        matched_pids.add(pid)
+        try:
+            matched_memory[pid] = float(memory_text.strip())
+        except (ValueError, TypeError):
+            # WSL may expose the compute PID while reporting used_memory as N/A.
+            continue
+    return True, matched_pids, matched_memory
 
 
 def _terminate_process_tree(proc: subprocess.Popen[bytes]) -> None:
@@ -210,12 +218,12 @@ def run_monitored_process(
                 peak_rss_mib = rss_mib if peak_rss_mib is None else max(peak_rss_mib, rss_mib)
 
             process_pids = set(observed_nodes)
-            gpu_available, gpu_memory = _query_gpu_process_memory(process_pids)
+            gpu_available, matched_gpu_pids, gpu_memory = _query_gpu_process_memory(process_pids)
             gpu_attribution_available = gpu_attribution_available or gpu_available
             if gpu_available:
                 gpu_sample_count += 1
+            gpu_pids.update(matched_gpu_pids)
             if gpu_memory:
-                gpu_pids.update(gpu_memory)
                 total_gpu_memory = sum(gpu_memory.values())
                 peak_gpu_memory_mib = (
                     total_gpu_memory
