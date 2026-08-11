@@ -1,1 +1,0 @@
-PR #260 validation evidence is recorded in the pull request and Linear; this placeholder should not be merged.
