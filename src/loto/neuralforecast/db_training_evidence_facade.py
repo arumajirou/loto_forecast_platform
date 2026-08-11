@@ -48,10 +48,31 @@ def _context_values(facade: ModuleType, *, backend: str, model_name: str) -> dic
     }
 
 
+def _install_certification_parameter_bridge(facade: ModuleType) -> None:
+    """Propagate campaign seed/precision into formal runtime-certification evidence."""
+
+    core = getattr(facade, "_CORE", None)
+    if core is None or getattr(core, "_loto_certification_parameter_bridge_installed", False):
+        return
+    original = core.certify_saved_runtime
+
+    def certify_saved_runtime(*args: Any, **kwargs: Any) -> Any:
+        context = facade._CONTEXT.get()
+        if context is not None:
+            kwargs.setdefault("random_seed", int(context.config.random_seed))
+            kwargs.setdefault("precision", str(context.config.precision))
+        return original(*args, **kwargs)
+
+    core._loto_certification_parameter_bridge_original = original
+    core.certify_saved_runtime = certify_saved_runtime
+    core._loto_certification_parameter_bridge_installed = True
+
+
 def install(facade: ModuleType) -> None:
-    """Wrap constructor boundaries idempotently; execution remains under facade RLock."""
+    """Wrap constructor/certification boundaries idempotently under the facade lock."""
 
     if getattr(facade, "_loto_training_evidence_installed", False):
+        _install_certification_parameter_bridge(facade)
         return
     original_construct = facade._construct_interceptor
     original_hint = facade._construct_auto_hint
@@ -83,4 +104,5 @@ def install(facade: ModuleType) -> None:
     if core is not None:
         core._construct_auto_hint = construct_auto_hint
 
+    _install_certification_parameter_bridge(facade)
     facade._loto_training_evidence_installed = True
