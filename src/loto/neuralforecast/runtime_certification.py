@@ -12,10 +12,11 @@ from loto.data.lineage import atomic_write_json
 
 from .runtime_compare import compare_predictions
 from .runtime_evidence import (
+    cuda_phase_baseline,
+    cuda_phase_evidence,
     extract_training_evidence,
     fitted_inner_model,
     formal_training_cuda,
-    phase_has_cuda,
     state_dict_finite,
     torch_runtime_snapshot,
 )
@@ -63,7 +64,7 @@ def _initial_result(
     atol: float,
 ) -> dict[str, Any]:
     return {
-        "schema_version": "1.2.0",
+        "schema_version": "1.3.0",
         "status": "FAIL",
         "failed_phase": "pre_save_validation",
         "loaded": False,
@@ -94,6 +95,10 @@ def _initial_result(
         "runtime_reload_inference": {},
         "gpu_pre_save_inference": {},
         "gpu_reload_inference": {},
+        "cuda_pre_save_phase_baseline": {},
+        "cuda_pre_save_phase_evidence": {},
+        "cuda_reload_phase_baseline": {},
+        "cuda_reload_phase_evidence": {},
         "point_column_before": None,
         "point_column_after": None,
         "key_columns": ["unique_id", "ds"],
@@ -125,6 +130,11 @@ def certify_saved_runtime(
     Stochastic models compare the mean and standard deviation of explicitly
     seeded samples. Formal GPU certification requires trial/worker training
     proof plus independent pre-save and reload-inference CUDA evidence.
+
+    Process-local inference CUDA evidence is phase-bound: immediately before
+    each prediction phase the PyTorch peak counter is reset and its allocated
+    byte baseline is captured. The phase passes only when the post-prediction
+    peak rises above that baseline (or an external nvidia-smi PID match exists).
     """
 
     policy = resolve_prediction_policy(neuralforecast, prediction_policy)
@@ -168,6 +178,9 @@ def certify_saved_runtime(
             result["error"] = "pre-save runtime certification checks failed"
             return _finish_result(model_path, result)
 
+        pre_phase_baseline = cuda_phase_baseline() if require_gpu else {}
+        result["cuda_pre_save_phase_baseline"] = pre_phase_baseline
+
         if policy == "stochastic":
             (
                 before_samples,
@@ -189,6 +202,19 @@ def certify_saved_runtime(
             )
             before_reference = before_samples[0].drop(columns=["sample_index", "seed"])
             before_reference = before_reference.rename(columns={"prediction": before_point})
+        elif require_gpu:
+            seed_runtime(random_seed)
+            prediction_probe = neuralforecast.predict(verbose=verbose)
+            prediction_probe.to_csv(model_path.parent / "prediction_before_save.csv", index=False)
+            before_frame, before_point, before_vector, before_duplicate = prediction_frame(
+                prediction_probe,
+                alias,
+            )
+            before_values = before_vector.reshape(1, -1)
+            before_keys_consistent = True
+            before_reference = before_frame
+            result["duplicate_keys_before"] = bool(initial_duplicate or before_duplicate)
+            result["point_column_before"] = before_point
         else:
             before_values = initial_values.reshape(1, -1)
             before_keys_consistent = True
@@ -196,11 +222,17 @@ def certify_saved_runtime(
 
         runtime_pre = torch_runtime_snapshot(fitted_model)
         gpu_pre = _safe_gpu_process_snapshot()
-        pre_cuda = phase_has_cuda(runtime_pre, gpu_pre)
+        pre_phase = cuda_phase_evidence(
+            runtime_pre,
+            gpu_pre,
+            pre_phase_baseline if require_gpu else None,
+        )
+        pre_cuda = bool(pre_phase["verified"])
         result.update(
             {
                 "runtime_pre_save_inference": runtime_pre,
                 "gpu_pre_save_inference": gpu_pre,
+                "cuda_pre_save_phase_evidence": pre_phase,
                 "cuda_pre_save_inference_evidence": pre_cuda,
                 "cuda_training_evidence": pre_cuda,
                 "formal_cuda_training_evidence": formal_training_cuda(resolved_training),
@@ -213,6 +245,9 @@ def certify_saved_runtime(
         loaded = neuralforecast_class.load(str(model_path))
         result["loaded"] = True
         result["failed_phase"] = "predict_after_load"
+
+        reload_phase_baseline = cuda_phase_baseline() if require_gpu else {}
+        result["cuda_reload_phase_baseline"] = reload_phase_baseline
 
         if policy == "stochastic":
             (
@@ -255,9 +290,15 @@ def certify_saved_runtime(
         result["state_after_finite"] = state_dict_finite(loaded_model)
         runtime_reload = torch_runtime_snapshot(loaded_model)
         gpu_reload = _safe_gpu_process_snapshot()
-        reload_cuda = phase_has_cuda(runtime_reload, gpu_reload)
+        reload_phase = cuda_phase_evidence(
+            runtime_reload,
+            gpu_reload,
+            reload_phase_baseline if require_gpu else None,
+        )
+        reload_cuda = bool(reload_phase["verified"])
         result["runtime_reload_inference"] = runtime_reload
         result["gpu_reload_inference"] = gpu_reload
+        result["cuda_reload_phase_evidence"] = reload_phase
         result["cuda_reload_inference_evidence"] = reload_cuda
 
         shape_match = before_values.shape == after_values.shape
