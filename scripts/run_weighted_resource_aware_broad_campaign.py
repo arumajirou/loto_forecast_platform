@@ -13,6 +13,7 @@ from typing import Any
 from loto.models.catalog_full import build_catalog
 from loto.orchestration.process_observer import run_monitored_process
 from loto.orchestration.weighted_resource_scheduler import (
+    WeightedResourceLease,
     WeightedResourceScheduler,
     configure_weighted_profiles,
     weighted_runtime_resource_class,
@@ -48,8 +49,20 @@ def _inject_weighted_defaults(argv: list[str]) -> list[str]:
 class ObservedWeightedResourceScheduler(WeightedResourceScheduler):
     """Weighted scheduler that binds the acquired lease to its worker thread."""
 
-    def acquire(self, **kwargs: Any):  # type: ignore[no-untyped-def]
-        lease = super().acquire(**kwargs)
+    def acquire(
+        self,
+        *,
+        requires_gpu: bool,
+        lease_id: str,
+        timeout: float | None = None,
+        exclusive_gpu: bool = False,
+    ) -> WeightedResourceLease:
+        lease = super().acquire(
+            requires_gpu=requires_gpu,
+            lease_id=lease_id,
+            timeout=timeout,
+            exclusive_gpu=exclusive_gpu,
+        )
         _ACTIVE_TASK.lease = lease
         return lease
 
