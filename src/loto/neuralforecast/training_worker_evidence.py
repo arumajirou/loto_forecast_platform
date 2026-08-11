@@ -276,16 +276,17 @@ _CLASS_LOCK = RLock()
 def restore_official_auto_class(model: Any) -> Any:
     """Restore a temporary evidence wrapper to its official NeuralForecast class."""
 
-    original = _ORIGINAL_CLASS_BY_INSTRUMENTED.get(type(model))
-    if original is None:
+    with _CLASS_LOCK:
+        original = _ORIGINAL_CLASS_BY_INSTRUMENTED.get(type(model))
+        if original is None:
+            return model
+        try:
+            model.__class__ = original
+        except TypeError as exc:
+            raise RuntimeError(
+                "NeuralForecast AutoModel instance cannot be restored to its official class"
+            ) from exc
         return model
-    try:
-        model.__class__ = original
-    except TypeError as exc:
-        raise RuntimeError(
-            "NeuralForecast AutoModel instance cannot be restored to its official class"
-        ) from exc
-    return model
 
 
 class TrainingWorkerEvidenceMixin:
@@ -297,11 +298,12 @@ class TrainingWorkerEvidenceMixin:
     training_evidence_require_gpu: bool = False
 
     def fit(self, *args: Any, **kwargs: Any):
-        """Run the complete official AutoModel fit, then restore save-compatible class identity."""
+        """Run official AutoModel fit and always restore save-compatible class identity."""
 
-        result = super().fit(*args, **kwargs)
-        restore_official_auto_class(self)
-        return result
+        try:
+            return super().fit(*args, **kwargs)
+        finally:
+            restore_official_auto_class(self)
 
     def _fit_model(
         self,
