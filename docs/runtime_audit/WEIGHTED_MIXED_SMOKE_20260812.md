@@ -114,24 +114,52 @@ Prospective evaluated  = false
 Promotion               = false
 ```
 
-## Remaining runtime-certification gap
+## Process-evidence follow-up
 
-This smoke does **not** close Issue #264 completely.
-
-All four leases reported:
+A later exact-head run on `7eff195de88f0786420c5a1ca40b284b75234d50` (`pr263-process-evidence-20260812-082542`) verified the remaining process-attribution mechanics except numeric per-task VRAM:
 
 ```text
-child_pid = null
+model runtime success         = 4/4
+matrix complete               = true
+scheduler invariants          = PASS
+actual child PID              = PASS 4/4
+process observation file      = PASS 4/4
+positive peak RSS             = PASS 4/4
+GPU PID attribution           = PASS 3/3 GPU models
+CPU fallback classification   = PASS
+all leases released           = true
+top-level SHA-256             = PASS
+nested SHA-256                = PASS
 ```
 
-Therefore the following evidence remains required before the scheduler/runtime certification gate can be considered complete:
+Observed process evidence:
 
-- actual spawned child PID;
-- process-tree capture;
-- per-task peak RSS;
-- GPU process/PID attribution;
-- per-task peak GPU memory evidence for ordinary GPU jobs;
-- explicit CPU-fallback verification where fallback is supported/expected;
-- tests proving process-observation evidence survives success, nonzero exit, and timeout paths.
+| Model | Child PID | Peak RSS MiB | GPU PID |
+|---|---:|---:|---:|
+| `sf-autoarima` | 560452 | 247.7578125 | N/A |
+| `nfauto-rnn` | 560453 | 2030.36328125 | 560453 |
+| `nf-dlinear` | 560454 | 1615.875 | 560454 |
+| `nf-timellm` | 561022 | 4018.87109375 | 561022 |
 
-The next implementation step is to replace the opaque `subprocess.run()` execution path with a monitored `Popen`-based helper that records those fields without changing model/evaluation semantics.
+The WSL `nvidia-smi --query-compute-apps=pid,used_memory` path returned valid compute PIDs but did not provide numeric per-process `used_memory`, so `peak_gpu_memory_mib` remained null in the generic process observer.
+
+## VRAM evidence scan correction
+
+The first post-run JSON scan reported `NO_NUMERIC_PEAK_FOUND`, but that scan used an overly narrow key regex and therefore produced a false negative for TimeLLM. The TimeLLM smoke contract already writes process-local PyTorch allocator values under:
+
+```text
+cuda_peak_allocated_mib
+cuda_peak_reserved_mib
+```
+
+in `timellm-smoke/RESULT.json`.
+
+Therefore the current state is **not** “0/3 GPU models have numeric VRAM evidence”. The immutable artifact must be rescanned with a pointer-aware rule that recognizes any numeric key/path containing `peak` plus CUDA/GPU/VRAM memory semantics. No new monitor should be implemented until that corrected scan is complete.
+
+For standard NeuralForecast campaign tasks, the stacked PR #260 lineage already contains process-local CUDA allocator primitives such as `cuda_peak_memory_allocated` and phase baseline/delta evidence. Those values were not confirmed in the representative broad-campaign artifacts and must not be assumed present without artifact evidence.
+
+## Remaining runtime-certification gap
+
+Issue #264 remains open until numeric per-task GPU-memory evidence is resolved for the representative GPU profiles and exact-head CI status is known.
+
+If the corrected artifact scan confirms numeric evidence only for TimeLLM, the next fallback should be limited to the missing ordinary GPU models. Any device-total VRAM fallback must run those GPU tasks in isolation and explicitly record the verification method, baseline, peak, delta, and absence of unrelated compute PIDs so that concurrent device memory cannot be misattributed.
