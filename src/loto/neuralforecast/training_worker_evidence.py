@@ -310,6 +310,7 @@ class TrainingWorkerEvidenceMixin:
 
 
 _CLASS_CACHE: dict[type, type] = {}
+_ORIGINAL_CLASS_BY_INSTRUMENTED: dict[type, type] = {}
 _CLASS_LOCK = RLock()
 
 
@@ -328,7 +329,28 @@ def training_evidence_auto_class(auto_cls: type) -> type:
         )
         globals()[name] = created
         _CLASS_CACHE[auto_cls] = created
+        _ORIGINAL_CLASS_BY_INSTRUMENTED[created] = auto_cls
         return created
+
+
+def restore_official_auto_class(model: Any) -> Any:
+    """Restore a training-instrumented wrapper to its official NeuralForecast class.
+
+    NeuralForecast ``save`` validates supported wrapper classes by class identity/name.
+    Training evidence lives on the fitted inner model, so the temporary mixin is no
+    longer needed after ``fit`` and must not leak into persistence.
+    """
+
+    original = _ORIGINAL_CLASS_BY_INSTRUMENTED.get(type(model))
+    if original is None:
+        return model
+    try:
+        model.__class__ = original
+    except TypeError as exc:
+        raise RuntimeError(
+            "NeuralForecast AutoModel instance cannot be restored to its official class"
+        ) from exc
+    return model
 
 
 def configure_training_evidence(
