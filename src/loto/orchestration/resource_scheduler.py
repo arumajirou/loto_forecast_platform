@@ -154,10 +154,6 @@ def resolve_resource_plan(
             usable = max(0, free_mib - safety_margin_mib)
             per_gpu_slots.append(usable // gpu_slot_mib)
         gpu_workers = min(outer_worker_cap, sum(per_gpu_slots)) if per_gpu_slots else 0
-        if gpu_workers == 0 and any(
-            free_mib > safety_margin_mib for free_mib in snapshot.gpu_free_mib
-        ):
-            gpu_workers = 1
 
     if cpu_workers + gpu_workers > outer_worker_cap:
         cpu_workers = max(1, outer_worker_cap - gpu_workers)
@@ -165,7 +161,7 @@ def resolve_resource_plan(
     return ResolvedResourcePlan(
         parallel_cpu_models=cpu_workers,
         parallel_gpu_models=gpu_workers,
-        parallel_exclusive_gpu_models=1 if snapshot.gpu_count else 0,
+        parallel_exclusive_gpu_models=1 if gpu_workers > 0 else 0,
         cpus_per_trial=cpus_per_trial,
         gpu_slot_mib=gpu_slot_mib,
         safety_margin_mib=safety_margin_mib,
