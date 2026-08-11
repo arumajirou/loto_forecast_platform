@@ -160,7 +160,17 @@ def _campaign_catalog_status(summary: dict[str, Any], model_id: str) -> tuple[st
     if len(matches) != 1:
         return "NO_CATALOG_RESULT", f"expected one catalog row, observed {len(matches)}"
     row = matches[0]
-    return str(row.get("status", "UNKNOWN")), str(row.get("reason", ""))
+    status = str(row.get("status", "UNKNOWN"))
+    reason = str(row.get("reason", ""))
+    failures = row.get("failures", [])
+    if status == "FAILED" and isinstance(failures, list) and failures:
+        first = failures[0]
+        if isinstance(first, dict):
+            failure_type = str(first.get("type", "Failure"))
+            failure_reason = str(first.get("reason", ""))
+            if failure_reason:
+                reason = f"{reason}; {failure_type}: {failure_reason}" if reason else f"{failure_type}: {failure_reason}"
+    return status, reason
 
 
 def _blocked_gpu_result(task: MatrixTask, case_dir: Path) -> dict[str, Any]:
@@ -198,6 +208,16 @@ def _run_task(
     case_dir.mkdir(parents=True, exist_ok=True)
     attempt = case_dir / f"attempt-{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 1_000_000_000:09d}"
     attempt.mkdir(parents=True)
+    runtime_workdir = attempt / "runtime-workdir"
+    runtime_workdir.mkdir()
+    _atomic_json(
+        attempt / "RUNTIME_CONTEXT.json",
+        {
+            "repo_root": str(ROOT),
+            "runtime_workdir": str(runtime_workdir),
+            "task_key": task.key,
+        },
+    )
 
     requires_gpu = task.resource_class in {"GPU", "EXCLUSIVE_GPU"}
     lease = scheduler.acquire(
@@ -268,7 +288,7 @@ def _run_task(
         try:
             proc = subprocess.run(
                 command,
-                cwd=ROOT,
+                cwd=runtime_workdir,
                 capture_output=True,
                 text=True,
                 timeout=timeout_seconds,
@@ -331,6 +351,7 @@ def _run_task(
             "elapsed_seconds": time.perf_counter() - started,
             "lease": lease.to_dict(),
             "attempt_dir": str(attempt),
+            "runtime_workdir": str(runtime_workdir),
             "holdout_evaluated": False,
             "prospective_evaluated": False,
             "promotion": False,
