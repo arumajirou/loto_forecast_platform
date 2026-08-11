@@ -228,6 +228,26 @@ class LegacyProtocolV1:
     payload: dict[str, Any]
 
 
+def _canonical_json_default(value: Any) -> dict[str, str]:
+    """Encode explicitly supported runtime-evidence objects deterministically.
+
+    Formal protocol models are already JSON-native through ``model_dump(mode="json")``.
+    The fallback is intentionally narrow: NeuralForecast loss modules may appear in
+    runtime metadata (for example ``MAE()``) after a successful fit/predict.  Encoding
+    their qualified type and stable module ``repr`` keeps campaign evidence writable
+    without turning arbitrary Python objects into silently accepted protocol content.
+    """
+
+    value_type = type(value)
+    module = value_type.__module__
+    if module.startswith("neuralforecast.losses."):
+        return {
+            "__python_type__": f"{module}.{value_type.__qualname__}",
+            "__repr__": repr(value),
+        }
+    raise TypeError(f"Object of type {value_type.__name__} is not JSON serializable")
+
+
 def canonical_json_bytes(payload: Any) -> bytes:
     """Serialize canonical JSON and reject NaN/Infinity."""
 
@@ -237,6 +257,7 @@ def canonical_json_bytes(payload: Any) -> bytes:
         allow_nan=False,
         sort_keys=True,
         separators=(",", ":"),
+        default=_canonical_json_default,
     ).encode("utf-8")
 
 
