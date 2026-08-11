@@ -4,8 +4,9 @@ import os
 import subprocess
 import threading
 import time
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from typing import Any
 
 from loto.models.catalog_full import ModelEntry
 from loto.orchestration.resource_scheduler import ResourcePolicy
