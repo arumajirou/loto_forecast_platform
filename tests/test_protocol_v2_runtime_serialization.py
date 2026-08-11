@@ -21,9 +21,7 @@ def test_canonical_json_serializes_neuralforecast_mae_runtime_evidence() -> None
     encoded = canonical_json_bytes(payload)
     decoded = json.loads(encoded)
 
-    assert decoded["params"]["loss"] == {
-        "__python_type__": "neuralforecast.losses.pytorch.MAE"
-    }
+    assert decoded["params"]["loss"] == {"__python_type__": "neuralforecast.losses.pytorch.MAE"}
 
 
 def test_canonical_json_still_rejects_unknown_python_objects() -> None:
