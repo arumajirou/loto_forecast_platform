@@ -38,7 +38,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--association-columns", default="")
     parser.add_argument("--time-column")
     parser.add_argument("--control-column")
-    parser.add_argument("--representation", choices=REPRESENTATIONS, default="generic_numeric_series")
+    parser.add_argument(
+        "--representation", choices=REPRESENTATIONS, default="generic_numeric_series"
+    )
     parser.add_argument("--data-scope", choices=ALLOWED_SCOPES, default="development")
     parser.add_argument("--lags", type=int, default=10)
     parser.add_argument("--min-segment", type=int, default=10)
