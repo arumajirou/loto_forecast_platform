@@ -74,9 +74,7 @@ def test_campaign_failure_reason_includes_first_seed_failure() -> None:
     assert "lightning_logs/version_1" in reason
 
 
-def test_case_result_persists_released_lease_state_and_isolated_cwd(
-    tmp_path, monkeypatch
-) -> None:
+def test_case_result_persists_released_lease_state_and_isolated_cwd(tmp_path, monkeypatch) -> None:
     module = _load_runner_module()
     model = next(entry for entry in build_catalog() if entry.model_id == "sf-autoarima")
     task = module._build_tasks([model], ["numbers4"])[0]
