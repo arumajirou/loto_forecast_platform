@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import sys
+from types import ModuleType, SimpleNamespace
+
 from loto.models.neuralforecast_adapter import (
     AutoModelRequest,
     _merge_default_config_overrides,
     resolve_auto_model_plan,
 )
+from loto.neuralforecast import db_training_evidence_facade as training_facade
+from loto.neuralforecast.training_worker_evidence import TrainingWorkerEvidenceMixin
 
 
 def test_default_ray_search_space_is_preserved_while_seed_and_precision_are_fixed() -> None:
@@ -144,3 +149,53 @@ def test_package_installs_training_evidence_facade_and_rebinds_autohint_core_rou
 
     assert getattr(facade, "_loto_training_evidence_installed", False) is True
     assert core._construct_auto_hint is facade._construct_auto_hint
+
+
+def test_training_evidence_instrumentation_does_not_patch_named_super_global(
+    monkeypatch,
+) -> None:
+    """Regression for NeuralForecast classes that use super(AutoX, self)."""
+
+    auto_module = ModuleType("neuralforecast.auto")
+    exec(
+        """
+class BaseAuto:
+    def __init__(self, *, cls_model=None):
+        self.cls_model = cls_model
+
+    def _fit_model(self, **kwargs):
+        return object()
+
+class AutoDLinear(BaseAuto):
+    def __init__(self):
+        super(AutoDLinear, self).__init__(cls_model='DLinear')
+""",
+        auto_module.__dict__,
+    )
+    package = ModuleType("neuralforecast")
+    package.auto = auto_module
+    monkeypatch.setitem(sys.modules, "neuralforecast", package)
+    monkeypatch.setitem(sys.modules, "neuralforecast.auto", auto_module)
+
+    original_class = auto_module.AutoDLinear
+    context = SimpleNamespace(
+        config=SimpleNamespace(gpus=1, require_gpu_execution=None),
+        spec=SimpleNamespace(model_id="nf-auto-dlinear"),
+    )
+    facade = ModuleType("fake_training_facade")
+    facade._CONTEXT = SimpleNamespace(get=lambda: context)
+    facade._CORE = None
+    facade._construct_interceptor = lambda plan: auto_module.AutoDLinear()
+    facade._construct_auto_hint = lambda config, panel: (auto_module.AutoDLinear(), panel)
+
+    training_facade.install(facade)
+    model = facade._construct_interceptor(
+        SimpleNamespace(model_name="AutoDLinear", backend="ray")
+    )
+
+    assert auto_module.AutoDLinear is original_class
+    assert isinstance(model, TrainingWorkerEvidenceMixin)
+    assert model.cls_model == "DLinear"
+    assert model.training_evidence_backend == "ray"
+    assert model.training_evidence_model_id == "nf-auto-dlinear"
+    assert model.training_evidence_require_gpu is True
