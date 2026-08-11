@@ -155,7 +155,9 @@ def _temporal_rows(
             repetitions=permutations,
             seed=seed,
         )
-        representation = "sorted_position" if game in SORTED_POSITION_GAMES else "generic_numeric_series"
+        representation = (
+            "sorted_position" if game in SORTED_POSITION_GAMES else "generic_numeric_series"
+        )
 
         rows.extend(
             [
@@ -210,7 +212,9 @@ def _association_rows(
     columns: tuple[str, ...],
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    representation = "sorted_position" if game in SORTED_POSITION_GAMES else "generic_numeric_series"
+    representation = (
+        "sorted_position" if game in SORTED_POSITION_GAMES else "generic_numeric_series"
+    )
     warning = STRUCTURAL_SORT_WARNING if game in SORTED_POSITION_GAMES else None
 
     for left, right in itertools.combinations(columns, 2):
@@ -311,7 +315,9 @@ def main(argv: list[str] | None = None) -> int:
         associations.extend(_association_rows(development, game=game, columns=columns))
 
     expected_positions = sum(len(columns) for columns in GAME_COLUMNS.values())
-    expected_pairs = sum(len(tuple(itertools.combinations(columns, 2))) for columns in GAME_COLUMNS.values())
+    expected_pairs = sum(
+        len(tuple(itertools.combinations(columns, 2))) for columns in GAME_COLUMNS.values()
+    )
     if expected_positions != 33 or len(temporal) != 99:
         raise RuntimeError("unexpected temporal campaign cardinality")
     if expected_pairs != 83 or len(associations) != 166:
@@ -361,9 +367,7 @@ def main(argv: list[str] | None = None) -> int:
         "holdout_size_per_game": args.holdout_size,
         "temporal_holm_rejections": sum(row["holm_rejected"] for row in temporal_correction),
         "temporal_bh_rejections": sum(row["bh_rejected"] for row in temporal_correction),
-        "association_holm_rejections": sum(
-            row["holm_rejected"] for row in association_correction
-        ),
+        "association_holm_rejections": sum(row["holm_rejected"] for row in association_correction),
         "association_bh_rejections": sum(row["bh_rejected"] for row in association_correction),
         "omnibus_holm_rejections": sum(row["holm_rejected"] for row in omnibus_correction),
         "omnibus_bh_rejections": sum(row["bh_rejected"] for row in omnibus_correction),
