@@ -38,6 +38,7 @@ def test_wsl_uses_process_local_cuda_context_when_compute_pid_query_is_empty(mon
     assert snapshot["rows"] == []
     assert snapshot["process_local_cuda"]["cuda_context_active"] is True
     assert snapshot["limitation"] == "wsl_nvidia_smi_active_compute_process_query_unavailable"
+    assert snapshot["nvidia_smi_error"] is None
 
 
 def test_native_linux_accepts_same_pid_process_local_cuda_context(monkeypatch):
@@ -124,3 +125,30 @@ def test_nvidia_smi_pid_match_has_priority_over_process_local_fallback(monkeypat
     assert snapshot["verification_method"] == "nvidia_smi_compute_apps"
     assert snapshot["rows"] == [f"{pid}, python, 123"]
     assert snapshot["process_local_cuda"] == {}
+
+
+def test_nvidia_smi_failure_context_is_preserved(monkeypatch):
+    def failed_nvidia_smi(*args, **kwargs):
+        return SimpleNamespace(returncode=9, stdout="", stderr="NVML unavailable")
+
+    monkeypatch.setattr(runtime.subprocess, "run", failed_nvidia_smi)
+    monkeypatch.setattr(runtime, "_is_wsl", lambda: False)
+    monkeypatch.setattr(
+        runtime,
+        "_process_local_cuda_snapshot",
+        lambda: {
+            "pid": os.getpid(),
+            "torch_available": True,
+            "cuda_available": False,
+            "cuda_current_device": None,
+            "cuda_memory_allocated": 0,
+            "cuda_memory_reserved": 0,
+            "cuda_peak_memory_allocated": 0,
+            "cuda_context_active": False,
+        },
+    )
+
+    snapshot = runtime.gpu_process_snapshot()
+
+    assert snapshot["gpu_pid_verified"] is False
+    assert snapshot["nvidia_smi_error"] == "nvidia-smi failed with return code 9: NVML unavailable"
