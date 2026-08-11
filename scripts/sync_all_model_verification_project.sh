@@ -64,12 +64,14 @@ ensure_number_field() {
     --data-type NUMBER
 }
 
+# Keep compatibility with the existing Project #1 Phase taxonomy. If the field
+# already exists, its options are authoritative and are not replaced here.
 ensure_single_select_field \
   "Phase" \
-  "Master,Scheduler Certification,Identity Smoke,Broad Runtime,Unified Runtime,Functional Certification,Accuracy Evaluation"
+  "Foundation,Runtime Remediation,Scheduler Certification,Broad Audit,Unified Audit,Accuracy Evaluation,Holdout,Prospective,Promotion"
 ensure_single_select_field \
   "Evidence Status" \
-  "PLANNED,VALIDATION_PENDING,VERIFIED,BLOCKED,FAILED"
+  "VERIFIED,VALIDATION_PENDING,BLOCKED,PLANNED,FAILED"
 ensure_number_field "Execution Units"
 
 refresh_fields
@@ -147,6 +149,27 @@ raise SystemExit(f"option not found: {field_name}/{option_name}")
 PY
 }
 
+require_option() {
+  local field="$1"
+  local option="$2"
+  if ! option_id "$field" "$option" >/dev/null; then
+    echo "ERROR: required project option missing: $field/$option" >&2
+    echo "AVAILABLE_OPTIONS:" >&2
+    python3 - "$FIELDS_JSON" "$field" <<'PY' >&2
+import json, sys
+path, field_name = sys.argv[1:3]
+obj = json.load(open(path, encoding="utf-8"))
+for field in obj.get("fields", []):
+    if field.get("name") == field_name:
+        for option in field.get("options", []):
+            print(f"  - {option.get('name')}")
+        raise SystemExit
+print("  <field not found>")
+PY
+    exit 3
+  fi
+}
+
 item_id_by_url() {
   python3 - "$ITEMS_JSON" "$1" <<'PY'
 import json, sys
@@ -167,6 +190,7 @@ set_select() {
   local url="$1"
   local field="$2"
   local option="$3"
+  require_option "$field" "$option"
   gh project item-edit \
     --id "$(item_id_by_url "$url")" \
     --project-id "$PROJECT_ID" \
@@ -189,6 +213,19 @@ set_number() {
   echo "SET $url :: $field=$value"
 }
 
+# Preflight all Project single-select options before making field mutations.
+for status in "In Progress" "Todo"; do
+  require_option "Status" "$status"
+done
+for phase in "Foundation" "Scheduler Certification" "Broad Audit" "Unified Audit"; do
+  require_option "Phase" "$phase"
+done
+for evidence in "PLANNED" "VALIDATION_PENDING" "BLOCKED"; do
+  require_option "Evidence Status" "$evidence"
+done
+
+echo "PROJECT_OPTION_PREFLIGHT=PASS"
+
 # Built-in workflow status.
 set_select "$URL_269" "Status" "In Progress"
 set_select "$URL_264" "Status" "In Progress"
@@ -196,12 +233,12 @@ set_select "$URL_263" "Status" "In Progress"
 set_select "$URL_265" "Status" "Todo"
 set_select "$URL_266" "Status" "Todo"
 
-# Verification phase.
-set_select "$URL_269" "Phase" "Master"
+# Existing Project #1 verification-phase taxonomy.
+set_select "$URL_269" "Phase" "Foundation"
 set_select "$URL_264" "Phase" "Scheduler Certification"
 set_select "$URL_263" "Phase" "Scheduler Certification"
-set_select "$URL_265" "Phase" "Broad Runtime"
-set_select "$URL_266" "Phase" "Unified Runtime"
+set_select "$URL_265" "Phase" "Broad Audit"
+set_select "$URL_266" "Phase" "Unified Audit"
 
 # Evidence state.
 set_select "$URL_269" "Evidence Status" "PLANNED"
