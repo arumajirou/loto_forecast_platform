@@ -58,6 +58,7 @@ class AutoModelPlan:
     search_algorithm: str = "library_default"
     ray_options: dict[str, Any] | None = None
     optuna_options: dict[str, Any] | None = None
+    default_config_overrides: dict[str, Any] = field(default_factory=dict)
 
 
 def choose_backend(*, gpus: int, cpus: int, requested: str | None, parallel_trials: int = 1) -> str:
@@ -117,6 +118,32 @@ def _build_search_algorithm(backend: str, strategy: str, *, seed: int, num_sampl
     return OptunaSearch(seed=seed), "Ray OptunaSearch"
 
 
+def _merge_default_config_overrides(
+    default_config: Any,
+    overrides: dict[str, Any],
+) -> Any:
+    """Overlay fixed experiment controls without discarding the official search space."""
+
+    if not overrides:
+        return default_config
+    frozen = dict(overrides)
+    if isinstance(default_config, dict):
+        merged = dict(default_config)
+        merged.update(frozen)
+        return merged
+    if callable(default_config):
+        def merged_config(trial: Any, base=default_config, fixed=frozen) -> dict[str, Any]:
+            resolved = dict(base(trial))
+            resolved.update(fixed)
+            return resolved
+
+        return merged_config
+    raise TypeError(
+        "NeuralForecast get_default_config must return a mapping or callable, "
+        f"got {type(default_config).__name__}"
+    )
+
+
 def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
     if request.h < 1:
         raise ValueError("h must be >= 1")
@@ -128,18 +155,36 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
         requested=request.backend,
         parallel_trials=request.parallel_trials,
     )
-    config = dict(request.config or {})
+
+    user_config = dict(request.config or {})
     adjustments: list[str] = []
     for key in ("num_workers_loader", "num_workers"):
-        if key in config:
-            config.pop(key)
+        if key in user_config:
+            user_config.pop(key)
             adjustments.append(f"removed_unsupported_{key}")
-    if request.early_stop_patience_steps is not None:
-        config["early_stop_patience_steps"] = int(request.early_stop_patience_steps)
-    precision = request.precision
+    custom_config = bool(user_config)
+
+    precision = str(user_config.get("precision", request.precision))
     if request.model_name in FFT_MODELS and precision in {"16", "16-mixed", "bf16", "bf16-mixed"}:
         precision = "32-true"
         adjustments.append("precision_adjusted_for_fft")
+
+    model_seed = int(user_config.get("random_seed", request.random_seed))
+    fixed_controls: dict[str, Any] = {
+        "random_seed": model_seed,
+        "precision": precision,
+    }
+    if request.early_stop_patience_steps is not None:
+        fixed_controls["early_stop_patience_steps"] = int(request.early_stop_patience_steps)
+
+    # Explicit model-config values have the highest precedence. The generic CLI controls
+    # then fill missing seed/precision values. When no explicit model config was supplied,
+    # these controls are merged into NeuralForecast's official per-model default search
+    # space at construction time instead of replacing that search space with a tiny dict.
+    config = dict(user_config)
+    for key, value in fixed_controls.items():
+        config.setdefault(key, value)
+
     search_alg, search_name = _build_search_algorithm(
         backend, request.search_strategy, seed=request.random_seed, num_samples=request.num_samples
     )
@@ -158,17 +203,20 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
     }
     needs_n_series = request.model_name in MODELS_REQUIRING_N_SERIES
     if needs_n_series and request.n_series is not None:
-        config["n_series"] = int(request.n_series)
-    if needs_n_series and request.n_series is not None:
         constructor_kwargs["n_series"] = int(request.n_series)
-    # Empty config intentionally delegates to the official per-model default search space.
-    if config:
+
+    default_config_overrides: dict[str, Any] = {}
+    if custom_config:
         if backend == "optuna":
             frozen_config = dict(config)
             constructor_kwargs["config"] = lambda _trial, c=frozen_config: dict(c)
             adjustments.append("fixed_optuna_config")
         else:
-            constructor_kwargs["config"] = config
+            constructor_kwargs["config"] = dict(config)
+    else:
+        default_config_overrides = dict(config)
+        adjustments.append("official_default_search_space_with_fixed_controls")
+
     if search_alg is not None:
         constructor_kwargs["search_alg"] = search_alg
     return AutoModelPlan(
@@ -183,6 +231,7 @@ def resolve_auto_model_plan(request: AutoModelRequest) -> AutoModelPlan:
         optuna_options={"study_kwargs": {"n_jobs": request.parallel_trials}}
         if backend == "optuna" and request.parallel_trials > 1
         else None,
+        default_config_overrides=default_config_overrides,
     )
 
 
@@ -195,6 +244,20 @@ def construct_auto_model(plan: AutoModelPlan):
     if cls is None:
         raise ValueError(f"NeuralForecast does not expose {plan.model_name}")
     kwargs = dict(plan.constructor_kwargs)
+
+    if kwargs.get("config") is None and plan.default_config_overrides:
+        get_default_config = getattr(cls, "get_default_config", None)
+        if not callable(get_default_config):
+            raise ValueError(f"NeuralForecast {plan.model_name} does not expose get_default_config")
+        default_kwargs: dict[str, Any] = {"h": kwargs["h"], "backend": plan.backend}
+        if "n_series" in kwargs:
+            default_kwargs["n_series"] = kwargs["n_series"]
+        default_config = get_default_config(**default_kwargs)
+        kwargs["config"] = _merge_default_config_overrides(
+            default_config,
+            plan.default_config_overrides,
+        )
+
     if plan.ray_options is not None:
         ray_options_cls = getattr(nf_auto, "RayOptions", None)
         if ray_options_cls is None:
