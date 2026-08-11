@@ -52,6 +52,30 @@ def test_ray_profile_serializes_callable_categories_without_mutating_cardinality
     assert "builtin_function_or_method" not in raw
 
 
+def test_ray_profile_treats_precision_string_as_constant_not_numeric_domain():
+    profile = profile_ray_config(
+        {
+            "precision": "32-true",
+            "random_seed": 1,
+        },
+        model_name="AutoDLinear",
+    )
+    dimensions = {item["name"]: item for item in profile.model_dump(mode="json")["dimensions"]}
+
+    assert dimensions["precision"] == {
+        "name": "precision",
+        "kind": "constant",
+        "value": "32-true",
+        "cardinality": 1,
+    }
+    assert dimensions["random_seed"] == {
+        "name": "random_seed",
+        "kind": "constant",
+        "value": 1,
+        "cardinality": 1,
+    }
+
+
 def test_optuna_profile_is_partial_and_detects_branch():
     def config(trial):
         family = trial.suggest_categorical("family", ["a", "b"])
