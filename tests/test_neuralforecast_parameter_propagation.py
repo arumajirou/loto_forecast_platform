@@ -189,9 +189,7 @@ class AutoDLinear(BaseAuto):
     facade._construct_auto_hint = lambda config, panel: (auto_module.AutoDLinear(), panel)
 
     training_facade.install(facade)
-    model = facade._construct_interceptor(
-        SimpleNamespace(model_name="AutoDLinear", backend="ray")
-    )
+    model = facade._construct_interceptor(SimpleNamespace(model_name="AutoDLinear", backend="ray"))
 
     assert auto_module.AutoDLinear is original_class
     assert isinstance(model, TrainingWorkerEvidenceMixin)
