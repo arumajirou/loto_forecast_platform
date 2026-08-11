@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator
-from contextlib import contextmanager
 from types import ModuleType
 from typing import Any
 
@@ -13,18 +11,26 @@ from .training_worker_evidence import (
 )
 
 
-@contextmanager
-def _patched_auto_class(model_name: str) -> Iterator[None]:
-    import neuralforecast.auto as auto_module
+def _instrument_instance(model: Any) -> Any:
+    """Attach the training-evidence mixin without mutating NeuralForecast globals.
 
-    original = getattr(auto_module, model_name, None)
-    if original is None:
-        raise ValueError(f"NeuralForecast does not expose {model_name}")
-    setattr(auto_module, model_name, training_evidence_auto_class(original))
-    try:
-        yield
-    finally:
-        setattr(auto_module, model_name, original)
+    NeuralForecast AutoModel constructors use expressions such as
+    ``super(AutoDLinear, self)``. Replacing ``neuralforecast.auto.AutoDLinear``
+    with a dynamic subclass therefore changes the global resolved by that method and
+    breaks constructor MRO. Construct the official class first, then switch only the
+    resulting instance to the pickle-addressable instrumentation subclass before fit.
+    """
+
+    instrumented = training_evidence_auto_class(type(model))
+    if not isinstance(model, instrumented):
+        try:
+            model.__class__ = instrumented
+        except TypeError as exc:
+            raise RuntimeError(
+                "NeuralForecast AutoModel instance cannot be instrumented without "
+                "mutating the official module class"
+            ) from exc
+    return model
 
 
 def _context_values(facade: ModuleType, *, backend: str, model_name: str) -> dict[str, Any]:
@@ -52,19 +58,17 @@ def install(facade: ModuleType) -> None:
 
     def construct_interceptor(plan: Any) -> Any:
         model_name = str(plan.model_name)
-        with _patched_auto_class(model_name):
-            model = original_construct(plan)
+        model = _instrument_instance(original_construct(plan))
         return configure_training_evidence(
             model,
             **_context_values(facade, backend=str(plan.backend), model_name=model_name),
         )
 
     def construct_auto_hint(config: Any, panel: Any):
-        with _patched_auto_class("AutoHINT"):
-            result = original_hint(config, panel)
+        result = original_hint(config, panel)
         model, *remaining = result
         configured = configure_training_evidence(
-            model,
+            _instrument_instance(model),
             **_context_values(facade, backend="ray", model_name="AutoHINT"),
         )
         return (configured, *remaining)
