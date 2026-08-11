@@ -130,9 +130,12 @@ def ljung_box_test(values: Sequence[float], lags: int) -> SerialDependenceResult
         autocorrelations.append(_correlation_bound(numerator / denominator))
 
     n = int(array.size)
-    q_statistic = n * (n + 2.0) * sum(
-        correlation**2 / (n - lag)
-        for lag, correlation in enumerate(autocorrelations, start=1)
+    q_statistic = (
+        n
+        * (n + 2.0)
+        * sum(
+            correlation**2 / (n - lag) for lag, correlation in enumerate(autocorrelations, start=1)
+        )
     )
     p_value = float(stats.chi2.sf(q_statistic, df=lags))
     if not math.isfinite(q_statistic) or not math.isfinite(p_value):
