@@ -120,9 +120,7 @@ def placebo_event_test(
         )
         for index in selected
     )
-    exceedances = sum(
-        abs(effect) >= abs(observed_effect) - 1e-15 for effect in placebo_effects
-    )
+    exceedances = sum(abs(effect) >= abs(observed_effect) - 1e-15 for effect in placebo_effects)
     p_value = (exceedances + 1.0) / (len(placebo_effects) + 1.0)
 
     return PlaceboEventResult(
