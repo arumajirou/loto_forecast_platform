@@ -56,20 +56,6 @@ safety_margin_mib             = 2048
 These values are evidence for that snapshot only. The runner re-resolves them from live
 resources on each run.
 
-## Focused local verification — 2026-08-11
-
-At branch head `935a867adc6e5d047900af7a5ef18e088c4cc76a`, after syncing the
-`dev` extra, focused Linux/WSL verification completed successfully:
-
-```text
-Ruff focused paths: PASS
-Focused pytest:      24 passed
-Broad matrix check:  174 identities x 6 games = 1,044 pairs, PASS
-```
-
-This verifies the focused implementation and planning contract only. It does not certify all
-model runtimes, game compatibility, accuracy, Holdout, Prospective, or promotion.
-
 ## Development-tool verification prerequisite
 
 `ruff` and `pytest` are declared in the project's optional `dev` extra, not in the default
@@ -77,7 +63,7 @@ runtime dependency set. A plain `uv run ruff` or `uv run pytest` can therefore f
 `Failed to spawn` when the dev extra has not been synced. That is an environment/tooling
 precondition failure, not a source-code test failure.
 
-For focused lint/test work only, use either:
+Use either:
 
 ```bash
 uv sync --extra dev
@@ -92,27 +78,19 @@ uv run --extra dev ruff check <paths...>
 uv run --extra dev pytest -q <paths...>
 ```
 
-Important: `uv sync --extra dev` makes the environment match the base dependencies plus the
-`dev` extra. It can therefore prune optional runtime packages from other extras. Before a
-runtime smoke that needs StatsForecast/LightGBM/XGBoost/CatBoost/MLForecast or other `full`
-packages, sync the runtime extras together with `dev`:
+Use `uv run python` (or `python3`) for inline Python checks on hosts that do not provide a
+`python` shell alias.
+
+For shared runtime smoke tests that need StatsForecast/MLForecast/LightGBM/XGBoost/CatBoost
+in addition to development tooling, sync both extras:
 
 ```bash
 uv sync --extra dev --extra full
 ```
 
-Before a broad shared-runtime sweep that also needs the optional framework and TSFM packages,
-use:
-
-```bash
-uv sync --extra dev --extra full --extra frameworks --extra tsfm
-```
-
-Provider-specific isolated environments remain separate execution contracts and should not be
-silently replaced by the shared environment.
-
-Use `uv run python` (or `python3`) for inline Python checks on hosts that do not provide a
-`python` shell alias.
+A wider shared-runtime sweep can use `dev + full + frameworks + tsfm`. Provider-specific
+isolated environments remain separate execution contracts and should not be silently folded
+into the shared environment.
 
 ## Resource planning
 
@@ -199,6 +177,50 @@ uv run python scripts/run_resource_aware_broad_campaign.py \
 The runner creates separate CPU and GPU executors and uses `ResourceScheduler` leases to
 prevent ordinary GPU jobs from overlapping an `EXCLUSIVE_GPU` task.
 
+## Local three-lane smoke evidence — 2026-08-11
+
+At source head `1d314bb9bccb2e7cf7e142d46655c9586c158970`, a three-task
+Numbers4 smoke exercised one CPU task, one ordinary GPU task, and one exclusive GPU task:
+
+```text
+sf-autoarima::numbers4  -> SUCCEEDED
+nf-dlinear::numbers4    -> SUCCEEDED
+nf-timellm::numbers4    -> RUNTIME_SMOKE_SUCCEEDED
+```
+
+The CPU and ordinary GPU leases started concurrently. TimeLLM did not acquire its exclusive
+lease until the ordinary DLinear GPU lease was released, then consumed both configured GPU
+slots. Matrix completeness was 3/3 and all generated SHA-256 checks passed.
+
+## Local all-game lane smoke evidence — 2026-08-11
+
+At source head `1d314bb9bccb2e7cf7e142d46655c9586c158970`, the same three model
+identities were expanded across all six canonical games (18 execution units):
+
+```text
+matrix_complete                    = true
+observed / expected                = 18 / 18
+SUCCEEDED                          = 11
+RUNTIME_SMOKE_SUCCEEDED            = 6
+FAILED                             = 1
+```
+
+Observed per-model result:
+
+- `sf-autoarima`: SUCCEEDED on all six games;
+- `nf-dlinear`: SUCCEEDED on loto6, loto7, mini, numbers3, numbers4; FAILED on bingo5 with
+  campaign reason `one or more approved seeds failed`;
+- `nf-timellm`: reduced runtime smoke succeeded on all six games. `mini` returned
+  `RAW_DOMAIN_PASS`; the other five games remained `PENDING_DECODE_OR_CALIBRATION`.
+
+The DLinear bingo5 row is a model/game execution failure, not a scheduler failure: command
+return code was zero, the campaign summary was produced, and the runner reported the catalog
+row's explicit `FAILED` status. Root cause below that campaign-level reason remains to be
+extracted from the per-seed/model logs before the 1,044-pair broad run.
+
+All generated SHA-256 checks passed. Holdout and Prospective remained closed and promotion
+remained false.
+
 ## Evidence artifacts
 
 Top-level artifacts include:
@@ -216,6 +238,10 @@ stderr, campaign or TimeLLM-smoke evidence, and `FINAL.json`.
 
 The campaign output directory is never pre-created before `loto3 campaign`; this preserves
 the fail-closed immutable-output contract.
+
+Each completed case now persists the post-release lease state into its own `FINAL.json` and
+therefore into `RESULTS.jsonl`; `released_at` is no longer available only in the aggregate
+`RESOURCE_LEASES.json` artifact.
 
 ## Status interpretation
 
