@@ -171,7 +171,10 @@ def estimate_pre_post_effect(
                 "control-adjusted event effect eligible for guarded causal interpretation; "
                 "negative-control and model-assumption checks still required"
             )
-        elif assessment.causal_claim_eligible and identification_plan.design != "controlled_event_study":
+        elif (
+            assessment.causal_claim_eligible
+            and identification_plan.design != "controlled_event_study"
+        ):
             interpretation = (
                 "identification plan passes its general gate, but this v1 estimator does not "
                 "implement the declared design; causal claim remains closed"
