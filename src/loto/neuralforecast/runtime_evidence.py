@@ -79,9 +79,7 @@ def cuda_phase_evidence(
     external_verified = bool(gpu_process.get("external_gpu_pid_verified"))
     payload: dict[str, Any] = {
         "verified": external_verified,
-        "verification_method": (
-            "nvidia_smi_compute_apps" if external_verified else "none"
-        ),
+        "verification_method": ("nvidia_smi_compute_apps" if external_verified else "none"),
         "external_gpu_pid_verified": external_verified,
         "process_local_phase_verified": False,
         "same_pid": False,
@@ -112,9 +110,7 @@ def cuda_phase_evidence(
     payload.update(
         {
             "verified": local_verified,
-            "verification_method": (
-                "torch_process_local_peak_delta" if local_verified else "none"
-            ),
+            "verification_method": ("torch_process_local_peak_delta" if local_verified else "none"),
             "process_local_phase_verified": local_verified,
             "same_pid": same_pid,
             "same_device": same_device,
