@@ -87,7 +87,9 @@ def test_process_local_fallback_never_claims_a_different_pid(monkeypatch):
     monkeypatch.setattr(
         runtime,
         "_process_local_cuda_snapshot",
-        lambda: (_ for _ in ()).throw(AssertionError("different PID must not use local CUDA proof")),
+        lambda: (_ for _ in ()).throw(
+            AssertionError("different PID must not use local CUDA proof")
+        ),
     )
 
     snapshot = runtime.gpu_process_snapshot(pid=os.getpid() + 1)
