@@ -46,7 +46,37 @@ def test_timellm_tasks_use_exclusive_gpu_lane() -> None:
     assert tasks[0].resource_class == "EXCLUSIVE_GPU"
 
 
-def test_case_result_persists_released_lease_state(tmp_path, monkeypatch) -> None:
+def test_campaign_failure_reason_includes_first_seed_failure() -> None:
+    module = _load_runner_module()
+    summary = {
+        "results": [
+            {
+                "source": "catalog",
+                "candidate_id": "nf-dlinear",
+                "status": "FAILED",
+                "reason": "one or more approved seeds failed",
+                "failures": [
+                    {
+                        "seed": 1,
+                        "type": "FileExistsError",
+                        "reason": "[Errno 17] File exists: 'lightning_logs/version_1'",
+                    }
+                ],
+            }
+        ]
+    }
+
+    status, reason = module._campaign_catalog_status(summary, "nf-dlinear")
+
+    assert status == "FAILED"
+    assert "one or more approved seeds failed" in reason
+    assert "FileExistsError" in reason
+    assert "lightning_logs/version_1" in reason
+
+
+def test_case_result_persists_released_lease_state_and_isolated_cwd(
+    tmp_path, monkeypatch
+) -> None:
     module = _load_runner_module()
     model = next(entry for entry in build_catalog() if entry.model_id == "sf-autoarima")
     task = module._build_tasks([model], ["numbers4"])[0]
@@ -72,12 +102,13 @@ def test_case_result_persists_released_lease_state(tmp_path, monkeypatch) -> Non
         parallel_trials=1,
         timellm_max_steps=2,
     )
+    observed_cwds: list[Path] = []
 
-    monkeypatch.setattr(
-        module.subprocess,
-        "run",
-        lambda *args, **kwargs: SimpleNamespace(returncode=0, stdout="", stderr=""),
-    )
+    def fake_run(*args, **kwargs):
+        observed_cwds.append(Path(kwargs["cwd"]))
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
 
     result = module._run_task(
         task,
@@ -89,6 +120,17 @@ def test_case_result_persists_released_lease_state(tmp_path, monkeypatch) -> Non
 
     assert result["status"] == "NO_RESULT_FILE"
     assert result["lease"]["released_at"] is not None
+    assert observed_cwds
+    assert observed_cwds[-1].name == "runtime-workdir"
+    assert observed_cwds[-1] == Path(result["runtime_workdir"])
+    assert observed_cwds[-1].parent == Path(result["attempt_dir"])
+
+    context_path = Path(result["attempt_dir"]) / "RUNTIME_CONTEXT.json"
+    context = json.loads(context_path.read_text(encoding="utf-8"))
+    assert context["runtime_workdir"] == result["runtime_workdir"]
+    assert context["task_key"] == task.key
+
     final_path = next((tmp_path / "cases").glob("*/FINAL.json"))
     persisted = json.loads(final_path.read_text(encoding="utf-8"))
     assert persisted["lease"]["released_at"] == result["lease"]["released_at"]
+    assert persisted["runtime_workdir"] == result["runtime_workdir"]
