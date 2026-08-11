@@ -1,0 +1,42 @@
+{
+  "acquisition_status": "SUCCEEDED",
+  "games": {
+    "bingo5": {
+      "frame_sha256": "2b230862d48a31d87301f486511e88c6c1bdecbf52c20c3ebf3a8ce306e86b02",
+      "normalized_file_sha256": "7adc619d75b11b3c2ac875d02a90bbaa3ba5a31b96e09d9d8d9972f6c4380484",
+      "quality_status": "PASS",
+      "rows": 482
+    },
+    "loto6": {
+      "frame_sha256": "6c29050f10e9aac3d566e0839067461fe9c1b69d6b30f003bfbd98b4c54448c7",
+      "normalized_file_sha256": "c0806fc14f24cfa4d37ea0b1845143c5b14d8d8fd28f2344763c23133b641345",
+      "quality_status": "PASS",
+      "rows": 2127
+    },
+    "loto7": {
+      "frame_sha256": "42f4c4342b345517b76d6c33c777bff1936e2c5be249302c882f7a69e0a02741",
+      "normalized_file_sha256": "82471978e1cfd3d8b942e28236b7284d42f4b5bca4374dc30093f4dfcefc40cb",
+      "quality_status": "PASS",
+      "rows": 689
+    },
+    "mini": {
+      "frame_sha256": "2c5979810b7d4cdc85b26d5b4fd817a118f62efb57b271d6d1944f4ac5e4275c",
+      "normalized_file_sha256": "5b2cb73d751a23bcfff6ae6252d946cd59f5fe3ac39ac5ec08619bd8b037461c",
+      "quality_status": "PASS",
+      "rows": 1398
+    },
+    "numbers3": {
+      "frame_sha256": "04d48de9e60d6066228a43c29ec5c067d56568cecbf1fbe981c51ef925df0842",
+      "normalized_file_sha256": "f27ab776c1973cea6a57bf77044076da1a3777c937237c89e3dcdd4450fa1ef1",
+      "quality_status": "PASS",
+      "rows": 7045
+    },
+    "numbers4": {
+      "frame_sha256": "00d413c2516c52598c1ec02ad9c5f4aa83b0d8990f2a94bad892dac3a36c2f44",
+      "normalized_file_sha256": "be6268486a8beef3f97dc4355d308f8e3843d56a51eade8073d80c5b2ebfaba3",
+      "quality_status": "PASS",
+      "rows": 7045
+    }
+  },
+  "schema_version": 1
+}

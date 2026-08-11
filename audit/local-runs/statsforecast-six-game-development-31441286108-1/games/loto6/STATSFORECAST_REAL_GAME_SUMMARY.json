@@ -1,0 +1,27 @@
+{
+  "full_model_game_rows": 41,
+  "games": [
+    "loto6"
+  ],
+  "git_commit": "541418431119631c4d6e2b2fd62f2018bf21c453",
+  "holdout_evaluated": false,
+  "lane_counts_per_game": {
+    "EXOGENOUS": 1,
+    "EXPECTED_NEGATIVE_CONTROL": 1,
+    "UNIVARIATE": 39
+  },
+  "library": "statsforecast",
+  "phase": "development_rolling",
+  "primary_matrix_complete": true,
+  "primary_model_game_rows": 39,
+  "primary_status": "SUCCEEDED",
+  "primary_status_counts": {
+    "SUCCEEDED": 39
+  },
+  "primary_univariate_models": 39,
+  "promotion": false,
+  "prospective_evaluated": false,
+  "schema_version": 1,
+  "seed": 1,
+  "statsforecast_models": 41
+}

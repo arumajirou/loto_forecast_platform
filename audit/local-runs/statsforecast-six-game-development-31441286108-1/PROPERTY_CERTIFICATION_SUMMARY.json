@@ -1,0 +1,14 @@
+{
+  "execution_failed": 0,
+  "failed_models": [],
+  "formal_pass": true,
+  "horizon": 1,
+  "library": "statsforecast",
+  "model_count": 41,
+  "negative_control": 1,
+  "other_status": 0,
+  "schema_version": 1,
+  "seed": 1,
+  "validation_failed": 0,
+  "verified": 40
+}

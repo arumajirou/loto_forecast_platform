@@ -1,0 +1,2847 @@
+[
+  {
+    "bundle_bytes": 13403,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "AutoARIMA",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 20947,
+    "constructed": {
+      "season_length": {
+        "effective": 4,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 4
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "AutoETS",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "season_length": 4
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 15451,
+    "constructed": {
+      "season_length": {
+        "effective": 4,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 4
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "AutoCES",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "season_length": 4
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 16455,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "AutoTheta",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 17458,
+    "constructed": {
+      "n_windows": {
+        "effective": 2,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 2
+      },
+      "season_length": {
+        "effective": [
+          4
+        ],
+        "match": true,
+        "mode": "DIRECT",
+        "requested": [
+          4
+        ]
+      },
+      "test_size": {
+        "effective": 4,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 4
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "n_windows": {
+          "effective": 2,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 2
+        },
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        },
+        "test_size": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "n_windows": {
+          "effective": 2,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 2
+        },
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        },
+        "test_size": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "n_windows": {
+          "effective": 2,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 2
+        },
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        },
+        "test_size": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "n_windows": {
+          "effective": 2,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 2
+        },
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        },
+        "test_size": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "AutoMFLES",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "n_windows": 2,
+      "season_length": [
+        4
+      ],
+      "test_size": 4
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 15319,
+    "constructed": {
+      "season_length": {
+        "effective": [
+          4
+        ],
+        "match": true,
+        "mode": "DIRECT",
+        "requested": [
+          4
+        ]
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      },
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      },
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "AutoTBATS",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "season_length": [
+        4
+      ]
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 9539,
+    "constructed": {
+      "order": {
+        "effective": [
+          1,
+          0,
+          0
+        ],
+        "match": true,
+        "mode": "DIRECT",
+        "requested": [
+          1,
+          0,
+          0
+        ]
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "order": {
+          "effective": [
+            1,
+            0,
+            0
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            1,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "order": {
+          "effective": [
+            1,
+            0,
+            0
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            1,
+            0,
+            0
+          ]
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "order": {
+          "effective": [
+            1,
+            0,
+            0
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            1,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "order": {
+          "effective": [
+            1,
+            0,
+            0
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            1,
+            0,
+            0
+          ]
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "ARIMA",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "order": [
+        1,
+        0,
+        0
+      ]
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 9548,
+    "constructed": {
+      "lags": {
+        "effective": {
+          "fixed": null,
+          "order": [
+            1,
+            0,
+            0
+          ]
+        },
+        "expected": {
+          "fixed": null,
+          "order": [
+            1,
+            0,
+            0
+          ]
+        },
+        "match": true,
+        "mode": "DERIVED",
+        "requested": 1
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "lags": {
+          "effective": {
+            "fixed": null,
+            "order": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": {
+            "fixed": null,
+            "order": [
+              1,
+              0,
+              0
+            ]
+          },
+          "match": true,
+          "mode": "DERIVED",
+          "requested": 1
+        }
+      },
+      {
+        "lags": {
+          "effective": {
+            "fixed": null,
+            "order": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": {
+            "fixed": null,
+            "order": [
+              1,
+              0,
+              0
+            ]
+          },
+          "match": true,
+          "mode": "DERIVED",
+          "requested": 1
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "lags": {
+          "effective": {
+            "fixed": null,
+            "order": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": {
+            "fixed": null,
+            "order": [
+              1,
+              0,
+              0
+            ]
+          },
+          "match": true,
+          "mode": "DERIVED",
+          "requested": 1
+        }
+      },
+      {
+        "lags": {
+          "effective": {
+            "fixed": null,
+            "order": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": {
+            "fixed": null,
+            "order": [
+              1,
+              0,
+              0
+            ]
+          },
+          "match": true,
+          "mode": "DERIVED",
+          "requested": 1
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "AutoRegressive",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "lags": 1
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 7971,
+    "constructed": {
+      "alpha": {
+        "effective": 0.3,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 0.3
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "alpha": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        }
+      },
+      {
+        "alpha": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "alpha": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        }
+      },
+      {
+        "alpha": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "SimpleExponentialSmoothing",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "alpha": 0.3
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 7950,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "SimpleExponentialSmoothingOptimized",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 8160,
+    "constructed": {
+      "alpha": {
+        "effective": 0.3,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 0.3
+      },
+      "season_length": {
+        "effective": 4,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 4
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "alpha": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        },
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "alpha": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        },
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "alpha": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        },
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "alpha": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        },
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "SeasonalExponentialSmoothing",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "alpha": 0.3,
+      "season_length": 4
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 8135,
+    "constructed": {
+      "season_length": {
+        "effective": 4,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 4
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "SeasonalExponentialSmoothingOptimized",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "season_length": 4
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 13793,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "Holt",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 20976,
+    "constructed": {
+      "season_length": {
+        "effective": 4,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 4
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "HoltWinters",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "season_length": 4
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 7871,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "HistoricAverage",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 7851,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "Naive",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 8052,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "RandomWalkWithDrift",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 7933,
+    "constructed": {
+      "season_length": {
+        "effective": 4,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 4
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "SeasonalNaive",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "season_length": 4
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 8873,
+    "constructed": {
+      "n_samples": {
+        "effective": 200,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 200
+      },
+      "season_length": {
+        "effective": 4,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 4
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "n_samples": {
+          "effective": 200,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 200
+        },
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "n_samples": {
+          "effective": 200,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 200
+        },
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "n_samples": {
+          "effective": 200,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 200
+        },
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      },
+      {
+        "n_samples": {
+          "effective": 200,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 200
+        },
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "ConformalSeasonalPool",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "n_samples": 200,
+      "season_length": 4
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 4627,
+    "constructed": {
+      "window_size": {
+        "effective": 3,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 3
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "window_size": {
+          "effective": 3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 3
+        }
+      },
+      {
+        "window_size": {
+          "effective": 3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 3
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "window_size": {
+          "effective": 3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 3
+        }
+      },
+      {
+        "window_size": {
+          "effective": 3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 3
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "WindowAverage",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "window_size": 3
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 4716,
+    "constructed": {
+      "season_length": {
+        "effective": 4,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 4
+      },
+      "window_size": {
+        "effective": 2,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 2
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        },
+        "window_size": {
+          "effective": 2,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 2
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        },
+        "window_size": {
+          "effective": 2,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 2
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        },
+        "window_size": {
+          "effective": 2,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 2
+        }
+      },
+      {
+        "season_length": {
+          "effective": 4,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 4
+        },
+        "window_size": {
+          "effective": 2,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 2
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "SeasonalWindowAverage",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "season_length": 4,
+      "window_size": 2
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 6204,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "intermittent_nonnegative",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "ADIDA",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 6278,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "intermittent_nonnegative",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "CrostonClassic",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 6215,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "intermittent_nonnegative",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "CrostonOptimized",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 6274,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "intermittent_nonnegative",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "CrostonSBA",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 6204,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "intermittent_nonnegative",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "IMAPA",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 6349,
+    "constructed": {
+      "alpha_d": {
+        "effective": 0.3,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 0.3
+      },
+      "alpha_p": {
+        "effective": 0.3,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 0.3
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "intermittent_nonnegative",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "alpha_d": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        },
+        "alpha_p": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        }
+      },
+      {
+        "alpha_d": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        },
+        "alpha_p": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "alpha_d": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        },
+        "alpha_p": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        }
+      },
+      {
+        "alpha_d": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        },
+        "alpha_p": {
+          "effective": 0.3,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 0.3
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "TSB",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "alpha_d": 0.3,
+      "alpha_p": 0.3
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 20529,
+    "constructed": {
+      "season_length": {
+        "effective": [
+          4
+        ],
+        "match": true,
+        "mode": "DIRECT",
+        "requested": [
+          4
+        ]
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      },
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      },
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "MSTL",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "season_length": [
+        4
+      ]
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 17252,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "MFLES",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 15370,
+    "constructed": {
+      "season_length": {
+        "effective": [
+          4
+        ],
+        "match": true,
+        "mode": "DIRECT",
+        "requested": [
+          4
+        ]
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      },
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      },
+      {
+        "season_length": {
+          "effective": [
+            4
+          ],
+          "match": true,
+          "mode": "DIRECT",
+          "requested": [
+            4
+          ]
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "TBATS",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "season_length": [
+        4
+      ]
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 16322,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "Theta",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 16463,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "OptimizedTheta",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 16330,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "DynamicTheta",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 16471,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "DynamicOptimizedTheta",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 8119,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "stationary_returns",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "GARCH",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 8082,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "stationary_returns",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "ARCH",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 8235,
+    "constructed": {
+      "model": {
+        "effective": {
+          "class": "sklearn.linear_model._base.LinearRegression",
+          "params": {
+            "copy_X": true,
+            "fit_intercept": true,
+            "n_jobs": null,
+            "positive": false,
+            "tol": 1e-06
+          }
+        },
+        "match": true,
+        "mode": "DIRECT",
+        "requested": {
+          "class": "sklearn.linear_model._base.LinearRegression",
+          "params": {
+            "copy_X": true,
+            "fit_intercept": true,
+            "n_jobs": null,
+            "positive": false,
+            "tol": 1e-06
+          }
+        }
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "model": {
+          "effective": {
+            "class": "sklearn.linear_model._base.LinearRegression",
+            "params": {
+              "copy_X": true,
+              "fit_intercept": true,
+              "n_jobs": null,
+              "positive": false,
+              "tol": 1e-06
+            }
+          },
+          "match": true,
+          "mode": "DIRECT",
+          "requested": {
+            "class": "sklearn.linear_model._base.LinearRegression",
+            "params": {
+              "copy_X": true,
+              "fit_intercept": true,
+              "n_jobs": null,
+              "positive": false,
+              "tol": 1e-06
+            }
+          }
+        }
+      },
+      {
+        "model": {
+          "effective": {
+            "class": "sklearn.linear_model._base.LinearRegression",
+            "params": {
+              "copy_X": true,
+              "fit_intercept": true,
+              "n_jobs": null,
+              "positive": false,
+              "tol": 1e-06
+            }
+          },
+          "match": true,
+          "mode": "DIRECT",
+          "requested": {
+            "class": "sklearn.linear_model._base.LinearRegression",
+            "params": {
+              "copy_X": true,
+              "fit_intercept": true,
+              "n_jobs": null,
+              "positive": false,
+              "tol": 1e-06
+            }
+          }
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "model": {
+          "effective": {
+            "class": "sklearn.linear_model._base.LinearRegression",
+            "params": {
+              "copy_X": true,
+              "fit_intercept": true,
+              "n_jobs": null,
+              "positive": false,
+              "tol": 1e-06
+            }
+          },
+          "match": true,
+          "mode": "DIRECT",
+          "requested": {
+            "class": "sklearn.linear_model._base.LinearRegression",
+            "params": {
+              "copy_X": true,
+              "fit_intercept": true,
+              "n_jobs": null,
+              "positive": false,
+              "tol": 1e-06
+            }
+          }
+        }
+      },
+      {
+        "model": {
+          "effective": {
+            "class": "sklearn.linear_model._base.LinearRegression",
+            "params": {
+              "copy_X": true,
+              "fit_intercept": true,
+              "n_jobs": null,
+              "positive": false,
+              "tol": 1e-06
+            }
+          },
+          "match": true,
+          "mode": "DIRECT",
+          "requested": {
+            "class": "sklearn.linear_model._base.LinearRegression",
+            "params": {
+              "copy_X": true,
+              "fit_intercept": true,
+              "n_jobs": null,
+              "positive": false,
+              "tol": 1e-06
+            }
+          }
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "SklearnModel",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "model": {
+        "class": "sklearn.linear_model._base.LinearRegression",
+        "params": {
+          "copy_X": true,
+          "fit_intercept": true,
+          "n_jobs": null,
+          "positive": false,
+          "tol": 1e-06
+        }
+      }
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 4536,
+    "constructed": {
+      "constant": {
+        "effective": 1.0,
+        "match": true,
+        "mode": "DIRECT",
+        "requested": 1.0
+      }
+    },
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {
+        "constant": {
+          "effective": 1.0,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 1.0
+        }
+      },
+      {
+        "constant": {
+          "effective": 1.0,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 1.0
+        }
+      }
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {
+        "constant": {
+          "effective": 1.0,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 1.0
+        }
+      },
+      {
+        "constant": {
+          "effective": 1.0,
+          "match": true,
+          "mode": "DIRECT",
+          "requested": 1.0
+        }
+      }
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "ConstantModel",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {
+      "constant": 1.0
+    },
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 4511,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": true,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "ZeroModel",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  },
+  {
+    "constructed": {},
+    "constructed_match": true,
+    "fitted_status": "EXPECTED_NOT_APPLICABLE",
+    "loaded_status": "EXPECTED_NOT_APPLICABLE",
+    "model_name": "NaNModel",
+    "property_status": "EXPECTED_NEGATIVE_CONTROL",
+    "requested_parameters": {},
+    "unresolved_parameters": []
+  },
+  {
+    "bundle_bytes": 174809,
+    "constructed": {},
+    "constructed_match": true,
+    "data_profile": "positive_trend_seasonal",
+    "expected_fitted_shape": [
+      2,
+      1
+    ],
+    "fit_state_present": false,
+    "fit_status": "VERIFIED",
+    "fitted": [
+      {},
+      {}
+    ],
+    "fitted_container_shape": [
+      2,
+      1
+    ],
+    "fitted_match": true,
+    "fitted_shape_match": true,
+    "load_status": "VERIFIED",
+    "loaded": [
+      {},
+      {}
+    ],
+    "loaded_match": true,
+    "loaded_shape_match": true,
+    "model_name": "UCM",
+    "prediction_parity": {
+      "identity_equal": true,
+      "max_abs_diff": 0.0,
+      "passed": true,
+      "shape_equal": true,
+      "values_equal": true
+    },
+    "property_status": "VERIFIED",
+    "requested_parameters": {},
+    "save_status": "VERIFIED",
+    "unresolved_parameters": []
+  }
+]
