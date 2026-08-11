@@ -120,6 +120,8 @@ def test_runner_writes_hashed_development_only_evidence(tmp_path: Path) -> None:
             "time",
             "--representation",
             "draw_aggregate",
+            "--holdout-size",
+            "10",
             "--lags",
             "5",
             "--min-segment",
@@ -145,7 +147,15 @@ def test_runner_writes_hashed_development_only_evidence(tmp_path: Path) -> None:
     summary = json.loads((output / "SUMMARY.json").read_text())
     config = json.loads((output / "CONFIG.json").read_text())
     assert summary["status"] == "ANALYSIS_COMPLETE"
+    assert summary["input_rows"] == 80
+    assert summary["rows"] == 70
+    assert summary["holdout_rows"] == 10
     assert summary["causal_evidence_gate"] is False
+    assert config["input_rows"] == 80
+    assert config["analyzed_rows"] == 70
+    assert config["holdout_rows"] == 10
+    assert config["holdout_start_index"] == 70
+    assert config["holdout_access"] == "split_only_not_analyzed"
     assert config["holdout_evaluated"] is False
     assert config["prospective_evaluated"] is False
     assert config["promotion"] is False
@@ -153,3 +163,29 @@ def test_runner_writes_hashed_development_only_evidence(tmp_path: Path) -> None:
     assert (output / "PLACEBO_FALSIFICATION.json").is_file()
     checksums = (output / "SHA256SUMS").read_text().splitlines()
     assert any(line.endswith("  SUMMARY.json") for line in checksums)
+
+
+def test_runner_refuses_development_label_without_physical_holdout(tmp_path: Path) -> None:
+    module = _load_runner_module()
+    input_path = tmp_path / "series.csv"
+    frame = pd.DataFrame(
+        {
+            "time": pd.date_range("2020-01-01", periods=40, freq="D"),
+            "value": np.arange(40.0),
+        }
+    )
+    frame.to_csv(input_path, index=False)
+
+    with pytest.raises(ValueError, match="requires a positive --holdout-size"):
+        module.main(
+            [
+                "--input",
+                str(input_path),
+                "--value-column",
+                "value",
+                "--time-column",
+                "time",
+                "--output",
+                str(tmp_path / "out"),
+            ]
+        )
