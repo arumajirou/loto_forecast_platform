@@ -1,4 +1,5 @@
 import hashlib
+import json
 
 from loto.models.neuralforecast_search_space import (
     SearchSpaceCompleteness,
@@ -29,6 +30,28 @@ def test_ray_profile_is_complete():
     assert profile.cmaes_eligible is False
 
 
+def test_ray_profile_serializes_callable_categories_without_mutating_cardinality():
+    profile = profile_ray_config(
+        {
+            "activation": Categorical([len, "ReLU"]),
+            "nested": [len, {"fn": max}],
+        },
+        model_name="AutoDLinear",
+    )
+
+    payload = profile.model_dump(mode="json")
+    raw = json.dumps(payload, sort_keys=True)
+
+    activation = next(item for item in payload["dimensions"] if item["name"] == "activation")
+    nested = next(item for item in payload["dimensions"] if item["name"] == "nested")
+
+    assert activation["cardinality"] == 2
+    assert activation["choices"][0] == {"type": "callable", "path": "builtins.len"}
+    assert nested["value"][0] == {"type": "callable", "path": "builtins.len"}
+    assert nested["value"][1]["fn"] == {"type": "callable", "path": "builtins.max"}
+    assert "builtin_function_or_method" not in raw
+
+
 def test_optuna_profile_is_partial_and_detects_branch():
     def config(trial):
         family = trial.suggest_categorical("family", ["a", "b"])
@@ -41,6 +64,23 @@ def test_optuna_profile_is_partial_and_detects_branch():
     assert profile.completeness is SearchSpaceCompleteness.PARTIAL
     assert profile.conditional is True
     assert profile.cmaes_eligible is False
+
+
+def test_optuna_profile_records_callable_choice_json_safely_but_returns_raw_choice():
+    seen = []
+
+    def config(trial):
+        value = trial.suggest_categorical("callable", [len])
+        seen.append(value)
+        return {"callable": value}
+
+    profile = profile_optuna_config(config)
+    payload = profile.model_dump(mode="json")
+    dimension = next(item for item in payload["dimensions"] if item["name"] == "callable")
+
+    assert seen == [len, len, len]
+    assert dimension["choices"] == [{"type": "callable", "path": "builtins.len"}]
+    json.dumps(payload)
 
 
 def test_fixed_and_unavailable_states_are_explicit(tmp_path):
