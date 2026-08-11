@@ -16,6 +16,8 @@ from loto.analysis.multiple_testing import (
     holm_adjust,
 )
 from loto.analysis.trends import linear_trend, mean_shift_scan
+from loto.evaluation.multiplicity import benjamini_hochberg as canonical_bh
+from loto.evaluation.multiplicity import holm as canonical_holm
 
 
 def test_association_is_strong_but_never_causal() -> None:
@@ -62,11 +64,15 @@ def test_linear_trend_and_mean_shift_scan_are_deterministic() -> None:
     assert first.causal_claim_eligible is False
 
 
-def test_holm_and_bh_adjustment_preserve_original_order() -> None:
+def test_holm_and_bh_adjustment_preserve_original_order_and_canonical_parity() -> None:
     p_values = [0.01, 0.04, 0.03]
 
-    assert holm_adjust(p_values) == pytest.approx([0.03, 0.06, 0.06])
-    assert benjamini_hochberg_adjust(p_values) == pytest.approx([0.03, 0.04, 0.04])
+    holm = holm_adjust(p_values)
+    bh = benjamini_hochberg_adjust(p_values)
+    assert holm == pytest.approx([0.03, 0.06, 0.06])
+    assert bh == pytest.approx([0.03, 0.04, 0.04])
+    assert holm == pytest.approx(canonical_holm(p_values).adjusted_p)
+    assert bh == pytest.approx(canonical_bh(p_values).adjusted_p)
 
     rows = adjust_hypotheses(
         ["a", "b", "c"],
