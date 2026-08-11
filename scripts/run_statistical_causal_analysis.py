@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Run development-only statistical/causal foundation analysis on a declared CSV snapshot."""
+"""Run guarded statistical/causal foundation analysis on a declared CSV snapshot."""
 
 from __future__ import annotations
 
@@ -18,6 +18,8 @@ from loto.analysis.trends import linear_trend, mean_shift_scan
 from loto.causal.contracts import IdentificationPlan, assess_identification
 from loto.causal.event_study import estimate_pre_post_effect
 from loto.causal.negative_control import placebo_event_test
+from loto.data.lineage import frame_fingerprint
+from loto.evaluation.splits import split_development_holdout
 
 ALLOWED_SCOPES = ("train", "validation", "development")
 REPRESENTATIONS = (
@@ -31,7 +33,7 @@ REPRESENTATIONS = (
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Development-only trend/dependence/causal-falsification analysis",
+        description="Guarded trend/dependence/causal-falsification analysis",
     )
     parser.add_argument("--input", required=True, help="CSV snapshot; row order is chronological")
     parser.add_argument("--value-column", required=True)
@@ -42,6 +44,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--representation", choices=REPRESENTATIONS, default="generic_numeric_series"
     )
     parser.add_argument("--data-scope", choices=ALLOWED_SCOPES, default="development")
+    parser.add_argument(
+        "--holdout-size",
+        type=int,
+        help=(
+            "Required positive trailing holdout size when --data-scope=development. "
+            "The holdout is split before any statistical analysis and is never scored."
+        ),
+    )
     parser.add_argument("--lags", type=int, default=10)
     parser.add_argument("--min-segment", type=int, default=10)
     parser.add_argument("--permutations", type=int, default=2000)
@@ -96,6 +106,28 @@ def _validate_time_order(frame: pd.DataFrame, column: str | None) -> str:
     return f"validated_monotonic_time_column:{column}"
 
 
+def _analysis_slice(
+    frame: pd.DataFrame,
+    *,
+    data_scope: str,
+    holdout_size: int | None,
+) -> tuple[pd.DataFrame, int, int | None]:
+    if data_scope == "development":
+        if holdout_size is None or holdout_size <= 0:
+            raise ValueError(
+                "--data-scope=development requires a positive --holdout-size so the trailing "
+                "holdout is physically excluded before exploratory analysis"
+            )
+        development_slice, holdout_slice = split_development_holdout(len(frame), holdout_size)
+        development = frame.iloc[development_slice].reset_index(drop=True)
+        holdout_rows = int(holdout_slice.stop - holdout_slice.start)
+        return development, holdout_rows, int(holdout_slice.start)
+
+    if holdout_size not in (None, 0):
+        raise ValueError("--holdout-size is only valid with --data-scope=development")
+    return frame.reset_index(drop=True), 0, None
+
+
 def _association_columns(raw: str) -> list[str]:
     return [item.strip() for item in raw.split(",") if item.strip()]
 
@@ -123,8 +155,13 @@ def main(argv: list[str] | None = None) -> int:
         raise FileExistsError(f"refusing to reuse output directory: {output}")
     output.mkdir(parents=True)
 
-    frame = pd.read_csv(input_path)
-    chronology = _validate_time_order(frame, args.time_column)
+    full_frame = pd.read_csv(input_path)
+    chronology = _validate_time_order(full_frame, args.time_column)
+    frame, holdout_rows, holdout_start_index = _analysis_slice(
+        full_frame,
+        data_scope=args.data_scope,
+        holdout_size=args.holdout_size,
+    )
     values = _numeric_column(frame, args.value_column)
     if args.lags >= len(values) - 1:
         raise ValueError("--lags must be smaller than n - 1")
@@ -207,6 +244,13 @@ def main(argv: list[str] | None = None) -> int:
     config = {
         "input": str(input_path),
         "input_sha256": _sha256(input_path),
+        "input_rows": int(len(full_frame)),
+        "analysis_frame_sha256": frame_fingerprint(frame),
+        "analyzed_rows": int(len(frame)),
+        "holdout_size_requested": args.holdout_size,
+        "holdout_rows": holdout_rows,
+        "holdout_start_index": holdout_start_index,
+        "holdout_access": "split_only_not_analyzed" if holdout_rows else "not_applicable",
         "value_column": args.value_column,
         "association_columns": _association_columns(args.association_columns),
         "time_column": args.time_column,
@@ -230,7 +274,9 @@ def main(argv: list[str] | None = None) -> int:
     _write_json(output / "CONFIG.json", config)
     summary = {
         "status": "ANALYSIS_COMPLETE",
+        "input_rows": int(len(full_frame)),
         "rows": int(len(values)),
+        "holdout_rows": holdout_rows,
         "representation": args.representation,
         "data_scope": args.data_scope,
         "hypotheses_in_family": len(hypothesis_ids),
