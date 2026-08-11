@@ -76,7 +76,8 @@ def cluster_bootstrap(
     rng = np.random.default_rng(seed)
     indexes = rng.integers(0, len(values), size=(iterations, len(values)))
     estimates = values[indexes].mean(axis=1)
-    return tuple(float(x) for x in np.quantile(estimates, [0.025, 0.5, 0.975]))
+    quantiles = np.quantile(estimates, [0.025, 0.5, 0.975])
+    return float(quantiles[0]), float(quantiles[1]), float(quantiles[2])
 
 
 def paired_summary(
