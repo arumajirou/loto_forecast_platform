@@ -56,6 +56,20 @@ safety_margin_mib             = 2048
 These values are evidence for that snapshot only. The runner re-resolves them from live
 resources on each run.
 
+## Focused local verification — 2026-08-11
+
+At branch head `935a867adc6e5d047900af7a5ef18e088c4cc76a`, after syncing the
+`dev` extra, focused Linux/WSL verification completed successfully:
+
+```text
+Ruff focused paths: PASS
+Focused pytest:      24 passed
+Broad matrix check:  174 identities x 6 games = 1,044 pairs, PASS
+```
+
+This verifies the focused implementation and planning contract only. It does not certify all
+model runtimes, game compatibility, accuracy, Holdout, Prospective, or promotion.
+
 ## Development-tool verification prerequisite
 
 `ruff` and `pytest` are declared in the project's optional `dev` extra, not in the default
@@ -63,7 +77,7 @@ runtime dependency set. A plain `uv run ruff` or `uv run pytest` can therefore f
 `Failed to spawn` when the dev extra has not been synced. That is an environment/tooling
 precondition failure, not a source-code test failure.
 
-Use either:
+For focused lint/test work only, use either:
 
 ```bash
 uv sync --extra dev
@@ -77,6 +91,25 @@ or run the tools without a persistent sync:
 uv run --extra dev ruff check <paths...>
 uv run --extra dev pytest -q <paths...>
 ```
+
+Important: `uv sync --extra dev` makes the environment match the base dependencies plus the
+`dev` extra. It can therefore prune optional runtime packages from other extras. Before a
+runtime smoke that needs StatsForecast/LightGBM/XGBoost/CatBoost/MLForecast or other `full`
+packages, sync the runtime extras together with `dev`:
+
+```bash
+uv sync --extra dev --extra full
+```
+
+Before a broad shared-runtime sweep that also needs the optional framework and TSFM packages,
+use:
+
+```bash
+uv sync --extra dev --extra full --extra frameworks --extra tsfm
+```
+
+Provider-specific isolated environments remain separate execution contracts and should not be
+silently replaced by the shared environment.
 
 Use `uv run python` (or `python3`) for inline Python checks on hosts that do not provide a
 `python` shell alias.
