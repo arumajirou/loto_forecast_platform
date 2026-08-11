@@ -1,4 +1,11 @@
-"""Deterministic family-level multiple-testing correction."""
+"""Typed exploratory-hypothesis adapter over the canonical evaluation multiplicity layer.
+
+The repository already owns Holm and Benjamini-Hochberg implementations in
+``loto.evaluation.multiplicity``.  Exploratory trend/dependence analysis needs a different
+result schema (hypothesis IDs and immutable records), not a second statistics implementation.
+This module therefore validates the exploratory family and delegates all p-value adjustment
+to that canonical layer so model-evaluation and scientific-analysis corrections cannot drift.
+"""
 
 from __future__ import annotations
 
@@ -7,6 +14,8 @@ from collections.abc import Sequence
 from typing import Literal
 
 from loto.analysis.contracts import AdjustedHypothesis
+from loto.evaluation.multiplicity import benjamini_hochberg as _canonical_bh
+from loto.evaluation.multiplicity import holm as _canonical_holm
 
 CorrectionMethod = Literal["holm", "benjamini_hochberg"]
 
@@ -22,39 +31,15 @@ def _validated_p_values(p_values: Sequence[float]) -> list[float]:
 
 
 def holm_adjust(p_values: Sequence[float]) -> list[float]:
-    """Return Holm step-down family-wise adjusted p-values in original order."""
+    """Return canonical Holm adjusted p-values in original order."""
     values = _validated_p_values(p_values)
-    m = len(values)
-    order = sorted(range(m), key=values.__getitem__)
-    adjusted_sorted: list[float] = []
-    running = 0.0
-    for rank, index in enumerate(order):
-        candidate = (m - rank) * values[index]
-        running = max(running, candidate)
-        adjusted_sorted.append(min(1.0, running))
-    adjusted = [0.0] * m
-    for index, value in zip(order, adjusted_sorted, strict=True):
-        adjusted[index] = value
-    return adjusted
+    return list(_canonical_holm(values).adjusted_p)
 
 
 def benjamini_hochberg_adjust(p_values: Sequence[float]) -> list[float]:
-    """Return Benjamini-Hochberg FDR adjusted p-values in original order."""
+    """Return canonical Benjamini-Hochberg adjusted p-values in original order."""
     values = _validated_p_values(p_values)
-    m = len(values)
-    order = sorted(range(m), key=values.__getitem__)
-    adjusted_sorted = [0.0] * m
-    running = 1.0
-    for reverse_rank in range(m - 1, -1, -1):
-        original_index = order[reverse_rank]
-        rank = reverse_rank + 1
-        candidate = values[original_index] * m / rank
-        running = min(running, candidate)
-        adjusted_sorted[reverse_rank] = min(1.0, running)
-    adjusted = [0.0] * m
-    for sorted_index, original_index in enumerate(order):
-        adjusted[original_index] = adjusted_sorted[sorted_index]
-    return adjusted
+    return list(_canonical_bh(values).adjusted_p)
 
 
 def adjust_hypotheses(
@@ -64,7 +49,7 @@ def adjust_hypotheses(
     method: CorrectionMethod,
     alpha: float = 0.05,
 ) -> list[AdjustedHypothesis]:
-    """Build immutable hypothesis records after one declared correction family."""
+    """Build immutable hypothesis records using the canonical correction engine."""
     if len(hypothesis_ids) != len(p_values):
         raise ValueError("hypothesis_ids and p_values must have equal length")
     if not hypothesis_ids:
@@ -76,9 +61,9 @@ def adjust_hypotheses(
 
     values = _validated_p_values(p_values)
     if method == "holm":
-        adjusted = holm_adjust(values)
+        correction = _canonical_holm(values, alpha=alpha)
     elif method == "benjamini_hochberg":
-        adjusted = benjamini_hochberg_adjust(values)
+        correction = _canonical_bh(values, alpha=alpha)
     else:
         raise ValueError(f"unsupported correction method: {method}")
 
@@ -89,12 +74,13 @@ def adjust_hypotheses(
             alpha=alpha,
             raw_p_value=raw,
             adjusted_p_value=corrected,
-            rejected=corrected <= alpha,
+            rejected=rejected,
         )
-        for hypothesis_id, raw, corrected in zip(
+        for hypothesis_id, raw, corrected, rejected in zip(
             hypothesis_ids,
-            values,
-            adjusted,
+            correction.raw_p,
+            correction.adjusted_p,
+            correction.rejected,
             strict=True,
         )
     ]
