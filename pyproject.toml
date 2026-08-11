@@ -83,6 +83,8 @@ select = ["E", "F", "I", "B", "UP"]
 known-third-party = ["mlflow"]
 
 [tool.ruff.lint.per-file-ignores]
+"scripts/run_resource_aware_broad_campaign.py" = ["E501"]
+"scripts/run_timellm_safe_smoke.py" = ["E501"]
 "src/loto/api/app.py" = ["B008", "E501"]
 "src/loto/probabilistic/experiment_tracking.py" = ["E501"]
 "src/loto/registry/full.py" = ["E501"]
