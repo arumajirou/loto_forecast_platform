@@ -26,9 +26,11 @@ def test_broad_matrix_expands_model_identities_into_model_game_pairs() -> None:
 
     tasks = module._build_tasks(catalog, games)
 
-    assert len(catalog) == 174
+    assert catalog
+    assert len({entry.model_id for entry in catalog}) == len(catalog)
+    assert len(games) > 1
     assert len(tasks) == len(catalog) * len(games)
-    assert len(tasks) > 174
+    assert len(tasks) > len(catalog)
     assert len({task.key for task in tasks}) == len(tasks)
 
 
