@@ -36,6 +36,29 @@ def test_resolve_resource_plan_uses_cpu_ram_and_vram_capacity() -> None:
     assert plan.parallel_cpu_models + plan.parallel_gpu_models <= 8
 
 
+def test_resolve_resource_plan_blocks_gpu_when_safe_slot_does_not_fit() -> None:
+    snapshot = ResourceSnapshot(
+        logical_cpus=32,
+        available_ram_mib=65536,
+        gpu_count=1,
+        gpu_total_mib=(16303,),
+        gpu_free_mib=(6000,),
+    )
+
+    plan = resolve_resource_plan(
+        snapshot,
+        outer_worker_cap=8,
+        cpus_per_trial=2,
+        ram_per_cpu_job_mib=6144,
+        gpu_slot_mib=5120,
+        safety_margin_mib=2048,
+    )
+
+    assert plan.parallel_gpu_models == 0
+    assert plan.parallel_exclusive_gpu_models == 0
+    assert plan.parallel_cpu_models == 8
+
+
 def test_timellm_is_exclusive_gpu_resource_class() -> None:
     assert (
         runtime_resource_class(
