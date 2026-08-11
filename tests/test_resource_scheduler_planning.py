@@ -119,3 +119,56 @@ def test_exclusive_gpu_lease_waits_for_regular_gpu_lease() -> None:
 
     assert acquired.is_set()
     assert released.is_set()
+
+
+def test_exclusive_gpu_lease_prevents_regular_job_leapfrogging() -> None:
+    scheduler = ResourceScheduler(
+        ResourcePolicy(
+            max_parallel_cpu_models=2,
+            max_parallel_gpu_models=2,
+            timeout_seconds=2,
+        )
+    )
+    first_regular = scheduler.acquire(requires_gpu=True, lease_id="first-regular")
+    exclusive_holding = threading.Event()
+    allow_exclusive_release = threading.Event()
+    second_regular_acquired = threading.Event()
+
+    def exclusive_worker() -> None:
+        lease = scheduler.acquire(
+            requires_gpu=True,
+            lease_id="exclusive",
+            exclusive_gpu=True,
+            timeout=1.5,
+        )
+        exclusive_holding.set()
+        allow_exclusive_release.wait(timeout=1.0)
+        scheduler.release(lease)
+
+    def second_regular_worker() -> None:
+        lease = scheduler.acquire(
+            requires_gpu=True,
+            lease_id="second-regular",
+            timeout=1.5,
+        )
+        second_regular_acquired.set()
+        scheduler.release(lease)
+
+    exclusive_thread = threading.Thread(target=exclusive_worker)
+    exclusive_thread.start()
+    time.sleep(0.05)
+
+    regular_thread = threading.Thread(target=second_regular_worker)
+    regular_thread.start()
+    time.sleep(0.05)
+    assert not second_regular_acquired.is_set()
+
+    scheduler.release(first_regular)
+    assert exclusive_holding.wait(timeout=1.0)
+    assert not second_regular_acquired.is_set()
+
+    allow_exclusive_release.set()
+    exclusive_thread.join(timeout=2)
+    regular_thread.join(timeout=2)
+
+    assert second_regular_acquired.is_set()
