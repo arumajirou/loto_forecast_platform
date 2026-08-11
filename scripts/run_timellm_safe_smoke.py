@@ -206,7 +206,9 @@ def main(argv: list[str] | None = None) -> int:
         "cuda_peak_allocated_mib": torch.cuda.max_memory_allocated() / 1024**2,
         "cuda_peak_reserved_mib": torch.cuda.max_memory_reserved() / 1024**2,
         "raw_game_domain": "PASS" if raw_domain_ok else "FAIL",
-        "game_compatibility": "PENDING_DECODE_OR_CALIBRATION" if not raw_domain_ok else "RAW_DOMAIN_PASS",
+        "game_compatibility": "PENDING_DECODE_OR_CALIBRATION"
+        if not raw_domain_ok
+        else "RAW_DOMAIN_PASS",
         "accuracy_evaluated": False,
         "holdout_evaluated": False,
         "prospective_evaluated": False,

@@ -169,7 +169,11 @@ def _campaign_catalog_status(summary: dict[str, Any], model_id: str) -> tuple[st
             failure_type = str(first.get("type", "Failure"))
             failure_reason = str(first.get("reason", ""))
             if failure_reason:
-                reason = f"{reason}; {failure_type}: {failure_reason}" if reason else f"{failure_type}: {failure_reason}"
+                reason = (
+                    f"{reason}; {failure_type}: {failure_reason}"
+                    if reason
+                    else f"{failure_type}: {failure_reason}"
+                )
     return status, reason
 
 
@@ -199,14 +203,18 @@ def _run_task(
     scheduler: ResourceScheduler,
     loto3: str,
 ) -> dict[str, Any]:
-    case_dir = output_root / "cases" / (
-        f"{task.ordinal:04d}-{_safe_name(task.model.model_id)}-{_safe_name(task.game)}"
+    case_dir = (
+        output_root
+        / "cases"
+        / (f"{task.ordinal:04d}-{_safe_name(task.model.model_id)}-{_safe_name(task.game)}")
     )
     final_path = case_dir / "FINAL.json"
     if args.resume and final_path.exists():
         return json.loads(final_path.read_text(encoding="utf-8"))
     case_dir.mkdir(parents=True, exist_ok=True)
-    attempt = case_dir / f"attempt-{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 1_000_000_000:09d}"
+    attempt = (
+        case_dir / f"attempt-{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 1_000_000_000:09d}"
+    )
     attempt.mkdir(parents=True)
     runtime_workdir = attempt / "runtime-workdir"
     runtime_workdir.mkdir()
@@ -224,7 +232,9 @@ def _run_task(
         requires_gpu=requires_gpu,
         lease_id=task.key,
         exclusive_gpu=task.resource_class == "EXCLUSIVE_GPU",
-        timeout=max(args.timeout, args.timellm_timeout if task.resource_class == "EXCLUSIVE_GPU" else 0),
+        timeout=max(
+            args.timeout, args.timellm_timeout if task.resource_class == "EXCLUSIVE_GPU" else 0
+        ),
     )
     started = time.perf_counter()
     result: dict[str, Any] | None = None
@@ -455,8 +465,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if plan.parallel_gpu_models == 0:
         for task in gpu_tasks:
-            case_dir = output_root / "cases" / (
-                f"{task.ordinal:04d}-{_safe_name(task.model.model_id)}-{_safe_name(task.game)}"
+            case_dir = (
+                output_root
+                / "cases"
+                / (f"{task.ordinal:04d}-{_safe_name(task.model.model_id)}-{_safe_name(task.game)}")
             )
             case_dir.mkdir(parents=True, exist_ok=True)
             results.append(_blocked_gpu_result(task, case_dir))

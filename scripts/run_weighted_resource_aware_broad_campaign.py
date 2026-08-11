@@ -46,8 +46,10 @@ def main(argv: list[str] | None = None) -> int:
     # then replace only the scheduling hooks. Execution/evaluation semantics remain
     # the existing audited campaign implementation.
     configure_weighted_profiles(build_catalog())
-    base.ResourceScheduler = WeightedResourceScheduler
-    base.runtime_resource_class = weighted_runtime_resource_class
+    # The base runner is loaded dynamically and these two hook attributes are
+    # intentionally replaced at runtime by this wrapper.
+    base.ResourceScheduler = WeightedResourceScheduler  # type: ignore[attr-defined]
+    base.runtime_resource_class = weighted_runtime_resource_class  # type: ignore[attr-defined]
 
     resolved_argv = _inject_weighted_defaults(list(sys.argv[1:] if argv is None else argv))
     return int(base.main(resolved_argv))
