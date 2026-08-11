@@ -2,14 +2,21 @@ from __future__ import annotations
 
 import pytest
 
-from loto.models.neuralforecast_adapter import AutoModelRequest, _merge_default_config_overrides
+from loto.models.neuralforecast_adapter import (
+    AutoModelRequest,
+    _merge_default_config_overrides,
+)
 from loto.neuralforecast.parameter_effect import (
     build_one_factor_cases,
     resolve_overlay_auto_model_plan,
 )
 
 
-def _request(model_name: str = "AutoDLinear", *, n_series: int | None = None) -> AutoModelRequest:
+def _request(
+    model_name: str = "AutoDLinear",
+    *,
+    n_series: int | None = None,
+) -> AutoModelRequest:
     return AutoModelRequest(
         model_name=model_name,
         h=1,
