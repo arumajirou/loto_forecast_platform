@@ -6,13 +6,14 @@ import threading
 import time
 from pathlib import Path
 
-from loto.models.catalog_full import build_catalog
+from loto.models.catalog_full import ModelEntry, build_catalog
 from loto.orchestration.resource_scheduler import ResourcePolicy
 from loto.orchestration.weighted_resource_scheduler import (
     EXCLUSIVE_GPU_PROFILE,
     GPU_HEAVY_PROFILE,
     GPU_LIGHT_PROFILE,
     GPU_MEDIUM_PROFILE,
+    WeightedResourceLease,
     WeightedResourceScheduler,
     configure_weighted_profiles,
     profile_for_entry,
@@ -20,7 +21,7 @@ from loto.orchestration.weighted_resource_scheduler import (
 )
 
 
-def _entry(model_id: str):
+def _entry(model_id: str) -> ModelEntry:
     return next(entry for entry in build_catalog() if entry.model_id == model_id)
 
 
@@ -128,7 +129,7 @@ def test_exclusive_job_waits_until_all_weighted_slots_are_free() -> None:
         timeout=0.5,
     )
     acquired = threading.Event()
-    holder: list[object] = []
+    holder: list[WeightedResourceLease] = []
 
     def worker() -> None:
         lease = scheduler.acquire(
