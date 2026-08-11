@@ -71,4 +71,12 @@ def install(facade: ModuleType) -> None:
 
     facade._construct_interceptor = construct_interceptor
     facade._construct_auto_hint = construct_auto_hint
+
+    # The persistence installer has already rebound the stable core AutoHINT route to
+    # the facade function object. Rebind it again after wrapping so AutoHINT receives
+    # the same in-worker evidence instrumentation as the regular AutoModel path.
+    core = getattr(facade, "_CORE", None)
+    if core is not None:
+        core._construct_auto_hint = construct_auto_hint
+
     facade._loto_training_evidence_installed = True
