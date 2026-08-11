@@ -17,10 +17,15 @@ from loto.evaluation.unified_campaign import (
 )
 from loto.game.geometry import geometry_for, known_games
 
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
 
 def _git_commit() -> str:
+    """Return the repository HEAD independently of the caller's working directory."""
+
     result = subprocess.run(
         ["git", "rev-parse", "HEAD"],
+        cwd=REPO_ROOT,
         check=True,
         capture_output=True,
         text=True,
