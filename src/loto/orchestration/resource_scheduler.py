@@ -217,7 +217,10 @@ class ResourceScheduler:
         self.policy = policy
         self._cpu = threading.BoundedSemaphore(policy.max_parallel_cpu_models)
         self._gpu = threading.BoundedSemaphore(max(1, policy.max_parallel_gpu_models))
-        self._exclusive_gpu_lock = threading.Lock()
+        # Ordinary GPU leases briefly pass this gate before taking a slot. Once an
+        # exclusive job owns the gate, no new ordinary GPU job can leapfrog it while
+        # it waits for already-running jobs to release their slots.
+        self._exclusive_gpu_gate = threading.Lock()
         self._lock = threading.Lock()
         self._leases: list[ResourceLease] = []
         self._active_gpu_trials = 0
@@ -270,7 +273,7 @@ class ResourceScheduler:
             raise RuntimeError("GPU trial requested but max_parallel_gpu_models is 0")
 
         if requires_gpu and exclusive_gpu:
-            if not self._exclusive_gpu_lock.acquire(timeout=lease_timeout):
+            if not self._exclusive_gpu_gate.acquire(timeout=lease_timeout):
                 raise TimeoutError(f"exclusive GPU lease timed out: {lease_id}")
             acquired = 0
             try:
@@ -283,7 +286,7 @@ class ResourceScheduler:
             except BaseException:
                 for _ in range(acquired):
                     self._gpu.release()
-                self._exclusive_gpu_lock.release()
+                self._exclusive_gpu_gate.release()
                 raise
             lease = ResourceLease(
                 lease_id=lease_id,
@@ -296,10 +299,24 @@ class ResourceScheduler:
                 self._leases.append(lease)
             return lease
 
-        semaphore = self._gpu if requires_gpu else self._cpu
-        ok = semaphore.acquire(timeout=lease_timeout)
-        if not ok:
-            raise TimeoutError(f"resource lease timed out: {lease_id}")
+        if requires_gpu:
+            deadline = time.monotonic() + lease_timeout
+            if not self._exclusive_gpu_gate.acquire(timeout=lease_timeout):
+                raise TimeoutError(f"GPU admission gate timed out: {lease_id}")
+            try:
+                remaining = max(0.0, deadline - time.monotonic())
+                ok = self._gpu.acquire(timeout=remaining)
+            finally:
+                self._exclusive_gpu_gate.release()
+            if not ok:
+                raise TimeoutError(f"resource lease timed out: {lease_id}")
+            semaphore = self._gpu
+        else:
+            semaphore = self._cpu
+            ok = semaphore.acquire(timeout=lease_timeout)
+            if not ok:
+                raise TimeoutError(f"resource lease timed out: {lease_id}")
+
         lease = ResourceLease(
             lease_id=lease_id,
             kind="gpu" if requires_gpu else "cpu",
@@ -318,7 +335,7 @@ class ResourceScheduler:
                 self._active_gpu_trials = max(0, self._active_gpu_trials - lease.slots)
             for _ in range(lease.slots):
                 self._gpu.release()
-            self._exclusive_gpu_lock.release()
+            self._exclusive_gpu_gate.release()
         elif lease.kind == "gpu":
             with self._lock:
                 self._active_gpu_trials = max(0, self._active_gpu_trials - 1)
