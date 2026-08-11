@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 from loto.game.geometry import known_games
 from loto.models.catalog_full import build_catalog
@@ -42,3 +44,51 @@ def test_timellm_tasks_use_exclusive_gpu_lane() -> None:
 
     assert len(tasks) == 1
     assert tasks[0].resource_class == "EXCLUSIVE_GPU"
+
+
+def test_case_result_persists_released_lease_state(tmp_path, monkeypatch) -> None:
+    module = _load_runner_module()
+    model = next(entry for entry in build_catalog() if entry.model_id == "sf-autoarima")
+    task = module._build_tasks([model], ["numbers4"])[0]
+    scheduler = module.ResourceScheduler(
+        module.ResourcePolicy(
+            max_parallel_cpu_models=1,
+            max_parallel_gpu_models=0,
+            timeout_seconds=1,
+        )
+    )
+    args = SimpleNamespace(
+        resume=False,
+        timeout=1,
+        timellm_timeout=1,
+        synthetic_rows=160,
+        seeds="1",
+        folds=1,
+        test_size=2,
+        min_train_size=80,
+        holdout_size=4,
+        precision="32",
+        max_trials=1,
+        parallel_trials=1,
+        timellm_max_steps=2,
+    )
+
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        lambda *args, **kwargs: SimpleNamespace(returncode=0, stdout="", stderr=""),
+    )
+
+    result = module._run_task(
+        task,
+        args=args,
+        output_root=tmp_path,
+        scheduler=scheduler,
+        loto3="loto3",
+    )
+
+    assert result["status"] == "NO_RESULT_FILE"
+    assert result["lease"]["released_at"] is not None
+    final_path = next((tmp_path / "cases").glob("*/FINAL.json"))
+    persisted = json.loads(final_path.read_text(encoding="utf-8"))
+    assert persisted["lease"]["released_at"] == result["lease"]["released_at"]
