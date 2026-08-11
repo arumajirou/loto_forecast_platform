@@ -127,10 +127,11 @@ class _SubprocessProxy:
                 **kwargs,
             )
 
+        effective_timeout = float(timeout if timeout is not None else 3600.0)
         monitored = run_monitored_process(
             command,
             cwd=cwd,
-            timeout=float(timeout if timeout is not None else 3600),
+            timeout=effective_timeout,
             on_start=_attach_child_pid,
         )
         observation = monitored.observation.to_dict()
@@ -142,7 +143,7 @@ class _SubprocessProxy:
         if monitored.timed_out:
             raise subprocess.TimeoutExpired(
                 command,
-                timeout,
+                effective_timeout,
                 output=stdout,
                 stderr=stderr,
             )
