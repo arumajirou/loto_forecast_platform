@@ -1,0 +1,230 @@
+name: 00 / visual dashboard build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "github-dashboard/**"
+      - "scripts/build_github_visual_dashboard.py"
+      - "scripts/build_github_observability_summary.py"
+      - "scripts/plan_all_execution_identities.py"
+      - "src/loto/models/**"
+      - "src/loto/probabilistic/**"
+      - ".github/workflows/github-visual-dashboard-build.yml"
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_pages:
+        description: "Deploy the verified artifact to GitHub Pages"
+        required: true
+        default: false
+        type: boolean
+  schedule:
+    - cron: "47 0 * * *"
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+  actions: read
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: visual-dashboard-build-${{ github.repository }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 60
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
+
+    steps:
+      - name: Verify expected Linux runner
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          clean: true
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+
+      - name: Prepare isolated build environment
+        run: |
+          set -Eeuo pipefail
+          uv python install "$UV_PYTHON"
+          dashboard_venv="$RUNNER_TEMP/dashboard-venv-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          uv_cache="$RUNNER_TEMP/dashboard-uv-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          work_dir="$RUNNER_TEMP/dashboard-build-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          site_dir="$RUNNER_TEMP/dashboard-site-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$dashboard_venv" "$uv_cache" "$work_dir" "$site_dir"
+          mkdir -p -- "$uv_cache" "$work_dir"
+          echo "DASHBOARD_VENV=$dashboard_venv" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$uv_cache" >> "$GITHUB_ENV"
+          echo "DASHBOARD_WORK_DIR=$work_dir" >> "$GITHUB_ENV"
+          echo "DASHBOARD_SITE_DIR=$site_dir" >> "$GITHUB_ENV"
+          UV_CACHE_DIR="$uv_cache" uv venv "$dashboard_venv" --python "$UV_PYTHON"
+
+      - name: Install CPU-only PyTorch and project dependencies
+        run: |
+          set -Eeuo pipefail
+          python="$DASHBOARD_VENV/bin/python"
+          uv pip install \
+            --quiet \
+            --python "$python" \
+            --index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.9.1"
+          uv pip install \
+            --quiet \
+            --python "$python" \
+            -e ".[api,dev,postgres]"
+          uv pip check --python "$python"
+
+      - name: Build live observability and identity inputs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOTO_PROJECT_URL: https://github.com/users/arumajirou/projects/1
+        run: |
+          set -Eeuo pipefail
+          python="$DASHBOARD_VENV/bin/python"
+          "$python" scripts/build_github_observability_summary.py \
+            --json "$DASHBOARD_WORK_DIR/observability.json" \
+            --markdown "$DASHBOARD_WORK_DIR/observability.md"
+          "$python" scripts/plan_all_execution_identities.py \
+            --output "$DASHBOARD_WORK_DIR/identities"
+
+      - name: Build fail-closed visual dashboard
+        run: |
+          set -Eeuo pipefail
+          python="$DASHBOARD_VENV/bin/python"
+          "$python" scripts/build_github_visual_dashboard.py \
+            --observability-json "$DASHBOARD_WORK_DIR/observability.json" \
+            --identity-summary-json "$DASHBOARD_WORK_DIR/identities/IDENTITY_SUMMARY.json" \
+            --unified-catalog-json "$DASHBOARD_WORK_DIR/identities/UNIFIED_CATALOG.json" \
+            --output-dir "$DASHBOARD_SITE_DIR"
+
+      - name: Verify dashboard scientific boundaries
+        run: |
+          set -Eeuo pipefail
+          "$DASHBOARD_VENV/bin/python" - "$DASHBOARD_SITE_DIR/data/dashboard.json" <<'PY'
+          import json
+          import sys
+
+          with open(sys.argv[1], encoding="utf-8") as stream:
+              data = json.load(stream)
+
+          identity = data["identity_summary"]
+          assert identity["unified_catalog_identities"] == 250, identity
+          assert len(identity["canonical_games"]) == 6, identity
+          assert identity["model_game_cross_product"] == 1500, identity
+          assert data["status_counts"] == {"UNASSESSED": 1500}, data["status_counts"]
+          assert data["formal_gates"]["holdout"] == "CLOSED"
+          assert data["formal_gates"]["prospective"] == "CLOSED"
+          assert data["formal_gates"]["automatic_promotion"] == "FORBIDDEN"
+          PY
+          test -f "$DASHBOARD_SITE_DIR/index.html"
+          test -f "$DASHBOARD_SITE_DIR/assets/app.js"
+          test -f "$DASHBOARD_SITE_DIR/data/dashboard.json"
+          test -f "$DASHBOARD_SITE_DIR/.nojekyll"
+
+      - name: Run focused dashboard tests
+        run: |
+          set -Eeuo pipefail
+          "$DASHBOARD_VENV/bin/python" -m pytest -q tests/test_github_visual_dashboard.py
+
+      - name: Upload visual dashboard artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: github-visual-dashboard-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.DASHBOARD_SITE_DIR }}
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14
+
+      - name: Verify source worktree remains clean
+        run: |
+          set -Eeuo pipefail
+          test -z "$(git status --porcelain)"
+
+      - name: Cleanup runner-owned paths
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          for path in \
+            "${DASHBOARD_VENV:-}" \
+            "${UV_CACHE_DIR:-}" \
+            "${DASHBOARD_WORK_DIR:-}" \
+            "${DASHBOARD_SITE_DIR:-}"
+          do
+            if [[ -n "$path" ]]; then
+              case "$path" in
+                "$RUNNER_TEMP"/*) rm -rf -- "$path" ;;
+                *) echo "refusing unsafe cleanup path: $path" >&2; exit 1 ;;
+              esac
+            fi
+          done
+
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_pages }}
+    needs: build
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 15
+
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download verified dashboard artifact
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: github-visual-dashboard-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/verified-dashboard-site
+
+      - name: Verify downloaded site
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -f "$RUNNER_TEMP/verified-dashboard-site/index.html"
+          test -f "$RUNNER_TEMP/verified-dashboard-site/data/dashboard.json"
+
+      - name: Configure Pages without implicit enablement
+        id: pages
+        uses: actions/configure-pages@7d49c7f84dd524bd66b6a2581e8c3b295744e47d # v6
+        with:
+          enablement: false
+
+      - name: Upload verified Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v4
+        with:
+          path: ${{ runner.temp }}/verified-dashboard-site
+
+      - name: Deploy verified Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@f33f361415d7d042451839309b0b307ca4de1eab # v4
