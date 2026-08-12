@@ -115,10 +115,11 @@ def run_probe(args: argparse.Namespace) -> dict[str, Any]:
 
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
-    device = torch.device("cuda:0")
+    device_index = int(torch.cuda.current_device())
+    device = torch.device(f"cuda:{device_index}")
     torch.cuda.empty_cache()
-    torch.cuda.reset_peak_memory_stats(device)
-    vram_before = int(torch.cuda.memory_allocated(device))
+    torch.cuda.reset_peak_memory_stats(device_index)
+    vram_before = int(torch.cuda.memory_allocated(device_index))
 
     model = Toto2Model.from_pretrained(str(snapshot_path))
     identity = validate_model(model)
@@ -146,7 +147,7 @@ def run_probe(args: argparse.Namespace) -> dict[str, Any]:
             decode_block_size=32,
             has_missing_values=False,
         )
-    torch.cuda.synchronize(device)
+    torch.cuda.synchronize(device_index)
 
     expected_shape = (9, 1, variates, horizon)
     actual_shape = tuple(int(value) for value in output.shape)
@@ -163,7 +164,7 @@ def run_probe(args: argparse.Namespace) -> dict[str, Any]:
     if not output_device.startswith("cuda"):
         raise VariantProbeError(f"output fell back to CPU: {output_device}")
     gpu_process = capture_gpu_process(os.getpid())
-    peak_vram = int(torch.cuda.max_memory_allocated(device))
+    peak_vram = int(torch.cuda.max_memory_allocated(device_index))
     if peak_vram <= 0:
         raise VariantProbeError("CUDA probe did not record positive peak VRAM")
 
@@ -187,7 +188,7 @@ def run_probe(args: argparse.Namespace) -> dict[str, Any]:
             "requested": "cuda",
             "model": model_device,
             "output": output_device,
-            "torch_device_name": torch.cuda.get_device_name(device),
+            "torch_device_name": torch.cuda.get_device_name(device_index),
             "gpu_uuid": gpu_process.gpu_uuid,
             "nvidia_smi_used_gpu_memory_mib": gpu_process.used_gpu_memory_mib,
             "vram_before_bytes": vram_before,
