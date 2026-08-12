@@ -1,4 +1,7 @@
+import pytest
+
 from scripts.build_github_observability_summary import classify_workflow
+from scripts.build_github_visual_dashboard import DashboardBuildError, _validate_observability
 
 
 def test_classify_canonical_ci() -> None:
@@ -60,3 +63,23 @@ def test_classify_unknown_specialized() -> None:
         )
         == "other-specialized"
     )
+
+
+def _observability_payload(version: int) -> dict[str, object]:
+    return {
+        "schema_version": version,
+        "repository": "arumajirou/loto_forecast_platform",
+        "main_sha": "a" * 40,
+        "open_issues": [],
+        "active_workflows": [],
+    }
+
+
+@pytest.mark.parametrize("version", [1, 2])
+def test_visual_dashboard_accepts_supported_observability_schema(version: int) -> None:
+    _validate_observability(_observability_payload(version))
+
+
+def test_visual_dashboard_rejects_unknown_observability_schema() -> None:
+    with pytest.raises(DashboardBuildError, match="schema_version must be one of: 1, 2"):
+        _validate_observability(_observability_payload(3))
