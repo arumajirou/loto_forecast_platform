@@ -94,17 +94,19 @@ def _validate_identity_inputs(
 
     expected_models = summary.get("unified_catalog_identities")
     if expected_models != len(normalized):
-        raise DashboardBuildError(
-            "unified catalog count mismatch: "
-            f"summary={expected_models!r}, actual={len(normalized)}"
+        message = (
+            f"unified catalog count mismatch: summary={expected_models!r}, "
+            f"actual={len(normalized)}"
         )
+        raise DashboardBuildError(message)
     expected_pairs = summary.get("unified_model_game_cross_product")
     actual_pairs = len(normalized) * len(games)
     if expected_pairs != actual_pairs:
-        raise DashboardBuildError(
-            "model-game cross-product mismatch: "
-            f"summary={expected_pairs!r}, actual={actual_pairs}"
+        message = (
+            f"model-game cross-product mismatch: summary={expected_pairs!r}, "
+            f"actual={actual_pairs}"
         )
+        raise DashboardBuildError(message)
     return games, normalized
 
 
