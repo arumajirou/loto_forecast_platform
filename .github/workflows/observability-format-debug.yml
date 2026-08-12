@@ -28,14 +28,21 @@ jobs:
       - name: Show Ruff format diff
         shell: bash
         run: |
-          set -Eeuo pipefail
+          set -u
           diff_file="$RUNNER_TEMP/observability-ruff-format.diff"
+          set +e
           uvx --from ruff==0.16.1 ruff format --diff \
-            scripts/build_github_observability_summary.py | tee "$diff_file"
+            scripts/build_github_observability_summary.py > "$diff_file" 2>&1
+          ruff_rc=$?
+          set -e
+          cat "$diff_file"
           {
             echo '## Ruff 0.16.1 format diff'
+            echo
+            echo "ruff_exit_code=$ruff_rc"
             echo
             echo '```diff'
             cat "$diff_file"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
