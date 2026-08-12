@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from collections import Counter
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError
@@ -45,6 +46,49 @@ def _issue_labels(issue: dict[str, Any]) -> list[str]:
     )
 
 
+def classify_workflow(name: str, path: str) -> str:
+    """Classify a workflow for navigation without changing workflow authority."""
+    filename = Path(path).name.lower()
+    text = f"{name} {filename}".lower()
+
+    if filename == "ci.yml":
+        return "canonical-gate"
+    if filename in {
+        "github-observability-dashboard.yml",
+        "github-visual-dashboard-build.yml",
+    }:
+        return "observability"
+    if filename == "windows-portability-ci.yml":
+        return "portability-gate"
+
+    runtime_terms = (
+        "runtime",
+        "certification",
+        "provider",
+        "campaign",
+        "gpu",
+        "model",
+    )
+    if any(term in text for term in runtime_terms):
+        return "runtime-specialized"
+
+    maintenance_terms = (
+        "repair",
+        "fix",
+        "format",
+        "lint",
+        "diagnostic",
+        "inventory",
+        "restore",
+        "builder",
+        "verify",
+    )
+    if any(term in text for term in maintenance_terms):
+        return "maintenance-diagnostic"
+
+    return "other-specialized"
+
+
 def _build_markdown(payload: dict[str, Any]) -> str:
     repo = payload["repository"]
     server = payload["server_url"]
@@ -78,7 +122,10 @@ def _build_markdown(payload: dict[str, Any]) -> str:
         f"- [Pull requests]({server}/{repo}/pulls)",
         f"- [Actions]({server}/{repo}/actions)",
         f"- [Insights]({server}/{repo}/pulse)",
-        f"- [Operations reference]({server}/{repo}/blob/main/docs/GITHUB_OPERATIONS_DASHBOARD.md)",
+        (
+            f"- [Operations reference]"
+            f"({server}/{repo}/blob/main/docs/GITHUB_OPERATIONS_DASHBOARD.md)"
+        ),
         "",
         "## Open issues",
         "",
@@ -97,21 +144,40 @@ def _build_markdown(payload: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
+            "## Workflow navigation classes",
+            "",
+            (
+                "These classes are name/path heuristics for navigation only. They do not change "
+                "workflow permissions, authority, certification status, or retirement eligibility."
+            ),
+            "",
+            "| Class | Count |",
+            "|---|---:|",
+        ]
+    )
+    for category, count in payload["workflow_category_counts"].items():
+        lines.append(f"| `{_md(category)}` | {count} |")
+
+    lines.extend(
+        [
+            "",
             "## Active workflow inventory",
             "",
             (
-                "The repository currently has many specialized workflows. Use `ci` as the "
-                "canonical repository gate and this dashboard as the navigation surface. "
-                "Provider/repair workflows remain evidence-specific until separately consolidated."
+                "Use `ci` as the canonical repository gate. Dashboard workflows are navigation "
+                "surfaces. Specialized and maintenance workflows remain evidence-specific until "
+                "separately audited; this report never disables them."
             ),
             "",
-            "| Workflow | Path |",
-            "|---|---|",
+            "| Class | Workflow | Path |",
+            "|---|---|---|",
         ]
     )
     for workflow in payload["active_workflows"]:
         lines.append(
-            f"| [{_md(workflow['name'])}]({workflow['html_url']}) | `{_md(workflow['path'])}` |"
+            f"| `{_md(workflow['category'])}` "
+            f"| [{_md(workflow['name'])}]({workflow['html_url']}) "
+            f"| `{_md(workflow['path'])}` |"
         )
 
     lines.extend(
@@ -123,6 +189,10 @@ def _build_markdown(payload: dict[str, Any]) -> str:
             (
                 "- An active workflow is an execution surface, not proof that the model/runtime "
                 "is certified."
+            ),
+            (
+                "- Workflow navigation classes are heuristic labels, not deletion or disablement "
+                "decisions."
             ),
             (
                 "- Project fields are a dashboard cache; immutable run artifacts and SHA-256 "
@@ -187,14 +257,19 @@ def build_payload() -> dict[str, Any]:
                 "name": str(workflow.get("name") or workflow.get("path") or "unnamed"),
                 "path": str(workflow.get("path", "")),
                 "html_url": str(workflow.get("html_url", "")),
+                "category": classify_workflow(
+                    str(workflow.get("name") or ""),
+                    str(workflow.get("path") or ""),
+                ),
             }
             for workflow in workflows
         ),
-        key=lambda item: (item["name"].lower(), item["path"]),
+        key=lambda item: (item["category"], item["name"].lower(), item["path"]),
     )
+    category_counts = Counter(item["category"] for item in normalized_workflows)
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "repository": repository,
         "server_url": server_url,
         "project_url": project_url,
@@ -202,6 +277,7 @@ def build_payload() -> dict[str, Any]:
         "open_issue_count": len(normalized_issues),
         "open_pr_count": len(prs),
         "active_workflow_count": len(normalized_workflows),
+        "workflow_category_counts": dict(sorted(category_counts.items())),
         "open_issues": normalized_issues,
         "active_workflows": normalized_workflows,
     }
