@@ -30,9 +30,7 @@ def _api_get(api_base: str, token: str | None, path: str) -> Any:
             return json.load(response)
     except HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(
-            f"GitHub API {path} failed: HTTP {exc.code}: {body[:1000]}"
-        ) from exc
+        raise RuntimeError(f"GitHub API {path} failed: HTTP {exc.code}: {body[:1000]}") from exc
 
 
 def _md(value: object) -> str:
