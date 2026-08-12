@@ -1,0 +1,78 @@
+name: Infrastructure / CI / portability blocker
+
+description: Track CI, runner, dependency, filesystem, orchestration, and evidence-harness failures separately from model failures.
+title: "[infra] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when the failure is in CI, checkout, dependency setup, process orchestration, serialization, resource scheduling, or evidence collection. Do not misclassify infrastructure failures as model failures.
+
+  - type: dropdown
+    id: failure_class
+    attributes:
+      label: Failure class
+      options:
+        - checkout / portability
+        - workflow / Actions
+        - runner
+        - dependency / lock
+        - serialization / evidence
+        - scheduler / resource allocation
+        - timeout / process cleanup
+        - GPU device attribution
+        - CPU fallback classification
+        - data access / storage
+        - unknown / needs classification
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Exact reproduction
+      description: Include workflow/run/job, Git SHA, command, exit code and smallest relevant log excerpt.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment / runner / resource evidence
+      description: OS, Python, uv, CPU/RAM, GPU/CUDA/VRAM, runner name, package lock or filesystem details as applicable.
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: State the focused tests/smoke and exact-head CI evidence required to close the blocker.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Boundary checks
+      options:
+        - label: The issue will preserve the distinction between infrastructure failure and model runtime failure.
+          required: true
+        - label: Holdout and Prospective state will not be changed by infrastructure remediation.
+          required: true
+        - label: No raw scientific data will be rewritten merely to satisfy CI/portability.
+          required: true
