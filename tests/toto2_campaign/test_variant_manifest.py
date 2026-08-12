@@ -12,8 +12,8 @@ from loto.toto2_campaign.model_manifest import (
     Toto2ModelManifest,
 )
 from loto.toto2_campaign.variant_manifest import (
-    TOTO2_22M,
     TOTO2_4M,
+    TOTO2_22M,
     TOTO2_VARIANTS,
     get_toto2_variant,
 )
