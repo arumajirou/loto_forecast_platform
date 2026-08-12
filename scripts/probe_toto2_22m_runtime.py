@@ -151,7 +151,9 @@ def run_probe(args: argparse.Namespace) -> dict[str, Any]:
     expected_shape = (9, 1, variates, horizon)
     actual_shape = tuple(int(value) for value in output.shape)
     if actual_shape != expected_shape:
-        raise VariantProbeError(f"output shape mismatch: expected {expected_shape}, got {actual_shape}")
+        raise VariantProbeError(
+            f"output shape mismatch: expected {expected_shape}, got {actual_shape}"
+        )
     if not bool(torch.isfinite(output).all().item()):
         raise VariantProbeError("model output contains non-finite values")
     if not bool(((output[1:] - output[:-1]) >= -1e-6).all().item()):
