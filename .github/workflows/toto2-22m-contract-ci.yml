@@ -3,7 +3,7 @@ name: Toto 2.0 22M contract CI
 on:
   pull_request:
     branches:
-      - agent/toto2-family-22m-provenance-v1
+      - main
     paths:
       - .github/workflows/toto2-22m-contract-ci.yml
       - src/loto/adapters/toto2_family/**

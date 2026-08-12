@@ -3,7 +3,7 @@ name: Toto 2.0 22M runtime probe
 on:
   pull_request:
     branches:
-      - agent/toto2-family-22m-provenance-v1
+      - main
     paths:
       - .github/workflows/toto2-22m-runtime-probe.yml
       - scripts/probe_toto2_22m_runtime.py
