@@ -52,14 +52,20 @@ def _build_markdown(payload: dict[str, Any]) -> str:
     lines = [
         "# Repository observability dashboard",
         "",
-        "> Navigation/status only. Runtime certification and scientific results require their own immutable evidence.",
+        (
+            "> Navigation/status only. Runtime certification and scientific results "
+            "require their own immutable evidence."
+        ),
         "",
         "## Current GitHub state",
         "",
         "| Item | Value |",
         "|---|---|",
         f"| Repository | [{repo}]({server}/{repo}) |",
-        f"| Main SHA | [`{payload['main_sha'][:12]}`]({server}/{repo}/commit/{payload['main_sha']}) |",
+        (
+            f"| Main SHA | [`{payload['main_sha'][:12]}`]"
+            f"({server}/{repo}/commit/{payload['main_sha']}) |"
+        ),
         f"| Open issues | {payload['open_issue_count']} |",
         f"| Open pull requests | {payload['open_pr_count']} |",
         f"| Active workflows | {payload['active_workflow_count']} |",
@@ -93,7 +99,11 @@ def _build_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Active workflow inventory",
             "",
-            "The repository currently has many specialized workflows. Use `ci` as the canonical repository gate and this dashboard as the navigation surface. Provider/repair workflows remain evidence-specific until separately consolidated.",
+            (
+                "The repository currently has many specialized workflows. Use `ci` as the "
+                "canonical repository gate and this dashboard as the navigation surface. "
+                "Provider/repair workflows remain evidence-specific until separately consolidated."
+            ),
             "",
             "| Workflow | Path |",
             "|---|---|",
@@ -110,9 +120,18 @@ def _build_markdown(payload: dict[str, Any]) -> str:
             "## Interpretation boundaries",
             "",
             "- An open/closed Issue is operational state, not model quality evidence.",
-            "- An active workflow is an execution surface, not proof that the model/runtime is certified.",
-            "- Project fields are a dashboard cache; immutable run artifacts and SHA-256 manifests remain authoritative.",
-            "- Holdout, Prospective, champion, and promotion state must be read from their explicit scientific/governance evidence; this script never infers them.",
+            (
+                "- An active workflow is an execution surface, not proof that the model/runtime "
+                "is certified."
+            ),
+            (
+                "- Project fields are a dashboard cache; immutable run artifacts and SHA-256 "
+                "manifests remain authoritative."
+            ),
+            (
+                "- Holdout, Prospective, champion, and promotion state must be read from their "
+                "explicit scientific/governance evidence; this script never infers them."
+            ),
             "",
         ]
     )
