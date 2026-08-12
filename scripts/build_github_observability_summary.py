@@ -30,7 +30,9 @@ def _api_get(api_base: str, token: str | None, path: str) -> Any:
             return json.load(response)
     except HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"GitHub API {path} failed: HTTP {exc.code}: {body[:1000]}") from exc
+        raise RuntimeError(
+            f"GitHub API {path} failed: HTTP {exc.code}: {body[:1000]}"
+        ) from exc
 
 
 def _md(value: object) -> str:
@@ -129,8 +131,12 @@ def build_payload() -> dict[str, Any]:
     )
 
     ref = _api_get(api_base, token, f"/repos/{repository}/git/ref/heads/main")
-    issues_and_prs = _api_get(api_base, token, f"/repos/{repository}/issues?state=open&per_page=100")
-    workflows_payload = _api_get(api_base, token, f"/repos/{repository}/actions/workflows?per_page=100")
+    issues_and_prs = _api_get(
+        api_base, token, f"/repos/{repository}/issues?state=open&per_page=100"
+    )
+    workflows_payload = _api_get(
+        api_base, token, f"/repos/{repository}/actions/workflows?per_page=100"
+    )
 
     issues = [item for item in issues_and_prs if "pull_request" not in item]
     prs = [item for item in issues_and_prs if "pull_request" in item]
