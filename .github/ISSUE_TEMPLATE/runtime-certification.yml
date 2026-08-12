@@ -1,0 +1,102 @@
+name: Runtime certification / model execution
+
+description: Track model/provider runtime, device, resource, and functionality certification work.
+title: "[runtime] "
+labels:
+  - validation
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for runtime execution/certification. Runtime success is not OOF, Holdout, Prospective, accuracy superiority, or promotion.
+
+  - type: input
+    id: model_id
+    attributes:
+      label: Canonical model ID
+      description: Use the collision-free repository model ID.
+      placeholder: chronos-2
+    validations:
+      required: true
+
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options:
+        - n/a / provider-only
+        - mini
+        - loto6
+        - loto7
+        - bingo5
+        - numbers3
+        - numbers4
+    validations:
+      required: true
+
+  - type: dropdown
+    id: execution_surface
+    attributes:
+      label: Execution surface
+      options:
+        - shared
+        - provider
+        - isolated
+        - reconciliation
+        - unknown / needs audit
+    validations:
+      required: true
+
+  - type: input
+    id: model_revision
+    attributes:
+      label: Model revision / artifact identity
+      description: Exact revision when applicable. Do not use floating latest for formal certification.
+
+  - type: input
+    id: runtime_lane
+    attributes:
+      label: Runtime lane
+      placeholder: Python 3.11 / Torch 2.9.1+cu128 / isolated provider env
+    validations:
+      required: true
+
+  - type: dropdown
+    id: expected_device
+    attributes:
+      label: Expected device
+      options:
+        - CPU
+        - CUDA
+        - CPU fallback allowed but must be classified
+        - n/a
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Required runtime evidence
+      description: Include load, input, inference, output shape, finite values, device, PID, VRAM/RSS, fallback, save/reload where applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Existing evidence / Run IDs / Actions links
+      description: Paste exact Run IDs, Git SHAs, artifact links, logs, and SHA-256 references.
+
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Scientific and governance boundaries
+      options:
+        - label: Holdout remains closed unless separately authorized.
+          required: true
+        - label: Prospective remains closed unless separately authorized.
+          required: true
+        - label: Runtime success will not be reported as accuracy superiority or promotion.
+          required: true
+        - label: Raw data will not be overwritten.
+          required: true

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Runtime & Model Certification Project
+    url: https://github.com/users/arumajirou/projects/1
+    about: View repository-wide runtime and model certification progress before opening duplicate work.
+  - name: GitHub Operations Dashboard
+    url: https://github.com/arumajirou/loto_forecast_platform/blob/main/docs/GITHUB_OPERATIONS_DASHBOARD.md
+    about: Start here for current GitHub navigation, blockers, and source-of-truth rules.
