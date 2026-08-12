@@ -1,58 +1,106 @@
 # Loto Forecast Platform
 
-**ミニロト / ロト6 / ロト7 / ビンゴ5 / ナンバーズ3 / ナンバーズ4**を対象に、統計モデル、機械学習、深層学習、AutoML、時系列基盤モデル（TSFM）、確率モデルを、時系列リークを防いだ共通契約の下で比較・検証・運用する研究プラットフォームです。
+**ミニロト / ロト6 / ロト7 / ビンゴ5 / ナンバーズ3 / ナンバーズ4**を対象に、統計モデル、機械学習、深層学習、AutoML、時系列基盤モデル（TSFM）、確率モデルを、時系列リークを防いだ共通契約で比較・検証・運用する研究プラットフォームです。
 
-このREADMEは、単なる「登録モデル一覧」ではなく、**何がコードとして存在し、どこから実行でき、どこまで実測証拠があり、何がまだ未検証か**を区別して読むための入口です。
+このREADMEは「何が使えるか」を最短で把握する入口です。モデル・ライブラリ別の詳細は専用対応表へ分離しました。
 
-> **Implementation audit base:** `main@abe7e02cdfc900618c83b21c922b4fd3f078b036` (2026-08-12)  
-> **Fact-check sources:** current `main` code / merged PR history / tests / retained runtime artifacts / Linear project state  
-> **Important:** `REGISTERED != RUNTIME_CERTIFIED != OOF_EVALUATED != HOLDOUT_EVALUATED != PROSPECTIVE_EVALUATED != PROMOTION_ELIGIBLE`  
+> **Implementation audit base:** `main@05eba49dad8c0700c303783267784cfde081e419` (2026-08-12)  
+> **Rule:** `REGISTERED != ROUTABLE != RUNTIME_CERTIFIED != OOF_EVALUATED != HOLDOUT_EVALUATED != PROSPECTIVE_EVALUATED != PROMOTION_ELIGIBLE`  
 > 現在のpackage versionはREADMEへ手書きしません。canonical versionは`loto.version.__version__` / installed package metadata / `loto-build-info`を正本とします。
+
+## まず見る資料
+
+| 知りたいこと | 資料 |
+|---|---|
+| ライブラリごとのモデル一覧・引数・対応機能・実装状況 | **[`docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md`](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md)** |
+| 実行コマンド・機能の詳細 | [`docs/CAPABILITIES_AND_OPERATIONS.md`](docs/CAPABILITIES_AND_OPERATIONS.md) |
+| TSFM 21 identityのruntime証拠 | [`docs/TSFM_RUNTIME_CAPABILITIES.md`](docs/TSFM_RUNTIME_CAPABILITIES.md) |
+| 評価・Hit@±1・OOF関連 | [`docs/evaluation/`](docs/evaluation/) |
+| 運用・監視 | [`docs/operations/`](docs/operations/) |
 
 ---
 
-## 1. 現在地 — 先に結論
+## 1. 現在地
 
-| 領域 | 現在状態 | 事実として確認できること | まだ意味しないこと |
+| 領域 | 状態 | 現在確認できること | まだ意味しないこと |
 |---|---|---|---|
-| 6ゲーム共通geometry | **VERIFIED** | `mini/loto6/loto7/bingo5/numbers3/numbers4` のpositions・値域・select/digits契約あり | 全モデルが6ゲームで実測済み、ではない |
-| Broad v1 inventory | **VERIFIED** | `catalog_full.py` の凍結在庫 **174** | 174モデルすべてruntime成功、ではない |
-| Unified v1 coverage | **EXECUTION_PENDING** | 既存計画の分母 **250 × 6 = 1500 units** | 1500 unit完走済み、ではない |
-| Expanded v2 inventory | **VERIFIED / PARTIALLY_VERIFIED** | Broad v1を壊さず別inventoryを追加。Phase 1は **210**。AutoGluon umbrella 1件をsource-backed **37 implementations**へ展開 | 新規37件すべてruntime-certified、ではない |
-| StatsForecast | **VERIFIED / PARTIALLY_VERIFIED** | broad 41、shared明示8。runtime lifecycle / property lifecycle / real-game development evaluationを実装・検証 | broad 41全件の全ゲーム科学評価完了、ではない |
-| NeuralForecast fixed | **VERIFIED / PARTIALLY_VERIFIED** | broad 37、shared direct classは17。通常学習経路あり | broad 37全件の全ゲームruntime/OOF完了、ではない |
-| NeuralForecast AutoModels | **VERIFIED / PARTIALLY_VERIFIED** | official AutoModel 36、Optuna/Ray、search policy、search-space persistence、seed/precision伝播、GPU evidence pathあり | 36×全ゲームの正式runtime/accuracy certification完了、ではない |
-| AutoGluon TimeSeries | **PARTIALLY_VERIFIED** | isolated provider + source inventory。v1.5.0 source manifestは29 models + 8 unique ensemble classes = 37 implementations | Expanded 37件すべてのruntime証明、ではない |
-| TSFM runtime audit | **PARTIALLY_VERIFIED** | audit identity 21中 **19 CERTIFIED / 2 BLOCKED** | 19すべてshared-routable、lottery-compatible、OOF優位、ではない |
-| Probabilistic platform | **VERIFIED / PARTIALLY_VERIFIED** | separate 72-model catalog、backend probe、compatibility/run/API surfaceあり | 72モデル全ゲームruntime/科学評価完了、ではない |
-| Resource-aware campaign | **VERIFIED** | live resource planning、GPU割当、resume fingerprint、timeout process-tree cleanup、outer-worker cap | Broad/Unified全unit完走、ではない |
-| GitHub observability | **VERIFIED** | Operations Dashboard / visual dashboard / Pages gate / structured intake実装済み | 各scientific gateの代替、ではない |
-| Holdout | **BLOCKED (CLOSED BY POLICY)** | development evidenceが揃うまで閉鎖 | development結果から自動解禁、ではない |
-| Prospective | **BLOCKED (CLOSED BY POLICY)** | prediction seal + future actual到着後のみ評価 | Holdout未承認のまま実行可、ではない |
-| Automatic promotion | **BLOCKED / FORBIDDEN** | promotionはhuman approval前提 | runtime PASSだけでchampion昇格、ではない |
+| 6ゲーム geometry | **VERIFIED** | 6ゲームのpositions・値域・select/digits契約あり | 全モデル×全ゲーム完走ではない |
+| Broad v1 | **VERIFIED** | frozen inventory **174** | 174全件runtime成功ではない |
+| Unified v1 | **EXECUTION_PENDING** | **250 × 6 = 1500 units** の計画分母 | 1500完走ではない |
+| Expanded v2 Phase 1 | **VERIFIED / PARTIALLY_VERIFIED** | **210 identities**。AutoGluon umbrellaを37実装へ展開 | 210全件runtime-certifiedではない |
+| StatsForecast | **VERIFIED / PARTIALLY_VERIFIED** | Broad 41 / shared explicit 8 / lifecycle + real-game dev lane | 41×6完走ではない |
+| NeuralForecast fixed | **VERIFIED / PARTIALLY_VERIFIED** | Broad 37 / direct shared subset 17 | 37全件runtime/OOF完了ではない |
+| NeuralForecast Auto | **VERIFIED / PARTIALLY_VERIFIED** | official 36 / Ray・Optuna / seed・precision・GPU evidence path | 36×6正式認証完了ではない |
+| MLForecast | **PARTIALLY_VERIFIED** | Auto inventory 8 / direct shared 2 | Auto 8 = shared workers 8ではない |
+| AutoGluon TimeSeries | **PARTIALLY_VERIFIED** | source 29 models + 8 unique ensembles = 37 expanded identities | 37全件runtime-certifiedではない |
+| TSFM | **PARTIALLY_VERIFIED** | retained audit 21中 **19 CERTIFIED / 2 BLOCKED** | 19全てlottery-compatible/OOF済みではない |
+| Probabilistic platform | **VERIFIED / PARTIALLY_VERIFIED** | separate **72-model** catalog + backend/run/API surface | 72全件科学評価完了ではない |
+| Holdout | **BLOCKED / CLOSED** | explicit authorization前は閉鎖 | development結果から自動解禁されない |
+| Prospective | **BLOCKED / CLOSED** | prediction seal後のfuture evaluationのみ | Holdout未承認で進めない |
+| Auto promotion | **FORBIDDEN** | human approval前提 | runtime PASSだけでchampion化しない |
 
 ### 状態語
 
-- **VERIFIED**: current code/history/tests/evidenceで対象の主張を確認済み。
-- **PARTIALLY_VERIFIED**: 一部モデル・一部lane・一部実行面のみ実測済み。
-- **EXECUTION_PENDING**: 実装・計画はあるが、対象分母の実行完了証拠が未完。
-- **BLOCKED**: 明示的なgate、runner、license、artifact、policy等で進行不可。
+| status | 意味 |
+|---|---|
+| `VERIFIED` | current code / tests / retained evidenceで主張を確認済み |
+| `PARTIALLY_VERIFIED` | 一部モデル・一部lane・一部証拠のみ成立 |
+| `EXECUTION_PENDING` | 実装または計画はあるが対象分母の実行完了証拠がない |
+| `BLOCKED` | policy / runner / license / artifact等の明示gateで停止 |
 
 ---
 
-## 2. 何を数えているか — 3つのinventoryを混同しない
+## 2. Broad v1 = 174 のライブラリ内訳
 
-| Inventory | 分母 | 目的 | 重要な境界 |
+この数は `src/loto/models/catalog_full.py` の current code から構成されます。
+
+| Library | Count | 主な役割 | 詳細 |
 |---|---:|---|---|
-| **Broad v1** | **174** | 既存の広い比較在庫。`src/loto/models/catalog_full.py` | 既存 174×6 campaignの分母を途中で変更しないため凍結 |
-| **Unified v1** | **250** | model/library/provider/reconciliation等を共通coverageで扱う既存計画 | 全250がstandalone forecasterとは限らない |
-| **Expanded v2 Phase 1** | **210** | umbrella entryをsource-backed implementation identityへ分解 | Broad v1を置換しない。新identityはruntime証明を別途要求 |
+| builtin | 4 | theory / frequency controls | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#4-builtin--scikit-learn--boosting) |
+| scikit-learn | 7 | candidate / position ML | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#4-builtin--scikit-learn--boosting) |
+| LightGBM | 2 | candidate / position boosting | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#4-builtin--scikit-learn--boosting) |
+| XGBoost | 1 | candidate boosting | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#4-builtin--scikit-learn--boosting) |
+| CatBoost | 1 | candidate boosting | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#4-builtin--scikit-learn--boosting) |
+| StatsForecast | **41** | statistical forecasting | [41モデル一覧](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#5-statsforecast--41-models) |
+| NeuralForecast fixed | **37** | deep forecasting | [37モデル一覧](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#7-neuralforecast-fixed--37-models) |
+| NeuralForecast Auto | **36** | AutoModel HPO | [36モデル一覧](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#8-neuralforecast-automodels--official-36) |
+| MLForecast Auto | **8** | lag AutoML | [8モデル一覧](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#6-mlforecast--auto-8--direct-shared-2) |
+| HierarchicalForecast | **10** | reconciliation | [10 method一覧](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#10-hierarchicalforecast--10-reconciliation-methods) |
+| TSFM | **21** | foundation / zero-shot | [21 runtime identities](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#11-tsfm--foundation-models--21-runtime-audit-identities) |
+| AutoGluon | 1 umbrella | AutoML / ensemble | [Expanded 37 identities](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#9-autogluon-timeseries-150--expanded-v2-phase-1) |
+| Darts | 1 | ensemble framework | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
+| GluonTS | 1 | probabilistic DeepAR | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
+| ReservoirPy | 1 | ESN | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
+| sktime | 1 | forecasting framework | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
+| skforecast | 1 | recursive lag ML | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
+| **TOTAL** | **174** |  | frozen denominator |
 
-Expanded v2 Phase 1では Broad v1 の `autogluon-timeseries` 1件を、AutoGluon 1.5.0 source manifestの **29 model aliases + 8 unique ensemble classes = 37 implementations**へ置換するため、`174 - 1 + 37 = 210` です。`ImplementationIdentity.runtime_status` の初期値は `NOT_RUN`、`runtime_certified=False` です。
+Broad v1外には Time-Series-Library、BasicTS、Merlion、separate probabilistic 72-model catalog等があります。これらも[専用対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md)へ記載しています。
 
 ---
 
-## 3. 6ゲームの共通契約
+## 3. 主要ライブラリの対応関係
+
+| Library | Inventory | Shared route | Provider / isolated | HPO | GPU | runtime evidence | 全ゲームOOF |
+|---|---:|---|---|:---:|:---:|---|---|
+| StatsForecast | 41 | 8 explicit | campaign | model内Auto | CPU中心 | **部分検証** | **未完** |
+| MLForecast | Auto 8 | 2 direct | AutoML/research | ✓ | backend依存 | **部分検証** | **未完** |
+| NeuralForecast fixed | 37 | 17 direct | dedicated paths | — | ✓ | **部分検証** | **未完** |
+| NeuralForecast Auto | 36 | AutoModel specs | dedicated runner | **Ray / Optuna** | ✓ | **部分検証** | **未完** |
+| AutoGluon | umbrella 1 / expanded 37 | umbrella | isolated provider | AutoML | backend依存 | **部分検証** | **未完** |
+| HierarchicalForecast | 10 | reconciliation | optional | — | — | capability verified | base forecast依存 |
+| TSFM | 21 audit ids | subset | provider-specific | — | 多くで対象 | **19 CERTIFIED / 2 BLOCKED** | **未完** |
+| Darts | 1 Broad | ✓ optional | optional | — | optional | **部分検証** | **未完** |
+| GluonTS | 1 Broad | ✓ optional | optional | — | shared path CPU-pinned | **部分検証** | **未完** |
+| ReservoirPy | 1 Broad | ✓ optional | optional | — | CPU中心 | **部分検証** | **未完** |
+| sktime | 1 Broad | — | isolated campaign | framework依存 | framework依存 | **EXECUTION_PENDING** | **未完** |
+| skforecast | 1 Broad | — | pending | — | regressor依存 | **EXECUTION_PENDING** | **未完** |
+
+モデル名、class、主要引数、capabilityの詳細は **[`docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md`](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md)** を参照してください。
+
+---
+
+## 4. 6ゲーム共通契約
 
 | game | family | positions | values | semantics |
 |---|---|---:|---|---|
@@ -63,199 +111,66 @@ Expanded v2 Phase 1では Broad v1 の `autogluon-timeseries` 1件を、AutoGluo
 | `numbers3` | digits | 3 | 0..9 | 順序あり・重複可 |
 | `numbers4` | digits | 4 | 0..9 | 順序あり・重複可 |
 
-`available=true`、import成功、単一ゲームsmokeだけでは「6ゲーム対応」と判定しません。出力shapeは必ずgame geometryへ適合させます。
+`available=true`、import成功、単一ゲームsmokeだけでは「6ゲーム対応」と判定しません。
 
 ---
 
-## 4. ライブラリ / framework 対応表
+## 5. 実装済みと科学的成功を分ける
 
-| Library / family | 在庫・代表モデル | 実行面 | 主要機能 / 引数 | 現在状態 |
-|---|---|---|---|---|
-| builtin | `uniform`, `frequency` 等 | shared | mandatory controls / theory reference | **VERIFIED** |
-| scikit-learn | logistic, ridge/elasticnet position, RF, ExtraTrees, HGB | shared | seed、candidate/position feature contract | **VERIFIED / PARTIALLY_VERIFIED** |
-| LightGBM | classifier / position | shared | candidate / position boosting | **PARTIALLY_VERIFIED** |
-| XGBoost | classifier | shared | candidate boosting | **PARTIALLY_VERIFIED** |
-| CatBoost | classifier | shared | candidate boosting | **PARTIALLY_VERIFIED** |
-| **StatsForecast** | broad **41** / shared 8 | shared + campaign | statistical forecast、lifecycle、real-game dev evaluation | **VERIFIED / PARTIALLY_VERIFIED** |
-| **MLForecast** | Auto inventory **8** / direct shared 2 | shared + research inventory | lag ML、regressor backend | **PARTIALLY_VERIFIED** |
-| **NeuralForecast fixed** | broad **37** / direct shared 17 | shared | GPU/CPU deep forecast、exogenous/probabilistic supportはmodel依存 | **PARTIALLY_VERIFIED** |
-| **NeuralForecast Auto** | official **36** | dedicated AutoModel runner | `backend`, `config`, `search_alg`, `num_samples`, CPU/GPU, seed, precision, refit | **VERIFIED / PARTIALLY_VERIFIED** |
-| **AutoGluon TimeSeries 1.5.0** | broad umbrella 1 / Expanded implementations **37** | isolated provider | model/ensemble inventory、subprocess isolation | **PARTIALLY_VERIFIED** |
-| Darts | `RegressionEnsembleModel` lane | shared / optional | NaiveDrift + ExponentialSmoothing ensemble | **PARTIALLY_VERIFIED** |
-| GluonTS | Torch DeepAR lane | shared / optional | Student-T probabilistic DeepAR | **PARTIALLY_VERIFIED**; shared path CPU-pinned |
-| ReservoirPy | ESN (`Reservoir >> Ridge`) | shared / optional | position-wise reservoir forecasting | **PARTIALLY_VERIFIED** |
-| HierarchicalForecast | **10** reconciliation methods | reconciliation | BottomUp / TopDown / MiddleOut / MinTrace / OptimalCombination / ERM等 | **VERIFIED / PARTIALLY_VERIFIED** |
-| sktime | campaign identity | isolated campaign | rolling-origin / lifecycle evaluation | **EXECUTION_PENDING** for broad real runtime |
-| skforecast | inventory/dependency identity | no audited shared worker | future expanded routing target | **EXECUTION_PENDING** |
-| BasicTS | outside Broad 174 | isolated campaign | provider/config/dataset/runtime smoke contracts | **PARTIALLY_VERIFIED** |
-| Time-Series-Library | outside Broad 174 | isolated campaign | DLinear/TSMixer/LightTS/SegRNN/FreTS/SCINet/TimeFilter/TiDE/FiLM lane | **PARTIALLY_VERIFIED** |
-| Merlion | outside Broad 174 | isolated campaign | ARIMA/ETS/MSES runtime certification surface | **EXECUTION_PENDING** for target-host completion |
-| TSFM / foundation models | audit identity **21** | shared provider subset + isolated lanes | pinned revision、load/inference/device/VRAM/shape/finite checks | **19 CERTIFIED / 2 BLOCKED**, routing scopeは別 |
-| probabilistic programming | separate **72** | `loto3 probabilistic` | backend probe、compatibility、plan/run/compare/API | **PARTIALLY_VERIFIED** |
-
----
-
-## 5. NeuralForecast — fixed 37 と AutoModels 36
-
-### 5.1 fixed model inventory 37
+確認順序は次です。
 
 ```text
-RNN GRU LSTM TCN DeepAR DilatedRNN MLP NHITS NBEATS NBEATSx
-DLinear NLinear TFT VanillaTransformer Informer Autoformer PatchTST
-FEDformer StemGNN HINT TimesNet TimeLLM TSMixer TSMixerx
-MLPMultivariate iTransformer BiTCN TiDE DeepNPTS SOFTS SOFTSSharp
-TimeMixer KAN RMoK TimeXer xLSTM XLinear
+source-declared
+  -> catalog-registered
+  -> shared/provider-routable
+  -> dependency/version verified
+  -> load verified
+  -> input accepted
+  -> inference executed
+  -> output shape / finite verified
+  -> device / GPU PID / VRAM / CPU fallback verified
+  -> save/reload verified when applicable
+  -> runtime-certified
+  -> lottery-compatible
+  -> chronological OOF evaluated
+  -> Holdout evaluated
+  -> Prospective evaluated
+  -> promotion eligible
 ```
 
-通常shared routeのdirect class subsetは次の17です。
+上の段階を飛ばして、下の段階をREADMEやdashboardで主張しません。
 
-```text
-DLinear NLinear NHITS NBEATS NBEATSx TiDE TCN GRU LSTM DeepAR
-TFT PatchTST TimesNet TSMixer TimeMixer iTransformer VanillaTransformer
-```
+### 科学評価の必須条件
 
-**37件が在庫にあること**と**37件全部がnormal shared routeから実行できること**は別です。
-
-### 5.2 official AutoModel inventory 36
-
-```text
-AutoRNN AutoLSTM AutoGRU AutoTCN AutoDeepAR AutoDilatedRNN AutoBiTCN
-AutoxLSTM AutoMLP AutoNBEATS AutoNBEATSx AutoNHITS AutoDLinear AutoNLinear
-AutoTiDE AutoDeepNPTS AutoKAN AutoTFT AutoVanillaTransformer AutoInformer
-AutoAutoformer AutoFEDformer AutoPatchTST AutoiTransformer AutoTimeXer
-AutoTimesNet AutoStemGNN AutoHINT AutoTSMixer AutoTSMixerx
-AutoMLPMultivariate AutoSOFTS AutoSOFTSSharp AutoTimeMixer AutoRMoK AutoXLinear
-```
-
-Local extensionsはofficial upstream inventoryと分離します。
-
-| local extension | status |
+| 項目 | contract |
 |---|---|
-| AutoTimeLLM | fail-closed local extension |
-| AutoSCINet | local extension |
-| AutoSegRNN | inactive |
-| AutoFreTS | inactive |
-
-### 5.3 AutoModel共通引数 / project control
-
-| 種別 | 引数 / control | 意味 / projectでの扱い |
-|---|---|---|
-| forecast | `h` | forecast horizon |
-| loss | `loss`, `valid_loss` | train / validation objective |
-| search space | `config` | model固有default HPO spaceまたはcustom config |
-| backend | `backend` | `ray` / `optuna` |
-| search | `search_alg` / project search strategy | auto / random / TPE系、backend整合性をfail-closed検証 |
-| budget | `num_samples` | HPO trial数 |
-| resource | `cpus`, `gpus` | Ray利用時のtrial resource。repositoryはtrial並列/resource planも管理 |
-| reproducibility | `random_seed` / CLI seed | outer experiment seedとして固定。HPO dimensionへ勝手に変換しない |
-| precision | project `precision` control | actual training configへ伝播。明示model configを優先 |
-| refit | `refit_with_val` | best model refit policy |
-| observability | `callbacks`, `verbose` | runtime/training evidenceとartifact保存へ接続 |
-
-2026-08-12までのmerged実装では、official per-model default search spaceを維持したまま固定experiment controlをoverlayし、seed/precisionの伝播、multiseries `n_series`、early stop、GPU training/pre-save/reload evidenceをfail-closedで扱うよう修正済みです。
+| primary metric | **Hit@±1** |
+| secondary | MAE / MSE / RMSE / position-wise Hit@±1 / all-position Hit@±1 |
+| baselines | Random / fixed / mean / median / recent / frequency / statistical |
+| split | chronological Train / Validation / Holdout / Prospective |
+| preprocessing / HPO | Train内だけでfit |
+| seeds | 全設定seed。平均・分散・worstを保存 |
+| prediction lock | actual判明前にSHA-256 + timestampで固定 |
+| Holdout | explicit authorizationのみ |
+| Prospective | sealed future predictionをactual到着後に評価 |
+| promotion | human approval。自動promotionは禁止 |
 
 ---
 
-## 6. StatsForecast / MLForecast
+## 6. TSFMの読み方
 
-### StatsForecast
+Retained auditでは21 identities中 **19 runtime CERTIFIED / 2 BLOCKED** です。
 
-Broad inventoryは **41**。通常shared IDsは意図的に狭く、次の8です。
+ただし、これは次を意味しません。
 
-```text
-stats-naive
-stats-historic-average
-stats-autoarima
-stats-autoets
-stats-autotheta
-stats-autoces
-stats-croston
-stats-tsb
-```
+- 19件すべてshared routeから選択可能
+- 19件すべてlottery-domain compatible
+- 19件すべてOOF evaluated
+- 19件すべて精度優位
 
-`Croston` / `TSB` は通常position-seriesと同一視せずcandidate-series semanticsを持ちます。
+例として Kronos Base はruntime evidenceを持ちますがnative domainはfinancial OHLCVで、lottery compatibilityはfalseです。Moirai 1.0 Baseはweights不足、T0 Alphaはgated accessでBLOCKEDです。
 
-最近のmerged履歴では、runtime lifecycle certification、property lifecycle certification、real-game development evaluation Phase Cが追加されています。これは**科学評価の実行面が実装・検証された**という意味であり、41モデル×6ゲームの全完走を意味しません。
-
-### MLForecast
-
-Broad AutoML inventory 8:
-
-```text
-AutoLightGBM AutoXGBoost AutoCatboost AutoLinearRegression
-AutoRidge AutoLasso AutoElasticNet AutoRandomForest
-```
-
-現在のdirect shared paths:
-
-```text
-mlforecast-ridge
-mlforecast-lightgbm
-```
-
-8件のAuto inventoryを「8 shared workers」と誤記しないでください。
-
----
-
-## 7. AutoGluon TimeSeries — umbrellaから37 implementationsへ
-
-Pinned source targetは `autogluon.timeseries==1.5.0`。
-
-### 29 source model aliases
-
-```text
-ADIDA ARIMA AutoARIMA AutoCES AutoETS Average Croston DLinear DeepAR
-DirectTabular DynamicOptimizedTheta ETS IMAPA Chronos Chronos2 NPTS Naive
-PatchTST PerStepTabular RecursiveTabular SeasonalAverage SeasonalNaive
-SimpleFeedForward TemporalFusionTransformer Theta TiDE Toto WaveNet Zero
-```
-
-### 8 unique ensemble classes
-
-```text
-Greedy PerItemGreedy PerformanceWeighted SimpleAverage Median Tabular
-PerQuantileTabular LinearStacker
-```
-
-`Weighted` は `GreedyEnsemble` aliasなのでunique classの分母へ重複加算しません。
-
-Expanded v2はsource-backed identityを作りますが、新identityのdefaultは `runtime_status=NOT_RUN`, `runtime_certified=False` です。source declarationとruntime certificationを分離しています。
-
----
-
-## 8. TSFM / foundation model runtime reality
-
-Current retained runtime auditは21 identitiesを判定し、**19 CERTIFIED / 2 BLOCKED / 0 pending**です。これはruntime evidenceであってaccuracy/OOF evidenceではありません。
-
-| audit identity | runtime | shared/provider relationshipの要点 |
-|---|---|---|
-| chronos-2 | CERTIFIED | shared exact ID / ChronosProvider |
-| chronos-bolt-tiny | CERTIFIED | shared exact ID / ChronosProvider |
-| chronos-t5-small | CERTIFIED | shared exact ID / ChronosProvider |
-| chronos-t5-base | CERTIFIED | exact shared ModelSpecなし |
-| granite-flowstate-r1 | CERTIFIED | exact shared ModelSpecなし |
-| granite-patchtsmixer | CERTIFIED | exact shared ModelSpecなし |
-| granite-patchtst | CERTIFIED | exact shared ModelSpecなし |
-| granite-ttm-r2 | CERTIFIED | shared `granite-ttm`とはidentity差あり |
-| kronos-base | CERTIFIED | native financial OHLCV contract、lottery compatibility=false |
-| lag-llama | CERTIFIED | exact shared ModelSpecなし |
-| moirai-1.0-base | **BLOCKED** | model weights missing / personal-noncommercial scope |
-| moirai-2.0-small | CERTIFIED | shared `moirai`とidentity差あり、lottery compatibility=false |
-| moment-1-large | CERTIFIED | forecast head scope要確認 |
-| moment-1-small | CERTIFIED | forecast head scope要確認 |
-| sundial-base | CERTIFIED | shared `sundial`とidentity差あり |
-| t0-alpha | **BLOCKED** | gated access required |
-| tabpfn-ts | CERTIFIED | shared exact ID、candidate/foundation-tabular path |
-| timesfm-2.5-transformers | CERTIFIED | shared `timesfm-2.5`とidentity/package差あり |
-| tirex-2 | CERTIFIED | shared `tirex`とlogical ID差あり |
-| toto-2.0-4m | CERTIFIED | exact shared registry entryなし |
-| toto-open-base | CERTIFIED | exact shared registry entryなし |
-
-Shared provider registryは21件より狭く、Chronos family / Sundial / TimesFM / Granite TTM / TiRex / Moirai / TabPFN-TSを中心に持ちます。provider不明はfail-closedです。
-
-### Toto 2.0 22M current boundary
-
-PR #296で `Datadog/Toto-2.0-22m` pinned snapshot、CUDA load/inference/replay、seed/precision/evidence infrastructureがmergeされました。ただし正式native-Linux gateは未完です。
+Toto 2.0 22Mも現時点では次を維持します。
 
 ```text
 runtime_certified=false
@@ -266,201 +181,61 @@ Prospective=CLOSED
 automatic promotion=FORBIDDEN
 ```
 
-したがって「22M runtime certified / shared selectable」とは記載しません。
+個別21 identityは[TSFM対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#11-tsfm--foundation-models--21-runtime-audit-identities)を参照してください。
 
 ---
 
-## 9. その他のframework lane
-
-| framework | 実装されている主なもの | 現在の注意点 |
-|---|---|---|
-| Darts | RegressionEnsembleModel over NaiveDrift + ExponentialSmoothing | framework全model自動展開ではない |
-| GluonTS | Torch DeepAR + Student-T | current shared trainerはCPU-pinned。CUDA-certifiedとしない |
-| ReservoirPy | Reservoir + Ridge ESN | position-wise lane |
-| HierarchicalForecast | BottomUp/TopDown/MiddleOut/MinTrace/OptimalCombination/ERM等10 | reconciliationはstandalone forecasterではない |
-| Time-Series-Library | DLinear/TSMixer/LightTS/SegRNN/FreTS/SCINet/TimeFilter/TiDE/FiLM | isolated campaign。upstream全architecture certificationではない |
-| BasicTS | provider/config/dataset/runtime smoke contracts | isolated provider surface |
-| sktime | rolling-origin campaign/lifecycle machinery | target runtime campaign pending |
-| Merlion | ARIMA/ETS/MSES provider/certification path | target-host completion pending |
-
----
-
-## 10. 全体機能マップ
-
-| 機能 | 実装面 | status / notes |
-|---|---|---|
-| Canonical game geometry | `loto3 games`, game contracts | **VERIFIED** |
-| Data acquisition / raw preservation | `loto data acquire` / acquisition modules | **VERIFIED / PARTIALLY_VERIFIED** per source |
-| Broad catalog | `loto3 catalog`, `catalog_full.py` | **VERIFIED**, 174 frozen |
-| Shared catalog | `loto models list`, `catalog.py` | **VERIFIED**, broadより狭い |
-| Expanded implementation identities | `implementation_catalog.py` | **VERIFIED**, Phase1=210 |
-| Model×game planning | `loto3 campaign --plan-only` | **VERIFIED** |
-| Resource-aware scheduling | live resource plan / GPU lease / process cleanup | **VERIFIED** via #270/#277 |
-| NeuralForecast HPO | `loto neuralforecast automodel-run` | **VERIFIED / PARTIALLY_VERIFIED** |
-| StatsForecast lifecycle | dedicated runtime/property/dev evaluation | **VERIFIED / PARTIALLY_VERIFIED** |
-| Runtime certification | exact identity/load/inference/device/VRAM/shape/finite checks | framework/model scope dependent |
-| Search-space persistence | DB-backed NF artifacts | **VERIFIED** |
-| Experiment/run registry | registry APIs / run evidence | **VERIFIED / PARTIALLY_VERIFIED** |
-| MLflow-compatible experiment tracking | params/metrics/artifacts integration surfaces | **PARTIALLY_VERIFIED** by execution lane |
-| Prediction sealing | sealing/prediction lock modules | **VERIFIED as capability**; prospective use remains gated |
-| Hit@±1-first evaluation | evaluation modules | **VERIFIED as metric/protocol capability** |
-| MAE/MSE/RMSE | evaluation modules | **VERIFIED** |
-| Mandatory baselines | random/fixed/mean/median/recent/frequency/statistical lanes | campaign/protocol dependent |
-| OOF | chronological development evaluation surfaces | **PARTIALLY_VERIFIED**; all-model campaign incomplete |
-| Holdout | policy gate | **CLOSED** |
-| Prospective | sealed future evaluation gate | **CLOSED** |
-| Promotion governance | approval/promotion subjects/status taxonomy | **VERIFIED as governance foundation**, auto-promotion forbidden |
-| GitHub Operations Dashboard | Actions/Projects/observability docs | **VERIFIED** |
-| Visual dashboard / Pages build gate | generated dashboard artifacts | **VERIFIED** |
-| Windows portability | Windows CI / portability work | **BLOCKED** by known NTFS-invalid path issue in current program state |
-
----
-
-## 11. 科学評価の正しい順序
-
-```text
-immutable raw data
-  -> data/geometry/leakage validation
-  -> time-ordered Train / Validation / Holdout / Prospective
-  -> Train-only fit of scaler/encoder/feature selection/HPO
-  -> chronological OOF with all configured seeds
-  -> mandatory baselines
-  -> Hit@±1 first + MAE/MSE/RMSE + position metrics
-  -> prediction hash/seal before actual is known
-  -> runtime/license eligibility
-  -> explicit Holdout authorization
-  -> explicit Prospective authorization
-  -> human promotion approval
-```
-
-最良seedだけを抜き出して採用せず、複数seedの平均・分散・worst caseを保存します。
-
----
-
-## 12. 直近の実装履歴 — fact-checkした主なmerged changes
-
-| PR | merged change | README上の解釈 |
-|---:|---|---|
-| #252 | geometry-general metrics / hard-code gate | 6-game geometryへ評価を一般化 |
-| #253 | theory-aware Hit@±1 promotion foundation | 理論基準をpromotion evidenceへ接続 |
-| #254 | MDE / power planning | 科学評価前の検出力設計 |
-| #255 | README/docs capability rewrite | 旧文書の大幅整備 |
-| #257 | StatsForecast runtime lifecycle certification | lifecycle実行面を実装 |
-| #258 | StatsForecast property lifecycle certification | property evidence追加 |
-| #259 | StatsForecast real-game development evaluation Phase C | 実ゲームdevelopment lane追加 |
-| #260 | NeuralForecast parameter propagation + training evidence | seed/precision/search-space/GPU evidence修正 |
-| #261 | NeuralForecast parameter-effect audit planning | OFAT型effect audit計画を実装 |
-| #268 | statistical + causal analysis foundation | Holdout/Prospectiveを使わない分析基盤 |
-| #270 | runtime audit serialization + resource-aware broad runner | broad campaign execution control強化 |
-| #273 | repository observability + structured work intake | GitHub上の状態可視化 |
-| #274 | evidence-aware visual dashboard + Pages gate | 証拠ベースdashboard |
-| #276 | GitHub operations control center | 最初に見るOperations Dashboard |
-| #277 | resource-aware scheduler stabilization | GPU lease/resume/cleanup/worker cap安定化 |
-| #293 | Expanded v2 inventory + AutoGluon expansion | Broad v1凍結のまま210へ展開 |
-| #295 | Toto2 family manifest / provenance gate | source identityとprovenanceをfail-closed化 |
-| #298 | unintended Toto 22M probe revert | 意図しないprobeをmainから除去 |
-| #296 | Toto2 22M pinned CUDA replay infrastructure | native-Linux formal certification前の部分証拠。shared routing未解禁 |
-
-**履歴にPRがあること自体を実装済み証拠にはしません。** current `main` にコードが残っているか、merge済みか、必要なtests/evidenceがあるかを合わせて判定します。
-
----
-
-## 13. まだ完了していない主要作業
-
-1. Broad v1 **174 × 6 = 1044** unitのruntime-remediation込み完走。
-2. Unified v1 **250 × 6 = 1500** unitのcoverage実行・結果集約。
-3. Expanded v2のAutoGluon以外（Darts / GluonTS / sktime/skforecast / Time-Series-Library / BasicTS等）のsource-backed展開とruntime campaign。
-4. NeuralForecast AutoModels 36を同一条件で全ゲームruntime認証し、GPU/CPU fallbackを明示。
-5. development OOFをHit@±1最優先で完了し、Random/固定値/平均/中央値/直近値/頻度/統計baselineと比較。
-6. Toto 2.0 22Mのnative-Linux external GPU PID/VRAM/release gateを完了するまで `runtime_certified=false` を維持。
-7. Windows portability blockerの解消。
-8. Holdout / Prospectiveはdevelopment evidenceと明示承認が揃うまで閉じたまま維持。
-
----
-
-## 14. よく使う入口
+## 7. よく使うコマンド
 
 ```bash
 # 6ゲームgeometry
 uv run loto3 games
 
-# Broad 174 inventory
+# Broad v1 inventory / counts
 uv run loto3 catalog --counts
+uv run loto3 catalog
 
-# Shared executable surface
+# shared ModelSpec surface
 uv run loto models list
 
-# model×game plan only
+# model × game plan only
 uv run loto3 campaign --output unused --plan-only
 
 # NeuralForecast AutoModels
 uv run loto neuralforecast automodel-run --help
 
-# Probabilistic catalog/backend
+# probabilistic platform
 uv run loto3 probabilistic catalog-list
 uv run loto3 probabilistic backends
 
-# TSFM pinned revisions
+# TSFM revisions
 uv run loto3 revisions --help
 
-# Data acquisition
+# data acquisition
 uv run loto data acquire --help
 ```
 
 ---
 
-## 15. 正本 / 詳細資料
+## 8. Source of truth
 
-実装状態の判定はMarkdown単独ではなく、次の順に確認してください。
+実装状態はMarkdown単独で判定しません。優先順は次です。
 
-1. **current code**
+1. current code
    - `src/loto/models/catalog_full.py`
    - `src/loto/models/catalog.py`
    - `src/loto/models/implementation_catalog.py`
    - `src/loto/models/providers.py`
-   - framework-specific `*_campaign` / `neuralforecast` / `statsforecast` modules
-2. **tests / workflows / retained artifacts**
-3. **merged PR / commit history**
-4. **live project state**
+   - framework-specific campaign / provider modules
+2. tests / workflows / retained runtime artifacts
+3. merged PR / commit history
+4. live Linear project state
 5. documentation
 
 詳細資料:
 
+- **[`docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md`](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md)**
 - [`docs/CAPABILITIES_AND_OPERATIONS.md`](docs/CAPABILITIES_AND_OPERATIONS.md)
 - [`docs/TSFM_RUNTIME_CAPABILITIES.md`](docs/TSFM_RUNTIME_CAPABILITIES.md)
-- [`docs/operations/`](docs/operations/)
-- [`docs/observability_expansion/`](docs/observability_expansion/)
 - [`docs/evaluation/`](docs/evaluation/)
-
-Upstream references:
-
-- NeuralForecast: https://nixtlaverse.nixtla.io/neuralforecast/
-- StatsForecast: https://nixtlaverse.nixtla.io/statsforecast/
-- MLForecast: https://nixtlaverse.nixtla.io/mlforecast/
-- HierarchicalForecast: https://nixtlaverse.nixtla.io/hierarchicalforecast/
-- Ray Tune: https://docs.ray.io/en/latest/tune/
-- Optuna: https://optuna.readthedocs.io/
-- MLflow: https://mlflow.org/docs/latest/
-
----
-
-## 16. 読み方の原則
-
-このrepositoryでは次を常に分けます。
-
-```text
-source-declared
-catalog-registered
-shared-routable
-provider-routable
-load-verified
-inference-verified
-runtime-certified
-lottery-compatible
-OOF-evaluated
-Holdout-evaluated
-Prospective-evaluated
-promotion-eligible
-```
-
-上の段階を飛ばして、下の段階をREADMEやdashboardで主張しないことが基本ルールです。
+- [`docs/operations/`](docs/operations/)
