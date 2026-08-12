@@ -89,22 +89,37 @@ TOTO2_22M = Toto2VariantManifest(
     model_revision="3affccf372ff82f5d200ac76fad3dbcdeb64299a",
     source_revision=SOURCE_REVISION,
     model_class=MODEL_CLASS,
-    model_parameter_count=None,
-    model_parameter_count_label="21.9M (official Hub metadata)",
-    model_parameter_count_verified=False,
+    model_parameter_count=21_915_584,
+    model_parameter_count_label="21,915,584",
+    model_parameter_count_verified=True,
     model_license=MODEL_LICENSE,
     toto_models_version=TOTO_MODELS_VERSION,
     toto_2_version=TOTO_2_VERSION,
     native_quantile_levels=NATIVE_QUANTILE_LEVELS,
     artifacts=(
         Toto2ArtifactPin(
+            name=".gitattributes",
+            sha256="11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+            size_bytes=1_519,
+        ),
+        Toto2ArtifactPin(
+            name="README.md",
+            sha256="ec40d6b5978fe1ed22e92abe5f9033b5147fc474209dc245df3b4fb8d4dfbf4c",
+            size_bytes=352,
+        ),
+        Toto2ArtifactPin(
+            name="config.json",
+            sha256="abeaf0fcd54aaac66757fde69ec3ddb4d3bfdcf96e0c8f767aefd03ab4c9e8d9",
+            size_bytes=593,
+        ),
+        Toto2ArtifactPin(
             name="model.safetensors",
             sha256="9cd503d82df3aa71747862688f47a31c1d0a4b80f898df6e046189016eaa21dd",
             size_bytes=87_669_368,
         ),
     ),
-    snapshot_validation_ready=False,
-    runtime_scope="PROVENANCE_ONLY",
+    snapshot_validation_ready=True,
+    runtime_scope="ISOLATED_PROVIDER_ONLY",
 )
 
 TOTO2_VARIANTS: Mapping[str, Toto2VariantManifest] = MappingProxyType(

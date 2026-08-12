@@ -36,14 +36,8 @@ def identity_payload(model_id: str) -> dict[str, object]:
     }
 
 
-def test_family_contract_accepts_reviewed_4m_and_22m_identity() -> None:
-    for model_id in (TOTO2_4M.model_id, TOTO2_22M.model_id):
-        request = Toto2FamilyProviderRequest.model_validate(identity_payload(model_id))
-        assert request.model_id == model_id
-
-
-def test_22m_predict_fails_closed_until_snapshot_validation_is_ready() -> None:
-    payload = identity_payload(TOTO2_22M.model_id)
+def predict_payload(model_id: str) -> dict[str, object]:
+    payload = identity_payload(model_id)
     payload.update(
         {
             "operation": "predict",
@@ -51,8 +45,26 @@ def test_22m_predict_fails_closed_until_snapshot_validation_is_ready() -> None:
             "history": [{"p1": 1.0, "p2": 2.0, "p3": 3.0}],
         }
     )
-    with pytest.raises(ValidationError, match="complete snapshot validation"):
-        Toto2FamilyProviderRequest.model_validate(payload)
+    return payload
+
+
+def test_family_contract_accepts_reviewed_4m_and_22m_identity() -> None:
+    for model_id in (TOTO2_4M.model_id, TOTO2_22M.model_id):
+        request = Toto2FamilyProviderRequest.model_validate(identity_payload(model_id))
+        assert request.model_id == model_id
+
+
+def test_22m_predict_stays_blocked_after_snapshot_verification() -> None:
+    assert TOTO2_22M.snapshot_validation_ready is True
+    assert TOTO2_22M.runtime_certified is False
+    with pytest.raises(ValidationError, match="formal runtime certification"):
+        Toto2FamilyProviderRequest.model_validate(predict_payload(TOTO2_22M.model_id))
+
+
+def test_family_predict_requires_formal_runtime_certification_for_every_variant() -> None:
+    assert TOTO2_4M.runtime_certified is False
+    with pytest.raises(ValidationError, match="formal runtime certification"):
+        Toto2FamilyProviderRequest.model_validate(predict_payload(TOTO2_4M.model_id))
 
 
 def test_family_contract_rejects_cross_variant_repo_identity() -> None:
@@ -69,15 +81,15 @@ def test_family_contract_rejects_unreviewed_variant() -> None:
         Toto2FamilyProviderRequest.model_validate(payload)
 
 
-def test_family_response_records_fail_closed_variant_state() -> None:
+def test_family_response_separates_snapshot_and_runtime_state() -> None:
     state = Toto2VariantContractState.from_model_id(TOTO2_22M.model_id)
     response = Toto2FamilyProviderResponse(
         status="BLOCKED",
-        phase="provenance",
-        message="complete snapshot validation is not ready",
+        phase="runtime_certification",
+        message="formal runtime certification is blocked by WSL NVML process visibility",
         variant_state=state,
     )
 
     assert response.variant_state.model_id == TOTO2_22M.model_id
-    assert response.variant_state.snapshot_validation_ready is False
+    assert response.variant_state.snapshot_validation_ready is True
     assert response.variant_state.runtime_certified is False
