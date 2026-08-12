@@ -110,10 +110,7 @@ def test_exact_runtime_evidence_updates_only_matching_cell(tmp_path: Path) -> No
         evidence,
     )
 
-    cells = {
-        (cell["model_id"], cell["game"]): cell
-        for cell in payload["cells"]
-    }
+    cells = {(cell["model_id"], cell["game"]): cell for cell in payload["cells"]}
     assert cells[("model-a", "numbers3")]["status"] == "RUNTIME_CERTIFIED"
     assert cells[("model-a", "numbers4")]["status"] == "UNASSESSED"
     assert payload["status_counts"] == {
@@ -171,8 +168,6 @@ def test_cross_product_mismatch_fails_closed() -> None:
 
 def test_client_avoids_dynamic_inner_html() -> None:
     root = Path(__file__).resolve().parents[1]
-    javascript = (root / "github-dashboard" / "assets" / "app.js").read_text(
-        encoding="utf-8"
-    )
+    javascript = (root / "github-dashboard" / "assets" / "app.js").read_text(encoding="utf-8")
     assert ".innerHTML" not in javascript
     assert ".textContent" in javascript
