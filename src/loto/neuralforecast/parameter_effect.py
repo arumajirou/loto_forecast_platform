@@ -45,7 +45,7 @@ def resolve_overlay_auto_model_plan(
     ``AutoModelRequest.config`` is intentionally not reused here because that
     field means a complete fixed model config in the regular campaign path.
     Parameter-effect experiments instead start from the dependency-provided
-    default search space and overlay only the requested parameter values.
+    default search space and overlay only the requested values.
     """
 
     if request.config:
