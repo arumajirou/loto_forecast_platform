@@ -91,8 +91,8 @@ def validate_model(model: Any) -> dict[str, Any]:
 
 
 def run_probe(args: argparse.Namespace) -> dict[str, Any]:
-    from huggingface_hub import snapshot_download
     import torch
+    from huggingface_hub import snapshot_download
     from toto2 import Toto2Model
 
     versions = require_runtime_versions(torch)
