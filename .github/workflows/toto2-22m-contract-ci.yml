@@ -70,6 +70,7 @@ jobs:
           uv pip install \
             --quiet \
             --python "$venv/bin/python" \
+            "numpy>=2,<3" \
             "pydantic==2.13.4" \
             "pytest==9.1.1" \
             "ruff==0.16.1"
