@@ -45,7 +45,7 @@ def resolve_overlay_auto_model_plan(
     ``AutoModelRequest.config`` is intentionally not reused here because that
     field means a complete fixed model config in the regular campaign path.
     Parameter-effect experiments instead start from the dependency-provided
-    default search space and overlay only the requested values.
+    default search space and overlay only the requested parameter values.
     """
 
     if request.config:
@@ -58,8 +58,7 @@ def resolve_overlay_auto_model_plan(
     constructor_only = sorted(_CONSTRUCTOR_ONLY_KEYS.intersection(frozen))
     if constructor_only:
         raise ValueError(
-            "constructor-only parameters must be supplied on AutoModelRequest: "
-            f"{constructor_only}"
+            f"constructor-only parameters must be supplied on AutoModelRequest: {constructor_only}"
         )
     unsupported = sorted(_UNSUPPORTED_KEYS.intersection(frozen))
     if unsupported:
