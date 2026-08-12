@@ -58,8 +58,7 @@ def resolve_overlay_auto_model_plan(
     constructor_only = sorted(_CONSTRUCTOR_ONLY_KEYS.intersection(frozen))
     if constructor_only:
         raise ValueError(
-            "constructor-only parameters must be supplied on AutoModelRequest: "
-            f"{constructor_only}"
+            f"constructor-only parameters must be supplied on AutoModelRequest: {constructor_only}"
         )
     unsupported = sorted(_UNSUPPORTED_KEYS.intersection(frozen))
     if unsupported:
