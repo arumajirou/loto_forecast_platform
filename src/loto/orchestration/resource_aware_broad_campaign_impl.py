@@ -29,8 +29,7 @@ from loto.orchestration.resource_scheduler import (
 ROOT = Path(__file__).resolve().parents[3]
 TASK_FINGERPRINT_VERSION = "resource-aware-broad-task-v2"
 MATRIX_PLAN_NOTE = (
-    "model-game pairs are execution units; "
-    + "catalog identity count is not the pair count"
+    "model-game pairs are execution units; " + "catalog identity count is not the pair count"
 )
 
 __all__ = [
