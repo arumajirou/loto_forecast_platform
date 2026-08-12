@@ -116,6 +116,20 @@ def parse_nvidia_compute_apps(text: str, *, pid: int) -> list[GpuProcessEvidence
     return matches
 
 
+def parse_nvidia_compute_app_pids(text: str) -> set[int]:
+    pids: set[int] = set()
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        first_field = line.split(",", maxsplit=1)[0].strip()
+        try:
+            pids.add(int(first_field))
+        except ValueError:
+            continue
+    return pids
+
+
 def _run_nvidia_smi(arguments: list[str]) -> str:
     completed = subprocess.run(
         ["nvidia-smi", *arguments],
@@ -129,14 +143,17 @@ def _run_nvidia_smi(arguments: list[str]) -> str:
     return completed.stdout
 
 
-def capture_gpu_process(pid: int) -> GpuProcessEvidence:
-    text = _run_nvidia_smi(
+def query_gpu_compute_apps() -> str:
+    return _run_nvidia_smi(
         [
             "--query-compute-apps=pid,gpu_uuid,used_gpu_memory",
             "--format=csv,noheader,nounits",
         ]
     )
-    matches = parse_nvidia_compute_apps(text, pid=pid)
+
+
+def capture_gpu_process(pid: int) -> GpuProcessEvidence:
+    matches = parse_nvidia_compute_apps(query_gpu_compute_apps(), pid=pid)
     if len(matches) != 1:
         raise VariantProbeError(
             f"expected exactly one positive-VRAM GPU record for pid {pid}, observed {len(matches)}"
