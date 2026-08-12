@@ -1,0 +1,105 @@
+name: Scientific evaluation / OOF
+
+description: Track leakage-safe development or OOF evaluation under the canonical metric/baseline protocol.
+title: "[evaluation] "
+labels:
+  - validation
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for development/OOF scientific evaluation. Runtime certification and scientific quality are separate gates.
+
+  - type: input
+    id: candidate
+    attributes:
+      label: Candidate identity
+      description: Model/provider/ensemble identity being evaluated.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options:
+        - mini
+        - loto6
+        - loto7
+        - bingo5
+        - numbers3
+        - numbers4
+    validations:
+      required: true
+
+  - type: textarea
+    id: data
+    attributes:
+      label: Immutable data snapshot
+      description: Source identity, row/draw range, data SHA-256, duplicate/missing/order/future-information checks.
+    validations:
+      required: true
+
+  - type: textarea
+    id: protocol
+    attributes:
+      label: Evaluation protocol
+      description: Train/Validation/OOF split, protocol hash, seeds, resource budget, post-processing and prediction-lock policy.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: metrics
+    attributes:
+      label: Required metrics
+      options:
+        - label: Hit@±1 is the primary metric.
+          required: true
+        - label: Position Hit@±1 and all-position Hit@±1 are retained.
+          required: true
+        - label: MAE, MSE and RMSE are retained.
+          required: true
+        - label: All configured seeds are retained with mean, variance and worst values.
+          required: true
+
+  - type: checkboxes
+    id: baselines
+    attributes:
+      label: Required baselines
+      options:
+        - label: Random
+          required: true
+        - label: Fixed value
+          required: true
+        - label: Mean
+          required: true
+        - label: Median
+          required: true
+        - label: Last value
+          required: true
+        - label: Frequency
+          required: true
+        - label: Statistical baseline
+          required: true
+
+  - type: textarea
+    id: prediction_lock
+    attributes:
+      label: Prediction sealing evidence
+      description: State how prediction write/fsync/SHA-256 occurs before matching actuals are read.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: gates
+    attributes:
+      label: Formal gate boundary
+      options:
+        - label: Holdout is not opened by this issue unless explicitly authorized in scope.
+          required: true
+        - label: Prospective is not opened by this issue unless explicitly authorized in scope.
+          required: true
+        - label: Best-seed-only adoption is forbidden.
+          required: true
+        - label: A valid result may be NO_MODEL_BEATS_BASELINE with no champion.
+          required: true
