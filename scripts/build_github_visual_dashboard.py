@@ -17,6 +17,7 @@ ALLOWED_RUNTIME_STATUSES = {
     "UNSUPPORTED",
     "NON_ROUTABLE",
 }
+SUPPORTED_OBSERVABILITY_SCHEMA_VERSIONS = {1, 2}
 FORMAL_GATES = {
     "holdout": "CLOSED",
     "prospective": "CLOSED",
@@ -55,8 +56,10 @@ def _required_text(row: dict[str, Any], field: str, context: str) -> str:
 
 
 def _validate_observability(payload: dict[str, Any]) -> None:
-    if payload.get("schema_version") != 1:
-        raise DashboardBuildError("observability schema_version must be 1")
+    version = payload.get("schema_version")
+    if version not in SUPPORTED_OBSERVABILITY_SCHEMA_VERSIONS:
+        supported = ", ".join(str(item) for item in sorted(SUPPORTED_OBSERVABILITY_SCHEMA_VERSIONS))
+        raise DashboardBuildError(f"observability schema_version must be one of: {supported}")
     _required_text(payload, "repository", "observability")
     _required_text(payload, "main_sha", "observability")
     _require_list(payload.get("open_issues"), "observability.open_issues")
@@ -209,57 +212,44 @@ def _copy_site_assets(source_dir: Path, output_dir: Path) -> None:
             raise DashboardBuildError(f"missing dashboard asset: {source}")
         destination = output_dir / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(source, destination)
+        shutil.copy2(source, destination)
 
 
-def _write_json(path: Path, payload: dict[str, Any]) -> None:
+def _write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
     )
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--observability-json", required=True, type=Path)
-    parser.add_argument("--identity-summary-json", required=True, type=Path)
-    parser.add_argument("--unified-catalog-json", required=True, type=Path)
-    parser.add_argument("--runtime-evidence-json", type=Path)
-    parser.add_argument("--site-source", type=Path, default=Path("github-dashboard"))
-    parser.add_argument("--output-dir", required=True, type=Path)
-    return parser
-
-
 def main() -> int:
-    args = build_parser().parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--observability-json", type=Path, required=True)
+    parser.add_argument("--identity-summary-json", type=Path, required=True)
+    parser.add_argument("--unified-catalog-json", type=Path, required=True)
+    parser.add_argument("--runtime-evidence-json", type=Path)
+    parser.add_argument("--source-dir", type=Path, default=Path("github-dashboard"))
+    parser.add_argument("--output-dir", type=Path, required=True)
+    args = parser.parse_args()
+
+    observability = _require_mapping(_load_json(args.observability_json), "observability")
+    identity_summary = _require_mapping(_load_json(args.identity_summary_json), "identity summary")
+    unified_catalog = _require_list(_load_json(args.unified_catalog_json), "unified catalog")
+
     if args.output_dir.exists():
         shutil.rmtree(args.output_dir)
     args.output_dir.mkdir(parents=True)
 
-    observability = _require_mapping(
-        _load_json(args.observability_json),
-        "observability",
-    )
-    identity_summary = _require_mapping(
-        _load_json(args.identity_summary_json),
-        "identity summary",
-    )
-    unified_catalog = _require_list(
-        _load_json(args.unified_catalog_json),
-        "unified catalog",
-    )
     payload = build_dashboard_payload(
         observability,
         identity_summary,
         unified_catalog,
         args.runtime_evidence_json,
     )
-
-    _copy_site_assets(args.site_source, args.output_dir)
+    _copy_site_assets(args.source_dir, args.output_dir)
     _write_json(args.output_dir / "data" / "dashboard.json", payload)
     (args.output_dir / ".nojekyll").write_text("", encoding="utf-8")
-    print(json.dumps(payload["status_counts"], sort_keys=True))
     return 0
 
 
