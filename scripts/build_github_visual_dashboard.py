@@ -59,9 +59,7 @@ def _validate_observability(payload: dict[str, Any]) -> None:
     version = payload.get("schema_version")
     if version not in SUPPORTED_OBSERVABILITY_SCHEMA_VERSIONS:
         supported = ", ".join(str(item) for item in sorted(SUPPORTED_OBSERVABILITY_SCHEMA_VERSIONS))
-        raise DashboardBuildError(
-            f"observability schema_version must be one of: {supported}"
-        )
+        raise DashboardBuildError(f"observability schema_version must be one of: {supported}")
     _required_text(payload, "repository", "observability")
     _required_text(payload, "main_sha", "observability")
     _require_list(payload.get("open_issues"), "observability.open_issues")
@@ -236,9 +234,7 @@ def main() -> int:
     args = parser.parse_args()
 
     observability = _require_mapping(_load_json(args.observability_json), "observability")
-    identity_summary = _require_mapping(
-        _load_json(args.identity_summary_json), "identity summary"
-    )
+    identity_summary = _require_mapping(_load_json(args.identity_summary_json), "identity summary")
     unified_catalog = _require_list(_load_json(args.unified_catalog_json), "unified catalog")
 
     if args.output_dir.exists():
