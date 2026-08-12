@@ -6,7 +6,8 @@
 
 > **Implementation audit base:** `main@abe7e02cdfc900618c83b21c922b4fd3f078b036` (2026-08-12)  
 > **Fact-check sources:** current `main` code / merged PR history / tests / retained runtime artifacts / Linear project state  
-> **Important:** `REGISTERED != RUNTIME_CERTIFIED != OOF_EVALUATED != HOLDOUT_EVALUATED != PROSPECTIVE_EVALUATED != PROMOTION_ELIGIBLE`
+> **Important:** `REGISTERED != RUNTIME_CERTIFIED != OOF_EVALUATED != HOLDOUT_EVALUATED != PROSPECTIVE_EVALUATED != PROMOTION_ELIGIBLE`  
+> 現在のpackage versionはREADMEへ手書きしません。canonical versionは`loto.version.__version__` / installed package metadata / `loto-build-info`を正本とします。
 
 ---
 
@@ -136,8 +137,6 @@ Local extensionsはofficial upstream inventoryと分離します。
 | AutoFreTS | inactive |
 
 ### 5.3 AutoModel共通引数 / project control
-
-NeuralForecast upstream AutoModelsの共通契約と、repository側で実装したcontrolの関係です。
 
 | 種別 | 引数 / control | 意味 / projectでの扱い |
 |---|---|---|
