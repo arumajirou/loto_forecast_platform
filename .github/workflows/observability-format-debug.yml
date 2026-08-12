@@ -1,0 +1,41 @@
+name: temporary / observability Ruff format diff
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  diff:
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          clean: true
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.11.21"
+          enable-cache: false
+
+      - name: Show Ruff format diff
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          diff_file="$RUNNER_TEMP/observability-ruff-format.diff"
+          uvx --from ruff==0.16.1 ruff format --diff \
+            scripts/build_github_observability_summary.py | tee "$diff_file"
+          {
+            echo '## Ruff 0.16.1 format diff'
+            echo
+            echo '```diff'
+            cat "$diff_file"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
