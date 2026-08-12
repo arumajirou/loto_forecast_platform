@@ -631,7 +631,10 @@ def main(argv: list[str] | None = None) -> int:
             "catalog_models": len(models),
             "games": games,
             "model_game_pairs": len(tasks),
-            "note": "model-game pairs are execution units; catalog identity count is not the pair count",
+            "note": (
+                "model-game pairs are execution units; "
+                "catalog identity count is not the pair count"
+            ),
             "tasks": [
                 {
                     "ordinal": task.ordinal,
