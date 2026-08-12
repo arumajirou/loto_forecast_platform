@@ -1,0 +1,314 @@
+name: Toto 2.0 22M runtime probe
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/toto2-22m-runtime-probe.yml
+      - scripts/probe_toto2_22m_runtime.py
+      - src/loto/toto2_campaign/variant_probe.py
+      - tests/toto2_campaign/test_variant_probe.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: toto2-22m-runtime-probe-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    name: Pinned 22M CUDA probe
+    if: ${{ github.actor == github.repository_owner }}
+    runs-on: [self-hosted, Linux, X64, loto-ci, gpu, cuda]
+    timeout-minutes: 90
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.12"
+      PYTHONUNBUFFERED: "1"
+      CUDA_VISIBLE_DEVICES: "0"
+      EVIDENCE_DIR: artifacts/toto2-22m-runtime-probe
+
+    steps:
+      - name: Verify expected self-hosted GPU runner
+        run: |
+          set -Eeuo pipefail
+          echo "runner_name=$RUNNER_NAME"
+          echo "runner_os=$RUNNER_OS"
+          echo "runner_arch=$RUNNER_ARCH"
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          clean: true
+
+      - name: Prepare evidence paths
+        run: |
+          set -Eeuo pipefail
+          mkdir -p "$EVIDENCE_DIR"
+          printf '%s\n' \
+            "repository=${GITHUB_REPOSITORY}" \
+            "ref=${GITHUB_REF}" \
+            "sha=${GITHUB_SHA}" \
+            "runner_name=${RUNNER_NAME}" \
+            "run_id=${GITHUB_RUN_ID}" \
+            "run_attempt=${GITHUB_RUN_ATTEMPT}" \
+            > "$EVIDENCE_DIR/run-context.txt"
+          printf 'RUNTIME_VENV=%s\n' "$RUNNER_TEMP/toto2-22m-venv" >> "$GITHUB_ENV"
+          printf 'HF_CACHE=%s\n' "$RUNNER_TEMP/toto2-22m-hf" >> "$GITHUB_ENV"
+          printf 'UV_CACHE_DIR=%s\n' "$RUNNER_TEMP/toto2-22m-uv-cache" >> "$GITHUB_ENV"
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+
+      - name: Build isolated Python 3.12 runtime
+        run: |
+          set -Eeuo pipefail
+          rm -rf -- "$RUNTIME_VENV" "$HF_CACHE" "$UV_CACHE_DIR"
+          mkdir -p "$HF_CACHE" "$UV_CACHE_DIR"
+          uv python install "$UV_PYTHON"
+          uv venv "$RUNTIME_VENV" --python "$UV_PYTHON"
+          python="$RUNTIME_VENV/bin/python"
+          "$python" --version | tee "$EVIDENCE_DIR/python-version.txt"
+          uv --version | tee "$EVIDENCE_DIR/uv-version.txt"
+
+          uv pip install \
+            --python "$python" \
+            --index-url https://download.pytorch.org/whl/cu130 \
+            "torch==2.13.0" \
+            2>&1 | tee "$EVIDENCE_DIR/install-torch.log"
+
+          uv pip install \
+            --python "$python" \
+            --index-url https://pypi.org/simple \
+            "numpy>=2,<3" \
+            "huggingface-hub>=0.34,<2" \
+            "toto-models==1.0.0" \
+            "toto-2==2.0.0" \
+            "pytest==9.1.1" \
+            "ruff==0.16.1" \
+            2>&1 | tee "$EVIDENCE_DIR/install-runtime.log"
+
+          uv pip check --python "$python" | tee "$EVIDENCE_DIR/pip-check.txt"
+          uv pip freeze --python "$python" > "$EVIDENCE_DIR/pip-freeze.txt"
+
+      - name: Focused quality gates
+        run: |
+          set -Eeuo pipefail
+          python="$RUNTIME_VENV/bin/python"
+          paths=(
+            src/loto/toto2_campaign/variant_probe.py
+            scripts/probe_toto2_22m_runtime.py
+            tests/toto2_campaign/test_variant_probe.py
+          )
+          "$python" -m ruff format --check "${paths[@]}"
+          "$python" -m ruff check "${paths[@]}"
+          "$python" -m compileall -q "${paths[@]}"
+          PYTHONPATH=src "$python" -m pytest -q tests/toto2_campaign/test_variant_probe.py
+
+      - name: CUDA preflight
+        run: |
+          set -Eeuo pipefail
+          python="$RUNTIME_VENV/bin/python"
+          nvidia-smi | tee "$EVIDENCE_DIR/nvidia-smi.txt"
+          PYTHONPATH=src "$python" - <<'PY' | tee "$EVIDENCE_DIR/cuda-preflight.txt"
+          import importlib.metadata
+          from pathlib import Path
+
+          import torch
+
+          osrelease = Path("/proc/sys/kernel/osrelease").read_text(encoding="utf-8").strip()
+          print(f"kernel_osrelease={osrelease}")
+          print(f"torch={torch.__version__}")
+          print(f"torch_cuda={torch.version.cuda}")
+          print(f"cuda_available={torch.cuda.is_available()}")
+          print(f"toto_2={importlib.metadata.version('toto-2')}")
+          print(f"toto_models={importlib.metadata.version('toto-models')}")
+          assert torch.__version__.startswith("2.13.0")
+          assert torch.version.cuda == "13.0"
+          assert torch.cuda.is_available()
+          PY
+
+      - name: Run online pinned probe process 1
+        run: |
+          set -Eeuo pipefail
+          python="$RUNTIME_VENV/bin/python"
+          PYTHONPATH=src "$python" scripts/probe_toto2_22m_runtime.py \
+            --output "$EVIDENCE_DIR/run-1" \
+            --cache-dir "$HF_CACHE" \
+            --seed 1 \
+            2>&1 | tee "$EVIDENCE_DIR/run-1.log"
+
+      - name: Verify process 1 exited
+        run: |
+          set -Eeuo pipefail
+          python="$RUNTIME_VENV/bin/python"
+          "$python" - "$EVIDENCE_DIR/run-1/probe.json" "$EVIDENCE_DIR/release-1.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          probe = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          pid = int(probe["pid"])
+          process_exited = not Path(f"/proc/{pid}").exists()
+          external_pid = bool(probe["device"]["external_gpu_pid_captured"])
+          payload = {
+              "pid": pid,
+              "process_exited": process_exited,
+              "external_gpu_pid_captured": external_pid,
+              "post_exit_gpu_release_certified": False,
+              "certification_blocker": probe["device"]["external_gpu_pid_blocker"],
+          }
+          Path(sys.argv[2]).write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          if not process_exited:
+              raise SystemExit(f"provider process still exists: {pid}")
+          PY
+
+      - name: Run offline replay probe process 2
+        run: |
+          set -Eeuo pipefail
+          python="$RUNTIME_VENV/bin/python"
+          PYTHONPATH=src "$python" scripts/probe_toto2_22m_runtime.py \
+            --output "$EVIDENCE_DIR/run-2" \
+            --cache-dir "$HF_CACHE" \
+            --seed 1 \
+            --local-files-only \
+            2>&1 | tee "$EVIDENCE_DIR/run-2.log"
+
+      - name: Verify process 2 exited
+        run: |
+          set -Eeuo pipefail
+          python="$RUNTIME_VENV/bin/python"
+          "$python" - "$EVIDENCE_DIR/run-2/probe.json" "$EVIDENCE_DIR/release-2.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          probe = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          pid = int(probe["pid"])
+          process_exited = not Path(f"/proc/{pid}").exists()
+          external_pid = bool(probe["device"]["external_gpu_pid_captured"])
+          payload = {
+              "pid": pid,
+              "process_exited": process_exited,
+              "external_gpu_pid_captured": external_pid,
+              "post_exit_gpu_release_certified": False,
+              "certification_blocker": probe["device"]["external_gpu_pid_blocker"],
+          }
+          Path(sys.argv[2]).write_text(
+              json.dumps(payload, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          if not process_exited:
+              raise SystemExit(f"provider process still exists: {pid}")
+          PY
+
+      - name: Verify exact two-process replay
+        run: |
+          set -Eeuo pipefail
+          python="$RUNTIME_VENV/bin/python"
+          "$python" - "$EVIDENCE_DIR" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          import numpy as np
+
+          root = Path(sys.argv[1])
+          first = json.loads((root / "run-1/probe.json").read_text(encoding="utf-8"))
+          second = json.loads((root / "run-2/probe.json").read_text(encoding="utf-8"))
+          release_1 = json.loads((root / "release-1.json").read_text(encoding="utf-8"))
+          release_2 = json.loads((root / "release-2.json").read_text(encoding="utf-8"))
+          output_1 = np.load(root / "run-1/native_output.npy", allow_pickle=False)
+          output_2 = np.load(root / "run-2/native_output.npy", allow_pickle=False)
+
+          allowed_statuses = {"PASS", "PARTIAL_PASS"}
+          assert first["status"] in allowed_statuses
+          assert second["status"] in allowed_statuses
+          assert int(first["pid"]) != int(second["pid"])
+          assert first["snapshot"]["files"] == second["snapshot"]["files"]
+          assert first["model_identity"] == second["model_identity"]
+          assert first["device"]["gpu_uuid"] == second["device"]["gpu_uuid"]
+          assert first["native_output_sha256"] == second["native_output_sha256"]
+          assert np.array_equal(output_1, output_2)
+          assert release_1["process_exited"] is True
+          assert release_2["process_exited"] is True
+
+          blockers = sorted(set(first["certification_blockers"] + second["certification_blockers"]))
+          external_pid = bool(first["device"]["external_gpu_pid_captured"]) and bool(
+              second["device"]["external_gpu_pid_captured"]
+          )
+          status = "PASS" if not blockers and external_pid else "PARTIAL_PASS"
+          certification = {
+              "status": status,
+              "contract": "toto2-22m-runtime-probe-v1",
+              "revision": first["revision"],
+              "snapshot_files": first["snapshot"]["files"],
+              "exact_parameter_count": first["model_identity"]["parameter_count"],
+              "model_class": first["model_identity"]["model_class"],
+              "patch_size": first["model_identity"]["patch_size"],
+              "quantile_levels": first["model_identity"]["quantile_levels"],
+              "gpu_uuid": first["device"]["gpu_uuid"],
+              "process_ids": [first["pid"], second["pid"]],
+              "peak_vram_bytes": [
+                  first["device"]["peak_vram_bytes"],
+                  second["device"]["peak_vram_bytes"],
+              ],
+              "exact_replay": True,
+              "provider_processes_exited": True,
+              "external_gpu_pid_captured": external_pid,
+              "post_exit_gpu_release_certified": False,
+              "snapshot_validation_ready_candidate": True,
+              "formal_runtime_certified": False,
+              "shared_routing_allowed": False,
+              "accuracy_certified": False,
+              "holdout_open": False,
+              "prospective_open": False,
+              "certification_blockers": blockers,
+          }
+          (root / "CERTIFICATION.json").write_text(
+              json.dumps(certification, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(certification, indent=2, sort_keys=True))
+          PY
+
+      - name: Verify tracked files stayed clean
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Upload runtime probe evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.0
+        with:
+          name: toto2-22m-runtime-probe-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/toto2-22m-runtime-probe/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove transient runtime
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          rm -rf -- "$RUNTIME_VENV" "$HF_CACHE" "$UV_CACHE_DIR"

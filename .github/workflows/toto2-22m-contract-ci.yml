@@ -1,0 +1,138 @@
+name: Toto 2.0 22M contract CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/toto2-22m-contract-ci.yml
+      - src/loto/adapters/toto2_family/**
+      - src/loto/toto2_campaign/variant_manifest.py
+      - tests/adapters/toto2_family/**
+      - tests/toto2_campaign/test_variant_manifest.py
+      - docs/toto2/22M_RUNTIME_PROBE_20260812.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: toto2-22m-contract-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Snapshot and fail-closed contract
+    if: ${{ github.actor == github.repository_owner }}
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 20
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
+
+    steps:
+      - name: Verify expected self-hosted runner
+        run: |
+          set -Eeuo pipefail
+          test "$RUNNER_NAME" = "az-loto-gpu"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          clean: true
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: false
+
+      - name: Prepare focused environment
+        run: |
+          set -Eeuo pipefail
+          venv="$RUNNER_TEMP/toto2-22m-contract-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cache="$RUNNER_TEMP/toto2-22m-contract-cache-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf -- "$venv" "$cache"
+          mkdir -p -- "$cache"
+          printf 'FOCUSED_VENV=%s\n' "$venv" >> "$GITHUB_ENV"
+          printf 'UV_CACHE_DIR=%s\n' "$cache" >> "$GITHUB_ENV"
+          uv python install "$UV_PYTHON"
+          UV_CACHE_DIR="$cache" uv venv "$venv" --python "$UV_PYTHON"
+          uv pip install \
+            --quiet \
+            --python "$venv/bin/python" \
+            "numpy>=2,<3" \
+            "pydantic==2.13.4" \
+            "pytest==9.1.1" \
+            "ruff==0.16.1"
+          uv pip check --python "$venv/bin/python"
+
+      - name: Run focused quality and contract tests
+        run: |
+          set -Eeuo pipefail
+          python="$FOCUSED_VENV/bin/python"
+          paths=(
+            src/loto/adapters/toto2_family/__init__.py
+            src/loto/adapters/toto2_family/contracts.py
+            src/loto/toto2_campaign/model_manifest.py
+            src/loto/toto2_campaign/variant_manifest.py
+            tests/adapters/toto2_family/test_contracts.py
+            tests/toto2_campaign/test_variant_manifest.py
+          )
+          "$python" -m ruff format --check "${paths[@]}"
+          "$python" -m ruff check "${paths[@]}"
+          "$python" -m compileall -q "${paths[@]}"
+          PYTHONPATH=src "$python" -m pytest -q \
+            tests/adapters/toto2_family/test_contracts.py \
+            tests/toto2_campaign/test_variant_manifest.py
+
+      - name: Verify promoted 22M state remains fail-closed
+        run: |
+          set -Eeuo pipefail
+          PYTHONPATH=src "$FOCUSED_VENV/bin/python" - <<'PY'
+          from loto.toto2_campaign.variant_manifest import TOTO2_22M
+
+          assert TOTO2_22M.model_parameter_count == 21_915_584
+          assert TOTO2_22M.model_parameter_count_verified is True
+          assert TOTO2_22M.snapshot_validation_ready is True
+          assert TOTO2_22M.runtime_certified is False
+          assert TOTO2_22M.accuracy_certified is False
+          assert TOTO2_22M.lottery_domain_compatibility_certified is False
+          assert len(TOTO2_22M.artifacts) == 4
+          print("TOTO2_22M_SNAPSHOT=VERIFIED")
+          print("TOTO2_22M_RUNTIME=BLOCKED")
+          print("SHARED_ROUTING=FORBIDDEN")
+          PY
+
+      - name: Verify repository stayed clean
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Remove focused environment
+        if: ${{ always() }}
+        run: |
+          set -Eeuo pipefail
+          if [[ -n "${FOCUSED_VENV:-}" ]]; then
+            case "$FOCUSED_VENV" in
+              "$RUNNER_TEMP"/*) rm -rf -- "$FOCUSED_VENV" ;;
+              *) echo "unsafe FOCUSED_VENV=$FOCUSED_VENV" >&2; exit 1 ;;
+            esac
+          fi
+          if [[ -n "${UV_CACHE_DIR:-}" ]]; then
+            case "$UV_CACHE_DIR" in
+              "$RUNNER_TEMP"/*) rm -rf -- "$UV_CACHE_DIR" ;;
+              *) echo "unsafe UV_CACHE_DIR=$UV_CACHE_DIR" >&2; exit 1 ;;
+            esac
+          fi
