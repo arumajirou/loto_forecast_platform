@@ -45,4 +45,17 @@ jobs:
             cat "$diff_file"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          annotation="$(python3 - "$diff_file" "$ruff_rc" <<'PY'
+          from pathlib import Path
+          import sys
+
+          path = Path(sys.argv[1])
+          rc = sys.argv[2]
+          text = path.read_text(encoding="utf-8", errors="replace")
+          message = f"ruff_exit_code={rc}\n{text}"
+          message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+          print(message)
+          PY
+          )"
+          echo "::notice file=scripts/build_github_observability_summary.py,title=Ruff 0.16.1 format diff::$annotation"
           exit 0
