@@ -1,6 +1,16 @@
 name: Toto 2.0 22M native Linux certification
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/toto2-22m-native-linux-cert.yml
+      - scripts/certify_toto2_22m_native_linux.py
+      - scripts/probe_toto2_22m_runtime.py
+      - src/loto/toto2_campaign/variant_probe.py
+      - tests/toto2_campaign/test_native_linux_certification.py
+      - tests/toto2_campaign/test_variant_probe.py
   workflow_dispatch:
 
 permissions:
