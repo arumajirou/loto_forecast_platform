@@ -3,47 +3,52 @@
 ```text
 status_class: LIVE_NAVIGATION_REFERENCE
 repository: arumajirou/loto_forecast_platform
-snapshot_main_sha: 775274cc22cf6701f148da80dfe86cb1bd099a7e
-snapshot_at: 2026-08-12T14:06+09:00
+snapshot_main_sha: c57731e17b43f8f5d9e038c75017aa9ce83fd5e9
+snapshot_at: 2026-08-12T15:51+09:00
 ```
 
-This page is the human entry point for understanding the current state of the repository. Live GitHub state and run artifacts take precedence over this timestamped snapshot.
+This page is the human control center for the repository. Live GitHub refs, Issues, Pull Requests,
+Actions and immutable run artifacts take precedence over this timestamped snapshot.
 
-## 1. Where to look first
+## 1. Start here
 
-| Question | GitHub surface | Link / source |
+| Question | Primary surface | Link / source |
 |---|---|---|
-| What is the overall certification progress? | Projects | [Loto Forecast — Runtime & Model Certification](https://github.com/users/arumajirou/projects/1) |
-| What is currently blocked or planned? | Issues | [Open issues](https://github.com/arumajirou/loto_forecast_platform/issues?q=is%3Aissue%20state%3Aopen) |
+| What is the overall certification progress? | Project | [Loto Forecast — Runtime & Model Certification](https://github.com/users/arumajirou/projects/1) |
+| What is blocked or planned? | Issues | [Open Issues](https://github.com/arumajirou/loto_forecast_platform/issues?q=is%3Aissue+state%3Aopen) |
 | What is running or failing now? | Actions | [Actions](https://github.com/arumajirou/loto_forecast_platform/actions) |
-| What changed in code? | Commits / Insights | [Commits](https://github.com/arumajirou/loto_forecast_platform/commits/main/) / [Insights](https://github.com/arumajirou/loto_forecast_platform/pulse) |
-| What can the platform actually do? | Capability reference | [`docs/CAPABILITIES_AND_OPERATIONS.md`](CAPABILITIES_AND_OPERATIONS.md) |
-| What is the audited scientific boundary? | Status | [`docs/STATUS.md`](STATUS.md) |
-| What runtime campaign is authoritative? | Umbrella issue | [#269](https://github.com/arumajirou/loto_forecast_platform/issues/269) |
-| What are the current scheduler defects? | Stabilization issue | [#271](https://github.com/arumajirou/loto_forecast_platform/issues/271) |
-| Why does native Windows checkout fail? | Portability issue | [#272](https://github.com/arumajirou/loto_forecast_platform/issues/272) |
+| What is the repository-level status summary? | Actions summary | [`00 / repository observability dashboard`](https://github.com/arumajirou/loto_forecast_platform/actions/workflows/github-observability-dashboard.yml) |
+| Can I inspect the visual Model × Game dashboard artifact? | Visual build | [`00 / visual dashboard build`](https://github.com/arumajirou/loto_forecast_platform/actions/workflows/github-visual-dashboard-build.yml) |
+| Why is the visual dashboard not public yet? | Pages activation | [#275](https://github.com/arumajirou/loto_forecast_platform/issues/275) |
+| What runtime campaign is authoritative? | Runtime umbrella | [#269](https://github.com/arumajirou/loto_forecast_platform/issues/269) |
+| What are the scheduler defects? | Stabilization | [#271](https://github.com/arumajirou/loto_forecast_platform/issues/271) |
+| Why does native Windows checkout fail? | Portability | [#272](https://github.com/arumajirou/loto_forecast_platform/issues/272) |
+| What can the platform actually do? | Capability reference | [`CAPABILITIES_AND_OPERATIONS.md`](CAPABILITIES_AND_OPERATIONS.md) |
+| What is the audited scientific boundary? | Scientific status | [`STATUS.md`](STATUS.md) |
 
 ## 2. Current control-plane snapshot
 
-| Item | Current state | Evidence boundary |
+| Item | Snapshot state | Authority |
 |---|---|---|
-| Default branch | `main` | GitHub ref |
-| Main SHA | `775274cc22cf6701f148da80dfe86cb1bd099a7e` | PR #270 merge |
-| Open issues | 8 | live GitHub issue list at snapshot time |
-| Active Actions workflows | 67 | live Actions workflow list at snapshot time |
-| Repository Project | 1 open Project | user Project #1 |
-| GitHub Pages | not configured at snapshot time | repository Pages endpoint returned no site |
-| Broad canonical forecast identities | 174 | live planner/catalog contract |
+| Default branch | `main` | live GitHub ref |
+| Main SHA | `c57731e17b43f8f5d9e038c75017aa9ce83fd5e9` | PR #274 merge |
+| Open Issues | 9 | live GitHub issue search |
+| Actions workflows returned by API | 71 total | live Actions workflow API |
+| Repository Project | Project #1 | GitHub Projects |
+| Visual dashboard build | IMPLEMENTED / VERIFIED | PR #274 + Actions artifacts |
+| GitHub Pages site | BLOCKED / NOT LIVE | Pages endpoint 404; #275 |
+| Broad canonical identities | 174 | live planner/catalog contract |
 | Probabilistic canonical identities | 76 | live planner/registry contract |
 | Unified canonical identities | 250 | collision-free planner contract |
 | Canonical games | 6 | `loto.game.geometry` |
-| Broad matrix upper bound | 1,044 | 174 × 6 |
-| Unified matrix upper bound | 1,500 | 250 × 6 |
+| Broad planning matrix | 1,044 | 174 × 6 |
+| Unified planning matrix | 1,500 | 250 × 6 |
+| Current visual-dashboard cells | 1,500 `UNASSESSED` by default | fail-closed dashboard contract |
 | Holdout | CLOSED | scientific gate |
 | Prospective | CLOSED | scientific gate |
 | Automatic promotion | FORBIDDEN | promotion policy |
 
-Do not interpret a catalog count as a runtime-success count. The capability ladder remains:
+Do not interpret inventory or dashboard cells as runtime-success counts. The capability ladder remains:
 
 ```text
 REGISTERED
@@ -59,74 +64,88 @@ REGISTERED
 -> HUMAN APPROVAL
 ```
 
-## 3. Open work by operational meaning
+## 3. Current work by operational meaning
 
 | Issue | Meaning | Current role |
 |---|---|---|
-| [#262](https://github.com/arumajirou/loto_forecast_platform/issues/262) | Runtime audit remediation umbrella | remains open until post-#270 stabilization is complete |
+| [#262](https://github.com/arumajirou/loto_forecast_platform/issues/262) | Runtime remediation umbrella | remains open until scheduler/runtime stabilization closes |
 | [#269](https://github.com/arumajirou/loto_forecast_platform/issues/269) | All-model execution/certification umbrella | master runtime plan |
 | [#265](https://github.com/arumajirou/loto_forecast_platform/issues/265) | Broad 174 × 6 | 1,044-unit runtime matrix |
 | [#266](https://github.com/arumajirou/loto_forecast_platform/issues/266) | Unified 250 × 6 | 1,500-unit runtime matrix |
-| [#271](https://github.com/arumajirou/loto_forecast_platform/issues/271) | Scheduler stabilization | resume integrity, GPU device assignment, timeout tree cleanup, outer cap |
+| [#271](https://github.com/arumajirou/loto_forecast_platform/issues/271) | Scheduler stabilization | resume integrity, GPU assignment, timeout trees, outer cap |
 | [#272](https://github.com/arumajirou/loto_forecast_platform/issues/272) | Windows portability | remove NTFS-invalid tracked paths |
+| [#275](https://github.com/arumajirou/loto_forecast_platform/issues/275) | GitHub Pages activation | repository setting is the remaining publish gate |
 | [#118](https://github.com/arumajirou/loto_forecast_platform/issues/118) | Timer-S1 | immutable runtime/certification gate |
 | [#239](https://github.com/arumajirou/loto_forecast_platform/issues/239) | Timer Base 84M | leakage-safe OOF evaluation |
 
-Completed weighted scheduler evidence is tracked in closed [#264](https://github.com/arumajirou/loto_forecast_platform/issues/264). The follow-up defects in #271 prevent treating the merged resource-aware foundation as final scheduler certification for every campaign topology.
+Closed #264 contains weighted-scheduler evidence. PR #274 contains the visual-dashboard foundation. Neither
+closes #271/#272 or upgrades runtime/accuracy certification by implication.
 
-## 4. Recommended Project views
+## 4. Visual dashboard status
 
-The Project should expose the same data through several views rather than one overloaded table.
+PR #274 added an evidence-aware static dashboard and a fail-closed build workflow.
 
-1. **00 Executive** — current phase, blockers, completion counts, latest run.
+Verified foundation:
+
+```text
+canonical identities: 250
+canonical games:       6
+planning cells:        1500
+default status:        UNASSESSED
+Holdout:               CLOSED
+Prospective:           CLOSED
+automatic promotion:   FORBIDDEN
+```
+
+The build workflow may create a verified artifact without publishing a public site. Public deployment remains
+blocked until repository Pages is explicitly configured to use **GitHub Actions** as the publishing source.
+Track that activation only in #275. Do not report a Pages URL as live while the Pages endpoint returns 404.
+
+## 5. Recommended Project views
+
+Use one Project with several views rather than one overloaded table:
+
+1. **00 Executive** — phase, blockers, completion counts, latest evidence.
 2. **01 Runtime Certification** — board grouped by runtime status.
-3. **02 Model × Game Matrix** — table grouped by model/library and filtered by game.
-4. **03 Accuracy Leaderboard** — development/OOF metrics only, sorted by Hit@±1 first.
-5. **04 Failures & Blockers** — board grouped by normalized failure class.
-6. **05 GPU / CPU** — resource class, device, peak VRAM/RSS, fallback state.
+3. **02 Model × Game Matrix** — model/library × game work items.
+4. **03 Accuracy Leaderboard** — development/OOF only, Hit@±1 first.
+5. **04 Failures & Blockers** — normalized failure class.
+6. **05 GPU / CPU** — resource class, requested/effective device, VRAM/RSS, fallback.
 7. **06 Roadmap** — inventory → smoke → Broad → Unified → OOF → Holdout → Prospective.
-8. **07 Formal Gates** — Holdout/Prospective/promotion state; development runs must not open these gates.
+8. **07 Formal Gates** — Holdout/Prospective/promotion state.
 
-The exact field definitions are in [`GITHUB_PROJECT_SCHEMA.md`](GITHUB_PROJECT_SCHEMA.md).
+Exact field definitions remain in [`GITHUB_PROJECT_SCHEMA.md`](GITHUB_PROJECT_SCHEMA.md).
 
-## 5. Actions usage rule
+## 6. Actions reading order
 
-The Actions tab currently contains many specialized workflows. Use this hierarchy when reading it:
+The Actions API currently exposes many historical and specialized workflows. Use this hierarchy:
 
-1. `00 / repository observability dashboard` — repository-level navigation/status summary.
-2. `ci` — canonical repository test gate.
-3. named runtime/certification workflows — model/provider-specific evidence.
-4. historical repair/diagnostic workflows — evidence/debug only; do not treat their existence as a current production path.
+1. `00 / repository observability dashboard` — navigation/control-plane summary.
+2. `00 / visual dashboard build` — verified visual artifact and future Pages deployment gate.
+3. `ci` — canonical repository test gate.
+4. named runtime/certification workflows — provider/model evidence.
+5. historical repair/diagnostic workflows — evidence/debug only.
 
-Each new certification/evaluation workflow should publish a concise `$GITHUB_STEP_SUMMARY` containing, where applicable:
+Do not disable workflows merely to make the Actions list shorter. Consolidation requires a separate audit that proves
+whether each workflow is canonical, provider-specific, historical evidence, one-shot repair, or safe to retire.
 
-- Run ID and Git SHA;
-- model ID / revision and game;
-- requested/effective device;
-- load/inference/output shape/finite verdict;
-- GPU PID / peak VRAM or CPU fallback classification;
-- primary Hit@±1 and companion metrics when scientific scoring is authorized;
-- mandatory baseline comparison;
-- prediction-lock SHA-256 state;
-- normalized final status and failure class;
-- Holdout / Prospective / promotion boundary.
-
-## 6. Source-of-truth priority
+## 7. Source-of-truth priority
 
 When information disagrees, use this order:
 
-1. live GitHub ref / issue / PR / Actions state;
+1. live GitHub ref / Issue / PR / Actions / Pages state;
 2. immutable run artifacts and SHA-256 manifests;
 3. current code/config at the exact Git SHA;
-4. generated status/dashboard snapshot;
+4. generated dashboard/status snapshot;
 5. prose documentation.
 
-A dashboard is navigation, not scientific evidence.
+A dashboard is navigation and observability, not scientific evidence.
 
-## 7. Next GitHub UX improvements
+## 8. Immediate GitHub UX priorities
 
-- Consolidate or explicitly classify the 67 active workflows before disabling anything; do not delete evidence workflows merely to reduce visual clutter.
-- Enable GitHub Pages only after a reviewed dashboard publish workflow exists; use it for interactive Model × Game heatmaps and metric/resource plots.
-- Keep Project items at Model × Game / work-item granularity. Keep seed/fold/trial detail in artifacts/registry rather than creating thousands of Project cards.
-- Use Issues for actionable blockers and scientific work, not as a row-per-run database.
-- Use Releases for immutable certification snapshots once a campaign is formally accepted.
+1. Activate Pages only when #275 repository enablement is available; then verify the deployed artifact byte-for-byte.
+2. Classify the 71 returned Actions workflows before retiring any of them.
+3. Keep Project items at Model × Game / actionable-work granularity; retain seed/fold/trial detail in run artifacts.
+4. Keep Issues for blockers and work packages rather than one Issue per run.
+5. Use Releases only for immutable, formally accepted certification snapshots.
+6. Keep #271 and #272 visibly separate from dashboard success so infrastructure debt cannot disappear behind green UI.
