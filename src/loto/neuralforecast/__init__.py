@@ -1,9 +1,11 @@
 """Database-backed NeuralForecast execution services."""
 
 from loto.neuralforecast import db_automodel as _db_automodel
-from loto.neuralforecast.db_automodel_facade import install as _install_db_persistence
+from loto.neuralforecast import db_automodel_facade as _db_automodel_facade
+from loto.neuralforecast.db_training_evidence_facade import install as _install_db_training_evidence
 
-_install_db_persistence(_db_automodel)
+_db_automodel_facade.install(_db_automodel)
+_install_db_training_evidence(_db_automodel_facade)
 
 AutoModelCampaignConfig = _db_automodel.AutoModelCampaignConfig
 DatabaseTableSource = _db_automodel.DatabaseTableSource

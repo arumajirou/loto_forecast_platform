@@ -177,8 +177,12 @@ def test_post_fit_cuda_snapshot_is_not_formal_training_proof(
     evidence = json.loads(
         (model_path.parent / "runtime_certification.json").read_text(encoding="utf-8")
     )
+    # A post-fit CUDA snapshot is retained as observational compatibility
+    # evidence, but schema 1.3.0 requires phase-bound inference proof.
     assert evidence["cuda_training_evidence"] is True
     assert evidence["formal_cuda_training_evidence"] is False
-    assert evidence["cuda_pre_save_inference_evidence"] is True
-    assert evidence["cuda_reload_inference_evidence"] is True
+    assert evidence["cuda_pre_save_inference_evidence"] is False
+    assert evidence["cuda_reload_inference_evidence"] is False
     assert "gpu_training_evidence" in evidence["failed_checks"]
+    assert "gpu_pre_save_inference_evidence" in evidence["failed_checks"]
+    assert "gpu_reload_inference_evidence" in evidence["failed_checks"]

@@ -4,7 +4,11 @@ from typing import Any
 
 import numpy as np
 
-from loto.auto_campaign.runtime import gpu_process_snapshot, torch_runtime_snapshot
+from loto.auto_campaign.runtime import (
+    cuda_phase_baseline,
+    gpu_process_snapshot,
+    torch_runtime_snapshot,
+)
 from loto.neuralforecast.training_worker_evidence import TrainingWorkerEvidence
 
 
@@ -42,6 +46,8 @@ def safe_gpu_process_snapshot() -> dict[str, Any]:
             "pid": None,
             "returncode": 127,
             "gpu_pid_verified": False,
+            "external_gpu_pid_verified": False,
+            "verification_method": "none",
             "rows": [],
             "error": "nvidia-smi not found",
         }
@@ -57,8 +63,73 @@ def runtime_has_cuda(snapshot: dict[str, Any]) -> bool:
     )
 
 
-def phase_has_cuda(runtime: dict[str, Any], gpu_process: dict[str, Any]) -> bool:
-    return bool(runtime_has_cuda(runtime) or gpu_process.get("gpu_pid_verified"))
+def cuda_phase_evidence(
+    runtime: dict[str, Any],
+    gpu_process: dict[str, Any],
+    baseline: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """Verify CUDA execution for one measured phase without stale allocator state.
+
+    External `nvidia-smi` PID evidence remains authoritative when available. The
+    process-local fallback is accepted only when a peak-reset baseline was
+    captured immediately before the operation and PyTorch's peak allocation
+    rose above the bytes already allocated at that baseline.
+    """
+
+    external_verified = bool(gpu_process.get("external_gpu_pid_verified"))
+    payload: dict[str, Any] = {
+        "verified": external_verified,
+        "verification_method": ("nvidia_smi_compute_apps" if external_verified else "none"),
+        "external_gpu_pid_verified": external_verified,
+        "process_local_phase_verified": False,
+        "same_pid": False,
+        "peak_reset": False,
+        "baseline_allocated_bytes": 0,
+        "peak_after_bytes": int(runtime.get("cuda_peak_memory_allocated") or 0),
+        "peak_delta_bytes": 0,
+    }
+    if external_verified or not baseline:
+        return payload
+
+    baseline_pid = baseline.get("pid")
+    runtime_pid = runtime.get("pid")
+    same_pid = bool(baseline_pid is not None and baseline_pid == runtime_pid)
+    peak_reset = baseline.get("peak_reset") is True
+    baseline_allocated = int(baseline.get("cuda_memory_allocated") or 0)
+    peak_after = int(runtime.get("cuda_peak_memory_allocated") or 0)
+    peak_delta = max(0, peak_after - baseline_allocated)
+    same_device = baseline.get("cuda_current_device") == runtime.get("cuda_current_device")
+    local_verified = bool(
+        same_pid
+        and same_device
+        and peak_reset
+        and baseline.get("cuda_available") is True
+        and runtime.get("cuda_available") is True
+        and peak_delta > 0
+    )
+    payload.update(
+        {
+            "verified": local_verified,
+            "verification_method": ("torch_process_local_peak_delta" if local_verified else "none"),
+            "process_local_phase_verified": local_verified,
+            "same_pid": same_pid,
+            "same_device": same_device,
+            "peak_reset": peak_reset,
+            "baseline_allocated_bytes": baseline_allocated,
+            "peak_after_bytes": peak_after,
+            "peak_delta_bytes": peak_delta,
+        }
+    )
+    return payload
+
+
+def phase_has_cuda(
+    runtime: dict[str, Any],
+    gpu_process: dict[str, Any],
+    *,
+    baseline: dict[str, Any] | None = None,
+) -> bool:
+    return bool(cuda_phase_evidence(runtime, gpu_process, baseline).get("verified"))
 
 
 def extract_training_evidence(neuralforecast: Any) -> dict[str, Any] | None:
@@ -110,6 +181,8 @@ def formal_training_cuda(training_evidence: dict[str, Any] | None) -> bool:
 
 
 __all__ = [
+    "cuda_phase_baseline",
+    "cuda_phase_evidence",
     "extract_training_evidence",
     "fitted_inner_model",
     "formal_training_cuda",

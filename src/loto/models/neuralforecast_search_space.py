@@ -9,6 +9,7 @@ import os
 import uuid
 from collections.abc import Callable
 from enum import StrEnum
+from numbers import Real
 from pathlib import Path
 from typing import Any
 
@@ -51,6 +52,32 @@ class SearchSpaceProfile(BaseModel):
         object.__setattr__(self, "profile_sha256", hashlib.sha256(raw).hexdigest())
 
 
+def _json_safe(value: Any) -> Any:
+    """Return a deterministic JSON-safe evidence representation without mutating HPO values."""
+
+    if value is None or isinstance(value, (bool, int, str)):
+        return value
+    if isinstance(value, float):
+        if math.isfinite(value):
+            return value
+        return repr(value)
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, (set, frozenset)):
+        return sorted((_json_safe(item) for item in value), key=repr)
+    if callable(value):
+        module = getattr(value, "__module__", None)
+        qualname = getattr(value, "__qualname__", None) or getattr(value, "__name__", None)
+        if module and qualname:
+            return {"type": "callable", "path": f"{module}.{qualname}"}
+        return {"type": "callable", "repr": repr(value)}
+    cls = type(value)
+    type_name = f"{cls.__module__}.{cls.__qualname__}"
+    return {"type": type_name, "repr": repr(value)}
+
+
 def _finish(
     *,
     backend: str,
@@ -61,8 +88,9 @@ def _finish(
     conditional: bool | None = False,
     errors: tuple[str, ...] = (),
 ) -> SearchSpaceProfile:
-    kinds = [item["kind"] for item in dimensions]
-    cards = [item.get("cardinality") for item in dimensions]
+    safe_dimensions = [_json_safe(item) for item in dimensions]
+    kinds = [item["kind"] for item in safe_dimensions]
+    cards = [item.get("cardinality") for item in safe_dimensions]
     combinations = None if any(card is None for card in cards) else math.prod(cards)
     tunable = sum(kind != "constant" for kind in kinds)
     categorical = kinds.count("categorical")
@@ -72,7 +100,7 @@ def _finish(
         backend=backend,
         source=source,
         completeness=completeness,
-        dimensions=tuple(sorted(dimensions, key=lambda item: item["name"])),
+        dimensions=tuple(sorted(safe_dimensions, key=lambda item: item["name"])),
         tunable_count=tunable,
         constant_count=kinds.count("constant"),
         categorical_count=categorical,
@@ -95,9 +123,7 @@ def _finish(
 
 
 def _constant(name: str, value: Any) -> dict[str, Any]:
-    if not isinstance(value, (type(None), bool, int, float, str, list, tuple)):
-        value = repr(value)
-    return {"name": name, "kind": "constant", "value": value, "cardinality": 1}
+    return {"name": name, "kind": "constant", "value": _json_safe(value), "cardinality": 1}
 
 
 def profile_fixed_config(
@@ -124,13 +150,20 @@ def profile_ray_config(
                 {
                     "name": name,
                     "kind": "categorical",
-                    "choices": values,
+                    "choices": [_json_safe(item) for item in values],
                     "cardinality": len(values),
                 }
             )
             continue
         low, high = getattr(value, "lower", None), getattr(value, "upper", None)
-        if low is None or high is None:
+        if (
+            low is None
+            or high is None
+            or isinstance(low, bool)
+            or isinstance(high, bool)
+            or not isinstance(low, Real)
+            or not isinstance(high, Real)
+        ):
             dimensions.append(_constant(name, value))
             continue
         integer = "integer" in type(value).__name__.lower()
@@ -138,8 +171,8 @@ def profile_ray_config(
             {
                 "name": name,
                 "kind": "integer" if integer else "float",
-                "lower": low,
-                "upper": high,
+                "lower": _json_safe(low),
+                "upper": _json_safe(high),
                 "upper_inclusive": not integer,
                 "cardinality": max(0, int(high) - int(low)) if integer else None,
             }
@@ -170,7 +203,7 @@ class _Trial:
         self.dimensions[name] = {
             "name": name,
             "kind": "categorical",
-            "choices": choices,
+            "choices": [_json_safe(item) for item in choices],
             "cardinality": len(choices),
         }
         return self._pick(choices)

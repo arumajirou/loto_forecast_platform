@@ -268,13 +268,42 @@ def build_training_worker_callback(
     return TrainingWorkerCallback()
 
 
+_CLASS_CACHE: dict[type, type] = {}
+_ORIGINAL_CLASS_BY_INSTRUMENTED: dict[type, type] = {}
+_CLASS_LOCK = RLock()
+
+
+def restore_official_auto_class(model: Any) -> Any:
+    """Restore a temporary evidence wrapper to its official NeuralForecast class."""
+
+    with _CLASS_LOCK:
+        original = _ORIGINAL_CLASS_BY_INSTRUMENTED.get(type(model))
+        if original is None:
+            return model
+        try:
+            model.__class__ = original
+        except TypeError as exc:
+            raise RuntimeError(
+                "NeuralForecast AutoModel instance cannot be restored to its official class"
+            ) from exc
+        return model
+
+
 class TrainingWorkerEvidenceMixin:
-    """Inject the evidence callback into every BaseAuto trial and final refit."""
+    """Inject evidence during AutoModel fitting and remove the wrapper before persistence."""
 
     training_evidence_backend: str = "unknown"
     training_evidence_model_name: str = "unknown"
     training_evidence_model_id: str | None = None
     training_evidence_require_gpu: bool = False
+
+    def fit(self, *args: Any, **kwargs: Any):
+        """Run official AutoModel fit and always restore save-compatible class identity."""
+
+        try:
+            return super().fit(*args, **kwargs)
+        finally:
+            restore_official_auto_class(self)
 
     def _fit_model(
         self,
@@ -309,10 +338,6 @@ class TrainingWorkerEvidenceMixin:
         return model
 
 
-_CLASS_CACHE: dict[type, type] = {}
-_CLASS_LOCK = RLock()
-
-
 def training_evidence_auto_class(auto_cls: type) -> type:
     """Return a stable pickle-addressable AutoModel subclass."""
 
@@ -328,6 +353,7 @@ def training_evidence_auto_class(auto_cls: type) -> type:
         )
         globals()[name] = created
         _CLASS_CACHE[auto_cls] = created
+        _ORIGINAL_CLASS_BY_INSTRUMENTED[created] = auto_cls
         return created
 
 
