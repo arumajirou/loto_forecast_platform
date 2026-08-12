@@ -160,11 +160,7 @@ def expanded_implementation_catalog() -> tuple[ImplementationIdentity, ...]:
     """Return Expanded v2 while leaving the Broad v1 registry untouched."""
 
     broad_v1 = build_catalog()
-    rows = [
-        _from_broad_v1(entry)
-        for entry in broad_v1
-        if entry.model_id != AUTOGLOUON_BROAD_V1_ID
-    ]
+    rows = [_from_broad_v1(entry) for entry in broad_v1 if entry.model_id != AUTOGLOUON_BROAD_V1_ID]
     rows.extend(autogluon_implementation_identities())
     _validate_identities(rows)
     return tuple(rows)

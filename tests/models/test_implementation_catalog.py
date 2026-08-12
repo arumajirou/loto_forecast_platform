@@ -15,9 +15,7 @@ def test_autogluon_expansion_uses_all_source_models_and_unique_ensemble_classes(
 
     assert len(SOURCE_MODEL_SPECS) == 29
     assert len(model_rows) == len(SOURCE_MODEL_SPECS)
-    assert len(ensemble_rows) == len(
-        {spec.expected_class_name for spec in SOURCE_ENSEMBLE_SPECS}
-    )
+    assert len(ensemble_rows) == len({spec.expected_class_name for spec in SOURCE_ENSEMBLE_SPECS})
     assert len(ensemble_rows) == 8
     assert len(rows) == 37
     assert len({row.implementation_id for row in rows}) == len(rows)
