@@ -159,7 +159,9 @@ def test_resume_reuses_only_matching_task_fingerprint(tmp_path, monkeypatch) -> 
     model = next(entry for entry in build_catalog() if entry.model_id == "sf-autoarima")
     task = module._build_tasks([model], ["numbers4"])[0]
     scheduler = module.ResourceScheduler(
-        module.ResourcePolicy(max_parallel_cpu_models=1, max_parallel_gpu_models=0, timeout_seconds=1)
+        module.ResourcePolicy(
+            max_parallel_cpu_models=1, max_parallel_gpu_models=0, timeout_seconds=1
+        )
     )
     calls = 0
 
