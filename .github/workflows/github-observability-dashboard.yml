@@ -1,0 +1,64 @@
+name: 00 / repository observability dashboard
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 0 * * *"
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, assigned, unassigned]
+  pull_request:
+    types: [opened, edited, closed, reopened, synchronize, ready_for_review, converted_to_draft]
+
+permissions:
+  contents: read
+  actions: read
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: repository-observability-${{ github.repository }}
+  cancel-in-progress: true
+
+jobs:
+  dashboard:
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 10
+
+    steps:
+      - name: Verify expected Linux runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          echo "runner_name=$RUNNER_NAME"
+          echo "runner_os=$RUNNER_OS"
+          echo "runner_arch=$RUNNER_ARCH"
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_ARCH" = "X64"
+
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          clean: true
+
+      - name: Build repository observability summary
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOTO_PROJECT_URL: https://github.com/users/arumajirou/projects/1
+        run: |
+          set -Eeuo pipefail
+          json_path="$RUNNER_TEMP/github-observability-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.json"
+          python3 scripts/build_github_observability_summary.py \
+            --markdown "$GITHUB_STEP_SUMMARY" \
+            --json "$json_path"
+          echo "dashboard_json=$json_path"
+          python3 -m json.tool "$json_path" >/dev/null
+          cat "$json_path"
+
+      - name: Verify source worktree remains clean
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -z "$(git status --porcelain)"
