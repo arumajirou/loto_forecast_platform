@@ -14,6 +14,12 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      deploy_pages:
+        description: "Deploy the verified artifact to GitHub Pages"
+        required: true
+        default: false
+        type: boolean
   schedule:
     - cron: "47 0 * * *"
   issues:
@@ -177,3 +183,48 @@ jobs:
               esac
             fi
           done
+
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_pages }}
+    needs: build
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 15
+
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download verified dashboard artifact
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: github-visual-dashboard-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/verified-dashboard-site
+
+      - name: Verify downloaded site
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -f "$RUNNER_TEMP/verified-dashboard-site/index.html"
+          test -f "$RUNNER_TEMP/verified-dashboard-site/data/dashboard.json"
+
+      - name: Configure Pages without implicit enablement
+        id: pages
+        uses: actions/configure-pages@7d49c7f84dd524bd66b6a2581e8c3b295744e47d # v6
+        with:
+          enablement: false
+
+      - name: Upload verified Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v4
+        with:
+          path: ${{ runner.temp }}/verified-dashboard-site
+
+      - name: Deploy verified Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@f33f361415d7d042451839309b0b307ca4de1eab # v4
