@@ -62,9 +62,7 @@ class Toto2FamilyProviderRequest(Toto2ProviderRequest):
         }
         for field_name, expected_value in expected.items():
             if getattr(self, field_name) != expected_value:
-                raise ValueError(
-                    f"{field_name} does not match the reviewed Toto 2.0 variant"
-                )
+                raise ValueError(f"{field_name} does not match the reviewed Toto 2.0 variant")
         if self.operation is Operation.PREDICT and not manifest.snapshot_validation_ready:
             raise ValueError(
                 "predict is blocked until complete snapshot validation is ready "
