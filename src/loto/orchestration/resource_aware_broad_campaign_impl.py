@@ -391,8 +391,10 @@ def _run_task(
     scheduler: ResourceScheduler,
     loto3: str,
 ) -> dict[str, Any]:
-    case_dir = output_root / "cases" / (
-        f"{task.ordinal:04d}-{_safe_name(task.model.model_id)}-{_safe_name(task.game)}"
+    case_dir = (
+        output_root
+        / "cases"
+        / (f"{task.ordinal:04d}-{_safe_name(task.model.model_id)}-{_safe_name(task.game)}")
     )
     final_path = case_dir / "FINAL.json"
     source_head = _git_head()
@@ -682,8 +684,10 @@ def main(argv: list[str] | None = None) -> int:
             if task.resource_class == "CPU":
                 runnable_tasks.append(task)
                 continue
-            case_dir = output_root / "cases" / (
-                f"{task.ordinal:04d}-{_safe_name(task.model.model_id)}-{_safe_name(task.game)}"
+            case_dir = (
+                output_root
+                / "cases"
+                / (f"{task.ordinal:04d}-{_safe_name(task.model.model_id)}-{_safe_name(task.game)}")
             )
             case_dir.mkdir(parents=True, exist_ok=True)
             results.append(_blocked_gpu_result(task, case_dir))
