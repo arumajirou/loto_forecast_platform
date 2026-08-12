@@ -100,7 +100,8 @@ def certify_post_exit_release(*, probe: dict[str, Any], output_path: Path) -> di
     gpu_uuid_matches = resident_gpu_uuid == execution_gpu_uuid
     if not gpu_uuid_matches:
         raise VariantProbeError(
-            f"resident GPU UUID mismatch: process={resident_gpu_uuid} execution={execution_gpu_uuid}"
+            "resident GPU UUID mismatch: "
+            f"process={resident_gpu_uuid} execution={execution_gpu_uuid}"
         )
 
     process_exited = not Path(f"/proc/{pid}").exists()
