@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loto Forecast GitHub Dashboard</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">GitHub control plane</p>
+      <h1>Loto Forecast Platform</h1>
+      <p id="semantics" class="muted">Loading evidence-aware repository state…</p>
+    </div>
+    <a id="repo-link" class="button-link" href="#">Open repository</a>
+  </header>
+
+  <main>
+    <section aria-labelledby="gates-heading">
+      <h2 id="gates-heading">Formal gates</h2>
+      <div id="gate-cards" class="cards"></div>
+    </section>
+
+    <section aria-labelledby="overview-heading">
+      <h2 id="overview-heading">Repository overview</h2>
+      <div id="overview-cards" class="cards"></div>
+    </section>
+
+    <section aria-labelledby="matrix-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="matrix-heading">Model × game planning matrix</h2>
+          <p class="muted">
+            A cell changes from UNASSESSED only when exact model/game runtime evidence is supplied.
+          </p>
+        </div>
+        <div class="filters">
+          <label>
+            Model
+            <input id="model-filter" type="search" placeholder="Filter model ID">
+          </label>
+          <label>
+            Library
+            <select id="library-filter">
+              <option value="">All libraries</option>
+            </select>
+          </label>
+          <label>
+            Status
+            <select id="status-filter">
+              <option value="">All statuses</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div id="status-summary" class="status-summary" aria-live="polite"></div>
+      <div class="matrix-wrap">
+        <table id="matrix-table">
+          <thead id="matrix-head"></thead>
+          <tbody id="matrix-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="two-column">
+      <article aria-labelledby="issues-heading">
+        <h2 id="issues-heading">Open issues</h2>
+        <div id="issues-list" class="list-panel"></div>
+      </article>
+      <article aria-labelledby="workflows-heading">
+        <h2 id="workflows-heading">Active workflows</h2>
+        <div id="workflows-list" class="list-panel"></div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Navigation and evidence index only. Runtime certification and scientific quality remain
+      separate formal gates.
+    </p>
+  </footer>
+
+  <script src="assets/app.js" defer></script>
+</body>
+</html>
