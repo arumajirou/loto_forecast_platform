@@ -1,218 +1,166 @@
 # Loto Forecast Platform
 
-**ミニロト / ロト6 / ロト7 / ビンゴ5 / ナンバーズ3 / ナンバーズ4**を対象に、統計モデル、機械学習、深層学習、AutoML、時系列基盤モデル（TSFM）、確率モデルを、時系列リークを防いだ共通契約の下で比較・検証・運用するための研究プラットフォームです。
+**ミニロト / ロト6 / ロト7 / ビンゴ5 / ナンバーズ3 / ナンバーズ4**を対象に、統計モデル、機械学習、深層学習、AutoML、時系列基盤モデル（TSFM）、確率モデルを、時系列リークを防いだ共通契約の下で比較・検証・運用する研究プラットフォームです。
 
-このREADMEは「名前が登録されているモデル」ではなく、**どのライブラリのどのモデルを、どの実行経路で、何の目的に使えるか**が分かることを目的にしています。
+このREADMEは、単なる「登録モデル一覧」ではなく、**何がコードとして存在し、どこから実行でき、どこまで実測証拠があり、何がまだ未検証か**を区別して読むための入口です。
 
-> **Code audit basis:** `main@2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8` (2026-08-10)  
-> このSHAは機能コードを監査した基準点です。README自身の更新後はGitの最新commitが文書版を識別します。  
+> **Implementation audit base:** `main@abe7e02cdfc900618c83b21c922b4fd3f078b036` (2026-08-12)  
+> **Fact-check sources:** current `main` code / merged PR history / tests / retained runtime artifacts / Linear project state  
+> **Important:** `REGISTERED != RUNTIME_CERTIFIED != OOF_EVALUATED != HOLDOUT_EVALUATED != PROSPECTIVE_EVALUATED != PROMOTION_ELIGIBLE`  
 > 現在のpackage versionはREADMEへ手書きしません。canonical versionは`loto.version.__version__` / installed package metadata / `loto-build-info`を正本とします。
 
-## 1. このリポジトリでできること
+---
 
-主な用途は次のとおりです。
+## 1. 現在地 — 先に結論
 
-| やりたいこと | 主な入口 | 実際の役割 |
-|---|---|---|
-| 6ゲームの仕様・合法性を確認 | `uv run loto3 games` | positions、値域、select/digits family、outcome spaceを確認 |
-| 理論上のIID-null基準を確認 | `uv run loto3 theory --game <game> --tau 1` | Hit@±1などの理論参照値を算出 |
-| 広いモデル在庫を確認 | `uv run loto3 catalog --counts` / `catalog` | 174-entry broad inventoryを確認 |
-| 通常のshared実行モデルを確認 | `uv run loto models list` | `catalog.py`のshared `ModelSpec`を確認 |
-| 6ゲーム × broad catalogを同一protocolで計画 | `uv run loto3 campaign --output unused --plan-only` | requested model × game matrixをmaterialize |
-| 6ゲーム統一development campaignを実行 | `uv run loto3 campaign ...` | fail-visibleな比較、全seed、baselines、prediction sealing |
-| 1つのinstrumented research cycle | `uv run loto3 research ...` | theory / leakage sentinel / statistical comparisonを含む研究cycle |
-| 旧shared research configを実行 | `uv run loto experiment research --config ...` | `catalog.py` → candidate/position/foundation worker経路 |
-| NeuralForecast AutoModelsをHPO実行 | `uv run loto neuralforecast automodel-run ...` | OptunaまたはRay、CPU/GPU、trial並列、モデル保存 |
-| 確率モデル群を調査・実行 | `uv run loto3 probabilistic ...` | 72-model probabilistic catalog、backend probe、run/compare/API |
-| TSFM revisionを固定・検証 | `uv run loto3 revisions ...` | broad TSFM inventoryへ明示revision manifestを適用 |
-| hierarchy/reconciliationを試す | `uv run loto3 hierarchy ...` | select-game hierarchyとreconciliationを検証 |
-| データ取得・正規化 | `uv run loto data acquire ...` | single/multi-game canonical data acquisition |
-| run/evidenceをregistryで管理 | `loto experiment status`, registry APIs | run、artifact、approval、release evidenceを管理 |
-| APIでrunを操作 | `uv run loto3 probabilistic api-* / run-*` | token付きlocal API、run start/current/stop |
-| 実験通知 | `loto notify ...` / probabilistic API TTS | report通知、VOICEVOX連携surface |
+| 領域 | 現在状態 | 事実として確認できること | まだ意味しないこと |
+|---|---|---|---|
+| 6ゲーム共通geometry | **VERIFIED** | `mini/loto6/loto7/bingo5/numbers3/numbers4` のpositions・値域・select/digits契約あり | 全モデルが6ゲームで実測済み、ではない |
+| Broad v1 inventory | **VERIFIED** | `catalog_full.py` の凍結在庫 **174** | 174モデルすべてruntime成功、ではない |
+| Unified v1 coverage | **EXECUTION_PENDING** | 既存計画の分母 **250 × 6 = 1500 units** | 1500 unit完走済み、ではない |
+| Expanded v2 inventory | **VERIFIED / PARTIALLY_VERIFIED** | Broad v1を壊さず別inventoryを追加。Phase 1は **210**。AutoGluon umbrella 1件をsource-backed **37 implementations**へ展開 | 新規37件すべてruntime-certified、ではない |
+| StatsForecast | **VERIFIED / PARTIALLY_VERIFIED** | broad 41、shared明示8。runtime lifecycle / property lifecycle / real-game development evaluationを実装・検証 | broad 41全件の全ゲーム科学評価完了、ではない |
+| NeuralForecast fixed | **VERIFIED / PARTIALLY_VERIFIED** | broad 37、shared direct classは17。通常学習経路あり | broad 37全件の全ゲームruntime/OOF完了、ではない |
+| NeuralForecast AutoModels | **VERIFIED / PARTIALLY_VERIFIED** | official AutoModel 36、Optuna/Ray、search policy、search-space persistence、seed/precision伝播、GPU evidence pathあり | 36×全ゲームの正式runtime/accuracy certification完了、ではない |
+| AutoGluon TimeSeries | **PARTIALLY_VERIFIED** | isolated provider + source inventory。v1.5.0 source manifestは29 models + 8 unique ensemble classes = 37 implementations | Expanded 37件すべてのruntime証明、ではない |
+| TSFM runtime audit | **PARTIALLY_VERIFIED** | audit identity 21中 **19 CERTIFIED / 2 BLOCKED** | 19すべてshared-routable、lottery-compatible、OOF優位、ではない |
+| Probabilistic platform | **VERIFIED / PARTIALLY_VERIFIED** | separate 72-model catalog、backend probe、compatibility/run/API surfaceあり | 72モデル全ゲームruntime/科学評価完了、ではない |
+| Resource-aware campaign | **VERIFIED** | live resource planning、GPU割当、resume fingerprint、timeout process-tree cleanup、outer-worker cap | Broad/Unified全unit完走、ではない |
+| GitHub observability | **VERIFIED** | Operations Dashboard / visual dashboard / Pages gate / structured intake実装済み | 各scientific gateの代替、ではない |
+| Holdout | **BLOCKED (CLOSED BY POLICY)** | development evidenceが揃うまで閉鎖 | development結果から自動解禁、ではない |
+| Prospective | **BLOCKED (CLOSED BY POLICY)** | prediction seal + future actual到着後のみ評価 | Holdout未承認のまま実行可、ではない |
+| Automatic promotion | **BLOCKED / FORBIDDEN** | promotionはhuman approval前提 | runtime PASSだけでchampion昇格、ではない |
 
-重要な境界があります。
+### 状態語
+
+- **VERIFIED**: current code/history/tests/evidenceで対象の主張を確認済み。
+- **PARTIALLY_VERIFIED**: 一部モデル・一部lane・一部実行面のみ実測済み。
+- **EXECUTION_PENDING**: 実装・計画はあるが、対象分母の実行完了証拠が未完。
+- **BLOCKED**: 明示的なgate、runner、license、artifact、policy等で進行不可。
+
+---
+
+## 2. 何を数えているか — 3つのinventoryを混同しない
+
+| Inventory | 分母 | 目的 | 重要な境界 |
+|---|---:|---|---|
+| **Broad v1** | **174** | 既存の広い比較在庫。`src/loto/models/catalog_full.py` | 既存 174×6 campaignの分母を途中で変更しないため凍結 |
+| **Unified v1** | **250** | model/library/provider/reconciliation等を共通coverageで扱う既存計画 | 全250がstandalone forecasterとは限らない |
+| **Expanded v2 Phase 1** | **210** | umbrella entryをsource-backed implementation identityへ分解 | Broad v1を置換しない。新identityはruntime証明を別途要求 |
+
+Expanded v2 Phase 1では Broad v1 の `autogluon-timeseries` 1件を、AutoGluon 1.5.0 source manifestの **29 model aliases + 8 unique ensemble classes = 37 implementations**へ置換するため、`174 - 1 + 37 = 210` です。`ImplementationIdentity.runtime_status` の初期値は `NOT_RUN`、`runtime_certified=False` です。
+
+---
+
+## 3. 6ゲームの共通契約
+
+| game | family | positions | values | semantics |
+|---|---|---:|---|---|
+| `mini` | select | 5 | 1..31 | 昇順・重複なし |
+| `loto6` | select | 6 | 1..43 | 昇順・重複なし |
+| `loto7` | select | 7 | 1..37 | 昇順・重複なし |
+| `bingo5` | select | 8 | 1..40 | 昇順・重複なし |
+| `numbers3` | digits | 3 | 0..9 | 順序あり・重複可 |
+| `numbers4` | digits | 4 | 0..9 | 順序あり・重複可 |
+
+`available=true`、import成功、単一ゲームsmokeだけでは「6ゲーム対応」と判定しません。出力shapeは必ずgame geometryへ適合させます。
+
+---
+
+## 4. ライブラリ / framework 対応表
+
+| Library / family | 在庫・代表モデル | 実行面 | 主要機能 / 引数 | 現在状態 |
+|---|---|---|---|---|
+| builtin | `uniform`, `frequency` 等 | shared | mandatory controls / theory reference | **VERIFIED** |
+| scikit-learn | logistic, ridge/elasticnet position, RF, ExtraTrees, HGB | shared | seed、candidate/position feature contract | **VERIFIED / PARTIALLY_VERIFIED** |
+| LightGBM | classifier / position | shared | candidate / position boosting | **PARTIALLY_VERIFIED** |
+| XGBoost | classifier | shared | candidate boosting | **PARTIALLY_VERIFIED** |
+| CatBoost | classifier | shared | candidate boosting | **PARTIALLY_VERIFIED** |
+| **StatsForecast** | broad **41** / shared 8 | shared + campaign | statistical forecast、lifecycle、real-game dev evaluation | **VERIFIED / PARTIALLY_VERIFIED** |
+| **MLForecast** | Auto inventory **8** / direct shared 2 | shared + research inventory | lag ML、regressor backend | **PARTIALLY_VERIFIED** |
+| **NeuralForecast fixed** | broad **37** / direct shared 17 | shared | GPU/CPU deep forecast、exogenous/probabilistic supportはmodel依存 | **PARTIALLY_VERIFIED** |
+| **NeuralForecast Auto** | official **36** | dedicated AutoModel runner | `backend`, `config`, `search_alg`, `num_samples`, CPU/GPU, seed, precision, refit | **VERIFIED / PARTIALLY_VERIFIED** |
+| **AutoGluon TimeSeries 1.5.0** | broad umbrella 1 / Expanded implementations **37** | isolated provider | model/ensemble inventory、subprocess isolation | **PARTIALLY_VERIFIED** |
+| Darts | `RegressionEnsembleModel` lane | shared / optional | NaiveDrift + ExponentialSmoothing ensemble | **PARTIALLY_VERIFIED** |
+| GluonTS | Torch DeepAR lane | shared / optional | Student-T probabilistic DeepAR | **PARTIALLY_VERIFIED**; shared path CPU-pinned |
+| ReservoirPy | ESN (`Reservoir >> Ridge`) | shared / optional | position-wise reservoir forecasting | **PARTIALLY_VERIFIED** |
+| HierarchicalForecast | **10** reconciliation methods | reconciliation | BottomUp / TopDown / MiddleOut / MinTrace / OptimalCombination / ERM等 | **VERIFIED / PARTIALLY_VERIFIED** |
+| sktime | campaign identity | isolated campaign | rolling-origin / lifecycle evaluation | **EXECUTION_PENDING** for broad real runtime |
+| skforecast | inventory/dependency identity | no audited shared worker | future expanded routing target | **EXECUTION_PENDING** |
+| BasicTS | outside Broad 174 | isolated campaign | provider/config/dataset/runtime smoke contracts | **PARTIALLY_VERIFIED** |
+| Time-Series-Library | outside Broad 174 | isolated campaign | DLinear/TSMixer/LightTS/SegRNN/FreTS/SCINet/TimeFilter/TiDE/FiLM lane | **PARTIALLY_VERIFIED** |
+| Merlion | outside Broad 174 | isolated campaign | ARIMA/ETS/MSES runtime certification surface | **EXECUTION_PENDING** for target-host completion |
+| TSFM / foundation models | audit identity **21** | shared provider subset + isolated lanes | pinned revision、load/inference/device/VRAM/shape/finite checks | **19 CERTIFIED / 2 BLOCKED**, routing scopeは別 |
+| probabilistic programming | separate **72** | `loto3 probabilistic` | backend probe、compatibility、plan/run/compare/API | **PARTIALLY_VERIFIED** |
+
+---
+
+## 5. NeuralForecast — fixed 37 と AutoModels 36
+
+### 5.1 fixed model inventory 37
 
 ```text
-モデルが登録されている
-!= shared CLIから実行できる
-!= isolated providerで実行できる
-!= runtime certification済み
-!= lottery dataでOOF評価済み
-!= Holdout/Prospective通過済み
-!= promotion可能
+RNN GRU LSTM TCN DeepAR DilatedRNN MLP NHITS NBEATS NBEATSx
+DLinear NLinear TFT VanillaTransformer Informer Autoformer PatchTST
+FEDformer StemGNN HINT TimesNet TimeLLM TSMixer TSMixerx
+MLPMultivariate iTransformer BiTCN TiDE DeepNPTS SOFTS SOFTSSharp
+TimeMixer KAN RMoK TimeXer xLSTM XLinear
 ```
 
-この区別をREADME、`docs/MODEL_EXECUTION_MATRIX.md`、runtime evidenceの全てで維持します。
+通常shared routeのdirect class subsetは次の17です。
 
----
-
-## 2. 対応ゲームとgeometry
-
-`src/loto/game/geometry.py`が単一の正本です。ゲームごとのpositions、値域、合法性をモデルやdecoder側で重複hard-codeしない設計です。
-
-| game key | 表示名 | family | positions | 値域 | 主要な合法性 |
-|---|---|---|---:|---|---|
-| `mini` | ミニロト | select | 5 | 1..31 | distinct / strictly ascending |
-| `loto6` | ロト6 | select | 6 | 1..43 | distinct / strictly ascending |
-| `loto7` | ロト7 | select | 7 | 1..37 | distinct / strictly ascending |
-| `bingo5` | ビンゴ5 | select | 8 | 1..40 | distinct / strictly ascending |
-| `numbers3` | ナンバーズ3 | digits | 3 | 0..9 | **位置順序を保持、重複digit可** |
-| `numbers4` | ナンバーズ4 | digits | 4 | 0..9 | **位置順序を保持、重複digit可** |
-
-確認:
-
-```bash
-uv run loto3 games
-uv run loto3 theory --game numbers3 --tau 1
-uv run loto3 theory --game loto7 --tau 1
+```text
+DLinear NLinear NHITS NBEATS NBEATSx TiDE TCN GRU LSTM DeepAR
+TFT PatchTST TimesNet TSMixer TimeMixer iTransformer VanillaTransformer
 ```
 
-select familyとdigits familyは同じ評価式へ無理に押し込めません。例えば`mean_hits`は、selectではset overlap、digitsでは**同一positionの一致数**として計算し、Numbers3/4の順序と重複を失いません。
+**37件が在庫にあること**と**37件全部がnormal shared routeから実行できること**は別です。
 
----
+### 5.2 official AutoModel inventory 36
 
-## 3. セットアップ
-
-Python契約は`pyproject.toml`と`uv.lock`が正本です。
-
-```bash
-git clone https://github.com/arumajirou/loto_forecast_platform.git
-cd loto_forecast_platform
-uv sync --locked --extra dev
-uv run loto-build-info
-uv run loto system doctor
+```text
+AutoRNN AutoLSTM AutoGRU AutoTCN AutoDeepAR AutoDilatedRNN AutoBiTCN
+AutoxLSTM AutoMLP AutoNBEATS AutoNBEATSx AutoNHITS AutoDLinear AutoNLinear
+AutoTiDE AutoDeepNPTS AutoKAN AutoTFT AutoVanillaTransformer AutoInformer
+AutoAutoformer AutoFEDformer AutoPatchTST AutoiTransformer AutoTimeXer
+AutoTimesNet AutoStemGNN AutoHINT AutoTSMixer AutoTSMixerx
+AutoMLPMultivariate AutoSOFTS AutoSOFTSSharp AutoTimeMixer AutoRMoK AutoXLinear
 ```
 
-Python対応範囲は現在 `>=3.11,<3.14` です。
+Local extensionsはofficial upstream inventoryと分離します。
 
-### 依存lane
-
-| lane | 用途 |
+| local extension | status |
 |---|---|
-| core (`uv sync`) | NumPy / pandas / Pydantic / scikit-learn / NeuralForecast 3.2.0 / Torch 2.9.1 / Transformers 4.57.6 / HF Hub等 |
-| `--extra dev` | pytest / Ruff / mypy / Hypothesis / Optuna / OpenTelemetry |
-| `--extra auto-campaign` | Optuna / StatsForecast / psutil |
-| `--extra full` | LightGBM / XGBoost / CatBoost / StatsForecast / MLForecast / HierarchicalForecast / Ray / MLflow / telemetry等 |
-| `--extra frameworks` | Darts / GluonTS / Lightning / sktime / skforecast / ReservoirPy |
-| `--extra tsfm` | Transformers / Accelerate / Chronos forecasting |
-| `--extra api` | FastAPI / Uvicorn / HTTP client |
-| `--extra postgres` | psycopg / SQLAlchemy |
-| `--extra mlflow` | MLflow tracking |
-| `environments/**` | AutoGluonやmodel/provider固有のversion-isolated runtime |
+| AutoTimeLLM | fail-closed local extension |
+| AutoSCINet | local extension |
+| AutoSegRNN | inactive |
+| AutoFreTS | inactive |
 
-Rootへpackageをinstallできることは、そのproviderがcertifiedであることを意味しません。model固有のPython/Torch/CUDA制約がある場合は`environments/**`のisolated lockを優先します。
+### 5.3 AutoModel共通引数 / project control
 
----
+| 種別 | 引数 / control | 意味 / projectでの扱い |
+|---|---|---|
+| forecast | `h` | forecast horizon |
+| loss | `loss`, `valid_loss` | train / validation objective |
+| search space | `config` | model固有default HPO spaceまたはcustom config |
+| backend | `backend` | `ray` / `optuna` |
+| search | `search_alg` / project search strategy | auto / random / TPE系、backend整合性をfail-closed検証 |
+| budget | `num_samples` | HPO trial数 |
+| resource | `cpus`, `gpus` | Ray利用時のtrial resource。repositoryはtrial並列/resource planも管理 |
+| reproducibility | `random_seed` / CLI seed | outer experiment seedとして固定。HPO dimensionへ勝手に変換しない |
+| precision | project `precision` control | actual training configへ伝播。明示model configを優先 |
+| refit | `refit_with_val` | best model refit policy |
+| observability | `callbacks`, `verbose` | runtime/training evidenceとartifact保存へ接続 |
 
-## 4. 3つのモデルsurfaceを区別する
-
-### 4.1 Broad inventory — `catalog_full.py`
-
-```bash
-uv run loto3 catalog --counts
-uv run loto3 catalog
-uv run loto3 catalog --library neuralforecast
-uv run loto3 catalog --unpinned
-uv run loto3 catalog --csv /tmp/model_catalog.csv
-```
-
-現在のbroad inventoryは**174 entries**です。
-
-| library | broad entries | 内容 |
-|---|---:|---|
-| builtin | 4 | 理論/頻度control |
-| sklearn | 7 | 線形・tree ML |
-| lightgbm | 2 | boosting |
-| xgboost | 1 | boosting |
-| catboost | 1 | boosting |
-| StatsForecast | 41 | 統計時系列モデル |
-| NeuralForecast | 37 | fixed deep models |
-| NeuralForecast Auto | 36 | official AutoModels |
-| MLForecast Auto | 8 | AutoMLForecast inventory |
-| HierarchicalForecast | 10 | reconciliation methods |
-| TSFM | 21 | foundation-model inventory |
-| AutoGluon | 1 | TimeSeries provider entry |
-| Darts | 1 | framework entry |
-| GluonTS | 1 | framework entry |
-| sktime | 1 | framework entry |
-| skforecast | 1 | framework entry |
-| ReservoirPy | 1 | ESN entry |
-| **total** | **174** | broad planning inventory |
-
-この174は**実行成功数ではありません**。統一campaignは、この在庫を「計画対象」として使い、非対応も結果行として残します。
-
-### 4.2 Shared execution catalog — `catalog.py`
-
-```bash
-uv run loto models list --format table
-uv run loto models list --available-only --format json
-uv run loto models show nf-nhits
-uv run loto models export-catalog --output /tmp/shared-models.json
-```
-
-`loto experiment research`や`PositionSeriesWorker`が通常参照する実行surfaceです。broad inventoryより意図的に狭いです。
-
-### 4.3 Isolated provider/campaign
-
-一部のlibraryはshared workerに直接入れず、別環境・別contractで安全に実行します。
-
-```text
-environments/**
-src/loto/*_campaign/**
-src/loto/adapters/**
-scripts/run_*_provider.py
-```
-
-BasicTS、Time-Series-Library、Merlion、sktime、AutoGluonなどは、このsurfaceの存在を必ず確認してから「利用可能」と判断します。
+2026-08-12までのmerged実装では、official per-model default search spaceを維持したまま固定experiment controlをoverlayし、seed/precisionの伝播、multiseries `n_series`、early stop、GPU training/pre-save/reload evidenceをfail-closedで扱うよう修正済みです。
 
 ---
 
-## 5. scikit-learn / LightGBM / XGBoost / CatBoost
+## 6. StatsForecast / MLForecast
 
-### Shared candidate models
+### StatsForecast
 
-`src/loto/models/factory.py`から直接fitできる代表ID:
-
-```text
-uniform
-frequency
-logistic
-random-forest
-extra-trees
-hist-gradient-boosting
-lightgbm-classifier
-xgboost-classifier
-catboost-classifier
-```
-
-位置series側には次もあります。
-
-```text
-ridge-position
-elasticnet-position
-lightgbm-position
-```
-
-candidate modelはdraw identity/target列をfeatureから除外してfitし、`predict_proba`、`decision_function`、または`predict`を共通candidate score/probability contractへ変換します。
-
-確率を持つcandidate estimatorを`loto3 campaign`で使う場合、slot-conditioned candidate probabilityをfamily別Hit@±1 decoderへ渡せます。分布identityは`row-normalized-slot-binary-probability-v1`として証拠へ残し、native categorical PMFとは呼びません。
-
----
-
-## 6. StatsForecast
-
-Broad inventoryは**41モデル**です。例:
-
-```text
-AutoARIMA, AutoETS, AutoCES, AutoTheta, AutoMFLES, AutoTBATS,
-ARIMA, AutoRegressive, Holt, HoltWinters, HistoricAverage, Naive,
-SeasonalNaive, RandomWalkWithDrift, ADIDA, CrostonClassic,
-CrostonOptimized, CrostonSBA, IMAPA, TSB, MSTL, TBATS,
-Theta family, GARCH, ARCH, UCM, ...
-```
-
-ただしshared execution catalogで直接配線済みなのは現在:
+Broad inventoryは **41**。通常shared IDsは意図的に狭く、次の8です。
 
 ```text
 stats-naive
@@ -225,861 +173,294 @@ stats-croston
 stats-tsb
 ```
 
-通常のposition seriesは`StatsForecast.fit()/predict(h=1)`を使用し、Croston/TSBはcandidate-series用の別routeです。
+`Croston` / `TSB` は通常position-seriesと同一視せずcandidate-series semanticsを持ちます。
 
-**41 registered != 41 shared-selectable**です。41全件を評価対象として計画したい場合は`loto3 campaign`でcoverageをmaterializeし、routeできない組み合わせも隠さず記録します。
+最近のmerged履歴では、runtime lifecycle certification、property lifecycle certification、real-game development evaluation Phase Cが追加されています。これは**科学評価の実行面が実装・検証された**という意味であり、41モデル×6ゲームの全完走を意味しません。
 
----
+### MLForecast
 
-## 7. MLForecast / AutoMLForecast
-
-Broad inventoryには8 AutoMLForecast estimatorがあります。
+Broad AutoML inventory 8:
 
 ```text
-AutoLightGBM
-AutoXGBoost
-AutoCatboost
-AutoLinearRegression
-AutoRidge
-AutoLasso
-AutoElasticNet
-AutoRandomForest
+AutoLightGBM AutoXGBoost AutoCatboost AutoLinearRegression
+AutoRidge AutoLasso AutoElasticNet AutoRandomForest
 ```
 
-shared workerで現在直接使うIDは:
+現在のdirect shared paths:
 
 ```text
 mlforecast-ridge
 mlforecast-lightgbm
 ```
 
-`PositionSeriesWorker`がlag featureを構築し、RidgeまたはLightGBMでhorizon=1を予測します。
-
-AutoMLForecast broad inventoryとshared MLForecast 2 routeを同一視しないでください。
+8件のAuto inventoryを「8 shared workers」と誤記しないでください。
 
 ---
 
-## 8. NeuralForecast — fixed models
+## 7. AutoGluon TimeSeries — umbrellaから37 implementationsへ
 
-Root coreは`neuralforecast==3.2.0`を固定しています。
+Pinned source targetは `autogluon.timeseries==1.5.0`。
 
-Broad inventoryは公式fixed class **37件**:
-
-```text
-RNN, GRU, LSTM, TCN, DeepAR, DilatedRNN, MLP,
-NHITS, NBEATS, NBEATSx, DLinear, NLinear, TFT,
-VanillaTransformer, Informer, Autoformer, PatchTST, FEDformer,
-StemGNN, HINT, TimesNet, TimeLLM, TSMixer, TSMixerx,
-MLPMultivariate, iTransformer, BiTCN, TiDE, DeepNPTS,
-SOFTS, SOFTSSharp, TimeMixer, KAN, RMoK, TimeXer, xLSTM, XLinear
-```
-
-shared researchへ直接配線されているfixed modelは現在:
+### 29 source model aliases
 
 ```text
-DLinear
-NLinear
-NHITS
-NBEATS
-NBEATSx
-TiDE
-TCN
-GRU
-LSTM
-DeepAR
-TFT
-PatchTST
-TimesNet
-TSMixer
-TimeMixer
-iTransformer
-VanillaTransformer
+ADIDA ARIMA AutoARIMA AutoCES AutoETS Average Croston DLinear DeepAR
+DirectTabular DynamicOptimizedTheta ETS IMAPA Chronos Chronos2 NPTS Naive
+PatchTST PerStepTabular RecursiveTabular SeasonalAverage SeasonalNaive
+SimpleFeedForward TemporalFusionTransformer Theta TiDE Toto WaveNet Zero
 ```
 
-workerは`neuralforecast.models`からclassを動的に解決し、horizon、input size、validation window、seed、precision、deviceを設定してfit/predictします。
+### 8 unique ensemble classes
 
-注意:
+```text
+Greedy PerItemGreedy PerformanceWeighted SimpleAverage Median Tabular
+PerQuantileTabular LinearStacker
+```
 
-- broad 37 classすべてのshared wrapper成功を保証するものではありません。
-- `TimesNet`はshared pathでreduced precision要求時にfull precisionへ安全側補正する実装があります。
-- multiseries modelは`n_series`契約を満たす必要があります。
+`Weighted` は `GreedyEnsemble` aliasなのでunique classの分母へ重複加算しません。
+
+Expanded v2はsource-backed identityを作りますが、新identityのdefaultは `runtime_status=NOT_RUN`, `runtime_certified=False` です。source declarationとruntime certificationを分離しています。
 
 ---
 
-## 9. NeuralForecast AutoModels — Optuna / Ray
+## 8. TSFM / foundation model runtime reality
 
-Broad inventoryは公式AutoModel **36件**を持ちます。
+Current retained runtime auditは21 identitiesを判定し、**19 CERTIFIED / 2 BLOCKED / 0 pending**です。これはruntime evidenceであってaccuracy/OOF evidenceではありません。
+
+| audit identity | runtime | shared/provider relationshipの要点 |
+|---|---|---|
+| chronos-2 | CERTIFIED | shared exact ID / ChronosProvider |
+| chronos-bolt-tiny | CERTIFIED | shared exact ID / ChronosProvider |
+| chronos-t5-small | CERTIFIED | shared exact ID / ChronosProvider |
+| chronos-t5-base | CERTIFIED | exact shared ModelSpecなし |
+| granite-flowstate-r1 | CERTIFIED | exact shared ModelSpecなし |
+| granite-patchtsmixer | CERTIFIED | exact shared ModelSpecなし |
+| granite-patchtst | CERTIFIED | exact shared ModelSpecなし |
+| granite-ttm-r2 | CERTIFIED | shared `granite-ttm`とはidentity差あり |
+| kronos-base | CERTIFIED | native financial OHLCV contract、lottery compatibility=false |
+| lag-llama | CERTIFIED | exact shared ModelSpecなし |
+| moirai-1.0-base | **BLOCKED** | model weights missing / personal-noncommercial scope |
+| moirai-2.0-small | CERTIFIED | shared `moirai`とidentity差あり、lottery compatibility=false |
+| moment-1-large | CERTIFIED | forecast head scope要確認 |
+| moment-1-small | CERTIFIED | forecast head scope要確認 |
+| sundial-base | CERTIFIED | shared `sundial`とidentity差あり |
+| t0-alpha | **BLOCKED** | gated access required |
+| tabpfn-ts | CERTIFIED | shared exact ID、candidate/foundation-tabular path |
+| timesfm-2.5-transformers | CERTIFIED | shared `timesfm-2.5`とidentity/package差あり |
+| tirex-2 | CERTIFIED | shared `tirex`とlogical ID差あり |
+| toto-2.0-4m | CERTIFIED | exact shared registry entryなし |
+| toto-open-base | CERTIFIED | exact shared registry entryなし |
+
+Shared provider registryは21件より狭く、Chronos family / Sundial / TimesFM / Granite TTM / TiRex / Moirai / TabPFN-TSを中心に持ちます。provider不明はfail-closedです。
+
+### Toto 2.0 22M current boundary
+
+PR #296で `Datadog/Toto-2.0-22m` pinned snapshot、CUDA load/inference/replay、seed/precision/evidence infrastructureがmergeされました。ただし正式native-Linux gateは未完です。
 
 ```text
-AutoRNN, AutoLSTM, AutoGRU, AutoTCN, AutoDeepAR, AutoDilatedRNN,
-AutoBiTCN, AutoxLSTM, AutoMLP, AutoNBEATS, AutoNBEATSx, AutoNHITS,
-AutoDLinear, AutoNLinear, AutoTiDE, AutoDeepNPTS, AutoKAN, AutoTFT,
-AutoVanillaTransformer, AutoInformer, AutoAutoformer, AutoFEDformer,
-AutoPatchTST, AutoiTransformer, AutoTimeXer, AutoTimesNet, AutoStemGNN,
-AutoHINT, AutoTSMixer, AutoTSMixerx, AutoMLPMultivariate, AutoSOFTS,
-AutoSOFTSSharp, AutoTimeMixer, AutoRMoK, AutoXLinear
+runtime_certified=false
+shared_routing_allowed=false
+OOF=NOT_RUN
+Holdout=CLOSED
+Prospective=CLOSED
+automatic promotion=FORBIDDEN
 ```
 
-shared AutoModel pathは次をruntimeで解決します。
+したがって「22M runtime certified / shared selectable」とは記載しません。
+
+---
+
+## 9. その他のframework lane
+
+| framework | 実装されている主なもの | 現在の注意点 |
+|---|---|---|
+| Darts | RegressionEnsembleModel over NaiveDrift + ExponentialSmoothing | framework全model自動展開ではない |
+| GluonTS | Torch DeepAR + Student-T | current shared trainerはCPU-pinned。CUDA-certifiedとしない |
+| ReservoirPy | Reservoir + Ridge ESN | position-wise lane |
+| HierarchicalForecast | BottomUp/TopDown/MiddleOut/MinTrace/OptimalCombination/ERM等10 | reconciliationはstandalone forecasterではない |
+| Time-Series-Library | DLinear/TSMixer/LightTS/SegRNN/FreTS/SCINet/TimeFilter/TiDE/FiLM | isolated campaign。upstream全architecture certificationではない |
+| BasicTS | provider/config/dataset/runtime smoke contracts | isolated provider surface |
+| sktime | rolling-origin campaign/lifecycle machinery | target runtime campaign pending |
+| Merlion | ARIMA/ETS/MSES provider/certification path | target-host completion pending |
+
+---
+
+## 10. 全体機能マップ
+
+| 機能 | 実装面 | status / notes |
+|---|---|---|
+| Canonical game geometry | `loto3 games`, game contracts | **VERIFIED** |
+| Data acquisition / raw preservation | `loto data acquire` / acquisition modules | **VERIFIED / PARTIALLY_VERIFIED** per source |
+| Broad catalog | `loto3 catalog`, `catalog_full.py` | **VERIFIED**, 174 frozen |
+| Shared catalog | `loto models list`, `catalog.py` | **VERIFIED**, broadより狭い |
+| Expanded implementation identities | `implementation_catalog.py` | **VERIFIED**, Phase1=210 |
+| Model×game planning | `loto3 campaign --plan-only` | **VERIFIED** |
+| Resource-aware scheduling | live resource plan / GPU lease / process cleanup | **VERIFIED** via #270/#277 |
+| NeuralForecast HPO | `loto neuralforecast automodel-run` | **VERIFIED / PARTIALLY_VERIFIED** |
+| StatsForecast lifecycle | dedicated runtime/property/dev evaluation | **VERIFIED / PARTIALLY_VERIFIED** |
+| Runtime certification | exact identity/load/inference/device/VRAM/shape/finite checks | framework/model scope dependent |
+| Search-space persistence | DB-backed NF artifacts | **VERIFIED** |
+| Experiment/run registry | registry APIs / run evidence | **VERIFIED / PARTIALLY_VERIFIED** |
+| MLflow-compatible experiment tracking | params/metrics/artifacts integration surfaces | **PARTIALLY_VERIFIED** by execution lane |
+| Prediction sealing | sealing/prediction lock modules | **VERIFIED as capability**; prospective use remains gated |
+| Hit@±1-first evaluation | evaluation modules | **VERIFIED as metric/protocol capability** |
+| MAE/MSE/RMSE | evaluation modules | **VERIFIED** |
+| Mandatory baselines | random/fixed/mean/median/recent/frequency/statistical lanes | campaign/protocol dependent |
+| OOF | chronological development evaluation surfaces | **PARTIALLY_VERIFIED**; all-model campaign incomplete |
+| Holdout | policy gate | **CLOSED** |
+| Prospective | sealed future evaluation gate | **CLOSED** |
+| Promotion governance | approval/promotion subjects/status taxonomy | **VERIFIED as governance foundation**, auto-promotion forbidden |
+| GitHub Operations Dashboard | Actions/Projects/observability docs | **VERIFIED** |
+| Visual dashboard / Pages build gate | generated dashboard artifacts | **VERIFIED** |
+| Windows portability | Windows CI / portability work | **BLOCKED** by known NTFS-invalid path issue in current program state |
+
+---
+
+## 11. 科学評価の正しい順序
 
 ```text
-backend = optuna | ray
-num_samples
-search_strategy = auto | random | tpe | cmaes
-cpus / gpus
-parallel_trials
-workers / max_gpu_jobs
-precision
-seed
-refit_with_val
-model-specific config
+immutable raw data
+  -> data/geometry/leakage validation
+  -> time-ordered Train / Validation / Holdout / Prospective
+  -> Train-only fit of scaler/encoder/feature selection/HPO
+  -> chronological OOF with all configured seeds
+  -> mandatory baselines
+  -> Hit@±1 first + MAE/MSE/RMSE + position metrics
+  -> prediction hash/seal before actual is known
+  -> runtime/license eligibility
+  -> explicit Holdout authorization
+  -> explicit Prospective authorization
+  -> human promotion approval
 ```
 
-DB-backed AutoModel run例:
+最良seedだけを抜き出して採用せず、複数seedの平均・分散・worst caseを保存します。
+
+---
+
+## 12. 直近の実装履歴 — fact-checkした主なmerged changes
+
+| PR | merged change | README上の解釈 |
+|---:|---|---|
+| #252 | geometry-general metrics / hard-code gate | 6-game geometryへ評価を一般化 |
+| #253 | theory-aware Hit@±1 promotion foundation | 理論基準をpromotion evidenceへ接続 |
+| #254 | MDE / power planning | 科学評価前の検出力設計 |
+| #255 | README/docs capability rewrite | 旧文書の大幅整備 |
+| #257 | StatsForecast runtime lifecycle certification | lifecycle実行面を実装 |
+| #258 | StatsForecast property lifecycle certification | property evidence追加 |
+| #259 | StatsForecast real-game development evaluation Phase C | 実ゲームdevelopment lane追加 |
+| #260 | NeuralForecast parameter propagation + training evidence | seed/precision/search-space/GPU evidence修正 |
+| #261 | NeuralForecast parameter-effect audit planning | OFAT型effect audit計画を実装 |
+| #268 | statistical + causal analysis foundation | Holdout/Prospectiveを使わない分析基盤 |
+| #270 | runtime audit serialization + resource-aware broad runner | broad campaign execution control強化 |
+| #273 | repository observability + structured work intake | GitHub上の状態可視化 |
+| #274 | evidence-aware visual dashboard + Pages gate | 証拠ベースdashboard |
+| #276 | GitHub operations control center | 最初に見るOperations Dashboard |
+| #277 | resource-aware scheduler stabilization | GPU lease/resume/cleanup/worker cap安定化 |
+| #293 | Expanded v2 inventory + AutoGluon expansion | Broad v1凍結のまま210へ展開 |
+| #295 | Toto2 family manifest / provenance gate | source identityとprovenanceをfail-closed化 |
+| #298 | unintended Toto 22M probe revert | 意図しないprobeをmainから除去 |
+| #296 | Toto2 22M pinned CUDA replay infrastructure | native-Linux formal certification前の部分証拠。shared routing未解禁 |
+
+**履歴にPRがあること自体を実装済み証拠にはしません。** current `main` にコードが残っているか、merge済みか、必要なtests/evidenceがあるかを合わせて判定します。
+
+---
+
+## 13. まだ完了していない主要作業
+
+1. Broad v1 **174 × 6 = 1044** unitのruntime-remediation込み完走。
+2. Unified v1 **250 × 6 = 1500** unitのcoverage実行・結果集約。
+3. Expanded v2のAutoGluon以外（Darts / GluonTS / sktime/skforecast / Time-Series-Library / BasicTS等）のsource-backed展開とruntime campaign。
+4. NeuralForecast AutoModels 36を同一条件で全ゲームruntime認証し、GPU/CPU fallbackを明示。
+5. development OOFをHit@±1最優先で完了し、Random/固定値/平均/中央値/直近値/頻度/統計baselineと比較。
+6. Toto 2.0 22Mのnative-Linux external GPU PID/VRAM/release gateを完了するまで `runtime_certified=false` を維持。
+7. Windows portability blockerの解消。
+8. Holdout / Prospectiveはdevelopment evidenceと明示承認が揃うまで閉じたまま維持。
+
+---
+
+## 14. よく使う入口
 
 ```bash
-uv run loto neuralforecast automodel-list --format table
+# 6ゲームgeometry
+uv run loto3 games
 
-uv run loto neuralforecast automodel-run \
-  --db-url sqlite:///data/platform.sqlite3 \
-  --table normalized_draws \
-  --game numbers4 \
-  --models nf-auto-dlinear,nf-auto-nhits \
-  --backend optuna \
-  --num-samples 10 \
-  --cpus 8 \
-  --gpus 1 \
-  --parallel-trials 2 \
-  --seed 1 \
-  --output artifacts/nf-auto-example
-```
-
-Rayを使う場合は`--backend ray`とし、resource上限を明示します。
-
-`AutoHINT`は特殊routeで、hierarchy、base model、distribution loss、reconciliation/coherenceを個別に組み立てます。
-
-### Repository-local NeuralForecast extensions
-
-公式36 AutoModelとは別に:
-
-| extension | 状態 |
-|---|---|
-| AutoTimeLLM | `src/loto/neuralforecast/auto_timellm/**` — fail-closed local extension |
-| AutoSCINet | `src/loto/neuralforecast/auto_scinet/**` — local extension |
-| AutoSegRNN | module上でInactive |
-| AutoFreTS | module上でInactive |
-
-「class/fileが存在する」「shared catalogへ配線された」「formal OOF済み」はそれぞれ別状態です。
-
----
-
-## 10. AutoGluon TimeSeries
-
-AutoGluonはrootへ無理に同居させず、isolated runtimeを使います。
-
-```text
-environments/autogluon-timeseries/
-scripts/run_autogluon_timeseries_provider.py
-```
-
-shared workerから概ね次の形で呼ばれます。
-
-```bash
-uv run --project environments/autogluon-timeseries --locked \
-  python scripts/run_autogluon_timeseries_provider.py ...
-```
-
-protocol v2が現在の標準で、v1は明示compatibility pathです。
-
-既存runtime evidenceではAutoGluon TimeSeries 1.5.0のCPU/fallback certificationと、real Naive fit/predict/save + persisted load/predict smokeが記録されています。**その証拠をGPU certificationへ読み替えません。**
-
-またAutoGluon promotion eligibilityにはhistorical v1とtheory-aware v2があります。v2でもautomatic promotion / automatic retraining / registry writeは明示的に禁止されています。
-
----
-
-## 11. Darts / GluonTS / ReservoirPy
-
-### Darts
-
-shared `darts-ensemble`はpositionごとに:
-
-```text
-NaiveDrift
-ExponentialSmoothing
-  -> RegressionEnsembleModel
-```
-
-をfitして1-step forecastを生成します。
-
-### GluonTS
-
-shared `gluonts-deepar`はTorch `DeepAREstimator` + Student-T outputを利用します。
-
-現在のshared workerはtrainerを`accelerator=cpu`, `devices=1`へ明示固定しています。したがって**GluonTS routeは存在しますが、このpathがCUDA要求を満たすとは記載しません。** GPUを主張する場合は別途actual device evidenceが必要です。
-
-### ReservoirPy
-
-shared `reservoir-esn`はpositionごとに`Reservoir >> Ridge`を構築し、deterministic seed offsetで1-step予測します。
-
----
-
-## 12. HierarchicalForecast / reconciliation
-
-HierarchicalForecastは独立forecasterではなく、base forecastをcoherentにする**reconciliation layer**です。
-
-core NumPy implementation:
-
-```text
-bottom_up
-top_down
-ols
-wls_struct
-mint_shrink
-```
-
-upstream HierarchicalForecast inventory:
-
-```text
-BottomUp
-BottomUpSparse
-TopDown
-TopDownSparse
-MiddleOut
-MiddleOutSparse
-MinTrace
-MinTraceSparse
-OptimalCombination
-ERM
-```
-
-試行例:
-
-```bash
-uv run loto3 hierarchy --game loto7 --method wls_struct --seed 42
-```
-
-一部upstream methodはstrict treeを要求するため、grouped hierarchyでは`UNSUPPORTED_HIERARCHY`になり得ます。10登録 = 10手法が全gameでstandalone実行できる、ではありません。
-
----
-
-## 13. BasicTS / Time-Series-Library / sktime / skforecast / Merlion
-
-これらはshared catalogだけを見て判断しないlibrary群です。
-
-### BasicTS
-
-```text
-src/loto/basicts_campaign/**
-scripts/run_basicts_provider.py
-```
-
-isolated provider contractでidentity、config validation、dataset compilation、construct/forward/save/load smoke等を扱います。既存contractはBasicTS 1.1.0と明示upstream revisionを使い、CPU-only laneを持ちます。
-
-### Time-Series-Library
-
-```text
-src/loto/time_series_library_campaign/**
-```
-
-provider/campaignが明示実装する主要model:
-
-```text
-DLinear
-TSMixer
-LightTS
-SegRNN
-FreTS
-SCINet
-TimeFilter
-TiDE
-FiLM
-```
-
-fit-save / load-predict / upstream discovery / bundle materialization / prediction verification / round-trip verificationを持ちます。
-
-### sktime
-
-```text
-src/loto/sktime_campaign/**
-```
-
-rolling-origin、validation benchmark、Holdout/Prospective contractを持つ別campaignです。通常の`PositionSeriesWorker` branchとは別です。
-
-### skforecast
-
-`frameworks` extraとbroad catalogにはありますが、現在のshared `PositionSeriesWorker`に直接dispatch branchはありません。したがってshared auto-run可能とは扱いません。
-
-### Merlion
-
-```text
-src/loto/merlion_campaign/**
-```
-
-version-isolated runtime/provenance/certification surfaceです。174-entry broad countにも通常shared workerにも含めません。
-
----
-
-## 14. Time-Series Foundation Models (TSFM)
-
-Broad inventoryは21 TSFM entryを持ちます。
-
-```text
-Chronos 2 / Chronos Bolt / Chronos T5
-TimesFM 2.5
-IBM Granite TTM / FlowState / PatchTST / PatchTSMixer
-Moirai 2.0 / 1.0
-TiRex 2
-Toto Open Base / Toto 2.0 4M
-MOMENT 1 small / large
-Lag-Llama
-Kronos
-Sundial
-TabPFN-TS
-T0 alpha
-```
-
-shared provider registryは少なくとも次を実装しています。
-
-| shared ID | provider |
-|---|---|
-| `chronos-bolt-tiny`, `chronos-t5-small`, `chronos-2`, `chronos-2-small` | `ChronosProvider` |
-| `timesfm-2.5` | `TimesFMProvider` |
-| `granite-ttm` | `GraniteTTMProvider` |
-| `tirex` | `TiRexProvider` |
-| `moirai` | `MoiraiProvider` |
-| `sundial` | `SundialProvider` |
-| `tabpfn-ts` | `TabPFNTSProvider` |
-
-unknown providerはsilent fallbackせず`PROVIDER_NOT_IMPLEMENTED`でfail closedします。
-
-### Revision pinning
-
-Broad inventoryのTSFM `revision=None`は「適当なSHAを埋めない」ための設計です。formal executionでは別manifestでimmutable revisionを結びます。
-
-```bash
-uv run loto3 revisions template --output /tmp/tsfm-pins.json
-uv run loto3 revisions validate --manifest configs/tsfm/verified-revisions.json --require-complete
-uv run loto3 revisions report --manifest configs/tsfm/verified-revisions.json --require-complete
-```
-
-### Runtime audit evidence
-
-`audit/tsfm-runtime/runtime-status.json`は現在、point-in-time aggregateとして:
-
-```text
-total_models=21
-runtime_certified_models=19
-```
-
-を記録しています。これは**exact runtime identityに対するload/inference evidence**であり、19モデルが全6ゲームでOOF superiorityを持つという意味ではありません。blocked/gated/licensing状態も個別recordで確認してください。
-
----
-
-## 15. 確率モデル / Probabilistic Programming
-
-`loto3 probabilistic`は通常の174 broad forecast inventoryとは別に、**72-model probabilistic catalog**を持ちます。
-
-```bash
-uv run loto3 probabilistic catalog-list
-uv run loto3 probabilistic native-coverage
-uv run loto3 probabilistic backends
-uv run loto3 probabilistic compatibility \
-  --model-id pp-conditional-bernoulli-fixed-k \
-  --game loto7 \
-  --backend builtin
-```
-
-familyには次のようなものがあります。
-
-```text
-conjugate / dynamic_conjugate / empirical_bayes
-bayesian_regression / hierarchical / state_space
-changepoint / regime_switching / mixture / nonparametric
-copula / gaussian_process / tree_bayesian
-fixed_subset / calibration / decision / ensemble
-count / ordinal / semi_parametric / deep_probabilistic
-```
-
-optional backend surface:
-
-```text
-builtin
-PyMC / ArviZ / PyMC-BART
-NumPyro + JAX
-Pyro + Torch
-CmdStanPy
-BlackJAX + JAX
-TensorFlow Probability
-```
-
-代表的なnative implementationにはfixed-k Conditional Bernoulli、multinomial DGLM、Gaussian copula categorical、BOCPD Dirichlet-categoricalなどがあります。
-
-実行はconfig-drivenです。
-
-```bash
-uv run loto3 probabilistic validate-config --config <config.yaml>
-uv run loto3 probabilistic plan --config <config.yaml>
-uv run loto3 probabilistic smoke --config <config.yaml>
-uv run loto3 probabilistic run --config <config.yaml>
-uv run loto3 probabilistic status --run-dir <run-dir>
-uv run loto3 probabilistic diagnose --run-dir <run-dir>
-uv run loto3 probabilistic compare --run-dir <run-dir>
-```
-
----
-
-## 16. 6ゲーム統一 all-model × all-game development campaign
-
-全ゲーム横断で比較する場合の正規入口は**`loto3 campaign`**です。
-
-### まずplanだけ確認
-
-```bash
-uv run loto3 campaign --output unused --plan-only
-```
-
-特定library/modelだけに絞る場合:
-
-```bash
-uv run loto3 campaign \
-  --output unused \
-  --games numbers3,numbers4,loto7 \
-  --models logistic,nf-nhits,chronos-2 \
-  --plan-only
-```
-
-### 実データdevelopment run
-
-入力directoryには対象gameの`<game>.csv`を置きます。
-
-```bash
-RUN_ID="campaign-$(date +%Y%m%d-%H%M%S)"
-
-uv run loto3 campaign \
-  --input-dir /absolute/path/to/canonical-csvs \
-  --output "artifacts/unified-campaign/${RUN_ID}" \
-  --seeds 42,1729,20260730 \
-  --folds 5 \
-  --test-size 20 \
-  --min-train-size 100 \
-  --holdout-size 50 \
-  --device auto \
-  --precision 32 \
-  --max-trials 10 \
-  --parallel-trials 1
-```
-
-### 小さいsynthetic smoke
-
-```bash
-uv run loto3 campaign \
-  --synthetic --synthetic-rows 40 \
-  --games numbers3,loto7 \
-  --models logistic \
-  --seeds 1 \
-  --folds 1 --test-size 2 --min-train-size 12 --holdout-size 4 \
-  --device cpu \
-  --output /tmp/loto-unified-smoke
-```
-
-### Campaignの重要な性質
-
-- requested **model × game pairをexactly one row**として残す。
-- `SUCCEEDED`だけでなく、`PARTIAL_SEEDS`, `FAILED`, `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `NON_STANDALONE_METHOD`を保持する。
-- `matrix_complete=true`は「全組合せに結果行がある」という意味で、全組合せ成功ではない。
-- full broad runを計画できることと、174 × 6のreal-data成功が完了済みであることは別。
-
----
-
-## 17. 評価指標、baselines、seed
-
-Primary metricは**Hit@±1**です。
-
-必須metrics:
-
-```text
-hit_at_1 / within_tau_rate
-position_hit_at_1
-all_positions_hit_at_1 / all_positions_within_tau_rate
-MAE
-MSE
-RMSE
-```
-
-geometry-general metric layerではselect/digitsの意味を分離しています。
-
-Mandatory baselines:
-
-```text
-random
-fixed
-mean
-median
-last
-frequency
-statistical_ar1
-```
-
-Default campaign seeds:
-
-```text
-42
-1729
-20260730
-```
-
-各metricは全seedを保持し、meanだけでなくpopulation variance、standard deviation、min/max、worst value、worst seedを残します。**best seedだけを選んでchampionにする設計ではありません。**
-
----
-
-## 18. Hit@±1-optimal decoder
-
-Probability-bearing candidate routeは、単純MAPだけでなく「±1以内に入る期待効用」を最大化する`WITHIN_TAU` objectiveを使えます。
-
-```text
-candidate probabilities
-  -> row-normalized-slot-binary-probability-v1
-  -> family dispatch
-       digits: positionごとのwindow-mass最大化
-       select: ascending/distinct legalityを守るconstrained DP
-  -> legal point prediction
-```
-
-select gameではstrictly increasing tupleを壊さず、digits gameではposition order/repetitionを維持します。
-
-point-only modelへ架空の確率分布を作ることはしません。decoder objective、distribution identity、post-processing identityはevidenceへ残します。
-
----
-
-## 19. Prediction sealing / leakage防止
-
-各formal evaluationで重要なのは「実測を見てから予測を書かない」ことです。
-
-Unified campaignでは各`game × candidate × seed`について:
-
-```text
-Train-only fit / eligible history
--> predict
--> prediction evidenceを書込 (actuals_known=false)
--> fsync
--> SHA-256を固定
--> その後にtarget actualをscoring stageで読む
--> metrics
-```
-
-既存output directoryは再利用せず、Run IDを分離します。
-
-Formal scientific ordering:
-
-```text
-Train
--> Validation / OOF development
--> authorized Holdout
--> sealed Prospective prediction
--> later actual scoring
--> promotion eligibility
-```
-
-HoldoutやProspectiveをdevelopment runが勝手に開くことはありません。
-
----
-
-## 20. Theory-aware Hit@±1 threshold
-
-`src/loto/evaluation/theory_guard.py`は、目標値を単なる固定%として扱わず、game geometryのIID-null理論値と結びます。
-
-2つのsemantics:
-
-```text
-absolute
-excess_vs_iid_null
-```
-
-例として`excess_vs_iid_null`のtarget=0.0は「IID-null exact referenceと同じabsolute target」を意味します。
-
-absolute targetがIID-null ceilingを超える場合、単に「高い目標だからよい」と受理せず、明示的なalternative hypothesisなしではfail closedします。
-
-IID-null ceilingは**指定IID-null分布下のexact optimum**であり、あらゆるbiased processに対する普遍的上限とは主張しません。
-
----
-
-## 21. Promotion eligibility — manual only
-
-AutoGluon campaignにはhistorical v1とtheory-aware v2 policyがあります。
-
-v2は:
-
-- `game`を必須化
-- scoring evidenceのsealed `game_id`とpolicy gameの一致を必須化
-- `tau=1`に固定
-- theory-aware semanticsから実際に比較するabsolute Hit@±1 targetを導出
-- aggregate/worst prospective windowを同じtargetで評価
-- Holdout→Prospective degradationを評価
-- mandatory baselines全件を比較
-
-します。
-
-しかし、全ruleがpassしてもdecisionは:
-
-```text
-ELIGIBLE_FOR_HUMAN_APPROVAL
-```
-
-までです。コード上で常に:
-
-```text
-human_approval_required = true
-automatic_promotion = false
-automatic_retraining = false
-registry_write_allowed = false
-promotion_status = NOT_PROMOTED
-```
-
-を維持します。
-
-したがって、**promotion eligibility == production promotionではありません。**
-
----
-
-## 22. 事前MDE / power planning
-
-`src/loto/evaluation/power_analysis.py`は「改善が見えなかった」のか「そもそもsample sizeでその差を検出できない」のかを事前に区別するためのplanning utilityです。
-
-method:
-
-```text
-paired-score-normal-approximation-v1
-```
-
-提供API:
-
-```python
-from loto.evaluation.power_analysis import (
-    PowerPlan,
-    minimum_detectable_effect,
-    power_curve,
-    required_paired_draws,
-)
-```
-
-`PowerPlan`は:
-
-- alpha
-- target power
-- multiplicity
-- one-sided positive paired alternative
-
-を固定し、multiplicityにはBonferroni planning alphaを使います。
-
-```python
-plan = PowerPlan(alpha=0.05, target_power=0.80, multiplicity=10)
-
-required = required_paired_draws(
-    effect=0.02,
-    score_sd=0.20,
-    plan=plan,
-)
-
-mde = minimum_detectable_effect(
-    n_draws=500,
-    score_sd=0.20,
-    plan=plan,
-)
-
-curve = power_curve((100, 250, 500, 1000), 0.20, plan=plan)
-```
-
-`score_sd`はtarget windowを見る前にdevelopment/pilot evidenceまたは宣言済みsimulationから固定する必要があります。これは**planning evidenceであり、p-value、Holdout result、promotion decisionではありません。**
-
----
-
-## 23. Artifacts / registry / approval / integrity
-
-Platformには予測だけでなく、run/evidence control-planeがあります。
-
-主なCLI:
-
-```bash
-uv run loto experiment status
-uv run loto artifact put --file <path> --store <artifact-store>
-uv run loto artifact verify-bundle --bundle <bundle>
-uv run loto approval request ...
-uv run loto approval decide ...
-uv run loto3 integrity generate --root .
-uv run loto3 integrity check --root .
-```
-
-PostgreSQL lane、MLflow lane、OpenTelemetry、Prometheus-compatible metrics、structured event/evidence layerを組み合わせられます。具体的なrunがどのstoreを使ったかは、そのrunのconfig/artifact manifestを権威としてください。
-
----
-
-## 24. Local API / run control / VOICEVOX
-
-Probabilistic execution surfaceにはauthenticated local APIがあります。
-
-```bash
-uv run loto3 probabilistic api-token-create --root .
-uv run loto3 probabilistic api-serve --root .
-uv run loto3 probabilistic api-health --root .
-uv run loto3 probabilistic api-profiles --root .
-
-uv run loto3 probabilistic run-start --root . --profile fast_cpu
-uv run loto3 probabilistic run-current --root .
-uv run loto3 probabilistic run-stop --root .
-```
-
-VOICEVOX endpointを利用するTTS surface:
-
-```bash
-uv run loto3 probabilistic tts-status --root .
-uv run loto3 probabilistic tts-play --root . --text "実験が完了しました"
-uv run loto3 probabilistic tts-synthesize \
-  --root . \
-  --text "検証結果を保存しました" \
-  --output /tmp/result.wav
-```
-
-API/TTS availabilityはlocal service/backendの実状態に依存します。
-
----
-
-## 25. 目的別の推奨運用
-
-### A. 「まず何が登録されているか見たい」
-
-```bash
+# Broad 174 inventory
 uv run loto3 catalog --counts
-uv run loto3 catalog --library neuralforecast
-uv run loto models list --format table
+
+# Shared executable surface
+uv run loto models list
+
+# model×game plan only
+uv run loto3 campaign --output unused --plan-only
+
+# NeuralForecast AutoModels
+uv run loto neuralforecast automodel-run --help
+
+# Probabilistic catalog/backend
+uv run loto3 probabilistic catalog-list
+uv run loto3 probabilistic backends
+
+# TSFM pinned revisions
+uv run loto3 revisions --help
+
+# Data acquisition
+uv run loto data acquire --help
 ```
 
-### B. 「特定modelをshared pathで試したい」
+---
 
-1. `loto models show <id>`で`ModelSpec`確認。
-2. 必要extra/providerをinstall。
-3. small synthetic/focused run。
-4. load/inference/device evidence確認。
-5. OOFへ進む場合はprotocol/data snapshotを固定。
+## 15. 正本 / 詳細資料
 
-### C. 「全library/modelを6ゲームで同条件比較したい」
+実装状態の判定はMarkdown単独ではなく、次の順に確認してください。
 
-1. `loto3 campaign --plan-only`でmatrix確認。
-2. 6ゲームのimmutable canonical CSV snapshotを準備。
-3. resource budgetとseedを固定。
-4. development campaignを新Run IDで実行。
-5. `model_game_results.csv`の成功だけでなくfailure statusも解析。
-6. mandatory baselines / seed variance / leakage / prediction sealを検証。
-7. OOF evidenceが十分になるまでHoldoutを開かない。
+1. **current code**
+   - `src/loto/models/catalog_full.py`
+   - `src/loto/models/catalog.py`
+   - `src/loto/models/implementation_catalog.py`
+   - `src/loto/models/providers.py`
+   - framework-specific `*_campaign` / `neuralforecast` / `statsforecast` modules
+2. **tests / workflows / retained artifacts**
+3. **merged PR / commit history**
+4. **live project state**
+5. documentation
 
-### D. 「AutoModelをOptuna/Rayで探索したい」
+詳細資料:
 
-`loto neuralforecast automodel-run`を使い、trial数、parallel trials、CPU/GPU、seed、precisionを明示します。modelごとの失敗を別Run ID/evidenceで残し、best trialだけで全model評価を置換しません。
+- [`docs/CAPABILITIES_AND_OPERATIONS.md`](docs/CAPABILITIES_AND_OPERATIONS.md)
+- [`docs/TSFM_RUNTIME_CAPABILITIES.md`](docs/TSFM_RUNTIME_CAPABILITIES.md)
+- [`docs/operations/`](docs/operations/)
+- [`docs/observability_expansion/`](docs/observability_expansion/)
+- [`docs/evaluation/`](docs/evaluation/)
 
-### E. 「Foundation modelを使いたい」
+Upstream references:
 
-1. broad catalogのrepo IDを見る。
-2. verified revision manifestを確認。
-3. shared providerまたはisolated providerの有無を確認。
-4. exact model/revision/runtimeのcertification evidenceを確認。
-5. OOFはruntime certificationと別runとして実施。
+- NeuralForecast: https://nixtlaverse.nixtla.io/neuralforecast/
+- StatsForecast: https://nixtlaverse.nixtla.io/statsforecast/
+- MLForecast: https://nixtlaverse.nixtla.io/mlforecast/
+- HierarchicalForecast: https://nixtlaverse.nixtla.io/hierarchicalforecast/
+- Ray Tune: https://docs.ray.io/en/latest/tune/
+- Optuna: https://optuna.readthedocs.io/
+- MLflow: https://mlflow.org/docs/latest/
 
-### F. 「promotion判定まで進めたい」
+---
+
+## 16. 読み方の原則
+
+このrepositoryでは次を常に分けます。
 
 ```text
-runtime certification
--> leakage-safe OOF
--> authorized Holdout
--> multiple sealed Prospective windows
--> theory-aware target + baseline/degradation rules
--> ELIGIBLE_FOR_HUMAN_APPROVAL
--> human approval
+source-declared
+catalog-registered
+shared-routable
+provider-routable
+load-verified
+inference-verified
+runtime-certified
+lottery-compatible
+OOF-evaluated
+Holdout-evaluated
+Prospective-evaluated
+promotion-eligible
 ```
 
-自動promotionや自動registry writeへ短絡しません。
-
----
-
-## 26. Capability stateの読み方
-
-文書では次の段階を使います。
-
-```text
-REGISTERED
--> DEPENDENCY_DECLARED
--> IMPLEMENTED
--> SHARED_ROUTABLE or PROVIDER_ROUTABLE
--> RUNTIME_CERTIFIED
--> LOTTERY_COMPATIBLE
--> OOF_EVALUATED
--> HOLDOUT_EVALUATED
--> PROSPECTIVE_EVALUATED
--> PROMOTION_ELIGIBLE
--> HUMAN_APPROVED / PROMOTED (別の明示操作)
-```
-
-後段を前段から推測しません。
-
----
-
-## 27. 現在の科学的境界 / 非主張
-
-このREADMEが説明するのは**機能・実行契約・既存runtime evidence**です。現時点で次を自動的には主張しません。
-
-- 174 broad entriesすべてがshared-routableである。
-- 174 entriesすべてが6ゲームすべてでruntime成功した。
-- 実データの完全な174 × 6 campaignが完了済みである。
-- 19 runtime-certified TSFMが全6ゲームでOOF superiorityを示した。
-- WITHIN_TAU decoderが全modelのreal OOFを改善する。
-- lottery drawが非IIDである。
-- Holdoutが開放済みである。
-- Prospective evidenceが完成している。
-- championが存在する。
-- production promotionが承認済みである。
-
-Open scientific/runtime workのcurrent snapshotは`docs/STATUS.md`を参照してください。
-
----
-
-## 28. Documentation map
-
-最初に読む順:
-
-1. [`docs/CAPABILITIES_AND_OPERATIONS.md`](docs/CAPABILITIES_AND_OPERATIONS.md) — library/model/CLI/providerを目的別に引ける詳細運用表
-2. [`docs/STATUS.md`](docs/STATUS.md) — 現在の監査snapshotと科学的境界
-3. [`docs/MODEL_EXECUTION_MATRIX.md`](docs/MODEL_EXECUTION_MATRIX.md) — registered/shared/provider/runtime evidenceの詳細
-4. [`docs/UNIFIED_EVALUATION_CAMPAIGN.md`](docs/UNIFIED_EVALUATION_CAMPAIGN.md) — all-model × all-game development campaign
-5. [`docs/evaluation_protocol/PROTOCOL_V2.md`](docs/evaluation_protocol/PROTOCOL_V2.md) — formal evaluation protocol
-6. [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) — 要件
-7. [`docs/SPECIFICATION.md`](docs/SPECIFICATION.md) — 外部仕様
-8. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — architecture
-9. [`docs/DATA_CONTRACT.md`](docs/DATA_CONTRACT.md) — data/leakage contract
-10. [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md) — verification gates
-11. [`docs/CURRENT_RUNBOOK.md`](docs/CURRENT_RUNBOOK.md) — 現在の実行手順
-12. [`docs/CURRENT_HANDOFF.md`](docs/CURRENT_HANDOFF.md) — 次作業への引継ぎ
-13. [`docs/DOCUMENTATION_POLICY.md`](docs/DOCUMENTATION_POLICY.md) — current/historical/generated evidenceの読み方
-
-`docs/MODEL_INVENTORY.md`はgenerated broad inventoryです。手書きの「実行可能数」として扱わないでください。
-
----
-
-## 29. Repository validation
-
-開発中はfocused testを優先し、最後にfull gateをまとめます。
-
-```bash
-uv sync --locked --extra dev
-uv run ruff format --check src scripts tests
-uv run ruff check src scripts tests
-uv run python -m compileall -q src scripts tests
-uv run pytest -q
-```
-
-Runtime-sensitive providerはこれに加えて、exact model/revision/environmentでload → inference → output checks → device evidence → unload/reloadを検証します。
-
----
-
-## 30. 重要な原則
-
-このplatformの目的は「モデル名を大量に並べること」ではありません。
-
-**同じゲーム、同じ時点、同じeligible data、同じmetrics/baselines、全seed、予測固定、明示resource budgetの下で比較し、失敗も含めて再現できる証拠を残すこと**が中心です。
+上の段階を飛ばして、下の段階をREADMEやdashboardで主張しないことが基本ルールです。
