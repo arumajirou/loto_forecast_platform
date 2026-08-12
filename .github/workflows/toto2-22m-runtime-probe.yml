@@ -128,8 +128,12 @@ jobs:
           nvidia-smi | tee "$EVIDENCE_DIR/nvidia-smi.txt"
           PYTHONPATH=src "$python" - <<'PY' | tee "$EVIDENCE_DIR/cuda-preflight.txt"
           import importlib.metadata
+          from pathlib import Path
+
           import torch
 
+          osrelease = Path("/proc/sys/kernel/osrelease").read_text(encoding="utf-8").strip()
+          print(f"kernel_osrelease={osrelease}")
           print(f"torch={torch.__version__}")
           print(f"torch_cuda={torch.version.cuda}")
           print(f"cuda_available={torch.cuda.is_available()}")
@@ -150,38 +154,32 @@ jobs:
             --seed 1 \
             2>&1 | tee "$EVIDENCE_DIR/run-1.log"
 
-      - name: Verify process 1 released GPU
+      - name: Verify process 1 exited
         run: |
           set -Eeuo pipefail
           python="$RUNTIME_VENV/bin/python"
           "$python" - "$EVIDENCE_DIR/run-1/probe.json" "$EVIDENCE_DIR/release-1.json" <<'PY'
           import json
-          import subprocess
           import sys
           from pathlib import Path
 
           probe = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           pid = int(probe["pid"])
-          completed = subprocess.run(
-              [
-                  "nvidia-smi",
-                  "--query-compute-apps=pid",
-                  "--format=csv,noheader,nounits",
-              ],
-              check=False,
-              capture_output=True,
-              text=True,
-          )
-          if completed.returncode != 0:
-              raise SystemExit(completed.stderr)
-          pids = {int(line.strip()) for line in completed.stdout.splitlines() if line.strip().isdigit()}
-          released = pid not in pids
+          process_exited = not Path(f"/proc/{pid}").exists()
+          external_pid = bool(probe["device"]["external_gpu_pid_captured"])
+          payload = {
+              "pid": pid,
+              "process_exited": process_exited,
+              "external_gpu_pid_captured": external_pid,
+              "post_exit_gpu_release_certified": False,
+              "certification_blocker": probe["device"]["external_gpu_pid_blocker"],
+          }
           Path(sys.argv[2]).write_text(
-              json.dumps({"pid": pid, "released": released}, indent=2, sort_keys=True) + "\n",
+              json.dumps(payload, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
-          if not released:
-              raise SystemExit(f"provider pid still holds GPU resources: {pid}")
+          if not process_exited:
+              raise SystemExit(f"provider process still exists: {pid}")
           PY
 
       - name: Run offline replay probe process 2
@@ -195,38 +193,32 @@ jobs:
             --local-files-only \
             2>&1 | tee "$EVIDENCE_DIR/run-2.log"
 
-      - name: Verify process 2 released GPU
+      - name: Verify process 2 exited
         run: |
           set -Eeuo pipefail
           python="$RUNTIME_VENV/bin/python"
           "$python" - "$EVIDENCE_DIR/run-2/probe.json" "$EVIDENCE_DIR/release-2.json" <<'PY'
           import json
-          import subprocess
           import sys
           from pathlib import Path
 
           probe = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           pid = int(probe["pid"])
-          completed = subprocess.run(
-              [
-                  "nvidia-smi",
-                  "--query-compute-apps=pid",
-                  "--format=csv,noheader,nounits",
-              ],
-              check=False,
-              capture_output=True,
-              text=True,
-          )
-          if completed.returncode != 0:
-              raise SystemExit(completed.stderr)
-          pids = {int(line.strip()) for line in completed.stdout.splitlines() if line.strip().isdigit()}
-          released = pid not in pids
+          process_exited = not Path(f"/proc/{pid}").exists()
+          external_pid = bool(probe["device"]["external_gpu_pid_captured"])
+          payload = {
+              "pid": pid,
+              "process_exited": process_exited,
+              "external_gpu_pid_captured": external_pid,
+              "post_exit_gpu_release_certified": False,
+              "certification_blocker": probe["device"]["external_gpu_pid_blocker"],
+          }
           Path(sys.argv[2]).write_text(
-              json.dumps({"pid": pid, "released": released}, indent=2, sort_keys=True) + "\n",
+              json.dumps(payload, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
-          if not released:
-              raise SystemExit(f"provider pid still holds GPU resources: {pid}")
+          if not process_exited:
+              raise SystemExit(f"provider process still exists: {pid}")
           PY
 
       - name: Verify exact two-process replay
@@ -248,19 +240,25 @@ jobs:
           output_1 = np.load(root / "run-1/native_output.npy", allow_pickle=False)
           output_2 = np.load(root / "run-2/native_output.npy", allow_pickle=False)
 
-          assert first["status"] == "PASS"
-          assert second["status"] == "PASS"
+          allowed_statuses = {"PASS", "PARTIAL_PASS"}
+          assert first["status"] in allowed_statuses
+          assert second["status"] in allowed_statuses
           assert int(first["pid"]) != int(second["pid"])
           assert first["snapshot"]["files"] == second["snapshot"]["files"]
           assert first["model_identity"] == second["model_identity"]
           assert first["device"]["gpu_uuid"] == second["device"]["gpu_uuid"]
           assert first["native_output_sha256"] == second["native_output_sha256"]
           assert np.array_equal(output_1, output_2)
-          assert release_1["released"] is True
-          assert release_2["released"] is True
+          assert release_1["process_exited"] is True
+          assert release_2["process_exited"] is True
 
+          blockers = sorted(set(first["certification_blockers"] + second["certification_blockers"]))
+          external_pid = bool(first["device"]["external_gpu_pid_captured"]) and bool(
+              second["device"]["external_gpu_pid_captured"]
+          )
+          status = "PASS" if not blockers and external_pid else "PARTIAL_PASS"
           certification = {
-              "status": "PASS",
+              "status": status,
               "contract": "toto2-22m-runtime-probe-v1",
               "revision": first["revision"],
               "snapshot_files": first["snapshot"]["files"],
@@ -275,18 +273,22 @@ jobs:
                   second["device"]["peak_vram_bytes"],
               ],
               "exact_replay": True,
-              "post_exit_gpu_release": True,
+              "provider_processes_exited": True,
+              "external_gpu_pid_captured": external_pid,
+              "post_exit_gpu_release_certified": False,
               "snapshot_validation_ready_candidate": True,
               "formal_runtime_certified": False,
               "shared_routing_allowed": False,
               "accuracy_certified": False,
               "holdout_open": False,
               "prospective_open": False,
+              "certification_blockers": blockers,
           }
           (root / "CERTIFICATION.json").write_text(
               json.dumps(certification, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
+          print(json.dumps(certification, indent=2, sort_keys=True))
           PY
 
       - name: Verify tracked files stayed clean
@@ -298,7 +300,7 @@ jobs:
 
       - name: Upload runtime probe evidence
         if: ${{ always() }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.0
         with:
           name: toto2-22m-runtime-probe-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/toto2-22m-runtime-probe/

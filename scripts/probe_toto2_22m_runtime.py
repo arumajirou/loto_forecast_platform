@@ -18,9 +18,12 @@ from loto.toto2_campaign.variant_probe import (
     TOTO2_22M_REPO_ID,
     TOTO2_22M_REQUIRED_FILES,
     TOTO2_22M_REVISION,
+    WSL_NVML_BLOCKER,
     VariantProbeError,
     capture_gpu_process,
     inspect_snapshot,
+    is_wsl,
+    query_gpu_uuid,
 )
 
 EXPECTED_MODEL_CLASS = "Toto2Model"
@@ -87,6 +90,28 @@ def validate_model(model: Any) -> dict[str, Any]:
         "parameter_count": parameter_count,
         "patch_size": patch_size,
         "quantile_levels": list(quantiles),
+    }
+
+
+def resolve_external_gpu_evidence(pid: int, device_index: int) -> dict[str, Any]:
+    try:
+        process = capture_gpu_process(pid)
+    except VariantProbeError:
+        if not is_wsl():
+            raise
+        return {
+            "external_gpu_pid_captured": False,
+            "external_gpu_pid_blocker": WSL_NVML_BLOCKER,
+            "gpu_uuid": query_gpu_uuid(device_index),
+            "nvidia_smi_used_gpu_memory_mib": None,
+            "evidence_scope": "GPU_UUID_ONLY_NVML_PROCESS_QUERY_BLOCKED",
+        }
+    return {
+        "external_gpu_pid_captured": True,
+        "external_gpu_pid_blocker": None,
+        "gpu_uuid": process.gpu_uuid,
+        "nvidia_smi_used_gpu_memory_mib": process.used_gpu_memory_mib,
+        "evidence_scope": "EXACT_PID_GPU_UUID_VRAM",
     }
 
 
@@ -163,18 +188,20 @@ def run_probe(args: argparse.Namespace) -> dict[str, Any]:
     output_device = str(output.device)
     if not output_device.startswith("cuda"):
         raise VariantProbeError(f"output fell back to CPU: {output_device}")
-    gpu_process = capture_gpu_process(os.getpid())
+    external_gpu = resolve_external_gpu_evidence(os.getpid(), device_index)
     peak_vram = int(torch.cuda.max_memory_allocated(device_index))
-    if peak_vram <= 0:
-        raise VariantProbeError("CUDA probe did not record positive peak VRAM")
+    current_vram = int(torch.cuda.memory_allocated(device_index))
+    if peak_vram <= 0 or current_vram <= 0:
+        raise VariantProbeError("CUDA probe did not record positive model VRAM")
 
     native = output.detach().to("cpu", dtype=torch.float32).numpy()
     output_path = args.output / "native_output.npy"
     np.save(output_path, native, allow_pickle=False)
     output_sha256 = sha256_bytes(native.tobytes(order="C"))
+    partial = not bool(external_gpu["external_gpu_pid_captured"])
 
     return {
-        "status": "PASS",
+        "status": "PARTIAL_PASS" if partial else "PASS",
         "probe_contract": "toto2-22m-runtime-probe-v1",
         "repo_id": TOTO2_22M_REPO_ID,
         "revision": TOTO2_22M_REVISION,
@@ -189,9 +216,14 @@ def run_probe(args: argparse.Namespace) -> dict[str, Any]:
             "model": model_device,
             "output": output_device,
             "torch_device_name": torch.cuda.get_device_name(device_index),
-            "gpu_uuid": gpu_process.gpu_uuid,
-            "nvidia_smi_used_gpu_memory_mib": gpu_process.used_gpu_memory_mib,
+            "device_index": device_index,
+            "gpu_uuid": external_gpu["gpu_uuid"],
+            "external_gpu_pid_captured": external_gpu["external_gpu_pid_captured"],
+            "external_gpu_pid_blocker": external_gpu["external_gpu_pid_blocker"],
+            "external_gpu_evidence_scope": external_gpu["evidence_scope"],
+            "nvidia_smi_used_gpu_memory_mib": external_gpu["nvidia_smi_used_gpu_memory_mib"],
             "vram_before_bytes": vram_before,
+            "current_vram_bytes": current_vram,
             "peak_vram_bytes": peak_vram,
             "cpu_fallback": False,
         },
@@ -207,6 +239,7 @@ def run_probe(args: argparse.Namespace) -> dict[str, Any]:
         "accuracy_certified": False,
         "holdout_open": False,
         "prospective_open": False,
+        "certification_blockers": [WSL_NVML_BLOCKER] if partial else [],
     }
 
 

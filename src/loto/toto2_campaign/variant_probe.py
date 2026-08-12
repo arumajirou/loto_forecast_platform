@@ -17,6 +17,7 @@ TOTO2_22M_REQUIRED_FILES = (
     "config.json",
     "model.safetensors",
 )
+WSL_NVML_BLOCKER = "WSL_NVML_ACTIVE_COMPUTE_PROCESS_QUERY_UNSUPPORTED"
 
 
 class VariantProbeError(RuntimeError):
@@ -76,6 +77,17 @@ def inspect_snapshot(snapshot_path: Path) -> dict[str, Any]:
     }
 
 
+def is_wsl() -> bool:
+    for path in (Path("/proc/sys/kernel/osrelease"), Path("/proc/version")):
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace").lower()
+        except OSError:
+            continue
+        if "microsoft" in text or "wsl" in text:
+            return True
+    return False
+
+
 def parse_nvidia_compute_apps(text: str, *, pid: int) -> list[GpuProcessEvidence]:
     matches: list[GpuProcessEvidence] = []
     for raw_line in text.splitlines():
@@ -104,23 +116,55 @@ def parse_nvidia_compute_apps(text: str, *, pid: int) -> list[GpuProcessEvidence
     return matches
 
 
-def capture_gpu_process(pid: int) -> GpuProcessEvidence:
+def _run_nvidia_smi(arguments: list[str]) -> str:
     completed = subprocess.run(
-        [
-            "nvidia-smi",
-            "--query-compute-apps=pid,gpu_uuid,used_gpu_memory",
-            "--format=csv,noheader,nounits",
-        ],
+        ["nvidia-smi", *arguments],
         check=False,
         capture_output=True,
         text=True,
+        timeout=10,
     )
     if completed.returncode != 0:
         raise VariantProbeError(f"nvidia-smi failed: {completed.stderr.strip()}")
-    matches = parse_nvidia_compute_apps(completed.stdout, pid=pid)
+    return completed.stdout
+
+
+def capture_gpu_process(pid: int) -> GpuProcessEvidence:
+    text = _run_nvidia_smi(
+        [
+            "--query-compute-apps=pid,gpu_uuid,used_gpu_memory",
+            "--format=csv,noheader,nounits",
+        ]
+    )
+    matches = parse_nvidia_compute_apps(text, pid=pid)
     if len(matches) != 1:
         raise VariantProbeError(
             f"expected exactly one positive-VRAM GPU record for pid {pid}, observed {len(matches)}"
+        )
+    return matches[0]
+
+
+def query_gpu_uuid(device_index: int) -> str:
+    text = _run_nvidia_smi(
+        [
+            "--query-gpu=index,uuid",
+            "--format=csv,noheader,nounits",
+        ]
+    )
+    matches: list[str] = []
+    for raw_line in text.splitlines():
+        fields = [field.strip() for field in raw_line.split(",")]
+        if len(fields) != 2:
+            continue
+        try:
+            observed_index = int(fields[0])
+        except ValueError:
+            continue
+        if observed_index == device_index and fields[1]:
+            matches.append(fields[1])
+    if len(matches) != 1:
+        raise VariantProbeError(
+            f"expected exactly one GPU UUID for index {device_index}, observed {len(matches)}"
         )
     return matches[0]
 
