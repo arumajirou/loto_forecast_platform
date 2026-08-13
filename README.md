@@ -4,7 +4,7 @@
 
 このREADMEは「何が実装されているか」「どの分母を見ているか」「どこまでruntime/scientific evidenceがあるか」を最短で把握する入口です。
 
-> **Expanded v2 Phase 3 base:** `main@eb988d2947994bb637dc8f0cbc40afa05570027f` (after PR #316, 2026-08-13)  
+> **Phase 4A candidate base:** `main@45bcf60fa04fc3736e3a73760039254573abf4c8` (after GluonTS PR #323, 2026-08-13)  
 > **Critical count rule:** `Broad v1 count != Committed Expanded v2 count != discovered/source count != runtime-certified count`  
 > **Scientific rule:** `REGISTERED != ROUTABLE != RUNTIME_CERTIFIED != OOF_EVALUATED != HOLDOUT_EVALUATED != PROSPECTIVE_EVALUATED != PROMOTION_ELIGIBLE`  
 > package versionはREADMEへ手書きしません。`loto.version.__version__` / installed metadata / `loto-build-info`を正本とします。
@@ -38,7 +38,7 @@
 | Probabilistic v1 | **VERIFIED / PARTIALLY_VERIFIED** | effective catalog **76** | Broad plannerへ自動結合されない |
 | Combined accounting | **250 identities** | 174 + 76、6ゲーム換算1,500 cells | current単一campaignが1,500行を生成する意味ではない |
 | Broad campaign planner | **VERIFIED CONTRACT** | `174 × 6 = 1,044` units | probabilistic 76を含まない |
-| Expanded v2 | **PHASE 3 / SOURCE-BACKED** | AutoGluon 37 + GluonTS 9を含むderived total **218** | 218全件runtime-certified、最終inventory freezeではない |
+| Expanded v2 | **PHASE 4A CANDIDATE / SOURCE-BACKED** | AutoGluon 37 + GluonTS 9 + skforecast 27を含むderived total **244** | 244全件runtime-certified、最終inventory freezeではない |
 | scikit-learn dynamic | **VERIFIED / PARTIALLY_VERIFIED** | installed-version discovery / smoke / certify | 全estimator成功保証ではない |
 | StatsForecast | **VERIFIED / PARTIALLY_VERIFIED** | Broad 41 / shared 8 / development evidence | Holdout/Prospectiveではない |
 | NeuralForecast fixed | **VERIFIED / PARTIALLY_VERIFIED** | Broad 37 / shared subset 17 | 37全件OOF完了ではない |
@@ -47,7 +47,7 @@
 | Darts | **BROAD 1 / SOURCE SURFACE >1** | 58 public forecasting exportsをPhase 2で調査、local NLinear/DLinear GPU evidence | 58全件standalone/runtime-certifiedではない |
 | GluonTS | **BROAD 1 / EXPANDED 9** | P6 registryの9 estimatorをExpanded identityへ統合。Draft #309 exact-headは2 lanes × 9 = 18/18 CPU lifecycle VERIFIED | 18 unique modelsではない。#309 main統合/GPU/OOFではない |
 | sktime | **BROAD 1 / REGISTRY 141** | 141 discovered/importable、53 core-compatible、88 optional、formal P1=4 | 141全件runtime-certifiedではない |
-| skforecast | **BROAD 1 / EVIDENCE PLAN 18** | 0.23.0 evidenceから18 candidate implementation identitiesを区別可能 | committed Expanded v2はまだ1。18 runtime-certifiedではない |
+| skforecast | **BROAD 1 / EXPANDED 27 CANDIDATE** | pinned 0.23.0 sourceからreviewed 27 identitiesを固定 | 27 runtime-certifiedではない。15 operator-local PASS / 2 BLOCKED / 10 NOT_RUN |
 | ReservoirPy | **BROAD 1 / EXPANSION OPEN** | current Broad identity + expansion issue #294 | final scientifically distinct count未freeze |
 | TSFM | **PARTIALLY_VERIFIED** | retained 21中19 CERTIFIED / 2 BLOCKED | 全19 OOF済みではない |
 | Holdout | **CLOSED** | explicit authorizationまで閉鎖 | development結果から自動解禁されない |
@@ -98,18 +98,16 @@
 
 ### 2.2 umbrellaの「1」と現在確認できる実体数
 
-`1` を見て「1モデルしかない」と判断しません。
-
-| Library | Broad v1 | Committed Expanded v2 after Phase 3 | Observed / discovered / evidence denominator | Current gate |
+| Library | Broad v1 | Expanded v2 candidate | Other denominator | Current gate |
 |---|---:|---:|---|---|
-| AutoGluon | 1 | **37** | 29 base + 8 unique ensembles | inventory merged previously |
+| AutoGluon | 1 | **37** | 29 base + 8 unique ensembles | merged |
 | Darts | 1 | **1** | **58 public forecasting exports** | #286 / TAJ-27 open |
-| GluonTS | 1 | **9** | **9 estimator algorithms**, 2 isolated lanes = **18 lifecycle cells** | #288 inventory integration; #309 runtime repair main pending |
+| GluonTS | 1 | **9** | **9 estimator algorithms**, 2 isolated lanes = **18 lifecycle cells** | #323 merged; runtime gate separate |
 | ReservoirPy | 1 | **1** | final distinct count未freeze | #294 open |
-| sktime | 1 | **1** | **141 discovered/importable** | #289 / TAJ-32 open |
-| skforecast | 1 | **1** | **18 candidate implementation identities** from current evidence plan | #289 / TAJ-32 open |
+| sktime | 1 | **1** | **141 discovered/importable** | #289 / TAJ-32 Phase 4B open |
+| skforecast | 1 | **27** | **27 reviewed source-backed identities** | PR #324 Phase 4A; formal repository runtime certificationは別 |
 
-### 2.3 current totals
+### 2.3 current candidate total
 
 ```text
 Broad v1                                      = 174
@@ -117,55 +115,56 @@ Probabilistic effective v1                    = 76
 Combined Broad + Probabilistic accounting     = 250
 Current Broad campaign planner                = 174 × 6 = 1,044
 Combined accounting × six games               = 250 × 6 = 1,500
-Expanded v2 Phase 1 historical                = 210
-Expanded v2 after GluonTS Phase 3             = 218
+Expanded v2 current main after GluonTS         = 218
+Expanded v2 with skforecast Phase 4A candidate = 244
 ```
-
-Phase 3の218はコードから導出します。
 
 ```text
-174
-- AutoGluon umbrella 1
-- GluonTS umbrella 1
-+ AutoGluon implementations 37
-+ GluonTS implementations 9
-= 218
+218 - skforecast Broad copy 1 + skforecast implementations 27 = 244
 ```
 
-Darts / ReservoirPy / sktime / skforecast / Time-Series-Library / BasicTSの今後の分解はまだ218へ入っていないため、**218はExpanded v2の最終freeze値ではありません**。
+Darts / ReservoirPy / sktime / Time-Series-Library / BasicTSの分解はまだ244へ入っていないため、**244はExpanded v2の最終freeze値ではありません**。
 
 詳細: [`docs/INVENTORY_COUNT_BOUNDARIES.md`](docs/INVENTORY_COUNT_BOUNDARIES.md)
 
 ---
 
-## 3. skforecast — Broad 1 / evidence plan 18 / committed Expanded 1
+## 3. skforecast — Broad 1 / Expanded 27 candidate
 
-`docs/SKFORECAST_RUNTIME_CERTIFICATION.md` のcurrent 0.23.0 evidence planから、無意味なwrapper×estimator Cartesian productを避けて次の18 candidate identitiesを区別できます。
+Phase 4Aはoperator evidenceだけでなく、固定したupstream source `skforecast v0.23.0` を再監査してmanifestを作ります。
+
+```text
+package = skforecast==0.23.0
+upstream_tag = v0.23.0
+upstream_commit = c881d5d350426985c1c31373077b7d5b620f233d
+operator_evidence_head = 9fcc1274755dca64c46dc31a9a0f60a9ef1c4ebd
+```
+
+Pinned source confirms:
+
+- recursive exports: `ForecasterEquivalentDate`, `ForecasterRecursive`, `ForecasterRecursiveClassifier`, `ForecasterRecursiveMultiSeries`, `ForecasterStats`;
+- direct exports: `ForecasterDirect`, `ForecasterDirectMultiVariate`;
+- deep-learning strategy: `ForecasterRnn`;
+- foundation strategy: `ForecasterFoundation` / `FoundationModel`;
+- `ForecasterStats` explicitly supports **7 statistical implementations**;
+- `FoundationModel` explicitly lists **8 selectable model IDs** including three Chronos-2 IDs.
+
+無限のwrapper × arbitrary sklearn estimator Cartesian productは作りません。
 
 | Group | Count | Evidence boundary |
 |---|---:|---|
-| recursive Ridge | 1 | PASS operator-local |
-| recursive HistGradientBoosting | 1 | PASS operator-local |
-| recursive LightGBM / XGBoost / CatBoost | 3 | CPU smoke PASS |
-| direct Ridge | 1 | PASS |
-| recursive multi-series Ridge | 1 | PASS |
-| direct multivariate Ridge | 1 | PASS |
-| EquivalentDate | 1 | PASS |
-| Stats ARAR | 1 | PASS |
-| RNN LSTM / GRU | 2 | GPU + CPU fallback evidence |
-| Foundation Chronos-2 / TimesFM 2.5 / Moirai-2 / TabICL v2 / TabPFN-TS / T0 | 6 | mixed PASS/BLOCKED/PENDING |
-| **Total candidate identities** | **18** | **not a committed Expanded count** |
+| Recursive regression families | 5 | OPERATOR_LOCAL_PASS |
+| Recursive classifier representative binding | 1 | SOURCE_DECLARED / NOT_RUN |
+| Direct Ridge | 1 | OPERATOR_LOCAL_PASS |
+| Recursive multi-series Ridge | 1 | OPERATOR_LOCAL_PASS |
+| Direct multivariate Ridge | 1 | OPERATOR_LOCAL_PASS |
+| EquivalentDate | 1 | OPERATOR_LOCAL_PASS |
+| ForecasterStats supported implementations | 7 | ARAR PASS / other 6 NOT_RUN |
+| RNN LSTM / GRU | 2 | OPERATOR_LOCAL_PASS |
+| Foundation explicit model IDs | 8 | mixed PASS / BLOCKED / NOT_RUN |
+| **Total** | **27** | **15 PASS / 2 BLOCKED / 10 NOT_RUN** |
 
-Important boundaries:
-
-- Chronos-2: GPU/CPU + exog/interval operator evidence.
-- TimesFM 2.5: GPU/CPU + interval/quantiles operator evidence.
-- TabICL v2: GPU/CPU + exog/interval/quantiles + checkpoint SHA-256 evidence.
-- Moirai-2: unsupported dependency metadata override下ではruntime PASS、normal dependency routabilityはBLOCKED。
-- TabPFN-TS v3: adapter setupは到達したがauthentication/license gateでcheckpoint取得前に停止、inference NOT_EXECUTED。
-- T0: current skforecast-specific sequenceでは未実行。
-
-`src/loto/models/implementation_catalog.py` がまだskforecast umbrellaを18へ分解していないため、**committed Expanded v2 countは1のまま**です。これは#289 / TAJ-32で解消すべき実装gapです。
+全27 rowで `runtime_certified=false` を維持します。Moirai-2はnormal dependency routeがBLOCKED、TabPFN-TS v3はinvalid/expired authenticationでcheckpoint取得前に停止、source-only追加rowはNOT_RUNです。
 
 ---
 
@@ -191,17 +190,7 @@ P6 isolated lane cells             = 9 × 2 = 18
 | `gluonts-torch-patchtst` | `PatchTSTEstimator` |
 | `gluonts-torch-lagtst` | `LagTSTEstimator` |
 
-各identityは`algorithm_id` / `implementation_id`を分離し、P6 registryのsource path、official source tags、distribution/trainer、CPU resource contractへ結びます。
-
-登録だけではruntime-certifiedにしません。新しい9 identityの初期値は明示的に次です。
-
-```text
-source_declared=true
-runtime_status=NOT_RUN
-runtime_certified=false
-```
-
-Draft PR #309 exact head `edba730a4f2c944c1ccc0bee510f7ce34833b6c3` ではlatest 9/9 + compat 9/9 = **18/18 CPU lifecycle VERIFIED**、P7D `VALID/VERIFIED`、`p8_eligible=true` の別証拠があります。しかし#309はmain未統合なので、この証拠をPhase 3 inventoryへ`runtime_certified=true`としてコピーしません。
+Draft PR #309 exact headの18/18 CPU lifecycle VERIFIEDは別evidence classであり、inventory登録だけでruntime-certifiedへ昇格させません。
 
 詳細: [`docs/gluonts/GLUONTS_EXPANDED_V2_PHASE3.md`](docs/gluonts/GLUONTS_EXPANDED_V2_PHASE3.md)
 
@@ -218,19 +207,13 @@ optional-dependency-declared = 88
 formal P1 models = 4
 ```
 
-formal P1 4モデルはfit/predict/save-load/formal verification PASSですが、141全件runtime-certifiedではありません。Expanded v2へのdeterministic identity integrationは#289 / TAJ-32で継続します。
+formal P1 4モデルはfit/predict/save-load/formal verification PASSですが、141全件runtime-certifiedではありません。Phase 4Bではexact 141-row manifestを固定し、wrapper/composite/adapterと独立forecasterを分類してからExpanded v2へ統合します。
 
 ---
 
 ## 6. Darts / ReservoirPy の「1」
 
-### Darts
-
-Broad v1は1 umbrellaですが、current documentationでは58 public forecasting exportsをPhase 2 inventory対象として扱っています。local exact worktreeではNLinear/DLinear actual GPU fit/predict evidenceがありますが、58全件standalone/runtime-certifiedという意味ではありません。
-
-### ReservoirPy
-
-Broad v1は1 ESN identityですが、#294はReservoir/NVAR/IPReservoir/ES2N等のscientifically distinct pipelinesを、Cartesian-product inflationを避けてExpanded v2へ追加する作業を要求しています。final countは未freezeです。
+Darts Broad v1は1 umbrellaですが、58 public forecasting exportsをPhase 2 inventory対象として調査中です。ReservoirPyもBroad v1は1ですが、#294でscientifically distinct pipelinesのExpanded化を追跡しています。
 
 ---
 
@@ -250,8 +233,8 @@ Broad v1は1 ESN identityですが、#294はReservoir/NVAR/IPReservoir/ES2N等�
 | AutoGluon | Broad 1 / Expanded 37 | isolated | backend dependent | 未完 |
 | Darts | Broad 1 / source surface 58 | provider/campaign | local bounded GPU evidence | 未完 |
 | GluonTS | Broad 1 / Expanded 9 / lane cells 18 | shared + isolated P6 provider | #309 exact-head CPU lifecycle | 未完 |
-| sktime | Broad 1 / registry 141 | isolated | formal P1 4 PASS | 未完 |
-| skforecast | Broad 1 / evidence plan 18 / committed Expanded 1 | repository integration pending | operator-local mixed evidence | 未完 |
+| sktime | Broad 1 / registry 141 / Expanded 1 | isolated | formal P1 4 PASS | 未完 |
+| skforecast | **Broad 1 / Expanded 27 candidate** | Expanded inventory; routing separate | 15 local PASS / 2 blocked / 10 not-run | 未完 |
 | ReservoirPy | Broad 1 | optional/shared | partial | 未完 |
 | TSFM | 21 | provider-specific | retained 19/21 certified | 未完 |
 | probabilistic | effective 76 | separate catalog/run/API | backend-specific | combined planner未実装 |
@@ -265,18 +248,13 @@ Broad v1は1 ESN identityですが、#294はReservoir/NVAR/IPReservoir/ES2N等�
 | #293 | `f04cd876...` | Expanded v2 foundation + AutoGluon 37 |
 | #301 | `3cc73dba...` | dynamic sklearn provider |
 | #302 | `7d75dadc...` | parallel Broad campaign orchestration |
-| #304 | `de1444af...` | XGBoost/CatBoost GPU routing |
-| #305 | `a03053ea...` | LightGBM accelerator probe |
-| #306 | `feb4ea5e...` | LightGBM OpenCL GPU routing |
 | #307 | `ed7d6c81...` | sktime P1 normalization |
 | #310 | `4f4f8579...` | current-state docs + skforecast operator evidence |
-| #312 | `063120fd...` | library/model matrix alignment |
-| #311 | `9623f2a5...` | Darts evidence + Broad planner boundary |
-| #313 | `0fb8d2e9...` | README audit-boundary stabilization |
-| #314 | `dfd9aa6e...` | current status/history alignment |
-| #315 | `770d5b97...` | GluonTS Broad 1 vs registry 9 vs lifecycle 18 clarity |
-| #316 | `eb988d29...` | umbrella Broad / Expanded / observed count boundary clarification |
-| #309 | Draft | GluonTS P6/P7 CPU lifecycle repair; exact-head evidence is not current-main certification |
+| #315 | `770d5b97...` | GluonTS count clarity |
+| #316 | `eb988d29...` | umbrella count boundary clarification |
+| #323 | `45bcf60f...` | GluonTS 9 Expanded identities merged |
+| #324 | open | skforecast 27 Phase 4A candidate; CI gate pending |
+| #309 | Draft | GluonTS P6/P7 runtime repair exact-head evidence |
 
 ---
 
@@ -284,23 +262,9 @@ Broad v1は1 ESN identityですが、#294はReservoir/NVAR/IPReservoir/ES2N等�
 
 Primary metric: **Hit@±1**.
 
-Required companions:
+Required companions: MAE / MSE / RMSE / position-wise Hit@±1 / all-position Hit@±1.
 
-- MAE / MSE / RMSE
-- position-wise Hit@±1
-- all-position Hit@±1
-
-Required baselines:
-
-- Random
-- fixed
-- mean
-- median
-- last/recent
-- frequency
-- statistical
-
-Evaluation order:
+Required baselines: Random / fixed / mean / median / last/recent / frequency / statistical.
 
 ```text
 Train-only preprocessing / scaler / encoder / feature selection / HPO
@@ -321,47 +285,23 @@ Holdout=CLOSED. Prospective=CLOSED. Automatic promotion/retraining/registry writ
 ## 10. Common commands
 
 ```bash
-# six-game geometry
 uv run loto3 games
-
-# frozen Broad v1
 uv run loto3 catalog --counts
-uv run loto3 catalog
-
-# shared ModelSpec
 uv run loto models list
 
 # Broad-only plan: 174 × 6 = 1,044
 uv run loto3 campaign --output unused --plan-only
 
-# separate probabilistic surface: effective 76
-uv run loto3 probabilistic catalog-list
-
-# derived Expanded v2 count; after GluonTS Phase 3 this must report 218
+# Expanded v2 Phase 4A candidate must report 244
 uv run python -c 'from loto.models.implementation_catalog import expanded_inventory_counts; print(expanded_inventory_counts())'
-
-# dynamic sklearn
-uv run loto-sklearn list
-uv run loto-sklearn certify --kind all --seed 1 --output artifacts/sklearn-certification
-
-# parallel Broad campaign
-uv run python -m loto.evaluation.parallel_campaign --help
 
 # sktime P1
 ROOT="$PWD" SKTIME_NO_PAUSE=1 bash scripts/run_sktime_p1_matrix_certification.sh
-
-# NeuralForecast Auto
-uv run loto neuralforecast automodel-run --help
-
-# data acquisition
-uv run loto data acquire --help
 ```
 
 ---
 
 ## 11. Source of truth
-
-優先順位:
 
 1. current code/configuration;
 2. tests/workflows/repository-retained evidence;
@@ -372,10 +312,4 @@ uv run loto data acquire --help
 7. current documentation;
 8. historical snapshots.
 
-特にcountは次のcodeを優先します。
-
-- `src/loto/models/catalog_full.py` — Broad v1
-- `src/loto/models/implementation_catalog.py` — committed Expanded v2
-- framework-specific registry/inventory modules — runtime/source denominators
-
-異なる分母や異なるSHAの成功証拠を、1つの「model count」や「current-main VERIFIED」に混ぜません。
+Count authorityは `catalog_full.py`（Broad v1）、`implementation_catalog.py` + pinned manifests（Expanded v2）、framework-specific registry（別分母）を分離して読みます。
