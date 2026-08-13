@@ -2,9 +2,11 @@
 
 **ミニロト / ロト6 / ロト7 / ビンゴ5 / ナンバーズ3 / ナンバーズ4**を対象に、統計モデル、機械学習、深層学習、AutoML、時系列基盤モデル（TSFM）、確率モデルを、時系列リークを防いだ共通契約で比較・検証・運用する研究プラットフォームです。
 
-このREADMEは「何が使えるか」を最短で把握する入口です。モデル・ライブラリ別の詳細は専用対応表へ分離しました。
+このREADMEは「何が使えるか」「どこまで実証済みか」「次に何を検証すべきか」を最短で把握する入口です。モデル・ライブラリ別の詳細は専用対応表へ分離しています。
 
-> **Implementation audit base:** `main@05eba49dad8c0700c303783267784cfde081e419` (2026-08-12)  
+> **Implementation audit base:** `main@feb4ea5ec6c63c1e3ceab26bcf9d3bc731d14add` (2026-08-13)  
+> **Latest merged boundary:** PR #306 — certified LightGBM OpenCL GPU backend routing  
+> **In-review boundary:** PR #307 — sktime P1 input-contract normalization fix; isolated-worktree formal P1 certification is PASS, while post-merge same-main-SHA recertification remains a separate gate  
 > **Rule:** `REGISTERED != ROUTABLE != RUNTIME_CERTIFIED != OOF_EVALUATED != HOLDOUT_EVALUATED != PROSPECTIVE_EVALUATED != PROMOTION_ELIGIBLE`  
 > 現在のpackage versionはREADMEへ手書きしません。canonical versionは`loto.version.__version__` / installed package metadata / `loto-build-info`を正本とします。
 
@@ -14,6 +16,10 @@
 |---|---|
 | ライブラリごとのモデル一覧・引数・対応機能・実装状況 | **[`docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md`](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md)** |
 | 実行コマンド・機能の詳細 | [`docs/CAPABILITIES_AND_OPERATIONS.md`](docs/CAPABILITIES_AND_OPERATIONS.md) |
+| scikit-learn dynamic all-estimator provider | [`docs/SKLEARN_ALL_MODELS.md`](docs/SKLEARN_ALL_MODELS.md) |
+| 6ゲーム並列Unified Campaign / live progress | [`docs/PARALLEL_UNIFIED_CAMPAIGN.md`](docs/PARALLEL_UNIFIED_CAMPAIGN.md) |
+| LightGBM GPU build / backend認証 | [`docs/LIGHTGBM_GPU_CERTIFICATION.md`](docs/LIGHTGBM_GPU_CERTIFICATION.md) |
+| sktime P1 certification runner | [`scripts/run_sktime_p1_matrix_certification.sh`](scripts/run_sktime_p1_matrix_certification.sh) |
 | TSFM 21 identityのruntime証拠 | [`docs/TSFM_RUNTIME_CAPABILITIES.md`](docs/TSFM_RUNTIME_CAPABILITIES.md) |
 | 評価・Hit@±1・OOF関連 | [`docs/evaluation/`](docs/evaluation/) |
 | 運用・監視 | [`docs/operations/`](docs/operations/) |
@@ -27,12 +33,18 @@
 | 6ゲーム geometry | **VERIFIED** | 6ゲームのpositions・値域・select/digits契約あり | 全モデル×全ゲーム完走ではない |
 | Broad v1 | **VERIFIED** | frozen inventory **174** | 174全件runtime成功ではない |
 | Unified v1 | **EXECUTION_PENDING** | **250 × 6 = 1500 units** の計画分母 | 1500完走ではない |
+| Parallel Unified Campaign | **VERIFIED / PARTIALLY_VERIFIED** | game単位process並列、CPU affinity/thread制限、`progress.json`、live status、集約artifactを実装 | 全174×6 real-data完走ではない |
 | Expanded v2 Phase 1 | **VERIFIED / PARTIALLY_VERIFIED** | **210 identities**。AutoGluon umbrellaを37実装へ展開 | 210全件runtime-certifiedではない |
+| scikit-learn Broad | **VERIFIED / PARTIALLY_VERIFIED** | Broad 7。`isotonic-calibrated-logistic`のfactory/routing gapを解消 | post-fix real-data 42/42成功をまだ主張しない |
+| scikit-learn dynamic provider | **VERIFIED / PARTIALLY_VERIFIED** | `loto-sklearn`、installed-version dynamic inventory、smoke/certify surfaceを実装 | installed versionごとの全 estimator が常に成功する意味ではない |
 | StatsForecast | **VERIFIED / PARTIALLY_VERIFIED** | Broad 41 / shared explicit 8 / lifecycle + real-game dev lane | 41×6完走ではない |
 | NeuralForecast fixed | **VERIFIED / PARTIALLY_VERIFIED** | Broad 37 / direct shared subset 17 | 37全件runtime/OOF完了ではない |
 | NeuralForecast Auto | **VERIFIED / PARTIALLY_VERIFIED** | official 36 / Ray・Optuna / seed・precision・GPU evidence path | 36×6正式認証完了ではない |
 | MLForecast | **PARTIALLY_VERIFIED** | Auto inventory 8 / direct shared 2 | Auto 8 = shared workers 8ではない |
 | AutoGluon TimeSeries | **PARTIALLY_VERIFIED** | source 29 models + 8 unique ensembles = 37 expanded identities | 37全件runtime-certifiedではない |
+| Tree GPU routing | **VERIFIED** | XGBoost / CatBoostはGPU lease runtime確認済み。LightGBM classifier/positionはcertified OpenCL GPU backendへrouting | 全tree modelの全ゲームOOF優位ではない |
+| LightGBM CUDA | **NOT CERTIFIED / FAIL-CLOSED** | resolved buildではOpenCL `device_type="gpu"`を使用 | `device_type="cuda"`対応を意味しない |
+| sktime | **PARTIALLY_VERIFIED / PR #307** | sktime 1.0.1 laneでregistry **141 discovered / 141 importable / 53 core / 88 optional**。P1固定4モデルはfit/predict/save-load/formal verification PASS | 141全件runtime-certified、6ゲームOOF完走、accuracy優位ではない |
 | TSFM | **PARTIALLY_VERIFIED** | retained audit 21中 **19 CERTIFIED / 2 BLOCKED** | 19全てlottery-compatible/OOF済みではない |
 | Probabilistic platform | **VERIFIED / PARTIALLY_VERIFIED** | separate **72-model** catalog + backend/run/API surface | 72全件科学評価完了ではない |
 | Holdout | **BLOCKED / CLOSED** | explicit authorization前は閉鎖 | development結果から自動解禁されない |
@@ -47,6 +59,9 @@
 | `PARTIALLY_VERIFIED` | 一部モデル・一部lane・一部証拠のみ成立 |
 | `EXECUTION_PENDING` | 実装または計画はあるが対象分母の実行完了証拠がない |
 | `BLOCKED` | policy / runner / license / artifact等の明示gateで停止 |
+| `NOT CERTIFIED` | 実装可否とruntime認証を分離し、成功証拠がない機能をfail-closedで扱う |
+
+> PR上のexact-worktree証拠と、merge後`main`上の正式再認証は別の証拠クラスです。特にsktime P1はPR #307で修正・認証済みですが、P0〜P4を同一のmerge後main SHAで揃える最終再認証は別途必要です。
 
 ---
 
@@ -71,11 +86,19 @@
 | Darts | 1 | ensemble framework | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
 | GluonTS | 1 | probabilistic DeepAR | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
 | ReservoirPy | 1 | ESN | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
-| sktime | 1 | forecasting framework | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
+| sktime | 1 | forecasting framework umbrella | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
 | skforecast | 1 | recursive lag ML | [対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md#12-darts--gluonts--reservoirpy--sktime--skforecast) |
 | **TOTAL** | **174** |  | frozen denominator |
 
-Broad v1外には Time-Series-Library、BasicTS、Merlion、separate probabilistic 72-model catalog等があります。これらも[専用対応表](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md)へ記載しています。
+Broad v1の174は**凍結された科学比較分母**です。次のdynamic/expanded inventoryを174へ足し戻しません。
+
+- scikit-learn `loto-sklearn`: installed versionから`sklearn.utils.all_estimators()`で動的発見
+- sktime isolated campaign: `sktime.registry.all_estimators(estimator_types="forecaster")`で動的発見
+- Expanded v2 identities
+- Time-Series-Library / BasicTS / Merlion
+- separate probabilistic 72-model catalog
+
+したがって、`Broad 174`、`scikit-learn dynamic denominator`、`sktime registry 141`は別の分母です。
 
 ---
 
@@ -83,6 +106,11 @@ Broad v1外には Time-Series-Library、BasicTS、Merlion、separate probabilist
 
 | Library | Inventory | Shared route | Provider / isolated | HPO | GPU | runtime evidence | 全ゲームOOF |
 |---|---:|---|---|:---:|:---:|---|---|
+| scikit-learn Broad | 7 | candidate / position | Unified Campaign | — | CPU + tree-specific routing | **部分検証** | **未完** |
+| scikit-learn dynamic | version-dependent | — | `loto-sklearn` | — | estimator依存 | provider/certification surface **VERIFIED** | **未完** |
+| XGBoost | Broad 1 | candidate | resource-aware Unified Campaign | — | **CUDA GPU VERIFIED** | exact-head GPU runtime **VERIFIED** | **未完** |
+| CatBoost | Broad 1 | candidate | resource-aware Unified Campaign | — | **GPU VERIFIED** | exact-head GPU runtime **VERIFIED** | **未完** |
+| LightGBM | Broad 2 | candidate / position | resource-aware Unified Campaign | — | **OpenCL GPU VERIFIED** / CUDA build未認証 | classifier + position runtime **VERIFIED** | **未完** |
 | StatsForecast | 41 | 8 explicit | campaign | model内Auto | CPU中心 | **部分検証** | **未完** |
 | MLForecast | Auto 8 | 2 direct | AutoML/research | ✓ | backend依存 | **部分検証** | **未完** |
 | NeuralForecast fixed | 37 | 17 direct | dedicated paths | — | ✓ | **部分検証** | **未完** |
@@ -93,10 +121,54 @@ Broad v1外には Time-Series-Library、BasicTS、Merlion、separate probabilist
 | Darts | 1 Broad | ✓ optional | optional | — | optional | **部分検証** | **未完** |
 | GluonTS | 1 Broad | ✓ optional | optional | — | shared path CPU-pinned | **部分検証** | **未完** |
 | ReservoirPy | 1 Broad | ✓ optional | optional | — | CPU中心 | **部分検証** | **未完** |
-| sktime | 1 Broad | — | isolated campaign | framework依存 | framework依存 | **EXECUTION_PENDING** | **未完** |
+| sktime | Broad umbrella 1 / registry 141 | — | isolated campaign | framework依存 | P1 CPU | dynamic inventory + fixed 4-model P1 **VERIFIED on PR #307 worktree** | **未完** |
 | skforecast | 1 Broad | — | pending | — | regressor依存 | **EXECUTION_PENDING** | **未完** |
 
 モデル名、class、主要引数、capabilityの詳細は **[`docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md`](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md)** を参照してください。
+
+### 3.1 2026-08-13 最新実装・認証差分
+
+| PR / main SHA | 状態 | 追加・修正した実体 | 証拠境界 |
+|---|---|---|---|
+| #301 / `3cc73dba...` | **MERGED** | dynamic all-estimator scikit-learn provider、`loto-sklearn` CLI | provider実装とversion-dependent certification surface。別環境の全件成功を一般化しない |
+| #302 / `7d75dadc...` | **MERGED** | 6ゲームprocess並列Unified Campaign、CPU affinity/thread制限、live progress、aggregate artifacts | scheduling/runtime orchestration。scientific split/lock semanticsは既存campaignを使用 |
+| #303 / `b9be4174...` | **MERGED** | `isotonic-calibrated-logistic`を`CalibratedClassifierCV`としてfactory/routingへ接続 | synthetic route + prediction lock確認。post-fix real-data 42/42は別途再実行が必要 |
+| #304 / `de1444af...` | **MERGED** | GPU leaseをXGBoost/CatBoost constructorへ接続 | RTX 5070 Ti exact-head runtime + external GPU telemetryでVERIFIED |
+| #305 / `a03053ea...` | **MERGED** | fail-closed LightGBM GPU build/backend probe | resolved buildはCUDA tree learner非対応、OpenCL `device_type="gpu"`はruntime VERIFIED |
+| #306 / `feb4ea5e...` | **MERGED / CURRENT AUDIT BASE** | LightGBM classifier/positionをcertified OpenCL GPU laneへrouting | GPU lease、device id、runtime、telemetry VERIFIED。CUDA supportは主張しない |
+| #307 | **OPEN / P1 LOCAL VERIFIED** | sktime formal P1 series hashをproviderの`list[float]`正規化境界へ一致 | focused tests PASS、P1 4/4 PASS、formal report PASS、SHA-256 PASS。merge後main再認証は別gate |
+
+#### sktime P1で現在実証できている範囲
+
+```text
+sktime = 1.0.1
+registry discovered = 141
+registry importable = 141
+core compatible = 53
+optional dependency declared = 88
+
+formal P1 models = 4
+- NaiveForecaster(last)
+- PolynomialTrendForecaster(degree=1)
+- ExponentialSmoothing
+- ThetaForecaster
+
+4/4:
+  dependency PASS
+  import PASS
+  construct PASS
+  fit PASS
+  predict PASS
+  finite output PASS
+  save/load PASS
+  exact re-prediction match PASS
+
+formal verifier = PASS
+input-contract numeric normalization = PASS
+artifact SHA-256 verification = PASS
+```
+
+このP1証拠は**141 forecasterのruntime認証ではありません**。dynamic inventoryは発見/importabilityの分母であり、optional dependency family、全constructor、全fit/predict、全ゲームOOFはExpanded v2の別実行対象です。
 
 ---
 
@@ -155,6 +227,8 @@ source-declared
 | Prospective | sealed future predictionをactual到着後に評価 |
 | promotion | human approval。自動promotionは禁止 |
 
+`matrix_complete=true`は「要求したmodel×gameの結果行が揃った」ことを意味し、全行成功や精度優位を意味しません。
+
 ---
 
 ## 6. TSFMの読み方
@@ -201,6 +275,18 @@ uv run loto models list
 # model × game plan only
 uv run loto3 campaign --output unused --plan-only
 
+# parallel Unified Campaign help / live progress runner
+uv run python -m loto.evaluation.parallel_campaign --help
+
+# dynamic scikit-learn provider
+uv run loto-sklearn list
+uv run loto-sklearn list --kind regressor
+uv run loto-sklearn smoke --model RandomForestRegressor --seed 1
+uv run loto-sklearn certify --kind all --seed 1 --output artifacts/sklearn-certification
+
+# sktime P1 formal matrix certification
+ROOT="$PWD" SKTIME_NO_PAUSE=1 bash scripts/run_sktime_p1_matrix_certification.sh
+
 # NeuralForecast AutoModels
 uv run loto neuralforecast automodel-run --help
 
@@ -226,16 +312,28 @@ uv run loto data acquire --help
    - `src/loto/models/catalog.py`
    - `src/loto/models/implementation_catalog.py`
    - `src/loto/models/providers.py`
+   - `src/loto/evaluation/unified_campaign.py`
+   - `src/loto/evaluation/parallel_campaign.py`
+   - `src/loto/sklearn_provider/`
+   - `src/loto/orchestration/resource_scheduler.py`
+   - `src/loto/lightgbm_gpu/`
+   - `src/loto/sktime_campaign/`
    - framework-specific campaign / provider modules
 2. tests / workflows / retained runtime artifacts
-3. merged PR / commit history
-4. live Linear project state
-5. documentation
+3. exact-head local/runtime certification evidence with source SHA and environment provenance
+4. merged PR / commit history
+5. live Linear project state
+6. documentation
+
+PR/worktreeで成功した証拠は、そのsource SHAに対する証拠です。merge後にmainが変わった場合、必要なformal certificationは新しいmain SHAで再実行し、異なるSHAの成功証拠を1つの「同一main VERIFIED」として混ぜません。
 
 詳細資料:
 
 - **[`docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md`](docs/LIBRARY_MODEL_COMPATIBILITY_MATRIX.md)**
 - [`docs/CAPABILITIES_AND_OPERATIONS.md`](docs/CAPABILITIES_AND_OPERATIONS.md)
+- [`docs/SKLEARN_ALL_MODELS.md`](docs/SKLEARN_ALL_MODELS.md)
+- [`docs/PARALLEL_UNIFIED_CAMPAIGN.md`](docs/PARALLEL_UNIFIED_CAMPAIGN.md)
+- [`docs/LIGHTGBM_GPU_CERTIFICATION.md`](docs/LIGHTGBM_GPU_CERTIFICATION.md)
 - [`docs/TSFM_RUNTIME_CAPABILITIES.md`](docs/TSFM_RUNTIME_CAPABILITIES.md)
 - [`docs/evaluation/`](docs/evaluation/)
 - [`docs/operations/`](docs/operations/)

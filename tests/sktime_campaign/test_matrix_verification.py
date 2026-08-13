@@ -15,7 +15,11 @@ from loto.sktime_campaign.matrix_verification import (
     FORMAL_THREAD_LIMITS,
     verify_matrix_bundle,
 )
-from loto.sktime_campaign.protocol import SmokeModelId
+from loto.sktime_campaign.protocol import (
+    ProviderOperation,
+    ProviderRequest,
+    SmokeModelId,
+)
 from loto.sktime_campaign.verification import VerificationError
 
 
@@ -116,7 +120,7 @@ def _matrix_bundle(directory: Path) -> None:
         "thread_limits": FORMAL_THREAD_LIMITS,
         "input_contract": {
             "series_rows": len(FORMAL_P1_SERIES),
-            "series_sha256": _canonical_sha256(list(FORMAL_P1_SERIES)),
+            "series_sha256": _canonical_sha256([float(value) for value in FORMAL_P1_SERIES]),
             "forecast_horizon": list(FORMAL_P1_FORECAST_HORIZON),
             "forecast_horizon_sha256": _canonical_sha256(list(FORMAL_P1_FORECAST_HORIZON)),
         },
@@ -195,3 +199,20 @@ def test_verify_matrix_bundle_rejects_thread_limit_drift(tmp_path: Path) -> None
 
     with pytest.raises(VerificationError, match="thread limits mismatch"):
         verify_matrix_bundle(bundle)
+
+
+def test_formal_p1_series_hash_matches_provider_normalization() -> None:
+    """Formal P1 verifier must hash the normalized provider representation."""
+
+    request = ProviderRequest(
+        operation=ProviderOperation.SMOKE_MATRIX,
+        output_dir="/tmp/sktime-p1-hash-test",
+        environment_lane="classic-py312",
+        series=list(FORMAL_P1_SERIES),
+    )
+
+    expected = _canonical_sha256([float(value) for value in FORMAL_P1_SERIES])
+    actual = _canonical_sha256(request.series)
+
+    assert actual == expected
+    assert actual == ("24dcc2aef8f4066d1a531f11ce3942388d1c963439c972b6601a78026a16cd01")

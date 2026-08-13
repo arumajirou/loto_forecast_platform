@@ -239,7 +239,7 @@ def verify_matrix_bundle(directory: Path) -> dict[str, Any]:
 
     expected_input_contract = {
         "series_rows": len(FORMAL_P1_SERIES),
-        "series_sha256": _canonical_sha256(list(FORMAL_P1_SERIES)),
+        "series_sha256": _canonical_sha256([float(value) for value in FORMAL_P1_SERIES]),
         "forecast_horizon": list(FORMAL_P1_FORECAST_HORIZON),
         "forecast_horizon_sha256": _canonical_sha256(list(FORMAL_P1_FORECAST_HORIZON)),
     }
