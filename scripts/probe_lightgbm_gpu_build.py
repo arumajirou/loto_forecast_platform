@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-from __future__ import annotations
-
 from loto.lightgbm_gpu.probe import main
 
 
