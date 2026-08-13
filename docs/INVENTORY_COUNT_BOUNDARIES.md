@@ -2,9 +2,9 @@
 
 ```text
 status_class: AUDITED_CURRENT_STATE
-as_of: 2026-08-13T18:30+09:00
+as_of: 2026-08-13T20:30+09:00
 repository: arumajirou/loto_forecast_platform
-code_audit_base_sha: 770d5b972a9d7a9c983518f8b0cb144654b1ea24
+phase3_base_main_sha: eb988d2947994bb637dc8f0cbc40afa05570027f
 ```
 
 この文書は、README等に表示される `1` が「そのライブラリに1モデルしかない」という意味に読めないよう、inventoryの分母を分離するためのcurrent-state資料です。
@@ -14,7 +14,7 @@ code_audit_base_sha: 770d5b972a9d7a9c983518f8b0cb144654b1ea24
 | Count class | 意味 |
 |---|---|
 | `Broad v1` | 既存Broad campaignとの互換性のため凍結されたcanonical identity数。総数174は変更しない。 |
-| `Committed Expanded v2` | `src/loto/models/implementation_catalog.py` が現在実際に返すversioned implementation identity数。 |
+| `Committed Expanded v2` | `src/loto/models/implementation_catalog.py` が実際に返すversioned implementation identity数。 |
 | `Observed / discovered denominator` | runtime registry、source export、operator evidenceなどから確認できる別分母。routability/runtime成功を意味しない。 |
 | `Runtime-certified` | exact identityでload/input/inference/shape/finite/device/lifecycle等の受理済み証拠を持つ数。 |
 
@@ -28,22 +28,44 @@ Broad count
 
 ## 2. umbrella libraryの現在値
 
-現在のExpanded-v2実装コードでumbrellaの分解が完了しているのはAutoGluon Phase 1です。その他はBroad identityをそのままExpanded側へコピーしているため、committed Expanded count自体はまだ1です。
+Expanded v2はAutoGluonに続いてGluonTS P6 registryもsource-backed implementation identityへ分解します。Broad v1は変更しません。
 
-| Library | Broad v1 | Committed Expanded v2 | Observed / discovered / evidence denominator | 現在の解釈 |
+| Library | Broad v1 | Committed Expanded v2 after Phase 3 | Observed / discovered / evidence denominator | 現在の解釈 |
 |---|---:|---:|---|---|
-| AutoGluon TimeSeries | 1 | **37** | 29 source models + 8 unique ensembles | Phase 1 merged。source-declared != runtime-certified。 |
+| AutoGluon TimeSeries | 1 | **37** | 29 source models + 8 unique ensembles | source-declared != runtime-certified。 |
 | Darts | 1 | **1** | **58 public forecasting exports**をPhase 2で調査中。local NLinear/DLinear GPU evidenceあり | #286 / TAJ-27 open。58全件standalone/runtime-certifiedではない。 |
-| GluonTS | 1 | **1** | **9 current-main P6 estimator algorithms**、2 isolated lanesで18 lifecycle cells | PR #315でREADME表示修正済み。#288/#309のExpanded/runtime gateは別。 |
+| GluonTS | 1 | **9** | **9 P6 estimator algorithms**、2 isolated lanesで18 lifecycle cells | #288 inventory integration。18はunique model countではない。#309 runtime repairはmain pending。 |
 | ReservoirPy | 1 | **1** | scientifically distinct expansion count未freeze | #294 open。 |
 | sktime | 1 | **1** | **141 discovered/importable** = 53 core-compatible + 88 optional-dependency-declared、formal P1=4 | #289 / TAJ-32 open。141 != 141 runtime-certified。 |
 | skforecast | 1 | **1** | current 0.23.0 operator evidenceから **18 candidate implementation identities** を科学的に区別可能 | #289 / TAJ-32 open。18はplanning/evidence denominatorで、まだcommitted Expanded countではない。 |
 
-## 3. なぜskforecastがまだ1なのか
+## 3. GluonTSの1 / 9 / 18
 
-`src/loto/models/implementation_catalog.py` のcurrent implementationは `autogluon-timeseries` だけを37 identitiesへ置き換えています。それ以外のBroad-v1 rowはExpanded-v2へそのままコピーされます。
+```text
+GluonTS Broad v1 canonical identity  = 1 (`gluonts-deepar`)
+GluonTS Expanded v2 implementations  = 9
+GluonTS P6 lifecycle cells            = 9 × 2 isolated lanes = 18
+```
 
-したがって現在のコードでは次が事実です。
+Expanded v2の9 identityは`src/loto/adapters/gluonts/p6_registry.py`から導出し、`src/loto/models/implementation_catalog.py`でlibrary-specific implementation identityへ変換します。
+
+```text
+gluonts-torch-deepnpts
+gluonts-torch-deepar
+gluonts-torch-tide
+gluonts-torch-simplefeedforward
+gluonts-torch-temporalfusiontransformer
+gluonts-torch-wavenet
+gluonts-torch-dlinear
+gluonts-torch-patchtst
+gluonts-torch-lagtst
+```
+
+9 identityの初期runtime stateは`NOT_RUN` / `runtime_certified=false`です。Draft #309 exact-headで18/18 CPU lifecycle VERIFIEDでも、その証拠をcurrent-main inventoryへ自動昇格させません。
+
+## 4. なぜskforecastがまだ1なのか
+
+Phase 3後の`implementation_catalog.py`はAutoGluonとGluonTSのBroad umbrellaを分解しますが、skforecast Broad rowはまだExpanded-v2へそのままコピーされます。
 
 ```text
 skforecast Broad v1                 = 1
@@ -53,7 +75,7 @@ skforecast evidence/planning slots  = 18
 
 これはREADMEだけの表示不具合ではなく、**#289 / TAJ-32の実装がまだ完了していないことを示す実装gap**です。
 
-## 4. skforecast 0.23.0の18 candidate identities
+## 5. skforecast 0.23.0の18 candidate identities
 
 `docs/SKFORECAST_RUNTIME_CERTIFICATION.md` のcurrent evidence planを、wrapper × estimatorの無意味なCartesian productを避けて数えると以下です。
 
@@ -80,7 +102,7 @@ skforecast evidence/planning slots  = 18
 
 したがって `18` を `18 runtime-certified` と表示してはいけません。
 
-## 5. current totals
+## 6. current totals
 
 ```text
 Broad v1                                      = 174
@@ -88,18 +110,32 @@ Probabilistic effective v1                    = 76
 Combined Broad + Probabilistic accounting     = 250
 Current Broad campaign plan                   = 174 × 6 = 1,044
 Combined accounting × six games               = 250 × 6 = 1,500
-Committed Expanded v2 Phase 1                 = 210
+Expanded v2 Phase 1                           = 210
+Expanded v2 after GluonTS Phase 3             = 218
 ```
 
-current `210` は次から導出されます。
+Phase 1:
 
 ```text
 174 - AutoGluon umbrella 1 + AutoGluon implementations 37 = 210
 ```
 
-Darts、GluonTS、ReservoirPy、sktime、skforecast、Time-Series-Library、BasicTSの今後の分解はまだこの210へ入っていません。
+Phase 3 current implementation:
 
-## 6. README/dashboard display rule
+```text
+174
+- AutoGluon umbrella 1
+- GluonTS umbrella 1
++ AutoGluon implementations 37
++ GluonTS implementations 9
+= 218
+```
+
+`expanded_inventory_counts()`が218を導出し、手書き値をcount authorityにしません。
+
+Darts、ReservoirPy、sktime、skforecast、Time-Series-Library、BasicTSの今後の分解はまだ218へ入っていません。したがって218はExpanded v2の最終freeze値ではありません。
+
+## 7. README/dashboard display rule
 
 umbrella libraryには単一の無印 `Count` を使わず、少なくとも次を分離します。
 
@@ -110,9 +146,9 @@ Observed/discovered denominator
 Runtime/evidence boundary
 ```
 
-特に `skforecast=1` は「Broad互換identityが1」であり、「skforecastに1モデルしかない」という意味ではありません。
+特に`GluonTS=1`はBroad互換identity、`GluonTS=9`はExpanded implementation identity、`18`は2 laneのlifecycle cell数です。
 
-## 7. Scientific boundary
+## 8. Scientific boundary
 
 Inventory expansionはforecast skillではありません。
 
