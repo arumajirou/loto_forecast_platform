@@ -10,8 +10,9 @@ README の全体像に対して、本書は次の質問へ素早く答えるこ�
 4. runtime / OOF / Holdout / Prospective の証拠はどこまであるか。
 5. 「登録済み」と「正式に科学評価済み」を混同していないか。
 
-> **Audit basis:** `main@05eba49dad8c0700c303783267784cfde081e419` / 2026-08-12  
+> **Audit basis:** `main@4f4f8579c6bcc05e25ea472e48385114bb56c71d` / 2026-08-13  
 > **Primary code sources:** `src/loto/models/catalog_full.py`, `src/loto/models/catalog.py`, `src/loto/models/implementation_catalog.py`, framework/provider implementations, tests, retained runtime evidence  
+> **Current execution addenda:** `docs/CURRENT_MODEL_EXECUTION_ADDENDUM.md`, `docs/SKFORECAST_RUNTIME_CERTIFICATION.md`  
 > **Rule:** `REGISTERED != ROUTABLE != RUNTIME_CERTIFIED != OOF_EVALUATED != HOLDOUT_EVALUATED != PROSPECTIVE_EVALUATED != PROMOTION_ELIGIBLE`
 
 ---
@@ -25,11 +26,12 @@ README の全体像に対して、本書は次の質問へ素早く答えるこ�
 | `PROVIDER_ROUTABLE` | provider / isolated process 経路がある |
 | `RUNTIME_CERTIFIED` | exact identity で load / inference / shape / finite / device 等の正式証拠がある |
 | `PARTIAL_RUNTIME_EVIDENCE` | 一部環境・一部モデル・一部証拠だけが成立 |
+| `OPERATOR_LOCAL_EVIDENCE` | maintainer hostで得たexact-source証拠。current-main retained certificationとは別クラス |
 | `OOF_EVALUATED` | chronological development OOF が完了 |
 | `EXECUTION_PENDING` | 実装・計画はあるが対象分母を完走していない |
-| `BLOCKED` | runner / license / artifact / policy 等で明示的に停止 |
+| `BLOCKED` | runner / dependency / license / artifact / policy 等で明示的に停止 |
 
-**重要:** import 成功、`available=true`、モデル名登録、単一 smoke 成功だけでは `RUNTIME_CERTIFIED` としません。
+**重要:** import 成功、`available=true`、モデル名登録、単一 smoke 成功だけでは `RUNTIME_CERTIFIED` としません。operator-local exact-source PASSも、より新しいmain SHAのformal certificationへ自動昇格しません。
 
 ---
 
@@ -37,37 +39,40 @@ README の全体像に対して、本書は次の質問へ素早く答えるこ�
 
 ### 2.1 Broad v1 = 174 の内訳
 
-`catalog_full.py` の current code から導出される Broad v1 の内訳です。
+`catalog_full.py` の current code から導出される Broad v1 の内訳です。Broad v1は凍結された分母で、dynamic / Expanded v2のidentityを足し戻しません。
 
 | Library | Broad v1 count | 主な役割 | shared / provider の実態 | 現在の証拠状態 |
 |---|---:|---|---|---|
 | builtin | 4 | theory / frequency controls | shared | **VERIFIED** |
 | scikit-learn | 7 | candidate / position ML | shared | **VERIFIED / PARTIALLY_VERIFIED** |
-| LightGBM | 2 | candidate / position boosting | shared | **PARTIALLY_VERIFIED** |
-| XGBoost | 1 | candidate boosting | shared | **PARTIALLY_VERIFIED** |
-| CatBoost | 1 | candidate boosting | shared | **PARTIALLY_VERIFIED** |
+| LightGBM | 2 | candidate / position boosting | shared | **OPENCL GPU ROUTE VERIFIED / CUDA NOT CERTIFIED** |
+| XGBoost | 1 | candidate boosting | shared | **CUDA GPU ROUTE VERIFIED** |
+| CatBoost | 1 | candidate boosting | shared | **GPU ROUTE VERIFIED** |
 | StatsForecast | 41 | statistical forecasting | broad 41 / shared explicit 8 | **VERIFIED / PARTIALLY_VERIFIED** |
 | NeuralForecast fixed | 37 | deep forecasting | broad 37 / direct shared subset 17 | **VERIFIED / PARTIALLY_VERIFIED** |
 | NeuralForecast Auto | 36 | HPO deep forecasting | dedicated AutoModel execution surface | **VERIFIED / PARTIALLY_VERIFIED** |
 | MLForecast Auto | 8 | lag-based AutoML | broad Auto 8 / direct shared 2 | **PARTIALLY_VERIFIED** |
 | HierarchicalForecast | 10 | reconciliation | reconciliation surface | **VERIFIED / PARTIALLY_VERIFIED** |
-| TSFM | 21 | foundation / zero-shot | shared provider subset + isolated lanes | **19 runtime CERTIFIED / 2 BLOCKED** in retained audit |
+| TSFM | 21 | foundation / zero-shot | shared provider subset + isolated lanes | retained audit **19 runtime CERTIFIED / 2 BLOCKED** |
 | AutoGluon TimeSeries | 1 umbrella | AutoML / ensemble | isolated provider; Expanded v2 decomposes to 37 | **PARTIALLY_VERIFIED** |
 | Darts | 1 | ensemble framework | shared optional lane | **PARTIALLY_VERIFIED** |
 | GluonTS | 1 | probabilistic DeepAR | shared optional lane | **PARTIALLY_VERIFIED** |
 | ReservoirPy | 1 | ESN | shared optional lane | **PARTIALLY_VERIFIED** |
-| sktime | 1 | forecasting framework | isolated campaign | **EXECUTION_PENDING** for broad target runtime |
-| skforecast | 1 | recursive lag ML | no audited equivalent shared worker | **EXECUTION_PENDING** |
+| sktime | 1 | forecasting framework | isolated campaign | **PARTIALLY_VERIFIED**; P1 fixed 4-model formal PASS on exact source |
+| skforecast | 1 | recursive lag ML | Broad identity remains one entry; Expanded integration open | **PARTIALLY_VERIFIED / OPERATOR_LOCAL_EVIDENCE** |
 | **TOTAL** | **174** |  |  | Broad denominator is frozen |
 
-### 2.2 Broad v1 外の主要 framework
+### 2.2 Broad v1 外の主要 framework / dynamic denominators
 
-| Framework | Broad v1 への収録 | 実装面 | 現在状態 |
+| Framework / inventory | Broad v1 への収録 | 実装面 | 現在状態 |
 |---|---|---|---|
+| scikit-learn dynamic | outside 174 | `loto-sklearn` installed-version discovery/certification | **PROVIDER VERIFIED / estimator runtime varies** |
+| sktime registry | outside Broad denominator | isolated registry/campaign | **141 discovered/importable; not 141 runtime-certified** |
+| Expanded v2 Phase 1 | separate inventory | implementation catalog | **210 identities** |
 | Time-Series-Library | outside 174 | isolated campaign / provider | **PARTIALLY_VERIFIED** |
 | BasicTS | outside 174 | isolated campaign / provider | **PARTIALLY_VERIFIED** |
 | Merlion | outside 174 | isolated runtime/certification lane | **EXECUTION_PENDING** for target-host completion |
-| Probabilistic platform | separate 72-model catalog | `loto3 probabilistic` | **VERIFIED / PARTIALLY_VERIFIED** |
+| Probabilistic platform | separate catalog | `loto3 probabilistic` | **VERIFIED / PARTIALLY_VERIFIED** |
 
 ---
 
@@ -76,21 +81,21 @@ README の全体像に対して、本書は次の質問へ素早く答えるこ�
 | Library / family | Candidate | Position | Position-series | Exogenous | Probabilistic | GPU path | HPO | Reconciliation | Shared route | Isolated/provider |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | builtin | ✓ | ✓ | — | — | 一部 | — | — | — | ✓ | — |
-| scikit-learn | ✓ | ✓ | ✓ | ✓ | classifier系 | CPU中心 | — | — | ✓ | — |
-| LightGBM | ✓ | — | ✓ | ✓ | classifier | optional | — | — | ✓ | — |
-| XGBoost | ✓ | — | — | ✓ | classifier | optional | — | — | ✓ | — |
-| CatBoost | ✓ | — | — | ✓ | classifier | optional | — | — | ✓ | — |
+| scikit-learn | ✓ | ✓ | ✓ | ✓ | classifier系 | CPU中心 / tree別 | — | — | ✓ | dynamic providerもあり |
+| LightGBM | ✓ | — | ✓ | ✓ | classifier | **OpenCL GPU verified** | — | — | ✓ | — |
+| XGBoost | ✓ | — | — | ✓ | classifier | **CUDA verified** | — | — | ✓ | — |
+| CatBoost | ✓ | — | — | ✓ | classifier | **GPU verified** | — | — | ✓ | — |
 | StatsForecast | 一部 | — | ✓ | model依存 | conformal等 | CPU中心 | model内Auto | — | 8 explicit | campaign |
 | MLForecast | — | — | ✓ | ✓ | regressor依存 | backend依存 | ✓ | — | 2 direct | research/AutoML |
 | NeuralForecast fixed | — | — | ✓ | model依存 | model依存 | ✓ | — | 一部 | 17 direct | dedicated paths |
-| NeuralForecast Auto | — | — | ✓ | base model依存 | base model依存 | ✓ | ✓ Ray/Optuna | 一部 | specあり | dedicated AutoModel runner |
+| NeuralForecast Auto | — | — | ✓ | base model依存 | base model依存 | ✓ | Ray / Optuna | 一部 | specあり | dedicated AutoModel runner |
 | AutoGluon | — | — | ✓ | model依存 | ✓ | backend依存 | AutoML | ensemble | umbrella | ✓ isolated |
 | Darts | — | — | ✓ | framework依存 | ✓ | optional | — | — | ✓ | optional |
 | GluonTS | — | — | ✓ | estimator依存 | ✓ | current shared path CPU-pinned | — | — | ✓ | optional |
 | ReservoirPy | — | ✓ | — | — | — | CPU中心 | — | — | ✓ | optional |
 | HierarchicalForecast | — | — | base forecast入力 | — | — | — | — | ✓ | reconciliation | optional |
 | sktime | — | — | ✓ | estimator依存 | estimator依存 | estimator依存 | estimator依存 | 一部 | — | ✓ |
-| skforecast | — | — | ✓ | ✓ | — | regressor依存 | — | — | — | pending |
+| skforecast | — | — | ✓ | ✓ | bootstrap/conformal/foundation model依存 | estimator/foundation依存 | grid/random/Optuna等 | — | Broad exact route未完 | upstream wrapper/runtime surfaceをoperator検証 |
 | TSFM | TabPFN-TS等 | — | ✓ | model依存 | model依存 | 多くはGPU検証対象 | — | — | subset | ✓ |
 | Time-Series-Library | — | — | ✓ | architecture依存 | architecture依存 | ✓ | project側で可能 | — | — | ✓ |
 | BasicTS | — | — | ✓ | framework依存 | framework依存 | framework依存 | framework依存 | — | — | ✓ |
@@ -110,7 +115,7 @@ README の全体像に対して、本書は次の質問へ素早く答えるこ�
 | `position-median` | `TheoryMedianAdapter` | position | MAE-floor control | **REGISTERED** in Broad |
 | `position-modal` | `TheoryModalAdapter` | position | within-tau ceiling control | **REGISTERED** in Broad |
 
-### 4.2 scikit-learn
+### 4.2 scikit-learn Broad 7
 
 | Broad model_id | shared route | class | 主な default params / capability |
 |---|---|---|---|
@@ -120,16 +125,18 @@ README の全体像に対して、本書は次の質問へ素早く答えるこ�
 | `random-forest` | `random-forest` | RandomForestClassifier | `n_estimators=300`, `min_samples_leaf=3`, `n_jobs=-1` |
 | `extra-trees` | `extra-trees` | ExtraTreesClassifier | `n_estimators=300`, `min_samples_leaf=2`, `n_jobs=-1` |
 | `hist-gradient-boosting` | `hist-gradient-boosting` | HistGradientBoostingClassifier | `learning_rate=0.05`, `max_iter=200` |
-| `isotonic-calibrated-logistic` | dedicated calibration semantics | CalibratedClassifierCV | `method=isotonic`, `cv=3` |
+| `isotonic-calibrated-logistic` | dedicated calibration route | CalibratedClassifierCV | `method=isotonic`, `cv=3`; routing gap repaired in #303 |
+
+Dynamic all-estimator provider is a separate denominator exposed by `loto-sklearn`; it does not alter Broad 7 or Broad total 174.
 
 ### 4.3 LightGBM / XGBoost / CatBoost
 
-| Library | model_id | class | task | major defaults | status boundary |
+| Library | model_id | class | task | major defaults | current runtime boundary |
 |---|---|---|---|---|---|
-| LightGBM | `lightgbm-classifier` | LGBMClassifier | candidate | `n_estimators=400`, `learning_rate=0.03`, `num_leaves=31` | GPU optional; not blanket-certified |
-| LightGBM | `lightgbm-position` | LGBMRegressor | position-series | `n_estimators=400`, `learning_rate=0.03` | GPU optional; not blanket-certified |
-| XGBoost | `xgboost-classifier` | XGBClassifier | candidate | `n_estimators=400`, `learning_rate=0.03`, `max_depth=5` | GPU optional; not blanket-certified |
-| CatBoost | `catboost-classifier` | CatBoostClassifier | candidate | `iterations=400`, `learning_rate=0.03` | GPU optional; not blanket-certified |
+| LightGBM | `lightgbm-classifier` | LGBMClassifier | candidate | `n_estimators=400`, `learning_rate=0.03`, `num_leaves=31` | OpenCL `device_type="gpu"` route verified; CUDA tree learner not certified |
+| LightGBM | `lightgbm-position` | LGBMRegressor | position-series | `n_estimators=400`, `learning_rate=0.03` | same OpenCL contract |
+| XGBoost | `xgboost-classifier` | XGBClassifier | candidate | `n_estimators=400`, `learning_rate=0.03`, `max_depth=5` | scheduler GPU lease → CUDA route verified |
+| CatBoost | `catboost-classifier` | CatBoostClassifier | candidate | `iterations=400`, `learning_rate=0.03` | scheduler GPU lease → GPU route verified |
 
 ---
 
@@ -289,7 +296,7 @@ Broad Auto entries use AutoMLForecast semantics with upstream default search spa
 | refit | `refit_with_val` | best model refit policy |
 | observability | callbacks / training evidence | GPU training, pre-save, reload evidenceと接続 |
 
-2026-08-12 merged implementationでは、official default search spaceを保持したまま fixed experiment controls を overlayし、seed / precision、multiseries `n_series`、early-stop、GPU training evidence を扱います。
+Merged implementationでは、official default search spaceを保持したまま fixed experiment controls を overlayし、seed / precision、multiseries `n_series`、early-stop、GPU training evidence を扱います。
 
 ### 8.3 local extensions
 
@@ -302,7 +309,7 @@ Broad Auto entries use AutoMLForecast semantics with upstream default search spa
 
 ---
 
-## 9. AutoGluon TimeSeries 1.5.0 — Expanded v2 Phase 1
+## 9. AutoGluon TimeSeries — Expanded v2 Phase 1
 
 Broad v1では `autogluon-timeseries` 1 umbrella entryです。Expanded v2 Phase 1では source-backed identity に分解します。
 
@@ -362,14 +369,14 @@ Broad v1では `autogluon-timeseries` 1 umbrella entryです。Expanded v2 Phase
 | MiddleOutSparse | sparse middle-out | no |
 | MinTrace | minimum-trace reconciliation | no |
 | MinTraceSparse | sparse MinTrace | no |
-| OptimalCombination | optimal combination | no |
+| OptimalCombination | optimal combination reconciliation | no |
 | ERM | empirical risk minimization reconciliation | no |
 
 これらは base forecast を coherent に変換する reconciliation methods であり、10個の独立予測モデルとして精度比較してはいけません。
 
 ---
 
-## 11. TSFM / foundation models — 21 runtime audit identities
+## 11. TSFM / foundation models — 21 retained runtime audit identities
 
 Retained runtime audit の current interpretation は **19 CERTIFIED / 2 BLOCKED / 0 pending** です。ただし runtime certification は lottery-domain compatibility や OOF accuracy を意味しません。
 
@@ -386,12 +393,12 @@ Retained runtime audit の current interpretation は **19 CERTIFIED / 2 BLOCKED
 | kronos-base | CERTIFIED | dedicated provider script | native financial OHLCV; lottery compatibility=false |
 | lag-llama | CERTIFIED | exact shared ModelSpecなし | shared research routing別 |
 | moirai-1.0-base | **BLOCKED** | exact shared specなし | weights missing; personal/noncommercial scope |
-| moirai-2.0-small | CERTIFIED | shared `moirai`とidentity差 | lottery compatibility=false |
+| moirai-2.0-small | CERTIFIED | shared `moirai`とidentity差 | retained identity evidence; separate skforecast dependency issue below |
 | moment-1-large | CERTIFIED | exact shared ModelSpecなし | forecasting head scope確認必要 |
 | moment-1-small | CERTIFIED | exact shared ModelSpecなし | forecasting head scope確認必要 |
 | sundial-base | CERTIFIED | shared `sundial`とidentity差 | exact identity binding必須 |
-| t0-alpha | **BLOCKED** | shared runnable specなし | gated access required |
-| tabpfn-ts | CERTIFIED | shared exact ID | candidate/foundation-tabular path |
+| t0-alpha | **BLOCKED** | shared runnable specなし | retained audit gated access required |
+| tabpfn-ts | CERTIFIED | retained shared exact ID | do not inherit this into new TS-3 lane automatically |
 | timesfm-2.5-transformers | CERTIFIED | shared `timesfm-2.5`とidentity差 | exact package/revision確認 |
 | tirex-2 | CERTIFIED | shared `tirex`とlogical ID差 | exact identity確認 |
 | toto-2.0-4m | CERTIFIED | exact shared registry entryなし | dedicated runtime evidence |
@@ -414,13 +421,117 @@ automatic promotion=FORBIDDEN
 
 ## 12. Darts / GluonTS / ReservoirPy / sktime / skforecast
 
-| Library | Broad identity | implementation | main parameters / notes | status |
+| Library | Broad identity | implementation | main parameters / notes | current status |
 |---|---|---|---|---|
 | Darts | `darts-ensemble` | RegressionEnsembleModel | NaiveDrift + ExponentialSmoothing ensemble lane | **PARTIALLY_VERIFIED** |
 | GluonTS | `gluonts-deepar` | DeepAREstimator | shared defaults include `epochs=1`, `num_batches_per_epoch=2`, `context_length=16`, `num_samples=20`; shared path CPU-pinned | **PARTIALLY_VERIFIED** |
 | ReservoirPy | `reservoir-esn` | ESN / Reservoir + Ridge | `reservoir_size=50`, `spectral_radius=0.9`, `leak_rate=0.3`, `ridge_alpha=1e-6` | **PARTIALLY_VERIFIED** |
-| sktime | `sktime-ensemble` | EnsembleForecaster / campaign | rolling-origin/lifecycle surface | **EXECUTION_PENDING** for broad target runtime |
-| skforecast | `skforecast-recursive` | ForecasterRecursive | exogenous-capable lag ML identity | **EXECUTION_PENDING** for routed broad runtime |
+| sktime | `sktime-ensemble` | EnsembleForecaster / isolated campaign | registry 141 discovered/importable; P1 fixed four-model formal matrix passed | **PARTIALLY_VERIFIED / Expanded v2 still open** |
+| skforecast | `skforecast-recursive` | ForecasterRecursive Broad identity | root optional dep declares `skforecast>=0.17`; operator runtime used 0.23.0 | **PARTIALLY_VERIFIED / OPERATOR_LOCAL_EVIDENCE / repository routing pending** |
+
+### 12.1 sktime evidence boundary
+
+Current exact-source P1 evidence:
+
+```text
+sktime=1.0.1
+registry discovered=141
+registry importable=141
+core-compatible=53
+optional-dependency-declared=88
+formal P1 models=4
+4/4 construct/fit/predict/finite/save-load/re-predict/formal verification=PASS
+```
+
+This does not convert 141 discovered/importable forecasters into 141 runtime-certified implementations. #289 / TAJ-32 remains open.
+
+### 12.2 skforecast 0.23.0 operator-local evidence
+
+The maintainer-host sequence was run against exact source head:
+
+```text
+9fcc1274755dca64c46dc31a9a0f60a9ef1c4ebd
+```
+
+This is an `OPERATOR_LOCAL_EVIDENCE` class, not current-main retained certification.
+
+#### Core strategies / estimator integration
+
+Observed PASS after correcting two smoke-harness assumptions:
+
+- `ForecasterRecursive + Ridge + exog`;
+- `ForecasterRecursive + HistGradientBoostingRegressor`;
+- recursive LightGBM / XGBoost / CatBoost CPU smoke;
+- `ForecasterDirect + Ridge`;
+- `ForecasterRecursiveMultiSeries`;
+- `ForecasterDirectMultiVariate + Ridge`;
+- `ForecasterEquivalentDate`;
+- `ForecasterStats + ARAR`;
+- RollingFeatures / CalendarFeatures;
+- TimeSeriesFold/backtesting;
+- Optuna Bayesian search;
+- save/load exact prediction round trip;
+- RangeDriftDetector;
+- bootstrap and out-of-sample calibrated interval paths.
+
+The initial multi-series expected-length failure and bootstrap residual-storage failure were harness/config mistakes, not library runtime defects.
+
+#### RNN
+
+| implementation | GPU | CPU fallback | device evidence |
+|---|---:|---:|---|
+| ForecasterRnn LSTM | PASS | PASS | CUDA model variables + PyTorch allocation + external PID; CPU zero-CUDA proof |
+| ForecasterRnn GRU | PASS | not repeated in this sequence | CUDA model variables + allocation + external PID |
+
+#### Foundation adapters
+
+| implementation | operator-local runtime | exog | probabilistic surface | boundary |
+|---|---|:---:|---|---|
+| Chronos-2 small | **GPU + CPU PASS** | ✓ | native interval | HF revision observed; repository revision enforcement/routing separate |
+| TimesFM 2.5 | **GPU + CPU PASS** | — | interval + q0.1/q0.5/q0.9 | source revision recorded; adapter correctly no-exog |
+| Moirai-2 small | **GPU + CPU PASS under controlled override** | — | interval + quantiles | normal dependency metadata conflict keeps routability BLOCKED |
+| TabICL v2 | **GPU + CPU PASS** | ✓ | interval + quantiles | checkpoint revision/bytes/SHA-256 VERIFIED |
+| TabPFN-TS v3 path | adapter/device setup PASS | ✓ | not executed | invalid/expired Prior Labs token blocks V3 weight download/inference |
+| T0 | not run | model-dependent | not run | pending in this sequence |
+
+TabICL artifact identity:
+
+```text
+repo=jingang/TabICL
+revision=4dcd344ece2c00be9e831fdd35bed57b5ad83e19
+checkpoint=tabicl-regressor-v2-20260212.ckpt
+size_bytes=114324594
+sha256=0db9cb538f114e79026bf08f45f41ad8dd7ad2de2aaca9a5ca8cd3bd9748ae7a
+status=VERIFIED
+```
+
+TabPFN-TS current operator diagnostic:
+
+```text
+tabpfn-time-series=1.2.0
+tabpfn=8.1.0
+requested_checkpoint=tabpfn-v3-regressor-v3_20260506_timeseries.ckpt
+license_name=tabpfn-3-license-v1.0
+token_valid=false
+license_accepted=not evaluated
+runtime_inference=NOT_EXECUTED
+```
+
+A cached `TabPFN-v2-reg` checkpoint is a different identity and must not be used as TS-3 evidence.
+
+Full details: `docs/SKFORECAST_RUNTIME_CERTIFICATION.md`.
+
+#### Expanded v2 interpretation
+
+The operator evidence does not define the final skforecast Expanded v2 count. #289 / TAJ-32 still must:
+
+- distinguish `algorithm_id` from `implementation_id`;
+- avoid wrapper × estimator Cartesian inflation;
+- freeze source/revision-backed implementation identities;
+- attach routability/capability/resource metadata;
+- add focused committed construct/predict tests;
+- preserve blocked/non-routable identities explicitly;
+- keep Broad v1=174 unchanged.
 
 ---
 
@@ -445,24 +556,27 @@ automatic promotion=FORBIDDEN
 | horizon `h` | forecasting libraries | forecast length |
 | CPU / GPU allocation | NF, AutoNF, boosting, TSFM, isolated providers | resource planning |
 | precision | NF / AutoNF / GPU models | `32-true`等; FFT modelsはfull precision制約 |
-| trial count | AutoNF / AutoML | HPO budget |
+| trial count | AutoNF / AutoML / skforecast search | HPO budget |
 | backend | AutoNF | Ray / Optuna |
 | timeout | campaigns/providers | runaway process prevention |
 | save/reload | trainable models | lifecycle certification |
-| revision / repo_id | TSFM | exact identity reproducibility |
+| revision / repo_id | TSFM / foundation adapters | exact identity reproducibility |
+| license/auth | gated models | access/governance gate; runtime failureと分離 |
 
 ### 14.2 科学評価
 
 | gate | required evidence |
 |---|---|
 | Development OOF | chronological folds, Train-only preprocessing/HPO, all seeds |
-| Primary metric | Hit@±1 |
+| Primary metric | **Hit@±1** |
 | Secondary metrics | MAE, MSE, RMSE, position-wise Hit@±1, all-position Hit@±1 |
 | Baselines | Random, fixed, mean, median, recent, frequency, statistical |
 | Prediction lock | actual判明前のSHA-256 + timestamp |
 | Holdout | explicit authorization only |
 | Prospective | sealed future prediction + later actual |
 | Promotion | human approval; automatic promotion forbidden |
+
+Synthetic smoke metrics in runtime certification are diagnostics only and are not substituted for development OOF.
 
 ---
 
@@ -474,7 +588,7 @@ automatic promotion=FORBIDDEN
 source-declared
   -> catalog-registered
   -> shared/provider-routable
-  -> dependency/version verified
+  -> dependency/version/identity verified
   -> load verified
   -> input accepted
   -> inference executed
@@ -487,6 +601,7 @@ source-declared
   -> Holdout evaluated
   -> Prospective evaluated
   -> promotion eligible
+  -> human approval
 ```
 
 ---
@@ -503,6 +618,17 @@ uv run loto models list
 
 # full model × game plan only
 uv run loto3 campaign --output unused --plan-only
+
+# parallel Unified Campaign
+uv run python -m loto.evaluation.parallel_campaign --help
+
+# dynamic sklearn provider
+uv run loto-sklearn list
+uv run loto-sklearn smoke --model RandomForestRegressor --seed 1
+uv run loto-sklearn certify --kind all --seed 1 --output artifacts/sklearn-certification
+
+# sktime P1
+ROOT="$PWD" SKTIME_NO_PAUSE=1 bash scripts/run_sktime_p1_matrix_certification.sh
 
 # NeuralForecast AutoModels
 uv run loto neuralforecast automodel-run --help
@@ -525,15 +651,23 @@ uv run loto3 probabilistic backends
    - `src/loto/models/implementation_catalog.py`
    - `src/loto/models/providers.py`
    - framework-specific campaign / provider modules
-2. tests / workflows / retained evidence
-3. merged PR / commit history
-4. live Linear project state
-5. documentation
+2. tests / workflows / repository-retained evidence
+3. exact-source operator/local runtime evidence with environment provenance
+4. merged PR / commit history
+5. live GitHub Issues / Linear project state
+6. current documentation
+7. historical snapshots
 
 関連資料:
 
 - `README.md`
+- `docs/STATUS.md`
+- `docs/CURRENT_VERIFICATION_REPORT.md`
+- `docs/CURRENT_MODEL_EXECUTION_ADDENDUM.md`
+- `docs/SKFORECAST_RUNTIME_CERTIFICATION.md`
 - `docs/CAPABILITIES_AND_OPERATIONS.md`
 - `docs/TSFM_RUNTIME_CAPABILITIES.md`
 - `docs/evaluation/`
 - `docs/operations/`
+
+Holdout remains **CLOSED**. Prospective remains **CLOSED**. Automatic promotion remains **FORBIDDEN**.
