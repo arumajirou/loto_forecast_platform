@@ -88,6 +88,7 @@ def test_explicit_backend_parameters_remain_authoritative(monkeypatch) -> None:
         params={"task_type": "CPU"},
     )
     assert cat.kwargs["task_type"] == "CPU"
+    assert "devices" not in cat.kwargs
 
 
 def test_lightgbm_cuda_is_not_forced_before_build_certification(monkeypatch) -> None:
