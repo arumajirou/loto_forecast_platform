@@ -33,9 +33,9 @@ def _numbers3_frame(rows: int = 40, seed: int = 11) -> pd.DataFrame:
     return pd.DataFrame(
         {
             "draw_no": np.arange(1, rows + 1),
-            "n1": values[:, 0],
-            "n2": values[:, 1],
-            "n3": values[:, 2],
+            "d1": values[:, 0],
+            "d2": values[:, 1],
+            "d3": values[:, 2],
         }
     )
 
