@@ -19,27 +19,30 @@ from loto.adapters.gluonts.p6_registry import (
     registry_sha256 as gluonts_registry_sha256,
 )
 from loto.models.catalog_full import ModelEntry, build_catalog
+from loto.models.skforecast_inventory import (
+    SKFORECAST_IMPLEMENTATION_SPECS,
+    SKFORECAST_OPERATOR_EVIDENCE_REVISION,
+    SKFORECAST_SOURCE_REVISION,
+    SKFORECAST_VERSION,
+)
 
-EXPANDED_INVENTORY_SCHEMA_VERSION = 2
+EXPANDED_INVENTORY_SCHEMA_VERSION = 3
 AUTOGLOUON_BROAD_V1_ID = "autogluon-timeseries"
 GLUONTS_BROAD_V1_ID = "gluonts-deepar"
+SKFORECAST_BROAD_V1_ID = "skforecast-recursive"
 
 SourceKind = Literal[
     "broad_v1",
     "autogluon_source_model",
     "autogluon_source_ensemble",
     "gluonts_p6_registry",
+    "skforecast_strategy",
 ]
 
 
 @dataclass(frozen=True, slots=True)
 class ImplementationIdentity:
-    """One library-specific executable implementation identity.
-
-    ``algorithm_id`` is intentionally separate from ``implementation_id``. The
-    former can be shared by equivalent scientific algorithms implemented by
-    different libraries, while the latter is always library/runtime specific.
-    """
+    """One library-specific executable implementation identity."""
 
     implementation_id: str
     algorithm_id: str
@@ -51,8 +54,17 @@ class ImplementationIdentity:
     canonical_v1_model_id: str | None = None
     source_alias: str | None = None
     source_declared: bool = True
+    source_version: str | None = None
+    source_revision: str | None = None
+    evidence_class: str = "SOURCE_DECLARED"
+    evidence_revision: str | None = None
+    artifact_id: str | None = None
+    artifact_revision: str | None = None
+    artifact_sha256: str | None = None
+    routability: str = "UNKNOWN"
     runtime_status: str = "NOT_RUN"
     runtime_certified: bool = False
+    block_reason: str | None = None
     capabilities: tuple[str, ...] = ()
     notes: str = ""
 
@@ -119,12 +131,7 @@ def _from_broad_v1(entry: ModelEntry) -> ImplementationIdentity:
 
 
 def autogluon_implementation_identities() -> tuple[ImplementationIdentity, ...]:
-    """Expand the repository's source-declared AutoGluon inventory.
-
-    AutoGluon currently has one Broad v1 umbrella entry, but the pinned source
-    inventory declares individual model aliases and ensemble implementations.
-    Selectable ensemble aliases resolving to the same class are counted once.
-    """
+    """Expand the repository's source-declared AutoGluon inventory."""
 
     rows: list[ImplementationIdentity] = []
     for spec in SOURCE_MODEL_SPECS:
@@ -176,13 +183,7 @@ def autogluon_implementation_identities() -> tuple[ImplementationIdentity, ...]:
 
 
 def gluonts_implementation_identities() -> tuple[ImplementationIdentity, ...]:
-    """Expand the frozen GluonTS Broad identity from the deterministic P6 registry.
-
-    The P6 registry is source-backed and deterministic, but its source declaration
-    must remain separate from runtime certification. The current P6 contract is
-    deliberately CPU-pinned; GPU, exogenous and multivariate behavior are not
-    inferred from registration alone.
-    """
+    """Expand the GluonTS Broad identity from the deterministic P6 registry."""
 
     payload = gluonts_registry_payload()
     source_tags = ",".join(payload["official_source_tags"])
@@ -226,11 +227,50 @@ def gluonts_implementation_identities() -> tuple[ImplementationIdentity, ...]:
     return tuple(rows)
 
 
+def skforecast_implementation_identities() -> tuple[ImplementationIdentity, ...]:
+    """Return the pinned reviewed skforecast 0.23.0 Phase 4A manifest."""
+
+    rows = [
+        ImplementationIdentity(
+            implementation_id=spec.implementation_id,
+            algorithm_id=spec.algorithm_id,
+            library="skforecast",
+            class_name=spec.class_name,
+            family=spec.family,
+            source_kind="skforecast_strategy",
+            execution_surface="expanded_inventory",
+            canonical_v1_model_id=SKFORECAST_BROAD_V1_ID,
+            source_alias=spec.source_alias,
+            source_declared=spec.source_declared,
+            source_version=SKFORECAST_VERSION,
+            source_revision=SKFORECAST_SOURCE_REVISION,
+            evidence_class=spec.evidence_class,
+            evidence_revision=spec.evidence_revision,
+            artifact_id=spec.artifact_id,
+            artifact_revision=spec.artifact_revision,
+            artifact_sha256=spec.artifact_sha256,
+            routability=spec.routability,
+            runtime_status=spec.runtime_status,
+            runtime_certified=False,
+            block_reason=spec.block_reason,
+            capabilities=spec.capabilities,
+            notes=spec.notes,
+        )
+        for spec in SKFORECAST_IMPLEMENTATION_SPECS
+    ]
+    _validate_identities(rows)
+    return tuple(rows)
+
+
 def expanded_implementation_catalog() -> tuple[ImplementationIdentity, ...]:
-    """Return current Expanded v2 while leaving the Broad v1 registry untouched."""
+    """Return current Expanded v2 while leaving Broad v1 untouched."""
 
     broad_v1 = build_catalog()
-    replaced_broad_ids = {AUTOGLOUON_BROAD_V1_ID, GLUONTS_BROAD_V1_ID}
+    replaced_broad_ids = {
+        AUTOGLOUON_BROAD_V1_ID,
+        GLUONTS_BROAD_V1_ID,
+        SKFORECAST_BROAD_V1_ID,
+    }
     rows = [
         _from_broad_v1(entry)
         for entry in broad_v1
@@ -238,6 +278,7 @@ def expanded_implementation_catalog() -> tuple[ImplementationIdentity, ...]:
     ]
     rows.extend(autogluon_implementation_identities())
     rows.extend(gluonts_implementation_identities())
+    rows.extend(skforecast_implementation_identities())
     _validate_identities(rows)
     return tuple(rows)
 
@@ -249,6 +290,7 @@ def expanded_inventory_counts() -> dict[str, Any]:
     expanded = expanded_implementation_catalog()
     autogluon = autogluon_implementation_identities()
     gluonts = gluonts_implementation_identities()
+    skforecast = skforecast_implementation_identities()
     by_library = Counter(row.library for row in expanded)
     return {
         "schema_version": EXPANDED_INVENTORY_SCHEMA_VERSION,
@@ -256,7 +298,7 @@ def expanded_inventory_counts() -> dict[str, Any]:
         "expanded_v2": len(expanded),
         "delta_vs_broad_v1": len(expanded) - len(broad_v1),
         "autogluon_broad_v1_umbrella_count": sum(
-            entry.model_id == AUTOGLOUON_BROAD_V1_ID for entry in broad_v1
+            entry.model_id == AUTOGLUON_BROAD_V1_ID for entry in broad_v1
         ),
         "autogluon_source_models": sum(
             row.source_kind == "autogluon_source_model" for row in autogluon
@@ -271,6 +313,16 @@ def expanded_inventory_counts() -> dict[str, Any]:
         "gluonts_p6_source_models": len(gluonts),
         "gluonts_expanded_total": len(gluonts),
         "gluonts_registry_sha256": gluonts_registry_sha256(),
+        "skforecast_broad_v1_umbrella_count": sum(
+            entry.model_id == SKFORECAST_BROAD_V1_ID for entry in broad_v1
+        ),
+        "skforecast_expanded_total": len(skforecast),
+        "skforecast_evidence_class": dict(
+            sorted(Counter(row.evidence_class for row in skforecast).items())
+        ),
+        "skforecast_runtime_status": dict(
+            sorted(Counter(row.runtime_status for row in skforecast).items())
+        ),
         "by_library": dict(sorted(by_library.items())),
     }
 
@@ -284,3 +336,22 @@ def _validate_identities(rows: list[ImplementationIdentity]) -> None:
         raise AssertionError("Expanded v2 algorithm_id must not be empty")
     if any(row.runtime_certified and row.runtime_status != "PASS" for row in rows):
         raise AssertionError("runtime_certified requires runtime_status=PASS")
+    if any(row.runtime_certified and row.evidence_class != "REPOSITORY_RETAINED" for row in rows):
+        raise AssertionError("runtime_certified requires repository-retained evidence")
+
+
+__all__ = [
+    "AUTOGLOUON_BROAD_V1_ID",
+    "EXPANDED_INVENTORY_SCHEMA_VERSION",
+    "GLUONTS_BROAD_V1_ID",
+    "ImplementationIdentity",
+    "SKFORECAST_BROAD_V1_ID",
+    "SKFORECAST_OPERATOR_EVIDENCE_REVISION",
+    "SKFORECAST_SOURCE_REVISION",
+    "SKFORECAST_VERSION",
+    "autogluon_implementation_identities",
+    "expanded_implementation_catalog",
+    "expanded_inventory_counts",
+    "gluonts_implementation_identities",
+    "skforecast_implementation_identities",
+]

@@ -1,22 +1,13 @@
 # Inventory Count Boundaries
 
 ```text
-status_class: AUDITED_CURRENT_STATE
-as_of: 2026-08-13T20:30+09:00
+status_class: EXPANDED_V2_PHASE4A_CANDIDATE
+as_of: 2026-08-13
 repository: arumajirou/loto_forecast_platform
-phase3_base_main_sha: eb988d2947994bb637dc8f0cbc40afa05570027f
+base_main_sha: 45bcf60fa04fc3736e3a73760039254573abf4c8
 ```
 
-この文書は、README等に表示される `1` が「そのライブラリに1モデルしかない」という意味に読めないよう、inventoryの分母を分離するためのcurrent-state資料です。
-
-## 1. countの種類
-
-| Count class | 意味 |
-|---|---|
-| `Broad v1` | 既存Broad campaignとの互換性のため凍結されたcanonical identity数。総数174は変更しない。 |
-| `Committed Expanded v2` | `src/loto/models/implementation_catalog.py` が実際に返すversioned implementation identity数。 |
-| `Observed / discovered denominator` | runtime registry、source export、operator evidenceなどから確認できる別分母。routability/runtime成功を意味しない。 |
-| `Runtime-certified` | exact identityでload/input/inference/shape/finite/device/lifecycle等の受理済み証拠を持つ数。 |
+Broad、Expanded、discovered、runtime-certifiedの分母を混同しません。
 
 ```text
 Broad count
@@ -26,137 +17,97 @@ Broad count
 != OOF-evaluated count
 ```
 
-## 2. umbrella libraryの現在値
+## Current candidate counts
 
-Expanded v2はAutoGluonに続いてGluonTS P6 registryもsource-backed implementation identityへ分解します。Broad v1は変更しません。
-
-| Library | Broad v1 | Committed Expanded v2 after Phase 3 | Observed / discovered / evidence denominator | 現在の解釈 |
+| Library | Broad v1 | Expanded v2 candidate | Other denominator | Boundary |
 |---|---:|---:|---|---|
-| AutoGluon TimeSeries | 1 | **37** | 29 source models + 8 unique ensembles | source-declared != runtime-certified。 |
-| Darts | 1 | **1** | **58 public forecasting exports**をPhase 2で調査中。local NLinear/DLinear GPU evidenceあり | #286 / TAJ-27 open。58全件standalone/runtime-certifiedではない。 |
-| GluonTS | 1 | **9** | **9 P6 estimator algorithms**、2 isolated lanesで18 lifecycle cells | #288 inventory integration。18はunique model countではない。#309 runtime repairはmain pending。 |
-| ReservoirPy | 1 | **1** | scientifically distinct expansion count未freeze | #294 open。 |
-| sktime | 1 | **1** | **141 discovered/importable** = 53 core-compatible + 88 optional-dependency-declared、formal P1=4 | #289 / TAJ-32 open。141 != 141 runtime-certified。 |
-| skforecast | 1 | **1** | current 0.23.0 operator evidenceから **18 candidate implementation identities** を科学的に区別可能 | #289 / TAJ-32 open。18はplanning/evidence denominatorで、まだcommitted Expanded countではない。 |
+| AutoGluon | 1 | **37** | 29 base + 8 ensembles | source declaration != runtime certification |
+| GluonTS | 1 | **9** | 9 models × 2 lanes = 18 lifecycle cells | #323 merged; runtime evidence remains separate |
+| skforecast | 1 | **27** | 15 operator-local PASS / 2 BLOCKED / 10 NOT_RUN | Phase 4A PR; runtime_certified=0 |
+| Darts | 1 | 1 | 58 public exports | #286 open |
+| sktime | 1 | 1 | 141 discovered/importable; formal P1=4 | Phase 4B remains open |
+| ReservoirPy | 1 | 1 | distinct count not frozen | #294 open |
 
-## 3. GluonTSの1 / 9 / 18
+## Derived Expanded v2 total
 
-```text
-GluonTS Broad v1 canonical identity  = 1 (`gluonts-deepar`)
-GluonTS Expanded v2 implementations  = 9
-GluonTS P6 lifecycle cells            = 9 × 2 isolated lanes = 18
-```
-
-Expanded v2の9 identityは`src/loto/adapters/gluonts/p6_registry.py`から導出し、`src/loto/models/implementation_catalog.py`でlibrary-specific implementation identityへ変換します。
+Current main after GluonTS #323 derives 218. Phase 4A replaces the one skforecast Broad copy with 27 reviewed implementations:
 
 ```text
-gluonts-torch-deepnpts
-gluonts-torch-deepar
-gluonts-torch-tide
-gluonts-torch-simplefeedforward
-gluonts-torch-temporalfusiontransformer
-gluonts-torch-wavenet
-gluonts-torch-dlinear
-gluonts-torch-patchtst
-gluonts-torch-lagtst
+218 - 1 + 27 = 244
 ```
 
-9 identityの初期runtime stateは`NOT_RUN` / `runtime_certified=false`です。Draft #309 exact-headで18/18 CPU lifecycle VERIFIEDでも、その証拠をcurrent-main inventoryへ自動昇格させません。
-
-## 4. なぜskforecastがまだ1なのか
-
-Phase 3後の`implementation_catalog.py`はAutoGluonとGluonTSのBroad umbrellaを分解しますが、skforecast Broad rowはまだExpanded-v2へそのままコピーされます。
-
-```text
-skforecast Broad v1                 = 1
-skforecast committed Expanded v2    = 1
-skforecast evidence/planning slots  = 18
-```
-
-これはREADMEだけの表示不具合ではなく、**#289 / TAJ-32の実装がまだ完了していないことを示す実装gap**です。
-
-## 5. skforecast 0.23.0の18 candidate identities
-
-`docs/SKFORECAST_RUNTIME_CERTIFICATION.md` のcurrent evidence planを、wrapper × estimatorの無意味なCartesian productを避けて数えると以下です。
-
-| Group | Count |
-|---|---:|
-| recursive Ridge | 1 |
-| recursive HistGradientBoosting | 1 |
-| recursive external boosters: LightGBM / XGBoost / CatBoost | 3 |
-| direct Ridge | 1 |
-| recursive multi-series Ridge | 1 |
-| direct multivariate Ridge | 1 |
-| EquivalentDate baseline | 1 |
-| Stats ARAR | 1 |
-| RNN LSTM / GRU | 2 |
-| Foundation: Chronos-2 / TimesFM 2.5 / Moirai-2 / TabICL v2 / TabPFN-TS / T0 | 6 |
-| **Total candidate identities represented by the current evidence plan** | **18** |
-
-18の内部statusは同一ではありません。
-
-- core / RNN / Chronos-2 / TimesFM 2.5 / TabICLにはoperator-local PASS evidenceがある。
-- Moirai-2はunsupported dependency metadata override下ではruntimeが通るがnormal routabilityはBLOCKED。
-- TabPFN-TS v3はauthentication/license gateでcheckpoint取得前に停止しinference NOT_EXECUTED。
-- T0はこのskforecast-specific sequenceでは未実行。
-
-したがって `18` を `18 runtime-certified` と表示してはいけません。
-
-## 6. current totals
-
-```text
-Broad v1                                      = 174
-Probabilistic effective v1                    = 76
-Combined Broad + Probabilistic accounting     = 250
-Current Broad campaign plan                   = 174 × 6 = 1,044
-Combined accounting × six games               = 250 × 6 = 1,500
-Expanded v2 Phase 1                           = 210
-Expanded v2 after GluonTS Phase 3             = 218
-```
-
-Phase 1:
-
-```text
-174 - AutoGluon umbrella 1 + AutoGluon implementations 37 = 210
-```
-
-Phase 3 current implementation:
+Equivalent full derivation:
 
 ```text
 174
-- AutoGluon umbrella 1
-- GluonTS umbrella 1
-+ AutoGluon implementations 37
-+ GluonTS implementations 9
-= 218
+- AutoGluon umbrella 1 + AutoGluon 37
+- GluonTS umbrella 1 + GluonTS 9
+- skforecast umbrella 1 + skforecast 27
+= 244
 ```
 
-`expanded_inventory_counts()`が218を導出し、手書き値をcount authorityにしません。
+Broad v1 remains **174** and the current Broad six-game planner remains **1,044 = 174 × 6**.
 
-Darts、ReservoirPy、sktime、skforecast、Time-Series-Library、BasicTSの今後の分解はまだ218へ入っていません。したがって218はExpanded v2の最終freeze値ではありません。
-
-## 7. README/dashboard display rule
-
-umbrella libraryには単一の無印 `Count` を使わず、少なくとも次を分離します。
+## skforecast 0.23.0 Phase 4A
 
 ```text
-Broad v1
-Committed Expanded v2
-Observed/discovered denominator
-Runtime/evidence boundary
+package = skforecast==0.23.0
+upstream_tag = v0.23.0
+upstream_commit = c881d5d350426985c1c31373077b7d5b620f233d
+operator_evidence_head = 9fcc1274755dca64c46dc31a9a0f60a9ef1c4ebd
 ```
 
-特に`GluonTS=1`はBroad互換identity、`GluonTS=9`はExpanded implementation identity、`18`は2 laneのlifecycle cell数です。
+Pinned upstream source confirms the major public forecasting surface:
 
-## 8. Scientific boundary
+- recursive exports: `ForecasterEquivalentDate`, `ForecasterRecursive`, `ForecasterRecursiveClassifier`, `ForecasterRecursiveMultiSeries`, `ForecasterStats`;
+- direct exports: `ForecasterDirect`, `ForecasterDirectMultiVariate`;
+- deep-learning strategy: `ForecasterRnn`;
+- foundation strategy: `ForecasterFoundation` / `FoundationModel`;
+- `ForecasterStats` explicitly supports seven statistical implementations;
+- `FoundationModel` explicitly lists eight selectable model IDs, including three Chronos-2 IDs.
 
-Inventory expansionはforecast skillではありません。
+To avoid an unbounded wrapper × arbitrary-estimator Cartesian product, the pinned manifest contains 27 reviewed identities:
 
-- primary metric: Hit@±1
-- companions: MAE/MSE/RMSE、position Hit@±1、all-position Hit@±1
-- chronological Train/Validation/OOF
-- all configured seeds + mean/variance/worst
-- actual read前のprediction SHA-256 seal
-- Holdout=CLOSED
-- Prospective=CLOSED
-- automatic promotion/retraining/registry write=FORBIDDEN
+| Group | Count |
+|---|---:|
+| Recursive regression families | 5 |
+| Recursive classifier representative binding | 1 |
+| Direct Ridge | 1 |
+| Recursive multi-series Ridge | 1 |
+| Direct multivariate Ridge | 1 |
+| EquivalentDate | 1 |
+| ForecasterStats supported implementations | 7 |
+| RNN LSTM / GRU | 2 |
+| Foundation explicit model IDs | 8 |
+| **Total** | **27** |
+
+Fail-closed status:
+
+```text
+OPERATOR_LOCAL_PASS                 = 15
+BLOCKED_DEPENDENCY_CONFLICT         = 1
+BLOCKED_INVALID_OR_EXPIRED_TOKEN    = 1
+NOT_RUN                             = 10
+runtime_certified=true              = 0
+```
+
+Moirai-2 is blocked on normal dependency routability despite an override probe. TabPFN-TS v3 is blocked before checkpoint/inference by invalid/expired authentication. All source-only additions remain NOT_RUN.
+
+## sktime Phase 4B
+
+Current sktime 1.0.1 discovery remains:
+
+```text
+discovered/importable = 141
+core-compatible = 53
+optional-dependency-declared = 88
+formal P1 = 4
+```
+
+Before replacing the sktime umbrella, Phase 4B must freeze the exact 141-row manifest and classify independent forecasters vs wrappers/composites/adapters. Therefore #289 / TAJ-32 remains In Progress after Phase 4A.
+
+## Scientific boundary
+
+Inventory expansion is not forecast skill. Hit@±1 remains primary with MAE/MSE/RMSE, position/all-position Hit@±1, mandatory baselines, chronological OOF, multi-seed mean/variance/worst and prediction SHA-256 sealing before actuals.
+
+Holdout=CLOSED. Prospective=CLOSED. Automatic promotion/retraining/registry writes=FORBIDDEN.
