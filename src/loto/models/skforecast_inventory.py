@@ -38,14 +38,17 @@ class SkforecastImplementationSpec:
     routability: str = "NOT_CURRENT_MAIN_ROUTABLE"
     block_reason: str | None = None
     source_declared: bool = True
+    artifact_id: str | None = None
+    artifact_revision: str | None = None
+    artifact_sha256: str | None = None
     notes: str = ""
 
 
 _COMMON_REGRESSION = ("position_series", "exogenous")
-_FOUNDATION_EXOG = (
+_FOUNDATION_EXOG_SOURCE = (
     "position_series",
     "foundation",
-    "exogenous",
+    "exogenous_source_declared",
     "probabilistic",
 )
 _FOUNDATION_NO_EXOG = (
@@ -64,6 +67,9 @@ def _operator_pass(
     source_alias: str,
     capabilities: tuple[str, ...],
     source_declared: bool = False,
+    artifact_id: str | None = None,
+    artifact_revision: str | None = None,
+    artifact_sha256: str | None = None,
     notes: str = "",
 ) -> SkforecastImplementationSpec:
     return SkforecastImplementationSpec(
@@ -77,12 +83,14 @@ def _operator_pass(
         evidence_class=OPERATOR_LOCAL_EVIDENCE,
         evidence_revision=SKFORECAST_OPERATOR_EVIDENCE_REVISION,
         source_declared=source_declared,
+        artifact_id=artifact_id,
+        artifact_revision=artifact_revision,
+        artifact_sha256=artifact_sha256,
         notes=notes,
     )
 
 
 SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
-    # ForecasterRecursive: representative scientifically distinct estimator families.
     _operator_pass(
         "skforecast-recursive-ridge",
         algorithm_id="recursive-ridge",
@@ -123,15 +131,13 @@ SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
         source_alias="catboost.CatBoostRegressor",
         capabilities=_COMMON_REGRESSION,
     ),
-    # Public recursive classifier strategy. The exact LogisticRegression binding is
-    # project-reviewed rather than an upstream-prescribed canonical estimator.
     SkforecastImplementationSpec(
         implementation_id="skforecast-recursive-classifier-logistic",
         algorithm_id="recursive-classifier-logistic",
         class_name="ForecasterRecursiveClassifier",
         family="recursive_classifier",
         source_alias="sklearn.linear_model.LogisticRegression",
-        capabilities=("position_series", "exogenous", "classification"),
+        capabilities=("position_series", "exogenous_source_declared", "classification"),
         source_declared=False,
         notes=(
             "source-declared ForecasterRecursiveClassifier strategy with a reviewed "
@@ -171,7 +177,6 @@ SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
         capabilities=("position_series", "baseline"),
         source_declared=True,
     ),
-    # ForecasterStats explicitly lists seven supported statistical implementations.
     _operator_pass(
         "skforecast-stats-arar",
         algorithm_id="arar",
@@ -203,7 +208,7 @@ SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
         class_name="ForecasterStats",
         family="statistical_wrapper",
         source_alias="skforecast.stats.Sarimax",
-        capabilities=("position_series", "statistical", "exogenous"),
+        capabilities=("position_series", "statistical", "exogenous_source_declared"),
     ),
     SkforecastImplementationSpec(
         implementation_id="skforecast-stats-sktime-arima",
@@ -232,7 +237,6 @@ SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
         capabilities=("position_series", "statistical", "optional_dependency"),
         notes="supported by ForecasterStats; underlying aeon dependency pin is a separate gate",
     ),
-    # Deep-learning strategy variants exercised in the operator lane.
     _operator_pass(
         "skforecast-rnn-lstm",
         algorithm_id="lstm",
@@ -249,15 +253,13 @@ SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
         source_alias="GRU",
         capabilities=("position_series", "gpu"),
     ),
-    # FoundationModel 0.23.0 explicitly lists all model IDs below. Chronos-2 has
-    # three distinct selectable model IDs sharing one scientific algorithm_id.
     SkforecastImplementationSpec(
         implementation_id="skforecast-foundation-chronos2-amazon",
         algorithm_id="chronos-2",
         class_name="ForecasterFoundation",
         family="foundation",
         source_alias="amazon/chronos-2",
-        capabilities=_FOUNDATION_EXOG,
+        capabilities=_FOUNDATION_EXOG_SOURCE,
     ),
     _operator_pass(
         "skforecast-foundation-chronos2-small",
@@ -265,7 +267,14 @@ SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
         class_name="ForecasterFoundation",
         family="foundation",
         source_alias="autogluon/chronos-2-small",
-        capabilities=_FOUNDATION_EXOG + ("gpu", "cpu_fallback"),
+        capabilities=(
+            "position_series",
+            "foundation",
+            "exogenous",
+            "probabilistic",
+            "gpu",
+            "cpu_fallback",
+        ),
         source_declared=True,
     ),
     SkforecastImplementationSpec(
@@ -274,7 +283,7 @@ SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
         class_name="ForecasterFoundation",
         family="foundation",
         source_alias="autogluon/chronos-2-synth",
-        capabilities=_FOUNDATION_EXOG,
+        capabilities=_FOUNDATION_EXOG_SOURCE,
     ),
     _operator_pass(
         "skforecast-foundation-timesfm25",
@@ -309,9 +318,22 @@ SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
         class_name="ForecasterFoundation",
         family="foundation",
         source_alias="soda-inria/tabicl",
-        capabilities=_FOUNDATION_EXOG + ("gpu", "cpu_fallback"),
+        capabilities=(
+            "position_series",
+            "foundation",
+            "exogenous",
+            "probabilistic",
+            "gpu",
+            "cpu_fallback",
+        ),
         source_declared=True,
-        notes="TabICL 2.1.1 checkpoint bytes independently SHA-256 verified in operator evidence",
+        artifact_id="jingang/TabICL/tabicl-regressor-v2-20260212.ckpt",
+        artifact_revision="4dcd344ece2c00be9e831fdd35bed57b5ad83e19",
+        artifact_sha256="0db9cb538f114e79026bf08f45f41ad8dd7ad2de2aaca9a5ca8cd3bd9748ae7a",
+        notes=(
+            "adapter selector is soda-inria/tabicl; verified checkpoint bytes are stored "
+            "under the separate jingang/TabICL artifact identity"
+        ),
     ),
     SkforecastImplementationSpec(
         implementation_id="skforecast-foundation-tabpfn-ts3",
@@ -319,13 +341,13 @@ SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
         class_name="ForecasterFoundation",
         family="foundation",
         source_alias="priorlabs/tabpfn-ts",
-        capabilities=_FOUNDATION_EXOG,
+        capabilities=("position_series", "foundation", "exogenous_contract_verified"),
         runtime_status="BLOCKED_INVALID_OR_EXPIRED_TOKEN",
         evidence_class=OPERATOR_LOCAL_EVIDENCE,
         evidence_revision=SKFORECAST_OPERATOR_EVIDENCE_REVISION,
         routability="BLOCKED",
         block_reason="INVALID_OR_EXPIRED_TOKEN",
-        notes="adapter contract passed; checkpoint download/inference did not execute",
+        notes="adapter allow_exog contract passed; checkpoint download/inference did not execute",
     ),
     SkforecastImplementationSpec(
         implementation_id="skforecast-foundation-t0",
@@ -333,10 +355,13 @@ SKFORECAST_IMPLEMENTATION_SPECS: tuple[SkforecastImplementationSpec, ...] = (
         class_name="ForecasterFoundation",
         family="foundation",
         source_alias="theforecastingcompany/t0-alpha",
-        capabilities=_FOUNDATION_EXOG,
+        capabilities=_FOUNDATION_EXOG_SOURCE,
         evidence_class=OPERATOR_LOCAL_EVIDENCE,
         evidence_revision=SKFORECAST_OPERATOR_EVIDENCE_REVISION,
-        notes="not executed in the current skforecast-specific operator sequence",
+        notes=(
+            "upstream source declares exogenous support, recorded as source-declared only; "
+            "T0 was not executed in the current skforecast operator sequence"
+        ),
     ),
 )
 
