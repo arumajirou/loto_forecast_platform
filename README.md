@@ -4,9 +4,8 @@
 
 このREADMEは「何が使えるか」「どこまで実証済みか」「次に何を検証すべきか」を最短で把握する入口です。モデル・ライブラリ別の詳細は専用対応表へ分離しています。
 
-> **Implementation audit base:** `main@feb4ea5ec6c63c1e3ceab26bcf9d3bc731d14add` (2026-08-13)  
-> **Latest merged boundary:** PR #306 — certified LightGBM OpenCL GPU backend routing  
-> **In-review boundary:** PR #307 — sktime P1 input-contract normalization fix; isolated-worktree formal P1 certification is PASS, while post-merge same-main-SHA recertification remains a separate gate  
+> **Implementation audit base:** `main@ed7d6c8151254653d44296b608457200ac80c5ce` (2026-08-13)  
+> **Latest merged boundary:** PR #307 — sktime P1 input-contract normalization fix  
 > **Rule:** `REGISTERED != ROUTABLE != RUNTIME_CERTIFIED != OOF_EVALUATED != HOLDOUT_EVALUATED != PROSPECTIVE_EVALUATED != PROMOTION_ELIGIBLE`  
 > 現在のpackage versionはREADMEへ手書きしません。canonical versionは`loto.version.__version__` / installed package metadata / `loto-build-info`を正本とします。
 
@@ -44,7 +43,7 @@
 | AutoGluon TimeSeries | **PARTIALLY_VERIFIED** | source 29 models + 8 unique ensembles = 37 expanded identities | 37全件runtime-certifiedではない |
 | Tree GPU routing | **VERIFIED** | XGBoost / CatBoostはGPU lease runtime確認済み。LightGBM classifier/positionはcertified OpenCL GPU backendへrouting | 全tree modelの全ゲームOOF優位ではない |
 | LightGBM CUDA | **NOT CERTIFIED / FAIL-CLOSED** | resolved buildではOpenCL `device_type="gpu"`を使用 | `device_type="cuda"`対応を意味しない |
-| sktime | **PARTIALLY_VERIFIED / PR #307** | sktime 1.0.1 laneでregistry **141 discovered / 141 importable / 53 core / 88 optional**。P1固定4モデルはfit/predict/save-load/formal verification PASS | 141全件runtime-certified、6ゲームOOF完走、accuracy優位ではない |
+| sktime | **PARTIALLY_VERIFIED / MERGED #307** | sktime 1.0.1 laneでregistry **141 discovered / 141 importable / 53 core / 88 optional**。P1固定4モデルはfit/predict/save-load/formal verification PASS | 141全件runtime-certified、6ゲームOOF完走、accuracy優位ではない |
 | TSFM | **PARTIALLY_VERIFIED** | retained audit 21中 **19 CERTIFIED / 2 BLOCKED** | 19全てlottery-compatible/OOF済みではない |
 | Probabilistic platform | **VERIFIED / PARTIALLY_VERIFIED** | separate **72-model** catalog + backend/run/API surface | 72全件科学評価完了ではない |
 | Holdout | **BLOCKED / CLOSED** | explicit authorization前は閉鎖 | development結果から自動解禁されない |
@@ -61,7 +60,7 @@
 | `BLOCKED` | policy / runner / license / artifact等の明示gateで停止 |
 | `NOT CERTIFIED` | 実装可否とruntime認証を分離し、成功証拠がない機能をfail-closedで扱う |
 
-> PR上のexact-worktree証拠と、merge後`main`上の正式再認証は別の証拠クラスです。特にsktime P1はPR #307で修正・認証済みですが、P0〜P4を同一のmerge後main SHAで揃える最終再認証は別途必要です。
+> PR上のexact-worktree証拠と、merge後`main`上の正式再認証は別の証拠クラスです。sktime P1はPR #307で修正・認証済みですが、P0〜P4を同一のmerge後main SHAで揃える最終再認証は別途必要です。
 
 ---
 
@@ -135,8 +134,8 @@ Broad v1の174は**凍結された科学比較分母**です。次のdynamic/exp
 | #303 / `b9be4174...` | **MERGED** | `isotonic-calibrated-logistic`を`CalibratedClassifierCV`としてfactory/routingへ接続 | synthetic route + prediction lock確認。post-fix real-data 42/42は別途再実行が必要 |
 | #304 / `de1444af...` | **MERGED** | GPU leaseをXGBoost/CatBoost constructorへ接続 | RTX 5070 Ti exact-head runtime + external GPU telemetryでVERIFIED |
 | #305 / `a03053ea...` | **MERGED** | fail-closed LightGBM GPU build/backend probe | resolved buildはCUDA tree learner非対応、OpenCL `device_type="gpu"`はruntime VERIFIED |
-| #306 / `feb4ea5e...` | **MERGED / CURRENT AUDIT BASE** | LightGBM classifier/positionをcertified OpenCL GPU laneへrouting | GPU lease、device id、runtime、telemetry VERIFIED。CUDA supportは主張しない |
-| #307 | **OPEN / P1 LOCAL VERIFIED** | sktime formal P1 series hashをproviderの`list[float]`正規化境界へ一致 | focused tests PASS、P1 4/4 PASS、formal report PASS、SHA-256 PASS。merge後main再認証は別gate |
+| #306 / `feb4ea5e...` | **MERGED** | LightGBM classifier/positionをcertified OpenCL GPU laneへrouting | GPU lease、device id、runtime、telemetry VERIFIED。CUDA supportは主張しない |
+| #307 / `ed7d6c81...` | **MERGED / CURRENT AUDIT BASE / P1 LOCAL VERIFIED** | sktime formal P1 series hashをproviderの`list[float]`正規化境界へ一致 | focused tests PASS、P1 4/4 PASS、formal report PASS、SHA-256 PASS。P0〜P4のmerge後main同一SHA再認証は別gate |
 
 #### sktime P1で現在実証できている範囲
 
