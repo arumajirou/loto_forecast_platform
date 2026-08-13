@@ -13,7 +13,7 @@ from loto.orchestration.resource_scheduler_impl import (
     runtime_resource_class as _runtime_resource_class,
 )
 
-_GPU_OPTIONAL_BROAD_LIBRARIES = frozenset({"xgboost", "catboost"})
+_GPU_OPTIONAL_BROAD_LIBRARIES = frozenset({"xgboost", "catboost", "lightgbm"})
 
 
 def runtime_resource_class(
@@ -26,10 +26,14 @@ def runtime_resource_class(
     """Return the runtime scheduling class with certified broad-tree GPU routing.
 
     The frozen Broad catalog predates the ``gpu_optional`` capability on the shared
-    model specs for XGBoost and CatBoost. Keep the catalog identity unchanged while
-    making the runtime scheduler consume the backend capability that is now wired and
-    explicitly GPU-leased. LightGBM intentionally stays unchanged until its installed
-    build is certified for GPU/CUDA execution.
+    model specs for XGBoost, CatBoost, and LightGBM. Keep the catalog identity unchanged
+    while making the runtime scheduler consume only backend capabilities that have been
+    wired and verified on the self-hosted GPU runtime.
+
+    LightGBM is certified specifically for its OpenCL backend (``device_type="gpu"``),
+    not for the separate CUDA tree learner. The model factory therefore remains
+    responsible for injecting the correct backend-specific device parameters after a
+    GPU lease is granted.
     """
 
     effective_capabilities = capabilities

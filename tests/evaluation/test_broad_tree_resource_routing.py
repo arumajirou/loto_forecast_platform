@@ -14,11 +14,8 @@ def _resource_class(model_id: str) -> str:
     )
 
 
-def test_broad_xgboost_and_catboost_are_gpu_routable() -> None:
+def test_broad_xgboost_catboost_and_lightgbm_are_gpu_routable() -> None:
     assert _resource_class("xgboost-classifier") == "GPU"
     assert _resource_class("catboost-classifier") == "GPU"
-
-
-def test_broad_lightgbm_stays_cpu_until_build_is_certified() -> None:
-    assert _resource_class("lightgbm-classifier") == "CPU"
-    assert _resource_class("lightgbm-position") == "CPU"
+    assert _resource_class("lightgbm-classifier") == "GPU"
+    assert _resource_class("lightgbm-position") == "GPU"

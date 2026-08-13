@@ -49,6 +49,24 @@ def cuda_device_is_leased() -> bool:
     return visible is not None and visible.strip() not in {"", "-1"}
 
 
+def leased_physical_gpu_index() -> int | None:
+    """Return the scheduler-leased physical GPU index when it is numeric.
+
+    CUDA libraries see leased devices through CUDA's logical re-numbering, so XGBoost and
+    CatBoost deliberately use logical device zero. LightGBM's verified OpenCL backend does
+    not rely on CUDA logical ordinals; it accepts ``gpu_device_id`` directly. The resource
+    scheduler currently writes numeric physical indexes to ``CUDA_VISIBLE_DEVICES``, so the
+    first leased index is propagated to LightGBM while non-numeric values fail closed to
+    LightGBM's own default device selection.
+    """
+
+    visible = os.environ.get("CUDA_VISIBLE_DEVICES")
+    if visible is None or visible.strip() in {"", "-1"}:
+        return None
+    first = visible.split(",", maxsplit=1)[0].strip()
+    return int(first) if first.isdigit() else None
+
+
 @dataclass
 class PredictionResult:
     candidate_probabilities: np.ndarray | None = None
@@ -167,6 +185,12 @@ class RuntimeModel:
             cls = getattr(module, self.spec.class_name)
             params.setdefault("random_state", self.seed)
             params.setdefault("verbosity", -1)
+            if cuda_device_is_leased():
+                params.setdefault("device_type", "gpu")
+                if str(params.get("device_type", "")).lower() == "gpu":
+                    physical_gpu_index = leased_physical_gpu_index()
+                    if physical_gpu_index is not None:
+                        params.setdefault("gpu_device_id", physical_gpu_index)
             return cls(**params)
         if self.spec.library == "xgboost":
             module = importlib.import_module("xgboost")
