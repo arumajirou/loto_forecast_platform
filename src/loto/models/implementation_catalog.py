@@ -58,6 +58,9 @@ class ImplementationIdentity:
     source_revision: str | None = None
     evidence_class: str = "SOURCE_DECLARED"
     evidence_revision: str | None = None
+    artifact_id: str | None = None
+    artifact_revision: str | None = None
+    artifact_sha256: str | None = None
     routability: str = "UNKNOWN"
     runtime_status: str = "NOT_RUN"
     runtime_certified: bool = False
@@ -243,6 +246,9 @@ def skforecast_implementation_identities() -> tuple[ImplementationIdentity, ...]
             source_revision=SKFORECAST_SOURCE_REVISION,
             evidence_class=spec.evidence_class,
             evidence_revision=spec.evidence_revision,
+            artifact_id=spec.artifact_id,
+            artifact_revision=spec.artifact_revision,
+            artifact_sha256=spec.artifact_sha256,
             routability=spec.routability,
             runtime_status=spec.runtime_status,
             runtime_certified=False,
@@ -292,7 +298,7 @@ def expanded_inventory_counts() -> dict[str, Any]:
         "expanded_v2": len(expanded),
         "delta_vs_broad_v1": len(expanded) - len(broad_v1),
         "autogluon_broad_v1_umbrella_count": sum(
-            entry.model_id == AUTOGLOUON_BROAD_V1_ID for entry in broad_v1
+            entry.model_id == AUTOGLUON_BROAD_V1_ID for entry in broad_v1
         ),
         "autogluon_source_models": sum(
             row.source_kind == "autogluon_source_model" for row in autogluon
