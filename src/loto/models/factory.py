@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib
 import json
+import os
 import pickle
 from dataclasses import dataclass
 from pathlib import Path
@@ -34,6 +35,18 @@ def numeric_feature_columns(frame: pd.DataFrame) -> list[str]:
         for col in frame.columns
         if col not in FEATURE_EXCLUDE and pd.api.types.is_numeric_dtype(frame[col])
     ]
+
+
+def cuda_device_is_leased() -> bool:
+    """Return true only when the outer scheduler exposed an explicit CUDA device.
+
+    ``ResourceScheduler`` binds GPU jobs through ``CUDA_VISIBLE_DEVICES``. Treating that
+    process boundary as the accelerator contract avoids opportunistically moving ordinary
+    CPU campaigns onto a GPU merely because one exists on the host.
+    """
+
+    visible = os.environ.get("CUDA_VISIBLE_DEVICES")
+    return visible is not None and visible.strip() not in {"", "-1"}
 
 
 @dataclass
@@ -160,11 +173,16 @@ class RuntimeModel:
             cls = getattr(module, self.spec.class_name)
             params.setdefault("random_state", self.seed)
             params.setdefault("n_jobs", 1)
+            if cuda_device_is_leased():
+                params.setdefault("device", "cuda")
             return cls(**params)
         if self.spec.library == "catboost":
             module = importlib.import_module("catboost")
             cls = getattr(module, self.spec.class_name)
             params.setdefault("random_seed", self.seed)
+            if cuda_device_is_leased():
+                params.setdefault("task_type", "GPU")
+                params.setdefault("devices", "0")
             return cls(**params)
         raise NotImplementedError(
             f"model {model_id} uses worker adapter "
