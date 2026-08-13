@@ -2,10 +2,10 @@
 
 ```text
 status_class: AUDITED_CURRENT_STATE
-audit_time: 2026-08-13T17:36+09:00
+audit_time: 2026-08-13T18:10+09:00
 repository: arumajirou/loto_forecast_platform
-documentation_audit_base_sha: 932977f7c4d8b4673c2bb02a23ec4ba6b7ad85bf
-scope: current merged implementation + retained evidence + explicitly separated operator-local runtime evidence
+documentation_audit_base_sha: 0fb8d2e954b8ab08a8663c42792a6b3b67dc1e9d
+scope: current merged implementation + retained evidence + explicitly separated exact-head/operator-local runtime evidence
 ```
 
 ## Verdict
@@ -13,16 +13,23 @@ scope: current merged implementation + retained evidence + explicitly separated 
 ```text
 SIX_GAME_GEOMETRY=VERIFIED
 BROAD_V1_174=FROZEN
-UNIFIED_V1_250=PLANNED_AND_ROUTABLE_BY_EXPLICIT_STATUS
-PARALLEL_UNIFIED_CAMPAIGN=IMPLEMENTED
+PROBABILISTIC_EFFECTIVE_V1_76=VERIFIED_LOADER_BEHAVIOR
+COMBINED_UNIFIED_ACCOUNTING_250=VERIFIED_DENOMINATOR
+CURRENT_BROAD_CAMPAIGN_PLAN_1044=VERIFIED_CONTRACT
+CURRENT_SINGLE_CAMPAIGN_PLAN_1500=false
+PARALLEL_BROAD_CAMPAIGN=IMPLEMENTED
 SCIKIT_LEARN_DYNAMIC_PROVIDER=IMPLEMENTED
-XGBOOST_GPU_ROUTE=VERIFIED_ON_EXACT_PR_SOURCE
-CATBOOST_GPU_ROUTE=VERIFIED_ON_EXACT_PR_SOURCE
-LIGHTGBM_OPENCL_GPU_ROUTE=VERIFIED_ON_EXACT_PR_SOURCE
+XGBOOST_GPU_ROUTE=VERIFIED_ON_BOUNDED_EXACT_SOURCE
+CATBOOST_GPU_ROUTE=VERIFIED_ON_BOUNDED_EXACT_SOURCE
+LIGHTGBM_OPENCL_GPU_ROUTE=VERIFIED_ON_BOUNDED_EXACT_SOURCE
 LIGHTGBM_CUDA=NOT_CERTIFIED
-SKTIME_P1_FIXED_4=VERIFIED_ON_EXACT_PR_SOURCE
+SKTIME_P1_FIXED_4=VERIFIED_ON_EXACT_SOURCE
 SKFORECAST_0_23_OPERATOR_RUNTIME=PARTIALLY_VERIFIED
 SKFORECAST_EXPANDED_V2_REPOSITORY_INTEGRATION=OPEN
+DARTS_LOCAL_TORCH_NLINEAR_DLINEAR=LOCAL_VERIFIED_MAIN_PENDING
+DARTS_EXPANDED_V2=IN_PROGRESS
+GLUONTS_PR_309_CPU_LIFECYCLE=EXACT_HEAD_VERIFIED_18_OF_18
+GLUONTS_PR_309_MAIN_INTEGRATION=PENDING
 HOLDOUT=CLOSED
 PROSPECTIVE=CLOSED
 AUTOMATIC_PROMOTION=FORBIDDEN
@@ -31,66 +38,98 @@ CHAMPION=NOT_AUTHORIZED
 
 ## Evidence classes
 
-This report intentionally separates evidence classes.
-
-| class | meaning |
+| Class | Meaning |
 |---|---|
 | `CURRENT_CODE` | behavior visible in current repository code/config |
-| `REPOSITORY_RETAINED` | tests/workflows/artifacts committed or retained through repository/GitHub evidence |
+| `REPOSITORY_RETAINED` | tests/workflows/artifacts retained through repository/GitHub evidence |
 | `EXACT_PR_SOURCE` | exact-head worktree/CI/runtime evidence for a specific PR SHA |
-| `OPERATOR_LOCAL` | maintainer-host runtime evidence for an exact source SHA, not automatically current-main certification |
+| `OPERATOR_LOCAL` | maintainer-host runtime evidence for an exact source SHA; not automatically current-main certification |
+| `LOCAL_VERIFIED_MAIN_PENDING` | bounded local exact-worktree success waiting for publication/integration |
 | `SCIENTIFIC_EVALUATION` | chronological development OOF / Holdout / Prospective evidence |
 
 Evidence from one class is not silently promoted into another.
 
-## Recent merged sequence
+## Current merged baseline
 
-| PR | Merge SHA | Verification / implementation boundary |
-|---|---|---|
-| #268 | `81bd4f8123d2a72226347c1cd2220fe95a17d750` | statistical/causal analysis foundation; development-only claim boundary |
-| #270 | `775274cc22cf6701f148da80dfe86cb1bd099a7e` | runtime evidence serialization + resource-aware broad runner |
-| #273 | `522253eab194b81a8d804236d5477a4bd9bacd68` | repository observability dashboard / structured intake |
-| #274 | `c57731e17b43f8f5d9e038c75017aa9ce83fd5e9` | evidence-aware visual dashboard; Pages activation remains separate |
-| #276 | `4eabd68d422baefe5180c747bb4bdc83df1caba2` | operations control center / workflow classification |
-| #277 | `1df090fa34fbf1d32ec7000b25689c49e0c20074` | resume fingerprint, physical GPU assignment, process-tree cleanup, outer worker cap |
-| #293 | `f04cd876f61b3c2ef85529082a6ba812f7859f6f` | Expanded v2 foundation + AutoGluon 37 implementation identities |
-| #295 | `951f5f57d8e975bd9b1dbf41a213569733a340e4` | Toto family manifest + 22M provenance gate |
-| #296 | `abe7e02cdfc900618c83b21c922b4fd3f078b036` | Toto 22M runtime/certification infrastructure; formal native-Linux gate remains open |
-| #299 | `05eba49dad8c0700c303783267784cfde081e419` | implementation-grounded README audit |
-| #300 | `a7eb50ca534c4880681d5febab193b0c2692f50c` | library/model compatibility matrix |
-| #301 | `3cc73dbad8c437bc5b8c18b20d00fb59ba60522d` | dynamic scikit-learn all-estimator provider |
-| #302 | `7d75dadc8c9da6292988ad7b4691e020dc90cc1e` | process-parallel Unified Campaign and live progress |
-| #303 | `b9be417463395642521a9955b055fdeac5aa1f8d` | isotonic calibrated logistic factory/routing repair |
-| #304 | `de1444af8915c69e466c0ded16c972e7dbabff0f` | XGBoost/CatBoost GPU lease → constructor routing |
-| #305 | `a03053eabf838d0e9583b49aac1aa3c2f40de6b0` | fail-closed LightGBM accelerator probe |
-| #306 | `feb4ea5ec6c63c1e3ceab26bcf9d3bc731d14add` | LightGBM OpenCL GPU routing |
-| #307 | `ed7d6c8151254653d44296b608457200ac80c5ce` | sktime P1 numeric input-contract normalization |
-| #308 | `932977f7c4d8b4673c2bb02a23ec4ba6b7ad85bf` | current-state README reconciliation |
+Current documentation is audited from:
 
-## Current code-grounded capability boundary
+```text
+main=0fb8d2e954b8ab08a8663c42792a6b3b67dc1e9d
+PR #310 merge=4f4f8579c6bcc05e25ea472e48385114bb56c71d
+PR #312 merge=063120fd9b07d07548442edbce480a6d068f9f43
+PR #311 merge=9623f2a562d21b4f9be84c392429885a51a72fe1
+PR #313 merge=0fb8d2e954b8ab08a8663c42792a6b3b67dc1e9d
+```
 
-Current repository code and merged history establish at least:
+#310 refreshed current-state docs and skforecast operator evidence. #312 aligned the detailed matrix. #311 then corrected the Darts state and a key campaign-denominator error. #313 stabilized README audit metadata after #311.
 
-- canonical six-game geometry;
-- frozen Broad v1 174 identity inventory;
-- Unified v1 250 planning inventory;
-- Expanded v2 Phase 1 = 210 identities;
-- shared candidate/position/foundation routing surfaces;
-- separate provider/isolated execution surfaces;
-- resource-aware scheduler with explicit GPU assignment and process cleanup;
-- game-parallel Unified Campaign with progress and aggregate artifacts;
-- dynamic scikit-learn provider;
-- GPU-routed XGBoost/CatBoost and OpenCL-routed LightGBM;
-- StatsForecast/MLForecast/NeuralForecast/AutoNF/AutoGluon/sktime/TSFM implementation surfaces;
-- geometry-general Hit@±1/MAE/MSE/RMSE evaluation;
-- prediction sealing before actual scoring reads in the unified development path;
-- theory-aware promotion eligibility with manual-only promotion policy;
-- paired-score MDE/power planning;
-- statistical/causal exploratory foundation with fail-closed causal eligibility.
+## Inventory and planner verification
+
+### Broad v1
+
+`src/loto/models/catalog_full.py` builds the Broad registry programmatically and `catalog_counts()` derives totals from `build_catalog()`. Broad v1 remains frozen at **174** identities.
+
+### Probabilistic v1
+
+The current probabilistic loader contains four PPL-02 fallback rows and appends them when absent from the configured YAML. Current effective probabilistic denominator is **76**.
+
+### Combined accounting
+
+```text
+Broad 174 + Probabilistic 76 = 250
+250 × 6 canonical games = 1,500 accounting cells
+```
+
+This is a combined accounting denominator, not the current single Broad campaign execution plan.
+
+### Current `loto3 campaign` planner
+
+PR #311 corrected the current execution boundary:
+
+```text
+current `loto3 campaign --plan-only`
+= Broad 174 identities × 6 games
+= 1,044 planning rows
+```
+
+The current planner does not automatically append the separate probabilistic 76 identities. Therefore statements that a current single `loto3 campaign --plan-only` produces 1,500 rows are incorrect.
+
+### Expanded v2
+
+`src/loto/models/implementation_catalog.py` constructs a separate Expanded v2 inventory so implementation expansion cannot silently rewrite the frozen Broad denominator. Phase 1 expands the AutoGluon umbrella into 29 source models + 8 unique ensembles and yields **210** implementation identities.
+
+## Runtime/execution verification
+
+### Scheduler and parallel campaign
+
+Merged code/history establish:
+
+- deterministic resume/task fingerprints;
+- explicit physical GPU assignment;
+- weighted/resource-aware admission;
+- timeout process-tree cleanup;
+- outer worker cap;
+- game-parallel Broad campaign wrapper;
+- live progress state;
+- fail-visible rows;
+- aggregate artifacts/checksums.
+
+These are execution-platform capabilities and do not certify every model.
+
+### scikit-learn / tree boosting
+
+- dynamic `loto-sklearn` provider: implemented;
+- isotonic-calibrated logistic route: implemented;
+- XGBoost GPU route: bounded exact-source runtime verified;
+- CatBoost GPU route: bounded exact-source runtime verified;
+- LightGBM 4.7.0 resolved build: CUDA tree learner not supported/certified;
+- LightGBM OpenCL `device_type="gpu"`: bounded runtime verified and routed.
+
+Documentation must not state generic “LightGBM CUDA supported” for the resolved build.
 
 ## sktime evidence boundary
 
-Exact PR-source evidence for sktime 1.0.1 P1 records:
+Exact-source sktime 1.0.1 P1 evidence records:
 
 ```text
 registry discovered = 141
@@ -102,92 +141,30 @@ formal matrix result = 4/4 PASS
 fit/predict = PASS
 finite output = PASS
 save/load/re-predict = PASS
-exact re-prediction equality = PASS
 artifact verification = PASS
 ```
 
-This does not certify all 141 forecasters. Expanded v2 source/routing work remains tracked under #289 / TAJ-32.
+This does not certify all 141 forecasters. Expanded v2 work remains tracked under #289 / TAJ-32.
 
-## skforecast operator-local runtime evidence
+## skforecast operator-local boundary
 
-A dedicated maintainer-host sequence exercised skforecast 0.23.0 against exact source head:
+A maintainer-host sequence exercised skforecast 0.23.0 against exact source head:
 
 ```text
 9fcc1274755dca64c46dc31a9a0f60a9ef1c4ebd
 ```
 
-The tests are documented in `docs/SKFORECAST_RUNTIME_CERTIFICATION.md`.
+Recorded bounded evidence includes:
 
-### Core / wrappers
-
-After correcting two harness/config assumptions, tested core surfaces completed without a genuine skforecast runtime failure:
-
-- ForecasterRecursive + Ridge/exog;
-- ForecasterRecursive + HistGradientBoosting;
-- ForecasterDirect + Ridge;
-- ForecasterRecursiveMultiSeries;
-- ForecasterDirectMultiVariate;
-- ForecasterEquivalentDate;
-- ForecasterStats + ARAR;
-- RollingFeatures / CalendarFeatures;
-- TimeSeriesFold / backtesting;
-- Optuna Bayesian search;
-- save/load round-trip;
-- RangeDriftDetector;
-- in-sample and out-of-sample interval paths.
-
-### RNN
-
-- LSTM / Keras torch backend: actual CUDA PASS;
-- GRU / Keras torch backend: actual CUDA PASS;
-- LSTM CPU fallback: PASS with zero CUDA allocation.
-
-Device claims were backed by model variable placement, PyTorch allocation and external `nvidia-smi` PID evidence.
-
-### Foundation adapters
-
-| identity | operator result | certification boundary |
-|---|---|---|
-| `autogluon/chronos-2-small` | GPU+CPU point/interval/exog PASS | Hub revision observed, repository pin/routing separate |
-| `google/timesfm-2.5-200m-pytorch` | GPU+CPU point/interval/quantile PASS | source revision recorded; checkpoint revision enforcement separate |
-| `Salesforce/moirai-2.0-R-small` | GPU+CPU runtime PASS only under controlled dependency override | normal dependency routability BLOCKED |
-| TabICL 2.1.1 | GPU+CPU/exog/interval/quantile PASS | checkpoint revision + local SHA-256 VERIFIED |
-| TabPFN-TS 1.2.0 / TabPFN 8.1.0 | adapter/exog/device setup PASS | v3 inference NOT EXECUTED; invalid/expired token blocks weight access |
-| T0 | not executed | pending |
-
-Strongest TabICL artifact identity:
-
-```text
-repo=jingang/TabICL
-revision=4dcd344ece2c00be9e831fdd35bed57b5ad83e19
-checkpoint=tabicl-regressor-v2-20260212.ckpt
-size_bytes=114324594
-sha256=0db9cb538f114e79026bf08f45f41ad8dd7ad2de2aaca9a5ca8cd3bd9748ae7a
-```
-
-TabPFN-TS current diagnostic:
-
-```text
-requested_checkpoint=tabpfn-v3-regressor-v3_20260506_timeseries.ckpt
-license_name=tabpfn-3-license-v1.0
-token_valid=false
-license_accepted=not evaluated
-inference=NOT_EXECUTED
-```
-
-The cached v2 TabPFN regressor checkpoint is a different identity and is not accepted as v3 evidence.
-
-### Repository interpretation
-
-This local evidence materially informs #289 / TAJ-32, but the repository still needs:
-
-- deterministic skforecast Expanded v2 identities;
-- explicit `algorithm_id` vs `implementation_id`;
-- repository routability/capability metadata;
-- source/revision records for committed identities;
-- focused repository tests;
-- no-silent-skip execution;
-- six-game functionality certification.
+- recursive/direct/multi-series/statistical/backtesting/persistence surfaces;
+- LightGBM/XGBoost/CatBoost estimator smoke on CPU;
+- RNN LSTM/GRU actual CUDA plus LSTM CPU fallback;
+- Chronos-2 GPU+CPU/exog/point/interval;
+- TimesFM 2.5 GPU+CPU/point/interval/quantiles;
+- Moirai-2 runtime only under a controlled unsupported dependency override;
+- TabICL v2 GPU+CPU/exog/interval/quantile plus checkpoint hash evidence;
+- TabPFN-TS V3 adapter/device/exog setup with inference blocked before weight access by invalid/expired authentication;
+- T0 not executed in that sequence.
 
 Therefore:
 
@@ -196,17 +173,82 @@ SKFORECAST_OPERATOR_RUNTIME=PARTIALLY_VERIFIED
 SKFORECAST_CURRENT_MAIN_EXPANDED_V2=NOT_COMPLETE
 ```
 
-## Tree GPU verification boundary
+See `docs/SKFORECAST_RUNTIME_CERTIFICATION.md`.
 
-- XGBoost: GPU lease and CUDA constructor execution verified on exact PR #304 source.
-- CatBoost: GPU lease and GPU constructor execution verified on exact PR #304 source.
-- LightGBM 4.7.0 resolved build: CUDA tree learner rejected by the build; OpenCL `device_type="gpu"` classifier/regressor execution and external GPU activity verified in #305; classifier/position routing through that OpenCL contract verified in #306.
+## Darts verification boundary
 
-No documentation should state generic “LightGBM CUDA supported” for the resolved build.
+PR #311 corrected the stale Darts documentation. Current main contains the Darts provider/campaign/runtime foundation. GitHub #286 and Linear TAJ-27 remain active for source-complete Expanded v2 inventory/routing/formal smokes.
+
+A separate later maintainer-host exact-worktree sequence established:
+
+```text
+darts=0.46.1
+torch=2.9.1+cu130
+CUDA=13.0
+pytorch-lightning=2.6.5
+official bootstrap=PASS
+campaign_execution_allowed=true
+NLinear actual GPU fit/predict=PASS
+DLinear actual GPU fit/predict=PASS
+```
+
+This is `LOCAL_VERIFIED / MAIN_PENDING`, not a current-main all-Darts certification. Current-main `smoke_models` must not be described as universal real fit/predict certification. The source-complete inventory/routing gate remains open.
+
+See `docs/darts/CURRENT_STATE_DARTS.md`.
+
+## GluonTS exact-head verification boundary
+
+Draft PR #309 remains open and main-pending. Exact PR head:
+
+```text
+edba730a4f2c944c1ccc0bee510f7ce34833b6c3
+```
+
+Retained exact-head evidence from the certification sequence establishes:
+
+```text
+latest lane models=9/9 VERIFIED
+compat lane models=9/9 VERIFIED
+verified model lifecycles=18/18
+observed devices=['cpu']
+P7D_RC=0
+independent_VERIFY_RC=0
+formal_audit_RC=0
+evidence_state=VALID
+certification_status=VERIFIED
+verification_state=VERIFIED
+p8_eligible=true
+```
+
+P7D archive:
+
+```text
+sha256=b56a94b0a0be29eff0a00960bdd9d6c0eeb3c85a13b166dce539b8dbc87b006b
+```
+
+Live GitHub state at this documentation audit:
+
+```text
+PR #309 state=OPEN
+draft=true
+mergeable=true
+head_sha=edba730a4f2c944c1ccc0bee510f7ce34833b6c3
+ci=QUEUED
+windows-portability-ci=QUEUED
+```
+
+Cancelled dashboard/observability runs are not treated as code/test success or failure. Because the runtime PR is not integrated:
+
+```text
+GLUONTS_EXACT_HEAD_RUNTIME=VERIFIED
+GLUONTS_CURRENT_MAIN_RUNTIME_FROM_PR_309=NOT_YET_ESTABLISHED
+```
+
+The evidence is CPU-pinned. It does not establish GluonTS GPU certification, OOF superiority, Holdout or Prospective performance.
 
 ## Toto 22M boundary
 
-Merged PR #296 has pinned snapshot/load/inference/replay evidence, but formal runtime certification remains fail-closed pending #297 native-Linux external provider-PID / per-process VRAM / post-exit release evidence.
+Merged PR #296 contains pinned family/runtime-certification infrastructure. Formal runtime certification remains fail-closed pending #297 native-Linux external provider PID / per-process VRAM / post-exit release evidence.
 
 ```text
 runtime_certified=false
@@ -216,33 +258,52 @@ Holdout=CLOSED
 Prospective=CLOSED
 ```
 
+## Scientific verification boundary
+
+Formal development evaluation requires:
+
+```text
+primary = Hit@±1
+companions = MAE / MSE / RMSE / position Hit@±1 / all-position Hit@±1
+baselines = Random / fixed / mean / median / last / frequency / statistical
+split = chronological Train / Validation / Holdout / Prospective
+preprocessing/HPO = Train-only within authorized data
+seeds = retain all configured seeds + mean / variance / worst
+forecast lock = SHA-256 + timestamp before corresponding actual read
+```
+
+Current scientific gates:
+
+```text
+HOLDOUT=CLOSED
+PROSPECTIVE=CLOSED
+AUTOMATIC_PROMOTION=FORBIDDEN
+CHAMPION=NOT_AUTHORIZED
+```
+
 ## Active verification gates
 
-Important open gates include:
-
+- #265 / #266 — complete runtime campaign work; preserve Broad vs probabilistic surface denominators;
+- #286 / TAJ-27 — Darts Expanded v2 inventory/routing/publication;
+- #288 / TAJ-29 — GluonTS Expanded v2 work; #309 exact-head runtime candidate remains main-pending;
 - #289 / TAJ-32 — sktime + skforecast Expanded v2 inventories;
-- #281 / TAJ-30 — TabPFN-TS-3 executable lane / license-auth gate;
 - #292 / TAJ-36 — Expanded v2 freeze + complete six-game runtime certification;
 - #297 — Toto 22M native-Linux formal GPU process/release evidence;
-- #265 / #266 — Broad and Unified runtime matrices;
+- #281 / TAJ-30 — TabPFN-TS-3 authentication/license/runtime gate;
 - #272 — native Windows path portability;
-- #239 — Timer Base 84M OOF;
-- #118 — Timer-S1 PR-B.
+- #239 — Timer Base 84M development OOF;
+- #118 — Timer-S1 continuation.
 
-## Scientific boundary
+## What this report does not certify
 
-This report does **not** certify:
-
-- complete 174×6 / 250×6 real-data success;
-- complete Expanded v2 runtime success;
-- skforecast current-main routing completion;
-- universal model GPU success;
+- all Broad 174 models succeeding across all six games;
+- a current single command automatically executing Broad 174 + probabilistic 76;
+- final Expanded v2 runtime success;
+- all registered models as routable;
+- all routable models as runtime-certified;
+- universal GPU success;
 - all-model development OOF superiority;
-- Holdout success;
-- Prospective success;
+- Holdout completion;
+- Prospective completion;
 - champion selection;
 - production promotion.
-
-Synthetic smoke Hit@±1/MAE/MSE/RMSE values are runtime diagnostics only and are never substituted for Loto development OOF evidence.
-
-Historical root `VERIFICATION_REPORT.md` remains historical evidence. Use this current file plus `docs/STATUS.md` for the live documentation snapshot.

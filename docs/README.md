@@ -2,37 +2,52 @@
 
 ```text
 status_class: LIVE_ENTRYPOINT
-code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
-as_of: 2026-08-10T20:23+09:00
+code_audit_base_sha: 0fb8d2e954b8ab08a8663c42792a6b3b67dc1e9d
+as_of: 2026-08-13T18:10+09:00
 ```
 
-このページは、**どの質問にどの資料を正本として使うか**を示します。コード、generated inventory、runtime evidence、scientific evidence、historical reportを同じ「現在値」として扱わないでください。
+このページは、**どの質問にどの資料を正本として使うか**を示します。コード、generated inventory、runtime evidence、scientific evidence、exact-PR evidence、operator-local evidence、historical reportを同じ「現在値」として扱わないでください。
 
 ## Start here
 
 | Question | Canonical reference |
 |---|---|
-| このplatformで具体的に何ができるか | [`../README.md`](../README.md) |
-| library/model/実行laneを詳しく引きたい | [`CAPABILITIES_AND_OPERATIONS.md`](CAPABILITIES_AND_OPERATIONS.md) |
+| platform全体を最短で把握したい | [`../README.md`](../README.md) |
+| 今までの主要改修を一覧したい | [`CURRENT_CHANGE_SUMMARY.md`](CURRENT_CHANGE_SUMMARY.md) |
 | 現在のrepository/scientific状態 | [`STATUS.md`](STATUS.md) |
-| 実際のmodel routing/runtime evidence | [`MODEL_EXECUTION_MATRIX.md`](MODEL_EXECUTION_MATRIX.md) |
-| broad generated catalog | [`MODEL_INVENTORY.md`](MODEL_INVENTORY.md), `uv run loto3 catalog` |
-| shared execution catalog | `src/loto/models/catalog.py`, `uv run loto models list` |
-| all-model × all-game campaign | [`UNIFIED_EVALUATION_CAMPAIGN.md`](UNIFIED_EVALUATION_CAMPAIGN.md) |
-| formal evaluation protocol | [`evaluation_protocol/PROTOCOL_V2.md`](evaluation_protocol/PROTOCOL_V2.md) |
-| requirements | [`REQUIREMENTS.md`](REQUIREMENTS.md) |
+| 現在の検証境界 | [`CURRENT_VERIFICATION_REPORT.md`](CURRENT_VERIFICATION_REPORT.md) |
+| 次に作業する人向け引継ぎ | [`CURRENT_HANDOFF.md`](CURRENT_HANDOFF.md) |
+| library/model/引数/実行laneを詳しく引きたい | [`LIBRARY_MODEL_COMPATIBILITY_MATRIX.md`](LIBRARY_MODEL_COMPATIBILITY_MATRIX.md) |
+| 実行・運用capability | [`CAPABILITIES_AND_OPERATIONS.md`](CAPABILITIES_AND_OPERATIONS.md) |
+| execution evidence addendum | [`CURRENT_MODEL_EXECUTION_ADDENDUM.md`](CURRENT_MODEL_EXECUTION_ADDENDUM.md) |
+| Darts current state | [`darts/CURRENT_STATE_DARTS.md`](darts/CURRENT_STATE_DARTS.md) |
+| skforecast operator-local runtime evidence | [`SKFORECAST_RUNTIME_CERTIFICATION.md`](SKFORECAST_RUNTIME_CERTIFICATION.md) |
+| dynamic scikit-learn | [`SKLEARN_ALL_MODELS.md`](SKLEARN_ALL_MODELS.md) |
+| parallel Broad campaign | [`PARALLEL_UNIFIED_CAMPAIGN.md`](PARALLEL_UNIFIED_CAMPAIGN.md) |
+| LightGBM GPU backend | [`LIGHTGBM_GPU_CERTIFICATION.md`](LIGHTGBM_GPU_CERTIFICATION.md) |
+| TSFM runtime evidence | [`TSFM_RUNTIME_CAPABILITIES.md`](TSFM_RUNTIME_CAPABILITIES.md) |
+| formal requirements | [`REQUIREMENTS.md`](REQUIREMENTS.md) |
 | external specification | [`SPECIFICATION.md`](SPECIFICATION.md) |
 | architecture | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
 | data/leakage contract | [`DATA_CONTRACT.md`](DATA_CONTRACT.md) |
 | test/verification plan | [`TEST_PLAN.md`](TEST_PLAN.md) |
-| current operations | [`CURRENT_RUNBOOK.md`](CURRENT_RUNBOOK.md) |
-| next-engineer handoff | [`CURRENT_HANDOFF.md`](CURRENT_HANDOFF.md) |
-| current merge/CI snapshot | [`CURRENT_VERIFICATION_REPORT.md`](CURRENT_VERIFICATION_REPORT.md) |
+| operations runbook | [`CURRENT_RUNBOOK.md`](CURRENT_RUNBOOK.md) |
 | current documentation artifacts | [`CURRENT_ARTIFACT_MANIFEST.md`](CURRENT_ARTIFACT_MANIFEST.md) |
 | documentation freshness rules | [`DOCUMENTATION_POLICY.md`](DOCUMENTATION_POLICY.md) |
-| TSFM runtime evidence | `audit/tsfm-runtime/runtime-status.json` + per-model evidence |
-| TSFM immutable revisions | `configs/tsfm/verified-revisions.json` |
-| native Windows install | [`WINDOWS_INSTALL.md`](WINDOWS_INSTALL.md) |
+
+## Current denominator map
+
+```text
+Broad v1                           = 174 frozen identities
+Probabilistic effective v1         = 76 identities
+Combined Broad + Probabilistic     = 250 accounting identities
+Current Broad campaign plan        = 174 × 6 = 1,044 rows
+Combined accounting × six games    = 250 × 6 = 1,500 cells
+Expanded v2 Phase 1                = 210 implementation identities
+Canonical games                    = 6
+```
+
+The current `loto3 campaign --plan-only` uses the Broad catalog and therefore plans **1,044** rows. It does not automatically append the separate probabilistic 76 identities. The 250/1,500 values are combined accounting denominators.
 
 ## Current platform surfaces
 
@@ -55,7 +70,7 @@ uv run loto3 catalog --counts
 uv run loto3 catalog --library neuralforecast
 ```
 
-The current broad inventory is 174 entries. It is a planning/inventory surface, not a success counter.
+The Broad inventory is 174 entries. It is a frozen planning/inventory denominator, not a success counter.
 
 ### Shared execution inventory
 
@@ -63,9 +78,9 @@ The current broad inventory is 174 entries. It is a planning/inventory surface, 
 uv run loto models list --format table
 ```
 
-This surface corresponds to `src/loto/models/catalog.py` and is narrower than the broad inventory.
+This corresponds to the shared executable catalog and is narrower/different from broad inventory and provider-specific source inventories.
 
-### Unified development campaign
+### Broad development campaign
 
 ```bash
 uv run loto3 campaign --output unused --plan-only
@@ -75,42 +90,49 @@ uv run loto3 campaign \
   --output /path/to/new-run-directory
 ```
 
-Every requested broad-catalog model × game pair receives a row. `FAILED`, `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `PARTIAL_SEEDS` and `NON_STANDALONE_METHOD` are valid evidence states and are not hidden.
+Every requested Broad model × game pair receives an explicit row. `FAILED`, `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `PARTIAL_SEEDS` and `NON_STANDALONE_METHOD` are valid evidence states and are not hidden.
 
-Primary metric is Hit@±1, accompanied by per-position/all-position Hit@±1, MAE, MSE and RMSE. Mandatory baselines and all configured seeds are retained. Predictions are sealed before the corresponding target actual is read for scoring.
+Primary metric is Hit@±1, accompanied by position/all-position Hit@±1, MAE, MSE and RMSE. Mandatory baselines and all configured seeds are retained. Predictions are sealed before the corresponding actual is read for scoring.
 
-## Current theory/evaluation additions
+### Parallel campaign wrapper
 
-The current code base also includes:
+```bash
+uv run python -m loto.evaluation.parallel_campaign --help
+```
 
-- geometry-general outcome metrics for all six games;
-- select/digit family-aware Hit@±1 decoding;
-- exact IID-null theory reference and theory-aware target semantics;
-- promotion policy v2 bound to sealed game identity and manual approval only;
-- pre-experiment paired-score MDE/power planning with multiplicity adjustment.
+This adds game-level process parallelism/resource controls. It does not change the Broad denominator or silently combine the separate probabilistic catalog.
 
-These are implementation/planning/governance capabilities. They do not imply real-data superiority, Holdout completion or production promotion.
+### Dynamic scikit-learn
 
-## Model surfaces
+```bash
+uv run loto-sklearn list
+```
+
+This denominator depends on the installed scikit-learn version and does not rewrite Broad v1.
+
+## Model/inventory surfaces
 
 ```text
-catalog_full.py
-  broad 174-entry inventory
+src/loto/models/catalog_full.py
+  Broad v1 = 174 frozen identities
 
-catalog.py
+src/loto/models/catalog.py
   shared executable ModelSpec catalog
+
+src/loto/models/implementation_catalog.py
+  separate Expanded v2 implementation identities
 
 factory.py + workers.py
   shared candidate/position/foundation dispatch
 
 models/providers/**
-  shared foundation providers
+  shared/provider-specific model execution
 
 *_campaign/** + adapters/** + environments/**
-  isolated/provider-specific execution lanes
+  isolated/provider-specific certification lanes
 
 probabilistic/**
-  separate 72-model probabilistic platform
+  separate effective probabilistic v1 = 76 under current loader behavior
 
 audit/**
   point-in-time exact runtime evidence
@@ -129,39 +151,70 @@ REGISTERED
 != PROMOTION_ELIGIBLE
 ```
 
+## Current important evidence boundaries
+
+### sktime
+
+```text
+141 discovered/importable
+4 formal P1 models
+4/4 formal fit/predict/save-load PASS
+```
+
+141 discovered/importable is not 141 runtime-certified.
+
+### skforecast
+
+`SKFORECAST_RUNTIME_CERTIFICATION.md` is `OPERATOR_LOCAL_EVIDENCE` against an exact source head. It does not close current-main Expanded v2 #289 / TAJ-32.
+
+### Darts
+
+Current main contains provider/campaign foundations. A separate local exact-worktree has Torch bootstrap + NLinear/DLinear real GPU fit/predict evidence. This is `LOCAL_VERIFIED / MAIN_PENDING`; #286 / TAJ-27 remains active.
+
+### GluonTS
+
+Draft PR #309 has exact-head P6/P7 CPU lifecycle evidence for 18/18 model lifecycles and P7D `VALID/VERIFIED`, but the PR is main-pending. Exact PR evidence is not current-main certification.
+
 ## Document classes
 
 ### Live entry points / design contracts
 
-These should be updated when current behavior changes:
+Update when current behavior changes:
 
 - root `README.md`;
-- `CAPABILITIES_AND_OPERATIONS.md`;
 - this `docs/README.md`;
+- `CAPABILITIES_AND_OPERATIONS.md`;
+- `LIBRARY_MODEL_COMPATIBILITY_MATRIX.md`;
 - `REQUIREMENTS.md`;
 - `SPECIFICATION.md`;
 - `ARCHITECTURE.md`;
 - `DATA_CONTRACT.md`;
 - `TEST_PLAN.md`;
 - `CURRENT_RUNBOOK.md`;
-- `UNIFIED_EVALUATION_CAMPAIGN.md`;
 - `DOCUMENTATION_POLICY.md`.
 
-### Audited snapshots
+### Audited current-state documents
 
-`STATUS.md`, `CURRENT_HANDOFF.md`, `CURRENT_VERIFICATION_REPORT.md`, `CURRENT_MODEL_EXECUTION_ADDENDUM.md`, and `CURRENT_ARTIFACT_MANIFEST.md` are timestamped snapshots. Live GitHub state wins after their `as_of` time.
+- `STATUS.md`;
+- `CURRENT_CHANGE_SUMMARY.md`;
+- `CURRENT_HANDOFF.md`;
+- `CURRENT_VERIFICATION_REPORT.md`;
+- `CURRENT_MODEL_EXECUTION_ADDENDUM.md`;
+- `CURRENT_ARTIFACT_MANIFEST.md`.
+
+Live GitHub/code state wins after their `as_of` time.
 
 ### Generated inventory
 
-`MODEL_INVENTORY.md` is generated. Do not hand-edit it to reflect routing or runtime results.
+Generated inventory files are not hand-edited to manufacture routing/runtime success. Source code/runtime discovery is authoritative for derived counts.
 
 ### Runtime/scientific evidence
 
-Runtime certification applies to the exact model/revision/environment it actually exercised. OOF/Holdout/Prospective evidence applies only to the exact protocol/data/model identity that generated it.
+Runtime certification applies only to the exact model/revision/environment/source it exercised. OOF/Holdout/Prospective evidence applies only to the exact protocol/data/model identity that generated it.
 
 ### Historical evidence
 
-Older root `VERIFICATION_REPORT.md`, prior handoffs and provider certification artifacts preserve their original observation. Add supersession guidance rather than rewriting historical facts.
+Older verification reports, handoffs and provider artifacts preserve their original observations. Add supersession/current-state references rather than rewriting historical facts.
 
 ### Immutable artifacts
 
@@ -172,11 +225,13 @@ Prediction/protocol locks, `SHA256SUMS`, model/data manifests and release bundle
 ```text
 IMPLEMENTED
 -> RUNTIME_CERTIFIED
--> OOF_EVALUATED
--> HOLDOUT_EVALUATED
--> PROSPECTIVE_EVALUATED
+-> DEVELOPMENT OOF
+-> explicit Holdout authorization
+-> HOLDOUT
+-> sealed PROSPECTIVE prediction
+-> later actual scoring
 -> PROMOTION_ELIGIBLE
 -> HUMAN APPROVAL
 ```
 
-`champion=null` / `NO_MODEL_BEATS_BASELINE` are valid outcomes. Implementation completion does not open Holdout or Prospective.
+`champion=null` / `NO_MODEL_BEATS_BASELINE` are valid outcomes. Implementation or runtime completion does not open Holdout or Prospective.
