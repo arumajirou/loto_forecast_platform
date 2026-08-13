@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Print the versioned Expanded v2 implementation inventory as JSON."""
+"""Print the authoritative source-backed Expanded v2 inventory as JSON."""
 
 from __future__ import annotations
 
 import json
 
-from loto.models.implementation_catalog import (
+from loto.models.expanded_inventory_v2 import (
     expanded_implementation_catalog,
     expanded_inventory_counts,
 )
