@@ -1,158 +1,211 @@
 # Current Model Execution Addendum
 
 ```text
-status_class: AUDITED_SNAPSHOT
-as_of: 2026-08-10T20:23+09:00
+status_class: AUDITED_CURRENT_STATE
+audit_time: 2026-08-13T17:36+09:00
 repository: arumajirou/loto_forecast_platform
-code_audit_base_sha: 2d27b7f6e82035c3405e3dd88c99c2b5b282f2d8
+documentation_audit_base_sha: 932977f7c4d8b4673c2bb02a23ec4ba6b7ad85bf
 ```
 
-This addendum records execution/evaluation changes layered on top of the detailed `MODEL_EXECUTION_MATRIX.md` audit. It does not rewrite historical runtime artifacts.
+This addendum records execution/evaluation changes layered on top of the detailed library/model and execution matrices. Historical runtime artifacts are not rewritten.
 
-## 1. Canonical broad campaign
-
-`uv run loto3 campaign` remains the canonical six-game broad development comparison path:
+## 1. Canonical campaign boundaries
 
 ```text
-catalog_full planning
--> model × game matrix
--> compatible RuntimeModel / PositionSeriesWorker/provider route
--> explicit fail-visible status otherwise
--> family-aware decoding/legalisation
--> prediction lock before actual scoring read
--> geometry-aware metrics
--> seed aggregation
+Broad v1 = 174 frozen identities
+Unified v1 = 250 canonical identities
+Canonical games = 6
+Unified planning matrix = 1500 units
+Expanded v2 Phase 1 = 210 implementation identities
 ```
 
-It is distinct from `loto experiment research` and `loto3 research`.
+`uv run loto3 campaign` remains the canonical broad/unified development comparison surface, while `loto.evaluation.parallel_campaign` adds game-level process parallelism without changing the scientific split/lock semantics inside each game worker.
 
-## 2. Six-game geometry
+Coverage and success remain distinct:
 
 ```text
-mini      select / 5
-loto6     select / 6
-loto7     select / 7
-bingo5    select / 8
-numbers3  digits / 3
-numbers4  digits / 4
+matrix_complete
+!= all models routable
+!= all models runtime-certified
+!= all rows successful
+!= OOF superiority
 ```
 
-The unified path now has geometry-general evaluation semantics through #252. In particular, digit hit counts are positional and do not use unordered set overlap.
+## 2. Current execution architecture
 
-## 3. Coverage versus execution
+The current runtime path includes:
+
+- deterministic task fingerprints for safe resume;
+- explicit physical GPU assignment through `CUDA_VISIBLE_DEVICES`;
+- weighted/resource-aware CPU/GPU admission;
+- process-tree termination on timeout;
+- shared outer-worker-cap enforcement;
+- game-parallel Unified Campaign;
+- atomically written progress state;
+- fail-visible final statuses;
+- aggregate artifacts and SHA-256 manifests.
+
+## 3. scikit-learn / boosting update
+
+Merged runtime changes now include:
+
+- `loto-sklearn` dynamic provider based on installed `sklearn.utils.all_estimators()`;
+- `isotonic-calibrated-logistic` routed through `CalibratedClassifierCV(method="isotonic", cv=3)`;
+- XGBoost GPU lease → CUDA constructor routing verified on exact PR source;
+- CatBoost GPU lease → GPU constructor routing verified on exact PR source;
+- LightGBM resolved 4.7.0 build probed fail-closed:
+  - `device_type="cuda"`: unsupported by this build;
+  - `device_type="gpu"`: OpenCL runtime verified;
+- LightGBM classifier/position Broad routes now use the certified OpenCL GPU contract when a scheduler GPU lease exists.
+
+Do not describe the resolved LightGBM build as CUDA-certified.
+
+## 4. sktime update
+
+The current sktime isolated lane uses sktime 1.0.1 evidence with:
 
 ```text
-174 registered
-!= 174 shared-routable
-!= 174 runtime-certified
-!= 174 × 6 successful executions
-!= 174 OOF-evaluated
+141 discovered/importable
+53 core compatible
+88 optional dependency declared
 ```
 
-The campaign records unsupported/non-routable/failure rows rather than dropping them.
-
-## 4. Decoder/routing addendum
-
-Probability-bearing candidate routes preserve:
+Formal P1 fixed matrix:
 
 ```text
-distribution_identity = row-normalized-slot-binary-probability-v1
+NaiveForecaster(last)
+PolynomialTrendForecaster(degree=1)
+ExponentialSmoothing
+ThetaForecaster
 ```
 
-and use:
+All four passed dependency/import/construct/fit/predict/finite/save-load/re-predict/formal verification on the exact PR source after PR #307 normalized the canonical numeric input representation.
+
+This is not a 141-model runtime certification.
+
+## 5. skforecast 0.23.0 operator-local evidence
+
+The repository Broad identity remains `skforecast-recursive`, and #289 / TAJ-32 remains open for Expanded v2 inventory/routing integration.
+
+Separately, the maintainer host exercised skforecast 0.23.0 against exact source head `9fcc1274755dca64c46dc31a9a0f60a9ef1c4ebd`.
+
+### Core strategies
+
+Verified in synthetic runtime smoke after correcting harness/config assumptions:
+
+- `ForecasterRecursive + Ridge + exog`;
+- `ForecasterRecursive + HistGradientBoostingRegressor`;
+- `ForecasterDirect + Ridge`;
+- `ForecasterRecursiveMultiSeries`;
+- `ForecasterDirectMultiVariate + Ridge`;
+- `ForecasterEquivalentDate`;
+- `ForecasterStats + ARAR`;
+- Rolling/Calendar features;
+- TimeSeriesFold/backtesting;
+- Optuna search;
+- save/load exact round trip;
+- RangeDriftDetector;
+- bootstrap and calibrated interval paths.
+
+Optional recursive estimator smoke also passed with LightGBM, XGBoost and CatBoost on CPU.
+
+### RNN
+
+`ForecasterRnn` evidence includes:
+
+- LSTM GPU PASS;
+- GRU GPU PASS;
+- LSTM CPU fallback PASS;
+- actual CUDA device/model-variable/PyTorch allocation/external PID evidence;
+- zero CUDA allocation in CPU fallback.
+
+### Foundation adapters
+
+| identity | operator-local status | boundary |
+|---|---|---|
+| Chronos-2 small | **GPU + CPU PASS** | exog/point/interval; Hub revision observed |
+| TimesFM 2.5 | **GPU + CPU PASS** | point/interval/quantiles; exog unsupported by adapter |
+| Moirai-2 small | **PASS under compatibility override** | normal dependency resolution/routability BLOCKED |
+| TabICL v2 | **GPU + CPU PASS** | exog/point/interval/quantiles + checkpoint SHA verified |
+| TabPFN-TS v3 path | **adapter setup PASS / inference BLOCKED** | invalid/expired Prior Labs token before weight download |
+| T0 | **NOT RUN** | pending |
+
+Detailed evidence: `docs/SKFORECAST_RUNTIME_CERTIFICATION.md`.
+
+## 6. TabICL artifact identity
+
+The checkpoint used by the operator-local TabICL run was independently resolved and hashed:
 
 ```text
-digits -> positional WITHIN_TAU/window-mass decoder
-select -> legality-constrained WITHIN_TAU DP
+repo=jingang/TabICL
+revision=4dcd344ece2c00be9e831fdd35bed57b5ad83e19
+checkpoint=tabicl-regressor-v2-20260212.ckpt
+size_bytes=114324594
+sha256=0db9cb538f114e79026bf08f45f41ad8dd7ad2de2aaca9a5ca8cd3bd9748ae7a
+status=VERIFIED
 ```
 
-Point-only models remain point-only.
+## 7. TabPFN-TS current authentication boundary
 
-## 5. Geometry-general metrics addendum (#252)
-
-`evaluate_outcomes()` now:
-
-- resolves game geometry explicitly;
-- validates actual/prediction width and legality;
-- uses positional hit count for digits;
-- uses set overlap hit count for select games;
-- reports position MAE/MSE/RMSE;
-- reports within-tau and all-position-within-tau rates.
-
-The legacy Loto7 `evaluate_draws()` remains a compatibility wrapper.
-
-## 6. Theory-aware downstream governance (#253)
-
-New promotion evidence can use `PromotionPolicyV2`:
-
-- explicit game;
-- tau=1 for current Hit@±1 promotion evidence;
-- absolute or IID-null-relative target semantics;
-- exact implied absolute target;
-- sealed `game_id` match;
-- aggregate/worst-window threshold rules;
-- degradation and mandatory baseline rules.
-
-This does not change model routing or make any model promoted.
-
-## 7. Manual-only promotion
-
-All-pass rules produce at most:
+Current operator diagnostic:
 
 ```text
-ELIGIBLE_FOR_HUMAN_APPROVAL
+tabpfn-time-series=1.2.0
+tabpfn=8.1.0
+requested_checkpoint=tabpfn-v3-regressor-v3_20260506_timeseries.ckpt
+license_name=tabpfn-3-license-v1.0
+token_valid=false
+license_accepted=not evaluated
+runtime_inference=NOT_EXECUTED
 ```
 
-The current contract keeps:
+This is an authentication/governance block, not a CUDA/skforecast inference failure. The cached TabPFN V2 regressor checkpoint is a different identity and must not be used as V3 evidence.
+
+## 8. Toto 2.0 22M current gate
+
+PR #296 merged a pinned family/runtime certification path. Formal runtime status still remains fail-closed until #297 obtains native-Linux external provider-PID/VRAM/release evidence.
 
 ```text
-automatic_promotion=false
-automatic_retraining=false
-registry_write_allowed=false
-promotion_status=NOT_PROMOTED
+runtime_certified=false
+shared_routing_allowed=false
+OOF=NOT_RUN
+Holdout=CLOSED
+Prospective=CLOSED
 ```
 
-## 8. Pre-experiment power planning (#254)
+## 9. Scientific evaluation boundary
 
-`evaluation.power_analysis` adds:
+Runtime smoke and synthetic metrics do not establish forecast skill.
+
+Formal development evaluation requires:
+
+- Hit@±1 primary;
+- MAE/MSE/RMSE;
+- position-wise and all-position Hit@±1;
+- Random/fixed/mean/median/recent/frequency/statistical baselines;
+- chronological folds;
+- Train-only preprocessing/HPO;
+- all configured seeds and mean/variance/worst summaries;
+- prediction SHA-256 + timestamp before actual read.
+
+Current Holdout and Prospective state:
 
 ```text
-PowerPlan
-required_paired_draws
-minimum_detectable_effect
-power_curve
+Holdout=CLOSED
+Prospective=CLOSED
+automatic_promotion=FORBIDDEN
 ```
 
-under `paired-score-normal-approximation-v1`.
+## 10. Source-of-truth order
 
-This layer is intended to determine whether a planned paired evaluation can detect a declared effect size. It does not execute model inference and does not alter runtime capability labels.
+Use current evidence in this order:
 
-## 9. Current library interpretation
+1. repository code/config;
+2. tests/workflows/repository-retained artifacts;
+3. exact-source operator/local runtime evidence;
+4. merged PR/commit history;
+5. live GitHub/Linear gate state;
+6. current documentation;
+7. historical snapshots.
 
-Use `MODEL_EXECUTION_MATRIX.md` and `CAPABILITIES_AND_OPERATIONS.md` for full detail. Important boundaries remain:
-
-- StatsForecast 41 broad vs 8 explicit shared IDs;
-- MLForecast Auto 8 broad vs 2 direct shared MLForecast IDs;
-- NeuralForecast 37 fixed broad + 36 Auto broad vs narrower direct fixed shared set;
-- AutoGluon isolated environment/provider;
-- BasicTS / Time-Series-Library / Merlion / sktime separate provider/campaign lanes;
-- GluonTS shared route currently CPU-configured;
-- TSFM runtime evidence must be read per exact model/revision;
-- separate probabilistic surface contains 72 models.
-
-## 10. Runtime evidence boundary
-
-A campaign plan or successful adapter route does not upgrade a model to runtime-certified. Runtime claims still require actual load/inference/device/output evidence for the exact identity.
-
-Current aggregate TSFM audit file records 21 total and 19 runtime-certified identities. It is not OOF evidence.
-
-## 11. Scientific boundary
-
-This addendum does not establish:
-
-- complete real-data 174 × 6 success;
-- all-model OOF superiority;
-- Holdout completion;
-- Prospective completion;
-- champion selection;
-- production promotion.
+An exact-source local PASS does not automatically certify a newer main SHA.
