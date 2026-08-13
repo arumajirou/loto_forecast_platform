@@ -4,8 +4,8 @@
 
 このREADMEは「何が実装されているか」「どの実行面まで確認できているか」「科学評価のどこまで進んでいるか」を最短で把握する入口です。
 
-> **Documentation audit base:** `main@063120fd9b07d07548442edbce480a6d068f9f43` (PR #312, 2026-08-13)  
-> **Latest merged boundary:** PR #312 — library/model matrix current-evidence alignment  
+> **Evidence audit source base before documentation alignment:** `main@063120fd9b07d07548442edbce480a6d068f9f43` (PR #312, 2026-08-13)  
+> **Documentation alignment:** PR #311 — merged as `9623f2a562d21b4f9be84c392429885a51a72fe1`  
 > **Open boundary:** Draft PR #309 — GluonTS P6/P7 CPU lifecycle certification; main未統合  
 > **Local-only boundary:** Darts Torch dependency/profile/lock + NLinear/DLinear GPU evidenceはmain未反映  
 > **Rule:** `REGISTERED != ROUTABLE != RUNTIME_CERTIFIED != OOF_EVALUATED != HOLDOUT_EVALUATED != PROSPECTIVE_EVALUATED != PROMOTION_ELIGIBLE`
@@ -202,6 +202,7 @@ This dependency/profile/lock correction is not merged. Current main `smoke_model
 | #308 | `932977f7...` | README reconciliation |
 | #310 | `4f4f8579...` | current state + skforecast operator evidence |
 | #312 | `063120fd...` | library/model matrix current-evidence alignment |
+| #311 | `9623f2a5...` | Darts evidence + Broad planner boundary documentation alignment |
 | #309 | Draft `edba730a...` | GluonTS P6/P7 CPU lifecycle repair; main pending |
 
 ---
