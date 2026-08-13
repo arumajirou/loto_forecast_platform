@@ -123,6 +123,12 @@ class RuntimeModel:
                 from sklearn.linear_model import LogisticRegression
 
                 return LogisticRegression(random_state=self.seed, **params)
+            if model_id == "isotonic-calibrated-logistic":
+                from sklearn.calibration import CalibratedClassifierCV
+                from sklearn.linear_model import LogisticRegression
+
+                base = LogisticRegression(C=1.0, max_iter=1000, random_state=self.seed)
+                return CalibratedClassifierCV(estimator=base, **params)
             if model_id == "ridge-position":
                 from sklearn.linear_model import Ridge
 

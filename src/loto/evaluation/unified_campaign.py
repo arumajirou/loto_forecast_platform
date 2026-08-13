@@ -434,9 +434,7 @@ def _entry_to_spec(entry: ModelEntry) -> ModelSpec:
 
 
 def _candidate_model_supported(spec: ModelSpec) -> bool:
-    return spec.library in {"sklearn", "lightgbm", "xgboost", "catboost"} and spec.model_id not in {
-        "isotonic-calibrated-logistic",
-    }
+    return spec.library in {"sklearn", "lightgbm", "xgboost", "catboost"}
 
 
 def _decode_candidate_probability_matrix(
