@@ -182,7 +182,8 @@ class RuntimeModel:
             params.setdefault("random_seed", self.seed)
             if cuda_device_is_leased():
                 params.setdefault("task_type", "GPU")
-                params.setdefault("devices", "0")
+                if str(params.get("task_type", "")).upper() == "GPU":
+                    params.setdefault("devices", "0")
             return cls(**params)
         raise NotImplementedError(
             f"model {model_id} uses worker adapter "
