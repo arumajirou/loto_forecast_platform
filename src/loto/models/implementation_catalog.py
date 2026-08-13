@@ -1,6 +1,6 @@
 """Versioned expanded implementation inventory.
 
-Broad v1 remains frozen for the already-planned 174 x 6 runtime campaign.  This
+Broad v1 remains frozen for the already-planned 174 x 6 runtime campaign. This
 module builds a parallel Expanded v2 inventory so framework umbrella entries can
 be decomposed into source-backed executable implementations without silently
 changing an active campaign denominator.
@@ -13,15 +13,22 @@ from dataclasses import asdict, dataclass
 from typing import Any, Literal
 
 from loto.adapters.autogluon.inventory import SOURCE_ENSEMBLE_SPECS, SOURCE_MODEL_SPECS
+from loto.adapters.gluonts.p6_registry import (
+    model_specs as gluonts_model_specs,
+    registry_payload as gluonts_registry_payload,
+    registry_sha256 as gluonts_registry_sha256,
+)
 from loto.models.catalog_full import ModelEntry, build_catalog
 
 EXPANDED_INVENTORY_SCHEMA_VERSION = 2
 AUTOGLOUON_BROAD_V1_ID = "autogluon-timeseries"
+GLUONTS_BROAD_V1_ID = "gluonts-deepar"
 
 SourceKind = Literal[
     "broad_v1",
     "autogluon_source_model",
     "autogluon_source_ensemble",
+    "gluonts_p6_registry",
 ]
 
 
@@ -29,7 +36,7 @@ SourceKind = Literal[
 class ImplementationIdentity:
     """One library-specific executable implementation identity.
 
-    ``algorithm_id`` is intentionally separate from ``implementation_id``.  The
+    ``algorithm_id`` is intentionally separate from ``implementation_id``. The
     former can be shared by equivalent scientific algorithms implemented by
     different libraries, while the latter is always library/runtime specific.
     """
@@ -76,6 +83,18 @@ _ALGORITHM_ALIASES = {
     "patchtst": "patchtst",
     "tide": "tide",
     "chronos2": "chronos-2",
+}
+
+_GLUONTS_FAMILIES = {
+    "DeepNPTSEstimator": "deep_probabilistic",
+    "DeepAREstimator": "deep_probabilistic",
+    "TiDEEstimator": "mlp",
+    "SimpleFeedForwardEstimator": "mlp",
+    "TemporalFusionTransformerEstimator": "transformer",
+    "WaveNetEstimator": "cnn",
+    "DLinearEstimator": "linear",
+    "PatchTSTEstimator": "transformer",
+    "LagTSTEstimator": "transformer",
 }
 
 
@@ -156,12 +175,69 @@ def autogluon_implementation_identities() -> tuple[ImplementationIdentity, ...]:
     return tuple(rows)
 
 
+def gluonts_implementation_identities() -> tuple[ImplementationIdentity, ...]:
+    """Expand the frozen GluonTS Broad identity from the deterministic P6 registry.
+
+    The P6 registry is source-backed and deterministic, but its source declaration
+    must remain separate from runtime certification. The current P6 contract is
+    deliberately CPU-pinned; GPU, exogenous and multivariate behavior are not
+    inferred from registration alone.
+    """
+
+    payload = gluonts_registry_payload()
+    source_tags = ",".join(payload["official_source_tags"])
+    rows: list[ImplementationIdentity] = []
+
+    for spec in gluonts_model_specs():
+        model_name = spec.model_class.removesuffix("Estimator")
+        capabilities = [
+            "position_series",
+            "fit",
+            "predict",
+            "save_reload_contract",
+            "cpu_p6_contract",
+            f"distribution_{spec.distribution_mode.value.lower()}",
+            f"trainer_{spec.trainer_kind.value.lower()}",
+        ]
+        if spec.supports_context_length:
+            capabilities.append("context_length")
+
+        rows.append(
+            ImplementationIdentity(
+                implementation_id=f"gluonts-torch-{_slug(model_name)}",
+                algorithm_id=_algorithm_id(model_name),
+                library="gluonts",
+                class_name=spec.model_class,
+                family=_GLUONTS_FAMILIES[spec.model_class],
+                source_kind="gluonts_p6_registry",
+                execution_surface="gluonts_p6_provider",
+                canonical_v1_model_id=GLUONTS_BROAD_V1_ID,
+                source_alias=spec.module_path,
+                capabilities=tuple(capabilities),
+                notes=(
+                    f"source_path={spec.source_path}; official_source_tags={source_tags}; "
+                    "P6 device policy=cpu; exogenous/multivariate/GPU support is not "
+                    "certified by this inventory; runtime certification is separate"
+                ),
+            )
+        )
+
+    _validate_identities(rows)
+    return tuple(rows)
+
+
 def expanded_implementation_catalog() -> tuple[ImplementationIdentity, ...]:
-    """Return Expanded v2 while leaving the Broad v1 registry untouched."""
+    """Return current Expanded v2 while leaving the Broad v1 registry untouched."""
 
     broad_v1 = build_catalog()
-    rows = [_from_broad_v1(entry) for entry in broad_v1 if entry.model_id != AUTOGLOUON_BROAD_V1_ID]
+    replaced_broad_ids = {AUTOGLOUON_BROAD_V1_ID, GLUONTS_BROAD_V1_ID}
+    rows = [
+        _from_broad_v1(entry)
+        for entry in broad_v1
+        if entry.model_id not in replaced_broad_ids
+    ]
     rows.extend(autogluon_implementation_identities())
+    rows.extend(gluonts_implementation_identities())
     _validate_identities(rows)
     return tuple(rows)
 
@@ -172,6 +248,7 @@ def expanded_inventory_counts() -> dict[str, Any]:
     broad_v1 = build_catalog()
     expanded = expanded_implementation_catalog()
     autogluon = autogluon_implementation_identities()
+    gluonts = gluonts_implementation_identities()
     by_library = Counter(row.library for row in expanded)
     return {
         "schema_version": EXPANDED_INVENTORY_SCHEMA_VERSION,
@@ -188,6 +265,12 @@ def expanded_inventory_counts() -> dict[str, Any]:
             row.source_kind == "autogluon_source_ensemble" for row in autogluon
         ),
         "autogluon_expanded_total": len(autogluon),
+        "gluonts_broad_v1_umbrella_count": sum(
+            entry.model_id == GLUONTS_BROAD_V1_ID for entry in broad_v1
+        ),
+        "gluonts_p6_source_models": len(gluonts),
+        "gluonts_expanded_total": len(gluonts),
+        "gluonts_registry_sha256": gluonts_registry_sha256(),
         "by_library": dict(sorted(by_library.items())),
     }
 
