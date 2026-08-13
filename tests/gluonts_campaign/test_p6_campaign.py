@@ -179,3 +179,37 @@ def test_campaign_does_not_start_reload_when_fit_is_blocked(tmp_path: Path) -> N
     )
     assert campaign.status is P6Status.BLOCKED
     assert all(model.reload is None for model in campaign.models)
+
+def test_campaign_normalizes_relative_artifact_paths(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    observed: list[tuple[Path, Path]] = []
+
+    def asserting_invoker(
+        request: P6ProviderRequest,
+        command: Sequence[str],
+        artifact_root: Path,
+        timeout_seconds: float,
+    ) -> StageInvocation:
+        assert command == ["provider"]
+        assert timeout_seconds == 30.0
+        predictor_dir = Path(request.artifact_dir)
+        assert artifact_root.is_absolute()
+        assert predictor_dir.is_absolute()
+        observed.append((artifact_root, predictor_dir))
+        return invocation(verified_response(request))
+
+    campaign = run_p6_campaign(
+        run_id="p6-relative-root",
+        lane="compat",
+        command=["provider"],
+        artifact_root=Path("relative-artifacts"),
+        workers=1,
+        timeout_seconds=30.0,
+        invoker=asserting_invoker,
+    )
+
+    assert campaign.status is P6Status.VERIFIED
+    assert observed

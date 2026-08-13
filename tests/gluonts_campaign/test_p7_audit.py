@@ -346,3 +346,41 @@ def test_provenance_accepts_uv_managed_python_symlink(
 
     assert lane.evidence_state is EvidenceState.VALID
     assert lane.certification_status is CertificationStatus.VERIFIED
+
+def test_provenance_rejects_python_path_traversal_outside_prefix(
+    tmp_path: Path,
+) -> None:
+    repo = make_repo(tmp_path)
+    root = make_lane_artifacts(repo, tmp_path, "compat")
+
+    provenance_path = root / "p6_environment_provenance.json"
+    provenance = json.loads(provenance_path.read_text())
+
+    prefix = Path(str(provenance["python_prefix"]))
+    traversal = prefix.joinpath(
+        *([".."] * 12),
+        "usr",
+        "bin",
+        "python3",
+    )
+
+    assert traversal.is_absolute()
+    traversal.relative_to(prefix)
+
+    provenance["python_executable"] = str(traversal)
+    atomic_write_json(provenance_path, provenance)
+
+    lines = [
+        f"{sha256_file(candidate)}  {candidate.relative_to(root).as_posix()}"
+        for candidate in sorted(root.rglob("*"))
+        if candidate.is_file() and candidate.name != "P6_SHA256SUMS"
+    ]
+    (root / "P6_SHA256SUMS").write_text(
+        "\n".join(lines) + "\n",
+        encoding="utf-8",
+    )
+
+    lane = audit(repo, root, "compat")
+
+    assert lane.evidence_state is EvidenceState.INVALID
+    assert P7FailureCategory.PROVENANCE_MISMATCH in lane.failure_categories

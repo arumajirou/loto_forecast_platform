@@ -70,6 +70,7 @@ def invoke_p6_provider(
 ) -> StageInvocation:
     if not command:
         raise ValueError("provider command cannot be empty")
+    artifact_root = artifact_root.resolve()
     run_dir = artifact_root / request.model_class / request.operation.value
     request_path = run_dir / "request.json"
     response_path = run_dir / "response.json"
@@ -251,6 +252,7 @@ def run_p6_campaign(
         raise ValueError("lane must be compat or latest")
     if workers < 1 or workers > 8:
         raise ValueError("P6 campaign workers must be in the range 1..8")
+    artifact_root = artifact_root.resolve()
     artifact_root.mkdir(parents=True, exist_ok=True)
     futures = {}
     results: dict[str, P6ModelLifecycle] = {}

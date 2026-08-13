@@ -302,8 +302,22 @@ def audit_lane(
                 "PROVENANCE_MISMATCH:python prefix is outside isolated lane"
             )
 
+        executable_name = python_executable.name
+        if executable_name in {"", ".", ".."}:
+            raise RuntimeError(
+                "PROVENANCE_MISMATCH:python executable path is invalid"
+            )
+
+        # Resolve all non-final path components so lexical traversal such as
+        # ".venv/../../usr/bin/python" cannot pass containment checks.
+        # Keep the final component unresolved so a legitimate venv Python
+        # symlink into a uv-managed interpreter remains acceptable.
+        python_executable_normalized = (
+            python_executable.parent.resolve() / executable_name
+        )
+
         try:
-            python_executable.relative_to(python_prefix)
+            python_executable_normalized.relative_to(prefix_resolved)
         except ValueError as exc:
             raise RuntimeError(
                 "PROVENANCE_MISMATCH:python executable is outside isolated prefix"
