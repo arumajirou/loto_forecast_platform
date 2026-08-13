@@ -1,19 +1,75 @@
 # Darts Current State
 
 ```text
-status: PARTIALLY_VERIFIED / MAIN_RUNTIME_FOUNDATION + LOCAL_TORCH_RUNTIME_VERIFIED / EXPANDED_V2_IN_PROGRESS
-main_audit_base: 063120fd9b07d07548442edbce480a6d068f9f43
+status: PARTIALLY_VERIFIED / EXPANDED_V2_PHASE2A_IMPLEMENTED / PHASE2B_RUNTIME_OPEN
+integration_base: 45bcf60fa04fc3736e3a73760039254573abf4c8
 main_target: darts==0.46.1
 tracking: GitHub #286 / Linear TAJ-27
+Broad_v1: 1 umbrella
+public_exports: 58
+Expanded_v2_source_identities: 55
+combined_Expanded_v2: 272
 Holdout: CLOSED
 Prospective: CLOSED
 ```
 
-この文書は古い「REAL_DARTS_RUNTIME_BLOCKED」記述を置き換え、**current mainで実装済みのDarts foundation**と、**2026-08-13 local exact-worktreeで追加検証されたruntime evidence**を分離します。
+この文書は、Dartsの `Broad v1 = 1` と実装候補数を混同しないためのcurrent-state資料です。**Broad 1は互換umbrellaであり、Dartsに1モデルしかないという意味ではありません。**
 
-## Current main foundation
+## Expanded v2 Phase 2a — source identity integration
 
-### Source discovery
+Darts 0.46.1のversioned public forecasting export fixtureは **58 names** です。Phase 2aでは次の3件をstandalone implementation denominatorから明示的に除外します。
+
+| public export | classification | canonical/reason |
+|---|---|---|
+| `EnsembleModel` | `ABSTRACT_BASE` | concrete ensemble implementationsを別identityとして扱う |
+| `RandomForest` | `DEPRECATED_ALIAS` | `RandomForestModel`へ正規化 |
+| `RegressionModel` | `DEPRECATED_ALIAS` | `SKLearnModel`へ正規化 |
+
+したがってsource-backed Darts Expanded identityは次のとおりです。
+
+```text
+58 public exports
+- 1 abstract base
+- 2 deprecated aliases
+= 55 source implementation identities
+```
+
+単一正本:
+
+- `src/loto/models/darts_source_inventory.py`
+- discoveryは同fixtureを参照し、58-name listを重複保持しない
+- authoritative compositionは`src/loto/models/expanded_inventory_v2.py`
+- `scripts/report_expanded_model_inventory.py`はauthoritative compositionを出力する
+
+55件はすべて初期状態をfail-closedにします。
+
+```text
+runtime_status=NOT_RUN
+runtime_certified=false
+execution_surface=darts_provider_pending
+capabilities=source_declared only
+```
+
+登録やsource exportの存在をruntime成功へ読み替えません。
+
+## Combined Expanded-v2 count
+
+current source-backed compositionはAutoGluon Phase 1、GluonTS Phase 3、Darts Phase 2aを同時に保持します。
+
+```text
+174 Broad v1
+- AutoGluon umbrella 1
+- GluonTS umbrella 1
+- Darts umbrella 1
++ AutoGluon implementations 37
++ GluonTS implementations 9
++ Darts source implementations 55
+= 272 Expanded-v2 identities
+```
+
+Broad v1は引き続き **174**、Broad campaign plannerは **174 × 6 = 1,044** のままです。272はruntime-certified count、OOF count、Holdout count、Prospective countではありません。
+
+## Source discovery foundation
 
 - Darts target: `0.46.1`;
 - versioned public forecasting export fixture: **58 names**;
@@ -21,25 +77,7 @@ Prospective: CLOSED
 - abstract/import/non-class/alias/signature/capability metadata;
 - optional dependency failures remain visible.
 
-58 public exportsは58 standalone forecasting algorithmsではありません。base/abstract/alias/classifier/wrapper/ensemble/conformal/optional exportsを含むため、#286でsource-complete implementation classificationが必要です。
-
-### Implemented execution surfaces
-
-- strict request/response contracts;
-- `discover` / `fit_predict` provider modes;
-- local/statistical matrix;
-- regression/boosting matrix;
-- Torch matrix;
-- foundation matrix;
-- ensemble/conformal matrix;
-- persistence/save-load contracts;
-- chronological OOF and multi-seed summaries;
-- Hit@±1-first evaluation + baselines;
-- prediction seal support;
-- isolated notorch / torch runtime projects;
-- fail-closed runtime preflight/bootstrap.
-
-Explicit represented groups include:
+Explicit represented execution groups include:
 
 ```text
 Local/statistical:
@@ -60,9 +98,23 @@ Ensemble/conformal:
 NaiveEnsembleModel RegressionEnsembleModel ConformalNaiveModel ConformalQRModel
 ```
 
-These explicit matrices are not the final source-complete identity set.
+これらのexplicit matricesは55 identityすべてのruntime certificationを意味しません。
 
-## Current main runtime bootstrap
+## Runtime foundation
+
+Repositoryには次が実装されています。
+
+- strict request/response contracts;
+- `discover` / `fit_predict` provider modes;
+- local/statistical、regression/boosting、Torch、foundation、ensemble/conformal matrices;
+- persistence/save-load contracts;
+- chronological OOF and multi-seed summaries;
+- Hit@±1-first evaluation + baselines;
+- prediction seal support;
+- isolated notorch / torch runtime projects;
+- fail-closed runtime preflight/bootstrap.
+
+Bootstrap:
 
 ```bash
 uv run python scripts/run_darts_runtime_bootstrap.py \
@@ -74,32 +126,11 @@ uv run python scripts/run_darts_runtime_bootstrap.py \
   --repository-root .
 ```
 
-Bootstrap validates repository-relative paths, resolves `uv`, locks the selected isolated project, hashes `uv.lock`, performs frozen sync, runs preflight, validates report/lock hashes and creates `CAMPAIGN_APPROVAL.json` only when all required stages PASS.
+Current `run_runtime_preflight()`はPython/lock/package/import/export/CUDA/nvidia-smi等を検証しますが、`RuntimeProfile.smoke_models`からactual construct/fit/predictを実行する正式統合はまだ未完です。
 
-**Current bootstrap does not train or predict.**
+## 2026-08-13 local Torch correction — publication boundary
 
-Current `run_runtime_preflight()` verifies:
-
-- Python version range;
-- lockfile existence/SHA;
-- exact package versions;
-- required/optional imports;
-- required Darts exports;
-- CUDA availability/allocation/synchronization;
-- CUDA device information;
-- `nvidia-smi` PID evidence;
-- tamper-sensitive report hash.
-
-Important implementation gap: `RuntimeProfile` declares `smoke_models`, but current main `run_runtime_preflight()` does not execute model construct/fit/predict from that field.
-
-## 2026-08-13 local Torch correction — MAIN PENDING
-
-Local exact-worktree investigation found two runtime-contract mismatches:
-
-1. `darts[torch]==0.46.1` permits `torch>=2.0.0`; without explicit isolated pin, actual resolution can drift from the preflight's intended Torch runtime.
-2. upstream Darts uses `pytorch-lightning`; the import is `pytorch_lightning`, while current main profile requests `lightning`.
-
-Locally verified corrective runtime:
+Local exact-worktreeでは次のcorrective runtimeを確認しています。
 
 ```text
 darts=0.46.1
@@ -110,15 +141,7 @@ Python=3.13
 GPU=NVIDIA GeForce RTX 5070 Ti
 ```
 
-Isolated lock SHA-256:
-
-```text
-41d0bed42194b6f4d79f6ee027a4a716230fedfa18a34c2830091d64ef3bc4e9
-```
-
-These dependency/profile/lock changes are not current main until a separate code PR is merged.
-
-## Local official bootstrap evidence
+Local official bootstrap evidence:
 
 ```text
 DARTS_TORCH_ENV=VERIFIED
@@ -130,20 +153,9 @@ campaign_execution_allowed=true
 BOOTSTRAP_RC=0
 ```
 
-Hash chain:
-
-```text
-lock=41d0bed42194b6f4d79f6ee027a4a716230fedfa18a34c2830091d64ef3bc4e9
-preflight=6fd6e52c45556030503b9f8a4b980c6e55c63e9d1bcb371ca70a809a717ed0fd
-bootstrap=e3b8c2dc29ea3c3a94891dd3ede827345b4196b3cfa5e15c493d8960df7962b3
-approval=58b95f72ec45f36fc132c646745a9622b1b4b979554d57b4dde01754c5f7ad54
-```
-
-Local certificate bundle SHA256SUMS verification also passed. Evidence class remains local until publication.
+このdependency/profile/lock evidenceは、対応するcode/profile/lockがmainへ反映された範囲だけcurrent-main certificationへ昇格できます。
 
 ## NLinearModel — LOCAL GPU VERIFIED
-
-Actual construct/fit/predict evidence captured during training and prediction:
 
 ```text
 prediction_shape=[4,1]
@@ -175,81 +187,69 @@ DLINEAR_GPU_RUNTIME=VERIFIED
 RC=0
 ```
 
-Post-run parameters observed on CPU do not invalidate these results because train/predict-time callback evidence directly observed CUDA.
+Post-run parametersがCPUへ戻っていても、train/predict-time callbackでCUDA device、GPU PID、VRAMを直接観測しているためCPU fallbackとは判定しません。
 
-## Formal smoke integration attempt — NOT IMPLEMENTED
+## Formal smoke integration — still open
 
-The first proposed patch intended to connect `smoke_models` to actual CPU/GPU fit/predict did not apply:
+最初の`smoke_models` actual fit/predict統合patchは適用されませんでした。
 
 ```text
 git apply --check -> error: corrupt patch at line 381
 git apply         -> error: corrupt patch at line 381
 ```
 
-No `runtime_smoke.py` integration was added by that attempt.
-
-A root Ruff invocation then failed because Ruff was not installed in that invocation environment:
+したがって正しい分類は次です。
 
 ```text
-Failed to spawn: ruff
-```
-
-Existing `test_runtime_preflight.py` remained 12/12 PASS because the proposed patch was absent.
-
-Correct classification:
-
-```text
-PATCH_APPLICATION_FAILED
-DEV_TOOLING_MISSING
 SMOKE_MODELS_EXECUTION_INTEGRATION=EXECUTION_PENDING
 ```
+
+既存preflight PASSを55件のconstruct/fit/predict PASSへ読み替えません。
 
 ## Current status table
 
 | Item | State |
 |---|---|
-| Darts 0.46.1 source/export discovery | VERIFIED |
-| 58 public export rows | VERIFIED inventory surface |
-| 58 standalone algorithms | NOT CLAIMED |
+| Darts 0.46.1 public source fixture 58 | VERIFIED |
+| explicit exclusions 3 | VERIFIED |
+| source-backed Expanded identities 55 | IMPLEMENTED / FAIL-CLOSED |
+| Broad Darts umbrella 1 | FROZEN / COMPATIBILITY |
+| combined source-backed Expanded v2 = 272 | IMPLEMENTED CONTRACT |
+| 55 runtime-certified implementations | NOT CLAIMED |
 | provider/evaluation/OOF foundations | IMPLEMENTED |
-| current main bootstrap/preflight | IMPLEMENTED |
-| corrected Torch 2.9.1+cu130 contract | LOCAL_VERIFIED / PUBLICATION_PENDING |
-| local official bootstrap/approval | LOCAL_VERIFIED |
+| current bootstrap/preflight foundation | IMPLEMENTED |
+| local corrected Torch 2.9.1+cu130 evidence | LOCAL_VERIFIED |
 | NLinear real GPU fit/predict | LOCAL_VERIFIED |
 | DLinear real GPU fit/predict | LOCAL_VERIFIED |
 | formal `smoke_models` execution | EXECUTION_PENDING |
-| source-complete Darts inventory | IN PROGRESS #286 |
-| Expanded v2 Darts integration | EXECUTION_PENDING |
+| per-identity capability/routing classification | PHASE 2B OPEN |
 | all routable-class smokes | EXECUTION_PENDING |
 | six-game OOF | EXECUTION_PENDING |
 | Holdout | CLOSED |
 | Prospective | CLOSED |
 
-## #286 acceptance still open
+## #286 acceptance remaining after Phase 2a
 
-Do not close #286 until:
+Phase 2a resolves the deterministic source manifest/count/collision boundary. #286 remains open until Phase 2b completes:
 
-- pinned source-complete forecasting implementation manifest exists;
-- abstract/test/internal-only entries are excluded;
-- `algorithm_id` / `implementation_id` are preserved;
-- base/alias/classifier/wrapper/ensemble/conformal/non-standalone classification is explicit;
-- probabilistic/covariate/multivariate/GPU/fit/zero-shot/save-reload capability metadata is complete;
-- provider/campaign routes exist for supported entries;
-- fail-visible `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `NON_STANDALONE_METHOD` states are explicit;
-- deterministic count/collision checks pass;
-- focused construct/inference smoke exists for all routable implementations;
-- Expanded v2 is integrated without changing Broad 174;
-- Holdout/Prospective stay CLOSED.
+- per-identity probabilistic/covariate/multivariate/GPU/fit/zero-shot/save-reload capability metadata;
+- game compatibility and provider/campaign routes;
+- explicit `UNAVAILABLE`, `NOT_ROUTABLE`, `UNSUPPORTED_GAME`, `NON_STANDALONE_METHOD` states;
+- focused construct/fit/predict smoke for every routable implementation;
+- output shape/finite checks;
+- expected vs observed CPU/GPU device;
+- GPU PID/VRAM and CPU fallback detection where applicable;
+- save/reload/predict evidence where supported;
+- complete six-game development OOF only after runtime stabilization.
 
 ## Next implementation order
 
-1. Publish the verified Torch dependency/profile/lock correction as a focused code PR.
-2. Implement a clean tested runtime-smoke module instead of reusing the corrupt patch.
-3. Connect `smoke_models` to fail-closed actual fit/predict evidence.
-4. Run notorch CPU representative smokes and Torch NLinear representative smoke through formal preflight.
-5. Require new Campaign Approval whose preflight hash binds model-smoke evidence.
-6. Extend to every routable Darts implementation.
-7. Freeze the Darts Expanded v2 implementation count.
-8. Only then run development OOF.
+1. Keep the 55-identity source manifest/hash deterministic and immutable for Darts 0.46.1.
+2. Classify all 55 identities by capability, dependency, game compatibility and routing.
+3. Implement a clean tested runtime-smoke module and connect `smoke_models` to actual fit/predict.
+4. Reuse the already verified NLinear/DLinear callback evidence criteria in the formal harness.
+5. Extend CPU/GPU/runtime certification to every routable Darts implementation.
+6. Preserve explicit failure states for non-routable/unsupported identities; no silent skips.
+7. Only after runtime certification, run identical-condition chronological development OOF.
 
 Runtime evidence does not authorize Holdout or Prospective.
