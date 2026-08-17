@@ -285,12 +285,43 @@ def audit_lane(
                 raise RuntimeError(f"{category.value}:{key} SHA-256 mismatch")
 
         lane_resolved = lane_root.resolve()
-        python_executable = Path(str(provenance.get("python_executable", ""))).resolve()
-        python_prefix = Path(str(provenance.get("python_prefix", ""))).resolve()
-        if lane_resolved not in python_executable.parents:
-            raise RuntimeError("PROVENANCE_MISMATCH:python executable is outside isolated lane")
-        if lane_resolved not in python_prefix.parents and python_prefix != lane_resolved:
-            raise RuntimeError("PROVENANCE_MISMATCH:python prefix is outside isolated lane")
+        python_executable = Path(str(provenance.get("python_executable", "")))
+        python_prefix = Path(str(provenance.get("python_prefix", "")))
+
+        if not python_executable.is_absolute() or not python_prefix.is_absolute():
+            raise RuntimeError(
+                "PROVENANCE_MISMATCH:python executable and prefix must be absolute"
+            )
+
+        prefix_resolved = python_prefix.resolve()
+        if (
+            lane_resolved not in prefix_resolved.parents
+            and prefix_resolved != lane_resolved
+        ):
+            raise RuntimeError(
+                "PROVENANCE_MISMATCH:python prefix is outside isolated lane"
+            )
+
+        executable_name = python_executable.name
+        if executable_name in {"", ".", ".."}:
+            raise RuntimeError(
+                "PROVENANCE_MISMATCH:python executable path is invalid"
+            )
+
+        # Resolve all non-final path components so lexical traversal such as
+        # ".venv/../../usr/bin/python" cannot pass containment checks.
+        # Keep the final component unresolved so a legitimate venv Python
+        # symlink into a uv-managed interpreter remains acceptable.
+        python_executable_normalized = (
+            python_executable.parent.resolve() / executable_name
+        )
+
+        try:
+            python_executable_normalized.relative_to(prefix_resolved)
+        except ValueError as exc:
+            raise RuntimeError(
+                "PROVENANCE_MISMATCH:python executable is outside isolated prefix"
+            ) from exc
         versions = provenance.get("versions")
         if (
             not isinstance(versions, dict)

@@ -53,3 +53,33 @@ def test_provider_cli_emits_nine_entry_matrix(tmp_path: Path) -> None:
     assert payload["lane"] == "compat"
     assert len(payload["entries"]) == 9
     assert sum(payload["summary"].values()) == 9
+
+def test_p6_registry_does_not_disable_gluonts_checkpointing() -> None:
+    paths = [
+        ROOT / "src/loto/adapters/gluonts/p6_registry.py",
+        ROOT / (
+            "environments/gluonts-compat/src/"
+            "loto_gluonts_provider/p6_registry.py"
+        ),
+        ROOT / (
+            "environments/gluonts-latest/src/"
+            "loto_gluonts_provider/p6_registry.py"
+        ),
+    ]
+    for path in paths:
+        source = path.read_text(encoding="utf-8")
+        assert '"enable_checkpointing": False' not in source
+
+
+def test_p6_provider_subprocess_has_per_stage_working_directory() -> None:
+    source = (
+        ROOT / "src/loto/adapters/gluonts/p6_campaign.py"
+    ).read_text(encoding="utf-8")
+    assert "cwd=run_dir" in source
+
+def test_p6_provider_subprocess_hides_cuda_for_cpu_certification() -> None:
+    source = (
+        ROOT / "src/loto/adapters/gluonts/p6_campaign.py"
+    ).read_text(encoding="utf-8")
+
+    assert '"CUDA_VISIBLE_DEVICES": ""' in source

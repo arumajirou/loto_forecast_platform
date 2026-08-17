@@ -70,6 +70,7 @@ def invoke_p6_provider(
 ) -> StageInvocation:
     if not command:
         raise ValueError("provider command cannot be empty")
+    artifact_root = artifact_root.resolve()
     run_dir = artifact_root / request.model_class / request.operation.value
     request_path = run_dir / "request.json"
     response_path = run_dir / "response.json"
@@ -78,6 +79,7 @@ def invoke_p6_provider(
     request_sha = atomic_write_json(request_path, request.model_dump(mode="json"))
     completed = subprocess.run(
         [*command, "--request", str(request_path), "--response", str(response_path)],
+        cwd=run_dir,
         check=False,
         capture_output=True,
         text=True,
@@ -89,6 +91,10 @@ def invoke_p6_provider(
             "OPENBLAS_NUM_THREADS": "1",
             "NUMEXPR_NUM_THREADS": "1",
             "PYTHONHASHSEED": str(request.seed),
+            # P6 is intentionally CPU-pinned. GluonTS predictors can
+            # independently auto-select CUDA even when Lightning training
+            # uses accelerator="cpu", so hide CUDA from provider processes.
+            "CUDA_VISIBLE_DEVICES": "",
         },
     )
     _atomic_write_bytes(stdout_path, completed.stdout.encode("utf-8"))
@@ -246,6 +252,7 @@ def run_p6_campaign(
         raise ValueError("lane must be compat or latest")
     if workers < 1 or workers > 8:
         raise ValueError("P6 campaign workers must be in the range 1..8")
+    artifact_root = artifact_root.resolve()
     artifact_root.mkdir(parents=True, exist_ok=True)
     futures = {}
     results: dict[str, P6ModelLifecycle] = {}
