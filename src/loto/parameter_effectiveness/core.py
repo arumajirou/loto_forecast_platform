@@ -12,7 +12,7 @@ import sys
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, TypeGuard
 
 from .contracts import (
     EffectOutcome,
@@ -110,7 +110,7 @@ def _failed_observation(error: BaseException) -> ProbeRunObservation:
     )
 
 
-def _is_numeric(value: ScalarObservable) -> bool:
+def _is_numeric(value: ScalarObservable) -> TypeGuard[int | float]:
     return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
