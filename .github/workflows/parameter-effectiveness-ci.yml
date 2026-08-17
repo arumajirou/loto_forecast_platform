@@ -1,0 +1,76 @@
+name: parameter-effectiveness-ci
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - src/loto/parameter_effectiveness/**
+      - tests/parameter_effectiveness/**
+      - examples/parameter_effectiveness/**
+      - docs/PARAMETER_EFFECTIVENESS.md
+      - .github/workflows/parameter-effectiveness-ci.yml
+  push:
+    branches:
+      - main
+    paths:
+      - src/loto/parameter_effectiveness/**
+      - tests/parameter_effectiveness/**
+      - examples/parameter_effectiveness/**
+      - .github/workflows/parameter-effectiveness-ci.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: parameter-effectiveness-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  focused-cross-platform:
+    name: Parameter probes (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+    env:
+      PYTHONPATH: src
+      UV_VERSION: "0.11.21"
+      UV_PYTHON: "3.13"
+
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Install exact uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - name: Install managed Python 3.13
+        run: uv python install 3.13
+
+      - name: Focused Ruff
+        run: uvx --from "ruff==0.16.3" ruff check src/loto/parameter_effectiveness tests/parameter_effectiveness
+
+      - name: Focused mypy
+        run: uvx --from "mypy>=1.14" --with "pydantic>=2.10" mypy --ignore-missing-imports src/loto/parameter_effectiveness
+
+      - name: Cross-platform core and real-adapter tests
+        run: uv run --no-project --python 3.13 --with "pytest>=8" --with "pydantic>=2.10" --with "numpy>=2" --with "pandas>=2.2" --with "scikit-learn>=1.5" --with "optuna>=4,<5" --with "mlforecast==1.1.0" --with "statsforecast==2.1.1" python -m pytest tests/parameter_effectiveness -q
+
+      - name: Reusable JSON CLI smoke
+        run: uv run --no-project --python 3.13 --with "pydantic>=2.10" --with "numpy>=2" --with "pandas>=2.2" --with "scikit-learn>=1.5" --with "optuna>=4,<5" --with "mlforecast==1.1.0" --with "statsforecast==2.1.1" python -m loto.parameter_effectiveness.cli --spec examples/parameter_effectiveness/cross_platform_smoke.json --output artifacts/parameter-effectiveness-ci/${{ matrix.os }}
+
+      - name: Verify tracked files stayed clean
+        run: git diff --exit-code
