@@ -48,6 +48,12 @@ jobs:
     steps:
       - name: Checkout focused paths without persistent credentials
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        env:
+          # The repository still contains legacy audit evidence with ':' in path names.
+          # Scope this compatibility setting to checkout only; never persist it globally.
+          GIT_CONFIG_COUNT: "1"
+          GIT_CONFIG_KEY_0: core.protectNTFS
+          GIT_CONFIG_VALUE_0: "false"
         with:
           persist-credentials: false
           fetch-depth: 1
