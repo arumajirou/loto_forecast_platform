@@ -76,7 +76,7 @@ class ParameterProbeSpec(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
-    def validate_pairing(self) -> "ParameterProbeSpec":
+    def validate_pairing(self) -> ParameterProbeSpec:
         if len(self.seeds) < 2:
             raise ValueError("at least two seeds are required")
         if len(set(self.seeds)) != len(self.seeds):
@@ -96,7 +96,7 @@ class ParameterSuiteSpec(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
-    def validate_probe_ids(self) -> "ParameterSuiteSpec":
+    def validate_probe_ids(self) -> ParameterSuiteSpec:
         ids = [probe.probe_id for probe in self.probes]
         if len(ids) != len(set(ids)):
             raise ValueError("probe_id values must be unique within a suite")
