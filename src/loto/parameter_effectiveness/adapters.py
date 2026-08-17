@@ -255,8 +255,10 @@ class StatsForecastParameterAdapter:
     library = "statsforecast"
 
     def _imports(self) -> tuple[type[Any], Any]:
-        from statsforecast import StatsForecast  # type: ignore[import-untyped]
-        from statsforecast import models  # type: ignore[import-untyped]
+        from statsforecast import (  # type: ignore[import-untyped]
+            StatsForecast,
+            models,
+        )
 
         return StatsForecast, models
 
