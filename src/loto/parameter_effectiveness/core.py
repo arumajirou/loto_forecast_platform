@@ -263,7 +263,9 @@ def evaluate_probe(
                 treatment_values.append(treatment_value)
             else:
                 matched = None
-                comparison = "pair not eligible because acceptance/success/finite validation failed"
+                comparison = (
+                    "pair not eligible because acceptance/success/finite validation failed"
+                )
 
             paired.append(
                 PairedProbeObservation(
@@ -346,7 +348,8 @@ def _write_evidence(
     created = datetime.now(UTC)
     suite_payload = suite.model_dump(mode="json")
     spec_bytes = json.dumps(suite_payload, sort_keys=True).encode("utf-8")
-    run_id = f"pe-{created.strftime('%Y%m%dT%H%M%SZ')}-{hashlib.sha256(spec_bytes).hexdigest()[:10]}"
+    spec_hash = hashlib.sha256(spec_bytes).hexdigest()[:10]
+    run_id = f"pe-{created.strftime('%Y%m%dT%H%M%SZ')}-{spec_hash}"
 
     _write_json(output_dir / "suite.json", suite_payload)
     _write_json(
@@ -406,7 +409,9 @@ def _write_evidence(
             )
 
     evidence_files = sorted(
-        path for path in output_dir.iterdir() if path.is_file() and path.name not in {"manifest.json", "SHA256SUMS"}
+        path
+        for path in output_dir.iterdir()
+        if path.is_file() and path.name not in {"manifest.json", "SHA256SUMS"}
     )
     manifest = {
         "run_id": run_id,
