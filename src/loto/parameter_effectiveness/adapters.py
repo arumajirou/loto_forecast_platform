@@ -1,8 +1,8 @@
 """Built-in forecasting-library adapters.
 
 Imports are lazy so the core harness stays usable when an optional forecasting
-library is not installed.  The adapters use deterministic synthetic
-Development data only; they never read project Holdout or Prospective actuals.
+library is not installed. The adapters use deterministic synthetic Development
+data only; they never read project Holdout or Prospective actuals.
 """
 
 from __future__ import annotations
@@ -52,7 +52,6 @@ def _mlforecast_panel(seed: int, repeat: int, train_length: int = 96) -> pd.Data
 
 def _mlforecast_future_actual(seed: int, repeat: int, h: int, train_length: int = 96) -> np.ndarray:
     rng = np.random.default_rng(seed + repeat * 100_003)
-    # Advance the deterministic RNG by the exact training draws used above.
     for _ in range(3):
         rng.normal(0.0, 0.03, size=train_length)
 
@@ -146,6 +145,7 @@ class MLForecastParameterAdapter:
 
             base = dict(spec.base_args)
             model_kwargs = dict(base.pop("model_kwargs", {}))
+            lags = [int(item) for item in base.pop("lags", [1, 2, 3, 5, 10])]
             constructor_kwargs = {
                 "freq": base.pop("freq", 1),
                 "season_length": base.pop("season_length", 1),
@@ -173,9 +173,19 @@ class MLForecastParameterAdapter:
             else:
                 raise ValueError(f"unsupported MLForecast parameter scope: {scope.value}")
 
+            def init_config(trial: Any) -> dict[str, Any]:
+                del trial
+                return {"lags": lags}
+
+            def fit_config(trial: Any) -> dict[str, Any]:
+                del trial
+                return {"static_features": []}
+
             model = model_class(**model_kwargs)
             automl = auto_mlforecast(
                 models={spec.model: model},
+                init_config=init_config,
+                fit_config=fit_config,
                 **constructor_kwargs,
             )
 
@@ -186,9 +196,7 @@ class MLForecastParameterAdapter:
                 id_col="unique_id",
                 time_col="ds",
                 target_col="y",
-                study_kwargs={
-                    "sampler": self._sampler(seed),
-                },
+                study_kwargs={"sampler": self._sampler(seed)},
                 optimize_kwargs={"n_jobs": 1},
                 **fit_kwargs,
             )
@@ -206,7 +214,6 @@ class MLForecastParameterAdapter:
             study = automl.results_[spec.model]
             actual = _mlforecast_future_actual(seed, repeat, h)
             if actual.shape != prediction.shape:
-                # AutoMLForecast orders panel forecasts by id then horizon.
                 actual = actual[: prediction.size]
 
             input_size = fit_kwargs.get("input_size")
@@ -231,6 +238,7 @@ class MLForecastParameterAdapter:
                     "adapter": type(self).__name__,
                     "model_signature": str(inspect.signature(model_class)),
                     "fit_signature": str(inspect.signature(auto_mlforecast.fit)),
+                    "lags": ",".join(str(item) for item in lags),
                 },
             )
         except Exception as exc:
@@ -360,9 +368,7 @@ class StatsForecastParameterAdapter:
                 finite=True,
                 output_shape=tuple(int(item) for item in forecast.shape),
                 prediction_sha256=_prediction_sha(prediction),
-                observables={
-                    "metric": _hit_at_1(prediction, actual),
-                },
+                observables={"metric": _hit_at_1(prediction, actual)},
                 runtime_seconds=time.perf_counter() - started,
                 metadata={
                     "adapter": type(self).__name__,
