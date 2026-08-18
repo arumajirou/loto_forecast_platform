@@ -51,16 +51,22 @@ resolve_loto3() {
 }
 
 progress_filter() {
-    awk '
-    match($0, /^\[([0-9]+)\/([0-9]+)\]/, a) {
-        n=a[1]+0; total=a[2]+0;
-        pct=(total > 0 ? 100.0*n/total : 0);
-        printf("[%d/%d] %6.2f%% %s\n", n, total, pct, substr($0, RLENGTH+2));
-        fflush();
-        next;
-    }
-    { print; fflush(); }
-    '
+    local line current total rest pct
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ "$line" =~ ^\[([0-9]+)/([0-9]+)\][[:space:]](.*)$ ]]; then
+            current="${BASH_REMATCH[1]}"
+            total="${BASH_REMATCH[2]}"
+            rest="${BASH_REMATCH[3]}"
+            if (( total > 0 )); then
+                pct="$(printf '%d.%02d' $(( current * 100 / total )) $(( (current * 10000 / total) % 100 )))"
+            else
+                pct="0.00"
+            fi
+            printf '[%d/%d] %6s%% %s\n' "$current" "$total" "$pct" "$rest"
+        else
+            printf '%s\n' "$line"
+        fi
+    done
 }
 
 current_root() {
