@@ -82,7 +82,10 @@ def resolve_probabilistic_scientific_route(
     spec = get_probabilistic_model_spec(model_id)
     native = get_native_implementation(model_id)
     geometry = geometry_for(game)
-    if native.primary_backend != spec.primary_backend or native.primary_profile != spec.primary_profile:
+    if (
+        native.primary_backend != spec.primary_backend
+        or native.primary_profile != spec.primary_profile
+    ):
         raise ProbabilisticScientificRouteError(
             "probabilistic catalog/native primary route mismatch: "
             f"model={model_id} catalog=({spec.primary_backend},{spec.primary_profile}) "
@@ -197,7 +200,9 @@ def predict_probabilistic_from_history(
     if not route.target_mode:
         raise ProbabilisticScientificRouteError("allowed route is missing target_mode")
     if len(history) < 10:
-        raise ProbabilisticScientificRouteError("scientific history must contain at least 10 rows")
+        raise ProbabilisticScientificRouteError(
+            "scientific history must contain at least 10 rows"
+        )
     geometry = geometry_for(route.game)
     columns = geometry.column_names()
     missing = [column for column in columns if column not in history.columns]
@@ -206,7 +211,9 @@ def predict_probabilistic_from_history(
             f"scientific history missing target columns for {route.game}: {missing}"
         )
 
-    train_frame = history[[column for column in ("draw_no", *columns) if column in history.columns]].copy()
+    train_frame = history[
+        [column for column in ("draw_no", *columns) if column in history.columns]
+    ].copy()
     data_identity = stable_hash(
         {
             "game": route.game,
