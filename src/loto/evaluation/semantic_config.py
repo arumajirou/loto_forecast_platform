@@ -61,8 +61,7 @@ def _canonical_global_sklearn_transformer(value: object) -> dict[str, CanonicalV
     transformer_class = _class_path(transformer)
     if transformer_class != "sklearn.preprocessing._function_transformer.FunctionTransformer":
         raise SemanticConfigError(
-            "unsupported GlobalSklearnTransformer transformer: "
-            f"{transformer_class}"
+            f"unsupported GlobalSklearnTransformer transformer: {transformer_class}"
         )
 
     state = {
@@ -90,8 +89,7 @@ def _canonical_global_sklearn_transformer(value: object) -> dict[str, CanonicalV
     }
     if state != expected:
         raise SemanticConfigError(
-            "unsupported GlobalSklearnTransformer FunctionTransformer state: "
-            f"{state!r}"
+            f"unsupported GlobalSklearnTransformer FunctionTransformer state: {state!r}"
         )
 
     return {
@@ -129,9 +127,7 @@ def _canonical_mlforecast_target_transform(
     if class_path == _GLOBAL_SKLEARN_TRANSFORMER:
         return _canonical_global_sklearn_transformer(value)
 
-    raise SemanticConfigError(
-        f"unsupported MLForecast target transform: {class_path}"
-    )
+    raise SemanticConfigError(f"unsupported MLForecast target transform: {class_path}")
 
 
 def _canonical_legacy_object_repr(
@@ -179,9 +175,7 @@ def canonicalize_semantic_value(
     if isinstance(value, float):
         return _canonical_float(value)
     if isinstance(value, str):
-        legacy = _canonical_legacy_object_repr(
-            value, legacy_object_states=legacy_object_states
-        )
+        legacy = _canonical_legacy_object_repr(value, legacy_object_states=legacy_object_states)
         return value if legacy is None else legacy
 
     if isinstance(value, Mapping):
@@ -189,8 +183,7 @@ def canonicalize_semantic_value(
         for key, item in value.items():
             if not isinstance(key, str):
                 raise SemanticConfigError(
-                    "semantic config mapping keys must be strings, "
-                    f"got {type(key).__name__}"
+                    f"semantic config mapping keys must be strings, got {type(key).__name__}"
                 )
             result[key] = canonicalize_semantic_value(
                 item, legacy_object_states=legacy_object_states
@@ -199,18 +192,14 @@ def canonicalize_semantic_value(
 
     if isinstance(value, list):
         return [
-            canonicalize_semantic_value(
-                item, legacy_object_states=legacy_object_states
-            )
+            canonicalize_semantic_value(item, legacy_object_states=legacy_object_states)
             for item in value
         ]
 
     if isinstance(value, tuple):
         return {
             "__tuple__": [
-                canonicalize_semantic_value(
-                    item, legacy_object_states=legacy_object_states
-                )
+                canonicalize_semantic_value(item, legacy_object_states=legacy_object_states)
                 for item in value
             ]
         }
@@ -230,9 +219,7 @@ def canonicalize_semantic_value(
 
     # NumPy scalar support without importing NumPy as a hard dependency.
     if class_path.startswith("numpy.") and hasattr(value, "item"):
-        return canonicalize_semantic_value(
-            value.item(), legacy_object_states=legacy_object_states
-        )
+        return canonicalize_semantic_value(value.item(), legacy_object_states=legacy_object_states)
 
     raise SemanticConfigError(
         f"unsupported semantic config type: {class_path}; add an explicit adapter"
@@ -246,9 +233,7 @@ def canonical_semantic_document_v1(
 ) -> dict[str, CanonicalValue]:
     return {
         "schema": SEMANTIC_CONFIG_SCHEMA_V1,
-        "config": canonicalize_semantic_value(
-            config, legacy_object_states=legacy_object_states
-        ),
+        "config": canonicalize_semantic_value(config, legacy_object_states=legacy_object_states),
     }
 
 
@@ -257,9 +242,7 @@ def canonical_semantic_bytes_v1(
     *,
     legacy_object_states: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> bytes:
-    document = canonical_semantic_document_v1(
-        config, legacy_object_states=legacy_object_states
-    )
+    document = canonical_semantic_document_v1(config, legacy_object_states=legacy_object_states)
     return json.dumps(
         document,
         ensure_ascii=False,
@@ -275,7 +258,5 @@ def canonical_semantic_sha256_v1(
     legacy_object_states: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> str:
     return hashlib.sha256(
-        canonical_semantic_bytes_v1(
-            config, legacy_object_states=legacy_object_states
-        )
+        canonical_semantic_bytes_v1(config, legacy_object_states=legacy_object_states)
     ).hexdigest()
