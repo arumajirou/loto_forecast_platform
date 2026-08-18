@@ -125,11 +125,11 @@ def test_probabilistic_seed_uses_history_only_and_scores_after_lock(tmp_path, mo
     assert source.index("lock = _write_prediction_lock") < source.index("actual = np.asarray")
 
 
-def test_disallowed_probabilistic_route_is_explicit_without_execution(tmp_path, monkeypatch) -> None:
+def test_disallowed_probabilistic_route_is_explicit_without_execution(
+    tmp_path, monkeypatch
+) -> None:
     geometry = geometry_for("numbers3")
-    frame = pd.DataFrame(
-        {"draw_no": [1], "d1": [1], "d2": [2], "d3": [3]}
-    )
+    frame = pd.DataFrame({"draw_no": [1], "d1": [1], "d2": [2], "d3": [3]})
     prepared = campaign.PreparedGame(
         geometry=geometry,
         development=frame,

@@ -1086,9 +1086,7 @@ def run_unified_campaign(
                 )
             )
 
-    catalog_results = [
-        row for row in results if row["source"] in {"catalog", "probabilistic"}
-    ]
+    catalog_results = [row for row in results if row["source"] in {"catalog", "probabilistic"}]
     if len(catalog_results) != expected_pairs:
         raise AssertionError("result matrix lost one or more model/game combinations")
     pair_keys = {(row["game"], row["candidate_id"]) for row in catalog_results}
