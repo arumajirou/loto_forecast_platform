@@ -15,6 +15,13 @@ MOD = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MOD)
 
 
+def test_diagnostic_runner_is_written_beside_derived_semantic_module(tmp_path: Path) -> None:
+    bundle = tmp_path / "derived_bundle"
+    assert MOD.diagnostic_runner_path(bundle) == (
+        bundle / "phase7_holdout_mapping_diagnostic.py"
+    )
+
+
 def test_collect_non_string_mapping_keys_reports_typed_path() -> None:
     config = {
         "mlf_init_params": {
