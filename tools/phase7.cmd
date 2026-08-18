@@ -8,6 +8,7 @@ if /I "%~1"=="live" goto :live
 if /I "%~1"=="replay" goto :replay
 if /I "%~1"=="verify" goto :verify
 if /I "%~1"=="preflight" goto :preflight
+if /I "%~1"=="holdout" goto :holdout
 
 echo ERROR: unknown Phase 7 command: %~1
 goto :usage
@@ -32,6 +33,10 @@ exit /b %ERRORLEVEL%
 call "%~dp0phase7_holdout_runner\run_main_preflight.cmd"
 exit /b %ERRORLEVEL%
 
+:holdout
+call "%~dp0phase7_holdout_runner\run_sealed_holdout.cmd"
+exit /b %ERRORLEVEL%
+
 :usage
 echo Usage:
 echo   tools\phase7.cmd forensic
@@ -39,4 +44,5 @@ echo   tools\phase7.cmd live
 echo   tools\phase7.cmd replay
 echo   tools\phase7.cmd verify
 echo   tools\phase7.cmd preflight
+echo   tools\phase7.cmd holdout
 exit /b 2
