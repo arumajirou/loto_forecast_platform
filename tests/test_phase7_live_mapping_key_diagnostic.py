@@ -6,9 +6,7 @@ from pathlib import Path
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
-MODULE_PATH = (
-    REPO / "tools" / "phase7_holdout_runner" / "live_mapping_key_diagnostic.py"
-)
+MODULE_PATH = REPO / "tools" / "phase7_holdout_runner" / "live_mapping_key_diagnostic.py"
 SPEC = importlib.util.spec_from_file_location("phase7_live_mapping_key_diagnostic", MODULE_PATH)
 assert SPEC is not None and SPEC.loader is not None
 MOD = importlib.util.module_from_spec(SPEC)
@@ -17,9 +15,7 @@ SPEC.loader.exec_module(MOD)
 
 def test_diagnostic_runner_is_written_beside_derived_semantic_module(tmp_path: Path) -> None:
     bundle = tmp_path / "derived_bundle"
-    assert MOD.diagnostic_runner_path(bundle) == (
-        bundle / "phase7_holdout_mapping_diagnostic.py"
-    )
+    assert MOD.diagnostic_runner_path(bundle) == (bundle / "phase7_holdout_mapping_diagnostic.py")
 
 
 def test_collect_non_string_mapping_keys_reports_typed_path() -> None:
