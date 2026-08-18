@@ -25,6 +25,7 @@ def test_live_scientific_preflight_freezes_exact_250x6_ready_surface(tmp_path: P
 
     result = module.build_preflight(output)
 
+    assert result["schema_version"] == "taj21-scientific-preflight/v2"
     assert result["status"] == "PASS"
     assert result["inventory"] == {
         "broad_identities": 174,
