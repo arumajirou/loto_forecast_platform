@@ -20,7 +20,7 @@ def git_blob(data: bytes) -> str:
 
 
 def fixture_runner() -> str:
-    return '''from __future__ import annotations
+    return """from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -109,15 +109,15 @@ def main():
     # B. Sequential Holdout
     # ========================================================
     return best_config
-'''
+"""
 
 
 def semantic_source() -> str:
-    return '''SEMANTIC_CONFIG_SCHEMA_V1 = "loto.semantic-config/v1"
+    return """SEMANTIC_CONFIG_SCHEMA_V1 = "loto.semantic-config/v1"
 
 def canonical_semantic_sha256_v1(config, *, legacy_object_states=None):
     return "same"
-'''
+"""
 
 
 def test_patch_preserves_legacy_evidence_and_adds_canonical_gate() -> None:
@@ -140,9 +140,7 @@ def test_patch_adds_replay_only_stop_before_holdout() -> None:
     assert 'print("HOLDOUT_DRAWS_ACCESSED=0")' in patched
     assert 'print("ACTUALS_ACCESSED=0")' in patched
     assert 'print("HOLDOUT_EXECUTED=NO")' in patched
-    assert patched.index("if args.stop_after_replay:") < patched.index(
-        "# B. Sequential Holdout"
-    )
+    assert patched.index("if args.stop_after_replay:") < patched.index("# B. Sequential Holdout")
 
 
 def test_patch_accepts_crlf_source_and_normalizes_only_derived_text() -> None:
