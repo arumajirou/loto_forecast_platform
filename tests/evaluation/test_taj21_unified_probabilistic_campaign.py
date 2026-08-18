@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+from collections import Counter
 from types import SimpleNamespace
 
 import numpy as np
@@ -35,6 +36,8 @@ def test_default_plan_is_exact_unified_250_by_6(tmp_path) -> None:
     assert sum(row["library"] == "probabilistic" for row in plan) == 456
     assert sum(row["library"] != "probabilistic" for row in plan) == 1044
     assert len({row["candidate_id"] for row in plan}) == 250
+    assert Counter(row["game"] for row in plan) == {game: 250 for game in config.games}
+    assert all(not row["candidate_id"].startswith("baseline:") for row in plan)
 
 
 def test_probabilistic_model_id_subset_routes_all_six_games(tmp_path) -> None:
