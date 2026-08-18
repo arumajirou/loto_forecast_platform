@@ -81,6 +81,8 @@ def replay_component(
     return best_config
 
 def main():
+    parser = None
+    args = parser.parse_args()
     frozen_trials = Path("trials")
     frozen_config = Path("config")
     replay_dir = Path("replay")
@@ -102,6 +104,10 @@ def main():
             replay_dir=
                 replay_dir,
         )
+
+    # ========================================================
+    # B. Sequential Holdout
+    # ========================================================
     return best_config
 '''
 
@@ -124,6 +130,19 @@ def test_patch_preserves_legacy_evidence_and_adds_canonical_gate() -> None:
     assert "frozen_config_path: Path" in patched
     assert "frozen_config_path=" in patched
     compile(patched, "derived.py", "exec")
+
+
+def test_patch_adds_replay_only_stop_before_holdout() -> None:
+    patched = MOD.patch_runner_source(fixture_runner())
+    assert '"--stop-after-replay"' in patched
+    assert '"REPLAY_ONLY_VERIFICATION.json"' in patched
+    assert '"REPLAY_VERIFIED_CANONICAL_V1"' in patched
+    assert 'print("HOLDOUT_DRAWS_ACCESSED=0")' in patched
+    assert 'print("ACTUALS_ACCESSED=0")' in patched
+    assert 'print("HOLDOUT_EXECUTED=NO")' in patched
+    assert patched.index("if args.stop_after_replay:") < patched.index(
+        "# B. Sequential Holdout"
+    )
 
 
 def test_patch_fails_closed_when_anchor_missing() -> None:
@@ -181,6 +200,9 @@ def test_derive_writes_compilable_bundle_without_mutating_original(tmp_path: Pat
 
     assert runner.read_bytes() == original
     assert result["original_runner_modified"] == "False"
+    assert result["replay_only_mode_supported"] == "True"
+    assert result["replay_only_holdout_access"] == "False"
+    assert result["replay_only_actual_access"] == "False"
     assert (tmp_path / "out" / MOD.DERIVED_RUNNER_NAME).is_file()
     assert (tmp_path / "out" / MOD.SEMANTIC_MODULE_NAME).is_file()
     assert (tmp_path / "out" / MOD.MANIFEST_NAME).is_file()
