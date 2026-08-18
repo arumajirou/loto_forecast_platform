@@ -85,3 +85,12 @@ def test_windows_powershell51_bootstrap_only_delegates_to_implementation() -> No
     )
     for fragment in forbidden:
         assert fragment.lower() not in text.lower()
+
+
+def test_windows_powershell51_bootstrap_omits_empty_output_root_argument() -> None:
+    text = launcher_source()
+    guard = 'if (-not [string]::IsNullOrWhiteSpace($OutputRoot)) {'
+    assert guard in text
+    before_guard, after_guard = text.split(guard, 1)
+    assert '"-OutputRoot"' not in before_guard
+    assert '$InvokeArgs += @("-OutputRoot", $OutputRoot)' in after_guard
