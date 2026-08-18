@@ -95,7 +95,7 @@ def patch_runner_for_mapping_diagnostic(source: str) -> str:
     )
 """
 
-    diagnostic = """    def _collect_non_string_mapping_keys(value, path="$\"):
+    diagnostic = '''    def _collect_non_string_mapping_keys(value, path="$"):
         findings = []
         if isinstance(value, dict):
             for key, item in value.items():
@@ -161,7 +161,7 @@ def patch_runner_for_mapping_diagnostic(source: str) -> str:
             f"key={first['key_repr']}"
         )
 
-""" + anchor
+''' + anchor
 
     count = source.count(anchor)
     if count != 1:
