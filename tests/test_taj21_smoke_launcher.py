@@ -131,6 +131,7 @@ def test_smoke_verifier_accepts_exact_route_and_seal_evidence(tmp_path: Path) ->
     assert result["probabilistic_status"] == "SUCCEEDED"
     assert result["prediction_locks_verified"] == 9
     assert result["checksummed_artifacts_verified"] == 10
+    assert result["sha256sums_sha256"] == _sha256(root / "SHA256SUMS")
 
 
 def test_smoke_verifier_rejects_target_actual_exposure(tmp_path: Path) -> None:
