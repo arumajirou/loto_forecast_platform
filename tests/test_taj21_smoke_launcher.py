@@ -27,15 +27,13 @@ def _sha256(path: Path) -> str:
 
 def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
     candidates = [
-        *(f"baseline:{name}" for name in (
-            "random",
-            "fixed",
-            "mean",
-            "median",
-            "last",
-            "frequency",
-            "statistical_ar1",
-        )),
+        "baseline:random",
+        "baseline:fixed",
+        "baseline:mean",
+        "baseline:median",
+        "baseline:last",
+        "baseline:frequency",
+        "baseline:statistical_ar1",
         "logistic",
         "pp-multinomial-dglm",
     ]
