@@ -389,7 +389,7 @@ def main() -> int:
 
     result = derive_runner(
         runner=args.runner,
-        semantic_config_source=semantic_config_source if False else args.semantic_config_source,
+        semantic_config_source=args.semantic_config_source,
         output_dir=args.output_dir,
     )
     for key in sorted(result):
