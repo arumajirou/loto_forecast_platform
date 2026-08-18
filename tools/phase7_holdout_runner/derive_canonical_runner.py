@@ -10,7 +10,7 @@ from typing import Final
 EXPECTED_ORIGINAL_RUNNER_SHA256: Final = (
     "986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187"
 )
-EXPECTED_SEMANTIC_CONFIG_GIT_BLOB: Final = "bd9c184e431a20039d8d2400b1b869b58a5f7833"
+EXPECTED_SEMANTIC_CONFIG_GIT_BLOB: Final = "44fe8c8b3149f1a3207370cef2d3e5c5bc6749d7"
 EXPECTED_MLFORECAST_VERSION: Final = "1.1.0"
 PATCH_SCHEMA: Final = "phase7-holdout-canonical-runner-derivation/v1"
 DERIVED_RUNNER_NAME: Final = "phase7_holdout_canonical_v1.py"
