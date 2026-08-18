@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "pp-static-dirichlet-categorical",
+  "family": "conjugate",
+  "role": "baseline",
+  "likelihood": "Categorical",
+  "latent_structure": "static Dirichlet posterior",
+  "backends": [
+    "builtin",
+    "pymc",
+    "numpyro",
+    "stan"
+  ],
+  "tasks": [
+    "digit_categorical",
+    "select_position_categorical"
+  ],
+  "priority": "p0",
+  "supports_exogenous": false,
+  "hierarchical": false,
+  "dynamic": false,
+  "experimental": false,
+  "notes": "",
+  "implementation_status": "IMPLEMENTED",
+  "reference_strategy": "dirichlet",
+  "primary_backend": "builtin",
+  "primary_profile": null,
+  "native_implementation_status": "IMPLEMENTED",
+  "native_graph_id": "static_dirichlet_categorical"
+}

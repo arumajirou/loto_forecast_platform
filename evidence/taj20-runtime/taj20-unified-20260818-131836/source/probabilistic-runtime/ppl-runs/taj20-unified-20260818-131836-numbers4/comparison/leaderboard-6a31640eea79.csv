@@ -1,0 +1,2 @@
+rank,model_id,family,game,target_mode,backend,hit_at_1,mae,mse,exact,all_positions_within_1,brier,log_loss
+1,pp-bocpd-dirichlet-categorical,changepoint,numbers4,online_changepoint,builtin,0.5,2.0,5.5,0.0,0.0,1.0899001332726668,3.118254908977235

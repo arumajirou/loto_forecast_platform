@@ -1,0 +1,38 @@
+{
+  "protocol_hash": "160bc62fb6d30ce00e1fc5872be209981472e6ba4afe0af6e069bdaf9b81ff09",
+  "protocol": {
+    "schema_version": "3.0.0",
+    "game": "bingo5",
+    "family": "select",
+    "positions": 8,
+    "universe_size": 40,
+    "target_mode": "fixed_cardinality_subset",
+    "horizon": 1,
+    "tau": 1,
+    "metric_set": [
+      "hit_at_1",
+      "mae",
+      "mse",
+      "exact",
+      "brier",
+      "log_loss"
+    ],
+    "data_version": "bingo5-synthetic-80-seed1",
+    "development_rows": 79,
+    "holdout_rows": 1,
+    "folds": 1,
+    "test_size": 1,
+    "gap": 0,
+    "expanding": true,
+    "min_train_size": 79,
+    "seeds": [
+      1
+    ],
+    "objective_primary": "hit_at_1",
+    "objective_weights": {
+      "hit_at_1": 1.0
+    },
+    "feature_windows": [],
+    "exponential_halflives": []
+  }
+}

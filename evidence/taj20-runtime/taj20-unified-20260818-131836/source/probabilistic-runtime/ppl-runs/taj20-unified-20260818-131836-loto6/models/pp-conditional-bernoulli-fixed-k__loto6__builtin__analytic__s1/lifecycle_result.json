@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "trial_id": "pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1",
+  "model_id": "pp-conditional-bernoulli-fixed-k",
+  "family": "fixed_subset",
+  "game": "loto6",
+  "target_mode": "fixed_cardinality_subset",
+  "backend": "builtin",
+  "protocol_hash": "425cfbae5e726199a5c5c52fbd2b2c8e4d9e2ea0af60b43d0c247e4089aca316",
+  "execution_fingerprint": "1cfa856f8f83327cf702625129e0bcec3aa701967a5fc573ee35ec5cf17af69f",
+  "metrics": {
+    "hit_at_1": 0.3333333333333333,
+    "mae": 4.166666666666667,
+    "mse": 26.166666666666668,
+    "exact": 0.0,
+    "set_overlap": 2.0,
+    "jaccard": 0.2,
+    "brier": 0.12328596218318097,
+    "log_loss": 3.890370225664887
+  },
+  "diagnostics": {
+    "status": "PASS",
+    "backend": "builtin",
+    "inference_profile_id": null,
+    "rhat_max": null,
+    "ess_bulk_min": null,
+    "ess_tail_min": null,
+    "divergences": null,
+    "max_treedepth_hits": null,
+    "ebfmi_min": null,
+    "elbo_finite": null,
+    "elbo_stable": null,
+    "posterior_finite": true,
+    "probability_simplex_valid": true,
+    "warnings": [],
+    "failure_codes": [],
+    "effective_sample_size": null,
+    "prediction_entropy": 3.7128834808382183,
+    "unique_point_predictions": 6
+  },
+  "point_prediction": [
+    3,
+    19,
+    23,
+    31,
+    40,
+    42
+  ],
+  "artifact_dir": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj20-unified-runtime/taj20-unified-20260818-131836/probabilistic-runtime/ppl-runs/taj20-unified-20260818-131836-loto6/models/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1",
+  "elapsed_seconds": 0.4199995000017225,
+  "error": null
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "metadata": {
+    "trial_id": "pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1",
+    "status": "PASS"
+  },
+  "files": [
+    {
+      "path": "diagnostics.json",
+      "size": 482,
+      "sha256": "8337331b367cd078fb8a6e555e1dd8a38b82d6c20eb387d8c5c855b68f1188c9"
+    },
+    {
+      "path": "execution_fingerprint.json",
+      "size": 641,
+      "sha256": "716f6d59eb99933ecacf4dbcf200768f0a3173f9b4373f65989d561174919b1c"
+    },
+    {
+      "path": "lifecycle_result.json",
+      "size": 1633,
+      "sha256": "2a6a93bd5f2fe4ed39038c33aa9f5a1577e1cd31e23a2e4e6788cdf929089ed4"
+    },
+    {
+      "path": "model_spec.json",
+      "size": 765,
+      "sha256": "ce0acc850a22a28c55ab661f0457345da6ee208c367839f04fcf71b988f6f030"
+    },
+    {
+      "path": "next_prediction.json",
+      "size": 7277,
+      "sha256": "74658da4efe5b38976734b1b2edadc869168a516740a08b057b660e4f05f0446"
+    },
+    {
+      "path": "posterior_metadata.json",
+      "size": 1007,
+      "sha256": "8bd64cd685635d9b218d1b1418080587ce2788484fdc8567cbc7cf7e48fb9283"
+    },
+    {
+      "path": "posterior_reference.json",
+      "size": 5650,
+      "sha256": "dc9d09a130dff8d3a4d26f0a6fe42799470fa7545811079fd608a9d9274e3d7d"
+    },
+    {
+      "path": "posterior_summary.csv",
+      "size": 77226,
+      "sha256": "681595765cb3f6611d6fee61a974614bdde2293d6f45c1276e56e4055f28765b"
+    },
+    {
+      "path": "protocol.json",
+      "size": 812,
+      "sha256": "a4171403c2393bcd465aed8b0139d45e4290b619b641b1b725608f76dd92affc"
+    },
+    {
+      "path": "rolling_predictions.csv",
+      "size": 257,
+      "sha256": "1c950bc8d0e3ea726cdce765a2f5f1556977aa7b46d918ea422e4d6b0e8806b4"
+    }
+  ]
+}

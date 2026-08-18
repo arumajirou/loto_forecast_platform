@@ -1,0 +1,679 @@
+{
+  "schema_version": 1,
+  "metadata": {
+    "run_id": "taj20-unified-20260818-131836-loto6",
+    "status": "PARTIAL"
+  },
+  "files": [
+    {
+      "path": "catalog_counts.json",
+      "size": 1049,
+      "sha256": "4199641506b357320e0880c3fa394998b56fe0862fa3db3d84a2182ea3ba53ec"
+    },
+    {
+      "path": "comparison/leaderboard-07d838a2764c.csv",
+      "size": 1081,
+      "sha256": "cf68b87eabeb6d04ff7f9c11d1c9cfe54d9c5d23b25c989a0e0cde7212352dff"
+    },
+    {
+      "path": "comparison/leaderboard-425cfbae5e72.csv",
+      "size": 297,
+      "sha256": "89f4e5342979e3b92f1f71e31c5a273bfe017f68f20d760b202e79515088b548"
+    },
+    {
+      "path": "comparison/leaderboard-4600b609d4af.csv",
+      "size": 262,
+      "sha256": "8e24503480fe1584267867a41f7cc5a4a194d22570a0f21ec05426e25672acf7"
+    },
+    {
+      "path": "comparison/leaderboard-5b3e43b3e894.csv",
+      "size": 287,
+      "sha256": "8ad4bf66be8f67132fd3b2d17ed4ed0d6dfbc747b132dd350600a03bc8cacbee"
+    },
+    {
+      "path": "comparison/leaderboard-5e59f6d0a57a.csv",
+      "size": 658,
+      "sha256": "270d51a742f2de41cd6c02802502ce39825d122c5dc1b2e647d92de57af56a0e"
+    },
+    {
+      "path": "comparison/leaderboards.json",
+      "size": 5374,
+      "sha256": "b2d2c8312200b418e0bac9c234adf81311e333e8b42fc55a050ab91c348a10eb"
+    },
+    {
+      "path": "datasets/loto6.json",
+      "size": 399,
+      "sha256": "9db4f5ff1eddee37b912a3aba413e9dc25edaa9064507156bcf7a876a554b671"
+    },
+    {
+      "path": "environment.json",
+      "size": 262,
+      "sha256": "0ad37e4d4b81bdffc187c521cf7ea6d1556eb31869e84a96361aa074cd0c359f"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 482,
+      "sha256": "1f47a464d1bac54e641fa839d5e446554645108bee05a88744f9f2a9e0f7e4e2"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "de505288c8ed9f9c5b77e5bd465c68360ac5ff1645d312103fafab9057b4bb70"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1607,
+      "sha256": "92100e0c41190c03506dc0097f32da648dd3f7512a532299a8c09da0044614c8"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 842,
+      "sha256": "4fc99481c6ac02c92841f2b334f949bef5d0e6f1ab4361855f66ac29917d839d"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 7303,
+      "sha256": "038ad405925889cee0de58020d49c8fde717bfd6c1266d244fc1c09a0f93cab8"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1830,
+      "sha256": "0fa78bd3118112f839554584ddbc2e57c71d6ee4134f6675fe57e07e8695f628"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 73753,
+      "sha256": "a414fb1f341ce5668e24aceb74638765e5083d31b325f5be48e2094caaa924a3"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1/protocol.json",
+      "size": 803,
+      "sha256": "12e7236f229d731830db65645fe61bb51fcf7de77b17130e66a5bb5569568c01"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 254,
+      "sha256": "afab62c4b5e2e0ef7ee85f49651ca8c92a813a0d34fb3d602c37caa1f07828d3"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "7aa1fc4e9de17a84f5a0622e08f3823b9ffb17f6ebdcaada23c142964a8f75e2"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "fae6c4ce95719d7165a76c8e2f4503b42e443909b3daffd5a7c8564e8a1a7ffc"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1622,
+      "sha256": "594bd1f269164c018fc038808687fefc273421058606cf0631ec6e938bdbb05f"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 831,
+      "sha256": "a1bc870077f8eebaea87d27492dfb8b34c0eecb4e030cc08101b412a61fe90e1"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 1299,
+      "sha256": "ba4d7bcabc276a53eb653bb9096bf48074c8623ee49667c7f4e8e9f5adc5ce76"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1790,
+      "sha256": "738215711eb686a415b49d101355934fde77141d143096ba85f45434980890f5"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 12703,
+      "sha256": "d9aa27039479b7b0475c14577626c8613b5e7ac05a58b530e5f49491a0a4471b"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1/protocol.json",
+      "size": 809,
+      "sha256": "0f8476e08fe224da251d139f0d831c40693d01dd33eb5014cb2c31a8c0db1424"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 257,
+      "sha256": "2b53c9f54ca89ca0967d4745c026e95f2c496d47c90afc65b6fe83d547115a2d"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 482,
+      "sha256": "8337331b367cd078fb8a6e555e1dd8a38b82d6c20eb387d8c5c855b68f1188c9"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "716f6d59eb99933ecacf4dbcf200768f0a3173f9b4373f65989d561174919b1c"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1633,
+      "sha256": "2a6a93bd5f2fe4ed39038c33aa9f5a1577e1cd31e23a2e4e6788cdf929089ed4"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 765,
+      "sha256": "ce0acc850a22a28c55ab661f0457345da6ee208c367839f04fcf71b988f6f030"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 7277,
+      "sha256": "74658da4efe5b38976734b1b2edadc869168a516740a08b057b660e4f05f0446"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1007,
+      "sha256": "8bd64cd685635d9b218d1b1418080587ce2788484fdc8567cbc7cf7e48fb9283"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_reference.json",
+      "size": 5650,
+      "sha256": "dc9d09a130dff8d3a4d26f0a6fe42799470fa7545811079fd608a9d9274e3d7d"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 77226,
+      "sha256": "681595765cb3f6611d6fee61a974614bdde2293d6f45c1276e56e4055f28765b"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1/protocol.json",
+      "size": 812,
+      "sha256": "a4171403c2393bcd465aed8b0139d45e4290b619b641b1b725608f76dd92affc"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 257,
+      "sha256": "1c950bc8d0e3ea726cdce765a2f5f1556977aa7b46d918ea422e4d6b0e8806b4"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "33d7e7bfaa21fa015f9390bd2aff3116afd2a71393d1e7f1df93ae1167973010"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "d342e3a9e8599ae5fb82e9a7d41572bec1a60e9b089525788c33285fa678a74a"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1643,
+      "sha256": "50c587c023400140abf59408e7764d82d95a0bb3baae3acde53146b83e4e8bf6"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 747,
+      "sha256": "1f249d9fb7f995b1d445522ce6aa6bd90d488466d707a9a09c8546c4ab74f5a5"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 7294,
+      "sha256": "99aee6211457cbfd9ed8e3b99b2ed27f585d111de3bf9a5117ac7a8ca3b9ed27"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1019,
+      "sha256": "5832d2e920a5c66323153de3feef290cf70996772ece84a59c6aac3cc2789dc9"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_reference.json",
+      "size": 3509,
+      "sha256": "930679e6fc1ab944894ad44ff5d5a28df334ab85e2827c84e7b41aaecbeaf8f2"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 77003,
+      "sha256": "9f899a444b231037d6e4e7236f38e3fa6e519de2781035182a2ea30a521ef809"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1/protocol.json",
+      "size": 812,
+      "sha256": "a4171403c2393bcd465aed8b0139d45e4290b619b641b1b725608f76dd92affc"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 270,
+      "sha256": "91d5f3345e11fad3e294306702adcbd5b9c41cde3fb3414ab7c23ab679020f89"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "c9f085bc48631b96678a8dfd5ee49b325fcbb711780b5287e407d03693522c6f"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "2ebd90ccb779619b59716796ec4612322668b21db0ee165ab4fda501d8c1037f"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1561,
+      "sha256": "db80c51f5be58a0107c3ab4f8321630cc1696ea279515db54cd30032c43b06fa"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 807,
+      "sha256": "46cea8724c6a2a3fcbeb0dfd0a2292ef9ad2765dccf89bf37fc7d23bbb0e4e4a"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 7343,
+      "sha256": "e55d230115b770d5fcf2d088fccd2fe986a307cb20d92b6131891274d56027fa"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1539,
+      "sha256": "5eb4341f3c01970823e3cd05ee082993a4fd04d363985f0ffd93a5455e6a2563"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 71164,
+      "sha256": "2a8df01d1049374b108cda772efc1671979a72eda26276c6cf0ff82bacdcf078"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__loto6__builtin__analytic__s1/protocol.json",
+      "size": 804,
+      "sha256": "ce21c094e3fb3c9d5bf8e0211288884bc93bb76fb6cb856289bb58c70152186a"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 240,
+      "sha256": "49a9005ca4a4279352ac773c52f206b8b0c0f8a8fb205d77acbd5c9d0f87197e"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "33d7e7bfaa21fa015f9390bd2aff3116afd2a71393d1e7f1df93ae1167973010"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "84ef688b30bcd019839a762980851dff4a9b864de6eb5f2cfaf26042b43abbc3"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1617,
+      "sha256": "f00f55357ca832caa77cdede89c21df112e4940a0f8bfc450bddd3e78ce85b88"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 675,
+      "sha256": "e3a3ac4669f4139c515ef3a6915136ee291944a7d558aea8655dfcdbfe5f0eb4"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 7294,
+      "sha256": "99aee6211457cbfd9ed8e3b99b2ed27f585d111de3bf9a5117ac7a8ca3b9ed27"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 950,
+      "sha256": "b41320ac02434d3647a1a6a05cb8673e962a7386872dd85bcfd924b2a8185d68"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1/posterior_reference.json",
+      "size": 3451,
+      "sha256": "66496f1b3491e69a2184b486a12c66295365952bccd5195890d45a9c7a1f2790"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 71585,
+      "sha256": "86c63468d4ad56193bbd0f0fbad24d4d6a6b2dd87620cb8c7eb9d63f5b06f2a4"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1/protocol.json",
+      "size": 793,
+      "sha256": "173233722d21c43829f6a7a556a8269d37e588969c5d36682c9c752242a42aeb"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 270,
+      "sha256": "91d5f3345e11fad3e294306702adcbd5b9c41cde3fb3414ab7c23ab679020f89"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "33d7e7bfaa21fa015f9390bd2aff3116afd2a71393d1e7f1df93ae1167973010"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "d8dbfa602d89551dc59f6d514db1329dfd1867212055a1c65b85d3f2176dfb69"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1609,
+      "sha256": "9b9fe76f560a0b811b43e238753437ef9ae0a28211e80f5b0cad2d5a7aa3e31a"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 689,
+      "sha256": "1b03a34322d728d82abd917bee2605acf924b6c5363ba913be0eae73113d2245"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 7294,
+      "sha256": "99aee6211457cbfd9ed8e3b99b2ed27f585d111de3bf9a5117ac7a8ca3b9ed27"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 944,
+      "sha256": "99d024c1431d400cc06bc3f150d81bd1f7b1c1e63acbd14b7c7dcc5cc16dc25f"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1/posterior_reference.json",
+      "size": 3448,
+      "sha256": "d3404eed8a4f987c687881d7e9481d8eed8f9379a92b38412bfdb8ed57372cbe"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 70811,
+      "sha256": "6158c82834c965cf75752474b339a702574355e6474a361e63bf42490aa2ad73"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1/protocol.json",
+      "size": 793,
+      "sha256": "173233722d21c43829f6a7a556a8269d37e588969c5d36682c9c752242a42aeb"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 270,
+      "sha256": "91d5f3345e11fad3e294306702adcbd5b9c41cde3fb3414ab7c23ab679020f89"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "33d7e7bfaa21fa015f9390bd2aff3116afd2a71393d1e7f1df93ae1167973010"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "12107e377637eb297784d29430fb42de070ee16d601aeb77a40a109790e2d6b5"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1596,
+      "sha256": "b99354362a10b8ff66a185ce453a011e114f04382177566df787aef9b92a5968"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 668,
+      "sha256": "072b338497f661f1bfc25dec2adf4f123e80b695039f0d6831208d550affedda"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 7294,
+      "sha256": "99aee6211457cbfd9ed8e3b99b2ed27f585d111de3bf9a5117ac7a8ca3b9ed27"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 936,
+      "sha256": "74010eb9200d61321d9351a4e893bf85446598fe753f7ad93be1bcd45b920612"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__loto6__builtin__analytic__s1/posterior_reference.json",
+      "size": 3444,
+      "sha256": "212a18e7e983090e8fc9c8074a4389e4b6c7ead3dc19426f120cb0384b34113c"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 69779,
+      "sha256": "e19345c33b19d1a2870ee04924c64853c1ce56366c8efab8148865eb3517186e"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__loto6__builtin__analytic__s1/protocol.json",
+      "size": 793,
+      "sha256": "173233722d21c43829f6a7a556a8269d37e588969c5d36682c9c752242a42aeb"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 270,
+      "sha256": "91d5f3345e11fad3e294306702adcbd5b9c41cde3fb3414ab7c23ab679020f89"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "13710a501708e7ddf76b3edd222c874c48abf161db22a7024297fa615badd6b9"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "f1bd40ea1fdb4c620348db00889ad0b869d34fd0eb50f3df605214358ed72bf3"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1624,
+      "sha256": "3885b4b11ad61112092004036c370a48a0a54ac8ab3e3fe6de0445cfee963523"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 757,
+      "sha256": "73894e0335c7844dc05774a9577e014e3929dc63988aebe0dccb1d495138ecc4"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 7293,
+      "sha256": "154e64ec4f3e6a302d35e261f5f5d945911df3b9f4dc696115a35640c1a5c2ac"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1015,
+      "sha256": "736a2b44f074b6e94dbf5f69d072a2b002ba008b1e2f1da8cc3b549dd3de552c"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_reference.json",
+      "size": 3509,
+      "sha256": "53564853834d68ad9c748c1b5cd839533364be9a73c3c7414ef98caed9b95e02"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 76462,
+      "sha256": "0ea878fcaa5deadd6ac8c7bbcafcc7c40399b6927ea2a211a21a2b0c20cf3dbf"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1/protocol.json",
+      "size": 812,
+      "sha256": "a4171403c2393bcd465aed8b0139d45e4290b619b641b1b725608f76dd92affc"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 258,
+      "sha256": "55d1fbd1cb4ede307de36aae05179e67425e10a39a4e64948209dc06ddfa72b6"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "33d7e7bfaa21fa015f9390bd2aff3116afd2a71393d1e7f1df93ae1167973010"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "a97c7940f2b250277da94fe47cc23a9c8638100e634b1632d1343cd18c6da5ab"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1634,
+      "sha256": "11421d718d505a01f76f190366598aa8c8ca506e066dc0c3f6359fe005d084b8"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 738,
+      "sha256": "5285e62f6135d9410a85d4b5bae09d2c4cd495953934cdfab9d572f446e65e3d"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 7294,
+      "sha256": "99aee6211457cbfd9ed8e3b99b2ed27f585d111de3bf9a5117ac7a8ca3b9ed27"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1013,
+      "sha256": "965be6c9cc48dce4e00aef8135b886fccd7fb882e8baa1b37cf1bdf7594af7a5"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_reference.json",
+      "size": 3506,
+      "sha256": "430600645934d1b29c7f23e9d829775adca71349f80eaccbd3b21c659449a2f3"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 76229,
+      "sha256": "442b3bf375d105ab40d6ef3a2fdc0badcf5d80b4e898c6a8b1083c33ef78b243"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1/protocol.json",
+      "size": 812,
+      "sha256": "a4171403c2393bcd465aed8b0139d45e4290b619b641b1b725608f76dd92affc"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 270,
+      "sha256": "91d5f3345e11fad3e294306702adcbd5b9c41cde3fb3414ab7c23ab679020f89"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__loto6__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "02cec80934106d94321f834a9ae9439da93f098b6ff6a895e28d802104896d84"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__loto6__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "f1bad31c7d65eb70168d7cbc26f602560b55f690efecd20aa024c992f0e249e8"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__loto6__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1573,
+      "sha256": "2bec22b4c42ebcfb4a10d6d22778b64de0e3b7e28f09ca70a222ff179060c93f"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__loto6__builtin__analytic__s1/model_spec.json",
+      "size": 717,
+      "sha256": "d658f05b101d4060e242bec19424f4db32b37b2f698566bd72ff32654acd432a"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__loto6__builtin__analytic__s1/next_prediction.json",
+      "size": 7275,
+      "sha256": "9332f61ea689e644f69e326db75c3775dbffcadb5c1a05384a756e5812a1f80a"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__loto6__builtin__analytic__s1/posterior_metadata.json",
+      "size": 991,
+      "sha256": "80bb848500592b657e857c6f86a53a71857f466cdf1fc77452d03cc87aaacb5a"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__loto6__builtin__analytic__s1/posterior_reference.json",
+      "size": 3487,
+      "sha256": "977745d5dde949a8a102bde9be3226f42caf77dc2c55ed378f8cdfcc7270e00d"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__loto6__builtin__analytic__s1/posterior_summary.csv",
+      "size": 73372,
+      "sha256": "206e4d2fbcf35986bd3c132e375774aaf20556a449ca9c4beff5e2187bdc8085"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__loto6__builtin__analytic__s1/protocol.json",
+      "size": 812,
+      "sha256": "a4171403c2393bcd465aed8b0139d45e4290b619b641b1b725608f76dd92affc"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__loto6__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 242,
+      "sha256": "2cd3eda38a1c7a1fde359126cbbff68827f68b9ef0a7d0301971c051ff60fd12"
+    },
+    {
+      "path": "plan.json",
+      "size": 37859,
+      "sha256": "7a59edd8d4be701298f53f618b7937c129ce7cb1612d1833293b49c6112ab890"
+    },
+    {
+      "path": "report/parallelism_audit.json",
+      "size": 528,
+      "sha256": "f34769058f59cf236f08d1ae2eeac6fa5c072abb3717d6beeea1007e9da02393"
+    },
+    {
+      "path": "report/progress.json",
+      "size": 2323,
+      "sha256": "8ed30e3bd16758d59511d3211c4a59246993a22445d4c721315474ae0c688c58"
+    },
+    {
+      "path": "report/summary.json",
+      "size": 648,
+      "sha256": "2a14b61361f61ee5ec48b1a0486370fa0ce30a03f91b4198638e30e9e3bcbb07"
+    },
+    {
+      "path": "results.csv",
+      "size": 13882,
+      "sha256": "bb27c9c6eb7456f05f382d21e0eb1cf46d3f5a5738eaab868bb3f897cf6a4570"
+    },
+    {
+      "path": "results.json",
+      "size": 57677,
+      "sha256": "816de6a76aff73a823f27dce539b4cc8ed39004a6f51f303f173b2f4e357cee3"
+    },
+    {
+      "path": "run_config.yaml",
+      "size": 2751,
+      "sha256": "7370bf5528f7233708ce319973f9ecd1f9b2af9903c31ea978cc051631d3c376"
+    },
+    {
+      "path": "status/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1.json",
+      "size": 1640,
+      "sha256": "a7abb87f337fef3ae7243309cb04e2e153312cc4cc723f0e657be5eff5612319"
+    },
+    {
+      "path": "status/pp-conditional-bernoulli-fixed-k__loto6__builtin__analytic__s1.json",
+      "size": 1655,
+      "sha256": "f0b24cf22b05b86681a10e9aecf8fd29b7ce4ebd7c21d88be330a104db96b2b8"
+    },
+    {
+      "path": "status/pp-discounted-dirichlet-categorical__loto6__builtin__analytic__s1.json",
+      "size": 1666,
+      "sha256": "e74cad4718f8170f01d4f9b613d9525a4205c07a25d25c8f75900630d4bdf68d"
+    },
+    {
+      "path": "status/pp-expanding-dirichlet-categorical__loto6__builtin__analytic__s1.json",
+      "size": 1676,
+      "sha256": "f99152d581b41c17d65310ed72f85cc6fdd770dd7db6f0141cd4e985f32d8448"
+    },
+    {
+      "path": "status/pp-multinomial-dglm__loto6__builtin__analytic__s1.json",
+      "size": 1594,
+      "sha256": "86583f1afa1dbeb52aa828165d204a16647e94da1a2e5a2238ce87f3b9e19baf"
+    },
+    {
+      "path": "status/pp-posterior-constrained-decoder__loto6__builtin__analytic__s1.json",
+      "size": 1650,
+      "sha256": "c7fd96acc2950dcad46f6493832063e5609e6aeaa5c7a1a63e842d46bbfaa8cf"
+    },
+    {
+      "path": "status/pp-posterior-utility-hit1-mse__loto6__builtin__analytic__s1.json",
+      "size": 1642,
+      "sha256": "1351e9c3700b566db72afd9d9c13334892dc1606d51acc4a469d2238d3beb66e"
+    },
+    {
+      "path": "status/pp-posterior-utility-hit1__loto6__builtin__analytic__s1.json",
+      "size": 1629,
+      "sha256": "38ac4b3d0a00a7c4359bfc2e1c7ea72b129b41f965ac827e99a4dc25ca2dd4d3"
+    },
+    {
+      "path": "status/pp-rolling-dirichlet-categorical__loto6__builtin__analytic__s1.json",
+      "size": 1657,
+      "sha256": "1e1097253aeeb1899cd82817a6f69671ddd201a6a2ebf29d0e7587ffe6c966cd"
+    },
+    {
+      "path": "status/pp-static-dirichlet-categorical__loto6__builtin__analytic__s1.json",
+      "size": 1667,
+      "sha256": "9a2051c0fb26afd2be467f9ff4f1a7ba0806ebd6b9eb65fe8aa1dbe1e42d1b72"
+    },
+    {
+      "path": "status/pp-uniform-dirichlet__loto6__builtin__analytic__s1.json",
+      "size": 1606,
+      "sha256": "2faecfcc00b2ed6fde2f36a9619146b39b53043b963e4cab05ced3437a8b3374"
+    }
+  ]
+}

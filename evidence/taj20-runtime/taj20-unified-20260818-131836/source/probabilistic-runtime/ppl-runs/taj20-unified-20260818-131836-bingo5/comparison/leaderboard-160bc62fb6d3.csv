@@ -1,0 +1,2 @@
+rank,model_id,family,game,target_mode,backend,hit_at_1,mae,mse,exact,set_overlap,jaccard,brier,log_loss
+1,pp-conditional-bernoulli-fixed-k,fixed_subset,bingo5,fixed_cardinality_subset,builtin,0.375,2.75,11.75,0.0,2.0,0.14285714285714285,0.15349311337900656,3.5870856151064645

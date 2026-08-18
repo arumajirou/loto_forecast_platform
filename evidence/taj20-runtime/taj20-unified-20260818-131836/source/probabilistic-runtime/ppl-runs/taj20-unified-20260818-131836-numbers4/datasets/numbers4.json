@@ -1,0 +1,17 @@
+{
+  "game": "numbers4",
+  "rows": 80,
+  "data_version": "numbers4-synthetic-80-seed1",
+  "feature_set_hash": "6f89d32fc7ed088ae40bf8ec938eb60268072d4c12b4c4cb7dae4c67fd916ac6",
+  "geometry": {
+    "key": "numbers4",
+    "family": "digits",
+    "positions": 4,
+    "value_min": 0,
+    "value_max": 9,
+    "universe_size": 10,
+    "bonus_count": 0,
+    "outcome_space": 10000
+  },
+  "source": "synthetic"
+}

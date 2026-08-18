@@ -1,0 +1,6 @@
+rank,model_id,family,game,target_mode,backend,hit_at_1,mae,mse,exact,set_overlap,jaccard,brier,log_loss
+1,pp-rolling-dirichlet-categorical,conjugate,loto6,select_position_categorical,builtin,0.3333333333333333,4.166666666666667,28.5,0.0,1.0,0.09090909090909091,0.9445901332769614,3.1545571839255353
+2,pp-discounted-dirichlet-categorical,conjugate,loto6,select_position_categorical,builtin,0.16666666666666666,7.0,68.33333333333333,0.0,1.0,0.09090909090909091,0.9577058319905092,3.3389349707574065
+3,pp-expanding-dirichlet-categorical,conjugate,loto6,select_position_categorical,builtin,0.16666666666666666,7.166666666666667,77.16666666666667,0.0,1.0,0.09090909090909091,0.9721827896344378,3.492269610186583
+4,pp-static-dirichlet-categorical,conjugate,loto6,select_position_categorical,builtin,0.16666666666666666,7.166666666666667,77.16666666666667,0.0,1.0,0.09090909090909091,0.9721827896344378,3.492269610186583
+5,pp-uniform-dirichlet,conjugate,loto6,select_position_categorical,builtin,0.0,4.333333333333333,21.0,0.0,1.0,0.09090909090909091,0.981512502734336,3.8590036488008663

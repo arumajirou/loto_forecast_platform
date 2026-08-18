@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "metadata": {
+    "trial_id": "pp-conditional-bernoulli-fixed-k__loto7__builtin__analytic__s1",
+    "status": "PASS"
+  },
+  "files": [
+    {
+      "path": "diagnostics.json",
+      "size": 483,
+      "sha256": "3612e8adc36b2829d6561a13aba8531400e70fb32544cf362731834b4ef3a6b9"
+    },
+    {
+      "path": "execution_fingerprint.json",
+      "size": 641,
+      "sha256": "67bbe68f0ef82b703cafd18da245ccc3656eec9ec6fbcd7cd5807aad45e14abb"
+    },
+    {
+      "path": "lifecycle_result.json",
+      "size": 1648,
+      "sha256": "4ab2b3a37bf15d5eff80347a832580645e3c2b2a4c68c653e85d75e9c3bcd363"
+    },
+    {
+      "path": "model_spec.json",
+      "size": 831,
+      "sha256": "a1bc870077f8eebaea87d27492dfb8b34c0eecb4e030cc08101b412a61fe90e1"
+    },
+    {
+      "path": "next_prediction.json",
+      "size": 1133,
+      "sha256": "bb12e9d06adbf02b6fde414f5d09d1c17fb661cc42f9c0cff31539671df217eb"
+    },
+    {
+      "path": "posterior_metadata.json",
+      "size": 1783,
+      "sha256": "5534fd4e7ba323245d8bb80e9fc86f01aba03e4921f8ac6d255fc5c0e2f49969"
+    },
+    {
+      "path": "posterior_summary.csv",
+      "size": 10943,
+      "sha256": "ec45dae0fefc9a0504e22909ab5f1fe0b3a0b0b803878fe866b74474deee8289"
+    },
+    {
+      "path": "protocol.json",
+      "size": 809,
+      "sha256": "62b68d67254198c757244239b1e0f5c8ef47402c04e4e9b9d2d4a5774054a7ea"
+    },
+    {
+      "path": "rolling_predictions.csv",
+      "size": 279,
+      "sha256": "23a98642a74ec60e67d3dbaeec7466a1ee388c7d5f7921d2061f35223dfc041d"
+    }
+  ]
+}

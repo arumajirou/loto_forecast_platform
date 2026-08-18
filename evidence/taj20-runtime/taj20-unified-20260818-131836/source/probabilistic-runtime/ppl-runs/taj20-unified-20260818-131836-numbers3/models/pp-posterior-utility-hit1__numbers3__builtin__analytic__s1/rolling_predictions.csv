@@ -1,0 +1,2 @@
+cutoff,draw_id,actual,prediction,hit_at_1,mae,mse,exact,all_positions_within_1,brier,log_loss
+79,80,"[8, 5, 5]","[2, 6, 6]",0.6666666666666666,2.6666666666666665,12.666666666666666,0.0,0.0,0.8956337710439072,2.4422379516661756

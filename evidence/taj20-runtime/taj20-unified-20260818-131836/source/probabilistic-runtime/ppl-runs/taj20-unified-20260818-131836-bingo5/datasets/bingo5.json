@@ -1,0 +1,17 @@
+{
+  "game": "bingo5",
+  "rows": 80,
+  "data_version": "bingo5-synthetic-80-seed1",
+  "feature_set_hash": "135acb0c02d53e95075a3e4bef0d5f88322e7584926ee78ee69ee6b3a468450f",
+  "geometry": {
+    "key": "bingo5",
+    "family": "select",
+    "positions": 8,
+    "value_min": 1,
+    "value_max": 40,
+    "universe_size": 40,
+    "bonus_count": 0,
+    "outcome_space": 76904685
+  },
+  "source": "synthetic"
+}

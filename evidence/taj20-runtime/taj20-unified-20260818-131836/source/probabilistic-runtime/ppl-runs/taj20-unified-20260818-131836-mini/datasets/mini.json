@@ -1,0 +1,17 @@
+{
+  "game": "mini",
+  "rows": 80,
+  "data_version": "mini-synthetic-80-seed1",
+  "feature_set_hash": "9b2a5bf43948a667e6e73418b2f7f9a23a26cdcaf85b4cb8eabf26054df7e71e",
+  "geometry": {
+    "key": "mini",
+    "family": "select",
+    "positions": 5,
+    "value_min": 1,
+    "value_max": 31,
+    "universe_size": 31,
+    "bonus_count": 1,
+    "outcome_space": 169911
+  },
+  "source": "synthetic"
+}

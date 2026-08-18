@@ -1,0 +1,21 @@
+{
+  "file_count": 3,
+  "files": [
+    {
+      "path": "CAMPAIGN_SUMMARY.json",
+      "sha256": "b2316a5dfc37e0b96f28af12be75fa1d97a638cde36660ac2150ac1c6ce0e52e",
+      "size_bytes": 3365
+    },
+    {
+      "path": "EVIDENCE_PROVENANCE.json",
+      "sha256": "902fa5e0d5f7742c99c5be1201b85eaca781ca6c1cbfc3ad7bf5df15cf08b271",
+      "size_bytes": 1667
+    },
+    {
+      "path": "UNIFIED_NORMALIZED_RESULTS.jsonl",
+      "sha256": "8020a6c044065992accffd3a8db602e4a0643fd0fb0f9dece6bc65b4d4aa835e",
+      "size_bytes": 3010026
+    }
+  ],
+  "schema_version": "taj20-unified-artifacts/v1"
+}

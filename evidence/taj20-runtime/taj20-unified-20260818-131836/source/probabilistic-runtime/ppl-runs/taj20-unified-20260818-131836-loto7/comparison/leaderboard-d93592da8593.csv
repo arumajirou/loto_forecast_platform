@@ -1,0 +1,2 @@
+rank,model_id,family,game,target_mode,backend,hit_at_1,mae,mse,exact,set_overlap,jaccard,brier,log_loss
+1,pp-multinomial-dglm,state_space,loto7,dynamic_multinomial,builtin,0.0,7.285714285714286,57.285714285714285,0.0,1.0,0.07692307692307693,1.0953286534437505,4.137026491612195

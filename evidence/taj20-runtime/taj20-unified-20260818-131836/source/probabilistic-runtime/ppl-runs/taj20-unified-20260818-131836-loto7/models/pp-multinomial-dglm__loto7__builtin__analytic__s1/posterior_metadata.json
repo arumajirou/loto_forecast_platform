@@ -1,0 +1,58 @@
+{
+  "model_id": "pp-multinomial-dglm",
+  "backend": "builtin",
+  "family": "state_space",
+  "target_mode": "dynamic_multinomial",
+  "game": "loto7",
+  "draw_shape": [
+    16,
+    7,
+    37
+  ],
+  "metadata": {
+    "schema_version": "1.0.0",
+    "model_id": "pp-multinomial-dglm",
+    "game": "loto7",
+    "classes": 37,
+    "positions": 7,
+    "state_names": [
+      "local_level"
+    ],
+    "include_trend": false,
+    "seasonal_periods": [],
+    "exogenous_dim": 0,
+    "discount_factor": 0.97,
+    "observation_jitter": 1e-06,
+    "covariance_floor": 1e-10,
+    "current_step": 80,
+    "history_rows": 80,
+    "max_covariance_jitter": 0.0,
+    "max_innovation_condition": 138.28784349582435,
+    "seed": 1,
+    "metadata": {
+      "inference": "sequential_extended_kalman_laplace",
+      "observation_order": "predict_before_update",
+      "discount_evolution": true,
+      "exogenous_enabled": false
+    },
+    "native_graph_id": "multinomial_dglm_filter_v1",
+    "implementation_kind": "sequential_laplace_filter",
+    "native_analytic": true,
+    "inference_profile_id": null
+  },
+  "diagnostics": {
+    "posterior_finite": true,
+    "probability_simplex_valid": true,
+    "state_covariance_psd": true,
+    "state_covariance_min_eigenvalue": 0.2766861612418068,
+    "max_covariance_jitter": 0.0,
+    "max_innovation_condition": 138.28784349582435,
+    "missing_update_count": 0,
+    "rhat_max": null,
+    "ess_bulk_min": null,
+    "ess_tail_min": null,
+    "divergences": null,
+    "elbo_finite": null,
+    "elbo_stable": null
+  }
+}

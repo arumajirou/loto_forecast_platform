@@ -1,0 +1,6 @@
+rank,model_id,family,game,target_mode,backend,hit_at_1,mae,mse,exact,set_overlap,jaccard,brier,log_loss
+1,pp-expanding-dirichlet-categorical,conjugate,bingo5,select_position_categorical,builtin,0.25,4.25,22.5,0.0,3.0,0.23076923076923078,0.9271696576825179,2.872595360235637
+2,pp-static-dirichlet-categorical,conjugate,bingo5,select_position_categorical,builtin,0.25,4.25,22.5,0.0,3.0,0.23076923076923078,0.9271696576825179,2.872595360235637
+3,pp-discounted-dirichlet-categorical,conjugate,bingo5,select_position_categorical,builtin,0.25,4.25,23.5,0.0,3.0,0.23076923076923078,0.9527406373416776,3.2701510879280775
+4,pp-rolling-dirichlet-categorical,conjugate,bingo5,select_position_categorical,builtin,0.125,4.875,32.875,0.0,2.0,0.14285714285714285,0.9762143733927258,3.583459749963431
+5,pp-uniform-dirichlet,conjugate,bingo5,select_position_categorical,builtin,0.125,5.75,45.75,0.0,1.0,0.06666666666666667,0.9790946296758114,3.7739446710510194

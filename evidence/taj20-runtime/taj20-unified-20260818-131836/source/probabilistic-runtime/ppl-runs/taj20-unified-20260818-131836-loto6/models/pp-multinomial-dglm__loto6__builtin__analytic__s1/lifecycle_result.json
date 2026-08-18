@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "trial_id": "pp-multinomial-dglm__loto6__builtin__analytic__s1",
+  "model_id": "pp-multinomial-dglm",
+  "family": "state_space",
+  "game": "loto6",
+  "target_mode": "dynamic_multinomial",
+  "backend": "builtin",
+  "protocol_hash": "4600b609d4af163d0532161e55a39da5f4541f545ecbb1c2f386c4f2efc28e68",
+  "execution_fingerprint": "9c91c288a15605abf0c43f0390b13b07a31be943f54c71b2bf427ff3b0f585ed",
+  "metrics": {
+    "hit_at_1": 0.3333333333333333,
+    "mae": 3.5,
+    "mse": 19.833333333333332,
+    "exact": 0.0,
+    "set_overlap": 2.0,
+    "jaccard": 0.2,
+    "brier": 0.987398376967616,
+    "log_loss": 3.557186134563395
+  },
+  "diagnostics": {
+    "status": "PASS",
+    "backend": "builtin",
+    "inference_profile_id": null,
+    "rhat_max": null,
+    "ess_bulk_min": null,
+    "ess_tail_min": null,
+    "divergences": null,
+    "max_treedepth_hits": null,
+    "ebfmi_min": null,
+    "elbo_finite": null,
+    "elbo_stable": null,
+    "posterior_finite": true,
+    "probability_simplex_valid": true,
+    "warnings": [],
+    "failure_codes": [],
+    "effective_sample_size": null,
+    "prediction_entropy": 3.2625790206270064,
+    "unique_point_predictions": 6
+  },
+  "point_prediction": [
+    10,
+    23,
+    26,
+    27,
+    33,
+    37
+  ],
+  "artifact_dir": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj20-unified-runtime/taj20-unified-20260818-131836/probabilistic-runtime/ppl-runs/taj20-unified-20260818-131836-loto6/models/pp-multinomial-dglm__loto6__builtin__analytic__s1",
+  "elapsed_seconds": 1.062450739002088,
+  "error": null
+}

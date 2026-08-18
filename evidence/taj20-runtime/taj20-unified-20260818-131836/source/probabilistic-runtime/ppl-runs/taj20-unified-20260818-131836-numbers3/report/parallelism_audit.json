@@ -1,0 +1,32 @@
+{
+  "outer_workers": 8,
+  "gpu_priority": true,
+  "native_device": "auto",
+  "limits": {
+    "gpu": 1,
+    "heavy_cpu": 2,
+    "light_cpu": 8
+  },
+  "running_total": 0,
+  "peak_running_total": 8,
+  "running_by_resource": {
+    "gpu": 0,
+    "heavy_cpu": 0,
+    "light_cpu": 0
+  },
+  "peak_running_by_resource": {
+    "gpu": 0,
+    "heavy_cpu": 2,
+    "light_cpu": 6
+  },
+  "pending_by_resource": {
+    "gpu": 0,
+    "heavy_cpu": 0,
+    "light_cpu": 0
+  },
+  "resource_order": [
+    "gpu",
+    "heavy_cpu",
+    "light_cpu"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "metadata": {
+    "trial_id": "pp-multinomial-dglm__mini__builtin__analytic__s1",
+    "status": "PASS"
+  },
+  "files": [
+    {
+      "path": "diagnostics.json",
+      "size": 482,
+      "sha256": "1587bdc2f4638d71e92d0679a3b3ef32bdaefbae0011ad15b3311c1f5b1ad608"
+    },
+    {
+      "path": "execution_fingerprint.json",
+      "size": 641,
+      "sha256": "bdc2de1e8735a1bf7776d56ed0ce62610e2835569783462f0c1d06d53ba9269d"
+    },
+    {
+      "path": "lifecycle_result.json",
+      "size": 1523,
+      "sha256": "276d6c1aeebb3a82d2aa078ac892b6e05620bb4b4cb832d1bb16a532955c662e"
+    },
+    {
+      "path": "model_spec.json",
+      "size": 807,
+      "sha256": "46cea8724c6a2a3fcbeb0dfd0a2292ef9ad2765dccf89bf37fc7d23bbb0e4e4a"
+    },
+    {
+      "path": "next_prediction.json",
+      "size": 4422,
+      "sha256": "880e9ce04dd666bc15b135ee5a3c25e6991b72dedced55098363a8508d8a8b62"
+    },
+    {
+      "path": "posterior_metadata.json",
+      "size": 1538,
+      "sha256": "5752b3bba2e89412dd6424b57ec15d6b0f3a10070c541ba10f5ab18cb3ccf448"
+    },
+    {
+      "path": "posterior_summary.csv",
+      "size": 42545,
+      "sha256": "10e8cd12c5c372107f6343442d7ffeb57b02062b4cc46cf2f556d34c2a8485e8"
+    },
+    {
+      "path": "protocol.json",
+      "size": 802,
+      "sha256": "a1c74f57e40e526ca037bb358a76cbf1b411dfa88f63c31ab057bc473f658664"
+    },
+    {
+      "path": "rolling_predictions.csv",
+      "size": 206,
+      "sha256": "0499b9dbb85b9370a923f2e5bdb679b5adb426bea015bae5d7a7d519d847c23a"
+    }
+  ]
+}

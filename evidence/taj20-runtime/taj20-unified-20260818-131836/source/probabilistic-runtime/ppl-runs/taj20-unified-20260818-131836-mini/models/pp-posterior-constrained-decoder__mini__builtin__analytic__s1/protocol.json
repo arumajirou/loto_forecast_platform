@@ -1,0 +1,38 @@
+{
+  "protocol_hash": "3f00d9c97055f67dde7c37c656fd040f53491f77c3c54d0ffac52e72e4c20fc5",
+  "protocol": {
+    "schema_version": "3.0.0",
+    "game": "mini",
+    "family": "select",
+    "positions": 5,
+    "universe_size": 31,
+    "target_mode": "decision",
+    "horizon": 1,
+    "tau": 1,
+    "metric_set": [
+      "hit_at_1",
+      "mae",
+      "mse",
+      "exact",
+      "brier",
+      "log_loss"
+    ],
+    "data_version": "mini-synthetic-80-seed1",
+    "development_rows": 79,
+    "holdout_rows": 1,
+    "folds": 1,
+    "test_size": 1,
+    "gap": 0,
+    "expanding": true,
+    "min_train_size": 79,
+    "seeds": [
+      1
+    ],
+    "objective_primary": "hit_at_1",
+    "objective_weights": {
+      "hit_at_1": 1.0
+    },
+    "feature_windows": [],
+    "exponential_halflives": []
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "protocol_hash": "4db7558b1e199b867d04caf1b15ccecf123ea7f3dc665082793033fc0162ef0d",
+  "model_spec_hash": "c26d80d3b8fffaaa7cd848be52d7fc138cc0fcc79858bb67d56bbc3af8ffe52a",
+  "prior_spec_hash": "a21524f592c3ff69e72e5db007c9033e05035933c4c5dd65249c7a57f1547436",
+  "inference_profile_hash": "903b512a7242d1eb45cfe8ea1b0613af18510f9e2d003c8fd5c38b04aebf39c8",
+  "decision_rule_hash": "a6a85c2bc284e52c523427259ca4ad0d43360481d709b19f2c7758325312bde9",
+  "environment_hash": "ca89995aff7b36273302a58240c0e6d7bf5d935495c12e37b459f28cf9f1e689",
+  "execution_fingerprint": "2778d83021d8e854f20302222cb6cea80551c6a6d5d1e5d37ee4f55e5f4d0e49"
+}

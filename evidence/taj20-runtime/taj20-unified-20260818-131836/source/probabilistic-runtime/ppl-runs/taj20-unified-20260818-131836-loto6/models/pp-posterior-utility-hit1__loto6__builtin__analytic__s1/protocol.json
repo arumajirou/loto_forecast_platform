@@ -1,0 +1,38 @@
+{
+  "protocol_hash": "5e59f6d0a57a1e5a78a70a0b1fac63d7293e45513d25923ab1ef2711f11084b0",
+  "protocol": {
+    "schema_version": "3.0.0",
+    "game": "loto6",
+    "family": "select",
+    "positions": 6,
+    "universe_size": 43,
+    "target_mode": "decision",
+    "horizon": 1,
+    "tau": 1,
+    "metric_set": [
+      "hit_at_1",
+      "mae",
+      "mse",
+      "exact",
+      "brier",
+      "log_loss"
+    ],
+    "data_version": "loto6-synthetic-80-seed1",
+    "development_rows": 79,
+    "holdout_rows": 1,
+    "folds": 1,
+    "test_size": 1,
+    "gap": 0,
+    "expanding": true,
+    "min_train_size": 79,
+    "seeds": [
+      1
+    ],
+    "objective_primary": "hit_at_1",
+    "objective_weights": {
+      "hit_at_1": 1.0
+    },
+    "feature_windows": [],
+    "exponential_halflives": []
+  }
+}

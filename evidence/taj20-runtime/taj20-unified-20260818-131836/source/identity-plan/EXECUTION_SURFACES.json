@@ -1,0 +1,42 @@
+{
+  "neuralforecast_local_extensions": [
+    "auto_frets",
+    "auto_scinet",
+    "auto_segrnn",
+    "auto_timellm"
+  ],
+  "provider_scripts": [
+    "run_autogluon_timeseries_provider.py",
+    "run_basicts_provider.py",
+    "run_chronos2_provider.py",
+    "run_chronos_2_provider.py",
+    "run_chronos_bolt_provider.py",
+    "run_chronos_t5_base_provider.py",
+    "run_chronos_t5_provider.py",
+    "run_darts_provider.py",
+    "run_granite_flowstate_r1_provider.py",
+    "run_granite_ttm_provider.py",
+    "run_kronos_base_provider.py",
+    "run_lag_llama_provider.py",
+    "run_merlion_provider.py",
+    "run_moirai2_provider.py",
+    "run_moirai_provider.py",
+    "run_moment_1_large_provider.py",
+    "run_moment_1_small_provider.py",
+    "run_sktime_provider.py",
+    "run_sundial_provider.py",
+    "run_tabpfn_ts_provider.py",
+    "run_tabpfn_ts_v2_certified_provider.py",
+    "run_time_series_library_provider.py",
+    "run_timer_base_84m_provider.py",
+    "run_timer_s1_provider.py",
+    "run_timesfm25_provider.py",
+    "run_timesfm_2_5_transformers_provider.py",
+    "run_timesfm_provider.py",
+    "run_tirex2_provider.py",
+    "run_tirex_provider.py",
+    "run_toto2_4m_provider.py",
+    "run_toto_2_0_4m_provider.py",
+    "run_toto_open_base_provider.py"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "pp-discounted-dirichlet-categorical",
+  "family": "conjugate",
+  "role": "candidate",
+  "likelihood": "Categorical",
+  "latent_structure": "exponentially discounted sufficient statistics",
+  "backends": [
+    "builtin",
+    "pymc",
+    "numpyro"
+  ],
+  "tasks": [
+    "digit_categorical",
+    "select_position_categorical"
+  ],
+  "priority": "p0",
+  "supports_exogenous": false,
+  "hierarchical": false,
+  "dynamic": true,
+  "experimental": false,
+  "notes": "",
+  "implementation_status": "IMPLEMENTED",
+  "reference_strategy": "discounted_dirichlet",
+  "primary_backend": "builtin",
+  "primary_profile": null,
+  "native_implementation_status": "IMPLEMENTED",
+  "native_graph_id": "discounted_dirichlet_categorical"
+}

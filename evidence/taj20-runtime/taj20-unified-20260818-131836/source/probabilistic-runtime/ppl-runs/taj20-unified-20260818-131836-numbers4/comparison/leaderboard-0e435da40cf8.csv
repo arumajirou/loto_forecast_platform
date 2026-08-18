@@ -1,0 +1,4 @@
+rank,model_id,family,game,target_mode,backend,hit_at_1,mae,mse,exact,all_positions_within_1,brier,log_loss
+1,pp-posterior-utility-hit1-mse,decision,numbers4,decision,builtin,0.75,0.75,1.25,0.5,0.0,0.9050275990671547,2.2305526593403675
+2,pp-posterior-utility-hit1,decision,numbers4,decision,builtin,0.5,1.5,3.5,0.25,0.0,0.9050275990671547,2.2305526593403675
+3,pp-posterior-constrained-decoder,decision,numbers4,decision,builtin,0.5,1.75,3.75,0.0,0.0,0.9050275990671547,2.2305526593403675

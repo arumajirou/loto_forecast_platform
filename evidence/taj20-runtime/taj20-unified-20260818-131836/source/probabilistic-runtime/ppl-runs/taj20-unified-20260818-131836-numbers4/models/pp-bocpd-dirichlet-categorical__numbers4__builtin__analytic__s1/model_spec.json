@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "pp-bocpd-dirichlet-categorical",
+  "family": "changepoint",
+  "role": "candidate",
+  "likelihood": "DirichletCategoricalBOCPD",
+  "latent_structure": "exact online run-length posterior with constant hazard and per-run-length Dirichlet categorical sufficient statistics",
+  "backends": [
+    "builtin"
+  ],
+  "tasks": [
+    "online_changepoint"
+  ],
+  "priority": "p0",
+  "supports_exogenous": false,
+  "hierarchical": false,
+  "dynamic": true,
+  "experimental": true,
+  "notes": "PPL-02 M06; pruned BOCPD monitor with RETRAIN_RECOMMENDED events",
+  "implementation_status": "IMPLEMENTED",
+  "reference_strategy": "dynamic_context",
+  "primary_backend": "builtin",
+  "primary_profile": null,
+  "native_implementation_status": "IMPLEMENTED",
+  "native_graph_id": "bocpd_dirichlet_categorical_v1"
+}

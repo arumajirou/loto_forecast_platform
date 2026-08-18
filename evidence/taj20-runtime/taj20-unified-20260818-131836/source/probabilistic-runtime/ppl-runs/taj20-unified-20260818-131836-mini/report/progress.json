@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "timestamp": "2026-08-18T23:32:02+0900",
+  "status": "PARTIAL",
+  "run_id": "taj20-unified-20260818-131836-mini",
+  "run_dir": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj20-unified-runtime/taj20-unified-20260818-131836/probabilistic-runtime/ppl-runs/taj20-unified-20260818-131836-mini",
+  "elapsed_seconds": 0.6,
+  "trials_allowed": 11,
+  "trials_blocked": 65,
+  "completed_allowed": 11,
+  "remaining_allowed": 0,
+  "progress_percent": 100.0,
+  "status_counts": {
+    "BLOCKED": 65,
+    "PASS": 11
+  },
+  "running_trials": [],
+  "pending_by_resource": {
+    "gpu": 0,
+    "heavy_cpu": 0,
+    "light_cpu": 0
+  },
+  "running_by_resource": {
+    "gpu": 0,
+    "heavy_cpu": 0,
+    "light_cpu": 0
+  },
+  "best_model": {
+    "model_id": "pp-multinomial-dglm",
+    "game": "mini",
+    "hit_at_1": 0.2,
+    "mae": 5.0,
+    "mse": 30.6
+  },
+  "eta": {
+    "estimated_remaining_seconds": 0.0,
+    "estimated_remaining_text": "0秒",
+    "estimated_completion_at": "2026-08-18T23:32:02+09:00",
+    "eta_confidence": "medium",
+    "estimated_seconds_by_resource": {
+      "gpu": 0.0,
+      "heavy_cpu": 0.0,
+      "light_cpu": 0.0
+    },
+    "median_trial_seconds_by_resource": {
+      "gpu": 180.0,
+      "heavy_cpu": 0.2,
+      "light_cpu": 0.1
+    },
+    "duration_samples_by_resource": {
+      "gpu": 0,
+      "heavy_cpu": 2,
+      "light_cpu": 9
+    }
+  },
+  "parallelism": {
+    "outer_workers": 8,
+    "gpu_priority": true,
+    "native_device": "auto",
+    "limits": {
+      "gpu": 1,
+      "heavy_cpu": 2,
+      "light_cpu": 8
+    },
+    "running_total": 0,
+    "peak_running_total": 8,
+    "running_by_resource": {
+      "gpu": 0,
+      "heavy_cpu": 0,
+      "light_cpu": 0
+    },
+    "peak_running_by_resource": {
+      "gpu": 0,
+      "heavy_cpu": 2,
+      "light_cpu": 6
+    },
+    "pending_by_resource": {
+      "gpu": 0,
+      "heavy_cpu": 0,
+      "light_cpu": 0
+    },
+    "resource_order": [
+      "gpu",
+      "heavy_cpu",
+      "light_cpu"
+    ]
+  },
+  "gpu": {
+    "available": true,
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 5070 Ti",
+        "utilization_percent": 0.0,
+        "memory_used_mib": 2.0,
+        "memory_total_mib": 16303.0,
+        "temperature_c": 39.0,
+        "power_w": 28.66
+      }
+    ]
+  }
+}

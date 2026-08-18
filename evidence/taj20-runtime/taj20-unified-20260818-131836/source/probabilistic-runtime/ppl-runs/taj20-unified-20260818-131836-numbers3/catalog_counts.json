@@ -1,0 +1,48 @@
+{
+  "probabilistic_models": 76,
+  "inference_profiles": 29,
+  "by_family": {
+    "bayesian_regression": 5,
+    "calibration": 3,
+    "changepoint": 3,
+    "conjugate": 8,
+    "copula": 1,
+    "count": 8,
+    "decision": 3,
+    "deep_probabilistic": 10,
+    "dynamic_conjugate": 1,
+    "empirical_bayes": 1,
+    "ensemble": 3,
+    "fixed_subset": 1,
+    "gaussian_process": 2,
+    "hierarchical": 2,
+    "mixture": 3,
+    "nonparametric": 5,
+    "ordinal": 3,
+    "regime_switching": 4,
+    "semi_parametric": 2,
+    "state_space": 7,
+    "tree_bayesian": 1
+  },
+  "by_priority": {
+    "p0": 20,
+    "p1": 25,
+    "p2": 31
+  },
+  "catalog_sha256": "6823099b474c772a6730bc09158ae147e3776a290e149106c35776405db29f9a",
+  "backend_availability": {
+    "arviz": false,
+    "blackjax": false,
+    "builtin": true,
+    "cmdstanpy": false,
+    "numpyro": false,
+    "pymc": false,
+    "pymc+blackjax": false,
+    "pymc+numpyro": false,
+    "pymc_bart": false,
+    "pyro": false,
+    "stan": false,
+    "tensorflow_probability": false,
+    "tfp": false
+  }
+}

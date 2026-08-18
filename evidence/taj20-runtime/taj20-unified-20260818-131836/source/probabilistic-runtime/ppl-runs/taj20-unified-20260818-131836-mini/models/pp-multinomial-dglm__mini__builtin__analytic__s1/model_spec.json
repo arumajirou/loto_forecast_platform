@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "pp-multinomial-dglm",
+  "family": "state_space",
+  "role": "candidate",
+  "likelihood": "MultinomialLogit",
+  "latent_structure": "reference-category dynamic generalized linear model with discount evolution and sequential Laplace/EKF updates",
+  "backends": [
+    "builtin"
+  ],
+  "tasks": [
+    "dynamic_multinomial"
+  ],
+  "priority": "p0",
+  "supports_exogenous": true,
+  "hierarchical": false,
+  "dynamic": true,
+  "experimental": true,
+  "notes": "PPL-02 M04; predict-before-update dynamic multinomial filter",
+  "implementation_status": "IMPLEMENTED",
+  "reference_strategy": "dynamic_context",
+  "primary_backend": "builtin",
+  "primary_profile": null,
+  "native_implementation_status": "IMPLEMENTED",
+  "native_graph_id": "multinomial_dglm_filter_v1"
+}

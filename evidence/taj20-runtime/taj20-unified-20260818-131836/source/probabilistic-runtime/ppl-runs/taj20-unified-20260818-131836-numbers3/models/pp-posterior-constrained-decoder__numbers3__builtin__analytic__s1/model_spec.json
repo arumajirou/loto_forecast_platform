@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "pp-posterior-constrained-decoder",
+  "family": "decision",
+  "role": "meta",
+  "likelihood": "Posterior predictive",
+  "latent_structure": "legal constrained joint decoder",
+  "backends": [
+    "builtin"
+  ],
+  "tasks": [
+    "decision"
+  ],
+  "priority": "p0",
+  "supports_exogenous": false,
+  "hierarchical": false,
+  "dynamic": false,
+  "experimental": false,
+  "notes": "",
+  "implementation_status": "IMPLEMENTED",
+  "reference_strategy": "decision_reference",
+  "primary_backend": "builtin",
+  "primary_profile": null,
+  "native_implementation_status": "IMPLEMENTED",
+  "native_graph_id": "posterior_constrained_decoder"
+}

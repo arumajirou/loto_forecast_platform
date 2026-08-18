@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "trial_id": "pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1",
+  "model_id": "pp-bocpd-dirichlet-categorical",
+  "family": "changepoint",
+  "game": "loto6",
+  "target_mode": "online_changepoint",
+  "backend": "builtin",
+  "protocol_hash": "5b3e43b3e8946b07d0317d0e09535189c40d6a4a6e509ced5f4e07450784278d",
+  "execution_fingerprint": "df0d84035c971ef3dfb7fdbec16a23aeece5ea25059939af2f8ffd1c5fbc6959",
+  "metrics": {
+    "hit_at_1": 0.0,
+    "mae": 6.666666666666667,
+    "mse": 68.66666666666667,
+    "exact": 0.0,
+    "set_overlap": 1.0,
+    "jaccard": 0.09090909090909091,
+    "brier": 0.9769126758034682,
+    "log_loss": 3.408237068529472
+  },
+  "diagnostics": {
+    "status": "PASS",
+    "backend": "builtin",
+    "inference_profile_id": null,
+    "rhat_max": null,
+    "ess_bulk_min": null,
+    "ess_tail_min": null,
+    "divergences": null,
+    "max_treedepth_hits": null,
+    "ebfmi_min": null,
+    "elbo_finite": null,
+    "elbo_stable": null,
+    "posterior_finite": true,
+    "probability_simplex_valid": true,
+    "warnings": [],
+    "failure_codes": [],
+    "effective_sample_size": null,
+    "prediction_entropy": 3.311839302034041,
+    "unique_point_predictions": 6
+  },
+  "point_prediction": [
+    3,
+    6,
+    19,
+    23,
+    31,
+    42
+  ],
+  "artifact_dir": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj20-unified-runtime/taj20-unified-20260818-131836/probabilistic-runtime/ppl-runs/taj20-unified-20260818-131836-loto6/models/pp-bocpd-dirichlet-categorical__loto6__builtin__analytic__s1",
+  "elapsed_seconds": 0.11020863800513325,
+  "error": null
+}

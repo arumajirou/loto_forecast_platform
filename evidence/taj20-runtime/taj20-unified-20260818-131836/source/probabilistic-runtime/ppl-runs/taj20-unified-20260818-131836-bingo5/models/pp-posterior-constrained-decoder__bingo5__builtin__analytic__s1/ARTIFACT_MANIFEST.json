@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "metadata": {
+    "trial_id": "pp-posterior-constrained-decoder__bingo5__builtin__analytic__s1",
+    "status": "PASS"
+  },
+  "files": [
+    {
+      "path": "diagnostics.json",
+      "size": 483,
+      "sha256": "29e7dda46ae322111856cab8d4666d214feb90e6ff774749cb015d75c69a371a"
+    },
+    {
+      "path": "execution_fingerprint.json",
+      "size": 641,
+      "sha256": "b2cf5e7ae81c0278cc81b17eb9637463716e1186799bdab3d92f71aa600bfb9d"
+    },
+    {
+      "path": "lifecycle_result.json",
+      "size": 1595,
+      "sha256": "912a4b5c61db1c72b47810198728a3d61b8407722e74e6dc89b53db699a0143d"
+    },
+    {
+      "path": "model_spec.json",
+      "size": 675,
+      "sha256": "e3a3ac4669f4139c515ef3a6915136ee291944a7d558aea8655dfcdbfe5f0eb4"
+    },
+    {
+      "path": "next_prediction.json",
+      "size": 9048,
+      "sha256": "8a86e2e213a439ea25e6f3a7e9babaf4e3cb38c2ef92fdd7c1410eed36a06d1c"
+    },
+    {
+      "path": "posterior_metadata.json",
+      "size": 951,
+      "sha256": "c41870694dd5d5d551b718288a511b047790d57396486629958c7150022c8860"
+    },
+    {
+      "path": "posterior_reference.json",
+      "size": 4163,
+      "sha256": "de7893575964aaa3afe241fb46006ce28624e8926e3fbeaca63b4b61f6186233"
+    },
+    {
+      "path": "posterior_summary.csv",
+      "size": 89101,
+      "sha256": "5c8cce19807e8682ab598efd4c7cf86383c906dc9b6a803f8dc4040b3a5b95b5"
+    },
+    {
+      "path": "protocol.json",
+      "size": 795,
+      "sha256": "8b8f14fbce9edbb272ab11bb8157e8cd05e4f828115be71993547adb85cd6779"
+    },
+    {
+      "path": "rolling_predictions.csv",
+      "size": 243,
+      "sha256": "d4e89094ad9f6dee2add2ada91abc5c488f46e2cd2416a7245b0c8a3e3ae7fe4"
+    }
+  ]
+}

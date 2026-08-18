@@ -1,0 +1,19 @@
+{
+  "status": "PARTIAL",
+  "run_id": "taj20-unified-20260818-131836-bingo5",
+  "run_dir": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj20-unified-runtime/taj20-unified-20260818-131836/probabilistic-runtime/ppl-runs/taj20-unified-20260818-131836-bingo5",
+  "models_planned": 76,
+  "trials_total": 76,
+  "status_counts": {
+    "BLOCKED": 65,
+    "PASS": 11
+  },
+  "protocol_groups": 5,
+  "leaderboard_paths": [
+    "comparison/leaderboard-007ebfaa75a2.csv",
+    "comparison/leaderboard-160bc62fb6d3.csv",
+    "comparison/leaderboard-6e440ffbbeb1.csv",
+    "comparison/leaderboard-cce19200aefb.csv",
+    "comparison/leaderboard-e992a7571c35.csv"
+  ]
+}

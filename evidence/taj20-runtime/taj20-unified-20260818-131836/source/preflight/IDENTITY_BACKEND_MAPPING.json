@@ -1,0 +1,689 @@
+{
+  "probabilistic": [
+    {
+      "graph_id": "bart_categorical",
+      "implementation_kind": "native_pymc_bart",
+      "model_id": "pp-bart-categorical",
+      "module": "backends/pymc_bart_adapter.py",
+      "primary_backend": "pymc_bart",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "bayesian_beta_calibration",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-bayesian-beta-calibration",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "bayesian_dirichlet_calibration",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-bayesian-dirichlet-calibration",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "bayesian_embedding_categorical",
+      "implementation_kind": "native_pyro",
+      "model_id": "pp-bayesian-embedding-categorical",
+      "module": "models/pyro_native.py",
+      "primary_backend": "pyro",
+      "primary_profile": "pyro-svi-autonormal",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "bayesian_gam_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-bayesian-gam-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "bayesian_gru",
+      "implementation_kind": "native_pyro",
+      "model_id": "pp-bayesian-gru",
+      "module": "models/pyro_native.py",
+      "primary_backend": "pyro",
+      "primary_profile": "pyro-svi-autonormal",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "bayesian_kernel_mixture",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-bayesian-kernel-mixture",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-smc",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "bayesian_lstm",
+      "implementation_kind": "native_pyro",
+      "model_id": "pp-bayesian-lstm",
+      "module": "models/pyro_native.py",
+      "primary_backend": "pyro",
+      "primary_profile": "pyro-svi-autonormal",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "bayesian_mlp",
+      "implementation_kind": "native_pyro",
+      "model_id": "pp-bayesian-mlp",
+      "module": "models/pyro_native.py",
+      "primary_backend": "pyro",
+      "primary_profile": "pyro-svi-autonormal",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "bayesian_model_averaging",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-bayesian-model-averaging",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "bayesian_neural_ordinal",
+      "implementation_kind": "native_pyro",
+      "model_id": "pp-bayesian-neural-ordinal",
+      "module": "models/pyro_native.py",
+      "primary_backend": "pyro",
+      "primary_profile": "pyro-svi-autonormal",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "bayesian_spline_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-bayesian-spline-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "bayesian_tcn",
+      "implementation_kind": "native_pyro",
+      "model_id": "pp-bayesian-tcn",
+      "module": "models/pyro_native.py",
+      "primary_backend": "pyro",
+      "primary_profile": "pyro-svi-autonormal",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "bayesian_temperature_calibration",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-bayesian-temperature-calibration",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "bayesian_transformer",
+      "implementation_kind": "native_pyro",
+      "model_id": "pp-bayesian-transformer",
+      "module": "models/pyro_native.py",
+      "primary_backend": "pyro",
+      "primary_profile": "pyro-svi-autonormal",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "beta_binomial_candidate",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-beta-binomial-candidate",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "beta_binomial_overdispersed",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-beta-binomial-overdispersed",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "beta_binomial_position",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-beta-binomial-position",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "bocpd_dirichlet_categorical_v1",
+      "implementation_kind": "exact_online_message_passing",
+      "model_id": "pp-bocpd-dirichlet-categorical",
+      "module": "loto.probabilistic.models.bocpd_native",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "conditional_bernoulli_fixed_k_v1",
+      "implementation_kind": "analytic_map_laplace",
+      "model_id": "pp-conditional-bernoulli-fixed-k",
+      "module": "loto.probabilistic.models.subset_native",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "deep_markov_model",
+      "implementation_kind": "native_pyro",
+      "model_id": "pp-deep-markov-model",
+      "module": "models/pyro_native.py",
+      "primary_backend": "pyro",
+      "primary_profile": "pyro-svi-autonormal",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "dirichlet_multinomial",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-dirichlet-multinomial",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "dirichlet_process_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-dirichlet-process-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-smc",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "discounted_dirichlet_categorical",
+      "implementation_kind": "analytic",
+      "model_id": "pp-discounted-dirichlet-categorical",
+      "module": "backends/builtin.py",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "dp_changepoint",
+      "implementation_kind": "native_numpyro",
+      "model_id": "pp-dp-changepoint",
+      "module": "models/numpyro_native.py",
+      "primary_backend": "numpyro",
+      "primary_profile": "numpyro-nuts",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "dynamic_dirichlet_discount",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-dynamic-dirichlet-discount",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "dynamic_horseshoe_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-dynamic-horseshoe-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-advi-fullrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "dynamic_model_averaging",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-dynamic-model-averaging",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "dynamic_regression_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-dynamic-regression-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "empirical_bayes_dirichlet",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-empirical-bayes-dirichlet",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "expanding_dirichlet_categorical",
+      "implementation_kind": "analytic",
+      "model_id": "pp-expanding-dirichlet-categorical",
+      "module": "backends/builtin.py",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "finite_mixture_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-finite-mixture-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-smc",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "gaussian_copula_categorical_v1",
+      "implementation_kind": "latent_gaussian_lkj",
+      "model_id": "pp-gaussian-copula-categorical",
+      "module": "loto.probabilistic.models.copula_native",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "gaussian_process_time_varying_logit",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-gaussian-process-time-varying-logit",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-smc",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "gp_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-gp-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-advi-fullrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "hierarchical_dirichlet_digits",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-hierarchical-dirichlet-digits",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "hierarchical_dirichlet_games",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-hierarchical-dirichlet-games",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "hierarchical_dirichlet_process",
+      "implementation_kind": "native_numpyro",
+      "model_id": "pp-hierarchical-dirichlet-process",
+      "module": "models/numpyro_native.py",
+      "primary_backend": "numpyro",
+      "primary_profile": "numpyro-nuts",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "hmm_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-hmm-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-smc",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "hsmm_categorical",
+      "implementation_kind": "native_numpyro",
+      "model_id": "pp-hsmm-categorical",
+      "module": "models/numpyro_native.py",
+      "primary_backend": "numpyro",
+      "primary_profile": "numpyro-svi-lowrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "hurdle_count",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-hurdle-count",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-advi-fullrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "latent_class_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-latent-class-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-smc",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "local_level_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-local-level-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "local_linear_trend_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-local-linear-trend-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "logistic_normal_random_walk",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-logistic-normal-random-walk",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "mixture_of_experts_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-mixture-of-experts-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-advi-fullrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "multinomial_dglm_filter_v1",
+      "implementation_kind": "sequential_laplace_filter",
+      "model_id": "pp-multinomial-dglm",
+      "module": "loto.probabilistic.models.dglm_native",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "multinomial_logistic_normal_count",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-multinomial-logistic-normal-count",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "multinomial_logit_horseshoe",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-multinomial-logit-horseshoe",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "multinomial_logit_laplace",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-multinomial-logit-laplace",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "multinomial_logit_normal",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-multinomial-logit-normal",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "multinomial_logit_regularized_horseshoe",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-multinomial-logit-regularized-horseshoe",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "multinomial_probit",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-multinomial-probit",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-advi-fullrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "multiple_changepoint_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-multiple-changepoint-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-smc",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "negative_binomial_candidate_count",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-negative-binomial-candidate-count",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "neural_hmm",
+      "implementation_kind": "native_pyro",
+      "model_id": "pp-neural-hmm",
+      "module": "models/pyro_native.py",
+      "primary_backend": "pyro",
+      "primary_profile": "pyro-svi-autonormal",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "ordinal_adjacent_category",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-ordinal-adjacent-category",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "ordinal_continuation_ratio",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-ordinal-continuation-ratio",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "ordinal_cumulative_logit",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-ordinal-cumulative-logit",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "poisson_candidate_count",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-poisson-candidate-count",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-nuts",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "poisson_lognormal_count",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-poisson-lognormal-count",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-advi-fullrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "posterior_constrained_decoder",
+      "implementation_kind": "decision",
+      "model_id": "pp-posterior-constrained-decoder",
+      "module": "backends/builtin.py",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "posterior_utility_hit1",
+      "implementation_kind": "decision",
+      "model_id": "pp-posterior-utility-hit1",
+      "module": "backends/builtin.py",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "posterior_utility_hit1_mse",
+      "implementation_kind": "decision",
+      "model_id": "pp-posterior-utility-hit1-mse",
+      "module": "backends/builtin.py",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "psis_loo_stacking",
+      "implementation_kind": "native_meta",
+      "model_id": "pp-psis-loo-stacking",
+      "module": "backends/arviz_adapter.py",
+      "primary_backend": "arviz",
+      "primary_profile": null,
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "rolling_dirichlet_categorical",
+      "implementation_kind": "analytic",
+      "model_id": "pp-rolling-dirichlet-categorical",
+      "module": "backends/builtin.py",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "seasonal_harmonic_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-seasonal-harmonic-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-advi-fullrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "single_changepoint_categorical",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-single-changepoint-categorical",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-smc",
+      "runtime_tier": "standard"
+    },
+    {
+      "graph_id": "static_dirichlet_categorical",
+      "implementation_kind": "analytic",
+      "model_id": "pp-static-dirichlet-categorical",
+      "module": "backends/builtin.py",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "sticky_hdp_hmm",
+      "implementation_kind": "native_numpyro",
+      "model_id": "pp-sticky-hdp-hmm",
+      "module": "models/numpyro_native.py",
+      "primary_backend": "numpyro",
+      "primary_profile": "numpyro-svi-lowrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "switching_dynamic_regression",
+      "implementation_kind": "native_numpyro",
+      "model_id": "pp-switching-dynamic-regression",
+      "module": "models/numpyro_native.py",
+      "primary_backend": "numpyro",
+      "primary_profile": "numpyro-svi-lowrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "switching_logistic_normal",
+      "implementation_kind": "native_numpyro",
+      "model_id": "pp-switching-logistic-normal",
+      "module": "models/numpyro_native.py",
+      "primary_backend": "numpyro",
+      "primary_profile": "numpyro-svi-lowrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "uniform_dirichlet",
+      "implementation_kind": "analytic",
+      "model_id": "pp-uniform-dirichlet",
+      "module": "backends/builtin.py",
+      "primary_backend": "builtin",
+      "primary_profile": null,
+      "runtime_tier": "confirmatory"
+    },
+    {
+      "graph_id": "variational_rnn",
+      "implementation_kind": "native_pyro",
+      "model_id": "pp-variational-rnn",
+      "module": "models/pyro_native.py",
+      "primary_backend": "pyro",
+      "primary_profile": "pyro-svi-autonormal",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "zero_inflated_negative_binomial_count",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-zero-inflated-negative-binomial-count",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-advi-fullrank",
+      "runtime_tier": "bounded"
+    },
+    {
+      "graph_id": "zero_inflated_poisson_count",
+      "implementation_kind": "native_pymc",
+      "model_id": "pp-zero-inflated-poisson-count",
+      "module": "models/pymc_native.py",
+      "primary_backend": "pymc",
+      "primary_profile": "pymc-advi-fullrank",
+      "runtime_tier": "bounded"
+    }
+  ],
+  "schema_version": "taj20-identity-backend-mapping/v1"
+}

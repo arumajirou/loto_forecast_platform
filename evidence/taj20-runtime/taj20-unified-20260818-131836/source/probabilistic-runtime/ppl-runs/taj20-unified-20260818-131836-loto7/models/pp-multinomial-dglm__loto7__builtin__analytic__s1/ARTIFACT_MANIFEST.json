@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "metadata": {
+    "trial_id": "pp-multinomial-dglm__loto7__builtin__analytic__s1",
+    "status": "PASS"
+  },
+  "files": [
+    {
+      "path": "diagnostics.json",
+      "size": 482,
+      "sha256": "d6b194d4e1daf89e950f980e549ab3f789481e0522f32bf1e20bbaee20638ea8"
+    },
+    {
+      "path": "execution_fingerprint.json",
+      "size": 641,
+      "sha256": "2d867c23e28f3432f747e7b5c42e6762afd261c712085d373cc27ddf3249f7d9"
+    },
+    {
+      "path": "lifecycle_result.json",
+      "size": 1581,
+      "sha256": "6f150dcbd05a321a9ed7e03c573dfb35289ea74a19ec1af866503e059d291098"
+    },
+    {
+      "path": "model_spec.json",
+      "size": 807,
+      "sha256": "46cea8724c6a2a3fcbeb0dfd0a2292ef9ad2765dccf89bf37fc7d23bbb0e4e4a"
+    },
+    {
+      "path": "next_prediction.json",
+      "size": 7346,
+      "sha256": "929c1caf59dc3c34c6d3245be4a74ced775d589125910d099e8f000788c25c86"
+    },
+    {
+      "path": "posterior_metadata.json",
+      "size": 1539,
+      "sha256": "2ebe57134a89da1dd49a6f3b587eb1a15dee32fc81c70c0ee5d8e32b6e793333"
+    },
+    {
+      "path": "posterior_summary.csv",
+      "size": 71344,
+      "sha256": "18a57e6c0c48a0cd5660e1544c5fc55a43166ab732b931b75fbfb7d13f8dc431"
+    },
+    {
+      "path": "protocol.json",
+      "size": 804,
+      "sha256": "18ae55e7e918c70f3c044f23cbc6893d7b2af5c72d80766d1790fae1c140a28e"
+    },
+    {
+      "path": "rolling_predictions.csv",
+      "size": 263,
+      "sha256": "2c23881e176db5f87452415646732551074dc62864927af2c0675364f013bf12"
+    }
+  ]
+}

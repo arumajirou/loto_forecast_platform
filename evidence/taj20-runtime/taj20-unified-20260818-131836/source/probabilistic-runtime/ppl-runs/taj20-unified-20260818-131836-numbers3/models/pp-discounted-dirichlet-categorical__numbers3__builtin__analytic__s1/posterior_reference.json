@@ -1,0 +1,59 @@
+{
+  "model_id": "pp-discounted-dirichlet-categorical",
+  "family": "conjugate",
+  "strategy": "discounted_dirichlet",
+  "target_mode": "digit_categorical",
+  "game": "numbers3",
+  "alpha": [
+    [
+      1.94312058359042,
+      3.5809469043294557,
+      4.308147046196721,
+      8.237323671691511,
+      4.864455496741213,
+      3.5037645787426177,
+      5.2976296797677636,
+      5.010059718147125,
+      2.673027090165575,
+      1.0
+    ],
+    [
+      1.0,
+      3.4889490301556068,
+      4.303100363337755,
+      5.389468127956754,
+      3.0326681947946814,
+      7.145583891466816,
+      2.18611721226705,
+      8.220722471048894,
+      3.139278116889024,
+      2.5125873614558225
+    ],
+    [
+      1.760231058654565,
+      2.521167486332624,
+      5.295622738468829,
+      7.174612662209643,
+      2.558065709716628,
+      7.590882085846982,
+      6.370629551851242,
+      3.4994899673577233,
+      1.974759520342993,
+      1.673013988591171
+    ]
+  ],
+  "metadata": {
+    "reference_backend": "builtin",
+    "native_backends": [
+      "builtin",
+      "pymc",
+      "numpyro"
+    ],
+    "training_rows": 80,
+    "seed": 1,
+    "prior_concentration": 1.0,
+    "rolling_window": 20,
+    "discount_factor": 0.97,
+    "reference_semantics": "dependency-light executable analogue; use a declared native backend for full MCMC/SVI semantics"
+  }
+}

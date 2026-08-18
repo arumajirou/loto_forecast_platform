@@ -1,0 +1,679 @@
+{
+  "schema_version": 1,
+  "metadata": {
+    "run_id": "taj20-unified-20260818-131836-mini",
+    "status": "PARTIAL"
+  },
+  "files": [
+    {
+      "path": "catalog_counts.json",
+      "size": 1049,
+      "sha256": "4199641506b357320e0880c3fa394998b56fe0862fa3db3d84a2182ea3ba53ec"
+    },
+    {
+      "path": "comparison/leaderboard-079996af3023.csv",
+      "size": 235,
+      "sha256": "1c496164142addc9b8976b9b96addd997a4bed09451234d988c1a9c1d3554346"
+    },
+    {
+      "path": "comparison/leaderboard-3f00d9c97055.csv",
+      "size": 481,
+      "sha256": "d729204ab0df7cce0f818b665e71cd44ef9d985ca5b42cc892086ad9317ce8ba"
+    },
+    {
+      "path": "comparison/leaderboard-6c58745296c9.csv",
+      "size": 267,
+      "sha256": "65f7956d6b79852f24d756224a8526f200d871b665b421c8c3c9d7a9d59a909f"
+    },
+    {
+      "path": "comparison/leaderboard-72d5955ad9ee.csv",
+      "size": 243,
+      "sha256": "65869a464fa6ffcc7c779484c8ead365f4583fc96d6548489647836d502b11e2"
+    },
+    {
+      "path": "comparison/leaderboard-776165a9950c.csv",
+      "size": 869,
+      "sha256": "e395a9a32dcb14838007b2017e75d89ed9dd5601f69653bcadb4fbfcd4fe6283"
+    },
+    {
+      "path": "comparison/leaderboards.json",
+      "size": 4884,
+      "sha256": "9903cd2cab271b034c7da24d9e886cad508343398fd0330ee68b490a96d6f4ff"
+    },
+    {
+      "path": "datasets/mini.json",
+      "size": 395,
+      "sha256": "2532ca9eb1bc1823d196ec41f5817d5f82ca656a9998a42ab2a3d52677e41c0a"
+    },
+    {
+      "path": "environment.json",
+      "size": 262,
+      "sha256": "0ad37e4d4b81bdffc187c521cf7ea6d1556eb31869e84a96361aa074cd0c359f"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "ff96a0b2c90a8116c77acc8d7087b9ab96815dc9b44e1bd27ec74c6c7c32993f"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "7b3d337e43fcf6bf6fe0797a5b273692a72cc7248d94dab69005b32c6994368e"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1554,
+      "sha256": "2a1c4123f2fa1a5a311af8aafa1466683b51ff614ad1c551e109e693626008b7"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__mini__builtin__analytic__s1/model_spec.json",
+      "size": 842,
+      "sha256": "4fc99481c6ac02c92841f2b334f949bef5d0e6f1ab4361855f66ac29917d839d"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 4422,
+      "sha256": "42cd64c59ab02c6f09f188627514a318ad538d976e05580c78ac8602af4cf0d9"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1828,
+      "sha256": "469ff543c0f65fb52f234aad3a8ec24d47f86690161c27f761a912bd795cff31"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 44151,
+      "sha256": "3c14c2c0d246327c9ff6e4d7240fe648075a7828388e0c5bb58295c716d7d13d"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__mini__builtin__analytic__s1/protocol.json",
+      "size": 801,
+      "sha256": "2576d997bfea58bc55224bf27961c8af0dc5fcb0ff9b22f565e23f470df19ce9"
+    },
+    {
+      "path": "models/pp-bocpd-dirichlet-categorical__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 204,
+      "sha256": "453c7d906625876442121a25143afb9bfd7b62db58137655bb1fa7316251567f"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "94536e1a3e1b735a6901604fc54b9ce1798c3b8a62cace155a29f7e96ab92c99"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "b06d165c30516ed16b35ec1b3610d00df71b7a5cb6bc1bd946f74ef111de5980"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1581,
+      "sha256": "f5bdec1ea118e862454ad8f09c77fba1e25fe813622947e1e9ded0fa7fc3c975"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__mini__builtin__analytic__s1/model_spec.json",
+      "size": 831,
+      "sha256": "a1bc870077f8eebaea87d27492dfb8b34c0eecb4e030cc08101b412a61fe90e1"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 942,
+      "sha256": "d52e399dbd39d7041d31b036eb50cc51be29d33adf5196b0e1cba03010e22b1a"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1774,
+      "sha256": "424fec8e4ded1ccef2fd1b51d7807d8f6be24715d59d478d493d4b00cbce027a"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 9139,
+      "sha256": "9ac9dc83fb8981f72ea9c3f1b45969563f0d81870e2afbe3e771d9d21ecd90b5"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__mini__builtin__analytic__s1/protocol.json",
+      "size": 807,
+      "sha256": "02e40c78b27373de72b14efe3b506c72bfc3d52c5b409c229c27c9c722ac2540"
+    },
+    {
+      "path": "models/pp-conditional-bernoulli-fixed-k__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 218,
+      "sha256": "58044d840563029ea4e88dd4ee72187a63a75ea4b091106b1e18c0e45ba4ccbf"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 483,
+      "sha256": "064cc8f696fdbe396f64061f6adb0d17bbb0eeeb2a3ad4dd1e7e52cdde541003"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "91f69f32e6124efe50adec2461a4d050a995c282cc57f06a07c9fdfec59ded14"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1576,
+      "sha256": "32c27737e484cecd8ba35a3fd033f86811480845abd46fe7a727dba03b150a2b"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1/model_spec.json",
+      "size": 765,
+      "sha256": "ce0acc850a22a28c55ab661f0457345da6ee208c367839f04fcf71b988f6f030"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 4409,
+      "sha256": "7fd6880e0415636896dbbf62da8ffc39d3ca7084bf9fe124bc74e6a1d368dd40"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1006,
+      "sha256": "7b3c999846ad86584324bf7cedca82df5ad2e1f2ca44a8aacadafdc3cb5a6282"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1/posterior_reference.json",
+      "size": 3684,
+      "sha256": "cb347650f7362ad45e205535df871565dc1859163dac37af6488a3de5793a4fe"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 46236,
+      "sha256": "a13d6abf05c890b86d7fd12cf60f2666f3139570fd54bfc7e33e5c97f5e96b2e"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1/protocol.json",
+      "size": 810,
+      "sha256": "fa9d543f2db4fcf0f27e8207b3592a3e140b301bf43ec2b3c64a274cd2ed7ae3"
+    },
+    {
+      "path": "models/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 204,
+      "sha256": "c78ab7ba98aaa4f42660dd49d4a7666e0d35af0ddb84f08cbc07f7902075c575"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 482,
+      "sha256": "ac3c2805ce850941e4beff8339b6a2a6f4cbf10e7ca8e160d70f8dad2c21e12a"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "a2ecb3c81bc92363350f4c0bc54d5a8ecced026d5ce244f8900dbb0b5aeea615"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1573,
+      "sha256": "bebd1a885fd0538bf75cadb0511a2e5e71008a3cea211fa43580ab81cca7155d"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1/model_spec.json",
+      "size": 747,
+      "sha256": "1f249d9fb7f995b1d445522ce6aa6bd90d488466d707a9a09c8546c4ab74f5a5"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 4404,
+      "sha256": "d64f4818fadae39f6a098068a127d82029526bfd14a4cf177ddf3d086e35d4ee"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1018,
+      "sha256": "8b1527b42089cccfc2f12215f6006cec4c7664150aa40ddc3e45112c36d842f5"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1/posterior_reference.json",
+      "size": 2365,
+      "sha256": "7a15db1970e4018170cb74629b2d3072ec187b0ace39da845705e57112afef01"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 46113,
+      "sha256": "20becd5eb902c5273ce1f0fa15507b9faccf8a3ab9cfe4442ea7dfbc481c4515"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1/protocol.json",
+      "size": 810,
+      "sha256": "fa9d543f2db4fcf0f27e8207b3592a3e140b301bf43ec2b3c64a274cd2ed7ae3"
+    },
+    {
+      "path": "models/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 205,
+      "sha256": "30a842c1542154a5d5f310e7e59caa9b2709637f3fc2e3dc45143b18ae5d40e9"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 482,
+      "sha256": "1587bdc2f4638d71e92d0679a3b3ef32bdaefbae0011ad15b3311c1f5b1ad608"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "bdc2de1e8735a1bf7776d56ed0ce62610e2835569783462f0c1d06d53ba9269d"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1523,
+      "sha256": "276d6c1aeebb3a82d2aa078ac892b6e05620bb4b4cb832d1bb16a532955c662e"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__mini__builtin__analytic__s1/model_spec.json",
+      "size": 807,
+      "sha256": "46cea8724c6a2a3fcbeb0dfd0a2292ef9ad2765dccf89bf37fc7d23bbb0e4e4a"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 4422,
+      "sha256": "880e9ce04dd666bc15b135ee5a3c25e6991b72dedced55098363a8508d8a8b62"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1538,
+      "sha256": "5752b3bba2e89412dd6424b57ec15d6b0f3a10070c541ba10f5ab18cb3ccf448"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 42545,
+      "sha256": "10e8cd12c5c372107f6343442d7ffeb57b02062b4cc46cf2f556d34c2a8485e8"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__mini__builtin__analytic__s1/protocol.json",
+      "size": 802,
+      "sha256": "a1c74f57e40e526ca037bb358a76cbf1b411dfa88f63c31ab057bc473f658664"
+    },
+    {
+      "path": "models/pp-multinomial-dglm__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 206,
+      "sha256": "0499b9dbb85b9370a923f2e5bdb679b5adb426bea015bae5d7a7d519d847c23a"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 482,
+      "sha256": "ac3c2805ce850941e4beff8339b6a2a6f4cbf10e7ca8e160d70f8dad2c21e12a"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "01018660e5423321493c46ffb26e4c5fced73bd241e0d896897ad85774ccc7e8"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1547,
+      "sha256": "2ec86c0e59909f94d2c6b483db3db25c689feb7edbf4086d7f5e61aaea179433"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__mini__builtin__analytic__s1/model_spec.json",
+      "size": 675,
+      "sha256": "e3a3ac4669f4139c515ef3a6915136ee291944a7d558aea8655dfcdbfe5f0eb4"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 4404,
+      "sha256": "d64f4818fadae39f6a098068a127d82029526bfd14a4cf177ddf3d086e35d4ee"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 949,
+      "sha256": "7b33e8368dc20eb400023faf40667080bdb49da7a7a2774682c14d92b7d7a4d7"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__mini__builtin__analytic__s1/posterior_reference.json",
+      "size": 2307,
+      "sha256": "d29ecbf66ab887c91b98dbec61311cba8261236b68c30eadad2ed28eb5ac4782"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 42858,
+      "sha256": "cdf201c2fa24f2856ac8af1ff6b992b8ac77ff171498d5715f3d959b68ee8674"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__mini__builtin__analytic__s1/protocol.json",
+      "size": 791,
+      "sha256": "00a01b436721d9eb1eb8a8da99922472f8078fc722e44c2db413034971dd82c2"
+    },
+    {
+      "path": "models/pp-posterior-constrained-decoder__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 205,
+      "sha256": "30a842c1542154a5d5f310e7e59caa9b2709637f3fc2e3dc45143b18ae5d40e9"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 482,
+      "sha256": "ac3c2805ce850941e4beff8339b6a2a6f4cbf10e7ca8e160d70f8dad2c21e12a"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "1d05431ed4d4140bd05575fbe2ce68414055a4ea5daadf2d6bddc7fb3606988e"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1539,
+      "sha256": "6d837a5a102db29ab880d98381269f8c09d5c86acee6a010267d4967fc92ade1"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1/model_spec.json",
+      "size": 689,
+      "sha256": "1b03a34322d728d82abd917bee2605acf924b6c5363ba913be0eae73113d2245"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 4404,
+      "sha256": "d64f4818fadae39f6a098068a127d82029526bfd14a4cf177ddf3d086e35d4ee"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 943,
+      "sha256": "24b989a5ee7e05bee0939e23cfbd383baec0f15df574d684a813cd80cebc90c3"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1/posterior_reference.json",
+      "size": 2304,
+      "sha256": "21626640ebb6685dc5c557ed7048e0a549c7be558c21d634d48602212d4bfe1f"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 42393,
+      "sha256": "843ba4ae26ea8fdb6280f5c2f93e0f2758b7f69f2c26228fd11798691502a437"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1/protocol.json",
+      "size": 791,
+      "sha256": "00a01b436721d9eb1eb8a8da99922472f8078fc722e44c2db413034971dd82c2"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 205,
+      "sha256": "30a842c1542154a5d5f310e7e59caa9b2709637f3fc2e3dc45143b18ae5d40e9"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 482,
+      "sha256": "ac3c2805ce850941e4beff8339b6a2a6f4cbf10e7ca8e160d70f8dad2c21e12a"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "1039df4b144a83ff33525e99da1e67751134813bff64ac9ff27865e0a29c5acd"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1526,
+      "sha256": "2733b1b1847d59db78b83a6f7996d07ac01db85a300aac743b1f08167e8eb20d"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__mini__builtin__analytic__s1/model_spec.json",
+      "size": 668,
+      "sha256": "072b338497f661f1bfc25dec2adf4f123e80b695039f0d6831208d550affedda"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 4404,
+      "sha256": "d64f4818fadae39f6a098068a127d82029526bfd14a4cf177ddf3d086e35d4ee"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 935,
+      "sha256": "a255692c549343fc82dac8524c00bedc3a3d8dc9419d01e27d6837831efdeb00"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__mini__builtin__analytic__s1/posterior_reference.json",
+      "size": 2300,
+      "sha256": "de0be67f61ac2cd26b20d1e8947f1bf2c45dde09fd73e657d341d3cb4bcdd075"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 41773,
+      "sha256": "be9f743bb96c82c081329be7961bcd39551185302b5ec6a163d1afdf3b6adb33"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__mini__builtin__analytic__s1/protocol.json",
+      "size": 791,
+      "sha256": "00a01b436721d9eb1eb8a8da99922472f8078fc722e44c2db413034971dd82c2"
+    },
+    {
+      "path": "models/pp-posterior-utility-hit1__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 205,
+      "sha256": "30a842c1542154a5d5f310e7e59caa9b2709637f3fc2e3dc45143b18ae5d40e9"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 482,
+      "sha256": "21b566ba13a267d84e48c13e318f3f3d1ea439fdc8a1883f98823482cd688e32"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "14d7a62b801dac00e90a0c5b3129deea56c1148d7d8b9576773b484f810f084d"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1581,
+      "sha256": "b71764827933aa7083daf60f2d1015d276772347f8a87877eb863353ae19c4ce"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1/model_spec.json",
+      "size": 757,
+      "sha256": "73894e0335c7844dc05774a9577e014e3929dc63988aebe0dccb1d495138ecc4"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 4411,
+      "sha256": "028c1bad6ce92105e82caca0df99a463915466aba3a08b681299220c626ffb00"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1014,
+      "sha256": "770c7367bbd6289e2e202ffb287bdda06d518956cc4c054b29cdb1086d3eabf2"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1/posterior_reference.json",
+      "size": 2363,
+      "sha256": "ec77e444c6daaf2d3156dc046e494e6d2d8ef008662cd5e0340ab6a5a53c547f"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 45769,
+      "sha256": "3ff05ee3e9e299eecf86a3a32cf652478ddfedd28e973765d1b96acb57ea8bff"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1/protocol.json",
+      "size": 810,
+      "sha256": "fa9d543f2db4fcf0f27e8207b3592a3e140b301bf43ec2b3c64a274cd2ed7ae3"
+    },
+    {
+      "path": "models/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 219,
+      "sha256": "554934658b3e64041a73a5324d04a080e20531525197b9ce8bd96855b8fbe67d"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 482,
+      "sha256": "ac3c2805ce850941e4beff8339b6a2a6f4cbf10e7ca8e160d70f8dad2c21e12a"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "30ae76ed43c8bb036e5e217f307dab86daea363293d9b462ccfd9bb9b4f981d7"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1564,
+      "sha256": "cbd0f299a126d1f84db176ea7aced4361e70aaddbd453bfd3dab1abc23eafe2a"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__mini__builtin__analytic__s1/model_spec.json",
+      "size": 738,
+      "sha256": "5285e62f6135d9410a85d4b5bae09d2c4cd495953934cdfab9d572f446e65e3d"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 4404,
+      "sha256": "d64f4818fadae39f6a098068a127d82029526bfd14a4cf177ddf3d086e35d4ee"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 1012,
+      "sha256": "35d9ec21a1559f5d9cbb988deb828cd410adb82835810b25f6344e6c76d8106f"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__mini__builtin__analytic__s1/posterior_reference.json",
+      "size": 2362,
+      "sha256": "5a4ce7e9207f142fd5db78e93e4cdd274e57c8b6934f78ceaa46c12d27e620d5"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 45648,
+      "sha256": "41df77e68ce3d6d1bcaafc3f4716a16d15e77919a3bcda87eab4129d2aeda103"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__mini__builtin__analytic__s1/protocol.json",
+      "size": 810,
+      "sha256": "fa9d543f2db4fcf0f27e8207b3592a3e140b301bf43ec2b3c64a274cd2ed7ae3"
+    },
+    {
+      "path": "models/pp-static-dirichlet-categorical__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 205,
+      "sha256": "30a842c1542154a5d5f310e7e59caa9b2709637f3fc2e3dc45143b18ae5d40e9"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__mini__builtin__analytic__s1/diagnostics.json",
+      "size": 482,
+      "sha256": "c412eab1fb125a7b2be74718afa3f451b1ed294bd79b02cfc3c5ea3aecc14b80"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__mini__builtin__analytic__s1/execution_fingerprint.json",
+      "size": 641,
+      "sha256": "906305f6a8c163049c0cc6b31f3f2c6f7cfb33428d762fd0d4a49036d61587c3"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__mini__builtin__analytic__s1/lifecycle_result.json",
+      "size": 1546,
+      "sha256": "738479a8371202e193cfd70d6e0a66b80ffc51c5f6295b8981c610dca6948aea"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__mini__builtin__analytic__s1/model_spec.json",
+      "size": 717,
+      "sha256": "d658f05b101d4060e242bec19424f4db32b37b2f698566bd72ff32654acd432a"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__mini__builtin__analytic__s1/next_prediction.json",
+      "size": 4400,
+      "sha256": "8419cc7b7afbcb1b9440076b7bb0de9fb211f4473b84a848c8201fab714566e8"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__mini__builtin__analytic__s1/posterior_metadata.json",
+      "size": 990,
+      "sha256": "8eb08a436fdebcadea36d6fd746db9fb61bb2e3efe1c394d78c6e738cc72b9ff"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__mini__builtin__analytic__s1/posterior_reference.json",
+      "size": 2341,
+      "sha256": "6dcc98d76d77c750f30703b42d0ead4a164bebc6baeb0a59b9ba33a1db015205"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__mini__builtin__analytic__s1/posterior_summary.csv",
+      "size": 43876,
+      "sha256": "d0551dd52ca9226b3895e4cadd2467a43b6778a33f66463c2ccfa396f30a209c"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__mini__builtin__analytic__s1/protocol.json",
+      "size": 810,
+      "sha256": "fa9d543f2db4fcf0f27e8207b3592a3e140b301bf43ec2b3c64a274cd2ed7ae3"
+    },
+    {
+      "path": "models/pp-uniform-dirichlet__mini__builtin__analytic__s1/rolling_predictions.csv",
+      "size": 220,
+      "sha256": "ecd51baf439b6b173f8ca734e99a778c0d7cf9045d678ff84f9d4d3d5dc737e6"
+    },
+    {
+      "path": "plan.json",
+      "size": 37709,
+      "sha256": "e3b06e4e81af581e9ff7802a93dc669195ab548c06b8040989e88da06d4a6c92"
+    },
+    {
+      "path": "report/parallelism_audit.json",
+      "size": 528,
+      "sha256": "f34769058f59cf236f08d1ae2eeac6fa5c072abb3717d6beeea1007e9da02393"
+    },
+    {
+      "path": "report/progress.json",
+      "size": 2291,
+      "sha256": "6d07e424a7d7387a44d281a3777438e05191e5a2afb3c326490429a6dab35850"
+    },
+    {
+      "path": "report/summary.json",
+      "size": 646,
+      "sha256": "fee071365ef1d3bc1094cbebbb9dbe48ffe0083292c8d1862999da5efcddedd3"
+    },
+    {
+      "path": "results.csv",
+      "size": 13259,
+      "sha256": "5f65a17d06b3a7bc8a4044b6db43316d292212c55dad79f679afe0aca9eff73e"
+    },
+    {
+      "path": "results.json",
+      "size": 56790,
+      "sha256": "3752d696432ffc86f7b85c117cf0f780568c89d77bfa32dab1072eeae44fdaed"
+    },
+    {
+      "path": "run_config.yaml",
+      "size": 2749,
+      "sha256": "44b2cabbf1d83fd9b7f7ee13fc52bab0ac4a64b74a506dfde829ada3fafb11da"
+    },
+    {
+      "path": "status/pp-bocpd-dirichlet-categorical__mini__builtin__analytic__s1.json",
+      "size": 1587,
+      "sha256": "adfb1f5502302f58f74a961c1b212813dcab502db7c8f489381eb5eedb6ccaef"
+    },
+    {
+      "path": "status/pp-conditional-bernoulli-fixed-k__mini__builtin__analytic__s1.json",
+      "size": 1614,
+      "sha256": "dec0834be7c680a809876241b0b5af8c8082eaad66c5fb585c0d904942b656cb"
+    },
+    {
+      "path": "status/pp-discounted-dirichlet-categorical__mini__builtin__analytic__s1.json",
+      "size": 1609,
+      "sha256": "e3adba26493d15d62c7508dd967ec9857df007cf60c0dc8fe67e6b454206cba5"
+    },
+    {
+      "path": "status/pp-expanding-dirichlet-categorical__mini__builtin__analytic__s1.json",
+      "size": 1606,
+      "sha256": "164877f5c1ccd265d86b5dfe4d1335f20116ff6f30f61ecd3f8ca227a70c1189"
+    },
+    {
+      "path": "status/pp-multinomial-dglm__mini__builtin__analytic__s1.json",
+      "size": 1556,
+      "sha256": "239b512851291d37514ba51cb57352d2fe2ed4739d237b6dfb9da7736bf81b09"
+    },
+    {
+      "path": "status/pp-posterior-constrained-decoder__mini__builtin__analytic__s1.json",
+      "size": 1580,
+      "sha256": "9814daa5803415e6d00ab13d0bf86e2b4c545c6fe4d69f0a8c78c2a3620d5a77"
+    },
+    {
+      "path": "status/pp-posterior-utility-hit1-mse__mini__builtin__analytic__s1.json",
+      "size": 1572,
+      "sha256": "1fddc5c5765f2b790d3990966269a9269f4d1036f9937f7dbef7a6e666ff7743"
+    },
+    {
+      "path": "status/pp-posterior-utility-hit1__mini__builtin__analytic__s1.json",
+      "size": 1559,
+      "sha256": "e7cd7efb17de4cade8b7be98f9a58d1fa040d6004f2878614c85070f1128011a"
+    },
+    {
+      "path": "status/pp-rolling-dirichlet-categorical__mini__builtin__analytic__s1.json",
+      "size": 1614,
+      "sha256": "e73208656b76ef60699ca1f94964010d9cad79e6397c917bfdafa4003ea8e208"
+    },
+    {
+      "path": "status/pp-static-dirichlet-categorical__mini__builtin__analytic__s1.json",
+      "size": 1597,
+      "sha256": "e1d44decd867c8c89c34da4ff03c8f6f09d36da044862fcc1c75e0e22db9054d"
+    },
+    {
+      "path": "status/pp-uniform-dirichlet__mini__builtin__analytic__s1.json",
+      "size": 1579,
+      "sha256": "f44987b1d82c1af11e3124b5d0f2ea172bd1c0c676135a773cb84d6b520a204b"
+    }
+  ]
+}

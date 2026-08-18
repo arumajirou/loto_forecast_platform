@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "backend": "builtin",
+  "inference_profile_id": null,
+  "rhat_max": null,
+  "ess_bulk_min": null,
+  "ess_tail_min": null,
+  "divergences": null,
+  "max_treedepth_hits": null,
+  "ebfmi_min": null,
+  "elbo_finite": null,
+  "elbo_stable": null,
+  "posterior_finite": true,
+  "probability_simplex_valid": true,
+  "warnings": [],
+  "failure_codes": [],
+  "effective_sample_size": null,
+  "prediction_entropy": 3.406483521345303,
+  "unique_point_predictions": 5
+}

@@ -1,0 +1,160 @@
+{
+  "6a31640eea79ac5bd383efbe9a94465c572b3b04d88fd62d0f23191dcf85b770": [
+    {
+      "rank": 1,
+      "model_id": "pp-bocpd-dirichlet-categorical",
+      "family": "changepoint",
+      "game": "numbers4",
+      "target_mode": "online_changepoint",
+      "backend": "builtin",
+      "hit_at_1": 0.5,
+      "mae": 2.0,
+      "mse": 5.5,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 1.0899001332726668,
+      "log_loss": 3.118254908977235
+    }
+  ],
+  "4db7558b1e199b867d04caf1b15ccecf123ea7f3dc665082793033fc0162ef0d": [
+    {
+      "rank": 1,
+      "model_id": "pp-expanding-dirichlet-categorical",
+      "family": "conjugate",
+      "game": "numbers4",
+      "target_mode": "digit_categorical",
+      "backend": "builtin",
+      "hit_at_1": 0.5,
+      "mae": 1.75,
+      "mse": 3.75,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.9050275990671547,
+      "log_loss": 2.2305526593403675
+    },
+    {
+      "rank": 2,
+      "model_id": "pp-static-dirichlet-categorical",
+      "family": "conjugate",
+      "game": "numbers4",
+      "target_mode": "digit_categorical",
+      "backend": "builtin",
+      "hit_at_1": 0.5,
+      "mae": 1.75,
+      "mse": 3.75,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.9050275990671547,
+      "log_loss": 2.2305526593403675
+    },
+    {
+      "rank": 3,
+      "model_id": "pp-discounted-dirichlet-categorical",
+      "family": "conjugate",
+      "game": "numbers4",
+      "target_mode": "digit_categorical",
+      "backend": "builtin",
+      "hit_at_1": 0.5,
+      "mae": 2.0,
+      "mse": 5.5,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.9330739275080214,
+      "log_loss": 2.369523959702308
+    },
+    {
+      "rank": 4,
+      "model_id": "pp-rolling-dirichlet-categorical",
+      "family": "conjugate",
+      "game": "numbers4",
+      "target_mode": "digit_categorical",
+      "backend": "builtin",
+      "hit_at_1": 0.5,
+      "mae": 2.25,
+      "mse": 6.75,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.9569876971443587,
+      "log_loss": 2.482626128475593
+    },
+    {
+      "rank": 5,
+      "model_id": "pp-uniform-dirichlet",
+      "family": "conjugate",
+      "game": "numbers4",
+      "target_mode": "digit_categorical",
+      "backend": "builtin",
+      "hit_at_1": 0.5,
+      "mae": 2.5,
+      "mse": 11.5,
+      "exact": 0.25,
+      "all_positions_within_1": 0.0,
+      "brier": 0.8790931582164746,
+      "log_loss": 2.212621825772227
+    }
+  ],
+  "5bebf958d30990ab1cc03d66f94cbd47e4a03f6dea81e0b7fbc545a1181d5ba4": [
+    {
+      "rank": 1,
+      "model_id": "pp-multinomial-dglm",
+      "family": "state_space",
+      "game": "numbers4",
+      "target_mode": "dynamic_multinomial",
+      "backend": "builtin",
+      "hit_at_1": 0.5,
+      "mae": 2.25,
+      "mse": 6.75,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.9819993430953877,
+      "log_loss": 2.5442800732326765
+    }
+  ],
+  "0e435da40cf8b7c4fed59eb48cc0df7fe88c172bb1d918c992c7b1e7b27e3047": [
+    {
+      "rank": 1,
+      "model_id": "pp-posterior-utility-hit1-mse",
+      "family": "decision",
+      "game": "numbers4",
+      "target_mode": "decision",
+      "backend": "builtin",
+      "hit_at_1": 0.75,
+      "mae": 0.75,
+      "mse": 1.25,
+      "exact": 0.5,
+      "all_positions_within_1": 0.0,
+      "brier": 0.9050275990671547,
+      "log_loss": 2.2305526593403675
+    },
+    {
+      "rank": 2,
+      "model_id": "pp-posterior-utility-hit1",
+      "family": "decision",
+      "game": "numbers4",
+      "target_mode": "decision",
+      "backend": "builtin",
+      "hit_at_1": 0.5,
+      "mae": 1.5,
+      "mse": 3.5,
+      "exact": 0.25,
+      "all_positions_within_1": 0.0,
+      "brier": 0.9050275990671547,
+      "log_loss": 2.2305526593403675
+    },
+    {
+      "rank": 3,
+      "model_id": "pp-posterior-constrained-decoder",
+      "family": "decision",
+      "game": "numbers4",
+      "target_mode": "decision",
+      "backend": "builtin",
+      "hit_at_1": 0.5,
+      "mae": 1.75,
+      "mse": 3.75,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.9050275990671547,
+      "log_loss": 2.2305526593403675
+    }
+  ]
+}

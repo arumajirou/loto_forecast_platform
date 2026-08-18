@@ -1,0 +1,18 @@
+{
+  "status": "PARTIAL",
+  "run_id": "taj20-unified-20260818-131836-numbers3",
+  "run_dir": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj20-unified-runtime/taj20-unified-20260818-131836/probabilistic-runtime/ppl-runs/taj20-unified-20260818-131836-numbers3",
+  "models_planned": 76,
+  "trials_total": 76,
+  "status_counts": {
+    "BLOCKED": 66,
+    "PASS": 10
+  },
+  "protocol_groups": 4,
+  "leaderboard_paths": [
+    "comparison/leaderboard-0fff43d5ee99.csv",
+    "comparison/leaderboard-617fb8a19d53.csv",
+    "comparison/leaderboard-ba8ceed24e79.csv",
+    "comparison/leaderboard-e27e4a868681.csv"
+  ]
+}

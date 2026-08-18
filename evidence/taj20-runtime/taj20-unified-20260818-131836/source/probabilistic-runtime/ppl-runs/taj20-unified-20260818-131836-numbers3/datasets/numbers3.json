@@ -1,0 +1,17 @@
+{
+  "game": "numbers3",
+  "rows": 80,
+  "data_version": "numbers3-synthetic-80-seed1",
+  "feature_set_hash": "96a8967e83576badfd933a2088e4b6661b02b9c993fab76ba322144d88ab6871",
+  "geometry": {
+    "key": "numbers3",
+    "family": "digits",
+    "positions": 3,
+    "value_min": 0,
+    "value_max": 9,
+    "universe_size": 10,
+    "bonus_count": 0,
+    "outcome_space": 1000
+  },
+  "source": "synthetic"
+}

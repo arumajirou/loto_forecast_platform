@@ -1,0 +1,111 @@
+{
+  "acceptance": "PASS",
+  "blockers": {
+    "broad_sensitive_changed_paths": [],
+    "broad_sha256_failures": [],
+    "identity_sha256_failures": [],
+    "probabilistic_sha256_failures": []
+  },
+  "broad_reuse": {
+    "changed_paths": [
+      ".github/check_pytest_failure_baseline.py",
+      ".github/check_ruff_lint_baseline.py",
+      ".github/pytest-failure-baseline.txt",
+      ".github/ruff-format-baseline.txt",
+      ".github/ruff-lint-baseline.json",
+      ".github/workflows/ci.yml",
+      "evidence/ci/pr370-format-baseline-20260818-224024/FORMAT_BASELINE.json",
+      "evidence/ci/pr370-format-baseline-20260818-224024/README.md",
+      "evidence/ci/pr370-format-baseline-20260818-224024/SOURCE_HASHES.txt",
+      "evidence/ci/pr370-pytest-baseline-20260818-2318/BASELINE.json",
+      "scripts/check_ruff_format_baseline.py",
+      "scripts/run_taj20_probabilistic_matrix.py",
+      "tests/test_ci_ruff_format_baseline.py",
+      "tests/test_taj20_acceptance.py",
+      "tests/test_taj20_probabilistic_matrix.py",
+      "tests/test_taj20_reverify_read_only.py",
+      "tests/test_taj20_unified_preflight.py",
+      "tools/runtime_audit/taj20_acceptance.py",
+      "tools/runtime_audit/taj20_preflight.py",
+      "tools/taj20.sh"
+    ],
+    "current_head": "847f5c23bf241cfe8ff8a0c35a808a702757fa42",
+    "reusable": true,
+    "sensitive_changed_paths": [],
+    "source_head": "ee2e6f95a87b95f54b44d31887628962e651ff27",
+    "source_is_ancestor": true
+  },
+  "gates": {
+    "broad_acceptance_pass": true,
+    "broad_evidence_reusable_from_current_head": true,
+    "broad_matrix_exact": true,
+    "broad_sha256_verified": true,
+    "canonical_identity_collision_free": true,
+    "holdout_closed": true,
+    "identity_sha256_verified": true,
+    "probabilistic_acceptance_pass": true,
+    "probabilistic_matrix_exact": true,
+    "probabilistic_native_parity": true,
+    "probabilistic_sha256_verified": true,
+    "prospective_closed": true,
+    "unified_matrix_exact": true
+  },
+  "identity_counts": {
+    "broad": 174,
+    "broad_pairs": 1044,
+    "games": 6,
+    "probabilistic": 76,
+    "probabilistic_pairs": 456,
+    "unified": 250,
+    "unified_pairs": 1500
+  },
+  "issue": "TAJ-20 / GitHub #266",
+  "matrix_checks": {
+    "broad": {
+      "duplicate_keys": [],
+      "expected_pairs": 1044,
+      "invalid_status_keys": [],
+      "label": "broad",
+      "missing_keys": [],
+      "pass": true,
+      "rows": 1044,
+      "unexpected_keys": []
+    },
+    "probabilistic": {
+      "duplicate_keys": [],
+      "expected_pairs": 456,
+      "invalid_status_keys": [],
+      "label": "probabilistic",
+      "missing_keys": [],
+      "pass": true,
+      "rows": 456,
+      "unexpected_keys": []
+    },
+    "unified": {
+      "duplicate_keys": [],
+      "expected_pairs": 1500,
+      "invalid_status_keys": [],
+      "label": "unified",
+      "missing_keys": [],
+      "pass": true,
+      "rows": 1500,
+      "unexpected_keys": []
+    }
+  },
+  "normalized_status_counts": {
+    "FAILED": 246,
+    "NON_STANDALONE_METHOD": 60,
+    "NOT_ROUTABLE": 60,
+    "RUNTIME_SMOKE_SUCCEEDED": 70,
+    "SUCCEEDED": 223,
+    "UNAVAILABLE": 820,
+    "UNSUPPORTED_GAME": 21
+  },
+  "schema_version": "taj20-unified-acceptance/v1",
+  "scientific_boundary": {
+    "accuracy_claim": false,
+    "holdout": "CLOSED",
+    "promotion": "CLOSED",
+    "prospective": "CLOSED"
+  }
+}

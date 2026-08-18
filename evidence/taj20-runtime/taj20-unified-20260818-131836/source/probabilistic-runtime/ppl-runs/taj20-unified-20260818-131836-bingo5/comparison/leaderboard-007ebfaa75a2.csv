@@ -1,0 +1,2 @@
+rank,model_id,family,game,target_mode,backend,hit_at_1,mae,mse,exact,set_overlap,jaccard,brier,log_loss
+1,pp-multinomial-dglm,state_space,bingo5,dynamic_multinomial,builtin,0.125,5.625,39.875,0.0,3.0,0.23076923076923078,0.9936931664071753,3.697309441427131

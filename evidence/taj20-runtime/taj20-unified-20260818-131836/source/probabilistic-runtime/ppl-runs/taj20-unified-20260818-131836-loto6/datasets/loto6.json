@@ -1,0 +1,17 @@
+{
+  "game": "loto6",
+  "rows": 80,
+  "data_version": "loto6-synthetic-80-seed1",
+  "feature_set_hash": "37dd16a078435fddb42aac48771b1ef257e789c643a3e1347b5da3f4cf781991",
+  "geometry": {
+    "key": "loto6",
+    "family": "select",
+    "positions": 6,
+    "value_min": 1,
+    "value_max": 43,
+    "universe_size": 43,
+    "bonus_count": 1,
+    "outcome_space": 6096454
+  },
+  "source": "synthetic"
+}

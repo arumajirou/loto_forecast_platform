@@ -1,0 +1,2 @@
+cutoff,draw_id,actual,prediction,hit_at_1,mae,mse,exact,set_overlap,jaccard,brier,log_loss
+79,80,"[10, 15, 21, 22, 25]","[2, 11, 18, 28, 31]",0.0,5.4,32.2,0.0,0.0,0.0,0.9775511450841577,3.381108304076328

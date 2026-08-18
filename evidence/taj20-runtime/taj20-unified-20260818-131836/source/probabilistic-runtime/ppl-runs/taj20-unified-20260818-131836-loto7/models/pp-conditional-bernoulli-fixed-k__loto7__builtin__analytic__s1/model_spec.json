@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "pp-conditional-bernoulli-fixed-k",
+  "family": "fixed_subset",
+  "role": "candidate",
+  "likelihood": "ConditionalBernoulliFixedK",
+  "latent_structure": "candidate log-weights with an exact fixed-cardinality normalizer and MAP/Laplace posterior",
+  "backends": [
+    "builtin"
+  ],
+  "tasks": [
+    "fixed_cardinality_subset"
+  ],
+  "priority": "p0",
+  "supports_exogenous": false,
+  "hierarchical": false,
+  "dynamic": false,
+  "experimental": true,
+  "notes": "PPL-02 M01; exact O(Kk) normalizer and backward-DP sampler",
+  "implementation_status": "IMPLEMENTED",
+  "reference_strategy": "fixed_cardinality_subset",
+  "primary_backend": "builtin",
+  "primary_profile": null,
+  "native_implementation_status": "IMPLEMENTED",
+  "native_graph_id": "conditional_bernoulli_fixed_k_v1"
+}

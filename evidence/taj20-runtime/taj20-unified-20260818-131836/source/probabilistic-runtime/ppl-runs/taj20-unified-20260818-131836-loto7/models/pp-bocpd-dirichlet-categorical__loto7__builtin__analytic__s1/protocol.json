@@ -1,0 +1,38 @@
+{
+  "protocol_hash": "f02aa7874ea0da02b5c5363c608e00750b808892f305b3eda1566442657cd136",
+  "protocol": {
+    "schema_version": "3.0.0",
+    "game": "loto7",
+    "family": "select",
+    "positions": 7,
+    "universe_size": 37,
+    "target_mode": "online_changepoint",
+    "horizon": 1,
+    "tau": 1,
+    "metric_set": [
+      "hit_at_1",
+      "mae",
+      "mse",
+      "exact",
+      "brier",
+      "log_loss"
+    ],
+    "data_version": "loto7-synthetic-80-seed1",
+    "development_rows": 79,
+    "holdout_rows": 1,
+    "folds": 1,
+    "test_size": 1,
+    "gap": 0,
+    "expanding": true,
+    "min_train_size": 79,
+    "seeds": [
+      1
+    ],
+    "objective_primary": "hit_at_1",
+    "objective_weights": {
+      "hit_at_1": 1.0
+    },
+    "feature_windows": [],
+    "exponential_halflives": []
+  }
+}

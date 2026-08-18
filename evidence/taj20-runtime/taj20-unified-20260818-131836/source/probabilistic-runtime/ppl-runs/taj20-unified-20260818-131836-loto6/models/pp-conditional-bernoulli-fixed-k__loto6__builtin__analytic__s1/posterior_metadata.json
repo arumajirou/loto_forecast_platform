@@ -1,0 +1,67 @@
+{
+  "model_id": "pp-conditional-bernoulli-fixed-k",
+  "backend": "builtin",
+  "family": "fixed_subset",
+  "target_mode": "fixed_cardinality_subset",
+  "game": "loto6",
+  "draw_shape": [
+    16,
+    1,
+    43
+  ],
+  "metadata": {
+    "schema_version": "1.0.0",
+    "model_id": "pp-conditional-bernoulli-fixed-k",
+    "game": "loto6",
+    "cardinality": 6,
+    "candidates": 43,
+    "draw_count": 16,
+    "training_rows": 60,
+    "optimizer_success": true,
+    "optimizer_message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+    "optimizer_iterations": 8,
+    "objective_value": 917.5011634855001,
+    "gradient_norm": 0.00018068630361290107,
+    "laplace_ridge": 1e-08,
+    "seed": 1,
+    "point_indices": [
+      2,
+      18,
+      22,
+      30,
+      39,
+      41
+    ],
+    "candidate_marginal_sum": 5.999999999999999,
+    "metadata": {
+      "algorithm": "MAP_LAPLACE",
+      "optimizer": "L-BFGS-B",
+      "normalizer": "exact_log_space_elementary_symmetric_dp",
+      "sampler": "exact_backward_dynamic_programming",
+      "prior_scale": 2.0,
+      "candidate_count": 43,
+      "fixed_cardinality": 6,
+      "training_rows_requested": 80,
+      "training_rows_used": 60
+    },
+    "native_graph_id": "conditional_bernoulli_fixed_k_v1",
+    "implementation_kind": "analytic_map_laplace",
+    "native_analytic": true,
+    "inference_profile_id": null
+  },
+  "diagnostics": {
+    "posterior_finite": true,
+    "probability_simplex_valid": true,
+    "cardinality_valid_rate": 1.0,
+    "duplicate_violation_rate": 0.0,
+    "optimizer_success": true,
+    "gradient_norm": 0.00018068630361290107,
+    "laplace_ridge": 1e-08,
+    "rhat_max": null,
+    "ess_bulk_min": null,
+    "ess_tail_min": null,
+    "divergences": null,
+    "elbo_finite": null,
+    "elbo_stable": null
+  }
+}

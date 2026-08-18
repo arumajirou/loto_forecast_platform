@@ -1,0 +1,72 @@
+{
+  "model_id": "pp-rolling-dirichlet-categorical",
+  "family": "conjugate",
+  "strategy": "rolling_dirichlet",
+  "target_mode": "digit_categorical",
+  "game": "numbers4",
+  "alpha": [
+    [
+      1.0,
+      1.0,
+      3.0,
+      5.0,
+      2.0,
+      3.0,
+      2.0,
+      7.0,
+      4.0,
+      2.0
+    ],
+    [
+      1.0,
+      3.0,
+      5.0,
+      5.0,
+      4.0,
+      5.0,
+      1.0,
+      3.0,
+      2.0,
+      1.0
+    ],
+    [
+      4.0,
+      4.0,
+      3.0,
+      2.0,
+      3.0,
+      3.0,
+      8.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      2.0,
+      2.0,
+      4.0,
+      5.0,
+      2.0,
+      7.0,
+      5.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "metadata": {
+    "reference_backend": "builtin",
+    "native_backends": [
+      "builtin",
+      "pymc",
+      "numpyro",
+      "stan"
+    ],
+    "training_rows": 80,
+    "seed": 1,
+    "prior_concentration": 1.0,
+    "rolling_window": 20,
+    "discount_factor": 0.97,
+    "reference_semantics": "dependency-light executable analogue; use a declared native backend for full MCMC/SVI semantics"
+  }
+}

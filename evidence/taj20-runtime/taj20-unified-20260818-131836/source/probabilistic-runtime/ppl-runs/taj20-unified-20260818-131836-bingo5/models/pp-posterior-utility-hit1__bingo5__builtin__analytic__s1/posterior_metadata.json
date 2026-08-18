@@ -1,0 +1,38 @@
+{
+  "model_id": "pp-posterior-utility-hit1",
+  "backend": "builtin",
+  "family": "decision",
+  "target_mode": "decision",
+  "game": "bingo5",
+  "draw_shape": [
+    16,
+    8,
+    40
+  ],
+  "metadata": {
+    "reference_backend": "builtin",
+    "native_backends": [
+      "builtin"
+    ],
+    "training_rows": 80,
+    "seed": 1,
+    "prior_concentration": 1.0,
+    "rolling_window": 20,
+    "discount_factor": 0.97,
+    "reference_semantics": "dependency-light executable analogue; use a declared native backend for full MCMC/SVI semantics",
+    "native_graph_id": "posterior_utility_hit1",
+    "implementation_kind": "analytic",
+    "native_analytic": true,
+    "inference_profile_id": null
+  },
+  "diagnostics": {
+    "posterior_finite": true,
+    "probability_simplex_valid": true,
+    "rhat_max": null,
+    "ess_bulk_min": null,
+    "ess_tail_min": null,
+    "divergences": null,
+    "elbo_finite": null,
+    "elbo_stable": null
+  }
+}

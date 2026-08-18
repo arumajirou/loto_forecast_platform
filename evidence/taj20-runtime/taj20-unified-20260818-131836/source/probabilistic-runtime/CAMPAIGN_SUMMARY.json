@@ -1,0 +1,45 @@
+{
+  "acceptance": "PASS",
+  "blockers": {
+    "duplicate_task_keys": [],
+    "invalid_status_task_keys": [],
+    "missing_source_evidence_task_keys": [],
+    "missing_task_keys": [],
+    "unexpected_task_keys": [],
+    "unmapped_raw_status_task_keys": []
+  },
+  "expected_pairs": 456,
+  "games": 6,
+  "gates": {
+    "all_rows_have_source_evidence": true,
+    "game_count_exact": true,
+    "holdout_closed": true,
+    "model_count_exact": true,
+    "no_duplicate_task_keys": true,
+    "no_missing_task_keys": true,
+    "no_unexpected_task_keys": true,
+    "no_unmapped_raw_status": true,
+    "normalized_status_taxonomy_valid": true,
+    "plan_pairs_exact": true,
+    "promotion_closed": true,
+    "prospective_closed": true,
+    "result_rows_exact": true
+  },
+  "issue": "TAJ-20 / GitHub #266",
+  "models": 76,
+  "normalized_status_counts": {
+    "RUNTIME_SMOKE_SUCCEEDED": 64,
+    "UNAVAILABLE": 376,
+    "UNSUPPORTED_GAME": 16
+  },
+  "observed_pairs": 456,
+  "preflight_sha256sums_sha256": "5508f7bd139fedf055e0dbefb39aefa79d2d02dd754b452c017a457fe0bc7f0e",
+  "schema_version": "taj20-probabilistic-acceptance/v2",
+  "scientific_boundary": {
+    "accuracy_claim": false,
+    "holdout": "CLOSED",
+    "promotion": "CLOSED",
+    "prospective": "CLOSED"
+  },
+  "source_head": "847f5c23bf241cfe8ff8a0c35a808a702757fa42"
+}

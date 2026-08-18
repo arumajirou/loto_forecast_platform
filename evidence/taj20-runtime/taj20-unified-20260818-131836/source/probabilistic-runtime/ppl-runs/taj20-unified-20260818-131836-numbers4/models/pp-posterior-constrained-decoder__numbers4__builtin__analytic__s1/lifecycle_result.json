@@ -1,0 +1,49 @@
+{
+  "status": "PASS",
+  "trial_id": "pp-posterior-constrained-decoder__numbers4__builtin__analytic__s1",
+  "model_id": "pp-posterior-constrained-decoder",
+  "family": "decision",
+  "game": "numbers4",
+  "target_mode": "decision",
+  "backend": "builtin",
+  "protocol_hash": "0e435da40cf8b7c4fed59eb48cc0df7fe88c172bb1d918c992c7b1e7b27e3047",
+  "execution_fingerprint": "f190d431f3f87bb43559d44e21b10d76eaae5a84887eaa2213296c6b2796dfe0",
+  "metrics": {
+    "hit_at_1": 0.5,
+    "mae": 1.75,
+    "mse": 3.75,
+    "exact": 0.0,
+    "all_positions_within_1": 0.0,
+    "brier": 0.9050275990671547,
+    "log_loss": 2.2305526593403675
+  },
+  "diagnostics": {
+    "status": "PASS",
+    "backend": "builtin",
+    "inference_profile_id": null,
+    "rhat_max": null,
+    "ess_bulk_min": null,
+    "ess_tail_min": null,
+    "divergences": null,
+    "max_treedepth_hits": null,
+    "ebfmi_min": null,
+    "elbo_finite": null,
+    "elbo_stable": null,
+    "posterior_finite": true,
+    "probability_simplex_valid": true,
+    "warnings": [],
+    "failure_codes": [],
+    "effective_sample_size": null,
+    "prediction_entropy": 2.1427735523742792,
+    "unique_point_predictions": 2
+  },
+  "point_prediction": [
+    6,
+    6,
+    6,
+    3
+  ],
+  "artifact_dir": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj20-unified-runtime/taj20-unified-20260818-131836/probabilistic-runtime/ppl-runs/taj20-unified-20260818-131836-numbers4/models/pp-posterior-constrained-decoder__numbers4__builtin__analytic__s1",
+  "elapsed_seconds": 0.005026517006626818,
+  "error": null
+}

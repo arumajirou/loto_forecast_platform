@@ -1,0 +1,34 @@
+{
+  "broad_reuse": {
+    "changed_paths": [
+      ".github/check_pytest_failure_baseline.py",
+      ".github/check_ruff_lint_baseline.py",
+      ".github/pytest-failure-baseline.txt",
+      ".github/ruff-format-baseline.txt",
+      ".github/ruff-lint-baseline.json",
+      ".github/workflows/ci.yml",
+      "evidence/ci/pr370-format-baseline-20260818-224024/FORMAT_BASELINE.json",
+      "evidence/ci/pr370-format-baseline-20260818-224024/README.md",
+      "evidence/ci/pr370-format-baseline-20260818-224024/SOURCE_HASHES.txt",
+      "evidence/ci/pr370-pytest-baseline-20260818-2318/BASELINE.json",
+      "scripts/check_ruff_format_baseline.py",
+      "scripts/run_taj20_probabilistic_matrix.py",
+      "tests/test_ci_ruff_format_baseline.py",
+      "tests/test_taj20_acceptance.py",
+      "tests/test_taj20_probabilistic_matrix.py",
+      "tests/test_taj20_reverify_read_only.py",
+      "tests/test_taj20_unified_preflight.py",
+      "tools/runtime_audit/taj20_acceptance.py",
+      "tools/runtime_audit/taj20_preflight.py",
+      "tools/taj20.sh"
+    ],
+    "current_head": "847f5c23bf241cfe8ff8a0c35a808a702757fa42",
+    "reusable": true,
+    "sensitive_changed_paths": [],
+    "source_head": "ee2e6f95a87b95f54b44d31887628962e651ff27",
+    "source_is_ancestor": true
+  },
+  "identity_root": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj20-unified-runtime/taj20-unified-20260818-131836/identity-plan",
+  "probabilistic_root": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj20-unified-runtime/taj20-unified-20260818-131836/probabilistic-runtime",
+  "taj19_root": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj19-broad-runtime/taj19-broad-20260818-114558/campaign"
+}

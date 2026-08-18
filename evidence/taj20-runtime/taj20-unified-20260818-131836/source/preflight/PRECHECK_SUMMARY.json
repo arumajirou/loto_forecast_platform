@@ -1,0 +1,31 @@
+{
+  "identity_contract": {
+    "broad": 174,
+    "final_pairs": 1500,
+    "games": 6,
+    "incremental_pairs": 456,
+    "probabilistic": 76,
+    "reused_pairs": 1044,
+    "unified": 250
+  },
+  "schema_version": "taj20-preflight/v1",
+  "scientific_boundary": {
+    "accuracy_claim": false,
+    "holdout": "CLOSED",
+    "promotion": "CLOSED",
+    "prospective": "CLOSED"
+  },
+  "status": "PASS",
+  "taj19_reuse": {
+    "artifact_manifest_sha256": "5bee5f8b6825e8f8e202f5af8a67c4c4ed6b76d7d790819261c005859002f1ab",
+    "campaign_root": "/mnt/e/env/ts/loto_phase7_linux_main/runs/taj19-broad-runtime/taj19-broad-20260818-114558/campaign",
+    "holdout": "CLOSED",
+    "promotion": "CLOSED",
+    "prospective": "CLOSED",
+    "reuse_status": "PASS",
+    "reused_pairs": 1044,
+    "sha256sums_sha256": "6d8648e838e2ebb2607387db3c8946fca6a0bf7ccff46c93afca809a6ca49bc7",
+    "source_files_verified": 20581,
+    "source_head": "ee2e6f95a87b95f54b44d31887628962e651ff27"
+  }
+}

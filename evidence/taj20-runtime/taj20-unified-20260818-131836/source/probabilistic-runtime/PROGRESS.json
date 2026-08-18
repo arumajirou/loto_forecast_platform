@@ -1,0 +1,9 @@
+{
+  "completed_games": 6,
+  "completed_pairs": 456,
+  "expected_pairs": 456,
+  "holdout": "CLOSED",
+  "prospective": "CLOSED",
+  "status": "RUNNING",
+  "total_games": 6
+}

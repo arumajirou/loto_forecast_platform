@@ -1,0 +1,73 @@
+{
+  "model_id": "pp-bocpd-dirichlet-categorical",
+  "backend": "builtin",
+  "family": "changepoint",
+  "target_mode": "online_changepoint",
+  "game": "bingo5",
+  "draw_shape": [
+    16,
+    8,
+    40
+  ],
+  "metadata": {
+    "model_id": "pp-bocpd-dirichlet-categorical",
+    "game": "bingo5",
+    "classes": 40,
+    "positions": 8,
+    "current_step": 80,
+    "evidence_count": 80,
+    "active_run_lengths": 6,
+    "map_run_length": 80,
+    "current_changepoint_probability": 4.3673582063099015e-06,
+    "cumulative_pruned_mass": 2.0132183109478063e-07,
+    "alert_count": 1,
+    "last_alert_step": 56,
+    "hazard_type": "constant",
+    "expected_run_length": 200.0,
+    "max_run_length": 512,
+    "posterior_mass_prune": 1e-08,
+    "alert_threshold": 0.5,
+    "minimum_evidence_count": 20,
+    "cooldown": 20,
+    "minimum_observed_fraction": 1.0,
+    "seed": 1,
+    "metadata": {
+      "inference": "exact_bocpd_message_passing",
+      "observation_order": "predict_before_update",
+      "predictive_model": "dirichlet_categorical",
+      "automatic_retraining": false
+    },
+    "native_graph_id": "bocpd_dirichlet_categorical_v1",
+    "implementation_kind": "exact_online_message_passing",
+    "native_analytic": true,
+    "inference_profile_id": null,
+    "alert_events": [
+      {
+        "event_type": "RETRAIN_RECOMMENDED",
+        "step": 56,
+        "changepoint_probability": 0.8578508290272561,
+        "evidence_count": 57,
+        "data_quality_gate": "PASS",
+        "automatic_retraining": false
+      }
+    ],
+    "automatic_retraining": false
+  },
+  "diagnostics": {
+    "posterior_finite": true,
+    "probability_simplex_valid": true,
+    "run_length_posterior_valid": true,
+    "current_changepoint_probability": 4.3673582063099015e-06,
+    "map_run_length": 80,
+    "active_run_lengths": 6,
+    "cumulative_pruned_mass": 2.0132183109478063e-07,
+    "alert_count": 1,
+    "data_quality_pass_rate": 1.0,
+    "rhat_max": null,
+    "ess_bulk_min": null,
+    "ess_tail_min": null,
+    "divergences": null,
+    "elbo_finite": null,
+    "elbo_stable": null
+  }
+}

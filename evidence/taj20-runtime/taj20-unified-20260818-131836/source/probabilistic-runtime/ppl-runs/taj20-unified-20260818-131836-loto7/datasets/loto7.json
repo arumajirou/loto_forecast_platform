@@ -1,0 +1,17 @@
+{
+  "game": "loto7",
+  "rows": 80,
+  "data_version": "loto7-synthetic-80-seed1",
+  "feature_set_hash": "36a92ff83fa96da164cf10ac1b65ff131ad91746f33281878d6e9ba8405bad60",
+  "geometry": {
+    "key": "loto7",
+    "family": "select",
+    "positions": 7,
+    "value_min": 1,
+    "value_max": 37,
+    "universe_size": 37,
+    "bonus_count": 2,
+    "outcome_space": 10295472
+  },
+  "source": "synthetic"
+}

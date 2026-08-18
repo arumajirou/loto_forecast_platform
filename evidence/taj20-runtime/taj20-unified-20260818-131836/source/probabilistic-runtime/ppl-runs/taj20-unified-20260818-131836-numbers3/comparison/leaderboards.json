@@ -1,0 +1,160 @@
+{
+  "617fb8a19d539f68197417cc1065398b4f057d2a6f51b4d885d7be1fdbe942dc": [
+    {
+      "rank": 1,
+      "model_id": "pp-bocpd-dirichlet-categorical",
+      "family": "changepoint",
+      "game": "numbers3",
+      "target_mode": "online_changepoint",
+      "backend": "builtin",
+      "hit_at_1": 0.0,
+      "mae": 3.0,
+      "mse": 11.0,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.8882271853026172,
+      "log_loss": 2.138822561861122
+    }
+  ],
+  "ba8ceed24e792421764f15d13a10637be0930df1b3e0a7f3cf55a138ec6b845e": [
+    {
+      "rank": 1,
+      "model_id": "pp-uniform-dirichlet",
+      "family": "conjugate",
+      "game": "numbers3",
+      "target_mode": "digit_categorical",
+      "backend": "builtin",
+      "hit_at_1": 0.6666666666666666,
+      "mae": 1.3333333333333333,
+      "mse": 3.3333333333333335,
+      "exact": 0.3333333333333333,
+      "all_positions_within_1": 0.0,
+      "brier": 0.8520732624204328,
+      "log_loss": 2.084964833419402
+    },
+    {
+      "rank": 2,
+      "model_id": "pp-expanding-dirichlet-categorical",
+      "family": "conjugate",
+      "game": "numbers3",
+      "target_mode": "digit_categorical",
+      "backend": "builtin",
+      "hit_at_1": 0.3333333333333333,
+      "mae": 2.6666666666666665,
+      "mse": 10.0,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.8956337710439072,
+      "log_loss": 2.4422379516661756
+    },
+    {
+      "rank": 3,
+      "model_id": "pp-static-dirichlet-categorical",
+      "family": "conjugate",
+      "game": "numbers3",
+      "target_mode": "digit_categorical",
+      "backend": "builtin",
+      "hit_at_1": 0.3333333333333333,
+      "mae": 2.6666666666666665,
+      "mse": 10.0,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.8956337710439072,
+      "log_loss": 2.4422379516661756
+    },
+    {
+      "rank": 4,
+      "model_id": "pp-discounted-dirichlet-categorical",
+      "family": "conjugate",
+      "game": "numbers3",
+      "target_mode": "digit_categorical",
+      "backend": "builtin",
+      "hit_at_1": 0.0,
+      "mae": 3.0,
+      "mse": 11.0,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.8834348378047792,
+      "log_loss": 2.2343968610153007
+    },
+    {
+      "rank": 5,
+      "model_id": "pp-rolling-dirichlet-categorical",
+      "family": "conjugate",
+      "game": "numbers3",
+      "target_mode": "digit_categorical",
+      "backend": "builtin",
+      "hit_at_1": 0.0,
+      "mae": 3.0,
+      "mse": 11.0,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.8482346897827373,
+      "log_loss": 1.9973188602484118
+    }
+  ],
+  "e27e4a868681990ab3b8c85589a4cb966230e26fa7f3c511451a3ac4daf09dc4": [
+    {
+      "rank": 1,
+      "model_id": "pp-multinomial-dglm",
+      "family": "state_space",
+      "game": "numbers3",
+      "target_mode": "dynamic_multinomial",
+      "backend": "builtin",
+      "hit_at_1": 0.0,
+      "mae": 3.0,
+      "mse": 11.0,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.9061867512945893,
+      "log_loss": 2.2427315143786952
+    }
+  ],
+  "0fff43d5ee99acb445e68345ff158b17d9830d8290524278234c163c18e4b784": [
+    {
+      "rank": 1,
+      "model_id": "pp-posterior-utility-hit1-mse",
+      "family": "decision",
+      "game": "numbers3",
+      "target_mode": "decision",
+      "backend": "builtin",
+      "hit_at_1": 0.6666666666666666,
+      "mae": 2.3333333333333335,
+      "mse": 9.0,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.8956337710439072,
+      "log_loss": 2.4422379516661756
+    },
+    {
+      "rank": 2,
+      "model_id": "pp-posterior-utility-hit1",
+      "family": "decision",
+      "game": "numbers3",
+      "target_mode": "decision",
+      "backend": "builtin",
+      "hit_at_1": 0.6666666666666666,
+      "mae": 2.6666666666666665,
+      "mse": 12.666666666666666,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.8956337710439072,
+      "log_loss": 2.4422379516661756
+    },
+    {
+      "rank": 3,
+      "model_id": "pp-posterior-constrained-decoder",
+      "family": "decision",
+      "game": "numbers3",
+      "target_mode": "decision",
+      "backend": "builtin",
+      "hit_at_1": 0.3333333333333333,
+      "mae": 2.6666666666666665,
+      "mse": 10.0,
+      "exact": 0.0,
+      "all_positions_within_1": 0.0,
+      "brier": 0.8956337710439072,
+      "log_loss": 2.4422379516661756
+    }
+  ]
+}
