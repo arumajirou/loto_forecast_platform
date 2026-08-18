@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 import pytest
+
 from loto.evaluation.semantic_config import (
     SEMANTIC_CONFIG_SCHEMA_V1,
     SemanticConfigError,
@@ -10,7 +11,6 @@ from loto.evaluation.semantic_config import (
     canonical_semantic_document_v1,
     canonical_semantic_sha256_v1,
 )
-
 
 Differences = type("Differences", (), {"__module__": "mlforecast.target_transforms"})
 LocalStandardScaler = type(
