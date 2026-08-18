@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
 RUNNER="$REPO_ROOT/scripts/run_resource_aware_broad_campaign.py"
 VERIFIER="$SCRIPT_DIR/runtime_audit/taj19_acceptance.py"
+GPU_PREFLIGHT="$SCRIPT_DIR/runtime_audit/taj19_gpu_preflight.py"
 BASE_ROOT="${TAJ19_ROOT:-$REPO_ROOT/runs/taj19-broad-runtime}"
 CURRENT_FILE="$BASE_ROOT/CURRENT"
 MODE="${1:-status}"
@@ -146,6 +147,7 @@ run_preflight() {
         --gpu-safety-margin-mib "${TAJ19_GPU_SAFETY_MARGIN_MIB:-2048}" \
         --plan-only
     "${PY_CMD[@]}" "$VERIFIER" preflight --root "$plan_root"
+    "${PY_CMD[@]}" "$GPU_PREFLIGHT" --root "$plan_root"
 }
 
 execute_campaign() {
