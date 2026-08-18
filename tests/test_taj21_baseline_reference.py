@@ -68,7 +68,13 @@ def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
             candidate_id = f"baseline:{baseline}"
             seed_results = []
             for seed in SEEDS:
-                lock = campaign / "prediction_locks" / game / candidate_id / f"seed-{seed}.json"
+                lock = (
+                    campaign
+                    / "prediction_locks"
+                    / game
+                    / candidate_id
+                    / f"seed-{seed}.json"
+                )
                 lock.parent.mkdir(parents=True, exist_ok=True)
                 payload = {
                     "schema_version": "prediction-lock-v1",
@@ -163,7 +169,9 @@ def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
         encoding="utf-8",
     )
     artifacts = sorted(path for path in root.rglob("*") if path.is_file())
-    lines = [f"{_sha256(path)}  {path.relative_to(root).as_posix()}" for path in artifacts]
+    lines = [
+        f"{_sha256(path)}  {path.relative_to(root).as_posix()}" for path in artifacts
+    ]
     (root / "SHA256SUMS").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -178,7 +186,9 @@ def test_launcher_requires_canonical_data_and_has_no_synthetic_fallback() -> Non
     assert "taj21_baseline_verify.py" in baseline_case
 
 
-def test_campaign_blocks_when_canonical_six_game_inputs_are_missing(tmp_path: Path) -> None:
+def test_campaign_blocks_when_canonical_six_game_inputs_are_missing(
+    tmp_path: Path,
+) -> None:
     campaign = _load(CAMPAIGN_PATH, "taj21_baseline_campaign_test")
     input_dir = tmp_path / "data"
     input_dir.mkdir()
@@ -191,7 +201,9 @@ def test_campaign_blocks_when_canonical_six_game_inputs_are_missing(tmp_path: Pa
         )
 
 
-def test_verifier_accepts_exact_six_game_seven_baseline_matrix(tmp_path: Path) -> None:
+def test_verifier_accepts_exact_six_game_seven_baseline_matrix(
+    tmp_path: Path,
+) -> None:
     verifier = _load(VERIFIER_PATH, "taj21_baseline_verify_test")
     root = tmp_path / "baseline"
     root.mkdir()
