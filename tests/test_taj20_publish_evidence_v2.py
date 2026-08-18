@@ -19,6 +19,33 @@ def load_module():
     return module
 
 
+def git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args],
+        check=check,
+        capture_output=True,
+        text=True,
+    )
+
+
+def git_head(repo: Path) -> str:
+    return subprocess.check_output(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        text=True,
+    ).strip()
+
+
+def init_repo(repo: Path) -> str:
+    repo.mkdir()
+    git(repo, "init", "-q", "-b", "main")
+    git(repo, "config", "user.name", "test")
+    git(repo, "config", "user.email", "test@example.invalid")
+    (repo / "file.txt").write_text("base\n", encoding="utf-8")
+    git(repo, "add", "file.txt")
+    git(repo, "commit", "-q", "-m", "base")
+    return git_head(repo)
+
+
 def test_identity_publication_matches_actual_planner_contract(tmp_path: Path) -> None:
     module = load_module()
     source = tmp_path / "source"
@@ -37,7 +64,8 @@ def test_identity_publication_matches_actual_planner_contract(tmp_path: Path) ->
 def test_secret_marker_is_rejected_before_publication(tmp_path: Path) -> None:
     module = load_module()
     (tmp_path / "evidence.json").write_text(
-        '{"token":"github_pat_example"}\n', encoding="utf-8"
+        '{"token":"github_pat_example"}\n',
+        encoding="utf-8",
     )
 
     with pytest.raises(module.PublishError, match="secret-like marker rejected"):
@@ -47,52 +75,25 @@ def test_secret_marker_is_rejected_before_publication(tmp_path: Path) -> None:
 def test_stale_local_branch_at_main_is_removed(tmp_path: Path) -> None:
     module = load_module()
     repo = tmp_path / "repo"
-    repo.mkdir()
-    subprocess.run(["git", "init", "-q", "-b", "main", str(repo)], check=True)
-    subprocess.run(["git", "-C", str(repo), "config", "user.name", "test"], check=True)
-    subprocess.run(
-        ["git", "-C", str(repo), "config", "user.email", "test@example.invalid"],
-        check=True,
-    )
-    (repo / "file.txt").write_text("base\n", encoding="utf-8")
-    subprocess.run(["git", "-C", str(repo), "add", "file.txt"], check=True)
-    subprocess.run(["git", "-C", str(repo), "commit", "-q", "-m", "base"], check=True)
-    head = subprocess.check_output(
-        ["git", "-C", str(repo), "rev-parse", "HEAD"], text=True
-    ).strip()
+    head = init_repo(repo)
     branch = "evidence/taj20-runtime-test"
-    subprocess.run(["git", "-C", str(repo), "branch", branch, head], check=True)
+    git(repo, "branch", branch, head)
 
     assert module._remove_stale_local_branch(repo, branch, head) is True
-    probe = subprocess.run(
-        ["git", "-C", str(repo), "show-ref", "--verify", f"refs/heads/{branch}"],
-        check=False,
-    )
+    probe = git(repo, "show-ref", "--verify", f"refs/heads/{branch}", check=False)
     assert probe.returncode != 0
 
 
 def test_stale_local_branch_with_unique_commit_is_preserved(tmp_path: Path) -> None:
     module = load_module()
     repo = tmp_path / "repo"
-    repo.mkdir()
-    subprocess.run(["git", "init", "-q", "-b", "main", str(repo)], check=True)
-    subprocess.run(["git", "-C", str(repo), "config", "user.name", "test"], check=True)
-    subprocess.run(
-        ["git", "-C", str(repo), "config", "user.email", "test@example.invalid"],
-        check=True,
-    )
-    (repo / "file.txt").write_text("base\n", encoding="utf-8")
-    subprocess.run(["git", "-C", str(repo), "add", "file.txt"], check=True)
-    subprocess.run(["git", "-C", str(repo), "commit", "-q", "-m", "base"], check=True)
-    main_head = subprocess.check_output(
-        ["git", "-C", str(repo), "rev-parse", "HEAD"], text=True
-    ).strip()
+    main_head = init_repo(repo)
     branch = "evidence/taj20-runtime-test"
-    subprocess.run(["git", "-C", str(repo), "switch", "-q", "-c", branch], check=True)
+    git(repo, "switch", "-q", "-c", branch)
     (repo / "unique.txt").write_text("unique\n", encoding="utf-8")
-    subprocess.run(["git", "-C", str(repo), "add", "unique.txt"], check=True)
-    subprocess.run(["git", "-C", str(repo), "commit", "-q", "-m", "unique"], check=True)
-    subprocess.run(["git", "-C", str(repo), "switch", "-q", "main"], check=True)
+    git(repo, "add", "unique.txt")
+    git(repo, "commit", "-q", "-m", "unique")
+    git(repo, "switch", "-q", "main")
 
     with pytest.raises(module.PublishError, match="contains unique commits"):
         module._remove_stale_local_branch(repo, branch, main_head)
