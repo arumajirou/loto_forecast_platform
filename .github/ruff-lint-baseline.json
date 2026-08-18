@@ -1,0 +1,27 @@
+{
+  "schema_version": "ruff-lint-baseline/v1",
+  "source_main": "b6575da744d9261d86b7ce9594b267498a0bb22c",
+  "ruff_version": "0.16.3",
+  "diagnostics": [
+    {"filename": "src/loto/models/implementation_catalog.py", "code": "I001", "row": 9, "column": 1, "message": "Import block is un-sorted or un-formatted"},
+    {"filename": "src/loto/models/implementation_catalog.py", "code": "F821", "row": 301, "column": 31, "message": "Undefined name `AUTOGLUON_BROAD_V1_ID`"},
+    {"filename": "src/loto/sklearn_provider/cli.py", "code": "E501", "row": 15, "column": 101, "message": "Line too long (101 > 100)"},
+    {"filename": "src/loto/sklearn_provider/inventory.py", "code": "E501", "row": 44, "column": 101, "message": "Line too long (101 > 100)"},
+    {"filename": "src/loto/sklearn_provider/runner.py", "code": "F401", "row": 17, "column": 5, "message": "`sklearn.ensemble.StackingClassifier` imported but unused"},
+    {"filename": "src/loto/sklearn_provider/runner.py", "code": "F401", "row": 18, "column": 5, "message": "`sklearn.ensemble.StackingRegressor` imported but unused"},
+    {"filename": "src/loto/sklearn_provider/runner.py", "code": "F401", "row": 19, "column": 5, "message": "`sklearn.ensemble.VotingClassifier` imported but unused"},
+    {"filename": "src/loto/sklearn_provider/runner.py", "code": "F401", "row": 20, "column": 5, "message": "`sklearn.ensemble.VotingRegressor` imported but unused"},
+    {"filename": "tests/test_phase7_canonical_bridge.py", "code": "I001", "row": 1, "column": 1, "message": "Import block is un-sorted or un-formatted"},
+    {"filename": "tests/test_phase7_cmd_dispatcher.py", "code": "I001", "row": 1, "column": 1, "message": "Import block is un-sorted or un-formatted"},
+    {"filename": "tests/test_phase7_pr355_verify_bootstrap.py", "code": "I001", "row": 1, "column": 1, "message": "Import block is un-sorted or un-formatted"},
+    {"filename": "tests/test_phase7_pr355_verify_bootstrap.py", "code": "E501", "row": 18, "column": 101, "message": "Line too long (109 > 100)"},
+    {"filename": "tests/test_phase7_semantic_diagnosis.py", "code": "I001", "row": 1, "column": 1, "message": "Import block is un-sorted or un-formatted"},
+    {"filename": "tests/test_phase7_semantic_launcher_contract.py", "code": "I001", "row": 1, "column": 1, "message": "Import block is un-sorted or un-formatted"},
+    {"filename": "tests/test_taj19_launcher_nounset.py", "code": "I001", "row": 1, "column": 1, "message": "Import block is un-sorted or un-formatted"},
+    {"filename": "tests/test_taj19_launcher_nounset.py", "code": "E501", "row": 18, "column": 101, "message": "Line too long (105 > 100)"},
+    {"filename": "tests/test_taj20_unified_preflight.py", "code": "E501", "row": 92, "column": 101, "message": "Line too long (101 > 100)"},
+    {"filename": "tests/test_taj20_unified_preflight.py", "code": "E501", "row": 96, "column": 101, "message": "Line too long (119 > 100)"},
+    {"filename": "tests/test_taj20_unified_preflight.py", "code": "E501", "row": 97, "column": 101, "message": "Line too long (109 > 100)"},
+    {"filename": "tests/test_taj20_unified_preflight.py", "code": "E501", "row": 130, "column": 101, "message": "Line too long (109 > 100)"}
+  ]
+}

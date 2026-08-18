@@ -5,9 +5,12 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
 PLANNER="$REPO_ROOT/scripts/plan_all_execution_identities.py"
 PREFLIGHT="$SCRIPT_DIR/runtime_audit/taj20_preflight.py"
+RUNNER="$REPO_ROOT/scripts/run_taj20_probabilistic_matrix.py"
+ACCEPTANCE="$SCRIPT_DIR/runtime_audit/taj20_acceptance.py"
 BASE_ROOT="${TAJ20_ROOT:-$REPO_ROOT/runs/taj20-unified-runtime}"
 CURRENT_FILE="$BASE_ROOT/CURRENT"
 TAJ19_BASE="$REPO_ROOT/runs/taj19-broad-runtime"
+SEED="${TAJ20_SEED:-1}"
 MODE="${1:-status}"
 
 fail() {
@@ -66,7 +69,7 @@ current_root() {
 }
 
 show_status() {
-    echo "TAJ20_LAUNCHER=v1"
+    echo "TAJ20_LAUNCHER=v2"
     echo "REPO_ROOT=$REPO_ROOT"
     echo "REPO_HEAD=$(git -C "$REPO_ROOT" rev-parse HEAD)"
     echo "EXPECTED_BROAD_IDENTITIES=174"
@@ -76,6 +79,7 @@ show_status() {
     echo "EXPECTED_REUSED_PAIRS=1044"
     echo "EXPECTED_INCREMENTAL_PAIRS=456"
     echo "EXPECTED_FINAL_PAIRS=1500"
+    echo "TAJ20_SEED=$SEED"
     echo "HOLDOUT=CLOSED"
     echo "PROSPECTIVE=CLOSED"
     echo "PROMOTION=CLOSED"
@@ -84,9 +88,13 @@ show_status() {
         root="$(head -n 1 "$CURRENT_FILE")"
         echo "CURRENT_RUN=$root"
         [[ -f "$root/preflight/PRECHECK_SUMMARY.json" ]] && echo "PREFLIGHT_EVIDENCE_PRESENT=YES" || echo "PREFLIGHT_EVIDENCE_PRESENT=NO"
+        [[ -f "$root/probabilistic-runtime/CAMPAIGN_SUMMARY.json" ]] && echo "RUNTIME_EVIDENCE_PRESENT=YES" || echo "RUNTIME_EVIDENCE_PRESENT=NO"
+        [[ -f "$root/unified-acceptance/CAMPAIGN_SUMMARY.json" ]] && echo "UNIFIED_ACCEPTANCE_PRESENT=YES" || echo "UNIFIED_ACCEPTANCE_PRESENT=NO"
     else
         echo "CURRENT_RUN=NONE"
         echo "PREFLIGHT_EVIDENCE_PRESENT=NO"
+        echo "RUNTIME_EVIDENCE_PRESENT=NO"
+        echo "UNIFIED_ACCEPTANCE_PRESENT=NO"
     fi
 }
 
@@ -110,7 +118,62 @@ run_plan() {
     echo "TAJ20_PLAN_ONLY=PASS"
     echo "TAJ20_RUN_ROOT=$root"
     echo "TAJ19_REUSE_CAMPAIGN=$taj19_campaign"
-    echo "NEXT=probabilistic 76 x 6 incremental runtime certification"
+    echo "NEXT=bash tools/taj20.sh run"
+}
+
+run_incremental() {
+    local root preflight_root identity_root runtime_root acceptance_root taj19_campaign run_id
+    root="$(current_root)"
+    preflight_root="$root/preflight"
+    identity_root="$root/identity-plan"
+    runtime_root="$root/probabilistic-runtime"
+    acceptance_root="$root/unified-acceptance"
+    [[ -d "$preflight_root" ]] || fail "preflight evidence missing: $preflight_root"
+    [[ -d "$identity_root" ]] || fail "identity plan missing: $identity_root"
+    [[ ! -e "$runtime_root" ]] || fail "probabilistic runtime already exists: $runtime_root"
+    [[ ! -e "$acceptance_root" ]] || fail "unified acceptance already exists: $acceptance_root"
+    taj19_campaign="$(resolve_taj19_campaign)"
+    run_id="$(basename "$root")"
+
+    echo "[1/2]  50% execute frozen probabilistic 76 x 6 = 456 runtime matrix"
+    "${PY_CMD[@]}" "$RUNNER" run \
+        --preflight-root "$preflight_root" \
+        --root "$runtime_root" \
+        --campaign-id "$run_id" \
+        --seed "$SEED"
+
+    echo "[2/2] 100% verify immutable 1044 + incremental 456 = unified 1500"
+    "${PY_CMD[@]}" "$ACCEPTANCE" \
+        --taj19-root "$taj19_campaign" \
+        --probabilistic-root "$runtime_root" \
+        --identity-root "$identity_root" \
+        --output "$acceptance_root"
+    echo "TAJ20_RUNTIME=PASS"
+    echo "TAJ20_RUN_ROOT=$root"
+}
+
+verify_runtime() {
+    local root preflight_root identity_root runtime_root taj19_campaign output_root stamp
+    root="$(current_root)"
+    preflight_root="$root/preflight"
+    identity_root="$root/identity-plan"
+    runtime_root="$root/probabilistic-runtime"
+    [[ -d "$preflight_root" ]] || fail "preflight evidence missing: $preflight_root"
+    [[ -d "$identity_root" ]] || fail "identity plan missing: $identity_root"
+    [[ -d "$runtime_root" ]] || fail "probabilistic runtime missing: $runtime_root"
+    taj19_campaign="$(resolve_taj19_campaign)"
+    stamp="$(date -u +%Y%m%d-%H%M%S)"
+    output_root="$root/unified-reverify-$stamp"
+
+    # Reverification must be read-only with respect to immutable runtime evidence.
+    # The unified acceptance verifier checks the existing runtime SHA256SUMS before
+    # evaluating the 1044 + 456 = 1500 matrix contract.
+    "${PY_CMD[@]}" "$ACCEPTANCE" \
+        --taj19-root "$taj19_campaign" \
+        --probabilistic-root "$runtime_root" \
+        --identity-root "$identity_root" \
+        --output "$output_root"
+    echo "TAJ20_REVERIFY_ROOT=$output_root"
 }
 
 case "$MODE" in
@@ -131,8 +194,14 @@ case "$MODE" in
             --taj19-campaign "$TAJ19_CAMPAIGN" \
             --output "$ROOT/preflight-reverify"
         ;;
+    run)
+        run_incremental
+        ;;
+    verify-runtime)
+        verify_runtime
+        ;;
     *)
-        echo "Usage: bash tools/taj20.sh {status|plan|verify-plan}"
+        echo "Usage: bash tools/taj20.sh {status|plan|verify-plan|run|verify-runtime}"
         exit 2
         ;;
 esac

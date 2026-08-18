@@ -1,0 +1,10 @@
+# Temporary full-pytest failure baseline.
+# Source main: b6575da744d9261d86b7ce9594b267498a0bb22c
+# Observed on PR #370 head dfe456d38803466cc2e84130be2b5451acbc97a4
+# via CI run 32146980647.
+#
+# Existing failures may resolve, but any NEW nodeid must fail CI.
+tests/models/test_implementation_catalog.py::test_expanded_v2_preserves_broad_v1_and_derives_current_phase_count
+tests/test_taj19_gpu_wait.py::test_status_ready_when_any_gpu_has_required_free_memory
+tests/test_taj19_gpu_wait.py::test_status_blocked_when_free_memory_is_below_threshold
+tests/test_version.py::test_readme_does_not_encode_the_current_version_in_its_title
