@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 import importlib.util
 from pathlib import Path
 
@@ -87,3 +88,32 @@ def test_preflight_refuses_to_overwrite_existing_output(tmp_path: Path) -> None:
 
     with pytest.raises(FileExistsError, match="refusing to overwrite"):
         module.build_preflight(output)
+
+
+def test_preflight_does_not_import_runtime_campaign_or_sklearn(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    module = load_module()
+    output = tmp_path / "dependency-free-preflight"
+    original_import = builtins.__import__
+
+    def guarded_import(name, *args, **kwargs):
+        if name == "loto.evaluation.unified_campaign" or name.startswith("sklearn"):
+            raise AssertionError(f"preflight attempted forbidden runtime import: {name}")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", guarded_import)
+
+    result = module.build_preflight(output)
+
+    assert result["status"] == "PASS"
+    assert result["inventory"]["current_scientific_pairs"] == 1044
+
+
+def test_preflight_source_contract_detects_broad_only_campaign() -> None:
+    module = load_module()
+
+    seeds, surface = module._current_scientific_contract()
+
+    assert seeds == (42, 1729, 20260730)
+    assert surface == "broad-only"
