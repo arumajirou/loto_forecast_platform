@@ -1,0 +1,43 @@
+{
+  "all_raw_differences_representation_only": true,
+  "canonical_diff_count": 0,
+  "canonical_differences": [],
+  "raw_diff_count": 2,
+  "raw_differences": [
+    {
+      "kind": "VALUE",
+      "left": "<mlforecast.target_transforms.Differences object at 0x000002785DF348A0>",
+      "left_type": "builtins.str",
+      "path": "$.mlf_init_params.target_transforms[0]",
+      "right": "<mlforecast.target_transforms.Differences object at 0x00000211030A29E0>",
+      "right_type": "builtins.str"
+    },
+    {
+      "kind": "VALUE",
+      "left": "<mlforecast.target_transforms.LocalStandardScaler object at 0x000002785F2B8590>",
+      "left_type": "builtins.str",
+      "path": "$.mlf_init_params.target_transforms[1]",
+      "right": "<mlforecast.target_transforms.LocalStandardScaler object at 0x0000021103063B30>",
+      "right_type": "builtins.str"
+    }
+  ],
+  "tolerant_raw_diff_count": 2,
+  "tolerant_raw_differences": [
+    {
+      "kind": "VALUE",
+      "left": "<mlforecast.target_transforms.Differences object at 0x000002785DF348A0>",
+      "left_type": "builtins.str",
+      "path": "$.mlf_init_params.target_transforms[0]",
+      "right": "<mlforecast.target_transforms.Differences object at 0x00000211030A29E0>",
+      "right_type": "builtins.str"
+    },
+    {
+      "kind": "VALUE",
+      "left": "<mlforecast.target_transforms.LocalStandardScaler object at 0x000002785F2B8590>",
+      "left_type": "builtins.str",
+      "path": "$.mlf_init_params.target_transforms[1]",
+      "right": "<mlforecast.target_transforms.LocalStandardScaler object at 0x0000021103063B30>",
+      "right_type": "builtins.str"
+    }
+  ]
+}

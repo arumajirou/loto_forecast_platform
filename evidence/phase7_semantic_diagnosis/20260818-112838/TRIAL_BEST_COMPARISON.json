@@ -1,0 +1,23 @@
+{
+  "best_objective_same": true,
+  "best_trial_same": true,
+  "frozen": {
+    "best_inner_loss": 2.659176845649281,
+    "best_trial": 14,
+    "semantic_config_sha256": "f406422fee3bc426c406443fa74f41a77361eed8987b00ce8143cd87b5d34abf"
+  },
+  "replay": {
+    "best_inner_loss": 2.659176845649281,
+    "best_trial": 14,
+    "semantic_config_sha256": "7a0add8cad6f943a3202a7182093010df5ea4ecc32680e0f8ef4903e1f457edf"
+  },
+  "trial_replay": {
+    "numbers_same": true,
+    "objectives_same": true,
+    "param_diff_rows": 0,
+    "params_same": true,
+    "states_same": true,
+    "trial_count_expected": 20,
+    "trial_count_replay": 20
+  }
+}

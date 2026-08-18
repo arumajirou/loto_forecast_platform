@@ -1,0 +1,85 @@
+{
+  "files": [
+    {
+      "bytes": 1989,
+      "file": "DIAGNOSIS.json",
+      "sha256": "a0d067c2691bb597fe380ef98acf191683ea72e259c3bc731ae34b54ff5074bc"
+    },
+    {
+      "bytes": 178,
+      "file": "DIAGNOSIS_PROGRESS.json",
+      "sha256": "905f4b79781e2402173626c71faf3e2d51b389eda4829018bd7e49c3ee2c02d6"
+    },
+    {
+      "bytes": 730,
+      "file": "ENVIRONMENT_CURRENT.json",
+      "sha256": "3d2cc85da109e779a6eb664443943af72a2af4b302540f686a89f0f501a4d883"
+    },
+    {
+      "bytes": 433,
+      "file": "ENVIRONMENT_DIFF.json",
+      "sha256": "b69704ec1a18bbad8347ee83f1d6d1a4518d6e0a1976df29a1ee9b4b28efa185"
+    },
+    {
+      "bytes": 703,
+      "file": "FROZEN_CONFIG_CANONICAL.json",
+      "sha256": "2f22b54f5964eae38f079187c89d25937dc36ad500fe8da207658c43dc847dec"
+    },
+    {
+      "bytes": 4733,
+      "file": "FROZEN_CONFIG_TYPED_TREE.json",
+      "sha256": "6cc3f4e70c84f4fd8fbfaf3ab449c13a51560900f739784e5eb2aa41b5662bae"
+    },
+    {
+      "bytes": 1051,
+      "file": "RAW_FROZEN_CONFIG.json",
+      "sha256": "418c3e7d35fed7ce8c29ce29ded32a8a9e5736e3db9b3be0416bf82b80ecb6dd"
+    },
+    {
+      "bytes": 889,
+      "file": "RAW_REPLAY_CONFIG.json",
+      "sha256": "259e583d6b7e26b742bd17d9e55862129f242db2fbaff61adf6be25d684289fc"
+    },
+    {
+      "bytes": 133,
+      "file": "README.md",
+      "sha256": "da3b9c3c8f4b89ff61aaeb477c3989628049012895c52f0e005917375dc29376"
+    },
+    {
+      "bytes": 703,
+      "file": "REPLAY_CONFIG_CANONICAL.json",
+      "sha256": "2f22b54f5964eae38f079187c89d25937dc36ad500fe8da207658c43dc847dec"
+    },
+    {
+      "bytes": 5218,
+      "file": "REPLAY_CONFIG_TYPED_TREE.json",
+      "sha256": "9de43a9f7546a61558b98c1903d97869843c8d4002fab37010b162c0e28e875a"
+    },
+    {
+      "bytes": 14653,
+      "file": "REPLAY_TRIALS_SEED1.csv",
+      "sha256": "45727adc3930132c8fac4ce5812af272f6a31d3d6cbf83cd39a84f35929aee72"
+    },
+    {
+      "bytes": 1671,
+      "file": "SEMANTIC_CONFIG_DIFF.json",
+      "sha256": "89e241d220aa6efd629c48b044183f65084135ee2b8a260d0df68cbe0bc4a655"
+    },
+    {
+      "bytes": 985,
+      "file": "SEMANTIC_CONFIG_DIFF.md",
+      "sha256": "8515337b1a6707997b54e882cc26e5a8af96203917ef762df384e3215f36810a"
+    },
+    {
+      "bytes": 661,
+      "file": "TRIAL_BEST_COMPARISON.json",
+      "sha256": "9cf870a5c735646cef0793427e335857d659545e1bf2c8414502047f3d93d064"
+    },
+    {
+      "bytes": 38,
+      "file": "TRIAL_PARAM_DIFF.csv",
+      "sha256": "0a408cceb497810f831d7579f7723d6a4e2eaedc0146f3665f85754e4139e735"
+    }
+  ],
+  "holdout_accessed": false
+}

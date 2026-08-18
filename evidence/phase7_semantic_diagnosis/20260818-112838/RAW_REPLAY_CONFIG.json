@@ -1,0 +1,31 @@
+{
+  "best_inner_loss": 2.659176845649281,
+  "best_trial": 14,
+  "config": {
+    "mlf_fit_params": {
+      "static_features": []
+    },
+    "mlf_init_params": {
+      "date_features": null,
+      "lag_transforms": null,
+      "lags": [
+        1
+      ],
+      "num_threads": 1,
+      "target_transforms": [
+        "<mlforecast.target_transforms.Differences object at 0x00000211030A29E0>",
+        "<mlforecast.target_transforms.LocalStandardScaler object at 0x0000021103063B30>"
+      ]
+    },
+    "model_params": {
+      "colsample_bylevel": 0.3647267818084223,
+      "depth": 3,
+      "learning_rate": 0.022109361986862856,
+      "min_data_in_leaf": 95.95708821814695,
+      "n_estimators": 821,
+      "silent": true,
+      "subsample": 0.8535280164377872
+    }
+  },
+  "config_sha256": "7a0add8cad6f943a3202a7182093010df5ea4ecc32680e0f8ef4903e1f457edf"
+}
