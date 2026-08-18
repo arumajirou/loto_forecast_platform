@@ -7,6 +7,7 @@ PLANNER="$REPO_ROOT/scripts/plan_all_execution_identities.py"
 PREFLIGHT="$SCRIPT_DIR/runtime_audit/taj20_preflight.py"
 RUNNER="$REPO_ROOT/scripts/run_taj20_probabilistic_matrix.py"
 ACCEPTANCE="$SCRIPT_DIR/runtime_audit/taj20_acceptance.py"
+PUBLISHER="$SCRIPT_DIR/runtime_audit/taj20_publish_evidence.py"
 BASE_ROOT="${TAJ20_ROOT:-$REPO_ROOT/runs/taj20-unified-runtime}"
 CURRENT_FILE="$BASE_ROOT/CURRENT"
 TAJ19_BASE="$REPO_ROOT/runs/taj19-broad-runtime"
@@ -176,6 +177,15 @@ verify_runtime() {
     echo "TAJ20_REVERIFY_ROOT=$output_root"
 }
 
+publish_evidence() {
+    local root
+    root="$(current_root)"
+    [[ -f "$PUBLISHER" ]] || fail "TAJ-20 evidence publisher missing: $PUBLISHER"
+    "${PY_CMD[@]}" "$PUBLISHER" \
+        --repo-root "$REPO_ROOT" \
+        --run-root "$root"
+}
+
 case "$MODE" in
     status)
         show_status
@@ -200,8 +210,11 @@ case "$MODE" in
     verify-runtime)
         verify_runtime
         ;;
+    publish-evidence)
+        publish_evidence
+        ;;
     *)
-        echo "Usage: bash tools/taj20.sh {status|plan|verify-plan|run|verify-runtime}"
+        echo "Usage: bash tools/taj20.sh {status|plan|verify-plan|run|verify-runtime|publish-evidence}"
         exit 2
         ;;
 esac
