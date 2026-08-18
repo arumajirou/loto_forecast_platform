@@ -138,20 +138,41 @@ def test_preflight_fails_closed_when_lock_moves_after_actual(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     module = load_module()
-    source = module.UNIFIED_CAMPAIGN_SOURCE.read_text(encoding="utf-8")
-    lock_start = source.index("    lock = _write_prediction_lock(")
-    actual_start = source.index("    actual = np.asarray(", lock_start)
-    return_start = source.index("    predicted = np.asarray(", actual_start)
-    lock_block = source[lock_start:actual_start]
-    without_lock = source[:lock_start] + source[actual_start:return_start]
-    mutated = (
-        without_lock[: return_start - len(lock_block)]
-        + lock_block
-        + without_lock[return_start - len(lock_block) :]
-    )
     source_path = tmp_path / "unified_campaign.py"
-    source_path.write_text(mutated, encoding="utf-8")
+    source_path.write_text(
+        """
+class UnifiedCampaignConfig:
+    seeds: tuple[int, ...] = (42, 1729, 20260730)
+
+
+def _selected_entries(config):
+    return build_catalog()
+
+
+def _selected_probabilistic_routes(config):
+    return build_probabilistic_scientific_plan(config.games)
+
+
+def build_campaign_plan(config):
+    return _selected_entries(config), _selected_probabilistic_routes(config)
+
+
+def _evaluate_seed(history):
+    prediction = predict_probabilistic_from_history(history)
+    actual = values[0]
+    lock = _write_prediction_lock(prediction)
+    return actual, lock
+
+
+def run_unified_campaign(config):
+    return _selected_probabilistic_routes(config)
+""".lstrip(),
+        encoding="utf-8",
+    )
     monkeypatch.setattr(module, "UNIFIED_CAMPAIGN_SOURCE", source_path)
 
-    with pytest.raises(module.ScientificPreflightError, match="execution contract is incomplete"):
+    with pytest.raises(
+        module.ScientificPreflightError,
+        match="execution contract is incomplete",
+    ):
         module._current_scientific_contract()
