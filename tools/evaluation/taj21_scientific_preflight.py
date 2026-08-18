@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import os
@@ -20,6 +21,9 @@ from loto.probabilistic.catalog import (
     list_probabilistic_model_specs,
 )
 from loto.probabilistic.native_registry import list_native_implementations
+
+ROOT: Final = Path(__file__).resolve().parents[2]
+UNIFIED_CAMPAIGN_SOURCE: Final = ROOT / "src" / "loto" / "evaluation" / "unified_campaign.py"
 
 EXPECTED_BROAD: Final = 174
 EXPECTED_PROBABILISTIC: Final = 76
@@ -86,16 +90,94 @@ def _assert_unique(name: str, values: list[str]) -> None:
         raise ScientificPreflightError(f"{name} contains duplicate identities")
 
 
-def _current_scientific_plan() -> tuple[list[dict[str, str]], tuple[int, ...]]:
-    # Import lazily so inventory/preflight remains lightweight until the existing
-    # scientific campaign surface is explicitly inspected.
-    from loto.evaluation.unified_campaign import UnifiedCampaignConfig, build_campaign_plan
+def _call_name(node: ast.Call) -> str | None:
+    if isinstance(node.func, ast.Name):
+        return node.func.id
+    if isinstance(node.func, ast.Attribute):
+        return node.func.attr
+    return None
 
-    probe = UnifiedCampaignConfig(
-        output_dir=Path("_taj21_plan_only_not_written"),
-        git_commit="0" * 40,
-    )
-    return build_campaign_plan(probe), probe.seeds
+
+def _current_scientific_contract() -> tuple[tuple[int, ...], str]:
+    """Inspect the current campaign source without importing runtime dependencies."""
+
+    if not UNIFIED_CAMPAIGN_SOURCE.is_file():
+        raise ScientificPreflightError(
+            f"unified campaign source missing: {UNIFIED_CAMPAIGN_SOURCE}"
+        )
+    try:
+        tree = ast.parse(UNIFIED_CAMPAIGN_SOURCE.read_text(encoding="utf-8"))
+    except (OSError, SyntaxError) as exc:
+        raise ScientificPreflightError(f"cannot inspect unified campaign source: {exc}") from exc
+
+    seed_default: tuple[int, ...] | None = None
+    selected_entries_calls: set[str] | None = None
+    campaign_plan_calls: set[str] | None = None
+
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and node.name == "UnifiedCampaignConfig":
+            for item in node.body:
+                if isinstance(item, ast.AnnAssign) and isinstance(item.target, ast.Name):
+                    if item.target.id == "seeds" and item.value is not None:
+                        try:
+                            raw = ast.literal_eval(item.value)
+                        except (ValueError, TypeError) as exc:
+                            raise ScientificPreflightError(
+                                "UnifiedCampaignConfig.seeds default is not statically readable"
+                            ) from exc
+                        if not isinstance(raw, tuple) or not all(
+                            isinstance(value, int) for value in raw
+                        ):
+                            raise ScientificPreflightError(
+                                "UnifiedCampaignConfig.seeds default is not an integer tuple"
+                            )
+                        seed_default = tuple(raw)
+        elif isinstance(node, ast.FunctionDef) and node.name == "_selected_entries":
+            selected_entries_calls = {
+                name
+                for child in ast.walk(node)
+                if isinstance(child, ast.Call) and (name := _call_name(child)) is not None
+            }
+        elif isinstance(node, ast.FunctionDef) and node.name == "build_campaign_plan":
+            campaign_plan_calls = {
+                name
+                for child in ast.walk(node)
+                if isinstance(child, ast.Call) and (name := _call_name(child)) is not None
+            }
+
+    if seed_default is None:
+        raise ScientificPreflightError("UnifiedCampaignConfig.seeds default not found")
+    if selected_entries_calls is None or "build_catalog" not in selected_entries_calls:
+        raise ScientificPreflightError(
+            "current scientific selector no longer derives entries from build_catalog()"
+        )
+    if selected_entries_calls & {
+        "build_unified_catalog_rows",
+        "list_probabilistic_model_specs",
+        "list_native_implementations",
+    }:
+        raise ScientificPreflightError(
+            "current scientific selector already references probabilistic/unified identities"
+        )
+    if campaign_plan_calls is None or "_selected_entries" not in campaign_plan_calls:
+        raise ScientificPreflightError(
+            "build_campaign_plan no longer derives its matrix from _selected_entries()"
+        )
+    return seed_default, "broad-only"
+
+
+def _current_scientific_plan(
+    broad_ids: list[str], games: list[str]
+) -> tuple[list[dict[str, str]], tuple[int, ...]]:
+    current_seeds, surface = _current_scientific_contract()
+    if surface != "broad-only":
+        raise ScientificPreflightError(f"unexpected current scientific surface: {surface}")
+    plan = [
+        {"game": game, "candidate_id": model_id}
+        for game in games
+        for model_id in broad_ids
+    ]
+    return plan, current_seeds
 
 
 def collect_preflight_state() -> dict[str, Any]:
@@ -104,12 +186,12 @@ def collect_preflight_state() -> dict[str, Any]:
     unified_rows = build_unified_catalog_rows()
     native = list_native_implementations()
     games = list(known_games())
-    current_plan, current_seeds = _current_scientific_plan()
 
     broad_ids = [entry.model_id for entry in broad]
     probabilistic_ids = [spec.model_id for spec in probabilistic]
     unified_ids = [str(row["model_id"]) for row in unified_rows]
     native_ids = [item.model_id for item in native]
+    current_plan, current_seeds = _current_scientific_plan(broad_ids, games)
     current_scientific_ids = sorted({str(row["candidate_id"]) for row in current_plan})
 
     _assert_unique("broad catalog", broad_ids)
