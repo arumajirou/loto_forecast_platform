@@ -132,7 +132,8 @@ new_run_root() {
 }
 
 run_preflight() {
-    local root="$1" plan_root="$root/preflight-plan"
+    local root="$1"
+    local plan_root="$root/preflight-plan"
     echo "[1/4]  25% freeze live Broad v1 inventory and resource plan"
     "${PY_CMD[@]}" "$RUNNER" \
         --output "$plan_root" \
@@ -148,7 +149,11 @@ run_preflight() {
 }
 
 execute_campaign() {
-    local root="$1" resume_flag="${2:-}" campaign="$root/campaign" loto3 rc=0
+    local root="$1"
+    local resume_flag="${2:-}"
+    local campaign="$root/campaign"
+    local loto3
+    local rc=0
     loto3="$(resolve_loto3)"
     echo "[2/4]  50% execute Broad 174 x 6 runtime matrix"
     echo "CAMPAIGN_ROOT=$campaign"
@@ -185,7 +190,8 @@ execute_campaign() {
 }
 
 verify_campaign() {
-    local root="$1" campaign="$root/campaign"
+    local root="$1"
+    local campaign="$root/campaign"
     echo "[3/4]  75% verify 1,044 explicit statuses and functional evidence"
     "${PY_CMD[@]}" "$VERIFIER" verify --root "$campaign"
     echo "[4/4] 100% TAJ-19 evidence finalized"
