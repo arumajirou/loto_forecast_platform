@@ -1,0 +1,47 @@
+name: TAJ-21 preflight format final diff
+
+on:
+  push:
+    branches:
+      - fix/taj21-preflight-unified-readiness-v1
+    paths:
+      - .github/workflows/taj21-preflight-format-fix.yml
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - .github/workflows/taj21-preflight-format-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.head_ref == 'fix/taj21-preflight-unified-readiness-v1' || github.ref_name == 'fix/taj21-preflight-unified-readiness-v1'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: fix/taj21-preflight-unified-readiness-v1
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Format PR-owned Python files
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m pip install --quiet ruff==0.16.3
+          python3 -m ruff format tools/evaluation/taj21_scientific_preflight.py tests/test_taj21_scientific_preflight.py
+          python3 -m ruff format --check tools/evaluation/taj21_scientific_preflight.py tests/test_taj21_scientific_preflight.py
+      - name: Commit formatted files and remove workflow
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/taj21-preflight-format-fix.yml
+          git add tools/evaluation/taj21_scientific_preflight.py tests/test_taj21_scientific_preflight.py
+          git diff --cached --check
+          git commit -m "style: format TAJ-21 unified readiness preflight"
+          git push origin HEAD:fix/taj21-preflight-unified-readiness-v1
