@@ -34,22 +34,49 @@ def test_fetch_pr_head_uses_fetch_head_without_switching(monkeypatch) -> None:
     ]
 
 
-def test_worktree_operations_are_detached_and_scoped(monkeypatch, tmp_path: Path) -> None:
-    calls: list[tuple[str, ...]] = []
+def test_materialize_pr_files_uses_only_git_show(monkeypatch, tmp_path: Path) -> None:
+    calls: list[tuple[str, str]] = []
 
-    def fake_run_git(repo: Path, *args: str, capture: bool = True):
-        calls.append(args)
-        return subprocess.CompletedProcess([], 0, "", "")
+    def fake_git_show_bytes(repo: Path, head: str, path: str) -> bytes:
+        calls.append((head, path))
+        return ("payload:" + path).encode("utf-8")
 
-    monkeypatch.setattr(MOD, "run_git", fake_run_git)
+    monkeypatch.setattr(MOD, "git_show_bytes", fake_git_show_bytes)
 
     repo = tmp_path / "repo"
-    worktree = tmp_path / "isolated"
+    root = tmp_path / "isolated"
+    head = "b" * 40
 
-    MOD.add_detached_worktree(repo, worktree, "b" * 40)
-    MOD.remove_worktree(repo, worktree)
+    MOD.materialize_pr_files(repo, root, head)
 
-    assert calls == [
-        ("worktree", "add", "--detach", str(worktree), "b" * 40),
-        ("worktree", "remove", str(worktree)),
-    ]
+    assert calls == [(head, path) for path in MOD.MATERIALIZED_PATHS]
+    for relative in MOD.MATERIALIZED_PATHS:
+        destination = root / relative
+        assert destination.read_bytes() == ("payload:" + relative).encode("utf-8")
+
+
+def test_materialization_does_not_use_git_worktree(monkeypatch, tmp_path: Path) -> None:
+    def forbidden_run_git(*args, **kwargs):
+        raise AssertionError("git worktree must not be used for selective materialization")
+
+    monkeypatch.setattr(MOD, "run_git", forbidden_run_git)
+    monkeypatch.setattr(
+        MOD,
+        "git_show_bytes",
+        lambda repo, head, path: b"x",
+    )
+
+    root = tmp_path / "isolated"
+    MOD.materialize_pr_files(tmp_path / "repo", root, "c" * 40)
+
+    assert root.is_dir()
+
+
+def test_remove_materialized_root_is_scoped(tmp_path: Path) -> None:
+    root = tmp_path / "isolated"
+    root.mkdir()
+    (root / "file.txt").write_text("x", encoding="utf-8")
+
+    MOD.remove_materialized_root(root)
+
+    assert not root.exists()
