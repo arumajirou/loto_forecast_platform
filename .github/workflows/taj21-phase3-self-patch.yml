@@ -19,7 +19,7 @@ permissions:
 jobs:
   apply:
     if: github.head_ref == 'feat/taj21-unified-probabilistic-oof-v1' || github.ref_name == 'feat/taj21-unified-probabilistic-oof-v1'
-    runs-on: [self-hosted, Linux, X64, loto-ci]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout patch branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
