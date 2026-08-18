@@ -1,0 +1,6 @@
+mlforecast==1.1.0
+optuna==4.9.0
+catboost==1.2.10
+pandas==2.3.3
+numpy==2.5.2
+scikit-learn==1.9.0
