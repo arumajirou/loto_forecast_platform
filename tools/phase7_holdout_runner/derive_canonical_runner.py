@@ -4,7 +4,6 @@ import argparse
 import hashlib
 import json
 import py_compile
-import shutil
 from pathlib import Path
 from typing import Final
 
@@ -197,6 +196,74 @@ def patch_runner_source(source: str) -> str:
                 replay_dir,'''
     source = _replace_once(source, call_old, call_new, label="replay call")
 
+    parse_args_old = '''    args = parser.parse_args()
+'''
+    parse_args_new = '''    parser.add_argument(
+        "--stop-after-replay",
+        action="store_true",
+        help=(
+            "Verify the frozen 4-seed/80-trial replay and canonical semantic gate, "
+            "then exit before Holdout prediction or actual access."
+        ),
+    )
+
+    args = parser.parse_args()
+'''
+    source = _replace_once(source, parse_args_old, parse_args_new, label="parse args")
+
+    holdout_marker = '''    # ========================================================
+    # B. Sequential Holdout
+    # ========================================================'''
+    replay_only_gate = '''    if args.stop_after_replay:
+        progress["status"] = "PASS"
+        progress["phase"] = "REPLAY_VERIFIED_CANONICAL_V1"
+        progress["current_seed"] = None
+        progress["current_draw"] = None
+
+        atomic_json(
+            progress_path,
+            progress,
+        )
+        atomic_json(
+            root / "REPLAY_ONLY_VERIFICATION.json",
+            {
+                "schema_version":
+                    "phase7-replay-only-verification/v1",
+                "status":
+                    "PASS",
+                "components_verified":
+                    4,
+                "verification_trial_count":
+                    80,
+                "canonical_semantic_schema":
+                    SEMANTIC_CONFIG_SCHEMA_V1,
+                "freeze_sha256":
+                    args.freeze_sha256,
+                "holdout_draws_accessed":
+                    0,
+                "actuals_accessed":
+                    0,
+                "holdout_executed":
+                    False,
+                "verified_at_utc":
+                    now(),
+            },
+        )
+
+        print("PHASE 7 REPLAY VERIFICATION COMPLETE")
+        print("HOLDOUT_DRAWS_ACCESSED=0")
+        print("ACTUALS_ACCESSED=0")
+        print("HOLDOUT_EXECUTED=NO")
+        return 0
+
+'''
+    source = _replace_once(
+        source,
+        holdout_marker,
+        replay_only_gate + holdout_marker,
+        label="sequential Holdout marker",
+    )
+
     return source
 
 
@@ -244,13 +311,18 @@ def derive_runner(
     manifest = output_dir / MANIFEST_NAME
 
     derived_runner.write_text(derived_source, encoding="utf-8", newline="\n")
-    shutil.copyfile(semantic_config_source, semantic_copy)
+    semantic_copy.write_bytes(semantic_bytes)
 
     try:
         py_compile.compile(str(derived_runner), doraise=True)
         py_compile.compile(str(semantic_copy), doraise=True)
     except py_compile.PyCompileError as exc:
         raise DerivationError(f"derived source compile failed: {exc}") from exc
+
+    if runner.read_bytes() != original_bytes:
+        raise DerivationError("original runner changed during derivation")
+    if semantic_config_source.read_bytes() != semantic_bytes:
+        raise DerivationError("semantic config source changed during derivation")
 
     derived_sha = sha256_bytes(derived_runner.read_bytes())
     semantic_sha = sha256_bytes(semantic_copy.read_bytes())
@@ -270,6 +342,9 @@ def derive_runner(
         "legacy_semantic_hash_is_gate": False,
         "canonical_semantic_hash_is_gate": True,
         "legacy_differences_state": [1],
+        "replay_only_mode_supported": True,
+        "replay_only_holdout_access": False,
+        "replay_only_actual_access": False,
         "original_runner_modified": False,
     }
     manifest.write_text(
