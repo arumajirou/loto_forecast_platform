@@ -2,8 +2,21 @@
   "canonical_semantic_schema": "loto.semantic-config/v1",
   "expected_mlforecast_version": "1.1.0",
   "expected_original_runner_sha256": "986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187",
-  "expected_semantic_config_git_blob": "52949291c563d1126e3dd6d1363305c5766a630d",
+  "expected_semantic_config_git_blob": "bd9c184e431a20039d8d2400b1b869b58a5f7833",
   "legacy_differences_state": [1],
+  "legacy_global_sklearn_transformer": {
+    "transformer": {
+      "class": "sklearn.preprocessing.FunctionTransformer",
+      "func": "numpy.log1p",
+      "inverse_func": "numpy.expm1",
+      "validate": false,
+      "accept_sparse": false,
+      "check_inverse": true,
+      "feature_names_out": null,
+      "kw_args": null,
+      "inv_kw_args": null
+    }
+  },
   "legacy_semantic_hash_is_gate": false,
   "legacy_semantic_hash_preserved": true,
   "canonical_semantic_hash_is_gate": true,
