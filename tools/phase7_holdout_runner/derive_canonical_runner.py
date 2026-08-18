@@ -38,7 +38,14 @@ def _replace_once(text: str, old: str, new: str, *, label: str) -> str:
     return text.replace(old, new, 1)
 
 
+def _normalize_source_newlines(source: str) -> str:
+    """Normalize only the in-memory derivation copy to deterministic LF newlines."""
+    return source.replace("\r\n", "\n").replace("\r", "\n")
+
+
 def patch_runner_source(source: str) -> str:
+    source = _normalize_source_newlines(source)
+
     import_anchor = "from __future__ import annotations\n"
     import_replacement = (
         import_anchor
@@ -342,6 +349,7 @@ def derive_runner(
         "legacy_semantic_hash_is_gate": False,
         "canonical_semantic_hash_is_gate": True,
         "legacy_differences_state": [1],
+        "source_newline_normalization": "lf_for_in_memory_derivation_only",
         "replay_only_mode_supported": True,
         "replay_only_holdout_access": False,
         "replay_only_actual_access": False,
