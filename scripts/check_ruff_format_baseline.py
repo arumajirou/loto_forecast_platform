@@ -39,6 +39,15 @@ def classify(*, baseline: set[str], current: set[str]) -> tuple[set[str], set[st
     return inherited, resolved, introduced
 
 
+def _print_introduced_diff(paths: set[str]) -> None:
+    command = [sys.executable, "-m", "ruff", "format", "--diff", *sorted(paths)]
+    proc = subprocess.run(command, check=False, capture_output=True, text=True)
+    combined = "\n".join(part for part in (proc.stdout, proc.stderr) if part)
+    print("RUFF_FORMAT_DIFF_BEGIN", file=sys.stderr)
+    print(combined, file=sys.stderr)
+    print("RUFF_FORMAT_DIFF_END", file=sys.stderr)
+
+
 def check_format(*, baseline_path: pathlib.Path, targets: list[str]) -> int:
     baseline = read_baseline(baseline_path)
     command = [sys.executable, "-m", "ruff", "format", "--check", *targets]
@@ -69,6 +78,7 @@ def check_format(*, baseline_path: pathlib.Path, targets: list[str]) -> int:
     for path in sorted(introduced):
         print(f"NEW_FORMAT_DEBT={path}", file=sys.stderr)
     if introduced:
+        _print_introduced_diff(introduced)
         print("RUFF_FORMAT_BASELINE_GATE=FAIL", file=sys.stderr)
         return 1
     print("RUFF_FORMAT_BASELINE_GATE=PASS")
