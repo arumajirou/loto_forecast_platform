@@ -129,6 +129,9 @@ def test_patch_preserves_legacy_evidence_and_adds_canonical_gate() -> None:
     assert "canonical_frozen_hash != canonical_replay_hash" in patched
     assert "frozen_config_path: Path" in patched
     assert "frozen_config_path=" in patched
+    assert '"mlforecast.target_transforms.GlobalSklearnTransformer"' in patched
+    assert '"func": "numpy.log1p"' in patched
+    assert '"inverse_func": "numpy.expm1"' in patched
     compile(patched, "derived.py", "exec")
 
 
@@ -140,7 +143,9 @@ def test_patch_adds_replay_only_stop_before_holdout() -> None:
     assert 'print("HOLDOUT_DRAWS_ACCESSED=0")' in patched
     assert 'print("ACTUALS_ACCESSED=0")' in patched
     assert 'print("HOLDOUT_EXECUTED=NO")' in patched
-    assert patched.index("if args.stop_after_replay:") < patched.index("# B. Sequential Holdout")
+    assert patched.index("if args.stop_after_replay:") < patched.index(
+        "# B. Sequential Holdout"
+    )
 
 
 def test_patch_accepts_crlf_source_and_normalizes_only_derived_text() -> None:
@@ -212,6 +217,7 @@ def test_derive_writes_compilable_bundle_without_mutating_original(tmp_path: Pat
     assert result["replay_only_mode_supported"] == "True"
     assert result["replay_only_holdout_access"] == "False"
     assert result["replay_only_actual_access"] == "False"
+    assert result["legacy_global_sklearn_transformer"] == "numpy.log1p/numpy.expm1"
     assert (tmp_path / "out" / MOD.DERIVED_RUNNER_NAME).is_file()
     assert (tmp_path / "out" / MOD.SEMANTIC_MODULE_NAME).is_file()
     assert (tmp_path / "out" / MOD.MANIFEST_NAME).is_file()
