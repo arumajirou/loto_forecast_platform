@@ -97,15 +97,11 @@ def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
         "promotion": False,
         "results": results,
     }
-    (root / "campaign_summary.json").write_text(
-        json.dumps(summary) + "\n", encoding="utf-8"
-    )
+    (root / "campaign_summary.json").write_text(json.dumps(summary) + "\n", encoding="utf-8")
     artifacts = sorted(
         path for path in root.rglob("*") if path.is_file() and path.name != "SHA256SUMS"
     )
-    lines = [
-        f"{_sha256(path)}  {path.relative_to(root).as_posix()}" for path in artifacts
-    ]
+    lines = [f"{_sha256(path)}  {path.relative_to(root).as_posix()}" for path in artifacts]
     (root / "SHA256SUMS").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
