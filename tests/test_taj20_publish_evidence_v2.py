@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import subprocess
 from pathlib import Path
@@ -47,19 +48,83 @@ def init_repo(repo: Path) -> str:
     return git_head(repo)
 
 
-def test_identity_publication_matches_actual_planner_contract(tmp_path: Path) -> None:
+def write_checksum_contract(root: Path, files: dict[str, str]) -> None:
+    root.mkdir(parents=True)
+    lines: list[str] = []
+    for relative, content in files.items():
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        lines.append(f"{digest}  {relative}")
+    (root / "SHA256SUMS").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def test_checksum_contract_copies_identity_without_manifest(tmp_path: Path) -> None:
+    module = load_module()
+    source = tmp_path / "identity"
+    destination = tmp_path / "copied"
+    files = {
+        "IDENTITY_SUMMARY.json": "{}\n",
+        "UNIFIED_CATALOG.json": "[]\n",
+        "PROBABILISTIC_NATIVE.json": "[]\n",
+        "EXECUTION_SURFACES.json": "{}\n",
+    }
+    write_checksum_contract(source, files)
+
+    copied = module._copy_checksum_contract(source, destination)
+
+    assert set(copied) == set(files)
+    assert not (destination / "ARTIFACT_MANIFEST.json").exists()
+    module.base._verify_sha256s(destination)
+
+
+def test_checksum_contract_copies_actual_preflight_without_manifest(tmp_path: Path) -> None:
+    module = load_module()
+    source = tmp_path / "preflight"
+    destination = tmp_path / "copied"
+    files = {
+        "UNIFIED_IDENTITY_MANIFEST.json": "{}\n",
+        "IDENTITY_BACKEND_MAPPING.json": "{}\n",
+        "INCREMENTAL_MATRIX_PLAN.json": "{}\n",
+        "REUSE_PROVENANCE.json": "{}\n",
+        "PRECHECK_SUMMARY.json": "{}\n",
+    }
+    write_checksum_contract(source, files)
+
+    copied = module._copy_checksum_contract(source, destination)
+
+    assert set(copied) == set(files)
+    assert not (destination / "ARTIFACT_MANIFEST.json").exists()
+    module.base._verify_sha256s(destination)
+
+
+def test_checksum_contract_preserves_nested_paths(tmp_path: Path) -> None:
     module = load_module()
     source = tmp_path / "source"
-    destination = tmp_path / "destination"
-    source.mkdir()
-    for name in module.IDENTITY_PUBLICATION_FILES:
-        (source / name).write_text(f"{name}\n", encoding="utf-8")
+    destination = tmp_path / "copied"
+    write_checksum_contract(source, {"nested/evidence.json": "{}\n"})
 
-    assert "ARTIFACT_MANIFEST.json" not in module.IDENTITY_PUBLICATION_FILES
-    module._copy_identity_plan(source, destination)
-    assert sorted(path.name for path in destination.iterdir()) == sorted(
-        module.IDENTITY_PUBLICATION_FILES
+    module._copy_checksum_contract(source, destination)
+
+    assert (destination / "nested" / "evidence.json").read_text(encoding="utf-8") == "{}\n"
+    module.base._verify_sha256s(destination)
+
+
+def test_checksum_contract_rejects_path_escape(tmp_path: Path) -> None:
+    module = load_module()
+    source = tmp_path / "source"
+    source.mkdir()
+    outside = tmp_path / "outside.json"
+    outside.write_text("{}\n", encoding="utf-8")
+    digest = hashlib.sha256(outside.read_bytes()).hexdigest()
+    (source / "SHA256SUMS").write_text(
+        f"{digest}  ../outside.json\n",
+        encoding="utf-8",
     )
+
+    with pytest.raises(module.PublishError, match="escapes root"):
+        module._copy_checksum_contract(source, tmp_path / "copied")
 
 
 def test_secret_marker_is_rejected_before_publication(tmp_path: Path) -> None:
