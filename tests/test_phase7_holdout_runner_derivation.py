@@ -145,6 +145,16 @@ def test_patch_adds_replay_only_stop_before_holdout() -> None:
     )
 
 
+def test_patch_accepts_crlf_source_and_normalizes_only_derived_text() -> None:
+    crlf_source = fixture_runner().replace("\n", "\r\n")
+    patched = MOD.patch_runner_source(crlf_source)
+
+    assert "\r" not in patched
+    assert "canonical_semantic_sha256_frozen" in patched
+    assert '"--stop-after-replay"' in patched
+    compile(patched, "derived.py", "exec")
+
+
 def test_patch_fails_closed_when_anchor_missing() -> None:
     with pytest.raises(MOD.DerivationError, match="replay signature anchor count"):
         MOD.patch_runner_source("from __future__ import annotations\n")
@@ -153,7 +163,7 @@ def test_patch_fails_closed_when_anchor_missing() -> None:
 def test_derive_rejects_wrong_runner_sha(tmp_path: Path) -> None:
     runner = tmp_path / "runner.py"
     semantic = tmp_path / "semantic.py"
-    runner.write_text(fixture_runner(), encoding="utf-8")
+    runner.write_bytes(fixture_runner().replace("\n", "\r\n").encode("utf-8"))
     semantic.write_text(semantic_source(), encoding="utf-8")
     with pytest.raises(MOD.DerivationError, match="original runner SHA mismatch"):
         MOD.derive_runner(
@@ -168,7 +178,7 @@ def test_derive_rejects_wrong_runner_sha(tmp_path: Path) -> None:
 def test_derive_rejects_wrong_semantic_blob(tmp_path: Path) -> None:
     runner = tmp_path / "runner.py"
     semantic = tmp_path / "semantic.py"
-    runner.write_text(fixture_runner(), encoding="utf-8")
+    runner.write_bytes(fixture_runner().replace("\n", "\r\n").encode("utf-8"))
     semantic.write_text(semantic_source(), encoding="utf-8")
     runner_sha = hashlib.sha256(runner.read_bytes()).hexdigest()
     with pytest.raises(MOD.DerivationError, match="Git blob mismatch"):
@@ -184,7 +194,7 @@ def test_derive_rejects_wrong_semantic_blob(tmp_path: Path) -> None:
 def test_derive_writes_compilable_bundle_without_mutating_original(tmp_path: Path) -> None:
     runner = tmp_path / "runner.py"
     semantic = tmp_path / "semantic.py"
-    runner.write_text(fixture_runner(), encoding="utf-8")
+    runner.write_bytes(fixture_runner().replace("\n", "\r\n").encode("utf-8"))
     semantic.write_text(semantic_source(), encoding="utf-8")
     original = runner.read_bytes()
     runner_sha = hashlib.sha256(original).hexdigest()
@@ -200,6 +210,7 @@ def test_derive_writes_compilable_bundle_without_mutating_original(tmp_path: Pat
 
     assert runner.read_bytes() == original
     assert result["original_runner_modified"] == "False"
+    assert result["source_newline_normalization"] == "lf_for_in_memory_derivation_only"
     assert result["replay_only_mode_supported"] == "True"
     assert result["replay_only_holdout_access"] == "False"
     assert result["replay_only_actual_access"] == "False"
@@ -212,7 +223,7 @@ def test_output_directory_must_be_new(tmp_path: Path) -> None:
     runner = tmp_path / "runner.py"
     semantic = tmp_path / "semantic.py"
     out = tmp_path / "out"
-    runner.write_text(fixture_runner(), encoding="utf-8")
+    runner.write_bytes(fixture_runner().replace("\n", "\r\n").encode("utf-8"))
     semantic.write_text(semantic_source(), encoding="utf-8")
     out.mkdir()
     with pytest.raises(MOD.DerivationError, match="already exists"):
