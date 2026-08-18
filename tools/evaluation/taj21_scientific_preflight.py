@@ -98,8 +98,49 @@ def _call_name(node: ast.Call) -> str | None:
     return None
 
 
-def _current_scientific_contract() -> tuple[tuple[int, ...], str]:
-    """Inspect the current campaign source without importing runtime dependencies."""
+def _function_calls(node: ast.FunctionDef) -> set[str]:
+    return {
+        name
+        for child in ast.walk(node)
+        if isinstance(child, ast.Call) and (name := _call_name(child)) is not None
+    }
+
+
+def _first_call_line(node: ast.FunctionDef, name: str) -> int | None:
+    lines = [
+        child.lineno
+        for child in ast.walk(node)
+        if isinstance(child, ast.Call) and _call_name(child) == name
+    ]
+    return min(lines) if lines else None
+
+
+def _assignment_line(node: ast.FunctionDef, target_name: str) -> int | None:
+    lines: list[int] = []
+    for child in ast.walk(node):
+        if not isinstance(child, (ast.Assign, ast.AnnAssign)):
+            continue
+        targets = child.targets if isinstance(child, ast.Assign) else [child.target]
+        if any(isinstance(target, ast.Name) and target.id == target_name for target in targets):
+            lines.append(child.lineno)
+    return min(lines) if lines else None
+
+
+def _predictor_receives_history(node: ast.FunctionDef) -> bool:
+    for child in ast.walk(node):
+        if (
+            not isinstance(child, ast.Call)
+            or _call_name(child) != "predict_probabilistic_from_history"
+        ):
+            continue
+        return bool(
+            child.args and isinstance(child.args[0], ast.Name) and child.args[0].id == "history"
+        )
+    return False
+
+
+def _current_scientific_contract() -> tuple[tuple[int, ...], str, dict[str, bool]]:
+    """Inspect the live campaign source without importing runtime model dependencies."""
 
     if not UNIFIED_CAMPAIGN_SOURCE.is_file():
         raise ScientificPreflightError(
@@ -111,73 +152,98 @@ def _current_scientific_contract() -> tuple[tuple[int, ...], str]:
         raise ScientificPreflightError(f"cannot inspect unified campaign source: {exc}") from exc
 
     seed_default: tuple[int, ...] | None = None
-    selected_entries_calls: set[str] | None = None
-    campaign_plan_calls: set[str] | None = None
-
+    functions: dict[str, ast.FunctionDef] = {}
     for node in tree.body:
-        if isinstance(node, ast.ClassDef) and node.name == "UnifiedCampaignConfig":
+        if isinstance(node, ast.FunctionDef):
+            functions[node.name] = node
+        elif isinstance(node, ast.ClassDef) and node.name == "UnifiedCampaignConfig":
             for item in node.body:
-                if isinstance(item, ast.AnnAssign) and isinstance(item.target, ast.Name):
-                    if item.target.id == "seeds" and item.value is not None:
-                        try:
-                            raw = ast.literal_eval(item.value)
-                        except (ValueError, TypeError) as exc:
-                            raise ScientificPreflightError(
-                                "UnifiedCampaignConfig.seeds default is not statically readable"
-                            ) from exc
-                        if not isinstance(raw, tuple) or not all(
-                            isinstance(value, int) for value in raw
-                        ):
-                            raise ScientificPreflightError(
-                                "UnifiedCampaignConfig.seeds default is not an integer tuple"
-                            )
-                        seed_default = tuple(raw)
-        elif isinstance(node, ast.FunctionDef) and node.name == "_selected_entries":
-            selected_entries_calls = {
-                name
-                for child in ast.walk(node)
-                if isinstance(child, ast.Call) and (name := _call_name(child)) is not None
-            }
-        elif isinstance(node, ast.FunctionDef) and node.name == "build_campaign_plan":
-            campaign_plan_calls = {
-                name
-                for child in ast.walk(node)
-                if isinstance(child, ast.Call) and (name := _call_name(child)) is not None
-            }
+                if not isinstance(item, ast.AnnAssign) or not isinstance(item.target, ast.Name):
+                    continue
+                if item.target.id != "seeds" or item.value is None:
+                    continue
+                try:
+                    raw = ast.literal_eval(item.value)
+                except (ValueError, TypeError) as exc:
+                    raise ScientificPreflightError(
+                        "UnifiedCampaignConfig.seeds default is not statically readable"
+                    ) from exc
+                if not isinstance(raw, tuple) or not all(isinstance(value, int) for value in raw):
+                    raise ScientificPreflightError(
+                        "UnifiedCampaignConfig.seeds default is not an integer tuple"
+                    )
+                seed_default = tuple(raw)
 
+    required_functions = {
+        "_selected_entries",
+        "_selected_probabilistic_routes",
+        "build_campaign_plan",
+        "_evaluate_seed",
+        "run_unified_campaign",
+    }
+    missing_functions = sorted(required_functions.difference(functions))
+    if missing_functions:
+        raise ScientificPreflightError(
+            f"unified scientific source is missing required functions: {missing_functions}"
+        )
     if seed_default is None:
         raise ScientificPreflightError("UnifiedCampaignConfig.seeds default not found")
-    if selected_entries_calls is None or "build_catalog" not in selected_entries_calls:
+
+    selected_entries_calls = _function_calls(functions["_selected_entries"])
+    probabilistic_selector_calls = _function_calls(functions["_selected_probabilistic_routes"])
+    campaign_plan_calls = _function_calls(functions["build_campaign_plan"])
+    evaluate_seed = functions["_evaluate_seed"]
+    evaluate_seed_calls = _function_calls(evaluate_seed)
+    run_calls = _function_calls(functions["run_unified_campaign"])
+
+    predictor_line = _first_call_line(evaluate_seed, "predict_probabilistic_from_history")
+    lock_line = _first_call_line(evaluate_seed, "_write_prediction_lock")
+    actual_line = _assignment_line(evaluate_seed, "actual")
+
+    checks = {
+        "broad_selector_from_build_catalog": "build_catalog" in selected_entries_calls,
+        "probabilistic_selector_from_scientific_plan": (
+            "build_probabilistic_scientific_plan" in probabilistic_selector_calls
+        ),
+        "planner_uses_broad_selector": "_selected_entries" in campaign_plan_calls,
+        "planner_uses_probabilistic_selector": (
+            "_selected_probabilistic_routes" in campaign_plan_calls
+        ),
+        "runtime_uses_probabilistic_selector": ("_selected_probabilistic_routes" in run_calls),
+        "history_only_probabilistic_predictor": (
+            "predict_probabilistic_from_history" in evaluate_seed_calls
+            and _predictor_receives_history(evaluate_seed)
+        ),
+        "durable_prediction_lock_present": "_write_prediction_lock" in evaluate_seed_calls,
+        "prediction_lock_before_actual": (
+            predictor_line is not None
+            and lock_line is not None
+            and actual_line is not None
+            and predictor_line < lock_line < actual_line
+        ),
+    }
+    failed = sorted(name for name, passed in checks.items() if not passed)
+    if failed:
         raise ScientificPreflightError(
-            "current scientific selector no longer derives entries from build_catalog()"
+            f"unified scientific execution contract is incomplete: {failed}"
         )
-    if selected_entries_calls & {
-        "build_unified_catalog_rows",
-        "list_probabilistic_model_specs",
-        "list_native_implementations",
-    }:
-        raise ScientificPreflightError(
-            "current scientific selector already references probabilistic/unified identities"
-        )
-    if campaign_plan_calls is None or "_selected_entries" not in campaign_plan_calls:
-        raise ScientificPreflightError(
-            "build_campaign_plan no longer derives its matrix from _selected_entries()"
-        )
-    return seed_default, "broad-only"
+    return seed_default, "unified-250", checks
 
 
 def _current_scientific_plan(
-    broad_ids: list[str], games: list[str]
-) -> tuple[list[dict[str, str]], tuple[int, ...]]:
-    current_seeds, surface = _current_scientific_contract()
-    if surface != "broad-only":
+    broad_ids: list[str], probabilistic_ids: list[str], games: list[str]
+) -> tuple[list[dict[str, str]], tuple[int, ...], dict[str, bool]]:
+    current_seeds, surface, checks = _current_scientific_contract()
+    if surface != "unified-250":
         raise ScientificPreflightError(f"unexpected current scientific surface: {surface}")
-    plan = [
-        {"game": game, "candidate_id": model_id}
-        for game in games
-        for model_id in broad_ids
-    ]
-    return plan, current_seeds
+    collision = sorted(set(broad_ids).intersection(probabilistic_ids))
+    if collision:
+        raise ScientificPreflightError(
+            f"current scientific plan has identity collisions: {collision}"
+        )
+    current_ids = sorted(set(broad_ids) | set(probabilistic_ids))
+    plan = [{"game": game, "candidate_id": model_id} for game in games for model_id in current_ids]
+    return plan, current_seeds, checks
 
 
 def collect_preflight_state() -> dict[str, Any]:
@@ -191,7 +257,9 @@ def collect_preflight_state() -> dict[str, Any]:
     probabilistic_ids = [spec.model_id for spec in probabilistic]
     unified_ids = [str(row["model_id"]) for row in unified_rows]
     native_ids = [item.model_id for item in native]
-    current_plan, current_seeds = _current_scientific_plan(broad_ids, games)
+    current_plan, current_seeds, source_checks = _current_scientific_plan(
+        broad_ids, probabilistic_ids, games
+    )
     current_scientific_ids = sorted({str(row["candidate_id"]) for row in current_plan})
 
     _assert_unique("broad catalog", broad_ids)
@@ -212,9 +280,9 @@ def collect_preflight_state() -> dict[str, Any]:
         raise ScientificPreflightError("unified catalog is not exactly Broad union probabilistic")
     if native_set != probabilistic_set:
         raise ScientificPreflightError("probabilistic/native identity parity failed")
-    if current_scientific_set != broad_set:
+    if current_scientific_set != unified_set:
         raise ScientificPreflightError(
-            "current unified_campaign scientific planner no longer matches the Broad catalog"
+            "current unified_campaign scientific planner does not match the unified catalog"
         )
 
     counts = {
@@ -231,8 +299,8 @@ def collect_preflight_state() -> dict[str, Any]:
         "probabilistic_identities": EXPECTED_PROBABILISTIC,
         "unified_identities": EXPECTED_UNIFIED,
         "games": EXPECTED_GAMES,
-        "current_scientific_identities": EXPECTED_BROAD,
-        "current_scientific_pairs": EXPECTED_BROAD_PAIRS,
+        "current_scientific_identities": EXPECTED_UNIFIED,
+        "current_scientific_pairs": EXPECTED_UNIFIED_PAIRS,
         "target_unified_pairs": EXPECTED_UNIFIED_PAIRS,
     }
     if counts != expected_counts:
@@ -252,8 +320,8 @@ def collect_preflight_state() -> dict[str, Any]:
         raise ScientificPreflightError(f"seed contract drift: {tuple(current_seeds)}")
 
     missing_ids = sorted(unified_set - current_scientific_set)
-    if set(missing_ids) != probabilistic_set or len(missing_ids) != EXPECTED_PROBABILISTIC:
-        raise ScientificPreflightError("scientific route gap is not exactly the probabilistic catalog")
+    if missing_ids:
+        raise ScientificPreflightError(f"scientific route gap remains: {missing_ids}")
 
     target_plan = [
         {
@@ -261,7 +329,9 @@ def collect_preflight_state() -> dict[str, Any]:
             "candidate_id": model_id,
             "catalog_source": "probabilistic" if model_id in probabilistic_set else "broad",
             "scientific_route": (
-                "ADAPTER_REQUIRED" if model_id in probabilistic_set else "CURRENT_BROAD_ROUTE"
+                "CURRENT_PROBABILISTIC_OOF_ROUTE"
+                if model_id in probabilistic_set
+                else "CURRENT_BROAD_ROUTE"
             ),
         }
         for game in games
@@ -273,18 +343,19 @@ def collect_preflight_state() -> dict[str, Any]:
         raise ScientificPreflightError("unified scientific plan contains duplicates")
 
     gap = {
-        "missing_scientific_identities": missing_ids,
-        "missing_identity_count": len(missing_ids),
-        "missing_model_game_pairs": len(missing_ids) * len(games),
-        "expected_missing_model_game_pairs": EXPECTED_INCREMENTAL_PAIRS,
+        "missing_scientific_identities": [],
+        "missing_identity_count": 0,
+        "missing_model_game_pairs": 0,
+        "historical_incremental_model_game_pairs": EXPECTED_INCREMENTAL_PAIRS,
         "required_adapter": "probabilistic-76-development-oof-v1",
-        "current_scientific_surface": "broad-only",
-        "execution_readiness": "BLOCKED",
-        "blocking_reasons": ["PROBABILISTIC_76_OOF_ADAPTER_MISSING"],
+        "current_scientific_surface": "unified-250",
+        "execution_readiness": "PASS",
+        "blocking_reasons": [],
+        "source_contract_checks": source_checks,
     }
 
     return {
-        "schema_version": "taj21-scientific-preflight/v1",
+        "schema_version": "taj21-scientific-preflight/v2",
         "status": "PASS",
         "inventory": counts,
         "canonical_games": games,
@@ -295,17 +366,18 @@ def collect_preflight_state() -> dict[str, Any]:
         "target_plan": target_plan,
         "route_gap": gap,
         "scientific_boundary": {
-            "development_oof": "PLANNED",
+            "development_oof": "EXECUTION_READY",
             "holdout": "CLOSED",
             "prospective": "CLOSED",
             "promotion": "CLOSED",
             "accuracy_claim": False,
         },
         "interpretation": (
-            "The scientific protocol foundation is valid, but execution readiness remains "
-            "blocked until the 76 probabilistic canonical identities receive a development-only "
-            "OOF adapter under the same chronological folds, metrics, baselines, seeds, and "
-            "prediction-before-actual contract."
+            "The dependency-free source and registry audit confirms that the unified 250-identity "
+            "development-only scientific route is wired across all six games, including the "
+            "history-only probabilistic predictor and durable prediction lock before target actual "
+            "reads. Execution readiness does not imply scientific success, accuracy, or promotion; "
+            "representative smoke and the full OOF campaign remain pending."
         ),
     }
 
@@ -329,7 +401,9 @@ def _write_artifact_manifest(output: Path, paths: list[Path]) -> Path:
 
 def _write_sha256sums(output: Path) -> Path:
     sums = output / "SHA256SUMS"
-    paths = sorted(path for path in output.rglob("*") if path.is_file() and path.name != "SHA256SUMS")
+    paths = sorted(
+        path for path in output.rglob("*") if path.is_file() and path.name != "SHA256SUMS"
+    )
     lines = [f"{_sha256(path)}  {path.relative_to(output).as_posix()}" for path in paths]
     sums.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return sums
@@ -350,7 +424,10 @@ def build_preflight(output: Path) -> dict[str, Any]:
     verification_path = output / "VERIFICATION_REPORT.json"
 
     _atomic_json(summary_path, summary)
-    _atomic_json(plan_path, {"schema_version": "taj21-unified-scientific-plan/v1", "rows": target_plan})
+    _atomic_json(
+        plan_path,
+        {"schema_version": "taj21-unified-scientific-plan/v2", "rows": target_plan},
+    )
     _atomic_json(gap_path, state["route_gap"])
     _atomic_json(
         verification_path,
@@ -365,10 +442,17 @@ def build_preflight(output: Path) -> dict[str, Any]:
                 "unified_250": True,
                 "games_6": True,
                 "target_pairs_1500": True,
-                "current_scientific_pairs_1044": True,
-                "missing_pairs_456": True,
+                "current_scientific_pairs_1500": True,
+                "missing_pairs_zero": True,
                 "identity_collision_zero": True,
                 "probabilistic_native_parity": True,
+                "probabilistic_oof_route_wired": True,
+                "history_only_predictor": state["route_gap"]["source_contract_checks"][
+                    "history_only_probabilistic_predictor"
+                ],
+                "prediction_lock_before_actual": state["route_gap"]["source_contract_checks"][
+                    "prediction_lock_before_actual"
+                ],
                 "metrics_contract": True,
                 "baseline_contract": True,
                 "seed_contract": True,
@@ -422,7 +506,8 @@ def main(argv: list[str] | None = None) -> int:
     print(f"MISSING_SCIENTIFIC_IDENTITIES={gap['missing_identity_count']}")
     print(f"MISSING_SCIENTIFIC_PAIRS={gap['missing_model_game_pairs']}")
     print(f"EXECUTION_READINESS={gap['execution_readiness']}")
-    print(f"BLOCKER={gap['blocking_reasons'][0]}")
+    blockers = gap["blocking_reasons"]
+    print("BLOCKER=" + (",".join(blockers) if blockers else "NONE"))
     print(f"PRIMARY_METRIC={result['primary_metric']}")
     print(f"BASELINES={len(result['required_baselines'])}")
     print("SEEDS=" + ",".join(str(seed) for seed in result["seed_inventory"]))
