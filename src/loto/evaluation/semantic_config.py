@@ -15,6 +15,8 @@ SEMANTIC_CONFIG_SCHEMA_V1 = "loto.semantic-config/v1"
 _LEGACY_OBJECT_RE = re.compile(
     r"^<(?P<class_path>[A-Za-z_][A-Za-z0-9_.]*) object at 0x[0-9A-Fa-f]+>$"
 )
+_GLOBAL_SKLEARN_TRANSFORMER = "mlforecast.target_transforms.GlobalSklearnTransformer"
+_FUNCTION_TRANSFORMER_CLASS = "sklearn.preprocessing.FunctionTransformer"
 
 
 class SemanticConfigError(TypeError):
@@ -32,6 +34,70 @@ def _canonical_float(value: float) -> float:
     if value == 0.0:
         return 0.0
     return value
+
+
+def _callable_path(value: object) -> str | None:
+    if value is None:
+        return None
+
+    name = getattr(value, "__name__", None)
+    module = getattr(value, "__module__", None)
+    if isinstance(module, str) and module and isinstance(name, str) and name:
+        return f"{module}.{name}"
+
+    if _class_path(value) == "numpy.ufunc" and isinstance(name, str) and name:
+        return f"numpy.{name}"
+
+    return None
+
+
+def _canonical_global_sklearn_transformer(value: object) -> dict[str, CanonicalValue]:
+    transformer = getattr(value, "transformer", None)
+    if transformer is None:
+        raise SemanticConfigError(
+            "GlobalSklearnTransformer is missing constructor state: transformer"
+        )
+
+    transformer_class = _class_path(transformer)
+    if transformer_class != "sklearn.preprocessing._function_transformer.FunctionTransformer":
+        raise SemanticConfigError(
+            "unsupported GlobalSklearnTransformer transformer: "
+            f"{transformer_class}"
+        )
+
+    state = {
+        "class": _FUNCTION_TRANSFORMER_CLASS,
+        "func": _callable_path(getattr(transformer, "func", None)),
+        "inverse_func": _callable_path(getattr(transformer, "inverse_func", None)),
+        "validate": getattr(transformer, "validate", None),
+        "accept_sparse": getattr(transformer, "accept_sparse", None),
+        "check_inverse": getattr(transformer, "check_inverse", None),
+        "feature_names_out": getattr(transformer, "feature_names_out", None),
+        "kw_args": getattr(transformer, "kw_args", None),
+        "inv_kw_args": getattr(transformer, "inv_kw_args", None),
+    }
+
+    expected = {
+        "class": _FUNCTION_TRANSFORMER_CLASS,
+        "func": "numpy.log1p",
+        "inverse_func": "numpy.expm1",
+        "validate": False,
+        "accept_sparse": False,
+        "check_inverse": True,
+        "feature_names_out": None,
+        "kw_args": None,
+        "inv_kw_args": None,
+    }
+    if state != expected:
+        raise SemanticConfigError(
+            "unsupported GlobalSklearnTransformer FunctionTransformer state: "
+            f"{state!r}"
+        )
+
+    return {
+        "__python_object_class__": _GLOBAL_SKLEARN_TRANSFORMER,
+        "state": {"transformer": expected},
+    }
 
 
 def _canonical_mlforecast_target_transform(
@@ -59,6 +125,9 @@ def _canonical_mlforecast_target_transform(
             "__python_object_class__": class_path,
             "state": {},
         }
+
+    if class_path == _GLOBAL_SKLEARN_TRANSFORMER:
+        return _canonical_global_sklearn_transformer(value)
 
     raise SemanticConfigError(
         f"unsupported MLForecast target transform: {class_path}"
