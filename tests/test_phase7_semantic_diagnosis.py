@@ -4,7 +4,12 @@ import importlib.util
 from pathlib import Path
 
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "tools" / "phase7_semantic_diagnosis" / "semantic_diagnosis.py"
+MODULE_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "tools"
+    / "phase7_semantic_diagnosis"
+    / "semantic_diagnosis.py"
+)
 SPEC = importlib.util.spec_from_file_location("phase7_semantic_diagnosis", MODULE_PATH)
 assert SPEC is not None and SPEC.loader is not None
 MOD = importlib.util.module_from_spec(SPEC)
@@ -51,3 +56,25 @@ def test_diagnosis_has_no_canonical_dataset_cli_argument() -> None:
     source = MODULE_PATH.read_text(encoding="utf-8")
     assert 'add_argument("--canonical"' not in source
     assert 'add_argument("--holdout"' not in source
+
+
+def test_diagnosis_preserves_legacy_hashes_and_adds_versioned_bridge_fields() -> None:
+    source = MODULE_PATH.read_text(encoding="utf-8")
+    assert "replay_semantic = sha256_json(replay_serialized)" in source
+    assert '"expected_semantic_sha256": frozen_semantic' in source
+    assert '"replay_semantic_sha256": replay_semantic' in source
+    assert '"legacy_semantic_sha256_frozen"' in source
+    assert '"legacy_semantic_sha256_replay"' in source
+    assert '"canonical_semantic_schema"' in source
+    assert '"canonical_semantic_sha256_frozen"' in source
+    assert '"canonical_semantic_sha256_replay"' in source
+    assert '"canonical_semantic_match"' in source
+
+
+def test_diagnosis_bridge_uses_live_replay_config_and_never_opens_holdout() -> None:
+    source = MODULE_PATH.read_text(encoding="utf-8")
+    assert "replay_config=replay_raw" in source
+    assert "bridge.verify_phase7_canonical_bridge" in source
+    assert '"safe_to_continue_holdout": False' in source
+    assert 'print("SAFE_TO_CONTINUE_HOLDOUT=NO")' in source
+    assert "holdout_draws != 0 or actuals_accessed != 0" in source

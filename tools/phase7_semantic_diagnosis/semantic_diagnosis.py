@@ -206,6 +206,16 @@ def load_runner(path: Path) -> Any:
     return module
 
 
+def load_canonical_bridge(repo: Path) -> Any:
+    path = repo / "tools" / "phase7_semantic_diagnosis" / "canonical_bridge.py"
+    spec = importlib.util.spec_from_file_location("phase7_canonical_bridge", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load canonical bridge: {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def environment(repo: Path, runner: Path) -> dict[str, Any]:
     rc, head = git_text(repo, "rev-parse", "HEAD")
     return {
@@ -385,10 +395,32 @@ def main() -> int:
     true_drift = bool((not best_trial_same) or (not trial_params_same) or (not semantic_values_same and not version_drift))
     type_only = bool(repr_only and semantic_values_same)
 
-    if repr_only and semantic_values_same and best_trial_same and best_objective_same and trial_params_same and not version_drift:
+    bridge = load_canonical_bridge(repo)
+    bridge_result = bridge.verify_phase7_canonical_bridge(
+        repo=repo,
+        frozen_config=frozen_config,
+        replay_config=replay_raw,
+        legacy_frozen_sha256=frozen_semantic,
+        legacy_replay_sha256=replay_semantic,
+        selected_candidate=str(freeze.get("selected_candidate")),
+        frozen_best_trial=int(frozen_doc["best_trial"]),
+        replay_best_trial=int(study.best_trial.number),
+        frozen_best_objective=float(frozen_doc["best_inner_loss"]),
+        replay_best_objective=float(study.best_value),
+        trial_comparison=trial_cmp,
+        replay_best_params=study.best_trial.params,
+        mlforecast_version=current_env["packages"].get("mlforecast"),
+        runner_sha256=runner_sha,
+        experiment_git_commit=str(freeze.get("git_commit")),
+    )
+    write_json(out / "FROZEN_CONFIG_CANONICAL_V1.json", bridge_result["frozen_canonical_document"])
+    write_json(out / "REPLAY_CONFIG_CANONICAL_V1.json", bridge_result["replay_canonical_document"])
+    write_json(out / "CANONICAL_SEMANTIC_BRIDGE_V1.json", {key: value for key, value in bridge_result.items() if key not in {"frozen_canonical_document", "replay_canonical_document"}})
+
+    if repr_only and semantic_values_same and best_trial_same and best_objective_same and trial_params_same and not version_drift and bridge_result["canonical_semantic_match"] is True:
         classification, status, safe_change = "SERIALIZATION_ONLY", "PASS", True
-        reason = "Raw serialized configs differ only by unstable representation while canonical semantic values, best trial/objective, trial sequence, and environment match."
-        next_action = "Implement and separately review a versioned canonical semantic serializer; keep Holdout sealed until that verifier change is independently verified."
+        reason = "Raw serialized configs differ only by unstable representation while canonical semantic values, best trial/objective, trial sequence, environment, and versioned canonical semantic SHA all match."
+        next_action = "Independently review the canonical verifier bridge evidence; keep Holdout sealed until that review is complete."
     elif version_drift and trial_params_same:
         classification, status, safe_change = "VERSION_DRIFT", "BLOCKED", False
         reason = "Runtime/package drift prevents certification of semantic equivalence."
@@ -402,7 +434,7 @@ def main() -> int:
         reason = "Available evidence does not prove serialization-only equivalence, version drift, or true semantic drift."
         next_action = "Review generated typed/raw/canonical evidence without accessing Holdout."
 
-    write_json(out / "TRIAL_BEST_COMPARISON.json", {"frozen": {"best_trial": int(frozen_doc["best_trial"]), "best_inner_loss": float(frozen_doc["best_inner_loss"]), "semantic_config_sha256": frozen_semantic}, "replay": {"best_trial": int(study.best_trial.number), "best_inner_loss": float(study.best_value), "semantic_config_sha256": replay_semantic}, "best_trial_same": best_trial_same, "best_objective_same": best_objective_same, "trial_replay": trial_cmp})
+    write_json(out / "TRIAL_BEST_COMPARISON.json", {"frozen": {"best_trial": int(frozen_doc["best_trial"]), "best_inner_loss": float(frozen_doc["best_inner_loss"]), "semantic_config_sha256": frozen_semantic}, "replay": {"best_trial": int(study.best_trial.number), "best_inner_loss": float(study.best_value), "semantic_config_sha256": replay_semantic}, "best_trial_same": best_trial_same, "best_objective_same": best_objective_same, "trial_replay": trial_cmp, "canonical_semantic_schema": bridge_result["canonical_semantic_schema"], "canonical_semantic_sha256_frozen": bridge_result["canonical_semantic_sha256_frozen"], "canonical_semantic_sha256_replay": bridge_result["canonical_semantic_sha256_replay"], "canonical_semantic_match": bridge_result["canonical_semantic_match"]})
 
     diagnosis = {
         "status": status,
@@ -412,6 +444,15 @@ def main() -> int:
         "candidate_freeze_sha256": freeze_sha,
         "expected_semantic_sha256": frozen_semantic,
         "replay_semantic_sha256": replay_semantic,
+        "legacy_semantic_sha256_frozen": bridge_result["legacy_semantic_sha256_frozen"],
+        "legacy_semantic_sha256_replay": bridge_result["legacy_semantic_sha256_replay"],
+        "legacy_semantic_hash_match": bridge_result["legacy_hash_match"],
+        "canonical_semantic_schema": bridge_result["canonical_semantic_schema"],
+        "canonical_semantic_sha256_frozen": bridge_result["canonical_semantic_sha256_frozen"],
+        "canonical_semantic_sha256_replay": bridge_result["canonical_semantic_sha256_replay"],
+        "canonical_semantic_match": bridge_result["canonical_semantic_match"],
+        "canonical_bridge_state_source": bridge_result["bridge_state_source"],
+        "canonical_bridge_differences_state": bridge_result["differences_state"],
         "known_prior_replay_semantic_sha256": KNOWN_REPLAY_SEMANTIC_SHA256,
         "replay_hash_matches_known_prior": replay_semantic == KNOWN_REPLAY_SEMANTIC_SHA256,
         "expected_runner_sha256": EXPECTED_RUNNER_SHA256,
@@ -461,6 +502,10 @@ def main() -> int:
     print(f"ACTUALS_ACCESSED={actuals_accessed}")
     print(f"EXPECTED_SEMANTIC_SHA256={frozen_semantic}")
     print(f"REPLAY_SEMANTIC_SHA256={replay_semantic}")
+    print(f"CANONICAL_SEMANTIC_SCHEMA={bridge_result['canonical_semantic_schema']}")
+    print(f"CANONICAL_FROZEN_SEMANTIC_SHA256={bridge_result['canonical_semantic_sha256_frozen']}")
+    print(f"CANONICAL_REPLAY_SEMANTIC_SHA256={bridge_result['canonical_semantic_sha256_replay']}")
+    print(f"CANONICAL_SEMANTIC_MATCH={'YES' if bridge_result['canonical_semantic_match'] else 'NO'}")
     print(f"SAFE_TO_CHANGE_VERIFIER={'YES' if safe_change else 'NO'}")
     print("SAFE_TO_CONTINUE_HOLDOUT=NO")
     print(f"OUTPUT={out}")
