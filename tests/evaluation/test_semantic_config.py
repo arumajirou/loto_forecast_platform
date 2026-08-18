@@ -13,9 +13,7 @@ from loto.evaluation.semantic_config import (
 )
 
 
-Differences = type(
-    "Differences", (), {"__module__": "mlforecast.target_transforms"}
-)
+Differences = type("Differences", (), {"__module__": "mlforecast.target_transforms"})
 LocalStandardScaler = type(
     "LocalStandardScaler", (), {"__module__": "mlforecast.target_transforms"}
 )
@@ -143,9 +141,7 @@ def test_global_log1p_legacy_repr_bridge_matches_live_config() -> None:
     )
     replay = phase7_config([global_log1p_transformer(), scaler()])
     legacy_states = {
-        "mlforecast.target_transforms.GlobalSklearnTransformer": (
-            global_log1p_legacy_state()
-        ),
+        "mlforecast.target_transforms.GlobalSklearnTransformer": (global_log1p_legacy_state()),
     }
 
     assert canonical_semantic_sha256_v1(
