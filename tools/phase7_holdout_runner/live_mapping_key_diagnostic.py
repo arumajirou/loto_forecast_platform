@@ -16,9 +16,7 @@ EXPECTED_ORIGINAL_RUNNER_SHA256: Final = (
 EXPECTED_BASE_DERIVED_SHA256: Final = (
     "8077ccf023f9100344206f588dadae655eb828f3529c4d4d83ebf89c9c1ee074"
 )
-EXPECTED_FREEZE_SHA256: Final = (
-    "deae004023fd1367d4bd30a6edad8b4ac687b939413c4b4ce641187664fa316c"
-)
+EXPECTED_FREEZE_SHA256: Final = "deae004023fd1367d4bd30a6edad8b4ac687b939413c4b4ce641187664fa316c"
 EXPECTED_DEVELOPMENT_SHA256: Final = (
     "f6e0292347cd03acea95b5c788eaa51436a8b9e7e42d2fc000e9b9d366e2557e"
 )
@@ -90,13 +88,14 @@ def patch_runner_for_mapping_diagnostic(source: str) -> str:
     """Inject a fail-closed path diagnostic before canonical replay hashing."""
     anchor = """    canonical_replay_hash = (\n        canonical_semantic_sha256_v1(\n            best_config,\n            legacy_object_states=\n                legacy_object_states,\n        )\n    )\n"""
 
-    diagnostic = """    def _collect_non_string_mapping_keys(value, path=\"$\"):\n        findings = []\n        if isinstance(value, dict):\n            for key, item in value.items():\n                if isinstance(key, str):\n                    child = path + \"[\" + json.dumps(key, ensure_ascii=False) + \"]\"\n                else:\n                    findings.append(\n                        {\n                            \"mapping_path\": path,\n                            \"key_type\": type(key).__name__,\n                            \"key_repr\": repr(key),\n                            \"value_type\": type(item).__name__,\n                        }\n                    )\n                    child = path + \"[\" + repr(key) + \"]\"\n                findings.extend(\n                    _collect_non_string_mapping_keys(item, child)\n                )\n            return findings\n        if isinstance(value, (list, tuple)):\n            for index, item in enumerate(value):\n                findings.extend(\n                    _collect_non_string_mapping_keys(\n                        item, f\"{path}[{index}]\"\n                    )\n                )\n        return findings\n\n    mapping_key_findings = _collect_non_string_mapping_keys(\n        best_config\n    )\n    if mapping_key_findings:\n        diagnostic_path = (\n            replay_dir\n            / f\"AutoCatboost__seed{seed}__MAPPING_KEY_DIAGNOSTIC.json\"\n        )\n        atomic_json(\n            diagnostic_path,\n            {\n                \"schema_version\":\n                    \"phase7-live-mapping-key-diagnostic/v1\",\n                \"status\":\n                    \"CAPTURED\",\n                \"seed\":\n                    seed,\n                \"findings\":\n                    mapping_key_findings,\n                \"holdout_draws_accessed\":\n                    0,\n                \"actuals_accessed\":\n                    0,\n                \"holdout_executed\":\n                    False,\n                \"captured_at_utc\":\n                    now(),\n            },\n        )\n        first = mapping_key_findings[0]\n        raise RuntimeError(\n            \"live best_config non-string mapping key \"\n            f\"seed={seed} path={first['mapping_path']} \"\n            f\"key_type={first['key_type']} \"\n            f\"key={first['key_repr']}\"\n        )\n\n""" + anchor
+    diagnostic = (
+        """    def _collect_non_string_mapping_keys(value, path=\"$\"):\n        findings = []\n        if isinstance(value, dict):\n            for key, item in value.items():\n                if isinstance(key, str):\n                    child = path + \"[\" + json.dumps(key, ensure_ascii=False) + \"]\"\n                else:\n                    findings.append(\n                        {\n                            \"mapping_path\": path,\n                            \"key_type\": type(key).__name__,\n                            \"key_repr\": repr(key),\n                            \"value_type\": type(item).__name__,\n                        }\n                    )\n                    child = path + \"[\" + repr(key) + \"]\"\n                findings.extend(\n                    _collect_non_string_mapping_keys(item, child)\n                )\n            return findings\n        if isinstance(value, (list, tuple)):\n            for index, item in enumerate(value):\n                findings.extend(\n                    _collect_non_string_mapping_keys(\n                        item, f\"{path}[{index}]\"\n                    )\n                )\n        return findings\n\n    mapping_key_findings = _collect_non_string_mapping_keys(\n        best_config\n    )\n    if mapping_key_findings:\n        diagnostic_path = (\n            replay_dir\n            / f\"AutoCatboost__seed{seed}__MAPPING_KEY_DIAGNOSTIC.json\"\n        )\n        atomic_json(\n            diagnostic_path,\n            {\n                \"schema_version\":\n                    \"phase7-live-mapping-key-diagnostic/v1\",\n                \"status\":\n                    \"CAPTURED\",\n                \"seed\":\n                    seed,\n                \"findings\":\n                    mapping_key_findings,\n                \"holdout_draws_accessed\":\n                    0,\n                \"actuals_accessed\":\n                    0,\n                \"holdout_executed\":\n                    False,\n                \"captured_at_utc\":\n                    now(),\n            },\n        )\n        first = mapping_key_findings[0]\n        raise RuntimeError(\n            \"live best_config non-string mapping key \"\n            f\"seed={seed} path={first['mapping_path']} \"\n            f\"key_type={first['key_type']} \"\n            f\"key={first['key_repr']}\"\n        )\n\n"""
+        + anchor
+    )
 
     count = source.count(anchor)
     if count != 1:
-        raise DiagnosticError(
-            f"canonical replay hash anchor count={count}; expected exactly 1"
-        )
+        raise DiagnosticError(f"canonical replay hash anchor count={count}; expected exactly 1")
     return source.replace(anchor, diagnostic, 1)
 
 
@@ -318,15 +317,10 @@ def run_diagnostic(*, repo_root: Path, output_root: Path) -> dict[str, Any]:
 
     checksum_path = output_root / "SHA256SUMS"
     output_files = sorted(
-        path
-        for path in output_root.rglob("*")
-        if path.is_file() and path != checksum_path
+        path for path in output_root.rglob("*") if path.is_file() and path != checksum_path
     )
     checksum_path.write_text(
-        "".join(
-            f"{sha256_file(path)}  {path.relative_to(output_root)}\n"
-            for path in output_files
-        ),
+        "".join(f"{sha256_file(path)}  {path.relative_to(output_root)}\n" for path in output_files),
         encoding="ascii",
     )
     return summary
