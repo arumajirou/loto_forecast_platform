@@ -22,28 +22,36 @@ The frozen experiment source commit remains:
 
 The **current repository HEAD is allowed to be newer**. The diagnosis verifies that the frozen experiment commit exists in the checkout and is an ancestor of the current HEAD, while it replays the frozen Phase 7 runner by its exact SHA-256. This makes the tool installable on current `main` without changing the frozen experiment authority.
 
-## Local workflow after merge
+## Windows worktree safety
 
-From Windows PowerShell 5.1:
+The repository contains historical tracked evidence paths with `:` in names such as `baseline:fixed`, which Git for Windows cannot materialize. A Windows checkout may therefore report invalid-path errors or show unrelated tracked files as deleted even though the Phase 7 tool itself is present.
+
+The diagnosis launcher deliberately does **not** repair, reset, clean, stage, or switch the user's primary worktree. In particular it does not run `git reset --hard`, `git clean`, `git switch -c`, `git add`, `git commit`, or `git push` against the local checkout.
+
+Legitimate local edits may remain in the primary worktree. They are not part of the Phase 7 evidence publication flow.
+
+## Local workflow
+
+From Windows PowerShell 5.1, run the merged launcher from the repository. The launcher only needs the repository metadata and tool files; it does not require a clean working tree.
 
 ```powershell
 Set-Location 'C:\Users\bp00425\env\ts\loto_forecast_platform'
-git switch main
-git pull --ff-only origin main
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
   '.\tools\phase7_semantic_diagnosis\run_semantic_diagnosis.ps1'
 ```
 
-The output is written under:
+By default, local output is written **outside the repository** under:
 
-`evidence/phase7_semantic_diagnosis/<RunId>/`
+`C:\Users\bp00425\Downloads\automlforecast-phase7-semantic-diagnosis-<RunId>\`
 
 It includes `DIAGNOSIS.json`, typed/canonical/raw config evidence, trial comparison, environment comparison, artifact manifest, and `SHA256SUMS`.
 
+Use `-OutputRoot <path>` to place the run directory under a different external root.
+
 ## GitHub evidence handoff
 
-To hand the local result back through GitHub instead of uploading a ZIP, start from a **clean working tree** and run:
+`-PublishEvidence` publishes the generated evidence without changing the primary worktree:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
@@ -51,13 +59,26 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
   -PublishEvidence
 ```
 
-The launcher creates and pushes a branch named:
+Requirements for publication only:
 
-`evidence/phase7-semantic-diagnosis-<RunId>`
+- GitHub CLI `gh` is installed.
+- `gh auth status` succeeds.
+- the authenticated account can push to `arumajirou/loto_forecast_platform`.
 
-Only the generated evidence directory is staged and committed. Existing Phase 3/6B/6C/7 raw artifacts are never staged, modified, or deleted.
+The launcher uses GitHub's Git Data API through `gh api` to create, server-side:
 
-After the push, report only the branch name (or simply say the run completed). The evidence can then be reviewed directly from GitHub.
+1. one Git blob per generated evidence file,
+2. a tree based on the current remote `main` tree,
+3. an evidence commit whose parent is the current remote `main` commit,
+4. `refs/heads/evidence/phase7-semantic-diagnosis-<RunId>`.
+
+The remote evidence path is restricted to:
+
+`evidence/phase7_semantic_diagnosis/<RunId>/`
+
+No local branch switch, staging, commit, or push occurs. Existing Phase 3/6B/6C/7 raw artifacts and unrelated local modifications are never uploaded.
+
+After publication, report the emitted `EVIDENCE_BRANCH` value (or simply say the run completed). The evidence can then be reviewed directly from GitHub.
 
 ## Interpretation
 
