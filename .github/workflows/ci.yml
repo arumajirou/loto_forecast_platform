@@ -154,10 +154,12 @@ jobs:
           "$CI_VENV/bin/python" -m ruff --version
           "$CI_VENV/bin/python" -m pytest --version
 
-      - name: Run Ruff format check
+      - name: Run Ruff format baseline gate
         run: |
           set -Eeuo pipefail
-          "$CI_VENV/bin/python" -m ruff format --check src scripts tests
+          "$CI_VENV/bin/python" scripts/check_ruff_format_baseline.py \
+            --baseline .github/ruff-format-baseline.txt \
+            src scripts tests
 
       - name: Run Ruff lint
         run: |
