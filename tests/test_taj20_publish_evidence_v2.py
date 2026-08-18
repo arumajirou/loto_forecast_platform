@@ -8,6 +8,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = ROOT / "tools" / "runtime_audit" / "taj20_publish_evidence_v2.py"
+LAUNCHER_PATH = ROOT / "tools" / "taj20-publish-evidence-v2.sh"
 
 
 def load_module():
@@ -97,3 +98,22 @@ def test_stale_local_branch_with_unique_commit_is_preserved(tmp_path: Path) -> N
 
     with pytest.raises(module.PublishError, match="contains unique commits"):
         module._remove_stale_local_branch(repo, branch, main_head)
+
+
+def test_launcher_recovers_branch_that_is_ancestor_of_advanced_main(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    old_main = init_repo(repo)
+    branch = "evidence/taj20-runtime-test"
+    git(repo, "branch", branch, old_main)
+
+    (repo / "file.txt").write_text("advanced\n", encoding="utf-8")
+    git(repo, "add", "file.txt")
+    git(repo, "commit", "-q", "-m", "advance main")
+    new_main = git_head(repo)
+
+    ancestor = git(repo, "merge-base", "--is-ancestor", old_main, new_main, check=False)
+    assert ancestor.returncode == 0
+
+    launcher = LAUNCHER_PATH.read_text(encoding="utf-8")
+    assert 'merge-base --is-ancestor "$BRANCH_TIP" "$MAIN_TIP"' in launcher
+    assert 'branch -D "$BRANCH"' in launcher
