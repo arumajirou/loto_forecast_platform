@@ -5,7 +5,7 @@ import csv
 import hashlib
 import json
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -37,15 +37,11 @@ def sha256_file(path: Path) -> str:
 
 
 def default_phase6c_root() -> Path:
-    return (
-        Path.home()
-        / "Downloads"
-        / "automlforecast-phase6c-ensemble-freeze-20260818-101021"
-    )
+    return Path.home() / "Downloads" / "automlforecast-phase6c-ensemble-freeze-20260818-101021"
 
 
 def default_output_dir() -> Path:
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     return Path.home() / "Downloads" / f"phase7-canonical-key-forensics-v3-{stamp}"
 
 
@@ -116,8 +112,7 @@ def scan_phase6c(
     freeze_sha = sha256_file(freeze_path)
     if freeze_sha != expected_freeze_sha256:
         raise RuntimeError(
-            "Candidate Freeze SHA mismatch: "
-            f"expected={expected_freeze_sha256} actual={freeze_sha}"
+            f"Candidate Freeze SHA mismatch: expected={expected_freeze_sha256} actual={freeze_sha}"
         )
 
     freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
@@ -169,12 +164,12 @@ def scan_phase6c(
         numeric_start = len(numeric_rows)
         duplicate_start = len(duplicate_rows)
 
-        def walk(value: Any, path: str) -> None:
+        def walk(value: Any, path: str, *, current_seed: int = seed) -> None:
             if isinstance(value, PairDict):
                 for duplicate in value.duplicate_keys:
                     duplicate_rows.append(
                         {
-                            "seed": seed,
+                            "seed": current_seed,
                             "mapping_path": path,
                             "duplicate_key": duplicate,
                         }
@@ -183,14 +178,14 @@ def scan_phase6c(
                     if NUMERIC_KEY_RE.fullmatch(key):
                         numeric_rows.append(
                             {
-                                "seed": seed,
+                                "seed": current_seed,
                                 "mapping_path": path,
                                 "key": key,
                                 "value_type": value_type(item),
                                 "value_preview": preview(item),
                             }
                         )
-                    walk(item, json_path(path, key))
+                    walk(item, json_path(path, key), current_seed=current_seed)
                 return
 
             if isinstance(value, dict):
@@ -199,25 +194,23 @@ def scan_phase6c(
                     if NUMERIC_KEY_RE.fullmatch(key_text):
                         numeric_rows.append(
                             {
-                                "seed": seed,
+                                "seed": current_seed,
                                 "mapping_path": path,
                                 "key": key_text,
                                 "value_type": value_type(item),
                                 "value_preview": preview(item),
                             }
                         )
-                    walk(item, json_path(path, key_text))
+                    walk(item, json_path(path, key_text), current_seed=current_seed)
                 return
 
             if isinstance(value, list):
                 for index, item in enumerate(value):
-                    walk(item, f"{path}[{index}]")
+                    walk(item, f"{path}[{index}]", current_seed=current_seed)
 
         walk(effective, root_path)
 
-        mlf_init = (
-            effective.get("mlf_init_params", {}) if isinstance(effective, dict) else {}
-        )
+        mlf_init = effective.get("mlf_init_params", {}) if isinstance(effective, dict) else {}
         for field in (
             "lags",
             "lag_transforms",
@@ -393,10 +386,7 @@ def main() -> int:
     print(f"FORENSIC_ROOT={output_dir}")
     print(f"NUMERIC_KEY_COUNT_TOTAL={report['numeric_key_count_total']}")
     print(f"SEED1_NUMERIC_KEY_COUNT={report['seed1_numeric_key_count']}")
-    print(
-        "DUPLICATE_JSON_KEY_COUNT_TOTAL="
-        f"{report['duplicate_json_key_count_total']}"
-    )
+    print(f"DUPLICATE_JSON_KEY_COUNT_TOTAL={report['duplicate_json_key_count_total']}")
     for component in report["components"]:
         print(
             "SEED="
@@ -405,8 +395,7 @@ def main() -> int:
             f"{component['numeric_key_count']} "
             "BEST_TRIAL="
             f"{component['best_trial']} "
-            "INDEX_FIELDS="
-            + json.dumps(component["trial_index_fields"], sort_keys=True)
+            "INDEX_FIELDS=" + json.dumps(component["trial_index_fields"], sort_keys=True)
         )
     print("SOURCE_IMMUTABILITY=PASS")
     print("SHA256SUMS_CREATED=YES")
