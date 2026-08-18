@@ -161,10 +161,12 @@ jobs:
             --baseline .github/ruff-format-baseline.txt \
             src scripts tests
 
-      - name: Run Ruff lint
+      - name: Run Ruff lint baseline gate
         run: |
           set -Eeuo pipefail
-          "$CI_VENV/bin/python" -m ruff check src scripts tests
+          "$CI_VENV/bin/python" .github/check_ruff_lint_baseline.py \
+            --baseline .github/ruff-lint-baseline.json \
+            src scripts tests
 
       - name: Compile Python sources
         run: |
