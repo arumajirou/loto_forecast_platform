@@ -5,7 +5,7 @@ import csv
 import hashlib
 import json
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -41,7 +41,7 @@ def default_phase6c_root() -> Path:
 
 
 def default_output_dir() -> Path:
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     return Path.home() / "Downloads" / f"phase7-canonical-key-forensics-v3-{stamp}"
 
 
@@ -164,12 +164,12 @@ def scan_phase6c(
         numeric_start = len(numeric_rows)
         duplicate_start = len(duplicate_rows)
 
-        def walk(value: Any, path: str) -> None:
+        def walk(value: Any, path: str, *, current_seed: int = seed) -> None:
             if isinstance(value, PairDict):
                 for duplicate in value.duplicate_keys:
                     duplicate_rows.append(
                         {
-                            "seed": seed,
+                            "seed": current_seed,
                             "mapping_path": path,
                             "duplicate_key": duplicate,
                         }
@@ -178,14 +178,14 @@ def scan_phase6c(
                     if NUMERIC_KEY_RE.fullmatch(key):
                         numeric_rows.append(
                             {
-                                "seed": seed,
+                                "seed": current_seed,
                                 "mapping_path": path,
                                 "key": key,
                                 "value_type": value_type(item),
                                 "value_preview": preview(item),
                             }
                         )
-                    walk(item, json_path(path, key))
+                    walk(item, json_path(path, key), current_seed=current_seed)
                 return
 
             if isinstance(value, dict):
@@ -194,19 +194,19 @@ def scan_phase6c(
                     if NUMERIC_KEY_RE.fullmatch(key_text):
                         numeric_rows.append(
                             {
-                                "seed": seed,
+                                "seed": current_seed,
                                 "mapping_path": path,
                                 "key": key_text,
                                 "value_type": value_type(item),
                                 "value_preview": preview(item),
                             }
                         )
-                    walk(item, json_path(path, key_text))
+                    walk(item, json_path(path, key_text), current_seed=current_seed)
                 return
 
             if isinstance(value, list):
                 for index, item in enumerate(value):
-                    walk(item, f"{path}[{index}]")
+                    walk(item, f"{path}[{index}]", current_seed=current_seed)
 
         walk(effective, root_path)
 
