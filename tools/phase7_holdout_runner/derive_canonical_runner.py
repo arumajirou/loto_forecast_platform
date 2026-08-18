@@ -10,7 +10,7 @@ from typing import Final
 EXPECTED_ORIGINAL_RUNNER_SHA256: Final = (
     "986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187"
 )
-EXPECTED_SEMANTIC_CONFIG_GIT_BLOB: Final = "52949291c563d1126e3dd6d1363305c5766a630d"
+EXPECTED_SEMANTIC_CONFIG_GIT_BLOB: Final = "bd9c184e431a20039d8d2400b1b869b58a5f7833"
 EXPECTED_MLFORECAST_VERSION: Final = "1.1.0"
 PATCH_SCHEMA: Final = "phase7-holdout-canonical-runner-derivation/v1"
 DERIVED_RUNNER_NAME: Final = "phase7_holdout_canonical_v1.py"
@@ -136,6 +136,19 @@ def patch_runner_source(source: str) -> str:
     legacy_object_states = {{
         "mlforecast.target_transforms.Differences": {{
             "differences": [1],
+        }},
+        "mlforecast.target_transforms.GlobalSklearnTransformer": {{
+            "transformer": {{
+                "class": "sklearn.preprocessing.FunctionTransformer",
+                "func": "numpy.log1p",
+                "inverse_func": "numpy.expm1",
+                "validate": False,
+                "accept_sparse": False,
+                "check_inverse": True,
+                "feature_names_out": None,
+                "kw_args": None,
+                "inv_kw_args": None,
+            }},
         }},
     }}
 
@@ -348,6 +361,7 @@ def derive_runner(
         "legacy_semantic_hash_is_gate": False,
         "canonical_semantic_hash_is_gate": True,
         "legacy_differences_state": [1],
+        "legacy_global_sklearn_transformer": "numpy.log1p/numpy.expm1",
         "source_newline_normalization": "lf_for_in_memory_derivation_only",
         "replay_only_mode_supported": True,
         "replay_only_holdout_access": False,
