@@ -4,7 +4,7 @@ Status: `FORMAT_FIX_APPLIED / EXECUTION_PENDING`
 
 Current PR head to verify on native Windows:
 
-- `1848ad8bb761515a84032063952de40e3559a022`
+- `3c1f14fadbafc2cf1f049e0e7771def130728e2d`
 
 Current pinned identities:
 
@@ -18,11 +18,10 @@ Evidence history:
 1. Original unstable legacy semantic SHA gate blocked seed 1 before Holdout.
 2. Canonical semantic v1 bridge was introduced without changing the sealed historical runner.
 3. Native Windows exposed CRLF source-anchor portability; fixed with raw-byte SHA validation first and in-memory newline normalization only.
-4. Native Windows exact-head focused tests later reached `8/8 PASS`, then Ruff formatting was repaired.
-5. Replay-only v2 reached the real runtime and failed closed before Holdout because `GlobalSklearnTransformer` constructor state was not covered by canonical v1.
-6. Serializer/deriver coverage was extended only for the evidence-backed MLForecast 1.1.0 `log1p/expm1` FunctionTransformer state; all other states remain fail-closed.
-7. Native Windows verification on head `c953a0e...` produced `17 passed` before Ruff reported format-only diffs in three files.
-8. Those three files were formatted only. Because formatting changed the serializer Git blob, deriver and contract pins were refreshed to `44fe8c8b...`.
+4. Replay-only v2 reached the real runtime and failed closed before Holdout because `GlobalSklearnTransformer` constructor state was not covered by canonical v1.
+5. Serializer/deriver coverage was extended only for the evidence-backed MLForecast 1.1.0 `log1p/expm1` FunctionTransformer state; all other states remain fail-closed.
+6. Native Windows verification on head `c953a0e...` produced `17 passed` before Ruff reported format-only diffs in three files.
+7. Those three files were formatted only. Formatting changed the serializer Git blob, so deriver and contract pins were refreshed to `44fe8c8b...`.
 
 No current-head Windows PASS is claimed yet.
 
