@@ -11,10 +11,18 @@ from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 from typing import Any, Final
 
-EXPECTED_RUNNER_SHA256: Final = "986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187"
-EXPECTED_FREEZE_SHA256: Final = "deae004023fd1367d4bd30a6edad8b4ac687b939413c4b4ce641187664fa316c"
-EXPECTED_DEVELOPMENT_SHA256: Final = "f6e0292347cd03acea95b5c788eaa51436a8b9e7e42d2fc000e9b9d366e2557e"
-EXPECTED_CANONICAL_SHA256: Final = "88fd7bf24d2864fce74e95bf6475ff4b0292446f1354d403105970d095d6592f"
+EXPECTED_RUNNER_SHA256: Final = (
+    "986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187"
+)
+EXPECTED_FREEZE_SHA256: Final = (
+    "deae004023fd1367d4bd30a6edad8b4ac687b939413c4b4ce641187664fa316c"
+)
+EXPECTED_DEVELOPMENT_SHA256: Final = (
+    "f6e0292347cd03acea95b5c788eaa51436a8b9e7e42d2fc000e9b9d366e2557e"
+)
+EXPECTED_CANONICAL_SHA256: Final = (
+    "88fd7bf24d2864fce74e95bf6475ff4b0292446f1354d403105970d095d6592f"
+)
 
 PHASE7_NAME: Final = "automlforecast-phase7-holdout-20260818-101611"
 PHASE6C_NAME: Final = "automlforecast-phase6c-ensemble-freeze-20260818-101021"
@@ -22,6 +30,7 @@ PHASE3_NAME: Final = "automlforecast-phase3-input-size-20260817-173808"
 MANIFEST_NAME: Final = "PHASE7_EVIDENCE_MANIFEST.json"
 SHA256SUMS_NAME: Final = "SHA256SUMS"
 CANONICAL_BUNDLE_PATH: Final = "canonical/numbers3-canonical.csv"
+SCHEMA_VERSION: Final = "phase7-portable-evidence-bundle/v1"
 
 
 class EvidenceBundleError(RuntimeError):
@@ -41,11 +50,12 @@ def resolve_pointer(pointer: Path) -> Path:
         raise EvidenceBundleError(f"canonical pointer missing: {pointer}")
     for line in pointer.read_text(encoding="utf-8").splitlines():
         candidate = line.strip()
-        if candidate:
-            path = Path(candidate)
-            if not path.is_file():
-                raise EvidenceBundleError(f"canonical pointer target missing: {path}")
-            return path
+        if not candidate:
+            continue
+        path = Path(candidate)
+        if not path.is_file():
+            raise EvidenceBundleError(f"canonical pointer target missing: {path}")
+        return path
     raise EvidenceBundleError(f"canonical pointer is empty: {pointer}")
 
 
@@ -66,6 +76,8 @@ def validate_archive_member_name(name: str) -> PurePosixPath:
     path = PurePosixPath(name)
     if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
         raise EvidenceBundleError(f"unsafe archive member path: {name!r}")
+    if any(":" in part for part in path.parts):
+        raise EvidenceBundleError(f"non-portable archive member path: {name!r}")
     return path
 
 
@@ -92,6 +104,7 @@ def verify_zero_progress(progress_path: Path) -> dict[str, Any]:
     payload = json.loads(progress_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise EvidenceBundleError("original progress root must be an object")
+
     state = payload.get("state", payload.get("phase"))
     if state != "REPLAY_VERIFICATION":
         raise EvidenceBundleError(f"unexpected original Phase7 state: {state!r}")
@@ -99,10 +112,36 @@ def verify_zero_progress(progress_path: Path) -> dict[str, Any]:
         raise EvidenceBundleError("original Holdout draws are nonzero")
     if int(payload.get("actuals_accessed", 0)) != 0:
         raise EvidenceBundleError("original actual accesses are nonzero")
+
     lock_root = progress_path.parent / "prediction_locks"
     if lock_root.exists() and any(path.is_file() for path in lock_root.rglob("*")):
         raise EvidenceBundleError("original Phase7 prediction locks already exist")
+    chain = progress_path.parent / "SEQUENTIAL_LOCK_CHAIN.jsonl"
+    if chain.exists():
+        raise EvidenceBundleError("original Phase7 sequential lock chain already exists")
     return payload
+
+
+def scientific_identities() -> dict[str, str]:
+    return {
+        "sealed_original_runner_sha256": EXPECTED_RUNNER_SHA256,
+        "candidate_freeze_sha256": EXPECTED_FREEZE_SHA256,
+        "development_sha256": EXPECTED_DEVELOPMENT_SHA256,
+        "canonical_sha256": EXPECTED_CANONICAL_SHA256,
+    }
+
+
+def build_sha256sums(
+    files: dict[str, dict[str, Any]],
+    manifest_bytes: bytes,
+) -> bytes:
+    lines = [
+        f"{metadata['sha256']}  {name}\n"
+        for name, metadata in sorted(files.items())
+    ]
+    manifest_sha = hashlib.sha256(manifest_bytes).hexdigest()
+    lines.append(f"{manifest_sha}  {MANIFEST_NAME}\n")
+    return "".join(lines).encode("ascii")
 
 
 def export_bundle(*, downloads: Path, output: Path) -> dict[str, Any]:
@@ -124,7 +163,9 @@ def export_bundle(*, downloads: Path, output: Path) -> dict[str, Any]:
     require_identity(canonical, EXPECTED_CANONICAL_SHA256, "canonical data")
     verify_zero_progress(progress)
     if not frozen_evidence.is_dir():
-        raise EvidenceBundleError(f"frozen component evidence missing: {frozen_evidence}")
+        raise EvidenceBundleError(
+            f"frozen component evidence missing: {frozen_evidence}"
+        )
 
     output = output.resolve()
     if output.exists():
@@ -133,15 +174,9 @@ def export_bundle(*, downloads: Path, output: Path) -> dict[str, Any]:
 
     file_manifest: dict[str, dict[str, Any]] = {}
     manifest: dict[str, Any] = {
-        "schema_version": "phase7-portable-evidence-bundle/v1",
+        "schema_version": SCHEMA_VERSION,
         "created_at_utc": datetime.now(UTC).isoformat(),
-        "source_downloads": str(downloads.resolve()),
-        "scientific_identities": {
-            "sealed_original_runner_sha256": EXPECTED_RUNNER_SHA256,
-            "candidate_freeze_sha256": EXPECTED_FREEZE_SHA256,
-            "development_sha256": EXPECTED_DEVELOPMENT_SHA256,
-            "canonical_sha256": EXPECTED_CANONICAL_SHA256,
-        },
+        "scientific_identities": scientific_identities(),
         "original_phase7_state": "REPLAY_VERIFICATION",
         "holdout_draws_accessed": 0,
         "actuals_accessed": 0,
@@ -149,25 +184,46 @@ def export_bundle(*, downloads: Path, output: Path) -> dict[str, Any]:
         "files": file_manifest,
     }
 
-    with zipfile.ZipFile(output, "x", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
-        add_file(zf, runner, f"{PHASE7_NAME}/phase7_holdout.py", file_manifest)
-        add_file(zf, progress, f"{PHASE7_NAME}/artifacts/progress.json", file_manifest)
-        add_file(zf, development, f"{PHASE3_NAME}/artifacts/numbers3-development-only.csv", file_manifest)
+    with zipfile.ZipFile(
+        output,
+        "x",
+        compression=zipfile.ZIP_DEFLATED,
+        compresslevel=6,
+    ) as zf:
+        add_file(
+            zf,
+            runner,
+            f"{PHASE7_NAME}/phase7_holdout.py",
+            file_manifest,
+        )
+        add_file(
+            zf,
+            progress,
+            f"{PHASE7_NAME}/artifacts/progress.json",
+            file_manifest,
+        )
+        add_file(
+            zf,
+            development,
+            f"{PHASE3_NAME}/artifacts/numbers3-development-only.csv",
+            file_manifest,
+        )
         add_file(zf, canonical, CANONICAL_BUNDLE_PATH, file_manifest)
 
         for source in iter_tree_files(phase6c):
             relative = source.relative_to(phase6c).as_posix()
             add_file(zf, source, f"{PHASE6C_NAME}/{relative}", file_manifest)
 
-        manifest_bytes = (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode("utf-8")
+        manifest_bytes = (
+            json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+        ).encode("utf-8")
         zf.writestr(MANIFEST_NAME, manifest_bytes)
-        sums = "".join(
-            f"{metadata['sha256']}  {name}\n" for name, metadata in sorted(file_manifest.items())
+        zf.writestr(
+            SHA256SUMS_NAME,
+            build_sha256sums(file_manifest, manifest_bytes),
         )
-        sums += f"{hashlib.sha256(manifest_bytes).hexdigest()}  {MANIFEST_NAME}\n"
-        zf.writestr(SHA256SUMS_NAME, sums.encode("ascii"))
 
-    result = {
+    return {
         "status": "PASS",
         "bundle": str(output),
         "bundle_sha256": sha256_file(output),
@@ -175,42 +231,90 @@ def export_bundle(*, downloads: Path, output: Path) -> dict[str, Any]:
         "holdout_executed": False,
         "actuals_accessed": 0,
     }
-    return result
 
 
-def load_manifest_from_zip(zf: zipfile.ZipFile) -> dict[str, Any]:
+def load_manifest_from_zip(zf: zipfile.ZipFile) -> tuple[dict[str, Any], bytes]:
     try:
-        payload = json.loads(zf.read(MANIFEST_NAME).decode("utf-8"))
+        manifest_bytes = zf.read(MANIFEST_NAME)
     except KeyError as exc:
-        raise EvidenceBundleError(f"bundle manifest missing: {MANIFEST_NAME}") from exc
-    if not isinstance(payload, dict) or payload.get("schema_version") != "phase7-portable-evidence-bundle/v1":
+        raise EvidenceBundleError(
+            f"bundle manifest missing: {MANIFEST_NAME}"
+        ) from exc
+    payload = json.loads(manifest_bytes.decode("utf-8"))
+    if not isinstance(payload, dict) or payload.get("schema_version") != SCHEMA_VERSION:
         raise EvidenceBundleError("unsupported or invalid evidence bundle manifest")
     files = payload.get("files")
     if not isinstance(files, dict) or not files:
         raise EvidenceBundleError("bundle manifest files map is missing or empty")
-    return payload
+    return payload, manifest_bytes
 
 
 def verify_manifest_identities(manifest: dict[str, Any]) -> None:
     identities = manifest.get("scientific_identities")
-    if not isinstance(identities, dict):
-        raise EvidenceBundleError("scientific identities missing from manifest")
-    expected = {
-        "sealed_original_runner_sha256": EXPECTED_RUNNER_SHA256,
-        "candidate_freeze_sha256": EXPECTED_FREEZE_SHA256,
-        "development_sha256": EXPECTED_DEVELOPMENT_SHA256,
-        "canonical_sha256": EXPECTED_CANONICAL_SHA256,
-    }
-    if identities != expected:
-        raise EvidenceBundleError(f"scientific identity manifest mismatch: {identities!r}")
+    if identities != scientific_identities():
+        raise EvidenceBundleError(
+            f"scientific identity manifest mismatch: {identities!r}"
+        )
     if manifest.get("original_phase7_state") != "REPLAY_VERIFICATION":
-        raise EvidenceBundleError("bundle original Phase7 state is not REPLAY_VERIFICATION")
+        raise EvidenceBundleError(
+            "bundle original Phase7 state is not REPLAY_VERIFICATION"
+        )
     if int(manifest.get("holdout_draws_accessed", -1)) != 0:
         raise EvidenceBundleError("bundle reports nonzero Holdout access")
     if int(manifest.get("actuals_accessed", -1)) != 0:
         raise EvidenceBundleError("bundle reports nonzero actual access")
     if manifest.get("prediction_lock_created") is not False:
         raise EvidenceBundleError("bundle reports a prediction lock")
+
+
+def verify_manifest_files_on_disk(
+    root: Path,
+    files: dict[str, Any],
+) -> None:
+    for name, metadata in files.items():
+        validate_archive_member_name(name)
+        if not isinstance(metadata, dict):
+            raise EvidenceBundleError(f"invalid manifest metadata for {name}")
+        path = root.joinpath(*PurePosixPath(name).parts)
+        if not path.is_file():
+            raise EvidenceBundleError(f"imported evidence file missing: {path}")
+        expected_sha = str(metadata.get("sha256", ""))
+        if sha256_file(path) != expected_sha:
+            raise EvidenceBundleError(f"imported evidence SHA mismatch: {path}")
+        if path.stat().st_size != int(metadata.get("size_bytes", -1)):
+            raise EvidenceBundleError(f"imported evidence size mismatch: {path}")
+
+
+def verify_installed_root(
+    root: Path,
+    manifest: dict[str, Any],
+) -> None:
+    files = manifest.get("files")
+    if not isinstance(files, dict):
+        raise EvidenceBundleError("installed manifest files map is invalid")
+    verify_manifest_files_on_disk(root, files)
+
+    require_identity(
+        root / PHASE7_NAME / "phase7_holdout.py",
+        EXPECTED_RUNNER_SHA256,
+        "sealed original runner",
+    )
+    require_identity(
+        root / PHASE6C_NAME / "artifacts" / "CANDIDATE_FREEZE.json",
+        EXPECTED_FREEZE_SHA256,
+        "Candidate Freeze",
+    )
+    require_identity(
+        root / PHASE3_NAME / "artifacts" / "numbers3-development-only.csv",
+        EXPECTED_DEVELOPMENT_SHA256,
+        "Development",
+    )
+    require_identity(
+        root.joinpath(*PurePosixPath(CANONICAL_BUNDLE_PATH).parts),
+        EXPECTED_CANONICAL_SHA256,
+        "canonical data",
+    )
+    verify_zero_progress(root / PHASE7_NAME / "artifacts" / "progress.json")
 
 
 def import_bundle(*, bundle: Path, target: Path) -> dict[str, Any]:
@@ -223,7 +327,8 @@ def import_bundle(*, bundle: Path, target: Path) -> dict[str, Any]:
         names = zf.namelist()
         for name in names:
             validate_archive_member_name(name)
-        manifest = load_manifest_from_zip(zf)
+
+        manifest, manifest_bytes = load_manifest_from_zip(zf)
         verify_manifest_identities(manifest)
         files = manifest["files"]
         assert isinstance(files, dict)
@@ -233,8 +338,13 @@ def import_bundle(*, bundle: Path, target: Path) -> dict[str, Any]:
         missing = expected_names - set(names)
         if unexpected or missing:
             raise EvidenceBundleError(
-                f"bundle member set mismatch: unexpected={sorted(unexpected)} missing={sorted(missing)}"
+                "bundle member set mismatch: "
+                f"unexpected={sorted(unexpected)} missing={sorted(missing)}"
             )
+
+        expected_sums = build_sha256sums(files, manifest_bytes)
+        if zf.read(SHA256SUMS_NAME) != expected_sums:
+            raise EvidenceBundleError("bundle SHA256SUMS does not match manifest")
 
         for name, metadata in files.items():
             validate_archive_member_name(name)
@@ -245,26 +355,37 @@ def import_bundle(*, bundle: Path, target: Path) -> dict[str, Any]:
             expected_sha = str(metadata.get("sha256", ""))
             if actual_sha != expected_sha:
                 raise EvidenceBundleError(
-                    f"archive member SHA mismatch: path={name} expected={expected_sha} actual={actual_sha}"
+                    "archive member SHA mismatch: "
+                    f"path={name} expected={expected_sha} actual={actual_sha}"
                 )
             if len(data) != int(metadata.get("size_bytes", -1)):
-                raise EvidenceBundleError(f"archive member size mismatch: {name}")
+                raise EvidenceBundleError(
+                    f"archive member size mismatch: {name}"
+                )
 
         if target.exists():
             sentinel = target / MANIFEST_NAME
             if sentinel.is_file():
                 existing = json.loads(sentinel.read_text(encoding="utf-8"))
                 if existing == manifest:
+                    verify_installed_root(target, manifest)
                     return {
                         "status": "PASS_ALREADY_IMPORTED",
                         "target": str(target),
                         "bundle_sha256": sha256_file(bundle),
                         "file_count": len(files),
                     }
-            raise EvidenceBundleError(f"refusing to overwrite existing evidence root: {target}")
+            raise EvidenceBundleError(
+                f"refusing to overwrite existing evidence root: {target}"
+            )
 
         target.parent.mkdir(parents=True, exist_ok=True)
-        temp = Path(tempfile.mkdtemp(prefix=f".{target.name}.import-", dir=target.parent))
+        temp = Path(
+            tempfile.mkdtemp(
+                prefix=f".{target.name}.import-",
+                dir=target.parent,
+            )
+        )
         try:
             for name in sorted(files):
                 destination = temp.joinpath(*PurePosixPath(name).parts)
@@ -274,29 +395,30 @@ def import_bundle(*, bundle: Path, target: Path) -> dict[str, Any]:
 
             canonical = temp.joinpath(*PurePosixPath(CANONICAL_BUNDLE_PATH).parts)
             pointer = temp / "numbers3-current-canonical-path.txt"
-            pointer.write_text(str((target / CANONICAL_BUNDLE_PATH).resolve()) + "\n", encoding="utf-8")
+            pointer.write_text(
+                str((target / CANONICAL_BUNDLE_PATH).resolve()) + "\n",
+                encoding="utf-8",
+            )
             (temp / MANIFEST_NAME).write_text(
-                json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+                json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
             )
 
-            require_identity(temp / PHASE7_NAME / "phase7_holdout.py", EXPECTED_RUNNER_SHA256, "sealed original runner")
-            require_identity(
-                temp / PHASE6C_NAME / "artifacts" / "CANDIDATE_FREEZE.json",
-                EXPECTED_FREEZE_SHA256,
-                "Candidate Freeze",
-            )
-            require_identity(
-                temp / PHASE3_NAME / "artifacts" / "numbers3-development-only.csv",
-                EXPECTED_DEVELOPMENT_SHA256,
-                "Development",
-            )
-            require_identity(canonical, EXPECTED_CANONICAL_SHA256, "canonical data")
-            verify_zero_progress(temp / PHASE7_NAME / "artifacts" / "progress.json")
+            verify_installed_root(temp, manifest)
 
             sums_lines = []
-            for path in sorted(p for p in temp.rglob("*") if p.is_file() and p.name != SHA256SUMS_NAME):
-                sums_lines.append(f"{sha256_file(path)}  {path.relative_to(temp).as_posix()}\n")
-            (temp / SHA256SUMS_NAME).write_text("".join(sums_lines), encoding="ascii")
+            for path in sorted(
+                item
+                for item in temp.rglob("*")
+                if item.is_file() and item.name != SHA256SUMS_NAME
+            ):
+                sums_lines.append(
+                    f"{sha256_file(path)}  {path.relative_to(temp).as_posix()}\n"
+                )
+            (temp / SHA256SUMS_NAME).write_text(
+                "".join(sums_lines),
+                encoding="ascii",
+            )
 
             os.replace(temp, target)
         except BaseException:
@@ -317,11 +439,17 @@ def default_export_path() -> Path:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Export/import exact portable Phase 7 evidence bundles.")
+    parser = argparse.ArgumentParser(
+        description="Export/import exact portable Phase 7 evidence bundles."
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
     export = sub.add_parser("export")
-    export.add_argument("--downloads", type=Path, default=Path.home() / "Downloads")
+    export.add_argument(
+        "--downloads",
+        type=Path,
+        default=Path.home() / "Downloads",
+    )
     export.add_argument("--output", type=Path, default=None)
 
     import_cmd = sub.add_parser("import")
@@ -333,7 +461,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_parser().parse_args()
     if args.command == "export":
-        result = export_bundle(downloads=args.downloads.resolve(), output=(args.output or default_export_path()))
+        output = args.output or default_export_path()
+        result = export_bundle(
+            downloads=args.downloads.resolve(),
+            output=output,
+        )
         print(f"EVIDENCE_BUNDLE={result['bundle']}")
         print(f"EVIDENCE_BUNDLE_SHA256={result['bundle_sha256']}")
         print(f"EVIDENCE_FILE_COUNT={result['file_count']}")
