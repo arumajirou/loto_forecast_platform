@@ -203,9 +203,7 @@ def validate_runtime_plan(
     trials: list[Any],
     frozen_tasks: list[dict[str, Any]],
 ) -> None:
-    frozen = {
-        str(row["model_id"]): row for row in frozen_tasks if str(row.get("game")) == game
-    }
+    frozen = {str(row["model_id"]): row for row in frozen_tasks if str(row.get("game")) == game}
     if len(frozen) != EXPECTED_PROBABILISTIC_MODELS or len(trials) != EXPECTED_PROBABILISTIC_MODELS:
         raise Taj20MatrixError(f"per-game plan count mismatch: game={game}")
     trial_by_model = {str(trial.model_id): trial for trial in trials}
@@ -295,12 +293,17 @@ def _source_result_complete(row: dict[str, Any]) -> bool:
         and str(item.get("model_id")) == str(row.get("model_id"))
         and str(item.get("trial_id")) == str(row.get("source_trial_id"))
     ]
-    return len(matches) == 1 and str(matches[0].get("status", "")).upper() == str(
-        row.get("raw_status", "")
-    ).upper()
+    return (
+        len(matches) == 1
+        and str(matches[0].get("status", "")).upper() == str(row.get("raw_status", "")).upper()
+    )
 
 
-def verify_campaign(root: Path) -> dict[str, Any]:
+def verify_campaign(
+    root: Path,
+    *,
+    write_summary: bool = True,
+) -> dict[str, Any]:
     plan = _read_json(root / "MATRIX_PLAN.json")
     rows = _read_jsonl(root / "NORMALIZED_RESULTS.jsonl")
     expected_keys = {str(task["task_key"]) for task in plan.get("tasks", [])}
@@ -313,9 +316,7 @@ def verify_campaign(root: Path) -> dict[str, Any]:
         for row in rows
         if str(row.get("normalized_status")) not in NORMALIZED_STATUSES
     )
-    unmapped = sorted(
-        str(row.get("task_key")) for row in rows if row.get("normalization_note")
-    )
+    unmapped = sorted(str(row.get("task_key")) for row in rows if row.get("normalization_note"))
     missing_source_evidence = sorted(
         str(row.get("task_key")) for row in rows if not _source_result_complete(row)
     )
@@ -364,7 +365,8 @@ def verify_campaign(root: Path) -> dict[str, Any]:
             "accuracy_claim": False,
         },
     }
-    _atomic_json(root / "CAMPAIGN_SUMMARY.json", summary)
+    if write_summary:
+        _atomic_json(root / "CAMPAIGN_SUMMARY.json", summary)
     return summary
 
 
@@ -506,7 +508,16 @@ def main() -> int:
         print(f"ARTIFACT_MANIFEST_SHA256={result['integrity']['manifest_sha256']}")
         print(f"SHA256SUMS_SHA256={result['integrity']['sha256sums_sha256']}")
         return 0 if result["acceptance"] == "PASS" else 20
-    result = verify_campaign(root)
+    sha_ok, sha_failures = _verify_sha256s(root)
+    if not sha_ok:
+        raise Taj20MatrixError(f"campaign SHA256 verification failed: {sha_failures[:10]}")
+
+    stored_summary = _read_json(root / "CAMPAIGN_SUMMARY.json")
+    result = verify_campaign(root, write_summary=False)
+
+    if stored_summary != result:
+        raise Taj20MatrixError("stored CAMPAIGN_SUMMARY.json does not match recomputed acceptance")
+
     print(f"TAJ20_PROB_ACCEPTANCE={result['acceptance']}")
     print(f"OBSERVED_PAIRS={result['observed_pairs']}")
     print("HOLDOUT=CLOSED")

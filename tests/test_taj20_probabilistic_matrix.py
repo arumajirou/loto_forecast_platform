@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
+import scripts.run_taj20_probabilistic_matrix as taj20_matrix
 from scripts.run_taj20_probabilistic_matrix import (
     EXPECTED_GAMES,
     EXPECTED_PAIRS,
@@ -83,3 +84,75 @@ def test_frozen_plan_rejects_silent_skip(tmp_path: Path) -> None:
         assert "76 x 6" in str(exc)
     else:
         raise AssertionError("silent skip must block TAJ-20 frozen plan")
+
+
+def test_verify_campaign_read_only_does_not_rewrite_summary(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    root = tmp_path / "runtime"
+    root.mkdir()
+
+    games = [f"game-{index}" for index in range(EXPECTED_GAMES)]
+
+    tasks = [
+        {
+            "task_key": f"pp-{model:03d}::{game}",
+            "model_id": f"pp-{model:03d}",
+            "game": game,
+        }
+        for model in range(EXPECTED_PROBABILISTIC_MODELS)
+        for game in games
+    ]
+
+    rows = [
+        {
+            "task_key": task["task_key"],
+            "model_id": task["model_id"],
+            "game": task["game"],
+            "normalized_status": "RUNTIME_SMOKE_SUCCEEDED",
+            "normalization_note": None,
+        }
+        for task in tasks
+    ]
+
+    (root / "MATRIX_PLAN.json").write_text(
+        json.dumps(
+            {
+                "tasks": tasks,
+                "scientific_boundary": {
+                    "holdout": "CLOSED",
+                    "prospective": "CLOSED",
+                    "promotion": "CLOSED",
+                },
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    (root / "NORMALIZED_RESULTS.jsonl").write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+    sentinel = {"must_remain_unchanged": True}
+    summary_path = root / "CAMPAIGN_SUMMARY.json"
+    original = json.dumps(sentinel, sort_keys=True) + "\n"
+    summary_path.write_text(original, encoding="utf-8")
+
+    monkeypatch.setattr(
+        taj20_matrix,
+        "_source_result_complete",
+        lambda row: True,
+    )
+
+    result = taj20_matrix.verify_campaign(
+        root,
+        write_summary=False,
+    )
+
+    assert result["acceptance"] == "PASS"
+    assert result["observed_pairs"] == EXPECTED_PAIRS
+    assert summary_path.read_text(encoding="utf-8") == original

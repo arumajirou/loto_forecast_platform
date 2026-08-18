@@ -113,7 +113,13 @@ def _verify_sha256s(root: Path) -> tuple[bool, list[str]]:
         except ValueError:
             failures.append(f"invalid SHA256SUMS line {number}")
             continue
-        path = root / relative
+        path = (root / relative).resolve()
+        try:
+            path.relative_to(root.resolve())
+        except ValueError:
+            failures.append(f"path escapes root: {relative}")
+            continue
+
         if not path.is_file():
             failures.append(f"missing hashed file: {relative}")
         elif _sha256(path) != expected:
@@ -162,8 +168,7 @@ def _catalog_sets(identity_root: Path) -> tuple[set[str], set[str], set[str], se
     summary = _read_json(identity_root / "IDENTITY_SUMMARY.json")
     if (
         int(summary.get("broad_catalog_identities", -1)) != EXPECTED_BROAD_MODELS
-        or int(summary.get("probabilistic_catalog_identities", -1))
-        != EXPECTED_PROBABILISTIC_MODELS
+        or int(summary.get("probabilistic_catalog_identities", -1)) != EXPECTED_PROBABILISTIC_MODELS
         or int(summary.get("unified_catalog_identities", -1)) != EXPECTED_UNIFIED_MODELS
         or len(summary.get("canonical_games", [])) != EXPECTED_GAMES
         or int(summary.get("broad_model_game_cross_product", -1)) != EXPECTED_BROAD_PAIRS
@@ -175,9 +180,7 @@ def _catalog_sets(identity_root: Path) -> tuple[set[str], set[str], set[str], se
     if not isinstance(unified, list) or not isinstance(native, list):
         raise AcceptanceError("identity catalog artifacts must be lists")
     broad_ids = {
-        str(row.get("model_id", ""))
-        for row in unified
-        if row.get("catalog_source") == "existing"
+        str(row.get("model_id", "")) for row in unified if row.get("catalog_source") == "existing"
     }
     probabilistic_ids = {
         str(row.get("model_id", ""))
@@ -195,8 +198,7 @@ def _catalog_sets(identity_root: Path) -> tuple[set[str], set[str], set[str], se
         raise AcceptanceError("unified catalog source counts do not match 174+76")
     if broad_ids & probabilistic_ids:
         raise AcceptanceError(
-            "broad/probabilistic model-ID collision: "
-            f"{sorted(broad_ids & probabilistic_ids)[:10]}"
+            f"broad/probabilistic model-ID collision: {sorted(broad_ids & probabilistic_ids)[:10]}"
         )
     if unified_ids != broad_ids | probabilistic_ids or native_ids != probabilistic_ids:
         raise AcceptanceError("unified/native catalog identity parity failed")
@@ -335,13 +337,11 @@ def verify_unified(
         "unified_matrix_exact": unified_matrix["pass"],
         "canonical_identity_collision_free": len(unified_ids) == EXPECTED_UNIFIED_MODELS,
         "probabilistic_native_parity": len(probabilistic_ids) == EXPECTED_PROBABILISTIC_MODELS,
-        "holdout_closed": broad_summary.get("scientific_boundary", {}).get("holdout")
-        == "CLOSED"
+        "holdout_closed": broad_summary.get("scientific_boundary", {}).get("holdout") == "CLOSED"
         and probabilistic_summary.get("scientific_boundary", {}).get("holdout") == "CLOSED",
         "prospective_closed": (
             broad_summary.get("scientific_boundary", {}).get("prospective") == "CLOSED"
-            and probabilistic_summary.get("scientific_boundary", {}).get("prospective")
-            == "CLOSED"
+            and probabilistic_summary.get("scientific_boundary", {}).get("prospective") == "CLOSED"
         ),
     }
     accepted = all(gates.values())

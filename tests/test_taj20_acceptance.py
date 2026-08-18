@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import hashlib
+from pathlib import Path
+
 from tools.runtime_audit.taj20_acceptance import (
     EXPECTED_BROAD_PAIRS,
     EXPECTED_PROBABILISTIC_PAIRS,
     EXPECTED_UNIFIED_PAIRS,
     _rows_by_expected_matrix,
+    _verify_sha256s,
 )
 
 
@@ -78,3 +82,25 @@ def test_matrix_checker_rejects_duplicate() -> None:
     )
     assert result["pass"] is False
     assert result["duplicate_keys"]
+
+
+def test_sha256_verifier_rejects_path_escape(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "evidence"
+    root.mkdir()
+
+    outside = tmp_path / "outside.txt"
+    outside.write_text("outside\n", encoding="utf-8")
+
+    digest = hashlib.sha256(outside.read_bytes()).hexdigest()
+
+    (root / "SHA256SUMS").write_text(
+        f"{digest}  ../outside.txt\n",
+        encoding="utf-8",
+    )
+
+    ok, failures = _verify_sha256s(root)
+
+    assert ok is False
+    assert failures == ["path escapes root: ../outside.txt"]
