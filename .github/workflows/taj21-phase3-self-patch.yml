@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          python3 tools/evaluation/taj21_phase3_apply.py
+          python3 tools/evaluation/taj21_phase3_apply_shim.py
           python3 -m py_compile src/loto/evaluation/unified_campaign.py tests/evaluation/test_taj21_unified_probabilistic_campaign.py
 
       - name: Commit only final implementation and tests
@@ -41,7 +41,7 @@ jobs:
           set -Eeuo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm .github/workflows/taj21-phase3-self-patch.yml tools/evaluation/taj21_phase3_apply.py
+          git rm .github/workflows/taj21-phase3-self-patch.yml tools/evaluation/taj21_phase3_apply.py tools/evaluation/taj21_phase3_apply_shim.py
           git add src/loto/evaluation/unified_campaign.py tests/evaluation/test_taj21_unified_probabilistic_campaign.py
           git diff --cached --check
           git commit -m "feat: wire probabilistic OOF into unified campaign"
