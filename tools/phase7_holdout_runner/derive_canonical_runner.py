@@ -10,7 +10,7 @@ from typing import Final
 EXPECTED_ORIGINAL_RUNNER_SHA256: Final = (
     "986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187"
 )
-EXPECTED_SEMANTIC_CONFIG_GIT_BLOB: Final = "44fe8c8b3149f1a3207370cef2d3e5c5bc6749d7"
+EXPECTED_SEMANTIC_CONFIG_GIT_BLOB: Final = "257d4d4a88e56f6070200a67fd86b2beca73a3c1"
 EXPECTED_MLFORECAST_VERSION: Final = "1.1.0"
 PATCH_SCHEMA: Final = "phase7-holdout-canonical-runner-derivation/v1"
 DERIVED_RUNNER_NAME: Final = "phase7_holdout_canonical_v1.py"
@@ -362,6 +362,10 @@ def derive_runner(
         "canonical_semantic_hash_is_gate": True,
         "legacy_differences_state": [1],
         "legacy_global_sklearn_transformer": "numpy.log1p/numpy.expm1",
+        "legacy_lag_transform_bridge": (
+            "mlf_init_params.lag_transforms positive int/JSON-string keys + "
+            "ExponentiallyWeightedMean(alpha=0.9)"
+        ),
         "source_newline_normalization": "lf_for_in_memory_derivation_only",
         "replay_only_mode_supported": True,
         "replay_only_holdout_access": False,
@@ -385,7 +389,7 @@ def main() -> int:
 
     result = derive_runner(
         runner=args.runner,
-        semantic_config_source=args.semantic_config_source,
+        semantic_config_source=semantic_config_source if False else args.semantic_config_source,
         output_dir=args.output_dir,
     )
     for key in sorted(result):
