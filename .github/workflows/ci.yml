@@ -173,10 +173,11 @@ jobs:
           set -Eeuo pipefail
           "$CI_VENV/bin/python" -m compileall -q src scripts tests
 
-      - name: Run tests
+      - name: Run full pytest baseline gate
         run: |
           set -Eeuo pipefail
-          "$CI_VENV/bin/python" -m pytest -q
+          "$CI_VENV/bin/python" .github/check_pytest_failure_baseline.py \
+            --baseline .github/pytest-failure-baseline.txt
 
       - name: Verify repository stayed clean
         if: ${{ always() }}
