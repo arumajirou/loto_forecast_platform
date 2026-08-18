@@ -15,7 +15,6 @@ from loto.evaluation.unified_campaign import (
     run_unified_campaign,
 )
 from loto.game.geometry import geometry_for, known_games
-from loto.models.catalog_full import build_catalog
 
 
 def _synthetic(game: str, *, rows: int = 32, seed: int = 7) -> pd.DataFrame:
@@ -55,11 +54,13 @@ def _config(tmp_path: Path, **updates) -> UnifiedCampaignConfig:
     return UnifiedCampaignConfig(**base)
 
 
-def test_plan_materialises_every_requested_catalog_game_pair(tmp_path: Path) -> None:
+def test_plan_materialises_every_requested_unified_game_pair(tmp_path: Path) -> None:
     config = _config(tmp_path, seeds=(1,), holdout_size=0)
     plan = build_campaign_plan(config)
-    assert len(plan) == len(build_catalog()) * len(known_games())
+    assert len(plan) == 250 * len(known_games())
     assert len({(row["game"], row["candidate_id"]) for row in plan}) == len(plan)
+    assert len({row["candidate_id"] for row in plan}) == 250
+    assert sum(row["library"] == "probabilistic" for row in plan) == 76 * len(known_games())
 
 
 @pytest.mark.parametrize("game", known_games())

@@ -26,6 +26,11 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from loto.evaluation.metric_registry import REQUIRED_BASELINE_IDS, REQUIRED_POINT_METRICS
 from loto.evaluation.metrics_general import positional_metrics
+from loto.evaluation.probabilistic_oof_adapter import (
+    ProbabilisticScientificRoute,
+    build_probabilistic_scientific_plan,
+    predict_probabilistic_from_history,
+)
 from loto.evaluation.protocol_v2 import (
     BaselineManifest,
     EvaluationProtocolV2,
@@ -640,6 +645,7 @@ def _evaluate_seed(
     *,
     baseline_id: str | None = None,
     entry: ModelEntry | None = None,
+    probabilistic_route: ProbabilisticScientificRoute | None = None,
 ) -> dict[str, Any]:
     records: list[dict[str, Any]] = []
     runtime_samples: list[dict[str, Any]] = []
@@ -663,6 +669,16 @@ def _evaluate_seed(
                     "decoder_id": f"baseline-{baseline_id}-v1",
                     "decoder_objective": "baseline_native",
                 }
+            elif probabilistic_route is not None:
+                prediction = predict_probabilistic_from_history(
+                    history,
+                    probabilistic_route,
+                    seed=seed,
+                    protocol_hash=prepared.protocol.protocol_hash,
+                    device=config.device,
+                )
+                pred = np.asarray(prediction.values, dtype=int)
+                metadata = dict(prediction.metadata)
             else:
                 if entry is None:
                     raise AssertionError("model entry is required")
@@ -772,7 +788,27 @@ def _evaluate_candidate(
     task: str,
     baseline_id: str | None = None,
     entry: ModelEntry | None = None,
+    probabilistic_route: ProbabilisticScientificRoute | None = None,
 ) -> dict[str, Any]:
+    if probabilistic_route is not None and not probabilistic_route.allowed:
+        unavailable_reasons = {"BACKEND_UNAVAILABLE", "MODEL_BLOCKED"}
+        unsupported_reasons = {"TARGET_MODE_UNSUPPORTED", "DRAW_ORDER_REQUIRED"}
+        if probabilistic_route.reason_code in unavailable_reasons:
+            status: Status = "UNAVAILABLE"
+        elif probabilistic_route.reason_code in unsupported_reasons:
+            status = "UNSUPPORTED_GAME"
+        else:
+            status = "NOT_ROUTABLE"
+        return _result_from_failure(
+            game=prepared.geometry.key,
+            candidate_id=candidate_id,
+            source=source,
+            status=status,
+            reason=f"{probabilistic_route.reason_code}: {probabilistic_route.details}",
+            library=library,
+            task=task,
+            protocol_hash=prepared.protocol.protocol_hash,
+        )
     seed_results: list[dict[str, Any]] = []
     failures: list[dict[str, Any]] = []
     for seed in config.seeds:
@@ -785,6 +821,7 @@ def _evaluate_candidate(
                     config,
                     baseline_id=baseline_id,
                     entry=entry,
+                    probabilistic_route=probabilistic_route,
                 )
             )
         except _UnsupportedGame as exc:
@@ -857,18 +894,36 @@ def _selected_entries(config: UnifiedCampaignConfig) -> list[ModelEntry]:
     if config.model_ids is None:
         return entries
     wanted = set(config.model_ids)
-    by_id = {entry.model_id: entry for entry in entries}
-    missing = sorted(wanted.difference(by_id))
-    if missing:
-        raise KeyError(f"unknown model IDs: {missing}")
     return [entry for entry in entries if entry.model_id in wanted]
 
 
+def _selected_probabilistic_routes(
+    config: UnifiedCampaignConfig,
+) -> list[ProbabilisticScientificRoute]:
+    routes = list(build_probabilistic_scientific_plan(config.games))
+    if config.model_ids is None:
+        return routes
+    wanted = set(config.model_ids)
+    return [route for route in routes if route.model_id in wanted]
+
+
 def build_campaign_plan(config: UnifiedCampaignConfig) -> list[dict[str, str]]:
-    """Return the complete requested catalog x game matrix without executing models."""
+    """Return the complete requested unified 250-identity x game matrix."""
 
     entries = _selected_entries(config)
-    return [
+    probabilistic_routes = _selected_probabilistic_routes(config)
+    broad_ids = {entry.model_id for entry in entries}
+    probabilistic_ids = {route.model_id for route in probabilistic_routes}
+    collisions = sorted(broad_ids.intersection(probabilistic_ids))
+    if collisions:
+        raise AssertionError(f"unified scientific identity collision: {collisions}")
+    if config.model_ids is not None:
+        wanted = set(config.model_ids)
+        missing = sorted(wanted.difference(broad_ids | probabilistic_ids))
+        if missing:
+            raise KeyError(f"unknown model IDs: {missing}")
+
+    broad_rows = [
         {
             "game": game,
             "candidate_id": entry.model_id,
@@ -878,6 +933,20 @@ def build_campaign_plan(config: UnifiedCampaignConfig) -> list[dict[str, str]]:
         for game in config.games
         for entry in entries
     ]
+    probabilistic_rows = [
+        {
+            "game": route.game,
+            "candidate_id": route.model_id,
+            "library": "probabilistic",
+            "task": route.target_mode or "probabilistic",
+        }
+        for route in probabilistic_routes
+    ]
+    rows = broad_rows + probabilistic_rows
+    pair_keys = {(row["game"], row["candidate_id"]) for row in rows}
+    if len(pair_keys) != len(rows):
+        raise AssertionError("unified campaign plan contains duplicate model/game pairs")
+    return rows
 
 
 def _leaderboards(
@@ -913,7 +982,7 @@ def _leaderboards(
 def _macro_summary(results: list[dict[str, Any]], games: tuple[str, ...]) -> list[dict[str, Any]]:
     by_candidate: dict[str, list[dict[str, Any]]] = {}
     for row in results:
-        if row["source"] != "catalog":
+        if row["source"] not in {"catalog", "probabilistic"}:
             continue
         by_candidate.setdefault(row["candidate_id"], []).append(row)
     summary: list[dict[str, Any]] = []
@@ -960,8 +1029,11 @@ def run_unified_campaign(
         raise FileExistsError(f"refusing to reuse campaign output directory: {output}")
     output.mkdir(parents=True)
     entries = _selected_entries(config)
+    probabilistic_routes = _selected_probabilistic_routes(config)
+    probabilistic_ids = {route.model_id for route in probabilistic_routes}
     plan = build_campaign_plan(config)
-    expected_pairs = len(entries) * len(config.games)
+    unified_models = len(entries) + len(probabilistic_ids)
+    expected_pairs = unified_models * len(config.games)
     if len(plan) != expected_pairs:
         raise AssertionError("campaign plan does not cover every requested model/game pair")
 
@@ -999,8 +1071,22 @@ def run_unified_campaign(
                     entry=entry,
                 )
             )
+        for route in probabilistic_routes:
+            if route.game != game:
+                continue
+            results.append(
+                _evaluate_candidate(
+                    context,
+                    config,
+                    candidate_id=route.model_id,
+                    source="probabilistic",
+                    library="probabilistic",
+                    task=route.target_mode or "probabilistic",
+                    probabilistic_route=route,
+                )
+            )
 
-    catalog_results = [row for row in results if row["source"] == "catalog"]
+    catalog_results = [row for row in results if row["source"] in {"catalog", "probabilistic"}]
     if len(catalog_results) != expected_pairs:
         raise AssertionError("result matrix lost one or more model/game combinations")
     pair_keys = {(row["game"], row["candidate_id"]) for row in catalog_results}
@@ -1019,7 +1105,9 @@ def run_unified_campaign(
         "git_commit": config.git_commit,
         "code_hash": _resolved_code_hash(config),
         "games": list(config.games),
-        "catalog_models": len(entries),
+        "catalog_models": unified_models,
+        "broad_catalog_models": len(entries),
+        "probabilistic_catalog_models": len(probabilistic_ids),
         "expected_model_game_pairs": expected_pairs,
         "observed_model_game_pairs": len(catalog_results),
         "matrix_complete": len(catalog_results) == expected_pairs
