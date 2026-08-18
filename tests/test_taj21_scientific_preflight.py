@@ -19,7 +19,7 @@ def load_module():
     return module
 
 
-def test_live_scientific_preflight_freezes_exact_250x6_gap(tmp_path: Path) -> None:
+def test_live_scientific_preflight_freezes_exact_250x6_ready_surface(tmp_path: Path) -> None:
     module = load_module()
     output = tmp_path / "taj21-preflight"
 
@@ -31,8 +31,8 @@ def test_live_scientific_preflight_freezes_exact_250x6_gap(tmp_path: Path) -> No
         "probabilistic_identities": 76,
         "unified_identities": 250,
         "games": 6,
-        "current_scientific_identities": 174,
-        "current_scientific_pairs": 1044,
+        "current_scientific_identities": 250,
+        "current_scientific_pairs": 1500,
         "target_unified_pairs": 1500,
     }
     assert result["target_plan_rows"] == 1500
@@ -57,14 +57,17 @@ def test_live_scientific_preflight_freezes_exact_250x6_gap(tmp_path: Path) -> No
     assert result["seed_inventory"] == [42, 1729, 20260730]
 
     gap = result["route_gap"]
-    assert gap["missing_identity_count"] == 76
-    assert gap["missing_model_game_pairs"] == 456
-    assert gap["execution_readiness"] == "BLOCKED"
-    assert gap["blocking_reasons"] == ["PROBABILISTIC_76_OOF_ADAPTER_MISSING"]
-    assert len(gap["missing_scientific_identities"]) == 76
+    assert gap["missing_identity_count"] == 0
+    assert gap["missing_model_game_pairs"] == 0
+    assert gap["historical_incremental_model_game_pairs"] == 456
+    assert gap["execution_readiness"] == "PASS"
+    assert gap["blocking_reasons"] == []
+    assert gap["missing_scientific_identities"] == []
+    assert gap["current_scientific_surface"] == "unified-250"
+    assert all(gap["source_contract_checks"].values())
 
     assert result["scientific_boundary"] == {
-        "development_oof": "PLANNED",
+        "development_oof": "EXECUTION_READY",
         "holdout": "CLOSED",
         "prospective": "CLOSED",
         "promotion": "CLOSED",
@@ -107,13 +110,45 @@ def test_preflight_does_not_import_runtime_campaign_or_sklearn(
     result = module.build_preflight(output)
 
     assert result["status"] == "PASS"
-    assert result["inventory"]["current_scientific_pairs"] == 1044
+    assert result["inventory"]["current_scientific_pairs"] == 1500
+    assert result["route_gap"]["execution_readiness"] == "PASS"
 
 
-def test_preflight_source_contract_detects_broad_only_campaign() -> None:
+def test_preflight_source_contract_detects_unified_campaign_and_lock_order() -> None:
     module = load_module()
 
-    seeds, surface = module._current_scientific_contract()
+    seeds, surface, checks = module._current_scientific_contract()
 
     assert seeds == (42, 1729, 20260730)
-    assert surface == "broad-only"
+    assert surface == "unified-250"
+    assert checks == {
+        "broad_selector_from_build_catalog": True,
+        "probabilistic_selector_from_scientific_plan": True,
+        "planner_uses_broad_selector": True,
+        "planner_uses_probabilistic_selector": True,
+        "runtime_uses_probabilistic_selector": True,
+        "history_only_probabilistic_predictor": True,
+        "durable_prediction_lock_present": True,
+        "prediction_lock_before_actual": True,
+    }
+
+
+def test_preflight_fails_closed_when_lock_moves_after_actual(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    module = load_module()
+    source = module.UNIFIED_CAMPAIGN_SOURCE.read_text(encoding="utf-8")
+    lock_start = source.index("    lock = _write_prediction_lock(")
+    actual_start = source.index("    actual = np.asarray(", lock_start)
+    return_start = source.index("    predicted = np.asarray(", actual_start)
+    lock_block = source[lock_start:actual_start]
+    without_lock = source[:lock_start] + source[actual_start:return_start]
+    mutated = without_lock[:return_start - len(lock_block)] + lock_block + without_lock[
+        return_start - len(lock_block) :
+    ]
+    source_path = tmp_path / "unified_campaign.py"
+    source_path.write_text(mutated, encoding="utf-8")
+    monkeypatch.setattr(module, "UNIFIED_CAMPAIGN_SOURCE", source_path)
+
+    with pytest.raises(module.ScientificPreflightError, match="execution contract is incomplete"):
+        module._current_scientific_contract()
