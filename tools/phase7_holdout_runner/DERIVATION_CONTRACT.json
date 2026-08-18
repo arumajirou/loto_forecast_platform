@@ -1,0 +1,12 @@
+{
+  "canonical_semantic_schema": "loto.semantic-config/v1",
+  "expected_mlforecast_version": "1.1.0",
+  "expected_original_runner_sha256": "986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187",
+  "expected_semantic_config_git_blob": "52949291c563d1126e3dd6d1363305c5766a630d",
+  "legacy_differences_state": [1],
+  "legacy_semantic_hash_is_gate": false,
+  "legacy_semantic_hash_preserved": true,
+  "canonical_semantic_hash_is_gate": true,
+  "holdout_execution_permitted_by_this_tool": false,
+  "actual_access_permitted_by_this_tool": false
+}
