@@ -6,7 +6,7 @@ import json
 import py_compile
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Final
 
@@ -47,7 +47,7 @@ def default_downloads() -> Path:
 
 
 def default_output_root() -> Path:
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     return default_downloads() / f"phase7-live-mapping-diagnostic-{stamp}"
 
 
@@ -86,12 +86,82 @@ def collect_non_string_mapping_keys(value: Any, path: str = "$") -> list[dict[st
 
 def patch_runner_for_mapping_diagnostic(source: str) -> str:
     """Inject a fail-closed path diagnostic before canonical replay hashing."""
-    anchor = """    canonical_replay_hash = (\n        canonical_semantic_sha256_v1(\n            best_config,\n            legacy_object_states=\n                legacy_object_states,\n        )\n    )\n"""
-
-    diagnostic = (
-        """    def _collect_non_string_mapping_keys(value, path=\"$\"):\n        findings = []\n        if isinstance(value, dict):\n            for key, item in value.items():\n                if isinstance(key, str):\n                    child = path + \"[\" + json.dumps(key, ensure_ascii=False) + \"]\"\n                else:\n                    findings.append(\n                        {\n                            \"mapping_path\": path,\n                            \"key_type\": type(key).__name__,\n                            \"key_repr\": repr(key),\n                            \"value_type\": type(item).__name__,\n                        }\n                    )\n                    child = path + \"[\" + repr(key) + \"]\"\n                findings.extend(\n                    _collect_non_string_mapping_keys(item, child)\n                )\n            return findings\n        if isinstance(value, (list, tuple)):\n            for index, item in enumerate(value):\n                findings.extend(\n                    _collect_non_string_mapping_keys(\n                        item, f\"{path}[{index}]\"\n                    )\n                )\n        return findings\n\n    mapping_key_findings = _collect_non_string_mapping_keys(\n        best_config\n    )\n    if mapping_key_findings:\n        diagnostic_path = (\n            replay_dir\n            / f\"AutoCatboost__seed{seed}__MAPPING_KEY_DIAGNOSTIC.json\"\n        )\n        atomic_json(\n            diagnostic_path,\n            {\n                \"schema_version\":\n                    \"phase7-live-mapping-key-diagnostic/v1\",\n                \"status\":\n                    \"CAPTURED\",\n                \"seed\":\n                    seed,\n                \"findings\":\n                    mapping_key_findings,\n                \"holdout_draws_accessed\":\n                    0,\n                \"actuals_accessed\":\n                    0,\n                \"holdout_executed\":\n                    False,\n                \"captured_at_utc\":\n                    now(),\n            },\n        )\n        first = mapping_key_findings[0]\n        raise RuntimeError(\n            \"live best_config non-string mapping key \"\n            f\"seed={seed} path={first['mapping_path']} \"\n            f\"key_type={first['key_type']} \"\n            f\"key={first['key_repr']}\"\n        )\n\n"""
-        + anchor
+    anchor = """    canonical_replay_hash = (
+        canonical_semantic_sha256_v1(
+            best_config,
+            legacy_object_states=
+                legacy_object_states,
+        )
     )
+"""
+
+    diagnostic = """    def _collect_non_string_mapping_keys(value, path="$\"):
+        findings = []
+        if isinstance(value, dict):
+            for key, item in value.items():
+                if isinstance(key, str):
+                    child = path + "[" + json.dumps(key, ensure_ascii=False) + "]"
+                else:
+                    findings.append(
+                        {
+                            "mapping_path": path,
+                            "key_type": type(key).__name__,
+                            "key_repr": repr(key),
+                            "value_type": type(item).__name__,
+                        }
+                    )
+                    child = path + "[" + repr(key) + "]"
+                findings.extend(
+                    _collect_non_string_mapping_keys(item, child)
+                )
+            return findings
+        if isinstance(value, (list, tuple)):
+            for index, item in enumerate(value):
+                findings.extend(
+                    _collect_non_string_mapping_keys(
+                        item, f"{path}[{index}]"
+                    )
+                )
+        return findings
+
+    mapping_key_findings = _collect_non_string_mapping_keys(
+        best_config
+    )
+    if mapping_key_findings:
+        diagnostic_path = (
+            replay_dir
+            / f"AutoCatboost__seed{seed}__MAPPING_KEY_DIAGNOSTIC.json"
+        )
+        atomic_json(
+            diagnostic_path,
+            {
+                "schema_version":
+                    "phase7-live-mapping-key-diagnostic/v1",
+                "status":
+                    "CAPTURED",
+                "seed":
+                    seed,
+                "findings":
+                    mapping_key_findings,
+                "holdout_draws_accessed":
+                    0,
+                "actuals_accessed":
+                    0,
+                "holdout_executed":
+                    False,
+                "captured_at_utc":
+                    now(),
+            },
+        )
+        first = mapping_key_findings[0]
+        raise RuntimeError(
+            "live best_config non-string mapping key "
+            f"seed={seed} path={first['mapping_path']} "
+            f"key_type={first['key_type']} "
+            f"key={first['key_repr']}"
+        )
+
+""" + anchor
 
     count = source.count(anchor)
     if count != 1:
