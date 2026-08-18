@@ -7,6 +7,11 @@
   "legacy_semantic_hash_is_gate": false,
   "legacy_semantic_hash_preserved": true,
   "canonical_semantic_hash_is_gate": true,
-  "holdout_execution_permitted_by_this_tool": false,
-  "actual_access_permitted_by_this_tool": false
+  "replay_only_flag": "--stop-after-replay",
+  "replay_only_components": 4,
+  "replay_only_trial_count": 80,
+  "replay_only_holdout_access": false,
+  "replay_only_actual_access": false,
+  "holdout_execution_permitted_by_derivation_tool": false,
+  "actual_access_permitted_by_derivation_tool": false
 }
