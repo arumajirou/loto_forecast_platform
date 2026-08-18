@@ -202,24 +202,31 @@ def predict_probabilistic_from_history(
         raise ProbabilisticScientificRouteError("allowed route is missing target_mode")
     if len(history) < 10:
         raise ProbabilisticScientificRouteError("scientific history must contain at least 10 rows")
+
     geometry = geometry_for(route.game)
-    columns = geometry.column_names()
-    missing = [column for column in columns if column not in history.columns]
-    if missing:
+    try:
+        probe_bundle = bundle_from_frame(
+            history.copy(),
+            game=route.game,
+            data_version="taj21-history-probe",
+        )
+    except (TypeError, ValueError) as exc:
         raise ProbabilisticScientificRouteError(
-            f"scientific history missing target columns for {route.game}: {missing}"
+            f"scientific history is invalid for {route.game}: {exc}"
+        ) from exc
+    if probe_bundle.rows != len(history):
+        raise ProbabilisticScientificRouteError(
+            "scientific history normalization changed the number of training rows"
         )
 
-    train_frame = history[
-        [column for column in ("draw_no", *columns) if column in history.columns]
-    ].copy()
+    columns = geometry.column_names()
+    train_frame = pd.DataFrame(probe_bundle.values, columns=columns)
+    train_frame.insert(0, "draw_no", list(probe_bundle.draw_ids))
     data_identity = stable_hash(
         {
             "game": route.game,
-            "rows": train_frame[[*columns]].astype(int).values.tolist(),
-            "draw_no": train_frame["draw_no"].astype(int).tolist()
-            if "draw_no" in train_frame.columns
-            else list(range(1, len(train_frame) + 1)),
+            "rows": probe_bundle.values.tolist(),
+            "draw_ids": list(probe_bundle.draw_ids),
         }
     )
     bundle = bundle_from_frame(
