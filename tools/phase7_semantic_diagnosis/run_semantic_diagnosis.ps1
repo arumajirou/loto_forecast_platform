@@ -32,9 +32,11 @@ try {
         "-Phase6BRoot", $Phase6BRoot,
         "-Phase3Root", $Phase3Root,
         "-SmokeRoot", $SmokeRoot,
-        "-Repository", $Repository,
-        "-OutputRoot", $OutputRoot
+        "-Repository", $Repository
     )
+    if (-not [string]::IsNullOrWhiteSpace($OutputRoot)) {
+        $InvokeArgs += @("-OutputRoot", $OutputRoot)
+    }
     if ($PublishEvidence) {
         $InvokeArgs += "-PublishEvidence"
     }
