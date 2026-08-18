@@ -53,6 +53,11 @@ def default_output_root() -> Path:
     return default_downloads() / f"phase7-live-mapping-diagnostic-{stamp}"
 
 
+def diagnostic_runner_path(bundle: Path) -> Path:
+    """Keep the diagnostic runner beside the derived semantic module for imports."""
+    return bundle / "phase7_holdout_mapping_diagnostic.py"
+
+
 def collect_non_string_mapping_keys(value: Any, path: str = "$") -> list[dict[str, str]]:
     """Return typed paths for non-string dict keys without mutating the input."""
     findings: list[dict[str, str]] = []
@@ -208,7 +213,7 @@ def run_diagnostic(*, repo_root: Path, output_root: Path) -> dict[str, Any]:
 
     source = base_runner.read_text(encoding="utf-8")
     diagnostic_source = patch_runner_for_mapping_diagnostic(source)
-    diagnostic_runner = output_root / "phase7_holdout_mapping_diagnostic.py"
+    diagnostic_runner = diagnostic_runner_path(bundle)
     diagnostic_runner.write_text(diagnostic_source, encoding="utf-8", newline="\n")
     py_compile.compile(str(diagnostic_runner), doraise=True)
 
@@ -285,9 +290,10 @@ def run_diagnostic(*, repo_root: Path, output_root: Path) -> dict[str, Any]:
     elif run.returncode == 0:
         status = "REPLAY_ONLY_PASSED_WITHOUT_NON_STRING_KEYS"
     else:
+        stderr_tail = "\n".join(run.stderr.splitlines()[-80:])
         raise DiagnosticError(
             "replay failed without mapping-key diagnostic artifact; "
-            f"rc={run.returncode}; inspect {stderr_path}"
+            f"rc={run.returncode}; stderr tail follows:\n{stderr_tail}"
         )
 
     summary = {
