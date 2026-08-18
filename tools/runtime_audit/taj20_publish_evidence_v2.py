@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import shutil
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -16,13 +17,6 @@ _SPEC.loader.exec_module(base)
 
 PublishError = base.PublishError
 
-IDENTITY_PUBLICATION_FILES = (
-    "IDENTITY_SUMMARY.json",
-    "UNIFIED_CATALOG.json",
-    "PROBABILISTIC_NATIVE.json",
-    "EXECUTION_SURFACES.json",
-    "SHA256SUMS",
-)
 FORBIDDEN_SECRET_MARKERS = (
     "-----BEGIN PRIVATE KEY-----",
     "-----BEGIN OPENSSH PRIVATE KEY-----",
@@ -30,11 +24,6 @@ FORBIDDEN_SECRET_MARKERS = (
     "ghp_",
     "AKIA",
 )
-
-
-def _copy_identity_plan(source: Path, destination: Path) -> None:
-    """Copy the exact artifact contract emitted by plan_all_execution_identities.py."""
-    base._copy_required(source, destination, IDENTITY_PUBLICATION_FILES)
 
 
 def _assert_no_secret_markers(root: Path) -> None:
@@ -49,6 +38,45 @@ def _assert_no_secret_markers(root: Path) -> None:
                 )
 
 
+def _copy_checksum_contract(source: Path, destination: Path) -> tuple[str, ...]:
+    """Copy exactly the files authenticated by source/SHA256SUMS."""
+    source = source.resolve()
+    sums = source / "SHA256SUMS"
+    if not sums.is_file():
+        raise PublishError(f"SHA256SUMS missing: {source}")
+
+    base._verify_sha256s(source)
+    destination.mkdir(parents=True, exist_ok=True)
+    copied: list[str] = []
+
+    for number, line in enumerate(sums.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            _expected, relative = line.split("  ", 1)
+        except ValueError as exc:
+            raise PublishError(f"invalid SHA256SUMS line {number}: {sums}") from exc
+        if relative == "SHA256SUMS":
+            raise PublishError("SHA256SUMS must not authenticate itself")
+
+        src = (source / relative).resolve()
+        try:
+            src.relative_to(source)
+        except ValueError as exc:
+            raise PublishError(f"SHA256SUMS path escapes source root: {relative}") from exc
+        if not src.is_file():
+            raise PublishError(f"publication source file missing: {src}")
+
+        dst = destination / relative
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+        copied.append(relative)
+
+    shutil.copy2(sums, destination / "SHA256SUMS")
+    base._verify_sha256s(destination)
+    return tuple(copied)
+
+
 def _materialize_publication_v2(
     *,
     run_root: Path,
@@ -58,48 +86,17 @@ def _materialize_publication_v2(
     remote_branch: str,
 ) -> tuple[str, str]:
     source_root = publication_root / "source"
-    _copy_identity_plan(validated["identity_root"], source_root / "identity-plan")
-    base._copy_required(
-        validated["preflight_root"],
-        source_root / "preflight",
-        (
-            "PRECHECK_SUMMARY.json",
-            "INCREMENTAL_MATRIX_PLAN.json",
-            "ARTIFACT_MANIFEST.json",
-            "SHA256SUMS",
-        ),
-    )
-    base._copy_required(
-        validated["probabilistic_root"],
-        source_root / "probabilistic-runtime",
-        (
-            "MATRIX_PLAN.json",
-            "NORMALIZED_RESULTS.jsonl",
-            "CAMPAIGN_SUMMARY.json",
-            "ARTIFACT_MANIFEST.json",
-            "SHA256SUMS",
-        ),
-    )
-    base._copy_required(
-        validated["unified_root"],
-        source_root / "unified-acceptance",
-        (
-            "CAMPAIGN_SUMMARY.json",
-            "UNIFIED_NORMALIZED_RESULTS.jsonl",
-            "ARTIFACT_MANIFEST.json",
-            "SHA256SUMS",
-        ),
-    )
-    base._copy_required(
-        validated["reverify_root"],
-        source_root / "unified-reverify",
-        (
-            "CAMPAIGN_SUMMARY.json",
-            "UNIFIED_NORMALIZED_RESULTS.jsonl",
-            "ARTIFACT_MANIFEST.json",
-            "SHA256SUMS",
-        ),
-    )
+    contracts = {
+        "identity-plan": validated["identity_root"],
+        "preflight": validated["preflight_root"],
+        "probabilistic-runtime": validated["probabilistic_root"],
+        "unified-acceptance": validated["unified_root"],
+        "unified-reverify": validated["reverify_root"],
+    }
+    copied_contracts = {
+        name: list(_copy_checksum_contract(source, source_root / name))
+        for name, source in contracts.items()
+    }
 
     publication = {
         "schema_version": "taj20-runtime-publication/v2",
@@ -107,6 +104,8 @@ def _materialize_publication_v2(
         "repo_head": repo_head,
         "remote_branch": remote_branch,
         "created_at_utc": datetime.now(UTC).isoformat(),
+        "publication_contract": "source SHA256SUMS is authoritative for each evidence directory",
+        "copied_checksum_contracts": copied_contracts,
         "identity_contract": {
             "probabilistic_pairs": base.EXPECTED_PROBABILISTIC_PAIRS,
             "unified_models": base.EXPECTED_UNIFIED_MODELS,
@@ -209,7 +208,7 @@ def main() -> int:
 
     result = publish(repo_root=args.repo_root, run_root=args.run_root)
     print("TAJ20_EVIDENCE_PUBLICATION=PASS")
-    print("PUBLISHER_VERSION=v2")
+    print("PUBLISHER_VERSION=v2-checksum-contract")
     print(f"REMOTE_BRANCH={result['branch']}")
     print(f"REMOTE_COMMIT={result['commit_sha']}")
     print("REMOTE_COMMIT_VERIFIED=PASS")
