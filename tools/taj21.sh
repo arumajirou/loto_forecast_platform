@@ -82,6 +82,7 @@ case "${1:-}" in
     GIT_COMMIT="$(git -C "$ROOT" rev-parse HEAD)"
     readarray -d '' -t PY_CMD < <(runtime_python_cmd)
     cd "$ROOT"
+    echo "TAJ21_BASELINE_INPUT_DIR=$TAJ21_DATA_DIR"
 
     PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}" \
       "${PY_CMD[@]}" tools/evaluation/taj21_baseline_campaign.py \
