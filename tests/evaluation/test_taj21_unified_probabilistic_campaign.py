@@ -30,6 +30,7 @@ def _config(tmp_path, *, model_ids=None):
 
 def test_default_plan_is_exact_unified_250_by_6(tmp_path) -> None:
     config = _config(tmp_path)
+    assert len(config.games) == 6
     plan = campaign.build_campaign_plan(config)
     assert len(plan) == 1500
     assert len({(row["game"], row["candidate_id"]) for row in plan}) == 1500
