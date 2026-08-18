@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import re
@@ -26,6 +25,7 @@ from main_preflight import (
 SCIENTIFIC_GIT_COMMIT: Final = "179bcbc9a51a60f0badfe7faa25f3818ab686229"
 EXPECTED_HOLDOUT_DRAWS: Final = 50
 HEX64_RE: Final = re.compile(r"^[0-9a-f]{64}$")
+HOLDOUT_ROOT_GLOB: Final = "phase7-sealed-holdout-v1-*"
 
 
 class HoldoutExecutionError(RuntimeError):
@@ -60,6 +60,37 @@ def collect_hex64(value: Any) -> set[str]:
         if HEX64_RE.fullmatch(candidate):
             found.add(candidate)
     return found
+
+
+def prior_holdout_state(root: Path) -> tuple[int, int]:
+    artifacts = root / "artifacts"
+    progress_path = artifacts / "progress.json"
+    actuals = 0
+    if progress_path.is_file():
+        try:
+            progress = load_json(progress_path)
+            actuals = int(progress.get("actuals_accessed", 0))
+        except (HoldoutExecutionError, ValueError, TypeError) as exc:
+            raise HoldoutExecutionError(
+                f"cannot prove prior Holdout state is safe: {progress_path}"
+            ) from exc
+    lock_root = artifacts / "prediction_locks"
+    locks = 0
+    if lock_root.exists():
+        locks = sum(1 for path in lock_root.rglob("*") if path.is_file())
+    return actuals, locks
+
+
+def ensure_no_prior_holdout_execution(downloads: Path) -> None:
+    for root in sorted(downloads.glob(HOLDOUT_ROOT_GLOB)):
+        if not root.is_dir():
+            continue
+        actuals, locks = prior_holdout_state(root)
+        if actuals > 0 or locks > 0:
+            raise HoldoutExecutionError(
+                "prior sealed Holdout evidence already exists; refusing rerun: "
+                f"root={root} actuals_accessed={actuals} prediction_locks={locks}"
+            )
 
 
 def require_metric_and_baseline_evidence(artifacts: Path) -> dict[str, list[str]]:
@@ -208,7 +239,39 @@ def write_sha256sums(root: Path) -> None:
     )
 
 
+def write_runner_terminal_state(output_root: Path, returncode: int) -> None:
+    artifacts = output_root / "artifacts"
+    progress_path = artifacts / "progress.json"
+    progress: dict[str, Any] = {}
+    if progress_path.is_file():
+        try:
+            progress = load_json(progress_path)
+        except HoldoutExecutionError:
+            progress = {}
+    lock_root = artifacts / "prediction_locks"
+    lock_count = 0
+    if lock_root.exists():
+        lock_count = sum(1 for path in lock_root.rglob("*") if path.is_file())
+    actuals = int(progress.get("actuals_accessed", 0)) if progress else 0
+    holdout_done = int(progress.get("holdout_draws_done", 0)) if progress else 0
+    payload = {
+        "schema_version": "phase7-runner-terminal-state/v1",
+        "runner_returncode": returncode,
+        "holdout_draws_done": holdout_done,
+        "actuals_accessed": actuals,
+        "prediction_lock_count": lock_count,
+        "do_not_rerun": actuals > 0 or lock_count > 0,
+        "recorded_at_utc": datetime.now(UTC).isoformat(),
+    }
+    (output_root / "RUNNER_TERMINAL_STATE.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
 def run_holdout(*, repo_root: Path, output_root: Path) -> dict[str, Any]:
+    downloads = Path.home() / "Downloads"
+    ensure_no_prior_holdout_execution(downloads)
     if output_root.exists():
         raise HoldoutExecutionError(f"output root already exists: {output_root}")
     output_root.mkdir(parents=True, exist_ok=False)
@@ -225,7 +288,6 @@ def run_holdout(*, repo_root: Path, output_root: Path) -> dict[str, Any]:
         if sha256_file(derived_runner) != EXPECTED_DERIVED_RUNNER_SHA256:
             raise HoldoutExecutionError("derived runner identity changed after preflight")
 
-        downloads = Path.home() / "Downloads"
         phase7_root = downloads / "automlforecast-phase7-holdout-20260818-101611"
         phase6c_root = downloads / "automlforecast-phase6c-ensemble-freeze-20260818-101021"
         phase3_root = downloads / "automlforecast-phase3-input-size-20260817-173808"
@@ -299,12 +361,15 @@ def run_holdout(*, repo_root: Path, output_root: Path) -> dict[str, Any]:
         )
         (output_root / "holdout.stdout.log").write_text(run.stdout, encoding="utf-8")
         (output_root / "holdout.stderr.log").write_text(run.stderr, encoding="utf-8")
+        write_runner_terminal_state(output_root, run.returncode)
         print(f"HOLDOUT_RUNNER_RC={run.returncode}")
         if run.returncode != 0:
             stdout_tail = "\n".join(run.stdout.splitlines()[-100:])
             stderr_tail = "\n".join(run.stderr.splitlines()[-120:])
             raise HoldoutExecutionError(
-                "sealed Holdout runner failed\n=== STDOUT TAIL ===\n"
+                "sealed Holdout runner failed; inspect RUNNER_TERMINAL_STATE.json and do "
+                "not rerun if it reports actuals_accessed>0 or prediction_lock_count>0\n"
+                "=== STDOUT TAIL ===\n"
                 + stdout_tail
                 + "\n=== STDERR TAIL ===\n"
                 + stderr_tail
