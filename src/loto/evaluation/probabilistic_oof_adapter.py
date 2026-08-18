@@ -200,9 +200,7 @@ def predict_probabilistic_from_history(
     if not route.target_mode:
         raise ProbabilisticScientificRouteError("allowed route is missing target_mode")
     if len(history) < 10:
-        raise ProbabilisticScientificRouteError(
-            "scientific history must contain at least 10 rows"
-        )
+        raise ProbabilisticScientificRouteError("scientific history must contain at least 10 rows")
     geometry = geometry_for(route.game)
     columns = geometry.column_names()
     missing = [column for column in columns if column not in history.columns]
