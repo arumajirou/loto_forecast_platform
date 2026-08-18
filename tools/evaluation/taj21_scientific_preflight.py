@@ -128,9 +128,14 @@ def _assignment_line(node: ast.FunctionDef, target_name: str) -> int | None:
 
 def _predictor_receives_history(node: ast.FunctionDef) -> bool:
     for child in ast.walk(node):
-        if not isinstance(child, ast.Call) or _call_name(child) != "predict_probabilistic_from_history":
+        if (
+            not isinstance(child, ast.Call)
+            or _call_name(child) != "predict_probabilistic_from_history"
+        ):
             continue
-        return bool(child.args and isinstance(child.args[0], ast.Name) and child.args[0].id == "history")
+        return bool(
+            child.args and isinstance(child.args[0], ast.Name) and child.args[0].id == "history"
+        )
     return False
 
 
@@ -204,9 +209,7 @@ def _current_scientific_contract() -> tuple[tuple[int, ...], str, dict[str, bool
         "planner_uses_probabilistic_selector": (
             "_selected_probabilistic_routes" in campaign_plan_calls
         ),
-        "runtime_uses_probabilistic_selector": (
-            "_selected_probabilistic_routes" in run_calls
-        ),
+        "runtime_uses_probabilistic_selector": ("_selected_probabilistic_routes" in run_calls),
         "history_only_probabilistic_predictor": (
             "predict_probabilistic_from_history" in evaluate_seed_calls
             and _predictor_receives_history(evaluate_seed)
@@ -235,13 +238,11 @@ def _current_scientific_plan(
         raise ScientificPreflightError(f"unexpected current scientific surface: {surface}")
     collision = sorted(set(broad_ids).intersection(probabilistic_ids))
     if collision:
-        raise ScientificPreflightError(f"current scientific plan has identity collisions: {collision}")
+        raise ScientificPreflightError(
+            f"current scientific plan has identity collisions: {collision}"
+        )
     current_ids = sorted(set(broad_ids) | set(probabilistic_ids))
-    plan = [
-        {"game": game, "candidate_id": model_id}
-        for game in games
-        for model_id in current_ids
-    ]
+    plan = [{"game": game, "candidate_id": model_id} for game in games for model_id in current_ids]
     return plan, current_seeds, checks
 
 

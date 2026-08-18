@@ -143,9 +143,11 @@ def test_preflight_fails_closed_when_lock_moves_after_actual(
     return_start = source.index("    predicted = np.asarray(", actual_start)
     lock_block = source[lock_start:actual_start]
     without_lock = source[:lock_start] + source[actual_start:return_start]
-    mutated = without_lock[:return_start - len(lock_block)] + lock_block + without_lock[
-        return_start - len(lock_block) :
-    ]
+    mutated = (
+        without_lock[: return_start - len(lock_block)]
+        + lock_block
+        + without_lock[return_start - len(lock_block) :]
+    )
     source_path = tmp_path / "unified_campaign.py"
     source_path.write_text(mutated, encoding="utf-8")
     monkeypatch.setattr(module, "UNIFIED_CAMPAIGN_SOURCE", source_path)
