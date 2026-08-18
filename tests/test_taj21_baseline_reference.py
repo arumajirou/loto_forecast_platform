@@ -68,13 +68,7 @@ def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
             candidate_id = f"baseline:{baseline}"
             seed_results = []
             for seed in SEEDS:
-                lock = (
-                    campaign
-                    / "prediction_locks"
-                    / game
-                    / candidate_id
-                    / f"seed-{seed}.json"
-                )
+                lock = campaign / "prediction_locks" / game / candidate_id / f"seed-{seed}.json"
                 lock.parent.mkdir(parents=True, exist_ok=True)
                 payload = {
                     "schema_version": "prediction-lock-v1",
@@ -84,9 +78,7 @@ def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
                     "actuals_known": expose_actuals
                     and game == known_games()[0]
                     and baseline == "random",
-                    "predictions": [
-                        {"fold_id": "fold-01", "draw_index": 100, "prediction": [1]}
-                    ],
+                    "predictions": [{"fold_id": "fold-01", "draw_index": 100, "prediction": [1]}],
                 }
                 lock.write_text(json.dumps(payload) + "\n", encoding="utf-8")
                 seed_results.append(
@@ -169,9 +161,7 @@ def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
         encoding="utf-8",
     )
     artifacts = sorted(path for path in root.rglob("*") if path.is_file())
-    lines = [
-        f"{_sha256(path)}  {path.relative_to(root).as_posix()}" for path in artifacts
-    ]
+    lines = [f"{_sha256(path)}  {path.relative_to(root).as_posix()}" for path in artifacts]
     (root / "SHA256SUMS").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

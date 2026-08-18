@@ -152,9 +152,7 @@ def verify_baselines(root: Path) -> dict[str, Any]:
 
     results = list(summary.get("results", []))
     if len(results) != EXPECTED_BASELINE_ROWS:
-        raise ValueError(
-            f"expected {EXPECTED_BASELINE_ROWS} baseline rows, got {len(results)}"
-        )
+        raise ValueError(f"expected {EXPECTED_BASELINE_ROWS} baseline rows, got {len(results)}")
     keys = {(str(row.get("game")), str(row.get("candidate_id"))) for row in results}
     expected_keys = {
         (game, f"baseline:{baseline}")
@@ -175,9 +173,7 @@ def verify_baselines(root: Path) -> dict[str, Any]:
             )
         lock_count += _verify_seed_evidence(root, row)
     if lock_count != EXPECTED_PREDICTION_LOCKS:
-        raise ValueError(
-            f"expected {EXPECTED_PREDICTION_LOCKS} prediction locks, got {lock_count}"
-        )
+        raise ValueError(f"expected {EXPECTED_PREDICTION_LOCKS} prediction locks, got {lock_count}")
 
     return {
         "baseline_rows": len(results),
