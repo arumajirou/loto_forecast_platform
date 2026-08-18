@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 
 import pytest
-
 from loto.evaluation.semantic_config import (
     SEMANTIC_CONFIG_SCHEMA_V1,
     SemanticConfigError,
