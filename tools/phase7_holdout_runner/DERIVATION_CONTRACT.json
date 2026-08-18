@@ -2,7 +2,7 @@
   "canonical_semantic_schema": "loto.semantic-config/v1",
   "expected_mlforecast_version": "1.1.0",
   "expected_original_runner_sha256": "986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187",
-  "expected_semantic_config_git_blob": "bd9c184e431a20039d8d2400b1b869b58a5f7833",
+  "expected_semantic_config_git_blob": "44fe8c8b3149f1a3207370cef2d3e5c5bc6749d7",
   "legacy_differences_state": [1],
   "legacy_global_sklearn_transformer": {
     "transformer": {
