@@ -1,0 +1,14 @@
+{
+  "bridge_state_source": "explicit_verified_phase7_contract",
+  "canonical_semantic_match": true,
+  "canonical_semantic_schema": "loto.semantic-config/v1",
+  "canonical_semantic_sha256_frozen": "254828a1680f097fd2aa6a09088982df7a6cd09f2d818e27222323f3c74697e5",
+  "canonical_semantic_sha256_replay": "254828a1680f097fd2aa6a09088982df7a6cd09f2d818e27222323f3c74697e5",
+  "differences_state": [
+    1
+  ],
+  "legacy_hash_match": false,
+  "legacy_semantic_sha256_frozen": "f406422fee3bc426c406443fa74f41a77361eed8987b00ce8143cd87b5d34abf",
+  "legacy_semantic_sha256_replay": "abed5955d9ec60d681cd37b28b5fb034ee14b5fc7f6157b6b07a1d9bd632efc3",
+  "safe_to_continue_holdout": false
+}

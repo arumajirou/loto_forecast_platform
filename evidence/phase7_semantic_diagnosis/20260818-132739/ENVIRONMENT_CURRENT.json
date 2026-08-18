@@ -1,0 +1,23 @@
+{
+  "git_head": "f9f5f6e97372af7b3d6084192d20756e9ab0c9a7",
+  "machine": "AMD64",
+  "packages": {
+    "catboost": "1.2.10",
+    "lightgbm": "4.7.0",
+    "mlforecast": "1.1.0",
+    "numpy": "2.5.2",
+    "optuna": "4.9.0",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.9.0"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.14 (main, Jun 11 2026, 04:04:46) [MSC v.1944 64 bit (AMD64)]",
+  "python_executable": "C:\\Users\\bp00425\\Downloads\\automlforecast-api-smoke-20260817-163008\\venv\\Scripts\\python.exe",
+  "runner_sha256": "986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187",
+  "windows_version": [
+    "11",
+    "10.0.26200",
+    "SP0",
+    "Multiprocessor Free"
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "items": [
+    {
+      "key": {
+        "python_type": "builtins.str",
+        "value": "mlf_fit_params"
+      },
+      "value": {
+        "items": [
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "static_features"
+            },
+            "value": {
+              "items": [],
+              "python_type": "builtins.list"
+            }
+          }
+        ],
+        "python_type": "builtins.dict"
+      }
+    },
+    {
+      "key": {
+        "python_type": "builtins.str",
+        "value": "mlf_init_params"
+      },
+      "value": {
+        "items": [
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "date_features"
+            },
+            "value": {
+              "python_type": "builtins.NoneType",
+              "value": null
+            }
+          },
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "lag_transforms"
+            },
+            "value": {
+              "python_type": "builtins.NoneType",
+              "value": null
+            }
+          },
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "lags"
+            },
+            "value": {
+              "items": [
+                {
+                  "python_type": "builtins.int",
+                  "value": 1
+                }
+              ],
+              "python_type": "builtins.list"
+            }
+          },
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "num_threads"
+            },
+            "value": {
+              "python_type": "builtins.int",
+              "value": 1
+            }
+          },
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "target_transforms"
+            },
+            "value": {
+              "items": [
+                {
+                  "python_type": "builtins.str",
+                  "value": "<mlforecast.target_transforms.Differences object at 0x000002785DF348A0>"
+                },
+                {
+                  "python_type": "builtins.str",
+                  "value": "<mlforecast.target_transforms.LocalStandardScaler object at 0x000002785F2B8590>"
+                }
+              ],
+              "python_type": "builtins.list"
+            }
+          }
+        ],
+        "python_type": "builtins.dict"
+      }
+    },
+    {
+      "key": {
+        "python_type": "builtins.str",
+        "value": "model_params"
+      },
+      "value": {
+        "items": [
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "colsample_bylevel"
+            },
+            "value": {
+              "python_type": "builtins.float",
+              "value": 0.3647267818084223
+            }
+          },
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "depth"
+            },
+            "value": {
+              "python_type": "builtins.int",
+              "value": 3
+            }
+          },
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "learning_rate"
+            },
+            "value": {
+              "python_type": "builtins.float",
+              "value": 0.022109361986862856
+            }
+          },
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "min_data_in_leaf"
+            },
+            "value": {
+              "python_type": "builtins.float",
+              "value": 95.95708821814695
+            }
+          },
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "n_estimators"
+            },
+            "value": {
+              "python_type": "builtins.int",
+              "value": 821
+            }
+          },
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "silent"
+            },
+            "value": {
+              "python_type": "builtins.bool",
+              "value": true
+            }
+          },
+          {
+            "key": {
+              "python_type": "builtins.str",
+              "value": "subsample"
+            },
+            "value": {
+              "python_type": "builtins.float",
+              "value": 0.8535280164377872
+            }
+          }
+        ],
+        "python_type": "builtins.dict"
+      }
+    }
+  ],
+  "python_type": "builtins.dict"
+}

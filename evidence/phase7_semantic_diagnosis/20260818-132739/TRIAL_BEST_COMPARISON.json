@@ -1,0 +1,27 @@
+{
+  "best_objective_same": true,
+  "best_trial_same": true,
+  "canonical_semantic_match": true,
+  "canonical_semantic_schema": "loto.semantic-config/v1",
+  "canonical_semantic_sha256_frozen": "254828a1680f097fd2aa6a09088982df7a6cd09f2d818e27222323f3c74697e5",
+  "canonical_semantic_sha256_replay": "254828a1680f097fd2aa6a09088982df7a6cd09f2d818e27222323f3c74697e5",
+  "frozen": {
+    "best_inner_loss": 2.659176845649281,
+    "best_trial": 14,
+    "semantic_config_sha256": "f406422fee3bc426c406443fa74f41a77361eed8987b00ce8143cd87b5d34abf"
+  },
+  "replay": {
+    "best_inner_loss": 2.659176845649281,
+    "best_trial": 14,
+    "semantic_config_sha256": "abed5955d9ec60d681cd37b28b5fb034ee14b5fc7f6157b6b07a1d9bd632efc3"
+  },
+  "trial_replay": {
+    "numbers_same": true,
+    "objectives_same": true,
+    "param_diff_rows": 0,
+    "params_same": true,
+    "states_same": true,
+    "trial_count_expected": 20,
+    "trial_count_replay": 20
+  }
+}

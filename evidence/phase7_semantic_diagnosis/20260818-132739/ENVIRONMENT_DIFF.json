@@ -1,0 +1,15 @@
+{
+  "differences": [],
+  "historical_available": true,
+  "historical_environment": {
+    "catboost": "1.2.10",
+    "device": "CPU",
+    "formal_runtime_certification": false,
+    "lightgbm": "4.7.0",
+    "mlforecast": "1.1.0",
+    "optuna": "4.9.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.14 (main, Jun 11 2026, 04:04:46) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "version_drift_detected": false
+}

@@ -1,0 +1,39 @@
+{
+  "config": {
+    "mlf_fit_params": {
+      "static_features": []
+    },
+    "mlf_init_params": {
+      "date_features": null,
+      "lag_transforms": null,
+      "lags": [
+        1
+      ],
+      "num_threads": 1,
+      "target_transforms": [
+        {
+          "__python_object_class__": "mlforecast.target_transforms.Differences",
+          "state": {
+            "differences": [
+              1
+            ]
+          }
+        },
+        {
+          "__python_object_class__": "mlforecast.target_transforms.LocalStandardScaler",
+          "state": {}
+        }
+      ]
+    },
+    "model_params": {
+      "colsample_bylevel": 0.3647267818084223,
+      "depth": 3,
+      "learning_rate": 0.022109361986862856,
+      "min_data_in_leaf": 95.95708821814695,
+      "n_estimators": 821,
+      "silent": true,
+      "subsample": 0.8535280164377872
+    }
+  },
+  "schema": "loto.semantic-config/v1"
+}
