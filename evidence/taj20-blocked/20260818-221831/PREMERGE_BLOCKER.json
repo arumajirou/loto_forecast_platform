@@ -1,0 +1,42 @@
+{
+  "schema_version": "taj20-blocked-attempt/v1",
+  "attempt_id": "20260818-221831",
+  "repository": "arumajirou/loto_forecast_platform",
+  "source_main_sha": "b6575da744d9261d86b7ce9594b267498a0bb22c",
+  "status": "BLOCKED",
+  "classification": "RUNTIME_LAUNCHER_NOT_MERGED_TO_MAIN",
+  "exit_code": 2,
+  "observed": {
+    "taj20_preflight": "PASS",
+    "taj20_plan_only": "PASS",
+    "broad_identities": 174,
+    "probabilistic_identities": 76,
+    "unified_identities": 250,
+    "games": 6,
+    "taj19_reused_pairs": 1044,
+    "probabilistic_incremental_pairs": 456,
+    "unified_final_pairs": 1500,
+    "taj19_source_files_verified": 20581
+  },
+  "taj19_integrity": {
+    "artifact_manifest_sha256": "5bee5f8b6825e8f8e202f5af8a67c4c4ed6b76d7d790819261c005859002f1ab",
+    "sha256sums_sha256": "6d8648e838e2ebb2607387db3c8946fca6a0bf7ccff46c93afca809a6ca49bc7"
+  },
+  "failure": {
+    "command": "bash tools/taj20.sh run",
+    "observed_usage": "Usage: bash tools/taj20.sh {status|plan|verify-plan}",
+    "reason": "PR #370 runtime launcher extension is not merged into main"
+  },
+  "execution_claims": {
+    "probabilistic_456_executed": false,
+    "unified_1500_accepted": false,
+    "remote_runtime_publication": false
+  },
+  "scientific_boundary": {
+    "holdout": "CLOSED",
+    "prospective": "CLOSED",
+    "promotion": "CLOSED",
+    "accuracy_claim": false
+  },
+  "next_gate": "PR #370 CI -> merge approval -> merge -> pull main -> TAJ-20 runtime"
+}
