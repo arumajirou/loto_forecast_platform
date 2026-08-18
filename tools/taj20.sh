@@ -165,9 +165,9 @@ verify_runtime() {
     stamp="$(date -u +%Y%m%d-%H%M%S)"
     output_root="$root/unified-reverify-$stamp"
 
-    "${PY_CMD[@]}" "$RUNNER" verify \
-        --preflight-root "$preflight_root" \
-        --root "$runtime_root"
+    # Reverification must be read-only with respect to immutable runtime evidence.
+    # The unified acceptance verifier checks the existing runtime SHA256SUMS before
+    # evaluating the 1044 + 456 = 1500 matrix contract.
     "${PY_CMD[@]}" "$ACCEPTANCE" \
         --taj19-root "$taj19_campaign" \
         --probabilistic-root "$runtime_root" \
