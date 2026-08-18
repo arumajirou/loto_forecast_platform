@@ -143,9 +143,7 @@ def test_patch_adds_replay_only_stop_before_holdout() -> None:
     assert 'print("HOLDOUT_DRAWS_ACCESSED=0")' in patched
     assert 'print("ACTUALS_ACCESSED=0")' in patched
     assert 'print("HOLDOUT_EXECUTED=NO")' in patched
-    assert patched.index("if args.stop_after_replay:") < patched.index(
-        "# B. Sequential Holdout"
-    )
+    assert patched.index("if args.stop_after_replay:") < patched.index("# B. Sequential Holdout")
 
 
 def test_patch_accepts_crlf_source_and_normalizes_only_derived_text() -> None:
