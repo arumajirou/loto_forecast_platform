@@ -4,12 +4,12 @@ Status: `FORMAT_FIX_APPLIED / EXECUTION_PENDING`
 
 Use the current PR #355 exact head returned by GitHub at verification time; do not hard-code an older branch head from this status document.
 
-Current pinned identities:
+Pinned identities:
 
 - sealed historical runner SHA-256: `986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187`
 - canonical serializer Git blob: `44fe8c8b3149f1a3207370cef2d3e5c5bc6749d7`
 - MLForecast: `1.1.0`
-- GlobalSklearnTransformer supported state: `FunctionTransformer(func=numpy.log1p, inverse_func=numpy.expm1)` with the exact default flags pinned in `DERIVATION_CONTRACT.json`
+- GlobalSklearnTransformer supported state: `FunctionTransformer(func=numpy.log1p, inverse_func=numpy.expm1)` with exact FunctionTransformer flags pinned in `DERIVATION_CONTRACT.json`
 
 Evidence history:
 
