@@ -2,7 +2,7 @@
   "canonical_semantic_schema": "loto.semantic-config/v1",
   "expected_mlforecast_version": "1.1.0",
   "expected_original_runner_sha256": "986ea78f655ab2579bc274b00b408a71e413f3139791e13daed69cc347e88187",
-  "expected_semantic_config_git_blob": "44fe8c8b3149f1a3207370cef2d3e5c5bc6749d7",
+  "expected_semantic_config_git_blob": "257d4d4a88e56f6070200a67fd86b2beca73a3c1",
   "legacy_differences_state": [1],
   "legacy_global_sklearn_transformer": {
     "transformer": {
@@ -15,6 +15,19 @@
       "feature_names_out": null,
       "kw_args": null,
       "inv_kw_args": null
+    }
+  },
+  "verified_lag_transform_bridge": {
+    "path": ["mlf_init_params", "lag_transforms"],
+    "key_domain": "positive integer or canonical decimal JSON string",
+    "collision_policy": "fail_closed",
+    "transform": "mlforecast.lag_transforms.ExponentiallyWeightedMean",
+    "transform_state": {
+      "alpha": 0.9,
+      "global_": false,
+      "groupby": null,
+      "partition_by": null,
+      "time_agg": "mean"
     }
   },
   "legacy_semantic_hash_is_gate": false,
