@@ -6,13 +6,19 @@ on:
       - feat/taj21-unified-probabilistic-oof-v1
     paths:
       - .github/workflows/taj21-phase3-self-patch.yml
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - .github/workflows/taj21-phase3-self-patch.yml
 
 permissions:
   contents: write
 
 jobs:
   apply:
-    if: github.event.head_commit.message != 'feat: wire probabilistic OOF into unified campaign'
+    if: github.head_ref == 'feat/taj21-unified-probabilistic-oof-v1' || github.ref_name == 'feat/taj21-unified-probabilistic-oof-v1'
     runs-on: [self-hosted, Linux, X64, loto-ci]
     steps:
       - name: Checkout patch branch
