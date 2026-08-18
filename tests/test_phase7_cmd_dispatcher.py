@@ -13,13 +13,16 @@ def test_phase7_dispatcher_does_not_forward_mode_argument() -> None:
     assert 'if /I "%~1"=="replay" goto :replay' in text
     assert 'if /I "%~1"=="verify" goto :verify' in text
     assert 'if /I "%~1"=="preflight" goto :preflight' in text
+    assert 'if /I "%~1"=="holdout" goto :holdout' in text
     assert 'call "%~dp0phase7_holdout_runner\\run_frozen_config_forensics.cmd"' in text
     assert 'call "%~dp0phase7_holdout_runner\\run_pr355_live_mapping_diagnostic.cmd"' in text
     assert 'call "%~dp0phase7_holdout_runner\\run_pr355_replay_only.cmd"' in text
     assert 'call "%~dp0phase7_holdout_runner\\run_pr355_verify.cmd"' in text
     assert 'call "%~dp0phase7_holdout_runner\\run_main_preflight.cmd"' in text
+    assert 'call "%~dp0phase7_holdout_runner\\run_sealed_holdout.cmd"' in text
     assert 'run_frozen_config_forensics.cmd" %*' not in text
     assert 'run_pr355_live_mapping_diagnostic.cmd" %*' not in text
     assert 'run_pr355_replay_only.cmd" %*' not in text
     assert 'run_pr355_verify.cmd" %*' not in text
     assert 'run_main_preflight.cmd" %*' not in text
+    assert 'run_sealed_holdout.cmd" %*' not in text
