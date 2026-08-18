@@ -56,15 +56,15 @@ def patch_runner_source(source: str) -> str:
     )
     source = _replace_once(source, import_anchor, import_replacement, label="future import")
 
-    signature_old = '''def replay_component(
+    signature_old = """def replay_component(
     *,
     seed: int,
     development: pd.DataFrame,
     expected_semantic_hash: str,
     frozen_trials_path: Path,
     replay_dir: Path,
-) -> dict[str, Any]:'''
-    signature_new = '''def replay_component(
+) -> dict[str, Any]:"""
+    signature_new = """def replay_component(
     *,
     seed: int,
     development: pd.DataFrame,
@@ -72,10 +72,10 @@ def patch_runner_source(source: str) -> str:
     frozen_trials_path: Path,
     frozen_config_path: Path,
     replay_dir: Path,
-) -> dict[str, Any]:'''
+) -> dict[str, Any]:"""
     source = _replace_once(source, signature_old, signature_new, label="replay signature")
 
-    legacy_gate_old = '''    serializable = json.loads(
+    legacy_gate_old = """    serializable = json.loads(
         json.dumps(
             best_config,
             default=str,
@@ -94,7 +94,7 @@ def patch_runner_source(source: str) -> str:
             f"expected={expected_semantic_hash} "
             f"actual={semantic_hash}"
         )
-'''
+"""
     canonical_gate_new = f'''    serializable = json.loads(
         json.dumps(
             best_config,
@@ -169,9 +169,9 @@ def patch_runner_source(source: str) -> str:
         label="legacy semantic gate",
     )
 
-    artifact_old = '''            "semantic_config_sha256":
-                semantic_hash,'''
-    artifact_new = '''            "semantic_config_sha256":
+    artifact_old = """            "semantic_config_sha256":
+                semantic_hash,"""
+    artifact_new = """            "semantic_config_sha256":
                 semantic_hash,
             "legacy_semantic_sha256_expected":
                 expected_semantic_hash,
@@ -188,24 +188,24 @@ def patch_runner_source(source: str) -> str:
             "canonical_semantic_match":
                 True,
             "mlforecast_version":
-                mlforecast_version,'''
+                mlforecast_version,"""
     source = _replace_once(source, artifact_old, artifact_new, label="replay artifact fields")
 
-    call_old = '''            frozen_trials_path=
+    call_old = """            frozen_trials_path=
                 frozen_trials,
             replay_dir=
-                replay_dir,'''
-    call_new = '''            frozen_trials_path=
+                replay_dir,"""
+    call_new = """            frozen_trials_path=
                 frozen_trials,
             frozen_config_path=
                 frozen_config,
             replay_dir=
-                replay_dir,'''
+                replay_dir,"""
     source = _replace_once(source, call_old, call_new, label="replay call")
 
-    parse_args_old = '''    args = parser.parse_args()
-'''
-    parse_args_new = '''    parser.add_argument(
+    parse_args_old = """    args = parser.parse_args()
+"""
+    parse_args_new = """    parser.add_argument(
         "--stop-after-replay",
         action="store_true",
         help=(
@@ -215,13 +215,13 @@ def patch_runner_source(source: str) -> str:
     )
 
     args = parser.parse_args()
-'''
+"""
     source = _replace_once(source, parse_args_old, parse_args_new, label="parse args")
 
-    holdout_marker = '''    # ========================================================
+    holdout_marker = """    # ========================================================
     # B. Sequential Holdout
-    # ========================================================'''
-    replay_only_gate = '''    if args.stop_after_replay:
+    # ========================================================"""
+    replay_only_gate = """    if args.stop_after_replay:
         progress["status"] = "PASS"
         progress["phase"] = "REPLAY_VERIFIED_CANONICAL_V1"
         progress["current_seed"] = None
@@ -263,7 +263,7 @@ def patch_runner_source(source: str) -> str:
         print("HOLDOUT_EXECUTED=NO")
         return 0
 
-'''
+"""
     source = _replace_once(
         source,
         holdout_marker,
@@ -293,8 +293,7 @@ def derive_runner(
     original_sha = sha256_bytes(original_bytes)
     if original_sha != expected_runner_sha256:
         raise DerivationError(
-            f"original runner SHA mismatch: expected={expected_runner_sha256} "
-            f"actual={original_sha}"
+            f"original runner SHA mismatch: expected={expected_runner_sha256} actual={original_sha}"
         )
 
     semantic_bytes = semantic_config_source.read_bytes()
