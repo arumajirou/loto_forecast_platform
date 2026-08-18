@@ -2,9 +2,7 @@
 
 Status: `FORMAT_FIX_APPLIED / EXECUTION_PENDING`
 
-Current PR head to verify on native Windows:
-
-- `3c1f14fadbafc2cf1f049e0e7771def130728e2d`
+Use the current PR #355 exact head returned by GitHub at verification time; do not hard-code an older branch head from this status document.
 
 Current pinned identities:
 
