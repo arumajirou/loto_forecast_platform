@@ -4,16 +4,165 @@ param(
     [string]$Phase6BRoot = "C:\Users\bp00425\Downloads\automlforecast-phase6b-multiseed-20260818-095723",
     [string]$Phase3Root = "C:\Users\bp00425\Downloads\automlforecast-phase3-input-size-20260817-173808",
     [string]$SmokeRoot = "C:\Users\bp00425\Downloads\automlforecast-api-smoke-20260817-163008",
+    [string]$Repository = "arumajirou/loto_forecast_platform",
+    [string]$OutputRoot = "",
     [switch]$PublishEvidence
 )
 
 $ErrorActionPreference = "Stop"
 $FinalRC = 99
 $RunId = Get-Date -Format "yyyyMMdd-HHmmss"
-$EvidenceBranch = $null
-$OriginalBranch = $null
+$EvidenceBranch = "evidence/phase7-semantic-diagnosis-$RunId"
+$EvidenceCommit = $null
 $Log = $null
 $Out = $null
+
+function Write-Utf8NoBom {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Text
+    )
+    $Encoding = New-Object System.Text.UTF8Encoding -ArgumentList $false
+    [System.IO.File]::WriteAllText($Path, $Text, $Encoding)
+}
+
+function Invoke-GhJson {
+    param(
+        [Parameter(Mandatory = $true)][string]$Endpoint,
+        [ValidateSet("GET", "POST")][string]$Method = "GET",
+        [object]$Body = $null
+    )
+
+    $TempJson = $null
+    try {
+        $GhArgs = @("api")
+        if ($Method -ne "GET") {
+            $GhArgs += @("--method", $Method)
+        }
+        $GhArgs += $Endpoint
+
+        if ($null -ne $Body) {
+            $TempJson = Join-Path ([System.IO.Path]::GetTempPath()) ("phase7-gh-" + [Guid]::NewGuid().ToString("N") + ".json")
+            Write-Utf8NoBom -Path $TempJson -Text ($Body | ConvertTo-Json -Depth 32)
+            $GhArgs += @("--input", $TempJson)
+        }
+
+        $Raw = & gh @GhArgs 2>&1
+        $Rc = $LASTEXITCODE
+        $Text = ($Raw | Out-String).Trim()
+
+        if ($Rc -ne 0) {
+            throw "gh api failed (rc=$Rc): $Endpoint`n$Text"
+        }
+        if ([string]::IsNullOrWhiteSpace($Text)) {
+            return $null
+        }
+        return ($Text | ConvertFrom-Json)
+    }
+    finally {
+        if ($TempJson -and (Test-Path -LiteralPath $TempJson)) {
+            Remove-Item -LiteralPath $TempJson -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
+
+function Publish-EvidenceServerSide {
+    param(
+        [Parameter(Mandatory = $true)][string]$RepositoryName,
+        [Parameter(Mandatory = $true)][string]$LocalOutput,
+        [Parameter(Mandatory = $true)][string]$RunIdentifier,
+        [Parameter(Mandatory = $true)][string]$BranchName
+    )
+
+    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+        throw "PublishEvidence requires GitHub CLI (gh), but gh was not found."
+    }
+
+    & gh auth status 1>$null 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw "PublishEvidence requires an authenticated gh session. Run: gh auth login"
+    }
+
+    $RemoteRepo = (& gh repo view $RepositoryName --json nameWithOwner --jq ".nameWithOwner" 2>$null).Trim()
+    if ($LASTEXITCODE -ne 0 -or $RemoteRepo -ne $RepositoryName) {
+        throw "Unable to verify GitHub repository identity: expected $RepositoryName, got '$RemoteRepo'."
+    }
+
+    $Main = Invoke-GhJson -Endpoint "repos/$RepositoryName/branches/main"
+    $BaseCommit = [string]$Main.commit.sha
+    if ([string]::IsNullOrWhiteSpace($BaseCommit)) {
+        throw "Unable to resolve remote main commit."
+    }
+
+    $BaseCommitDoc = Invoke-GhJson -Endpoint "repos/$RepositoryName/git/commits/$BaseCommit"
+    $BaseTree = [string]$BaseCommitDoc.tree.sha
+    if ([string]::IsNullOrWhiteSpace($BaseTree)) {
+        throw "Unable to resolve remote main tree."
+    }
+
+    $Files = @(Get-ChildItem -LiteralPath $LocalOutput -File -Recurse | Sort-Object FullName)
+    if ($Files.Count -eq 0) {
+        throw "No diagnosis evidence files found under $LocalOutput"
+    }
+
+    $TreeEntries = @()
+    foreach ($File in $Files) {
+        $Relative = $File.FullName.Substring($LocalOutput.Length).TrimStart([char[]]@('\', '/')) -replace "\\", "/"
+        $RemotePath = "evidence/phase7_semantic_diagnosis/$RunIdentifier/$Relative"
+        $Base64 = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($File.FullName))
+        $Blob = Invoke-GhJson -Endpoint "repos/$RepositoryName/git/blobs" -Method "POST" -Body @{
+            content = $Base64
+            encoding = "base64"
+        }
+        if ([string]::IsNullOrWhiteSpace([string]$Blob.sha)) {
+            throw "GitHub blob creation returned no SHA for $Relative"
+        }
+        $TreeEntries += @{
+            path = $RemotePath
+            mode = "100644"
+            type = "blob"
+            sha = [string]$Blob.sha
+        }
+    }
+
+    $Tree = Invoke-GhJson -Endpoint "repos/$RepositoryName/git/trees" -Method "POST" -Body @{
+        base_tree = $BaseTree
+        tree = $TreeEntries
+    }
+    if ([string]::IsNullOrWhiteSpace([string]$Tree.sha)) {
+        throw "GitHub tree creation returned no SHA."
+    }
+
+    $Commit = Invoke-GhJson -Endpoint "repos/$RepositoryName/git/commits" -Method "POST" -Body @{
+        message = "evidence: phase7 semantic diagnosis $RunIdentifier"
+        tree = [string]$Tree.sha
+        parents = @($BaseCommit)
+    }
+    if ([string]::IsNullOrWhiteSpace([string]$Commit.sha)) {
+        throw "GitHub commit creation returned no SHA."
+    }
+
+    $CreatedRef = Invoke-GhJson -Endpoint "repos/$RepositoryName/git/refs" -Method "POST" -Body @{
+        ref = "refs/heads/$BranchName"
+        sha = [string]$Commit.sha
+    }
+    if ([string]::IsNullOrWhiteSpace([string]$CreatedRef.object.sha)) {
+        throw "GitHub branch creation returned no commit SHA."
+    }
+
+    $VerifyRef = Invoke-GhJson -Endpoint "repos/$RepositoryName/git/ref/heads/$BranchName"
+    if ([string]$VerifyRef.object.sha -ne [string]$Commit.sha) {
+        throw "Published evidence ref verification failed."
+    }
+
+    return @{
+        branch = $BranchName
+        commit = [string]$Commit.sha
+        base_commit = $BaseCommit
+        remote_path = "evidence/phase7_semantic_diagnosis/$RunIdentifier"
+        file_count = $Files.Count
+    }
+}
 
 try {
     $Repo = (& git -C $PSScriptRoot rev-parse --show-toplevel 2>$null).Trim()
@@ -21,31 +170,20 @@ try {
         throw "This tool must be run from a Git checkout."
     }
 
-    $OriginalBranch = (& git -C $Repo branch --show-current).Trim()
     $RepoHead = (& git -C $Repo rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($RepoHead)) {
+        throw "Unable to resolve local repository HEAD."
+    }
 
     $Development = Join-Path $Phase3Root "artifacts\numbers3-development-only.csv"
     $Python = Join-Path $SmokeRoot "venv\Scripts\python.exe"
     $Script = Join-Path $PSScriptRoot "semantic_diagnosis.py"
     $Monitor = Join-Path $PSScriptRoot "monitor_semantic_diagnosis.ps1"
 
-    if ($PublishEvidence) {
-        $Dirty = @(& git -C $Repo status --porcelain=v1)
-        if ($LASTEXITCODE -ne 0) {
-            throw "git status failed."
-        }
-        if ($Dirty.Count -gt 0) {
-            throw "PublishEvidence requires a clean working tree before diagnosis. Commit/stash unrelated changes first."
-        }
-
-        $EvidenceBranch = "evidence/phase7-semantic-diagnosis-$RunId"
-        & git -C $Repo switch -c $EvidenceBranch
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to create evidence branch: $EvidenceBranch"
-        }
+    if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
+        $OutputRoot = Join-Path $HOME "Downloads"
     }
-
-    $Out = Join-Path $Repo "evidence\phase7_semantic_diagnosis\$RunId"
+    $Out = Join-Path $OutputRoot "automlforecast-phase7-semantic-diagnosis-$RunId"
     $Log = Join-Path $Out "launcher.log"
 
     Write-Host "============================================================"
@@ -58,7 +196,7 @@ try {
     Write-Host "HOLDOUT_EXPECTED=0/50"
     Write-Host "ACTUALS_EXPECTED=0"
     Write-Host "PUBLISH_EVIDENCE=$([bool]$PublishEvidence)"
-    if ($EvidenceBranch) { Write-Host "EVIDENCE_BRANCH=$EvidenceBranch" }
+    if ($PublishEvidence) { Write-Host "EVIDENCE_BRANCH=$EvidenceBranch" }
     Write-Host "OUTPUT=$Out"
     Write-Host ""
 
@@ -154,30 +292,26 @@ try {
     Write-Host "HOLDOUT_INTEGRITY=PRESERVED" -ForegroundColor Green
 
     if ($PublishEvidence) {
-        $RelativeOut = "evidence/phase7_semantic_diagnosis/$RunId"
-        & git -C $Repo add -- $RelativeOut
-        if ($LASTEXITCODE -ne 0) { throw "git add evidence failed" }
+        Write-Host ""
+        Write-Host "Publishing evidence server-side through GitHub Git Data API..."
+        $Published = Publish-EvidenceServerSide `
+            -RepositoryName $Repository `
+            -LocalOutput $Out `
+            -RunIdentifier $RunId `
+            -BranchName $EvidenceBranch
 
-        & git -C $Repo diff --cached --quiet
-        if ($LASTEXITCODE -eq 0) {
-            throw "No evidence files were staged."
-        }
-
-        & git -C $Repo commit -m "evidence: phase7 semantic diagnosis $RunId"
-        if ($LASTEXITCODE -ne 0) { throw "git commit evidence failed" }
-
-        & git -C $Repo push -u origin $EvidenceBranch
-        if ($LASTEXITCODE -ne 0) { throw "git push evidence branch failed" }
-
-        $EvidenceCommit = (& git -C $Repo rev-parse HEAD).Trim()
+        $EvidenceCommit = [string]$Published.commit
         Write-Host "EVIDENCE_PUBLISHED=YES" -ForegroundColor Green
-        Write-Host "EVIDENCE_BRANCH=$EvidenceBranch"
-        Write-Host "EVIDENCE_COMMIT=$EvidenceCommit"
-        Write-Host "EVIDENCE_PATH=$RelativeOut"
+        Write-Host "EVIDENCE_BRANCH=$($Published.branch)"
+        Write-Host "EVIDENCE_COMMIT=$($Published.commit)"
+        Write-Host "EVIDENCE_BASE_COMMIT=$($Published.base_commit)"
+        Write-Host "EVIDENCE_PATH=$($Published.remote_path)"
+        Write-Host "EVIDENCE_FILE_COUNT=$($Published.file_count)"
     }
     else {
         Write-Host "EVIDENCE_PUBLISHED=NO"
-        Write-Host "To publish this evidence through GitHub, rerun from a clean checkout with -PublishEvidence."
+        Write-Host "Local diagnosis evidence remains at: $Out"
+        Write-Host "Rerun with -PublishEvidence to create a server-side GitHub evidence branch."
     }
 
     # A non-serialization diagnosis is scientifically BLOCKED, but the launcher itself succeeded.
@@ -189,15 +323,15 @@ catch {
     Write-Host "STATUS=BLOCKED" -ForegroundColor Red
     Write-Host "ERROR=$($_.Exception.Message)" -ForegroundColor Red
     if ($Out) { Write-Host "OUTPUT=$Out" }
-    if ($EvidenceBranch) { Write-Host "EVIDENCE_BRANCH=$EvidenceBranch" }
+    if ($PublishEvidence) { Write-Host "EVIDENCE_BRANCH=$EvidenceBranch" }
 }
 finally {
     Write-Host ""
     Write-Host "============================================================"
     Write-Host "FINAL_LAUNCHER_RC=$FinalRC"
-    if ($OriginalBranch) { Write-Host "ORIGINAL_BRANCH=$OriginalBranch" }
-    if ($EvidenceBranch) { Write-Host "CURRENT_BRANCH=$EvidenceBranch" }
     if ($Log) { Write-Host "LOG=$Log" }
+    if ($EvidenceCommit) { Write-Host "EVIDENCE_COMMIT=$EvidenceCommit" }
+    Write-Host "PRIMARY_WORKTREE_MUTATED=NO"
     Write-Host "============================================================"
     Write-Host ""
     Read-Host "Enterキーでターミナルに戻ります"
