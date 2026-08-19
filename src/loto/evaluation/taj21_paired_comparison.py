@@ -12,12 +12,12 @@ REFERENCE_BASELINE_ID = "baseline:statistical_ar1"
 PAIRING_UNIT = "seed_fold_hit_at_1"
 
 
-def _units(row: dict[str, Any]) -> dict[tuple[int, int], float]:
-    units: dict[tuple[int, int], float] = {}
+def _units(row: dict[str, Any]) -> dict[tuple[int, str], float]:
+    units: dict[tuple[int, str], float] = {}
     for seed_result in row.get("seed_results", []):
         seed = int(seed_result["seed"])
         for fold in seed_result.get("fold_metrics", []):
-            key = (seed, int(fold["fold_id"]))
+            key = (seed, str(fold["fold_id"]))
             if key in units:
                 raise ValueError(f"duplicate paired unit: {row.get('candidate_id')} {key}")
             units[key] = float(fold["metrics"]["hit_at_1"])
