@@ -37,9 +37,7 @@ def encode_path_component(value: str) -> str:
     if _is_portable_component(value):
         return value
 
-    token = base64.urlsafe_b64encode(
-        value.encode("utf-8")
-    ).decode("ascii").rstrip("=")
+    token = base64.urlsafe_b64encode(value.encode("utf-8")).decode("ascii").rstrip("=")
 
     return f"~{token}"
 
@@ -62,9 +60,7 @@ def decode_path_component(value: str) -> str:
     padding = "=" * (-len(token) % 4)
 
     try:
-        decoded = base64.urlsafe_b64decode(
-            token + padding
-        ).decode("utf-8")
+        decoded = base64.urlsafe_b64decode(token + padding).decode("utf-8")
     except (binascii.Error, UnicodeDecodeError, ValueError) as exc:
         raise ValueError("invalid encoded path component") from exc
 

@@ -69,7 +69,13 @@ def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
             candidate_id = f"baseline:{baseline}"
             seed_results = []
             for seed in SEEDS:
-                lock = campaign / "prediction_locks" / game / encode_path_component(candidate_id) / f"seed-{seed}.json"
+                lock = (
+                    campaign
+                    / "prediction_locks"
+                    / game
+                    / encode_path_component(candidate_id)
+                    / f"seed-{seed}.json"
+                )
                 lock.parent.mkdir(parents=True, exist_ok=True)
                 payload = {
                     "schema_version": "prediction-lock-v1",
