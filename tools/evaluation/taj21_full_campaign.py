@@ -18,6 +18,11 @@ from loto.evaluation.taj21_artifacts import (
 )
 from loto.evaluation.taj21_fold_evidence import augment_fold_and_seed_evidence
 from loto.evaluation.taj21_paired_comparison import build_paired_comparisons
+from loto.evaluation.taj21_snapshot import (
+    BASELINE_REFERENCE_GIT_COMMIT,
+    BASELINE_REFERENCE_SHA256SUMS,
+    validate_snapshot_item,
+)
 from loto.evaluation.unified_campaign import UnifiedCampaignConfig, run_unified_campaign
 from loto.game.geometry import known_games
 
@@ -56,6 +61,13 @@ def _load_inputs(
         digest = _sha256(path)
         spec = get_lottery_spec(game)
         frame, parser_meta = parse_file(path, spec)
+        validate_snapshot_item(
+            game,
+            rows=int(len(frame)),
+            sha256=digest,
+            encoding=str(parser_meta["encoding"]),
+            separator=str(parser_meta["sep"]),
+        )
         frames[game] = frame
         before[game] = digest
         files.append(
@@ -75,6 +87,9 @@ def _load_inputs(
             "schema_version": "taj21-full-input-manifest-v1",
             "games": list(known_games()),
             "files": files,
+            "baseline_reference_git_commit": BASELINE_REFERENCE_GIT_COMMIT,
+            "baseline_reference_sha256sums": BASELINE_REFERENCE_SHA256SUMS,
+            "frozen_snapshot_match": True,
             "synthetic": False,
             "raw_files_mutated": False,
         },
