@@ -27,37 +27,37 @@
       "size_bytes": 16432
     },
     {
-      "path": "prediction_locks/numbers3/baseline:fixed/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "01869b705dc35c076484f68bb7330290e5794221e8ea93eb4e8c05f178ea5703",
       "size_bytes": 7871
     },
     {
-      "path": "prediction_locks/numbers3/baseline:frequency/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "d89f16adeeac57dced08be68a34fb1c3ba84498f951602d64123285d4a16900f",
       "size_bytes": 7875
     },
     {
-      "path": "prediction_locks/numbers3/baseline:last/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "c129a87000dab1f282ea7dbd06ea4847cfa852e9cc71cfb329f32eda83c9e6d8",
       "size_bytes": 7870
     },
     {
-      "path": "prediction_locks/numbers3/baseline:mean/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "318c0e20e465c9babbe9fbdf1d0141a0fc578462333453f6db41977d896d1fb6",
       "size_bytes": 7870
     },
     {
-      "path": "prediction_locks/numbers3/baseline:median/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "1f87ad0f6d5ed777f8dcf0594d21c949bf94d4f7df4252ad8497dc488251587d",
       "size_bytes": 7872
     },
     {
-      "path": "prediction_locks/numbers3/baseline:random/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "50ed58ad68240709ec61ce07dcd32d6f1e55079ab3ddda40b1263ab25b64768f",
       "size_bytes": 7872
     },
     {
-      "path": "prediction_locks/numbers3/baseline:statistical_ar1/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "91a89276ad88ce4f34ce215f8755c494359f0a3d6ce3b51457a683edf4b9529c",
       "size_bytes": 7881
     },

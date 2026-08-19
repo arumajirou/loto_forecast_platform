@@ -97,37 +97,37 @@
       "size_bytes": 13634
     },
     {
-      "path": "games/bingo5/prediction_locks/bingo5/baseline:fixed/seed-1.json",
+      "path": "games/bingo5/prediction_locks/bingo5/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "1b5d12b8fdea8dc796fe9167cfbae7624a7b0f33308bbae25bce2e8de66d70ab",
       "size_bytes": 9269
     },
     {
-      "path": "games/bingo5/prediction_locks/bingo5/baseline:frequency/seed-1.json",
+      "path": "games/bingo5/prediction_locks/bingo5/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "367a9b4308705694bfbfd09deb68d7a92ffcf2edfd9dc58bbe8535e5d1316d79",
       "size_bytes": 9273
     },
     {
-      "path": "games/bingo5/prediction_locks/bingo5/baseline:last/seed-1.json",
+      "path": "games/bingo5/prediction_locks/bingo5/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "fd1c7e0586db1c11d48a67cb136786e0765028482f601b39527e9d3af59b7502",
       "size_bytes": 9287
     },
     {
-      "path": "games/bingo5/prediction_locks/bingo5/baseline:mean/seed-1.json",
+      "path": "games/bingo5/prediction_locks/bingo5/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "fb02fd0774cf141fdc2e16339916548d626ed6ada093a686a66f240aa0021d35",
       "size_bytes": 9268
     },
     {
-      "path": "games/bingo5/prediction_locks/bingo5/baseline:median/seed-1.json",
+      "path": "games/bingo5/prediction_locks/bingo5/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "b3bc8e656ab4c9c0cba61589bff3cee0fd9ed5ab9cb50d7769428af40b0ea1bd",
       "size_bytes": 9270
     },
     {
-      "path": "games/bingo5/prediction_locks/bingo5/baseline:random/seed-1.json",
+      "path": "games/bingo5/prediction_locks/bingo5/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "eb5dbc01e801505082ff137b3a529452eea017d2e714533a2038d4f1c781b6c7",
       "size_bytes": 9303
     },
     {
-      "path": "games/bingo5/prediction_locks/bingo5/baseline:statistical_ar1/seed-1.json",
+      "path": "games/bingo5/prediction_locks/bingo5/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "bd3fb85f8aaebdd114e6a02095bc3df56d5e62bd5871d33b99a323695f8cbba3",
       "size_bytes": 9279
     },
@@ -357,37 +357,37 @@
       "size_bytes": 15998
     },
     {
-      "path": "games/loto6/prediction_locks/loto6/baseline:fixed/seed-1.json",
+      "path": "games/loto6/prediction_locks/loto6/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "777b6dc53d8890f3dddc54bb422e59ec8e538fc9567a8e921af2743689bd57dc",
       "size_bytes": 8868
     },
     {
-      "path": "games/loto6/prediction_locks/loto6/baseline:frequency/seed-1.json",
+      "path": "games/loto6/prediction_locks/loto6/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "f387a507a96942134224a4360f5749e798f1f9d28072d11990f27b4eb9df02ab",
       "size_bytes": 8972
     },
     {
-      "path": "games/loto6/prediction_locks/loto6/baseline:last/seed-1.json",
+      "path": "games/loto6/prediction_locks/loto6/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "44a3cea978b7d53a7f4682cec924e6735fb32489b80f18b7a0f79dfe53d87f61",
       "size_bytes": 8951
     },
     {
-      "path": "games/loto6/prediction_locks/loto6/baseline:mean/seed-1.json",
+      "path": "games/loto6/prediction_locks/loto6/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "cd27564624d17a70dddbedb96ceb28cbdbcc7e7f3baf215ed5c41535441aea8e",
       "size_bytes": 8967
     },
     {
-      "path": "games/loto6/prediction_locks/loto6/baseline:median/seed-1.json",
+      "path": "games/loto6/prediction_locks/loto6/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "56a9812c93652b1eacd73dac5f48f47b04d02ba86241ba8de911ca78416d137a",
       "size_bytes": 8969
     },
     {
-      "path": "games/loto6/prediction_locks/loto6/baseline:random/seed-1.json",
+      "path": "games/loto6/prediction_locks/loto6/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "1c996fe15db745d7b59bea7af9dbb3732500f0d50b89d71d5e505977ffbb11a6",
       "size_bytes": 8936
     },
     {
-      "path": "games/loto6/prediction_locks/loto6/baseline:statistical_ar1/seed-1.json",
+      "path": "games/loto6/prediction_locks/loto6/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "794642e2fefb440d875cb944b6751187a59c37e617fa4e1f65a6f177dd34ba08",
       "size_bytes": 8978
     },
@@ -617,37 +617,37 @@
       "size_bytes": 16970
     },
     {
-      "path": "games/loto7/prediction_locks/loto7/baseline:fixed/seed-1.json",
+      "path": "games/loto7/prediction_locks/loto7/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "fc5aa0283a6ad624c4e6687e11ebc3f5899f083914e30295e670f6199dcf7821",
       "size_bytes": 8968
     },
     {
-      "path": "games/loto7/prediction_locks/loto7/baseline:frequency/seed-1.json",
+      "path": "games/loto7/prediction_locks/loto7/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "be45fcdb153fa9b8eedf4d1a0862421e79037f596fed44eaad2dffb944fadd93",
       "size_bytes": 8972
     },
     {
-      "path": "games/loto7/prediction_locks/loto7/baseline:last/seed-1.json",
+      "path": "games/loto7/prediction_locks/loto7/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "34c4f93f7009f230b4f5e580a6d88237dd7de5a59def38ad2cac81fd47091f5b",
       "size_bytes": 9006
     },
     {
-      "path": "games/loto7/prediction_locks/loto7/baseline:mean/seed-1.json",
+      "path": "games/loto7/prediction_locks/loto7/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "43128c5e2e82c9d588c230faedac026c2c26d3db51055e66db31913ebb5faa67",
       "size_bytes": 9067
     },
     {
-      "path": "games/loto7/prediction_locks/loto7/baseline:median/seed-1.json",
+      "path": "games/loto7/prediction_locks/loto7/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "df71575c8ee795d7c05ccf89ef993103f192b98541256f49733c4ec06887e363",
       "size_bytes": 8969
     },
     {
-      "path": "games/loto7/prediction_locks/loto7/baseline:random/seed-1.json",
+      "path": "games/loto7/prediction_locks/loto7/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "04ae9058fd80471e451a4c400732d7f37bf9ca2a3a5fdb77a3e3f53a6507cfcf",
       "size_bytes": 9031
     },
     {
-      "path": "games/loto7/prediction_locks/loto7/baseline:statistical_ar1/seed-1.json",
+      "path": "games/loto7/prediction_locks/loto7/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "022235787fccb3b500992db21d4ca30e0530e355b6476d3b4e73b6c2454e34ab",
       "size_bytes": 9051
     },
@@ -877,37 +877,37 @@
       "size_bytes": 13142
     },
     {
-      "path": "games/mini/prediction_locks/mini/baseline:fixed/seed-1.json",
+      "path": "games/mini/prediction_locks/mini/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "93dd591b2b53d8610ff3f6c99fc11d4302cdf7bf704c71a32ce0ceb2b3a22dca",
       "size_bytes": 8567
     },
     {
-      "path": "games/mini/prediction_locks/mini/baseline:frequency/seed-1.json",
+      "path": "games/mini/prediction_locks/mini/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "d14341c7775bc9c0d6b0a99ffe2f6188339d5316274998d94583cb8843b4adb6",
       "size_bytes": 8571
     },
     {
-      "path": "games/mini/prediction_locks/mini/baseline:last/seed-1.json",
+      "path": "games/mini/prediction_locks/mini/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "4ea4fa0c8e8ee593a825432773404bae35589c1750855ab4537ebf6708edb790",
       "size_bytes": 8631
     },
     {
-      "path": "games/mini/prediction_locks/mini/baseline:mean/seed-1.json",
+      "path": "games/mini/prediction_locks/mini/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "4141a02eaef388225a9b7de0b3c5043940d410837b9e825699c91773b2eb6e42",
       "size_bytes": 8666
     },
     {
-      "path": "games/mini/prediction_locks/mini/baseline:median/seed-1.json",
+      "path": "games/mini/prediction_locks/mini/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "cd04811776d83860879eb1d19f56d5fe226b85346d6b4084d01bf0e32f8d75fa",
       "size_bytes": 8668
     },
     {
-      "path": "games/mini/prediction_locks/mini/baseline:random/seed-1.json",
+      "path": "games/mini/prediction_locks/mini/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "6684a286f4e4e765b1473d2bc7b54fb0b8a43981cb0e63f1214cf34f46ba10e1",
       "size_bytes": 8639
     },
     {
-      "path": "games/mini/prediction_locks/mini/baseline:statistical_ar1/seed-1.json",
+      "path": "games/mini/prediction_locks/mini/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "5ce406f133653fb531be0181e3e2605787440d9d762e11d6606120f2eb48b28a",
       "size_bytes": 8677
     },
@@ -1137,37 +1137,37 @@
       "size_bytes": 16432
     },
     {
-      "path": "games/numbers3/prediction_locks/numbers3/baseline:fixed/seed-1.json",
+      "path": "games/numbers3/prediction_locks/numbers3/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "01869b705dc35c076484f68bb7330290e5794221e8ea93eb4e8c05f178ea5703",
       "size_bytes": 7871
     },
     {
-      "path": "games/numbers3/prediction_locks/numbers3/baseline:frequency/seed-1.json",
+      "path": "games/numbers3/prediction_locks/numbers3/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "d89f16adeeac57dced08be68a34fb1c3ba84498f951602d64123285d4a16900f",
       "size_bytes": 7875
     },
     {
-      "path": "games/numbers3/prediction_locks/numbers3/baseline:last/seed-1.json",
+      "path": "games/numbers3/prediction_locks/numbers3/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "c129a87000dab1f282ea7dbd06ea4847cfa852e9cc71cfb329f32eda83c9e6d8",
       "size_bytes": 7870
     },
     {
-      "path": "games/numbers3/prediction_locks/numbers3/baseline:mean/seed-1.json",
+      "path": "games/numbers3/prediction_locks/numbers3/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "318c0e20e465c9babbe9fbdf1d0141a0fc578462333453f6db41977d896d1fb6",
       "size_bytes": 7870
     },
     {
-      "path": "games/numbers3/prediction_locks/numbers3/baseline:median/seed-1.json",
+      "path": "games/numbers3/prediction_locks/numbers3/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "1f87ad0f6d5ed777f8dcf0594d21c949bf94d4f7df4252ad8497dc488251587d",
       "size_bytes": 7872
     },
     {
-      "path": "games/numbers3/prediction_locks/numbers3/baseline:random/seed-1.json",
+      "path": "games/numbers3/prediction_locks/numbers3/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "50ed58ad68240709ec61ce07dcd32d6f1e55079ab3ddda40b1263ab25b64768f",
       "size_bytes": 7872
     },
     {
-      "path": "games/numbers3/prediction_locks/numbers3/baseline:statistical_ar1/seed-1.json",
+      "path": "games/numbers3/prediction_locks/numbers3/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "91a89276ad88ce4f34ce215f8755c494359f0a3d6ce3b51457a683edf4b9529c",
       "size_bytes": 7881
     },
@@ -1397,37 +1397,37 @@
       "size_bytes": 13048
     },
     {
-      "path": "games/numbers4/prediction_locks/numbers4/baseline:fixed/seed-1.json",
+      "path": "games/numbers4/prediction_locks/numbers4/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "7078ba4185d0b52bc179a5bf63405e01ff3fa419c1a9ad3417b878f46ded8b17",
       "size_bytes": 8071
     },
     {
-      "path": "games/numbers4/prediction_locks/numbers4/baseline:frequency/seed-1.json",
+      "path": "games/numbers4/prediction_locks/numbers4/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "dadecee13526de4b423d0da897b1ec0cfc4aedcbf0719ec94e08fc4d04328f56",
       "size_bytes": 8075
     },
     {
-      "path": "games/numbers4/prediction_locks/numbers4/baseline:last/seed-1.json",
+      "path": "games/numbers4/prediction_locks/numbers4/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "8b0e21a87bdd97bc9de03099d4c15bf6acbb748ff0eb56fe6fbebbe3f84e63e2",
       "size_bytes": 8070
     },
     {
-      "path": "games/numbers4/prediction_locks/numbers4/baseline:mean/seed-1.json",
+      "path": "games/numbers4/prediction_locks/numbers4/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "4b2abfbbb2f243ce28b2658e3f3d12a280b4caebb6e16ca21f60313de593ff00",
       "size_bytes": 8070
     },
     {
-      "path": "games/numbers4/prediction_locks/numbers4/baseline:median/seed-1.json",
+      "path": "games/numbers4/prediction_locks/numbers4/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "087846b7f2dd312522e38a4782d7ec218413199146df7b3cd40bf97a07d310a1",
       "size_bytes": 8072
     },
     {
-      "path": "games/numbers4/prediction_locks/numbers4/baseline:random/seed-1.json",
+      "path": "games/numbers4/prediction_locks/numbers4/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "af280e0a3aa9f5c3b370d09ad299d0f4f0b4764bf025482eaeef3eaf9e5b0394",
       "size_bytes": 8072
     },
     {
-      "path": "games/numbers4/prediction_locks/numbers4/baseline:statistical_ar1/seed-1.json",
+      "path": "games/numbers4/prediction_locks/numbers4/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "7571f471451e738aae14ea28925bb95ceac8eb5c4e22aec6333be18e828d7069",
       "size_bytes": 8081
     },
@@ -1637,37 +1637,37 @@
       "size_bytes": 85522
     },
     {
-      "path": "prediction_locks/bingo5/baseline:fixed/seed-1.json",
+      "path": "prediction_locks/bingo5/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "1b5d12b8fdea8dc796fe9167cfbae7624a7b0f33308bbae25bce2e8de66d70ab",
       "size_bytes": 9269
     },
     {
-      "path": "prediction_locks/bingo5/baseline:frequency/seed-1.json",
+      "path": "prediction_locks/bingo5/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "367a9b4308705694bfbfd09deb68d7a92ffcf2edfd9dc58bbe8535e5d1316d79",
       "size_bytes": 9273
     },
     {
-      "path": "prediction_locks/bingo5/baseline:last/seed-1.json",
+      "path": "prediction_locks/bingo5/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "fd1c7e0586db1c11d48a67cb136786e0765028482f601b39527e9d3af59b7502",
       "size_bytes": 9287
     },
     {
-      "path": "prediction_locks/bingo5/baseline:mean/seed-1.json",
+      "path": "prediction_locks/bingo5/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "fb02fd0774cf141fdc2e16339916548d626ed6ada093a686a66f240aa0021d35",
       "size_bytes": 9268
     },
     {
-      "path": "prediction_locks/bingo5/baseline:median/seed-1.json",
+      "path": "prediction_locks/bingo5/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "b3bc8e656ab4c9c0cba61589bff3cee0fd9ed5ab9cb50d7769428af40b0ea1bd",
       "size_bytes": 9270
     },
     {
-      "path": "prediction_locks/bingo5/baseline:random/seed-1.json",
+      "path": "prediction_locks/bingo5/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "eb5dbc01e801505082ff137b3a529452eea017d2e714533a2038d4f1c781b6c7",
       "size_bytes": 9303
     },
     {
-      "path": "prediction_locks/bingo5/baseline:statistical_ar1/seed-1.json",
+      "path": "prediction_locks/bingo5/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "bd3fb85f8aaebdd114e6a02095bc3df56d5e62bd5871d33b99a323695f8cbba3",
       "size_bytes": 9279
     },
@@ -1867,37 +1867,37 @@
       "size_bytes": 8667
     },
     {
-      "path": "prediction_locks/loto6/baseline:fixed/seed-1.json",
+      "path": "prediction_locks/loto6/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "777b6dc53d8890f3dddc54bb422e59ec8e538fc9567a8e921af2743689bd57dc",
       "size_bytes": 8868
     },
     {
-      "path": "prediction_locks/loto6/baseline:frequency/seed-1.json",
+      "path": "prediction_locks/loto6/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "f387a507a96942134224a4360f5749e798f1f9d28072d11990f27b4eb9df02ab",
       "size_bytes": 8972
     },
     {
-      "path": "prediction_locks/loto6/baseline:last/seed-1.json",
+      "path": "prediction_locks/loto6/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "44a3cea978b7d53a7f4682cec924e6735fb32489b80f18b7a0f79dfe53d87f61",
       "size_bytes": 8951
     },
     {
-      "path": "prediction_locks/loto6/baseline:mean/seed-1.json",
+      "path": "prediction_locks/loto6/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "cd27564624d17a70dddbedb96ceb28cbdbcc7e7f3baf215ed5c41535441aea8e",
       "size_bytes": 8967
     },
     {
-      "path": "prediction_locks/loto6/baseline:median/seed-1.json",
+      "path": "prediction_locks/loto6/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "56a9812c93652b1eacd73dac5f48f47b04d02ba86241ba8de911ca78416d137a",
       "size_bytes": 8969
     },
     {
-      "path": "prediction_locks/loto6/baseline:random/seed-1.json",
+      "path": "prediction_locks/loto6/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "1c996fe15db745d7b59bea7af9dbb3732500f0d50b89d71d5e505977ffbb11a6",
       "size_bytes": 8936
     },
     {
-      "path": "prediction_locks/loto6/baseline:statistical_ar1/seed-1.json",
+      "path": "prediction_locks/loto6/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "794642e2fefb440d875cb944b6751187a59c37e617fa4e1f65a6f177dd34ba08",
       "size_bytes": 8978
     },
@@ -2097,37 +2097,37 @@
       "size_bytes": 8466
     },
     {
-      "path": "prediction_locks/loto7/baseline:fixed/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "fc5aa0283a6ad624c4e6687e11ebc3f5899f083914e30295e670f6199dcf7821",
       "size_bytes": 8968
     },
     {
-      "path": "prediction_locks/loto7/baseline:frequency/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "be45fcdb153fa9b8eedf4d1a0862421e79037f596fed44eaad2dffb944fadd93",
       "size_bytes": 8972
     },
     {
-      "path": "prediction_locks/loto7/baseline:last/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "34c4f93f7009f230b4f5e580a6d88237dd7de5a59def38ad2cac81fd47091f5b",
       "size_bytes": 9006
     },
     {
-      "path": "prediction_locks/loto7/baseline:mean/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "43128c5e2e82c9d588c230faedac026c2c26d3db51055e66db31913ebb5faa67",
       "size_bytes": 9067
     },
     {
-      "path": "prediction_locks/loto7/baseline:median/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "df71575c8ee795d7c05ccf89ef993103f192b98541256f49733c4ec06887e363",
       "size_bytes": 8969
     },
     {
-      "path": "prediction_locks/loto7/baseline:random/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "04ae9058fd80471e451a4c400732d7f37bf9ca2a3a5fdb77a3e3f53a6507cfcf",
       "size_bytes": 9031
     },
     {
-      "path": "prediction_locks/loto7/baseline:statistical_ar1/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "022235787fccb3b500992db21d4ca30e0530e355b6476d3b4e73b6c2454e34ab",
       "size_bytes": 9051
     },
@@ -2327,37 +2327,37 @@
       "size_bytes": 8466
     },
     {
-      "path": "prediction_locks/mini/baseline:fixed/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "93dd591b2b53d8610ff3f6c99fc11d4302cdf7bf704c71a32ce0ceb2b3a22dca",
       "size_bytes": 8567
     },
     {
-      "path": "prediction_locks/mini/baseline:frequency/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "d14341c7775bc9c0d6b0a99ffe2f6188339d5316274998d94583cb8843b4adb6",
       "size_bytes": 8571
     },
     {
-      "path": "prediction_locks/mini/baseline:last/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "4ea4fa0c8e8ee593a825432773404bae35589c1750855ab4537ebf6708edb790",
       "size_bytes": 8631
     },
     {
-      "path": "prediction_locks/mini/baseline:mean/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "4141a02eaef388225a9b7de0b3c5043940d410837b9e825699c91773b2eb6e42",
       "size_bytes": 8666
     },
     {
-      "path": "prediction_locks/mini/baseline:median/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "cd04811776d83860879eb1d19f56d5fe226b85346d6b4084d01bf0e32f8d75fa",
       "size_bytes": 8668
     },
     {
-      "path": "prediction_locks/mini/baseline:random/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "6684a286f4e4e765b1473d2bc7b54fb0b8a43981cb0e63f1214cf34f46ba10e1",
       "size_bytes": 8639
     },
     {
-      "path": "prediction_locks/mini/baseline:statistical_ar1/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "5ce406f133653fb531be0181e3e2605787440d9d762e11d6606120f2eb48b28a",
       "size_bytes": 8677
     },
@@ -2557,37 +2557,37 @@
       "size_bytes": 8265
     },
     {
-      "path": "prediction_locks/numbers3/baseline:fixed/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "01869b705dc35c076484f68bb7330290e5794221e8ea93eb4e8c05f178ea5703",
       "size_bytes": 7871
     },
     {
-      "path": "prediction_locks/numbers3/baseline:frequency/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "d89f16adeeac57dced08be68a34fb1c3ba84498f951602d64123285d4a16900f",
       "size_bytes": 7875
     },
     {
-      "path": "prediction_locks/numbers3/baseline:last/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "c129a87000dab1f282ea7dbd06ea4847cfa852e9cc71cfb329f32eda83c9e6d8",
       "size_bytes": 7870
     },
     {
-      "path": "prediction_locks/numbers3/baseline:mean/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "318c0e20e465c9babbe9fbdf1d0141a0fc578462333453f6db41977d896d1fb6",
       "size_bytes": 7870
     },
     {
-      "path": "prediction_locks/numbers3/baseline:median/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "1f87ad0f6d5ed777f8dcf0594d21c949bf94d4f7df4252ad8497dc488251587d",
       "size_bytes": 7872
     },
     {
-      "path": "prediction_locks/numbers3/baseline:random/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "50ed58ad68240709ec61ce07dcd32d6f1e55079ab3ddda40b1263ab25b64768f",
       "size_bytes": 7872
     },
     {
-      "path": "prediction_locks/numbers3/baseline:statistical_ar1/seed-1.json",
+      "path": "prediction_locks/numbers3/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "91a89276ad88ce4f34ce215f8755c494359f0a3d6ce3b51457a683edf4b9529c",
       "size_bytes": 7881
     },
@@ -2787,37 +2787,37 @@
       "size_bytes": 7869
     },
     {
-      "path": "prediction_locks/numbers4/baseline:fixed/seed-1.json",
+      "path": "prediction_locks/numbers4/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "7078ba4185d0b52bc179a5bf63405e01ff3fa419c1a9ad3417b878f46ded8b17",
       "size_bytes": 8071
     },
     {
-      "path": "prediction_locks/numbers4/baseline:frequency/seed-1.json",
+      "path": "prediction_locks/numbers4/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "dadecee13526de4b423d0da897b1ec0cfc4aedcbf0719ec94e08fc4d04328f56",
       "size_bytes": 8075
     },
     {
-      "path": "prediction_locks/numbers4/baseline:last/seed-1.json",
+      "path": "prediction_locks/numbers4/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "8b0e21a87bdd97bc9de03099d4c15bf6acbb748ff0eb56fe6fbebbe3f84e63e2",
       "size_bytes": 8070
     },
     {
-      "path": "prediction_locks/numbers4/baseline:mean/seed-1.json",
+      "path": "prediction_locks/numbers4/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "4b2abfbbb2f243ce28b2658e3f3d12a280b4caebb6e16ca21f60313de593ff00",
       "size_bytes": 8070
     },
     {
-      "path": "prediction_locks/numbers4/baseline:median/seed-1.json",
+      "path": "prediction_locks/numbers4/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "087846b7f2dd312522e38a4782d7ec218413199146df7b3cd40bf97a07d310a1",
       "size_bytes": 8072
     },
     {
-      "path": "prediction_locks/numbers4/baseline:random/seed-1.json",
+      "path": "prediction_locks/numbers4/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "af280e0a3aa9f5c3b370d09ad299d0f4f0b4764bf025482eaeef3eaf9e5b0394",
       "size_bytes": 8072
     },
     {
-      "path": "prediction_locks/numbers4/baseline:statistical_ar1/seed-1.json",
+      "path": "prediction_locks/numbers4/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "7571f471451e738aae14ea28925bb95ceac8eb5c4e22aec6333be18e828d7069",
       "size_bytes": 8081
     },
