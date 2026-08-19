@@ -6,6 +6,12 @@ import json
 from pathlib import Path
 from typing import Any
 
+from loto.evaluation.taj21_snapshot import (
+    BASELINE_REFERENCE_GIT_COMMIT,
+    BASELINE_REFERENCE_SHA256SUMS,
+    validate_snapshot_item,
+)
+
 EXPECTED_GAMES = ("bingo5", "loto6", "loto7", "mini", "numbers3", "numbers4")
 EXPECTED_SEEDS = (42, 1729, 20260730)
 EXPECTED_MODELS = 250
@@ -85,6 +91,12 @@ def _verify_input_manifest(root: Path) -> None:
         raise ValueError("formal full campaign must use real inputs")
     if manifest.get("raw_files_mutated") is not False:
         raise ValueError("formal full campaign reports raw mutation")
+    if manifest.get("frozen_snapshot_match") is not True:
+        raise ValueError("formal full campaign is not bound to frozen baseline snapshot")
+    if manifest.get("baseline_reference_git_commit") != BASELINE_REFERENCE_GIT_COMMIT:
+        raise ValueError("baseline reference Git identity mismatch")
+    if manifest.get("baseline_reference_sha256sums") != BASELINE_REFERENCE_SHA256SUMS:
+        raise ValueError("baseline reference SHA256SUMS identity mismatch")
     if tuple(manifest.get("games", [])) != EXPECTED_GAMES:
         raise ValueError("input manifest does not contain exact six games")
     files = list(manifest.get("files", []))
@@ -93,10 +105,13 @@ def _verify_input_manifest(root: Path) -> None:
     for item in files:
         if item.get("parser") != "loto.data.parser.parse_file":
             raise ValueError(f"unexpected parser identity: {item}")
-        if not str(item.get("encoding", "")) or not str(item.get("separator", "")):
-            raise ValueError(f"parser provenance incomplete: {item}")
-        if len(str(item.get("sha256", ""))) != 64 or int(item.get("rows", 0)) <= 0:
-            raise ValueError(f"input identity invalid: {item}")
+        validate_snapshot_item(
+            str(item.get("game", "")),
+            rows=int(item.get("rows", 0)),
+            sha256=str(item.get("sha256", "")),
+            encoding=str(item.get("encoding", "")),
+            separator=str(item.get("separator", "")),
+        )
 
 
 def _verify_prediction_lock(root: Path, seed_result: dict[str, Any]) -> None:
@@ -148,9 +163,15 @@ def verify_full(root: Path, *, expected_git_commit: str | None = None) -> dict[s
     summary = _json(root / "campaign_summary.json")
     report = _json(root / "VERIFICATION_REPORT.json")
     paired = _json(root / "PAIRED_COMPARISONS.json")
+    artifact_manifest = _json(root / "ARTIFACT_MANIFEST.json")
 
-    if expected_git_commit is not None and summary.get("git_commit") != expected_git_commit:
-        raise ValueError("campaign Git commit does not match expected commit")
+    if expected_git_commit is not None:
+        if summary.get("git_commit") != expected_git_commit:
+            raise ValueError("campaign Git commit does not match expected commit")
+        if report.get("git_commit") != expected_git_commit:
+            raise ValueError("verification report Git commit does not match expected commit")
+        if artifact_manifest.get("git_commit") != expected_git_commit:
+            raise ValueError("artifact manifest Git commit does not match expected commit")
     if int(summary.get("catalog_models", -1)) != EXPECTED_MODELS:
         raise ValueError("formal catalog is not Unified250")
     if int(summary.get("expected_model_game_pairs", -1)) != EXPECTED_PAIRS:
