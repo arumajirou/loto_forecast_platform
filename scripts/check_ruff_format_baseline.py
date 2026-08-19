@@ -69,6 +69,16 @@ def check_format(*, baseline_path: pathlib.Path, targets: list[str]) -> int:
     for path in sorted(introduced):
         print(f"NEW_FORMAT_DEBT={path}", file=sys.stderr)
     if introduced:
+        diff = subprocess.run(
+            [sys.executable, "-m", "ruff", "format", "--diff", *sorted(introduced)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        print("TAJ21_TEMP_RUFF_DIFF_BEGIN", file=sys.stderr)
+        print(diff.stdout, file=sys.stderr)
+        print(diff.stderr, file=sys.stderr)
+        print("TAJ21_TEMP_RUFF_DIFF_END", file=sys.stderr)
         print("RUFF_FORMAT_BASELINE_GATE=FAIL", file=sys.stderr)
         return 1
     print("RUFF_FORMAT_BASELINE_GATE=PASS")
