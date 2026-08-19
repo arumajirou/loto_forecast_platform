@@ -107,7 +107,7 @@ def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
 
 def test_launcher_exposes_one_command_representative_smoke() -> None:
     source = LAUNCHER_PATH.read_text(encoding="utf-8")
-    assert "{preflight|smoke}" in source
+    assert "{preflight|smoke|baselines}" in source
     assert "uv run --frozen python" in source
     assert "--games numbers3" in source
     assert "--models logistic,pp-multinomial-dglm" in source

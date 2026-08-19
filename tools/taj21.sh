@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PYTHON_BIN="${PYTHON_BIN:-python}"
 
 usage() {
-  echo "usage: bash tools/taj21.sh {preflight|smoke}"
+  echo "usage: bash tools/taj21.sh {preflight|smoke|baselines}"
 }
 
 runtime_python_cmd() {
@@ -16,8 +16,8 @@ runtime_python_cmd() {
   elif command -v python3 >/dev/null 2>&1; then
     printf '%s\0' python3
   else
-    echo "TAJ21_REPRESENTATIVE_SMOKE=FAIL" >&2
-    echo "REASON=uv/python3 is required for runtime smoke" >&2
+    echo "TAJ21_RUNTIME=FAIL" >&2
+    echo "REASON=uv/python3 is required" >&2
     exit 20
   fi
 }
@@ -65,6 +65,34 @@ case "${1:-}" in
     PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}" \
       "${PY_CMD[@]}" tools/evaluation/taj21_smoke_verify.py --root "$OUT"
     echo "TAJ21_SMOKE_ROOT=$OUT"
+    ;;
+  baselines)
+    if [[ -z "${TAJ21_DATA_DIR:-}" ]]; then
+      echo "TAJ21_BASELINE_REFERENCE=BLOCKED"
+      echo "REASON=TAJ21_DATA_DIR must point to canonical six-game CSV directory"
+      echo "SYNTHETIC_FALLBACK=FORBIDDEN"
+      echo "HOLDOUT=CLOSED"
+      echo "PROSPECTIVE=CLOSED"
+      echo "PROMOTION=CLOSED"
+      exit 21
+    fi
+
+    RUN_ID="$(date +%Y%m%d-%H%M%S)"
+    OUT="${TAJ21_BASELINE_ROOT:-$ROOT/runs/taj21-baseline-reference/taj21-baselines-$RUN_ID}"
+    GIT_COMMIT="$(git -C "$ROOT" rev-parse HEAD)"
+    readarray -d '' -t PY_CMD < <(runtime_python_cmd)
+    cd "$ROOT"
+    echo "TAJ21_BASELINE_INPUT_DIR=$TAJ21_DATA_DIR"
+
+    PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}" \
+      "${PY_CMD[@]}" tools/evaluation/taj21_baseline_campaign.py \
+      --input-dir "$TAJ21_DATA_DIR" \
+      --output "$OUT" \
+      --git-commit "$GIT_COMMIT"
+
+    PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}" \
+      "${PY_CMD[@]}" tools/evaluation/taj21_baseline_verify.py --root "$OUT"
+    echo "TAJ21_BASELINE_ROOT=$OUT"
     ;;
   *)
     usage

@@ -27,37 +27,37 @@
       "size_bytes": 13142
     },
     {
-      "path": "prediction_locks/mini/baseline:fixed/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "93dd591b2b53d8610ff3f6c99fc11d4302cdf7bf704c71a32ce0ceb2b3a22dca",
       "size_bytes": 8567
     },
     {
-      "path": "prediction_locks/mini/baseline:frequency/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "d14341c7775bc9c0d6b0a99ffe2f6188339d5316274998d94583cb8843b4adb6",
       "size_bytes": 8571
     },
     {
-      "path": "prediction_locks/mini/baseline:last/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "4ea4fa0c8e8ee593a825432773404bae35589c1750855ab4537ebf6708edb790",
       "size_bytes": 8631
     },
     {
-      "path": "prediction_locks/mini/baseline:mean/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "4141a02eaef388225a9b7de0b3c5043940d410837b9e825699c91773b2eb6e42",
       "size_bytes": 8666
     },
     {
-      "path": "prediction_locks/mini/baseline:median/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "cd04811776d83860879eb1d19f56d5fe226b85346d6b4084d01bf0e32f8d75fa",
       "size_bytes": 8668
     },
     {
-      "path": "prediction_locks/mini/baseline:random/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "6684a286f4e4e765b1473d2bc7b54fb0b8a43981cb0e63f1214cf34f46ba10e1",
       "size_bytes": 8639
     },
     {
-      "path": "prediction_locks/mini/baseline:statistical_ar1/seed-1.json",
+      "path": "prediction_locks/mini/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "5ce406f133653fb531be0181e3e2605787440d9d762e11d6606120f2eb48b28a",
       "size_bytes": 8677
     },

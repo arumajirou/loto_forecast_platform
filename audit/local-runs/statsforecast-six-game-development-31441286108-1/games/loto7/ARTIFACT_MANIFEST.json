@@ -27,37 +27,37 @@
       "size_bytes": 16970
     },
     {
-      "path": "prediction_locks/loto7/baseline:fixed/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6Zml4ZWQ/seed-1.json",
       "sha256": "fc5aa0283a6ad624c4e6687e11ebc3f5899f083914e30295e670f6199dcf7821",
       "size_bytes": 8968
     },
     {
-      "path": "prediction_locks/loto7/baseline:frequency/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6ZnJlcXVlbmN5/seed-1.json",
       "sha256": "be45fcdb153fa9b8eedf4d1a0862421e79037f596fed44eaad2dffb944fadd93",
       "size_bytes": 8972
     },
     {
-      "path": "prediction_locks/loto7/baseline:last/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6bGFzdA/seed-1.json",
       "sha256": "34c4f93f7009f230b4f5e580a6d88237dd7de5a59def38ad2cac81fd47091f5b",
       "size_bytes": 9006
     },
     {
-      "path": "prediction_locks/loto7/baseline:mean/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6bWVhbg/seed-1.json",
       "sha256": "43128c5e2e82c9d588c230faedac026c2c26d3db51055e66db31913ebb5faa67",
       "size_bytes": 9067
     },
     {
-      "path": "prediction_locks/loto7/baseline:median/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6bWVkaWFu/seed-1.json",
       "sha256": "df71575c8ee795d7c05ccf89ef993103f192b98541256f49733c4ec06887e363",
       "size_bytes": 8969
     },
     {
-      "path": "prediction_locks/loto7/baseline:random/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6cmFuZG9t/seed-1.json",
       "sha256": "04ae9058fd80471e451a4c400732d7f37bf9ca2a3a5fdb77a3e3f53a6507cfcf",
       "size_bytes": 9031
     },
     {
-      "path": "prediction_locks/loto7/baseline:statistical_ar1/seed-1.json",
+      "path": "prediction_locks/loto7/~YmFzZWxpbmU6c3RhdGlzdGljYWxfYXIx/seed-1.json",
       "sha256": "022235787fccb3b500992db21d4ca30e0530e355b6476d3b4e73b6c2454e34ab",
       "size_bytes": 9051
     },
