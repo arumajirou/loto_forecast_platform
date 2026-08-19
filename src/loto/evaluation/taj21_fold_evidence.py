@@ -102,13 +102,14 @@ def _augment_seed(
     if actual_read_started <= sealed_at:
         raise AssertionError("verification actual read did not occur after prediction seal")
 
-    by_fold: dict[int, list[dict[str, Any]]] = {}
+    by_fold: dict[str, list[dict[str, Any]]] = {}
     for record in records:
-        by_fold.setdefault(int(record["fold_id"]), []).append(record)
+        by_fold.setdefault(str(record["fold_id"]), []).append(record)
 
     fold_metrics: list[dict[str, Any]] = []
     for fold in prepared.folds:
-        fold_records = by_fold.get(int(fold.fold_id), [])
+        fold_id = str(fold.fold_id)
+        fold_records = by_fold.get(fold_id, [])
         if not fold_records:
             raise ValueError(f"prediction evidence missing fold {fold.fold_id}")
         actual = np.asarray(
@@ -122,7 +123,7 @@ def _augment_seed(
         predicted = np.asarray([record["prediction"] for record in fold_records], dtype=float)
         fold_metrics.append(
             {
-                "fold_id": int(fold.fold_id),
+                "fold_id": fold_id,
                 "draws": len(fold_records),
                 "metrics": unified._canonical_metrics(
                     actual, predicted, prepared.geometry, tau=tau
