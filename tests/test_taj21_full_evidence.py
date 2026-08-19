@@ -60,11 +60,16 @@ def _config(tmp_path: Path) -> UnifiedCampaignConfig:
 def test_prediction_lock_source_contract_is_fail_closed() -> None:
     contract = prediction_before_actual_source_contract()
     assert contract["prediction_lock_before_target_actual"] is True
-    assert contract["prediction_lock_relative_line"] < contract["target_actual_relative_line"]
+    assert (
+        contract["prediction_lock_relative_line"]
+        < contract["target_actual_relative_line"]
+    )
     assert len(contract["source_sha256"]) == 64
 
 
-def test_full_evidence_layer_adds_fold_seed_ordering_and_paired_evidence(tmp_path: Path) -> None:
+def test_full_evidence_layer_adds_fold_seed_ordering_and_paired_evidence(
+    tmp_path: Path,
+) -> None:
     config = _config(tmp_path)
     frames = {"numbers3": _synthetic("numbers3")}
     summary = run_unified_campaign(frames, config)
@@ -80,11 +85,14 @@ def test_full_evidence_layer_adds_fold_seed_ordering_and_paired_evidence(tmp_pat
             assert len(seed_result["fold_metrics"]) == 2
             evidence = seed_result["actual_read_evidence"]
             assert evidence["verification_actual_read_after_prediction_seal"] is True
-            assert evidence["scoring_source_contract"]["prediction_lock_before_target_actual"] is True
+            assert (
+                evidence["scoring_source_contract"][
+                    "prediction_lock_before_target_actual"
+                ]
+                is True
+            )
 
-    comparisons = build_paired_comparisons(
-        summary["results"], config.games, n_boot=50
-    )
+    comparisons = build_paired_comparisons(summary["results"], config.games, n_boot=50)
     rows = comparisons["comparisons"]
     assert len(rows) == 1
     assert rows[0]["candidate_id"] == "logistic"
@@ -98,9 +106,7 @@ def test_formal_artifacts_are_manifested_and_checksummed(tmp_path: Path) -> None
     frames = {"numbers3": _synthetic("numbers3")}
     summary = run_unified_campaign(frames, config)
     summary = augment_fold_and_seed_evidence(frames, config, summary)
-    comparisons = build_paired_comparisons(
-        summary["results"], config.games, n_boot=50
-    )
+    comparisons = build_paired_comparisons(summary["results"], config.games, n_boot=50)
     report = build_verification_report(
         summary,
         comparisons,
@@ -135,7 +141,9 @@ def test_formal_artifacts_are_manifested_and_checksummed(tmp_path: Path) -> None
 
 def test_formal_runner_uses_shared_parser_and_forbids_synthetic_fallback() -> None:
     root = Path(__file__).resolve().parents[1]
-    runner = (root / "tools/evaluation/taj21_full_campaign.py").read_text(encoding="utf-8")
+    runner = (root / "tools/evaluation/taj21_full_campaign.py").read_text(
+        encoding="utf-8"
+    )
     launcher = (root / "tools/taj21_full.sh").read_text(encoding="utf-8")
     assert "parse_file(path, spec)" in runner
     assert "pd.read_csv(path)" not in runner
