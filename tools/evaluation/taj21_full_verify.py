@@ -15,6 +15,8 @@ from loto.evaluation.taj21_snapshot import (
 EXPECTED_GAMES = ("bingo5", "loto6", "loto7", "mini", "numbers3", "numbers4")
 EXPECTED_SEEDS = (42, 1729, 20260730)
 EXPECTED_MODELS = 250
+EXPECTED_BROAD_MODELS = 174
+EXPECTED_PROBABILISTIC_MODELS = 76
 EXPECTED_PAIRS = 1500
 EXPECTED_BASELINES = 42
 EXPECTED_FOLDS = 5
@@ -143,7 +145,7 @@ def _verify_success_row(root: Path, row: dict[str, Any]) -> int:
         folds = list(seed_result.get("fold_metrics", []))
         if len(folds) != EXPECTED_FOLDS:
             raise ValueError(f"fold metric inventory incomplete: {row['candidate_id']}")
-        if len({int(item["fold_id"]) for item in folds}) != EXPECTED_FOLDS:
+        if len({str(item["fold_id"]) for item in folds}) != EXPECTED_FOLDS:
             raise ValueError(f"duplicate fold metrics: {row['candidate_id']}")
         evidence = seed_result.get("actual_read_evidence", {})
         source = evidence.get("scoring_source_contract", {})
@@ -153,6 +155,18 @@ def _verify_success_row(root: Path, row: dict[str, Any]) -> int:
             raise ValueError(f"source ordering contract missing: {row['candidate_id']}")
         _verify_prediction_lock(root, seed_result)
     return len(seed_results)
+
+
+def _verify_unified250_identity(candidates: list[dict[str, Any]]) -> None:
+    by_game = {
+        game: {str(row["candidate_id"]) for row in candidates if row["game"] == game}
+        for game in EXPECTED_GAMES
+    }
+    if any(len(model_ids) != EXPECTED_MODELS for model_ids in by_game.values()):
+        raise ValueError("one or more games does not contain exactly 250 candidate identities")
+    reference = by_game[EXPECTED_GAMES[0]]
+    if any(model_ids != reference for model_ids in by_game.values()):
+        raise ValueError("candidate identity set differs between games")
 
 
 def verify_full(root: Path, *, expected_git_commit: str | None = None) -> dict[str, int]:
@@ -174,6 +188,10 @@ def verify_full(root: Path, *, expected_git_commit: str | None = None) -> dict[s
             raise ValueError("artifact manifest Git commit does not match expected commit")
     if int(summary.get("catalog_models", -1)) != EXPECTED_MODELS:
         raise ValueError("formal catalog is not Unified250")
+    if int(summary.get("broad_catalog_models", -1)) != EXPECTED_BROAD_MODELS:
+        raise ValueError("formal broad catalog is not 174 models")
+    if int(summary.get("probabilistic_catalog_models", -1)) != EXPECTED_PROBABILISTIC_MODELS:
+        raise ValueError("formal probabilistic catalog is not 76 models")
     if int(summary.get("expected_model_game_pairs", -1)) != EXPECTED_PAIRS:
         raise ValueError("expected model-game matrix is not 1500")
     if int(summary.get("observed_model_game_pairs", -1)) != EXPECTED_PAIRS:
@@ -198,6 +216,7 @@ def verify_full(root: Path, *, expected_git_commit: str | None = None) -> dict[s
         raise ValueError("candidate result inventory is not 1500")
     if len({(row["game"], row["candidate_id"]) for row in candidates}) != EXPECTED_PAIRS:
         raise ValueError("candidate matrix contains duplicate pairs")
+    _verify_unified250_identity(candidates)
     if len(baselines) != EXPECTED_BASELINES or any(
         row.get("status") != "SUCCEEDED" for row in baselines
     ):
