@@ -26,9 +26,7 @@ def build_verification_report(
     folds: int,
 ) -> dict[str, Any]:
     results = list(summary["results"])
-    candidates = [
-        row for row in results if row["source"] in {"catalog", "probabilistic"}
-    ]
+    candidates = [row for row in results if row["source"] in {"catalog", "probabilistic"}]
     baselines = [row for row in results if row["source"] == "baseline"]
     expected_baselines = len(REQUIRED_BASELINE_IDS) * len(summary["games"])
 
@@ -39,9 +37,7 @@ def build_verification_report(
     for row in results:
         if row["status"] != "SUCCEEDED":
             continue
-        position = row.get("seed_summary", {}).get(
-            "position_hit_at_1_by_position", {}
-        )
+        position = row.get("seed_summary", {}).get("position_hit_at_1_by_position", {})
         if not position:
             position_complete = False
         for seed_result in row.get("seed_results", []):
@@ -56,9 +52,7 @@ def build_verification_report(
                 ordering_complete = False
 
     comparison_rows = list(comparisons["comparisons"])
-    valid_comparisons = [
-        item for item in comparison_rows if item["comparison_status"] == "VALID"
-    ]
+    valid_comparisons = [item for item in comparison_rows if item["comparison_status"] == "VALID"]
     report = {
         "schema_version": "taj21-full-verification-report-v1",
         "status": "PASS",
@@ -94,10 +88,7 @@ def build_verification_report(
     }
     if not report["matrix_complete"]:
         raise AssertionError("formal candidate matrix is incomplete")
-    if (
-        len(baselines) != expected_baselines
-        or report["baseline_succeeded"] != expected_baselines
-    ):
+    if len(baselines) != expected_baselines or report["baseline_succeeded"] != expected_baselines:
         raise AssertionError("formal baseline matrix is incomplete")
     if not fold_complete:
         raise AssertionError("fold-level metric evidence is incomplete")
@@ -114,8 +105,7 @@ def write_artifact_manifest(output: Path, *, git_commit: str) -> dict[str, Any]:
     artifacts = sorted(
         path
         for path in output.rglob("*")
-        if path.is_file()
-        and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
+        if path.is_file() and path.name not in {"ARTIFACT_MANIFEST.json", "SHA256SUMS"}
     )
     manifest = {
         "schema_version": "taj21-artifact-manifest-v1",
@@ -137,14 +127,9 @@ def write_artifact_manifest(output: Path, *, git_commit: str) -> dict[str, Any]:
 
 def regenerate_sha256sums(output: Path) -> str:
     artifacts = sorted(
-        path
-        for path in output.rglob("*")
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output.rglob("*") if path.is_file() and path.name != "SHA256SUMS"
     )
-    lines = [
-        f"{sha256_file(path)}  {path.relative_to(output).as_posix()}"
-        for path in artifacts
-    ]
+    lines = [f"{sha256_file(path)}  {path.relative_to(output).as_posix()}" for path in artifacts]
     sums = output / "SHA256SUMS"
     sums.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return sha256_file(sums)
