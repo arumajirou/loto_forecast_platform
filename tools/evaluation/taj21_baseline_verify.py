@@ -116,6 +116,12 @@ def verify_baselines(root: Path) -> dict[str, Any]:
             raise ValueError(f"invalid input SHA-256: {item}")
         if int(item.get("rows", 0)) <= 0:
             raise ValueError(f"invalid input row count: {item}")
+        if item.get("parser") != "loto.data.parser.parse_file":
+            raise ValueError(f"unexpected input parser identity: {item}")
+        if not str(item.get("encoding", "")):
+            raise ValueError(f"input encoding evidence missing: {item}")
+        if not str(item.get("separator", "")):
+            raise ValueError(f"input separator evidence missing: {item}")
 
     reference = json.loads((root / "BASELINE_REFERENCE.json").read_text(encoding="utf-8"))
     if reference.get("status") != "EXECUTED":

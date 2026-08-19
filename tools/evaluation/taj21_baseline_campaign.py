@@ -8,6 +8,8 @@ from typing import Any
 
 import pandas as pd
 
+from loto.data.lotteries import get_lottery_spec
+from loto.data.parser import parse_file
 from loto.evaluation.unified_campaign import UnifiedCampaignConfig, run_unified_campaign
 from loto.game.geometry import geometry_for, known_games
 
@@ -43,7 +45,8 @@ def _input_manifest(input_dir: Path) -> tuple[dict[str, pd.DataFrame], dict[str,
         path = input_dir / f"{game}.csv"
         if not path.is_file():
             raise FileNotFoundError(f"missing canonical development CSV: {path}")
-        frame = pd.read_csv(path)
+        spec = get_lottery_spec(game)
+        frame, parser_meta = parse_file(path, spec)
         geometry = geometry_for(game)
         required_columns = geometry.column_names()
         missing = [column for column in required_columns if column not in frame.columns]
@@ -58,6 +61,9 @@ def _input_manifest(input_dir: Path) -> tuple[dict[str, pd.DataFrame], dict[str,
                 "filename": path.name,
                 "sha256": _sha256(path),
                 "rows": int(len(frame)),
+                "parser": "loto.data.parser.parse_file",
+                "encoding": parser_meta["encoding"],
+                "separator": parser_meta["sep"],
                 "target_columns": required_columns,
             }
         )

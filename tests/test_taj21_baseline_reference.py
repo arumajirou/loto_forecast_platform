@@ -5,6 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from loto.evaluation.metric_registry import REQUIRED_BASELINE_IDS, REQUIRED_POINT_METRICS
@@ -147,6 +148,9 @@ def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
                         "filename": f"{game}.csv",
                         "sha256": "0" * 64,
                         "rows": 200,
+                        "parser": "loto.data.parser.parse_file",
+                        "encoding": "cp932",
+                        "separator": ",",
                     }
                     for game in known_games()
                 ],
@@ -196,6 +200,65 @@ def test_campaign_blocks_when_canonical_six_game_inputs_are_missing(
             output=tmp_path / "out",
             git_commit="a" * 40,
         )
+
+
+def test_campaign_accepts_cp932_raw_input_via_shared_parser(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    campaign = _load(
+        CAMPAIGN_PATH,
+        "taj21_baseline_cp932_test",
+    )
+
+    input_dir = tmp_path / "data"
+    input_dir.mkdir()
+
+    rows = 200
+    raw = pd.DataFrame(
+        {
+            "\u958b\u50ac\u56de": range(1, rows + 1),
+            "\u958b\u50ac\u65e5": ["2026/01/01"] * rows,
+            "\u7b2c1\u6570\u5b57": [1] * rows,
+            "\u7b2c2\u6570\u5b57": [2] * rows,
+            "\u7b2c3\u6570\u5b57": [3] * rows,
+            "\u7b2c4\u6570\u5b57": [4] * rows,
+            "\u7b2c5\u6570\u5b57": [5] * rows,
+            "\u30dc\u30fc\u30ca\u30b9\u6570\u5b57": [6] * rows,
+        }
+    )
+
+    raw.to_csv(
+        input_dir / "mini.csv",
+        index=False,
+        encoding="cp932",
+    )
+
+    monkeypatch.setattr(
+        campaign,
+        "known_games",
+        lambda: ["mini"],
+    )
+
+    frames, manifest = campaign._input_manifest(input_dir)
+
+    assert list(frames) == ["mini"]
+    assert len(frames["mini"]) == rows
+    assert all(column in frames["mini"].columns for column in ("n1", "n2", "n3", "n4", "n5"))
+
+    item = manifest["files"][0]
+
+    assert item["game"] == "mini"
+    assert item["parser"] == "loto.data.parser.parse_file"
+    assert item["encoding"] == "cp932"
+    assert item["separator"] == ","
+    assert item["target_columns"] == [
+        "n1",
+        "n2",
+        "n3",
+        "n4",
+        "n5",
+    ]
 
 
 def test_verifier_accepts_exact_six_game_seven_baseline_matrix(
