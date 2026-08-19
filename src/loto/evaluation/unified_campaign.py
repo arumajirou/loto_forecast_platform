@@ -26,6 +26,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from loto.evaluation.metric_registry import REQUIRED_BASELINE_IDS, REQUIRED_POINT_METRICS
 from loto.evaluation.metrics_general import positional_metrics
+from loto.evaluation.path_codec import encode_path_component
 from loto.evaluation.probabilistic_oof_adapter import (
     ProbabilisticScientificRoute,
     build_probabilistic_scientific_plan,
@@ -706,7 +707,7 @@ def _evaluate_seed(
                 }
             )
 
-    safe_id = candidate_id.replace("/", "_")
+    safe_id = encode_path_component(candidate_id)
     lock = _write_prediction_lock(
         config.output_dir
         / "prediction_locks"

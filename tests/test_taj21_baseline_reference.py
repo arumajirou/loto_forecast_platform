@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from loto.evaluation.metric_registry import REQUIRED_BASELINE_IDS, REQUIRED_POINT_METRICS
+from loto.evaluation.path_codec import encode_path_component
 from loto.game.geometry import known_games
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,7 +69,7 @@ def _write_fixture(root: Path, *, expose_actuals: bool = False) -> None:
             candidate_id = f"baseline:{baseline}"
             seed_results = []
             for seed in SEEDS:
-                lock = campaign / "prediction_locks" / game / candidate_id / f"seed-{seed}.json"
+                lock = campaign / "prediction_locks" / game / encode_path_component(candidate_id) / f"seed-{seed}.json"
                 lock.parent.mkdir(parents=True, exist_ok=True)
                 payload = {
                     "schema_version": "prediction-lock-v1",

@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 
 from loto.evaluation.metric_registry import REQUIRED_POINT_METRICS
+from loto.evaluation.path_codec import encode_path_component
 from loto.evaluation.protocol_v2 import canonical_json_bytes
 from loto.evaluation.unified_campaign import (
     UnifiedCampaignConfig,
@@ -454,7 +455,7 @@ def _status_snapshot(root: Path, hardware: bool) -> tuple[str, bool, str]:
             indexes = [
                 index
                 for index, model_id in enumerate(model_ids)
-                if (lock_root / model_id.replace("/", "_")).is_dir()
+                if (lock_root / encode_path_component(model_id)).is_dir()
             ]
             done = max(indexes) + 1 if indexes else 0
             state = progress["games"].get(game, {}).get("status", "PENDING")
