@@ -1,0 +1,51 @@
+{
+  "suite_id": "cross-platform-library-parameter-smoke-v1",
+  "metadata": {
+    "purpose": "Development-only cross-platform argument effectiveness smoke",
+    "holdout_evaluated": false,
+    "prospective_evaluated": false
+  },
+  "probes": [
+    {
+      "probe_id": "mlforecast-num-samples-trial-count",
+      "library": "mlforecast",
+      "model": "AutoLinearRegression",
+      "parameter": "num_samples",
+      "scope": "fit",
+      "control": 1,
+      "treatment": 2,
+      "expected_surface": "trial_count",
+      "expected_relation": "increase",
+      "seeds": [1, 42],
+      "repeats": 1,
+      "min_match_fraction": 1.0,
+      "base_args": {
+        "n_windows": 2,
+        "h": 1,
+        "step_size": 1,
+        "input_size": 48,
+        "refit": false
+      }
+    },
+    {
+      "probe_id": "statsforecast-season-length-prediction",
+      "library": "statsforecast",
+      "model": "SeasonalNaive",
+      "parameter": "season_length",
+      "scope": "model_constructor",
+      "control": 2,
+      "treatment": 7,
+      "expected_surface": "prediction",
+      "expected_relation": "change",
+      "seeds": [1, 42],
+      "repeats": 1,
+      "min_match_fraction": 1.0,
+      "base_args": {
+        "h": 7,
+        "train_length": 84,
+        "freq": "D",
+        "n_jobs": 1
+      }
+    }
+  ]
+}
