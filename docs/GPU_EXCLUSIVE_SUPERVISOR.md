@@ -38,8 +38,10 @@ model alias from the local environment; do not guess them.
   "qwen": {
     "running_url": "http://127.0.0.1:18081/running",
     "running_contains": "<MODEL_ALIAS>",
-    "start_url": "http://127.0.0.1:18081/api/models/load/<MODEL_ALIAS>",
-    "stop_url": "http://127.0.0.1:18081/api/models/unload/<MODEL_ALIAS>"
+    "start_url": "http://127.0.0.1:18081/upstream/<MODEL_ALIAS>/",
+    "start_method": "GET",
+    "stop_url": "http://127.0.0.1:18081/api/models/unload/<MODEL_ALIAS>",
+    "stop_method": "POST"
   },
   "gate": {
     "status_url": "http://127.0.0.1:18083/control/status",
@@ -62,6 +64,11 @@ model alias from the local environment; do not guess them.
   "output_dir": "/mnt/e/env/ts/loto_gpu_runs/gpu-exclusive-smoke"
 }
 ```
+
+For llama-swap v250, model unload is an explicit POST control operation while
+model startup is lazy and is triggered by a GET request to `/upstream/<MODEL_ALIAS>/`.
+`start_method` and `stop_method` default to `POST` so existing HTTP-controlled
+runtimes remain backward compatible.
 
 Run it with:
 

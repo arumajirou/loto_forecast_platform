@@ -3,7 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
+from loto.gpu_exclusive import adapters as adapters_module
+from loto.gpu_exclusive.adapters import HttpRuntime
 from loto.gpu_exclusive.models import (
     ForecastJobConfig,
     GpuProbeConfig,
@@ -135,3 +138,63 @@ def test_reappearing_qwen_is_fail_closed_and_restored(tmp_path: Path) -> None:
 def test_empty_forecast_command_is_rejected(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="forecast command must not be empty"):
         ForecastJobConfig(command=[], cwd=tmp_path)
+
+
+
+def test_http_runtime_defaults_remain_post() -> None:
+    config = HttpRuntimeConfig(
+        running_url="http://127.0.0.1/running",
+        running_contains="qwen",
+        start_url="http://127.0.0.1/start",
+        stop_url="http://127.0.0.1/stop",
+    )
+
+    assert config.start_method == "POST"
+    assert config.stop_method == "POST"
+
+
+def test_http_runtime_uses_configured_start_and_stop_methods(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, str]] = []
+
+    def fake_request(
+        url: str,
+        *,
+        method: str,
+        timeout: float,
+    ) -> tuple[int, str]:
+        del timeout
+        calls.append((url, method))
+        return 200, "{}"
+
+    monkeypatch.setattr(adapters_module, "_request", fake_request)
+
+    config = HttpRuntimeConfig(
+        running_url="http://127.0.0.1/running",
+        running_contains="qwen",
+        start_url="http://127.0.0.1/upstream/qwen/",
+        stop_url="http://127.0.0.1/api/models/unload/qwen",
+        start_method="GET",
+        stop_method="POST",
+    )
+
+    runtime = HttpRuntime(config)
+    runtime.start()
+    runtime.stop()
+
+    assert calls == [
+        ("http://127.0.0.1/upstream/qwen/", "GET"),
+        ("http://127.0.0.1/api/models/unload/qwen", "POST"),
+    ]
+
+
+def test_http_runtime_rejects_unsupported_method() -> None:
+    with pytest.raises(ValidationError):
+        HttpRuntimeConfig(
+            running_url="http://127.0.0.1/running",
+            running_contains="qwen",
+            start_url="http://127.0.0.1/start",
+            stop_url="http://127.0.0.1/stop",
+            start_method="PUT",  # type: ignore[arg-type]
+        )

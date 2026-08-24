@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -27,6 +28,8 @@ class HttpRuntimeConfig(BaseModel):
     running_contains: str
     start_url: str
     stop_url: str
+    start_method: Literal["GET", "POST"] = "POST"
+    stop_method: Literal["GET", "POST"] = "POST"
     timeout_seconds: float = Field(default=10.0, gt=0)
     poll_interval_seconds: float = Field(default=1.0, gt=0)
     transition_timeout_seconds: float = Field(default=90.0, gt=0)

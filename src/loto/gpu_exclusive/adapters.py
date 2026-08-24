@@ -43,7 +43,7 @@ class HttpRuntime:
     def start(self) -> None:
         status, _ = _request(
             self.config.start_url,
-            method="POST",
+            method=self.config.start_method,
             timeout=self.config.timeout_seconds,
         )
         if not 200 <= status < 300:
@@ -52,7 +52,7 @@ class HttpRuntime:
     def stop(self) -> None:
         status, _ = _request(
             self.config.stop_url,
-            method="POST",
+            method=self.config.stop_method,
             timeout=self.config.timeout_seconds,
         )
         if not 200 <= status < 300:
