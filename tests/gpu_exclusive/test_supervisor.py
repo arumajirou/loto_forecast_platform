@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -198,3 +199,43 @@ def test_http_runtime_rejects_unsupported_method() -> None:
             stop_url="http://127.0.0.1/stop",
             start_method="PUT",  # type: ignore[arg-type]
         )
+
+
+
+class FailingStartRuntime(FakeRuntime):
+    def start(self) -> None:
+        raise RuntimeError("synthetic restore failure")
+
+
+def test_restore_failure_persists_failed_state_and_keeps_gate_closed(
+    tmp_path: Path,
+) -> None:
+    config = _config(
+        tmp_path,
+        ["python", "-c", "print('forecast ok')"],
+    )
+    supervisor = ExclusiveGpuSupervisor(config)
+
+    runtime = FailingStartRuntime(running=True)
+    gate = FakeGate()
+
+    supervisor.runtime = runtime  # type: ignore[assignment]
+    supervisor.gpu = FakeGpu()  # type: ignore[assignment]
+    supervisor.gate = gate  # type: ignore[assignment]
+
+    result = supervisor.run()
+
+    assert result["status"] == "FAILED"
+    assert result["qwen_stopped"] is True
+    assert result["qwen_restored"] is False
+
+    assert gate.closed is True
+    assert gate.opened is False
+
+    state = json.loads(
+        (config.output_dir / "state.json").read_text(
+            encoding="utf-8",
+        )
+    )
+
+    assert state["state"] == "FAILED"

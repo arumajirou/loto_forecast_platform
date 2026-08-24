@@ -38,7 +38,7 @@ model alias from the local environment; do not guess them.
   "qwen": {
     "running_url": "http://127.0.0.1:18081/running",
     "running_contains": "<MODEL_ALIAS>",
-    "start_url": "http://127.0.0.1:18081/upstream/<MODEL_ALIAS>/",
+    "start_url": "http://127.0.0.1:18081/upstream/<MODEL_ALIAS>/v1/models",
     "start_method": "GET",
     "stop_url": "http://127.0.0.1:18081/api/models/unload/<MODEL_ALIAS>",
     "stop_method": "POST"
@@ -66,7 +66,7 @@ model alias from the local environment; do not guess them.
 ```
 
 For llama-swap v250, model unload is an explicit POST control operation while
-model startup is lazy and is triggered by a GET request to `/upstream/<MODEL_ALIAS>/`.
+model startup is lazy and is triggered by a GET request to `/upstream/<MODEL_ALIAS>/v1/models`. Using the backend health endpoint both triggers lazy loading and returns HTTP 200 when the runtime is healthy.
 `start_method` and `stop_method` default to `POST` so existing HTTP-controlled
 runtimes remain backward compatible.
 
