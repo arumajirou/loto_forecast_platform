@@ -141,7 +141,6 @@ def test_empty_forecast_command_is_rejected(tmp_path: Path) -> None:
         ForecastJobConfig(command=[], cwd=tmp_path)
 
 
-
 def test_http_runtime_defaults_remain_post() -> None:
     config = HttpRuntimeConfig(
         running_url="http://127.0.0.1/running",
@@ -199,7 +198,6 @@ def test_http_runtime_rejects_unsupported_method() -> None:
             stop_url="http://127.0.0.1/stop",
             start_method="PUT",  # type: ignore[arg-type]
         )
-
 
 
 class FailingStartRuntime(FakeRuntime):

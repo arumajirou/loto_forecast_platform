@@ -94,7 +94,6 @@ def test_bingo5_position_range_is_enforced() -> None:
         compile_chronos_input(request)
 
 
-
 def test_compiled_timestamps_are_numpy_int64_view_safe() -> None:
     request = Chronos2RequestV2.model_validate(
         make_payload(
