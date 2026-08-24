@@ -101,9 +101,10 @@ class ExclusiveGpuSupervisor:
         env["CUDA_VISIBLE_DEVICES"] = str(self.config.gpu.index)
         stdout_path = self.config.output_dir / "forecast.stdout.log"
         stderr_path = self.config.output_dir / "forecast.stderr.log"
-        with stdout_path.open("w", encoding="utf-8") as stdout, stderr_path.open(
-            "w", encoding="utf-8"
-        ) as stderr:
+        with (
+            stdout_path.open("w", encoding="utf-8") as stdout,
+            stderr_path.open("w", encoding="utf-8") as stderr,
+        ):
             proc = subprocess.Popen(
                 self.config.forecast.command,
                 cwd=self.config.forecast.cwd,
