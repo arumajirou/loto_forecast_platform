@@ -112,20 +112,41 @@ def _run_once(
     request_path.write_text(request.model_dump_json(indent=2) + "\n", encoding="utf-8")
 
     environment_path = RUNTIME_LANES[runtime_lane]
-    command = [
-        "uv",
-        "run",
-        "--project",
-        str(environment_path),
-        "python",
-        str(RUNNER),
-        "--request",
-        str(request_path),
-        "--response",
-        str(response_path),
-        "--runtime-lane",
-        runtime_lane,
-    ]
+    lane_python = environment_path / ".venv" / "bin" / "python"
+    if lane_python.is_file():
+        # Invoke the lane's venv interpreter directly. Going through
+        # `uv run --project <lane> python ...` does not reliably exec-replace
+        # itself when the parent process already has a mismatched
+        # VIRTUAL_ENV in its environment (as happens here, since this
+        # script itself typically runs under `uv run --project <root>`),
+        # in which case `subprocess.Popen.pid` ends up being uv's own PID
+        # rather than the actual provider process's PID, breaking the PID
+        # identity check below.
+        command = [
+            str(lane_python),
+            str(RUNNER),
+            "--request",
+            str(request_path),
+            "--response",
+            str(response_path),
+            "--runtime-lane",
+            runtime_lane,
+        ]
+    else:
+        command = [
+            "uv",
+            "run",
+            "--project",
+            str(environment_path),
+            "python",
+            str(RUNNER),
+            "--request",
+            str(request_path),
+            "--response",
+            str(response_path),
+            "--runtime-lane",
+            runtime_lane,
+        ]
     environment = os.environ.copy()
     environment["PYTHONUNBUFFERED"] = "1"
     if request.device == "cpu":
