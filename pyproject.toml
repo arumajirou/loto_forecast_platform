@@ -57,6 +57,7 @@ loto-sklearn = "loto.sklearn_provider.cli:main"
 loto-integrity = "loto.entrypoints:integrity_main"
 loto-github-audit = "loto.github_audit.cli:main"
 loto-build-info = "loto.version:main"
+loto-gpu-exclusive = "loto.gpu_exclusive.cli:main"
 loto-hierarchicalforecast-certify = "loto.reconciliation.portable_package_certification:main"
 loto-hierarchicalforecast-verify-package = "loto.reconciliation.package_verifier:main"
 
