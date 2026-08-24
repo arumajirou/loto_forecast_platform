@@ -2,7 +2,7 @@
 name = "loto-moirai2-cuda13-experimental-provider"
 version = "0.1.0"
 description = "Unsupported-version experimental CUDA 13 Moirai 2.0 research runtime"
-requires-python = ">=3.11,<3.14"
+requires-python = ">=3.11,<3.13"
 dependencies = [
   "uni2ts==2.0.0",
   "gluonts==0.14.4",
@@ -14,3 +14,19 @@ dependencies = [
 
 [dependency-groups]
 dev = ["pytest==9.0.2"]
+
+# Compatibility overrides are intentional for the RTX 5070 Ti
+# CUDA 13 experimental lane:
+#
+# - gluonts==0.14.4 declares pandas<2.2, while this lane has
+#   verified resolution with pandas==2.2.3.
+# - uni2ts==2.0.0 declares torch<2.5, while Blackwell/sm_120
+#   execution requires the newer torch==2.13.0 CUDA runtime.
+#
+# These are experimental compatibility overrides, not claims of
+# upstream-supported dependency combinations.
+[tool.uv]
+override-dependencies = [
+  "pandas==2.2.3",
+  "torch==2.13.0",
+]
