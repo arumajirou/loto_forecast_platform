@@ -168,7 +168,9 @@ class ExclusiveGpuSupervisor:
             self._transition(SupervisorState.FORECAST_RUNNING)
             forecast_exit_code = self._run_forecast()
             if forecast_exit_code != 0:
-                raise ExclusiveGpuError(f"forecast command failed with exit code {forecast_exit_code}")
+                raise ExclusiveGpuError(
+                    f"forecast command failed with exit code {forecast_exit_code}"
+                )
 
             self._transition(SupervisorState.FORECAST_STOPPING)
             after = self.gpu.wait_free()
