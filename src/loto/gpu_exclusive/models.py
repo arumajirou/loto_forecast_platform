@@ -61,7 +61,7 @@ class ForecastJobConfig(BaseModel):
     terminate_grace_seconds: float = Field(default=10.0, gt=0)
 
     @model_validator(mode="after")
-    def _command_is_not_empty(self) -> "ForecastJobConfig":
+    def _command_is_not_empty(self) -> ForecastJobConfig:
         if not self.command:
             raise ValueError("forecast command must not be empty")
         return self
