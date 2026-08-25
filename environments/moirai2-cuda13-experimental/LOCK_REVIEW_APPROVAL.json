@@ -1,11 +1,13 @@
 {
+  "approval_scope": "AUTOMATED_POLICY_ONLY",
   "decision": "APPROVED",
+  "formal_human_reviewed": false,
   "inventory_sha256": "54123946cdba288c65783ee79a60383a845c264874cba537821399dea6f60819",
   "lock_sha256": "cb88264ab130d41ac588c529e683d806691699caf398ef53609f13866f59da24",
   "pyproject_sha256": "21c61521da0958f925f895bcde90c6f2deef5eb702c83544580e0e05f4bf5fa1",
   "report_sha256": "8f331aa14fffd486447aa93477cc4df1ba7e66e24d12da06e2df1d3382cf8bce",
   "reviewed_at": "2026-08-24T13:57:00Z",
-  "reviewer": "arumajirou (Lead Engineer, automated review via Claude Code)",
+  "reviewer": "automated policy review via Claude Code (non-human)",
   "runtime_lane": "cuda13-experimental",
   "schema_version": "moirai2-lock-approval-v1",
   "violation_count": 0
