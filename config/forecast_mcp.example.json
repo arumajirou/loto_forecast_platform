@@ -8,8 +8,7 @@
     "repo_root": "/mnt/e/env/ts/loto_forecast_platform",
     "provider_python": "/mnt/e/env/ts/loto_forecast_platform/environments/moirai2-cuda13-experimental/.venv/bin/python",
     "provider_script": "/mnt/e/env/ts/loto_forecast_platform/scripts/run_moirai2_provider.py",
-    "approved_request": "/mnt/e/env/ts/loto_forecast_platform/.runtime/forecast-mcp/numbers3-development-request.json",
-    "request_manifest": "/mnt/e/env/ts/loto_forecast_platform/.runtime/forecast-mcp/numbers3-development-request.manifest.json",
+    "operator_runtime_root": "/home/az/.local/share/loto-forecast-mcp/route",
     "runtime_lane": "cuda13-experimental",
     "timeout_seconds": 900.0
   },
@@ -40,6 +39,27 @@
     "timeout_seconds": 10.0,
     "poll_interval_seconds": 0.5,
     "drain_timeout_seconds": 60.0
+  },
+  "residency": {
+    "mode": "auto",
+    "resource_profile_path": "/mnt/e/env/ts/loto_forecast_platform/.runtime/gpu-residency/profiles.json",
+    "profile_selector": {
+      "llm_alias": "<MODEL_ALIAS>",
+      "llm_runtime": "<LLM_RUNTIME>",
+      "llm_context_length": 65536,
+      "foundation_repo_id": "Salesforce/moirai-2.0-R-small",
+      "foundation_revision": "30f43ff08c8494f4943ae1521e9d4e94a0fbb389",
+      "runtime_lane": "cuda13-experimental"
+    },
+    "hard_reserve_mib": 2048,
+    "reserve_ratio": 0.12,
+    "foundation_peak_safety_factor": 1.25,
+    "minimum_foundation_budget_mib": 1024,
+    "unknown_profile_action": "handoff",
+    "require_external_peak_evidence": true,
+    "require_exact_llm_identity": true,
+    "require_llm_pid_stability_when_available": true,
+    "post_run_vram_tolerance_mib": 256
   },
   "lock_path": "/tmp/loto-gpu-exclusive.lock"
 }

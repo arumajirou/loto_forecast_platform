@@ -1,6 +1,19 @@
-"""Exclusive single-GPU control plane for local LLM/forecast handoff."""
+"""Single-GPU control plane for local LLM/forecast execution."""
 
-from .models import SupervisorConfig, SupervisorState
+from .adaptive import AdaptiveGpuSupervisor
+from .models import (
+    GpuResidencyPolicy,
+    ResidencyMode,
+    SupervisorConfig,
+    SupervisorState,
+)
 from .supervisor import ExclusiveGpuSupervisor
 
-__all__ = ["ExclusiveGpuSupervisor", "SupervisorConfig", "SupervisorState"]
+__all__ = [
+    "AdaptiveGpuSupervisor",
+    "ExclusiveGpuSupervisor",
+    "GpuResidencyPolicy",
+    "ResidencyMode",
+    "SupervisorConfig",
+    "SupervisorState",
+]

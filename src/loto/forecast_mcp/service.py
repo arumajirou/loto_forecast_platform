@@ -1,4 +1,4 @@
-"""Fail-closed Forecast MCP service backed by the GPU Exclusive Supervisor."""
+"""Fail-closed Forecast MCP service backed by adaptive GPU residency."""
 
 from __future__ import annotations
 
@@ -19,8 +19,8 @@ from loto.adapters.moirai2.contracts import (
     Operation,
 )
 from loto.gpu_exclusive.adapters import ExternalGate, HttpRuntime, NvidiaSmiProbe
+from loto.gpu_exclusive.adaptive import AdaptiveGpuSupervisor
 from loto.gpu_exclusive.models import ForecastJobConfig, SupervisorConfig
-from loto.gpu_exclusive.supervisor import ExclusiveGpuSupervisor
 from loto.moirai2_campaign.provenance import verify_snapshot
 
 from .contracts import (
@@ -82,7 +82,7 @@ class ForecastMcpService:
         self,
         config: ForecastMcpConfig,
         *,
-        supervisor_factory: SupervisorFactory = ExclusiveGpuSupervisor,
+        supervisor_factory: SupervisorFactory = AdaptiveGpuSupervisor,
     ) -> None:
         self.config = config
         self._supervisor_factory = supervisor_factory
@@ -182,6 +182,36 @@ class ForecastMcpService:
         if gpu.peak_vram_bytes <= 0:
             raise RuntimeError("provider peak VRAM evidence is missing")
 
+    @staticmethod
+    def _validate_supervisor_result(supervisor_result: dict[str, Any]) -> str:
+        if supervisor_result.get("status") != "PASS":
+            raise RuntimeError(f"GPU supervisor failed closed: {supervisor_result.get('failure')}")
+        if not supervisor_result.get("qwen_initially_running"):
+            raise RuntimeError("formal MCP forecast requires the selected Qwen runtime to be live")
+
+        residency = supervisor_result.get("gpu_residency")
+        if isinstance(residency, dict):
+            selected_mode = str(residency.get("selected_mode", "handoff"))
+        else:
+            selected_mode = "handoff"
+
+        if selected_mode == "handoff":
+            if not supervisor_result.get("qwen_stopped"):
+                raise RuntimeError("selected Qwen runtime was not unloaded for GPU HANDOFF")
+            if not supervisor_result.get("qwen_restored"):
+                raise RuntimeError("selected Qwen runtime was not restored after GPU HANDOFF")
+        elif selected_mode == "coexist":
+            if supervisor_result.get("qwen_stopped") or supervisor_result.get("qwen_restored"):
+                raise RuntimeError("COEXIST must not stop or restart the selected Qwen runtime")
+            if not isinstance(residency, dict) or not residency.get("llm_continuity_verified"):
+                raise RuntimeError("COEXIST LLM continuity evidence is missing")
+        else:
+            raise RuntimeError(f"unexpected successful residency mode: {selected_mode}")
+
+        if not supervisor_result.get("gate_reopened"):
+            raise RuntimeError("request gate was not reopened")
+        return selected_mode
+
     def status(self) -> dict[str, Any]:
         readiness_errors: list[str] = []
         snapshot_evidence: dict[str, Any] | None = None
@@ -208,13 +238,20 @@ class ForecastMcpService:
             gate_error = f"{type(exc).__name__}: {exc}"
             readiness_errors.append(f"gate: {gate_error}")
 
-        gpu_snapshot: dict[str, int] | None = None
+        gpu_snapshot: dict[str, object] | None = None
         gpu_error: str | None = None
         try:
             snapshot = NvidiaSmiProbe(self.config.gpu).snapshot()
+            gpu_free_mib = getattr(
+                snapshot,
+                "memory_free_mib",
+                snapshot.memory_total_mib - snapshot.memory_used_mib,
+            )
             gpu_snapshot = {
                 "index": snapshot.index,
+                "uuid": getattr(snapshot, "uuid", None),
                 "memory_used_mib": snapshot.memory_used_mib,
+                "memory_free_mib": gpu_free_mib,
                 "memory_total_mib": snapshot.memory_total_mib,
             }
         except Exception as exc:  # live status must report rather than mutate
@@ -233,6 +270,7 @@ class ForecastMcpService:
                 "repo_id": MOIRAI2_REPO_ID,
                 "revision": MOIRAI2_REVISION,
             },
+            "residency": self.config.residency.model_dump(mode="json"),
             "readiness_errors": readiness_errors,
             "snapshot": snapshot_evidence,
             "qwen_running": qwen_running,
@@ -289,6 +327,7 @@ class ForecastMcpService:
             require_qwen_initially_running=True,
             restore_qwen_if_initially_running=True,
             monitor_qwen_during_forecast=True,
+            residency=self.config.residency,
         )
         supervisor_result = self._supervisor_factory(supervisor_config).run()
         _write_json(run_dir / "supervisor_result.json", supervisor_result)
@@ -301,19 +340,10 @@ class ForecastMcpService:
             except json.JSONDecodeError as exc:
                 provider_error = f"invalid provider response JSON: {exc}"
 
-        if supervisor_result.get("status") != "PASS":
-            raise RuntimeError(
-                "GPU Exclusive Supervisor failed closed: "
-                f"{supervisor_result.get('failure')}; provider_error={provider_error}"
-            )
-        if not supervisor_result.get("qwen_initially_running"):
-            raise RuntimeError("formal MCP forecast requires the selected Qwen runtime to be live")
-        if not supervisor_result.get("qwen_stopped"):
-            raise RuntimeError("selected Qwen runtime was not unloaded for the GPU handoff")
-        if not supervisor_result.get("qwen_restored"):
-            raise RuntimeError("selected Qwen runtime was not restored")
-        if not supervisor_result.get("gate_reopened"):
-            raise RuntimeError("request gate was not reopened")
+        try:
+            selected_mode = self._validate_supervisor_result(supervisor_result)
+        except RuntimeError as exc:
+            raise RuntimeError(f"{exc}; provider_error={provider_error}") from exc
         if provider_payload is None:
             raise RuntimeError(provider_error or "provider response file is missing")
 
@@ -331,6 +361,18 @@ class ForecastMcpService:
             "point_method": provider_response.point_method,
         }
         prediction_sha256 = _sha256_bytes(_canonical_json_bytes(prediction_payload))
+        gpu_residency = supervisor_result.get("gpu_residency")
+        if not isinstance(gpu_residency, dict):
+            gpu_residency = {
+                "requested_mode": "handoff",
+                "selected_mode": "handoff",
+                "decision_reason": "legacy_supervisor_compatibility",
+                "llm_continuity_verified": False,
+                "qwen_stopped": supervisor_result.get("qwen_stopped"),
+                "qwen_restored": supervisor_result.get("qwen_restored"),
+                "fallback_triggered": False,
+            }
+
         result = {
             "status": "PASS",
             "run_id": run_id,
@@ -351,7 +393,10 @@ class ForecastMcpService:
             "prediction_sha256": prediction_sha256,
             "runtime_evidence": runtime_evidence.model_dump(mode="json"),
             "gpu_evidence": gpu_evidence.model_dump(mode="json"),
+            "gpu_residency": gpu_residency,
+            "timings_ms": supervisor_result.get("timings_ms", {}),
             "supervisor": {
+                "selected_mode": selected_mode,
                 "qwen_initially_running": supervisor_result.get("qwen_initially_running"),
                 "qwen_stopped": supervisor_result.get("qwen_stopped"),
                 "qwen_restored": supervisor_result.get("qwen_restored"),
@@ -362,8 +407,8 @@ class ForecastMcpService:
             "prospective_access": False,
             "actual_access": False,
             "evidence_boundary": (
-                "provider-reported PID/VRAM is retained here; formal external GPU UUID/PID "
-                "correlation remains a target-machine acceptance gate"
+                "Source mode selection is verified here. Formal target-machine COEXIST "
+                "certification still requires exact-head external GPU UUID/PID/VRAM evidence."
             ),
         }
         result_path = run_dir / "FORECAST_MCP_RESULT.json"
