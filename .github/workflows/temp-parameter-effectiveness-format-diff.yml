@@ -1,0 +1,37 @@
+name: temporary parameter effectiveness format diff
+
+on:
+  pull_request:
+    paths:
+      - "src/loto/parameter_effectiveness/adapters.py"
+      - "src/loto/parameter_effectiveness/core.py"
+      - ".github/workflows/temp-parameter-effectiveness-format-diff.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  format-diff:
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 10
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Install exact uv without cache
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: "0.11.21"
+          enable-cache: false
+
+      - name: Print exact Ruff format diff
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          uvx --from ruff==0.16.4 ruff --version
+          uvx --from ruff==0.16.4 ruff format --diff \
+            src/loto/parameter_effectiveness/adapters.py \
+            src/loto/parameter_effectiveness/core.py
