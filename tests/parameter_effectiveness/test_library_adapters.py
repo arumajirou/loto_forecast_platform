@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from loto.parameter_effectiveness.adapters import default_registry
 from loto.parameter_effectiveness.contracts import (
     EffectOutcome,
@@ -12,6 +14,8 @@ from loto.parameter_effectiveness.core import evaluate_probe
 
 
 def test_mlforecast_num_samples_changes_real_trial_count() -> None:
+    pytest.importorskip("mlforecast")
+
     probe = ParameterProbeSpec(
         probe_id="mlforecast-num-samples",
         library="mlforecast",
@@ -46,6 +50,8 @@ def test_mlforecast_num_samples_changes_real_trial_count() -> None:
 
 
 def test_statsforecast_season_length_changes_real_predictions() -> None:
+    pytest.importorskip("statsforecast")
+
     probe = ParameterProbeSpec(
         probe_id="statsforecast-season-length",
         library="statsforecast",
