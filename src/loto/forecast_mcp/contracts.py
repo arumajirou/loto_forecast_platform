@@ -118,7 +118,10 @@ class Moirai2RouteConfig(BaseModel):
         if not root.is_absolute():
             raise ValueError("operator_runtime_root must be an absolute path")
 
-        payload["operator_runtime_root"] = root
+        # Keep the pre-validator output JSON-compatible. Pydantic 2.13 rejects a
+        # Path injected by a before-validator while model_validate_json() is still
+        # in JSON mode. The field validator will convert this string back to Path.
+        payload["operator_runtime_root"] = str(root)
         return payload
 
     @property
