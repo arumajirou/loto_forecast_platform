@@ -115,6 +115,10 @@ deploy/systemd/loto-forecast-mcp.service.example
 ```
 
 The example is inert; source installation does not enable or restart a target-machine service.
+The default `/tmp/loto-gpu-exclusive.lock` is shared with every GPU Exclusive
+Supervisor contender, so the example explicitly uses `PrivateTmp=false`. Do not
+enable a private `/tmp` namespace unless every contender is configured to use the
+same alternate shared lock directory.
 
 ## OpenCode
 

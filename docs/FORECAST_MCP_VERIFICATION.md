@@ -12,6 +12,9 @@ claims. Passing source checks or GitHub CI does not certify the target GPU route
   portability workflow remains supplied by `main`.
 - Runtime lane: the frozen isolated `environments/forecast-mcp` project. It is not
   added to the repository-root lock and it remains separate from Memory MCP.
+- GPU handoff: Forecast MCP atomically requires the selected Qwen before the
+  provider can start, and the example service leaves the shared GPU lock visible
+  to every supervisor contender.
 - Forecast route: loopback-only `http://127.0.0.1:18778/mcp`, exactly the bounded
   development-only Numbers3/Moirai-2 CUDA request documented in `FORECAST_MCP.md`.
 - Holdout: `CLOSED`; Prospective: `CLOSED`; Actual access: `FALSE`.
@@ -41,7 +44,8 @@ change the certified #389 runtime lock, provider, supervisor, or Moirai model id
 
 ## Target-machine E2E boundary
 
-Only fresh external evidence bound to the final PR #390 source head may set
+Only fresh external evidence bound to the final source head, including any
+corrective follow-up to PR #390, may set
 `END_TO_END_FORECAST_KPI=PASS`. It must show one forecast flowing from OpenCode
 through the selected local Qwen and this Forecast MCP endpoint, through the GPU
 Exclusive Supervisor, to `Salesforce/moirai-2.0-R-small` at revision

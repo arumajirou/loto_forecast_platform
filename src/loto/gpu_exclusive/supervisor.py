@@ -148,6 +148,8 @@ class ExclusiveGpuSupervisor:
             self._write_state()
             qwen_initially_running = self.runtime.running()
             self._record("preflight", qwen_initially_running=qwen_initially_running)
+            if self.config.require_qwen_initially_running and not qwen_initially_running:
+                raise ExclusiveGpuError("selected Qwen runtime must be live before the GPU handoff")
 
             if self.gate is not None:
                 self._transition(SupervisorState.DRAINING)

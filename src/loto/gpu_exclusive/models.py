@@ -77,5 +77,6 @@ class SupervisorConfig(BaseModel):
     gate: ExternalGateConfig | None = None
     output_dir: Path
     lock_path: Path = Path("/tmp/loto-gpu-exclusive.lock")
+    require_qwen_initially_running: bool = False
     restore_qwen_if_initially_running: bool = True
     monitor_qwen_during_forecast: bool = True

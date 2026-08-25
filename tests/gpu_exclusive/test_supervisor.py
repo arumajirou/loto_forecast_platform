@@ -122,6 +122,30 @@ def test_forecast_failure_still_restores_qwen(tmp_path: Path) -> None:
     assert runtime.is_running is True
 
 
+def test_required_qwen_absence_fails_before_gate_or_forecast(tmp_path: Path) -> None:
+    class GpuMustNotBeUsed:
+        def wait_free(self) -> FakeGpu.Snapshot:
+            raise AssertionError("GPU probe must not run without the required Qwen")
+
+    config = _config(tmp_path, ["python", "-c", "raise SystemExit(7)"])
+    config.require_qwen_initially_running = True
+    supervisor = ExclusiveGpuSupervisor(config)
+    runtime = FakeRuntime(running=False)
+    gate = FakeGate()
+    supervisor.runtime = runtime  # type: ignore[assignment]
+    supervisor.gpu = GpuMustNotBeUsed()  # type: ignore[assignment]
+    supervisor.gate = gate  # type: ignore[assignment]
+
+    result = supervisor.run()
+
+    assert result["status"] == "FAILED"
+    assert "must be live before the GPU handoff" in str(result["failure"])
+    assert result["forecast_exit_code"] is None
+    assert result["qwen_stopped"] is False
+    assert gate.closed is False
+    assert gate.opened is False
+
+
 def test_reappearing_qwen_is_fail_closed_and_restored(tmp_path: Path) -> None:
     config = _config(tmp_path, ["python", "-c", "import time; time.sleep(5)"])
     supervisor = ExclusiveGpuSupervisor(config)

@@ -14,3 +14,14 @@ def test_server_uses_mcp_v2_streamable_http_contract() -> None:
     assert 'transport="streamable-http"' in source
     assert "stateless_http=True" in source
     assert "json_response=True" in source
+
+
+def test_systemd_example_keeps_the_shared_gpu_lock_visible() -> None:
+    unit = (
+        Path(__file__).parents[2] / "deploy" / "systemd" / "loto-forecast-mcp.service.example"
+    ).read_text(encoding="utf-8")
+
+    assert "PrivateTmp=false" in unit
+    assert "PrivateTmp=true" not in unit
+    assert "ReadWritePaths=" in unit
+    assert " /tmp" in unit
