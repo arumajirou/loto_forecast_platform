@@ -1,8 +1,8 @@
 """Strict contracts for the Forecast MCP bridge.
 
 The LLM-facing request deliberately contains no command, shell, path, history,
-actual, Holdout, or Prospective fields. Operator-controlled paths live only in
-the server configuration.
+actual, Holdout, Prospective, or residency-mode fields. Operator-controlled paths
+and GPU residency policy live only in server configuration.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from loto.gpu_exclusive.models import (
     ExternalGateConfig,
     GpuProbeConfig,
+    GpuResidencyPolicy,
     HttpRuntimeConfig,
 )
 
@@ -24,7 +25,7 @@ MOIRAI2_MODEL_ID = "moirai2-0-r-small"
 
 
 class ForecastToolRequest(BaseModel):
-    """Only the single formally allowed TAJ-69 route is exposed to the LLM."""
+    """Only the single formally allowed route is exposed to the LLM."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -80,4 +81,5 @@ class ForecastMcpConfig(BaseModel):
     qwen: HttpRuntimeConfig
     gpu: GpuProbeConfig
     gate: ExternalGateConfig
+    residency: GpuResidencyPolicy = Field(default_factory=GpuResidencyPolicy)
     lock_path: Path = Path("/tmp/loto-gpu-exclusive.lock")
