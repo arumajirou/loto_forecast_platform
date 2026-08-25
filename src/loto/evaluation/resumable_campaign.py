@@ -58,12 +58,8 @@ class UnifiedCampaignResumeConfig(BaseModel):
         for game, digest in value.items():
             if not game:
                 raise ValueError("input_sha256 game keys must be non-empty")
-            if len(digest) != 64 or any(
-                ch not in "0123456789abcdef" for ch in digest
-            ):
-                raise ValueError(
-                    f"input_sha256[{game}] must be a lowercase SHA-256 digest"
-                )
+            if len(digest) != 64 or any(ch not in "0123456789abcdef" for ch in digest):
+                raise ValueError(f"input_sha256[{game}] must be a lowercase SHA-256 digest")
         return value
 
 
@@ -174,9 +170,7 @@ def _bind_resume_contract(
     except ValueError:
         pass
     else:
-        raise ValueError(
-            "checkpoint_dir must be outside the formal campaign output directory"
-        )
+        raise ValueError("checkpoint_dir must be outside the formal campaign output directory")
 
     contract_path = checkpoint_dir / "contract.json"
     payload = _contract_payload(config, resume=resume, plan=plan)
@@ -201,8 +195,7 @@ def _bind_resume_contract(
 
     if output.exists():
         raise FileExistsError(
-            "formal output exists without a matching resume contract; refusing reuse: "
-            f"{output}"
+            f"formal output exists without a matching resume contract; refusing reuse: {output}"
         )
     if checkpoint_dir.exists() and any(checkpoint_dir.iterdir()):
         raise RuntimeError(
@@ -223,9 +216,7 @@ def _ensure_protocol_artifact(path: Path, protocol: Any) -> None:
     expected = canonical_json_bytes(artifact) + b"\n"
     if path.exists():
         if path.read_bytes() != expected:
-            raise RuntimeError(
-                f"existing protocol artifact mismatches current contract: {path}"
-            )
+            raise RuntimeError(f"existing protocol artifact mismatches current contract: {path}")
         return
     write_protocol_artifact(path, protocol)
 
@@ -267,12 +258,7 @@ def _prediction_lock_dir(
     game: str,
     candidate_id: str,
 ) -> Path:
-    return (
-        config.output_dir
-        / "prediction_locks"
-        / game
-        / encode_path_component(candidate_id)
-    )
+    return config.output_dir / "prediction_locks" / game / encode_path_component(candidate_id)
 
 
 def _discard_incomplete_unit_locks(
@@ -289,9 +275,7 @@ def _discard_incomplete_unit_locks(
     try:
         resolved.relative_to(root)
     except ValueError as exc:
-        raise RuntimeError(
-            f"refusing unsafe Prediction Lock cleanup path: {resolved}"
-        ) from exc
+        raise RuntimeError(f"refusing unsafe Prediction Lock cleanup path: {resolved}") from exc
     shutil.rmtree(resolved)
 
 
@@ -313,8 +297,7 @@ def _verify_prediction_locks(
                 f"{game}/{candidate_id}/seed={seed}"
             )
         expected_path = (
-            _prediction_lock_dir(config, game=game, candidate_id=candidate_id)
-            / f"seed-{seed}.json"
+            _prediction_lock_dir(config, game=game, candidate_id=candidate_id) / f"seed-{seed}.json"
         ).resolve()
         stored_path = Path(str(lock.get("path", ""))).resolve()
         if stored_path != expected_path:
@@ -339,12 +322,8 @@ def _verify_prediction_locks(
         if payload.get("protocol_hash") != protocol_hash:
             raise RuntimeError(f"Prediction Lock protocol mismatch: {stored_path}")
         if payload.get("actuals_known") is not False:
-            raise RuntimeError(
-                f"Prediction Lock actuals_known contract violated: {stored_path}"
-            )
-        if lock.get("sealed_at_utc") and payload.get("sealed_at_utc") != lock.get(
-            "sealed_at_utc"
-        ):
+            raise RuntimeError(f"Prediction Lock actuals_known contract violated: {stored_path}")
+        if lock.get("sealed_at_utc") and payload.get("sealed_at_utc") != lock.get("sealed_at_utc"):
             raise RuntimeError(f"Prediction Lock timestamp mismatch: {stored_path}")
 
 
@@ -454,9 +433,7 @@ def _finalize_campaign(
     probabilistic_ids: set[str],
     expected_pairs: int,
 ) -> dict[str, Any]:
-    catalog_results = [
-        row for row in results if row["source"] in {"catalog", "probabilistic"}
-    ]
+    catalog_results = [row for row in results if row["source"] in {"catalog", "probabilistic"}]
     if len(catalog_results) != expected_pairs:
         raise AssertionError("result matrix lost one or more model/game combinations")
     pair_keys = {(row["game"], row["candidate_id"]) for row in catalog_results}
@@ -472,9 +449,7 @@ def _finalize_campaign(
     summary = {
         "schema_version": CAMPAIGN_SCHEMA_VERSION,
         "status": (
-            "SUCCEEDED"
-            if status_counts.get("SUCCEEDED", 0) == expected_pairs
-            else "PARTIAL"
+            "SUCCEEDED" if status_counts.get("SUCCEEDED", 0) == expected_pairs else "PARTIAL"
         ),
         "created_at_utc": datetime.now(UTC).isoformat(),
         "git_commit": config.git_commit,
@@ -500,9 +475,7 @@ def _finalize_campaign(
         "macro_summary": macro,
     }
     output = config.output_dir
-    (output / "campaign_summary.json").write_bytes(
-        canonical_json_bytes(summary) + b"\n"
-    )
+    (output / "campaign_summary.json").write_bytes(canonical_json_bytes(summary) + b"\n")
 
     flat_rows: list[dict[str, Any]] = []
     for row in results:
@@ -522,24 +495,17 @@ def _finalize_campaign(
             flat[f"{metric_id}_variance"] = (
                 summary_item["population_variance"] if summary_item else None
             )
-            flat[f"{metric_id}_worst"] = (
-                summary_item["worst_value"] if summary_item else None
-            )
-            flat[f"{metric_id}_worst_seed"] = (
-                summary_item["worst_seed"] if summary_item else None
-            )
+            flat[f"{metric_id}_worst"] = summary_item["worst_value"] if summary_item else None
+            flat[f"{metric_id}_worst_seed"] = summary_item["worst_seed"] if summary_item else None
         flat_rows.append(flat)
     pd.DataFrame(flat_rows).to_csv(output / "model_game_results.csv", index=False)
     pd.DataFrame(macro).to_csv(output / "all_game_macro_summary.csv", index=False)
 
     artifact_paths = sorted(
-        path
-        for path in output.rglob("*")
-        if path.is_file() and path.name != "SHA256SUMS"
+        path for path in output.rglob("*") if path.is_file() and path.name != "SHA256SUMS"
     )
     checksum_lines = [
-        f"{hashlib.sha256(path.read_bytes()).hexdigest()}  "
-        f"{path.relative_to(output).as_posix()}"
+        f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(output).as_posix()}"
         for path in artifact_paths
     ]
     (output / "SHA256SUMS").write_text(
