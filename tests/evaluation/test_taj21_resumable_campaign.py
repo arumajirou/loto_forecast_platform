@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
@@ -39,7 +40,11 @@ def _config(tmp_path, name: str, **overrides: Any) -> UnifiedCampaignConfig:
     return UnifiedCampaignConfig(**values)
 
 
-def _resume(tmp_path, name: str, digest: str = "1" * 64) -> resumable.UnifiedCampaignResumeConfig:
+def _resume(
+    tmp_path,
+    name: str,
+    digest: str = "1" * 64,
+) -> resumable.UnifiedCampaignResumeConfig:
     return resumable.UnifiedCampaignResumeConfig(
         checkpoint_dir=tmp_path / f"{name}.checkpoints",
         input_sha256={"numbers3": digest},
@@ -106,7 +111,6 @@ def _result(
         "mse": 2.0,
         "rmse": 2.0**0.5,
     }
-    lock = _write_lock(config, candidate_id=candidate_id)
     return {
         "game": "numbers3",
         "candidate_id": candidate_id,
@@ -121,7 +125,7 @@ def _result(
             {
                 "seed": 42,
                 "metrics": metric_values,
-                "prediction_lock": lock,
+                "prediction_lock": _write_lock(config, candidate_id=candidate_id),
                 "runtime_samples": [],
             }
         ],
@@ -139,7 +143,11 @@ def _install_fake_campaign(monkeypatch, state: dict[str, Any]) -> None:
         protocol=_FakeProtocol(),
     )
     monkeypatch.setattr(resumable, "_selected_entries", lambda config: [entry])
-    monkeypatch.setattr(resumable, "_selected_probabilistic_routes", lambda config: [])
+    monkeypatch.setattr(
+        resumable,
+        "_selected_probabilistic_routes",
+        lambda config: [],
+    )
     monkeypatch.setattr(
         resumable,
         "build_campaign_plan",
@@ -152,14 +160,17 @@ def _install_fake_campaign(monkeypatch, state: dict[str, Any]) -> None:
             }
         ],
     )
-    monkeypatch.setattr(resumable, "_prepare_game", lambda game, frame, config: prepared)
+    monkeypatch.setattr(
+        resumable,
+        "_prepare_game",
+        lambda game, frame, config: prepared,
+    )
 
     def fake_evaluate(prepared, config, **kwargs):
         state["calls"] = state.get("calls", 0) + 1
         candidate_id = kwargs["candidate_id"]
         state.setdefault("executed", []).append(candidate_id)
-        interrupt_on = state.get("interrupt_on")
-        if interrupt_on is not None and state["calls"] == interrupt_on:
+        if state.get("interrupt_on") == state["calls"]:
             if state.get("write_partial_lock"):
                 partial_lock = _write_lock(config, candidate_id=candidate_id)
                 state["partial_lock"] = partial_lock["path"]
@@ -186,21 +197,20 @@ def _install_fake_campaign(monkeypatch, state: dict[str, Any]) -> None:
 
 
 def _scientific_signature(summary: dict[str, Any]) -> dict[str, Any]:
-    rows = []
-    for row in summary["results"]:
-        rows.append(
-            {
-                "game": row["game"],
-                "candidate_id": row["candidate_id"],
-                "source": row["source"],
-                "library": row["library"],
-                "task": row["task"],
-                "status": row["status"],
-                "reason": row["reason"],
-                "protocol_hash": row["protocol_hash"],
-                "seed_summary": row["seed_summary"],
-            }
-        )
+    rows = [
+        {
+            "game": row["game"],
+            "candidate_id": row["candidate_id"],
+            "source": row["source"],
+            "library": row["library"],
+            "task": row["task"],
+            "status": row["status"],
+            "reason": row["reason"],
+            "protocol_hash": row["protocol_hash"],
+            "seed_summary": row["seed_summary"],
+        }
+        for row in summary["results"]
+    ]
     return {
         "schema_version": summary["schema_version"],
         "status": summary["status"],
@@ -221,54 +231,51 @@ def _scientific_signature(summary: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def test_interrupted_unit_is_rerun_and_fresh_resume_results_match(tmp_path, monkeypatch) -> None:
-    interrupted_state: dict[str, Any] = {"interrupt_on": 4, "write_partial_lock": True}
-    _install_fake_campaign(monkeypatch, interrupted_state)
-    resumed_config = _config(tmp_path, "resumed")
-    resumed_checkpoint = _resume(tmp_path, "resumed")
+def test_interrupted_unit_reruns_and_matches_fresh(tmp_path, monkeypatch) -> None:
+    state: dict[str, Any] = {"interrupt_on": 4, "write_partial_lock": True}
+    _install_fake_campaign(monkeypatch, state)
+    config = _config(tmp_path, "resumed")
+    resume = _resume(tmp_path, "resumed")
     frames = {"numbers3": pd.DataFrame()}
 
     with pytest.raises(InterruptedError, match="simulated interruption"):
-        resumable.run_resumable_unified_campaign(
-            frames,
-            resumed_config,
-            resume=resumed_checkpoint,
-        )
+        resumable.run_resumable_unified_campaign(frames, config, resume=resume)
 
-    assert len(list((resumed_checkpoint.checkpoint_dir / "units").rglob("*.json"))) == 3
-    assert Path(interrupted_state["partial_lock"]).exists()
+    unit_dir = resume.checkpoint_dir / "units"
+    assert len(list(unit_dir.rglob("*.json"))) == 3
+    assert Path(state["partial_lock"]).exists()
 
-    resume_state: dict[str, Any] = {
-        "expect_clean_candidate": interrupted_state["partial_candidate"],
+    resumed_state: dict[str, Any] = {
+        "expect_clean_candidate": state["partial_candidate"],
     }
-    _install_fake_campaign(monkeypatch, resume_state)
+    _install_fake_campaign(monkeypatch, resumed_state)
     resumed_summary = resumable.run_resumable_unified_campaign(
         frames,
-        resumed_config,
-        resume=resumed_checkpoint,
+        config,
+        resume=resume,
     )
-    assert resume_state["calls"] == 5
-    assert resume_state["clean_rerun_observed"] is True
-    assert len(list((resumed_checkpoint.checkpoint_dir / "units").rglob("*.json"))) == 8
+    assert resumed_state["calls"] == 5
+    assert resumed_state["clean_rerun_observed"] is True
+    assert len(list(unit_dir.rglob("*.json"))) == 8
 
     fresh_state: dict[str, Any] = {}
     _install_fake_campaign(monkeypatch, fresh_state)
     fresh_config = _config(tmp_path, "fresh")
-    fresh_checkpoint = _resume(tmp_path, "fresh")
+    fresh_resume = _resume(tmp_path, "fresh")
     fresh_summary = resumable.run_resumable_unified_campaign(
         frames,
         fresh_config,
-        resume=fresh_checkpoint,
+        resume=fresh_resume,
     )
     assert fresh_state["calls"] == 8
-
     assert _scientific_signature(resumed_summary) == _scientific_signature(fresh_summary)
-    assert (resumed_config.output_dir / "model_game_results.csv").read_bytes() == (
-        fresh_config.output_dir / "model_game_results.csv"
-    ).read_bytes()
-    assert (resumed_config.output_dir / "all_game_macro_summary.csv").read_bytes() == (
-        fresh_config.output_dir / "all_game_macro_summary.csv"
-    ).read_bytes()
+
+    resumed_csv = (config.output_dir / "model_game_results.csv").read_bytes()
+    fresh_csv = (fresh_config.output_dir / "model_game_results.csv").read_bytes()
+    assert resumed_csv == fresh_csv
+    resumed_macro = (config.output_dir / "all_game_macro_summary.csv").read_bytes()
+    fresh_macro = (fresh_config.output_dir / "all_game_macro_summary.csv").read_bytes()
+    assert resumed_macro == fresh_macro
 
 
 def test_corrupt_unit_checkpoint_fails_closed(tmp_path, monkeypatch) -> None:
@@ -318,7 +325,11 @@ def test_input_sha_mismatch_fails_closed(tmp_path, monkeypatch) -> None:
         {"feature_windows": (5, 10, 20)},
     ],
 )
-def test_result_affecting_config_mismatch_fails_closed(tmp_path, monkeypatch, override) -> None:
+def test_result_config_mismatch_fails_closed(
+    tmp_path,
+    monkeypatch,
+    override,
+) -> None:
     state: dict[str, Any] = {"interrupt_on": 2}
     _install_fake_campaign(monkeypatch, state)
     config = _config(tmp_path, "config-mismatch")
@@ -364,7 +375,7 @@ def test_model_universe_mismatch_fails_closed(tmp_path, monkeypatch) -> None:
         resumable.run_resumable_unified_campaign(frames, config, resume=resume)
 
 
-def test_checkpointed_prediction_lock_tamper_fails_closed(tmp_path, monkeypatch) -> None:
+def test_checkpointed_lock_tamper_fails_closed(tmp_path, monkeypatch) -> None:
     state: dict[str, Any] = {"interrupt_on": 2}
     _install_fake_campaign(monkeypatch, state)
     config = _config(tmp_path, "lock-tamper")
@@ -375,8 +386,8 @@ def test_checkpointed_prediction_lock_tamper_fails_closed(tmp_path, monkeypatch)
         resumable.run_resumable_unified_campaign(frames, config, resume=resume)
     checkpoint = next((resume.checkpoint_dir / "units").rglob("*.json"))
     payload = json.loads(checkpoint.read_text(encoding="utf-8"))
-    lock_path = Path(payload["result"]["seed_results"][0]["prediction_lock"]["path"])
-    lock_path.write_text("tampered\n", encoding="utf-8")
+    lock_value = payload["result"]["seed_results"][0]["prediction_lock"]["path"]
+    Path(lock_value).write_text("tampered\n", encoding="utf-8")
 
     state.clear()
     _install_fake_campaign(monkeypatch, state)
