@@ -127,7 +127,9 @@ def _python_matches_requires(version: tuple[int, int, int], specifier: str) -> b
         raise RuntimeCertificationError("runtime lane requires-python is empty")
     operators = (">=", "<=", "==", ">", "<")
     for clause in clauses:
-        operator = next((candidate for candidate in operators if clause.startswith(candidate)), None)
+        operator = next(
+            (candidate for candidate in operators if clause.startswith(candidate)), None
+        )
         if operator is None:
             raise RuntimeCertificationError(
                 f"unsupported requires-python clause for fail-closed validation: {clause!r}"
