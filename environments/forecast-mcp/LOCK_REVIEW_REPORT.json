@@ -1,0 +1,33 @@
+{
+  "schema_version": "forecast-mcp-lock-review-v1",
+  "status": "PASS",
+  "review_scope": "AUTOMATED_POLICY_AND_INTEGRITY_ONLY",
+  "formal_human_reviewed": false,
+  "runtime_lane": "forecast-mcp",
+  "reviewed_at": "2026-08-25T05:22:37+00:00",
+  "requires_python": ">=3.11,<3.13",
+  "pyproject_sha256": "f3cb36cc6e7798417f2264e3d1fbd985f880ac45a3a3e264362a976c9d423a3b",
+  "lock_sha256": "d07f106619ec420f6c6f24fd547a461af2e2eb707aa9d8f9c29d9d849536a8a2",
+  "direct_dependencies": {
+    "mcp": "2.0.0",
+    "pydantic": "2.13.4"
+  },
+  "locked_runtime_dependencies": {
+    "mcp": "2.0.0",
+    "mcp-types": "2.0.0",
+    "pydantic": "2.13.4",
+    "uvicorn": "0.52.4"
+  },
+  "mcp_artifacts": {
+    "wheel_sha256": "1cb4c75d2d2c7b8c1d756355e5d82a39f2822cc7f13e22a2051d7ca3592349d6",
+    "sdist_sha256": "0f440e735c13ece8bb19bc62cf0b86f4313448432fbb77d35e14034f4e050728"
+  },
+  "commands_verified": [
+    "uv lock --check --project environments/forecast-mcp",
+    "uv sync --frozen --project environments/forecast-mcp"
+  ],
+  "violations": [],
+  "warnings": [
+    "This report does not assert a human dependency, legal, security, or target-host approval."
+  ]
+}

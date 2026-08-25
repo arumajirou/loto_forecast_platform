@@ -1,0 +1,45 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 18778,
+    "artifact_root": "/mnt/e/env/ts/loto_gpu_runs/forecast-mcp"
+  },
+  "route": {
+    "repo_root": "/mnt/e/env/ts/loto_forecast_platform",
+    "provider_python": "/mnt/e/env/ts/loto_forecast_platform/environments/moirai2-cuda13-experimental/.venv/bin/python",
+    "provider_script": "/mnt/e/env/ts/loto_forecast_platform/scripts/run_moirai2_provider.py",
+    "approved_request": "/mnt/e/env/ts/loto_forecast_platform/.runtime/forecast-mcp/numbers3-development-request.json",
+    "request_manifest": "/mnt/e/env/ts/loto_forecast_platform/.runtime/forecast-mcp/numbers3-development-request.manifest.json",
+    "runtime_lane": "cuda13-experimental",
+    "timeout_seconds": 900.0
+  },
+  "qwen": {
+    "running_url": "http://127.0.0.1:18081/running",
+    "running_contains": "<MODEL_ALIAS>",
+    "start_url": "http://127.0.0.1:18081/upstream/<MODEL_ALIAS>/v1/models",
+    "stop_url": "http://127.0.0.1:18081/api/models/unload/<MODEL_ALIAS>",
+    "start_method": "GET",
+    "stop_method": "POST",
+    "timeout_seconds": 10.0,
+    "poll_interval_seconds": 1.0,
+    "transition_timeout_seconds": 90.0
+  },
+  "gpu": {
+    "index": 0,
+    "max_memory_used_mib_when_free": 1024,
+    "poll_interval_seconds": 1.0,
+    "free_timeout_seconds": 90.0,
+    "stable_samples": 3
+  },
+  "gate": {
+    "status_url": "http://127.0.0.1:18083/control/status",
+    "quiesce_url": "http://127.0.0.1:18083/control/quiesce",
+    "close_url": "http://127.0.0.1:18083/control/close",
+    "open_url": "http://127.0.0.1:18083/control/open",
+    "in_flight_field": "in_flight",
+    "timeout_seconds": 10.0,
+    "poll_interval_seconds": 0.5,
+    "drain_timeout_seconds": 60.0
+  },
+  "lock_path": "/tmp/loto-gpu-exclusive.lock"
+}

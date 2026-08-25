@@ -92,6 +92,11 @@ class ExternalGate:
             raise AdapterError("gate status JSON is not an object")
         return payload
 
+    def status(self) -> dict[str, object]:
+        """Return the live gate state without changing admission control."""
+
+        return self._status()
+
     def drain_and_close(self) -> None:
         self._post(self.config.quiesce_url)
         deadline = time.monotonic() + self.config.drain_timeout_seconds
