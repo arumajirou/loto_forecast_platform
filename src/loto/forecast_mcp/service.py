@@ -286,6 +286,7 @@ class ForecastMcpService:
             ),
             output_dir=run_dir / "supervisor",
             lock_path=self.config.lock_path,
+            require_qwen_initially_running=True,
             restore_qwen_if_initially_running=True,
             monitor_qwen_during_forecast=True,
         )

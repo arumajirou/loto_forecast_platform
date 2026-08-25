@@ -216,6 +216,7 @@ def test_forecast_runs_only_fixed_approved_route_and_seals_evidence(
     assert "--runtime-lane" in command
     assert "holdout" not in " ".join(command).lower()
     assert "prospective" not in " ".join(command).lower()
+    assert captured[0].require_qwen_initially_running is True
 
     run_dir = tmp_path / "artifacts" / result["run_id"]
     assert (run_dir / "FORECAST_MCP_RESULT.json").is_file()

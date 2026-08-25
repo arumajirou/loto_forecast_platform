@@ -10,7 +10,8 @@ Restart=on-failure
 RestartSec=3
 Environment=PYTHONUNBUFFERED=1
 NoNewPrivileges=true
-PrivateTmp=true
+# The default /tmp GPU lock must remain visible to every GPU-exclusive contender.
+PrivateTmp=false
 ProtectHome=read-only
 ProtectSystem=strict
 ReadWritePaths=/mnt/e/env/ts/loto_gpu_runs /mnt/e/env/ts/loto_forecast_platform/.runtime /tmp
