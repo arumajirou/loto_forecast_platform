@@ -88,14 +88,19 @@ jobs:
           '''
           source = source.replace(marker, helper + marker, 1)
 
-          hash_marker = '"code_hash": _resolved_code_hash(config),'
-          if source.count(hash_marker) != 1:
+          contract_marker = (
+              '        "schema_version": RESUME_CONTRACT_SCHEMA_VERSION,\n'
+              '        "git_commit": config.git_commit,\n'
+              '        "code_hash": _resolved_code_hash(config),\n'
+          )
+          if source.count(contract_marker) != 1:
               raise SystemExit(
-                  f"code_hash contract marker count={source.count(hash_marker)}"
+                  f"resume contract context count={source.count(contract_marker)}"
               )
           source = source.replace(
-              hash_marker,
-              hash_marker + '\n        "runtime_device": _runtime_device_contract(config),',
+              contract_marker,
+              contract_marker
+              + '        "runtime_device": _runtime_device_contract(config),\n',
               1,
           )
           source_path.write_text(source, encoding="utf-8")
