@@ -208,10 +208,7 @@ class ForecastMcpService:
         approved = self._load_approved_request()
 
         run_id = (
-            "forecast-mcp-"
-            + datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
-            + "-"
-            + uuid4().hex[:12]
+            "forecast-mcp-" + datetime.now(UTC).strftime("%Y%m%dT%H%M%S") + "-" + uuid4().hex[:12]
         )
         run_dir = self.config.server.artifact_root / run_id
         if run_dir.exists():
