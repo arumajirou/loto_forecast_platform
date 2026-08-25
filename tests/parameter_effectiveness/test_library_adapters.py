@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 import pytest
 
 from loto.parameter_effectiveness.adapters import default_registry
@@ -7,10 +9,22 @@ from loto.parameter_effectiveness.contracts import (
     EffectOutcome,
     EffectSurface,
     ExpectedRelation,
+    ParameterProbeResult,
     ParameterProbeSpec,
     ParameterScope,
 )
 from loto.parameter_effectiveness.core import evaluate_probe
+
+_REQUIRE_REAL_ADAPTERS = os.getenv("LOTO_REQUIRE_REAL_PARAMETER_ADAPTERS") == "1"
+
+
+def _require_supported_or_skip(result: ParameterProbeResult) -> None:
+    if result.outcome is not EffectOutcome.UNSUPPORTED:
+        return
+    message = f"real parameter adapter unavailable: {result.support_reason or result.library}"
+    if _REQUIRE_REAL_ADAPTERS:
+        pytest.fail(message)
+    pytest.skip(message)
 
 
 def test_mlforecast_num_samples_changes_real_trial_count() -> None:
@@ -39,6 +53,7 @@ def test_mlforecast_num_samples_changes_real_trial_count() -> None:
     )
 
     result = evaluate_probe(probe, default_registry())
+    _require_supported_or_skip(result)
 
     assert result.outcome is EffectOutcome.EFFECTIVE
     assert result.pairs_eligible == 2
@@ -69,6 +84,7 @@ def test_statsforecast_season_length_changes_real_predictions() -> None:
     )
 
     result = evaluate_probe(probe, default_registry())
+    _require_supported_or_skip(result)
 
     assert result.outcome is EffectOutcome.EFFECTIVE
     assert result.pairs_eligible == 2
