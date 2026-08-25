@@ -155,6 +155,56 @@ jobs:
 
       - name: Verify tracked files stayed clean
         if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git diff --exit-code
-          git diff --cached --exit-code
+          $ErrorActionPreference = "Stop"
+          if ([string]::IsNullOrWhiteSpace($env:GH_TOKEN)) {
+            throw "GitHub token is required to verify the REST archive checkout"
+          }
+
+          $headers = @{
+            Authorization = "Bearer $env:GH_TOKEN"
+            Accept = "application/vnd.github+json"
+            "X-GitHub-Api-Version" = "2022-11-28"
+          }
+          $commitUri = "$($env:GITHUB_API_URL)/repos/$($env:GITHUB_REPOSITORY)/git/commits/$($env:GITHUB_SHA)"
+          $commit = Invoke-RestMethod -Headers $headers -Uri $commitUri
+          $treeUri = "$($env:GITHUB_API_URL)/repos/$($env:GITHUB_REPOSITORY)/git/trees/$($commit.tree.sha)?recursive=1"
+          $tree = Invoke-RestMethod -Headers $headers -Uri $treeUri
+          if ($tree.truncated) {
+            throw "GitHub tree response is truncated; refusing incomplete tracked-file verification"
+          }
+
+          $workspace = [IO.Path]::GetFullPath($env:GITHUB_WORKSPACE)
+          $workspacePrefix = $workspace + [IO.Path]::DirectorySeparatorChar
+          $sha1 = [Security.Cryptography.SHA1]::Create()
+          $checked = 0
+          foreach ($entry in @($tree.tree | Where-Object { $_.type -eq "blob" })) {
+            $relative = [string]$entry.path
+            if ([IO.Path]::IsPathRooted($relative) -or $relative -match "(^|/)\.\.(/|$)") {
+              throw "unsafe tracked path from GitHub tree: $relative"
+            }
+            $localPath = [IO.Path]::GetFullPath((Join-Path $workspace $relative))
+            if (-not $localPath.StartsWith($workspacePrefix, [StringComparison]::OrdinalIgnoreCase)) {
+              throw "tracked path escapes workspace: $relative"
+            }
+            if (-not [IO.File]::Exists($localPath)) {
+              throw "tracked file missing from checkout: $relative"
+            }
+
+            $content = [IO.File]::ReadAllBytes($localPath)
+            $header = [Text.Encoding]::UTF8.GetBytes("blob $($content.Length)`0")
+            $blob = [byte[]]::new($header.Length + $content.Length)
+            [Array]::Copy($header, 0, $blob, 0, $header.Length)
+            [Array]::Copy($content, 0, $blob, $header.Length, $content.Length)
+            $actual = -join ($sha1.ComputeHash($blob) | ForEach-Object { $_.ToString("x2") })
+            if ($actual -ne [string]$entry.sha) {
+              throw "tracked file changed: $relative"
+            }
+            $checked++
+          }
+          if ($checked -eq 0) {
+            throw "GitHub tree contains no checked tracked files"
+          }
+          Write-Host "tracked_file_tree_integrity=PASS count=$checked"
