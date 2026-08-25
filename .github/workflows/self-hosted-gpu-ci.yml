@@ -167,7 +167,7 @@ jobs:
 
       - name: Upload execution evidence
         if: ${{ always() }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: self-hosted-gpu-ci-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/self-hosted/
