@@ -25,8 +25,9 @@ else
   exit 20
 fi
 
-RUN_ID="$(date +%Y%m%d-%H%M%S)"
+RUN_ID="${TAJ21_RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
 OUT="${TAJ21_FULL_ROOT:-$ROOT/runs/taj21-full-oof/taj21-full-$RUN_ID}"
+CHECKPOINT_DIR="${TAJ21_CHECKPOINT_DIR:-${OUT}.checkpoints}"
 GIT_COMMIT="$(git -C "$ROOT" rev-parse HEAD)"
 
 cd "$ROOT"
@@ -35,11 +36,14 @@ echo "TAJ21_FULL_RUN_ID=$RUN_ID"
 echo "TAJ21_FULL_GIT_COMMIT=$GIT_COMMIT"
 echo "TAJ21_FULL_INPUT_DIR=$TAJ21_DATA_DIR"
 echo "TAJ21_FULL_OUTPUT=$OUT"
+echo "TAJ21_FULL_CHECKPOINT_DIR=$CHECKPOINT_DIR"
+echo "TAJ21_RESUME_HINT=rerun with the same TAJ21_RUN_ID or TAJ21_FULL_ROOT/TAJ21_CHECKPOINT_DIR"
 
 PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}" \
   "${PY_CMD[@]}" tools/evaluation/taj21_full_campaign.py \
   --input-dir "$TAJ21_DATA_DIR" \
   --output "$OUT" \
+  --checkpoint-dir "$CHECKPOINT_DIR" \
   --git-commit "$GIT_COMMIT" \
   --device "${TAJ21_DEVICE:-auto}" \
   --precision "${TAJ21_PRECISION:-32}" \
@@ -60,3 +64,4 @@ echo "HOLDOUT=CLOSED"
 echo "PROSPECTIVE=CLOSED"
 echo "PROMOTION=CLOSED"
 echo "TAJ21_FULL_ROOT=$OUT"
+echo "TAJ21_FULL_CHECKPOINT_DIR=$CHECKPOINT_DIR"
