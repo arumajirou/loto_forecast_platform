@@ -88,11 +88,16 @@ jobs:
           '''
           source = source.replace(marker, helper + marker, 1)
 
-          old_hash = '        "code_hash": _resolved_code_hash(config),\n'
-          new_hash = old_hash + '        "runtime_device": _runtime_device_contract(config),\n'
-          if source.count(old_hash) != 1:
-              raise SystemExit("code_hash contract marker not found exactly once")
-          source = source.replace(old_hash, new_hash, 1)
+          hash_marker = '"code_hash": _resolved_code_hash(config),'
+          if source.count(hash_marker) != 1:
+              raise SystemExit(
+                  f"code_hash contract marker count={source.count(hash_marker)}"
+              )
+          source = source.replace(
+              hash_marker,
+              hash_marker + '\n        "runtime_device": _runtime_device_contract(config),',
+              1,
+          )
           source_path.write_text(source, encoding="utf-8")
 
           test_path = Path("tests/evaluation/test_taj21_resumable_campaign.py")
