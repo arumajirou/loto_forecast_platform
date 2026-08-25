@@ -33,7 +33,9 @@ uv run --frozen --extra dev pytest -q tests/forecast_mcp \
 git diff --check
 ```
 
-The exact final PR #390 head still requires one successful full repository CI run.
+The exact final PR #390 head `98f9f9d065a28ab5e56fdea5e3d80eb592c8e2ed`
+completed its required full repository CI successfully (GitHub Actions run
+`32816051360`); its Windows portability run (`32816051377`) also succeeded.
 The six-case P8 CUDA campaign is intentionally not rerun here: this replay does not
 change the certified #389 runtime lock, provider, supervisor, or Moirai model identity.
 
