@@ -81,16 +81,10 @@ def main() -> int:
     peaks = [int(item["external_peak_vram_mib"]) for item in evidence]
     run_ids = [str(item["run_id"]) for item in evidence]
     process_names = sorted(
-        {
-            str(name)
-            for item in evidence
-            for name in item["llm"].get("baseline_process_names", [])
-        }
+        {str(name) for item in evidence for name in item["llm"].get("baseline_process_names", [])}
     )
     code_hashes = {
-        item.get("code_sha256")
-        for item in evidence
-        if isinstance(item.get("code_sha256"), str)
+        item.get("code_sha256") for item in evidence if isinstance(item.get("code_sha256"), str)
     }
     if len(code_hashes) > 1:
         raise RuntimeError("characterization evidence has inconsistent code SHA-256 values")
@@ -125,9 +119,7 @@ def main() -> int:
     registry: dict[str, Any]
     if args.registry.is_file():
         registry = _load(args.registry)
-        if registry.get("schema_version") != 1 or not isinstance(
-            registry.get("profiles"), list
-        ):
+        if registry.get("schema_version") != 1 or not isinstance(registry.get("profiles"), list):
             raise RuntimeError("existing registry is not schema_version=1")
     else:
         registry = {"schema_version": 1, "profiles": []}

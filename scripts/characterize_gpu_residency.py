@@ -115,9 +115,12 @@ def main() -> int:
     baseline = _gpu_snapshot(args.gpu_index)
     baseline_processes = _gpu_processes(baseline["uuid"])
     baseline_pids = sorted(int(row["pid"]) for row in baseline_processes)
-    run_id = "gpu-residency-characterize-" + datetime.now(UTC).strftime(
-        "%Y%m%dT%H%M%SZ"
-    ) + "-" + uuid4().hex[:8]
+    run_id = (
+        "gpu-residency-characterize-"
+        + datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+        + "-"
+        + uuid4().hex[:8]
+    )
 
     started_at_utc = datetime.now(UTC).isoformat()
     started = time.monotonic()

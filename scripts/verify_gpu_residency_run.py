@@ -61,9 +61,7 @@ def main() -> int:
     else:
         selected = residency.get("selected_mode")
         if args.expected_mode and selected != args.expected_mode:
-            errors.append(
-                f"selected_mode={selected!r}, expected={args.expected_mode!r}"
-            )
+            errors.append(f"selected_mode={selected!r}, expected={args.expected_mode!r}")
         if selected == "coexist":
             if residency.get("qwen_stopped") is not False:
                 errors.append("COEXIST qwen_stopped must be false")

@@ -255,9 +255,7 @@ class AdaptiveGpuSupervisor(ExclusiveGpuSupervisor):
                 self._transition(SupervisorState.FORECAST_RUNNING)
                 forecast_started = time.monotonic()
                 forecast_exit_code = self._run_forecast()
-                timings["forecast_inference_ms"] = (
-                    time.monotonic() - forecast_started
-                ) * 1000.0
+                timings["forecast_inference_ms"] = (time.monotonic() - forecast_started) * 1000.0
                 if forecast_exit_code != 0:
                     raise AdaptiveGpuError(
                         f"forecast command failed with exit code {forecast_exit_code}"
@@ -288,9 +286,7 @@ class AdaptiveGpuSupervisor(ExclusiveGpuSupervisor):
                     llm_pids=llm_pids_before,
                     gpu_uuid=baseline.uuid,
                 )
-                timings["forecast_inference_ms"] = (
-                    time.monotonic() - forecast_started
-                ) * 1000.0
+                timings["forecast_inference_ms"] = (time.monotonic() - forecast_started) * 1000.0
                 if forecast_exit_code != 0:
                     raise AdaptiveGpuError(
                         f"forecast command failed with exit code {forecast_exit_code}"

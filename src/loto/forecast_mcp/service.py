@@ -185,9 +185,7 @@ class ForecastMcpService:
     @staticmethod
     def _validate_supervisor_result(supervisor_result: dict[str, Any]) -> str:
         if supervisor_result.get("status") != "PASS":
-            raise RuntimeError(
-                "GPU supervisor failed closed: " f"{supervisor_result.get('failure')}"
-            )
+            raise RuntimeError(f"GPU supervisor failed closed: {supervisor_result.get('failure')}")
         if not supervisor_result.get("qwen_initially_running"):
             raise RuntimeError("formal MCP forecast requires the selected Qwen runtime to be live")
 
@@ -435,9 +433,7 @@ class ForecastMcpService:
             for candidate in run_dir.rglob("*")
             if candidate.is_file() and candidate.name != "SHA256SUMS"
         ):
-            checksum_rows.append(
-                f"{_sha256_file(path)}  {path.relative_to(run_dir).as_posix()}"
-            )
+            checksum_rows.append(f"{_sha256_file(path)}  {path.relative_to(run_dir).as_posix()}")
         (run_dir / "SHA256SUMS").write_text(
             "\n".join(checksum_rows) + "\n",
             encoding="utf-8",
