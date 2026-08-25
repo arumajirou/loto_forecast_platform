@@ -263,9 +263,7 @@ def evaluate_probe(
                 treatment_values.append(treatment_value)
             else:
                 matched = None
-                comparison = (
-                    "pair not eligible because acceptance/success/finite validation failed"
-                )
+                comparison = "pair not eligible because acceptance/success/finite validation failed"
 
             paired.append(
                 PairedProbeObservation(
