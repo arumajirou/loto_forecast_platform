@@ -5,9 +5,10 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Protocol
+from typing import Any, Protocol
 from uuid import uuid4
 
 from pydantic import ValidationError
@@ -22,11 +23,11 @@ from loto.gpu_exclusive.models import ForecastJobConfig, SupervisorConfig
 from loto.gpu_exclusive.supervisor import ExclusiveGpuSupervisor
 
 from .contracts import (
+    MOIRAI2_REPO_ID,
+    MOIRAI2_REVISION,
     DevelopmentRequestManifest,
     ForecastMcpConfig,
     ForecastToolRequest,
-    MOIRAI2_REPO_ID,
-    MOIRAI2_REVISION,
 )
 
 
