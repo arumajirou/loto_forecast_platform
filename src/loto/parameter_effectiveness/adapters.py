@@ -346,9 +346,7 @@ class StatsForecastParameterAdapter:
             forecast = engine.forecast(df=frame, h=h)
 
             candidate_columns = [
-                column
-                for column in forecast.columns
-                if column not in {"unique_id", "ds"}
+                column for column in forecast.columns if column not in {"unique_id", "ds"}
             ]
             if len(candidate_columns) != 1:
                 raise RuntimeError(f"expected one forecast column, got {candidate_columns}")
