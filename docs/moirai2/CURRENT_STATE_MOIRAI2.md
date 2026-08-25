@@ -9,3 +9,7 @@ shared catalogs, the root dependency graph, or other foundation-model providers.
 Verified in this change: schema validation, dynamic game geometry, draw/calendar time adapters,
 token-budget checks, native quantile validation, license fail-closed policy, post-processing, and
 legacy schema-v1 conversion. Real `uni2ts` model loading and GPU execution are not claimed.
+
+Update: real `uni2ts` model loading and CUDA GPU execution have since been certified on the
+`cuda13-experimental` lane under a later change; see `docs/moirai2/P8_VERIFICATION_REPORT.md`.
+Accuracy certification and production-champion eligibility remain unclaimed.

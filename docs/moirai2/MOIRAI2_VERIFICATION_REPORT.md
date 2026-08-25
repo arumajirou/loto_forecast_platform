@@ -35,3 +35,12 @@ token budgets, package hashes, model hashes, and snapshot mismatch rejection.
 
 No unexecuted item is represented as success. Research-only license policy keeps production
 champion eligibility and automatic promotion disabled.
+
+## Update
+
+Real Uni2TS import, snapshot load, all-nine-quantile inference, separate-process reload, and CUDA
+PID/GPU UUID/VRAM evidence have since been executed and certified on the `cuda13-experimental`
+lane under a later change. See `docs/moirai2/P8_VERIFICATION_REPORT.md` and
+`docs/moirai2/MOIRAI2_RUNTIME_CERTIFICATION.csv` for the current runtime-certification status.
+Accuracy, OOF, Holdout, Prospective, and production-champion eligibility remain unexecuted and are
+out of scope for that change.

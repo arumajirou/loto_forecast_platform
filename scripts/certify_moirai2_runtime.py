@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import time
+import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +29,11 @@ from loto.moirai2_campaign.runtime_certification import (  # noqa: E402
     sha256_file,
     sha256_payload,
     write_sha256_manifest,
+)
+from loto.moirai2_campaign.runtime_preflight import (  # noqa: E402
+    RuntimePreflightError,
+    run_frozen_probe,
+    validate_lane_files,
 )
 
 RUNNER = ROOT / "scripts" / "run_moirai2_provider.py"
@@ -94,11 +100,140 @@ def _records(snapshot: dict[str, Any]) -> tuple[list[GpuMemoryRecord], list[Comp
     return memory, processes
 
 
+def _parse_python_version(raw: str) -> tuple[int, int, int]:
+    token = raw.strip().split(maxsplit=1)[0]
+    parts = token.split(".")
+    if len(parts) < 2 or len(parts) > 3 or any(not part.isdigit() for part in parts):
+        raise RuntimeCertificationError(f"invalid Python version from frozen probe: {raw!r}")
+    values = [int(part) for part in parts]
+    while len(values) < 3:
+        values.append(0)
+    return values[0], values[1], values[2]
+
+
+def _parse_version_literal(raw: str) -> tuple[int, int, int]:
+    parts = raw.strip().split(".")
+    if not 1 <= len(parts) <= 3 or any(not part.isdigit() for part in parts):
+        raise RuntimeCertificationError(f"unsupported requires-python version: {raw!r}")
+    values = [int(part) for part in parts]
+    while len(values) < 3:
+        values.append(0)
+    return values[0], values[1], values[2]
+
+
+def _python_matches_requires(version: tuple[int, int, int], specifier: str) -> bool:
+    clauses = [clause.strip() for clause in specifier.split(",") if clause.strip()]
+    if not clauses:
+        raise RuntimeCertificationError("runtime lane requires-python is empty")
+    operators = (">=", "<=", "==", ">", "<")
+    for clause in clauses:
+        operator = next(
+            (candidate for candidate in operators if clause.startswith(candidate)), None
+        )
+        if operator is None:
+            raise RuntimeCertificationError(
+                f"unsupported requires-python clause for fail-closed validation: {clause!r}"
+            )
+        expected = _parse_version_literal(clause[len(operator) :])
+        comparisons = {
+            ">=": version >= expected,
+            "<=": version <= expected,
+            "==": version == expected,
+            ">": version > expected,
+            "<": version < expected,
+        }
+        if not comparisons[operator]:
+            return False
+    return True
+
+
+def _prepare_lane_interpreter(
+    *,
+    request: Moirai2ProviderRequest,
+    runtime_lane: str,
+    timeout_seconds: int,
+) -> tuple[Path, dict[str, Any]]:
+    """Bind direct provider execution to the exact frozen/reviewed lane.
+
+    The certifier needs the provider PID itself, so the provider is launched through
+    the lane interpreter rather than a nested ``uv run`` process.  The direct
+    interpreter is trusted only after the same frozen lane checks used by the formal
+    campaign prove that the lock, snapshot, imports, Python version, and requested
+    device all match the selected lane.
+    """
+
+    environment_path = RUNTIME_LANES[runtime_lane]
+    if request.snapshot_path is None:
+        raise RuntimeCertificationError("runtime preflight requires snapshot_path")
+    snapshot_path = Path(request.snapshot_path)
+    try:
+        lane_files = validate_lane_files(
+            environment_path,
+            snapshot_path,
+            runtime_lane=runtime_lane,
+        )
+        probe = run_frozen_probe(
+            environment_path=environment_path,
+            requested_device=request.device,
+            timeout_seconds=min(timeout_seconds, 300),
+        )
+    except RuntimePreflightError as exc:
+        raise RuntimeCertificationError(f"frozen runtime lane preflight failed: {exc}") from exc
+
+    pyproject_payload = tomllib.loads(
+        (environment_path / "pyproject.toml").read_text(encoding="utf-8")
+    )
+    project = pyproject_payload.get("project")
+    requires_python = project.get("requires-python") if isinstance(project, dict) else None
+    if not isinstance(requires_python, str) or not requires_python.strip():
+        raise RuntimeCertificationError("runtime lane requires-python is missing")
+    python_version_raw = probe.get("python_version")
+    if not isinstance(python_version_raw, str):
+        raise RuntimeCertificationError("frozen probe did not report python_version")
+    python_version = _parse_python_version(python_version_raw)
+    if not _python_matches_requires(python_version, requires_python):
+        raise RuntimeCertificationError(
+            "frozen probe Python does not satisfy runtime lane requires-python: "
+            f"version={python_version_raw!r}, requires={requires_python!r}"
+        )
+
+    lane_python = environment_path / ".venv" / "bin" / "python"
+    if not lane_python.is_file():
+        raise RuntimeCertificationError(
+            f"frozen runtime probe passed but lane interpreter is missing: {lane_python}"
+        )
+    probe_executable_raw = probe.get("python_executable")
+    if not isinstance(probe_executable_raw, str) or not probe_executable_raw:
+        raise RuntimeCertificationError("frozen probe did not report python_executable")
+    probe_executable = Path(probe_executable_raw)
+    expected_parent = lane_python.absolute().parent
+    actual_parent = probe_executable.absolute().parent
+    if actual_parent != expected_parent or probe_executable.resolve() != lane_python.resolve():
+        raise RuntimeCertificationError(
+            "frozen probe interpreter does not match selected lane interpreter: "
+            f"probe={probe_executable}, expected={lane_python}"
+        )
+
+    evidence = {
+        "runtime_lane": runtime_lane,
+        "environment_path": str(environment_path.resolve()),
+        "lane_python": str(lane_python.absolute()),
+        "requires_python": requires_python,
+        "python_version": python_version_raw,
+        "python_executable": probe_executable_raw,
+        "requested_device": request.device,
+        "lane_files": lane_files,
+        "frozen_probe": probe,
+    }
+    return lane_python, evidence
+
+
 def _run_once(
     *,
     label: str,
     request: Moirai2ProviderRequest,
     runtime_lane: str,
+    lane_python: Path,
     output_dir: Path,
     timeout_seconds: int,
     monitor_interval_seconds: float,
@@ -111,13 +246,10 @@ def _run_once(
     stderr_path = run_dir / "stderr.log"
     request_path.write_text(request.model_dump_json(indent=2) + "\n", encoding="utf-8")
 
-    environment_path = RUNTIME_LANES[runtime_lane]
+    # The interpreter was already bound to the frozen lane by
+    # _prepare_lane_interpreter().  Never fall back to an arbitrary existing venv.
     command = [
-        "uv",
-        "run",
-        "--project",
-        str(environment_path),
-        "python",
+        str(lane_python),
         str(RUNNER),
         "--request",
         str(request_path),
@@ -256,10 +388,18 @@ def certify(
     request_payload = request.model_dump(mode="json")
     _write_json(output_dir / "certification_request.json", request_payload)
 
+    lane_python, runtime_preflight = _prepare_lane_interpreter(
+        request=request,
+        runtime_lane=runtime_lane,
+        timeout_seconds=timeout_seconds,
+    )
+    _write_json(output_dir / "runtime_preflight.json", runtime_preflight)
+
     first = _run_once(
         label="run-a",
         request=request,
         runtime_lane=runtime_lane,
+        lane_python=lane_python,
         output_dir=output_dir,
         timeout_seconds=timeout_seconds,
         monitor_interval_seconds=monitor_interval_seconds,
@@ -268,6 +408,7 @@ def certify(
         label="run-b",
         request=request,
         runtime_lane=runtime_lane,
+        lane_python=lane_python,
         output_dir=output_dir,
         timeout_seconds=timeout_seconds,
         monitor_interval_seconds=monitor_interval_seconds,
@@ -280,6 +421,8 @@ def certify(
         "runtime_lane": runtime_lane,
         "requested_device": request.device,
         "request_sha256": sha256_payload(request_payload),
+        "runtime_preflight_sha256": sha256_file(output_dir / "runtime_preflight.json"),
+        "lane_python": str(lane_python.absolute()),
         "separate_process_reload": True,
         "save_load_status": "BASE_SNAPSHOT_RELOADED",
         "prediction_comparison": comparison.as_dict(),

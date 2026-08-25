@@ -198,6 +198,7 @@ class ExclusiveGpuSupervisor:
                     restore_error = f"{type(exc).__name__}: {exc}"
                     failure = f"{failure}; restore={restore_error}" if failure else restore_error
                     self.state = SupervisorState.FAILED
+                    self._write_state()
                     self._record("qwen_restore_failed", error=restore_error)
 
             if self.gate is not None and gate_closed and (not restore_required or qwen_restored):
@@ -209,6 +210,7 @@ class ExclusiveGpuSupervisor:
                     gate_error = f"{type(exc).__name__}: {exc}"
                     failure = f"{failure}; gate_open={gate_error}" if failure else gate_error
                     self.state = SupervisorState.FAILED
+                    self._write_state()
                     self._record("gate_reopen_failed", error=gate_error)
 
             success = failure is None and forecast_exit_code == 0

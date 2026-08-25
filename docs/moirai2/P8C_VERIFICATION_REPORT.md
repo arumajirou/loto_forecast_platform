@@ -1,6 +1,16 @@
 # P8C Verification Report
 
-Status: `PARTIALLY_VERIFIED / EVIDENCE_GATE_LOCAL_PASS / REAL_CAMPAIGNS_PENDING`.
+Status: `PARTIALLY_VERIFIED / EVIDENCE_GATE_LOCAL_PASS_AND_TARGET_HOST_CUDA13_PASS / SUPPORTED_CPU_CAMPAIGN_PENDING`.
+
+## Executed on target host (cuda13-experimental)
+
+- real reviewed lock resolution and approval: `PASS` (`LOCK_REVIEW_REPORT.json` +
+  `LOCK_REVIEW_APPROVAL.json`, lock SHA-256 cross-verified in campaign preflight);
+- real CUDA13 campaign, all 6 formal cases: `6/6 PASS`;
+- real Uni2TS import, snapshot load, quantile inference, and GPU observation: `PASS`.
+
+Evidence: `RUN_ID=moirai2-p8-campaign-20260824T144850Z`. The real supported CPU campaign has not
+been executed; P9 remains closed until that campaign also passes.
 
 ## Executed locally
 
@@ -21,13 +31,11 @@ Status: `PARTIALLY_VERIFIED / EVIDENCE_GATE_LOCAL_PASS / REAL_CAMPAIGNS_PENDING`
 
 ## Not executed or certified
 
-- real reviewed lock resolution or approval;
 - real supported CPU campaign;
-- real CUDA13 campaign;
-- real 24-process evidence set;
-- real Uni2TS import, snapshot load, quantile inference, or GPU observation;
-- Ruff, mypy, full repository pytest, or successful GitHub Actions steps;
+- full repository pytest or successful GitHub Actions CI steps (only focused-scope Ruff, mypy,
+  and pytest have been run to date);
 - OOF, Holdout, Prospective, Hit@±1, MAE, MSE, RMSE, calibration, or baselines.
 
 Synthetic campaign fixtures and mocked subprocess boundaries are not represented as real runtime
-certification. P9 remains closed until the independent verifier passes real CPU and CUDA campaigns.
+certification independent of the target-host evidence cited above. P9 remains closed until the
+independent verifier also passes a real CPU campaign.

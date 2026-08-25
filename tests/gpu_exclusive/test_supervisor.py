@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
+from loto.gpu_exclusive import adapters as adapters_module
+from loto.gpu_exclusive.adapters import HttpRuntime
 from loto.gpu_exclusive.models import (
     ForecastJobConfig,
     GpuProbeConfig,
@@ -135,3 +139,101 @@ def test_reappearing_qwen_is_fail_closed_and_restored(tmp_path: Path) -> None:
 def test_empty_forecast_command_is_rejected(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="forecast command must not be empty"):
         ForecastJobConfig(command=[], cwd=tmp_path)
+
+
+def test_http_runtime_defaults_remain_post() -> None:
+    config = HttpRuntimeConfig(
+        running_url="http://127.0.0.1/running",
+        running_contains="qwen",
+        start_url="http://127.0.0.1/start",
+        stop_url="http://127.0.0.1/stop",
+    )
+
+    assert config.start_method == "POST"
+    assert config.stop_method == "POST"
+
+
+def test_http_runtime_uses_configured_start_and_stop_methods(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, str]] = []
+
+    def fake_request(
+        url: str,
+        *,
+        method: str,
+        timeout: float,
+    ) -> tuple[int, str]:
+        del timeout
+        calls.append((url, method))
+        return 200, "{}"
+
+    monkeypatch.setattr(adapters_module, "_request", fake_request)
+
+    config = HttpRuntimeConfig(
+        running_url="http://127.0.0.1/running",
+        running_contains="qwen",
+        start_url="http://127.0.0.1/upstream/qwen/",
+        stop_url="http://127.0.0.1/api/models/unload/qwen",
+        start_method="GET",
+        stop_method="POST",
+    )
+
+    runtime = HttpRuntime(config)
+    runtime.start()
+    runtime.stop()
+
+    assert calls == [
+        ("http://127.0.0.1/upstream/qwen/", "GET"),
+        ("http://127.0.0.1/api/models/unload/qwen", "POST"),
+    ]
+
+
+def test_http_runtime_rejects_unsupported_method() -> None:
+    with pytest.raises(ValidationError):
+        HttpRuntimeConfig(
+            running_url="http://127.0.0.1/running",
+            running_contains="qwen",
+            start_url="http://127.0.0.1/start",
+            stop_url="http://127.0.0.1/stop",
+            start_method="PUT",  # type: ignore[arg-type]
+        )
+
+
+class FailingStartRuntime(FakeRuntime):
+    def start(self) -> None:
+        raise RuntimeError("synthetic restore failure")
+
+
+def test_restore_failure_persists_failed_state_and_keeps_gate_closed(
+    tmp_path: Path,
+) -> None:
+    config = _config(
+        tmp_path,
+        ["python", "-c", "print('forecast ok')"],
+    )
+    supervisor = ExclusiveGpuSupervisor(config)
+
+    runtime = FailingStartRuntime(running=True)
+    gate = FakeGate()
+
+    supervisor.runtime = runtime  # type: ignore[assignment]
+    supervisor.gpu = FakeGpu()  # type: ignore[assignment]
+    supervisor.gate = gate  # type: ignore[assignment]
+
+    result = supervisor.run()
+
+    assert result["status"] == "FAILED"
+    assert result["qwen_stopped"] is True
+    assert result["qwen_restored"] is False
+
+    assert gate.closed is True
+    assert gate.opened is False
+
+    state = json.loads(
+        (config.output_dir / "state.json").read_text(
+            encoding="utf-8",
+        )
+    )
+
+    assert state["state"] == "FAILED"

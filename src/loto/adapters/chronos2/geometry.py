@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 import pandas as pd
@@ -148,7 +148,13 @@ def _validate_history(request: Chronos2RequestV2) -> None:
 
 def compile_chronos_input(request: Chronos2RequestV2) -> CompiledChronosInput:
     _validate_history(request)
-    base = datetime(2000, 1, 1, tzinfo=UTC)
+    # Chronos 2.3.1 normalizes timestamps through
+    # ``to_numpy().view("int64")``. Pandas timezone-aware datetime
+    # columns may materialize as object/reference arrays, which are
+    # not safe for that operation. These timestamps are synthetic,
+    # regular model coordinates rather than source draw timestamps,
+    # so keep them timezone-naive and NumPy datetime64-compatible.
+    base = datetime(2000, 1, 1)
     timestamps = [base + timedelta(days=index) for index in range(len(request.history))]
     past_covariates = request.past_covariates or tuple({} for _ in request.history)
 

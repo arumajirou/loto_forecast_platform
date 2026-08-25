@@ -92,3 +92,26 @@ def test_bingo5_position_range_is_enforced() -> None:
     request = Chronos2RequestV2.model_validate(payload)
     with pytest.raises(ValueError, match=r"outside \[1, 5\]"):
         compile_chronos_input(request)
+
+
+def test_compiled_timestamps_are_numpy_int64_view_safe() -> None:
+    request = Chronos2RequestV2.model_validate(
+        make_payload(
+            "loto7",
+            layout="position_multivariate",
+        )
+    )
+
+    compiled = compile_chronos_input(request)
+
+    timestamps = compiled.context_df["timestamp"]
+
+    assert timestamps.dt.tz is None
+
+    array = timestamps.to_numpy()
+
+    assert array.dtype.kind == "M"
+
+    viewed = array.view("int64")
+
+    assert viewed.shape == array.shape
