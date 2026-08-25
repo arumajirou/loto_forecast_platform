@@ -12,9 +12,11 @@ Environment=PYTHONUNBUFFERED=1
 NoNewPrivileges=true
 # The default /tmp GPU lock must remain visible to every GPU-exclusive contender.
 PrivateTmp=false
+# The approved request/manifest pair is operator-owned under the user's data root.
 ProtectHome=read-only
 ProtectSystem=strict
-ReadWritePaths=/mnt/e/env/ts/loto_gpu_runs /mnt/e/env/ts/loto_forecast_platform/.runtime /tmp
+ReadOnlyPaths=/home/az/.local/share/loto-forecast-mcp/route
+ReadWritePaths=/mnt/e/env/ts/loto_gpu_runs /tmp
 
 [Install]
 WantedBy=default.target

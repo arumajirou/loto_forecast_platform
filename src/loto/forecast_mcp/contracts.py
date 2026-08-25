@@ -10,7 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from loto.gpu_exclusive.models import (
     ExternalGateConfig,
@@ -22,6 +22,8 @@ from loto.gpu_exclusive.models import (
 MOIRAI2_REPO_ID = "Salesforce/moirai-2.0-R-small"
 MOIRAI2_REVISION = "30f43ff08c8494f4943ae1521e9d4e94a0fbb389"
 MOIRAI2_MODEL_ID = "moirai2-0-r-small"
+APPROVED_REQUEST_NAME = "numbers3-development-request.json"
+REQUEST_MANIFEST_NAME = "numbers3-development-request.manifest.json"
 
 
 class ForecastToolRequest(BaseModel):
@@ -58,17 +60,78 @@ class ServerBinding(BaseModel):
 
 
 class Moirai2RouteConfig(BaseModel):
+    """Operator route with one source of truth for approved runtime artifacts.
+
+    New configuration supplies only ``operator_runtime_root``. For migration,
+    the legacy ``approved_request`` and ``request_manifest`` keys are accepted
+    only when they identify the exact canonical filenames in the same directory;
+    they are normalized into ``operator_runtime_root`` before validation.
+    """
+
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     repo_root: Path
     provider_python: Path
     provider_script: Path
-    approved_request: Path
-    request_manifest: Path
+    operator_runtime_root: Path
     runtime_lane: Literal["cuda13-experimental"] = "cuda13-experimental"
     timeout_seconds: float = Field(default=900.0, gt=0)
     expected_repo_id: Literal[MOIRAI2_REPO_ID] = MOIRAI2_REPO_ID
     expected_revision: Literal[MOIRAI2_REVISION] = MOIRAI2_REVISION
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_operator_artifact_paths(cls, value: object) -> object:
+        if not isinstance(value, dict):
+            return value
+
+        payload = dict(value)
+        root_value = payload.get("operator_runtime_root")
+        legacy_request = payload.pop("approved_request", None)
+        legacy_manifest = payload.pop("request_manifest", None)
+
+        if (legacy_request is None) != (legacy_manifest is None):
+            raise ValueError(
+                "legacy approved_request and request_manifest must be supplied together"
+            )
+
+        root = Path(root_value).expanduser() if root_value is not None else None
+
+        if legacy_request is not None and legacy_manifest is not None:
+            request_path = Path(legacy_request).expanduser()
+            manifest_path = Path(legacy_manifest).expanduser()
+            if request_path.name != APPROVED_REQUEST_NAME:
+                raise ValueError("legacy approved_request filename is not canonical")
+            if manifest_path.name != REQUEST_MANIFEST_NAME:
+                raise ValueError("legacy request_manifest filename is not canonical")
+            if request_path.parent != manifest_path.parent:
+                raise ValueError("operator approved request/manifest path drift detected")
+
+            legacy_root = request_path.parent
+            if root is None:
+                root = legacy_root
+            elif root != legacy_root:
+                raise ValueError("operator_runtime_root conflicts with legacy artifact paths")
+
+        if root is None:
+            raise ValueError("operator_runtime_root is required")
+        if not root.is_absolute():
+            raise ValueError("operator_runtime_root must be an absolute path")
+
+        payload["operator_runtime_root"] = root
+        return payload
+
+    @property
+    def approved_request(self) -> Path:
+        """Canonical operator-approved development request path."""
+
+        return self.operator_runtime_root / APPROVED_REQUEST_NAME
+
+    @property
+    def request_manifest(self) -> Path:
+        """Canonical SHA-binding manifest path for the approved request."""
+
+        return self.operator_runtime_root / REQUEST_MANIFEST_NAME
 
 
 class ForecastMcpConfig(BaseModel):

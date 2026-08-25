@@ -8,8 +8,7 @@
     "repo_root": "/mnt/e/env/ts/loto_forecast_platform",
     "provider_python": "/mnt/e/env/ts/loto_forecast_platform/environments/moirai2-cuda13-experimental/.venv/bin/python",
     "provider_script": "/mnt/e/env/ts/loto_forecast_platform/scripts/run_moirai2_provider.py",
-    "approved_request": "/mnt/e/env/ts/loto_forecast_platform/.runtime/forecast-mcp/numbers3-development-request.json",
-    "request_manifest": "/mnt/e/env/ts/loto_forecast_platform/.runtime/forecast-mcp/numbers3-development-request.manifest.json",
+    "operator_runtime_root": "/home/az/.local/share/loto-forecast-mcp/route",
     "runtime_lane": "cuda13-experimental",
     "timeout_seconds": 900.0
   },
