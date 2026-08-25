@@ -1,0 +1,19 @@
+[Unit]
+Description=Loto Forecast MCP (loopback only)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/mnt/e/env/ts/loto_forecast_platform
+ExecStart=/home/az/.local/share/loto-forecast-mcp/.venv/bin/python /mnt/e/env/ts/loto_forecast_platform/scripts/forecast_mcp_server.py --config /home/az/.config/loto/forecast-mcp.json
+Restart=on-failure
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=read-only
+ProtectSystem=strict
+ReadWritePaths=/mnt/e/env/ts/loto_gpu_runs /mnt/e/env/ts/loto_forecast_platform/.runtime /tmp
+
+[Install]
+WantedBy=default.target
