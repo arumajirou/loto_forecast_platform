@@ -393,3 +393,49 @@ def test_checkpointed_lock_tamper_fails_closed(tmp_path, monkeypatch) -> None:
     _install_fake_campaign(monkeypatch, state)
     with pytest.raises(RuntimeError, match="Prediction Lock SHA mismatch"):
         resumable.run_resumable_unified_campaign(frames, config, resume=resume)
+
+
+def test_resolved_runtime_device_mismatch_fails_closed(tmp_path, monkeypatch) -> None:
+    state: dict[str, Any] = {"interrupt_on": 2}
+    _install_fake_campaign(monkeypatch, state)
+    config = _config(tmp_path, "device-mismatch", device="auto")
+    resume = _resume(tmp_path, "device-mismatch")
+    frames = {"numbers3": pd.DataFrame()}
+
+    monkeypatch.setattr(
+        resumable,
+        "_runtime_device_contract",
+        lambda config: {
+            "requested_device": "auto",
+            "resolved_device": "cpu",
+            "torch_version": "test",
+            "cuda_available": False,
+        },
+    )
+    with pytest.raises(InterruptedError):
+        resumable.run_resumable_unified_campaign(frames, config, resume=resume)
+
+    state.clear()
+    _install_fake_campaign(monkeypatch, state)
+    monkeypatch.setattr(
+        resumable,
+        "_runtime_device_contract",
+        lambda config: {
+            "requested_device": "auto",
+            "resolved_device": "cuda",
+            "torch_version": "test",
+            "cuda_available": True,
+            "torch_cuda_runtime": "test",
+            "cuda_device_count": 1,
+            "cuda_devices": [
+                {
+                    "index": 0,
+                    "name": "test-gpu",
+                    "capability": [12, 0],
+                    "total_memory_bytes": 16 * 1024**3,
+                }
+            ],
+        },
+    )
+    with pytest.raises(RuntimeError, match="resume contract SHA mismatch"):
+        resumable.run_resumable_unified_campaign(frames, config, resume=resume)

@@ -40,7 +40,7 @@ from loto.evaluation.unified_campaign import (
     build_campaign_plan,
 )
 
-RESUME_CONTRACT_SCHEMA_VERSION = "taj21-resume-contract-v1"
+RESUME_CONTRACT_SCHEMA_VERSION = "taj21-resume-contract-v2"
 UNIT_CHECKPOINT_SCHEMA_VERSION = "taj21-model-game-checkpoint-v1"
 
 
@@ -120,6 +120,41 @@ def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> None:
         raise
 
 
+def _runtime_device_contract(config: UnifiedCampaignConfig) -> dict[str, Any]:
+    """Resolve and freeze the execution device that can affect scientific results."""
+
+    import torch
+
+    requested = str(config.device)
+    cuda_available = bool(torch.cuda.is_available())
+    if requested == "cuda" and not cuda_available:
+        raise RuntimeError("device=cuda requested but CUDA is unavailable")
+    resolved = "cuda" if requested == "cuda" or (requested == "auto" and cuda_available) else "cpu"
+    contract: dict[str, Any] = {
+        "requested_device": requested,
+        "resolved_device": resolved,
+        "torch_version": str(torch.__version__),
+    }
+    if requested == "auto":
+        contract["cuda_available"] = cuda_available
+    if resolved == "cuda":
+        count = int(torch.cuda.device_count())
+        if count < 1:
+            raise RuntimeError("resolved CUDA device has no visible CUDA devices")
+        contract["torch_cuda_runtime"] = str(torch.version.cuda)
+        contract["cuda_device_count"] = count
+        contract["cuda_devices"] = [
+            {
+                "index": index,
+                "name": str(torch.cuda.get_device_name(index)),
+                "capability": list(torch.cuda.get_device_capability(index)),
+                "total_memory_bytes": int(torch.cuda.get_device_properties(index).total_memory),
+            }
+            for index in range(count)
+        ]
+    return contract
+
+
 def _contract_payload(
     config: UnifiedCampaignConfig,
     *,
@@ -138,6 +173,7 @@ def _contract_payload(
         "schema_version": RESUME_CONTRACT_SCHEMA_VERSION,
         "git_commit": config.git_commit,
         "code_hash": _resolved_code_hash(config),
+        "runtime_device": _runtime_device_contract(config),
         "output_dir": str(config.output_dir.resolve()),
         "checkpoint_dir": str(resume.checkpoint_dir.resolve()),
         "input_sha256": {game: resume.input_sha256[game] for game in config.games},
