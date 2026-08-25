@@ -1,0 +1,31 @@
+name: taj69-ruff-diagnostic
+
+on:
+  push:
+    branches:
+      - feat/taj-69-forecast-mcp-bridge
+
+permissions:
+  contents: read
+
+jobs:
+  format-diff:
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: "0.11.21"
+          enable-cache: false
+      - name: Print exact Ruff format diff
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          uvx --from 'ruff==0.16.3' ruff format src/loto/forecast_mcp/service.py
+          echo '=== TAJ69_RUFF_FORMAT_DIFF_BEGIN ==='
+          git diff -- src/loto/forecast_mcp/service.py
+          echo '=== TAJ69_RUFF_FORMAT_DIFF_END ==='
