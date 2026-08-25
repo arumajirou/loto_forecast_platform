@@ -10,6 +10,10 @@ import pandas as pd
 
 from loto.data.lotteries import get_lottery_spec
 from loto.data.parser import parse_file
+from loto.evaluation.resumable_campaign import (
+    UnifiedCampaignResumeConfig,
+    run_resumable_unified_campaign,
+)
 from loto.evaluation.taj21_artifacts import (
     build_verification_report,
     regenerate_sha256sums,
@@ -23,7 +27,7 @@ from loto.evaluation.taj21_snapshot import (
     BASELINE_REFERENCE_SHA256SUMS,
     validate_snapshot_item,
 )
-from loto.evaluation.unified_campaign import UnifiedCampaignConfig, run_unified_campaign
+from loto.evaluation.unified_campaign import UnifiedCampaignConfig
 from loto.game.geometry import known_games
 
 APPROVED_SEEDS = (42, 1729, 20260730)
@@ -111,6 +115,7 @@ def run_full(
     *,
     input_dir: Path,
     output: Path,
+    checkpoint_dir: Path,
     git_commit: str,
     device: str,
     precision: str,
@@ -121,8 +126,6 @@ def run_full(
     gpu_count: int,
     gpu_memory_bytes: int,
 ) -> dict[str, Any]:
-    if output.exists():
-        raise FileExistsError(f"refusing to reuse full OOF output directory: {output}")
     frames, input_manifest, raw_before = _load_inputs(input_dir)
     config = UnifiedCampaignConfig(
         output_dir=output.resolve(),
@@ -144,7 +147,11 @@ def run_full(
         gpu_count=gpu_count,
         gpu_memory_bytes=gpu_memory_bytes,
     )
-    summary = run_unified_campaign(frames, config)
+    resume = UnifiedCampaignResumeConfig(
+        checkpoint_dir=checkpoint_dir.resolve(),
+        input_sha256=raw_before,
+    )
+    summary = run_resumable_unified_campaign(frames, config, resume=resume)
     summary = augment_fold_and_seed_evidence(frames, config, summary)
     comparisons = build_paired_comparisons(summary["results"], config.games)
     summary["scientific_evidence_schema_version"] = "taj21-full-oof-evidence-v1"
@@ -168,6 +175,7 @@ def run_full(
         "verification_report": report,
         "sha256sums_sha256": sums_sha,
         "output": str(config.output_dir),
+        "checkpoint_dir": str(resume.checkpoint_dir),
     }
 
 
@@ -175,6 +183,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--checkpoint-dir", type=Path, default=None)
     parser.add_argument("--git-commit", default=None)
     parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto")
     parser.add_argument("--precision", choices=["32", "16-mixed", "bf16-mixed"], default="32")
@@ -185,10 +194,12 @@ def main() -> int:
     parser.add_argument("--gpu-count", type=int, default=0)
     parser.add_argument("--gpu-memory-bytes", type=int, default=0)
     args = parser.parse_args()
+    checkpoint_dir = args.checkpoint_dir or Path(f"{args.output}.checkpoints")
     try:
         result = run_full(
             input_dir=args.input_dir,
             output=args.output,
+            checkpoint_dir=checkpoint_dir,
             git_commit=args.git_commit or _git_commit(),
             device=args.device,
             precision=args.precision,
@@ -202,6 +213,7 @@ def main() -> int:
     except Exception as exc:  # noqa: BLE001 - formal runner must fail visibly
         print("TAJ21_FULL_OOF=BLOCKED")
         print(f"REASON={type(exc).__name__}: {exc}")
+        print(f"CHECKPOINT_DIR={checkpoint_dir}")
         print("HOLDOUT=CLOSED")
         print("PROSPECTIVE=CLOSED")
         print("PROMOTION=CLOSED")
@@ -214,6 +226,7 @@ def main() -> int:
     print(f"MODEL_GAME_PAIRS={summary['observed_model_game_pairs']}/{summary['expected_model_game_pairs']}")
     print(f"CANDIDATE_SUCCEEDED={report['candidate_succeeded']}")
     print(f"SHA256SUMS_SHA256={result['sha256sums_sha256']}")
+    print(f"CHECKPOINT_DIR={result['checkpoint_dir']}")
     print("HOLDOUT=CLOSED")
     print("PROSPECTIVE=CLOSED")
     print("PROMOTION=CLOSED")
