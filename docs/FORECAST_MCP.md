@@ -75,12 +75,11 @@ Authoritative upstream:
 - https://pypi.org/project/mcp/2.0.0/
 
 The source tree intentionally does not add MCP to the repository root `uv.lock`. The server is
-an operator runtime and must use a separate reviewed environment. Until a dedicated frozen lock
-is committed and target-machine acceptance is complete, the runtime state is
-`PARTIALLY_VERIFIED`, not formally certified.
-
-For a source smoke only, an operator may create an isolated environment with exact top-level
-`mcp==2.0.0`. Do not treat that smoke as the formal lock review.
+an operator runtime and uses the isolated, frozen `environments/forecast-mcp` project. Its exact
+top-level pins are `mcp==2.0.0` and `pydantic==2.13.4`; use `uv sync --frozen` against that
+project. The committed lock makes the runtime reproducible, but target-machine acceptance remains
+separate from source validation. Its committed review artifacts are explicitly automated
+integrity/policy evidence only; they do not fabricate a human approval.
 
 ## Configuration
 
@@ -92,10 +91,12 @@ development snapshot and local frozen model snapshot.
 
 ## Start
 
-After preparing a reviewed MCP runtime environment:
+Prepare the isolated runtime from its committed lock. The target installation may keep the venv in
+user-owned application data while using the repository's immutable project and lock:
 
 ```bash
-cd /mnt/e/env/ts/loto_forecast_platform || exit 1
+env UV_PROJECT_ENVIRONMENT=/home/az/.local/share/loto-forecast-mcp/.venv \
+  uv sync --frozen --project /mnt/e/env/ts/loto_forecast_platform/environments/forecast-mcp
 /home/az/.local/share/loto-forecast-mcp/.venv/bin/python \
   scripts/forecast_mcp_server.py \
   --config /home/az/.config/loto/forecast-mcp.json

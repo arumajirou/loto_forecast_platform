@@ -18,9 +18,10 @@ from loto.adapters.moirai2.contracts import (
     Moirai2ProviderResponse,
     Operation,
 )
-from loto.gpu_exclusive.adapters import HttpRuntime, NvidiaSmiProbe
+from loto.gpu_exclusive.adapters import ExternalGate, HttpRuntime, NvidiaSmiProbe
 from loto.gpu_exclusive.models import ForecastJobConfig, SupervisorConfig
 from loto.gpu_exclusive.supervisor import ExclusiveGpuSupervisor
+from loto.moirai2_campaign.provenance import verify_snapshot
 
 from .contracts import (
     MOIRAI2_REPO_ID,
@@ -102,6 +103,23 @@ class ForecastMcpService:
         self._validate_route(request)
         return request
 
+    def _validate_execution_paths(self) -> None:
+        route = self.config.route
+        checks = {
+            "repo_root": route.repo_root.is_dir(),
+            "provider_python": route.provider_python.is_file(),
+            "provider_script": route.provider_script.is_file(),
+        }
+        failed = sorted(name for name, passed in checks.items() if not passed)
+        if failed:
+            raise RuntimeError(f"configured provider route paths are unavailable: {failed}")
+
+    @staticmethod
+    def _verify_approved_snapshot(request: Moirai2ProviderRequest) -> dict[str, Any]:
+        if request.snapshot_path is None:
+            raise RuntimeError("approved request must bind an exact local snapshot path")
+        return verify_snapshot(Path(request.snapshot_path))
+
     @staticmethod
     def _validate_route(request: Moirai2ProviderRequest) -> None:
         expected_geometry = {
@@ -153,6 +171,8 @@ class ForecastMcpService:
             raise RuntimeError("provider runtime/GPU evidence is missing")
         if runtime.output_shape != [1, 3]:
             raise RuntimeError("provider output_shape evidence mismatch")
+        if runtime.runtime_lane != "cuda13-experimental":
+            raise RuntimeError("provider runtime lane evidence mismatch")
         if runtime.execution_device != "cuda" or runtime.cpu_fallback:
             raise RuntimeError("provider runtime evidence indicates CUDA mismatch/fallback")
         if gpu.execution_device != "cuda" or gpu.cpu_fallback:
@@ -163,13 +183,31 @@ class ForecastMcpService:
             raise RuntimeError("provider peak VRAM evidence is missing")
 
     def status(self) -> dict[str, Any]:
-        route_error: str | None = None
+        readiness_errors: list[str] = []
+        snapshot_evidence: dict[str, Any] | None = None
         try:
-            self._load_approved_request()
+            approved = self._load_approved_request()
+            self._validate_execution_paths()
+            snapshot_evidence = self._verify_approved_snapshot(approved)
         except (OSError, RuntimeError, ValidationError) as exc:
-            route_error = f"{type(exc).__name__}: {exc}"
+            readiness_errors.append(f"route: {type(exc).__name__}: {exc}")
 
         qwen_running = HttpRuntime(self.config.qwen).running()
+        if not qwen_running:
+            readiness_errors.append("selected Qwen runtime is not reachable")
+
+        gate_snapshot: dict[str, object] | None = None
+        gate_error: str | None = None
+        try:
+            gate_snapshot = ExternalGate(self.config.gate).status()
+            if gate_snapshot.get("state") != "OPEN":
+                readiness_errors.append("request gate is not OPEN")
+            if not isinstance(gate_snapshot.get(self.config.gate.in_flight_field), int):
+                readiness_errors.append("request gate does not report an integer in_flight value")
+        except Exception as exc:  # live status must report rather than mutate
+            gate_error = f"{type(exc).__name__}: {exc}"
+            readiness_errors.append(f"gate: {gate_error}")
+
         gpu_snapshot: dict[str, int] | None = None
         gpu_error: str | None = None
         try:
@@ -181,9 +219,10 @@ class ForecastMcpService:
             }
         except Exception as exc:  # live status must report rather than mutate
             gpu_error = f"{type(exc).__name__}: {exc}"
+            readiness_errors.append(f"gpu: {gpu_error}")
 
         return {
-            "status": "READY" if route_error is None else "BLOCKED",
+            "status": "READY" if not readiness_errors else "BLOCKED",
             "endpoint": f"http://{self.config.server.host}:{self.config.server.port}/mcp",
             "route": {
                 "game": "numbers3",
@@ -194,9 +233,11 @@ class ForecastMcpService:
                 "repo_id": MOIRAI2_REPO_ID,
                 "revision": MOIRAI2_REVISION,
             },
-            "route_error": route_error,
+            "readiness_errors": readiness_errors,
+            "snapshot": snapshot_evidence,
             "qwen_running": qwen_running,
-            "gate_configured": True,
+            "gate": gate_snapshot,
+            "gate_error": gate_error,
             "gpu": gpu_snapshot,
             "gpu_error": gpu_error,
             "holdout_access": False,
@@ -207,6 +248,8 @@ class ForecastMcpService:
     def forecast(self, tool_request: ForecastToolRequest) -> dict[str, Any]:
         ForecastToolRequest.model_validate(tool_request.model_dump(mode="json"))
         approved = self._load_approved_request()
+        self._validate_execution_paths()
+        snapshot_evidence = self._verify_approved_snapshot(approved)
 
         run_id = (
             "forecast-mcp-" + datetime.now(UTC).strftime("%Y%m%dT%H%M%S") + "-" + uuid4().hex[:12]
@@ -264,6 +307,8 @@ class ForecastMcpService:
             )
         if not supervisor_result.get("qwen_initially_running"):
             raise RuntimeError("formal MCP forecast requires the selected Qwen runtime to be live")
+        if not supervisor_result.get("qwen_stopped"):
+            raise RuntimeError("selected Qwen runtime was not unloaded for the GPU handoff")
         if not supervisor_result.get("qwen_restored"):
             raise RuntimeError("selected Qwen runtime was not restored")
         if not supervisor_result.get("gate_reopened"):
@@ -293,6 +338,13 @@ class ForecastMcpService:
             "model_identity": {
                 "repo_id": MOIRAI2_REPO_ID,
                 "revision": MOIRAI2_REVISION,
+            },
+            "route_provenance": {
+                "provider_python": str(self.config.route.provider_python),
+                "provider_script": str(self.config.route.provider_script),
+                "provider_script_sha256": _sha256_file(self.config.route.provider_script),
+                "runtime_lane": self.config.route.runtime_lane,
+                "snapshot": snapshot_evidence,
             },
             "prediction": prediction_payload,
             "prediction_sha256": prediction_sha256,

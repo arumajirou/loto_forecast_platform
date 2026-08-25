@@ -5,9 +5,10 @@ import os
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import pandas as pd
+if TYPE_CHECKING:
+    import pandas as pd
 
 from loto.adapters.moirai2.contracts import (
     GameGeometry,

@@ -172,8 +172,17 @@ def test_llm_contract_rejects_shell_path_and_scope_override() -> None:
         ForecastToolRequest(scope="holdout")  # type: ignore[arg-type]
 
 
-def test_forecast_runs_only_fixed_approved_route_and_seals_evidence(tmp_path: Path) -> None:
+def test_forecast_runs_only_fixed_approved_route_and_seals_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     captured: list[Any] = []
+
+    monkeypatch.setattr(
+        ForecastMcpService,
+        "_verify_approved_snapshot",
+        staticmethod(lambda _: {"snapshot_path": "test-snapshot"}),
+    )
 
     def factory(config: Any) -> _FakeSupervisor:
         captured.append(config)
@@ -194,6 +203,7 @@ def test_forecast_runs_only_fixed_approved_route_and_seals_evidence(tmp_path: Pa
     assert result["model_identity"]["revision"] == MODEL_REVISION
     assert result["prediction"]["point_forecast"] == [[1.25, 4.5, 8.75]]
     assert len(result["prediction_sha256"]) == 64
+    assert result["route_provenance"]["runtime_lane"] == "cuda13-experimental"
     assert result["holdout_access"] is False
     assert result["prospective_access"] is False
     assert result["actual_access"] is False
@@ -227,3 +237,91 @@ def test_manifest_hash_mismatch_fails_before_supervisor(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="SHA-256 mismatch"):
         service.forecast(ForecastToolRequest())
     assert calls == 0
+
+
+def test_machine_route_config_rejects_non_loopback_or_non_cuda_lane(tmp_path: Path) -> None:
+    payload = _config(tmp_path).model_dump(mode="json")
+
+    payload["server"]["host"] = "0.0.0.0"
+    with pytest.raises(ValidationError):
+        ForecastMcpConfig.model_validate(payload)
+
+    payload = _config(tmp_path).model_dump(mode="json")
+    payload["server"]["port"] = 18779
+    with pytest.raises(ValidationError):
+        ForecastMcpConfig.model_validate(payload)
+
+    payload = _config(tmp_path).model_dump(mode="json")
+    payload["route"]["runtime_lane"] = "cpu"
+    with pytest.raises(ValidationError):
+        ForecastMcpConfig.model_validate(payload)
+
+
+def test_forecast_requires_qwen_to_have_been_unloaded(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class SupervisorWithoutStop(_FakeSupervisor):
+        def run(self) -> dict[str, Any]:
+            result = super().run()
+            result["qwen_stopped"] = False
+            return result
+
+    monkeypatch.setattr(
+        ForecastMcpService,
+        "_verify_approved_snapshot",
+        staticmethod(lambda _: {"snapshot_path": "test-snapshot"}),
+    )
+    service = ForecastMcpService(
+        _config(tmp_path),
+        supervisor_factory=lambda config: SupervisorWithoutStop(config),
+    )
+
+    with pytest.raises(RuntimeError, match="not unloaded"):
+        service.forecast(ForecastToolRequest())
+
+
+def test_status_requires_live_qwen_open_gate_and_gpu(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Runtime:
+        def __init__(self, _: Any) -> None:
+            pass
+
+        def running(self) -> bool:
+            return True
+
+    class Gate:
+        def __init__(self, _: Any) -> None:
+            pass
+
+        def status(self) -> dict[str, object]:
+            return {"state": "OPEN", "in_flight": 0}
+
+    class Gpu:
+        def __init__(self, _: Any) -> None:
+            pass
+
+        class Snapshot:
+            index = 0
+            memory_used_mib = 100
+            memory_total_mib = 16303
+
+        def snapshot(self) -> Snapshot:
+            return self.Snapshot()
+
+    monkeypatch.setattr("loto.forecast_mcp.service.HttpRuntime", Runtime)
+    monkeypatch.setattr("loto.forecast_mcp.service.ExternalGate", Gate)
+    monkeypatch.setattr("loto.forecast_mcp.service.NvidiaSmiProbe", Gpu)
+    monkeypatch.setattr(
+        ForecastMcpService,
+        "_verify_approved_snapshot",
+        staticmethod(lambda _: {"snapshot_path": "test-snapshot"}),
+    )
+
+    ready = ForecastMcpService(_config(tmp_path)).status()
+
+    assert ready["status"] == "READY"
+    assert ready["gate"] == {"state": "OPEN", "in_flight": 0}
+    assert ready["readiness_errors"] == []

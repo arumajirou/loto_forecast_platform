@@ -14,18 +14,14 @@ from typing import Literal
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from mcp.server.fastmcp import FastMCP  # noqa: E402
+from mcp.server import MCPServer  # noqa: E402
 
 from loto.forecast_mcp.contracts import ForecastToolRequest  # noqa: E402
 from loto.forecast_mcp.service import ForecastMcpService, load_config  # noqa: E402
 
 _SERVICE: ForecastMcpService | None = None
 
-mcp = FastMCP(
-    "Loto Forecast MCP",
-    stateless_http=True,
-    json_response=True,
-)
+mcp = MCPServer("Loto Forecast MCP")
 
 
 def _service() -> ForecastMcpService:
@@ -77,6 +73,8 @@ def main() -> int:
         host=config.server.host,
         port=config.server.port,
         streamable_http_path="/mcp",
+        stateless_http=True,
+        json_response=True,
     )
     return 0
 

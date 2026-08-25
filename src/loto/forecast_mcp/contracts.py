@@ -51,8 +51,8 @@ class DevelopmentRequestManifest(BaseModel):
 class ServerBinding(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    host: Literal["127.0.0.1", "::1"] = "127.0.0.1"
-    port: int = Field(default=18778, ge=1, le=65535)
+    host: Literal["127.0.0.1"] = "127.0.0.1"
+    port: Literal[18778] = 18778
     artifact_root: Path
 
 
@@ -64,7 +64,7 @@ class Moirai2RouteConfig(BaseModel):
     provider_script: Path
     approved_request: Path
     request_manifest: Path
-    runtime_lane: str = Field(min_length=1, max_length=128)
+    runtime_lane: Literal["cuda13-experimental"] = "cuda13-experimental"
     timeout_seconds: float = Field(default=900.0, gt=0)
     expected_repo_id: Literal[MOIRAI2_REPO_ID] = MOIRAI2_REPO_ID
     expected_revision: Literal[MOIRAI2_REVISION] = MOIRAI2_REVISION
