@@ -1,8 +1,8 @@
 """Prepare the isolated Bingo5 parameter-sweep discovery artifacts.
 
-This command is intentionally preparation-only. It inventories the canonical 250-model
-universe, binds the immutable Bingo5 raw input, extracts installed constructor signatures,
-and writes bounded search-space declarations. It never reads Holdout/Prospective targets
+This command is preparation-only. It inventories the canonical 250-model universe,
+binds the immutable Bingo5 raw input, extracts installed constructor signatures, and
+writes bounded search-space declarations. It never evaluates Holdout/Prospective targets
 and never touches the paused TAJ-21 formal checkpoint tree.
 """
 
@@ -19,22 +19,68 @@ from typing import Any
 
 from loto.data.lotteries import get_lottery_spec
 from loto.data.parser import parse_file
-from loto.evaluation.parameter_sweep import PilotRunConfig, build_bingo5_inventory, build_search_spaces
+from loto.evaluation.parameter_sweep import (
+    PilotRunConfig,
+    build_bingo5_inventory,
+    build_search_spaces,
+)
 from loto.evaluation.parameter_sweep.artifacts import atomic_write_json, regenerate_sha256sums
 from loto.evaluation.parameter_sweep.contracts import SearchSpaceStatus
 from loto.evaluation.taj21_snapshot import validate_snapshot_item
 
 TARGET_GAME = "bingo5"
 EXPECTED_IDENTITIES = 250
+HOLDOUT_SIZE = 50
+COARSE_VALIDATION_SIZE = 20
 
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def _git(*args: str) -> str:
+    return subprocess.check_output(["git", *args], cwd=_repo_root(), text=True).strip()
+
+
 def _git_commit() -> str:
-    root = Path(__file__).resolve().parents[2]
-    return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
+    return _git("rev-parse", "HEAD")
+
+
+def _code_identity() -> dict[str, Any]:
+    paths = [
+        _repo_root() / "src" / "loto" / "evaluation" / "parameter_sweep",
+        _repo_root() / "tools" / "evaluation" / "bingo5_parameter_sweep.py",
+        _repo_root() / "tools" / "evaluation" / "bingo5_parameter_smoke.py",
+        _repo_root() / "tools" / "evaluation" / "bingo5_parameter_coarse.py",
+    ]
+    files: list[Path] = []
+    for path in paths:
+        if path.is_dir():
+            files.extend(sorted(item for item in path.rglob("*.py") if item.is_file()))
+        elif path.is_file():
+            files.append(path)
+    file_hashes = {
+        path.relative_to(_repo_root()).as_posix(): _sha256(path)
+        for path in sorted(set(files))
+    }
+    aggregate = hashlib.sha256()
+    for path, digest in sorted(file_hashes.items()):
+        aggregate.update(path.encode("utf-8"))
+        aggregate.update(b"\0")
+        aggregate.update(digest.encode("ascii"))
+        aggregate.update(b"\n")
+    status = _git("status", "--porcelain")
+    return {
+        "git_commit": _git_commit(),
+        "git_tree": _git("rev-parse", "HEAD^{tree}"),
+        "git_status_clean": not bool(status),
+        "tracked_source_sha256": aggregate.hexdigest(),
+        "files": file_hashes,
+    }
 
 
 def _nvidia_smi() -> dict[str, Any]:
@@ -44,7 +90,13 @@ def _nvidia_smi() -> dict[str, Any]:
         "--format=csv,noheader,nounits",
     ]
     try:
-        result = subprocess.run(command, check=True, capture_output=True, text=True, timeout=10)
+        result = subprocess.run(
+            command,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
     except (FileNotFoundError, subprocess.SubprocessError) as exc:
         return {"available": False, "reason": f"{type(exc).__name__}: {exc}"}
     rows = [line.strip() for line in result.stdout.splitlines() if line.strip()]
@@ -86,7 +138,13 @@ def _load_bingo5(input_dir: Path) -> tuple[Any, dict[str, Any]]:
     }
 
 
-def prepare(*, input_dir: Path, run_root: Path, run_id: str, base_commit: str) -> dict[str, Any]:
+def prepare(
+    *,
+    input_dir: Path,
+    run_root: Path,
+    run_id: str,
+    base_commit: str,
+) -> dict[str, Any]:
     if run_root.exists():
         raise FileExistsError(f"refusing to reuse run root: {run_root}")
     run_root.mkdir(parents=True)
@@ -97,6 +155,11 @@ def prepare(*, input_dir: Path, run_root: Path, run_id: str, base_commit: str) -
         run_root=str(run_root.resolve()),
     )
     frame, data_manifest = _load_bingo5(input_dir)
+    development_rows = int(len(frame)) - HOLDOUT_SIZE
+    train_rows = development_rows - COARSE_VALIDATION_SIZE
+    if train_rows < 2:
+        raise ValueError("insufficient Bingo5 Train rows after sealing Holdout and Validation")
+
     inventory = build_bingo5_inventory()
     if len(inventory) != EXPECTED_IDENTITIES:
         atomic_write_json(
@@ -111,9 +174,7 @@ def prepare(*, input_dir: Path, run_root: Path, run_id: str, base_commit: str) -
             f"model inventory mismatch: expected={EXPECTED_IDENTITIES} observed={len(inventory)}"
         )
 
-    train_rows = max(int(len(frame)) - 20, 2)
     spaces = build_search_spaces(inventory, train_rows=train_rows)
-
     parameter_rows = [
         {
             "model_id": row.model_id,
@@ -136,19 +197,23 @@ def prepare(*, input_dir: Path, run_root: Path, run_id: str, base_commit: str) -
         "cpu_count": max(int(os.cpu_count() or 1), 1),
         "gpu": _nvidia_smi(),
     }
+    split_contract = {
+        "raw_rows": int(len(frame)),
+        "holdout_size": HOLDOUT_SIZE,
+        "development_rows": development_rows,
+        "coarse_validation_size": COARSE_VALIDATION_SIZE,
+        "coarse_train_rows": train_rows,
+        "holdout": "CLOSED",
+        "prospective": "CLOSED",
+        "promotion": "CLOSED",
+    }
     atomic_write_json(run_root / "RUN_CONFIG.json", config)
     atomic_write_json(run_root / "DATA_HASHES.json", data_manifest)
+    atomic_write_json(run_root / "SPLIT_CONTRACT.json", split_contract)
     atomic_write_json(run_root / "MODEL_INVENTORY.json", inventory)
     atomic_write_json(run_root / "PARAMETER_INVENTORY.json", parameter_rows)
     atomic_write_json(run_root / "SEARCH_SPACES.json", spaces)
-    atomic_write_json(
-        run_root / "CODE_HASH.json",
-        {
-            "git_commit": _git_commit(),
-            "base_commit": base_commit,
-            "note": "full source-tree code hash is deferred to the execution wrapper",
-        },
-    )
+    atomic_write_json(run_root / "CODE_HASH.json", _code_identity())
     atomic_write_json(run_root / "GPU_INFO.json", runtime["gpu"])
     atomic_write_json(run_root / "RUNTIME_SUMMARY.json", runtime)
     atomic_write_json(
@@ -168,6 +233,7 @@ def prepare(*, input_dir: Path, run_root: Path, run_id: str, base_commit: str) -
             "smoke_total": 0,
             "smoke_pass": 0,
             "smoke_fail": 0,
+            "split_contract": split_contract,
             "holdout": "CLOSED",
             "prospective": "CLOSED",
             "promotion": "CLOSED",
@@ -184,6 +250,7 @@ def prepare(*, input_dir: Path, run_root: Path, run_id: str, base_commit: str) -
         "inventory": inventory,
         "spaces": spaces,
         "status_counts": status_counts,
+        "split_contract": split_contract,
         "sha256sums_sha256": sums_sha,
     }
 
