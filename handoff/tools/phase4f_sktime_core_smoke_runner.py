@@ -65,6 +65,7 @@ def generate() -> str:
     replacements = (
         ("PHASE4E", "PHASE4F"),
         ("phase4e", "phase4f"),
+        ("Phase 4E", "Phase 4F"),
         ("sktime-classic-py312", "sktime-core-py313"),
         ("sktime-classic", "sktime-core"),
         ("sktime classic", "sktime core"),
