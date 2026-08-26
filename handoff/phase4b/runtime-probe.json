@@ -1,0 +1,25 @@
+{
+  "arch_list": [
+    "sm_75",
+    "sm_80",
+    "sm_86",
+    "sm_90",
+    "sm_100",
+    "sm_120"
+  ],
+  "compute_capability_outside_provider": [
+    12,
+    0
+  ],
+  "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-latest/.venv/bin/python",
+  "gluonts": "0.17.0",
+  "lightning": "2.6.5",
+  "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-latest/.venv",
+  "python": "3.13.13",
+  "pytorch_lightning": "2.6.5",
+  "torch": "2.13.0",
+  "torch_cuda_available_outside_provider": true,
+  "torch_cuda_build": "13.0",
+  "torch_device_count_outside_provider": 1,
+  "torch_device_name_outside_provider": "NVIDIA GeForce RTX 5070 Ti"
+}
