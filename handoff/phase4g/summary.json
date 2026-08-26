@@ -1,0 +1,463 @@
+{
+  "baseline_metrics": {
+    "fixed": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.0,
+      "horizon": 1,
+      "mae": 4.5,
+      "mse": 23.75,
+      "position_hit_at_plus_minus_1": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "positions": 4,
+      "rmse": 4.873397172404482,
+      "tolerance": 1.0
+    },
+    "frequency": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.75,
+      "horizon": 1,
+      "mae": 0.75,
+      "mse": 1.25,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "positions": 4,
+      "rmse": 1.118033988749895,
+      "tolerance": 1.0
+    },
+    "last": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.75,
+      "horizon": 1,
+      "mae": 1.25,
+      "mse": 2.75,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "positions": 4,
+      "rmse": 1.6583123951777,
+      "tolerance": 1.0
+    },
+    "mean": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.5,
+      "horizon": 1,
+      "mae": 1.362204724409449,
+      "mse": 2.136369272738546,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "positions": 4,
+      "rmse": 1.4616324000030056,
+      "tolerance": 1.0
+    },
+    "median": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.5,
+      "horizon": 1,
+      "mae": 1.25,
+      "mse": 2.25,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "positions": 4,
+      "rmse": 1.5,
+      "tolerance": 1.0
+    },
+    "random": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.25,
+      "horizon": 1,
+      "mae": 3.25,
+      "mse": 14.25,
+      "position_hit_at_plus_minus_1": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "positions": 4,
+      "rmse": 3.774917217635375,
+      "tolerance": 1.0
+    },
+    "seasonal_naive": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.75,
+      "horizon": 1,
+      "mae": 1.25,
+      "mse": 2.75,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "positions": 4,
+      "rmse": 1.6583123951777,
+      "tolerance": 1.0
+    }
+  },
+  "data": {
+    "cuda_visible_devices": "",
+    "derived_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4g-statsforecast-smoke-20260826-141608/smoke-input.csv",
+    "derived_sha256": "0ba9eac7c88670bbbc4cf0db65dc69eda5eb4b4cbcda2aedee32cd0bb0ea8489",
+    "draw_no_col": "draw_no",
+    "first_draw": 354,
+    "last_draw": 481,
+    "max_value": 20,
+    "min_value": 1,
+    "position_columns": [
+      "n1",
+      "n2",
+      "n3",
+      "n4"
+    ],
+    "process_id": 3736458,
+    "rows": 128,
+    "source_path": "/mnt/e/env/ts/backups/loto-pre-consolidation-20260802-012717/loto_life_feature_pipeline/data/interim/bingo5_normalized.csv",
+    "source_sha256": "62a2c0984877c58593961052787469272e3f609e9c88472394cc0657c1248a9d",
+    "statsforecast": "2.1.1"
+  },
+  "dataset_policy": {
+    "accuracy_ranking": false,
+    "kind": "exact_phase4a_verified_real_data_window",
+    "phase6_metrics_pending": [
+      "Hit@±1",
+      "MAE",
+      "MSE",
+      "RMSE",
+      "position_Hit@±1",
+      "all_position_Hit@±1"
+    ]
+  },
+  "dependencies_modified": false,
+  "device_policy": {
+    "cpu_fallback": false,
+    "cuda_visible_devices": "",
+    "gpu_execution_claimed": false,
+    "reason": "CPU is the intended Phase 4G StatsForecast runtime contract",
+    "requested": "cpu"
+  },
+  "environment": "environments/statsforecast-py313",
+  "environment_contract": {
+    "dependencies_modified": false,
+    "existing_venv_reused": true,
+    "lockfile_modified": false,
+    "pyproject_path": "/mnt/e/env/ts/worktrees/loto-runtime-audit-20260826-121248/environments/statsforecast-py313/pyproject.toml",
+    "pyproject_sha256": "4a26d9d1f02614b824fcf71fd425b1ee159cb91af8bdccb7fb2e25fc54fb8a5d",
+    "uv_lock_exists": false,
+    "uv_lock_sha256": null
+  },
+  "formal_runtime_certification": true,
+  "gpu": {
+    "fit_monitor": {
+      "duration_seconds": 0.9063735008239746,
+      "matched_gpu_pids": [],
+      "nvidia_smi_failures": 0,
+      "peak_matching_gpu_memory_mib": 0,
+      "returncode": 0,
+      "root_pid": 3736490
+    },
+    "matched_gpu_pids": [],
+    "reload_monitor": {
+      "duration_seconds": 0.9128198623657227,
+      "matched_gpu_pids": [],
+      "nvidia_smi_failures": 0,
+      "peak_matching_gpu_memory_mib": 0,
+      "returncode": 0,
+      "root_pid": 3736553
+    }
+  },
+  "lane": {
+    "candidate_probe_status": "PASS",
+    "candidate_python_version": "3.13.13",
+    "candidate_runtime": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv",
+    "candidate_source": "DIRECT_PROJECT_RUNTIME",
+    "cuda_builds": "[]",
+    "decision_reason": "Direct venv, declared dependencies compatible, CPU import verified.",
+    "declared_contract_compatible": "True",
+    "dependency_coverage": "1.0",
+    "environment": "environments/statsforecast-py313",
+    "lane": "CURRENT_CPU_LEGACY",
+    "mapping_status": "DIRECT_PROJECT_RUNTIME",
+    "missing_dependencies": "[]",
+    "phase2_statuses": "[\"IMPORT_VERIFIED_CPU\"]",
+    "phase3c_classification": "",
+    "phase4_priority": "30",
+    "phase4_smoke_allowed": "True",
+    "python_compatible": "True",
+    "torch_versions": "[]",
+    "version_incompatible": "[]"
+  },
+  "lockfile_modified": false,
+  "metrics": {
+    "all_position_hit_at_plus_minus_1": 0.0,
+    "hit_at_plus_minus_1": 0.75,
+    "horizon": 1,
+    "mae": 1.25,
+    "mse": 2.75,
+    "position_hit_at_plus_minus_1": [
+      1.0,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "positions": 4,
+    "rmse": 1.6583123951777,
+    "tolerance": 1.0
+  },
+  "model": {
+    "public_name": "Naive",
+    "separate_process_reload": true,
+    "serialization": "python-pickle"
+  },
+  "phase": "PHASE4G_STATSFORECAST_PY313_CPU_LIFECYCLE",
+  "run_id": "20260826-141608",
+  "runtime": {
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv/bin/python",
+    "naive_class": "Naive",
+    "naive_module": "statsforecast.models",
+    "numpy": "2.5.2",
+    "packaging": "26.3",
+    "pandas": "2.3.3",
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv",
+    "pydantic": "2.13.4",
+    "python": "3.13.13",
+    "scikit_learn": "1.9.0",
+    "statsforecast": "2.1.1",
+    "torch_installed": false
+  },
+  "schema_version": 1,
+  "scope": "StatsForecast Python 3.13 CPU real-data lifecycle smoke",
+  "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
+  "status": "VERIFIED",
+  "validation": {
+    "baseline_metrics": {
+      "fixed": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.0,
+        "horizon": 1,
+        "mae": 4.5,
+        "mse": 23.75,
+        "position_hit_at_plus_minus_1": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 4.873397172404482,
+        "tolerance": 1.0
+      },
+      "frequency": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.75,
+        "horizon": 1,
+        "mae": 0.75,
+        "mse": 1.25,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "positions": 4,
+        "rmse": 1.118033988749895,
+        "tolerance": 1.0
+      },
+      "last": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.75,
+        "horizon": 1,
+        "mae": 1.25,
+        "mse": 2.75,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "positions": 4,
+        "rmse": 1.6583123951777,
+        "tolerance": 1.0
+      },
+      "mean": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.5,
+        "horizon": 1,
+        "mae": 1.362204724409449,
+        "mse": 2.136369272738546,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 1.4616324000030056,
+        "tolerance": 1.0
+      },
+      "median": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.5,
+        "horizon": 1,
+        "mae": 1.25,
+        "mse": 2.25,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 1.5,
+        "tolerance": 1.0
+      },
+      "random": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.25,
+        "horizon": 1,
+        "mae": 3.25,
+        "mse": 14.25,
+        "position_hit_at_plus_minus_1": [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 3.774917217635375,
+        "tolerance": 1.0
+      },
+      "seasonal_naive": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.75,
+        "horizon": 1,
+        "mae": 1.25,
+        "mse": 2.75,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "positions": 4,
+        "rmse": 1.6583123951777,
+        "tolerance": 1.0
+      }
+    },
+    "checks": {
+      "all_critical_checks_pass": true,
+      "baselines_complete": true,
+      "cpu_env_fit": true,
+      "cpu_env_reload": true,
+      "fit_shape_finite_all": true,
+      "fit_status_verified": true,
+      "four_positions_fit": true,
+      "four_positions_reload": true,
+      "gpu_monitor_fit_healthy": true,
+      "gpu_monitor_reload_healthy": true,
+      "metrics_complete": true,
+      "model_identity_fit": true,
+      "no_gpu_pid_fit": true,
+      "no_gpu_pid_reload": true,
+      "prediction_equal_after_reload": true,
+      "reload_shape_finite_all": true,
+      "reload_status_verified": true,
+      "separate_process_reload": true,
+      "statsforecast_version_fit": true,
+      "statsforecast_version_reload": true,
+      "torch_not_imported_fit": true,
+      "torch_not_imported_reload": true,
+      "training_holdout_ordered": true
+    },
+    "fit_predictions": [
+      [
+        5.0
+      ],
+      [
+        10.0
+      ],
+      [
+        12.0
+      ],
+      [
+        16.0
+      ]
+    ],
+    "fit_process_id": 3736490,
+    "metrics": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.75,
+      "horizon": 1,
+      "mae": 1.25,
+      "mse": 2.75,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "positions": 4,
+      "rmse": 1.6583123951777,
+      "tolerance": 1.0
+    },
+    "model_artifacts": [
+      {
+        "alias": "Naive",
+        "artifact_sha256": "d56f08c0126389d3783db6e191f554306f54f0abbe883461de878e0bde8b2c38",
+        "model_class": "Naive",
+        "position": "n1"
+      },
+      {
+        "alias": "Naive",
+        "artifact_sha256": "ca974c41699f61cdca1b971f59b38a2e383adc6877d37c6ea0c0f6117c18962c",
+        "model_class": "Naive",
+        "position": "n2"
+      },
+      {
+        "alias": "Naive",
+        "artifact_sha256": "4c52aa547803dd88626c7b2f652719f8339b7ca0b7d846921c7aaf35d5f92d58",
+        "model_class": "Naive",
+        "position": "n3"
+      },
+      {
+        "alias": "Naive",
+        "artifact_sha256": "9ad17be8ac7bdea8991f3d2658a710cc32af2219eae7bb96882e8f7b6993b8f4",
+        "model_class": "Naive",
+        "position": "n4"
+      }
+    ],
+    "reload_predictions": [
+      [
+        5.0
+      ],
+      [
+        10.0
+      ],
+      [
+        12.0
+      ],
+      [
+        16.0
+      ]
+    ],
+    "reload_process_id": 3736553
+  }
+}

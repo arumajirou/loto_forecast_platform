@@ -1,0 +1,110 @@
+{
+  "artifacts": [
+    {
+      "path": "child-pycompile.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "child-pycompile.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "data-evidence.json",
+      "sha256": "4716e9a0c2defdeb884e45df96ec7629c49eb9cfadab5808e64c476f3360a147",
+      "size_bytes": 721
+    },
+    {
+      "path": "fit-result.json",
+      "sha256": "3a09b2b01dd42a6beb1b6ad2fa33e280bc5b8cf14ac8e7025f7cd96a645bde91",
+      "size_bytes": 5094
+    },
+    {
+      "path": "fit.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "fit.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "gpu-process-samples.jsonl",
+      "sha256": "38f20b27159c2690a6eb558f91167bd9f49f79cb073843aeb568acfcb6ae1cc0",
+      "size_bytes": 3410
+    },
+    {
+      "path": "models/position-1.pickle",
+      "sha256": "d56f08c0126389d3783db6e191f554306f54f0abbe883461de878e0bde8b2c38",
+      "size_bytes": 2394
+    },
+    {
+      "path": "models/position-2.pickle",
+      "sha256": "ca974c41699f61cdca1b971f59b38a2e383adc6877d37c6ea0c0f6117c18962c",
+      "size_bytes": 2394
+    },
+    {
+      "path": "models/position-3.pickle",
+      "sha256": "4c52aa547803dd88626c7b2f652719f8339b7ca0b7d846921c7aaf35d5f92d58",
+      "size_bytes": 2394
+    },
+    {
+      "path": "models/position-4.pickle",
+      "sha256": "9ad17be8ac7bdea8991f3d2658a710cc32af2219eae7bb96882e8f7b6993b8f4",
+      "size_bytes": 2394
+    },
+    {
+      "path": "prepare.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "prepare.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "reload-result.json",
+      "sha256": "9e4737bbb4b648ab18de36839cd49ac332e83748336613086aa8b491f0f7e8ca",
+      "size_bytes": 2118
+    },
+    {
+      "path": "reload.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "reload.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "runtime-probe.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "runtime-probe.stdout.log",
+      "sha256": "f8ddd59cc5ab2d909b7c87f5aceeb317cace2771fabcb58de2ebb2fe922f95e9",
+      "size_bytes": 436
+    },
+    {
+      "path": "smoke-input.csv",
+      "sha256": "0ba9eac7c88670bbbc4cf0db65dc69eda5eb4b4cbcda2aedee32cd0bb0ea8489",
+      "size_bytes": 1834
+    },
+    {
+      "path": "statsforecast-child.py",
+      "sha256": "8ac33635040a501b786d1ced5d9e713e539b5e72f90f24df13f104aa93a74af0",
+      "size_bytes": 9167
+    },
+    {
+      "path": "summary.json",
+      "sha256": "a7e05ec228a72bf8cf5fddb942821172d1b8ee61fb95b4a3dcbaf292ff9a02bf",
+      "size_bytes": 11883
+    }
+  ],
+  "schema_version": 1
+}
