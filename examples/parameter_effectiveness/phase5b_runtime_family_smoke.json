@@ -1,0 +1,87 @@
+{
+  "suite_id": "phase5b-runtime-family-parameter-smoke-v1",
+  "metadata": {
+    "purpose": "Development-only parameter effectiveness for Phase 4-certified runtime families",
+    "holdout_evaluated": false,
+    "prospective_evaluated": false,
+    "accuracy_ranking": false
+  },
+  "probes": [
+    {
+      "probe_id": "darts-naive-seasonal-k-prediction",
+      "library": "darts",
+      "model": "NaiveSeasonal",
+      "parameter": "K",
+      "scope": "model_constructor",
+      "control": 1,
+      "treatment": 7,
+      "expected_surface": "prediction",
+      "expected_relation": "change",
+      "seeds": [1, 42],
+      "repeats": 1,
+      "min_match_fraction": 1.0,
+      "base_args": {
+        "h": 7,
+        "train_length": 84
+      }
+    },
+    {
+      "probe_id": "sktime-naive-strategy-prediction",
+      "library": "sktime",
+      "model": "NaiveForecaster",
+      "parameter": "strategy",
+      "scope": "model_constructor",
+      "control": "last",
+      "treatment": "mean",
+      "expected_surface": "prediction",
+      "expected_relation": "change",
+      "seeds": [1, 42],
+      "repeats": 1,
+      "min_match_fraction": 1.0,
+      "base_args": {
+        "h": 7,
+        "train_length": 84,
+        "sp": 1
+      }
+    },
+    {
+      "probe_id": "gluonts-seasonal-naive-season-length-prediction",
+      "library": "gluonts",
+      "model": "SeasonalNaivePredictor",
+      "parameter": "season_length",
+      "scope": "model_constructor",
+      "control": 1,
+      "treatment": 7,
+      "expected_surface": "prediction",
+      "expected_relation": "change",
+      "seeds": [1, 42],
+      "repeats": 1,
+      "min_match_fraction": 1.0,
+      "base_args": {
+        "h": 7,
+        "train_length": 84,
+        "freq": "D"
+      }
+    },
+    {
+      "probe_id": "toto2-context-length-history",
+      "library": "toto2",
+      "model": "toto-2.0-4m",
+      "parameter": "context_length",
+      "scope": "predict",
+      "control": 128,
+      "treatment": 256,
+      "expected_surface": "history",
+      "expected_relation": "increase",
+      "seeds": [1, 42],
+      "repeats": 1,
+      "min_match_fraction": 1.0,
+      "base_args": {
+        "prediction_length": 1,
+        "decode_block_size": 32,
+        "device": "cuda",
+        "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9"
+      }
+    }
+  ]
+}
