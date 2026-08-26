@@ -1,0 +1,26 @@
+{
+  "artifact_count": 4,
+  "artifacts": [
+    {
+      "path": "PHASE3C_REPORT.md",
+      "sha256": "310fe4f58cd275d58315e89fa4fd1613ddf54388e537d80d3a829234f294921e",
+      "size": 1005
+    },
+    {
+      "path": "candidate-compatibility.tsv",
+      "sha256": "62ac7ef862ce29ff3f0f25ea5ec79f7998b2fffaf3639f05d05d2b1b937e809c",
+      "size": 38546
+    },
+    {
+      "path": "runtime-gap-review.tsv",
+      "sha256": "8d12a1aa1ddbad3e2005e9d735cfdf8fe1b574bd834dbbd5420d1fa74028ced6",
+      "size": 5774
+    },
+    {
+      "path": "summary.json",
+      "sha256": "81d2dacb729ed70ba7bfa889f0d0fa57331d1fe1ecfb07b7f9eda00ebb0c908e",
+      "size": 626
+    }
+  ],
+  "schema_version": 1
+}
