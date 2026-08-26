@@ -10,7 +10,7 @@ from .contracts import (
     SearchDimension,
     SearchSpaceStatus,
 )
-
+from .routing import known_route_reason
 
 _ALPHA_VALUES = (0.1, 0.3, 0.5, 0.7, 0.9)
 _LAG_CANDIDATES = (1, 2, 3, 4, 5, 7, 14, 28)
@@ -106,6 +106,19 @@ def _baseline_params(row: ModelInventoryRow) -> dict[str, Any]:
     return baseline
 
 
+def _closed_space(
+    row: ModelInventoryRow,
+    status: SearchSpaceStatus,
+    reason: str,
+) -> ModelSearchSpace:
+    return ModelSearchSpace(
+        model_id=row.model_id,
+        status=status,
+        baseline_params=_baseline_params(row),
+        reason=reason,
+    )
+
+
 def build_search_spaces(
     rows: list[ModelInventoryRow],
     *,
@@ -115,33 +128,30 @@ def build_search_spaces(
 
     output: list[ModelSearchSpace] = []
     for row in rows:
-        if row.reason_if_not_supported == "EXPECTED_NEGATIVE_CONTROL":
+        route_reason = known_route_reason(row)
+        if route_reason == "EXPECTED_NEGATIVE_CONTROL":
             output.append(
-                ModelSearchSpace(
-                    model_id=row.model_id,
-                    status=SearchSpaceStatus.EXPECTED_NEGATIVE_CONTROL,
-                    baseline_params=_baseline_params(row),
-                    reason="negative control must not be tuned into a finite forecaster",
+                _closed_space(
+                    row,
+                    SearchSpaceStatus.EXPECTED_NEGATIVE_CONTROL,
+                    "negative control must not be tuned into a finite forecaster",
                 )
             )
             continue
-        if row.task == "reconciliation":
+        if route_reason and route_reason.startswith("NON_STANDALONE_METHOD"):
             output.append(
-                ModelSearchSpace(
-                    model_id=row.model_id,
-                    status=SearchSpaceStatus.NON_STANDALONE_METHOD,
-                    baseline_params=_baseline_params(row),
-                    reason="reconciliation method is not a standalone forecasting candidate",
-                )
+                _closed_space(row, SearchSpaceStatus.NON_STANDALONE_METHOD, route_reason)
             )
+            continue
+        if route_reason:
+            output.append(_closed_space(row, SearchSpaceStatus.NOT_ROUTABLE, route_reason))
             continue
         if row.supports_bingo5 is False:
             output.append(
-                ModelSearchSpace(
-                    model_id=row.model_id,
-                    status=SearchSpaceStatus.NOT_ROUTABLE,
-                    baseline_params=_baseline_params(row),
-                    reason=row.reason_if_not_supported or "not routable for Bingo5",
+                _closed_space(
+                    row,
+                    SearchSpaceStatus.NOT_ROUTABLE,
+                    row.reason_if_not_supported or "not routable for Bingo5",
                 )
             )
             continue
@@ -152,9 +162,8 @@ def build_search_spaces(
             for descriptor in tunable
             if (dimension := _dimension(descriptor.name, train_rows=train_rows)) is not None
         )
-        unresolved = tuple(
-            sorted({descriptor.name for descriptor in tunable}.difference({d.parameter for d in dimensions}))
-        )
+        resolved = {dimension.parameter for dimension in dimensions}
+        unresolved = tuple(sorted({descriptor.name for descriptor in tunable}.difference(resolved)))
         if unresolved:
             output.append(
                 ModelSearchSpace(
@@ -171,18 +180,17 @@ def build_search_spaces(
             continue
         if not dimensions:
             output.append(
-                ModelSearchSpace(
-                    model_id=row.model_id,
-                    status=SearchSpaceStatus.NO_TUNABLE_PARAMETERS,
-                    baseline_params=_baseline_params(row),
-                    reason="no automatically approved accuracy-tunable constructor parameter found",
+                _closed_space(
+                    row,
+                    SearchSpaceStatus.NO_TUNABLE_PARAMETERS,
+                    "no automatically approved accuracy-tunable constructor parameter found",
                 )
             )
             continue
 
         cost_class = "cheap" if row.library == "statsforecast" else "medium"
         budget = 100 if cost_class == "cheap" else 50
-        ofat_trials = 1 + sum(len(d.values) for d in dimensions)
+        ofat_trials = 1 + sum(len(dimension.values) for dimension in dimensions)
         output.append(
             ModelSearchSpace(
                 model_id=row.model_id,
@@ -190,9 +198,7 @@ def build_search_spaces(
                 baseline_params=_baseline_params(row),
                 dimensions=dimensions,
                 trial_budget=min(budget, ofat_trials),
-                reason=(
-                    "coarse one-factor-at-a-time screening; no full Cartesian product is permitted"
-                ),
+                reason="coarse one-factor-at-a-time screening; no Cartesian product is permitted",
             )
         )
 
