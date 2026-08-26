@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 from dataclasses import replace
 from pathlib import Path
@@ -23,6 +24,8 @@ from loto.models.catalog_full import build_catalog
 from .artifacts import atomic_write_json, canonical_json_bytes
 from .contracts import ModelInventoryRow, ModelSearchSpace, SearchSpaceStatus
 
+_HOLDOUT_SIZE = 50
+
 
 def _parameter_hash(params: dict[str, Any]) -> str:
     return hashlib.sha256(canonical_json_bytes(params)).hexdigest()
@@ -34,7 +37,11 @@ def build_ofat_trials(space: ModelSearchSpace) -> list[dict[str, Any]]:
     if space.status is not SearchSpaceStatus.READY:
         return []
     baseline = dict(space.baseline_params)
-    missing = [dimension.parameter for dimension in space.dimensions if dimension.parameter not in baseline]
+    missing = [
+        dimension.parameter
+        for dimension in space.dimensions
+        if dimension.parameter not in baseline
+    ]
     if missing:
         raise ValueError(
             f"READY search space lacks auditable baseline values for {space.model_id}: {missing}"
@@ -100,6 +107,10 @@ def _trial_checkpoint_path(root: Path, model_id: str, digest: str) -> Path:
     return root / "trials" / safe / f"{digest}.json"
 
 
+def _baseline_checkpoint_path(root: Path, baseline_id: str) -> Path:
+    return root / "baselines" / f"{baseline_id}.json"
+
+
 def _load_checkpoint(path: Path, contract_sha256: str) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("contract_sha256") != contract_sha256:
@@ -113,11 +124,28 @@ def _load_checkpoint(path: Path, contract_sha256: str) -> dict[str, Any]:
     return result
 
 
-def _cleanup_incomplete_prediction_lock(output: Path, trial_id: str) -> None:
+def _write_checkpoint(
+    path: Path,
+    *,
+    contract_sha256: str,
+    result: dict[str, Any],
+) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    atomic_write_json(
+        path,
+        {
+            "contract_sha256": contract_sha256,
+            "result_sha256": canonical_sha256(result),
+            "result": result,
+        },
+    )
+
+
+def _cleanup_incomplete_prediction_lock(output: Path, candidate_id: str) -> None:
     from loto.evaluation.path_codec import encode_path_component
 
     root = (output / "prediction_locks").resolve()
-    path = (root / "bingo5" / encode_path_component(trial_id)).resolve()
+    path = (root / "bingo5" / encode_path_component(candidate_id)).resolve()
     try:
         path.relative_to(root)
     except ValueError as exc:
@@ -134,6 +162,7 @@ def _write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
             handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True, allow_nan=False))
             handle.write("\n")
         handle.flush()
+        os.fsync(handle.fileno())
     temp.replace(path)
 
 
@@ -185,13 +214,22 @@ def _effectiveness(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return output
 
 
-def _ranking(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
+def _rank_value(row: dict[str, Any], key: str, *, higher_is_better: bool) -> float:
+    value = row.get(key)
+    if value is None:
+        return float("-inf") if higher_is_better else float("inf")
+    return float(value)
+
+
+def _ranking(
+    rows: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
     succeeded = [row for row in rows if row.get("status") == "SUCCEEDED"]
     succeeded.sort(
         key=lambda row: (
-            -float(row.get("hit_at_1") or -1.0),
-            -float(row.get("all_positions_hit_at_1") or -1.0),
-            float(row.get("mae") if row.get("mae") is not None else float("inf")),
+            -_rank_value(row, "hit_at_1", higher_is_better=True),
+            -_rank_value(row, "all_positions_hit_at_1", higher_is_better=True),
+            _rank_value(row, "mae", higher_is_better=False),
             str(row["model_id"]),
             str(row["parameter_hash"]),
         )
@@ -203,6 +241,36 @@ def _ranking(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str
         ranking.append(ranked)
         best.setdefault(str(row["model_id"]), ranked)
     return ranking, best
+
+
+def _evaluate_baselines(
+    prepared: Any,
+    config: UnifiedCampaignConfig,
+    *,
+    output: Path,
+    checkpoint: Path,
+    contract_sha256: str,
+) -> list[dict[str, Any]]:
+    results: list[dict[str, Any]] = []
+    for baseline_id in REQUIRED_BASELINE_IDS:
+        path = _baseline_checkpoint_path(checkpoint, baseline_id)
+        candidate_id = f"coarse-baseline:{baseline_id}"
+        if path.exists():
+            result = _load_checkpoint(path, contract_sha256)
+        else:
+            _cleanup_incomplete_prediction_lock(output, candidate_id)
+            result = _evaluate_candidate(
+                prepared,
+                config,
+                candidate_id=candidate_id,
+                source="baseline",
+                library="baseline",
+                task="position",
+                baseline_id=baseline_id,
+            )
+            _write_checkpoint(path, contract_sha256=contract_sha256, result=result)
+        results.append(result)
+    return results
 
 
 def run_coarse_ofat(
@@ -238,6 +306,7 @@ def run_coarse_ofat(
         "folds": 1,
         "test_size": 20,
         "min_train_size": 100,
+        "holdout_size": _HOLDOUT_SIZE,
         "holdout": "CLOSED",
         "prospective": "CLOSED",
         "promotion": "CLOSED",
@@ -267,7 +336,7 @@ def run_coarse_ofat(
         folds=1,
         test_size=20,
         min_train_size=100,
-        holdout_size=0,
+        holdout_size=_HOLDOUT_SIZE,
         gap=0,
         device=device,
         precision=precision,
@@ -283,30 +352,13 @@ def run_coarse_ofat(
     if not protocol_path.exists():
         write_protocol_artifact(protocol_path, prepared.protocol)
 
-    baseline_results: list[dict[str, Any]] = []
-    baseline_path = checkpoint / "baselines.json"
-    if baseline_path.exists():
-        stored = json.loads(baseline_path.read_text(encoding="utf-8"))
-        if stored.get("contract_sha256") != contract_sha:
-            raise RuntimeError("baseline checkpoint contract mismatch")
-        baseline_results = list(stored["results"])
-    else:
-        for baseline_id in REQUIRED_BASELINE_IDS:
-            baseline_results.append(
-                _evaluate_candidate(
-                    prepared,
-                    config,
-                    candidate_id=f"coarse-baseline:{baseline_id}",
-                    source="baseline",
-                    library="baseline",
-                    task="position",
-                    baseline_id=baseline_id,
-                )
-            )
-        atomic_write_json(
-            baseline_path,
-            {"contract_sha256": contract_sha, "results": baseline_results},
-        )
+    baseline_results = _evaluate_baselines(
+        prepared,
+        config,
+        output=output,
+        checkpoint=checkpoint,
+        contract_sha256=contract_sha,
+    )
 
     entry_by_id = {entry.model_id: entry for entry in build_catalog()}
     inventory_by_id = {row.model_id: row for row in inventory}
@@ -340,14 +392,10 @@ def run_coarse_ofat(
                     task=entry.task,
                     entry=sweep_entry,
                 )
-                trial_checkpoint.parent.mkdir(parents=True, exist_ok=True)
-                atomic_write_json(
+                _write_checkpoint(
                     trial_checkpoint,
-                    {
-                        "contract_sha256": contract_sha,
-                        "result_sha256": canonical_sha256(result),
-                        "result": result,
-                    },
+                    contract_sha256=contract_sha,
+                    result=result,
                 )
 
             trial_rows.append(
@@ -385,14 +433,36 @@ def run_coarse_ofat(
         {
             key: value
             for key, value in row.items()
-            if key not in {"requested_params", "resolved_params", "constructor_params", "failures"}
+            if key
+            not in {
+                "requested_params",
+                "resolved_params",
+                "constructor_params",
+                "failures",
+            }
         }
         for row in trial_rows
     ]
-    frame_rows = pd.DataFrame(flat_rows)
-    frame_rows.to_parquet(run_root / "TRIALS.parquet", index=False)
-    pd.DataFrame(ranking).to_csv(run_root / "MODEL_RANKING.csv", index=False)
-    pd.DataFrame(ranking).to_parquet(run_root / "MODEL_RANKING.parquet", index=False)
+    pd.DataFrame(flat_rows).to_parquet(run_root / "TRIALS.parquet", index=False)
+
+    ranking_rows = [
+        {
+            "rank": row["rank"],
+            "model_id": row["model_id"],
+            "trial_id": row["trial_id"],
+            "parameter_hash": row["parameter_hash"],
+            "params_json": json.dumps(row["requested_params"], sort_keys=True, default=str),
+            "hit_at_1": row["hit_at_1"],
+            "position_hit_at_1": row["position_hit_at_1"],
+            "all_positions_hit_at_1": row["all_positions_hit_at_1"],
+            "mae": row["mae"],
+            "mse": row["mse"],
+            "rmse": row["rmse"],
+        }
+        for row in ranking
+    ]
+    pd.DataFrame(ranking_rows).to_csv(run_root / "MODEL_RANKING.csv", index=False)
+    pd.DataFrame(ranking_rows).to_parquet(run_root / "MODEL_RANKING.parquet", index=False)
     return {
         "ready_models": len(ready),
         "trials": len(trial_rows),
@@ -400,5 +470,6 @@ def run_coarse_ofat(
         "failed": sum(1 for row in trial_rows if row["status"] != "SUCCEEDED"),
         "parameter_effectiveness": effectiveness,
         "best": best,
+        "baseline_results": baseline_results,
         "contract_sha256": contract_sha,
     }
