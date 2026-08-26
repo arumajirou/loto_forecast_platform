@@ -52,4 +52,4 @@
 
 ## Interpretation
 
-This phase certifies the existing sktime 1.0.1 classic Python 3.13 runtime without dependency or lockfile mutation. Metrics and baselines are retained only as smoke evidence and must not be promoted as Phase 6 ranking evidence.
+This phase certifies the existing sktime 1.0.1 core Python 3.13 runtime without dependency or lockfile mutation. Metrics and baselines are retained only as smoke evidence and must not be promoted as Phase 6 ranking evidence.
