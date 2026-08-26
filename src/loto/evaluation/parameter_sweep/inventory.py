@@ -10,7 +10,9 @@ from typing import Any
 
 from loto.evaluation.probabilistic_oof_adapter import build_probabilistic_scientific_plan
 from loto.models.catalog_full import ModelEntry, build_catalog
-from loto.statsforecast.certification_models import _DEFAULTS as STATSFORECAST_CERTIFICATION_DEFAULTS
+from loto.statsforecast.certification_models import (
+    _DEFAULTS as STATSFORECAST_CERTIFICATION_DEFAULTS,
+)
 
 from .contracts import ModelInventoryRow, ParameterCategory, ParameterDescriptor
 
@@ -177,7 +179,9 @@ def _classify_parameter(name: str, *, required: bool) -> tuple[ParameterCategory
     )
 
 
-def _inspect_parameters(constructor: type[Any] | None) -> tuple[
+def _inspect_parameters(
+    constructor: type[Any] | None,
+) -> tuple[
     str | None,
     tuple[str, ...],
     tuple[str, ...],
@@ -260,7 +264,9 @@ def build_bingo5_inventory() -> list[ModelInventoryRow]:
     route_ids = {route.model_id for route in routes}
     collisions = sorted(broad_ids & route_ids)
     if collisions:
-        raise AssertionError(f"identity collision between broad/probabilistic catalogs: {collisions}")
+        raise AssertionError(
+            f"identity collision between broad/probabilistic catalogs: {collisions}"
+        )
     observed = len(broad) + len(routes)
     if observed != _EXPECTED_IDENTITIES:
         raise RuntimeError(
