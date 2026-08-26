@@ -1,0 +1,17 @@
+{
+  "artifact_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4a-darts-gpu-smoke-20260826-125942/discover-artifacts",
+  "device": "cuda",
+  "geometry": {
+    "draw_no_col": "draw_no",
+    "game_id": "phase4a-real-data",
+    "max_value": 20,
+    "min_value": 1,
+    "position_prefix": "n",
+    "positions": 4
+  },
+  "mode": "discover",
+  "run_id": "phase4a-darts-discover-20260826-125942",
+  "runtime": "torch",
+  "schema_version": 1,
+  "seed": 1
+}

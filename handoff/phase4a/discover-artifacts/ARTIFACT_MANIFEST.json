@@ -1,0 +1,16 @@
+{
+  "file_count": 2,
+  "files": [
+    {
+      "path": "request.json",
+      "sha256": "cd93d97ee3f955a6198ea9e9c0f6559f0c4136a6ba144bcc4df44fd69b80a99e",
+      "size_bytes": 1147
+    },
+    {
+      "path": "response.json",
+      "sha256": "ade975757cae324bab8625a83741a0c883ce262215480e57605bce91f6cf2cd3",
+      "size_bytes": 305504
+    }
+  ],
+  "schema_version": 1
+}

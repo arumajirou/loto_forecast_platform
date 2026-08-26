@@ -1,0 +1,42 @@
+{
+  "discovery": {
+    "backtest_signature": "(self, series: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries']], past_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, future_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, historical_forecasts: darts.timeseries.TimeSeries | collections.abc.Sequence[darts.timeseries.TimeSeries] | collections.abc.Sequence[collections.abc.Sequence[darts.timeseries.TimeSeries]] | None = None, forecast_horizon: int = 1, num_samples: int = 1, train_length: int | None = None, val_length: int = 0, start: Union[pandas.Timestamp, int, float, Literal['end'], NoneType] = None, start_format: Literal['position', 'value'] = 'value', stride: int = 1, retrain: bool | int | collections.abc.Callable[..., bool] = True, apply_globally: bool = False, overlap_end: bool = False, last_points_only: bool = False, metric: collections.abc.Callable[..., float | list[float] | numpy.ndarray | list[numpy.ndarray]] | list[collections.abc.Callable[..., float | list[float] | numpy.ndarray | list[numpy.ndarray]]] = <function mape at 0x7730f1b8e2a0>, reduction: collections.abc.Callable[..., float] | None = <function nanmean at 0x7731ba1f8a30>, verbose: bool = False, show_warnings: bool = True, predict_likelihood_parameters: bool = False, enable_optimization: bool = True, data_transformers: dict[str, darts.dataprocessing.transformers.base_data_transformer.BaseDataTransformer | darts.dataprocessing.pipeline.Pipeline] | None = None, metric_kwargs: dict[str, typing.Any] | list[dict[str, typing.Any]] | None = None, fit_kwargs: dict[str, typing.Any] | None = None, predict_kwargs: dict[str, typing.Any] | None = None, sample_weight: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], str, NoneType] = None, random_state: int | None = None) -> float | numpy.ndarray | list[float] | list[numpy.ndarray]",
+    "class_name": "DLinearModel",
+    "constructor_signature": "(*args, **kwargs)",
+    "declares_supports_future_covariates": true,
+    "declares_supports_likelihood_parameter_prediction": true,
+    "declares_supports_multivariate": true,
+    "declares_supports_past_covariates": true,
+    "declares_supports_probabilistic_prediction": true,
+    "declares_supports_sample_weight": true,
+    "declares_supports_static_covariates": true,
+    "fit_signature": "(self, series: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries']], past_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, future_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, val_series: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, val_past_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, val_future_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, trainer: pytorch_lightning.trainer.trainer.Trainer | None = None, verbose: bool | None = None, epochs: int = 0, max_samples_per_ts: int | None = None, dataloader_kwargs: dict[str, typing.Any] | None = None, sample_weight: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], str, NoneType] = None, val_sample_weight: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], str, NoneType] = None, stride: int = 1, load_best: bool = False) -> 'TorchForecastingModel'",
+    "historical_forecasts_signature": "(self, series: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries']], past_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, future_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, forecast_horizon: int = 1, num_samples: int = 1, train_length: int | None = None, val_length: int = 0, start: Union[pandas.Timestamp, int, float, Literal['end'], NoneType] = None, start_format: Literal['position', 'value'] = 'value', stride: int = 1, retrain: bool | int | collections.abc.Callable[..., bool] = True, apply_globally: bool = False, overlap_end: bool = False, last_points_only: bool = True, verbose: bool = False, show_warnings: bool = True, predict_likelihood_parameters: bool = False, enable_optimization: bool = True, data_transformers: dict[str, darts.dataprocessing.transformers.base_data_transformer.BaseDataTransformer | darts.dataprocessing.pipeline.Pipeline] | None = None, fit_kwargs: dict[str, typing.Any] | None = None, predict_kwargs: dict[str, typing.Any] | None = None, sample_weight: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], str, NoneType] = None, random_state: int | None = None) -> darts.timeseries.TimeSeries | list[darts.timeseries.TimeSeries] | list[list[darts.timeseries.TimeSeries]]",
+    "is_abstract": false,
+    "is_alias": false,
+    "is_class": true,
+    "load_signature": "(path: str, pl_trainer_kwargs: dict | None = None, **kwargs) -> 'TorchForecastingModel'",
+    "module": "darts.models.forecasting.dlinear",
+    "predict_signature": "(self, n: int, series: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, past_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, future_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, trainer: pytorch_lightning.trainer.trainer.Trainer | None = None, batch_size: int | None = None, verbose: bool | None = None, n_jobs: int = 1, roll_size: int | None = None, num_samples: int = 1, dataloader_kwargs: dict[str, typing.Any] | None = None, mc_dropout: bool = False, predict_likelihood_parameters: bool = False, show_warnings: bool = True, random_state: int | None = None) -> Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries']]",
+    "public_name": "DLinearModel",
+    "residuals_signature": "(self, series: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries']], past_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, future_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, historical_forecasts: darts.timeseries.TimeSeries | collections.abc.Sequence[darts.timeseries.TimeSeries] | collections.abc.Sequence[collections.abc.Sequence[darts.timeseries.TimeSeries]] | None = None, forecast_horizon: int = 1, num_samples: int = 1, train_length: int | None = None, val_length: int = 0, start: Union[pandas.Timestamp, int, float, Literal['end'], NoneType] = None, start_format: Literal['position', 'value'] = 'value', stride: int = 1, retrain: bool | int | collections.abc.Callable[..., bool] = True, apply_globally: bool = False, overlap_end: bool = False, last_points_only: bool = True, metric: collections.abc.Callable[..., float | list[float] | numpy.ndarray | list[numpy.ndarray]] = <function err at 0x7730f1b8c680>, verbose: bool = False, show_warnings: bool = True, predict_likelihood_parameters: bool = False, enable_optimization: bool = True, data_transformers: dict[str, darts.dataprocessing.transformers.base_data_transformer.BaseDataTransformer | darts.dataprocessing.pipeline.Pipeline] | None = None, metric_kwargs: dict[str, typing.Any] | None = None, fit_kwargs: dict[str, typing.Any] | None = None, predict_kwargs: dict[str, typing.Any] | None = None, sample_weight: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], str, NoneType] = None, values_only: bool = False, random_state: int | None = None) -> darts.timeseries.TimeSeries | list[darts.timeseries.TimeSeries] | list[list[darts.timeseries.TimeSeries]]",
+    "save_signature": "(self, path: str | None = None, clean: bool = False) -> None",
+    "status": "IMPORTED"
+  },
+  "public_name": "DLinearModel",
+  "signature": {
+    "parameters": {
+      "args": {
+        "default": null,
+        "kind": "VAR_POSITIONAL",
+        "required": true
+      },
+      "kwargs": {
+        "default": null,
+        "kind": "VAR_KEYWORD",
+        "required": true
+      }
+    },
+    "signature": "(*args, **kwargs)"
+  }
+}

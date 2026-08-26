@@ -1,0 +1,71 @@
+{
+  "file_count": 13,
+  "files": [
+    {
+      "path": "baseline_metrics.json",
+      "sha256": "e777425f4e22ec1ea75b70630a0f126eb7798e21db209bbfa8f82635152f76bd",
+      "size_bytes": 2178
+    },
+    {
+      "path": "metrics.json",
+      "sha256": "a958deba2e00a61ef4a7d466b1f8bc3229f3e8310a96af9302bc82dee7eb73c2",
+      "size_bytes": 292
+    },
+    {
+      "path": "models/position-1.model",
+      "sha256": "0ba4efce87e800b01749d524be89ada743f88f9d2e1ce27fe82dfbde997a1395",
+      "size_bytes": 13549
+    },
+    {
+      "path": "models/position-1.model.ckpt",
+      "sha256": "d73f42383b93421019c98813e07d445aa9a1020624505ebe36202fa41ecca6ff",
+      "size_bytes": 6045
+    },
+    {
+      "path": "models/position-2.model",
+      "sha256": "1171f8f4054c4ffd76def41d0a64d1cc4433d45ff31e7640a750c4fffca4acc3",
+      "size_bytes": 13549
+    },
+    {
+      "path": "models/position-2.model.ckpt",
+      "sha256": "a552db1f212111636ff965e3e59d4bd345de6f5bd8762b00438b3f5020d9dae4",
+      "size_bytes": 6045
+    },
+    {
+      "path": "models/position-3.model",
+      "sha256": "90cb0088cc46e86f5eff2c4848c79f00473251783eaadfdcb5fce05dee79be93",
+      "size_bytes": 13549
+    },
+    {
+      "path": "models/position-3.model.ckpt",
+      "sha256": "1a3cd8216bb0325ebc4550260519ded770ce1234f38de280b76b6d9db559139e",
+      "size_bytes": 6045
+    },
+    {
+      "path": "models/position-4.model",
+      "sha256": "16fa3641fc07761b4e600b575662d24f131bc3b574ec334f58b75126153adeef",
+      "size_bytes": 13549
+    },
+    {
+      "path": "models/position-4.model.ckpt",
+      "sha256": "d1a75a8e7cb589ce1976fbc652d3c71007405bff9b04cdc8752f5a3b6fe0b0e3",
+      "size_bytes": 6045
+    },
+    {
+      "path": "request.json",
+      "sha256": "2ee4a19a686ec94edc8a0a4739c7ded359760a5fd4143116a091e2a337298c4c",
+      "size_bytes": 1639
+    },
+    {
+      "path": "response.json",
+      "sha256": "eb031109ab4f04aa564df0f20d2ad330c150258eda9f56e5e036423d60d81d3f",
+      "size_bytes": 6388
+    },
+    {
+      "path": "runtime_certification.json",
+      "sha256": "ab964c6c9eb56759c4cc737952afbae99f86d53525aefb49702f5b9c644f2b24",
+      "size_bytes": 1466
+    }
+  ],
+  "schema_version": 1
+}
