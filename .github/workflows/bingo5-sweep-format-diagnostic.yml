@@ -1,0 +1,44 @@
+name: bingo5-sweep-format-diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/loto/evaluation/parameter_sweep/**"
+      - "tests/evaluation/test_parameter_sweep.py"
+      - "tools/evaluation/bingo5_parameter_*.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  format-diff:
+    runs-on: [self-hosted, Linux, X64, loto-ci]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        with:
+          version: "0.11.21"
+          enable-cache: false
+      - name: Produce exact Ruff 0.16.4 format diff
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          uvx --from ruff==0.16.4 ruff format \
+            src/loto/evaluation/parameter_sweep \
+            tests/evaluation/test_parameter_sweep.py \
+            tools/evaluation/bingo5_parameter_sweep.py \
+            tools/evaluation/bingo5_parameter_smoke.py \
+            tools/evaluation/bingo5_parameter_coarse.py
+          echo '=== RUFF_FORMAT_DIFF ==='
+          git diff -- \
+            src/loto/evaluation/parameter_sweep \
+            tests/evaluation/test_parameter_sweep.py \
+            tools/evaluation/bingo5_parameter_sweep.py \
+            tools/evaluation/bingo5_parameter_smoke.py \
+            tools/evaluation/bingo5_parameter_coarse.py
