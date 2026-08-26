@@ -1,12 +1,12 @@
 # Loto Forecast Runtime Audit Handoff
 
-Updated: 2026-08-26T12:47:04.711404+09:00
+Updated: 2026-08-26T12:49:29.711246+09:00
 
 ## Current overall status
 
 - overall: `PARTIALLY_VERIFIED`
-- estimated progress: `38%`
-- current phase: `Phase 3C completed / Phase 4 lane selection next`
+- estimated progress: `40%`
+- current phase: `Phase 3D completed / Phase 4A smoke next`
 
 ## Completed
 
@@ -16,25 +16,23 @@ Updated: 2026-08-26T12:47:04.711404+09:00
 - Phase 3: PARTIALLY_VERIFIED
 - Phase 3B: VERIFIED
 - Phase 3C: VERIFIED
+- Phase 3D: VERIFIED
 
-## Phase 3C runtime gap review
+## Phase 3D lane counts
 
-- source environments: 29
-- unresolved reviewed: 10
-- ambiguous reviewed: 2
-- broken declared runtimes: 4
-- reusable compatible candidates: 1
-- candidate exists but incompatible/partial: 7
-- no runtime found: 0
+- CURRENT_CPU_LEGACY: 4
+- CURRENT_LEGACY_GPU_COMPAT: 1
+- CURRENT_MODERN_GPU_CANDIDATE: 2
+- EXISTING_VENV_FORMAL_COMPAT_REQUIRED: 7
+- NO_FORMAL_RUNTIME_READY: 3
+- REPAIR_DECLARED_RUNTIME: 4
+- REUSABLE_COMPATIBLE_VENV: 1
+- SEPARATE_FORMAL_LANE_REQUIRED: 7
+
+- Phase 4 smoke allowed now: 8
+- blocked pending repair/formal lane: 21
 
 ## Next
 
-Use Phase 3C evidence to select formal Modern GPU and Legacy compatibility lanes.
-Do not install or overwrite unresolved environments until the lane decision is recorded.
-Then begin Phase 4 real checkpoint load/inference smoke certification.
-
-## Formal runtime certification
-
-Not yet complete. Phase 4 must verify checkpoint load, real input, inference,
-output shape, finite values, requested/effective device, GPU PID/VRAM,
-CPU fallback, and save/reload where applicable.
+Begin Phase 4A real checkpoint/load-inference smoke on the ready queue.
+Do not treat Phase 3D metadata compatibility as formal model certification.

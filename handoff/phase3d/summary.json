@@ -1,0 +1,26 @@
+{
+  "cpu_legacy_count": 4,
+  "dependencies_modified": false,
+  "formal_runtime_certification": false,
+  "interpretation": "Phase 3D selects current runtime lanes and Phase 4 smoke eligibility only. It does not upgrade Python/Torch/CUDA or certify any model.",
+  "lane_counts": {
+    "CURRENT_CPU_LEGACY": 4,
+    "CURRENT_LEGACY_GPU_COMPAT": 1,
+    "CURRENT_MODERN_GPU_CANDIDATE": 2,
+    "EXISTING_VENV_FORMAL_COMPAT_REQUIRED": 7,
+    "NO_FORMAL_RUNTIME_READY": 3,
+    "REPAIR_DECLARED_RUNTIME": 4,
+    "REUSABLE_COMPATIBLE_VENV": 1,
+    "SEPARATE_FORMAL_LANE_REQUIRED": 7
+  },
+  "legacy_gpu_compat_count": 1,
+  "model_checkpoint_loaded": false,
+  "modern_gpu_candidate_count": 2,
+  "modern_target_not_migrated": true,
+  "phase3c_review_target_count": 12,
+  "phase4_blocked_count": 21,
+  "phase4_smoke_allowed_count": 8,
+  "schema_version": 1,
+  "source_environment_count": 29,
+  "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c"
+}

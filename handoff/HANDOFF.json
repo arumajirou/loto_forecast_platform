@@ -13,10 +13,11 @@
     "phase2": "VERIFIED",
     "phase3": "PARTIALLY_VERIFIED",
     "phase3b": "VERIFIED",
-    "phase3c": "VERIFIED"
+    "phase3c": "VERIFIED",
+    "phase3d": "VERIFIED"
   },
-  "current_phase": "phase3c_completed_pending_phase4_lane_selection",
-  "estimated_progress_percent": 38,
+  "current_phase": "phase3d_completed_phase4a_next",
+  "estimated_progress_percent": 40,
   "handoff_run_id": "20260826-124659",
   "next_phases": [
     "phase3b_venv_identity_correction",
@@ -74,7 +75,33 @@
     "source_environment_count": 29,
     "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c"
   },
+  "phase3d": {
+    "cpu_legacy_count": 4,
+    "dependencies_modified": false,
+    "formal_runtime_certification": false,
+    "interpretation": "Phase 3D selects current runtime lanes and Phase 4 smoke eligibility only. It does not upgrade Python/Torch/CUDA or certify any model.",
+    "lane_counts": {
+      "CURRENT_CPU_LEGACY": 4,
+      "CURRENT_LEGACY_GPU_COMPAT": 1,
+      "CURRENT_MODERN_GPU_CANDIDATE": 2,
+      "EXISTING_VENV_FORMAL_COMPAT_REQUIRED": 7,
+      "NO_FORMAL_RUNTIME_READY": 3,
+      "REPAIR_DECLARED_RUNTIME": 4,
+      "REUSABLE_COMPATIBLE_VENV": 1,
+      "SEPARATE_FORMAL_LANE_REQUIRED": 7
+    },
+    "legacy_gpu_compat_count": 1,
+    "model_checkpoint_loaded": false,
+    "modern_gpu_candidate_count": 2,
+    "modern_target_not_migrated": true,
+    "phase3c_review_target_count": 12,
+    "phase4_blocked_count": 21,
+    "phase4_smoke_allowed_count": 8,
+    "schema_version": 1,
+    "source_environment_count": 29,
+    "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c"
+  },
   "schema_version": 1,
   "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
-  "updated_at_utc": "2026-08-26T03:47:04.711306+00:00"
+  "updated_at_utc": "2026-08-26T03:49:29.711131+00:00"
 }
