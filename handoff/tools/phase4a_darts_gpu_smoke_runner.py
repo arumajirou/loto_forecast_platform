@@ -3,10 +3,16 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import shutil
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+# Keep local bytecode/cache files out of the Git handoff worktree.
+sys.dont_write_bytecode = True
+os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 
 HERE = Path(__file__).resolve().parent
 TARGET = HERE / "phase4a_darts_gpu_smoke.py"
@@ -16,6 +22,183 @@ if spec is None or spec.loader is None:
     raise SystemExit("cannot load phase4a_darts_gpu_smoke.py")
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
+
+# ---------------------------------------------------------------------------
+# Phase 4A retry correction
+# ---------------------------------------------------------------------------
+# The first Phase 4A attempt failed before model execution because the original
+# data discovery searched only a few repo-local directories.  Do not change the
+# smoke/certification semantics; only widen the read-only candidate discovery
+# to the user's time-series workspace.  The implementation's existing
+# choose_real_data() still performs the final schema gate (draw_no + n1..nN).
+_original_candidate_data_paths = mod.candidate_data_paths
+_original_inspect_columns = mod.inspect_columns
+
+
+def _likely_real_data_file(path: Path) -> bool:
+    lowered = str(path).lower()
+    name = path.name.lower()
+
+    include_tokens = (
+        "numbers3",
+        "numbers4",
+        "number3",
+        "number4",
+        "loto6",
+        "loto7",
+        "mini_loto",
+        "miniloto",
+        "bingo5",
+        "loto_y_ts",
+        "lottery",
+        "draws",
+        "draw_history",
+        "draw-history",
+        "loto",
+    )
+    if not any(token in name for token in include_tokens):
+        return False
+
+    # Exclude obvious derived predictions/evaluation outputs.  We deliberately
+    # do not exclude generic processed/unified datasets because those can still
+    # be legitimate historical panels and will be schema-validated later.
+    exclude_tokens = (
+        "/artifacts/",
+        "/worktrees/",
+        "/logs/",
+        "/mlruns/",
+        "/wandb/",
+        "prediction",
+        "forecast",
+        "_oof",
+        "oof_",
+        "holdout",
+        "prospective",
+        "metrics",
+        "baseline_metrics",
+        "provider-response",
+        "characterization",
+    )
+    return not any(token in lowered for token in exclude_tokens)
+
+
+def _walk_data_root(root: Path, *, max_depth: int = 7) -> list[Path]:
+    if not root.exists() or not root.is_dir():
+        return []
+
+    skip_dir_names = {
+        ".git",
+        ".venv",
+        ".runtime-envs",
+        "venv",
+        "venvs",
+        "node_modules",
+        "site-packages",
+        "__pycache__",
+        ".cache",
+        "cache",
+        "caches",
+        "models",
+        "model",
+        "checkpoints",
+        "artifacts",
+        "worktrees",
+        "logs",
+        "mlruns",
+        "wandb",
+    }
+
+    found: list[Path] = []
+    root = Path(os.path.abspath(str(root)))
+
+    for current, dirs, files in os.walk(root):
+        current_path = Path(current)
+        try:
+            depth = len(current_path.relative_to(root).parts)
+        except ValueError:
+            depth = max_depth + 1
+        if depth >= max_depth:
+            dirs[:] = []
+        else:
+            dirs[:] = [
+                d
+                for d in dirs
+                if d.lower() not in skip_dir_names
+                and not d.lower().startswith(".venv")
+            ]
+
+        for name in files:
+            if not name.lower().endswith((".csv", ".parquet")):
+                continue
+            path = current_path / name
+            if _likely_real_data_file(path):
+                found.append(path)
+
+    return found
+
+
+def broad_candidate_data_paths() -> list[Path]:
+    result: list[Path] = list(_original_candidate_data_paths())
+
+    explicit_root = os.environ.get("LOTO_DATA_ROOT")
+    roots = [
+        mod.ROOT.parent,  # /mnt/e/env/ts
+        mod.ROOT.parent / "loto_ops",
+        mod.ROOT.parent / "data",
+        mod.ROOT.parent / "dataset",
+        mod.ROOT.parent / "datasets",
+    ]
+    if explicit_root:
+        roots.insert(0, Path(explicit_root))
+
+    seen_roots: set[str] = set()
+    for root in roots:
+        key = os.path.abspath(str(root))
+        if key in seen_roots:
+            continue
+        seen_roots.add(key)
+        result.extend(_walk_data_root(Path(key)))
+
+    # Prefer explicit input first, then raw/data/dataset-looking paths, while
+    # retaining deterministic ordering.  choose_real_data() performs the final
+    # content/schema ranking.
+    explicit = os.environ.get("LOTO_PHASE4_DATA")
+
+    def rank(path: Path) -> tuple[int, str]:
+        text = str(path).lower()
+        score = 0
+        if explicit and os.path.abspath(str(path)) == os.path.abspath(explicit):
+            score -= 1000
+        for token in ("/raw/", "/data/", "/dataset/", "/datasets/", "history", "official"):
+            if token in text:
+                score -= 20
+        return score, text
+
+    dedup: dict[str, Path] = {}
+    for path in result:
+        key = os.path.abspath(str(path))
+        dedup.setdefault(key, Path(key))
+    return sorted(dedup.values(), key=rank)
+
+
+def efficient_inspect_columns(path: Path) -> list[str] | None:
+    try:
+        if path.suffix.lower() == ".csv":
+            import pandas as pd
+
+            return list(pd.read_csv(path, nrows=2).columns)
+        try:
+            import pyarrow.parquet as pq
+
+            return list(pq.ParquetFile(path).schema.names)
+        except Exception:
+            return _original_inspect_columns(path)
+    except Exception:
+        return None
+
+
+mod.candidate_data_paths = broad_candidate_data_paths
+mod.inspect_columns = efficient_inspect_columns
 
 
 def safe_publish(summary: dict) -> str:
