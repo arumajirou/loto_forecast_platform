@@ -1,0 +1,80 @@
+{
+  "cuda_visible_devices": "",
+  "models": [
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4e-sktime-classic-smoke-20260826-135004/models/position-1.pickle",
+      "artifact_sha256": "49f9232b539815437d6214c24d86a17ece624ed6a467561d312b85a7cfc00b2a",
+      "model_class": "NaiveForecaster",
+      "position": "n1",
+      "prediction": [
+        5.015873015873016
+      ],
+      "prediction_finite": true,
+      "prediction_shape": [
+        1
+      ],
+      "strategy": "drift"
+    },
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4e-sktime-classic-smoke-20260826-135004/models/position-2.pickle",
+      "artifact_sha256": "db2efca7c788389eaefa684b96fc7fbef52f89395a73542bacb4cae3669fc3de",
+      "model_class": "NaiveForecaster",
+      "position": "n2",
+      "prediction": [
+        10.007936507936508
+      ],
+      "prediction_finite": true,
+      "prediction_shape": [
+        1
+      ],
+      "strategy": "drift"
+    },
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4e-sktime-classic-smoke-20260826-135004/models/position-3.pickle",
+      "artifact_sha256": "d4de591053af5fda74941c76ea6b35fcdfbb899caf6943e16e9232daaaa3253d",
+      "model_class": "NaiveForecaster",
+      "position": "n3",
+      "prediction": [
+        12.0
+      ],
+      "prediction_finite": true,
+      "prediction_shape": [
+        1
+      ],
+      "strategy": "drift"
+    },
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4e-sktime-classic-smoke-20260826-135004/models/position-4.pickle",
+      "artifact_sha256": "15a36afbf2469cf85489ec9918a2cdf15bf5cda60f49d7367691771e5136b126",
+      "model_class": "NaiveForecaster",
+      "position": "n4",
+      "prediction": [
+        15.976190476190476
+      ],
+      "prediction_finite": true,
+      "prediction_shape": [
+        1
+      ],
+      "strategy": "drift"
+    }
+  ],
+  "operation": "SEPARATE_PROCESS_RELOAD_PREDICT",
+  "predictions": [
+    [
+      5.015873015873016
+    ],
+    [
+      10.007936507936508
+    ],
+    [
+      12.0
+    ],
+    [
+      15.976190476190476
+    ]
+  ],
+  "process_id": 3683359,
+  "sktime": "1.0.1",
+  "status": "VERIFIED",
+  "torch_imported": false
+}
