@@ -1,0 +1,34 @@
+{
+  "cuda_builds": {
+    "12.8": 2,
+    "13.0": 4
+  },
+  "cuda_kernel_pass_count": 6,
+  "environment_status_counts": {
+    "CUDA_KERNEL_PASS": 6,
+    "IMPORT_VERIFIED_CPU": 4,
+    "NO_HOST_RUNTIME": 19
+  },
+  "extra_provider_or_root_runtimes": 30,
+  "extra_runtime_status_counts": {
+    "CUDA_KERNEL_PASS": 24,
+    "FRAMEWORK_IMPORT_FAILED": 2,
+    "IMPORT_VERIFIED_CPU": 4
+  },
+  "formal_certification_claim": false,
+  "host_runtime_candidates": 40,
+  "mapped_environment_runtimes": 10,
+  "python_versions": {
+    "3.11.14": 1,
+    "3.12.13": 2,
+    "3.13.13": 7
+  },
+  "schema_version": 1,
+  "sm120_listed_count": 6,
+  "source_environment_count": 29,
+  "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
+  "torch_versions": {
+    "2.13.0+cu130": 4,
+    "2.9.1+cu128": 2
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "important_note": "Phase 2 does not authorize dependency upgrades. Modern GPU candidate means only that the CURRENT environment passed import and tiny CUDA-kernel checks.",
+  "modern_gpu_candidate": [
+    "environments/chronos2-py313",
+    "environments/darts-torch",
+    "environments/gluonts-compat",
+    "environments/gluonts-latest",
+    "environments/moirai2-cuda13-experimental",
+    "environments/tabpfn-ts"
+  ],
+  "requires_attention": [
+    {
+      "environment": "environments/autogluon-timeseries",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/basicts-py310",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/basicts-py311",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/forecast-mcp",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/granite-ttm",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/merlion-core-py311",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/moirai",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/moirai2-supported-py311",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/sundial",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/timer-base-84m-supported-py310",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/timer-s1-py311",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/timesfm",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/timesfm25-pytorch",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/timesfm25-pytorch-source",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/timesfm25-transformers",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/tirex",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/tirex2-supported-py312",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/toto2-4m-py312",
+      "status": "NO_HOST_RUNTIME"
+    },
+    {
+      "environment": "environments/tslib-core",
+      "status": "NO_HOST_RUNTIME"
+    }
+  ],
+  "working_but_not_gpu_verified": [
+    "environments/darts-notorch",
+    "environments/sktime-classic-py312",
+    "environments/sktime-core-py313",
+    "environments/statsforecast-py313"
+  ]
+}

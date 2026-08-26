@@ -1,0 +1,31 @@
+{
+  "broad_v1": 174,
+  "by_library": {
+    "autogluon": 37,
+    "builtin": 4,
+    "catboost": 1,
+    "darts": 1,
+    "gluonts": 9,
+    "hierarchicalforecast": 10,
+    "lightgbm": 2,
+    "mlforecast_auto": 8,
+    "neuralforecast": 37,
+    "neuralforecast_auto": 36,
+    "reservoirpy": 1,
+    "skforecast": 27,
+    "sklearn": 7,
+    "sktime": 1,
+    "statsforecast": 41,
+    "tsfm": 21,
+    "xgboost": 1
+  },
+  "by_source_kind": {
+    "autogluon_source_ensemble": 8,
+    "autogluon_source_model": 29,
+    "broad_v1": 171,
+    "gluonts_p6_registry": 9,
+    "skforecast_strategy": 27
+  },
+  "delta_vs_broad_v1": 70,
+  "expanded_v2": 244
+}

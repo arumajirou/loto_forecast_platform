@@ -1,0 +1,66 @@
+{
+  "expanded_counts": {
+    "broad_v1": 174,
+    "by_library": {
+      "autogluon": 37,
+      "builtin": 4,
+      "catboost": 1,
+      "darts": 1,
+      "gluonts": 9,
+      "hierarchicalforecast": 10,
+      "lightgbm": 2,
+      "mlforecast_auto": 8,
+      "neuralforecast": 37,
+      "neuralforecast_auto": 36,
+      "reservoirpy": 1,
+      "skforecast": 27,
+      "sklearn": 7,
+      "sktime": 1,
+      "statsforecast": 41,
+      "tsfm": 21,
+      "xgboost": 1
+    },
+    "by_source_kind": {
+      "autogluon_source_ensemble": 8,
+      "autogluon_source_model": 29,
+      "broad_v1": 171,
+      "gluonts_p6_registry": 9,
+      "skforecast_strategy": 27
+    },
+    "delta_vs_broad_v1": 70,
+    "expanded_v2": 244
+  },
+  "known_source_defect": {
+    "affected_function": "expanded_inventory_counts",
+    "broken_identifier": "AUTOGLUON_BROAD_V1_ID",
+    "defect_present": true,
+    "defined_identifier": "AUTOGLOUON_BROAD_V1_ID",
+    "file": "src/loto/models/implementation_catalog.py",
+    "impact": "NameError prevents expanded inventory summary generation",
+    "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
+    "workaround": "expanded_implementation_catalog() called directly; counts derived locally"
+  },
+  "phase1_original": {
+    "base_catalog": 89,
+    "broad_v1": 174,
+    "canonical_identity_candidates": 233,
+    "canonical_observations": 328,
+    "environments": 29,
+    "expanded_v2": 0,
+    "extraction_errors": 1,
+    "foundation_verified_revisions": 21,
+    "providers": 36,
+    "repo_alias_groups": 2,
+    "timesfm_backends": 4,
+    "toto2_variants": 2
+  },
+  "phase1b_repaired": {
+    "canonical_identity_candidates": 306,
+    "canonical_observations": 554,
+    "execution_surfaces": 55,
+    "expanded_v2": 244,
+    "repo_alias_groups": 2
+  },
+  "schema_version": 2,
+  "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c"
+}

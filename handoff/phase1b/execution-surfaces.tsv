@@ -1,0 +1,56 @@
+surface	execution_kind	execution_path	model_id	repo_id	revision
+execution_surface	runtime_certifier	scripts/certify_kdpp_fixed_k_runtime.py			
+execution_surface	runtime_certifier	scripts/certify_moirai2_runtime.py			
+execution_surface	runtime_certifier	scripts/certify_tabpfn_ts_v2_runtime.py			
+execution_surface	runtime_certifier	scripts/certify_toto2_4m_runtime.py			
+execution_surface	certification_runner	scripts/run_auto_frets_runtime_certification.sh			
+execution_surface	certification_runner	scripts/run_auto_segrnn_runtime_certification.sh			
+execution_surface	certification_runner	scripts/run_auto_timellm_runtime_certification.sh			
+execution_surface	provider	scripts/run_autogluon_timeseries_provider.py			
+execution_surface	provider	scripts/run_basicts_provider.py			
+execution_surface	provider	scripts/run_chronos2_provider.py			
+execution_surface	provider	scripts/run_chronos_2_provider.py	chronos-2	amazon/chronos-2	29ec3766d36d6f73f0696f85560a422f50e8498c
+execution_surface	provider	scripts/run_chronos_bolt_provider.py	chronos-bolt-tiny	amazon/chronos-bolt-tiny	a0e552de83495b5c28c14c71c374f3e33280b340
+execution_surface	provider	scripts/run_chronos_t5_base_provider.py	chronos-t5-base	amazon/chronos-t5-base	ad294eaacead15db499b740ea4122266dd2a81a2
+execution_surface	provider	scripts/run_chronos_t5_provider.py	chronos-t5-small	amazon/chronos-t5-small	a971ba21945c4f1796b17a91fe69214b5f4ad472
+execution_surface	provider	scripts/run_darts_provider.py			
+execution_surface	provider	scripts/run_granite_flowstate_r1_provider.py	granite-flowstate-r1	ibm-granite/granite-timeseries-flowstate-r1	05effc6cb39ee16dce9dd0064ed1a76e4b8ff464
+execution_surface	provider	scripts/run_granite_ttm_provider.py		ibm-granite/granite-timeseries-ttm-r2	
+execution_surface	provider	scripts/run_kronos_base_provider.py	kronos-base	NeoQuasar/Kronos-base	2b554741eca47781b64468546e77fef3e85130e6
+execution_surface	provider	scripts/run_lag_llama_provider.py	lag-llama	time-series-foundation-models/Lag-Llama	72dcfc29da106acfe38250a60f4ae29d1e56a3d9
+execution_surface	certification_runner	scripts/run_merlion_core_certification.sh			
+execution_surface	provider	scripts/run_merlion_provider.py			
+execution_surface	provider	scripts/run_moirai2_provider.py			
+execution_surface	provider	scripts/run_moirai_provider.py		Salesforce/moirai-2.0-R-small	30f43ff08c8494f4943ae1521e9d4e94a0fbb389
+execution_surface	provider	scripts/run_moment_1_large_provider.py	moment-1-large	AutonLab/MOMENT-1-large	ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc
+execution_surface	provider	scripts/run_moment_1_small_provider.py	moment-1-small	AutonLab/MOMENT-1-small	411e288267f82cce86296dbe4d6c8bc533cc162f
+execution_surface	certification_runner	scripts/run_sktime_p0_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p10_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p11_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p1_matrix_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p2_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p3_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p4_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p5_lock_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p5_monitor_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p6_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p7_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p8_certification.sh			
+execution_surface	certification_runner	scripts/run_sktime_p9_certification.sh			
+execution_surface	provider	scripts/run_sktime_provider.py			
+execution_surface	provider	scripts/run_sundial_provider.py		thuml/sundial-base-128m	3212e42564493f520593e5414af4367fc4b49226
+execution_surface	certification_runner	scripts/run_sundial_provider_v2_certification.sh			
+execution_surface	provider	scripts/run_tabpfn_ts_provider.py		Prior-Labs/TabPFN-v2-reg	4972a65a1b30806315c6f92499959ffbfc69a673
+execution_surface	provider	scripts/run_tabpfn_ts_v2_certified_provider.py			
+execution_surface	certification_runner	scripts/run_tabpfn_ts_v2_target_host_certification.sh			
+execution_surface	provider	scripts/run_time_series_library_provider.py			
+execution_surface	provider	scripts/run_timer_base_84m_provider.py			
+execution_surface	provider	scripts/run_timer_s1_provider.py			
+execution_surface	provider	scripts/run_timesfm25_provider.py			
+execution_surface	provider	scripts/run_timesfm_2_5_transformers_provider.py	timesfm-2.5-transformers	google/timesfm-2.5-200m-transformers	5a9806b9b291fad9233b5249d88263f1846304d3
+execution_surface	provider	scripts/run_timesfm_provider.py		google/timesfm-2.5-200m-pytorch	
+execution_surface	provider	scripts/run_tirex2_provider.py			
+execution_surface	provider	scripts/run_tirex_provider.py		NX-AI/TiRex-2	05e5b26db52bfb256f1ae1bdf785589850482de3
+execution_surface	provider	scripts/run_toto2_4m_provider.py			
+execution_surface	provider	scripts/run_toto_2_0_4m_provider.py	toto-2.0-4m	Datadog/Toto-2.0-4m	8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9
+execution_surface	provider	scripts/run_toto_open_base_provider.py	toto-open-base	Datadog/Toto-Open-Base-1.0	0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5

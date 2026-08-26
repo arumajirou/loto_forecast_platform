@@ -1,0 +1,11 @@
+environment	project_name	requires_python	phase2_status	mapping_status	selected_runtime	candidate_count	all_candidates
+environments/autogluon-timeseries	loto-autogluon-timeseries-provider	>=3.11,<3.13	NO_HOST_RUNTIME	UNRESOLVED_NO_RUNTIME		0	[]
+environments/basicts-py310	loto-basicts-provider	>=3.10,<3.11	NO_HOST_RUNTIME	UNRESOLVED_NO_RUNTIME		0	[]
+environments/basicts-py311	loto-basicts-provider	>=3.11,<3.12	NO_HOST_RUNTIME	UNRESOLVED_NO_RUNTIME		0	[]
+environments/forecast-mcp	loto-forecast-mcp-runtime	>=3.11,<3.13	NO_HOST_RUNTIME	UNRESOLVED_NO_RUNTIME		0	[]
+environments/granite-ttm	loto-granite-ttm-provider	>=3.11,<3.13	NO_HOST_RUNTIME	UNRESOLVED_NO_RUNTIME		0	[]
+environments/merlion-core-py311	loto-merlion-provider	>=3.11,<3.12	NO_HOST_RUNTIME	UNRESOLVED_NO_RUNTIME		0	[]
+environments/sundial	loto-sundial-provider	>=3.11,<3.13	NO_HOST_RUNTIME	UNRESOLVED_NO_RUNTIME		0	[]
+environments/tirex	loto-tirex-provider	>=3.11,<3.13	NO_HOST_RUNTIME	UNRESOLVED_NO_RUNTIME		0	[]
+environments/tirex2-supported-py312	loto-tirex2-supported	>=3.12,<3.13	NO_HOST_RUNTIME	UNRESOLVED_NO_RUNTIME		0	[]
+environments/tslib-core	loto-tslib-core-runtime	>=3.11,<3.14	NO_HOST_RUNTIME	UNRESOLVED_NO_RUNTIME		0	[]

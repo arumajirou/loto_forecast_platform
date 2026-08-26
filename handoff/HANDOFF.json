@@ -1,0 +1,45 @@
+{
+  "canonical_inventory": {
+    "broad_v1": 174,
+    "canonical_identity_candidates": 306,
+    "execution_surfaces": 55,
+    "expanded_v2": 244,
+    "source_environments": 29
+  },
+  "completed_phases": {
+    "phase0": "VERIFIED",
+    "phase1": "VERIFIED",
+    "phase1b": "VERIFIED",
+    "phase2": "VERIFIED",
+    "phase3": "PARTIALLY_VERIFIED"
+  },
+  "current_phase": "phase3b_venv_identity_correction",
+  "estimated_progress_percent": 30,
+  "handoff_run_id": "20260826-123710",
+  "next_phases": [
+    "phase3b_venv_identity_correction",
+    "phase4_model_load_inference_smoke",
+    "phase5_argument_effectiveness",
+    "phase6_all_model_all_game_evaluation",
+    "phase7_runtime_migration_and_repairs",
+    "phase8_documentation_and_final_evidence"
+  ],
+  "overall_status": "PARTIALLY_VERIFIED",
+  "phase2": {
+    "cpu_import_pass": 4,
+    "cuda_kernel_pass": 6,
+    "directly_mapped_environments": 10,
+    "extra_cuda_pass": 24,
+    "extra_runtime_count": 30,
+    "framework_import_failures": 2,
+    "no_host_runtime": 19,
+    "runtime_path_candidates": 40
+  },
+  "phase3": {
+    "known_problem": "interpreter realpath was used as runtime identity; separate venvs may collapse when sharing the same uv-managed base interpreter",
+    "status": "PARTIALLY_VERIFIED"
+  },
+  "schema_version": 1,
+  "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
+  "updated_at_utc": "2026-08-26T03:37:10.334406+00:00"
+}

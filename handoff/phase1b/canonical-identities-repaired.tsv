@@ -1,0 +1,307 @@
+model_id	identity_status	repo_ids	revisions	surfaces	providers	environments	backends	libraries	classes	runtime_statuses	algorithm_ids	implementation_ids
+autogluon-adida	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""ADIDAModel""]"	"[""NOT_RUN""]"	"[""adida""]"	"[""autogluon-adida""]"
+autogluon-arima	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""ARIMAModel""]"	"[""NOT_RUN""]"	"[""arima""]"	"[""autogluon-arima""]"
+autogluon-autoarima	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""AutoARIMAModel""]"	"[""NOT_RUN""]"	"[""autoarima""]"	"[""autogluon-autoarima""]"
+autogluon-autoces	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""AutoCESModel""]"	"[""NOT_RUN""]"	"[""autoces""]"	"[""autogluon-autoces""]"
+autogluon-autoets	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""AutoETSModel""]"	"[""NOT_RUN""]"	"[""autoets""]"	"[""autogluon-autoets""]"
+autogluon-average	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""AverageModel""]"	"[""NOT_RUN""]"	"[""average""]"	"[""autogluon-average""]"
+autogluon-chronos	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""ChronosModel""]"	"[""NOT_RUN""]"	"[""chronos""]"	"[""autogluon-chronos""]"
+autogluon-chronos2	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""Chronos2Model""]"	"[""NOT_RUN""]"	"[""chronos-2""]"	"[""autogluon-chronos2""]"
+autogluon-croston	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""CrostonModel""]"	"[""NOT_RUN""]"	"[""croston""]"	"[""autogluon-croston""]"
+autogluon-deepar	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""DeepARModel""]"	"[""NOT_RUN""]"	"[""deepar""]"	"[""autogluon-deepar""]"
+autogluon-directtabular	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""DirectTabularModel""]"	"[""NOT_RUN""]"	"[""directtabular""]"	"[""autogluon-directtabular""]"
+autogluon-dlinear	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""DLinearModel""]"	"[""NOT_RUN""]"	"[""dlinear""]"	"[""autogluon-dlinear""]"
+autogluon-dynamicoptimizedtheta	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""DynamicOptimizedThetaModel""]"	"[""NOT_RUN""]"	"[""dynamicoptimizedtheta""]"	"[""autogluon-dynamicoptimizedtheta""]"
+autogluon-ensemble-greedy	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""GreedyEnsemble""]"	"[""NOT_RUN""]"	"[""greedyensemble""]"	"[""autogluon-ensemble-greedy""]"
+autogluon-ensemble-linearstacker	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""LinearStackerEnsemble""]"	"[""NOT_RUN""]"	"[""linearstackerensemble""]"	"[""autogluon-ensemble-linearstacker""]"
+autogluon-ensemble-median	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""MedianEnsemble""]"	"[""NOT_RUN""]"	"[""medianensemble""]"	"[""autogluon-ensemble-median""]"
+autogluon-ensemble-performanceweighted	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""PerformanceWeightedEnsemble""]"	"[""NOT_RUN""]"	"[""performanceweightedensemble""]"	"[""autogluon-ensemble-performanceweighted""]"
+autogluon-ensemble-peritemgreedy	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""PerItemGreedyEnsemble""]"	"[""NOT_RUN""]"	"[""peritemgreedyensemble""]"	"[""autogluon-ensemble-peritemgreedy""]"
+autogluon-ensemble-perquantiletabular	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""PerQuantileTabularEnsemble""]"	"[""NOT_RUN""]"	"[""perquantiletabularensemble""]"	"[""autogluon-ensemble-perquantiletabular""]"
+autogluon-ensemble-simpleaverage	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""SimpleAverageEnsemble""]"	"[""NOT_RUN""]"	"[""simpleaverageensemble""]"	"[""autogluon-ensemble-simpleaverage""]"
+autogluon-ensemble-tabular	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""TabularEnsemble""]"	"[""NOT_RUN""]"	"[""tabularensemble""]"	"[""autogluon-ensemble-tabular""]"
+autogluon-ets	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""ETSModel""]"	"[""NOT_RUN""]"	"[""ets""]"	"[""autogluon-ets""]"
+autogluon-imapa	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""IMAPAModel""]"	"[""NOT_RUN""]"	"[""imapa""]"	"[""autogluon-imapa""]"
+autogluon-naive	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""NaiveModel""]"	"[""NOT_RUN""]"	"[""naive""]"	"[""autogluon-naive""]"
+autogluon-npts	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""NPTSModel""]"	"[""NOT_RUN""]"	"[""npts""]"	"[""autogluon-npts""]"
+autogluon-patchtst	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""PatchTSTModel""]"	"[""NOT_RUN""]"	"[""patchtst""]"	"[""autogluon-patchtst""]"
+autogluon-persteptabular	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""PerStepTabularModel""]"	"[""NOT_RUN""]"	"[""persteptabular""]"	"[""autogluon-persteptabular""]"
+autogluon-recursivetabular	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""RecursiveTabularModel""]"	"[""NOT_RUN""]"	"[""recursivetabular""]"	"[""autogluon-recursivetabular""]"
+autogluon-seasonalaverage	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""SeasonalAverageModel""]"	"[""NOT_RUN""]"	"[""seasonalaverage""]"	"[""autogluon-seasonalaverage""]"
+autogluon-seasonalnaive	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""SeasonalNaiveModel""]"	"[""NOT_RUN""]"	"[""seasonalnaive""]"	"[""autogluon-seasonalnaive""]"
+autogluon-simplefeedforward	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""SimpleFeedForwardModel""]"	"[""NOT_RUN""]"	"[""simplefeedforward""]"	"[""autogluon-simplefeedforward""]"
+autogluon-temporalfusiontransformer	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""TemporalFusionTransformerModel""]"	"[""NOT_RUN""]"	"[""tft""]"	"[""autogluon-temporalfusiontransformer""]"
+autogluon-theta	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""ThetaModel""]"	"[""NOT_RUN""]"	"[""theta""]"	"[""autogluon-theta""]"
+autogluon-tide	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""TiDEModel""]"	"[""NOT_RUN""]"	"[""tide""]"	"[""autogluon-tide""]"
+autogluon-timeseries	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1""]"	[]	[]	[]	"[""autogluon""]"	"[""TimeSeriesPredictor""]"	[]	[]	[]
+autogluon-toto	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""TotoModel""]"	"[""NOT_RUN""]"	"[""toto""]"	"[""autogluon-toto""]"
+autogluon-wavenet	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""WaveNetModel""]"	"[""NOT_RUN""]"	"[""wavenet""]"	"[""autogluon-wavenet""]"
+autogluon-zero	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""autogluon""]"	"[""ZeroModel""]"	"[""NOT_RUN""]"	"[""zero""]"	"[""autogluon-zero""]"
+catboost-classifier	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""catboost""]"	"[""CatBoostClassifier""]"	"[""NOT_RUN""]"	"[""catboostclassifier""]"	"[""catboost-classifier""]"
+chronos-2	RESOLVED_CANDIDATE	"[""amazon/chronos-2""]"	"[""29ec3766d36d6f73f0696f85560a422f50e8498c""]"	"[""base_catalog"", ""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_chronos_2_provider.py""]"	[]	[]	"[""chronos"", ""tsfm""]"	"[""Chronos2Pipeline""]"	"[""NOT_RUN""]"	"[""chronos2pipeline""]"	"[""chronos-2""]"
+chronos-2-small	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""chronos""]"	"[""Chronos2Pipeline""]"	[]	[]	[]
+chronos-bolt-tiny	RESOLVED_CANDIDATE	"[""amazon/chronos-bolt-tiny""]"	"[""a0e552de83495b5c28c14c71c374f3e33280b340""]"	"[""base_catalog"", ""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_chronos_bolt_provider.py""]"	[]	[]	"[""chronos"", ""tsfm""]"	"[""ChronosBoltPipeline""]"	"[""NOT_RUN""]"	"[""chronosboltpipeline""]"	"[""chronos-bolt-tiny""]"
+chronos-t5-base	RESOLVED_CANDIDATE	"[""amazon/chronos-t5-base""]"	"[""ad294eaacead15db499b740ea4122266dd2a81a2""]"	"[""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_chronos_t5_base_provider.py""]"	[]	[]	"[""tsfm""]"	"[""ChronosPipeline""]"	"[""NOT_RUN""]"	"[""chronospipeline""]"	"[""chronos-t5-base""]"
+chronos-t5-small	RESOLVED_CANDIDATE	"[""amazon/chronos-t5-small""]"	"[""a971ba21945c4f1796b17a91fe69214b5f4ad472""]"	"[""base_catalog"", ""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_chronos_t5_provider.py""]"	[]	[]	"[""chronos"", ""tsfm""]"	"[""ChronosPipeline""]"	"[""NOT_RUN""]"	"[""chronospipeline""]"	"[""chronos-t5-small""]"
+darts-ensemble	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""darts""]"	"[""RegressionEnsembleModel""]"	"[""NOT_RUN""]"	"[""regressionensemblemodel""]"	"[""darts-ensemble""]"
+elastic-net	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""sklearn""]"	"[""ElasticNet""]"	"[""NOT_RUN""]"	"[""elasticnet""]"	"[""elastic-net""]"
+elasticnet-position	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""sklearn""]"	"[""ElasticNet""]"	[]	[]	[]
+extra-trees	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""sklearn""]"	"[""ExtraTreesClassifier""]"	"[""NOT_RUN""]"	"[""extratreesclassifier""]"	"[""extra-trees""]"
+frequency	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""builtin""]"	"[""FrequencyCandidateAdapter""]"	"[""NOT_RUN""]"	"[""frequencycandidateadapter""]"	"[""frequency""]"
+gluonts-deepar	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1""]"	[]	[]	[]	"[""gluonts""]"	"[""DeepAREstimator""]"	[]	[]	[]
+gluonts-torch-deepar	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""gluonts""]"	"[""DeepAREstimator""]"	"[""NOT_RUN""]"	"[""deepar""]"	"[""gluonts-torch-deepar""]"
+gluonts-torch-deepnpts	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""gluonts""]"	"[""DeepNPTSEstimator""]"	"[""NOT_RUN""]"	"[""deepnpts""]"	"[""gluonts-torch-deepnpts""]"
+gluonts-torch-dlinear	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""gluonts""]"	"[""DLinearEstimator""]"	"[""NOT_RUN""]"	"[""dlinear""]"	"[""gluonts-torch-dlinear""]"
+gluonts-torch-lagtst	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""gluonts""]"	"[""LagTSTEstimator""]"	"[""NOT_RUN""]"	"[""lagtst""]"	"[""gluonts-torch-lagtst""]"
+gluonts-torch-patchtst	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""gluonts""]"	"[""PatchTSTEstimator""]"	"[""NOT_RUN""]"	"[""patchtst""]"	"[""gluonts-torch-patchtst""]"
+gluonts-torch-simplefeedforward	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""gluonts""]"	"[""SimpleFeedForwardEstimator""]"	"[""NOT_RUN""]"	"[""simplefeedforward""]"	"[""gluonts-torch-simplefeedforward""]"
+gluonts-torch-temporalfusiontransformer	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""gluonts""]"	"[""TemporalFusionTransformerEstimator""]"	"[""NOT_RUN""]"	"[""tft""]"	"[""gluonts-torch-temporalfusiontransformer""]"
+gluonts-torch-tide	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""gluonts""]"	"[""TiDEEstimator""]"	"[""NOT_RUN""]"	"[""tide""]"	"[""gluonts-torch-tide""]"
+gluonts-torch-wavenet	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""gluonts""]"	"[""WaveNetEstimator""]"	"[""NOT_RUN""]"	"[""wavenet""]"	"[""gluonts-torch-wavenet""]"
+granite-flowstate-r1	RESOLVED_CANDIDATE	"[""ibm-granite/granite-timeseries-flowstate-r1""]"	"[""05effc6cb39ee16dce9dd0064ed1a76e4b8ff464""]"	"[""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_granite_flowstate_r1_provider.py""]"	[]	[]	"[""tsfm""]"	"[""FlowStateForPrediction""]"	"[""NOT_RUN""]"	"[""flowstateforprediction""]"	"[""granite-flowstate-r1""]"
+granite-patchtsmixer	RESOLVED_CANDIDATE	"[""ibm-granite/granite-timeseries-patchtsmixer""]"	"[""90dc5a88d45f032b7dceefb5d814ca2af54f2ff9""]"	"[""broad_v1"", ""expanded_v2"", ""verified_revision""]"	[]	[]	[]	"[""tsfm""]"	"[""PatchTSMixerForPrediction""]"	"[""NOT_RUN""]"	"[""patchtsmixerforprediction""]"	"[""granite-patchtsmixer""]"
+granite-patchtst	RESOLVED_CANDIDATE	"[""ibm-granite/granite-timeseries-patchtst""]"	"[""7fe295d8bc8fbac8041b60ab351882634165517f""]"	"[""broad_v1"", ""expanded_v2"", ""verified_revision""]"	[]	[]	[]	"[""tsfm""]"	"[""PatchTSTForPrediction""]"	"[""NOT_RUN""]"	"[""patchtstforprediction""]"	"[""granite-patchtst""]"
+granite-ttm	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""transformers""]"	"[""TinyTimeMixerForPrediction""]"	[]	[]	[]
+granite-ttm-r2	RESOLVED_CANDIDATE	"[""ibm-granite/granite-timeseries-ttm-r2""]"	"[""d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f""]"	"[""broad_v1"", ""expanded_v2"", ""verified_revision""]"	[]	[]	[]	"[""tsfm""]"	"[""TinyTimeMixerForPrediction""]"	"[""NOT_RUN""]"	"[""tinytimemixerforprediction""]"	"[""granite-ttm-r2""]"
+hf-bottomup	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""hierarchicalforecast""]"	"[""BottomUp""]"	"[""NOT_RUN""]"	"[""bottomup""]"	"[""hf-bottomup""]"
+hf-bottomupsparse	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""hierarchicalforecast""]"	"[""BottomUpSparse""]"	"[""NOT_RUN""]"	"[""bottomupsparse""]"	"[""hf-bottomupsparse""]"
+hf-erm	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""hierarchicalforecast""]"	"[""ERM""]"	"[""NOT_RUN""]"	"[""erm""]"	"[""hf-erm""]"
+hf-middleout	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""hierarchicalforecast""]"	"[""MiddleOut""]"	"[""NOT_RUN""]"	"[""middleout""]"	"[""hf-middleout""]"
+hf-middleoutsparse	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""hierarchicalforecast""]"	"[""MiddleOutSparse""]"	"[""NOT_RUN""]"	"[""middleoutsparse""]"	"[""hf-middleoutsparse""]"
+hf-mintrace	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""hierarchicalforecast""]"	"[""MinTrace""]"	"[""NOT_RUN""]"	"[""mintrace""]"	"[""hf-mintrace""]"
+hf-mintracesparse	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""hierarchicalforecast""]"	"[""MinTraceSparse""]"	"[""NOT_RUN""]"	"[""mintracesparse""]"	"[""hf-mintracesparse""]"
+hf-optimalcombination	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""hierarchicalforecast""]"	"[""OptimalCombination""]"	"[""NOT_RUN""]"	"[""optimalcombination""]"	"[""hf-optimalcombination""]"
+hf-topdown	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""hierarchicalforecast""]"	"[""TopDown""]"	"[""NOT_RUN""]"	"[""topdown""]"	"[""hf-topdown""]"
+hf-topdownsparse	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""hierarchicalforecast""]"	"[""TopDownSparse""]"	"[""NOT_RUN""]"	"[""topdownsparse""]"	"[""hf-topdownsparse""]"
+hist-gradient-boosting	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""sklearn""]"	"[""HistGradientBoostingClassifier""]"	"[""NOT_RUN""]"	"[""histgradientboostingclassifier""]"	"[""hist-gradient-boosting""]"
+isotonic-calibrated-logistic	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""sklearn""]"	"[""CalibratedClassifierCV""]"	"[""NOT_RUN""]"	"[""calibratedclassifiercv""]"	"[""isotonic-calibrated-logistic""]"
+kronos-base	RESOLVED_CANDIDATE	"[""NeoQuasar/Kronos-base""]"	"[""2b554741eca47781b64468546e77fef3e85130e6""]"	"[""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_kronos_base_provider.py""]"	[]	[]	"[""tsfm""]"	"[""KronosPredictor""]"	"[""NOT_RUN""]"	"[""kronospredictor""]"	"[""kronos-base""]"
+lag-llama	RESOLVED_CANDIDATE	"[""time-series-foundation-models/Lag-Llama""]"	"[""72dcfc29da106acfe38250a60f4ae29d1e56a3d9""]"	"[""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_lag_llama_provider.py""]"	[]	[]	"[""tsfm""]"	"[""LagLlamaEstimator""]"	"[""NOT_RUN""]"	"[""lagllamaestimator""]"	"[""lag-llama""]"
+lightgbm-classifier	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""lightgbm""]"	"[""LGBMClassifier""]"	"[""NOT_RUN""]"	"[""lgbmclassifier""]"	"[""lightgbm-classifier""]"
+lightgbm-position	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""lightgbm""]"	"[""LGBMRegressor""]"	"[""NOT_RUN""]"	"[""lgbmregressor""]"	"[""lightgbm-position""]"
+logistic	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""sklearn""]"	"[""LogisticRegression""]"	"[""NOT_RUN""]"	"[""logisticregression""]"	"[""logistic""]"
+mfauto-catboost	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""mlforecast_auto""]"	"[""AutoCatboost""]"	"[""NOT_RUN""]"	"[""autocatboost""]"	"[""mfauto-catboost""]"
+mfauto-elasticnet	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""mlforecast_auto""]"	"[""AutoElasticNet""]"	"[""NOT_RUN""]"	"[""autoelasticnet""]"	"[""mfauto-elasticnet""]"
+mfauto-lasso	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""mlforecast_auto""]"	"[""AutoLasso""]"	"[""NOT_RUN""]"	"[""autolasso""]"	"[""mfauto-lasso""]"
+mfauto-lightgbm	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""mlforecast_auto""]"	"[""AutoLightGBM""]"	"[""NOT_RUN""]"	"[""autolightgbm""]"	"[""mfauto-lightgbm""]"
+mfauto-linearregression	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""mlforecast_auto""]"	"[""AutoLinearRegression""]"	"[""NOT_RUN""]"	"[""autolinearregression""]"	"[""mfauto-linearregression""]"
+mfauto-randomforest	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""mlforecast_auto""]"	"[""AutoRandomForest""]"	"[""NOT_RUN""]"	"[""autorandomforest""]"	"[""mfauto-randomforest""]"
+mfauto-ridge	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""mlforecast_auto""]"	"[""AutoRidge""]"	"[""NOT_RUN""]"	"[""autoridge""]"	"[""mfauto-ridge""]"
+mfauto-xgboost	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""mlforecast_auto""]"	"[""AutoXGBoost""]"	"[""NOT_RUN""]"	"[""autoxgboost""]"	"[""mfauto-xgboost""]"
+mlforecast-lightgbm	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""mlforecast""]"	"[""LGBMRegressor""]"	[]	[]	[]
+mlforecast-ridge	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""mlforecast""]"	"[""Ridge""]"	[]	[]	[]
+moirai	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""uni2ts""]"	"[""Moirai2Forecast""]"	[]	[]	[]
+moirai-1.0-base	RESOLVED_CANDIDATE	"[""Salesforce/moirai-1.0-R-base""]"	"[""4fa939a8800d9da346c0280f3d9aeba0d2d35877""]"	"[""broad_v1"", ""expanded_v2"", ""verified_revision""]"	[]	[]	[]	"[""tsfm""]"	"[""MoiraiForecast""]"	"[""NOT_RUN""]"	"[""moiraiforecast""]"	"[""moirai-1.0-base""]"
+moirai-2.0-r-small	RESOLVED_CANDIDATE	"[""Salesforce/moirai-2.0-R-small""]"	"[""30f43ff08c8494f4943ae1521e9d4e94a0fbb389""]"	"[""manifest_constants""]"	[]	[]	[]	[]	[]	[]	[]	[]
+moirai-2.0-small	RESOLVED_CANDIDATE	"[""Salesforce/moirai-2.0-R-small""]"	"[""30f43ff08c8494f4943ae1521e9d4e94a0fbb389""]"	"[""broad_v1"", ""expanded_v2"", ""verified_revision""]"	[]	[]	[]	"[""tsfm""]"	"[""MoiraiForecast""]"	"[""NOT_RUN""]"	"[""moiraiforecast""]"	"[""moirai-2.0-small""]"
+moment-1-large	RESOLVED_CANDIDATE	"[""AutonLab/MOMENT-1-large""]"	"[""ca58581bc7bea2ebed4e80dc0a3e4b8b609c6ecc""]"	"[""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_moment_1_large_provider.py""]"	[]	[]	"[""tsfm""]"	"[""MOMENTPipeline""]"	"[""NOT_RUN""]"	"[""momentpipeline""]"	"[""moment-1-large""]"
+moment-1-small	RESOLVED_CANDIDATE	"[""AutonLab/MOMENT-1-small""]"	"[""411e288267f82cce86296dbe4d6c8bc533cc162f""]"	"[""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_moment_1_small_provider.py""]"	[]	[]	"[""tsfm""]"	"[""MOMENTPipeline""]"	"[""NOT_RUN""]"	"[""momentpipeline""]"	"[""moment-1-small""]"
+nf-auto-autoformer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoAutoformer""]"	[]	[]	[]
+nf-auto-bitcn	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoBiTCN""]"	[]	[]	[]
+nf-auto-deepar	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoDeepAR""]"	[]	[]	[]
+nf-auto-deepnpts	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoDeepNPTS""]"	[]	[]	[]
+nf-auto-dilatedrnn	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoDilatedRNN""]"	[]	[]	[]
+nf-auto-dlinear	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoDLinear""]"	[]	[]	[]
+nf-auto-fedformer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoFEDformer""]"	[]	[]	[]
+nf-auto-gru	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoGRU""]"	[]	[]	[]
+nf-auto-hint	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoHINT""]"	[]	[]	[]
+nf-auto-informer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoInformer""]"	[]	[]	[]
+nf-auto-itransformer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoiTransformer""]"	[]	[]	[]
+nf-auto-kan	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoKAN""]"	[]	[]	[]
+nf-auto-lstm	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoLSTM""]"	[]	[]	[]
+nf-auto-mlp	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoMLP""]"	[]	[]	[]
+nf-auto-mlp-multivariate	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoMLPMultivariate""]"	[]	[]	[]
+nf-auto-nbeats	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoNBEATS""]"	[]	[]	[]
+nf-auto-nbeatsx	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoNBEATSx""]"	[]	[]	[]
+nf-auto-nhits	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoNHITS""]"	[]	[]	[]
+nf-auto-nlinear	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoNLinear""]"	[]	[]	[]
+nf-auto-patchtst	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoPatchTST""]"	[]	[]	[]
+nf-auto-rmok	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoRMoK""]"	[]	[]	[]
+nf-auto-rnn	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoRNN""]"	[]	[]	[]
+nf-auto-softs	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoSOFTS""]"	[]	[]	[]
+nf-auto-softssharp	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoSOFTSSharp""]"	[]	[]	[]
+nf-auto-stemgnn	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoStemGNN""]"	[]	[]	[]
+nf-auto-tcn	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTCN""]"	[]	[]	[]
+nf-auto-tft	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTFT""]"	[]	[]	[]
+nf-auto-tide	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTiDE""]"	[]	[]	[]
+nf-auto-timemixer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTimeMixer""]"	[]	[]	[]
+nf-auto-timesnet	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTimesNet""]"	[]	[]	[]
+nf-auto-timexer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTimeXer""]"	[]	[]	[]
+nf-auto-tsmixer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTSMixer""]"	[]	[]	[]
+nf-auto-tsmixerx	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTSMixerx""]"	[]	[]	[]
+nf-auto-vanilla-transformer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoVanillaTransformer""]"	[]	[]	[]
+nf-auto-xlinear	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoXLinear""]"	[]	[]	[]
+nf-auto-xlstm	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoxLSTM""]"	[]	[]	[]
+nf-autoformer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""Autoformer""]"	"[""NOT_RUN""]"	"[""autoformer""]"	"[""nf-autoformer""]"
+nf-bitcn	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""BiTCN""]"	"[""NOT_RUN""]"	"[""bitcn""]"	"[""nf-bitcn""]"
+nf-deepar	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""DeepAR""]"	"[""NOT_RUN""]"	"[""deepar""]"	"[""nf-deepar""]"
+nf-deepnpts	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""DeepNPTS""]"	"[""NOT_RUN""]"	"[""deepnpts""]"	"[""nf-deepnpts""]"
+nf-dilatedrnn	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""DilatedRNN""]"	"[""NOT_RUN""]"	"[""dilatedrnn""]"	"[""nf-dilatedrnn""]"
+nf-dlinear	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""DLinear""]"	"[""NOT_RUN""]"	"[""dlinear""]"	"[""nf-dlinear""]"
+nf-fedformer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""FEDformer""]"	"[""NOT_RUN""]"	"[""fedformer""]"	"[""nf-fedformer""]"
+nf-gru	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""GRU""]"	"[""NOT_RUN""]"	"[""gru""]"	"[""nf-gru""]"
+nf-hint	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""HINT""]"	"[""NOT_RUN""]"	"[""hint""]"	"[""nf-hint""]"
+nf-informer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""Informer""]"	"[""NOT_RUN""]"	"[""informer""]"	"[""nf-informer""]"
+nf-itransformer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""iTransformer""]"	"[""NOT_RUN""]"	"[""itransformer""]"	"[""nf-itransformer""]"
+nf-kan	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""KAN""]"	"[""NOT_RUN""]"	"[""kan""]"	"[""nf-kan""]"
+nf-lstm	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""LSTM""]"	"[""NOT_RUN""]"	"[""lstm""]"	"[""nf-lstm""]"
+nf-mlp	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""MLP""]"	"[""NOT_RUN""]"	"[""mlp""]"	"[""nf-mlp""]"
+nf-mlpmultivariate	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""MLPMultivariate""]"	"[""NOT_RUN""]"	"[""mlpmultivariate""]"	"[""nf-mlpmultivariate""]"
+nf-nbeats	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""NBEATS""]"	"[""NOT_RUN""]"	"[""nbeats""]"	"[""nf-nbeats""]"
+nf-nbeatsx	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""NBEATSx""]"	"[""NOT_RUN""]"	"[""nbeatsx""]"	"[""nf-nbeatsx""]"
+nf-nhits	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""NHITS""]"	"[""NOT_RUN""]"	"[""nhits""]"	"[""nf-nhits""]"
+nf-nlinear	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""NLinear""]"	"[""NOT_RUN""]"	"[""nlinear""]"	"[""nf-nlinear""]"
+nf-patchtst	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""PatchTST""]"	"[""NOT_RUN""]"	"[""patchtst""]"	"[""nf-patchtst""]"
+nf-rmok	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""RMoK""]"	"[""NOT_RUN""]"	"[""rmok""]"	"[""nf-rmok""]"
+nf-rnn	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""RNN""]"	"[""NOT_RUN""]"	"[""rnn""]"	"[""nf-rnn""]"
+nf-softs	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""SOFTS""]"	"[""NOT_RUN""]"	"[""softs""]"	"[""nf-softs""]"
+nf-softssharp	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""SOFTSSharp""]"	"[""NOT_RUN""]"	"[""softssharp""]"	"[""nf-softssharp""]"
+nf-stemgnn	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""StemGNN""]"	"[""NOT_RUN""]"	"[""stemgnn""]"	"[""nf-stemgnn""]"
+nf-tcn	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""TCN""]"	"[""NOT_RUN""]"	"[""tcn""]"	"[""nf-tcn""]"
+nf-tft	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""TFT""]"	"[""NOT_RUN""]"	"[""tft""]"	"[""nf-tft""]"
+nf-tide	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""TiDE""]"	"[""NOT_RUN""]"	"[""tide""]"	"[""nf-tide""]"
+nf-timellm	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""TimeLLM""]"	"[""NOT_RUN""]"	"[""timellm""]"	"[""nf-timellm""]"
+nf-timemixer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""TimeMixer""]"	"[""NOT_RUN""]"	"[""timemixer""]"	"[""nf-timemixer""]"
+nf-timesnet	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""TimesNet""]"	"[""NOT_RUN""]"	"[""timesnet""]"	"[""nf-timesnet""]"
+nf-timexer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""TimeXer""]"	"[""NOT_RUN""]"	"[""timexer""]"	"[""nf-timexer""]"
+nf-tsmixer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""TSMixer""]"	"[""NOT_RUN""]"	"[""tsmixer""]"	"[""nf-tsmixer""]"
+nf-tsmixerx	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""TSMixerx""]"	"[""NOT_RUN""]"	"[""tsmixerx""]"	"[""nf-tsmixerx""]"
+nf-vanilla-transformer	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""neuralforecast""]"	"[""VanillaTransformer""]"	[]	[]	[]
+nf-vanillatransformer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""VanillaTransformer""]"	"[""NOT_RUN""]"	"[""vanillatransformer""]"	"[""nf-vanillatransformer""]"
+nf-xlinear	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""XLinear""]"	"[""NOT_RUN""]"	"[""xlinear""]"	"[""nf-xlinear""]"
+nf-xlstm	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast""]"	"[""xLSTM""]"	"[""NOT_RUN""]"	"[""xlstm""]"	"[""nf-xlstm""]"
+nfauto-autoformer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoAutoformer""]"	"[""NOT_RUN""]"	"[""autoautoformer""]"	"[""nfauto-autoformer""]"
+nfauto-bitcn	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoBiTCN""]"	"[""NOT_RUN""]"	"[""autobitcn""]"	"[""nfauto-bitcn""]"
+nfauto-deepar	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoDeepAR""]"	"[""NOT_RUN""]"	"[""autodeepar""]"	"[""nfauto-deepar""]"
+nfauto-deepnpts	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoDeepNPTS""]"	"[""NOT_RUN""]"	"[""autodeepnpts""]"	"[""nfauto-deepnpts""]"
+nfauto-dilatedrnn	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoDilatedRNN""]"	"[""NOT_RUN""]"	"[""autodilatedrnn""]"	"[""nfauto-dilatedrnn""]"
+nfauto-dlinear	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoDLinear""]"	"[""NOT_RUN""]"	"[""autodlinear""]"	"[""nfauto-dlinear""]"
+nfauto-fedformer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoFEDformer""]"	"[""NOT_RUN""]"	"[""autofedformer""]"	"[""nfauto-fedformer""]"
+nfauto-gru	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoGRU""]"	"[""NOT_RUN""]"	"[""autogru""]"	"[""nfauto-gru""]"
+nfauto-hint	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoHINT""]"	"[""NOT_RUN""]"	"[""autohint""]"	"[""nfauto-hint""]"
+nfauto-informer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoInformer""]"	"[""NOT_RUN""]"	"[""autoinformer""]"	"[""nfauto-informer""]"
+nfauto-itransformer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoiTransformer""]"	"[""NOT_RUN""]"	"[""autoitransformer""]"	"[""nfauto-itransformer""]"
+nfauto-kan	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoKAN""]"	"[""NOT_RUN""]"	"[""autokan""]"	"[""nfauto-kan""]"
+nfauto-lstm	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoLSTM""]"	"[""NOT_RUN""]"	"[""autolstm""]"	"[""nfauto-lstm""]"
+nfauto-mlp	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoMLP""]"	"[""NOT_RUN""]"	"[""automlp""]"	"[""nfauto-mlp""]"
+nfauto-mlpmultivariate	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoMLPMultivariate""]"	"[""NOT_RUN""]"	"[""automlpmultivariate""]"	"[""nfauto-mlpmultivariate""]"
+nfauto-nbeats	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoNBEATS""]"	"[""NOT_RUN""]"	"[""autonbeats""]"	"[""nfauto-nbeats""]"
+nfauto-nbeatsx	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoNBEATSx""]"	"[""NOT_RUN""]"	"[""autonbeatsx""]"	"[""nfauto-nbeatsx""]"
+nfauto-nhits	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoNHITS""]"	"[""NOT_RUN""]"	"[""autonhits""]"	"[""nfauto-nhits""]"
+nfauto-nlinear	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoNLinear""]"	"[""NOT_RUN""]"	"[""autonlinear""]"	"[""nfauto-nlinear""]"
+nfauto-patchtst	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoPatchTST""]"	"[""NOT_RUN""]"	"[""autopatchtst""]"	"[""nfauto-patchtst""]"
+nfauto-rmok	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoRMoK""]"	"[""NOT_RUN""]"	"[""autormok""]"	"[""nfauto-rmok""]"
+nfauto-rnn	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoRNN""]"	"[""NOT_RUN""]"	"[""autornn""]"	"[""nfauto-rnn""]"
+nfauto-softs	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoSOFTS""]"	"[""NOT_RUN""]"	"[""autosofts""]"	"[""nfauto-softs""]"
+nfauto-softssharp	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoSOFTSSharp""]"	"[""NOT_RUN""]"	"[""autosoftssharp""]"	"[""nfauto-softssharp""]"
+nfauto-stemgnn	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoStemGNN""]"	"[""NOT_RUN""]"	"[""autostemgnn""]"	"[""nfauto-stemgnn""]"
+nfauto-tcn	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTCN""]"	"[""NOT_RUN""]"	"[""autotcn""]"	"[""nfauto-tcn""]"
+nfauto-tft	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTFT""]"	"[""NOT_RUN""]"	"[""autotft""]"	"[""nfauto-tft""]"
+nfauto-tide	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTiDE""]"	"[""NOT_RUN""]"	"[""autotide""]"	"[""nfauto-tide""]"
+nfauto-timemixer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTimeMixer""]"	"[""NOT_RUN""]"	"[""autotimemixer""]"	"[""nfauto-timemixer""]"
+nfauto-timesnet	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTimesNet""]"	"[""NOT_RUN""]"	"[""autotimesnet""]"	"[""nfauto-timesnet""]"
+nfauto-timexer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTimeXer""]"	"[""NOT_RUN""]"	"[""autotimexer""]"	"[""nfauto-timexer""]"
+nfauto-tsmixer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTSMixer""]"	"[""NOT_RUN""]"	"[""autotsmixer""]"	"[""nfauto-tsmixer""]"
+nfauto-tsmixerx	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoTSMixerx""]"	"[""NOT_RUN""]"	"[""autotsmixerx""]"	"[""nfauto-tsmixerx""]"
+nfauto-vanillatransformer	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoVanillaTransformer""]"	"[""NOT_RUN""]"	"[""autovanillatransformer""]"	"[""nfauto-vanillatransformer""]"
+nfauto-xlinear	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoXLinear""]"	"[""NOT_RUN""]"	"[""autoxlinear""]"	"[""nfauto-xlinear""]"
+nfauto-xlstm	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""neuralforecast_auto""]"	"[""AutoxLSTM""]"	"[""NOT_RUN""]"	"[""autoxlstm""]"	"[""nfauto-xlstm""]"
+position-median	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""builtin""]"	"[""TheoryMedianAdapter""]"	"[""NOT_RUN""]"	"[""theorymedianadapter""]"	"[""position-median""]"
+position-modal	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""builtin""]"	"[""TheoryModalAdapter""]"	"[""NOT_RUN""]"	"[""theorymodaladapter""]"	"[""position-modal""]"
+random-forest	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""sklearn""]"	"[""RandomForestClassifier""]"	"[""NOT_RUN""]"	"[""randomforestclassifier""]"	"[""random-forest""]"
+reservoir-esn	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""reservoirpy""]"	"[""ESN""]"	"[""NOT_RUN""]"	"[""esn""]"	"[""reservoir-esn""]"
+ridge	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""sklearn""]"	"[""Ridge""]"	"[""NOT_RUN""]"	"[""ridge""]"	"[""ridge""]"
+ridge-position	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""sklearn""]"	"[""Ridge""]"	[]	[]	[]
+sf-adida	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""ADIDA""]"	"[""NOT_RUN""]"	"[""adida""]"	"[""sf-adida""]"
+sf-arch	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""ARCH""]"	"[""NOT_RUN""]"	"[""arch""]"	"[""sf-arch""]"
+sf-arima	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""ARIMA""]"	"[""NOT_RUN""]"	"[""arima""]"	"[""sf-arima""]"
+sf-autoarima	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoARIMA""]"	"[""NOT_RUN""]"	"[""autoarima""]"	"[""sf-autoarima""]"
+sf-autoces	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoCES""]"	"[""NOT_RUN""]"	"[""autoces""]"	"[""sf-autoces""]"
+sf-autoets	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoETS""]"	"[""NOT_RUN""]"	"[""autoets""]"	"[""sf-autoets""]"
+sf-automfles	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoMFLES""]"	"[""NOT_RUN""]"	"[""automfles""]"	"[""sf-automfles""]"
+sf-autoregressive	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoRegressive""]"	"[""NOT_RUN""]"	"[""autoregressive""]"	"[""sf-autoregressive""]"
+sf-autotbats	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoTBATS""]"	"[""NOT_RUN""]"	"[""autotbats""]"	"[""sf-autotbats""]"
+sf-autotheta	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoTheta""]"	"[""NOT_RUN""]"	"[""autotheta""]"	"[""sf-autotheta""]"
+sf-conformalseasonalpool	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""ConformalSeasonalPool""]"	"[""NOT_RUN""]"	"[""conformalseasonalpool""]"	"[""sf-conformalseasonalpool""]"
+sf-constantmodel	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""ConstantModel""]"	"[""NOT_RUN""]"	"[""constantmodel""]"	"[""sf-constantmodel""]"
+sf-crostonclassic	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""CrostonClassic""]"	"[""NOT_RUN""]"	"[""crostonclassic""]"	"[""sf-crostonclassic""]"
+sf-crostonoptimized	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""CrostonOptimized""]"	"[""NOT_RUN""]"	"[""crostonoptimized""]"	"[""sf-crostonoptimized""]"
+sf-crostonsba	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""CrostonSBA""]"	"[""NOT_RUN""]"	"[""crostonsba""]"	"[""sf-crostonsba""]"
+sf-dynamicoptimizedtheta	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""DynamicOptimizedTheta""]"	"[""NOT_RUN""]"	"[""dynamicoptimizedtheta""]"	"[""sf-dynamicoptimizedtheta""]"
+sf-dynamictheta	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""DynamicTheta""]"	"[""NOT_RUN""]"	"[""dynamictheta""]"	"[""sf-dynamictheta""]"
+sf-garch	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""GARCH""]"	"[""NOT_RUN""]"	"[""garch""]"	"[""sf-garch""]"
+sf-historicaverage	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""HistoricAverage""]"	"[""NOT_RUN""]"	"[""historicaverage""]"	"[""sf-historicaverage""]"
+sf-holt	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""Holt""]"	"[""NOT_RUN""]"	"[""holt""]"	"[""sf-holt""]"
+sf-holtwinters	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""HoltWinters""]"	"[""NOT_RUN""]"	"[""holtwinters""]"	"[""sf-holtwinters""]"
+sf-imapa	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""IMAPA""]"	"[""NOT_RUN""]"	"[""imapa""]"	"[""sf-imapa""]"
+sf-mfles	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""MFLES""]"	"[""NOT_RUN""]"	"[""mfles""]"	"[""sf-mfles""]"
+sf-mstl	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""MSTL""]"	"[""NOT_RUN""]"	"[""mstl""]"	"[""sf-mstl""]"
+sf-naive	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""Naive""]"	"[""NOT_RUN""]"	"[""naive""]"	"[""sf-naive""]"
+sf-nanmodel	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""NaNModel""]"	"[""NOT_RUN""]"	"[""nanmodel""]"	"[""sf-nanmodel""]"
+sf-optimizedtheta	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""OptimizedTheta""]"	"[""NOT_RUN""]"	"[""optimizedtheta""]"	"[""sf-optimizedtheta""]"
+sf-randomwalkwithdrift	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""RandomWalkWithDrift""]"	"[""NOT_RUN""]"	"[""randomwalkwithdrift""]"	"[""sf-randomwalkwithdrift""]"
+sf-seasonalexponentialsmoothing	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""SeasonalExponentialSmoothing""]"	"[""NOT_RUN""]"	"[""seasonalexponentialsmoothing""]"	"[""sf-seasonalexponentialsmoothing""]"
+sf-seasonalexponentialsmoothingoptimized	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""SeasonalExponentialSmoothingOptimized""]"	"[""NOT_RUN""]"	"[""seasonalexponentialsmoothingoptimized""]"	"[""sf-seasonalexponentialsmoothingoptimized""]"
+sf-seasonalnaive	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""SeasonalNaive""]"	"[""NOT_RUN""]"	"[""seasonalnaive""]"	"[""sf-seasonalnaive""]"
+sf-seasonalwindowaverage	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""SeasonalWindowAverage""]"	"[""NOT_RUN""]"	"[""seasonalwindowaverage""]"	"[""sf-seasonalwindowaverage""]"
+sf-simpleexponentialsmoothing	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""SimpleExponentialSmoothing""]"	"[""NOT_RUN""]"	"[""simpleexponentialsmoothing""]"	"[""sf-simpleexponentialsmoothing""]"
+sf-simpleexponentialsmoothingoptimized	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""SimpleExponentialSmoothingOptimized""]"	"[""NOT_RUN""]"	"[""simpleexponentialsmoothingoptimized""]"	"[""sf-simpleexponentialsmoothingoptimized""]"
+sf-sklearnmodel	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""SklearnModel""]"	"[""NOT_RUN""]"	"[""sklearnmodel""]"	"[""sf-sklearnmodel""]"
+sf-tbats	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""TBATS""]"	"[""NOT_RUN""]"	"[""tbats""]"	"[""sf-tbats""]"
+sf-theta	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""Theta""]"	"[""NOT_RUN""]"	"[""theta""]"	"[""sf-theta""]"
+sf-tsb	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""TSB""]"	"[""NOT_RUN""]"	"[""tsb""]"	"[""sf-tsb""]"
+sf-ucm	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""UCM""]"	"[""NOT_RUN""]"	"[""ucm""]"	"[""sf-ucm""]"
+sf-windowaverage	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""WindowAverage""]"	"[""NOT_RUN""]"	"[""windowaverage""]"	"[""sf-windowaverage""]"
+sf-zeromodel	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""statsforecast""]"	"[""ZeroModel""]"	"[""NOT_RUN""]"	"[""zeromodel""]"	"[""sf-zeromodel""]"
+skforecast-direct-multivariate-ridge	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterDirectMultiVariate""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""direct-multivariate-ridge""]"	"[""skforecast-direct-multivariate-ridge""]"
+skforecast-direct-ridge	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterDirect""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""direct-ridge""]"	"[""skforecast-direct-ridge""]"
+skforecast-equivalent-date	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterEquivalentDate""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""equivalent-date""]"	"[""skforecast-equivalent-date""]"
+skforecast-foundation-chronos2-amazon	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterFoundation""]"	"[""NOT_RUN""]"	"[""chronos-2""]"	"[""skforecast-foundation-chronos2-amazon""]"
+skforecast-foundation-chronos2-small	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterFoundation""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""chronos-2""]"	"[""skforecast-foundation-chronos2-small""]"
+skforecast-foundation-chronos2-synth	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterFoundation""]"	"[""NOT_RUN""]"	"[""chronos-2""]"	"[""skforecast-foundation-chronos2-synth""]"
+skforecast-foundation-moirai2	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterFoundation""]"	"[""BLOCKED_DEPENDENCY_CONFLICT""]"	"[""moirai-2""]"	"[""skforecast-foundation-moirai2""]"
+skforecast-foundation-t0	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterFoundation""]"	"[""NOT_RUN""]"	"[""tfc-t0""]"	"[""skforecast-foundation-t0""]"
+skforecast-foundation-tabicl-v2	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterFoundation""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""tabicl-v2""]"	"[""skforecast-foundation-tabicl-v2""]"
+skforecast-foundation-tabpfn-ts3	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterFoundation""]"	"[""BLOCKED_INVALID_OR_EXPIRED_TOKEN""]"	"[""tabpfn-ts3""]"	"[""skforecast-foundation-tabpfn-ts3""]"
+skforecast-foundation-timesfm25	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterFoundation""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""timesfm-2.5""]"	"[""skforecast-foundation-timesfm25""]"
+skforecast-recursive	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterRecursive""]"	[]	[]	[]
+skforecast-recursive-catboost	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterRecursive""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""recursive-catboost""]"	"[""skforecast-recursive-catboost""]"
+skforecast-recursive-classifier-logistic	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterRecursiveClassifier""]"	"[""NOT_RUN""]"	"[""recursive-classifier-logistic""]"	"[""skforecast-recursive-classifier-logistic""]"
+skforecast-recursive-histgb	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterRecursive""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""recursive-hist-gradient-boosting""]"	"[""skforecast-recursive-histgb""]"
+skforecast-recursive-lightgbm	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterRecursive""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""recursive-lightgbm""]"	"[""skforecast-recursive-lightgbm""]"
+skforecast-recursive-multiseries-ridge	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterRecursiveMultiSeries""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""recursive-multiseries-ridge""]"	"[""skforecast-recursive-multiseries-ridge""]"
+skforecast-recursive-ridge	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterRecursive""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""recursive-ridge""]"	"[""skforecast-recursive-ridge""]"
+skforecast-recursive-xgboost	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterRecursive""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""recursive-xgboost""]"	"[""skforecast-recursive-xgboost""]"
+skforecast-rnn-gru	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterRnn""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""gru""]"	"[""skforecast-rnn-gru""]"
+skforecast-rnn-lstm	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterRnn""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""lstm""]"	"[""skforecast-rnn-lstm""]"
+skforecast-stats-aeon-arima	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterStats""]"	"[""NOT_RUN""]"	"[""arima""]"	"[""skforecast-stats-aeon-arima""]"
+skforecast-stats-aeon-ets	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterStats""]"	"[""NOT_RUN""]"	"[""ets""]"	"[""skforecast-stats-aeon-ets""]"
+skforecast-stats-arar	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterStats""]"	"[""OPERATOR_LOCAL_PASS""]"	"[""arar""]"	"[""skforecast-stats-arar""]"
+skforecast-stats-arima	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterStats""]"	"[""NOT_RUN""]"	"[""arima""]"	"[""skforecast-stats-arima""]"
+skforecast-stats-ets	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterStats""]"	"[""NOT_RUN""]"	"[""ets""]"	"[""skforecast-stats-ets""]"
+skforecast-stats-sarimax	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterStats""]"	"[""NOT_RUN""]"	"[""sarimax""]"	"[""skforecast-stats-sarimax""]"
+skforecast-stats-sktime-arima	RESOLVED_CANDIDATE	[]	[]	"[""expanded_v2""]"	[]	[]	[]	"[""skforecast""]"	"[""ForecasterStats""]"	"[""NOT_RUN""]"	"[""arima""]"	"[""skforecast-stats-sktime-arima""]"
+sktime-ensemble	RESOLVED_CANDIDATE	[]	[]	"[""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""sktime""]"	"[""EnsembleForecaster""]"	"[""NOT_RUN""]"	"[""ensembleforecaster""]"	"[""sktime-ensemble""]"
+stats-autoarima	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoARIMA""]"	[]	[]	[]
+stats-autoces	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoCES""]"	[]	[]	[]
+stats-autoets	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoETS""]"	[]	[]	[]
+stats-autotheta	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""statsforecast""]"	"[""AutoTheta""]"	[]	[]	[]
+stats-croston	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""statsforecast""]"	"[""CrostonClassic""]"	[]	[]	[]
+stats-historic-average	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""statsforecast""]"	"[""HistoricAverage""]"	[]	[]	[]
+stats-naive	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""statsforecast""]"	"[""Naive""]"	[]	[]	[]
+stats-tsb	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""statsforecast""]"	"[""TSB""]"	[]	[]	[]
+sundial	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""transformers""]"	"[""SundialForPrediction""]"	[]	[]	[]
+sundial-base	RESOLVED_CANDIDATE	"[""thuml/sundial-base-128m""]"	"[""3212e42564493f520593e5414af4367fc4b49226""]"	"[""broad_v1"", ""expanded_v2"", ""verified_revision""]"	[]	[]	[]	"[""tsfm""]"	"[""SundialForPrediction""]"	"[""NOT_RUN""]"	"[""sundialforprediction""]"	"[""sundial-base""]"
+t0-alpha	RESOLVED_CANDIDATE	"[""theforecastingcompany/t0-alpha""]"	"[""f8727c2357e0d81f1d9f56fe3aaac43068b5fc72""]"	"[""broad_v1"", ""expanded_v2"", ""verified_revision""]"	[]	[]	[]	"[""tsfm""]"	"[""T0Pipeline""]"	"[""NOT_RUN""]"	"[""t0pipeline""]"	"[""t0-alpha""]"
+tabpfn-ts	AMBIGUOUS	"[""Prior-Labs/TabPFN-v2-clf"", ""Prior-Labs/TabPFN-v2-reg""]"	"[""4972a65a1b30806315c6f92499959ffbfc69a673""]"	"[""base_catalog"", ""broad_v1"", ""expanded_v2"", ""verified_revision""]"	[]	[]	[]	"[""tabpfn_time_series"", ""tsfm""]"	"[""TabPFNTimeSeries""]"	"[""NOT_RUN""]"	"[""tabpfntimeseries""]"	"[""tabpfn-ts""]"
+timer-base-84m	RESOLVED_CANDIDATE	"[""thuml/timer-base-84m""]"	"[""70077a71acce1b4c00d98332fcaabc694255d8e5""]"	"[""manifest_constants""]"	[]	[]	[]	[]	[]	[]	[]	[]
+timesfm-2.5	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""timesfm""]"	"[""TimesFM""]"	[]	[]	[]
+timesfm-2.5-200m	AMBIGUOUS	"[""google/timesfm-2.5-200m-pytorch"", ""google/timesfm-2.5-200m-transformers""]"	"[""1d952420fba87f3c6dee4f240de0f1a0fbc790e3"", ""5a9806b9b291fad9233b5249d88263f1846304d3""]"	"[""timesfm_backend""]"	[]	"[""environments/timesfm25-pytorch"", ""environments/timesfm25-pytorch-source"", ""environments/timesfm25-transformers"", ""environments/timesfm25-xreg""]"	"[""pytorch_native"", ""pytorch_source"", ""transformers"", ""xreg""]"	[]	[]	"[""DEFERRED"", ""IMPLEMENTED_NOT_GPU_CERTIFIED"", ""SCHEMA_ONLY"", ""SCHEMA_ONLY_GITHUB_EVIDENCE_BLOCKED""]"	[]	[]
+timesfm-2.5-transformers	RESOLVED_CANDIDATE	"[""google/timesfm-2.5-200m-transformers""]"	"[""5a9806b9b291fad9233b5249d88263f1846304d3""]"	"[""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_timesfm_2_5_transformers_provider.py""]"	[]	[]	"[""tsfm""]"	"[""TimesFmModelForPrediction""]"	"[""NOT_RUN""]"	"[""timesfmmodelforprediction""]"	"[""timesfm-2.5-transformers""]"
+tirex	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog""]"	[]	[]	[]	"[""tirex""]"	"[""TiRex""]"	[]	[]	[]
+tirex-2	RESOLVED_CANDIDATE	"[""NX-AI/TiRex-2""]"	"[""05e5b26db52bfb256f1ae1bdf785589850482de3""]"	"[""broad_v1"", ""expanded_v2"", ""verified_revision""]"	[]	[]	[]	"[""tsfm""]"	"[""TiRex""]"	"[""NOT_RUN""]"	"[""tirex""]"	"[""tirex-2""]"
+toto-2.0-22m	RESOLVED_CANDIDATE	"[""Datadog/Toto-2.0-22m""]"	"[""3affccf372ff82f5d200ac76fad3dbcdeb64299a""]"	"[""toto2_variant""]"	[]	[]	[]	[]	"[""Toto2Model""]"	"[""NOT_CERTIFIED""]"	[]	[]
+toto-2.0-4m	RESOLVED_CANDIDATE	"[""Datadog/Toto-2.0-4m""]"	"[""8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9""]"	"[""broad_v1"", ""execution_surface"", ""expanded_v2"", ""toto2_variant"", ""verified_revision""]"	"[""scripts/run_toto_2_0_4m_provider.py""]"	[]	[]	"[""tsfm""]"	"[""Toto2Model"", ""TotoForecaster""]"	"[""NOT_CERTIFIED"", ""NOT_RUN""]"	"[""totoforecaster""]"	"[""toto-2.0-4m""]"
+toto-open-base	RESOLVED_CANDIDATE	"[""Datadog/Toto-Open-Base-1.0""]"	"[""0411ceb27bdf7fc3e4892e99edc8ad08192dc3c5""]"	"[""broad_v1"", ""execution_surface"", ""expanded_v2"", ""verified_revision""]"	"[""scripts/run_toto_open_base_provider.py""]"	[]	[]	"[""tsfm""]"	"[""TotoForecaster""]"	"[""NOT_RUN""]"	"[""totoforecaster""]"	"[""toto-open-base""]"
+uniform	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""builtin""]"	"[""UniformCandidateAdapter""]"	"[""NOT_RUN""]"	"[""uniformcandidateadapter""]"	"[""uniform""]"
+xgboost-classifier	RESOLVED_CANDIDATE	[]	[]	"[""base_catalog"", ""broad_v1"", ""expanded_v2""]"	[]	[]	[]	"[""xgboost""]"	"[""XGBClassifier""]"	"[""NOT_RUN""]"	"[""xgbclassifier""]"	"[""xgboost-classifier""]"

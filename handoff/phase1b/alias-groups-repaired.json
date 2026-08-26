@@ -1,0 +1,30 @@
+[
+  {
+    "model_ids": [
+      "moirai-2.0-r-small",
+      "moirai-2.0-small"
+    ],
+    "repo_id": "Salesforce/moirai-2.0-R-small",
+    "status": "REQUIRES_IDENTITY_REVIEW",
+    "surfaces": [
+      "broad_v1",
+      "execution_surface",
+      "manifest_constants",
+      "verified_revision"
+    ]
+  },
+  {
+    "model_ids": [
+      "timesfm-2.5-200m",
+      "timesfm-2.5-transformers"
+    ],
+    "repo_id": "google/timesfm-2.5-200m-transformers",
+    "status": "REQUIRES_IDENTITY_REVIEW",
+    "surfaces": [
+      "broad_v1",
+      "execution_surface",
+      "timesfm_backend",
+      "verified_revision"
+    ]
+  }
+]

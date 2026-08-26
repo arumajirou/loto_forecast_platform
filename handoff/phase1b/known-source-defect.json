@@ -1,0 +1,10 @@
+{
+  "affected_function": "expanded_inventory_counts",
+  "broken_identifier": "AUTOGLUON_BROAD_V1_ID",
+  "defect_present": true,
+  "defined_identifier": "AUTOGLOUON_BROAD_V1_ID",
+  "file": "src/loto/models/implementation_catalog.py",
+  "impact": "NameError prevents expanded inventory summary generation",
+  "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
+  "workaround": "expanded_implementation_catalog() called directly; counts derived locally"
+}

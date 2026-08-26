@@ -1,0 +1,31 @@
+{
+  "environment_mapping_counts": {
+    "DIRECT_PROJECT_RUNTIME": 10,
+    "EXISTING_RUNTIME_CANDIDATE": 9,
+    "UNRESOLVED_NO_RUNTIME": 10
+  },
+  "execution_route_counts": {
+    "AMBIGUOUS_ROUTE": 9,
+    "EXPLICIT_ROUTE": 15,
+    "ROUTE_CANDIDATE": 24,
+    "UNRESOLVED_EXECUTION_ENVIRONMENT": 7
+  },
+  "formal_runtime_certification": false,
+  "framework_import_failure_count": 2,
+  "inputs": {
+    "execution_surfaces": 55,
+    "expanded_v2": 244,
+    "phase2_runtime_path_candidates": 40,
+    "source_environments": 29
+  },
+  "interpretation": "Mappings other than DIRECT_PROJECT_RUNTIME or EXPLICIT_ROUTE are candidates only and must not be treated as formal runtime identity.",
+  "mapping_conflict_count": 26,
+  "runtime_identity": {
+    "canonical_physical_runtimes": 4,
+    "duplicate_or_alias_path_count": 36,
+    "raw_runtime_paths": 40
+  },
+  "schema_version": 1,
+  "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
+  "unresolved_environment_count": 10
+}
