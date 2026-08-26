@@ -139,9 +139,7 @@ def build_search_spaces(
             )
             continue
         if route_reason and route_reason.startswith("NON_STANDALONE_METHOD"):
-            output.append(
-                _closed_space(row, SearchSpaceStatus.NON_STANDALONE_METHOD, route_reason)
-            )
+            output.append(_closed_space(row, SearchSpaceStatus.NON_STANDALONE_METHOD, route_reason))
             continue
         if route_reason:
             output.append(_closed_space(row, SearchSpaceStatus.NOT_ROUTABLE, route_reason))
