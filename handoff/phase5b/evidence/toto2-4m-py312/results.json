@@ -1,0 +1,170 @@
+[
+  {
+    "control_aggregate": {
+      "count": 2,
+      "maximum": 128.0,
+      "mean": 128.0,
+      "minimum": 128.0,
+      "std": 0.0,
+      "worst": 128.0
+    },
+    "expected_relation": "increase",
+    "expected_surface": "history",
+    "holdout_evaluated": false,
+    "library": "toto2",
+    "matched_fraction": 1.0,
+    "model": "toto-2.0-4m",
+    "outcome": "effective",
+    "paired": [
+      {
+        "comparison": "control=128; treatment=256; expected=increase",
+        "control": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "Toto2MinimalParameterAdapter",
+            "cpu_fallback": false,
+            "execution_device": "cuda:0",
+            "input_shape": [
+              1,
+              1,
+              128
+            ],
+            "model_device": "cuda:0",
+            "output_device": "cuda:0",
+            "peak_vram_bytes": 64238592
+          },
+          "observables": {
+            "history": 128
+          },
+          "output_shape": [
+            9,
+            1,
+            1,
+            1
+          ],
+          "prediction_sha256": "dc2eaa751ce0daa4d4148661885e60e8f803dd129ffe8ca17348da42d3eb02df",
+          "runtime_seconds": 2.758100874001684,
+          "success": true
+        },
+        "matched_expectation": true,
+        "repeat": 0,
+        "seed": 1,
+        "treatment": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "Toto2MinimalParameterAdapter",
+            "cpu_fallback": false,
+            "execution_device": "cuda:0",
+            "input_shape": [
+              1,
+              1,
+              256
+            ],
+            "model_device": "cuda:0",
+            "output_device": "cuda:0",
+            "peak_vram_bytes": 80894464
+          },
+          "observables": {
+            "history": 256
+          },
+          "output_shape": [
+            9,
+            1,
+            1,
+            1
+          ],
+          "prediction_sha256": "99c214935bb05d2e6efd077d04659022c38ada26acd5fc13b97af4e43709280b",
+          "runtime_seconds": 0.06132295999850612,
+          "success": true
+        }
+      },
+      {
+        "comparison": "control=128; treatment=256; expected=increase",
+        "control": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "Toto2MinimalParameterAdapter",
+            "cpu_fallback": false,
+            "execution_device": "cuda:0",
+            "input_shape": [
+              1,
+              1,
+              128
+            ],
+            "model_device": "cuda:0",
+            "output_device": "cuda:0",
+            "peak_vram_bytes": 64238592
+          },
+          "observables": {
+            "history": 128
+          },
+          "output_shape": [
+            9,
+            1,
+            1,
+            1
+          ],
+          "prediction_sha256": "e02b219eaf2f46cd6a2d499fcb6a07058af1c62cce17873a1c75901879eacc61",
+          "runtime_seconds": 0.24286145200312603,
+          "success": true
+        },
+        "matched_expectation": true,
+        "repeat": 0,
+        "seed": 42,
+        "treatment": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "Toto2MinimalParameterAdapter",
+            "cpu_fallback": false,
+            "execution_device": "cuda:0",
+            "input_shape": [
+              1,
+              1,
+              256
+            ],
+            "model_device": "cuda:0",
+            "output_device": "cuda:0",
+            "peak_vram_bytes": 80894464
+          },
+          "observables": {
+            "history": 256
+          },
+          "output_shape": [
+            9,
+            1,
+            1,
+            1
+          ],
+          "prediction_sha256": "5dc916b5f20486464aa4e4ec6c4527944f510a82399b2946bf735a7bfcc5f00d",
+          "runtime_seconds": 0.04036761699535418,
+          "success": true
+        }
+      }
+    ],
+    "pairs_eligible": 2,
+    "pairs_failed": 0,
+    "pairs_matched": 2,
+    "pairs_total": 2,
+    "parameter": "context_length",
+    "probe_id": "toto2-context-length-history",
+    "prospective_evaluated": false,
+    "support_reason": null,
+    "supported": true,
+    "treatment_aggregate": {
+      "count": 2,
+      "maximum": 256.0,
+      "mean": 256.0,
+      "minimum": 256.0,
+      "std": 0.0,
+      "worst": 256.0
+    }
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "accuracy_ranking": false,
+    "holdout_evaluated": false,
+    "prospective_evaluated": false,
+    "runtime_target": "toto2-4m-py312"
+  },
+  "probes": [
+    {
+      "absolute_tolerance": 1e-12,
+      "base_args": {
+        "decode_block_size": 32,
+        "device": "cuda",
+        "prediction_length": 1,
+        "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9"
+      },
+      "control": 128,
+      "expected_relation": "increase",
+      "expected_surface": "history",
+      "library": "toto2",
+      "metadata": {},
+      "min_match_fraction": 1.0,
+      "model": "toto-2.0-4m",
+      "parameter": "context_length",
+      "probe_id": "toto2-context-length-history",
+      "relative_tolerance": 1e-09,
+      "repeats": 1,
+      "scope": "predict",
+      "seeds": [
+        1,
+        42
+      ],
+      "treatment": 256
+    }
+  ],
+  "suite_id": "phase5b-toto2-4m-py312"
+}

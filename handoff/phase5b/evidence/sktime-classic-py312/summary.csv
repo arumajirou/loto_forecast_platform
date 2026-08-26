@@ -1,0 +1,2 @@
+probe_id,library,model,parameter,surface,relation,outcome,pairs_total,pairs_eligible,pairs_matched,pairs_failed,matched_fraction
+sktime-naive-strategy-prediction,sktime,NaiveForecaster,strategy,prediction,change,effective,2,2,2,0,1.0

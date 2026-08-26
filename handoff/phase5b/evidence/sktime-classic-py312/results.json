@@ -1,0 +1,108 @@
+[
+  {
+    "control_aggregate": null,
+    "expected_relation": "change",
+    "expected_surface": "prediction",
+    "holdout_evaluated": false,
+    "library": "sktime",
+    "matched_fraction": 1.0,
+    "model": "NaiveForecaster",
+    "outcome": "effective",
+    "paired": [
+      {
+        "comparison": "control='73f183198d086df4339401ee240c6535d1347d9000764e3ac06b70d7d682968d'; treatment='00e14215e2f5ddb6b646ad62918f3bc14ed27479e0e745a2cd6b1bf6f79155c1'; expected=change",
+        "control": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "SktimeParameterAdapter",
+            "model_signature": "(strategy='last', window_length=None, sp=1)"
+          },
+          "observables": {
+            "metric": 0.2857142857142857
+          },
+          "output_shape": [
+            7
+          ],
+          "prediction_sha256": "73f183198d086df4339401ee240c6535d1347d9000764e3ac06b70d7d682968d",
+          "runtime_seconds": 0.01684870399913052,
+          "success": true
+        },
+        "matched_expectation": true,
+        "repeat": 0,
+        "seed": 1,
+        "treatment": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "SktimeParameterAdapter",
+            "model_signature": "(strategy='last', window_length=None, sp=1)"
+          },
+          "observables": {
+            "metric": 0.42857142857142855
+          },
+          "output_shape": [
+            7
+          ],
+          "prediction_sha256": "00e14215e2f5ddb6b646ad62918f3bc14ed27479e0e745a2cd6b1bf6f79155c1",
+          "runtime_seconds": 0.0026233829994453117,
+          "success": true
+        }
+      },
+      {
+        "comparison": "control='d65148fc3239bdc9417076e5163107507327abf20ad3cb25fa6e4e634cd429de'; treatment='f423e6ffe7aecef95efe1402f4f28a2775012afb0a3c9c6aece1acaaa415ed68'; expected=change",
+        "control": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "SktimeParameterAdapter",
+            "model_signature": "(strategy='last', window_length=None, sp=1)"
+          },
+          "observables": {
+            "metric": 0.2857142857142857
+          },
+          "output_shape": [
+            7
+          ],
+          "prediction_sha256": "d65148fc3239bdc9417076e5163107507327abf20ad3cb25fa6e4e634cd429de",
+          "runtime_seconds": 0.005634669003484305,
+          "success": true
+        },
+        "matched_expectation": true,
+        "repeat": 0,
+        "seed": 42,
+        "treatment": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "SktimeParameterAdapter",
+            "model_signature": "(strategy='last', window_length=None, sp=1)"
+          },
+          "observables": {
+            "metric": 0.42857142857142855
+          },
+          "output_shape": [
+            7
+          ],
+          "prediction_sha256": "f423e6ffe7aecef95efe1402f4f28a2775012afb0a3c9c6aece1acaaa415ed68",
+          "runtime_seconds": 0.0022763759989175014,
+          "success": true
+        }
+      }
+    ],
+    "pairs_eligible": 2,
+    "pairs_failed": 0,
+    "pairs_matched": 2,
+    "pairs_total": 2,
+    "parameter": "strategy",
+    "probe_id": "sktime-naive-strategy-prediction",
+    "prospective_evaluated": false,
+    "support_reason": null,
+    "supported": true,
+    "treatment_aggregate": null
+  }
+]

@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "accuracy_ranking": false,
+    "holdout_evaluated": false,
+    "prospective_evaluated": false,
+    "runtime_target": "darts-torch"
+  },
+  "probes": [
+    {
+      "absolute_tolerance": 1e-12,
+      "base_args": {
+        "h": 7,
+        "train_length": 84
+      },
+      "control": 1,
+      "expected_relation": "change",
+      "expected_surface": "prediction",
+      "library": "darts",
+      "metadata": {},
+      "min_match_fraction": 1.0,
+      "model": "NaiveSeasonal",
+      "parameter": "K",
+      "probe_id": "darts-naive-seasonal-k-prediction",
+      "relative_tolerance": 1e-09,
+      "repeats": 1,
+      "scope": "model_constructor",
+      "seeds": [
+        1,
+        42
+      ],
+      "treatment": 7
+    }
+  ],
+  "suite_id": "phase5b-darts-torch"
+}

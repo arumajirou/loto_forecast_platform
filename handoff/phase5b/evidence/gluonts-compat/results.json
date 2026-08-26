@@ -1,0 +1,108 @@
+[
+  {
+    "control_aggregate": null,
+    "expected_relation": "change",
+    "expected_surface": "prediction",
+    "holdout_evaluated": false,
+    "library": "gluonts",
+    "matched_fraction": 1.0,
+    "model": "SeasonalNaivePredictor",
+    "outcome": "effective",
+    "paired": [
+      {
+        "comparison": "control='65425a465bd26289aa3051fedf7620871a7601d7c7ae2000da1b389722bcbe66'; treatment='63032b6eac9aff112ed6fa49efd673a71b6ccb803fd13f3507c20b37fccfa5eb'; expected=change",
+        "control": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "GluonTSParameterAdapter",
+            "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+          },
+          "observables": {
+            "metric": 0.2857142857142857
+          },
+          "output_shape": [
+            7
+          ],
+          "prediction_sha256": "65425a465bd26289aa3051fedf7620871a7601d7c7ae2000da1b389722bcbe66",
+          "runtime_seconds": 0.0007497490005334839,
+          "success": true
+        },
+        "matched_expectation": true,
+        "repeat": 0,
+        "seed": 1,
+        "treatment": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "GluonTSParameterAdapter",
+            "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+          },
+          "observables": {
+            "metric": 0.2857142857142857
+          },
+          "output_shape": [
+            7
+          ],
+          "prediction_sha256": "63032b6eac9aff112ed6fa49efd673a71b6ccb803fd13f3507c20b37fccfa5eb",
+          "runtime_seconds": 0.0002713130015763454,
+          "success": true
+        }
+      },
+      {
+        "comparison": "control='c8e6b69428e6b248e9c197ab47d5006a06b74dfdf08f2f9c34802eb87f8ac297'; treatment='543cf5d86525a63a78debb1ead5438af0752d46c41278eeee7ea47389af82309'; expected=change",
+        "control": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "GluonTSParameterAdapter",
+            "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+          },
+          "observables": {
+            "metric": 0.2857142857142857
+          },
+          "output_shape": [
+            7
+          ],
+          "prediction_sha256": "c8e6b69428e6b248e9c197ab47d5006a06b74dfdf08f2f9c34802eb87f8ac297",
+          "runtime_seconds": 0.00020980699628125876,
+          "success": true
+        },
+        "matched_expectation": true,
+        "repeat": 0,
+        "seed": 42,
+        "treatment": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "GluonTSParameterAdapter",
+            "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+          },
+          "observables": {
+            "metric": 0.2857142857142857
+          },
+          "output_shape": [
+            7
+          ],
+          "prediction_sha256": "543cf5d86525a63a78debb1ead5438af0752d46c41278eeee7ea47389af82309",
+          "runtime_seconds": 0.00017241599562112242,
+          "success": true
+        }
+      }
+    ],
+    "pairs_eligible": 2,
+    "pairs_failed": 0,
+    "pairs_matched": 2,
+    "pairs_total": 2,
+    "parameter": "season_length",
+    "probe_id": "gluonts-seasonal-naive-season-length-prediction",
+    "prospective_evaluated": false,
+    "support_reason": null,
+    "supported": true,
+    "treatment_aggregate": null
+  }
+]

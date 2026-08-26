@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "accuracy_ranking": false,
+    "holdout_evaluated": false,
+    "prospective_evaluated": false,
+    "runtime_target": "sktime-classic-py312"
+  },
+  "probes": [
+    {
+      "base_args": {
+        "h": 7,
+        "sp": 1,
+        "train_length": 84
+      },
+      "control": "last",
+      "expected_relation": "change",
+      "expected_surface": "prediction",
+      "library": "sktime",
+      "min_match_fraction": 1.0,
+      "model": "NaiveForecaster",
+      "parameter": "strategy",
+      "probe_id": "sktime-naive-strategy-prediction",
+      "repeats": 1,
+      "scope": "model_constructor",
+      "seeds": [
+        1,
+        42
+      ],
+      "treatment": "mean"
+    }
+  ],
+  "suite_id": "phase5b-sktime-classic-py312"
+}

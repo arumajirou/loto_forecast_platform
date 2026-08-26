@@ -1,0 +1,26 @@
+{
+  "files": [
+    {
+      "bytes": 455,
+      "path": "environment.json",
+      "sha256": "50f6b13e994f92400decf623c45a22a82e93c9867b5bd47b9834999718c902bd"
+    },
+    {
+      "bytes": 3459,
+      "path": "results.json",
+      "sha256": "fd4ee56155770f2c6077d951113b69188552ac42ad7d1f6d977526cbc46d09e7"
+    },
+    {
+      "bytes": 788,
+      "path": "suite.json",
+      "sha256": "49ccbe6fdfb211e408acf91b7f9698e61616c81244ef445202f8a7726231610a"
+    },
+    {
+      "bytes": 227,
+      "path": "summary.csv",
+      "sha256": "4869c6d2326c0469db5b9c70f2a16ac2c3fe9e1eb5f988d78fc1613160e5d407"
+    }
+  ],
+  "run_id": "pe-20260826T063249Z-46087a69bb",
+  "schema_version": 1
+}

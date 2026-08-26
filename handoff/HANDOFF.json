@@ -23,11 +23,13 @@
     "phase4f": "VERIFIED",
     "phase4g": "VERIFIED",
     "phase4h": "VERIFIED",
-    "phase5a": "VERIFIED"
+    "phase5": "VERIFIED",
+    "phase5a": "VERIFIED",
+    "phase5b": "VERIFIED"
   },
-  "current_phase": "phase5a_verified_phase5b_next",
+  "current_phase": "phase5_verified_phase6_next",
   "estimated_progress_percent": 48,
-  "handoff_run_id": "20260826-151111",
+  "handoff_run_id": "20260826-153243",
   "next_phases": [
     "phase3b_venv_identity_correction",
     "phase4_model_load_inference_smoke",
@@ -3934,7 +3936,1043 @@
       ]
     }
   },
+  "phase5b": {
+    "accuracy_ranking": false,
+    "coverage": {
+      "next": "phase6_formal_accuracy_evaluation",
+      "phase4_runtime_target_total": 8,
+      "phase4_runtime_targets_with_parameter_effectiveness": 8,
+      "phase5_complete": true,
+      "phase5a_verified_probe_count": 2,
+      "phase5b_runtime_target_count": 7
+    },
+    "dependencies_modified": false,
+    "focused_tests": {
+      "returncode": 0,
+      "runtime": "/mnt/e/env/ts/loto_forecast_platform/.venv/bin/python",
+      "stdout_tail": "........                                                                 [100%]\n"
+    },
+    "holdout_evaluated": false,
+    "lockfile_modified": false,
+    "phase": "PHASE5B_RUNTIME_FAMILY_PARAMETER_EFFECTIVENESS",
+    "prospective_evaluated": false,
+    "run_id": "20260826-153243",
+    "schema_version": 1,
+    "source_contract": {
+      "pyproject_sha256": "e2904a9ed042e83518cc878f5556ea8bdb1d318d9d4b2dcff4e0b607e4df43c2",
+      "source_sha": "03c366ed929d897e80f6541c26132ba5419f440d",
+      "spec_sha256": "f2044096e469cf978ec070ff20c6e33e3ae7674f44d7024791ca15937007c37b",
+      "uv_lock_sha256": "44744e1707fbe342767baf0842ba26bcfa2fa8b855bce914866f755b7370670f"
+    },
+    "source_sha": "03c366ed929d897e80f6541c26132ba5419f440d",
+    "status": "VERIFIED",
+    "targets": [
+      {
+        "checks": {
+          "all_observations_valid": true,
+          "effective": true,
+          "holdout_false": true,
+          "matched_fraction": true,
+          "paired_count": true,
+          "pairs_eligible": true,
+          "pairs_failed": true,
+          "pairs_matched": true,
+          "pairs_total": true,
+          "prospective_false": true
+        },
+        "evidence_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase5b-runtime-family-effectiveness-20260826-153243/evidence/darts-torch",
+        "identity": {
+          "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-torch/.venv/bin/python",
+          "import_error": null,
+          "imported": true,
+          "library": "darts",
+          "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-torch/.venv",
+          "python": "3.13.13",
+          "version": null
+        },
+        "result": {
+          "control_aggregate": null,
+          "expected_relation": "change",
+          "expected_surface": "prediction",
+          "holdout_evaluated": false,
+          "library": "darts",
+          "matched_fraction": 1.0,
+          "model": "NaiveSeasonal",
+          "outcome": "effective",
+          "paired": [
+            {
+              "comparison": "control='73f183198d086df4339401ee240c6535d1347d9000764e3ac06b70d7d682968d'; treatment='130c6b827b5e841ffc093bc609a2f9ff8029fc24bbe6b52cee7267a0ef9cf76a'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "DartsParameterAdapterV2",
+                  "model_signature": "(*args, **kwargs)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7,
+                  1
+                ],
+                "prediction_sha256": "73f183198d086df4339401ee240c6535d1347d9000764e3ac06b70d7d682968d",
+                "runtime_seconds": 0.0006841040012659505,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 1,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "DartsParameterAdapterV2",
+                  "model_signature": "(*args, **kwargs)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7,
+                  1
+                ],
+                "prediction_sha256": "130c6b827b5e841ffc093bc609a2f9ff8029fc24bbe6b52cee7267a0ef9cf76a",
+                "runtime_seconds": 0.0002507940007490106,
+                "success": true
+              }
+            },
+            {
+              "comparison": "control='d65148fc3239bdc9417076e5163107507327abf20ad3cb25fa6e4e634cd429de'; treatment='96c7ff0e442e68bf4105025ba81290a37762c25bd13c82a389386d48163bb953'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "DartsParameterAdapterV2",
+                  "model_signature": "(*args, **kwargs)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7,
+                  1
+                ],
+                "prediction_sha256": "d65148fc3239bdc9417076e5163107507327abf20ad3cb25fa6e4e634cd429de",
+                "runtime_seconds": 0.00019053000141866505,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 42,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "DartsParameterAdapterV2",
+                  "model_signature": "(*args, **kwargs)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7,
+                  1
+                ],
+                "prediction_sha256": "96c7ff0e442e68bf4105025ba81290a37762c25bd13c82a389386d48163bb953",
+                "runtime_seconds": 0.00014989399642217904,
+                "success": true
+              }
+            }
+          ],
+          "pairs_eligible": 2,
+          "pairs_failed": 0,
+          "pairs_matched": 2,
+          "pairs_total": 2,
+          "parameter": "K",
+          "probe_id": "darts-naive-seasonal-k-prediction",
+          "prospective_evaluated": false,
+          "support_reason": null,
+          "supported": true,
+          "treatment_aggregate": null
+        },
+        "target": "darts-torch"
+      },
+      {
+        "checks": {
+          "all_observations_valid": true,
+          "effective": true,
+          "holdout_false": true,
+          "matched_fraction": true,
+          "paired_count": true,
+          "pairs_eligible": true,
+          "pairs_failed": true,
+          "pairs_matched": true,
+          "pairs_total": true,
+          "prospective_false": true
+        },
+        "evidence_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase5b-runtime-family-effectiveness-20260826-153243/evidence/darts-notorch",
+        "identity": {
+          "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-notorch/.venv/bin/python",
+          "import_error": null,
+          "imported": true,
+          "library": "darts",
+          "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-notorch/.venv",
+          "python": "3.13.13",
+          "version": null
+        },
+        "result": {
+          "control_aggregate": null,
+          "expected_relation": "change",
+          "expected_surface": "prediction",
+          "holdout_evaluated": false,
+          "library": "darts",
+          "matched_fraction": 1.0,
+          "model": "NaiveSeasonal",
+          "outcome": "effective",
+          "paired": [
+            {
+              "comparison": "control='73f183198d086df4339401ee240c6535d1347d9000764e3ac06b70d7d682968d'; treatment='130c6b827b5e841ffc093bc609a2f9ff8029fc24bbe6b52cee7267a0ef9cf76a'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "DartsParameterAdapterV2",
+                  "model_signature": "(*args, **kwargs)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7,
+                  1
+                ],
+                "prediction_sha256": "73f183198d086df4339401ee240c6535d1347d9000764e3ac06b70d7d682968d",
+                "runtime_seconds": 0.0038709630025550723,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 1,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "DartsParameterAdapterV2",
+                  "model_signature": "(*args, **kwargs)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7,
+                  1
+                ],
+                "prediction_sha256": "130c6b827b5e841ffc093bc609a2f9ff8029fc24bbe6b52cee7267a0ef9cf76a",
+                "runtime_seconds": 0.00031803199817659333,
+                "success": true
+              }
+            },
+            {
+              "comparison": "control='d65148fc3239bdc9417076e5163107507327abf20ad3cb25fa6e4e634cd429de'; treatment='96c7ff0e442e68bf4105025ba81290a37762c25bd13c82a389386d48163bb953'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "DartsParameterAdapterV2",
+                  "model_signature": "(*args, **kwargs)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7,
+                  1
+                ],
+                "prediction_sha256": "d65148fc3239bdc9417076e5163107507327abf20ad3cb25fa6e4e634cd429de",
+                "runtime_seconds": 0.0002262579946545884,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 42,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "DartsParameterAdapterV2",
+                  "model_signature": "(*args, **kwargs)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7,
+                  1
+                ],
+                "prediction_sha256": "96c7ff0e442e68bf4105025ba81290a37762c25bd13c82a389386d48163bb953",
+                "runtime_seconds": 0.0001753209944581613,
+                "success": true
+              }
+            }
+          ],
+          "pairs_eligible": 2,
+          "pairs_failed": 0,
+          "pairs_matched": 2,
+          "pairs_total": 2,
+          "parameter": "K",
+          "probe_id": "darts-naive-seasonal-k-prediction",
+          "prospective_evaluated": false,
+          "support_reason": null,
+          "supported": true,
+          "treatment_aggregate": null
+        },
+        "target": "darts-notorch"
+      },
+      {
+        "checks": {
+          "all_observations_valid": true,
+          "effective": true,
+          "holdout_false": true,
+          "matched_fraction": true,
+          "paired_count": true,
+          "pairs_eligible": true,
+          "pairs_failed": true,
+          "pairs_matched": true,
+          "pairs_total": true,
+          "prospective_false": true
+        },
+        "evidence_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase5b-runtime-family-effectiveness-20260826-153243/evidence/gluonts-latest",
+        "identity": {
+          "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-latest/.venv/bin/python",
+          "import_error": null,
+          "imported": true,
+          "library": "gluonts",
+          "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-latest/.venv",
+          "python": "3.13.13",
+          "version": "0.17.0"
+        },
+        "result": {
+          "control_aggregate": null,
+          "expected_relation": "change",
+          "expected_surface": "prediction",
+          "holdout_evaluated": false,
+          "library": "gluonts",
+          "matched_fraction": 1.0,
+          "model": "SeasonalNaivePredictor",
+          "outcome": "effective",
+          "paired": [
+            {
+              "comparison": "control='65425a465bd26289aa3051fedf7620871a7601d7c7ae2000da1b389722bcbe66'; treatment='63032b6eac9aff112ed6fa49efd673a71b6ccb803fd13f3507c20b37fccfa5eb'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "GluonTSParameterAdapter",
+                  "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "65425a465bd26289aa3051fedf7620871a7601d7c7ae2000da1b389722bcbe66",
+                "runtime_seconds": 0.0006892029996379279,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 1,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "GluonTSParameterAdapter",
+                  "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "63032b6eac9aff112ed6fa49efd673a71b6ccb803fd13f3507c20b37fccfa5eb",
+                "runtime_seconds": 0.0002462859993102029,
+                "success": true
+              }
+            },
+            {
+              "comparison": "control='c8e6b69428e6b248e9c197ab47d5006a06b74dfdf08f2f9c34802eb87f8ac297'; treatment='543cf5d86525a63a78debb1ead5438af0752d46c41278eeee7ea47389af82309'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "GluonTSParameterAdapter",
+                  "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "c8e6b69428e6b248e9c197ab47d5006a06b74dfdf08f2f9c34802eb87f8ac297",
+                "runtime_seconds": 0.00019216299551771954,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 42,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "GluonTSParameterAdapter",
+                  "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "543cf5d86525a63a78debb1ead5438af0752d46c41278eeee7ea47389af82309",
+                "runtime_seconds": 0.00016457099991384894,
+                "success": true
+              }
+            }
+          ],
+          "pairs_eligible": 2,
+          "pairs_failed": 0,
+          "pairs_matched": 2,
+          "pairs_total": 2,
+          "parameter": "season_length",
+          "probe_id": "gluonts-seasonal-naive-season-length-prediction",
+          "prospective_evaluated": false,
+          "support_reason": null,
+          "supported": true,
+          "treatment_aggregate": null
+        },
+        "target": "gluonts-latest"
+      },
+      {
+        "checks": {
+          "all_observations_valid": true,
+          "effective": true,
+          "holdout_false": true,
+          "matched_fraction": true,
+          "paired_count": true,
+          "pairs_eligible": true,
+          "pairs_failed": true,
+          "pairs_matched": true,
+          "pairs_total": true,
+          "prospective_false": true
+        },
+        "evidence_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase5b-runtime-family-effectiveness-20260826-153243/evidence/gluonts-compat",
+        "identity": {
+          "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-compat/.venv/bin/python",
+          "import_error": null,
+          "imported": true,
+          "library": "gluonts",
+          "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-compat/.venv",
+          "python": "3.13.13",
+          "version": "0.16.3"
+        },
+        "result": {
+          "control_aggregate": null,
+          "expected_relation": "change",
+          "expected_surface": "prediction",
+          "holdout_evaluated": false,
+          "library": "gluonts",
+          "matched_fraction": 1.0,
+          "model": "SeasonalNaivePredictor",
+          "outcome": "effective",
+          "paired": [
+            {
+              "comparison": "control='65425a465bd26289aa3051fedf7620871a7601d7c7ae2000da1b389722bcbe66'; treatment='63032b6eac9aff112ed6fa49efd673a71b6ccb803fd13f3507c20b37fccfa5eb'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "GluonTSParameterAdapter",
+                  "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "65425a465bd26289aa3051fedf7620871a7601d7c7ae2000da1b389722bcbe66",
+                "runtime_seconds": 0.0007497490005334839,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 1,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "GluonTSParameterAdapter",
+                  "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "63032b6eac9aff112ed6fa49efd673a71b6ccb803fd13f3507c20b37fccfa5eb",
+                "runtime_seconds": 0.0002713130015763454,
+                "success": true
+              }
+            },
+            {
+              "comparison": "control='c8e6b69428e6b248e9c197ab47d5006a06b74dfdf08f2f9c34802eb87f8ac297'; treatment='543cf5d86525a63a78debb1ead5438af0752d46c41278eeee7ea47389af82309'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "GluonTSParameterAdapter",
+                  "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "c8e6b69428e6b248e9c197ab47d5006a06b74dfdf08f2f9c34802eb87f8ac297",
+                "runtime_seconds": 0.00020980699628125876,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 42,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "GluonTSParameterAdapter",
+                  "model_signature": "(prediction_length: int, season_length: Union[int, Callable], imputation_method: gluonts.transform.feature.MissingValueImputation = gluonts.transform.feature.LastValueImputation()) -> None"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "543cf5d86525a63a78debb1ead5438af0752d46c41278eeee7ea47389af82309",
+                "runtime_seconds": 0.00017241599562112242,
+                "success": true
+              }
+            }
+          ],
+          "pairs_eligible": 2,
+          "pairs_failed": 0,
+          "pairs_matched": 2,
+          "pairs_total": 2,
+          "parameter": "season_length",
+          "probe_id": "gluonts-seasonal-naive-season-length-prediction",
+          "prospective_evaluated": false,
+          "support_reason": null,
+          "supported": true,
+          "treatment_aggregate": null
+        },
+        "target": "gluonts-compat"
+      },
+      {
+        "checks": {
+          "all_observations_valid": true,
+          "effective": true,
+          "holdout_false": true,
+          "matched_fraction": true,
+          "paired_count": true,
+          "pairs_eligible": true,
+          "pairs_failed": true,
+          "pairs_matched": true,
+          "pairs_total": true,
+          "prospective_false": true
+        },
+        "evidence_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase5b-runtime-family-effectiveness-20260826-153243/evidence/sktime-classic-py312",
+        "identity": {
+          "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-classic-py312/.venv/bin/python",
+          "import_error": null,
+          "imported": true,
+          "library": "sktime",
+          "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-classic-py312/.venv",
+          "python": "3.12.13",
+          "version": "1.0.1"
+        },
+        "result": {
+          "control_aggregate": null,
+          "expected_relation": "change",
+          "expected_surface": "prediction",
+          "holdout_evaluated": false,
+          "library": "sktime",
+          "matched_fraction": 1.0,
+          "model": "NaiveForecaster",
+          "outcome": "effective",
+          "paired": [
+            {
+              "comparison": "control='73f183198d086df4339401ee240c6535d1347d9000764e3ac06b70d7d682968d'; treatment='00e14215e2f5ddb6b646ad62918f3bc14ed27479e0e745a2cd6b1bf6f79155c1'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "SktimeParameterAdapter",
+                  "model_signature": "(strategy='last', window_length=None, sp=1)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "73f183198d086df4339401ee240c6535d1347d9000764e3ac06b70d7d682968d",
+                "runtime_seconds": 0.01684870399913052,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 1,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "SktimeParameterAdapter",
+                  "model_signature": "(strategy='last', window_length=None, sp=1)"
+                },
+                "observables": {
+                  "metric": 0.42857142857142855
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "00e14215e2f5ddb6b646ad62918f3bc14ed27479e0e745a2cd6b1bf6f79155c1",
+                "runtime_seconds": 0.0026233829994453117,
+                "success": true
+              }
+            },
+            {
+              "comparison": "control='d65148fc3239bdc9417076e5163107507327abf20ad3cb25fa6e4e634cd429de'; treatment='f423e6ffe7aecef95efe1402f4f28a2775012afb0a3c9c6aece1acaaa415ed68'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "SktimeParameterAdapter",
+                  "model_signature": "(strategy='last', window_length=None, sp=1)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "d65148fc3239bdc9417076e5163107507327abf20ad3cb25fa6e4e634cd429de",
+                "runtime_seconds": 0.005634669003484305,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 42,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "SktimeParameterAdapter",
+                  "model_signature": "(strategy='last', window_length=None, sp=1)"
+                },
+                "observables": {
+                  "metric": 0.42857142857142855
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "f423e6ffe7aecef95efe1402f4f28a2775012afb0a3c9c6aece1acaaa415ed68",
+                "runtime_seconds": 0.0022763759989175014,
+                "success": true
+              }
+            }
+          ],
+          "pairs_eligible": 2,
+          "pairs_failed": 0,
+          "pairs_matched": 2,
+          "pairs_total": 2,
+          "parameter": "strategy",
+          "probe_id": "sktime-naive-strategy-prediction",
+          "prospective_evaluated": false,
+          "support_reason": null,
+          "supported": true,
+          "treatment_aggregate": null
+        },
+        "target": "sktime-classic-py312"
+      },
+      {
+        "checks": {
+          "all_observations_valid": true,
+          "effective": true,
+          "holdout_false": true,
+          "matched_fraction": true,
+          "paired_count": true,
+          "pairs_eligible": true,
+          "pairs_failed": true,
+          "pairs_matched": true,
+          "pairs_total": true,
+          "prospective_false": true
+        },
+        "evidence_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase5b-runtime-family-effectiveness-20260826-153243/evidence/sktime-core-py313",
+        "identity": {
+          "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-core-py313/.venv/bin/python",
+          "import_error": null,
+          "imported": true,
+          "library": "sktime",
+          "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-core-py313/.venv",
+          "python": "3.13.13",
+          "version": "1.0.1"
+        },
+        "result": {
+          "control_aggregate": null,
+          "expected_relation": "change",
+          "expected_surface": "prediction",
+          "holdout_evaluated": false,
+          "library": "sktime",
+          "matched_fraction": 1.0,
+          "model": "NaiveForecaster",
+          "outcome": "effective",
+          "paired": [
+            {
+              "comparison": "control='73f183198d086df4339401ee240c6535d1347d9000764e3ac06b70d7d682968d'; treatment='00e14215e2f5ddb6b646ad62918f3bc14ed27479e0e745a2cd6b1bf6f79155c1'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "SktimeParameterAdapter",
+                  "model_signature": "(strategy='last', window_length=None, sp=1)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "73f183198d086df4339401ee240c6535d1347d9000764e3ac06b70d7d682968d",
+                "runtime_seconds": 0.01992112700099824,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 1,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "SktimeParameterAdapter",
+                  "model_signature": "(strategy='last', window_length=None, sp=1)"
+                },
+                "observables": {
+                  "metric": 0.42857142857142855
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "00e14215e2f5ddb6b646ad62918f3bc14ed27479e0e745a2cd6b1bf6f79155c1",
+                "runtime_seconds": 0.0030019789992365986,
+                "success": true
+              }
+            },
+            {
+              "comparison": "control='d65148fc3239bdc9417076e5163107507327abf20ad3cb25fa6e4e634cd429de'; treatment='f423e6ffe7aecef95efe1402f4f28a2775012afb0a3c9c6aece1acaaa415ed68'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "SktimeParameterAdapter",
+                  "model_signature": "(strategy='last', window_length=None, sp=1)"
+                },
+                "observables": {
+                  "metric": 0.2857142857142857
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "d65148fc3239bdc9417076e5163107507327abf20ad3cb25fa6e4e634cd429de",
+                "runtime_seconds": 0.005376061002607457,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 42,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "SktimeParameterAdapter",
+                  "model_signature": "(strategy='last', window_length=None, sp=1)"
+                },
+                "observables": {
+                  "metric": 0.42857142857142855
+                },
+                "output_shape": [
+                  7
+                ],
+                "prediction_sha256": "f423e6ffe7aecef95efe1402f4f28a2775012afb0a3c9c6aece1acaaa415ed68",
+                "runtime_seconds": 0.002283970999997109,
+                "success": true
+              }
+            }
+          ],
+          "pairs_eligible": 2,
+          "pairs_failed": 0,
+          "pairs_matched": 2,
+          "pairs_total": 2,
+          "parameter": "strategy",
+          "probe_id": "sktime-naive-strategy-prediction",
+          "prospective_evaluated": false,
+          "support_reason": null,
+          "supported": true,
+          "treatment_aggregate": null
+        },
+        "target": "sktime-core-py313"
+      },
+      {
+        "checks": {
+          "all_observations_valid": true,
+          "effective": true,
+          "holdout_false": true,
+          "matched_fraction": true,
+          "paired_count": true,
+          "pairs_eligible": true,
+          "pairs_failed": true,
+          "pairs_matched": true,
+          "pairs_total": true,
+          "prospective_false": true,
+          "toto_cuda_execution": true
+        },
+        "evidence_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase5b-runtime-family-effectiveness-20260826-153243/evidence/toto2-4m-py312",
+        "identity": {
+          "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto/bin/python",
+          "import_error": null,
+          "imported": true,
+          "library": "toto2",
+          "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto",
+          "python": "3.12.13",
+          "version": "2.0.0"
+        },
+        "result": {
+          "control_aggregate": {
+            "count": 2,
+            "maximum": 128.0,
+            "mean": 128.0,
+            "minimum": 128.0,
+            "std": 0.0,
+            "worst": 128.0
+          },
+          "expected_relation": "increase",
+          "expected_surface": "history",
+          "holdout_evaluated": false,
+          "library": "toto2",
+          "matched_fraction": 1.0,
+          "model": "toto-2.0-4m",
+          "outcome": "effective",
+          "paired": [
+            {
+              "comparison": "control=128; treatment=256; expected=increase",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "Toto2MinimalParameterAdapter",
+                  "cpu_fallback": false,
+                  "execution_device": "cuda:0",
+                  "input_shape": [
+                    1,
+                    1,
+                    128
+                  ],
+                  "model_device": "cuda:0",
+                  "output_device": "cuda:0",
+                  "peak_vram_bytes": 64238592
+                },
+                "observables": {
+                  "history": 128
+                },
+                "output_shape": [
+                  9,
+                  1,
+                  1,
+                  1
+                ],
+                "prediction_sha256": "dc2eaa751ce0daa4d4148661885e60e8f803dd129ffe8ca17348da42d3eb02df",
+                "runtime_seconds": 2.758100874001684,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 1,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "Toto2MinimalParameterAdapter",
+                  "cpu_fallback": false,
+                  "execution_device": "cuda:0",
+                  "input_shape": [
+                    1,
+                    1,
+                    256
+                  ],
+                  "model_device": "cuda:0",
+                  "output_device": "cuda:0",
+                  "peak_vram_bytes": 80894464
+                },
+                "observables": {
+                  "history": 256
+                },
+                "output_shape": [
+                  9,
+                  1,
+                  1,
+                  1
+                ],
+                "prediction_sha256": "99c214935bb05d2e6efd077d04659022c38ada26acd5fc13b97af4e43709280b",
+                "runtime_seconds": 0.06132295999850612,
+                "success": true
+              }
+            },
+            {
+              "comparison": "control=128; treatment=256; expected=increase",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "Toto2MinimalParameterAdapter",
+                  "cpu_fallback": false,
+                  "execution_device": "cuda:0",
+                  "input_shape": [
+                    1,
+                    1,
+                    128
+                  ],
+                  "model_device": "cuda:0",
+                  "output_device": "cuda:0",
+                  "peak_vram_bytes": 64238592
+                },
+                "observables": {
+                  "history": 128
+                },
+                "output_shape": [
+                  9,
+                  1,
+                  1,
+                  1
+                ],
+                "prediction_sha256": "e02b219eaf2f46cd6a2d499fcb6a07058af1c62cce17873a1c75901879eacc61",
+                "runtime_seconds": 0.24286145200312603,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 42,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "Toto2MinimalParameterAdapter",
+                  "cpu_fallback": false,
+                  "execution_device": "cuda:0",
+                  "input_shape": [
+                    1,
+                    1,
+                    256
+                  ],
+                  "model_device": "cuda:0",
+                  "output_device": "cuda:0",
+                  "peak_vram_bytes": 80894464
+                },
+                "observables": {
+                  "history": 256
+                },
+                "output_shape": [
+                  9,
+                  1,
+                  1,
+                  1
+                ],
+                "prediction_sha256": "5dc916b5f20486464aa4e4ec6c4527944f510a82399b2946bf735a7bfcc5f00d",
+                "runtime_seconds": 0.04036761699535418,
+                "success": true
+              }
+            }
+          ],
+          "pairs_eligible": 2,
+          "pairs_failed": 0,
+          "pairs_matched": 2,
+          "pairs_total": 2,
+          "parameter": "context_length",
+          "probe_id": "toto2-context-length-history",
+          "prospective_evaluated": false,
+          "support_reason": null,
+          "supported": true,
+          "treatment_aggregate": {
+            "count": 2,
+            "maximum": 256.0,
+            "mean": 256.0,
+            "minimum": 256.0,
+            "std": 0.0,
+            "worst": 256.0
+          }
+        },
+        "target": "toto2-4m-py312"
+      }
+    ],
+    "validation": {
+      "checks": {
+        "all_critical_checks_pass": true,
+        "all_match_fraction_1": true,
+        "all_targets_2_of_2": true,
+        "all_targets_effective": true,
+        "dependencies_unchanged": true,
+        "holdout_not_evaluated": true,
+        "lockfile_unchanged": true,
+        "phase5a_verified": true,
+        "prospective_not_evaluated": true,
+        "seven_targets": true,
+        "source_exact": true
+      }
+    }
+  },
   "schema_version": 1,
   "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
-  "updated_at_utc": "2026-08-26T06:11:30.448161+00:00"
+  "updated_at_utc": "2026-08-26T06:33:01.456970+00:00"
 }
