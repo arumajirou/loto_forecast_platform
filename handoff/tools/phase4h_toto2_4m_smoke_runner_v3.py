@@ -64,6 +64,11 @@ def generate() -> str:
     text = TEMPLATE.read_text(encoding="utf-8")
     text = replace_once(
         text,
+        'if phase3d.get("source_sha") != EXPECTED_SOURCE_SHA:',
+        f'if phase3d.get("source_sha") != "{ORIGINAL_SOURCE_SHA}":',
+    )
+    text = replace_once(
+        text,
         f'EXPECTED_SOURCE_SHA = "{ORIGINAL_SOURCE_SHA}"',
         f'EXPECTED_SOURCE_SHA = "{SOURCE_FIX_SHA}"',
     )
@@ -80,6 +85,7 @@ def generate() -> str:
 
     required = (
         f'EXPECTED_SOURCE_SHA = "{SOURCE_FIX_SHA}"',
+        f'if phase3d.get("source_sha") != "{ORIGINAL_SOURCE_SHA}":',
         'PYTHONPATH": str(SOURCE_WT / "src")',
         'proc = run([str(RUNTIME), "-c", code], timeout=120, env=offline_env())',
         '[str(RUNTIME), "-c", code, str(candidate)],',
@@ -93,6 +99,7 @@ def generate() -> str:
         raise RuntimeError(f"PHASE4H_V3_TRANSFORM_INCOMPLETE:{missing}")
 
     forbidden = (
+        'if phase3d.get("source_sha") != EXPECTED_SOURCE_SHA:',
         f'EXPECTED_SOURCE_SHA = "{ORIGINAL_SOURCE_SHA}"',
         'proc = run([str(RUNTIME), "-I", "-c", code], timeout=120, env=offline_env())',
         '[str(RUNTIME), "-I", "-c", code, str(candidate)],',
@@ -123,6 +130,7 @@ def main() -> int:
             return fail("GENERATED_PHASE4H_V3_PY_COMPILE_FAILED", compile_proc.returncode or 2)
         print("PHASE4H_V3_GENERATED_RUNNER_SYNTAX=PASS")
         print(f"PHASE4H_TEMPLATE_BLOB={EXPECTED_TEMPLATE_BLOB}")
+        print(f"PHASE4H_PHASE3D_SOURCE_SHA={ORIGINAL_SOURCE_SHA}")
         print(f"PHASE4H_SOURCE_FIX_SHA={SOURCE_FIX_SHA}")
         proc = subprocess.run([sys.executable, str(GENERATED)], env=env, check=False)
         return proc.returncode
