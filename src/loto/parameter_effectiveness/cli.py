@@ -9,7 +9,7 @@ from pathlib import Path
 from .adapters import default_registry
 from .contracts import EffectOutcome, ParameterSuiteSpec
 from .core import run_suite
-from .extended_adapters import register_extended_adapters
+from .extended_registry_v2 import register_extended_adapters_v2
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -29,7 +29,7 @@ def main(argv: list[str] | None = None) -> int:
 
     suite = ParameterSuiteSpec.model_validate_json(args.spec.read_text(encoding="utf-8"))
     registry = default_registry()
-    register_extended_adapters(registry)
+    register_extended_adapters_v2(registry)
     results = run_suite(suite, registry, args.output)
 
     print("=" * 96)
