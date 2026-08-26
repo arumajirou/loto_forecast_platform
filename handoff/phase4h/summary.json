@@ -1,0 +1,376 @@
+{
+  "accuracy_ranking": false,
+  "dataset_policy": {
+    "accuracy_ranking": false,
+    "holdout_opened": false,
+    "kind": "deterministic_synthetic_runtime_fixture",
+    "metrics": "NOT_APPLICABLE_PHASE4_RUNTIME_ONLY",
+    "prospective_actual_known": false
+  },
+  "dependencies_modified": false,
+  "device_policy": {
+    "cpu_fallback": false,
+    "external_provider_pid_required": true,
+    "gpu_execution_claimed": true,
+    "positive_vram_required": true,
+    "requested": "cuda",
+    "runtime_scope": "FULL_INFERENCE"
+  },
+  "environment": "environments/toto2-4m-py312",
+  "environment_contract": {
+    "dependencies_modified": false,
+    "existing_compatible_venv_reused": true,
+    "lockfile_modified": false,
+    "pyproject_path": "/mnt/e/env/ts/worktrees/loto-runtime-audit-20260826-121248/environments/toto2-4m-py312/pyproject.toml",
+    "pyproject_sha256": "75d4c1e3cf9f353066eb541d29bf7e6065d5a5fdf92907216c33b06be42ea8d2",
+    "selected_runtime": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto",
+    "source_uv_lock_exists": false,
+    "source_uv_lock_sha256": null
+  },
+  "formal_runtime_certification": true,
+  "gpu_inventory_after": {
+    "command": [
+      "nvidia-smi",
+      "--query-gpu=index,name,uuid,memory.total,memory.free,driver_version",
+      "--format=csv,noheader,nounits"
+    ],
+    "rows": [
+      {
+        "driver_version": "595.84",
+        "index": 0,
+        "memory_free_mib": 15841,
+        "memory_total_mib": 16303,
+        "name": "NVIDIA GeForce RTX 5070 Ti",
+        "uuid": "GPU-fac07577-072e-c021-9ac4-d7dc9b9711af"
+      }
+    ]
+  },
+  "gpu_inventory_before": {
+    "command": [
+      "nvidia-smi",
+      "--query-gpu=index,name,uuid,memory.total,memory.free,driver_version",
+      "--format=csv,noheader,nounits"
+    ],
+    "rows": [
+      {
+        "driver_version": "595.84",
+        "index": 0,
+        "memory_free_mib": 15841,
+        "memory_total_mib": 16303,
+        "name": "NVIDIA GeForce RTX 5070 Ti",
+        "uuid": "GPU-fac07577-072e-c021-9ac4-d7dc9b9711af"
+      }
+    ]
+  },
+  "lane": {
+    "candidate_probe_status": "PASS",
+    "candidate_python_version": "3.12.13",
+    "candidate_runtime": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto",
+    "candidate_source": "REUSABLE_COMPATIBLE_VENV",
+    "cuda_builds": "[\"13.0\"]",
+    "decision_reason": "Existing separate venv satisfies declared Python/direct dependency metadata; formal smoke still required.",
+    "declared_contract_compatible": "True",
+    "dependency_coverage": "1.0",
+    "environment": "environments/toto2-4m-py312",
+    "lane": "REUSABLE_COMPATIBLE_VENV",
+    "mapping_status": "MULTIPLE_VENV_CANDIDATES",
+    "missing_dependencies": "[]",
+    "phase2_statuses": "[\"CUDA_KERNEL_PASS\"]",
+    "phase3c_classification": "REUSABLE_COMPATIBLE_VENV",
+    "phase4_priority": "40",
+    "phase4_smoke_allowed": "True",
+    "python_compatible": "True",
+    "torch_versions": "[\"2.13.0+cu130\"]",
+    "version_incompatible": "[]"
+  },
+  "lockfile_modified": false,
+  "phase": "PHASE4H_TOTO2_4M_PY312_CUDA_LIFECYCLE",
+  "request_contract": {
+    "actuals_used": false,
+    "context_length": 128,
+    "decode_block_size": 32,
+    "device": "cuda",
+    "dtype": "float32",
+    "local_files_only": true,
+    "prediction_length": 1,
+    "series_layout": "position_univariate",
+    "synthetic_runtime_fixture": true
+  },
+  "run_id": "20260826-144414",
+  "runtime": {
+    "artifact_sha256": {
+      "README.md": "c8f85b01eae1b586a742d9a0065df252bfe5855644f595969ca111bc206fcfcd",
+      "config.json": "7a926d130e401ab0c5fdb3564f46c8d917bd05c7b3ae26b9c22d2da2ef01d2d8",
+      "model.safetensors": "316660d5afb47943e531f39242e0b02ca0b8bb73be5709dfe07ca80dfce9805e"
+    },
+    "artifact_size_bytes": {
+      "model.safetensors": 16582848
+    },
+    "certified_cuda": "13.0",
+    "certified_python_series": "3.12",
+    "certified_torch_prefix": "2.13.0",
+    "checks": {
+      "cuda_available": true,
+      "cuda_device_count": true,
+      "model_class": true,
+      "model_id": true,
+      "model_import": true,
+      "model_license": true,
+      "model_parameter_count": true,
+      "model_revision": true,
+      "model_weight_sha": true,
+      "model_weight_size": true,
+      "prefix": true,
+      "python": true,
+      "repo_id": true,
+      "source_revision": true,
+      "torch": true,
+      "torch_cuda": true,
+      "toto_2": true,
+      "toto_models": true
+    },
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto/bin/python",
+    "manifest_toto_2_version": "2.0.0",
+    "manifest_toto_models_version": "1.0.0",
+    "model_class": "Toto2Model",
+    "model_id": "toto-2.0-4m",
+    "model_license": "Apache-2.0",
+    "model_parameter_count": 4144448,
+    "model_revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto",
+    "python": "3.12.13",
+    "repo_id": "Datadog/Toto-2.0-4m",
+    "source_revision": "44ea4e88852228039564aa3e76fac26aafac0803",
+    "torch": "2.13.0+cu130",
+    "torch_cuda": "13.0",
+    "torch_cuda_available": true,
+    "torch_cuda_device_count": 1,
+    "torch_device_name": "NVIDIA GeForce RTX 5070 Ti",
+    "toto2_model_import_class": "Toto2Model",
+    "toto_2": "2.0.0",
+    "toto_models": "1.0.0"
+  },
+  "runtime_output_lock": {
+    "kind": "runtime-smoke-output-lock-not-prospective-accuracy",
+    "locked_at_utc": "2026-08-26T05:44:44.975020+00:00",
+    "native_output_sha256": "156bbb9314bdd0e455d9e0d2d088758a3530d5cb7e93f9ee52eae94477b5d432",
+    "request_sha256": "5d189e9326e7fbe0c59a31b8c2a7350680eb9dbdfabe3e5592e1cda8184a262a",
+    "response_sha256": "6bd7f49e0580e33decb65789bfed9cef0e761f21c1407dfab36e7b5a7ff6471a",
+    "two_process_native_exact_equal": true
+  },
+  "schema_version": 1,
+  "scope": "Toto 2.0 4M real-checkpoint CUDA full-inference lifecycle smoke",
+  "selected_runtime": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto",
+  "snapshot": {
+    "files": {
+      "README.md": {
+        "path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9/README.md",
+        "sha256": "c8f85b01eae1b586a742d9a0065df252bfe5855644f595969ca111bc206fcfcd",
+        "size_bytes": 7307
+      },
+      "config.json": {
+        "path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9/config.json",
+        "sha256": "7a926d130e401ab0c5fdb3564f46c8d917bd05c7b3ae26b9c22d2da2ef01d2d8",
+        "size_bytes": 592
+      },
+      "model.safetensors": {
+        "path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9/model.safetensors",
+        "sha256": "316660d5afb47943e531f39242e0b02ca0b8bb73be5709dfe07ca80dfce9805e",
+        "size_bytes": 16582848
+      }
+    },
+    "revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9"
+  },
+  "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+  "source_sha": "0a13c287e0f0fcc8f983be3512654524dad18b2c",
+  "status": "VERIFIED",
+  "validation": {
+    "checks": {
+      "all_critical_checks_pass": true,
+      "cpu_fallback_false": true,
+      "effective_actuals_unused": true,
+      "effective_native_shape": true,
+      "execution_device_cuda": true,
+      "external_gpu_pid_captured": true,
+      "input_shape": true,
+      "model_device_cuda": true,
+      "model_identity_class": true,
+      "model_identity_id": true,
+      "model_identity_parameter_count": true,
+      "model_identity_repo": true,
+      "model_identity_revision": true,
+      "native_exact_equal": true,
+      "native_finite": true,
+      "native_first_shape": true,
+      "native_second_shape": true,
+      "output_device_cuda": true,
+      "output_finite": true,
+      "output_shape": true,
+      "point_forecast_shape": true,
+      "positive_peak_vram": true,
+      "quantile_count": true,
+      "quantile_monotonicity": true,
+      "requested_device_cuda": true,
+      "response_phase_predict": true,
+      "response_status_ok": true,
+      "response_values_finite": true,
+      "runtime_scope_full_inference": true,
+      "snapshot_revision": true,
+      "snapshot_weight_sha": true,
+      "snapshot_weight_size": true,
+      "two_process_count": true,
+      "two_process_distinct_pid": true,
+      "two_process_exact_replay": true,
+      "two_process_gpu_evidence": true
+    },
+    "effective_arguments": {
+      "actuals_used": false,
+      "batch_size": 1,
+      "context_length": 128,
+      "decode_block_size": 32,
+      "game_geometry": {
+        "candidate_max": 20,
+        "candidate_min": 1,
+        "game_id": "phase4h_synthetic",
+        "position_count": 1,
+        "strictly_increasing": false
+      },
+      "native_shape": [
+        9,
+        1,
+        1,
+        1
+      ],
+      "prediction_length": 1,
+      "quantile_monotonicity": true,
+      "series_layout": "position_univariate"
+    },
+    "gpu_process_evidence": [
+      {
+        "capture_count": 28,
+        "captured": true,
+        "gpu_uuid": "GPU-fac07577-072e-c021-9ac4-d7dc9b9711af",
+        "max_gpu_memory_mib": 356,
+        "min_gpu_memory_mib": 312,
+        "provider_pid": 3808075
+      },
+      {
+        "capture_count": 24,
+        "captured": true,
+        "gpu_uuid": "GPU-fac07577-072e-c021-9ac4-d7dc9b9711af",
+        "max_gpu_memory_mib": 356,
+        "min_gpu_memory_mib": 312,
+        "provider_pid": 3808613
+      }
+    ],
+    "native_output": {
+      "dtype": "float32",
+      "exact_equal": true,
+      "first_finite": true,
+      "first_sha256": "156bbb9314bdd0e455d9e0d2d088758a3530d5cb7e93f9ee52eae94477b5d432",
+      "first_shape": [
+        9,
+        1,
+        1,
+        1
+      ],
+      "second_finite": true,
+      "second_sha256": "156bbb9314bdd0e455d9e0d2d088758a3530d5cb7e93f9ee52eae94477b5d432",
+      "second_shape": [
+        9,
+        1,
+        1,
+        1
+      ]
+    },
+    "point_forecast": [
+      [
+        8.863503456115723
+      ]
+    ],
+    "provider_pids": [
+      3808075,
+      3808613
+    ],
+    "quantiles": {
+      "q0.1": [
+        [
+          8.405832290649414
+        ]
+      ],
+      "q0.2": [
+        [
+          8.583107948303223
+        ]
+      ],
+      "q0.3": [
+        [
+          8.67068099975586
+        ]
+      ],
+      "q0.4": [
+        [
+          8.770241737365723
+        ]
+      ],
+      "q0.5": [
+        [
+          8.863503456115723
+        ]
+      ],
+      "q0.6": [
+        [
+          8.964338302612305
+        ]
+      ],
+      "q0.7": [
+        [
+          9.056843757629395
+        ]
+      ],
+      "q0.8": [
+        [
+          9.172698974609375
+        ]
+      ],
+      "q0.9": [
+        [
+          9.368696212768555
+        ]
+      ]
+    },
+    "replay": {
+      "exact_equal": true,
+      "first_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-1/native_output.npy",
+      "first_sha256": "156bbb9314bdd0e455d9e0d2d088758a3530d5cb7e93f9ee52eae94477b5d432",
+      "first_shape": [
+        9,
+        1,
+        1,
+        1
+      ],
+      "max_abs_diff": 0.0,
+      "same_shape": true,
+      "second_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-2/native_output.npy",
+      "second_sha256": "156bbb9314bdd0e455d9e0d2d088758a3530d5cb7e93f9ee52eae94477b5d432",
+      "second_shape": [
+        9,
+        1,
+        1,
+        1
+      ]
+    },
+    "runtime_evidence": {
+      "cpu_fallback": false,
+      "execution_device": "cuda:0",
+      "external_gpu_pid_captured": true,
+      "model_device": "cuda:0",
+      "output_device": "cuda:0",
+      "peak_vram_bytes": 373293056,
+      "provider_pid": 3808075,
+      "requested_device": "cuda",
+      "runtime_scope": "FULL_INFERENCE"
+    }
+  }
+}

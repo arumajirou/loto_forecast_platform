@@ -1,0 +1,26 @@
+{
+  "model_device": "cuda:0",
+  "provider_pid": 3808613,
+  "requested_device": "cuda",
+  "snapshot": {
+    "files": {
+      "README.md": {
+        "path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9/README.md",
+        "sha256": "c8f85b01eae1b586a742d9a0065df252bfe5855644f595969ca111bc206fcfcd",
+        "size_bytes": 7307
+      },
+      "config.json": {
+        "path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9/config.json",
+        "sha256": "7a926d130e401ab0c5fdb3564f46c8d917bd05c7b3ae26b9c22d2da2ef01d2d8",
+        "size_bytes": 592
+      },
+      "model.safetensors": {
+        "path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9/model.safetensors",
+        "sha256": "316660d5afb47943e531f39242e0b02ca0b8bb73be5709dfe07ca80dfce9805e",
+        "size_bytes": 16582848
+      }
+    },
+    "revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+    "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "forecast_accuracy_certified": false,
+  "lottery_domain_compatibility_certified": false,
+  "response_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/response.json",
+  "runtime_scope": "FULL_INFERENCE",
+  "status": "PASS",
+  "two_process_exact_replay": true
+}

@@ -1,0 +1,8 @@
+{
+  "kind": "runtime-smoke-output-lock-not-prospective-accuracy",
+  "locked_at_utc": "2026-08-26T05:44:44.975020+00:00",
+  "native_output_sha256": "156bbb9314bdd0e455d9e0d2d088758a3530d5cb7e93f9ee52eae94477b5d432",
+  "request_sha256": "5d189e9326e7fbe0c59a31b8c2a7350680eb9dbdfabe3e5592e1cda8184a262a",
+  "response_sha256": "6bd7f49e0580e33decb65789bfed9cef0e761f21c1407dfab36e7b5a7ff6471a",
+  "two_process_native_exact_equal": true
+}

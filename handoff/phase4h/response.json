@@ -1,0 +1,239 @@
+{
+  "artifact_reference": {
+    "input_shape": [
+      1,
+      1,
+      128
+    ],
+    "output_finite": true,
+    "output_shape": [
+      9,
+      1,
+      1,
+      1
+    ],
+    "processes": [
+      {
+        "gpu_evidence": {
+          "capture_count": 28,
+          "captured": true,
+          "gpu_uuid": "GPU-fac07577-072e-c021-9ac4-d7dc9b9711af",
+          "max_gpu_memory_mib": 356,
+          "min_gpu_memory_mib": 312,
+          "provider_pid": 3808075
+        },
+        "run_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-1",
+        "runtime_evidence": {
+          "cpu_fallback": false,
+          "execution_device": "cuda:0",
+          "external_gpu_pid_captured": true,
+          "model_device": "cuda:0",
+          "output_device": "cuda:0",
+          "peak_vram_bytes": 373293056,
+          "provider_pid": 3808075,
+          "requested_device": "cuda",
+          "runtime_scope": "FULL_INFERENCE"
+        }
+      },
+      {
+        "gpu_evidence": {
+          "capture_count": 24,
+          "captured": true,
+          "gpu_uuid": "GPU-fac07577-072e-c021-9ac4-d7dc9b9711af",
+          "max_gpu_memory_mib": 356,
+          "min_gpu_memory_mib": 312,
+          "provider_pid": 3808613
+        },
+        "run_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-2",
+        "runtime_evidence": {
+          "cpu_fallback": false,
+          "execution_device": "cuda:0",
+          "external_gpu_pid_captured": true,
+          "model_device": "cuda:0",
+          "output_device": "cuda:0",
+          "peak_vram_bytes": 373293056,
+          "provider_pid": 3808613,
+          "requested_device": "cuda",
+          "runtime_scope": "FULL_INFERENCE"
+        }
+      }
+    ],
+    "quantile_monotonicity": true,
+    "replay": {
+      "exact_equal": true,
+      "first_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-1/native_output.npy",
+      "first_sha256": "156bbb9314bdd0e455d9e0d2d088758a3530d5cb7e93f9ee52eae94477b5d432",
+      "first_shape": [
+        9,
+        1,
+        1,
+        1
+      ],
+      "max_abs_diff": 0.0,
+      "same_shape": true,
+      "second_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-2/native_output.npy",
+      "second_sha256": "156bbb9314bdd0e455d9e0d2d088758a3530d5cb7e93f9ee52eae94477b5d432",
+      "second_shape": [
+        9,
+        1,
+        1,
+        1
+      ]
+    },
+    "runtime": {
+      "python_version": "3.12.13",
+      "torch_cuda_version": "13.0",
+      "torch_version": "2.13.0+cu130",
+      "toto_2_version": "2.0.0",
+      "toto_models_version": "1.0.0"
+    },
+    "snapshot": {
+      "files": {
+        "README.md": {
+          "path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9/README.md",
+          "sha256": "c8f85b01eae1b586a742d9a0065df252bfe5855644f595969ca111bc206fcfcd",
+          "size_bytes": 7307
+        },
+        "config.json": {
+          "path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9/config.json",
+          "sha256": "7a926d130e401ab0c5fdb3564f46c8d917bd05c7b3ae26b9c22d2da2ef01d2d8",
+          "size_bytes": 592
+        },
+        "model.safetensors": {
+          "path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9/model.safetensors",
+          "sha256": "316660d5afb47943e531f39242e0b02ca0b8bb73be5709dfe07ca80dfce9805e",
+          "size_bytes": 16582848
+        }
+      },
+      "revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+      "snapshot_path": "/mnt/e/env/huggingface/hub/models--Datadog--Toto-2.0-4m/snapshots/8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9"
+    },
+    "vram_before_bytes": 0
+  },
+  "effective_arguments": {
+    "actuals_used": false,
+    "batch_size": 1,
+    "context_length": 128,
+    "decode_block_size": 32,
+    "game_geometry": {
+      "candidate_max": 20,
+      "candidate_min": 1,
+      "game_id": "phase4h_synthetic",
+      "position_count": 1,
+      "strictly_increasing": false
+    },
+    "native_shape": [
+      9,
+      1,
+      1,
+      1
+    ],
+    "prediction_length": 1,
+    "quantile_monotonicity": true,
+    "series_layout": "position_univariate"
+  },
+  "message": "native Toto 2.0 quantiles validated",
+  "model_identity": {
+    "accuracy_certified": false,
+    "lottery_domain_compatibility_certified": false,
+    "model_class": "Toto2Model",
+    "model_id": "toto-2.0-4m",
+    "model_license": "Apache-2.0",
+    "model_parameter_count": 4144448,
+    "model_revision": "8306a9801cf98c0f5ffe4b2dcc8f496e616d84d9",
+    "native_quantile_levels": [
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9
+    ],
+    "repo_id": "Datadog/Toto-2.0-4m",
+    "runtime_scope": "ISOLATED_PROVIDER_ONLY",
+    "source_revision": "44ea4e88852228039564aa3e76fac26aafac0803",
+    "toto_2_version": "2.0.0",
+    "toto_models_version": "1.0.0"
+  },
+  "phase": "predict",
+  "point_forecast": [
+    [
+      8.863503456115723
+    ]
+  ],
+  "point_method": "median_q0.5",
+  "prediction_index": [
+    1
+  ],
+  "quantiles": {
+    "q0.1": [
+      [
+        8.405832290649414
+      ]
+    ],
+    "q0.2": [
+      [
+        8.583107948303223
+      ]
+    ],
+    "q0.3": [
+      [
+        8.67068099975586
+      ]
+    ],
+    "q0.4": [
+      [
+        8.770241737365723
+      ]
+    ],
+    "q0.5": [
+      [
+        8.863503456115723
+      ]
+    ],
+    "q0.6": [
+      [
+        8.964338302612305
+      ]
+    ],
+    "q0.7": [
+      [
+        9.056843757629395
+      ]
+    ],
+    "q0.8": [
+      [
+        9.172698974609375
+      ]
+    ],
+    "q0.9": [
+      [
+        9.368696212768555
+      ]
+    ]
+  },
+  "runtime_evidence": {
+    "cpu_fallback": false,
+    "execution_device": "cuda:0",
+    "external_gpu_pid_captured": true,
+    "model_device": "cuda:0",
+    "output_device": "cuda:0",
+    "peak_vram_bytes": 373293056,
+    "provider_pid": 3808075,
+    "requested_device": "cuda",
+    "runtime_scope": "FULL_INFERENCE"
+  },
+  "schema_version": 2,
+  "series_identity": [
+    "n1"
+  ],
+  "status": "OK",
+  "unsupported_arguments": [],
+  "warnings": [
+    "raw probabilistic output is retained without lottery-domain projection",
+    "forecast accuracy remains unverified"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "cpu_fallback": false,
+  "execution_device": "cuda:0",
+  "external_gpu_pid_captured": false,
+  "model_device": "cuda:0",
+  "output_device": "cuda:0",
+  "peak_vram_bytes": 64238592,
+  "provider_pid": 3808075,
+  "requested_device": "cuda",
+  "runtime_scope": "FULL_INFERENCE"
+}

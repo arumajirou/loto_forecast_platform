@@ -1,0 +1,8 @@
+{
+  "capture_count": 24,
+  "captured": true,
+  "gpu_uuid": "GPU-fac07577-072e-c021-9ac4-d7dc9b9711af",
+  "max_gpu_memory_mib": 356,
+  "min_gpu_memory_mib": 312,
+  "provider_pid": 3808613
+}

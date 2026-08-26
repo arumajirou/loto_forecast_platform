@@ -1,0 +1,21 @@
+{
+  "exact_equal": true,
+  "first_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-1/native_output.npy",
+  "first_sha256": "156bbb9314bdd0e455d9e0d2d088758a3530d5cb7e93f9ee52eae94477b5d432",
+  "first_shape": [
+    9,
+    1,
+    1,
+    1
+  ],
+  "max_abs_diff": 0.0,
+  "same_shape": true,
+  "second_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-2/native_output.npy",
+  "second_sha256": "156bbb9314bdd0e455d9e0d2d088758a3530d5cb7e93f9ee52eae94477b5d432",
+  "second_shape": [
+    9,
+    1,
+    1,
+    1
+  ]
+}

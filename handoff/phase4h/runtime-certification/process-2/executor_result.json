@@ -1,0 +1,7 @@
+{
+  "artifact_reference_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-2/artifact_reference.json",
+  "native_output_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-2/native_output.npy",
+  "provider_pid": 3808613,
+  "runtime_evidence_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4h-toto2-4m-smoke-20260826-144414/runtime-certification/process-2/runtime_evidence.internal.json",
+  "status": "PASS"
+}
