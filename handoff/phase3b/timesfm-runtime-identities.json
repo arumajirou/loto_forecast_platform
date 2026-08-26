@@ -1,0 +1,32 @@
+[
+  {
+    "alias_count": 2,
+    "aliases": [
+      "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/timesfm/bin/python",
+      "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/timesfm/bin/python3"
+    ],
+    "base_prefix": "/home/az/.local/share/uv/python/cpython-3.13.13-linux-x86_64-gnu",
+    "classification": "VIRTUAL_ENVIRONMENT",
+    "cuda_builds": [
+      "13.0"
+    ],
+    "package_counts": [
+      53
+    ],
+    "package_fingerprints": [
+      "4f998d5e34ab25c0d77969386352171dde703655cb6b4f4aea1961b6c28a3947"
+    ],
+    "phase2_statuses": [
+      "FRAMEWORK_IMPORT_FAILED"
+    ],
+    "python_version": "3.13.13",
+    "runtime_identity_sha256": "915cc93574ef583972762f8839ec92237816db0ff15db41ea233cac1b61ded86",
+    "runtime_prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/timesfm",
+    "site_packages": [
+      "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/timesfm/lib/python3.13/site-packages"
+    ],
+    "torch_versions": [
+      "2.13.0+cu130"
+    ]
+  }
+]

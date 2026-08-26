@@ -1,6 +1,6 @@
 # Loto Forecast Runtime Audit Handoff
 
-Updated: 2026-08-26T12:37:10+09:00
+Updated: 2026-08-26T12:41:17.745804+09:00
 
 ## Canonical source
 
@@ -9,69 +9,58 @@ Updated: 2026-08-26T12:37:10+09:00
 ## Current overall status
 
 - overall: `PARTIALLY_VERIFIED`
-- estimated progress: `30%`
-- current phase: `Phase 3B - venv identity correction`
+- estimated progress: `35%`
+- current phase: `Phase 3B completed / runtime-gap review next`
 
 ## Completed
 
-### Phase 0
-- clean source identity fixed
-- status: VERIFIED
+- Phase 0: VERIFIED
+- Phase 1 / 1B: VERIFIED
+- Phase 2: VERIFIED
+- Phase 3: PARTIALLY_VERIFIED
+- Phase 3B: VERIFIED
 
-### Phase 1 / 1B
+## Canonical inventory
+
 - Broad v1: 174
 - Expanded v2: 244
 - execution surfaces: 55
 - canonical identity candidates: 306
 - source environments: 29
-- status: VERIFIED
 
-### Phase 2
-- runtime path candidates: 40
-- directly mapped environments: 10
-- CUDA kernel PASS: 6
-- CPU import PASS: 4
-- NO_HOST_RUNTIME: 19
-- extra/provider/root runtimes: 30
-- extra CUDA PASS: 24
-- framework import failures: 2
-- status: VERIFIED
+## Phase 3B corrected runtime identity
 
-### Phase 3
-- environment direct runtime: 10
-- existing runtime candidate: 9
+- identity method: `sys.prefix`
+- distinct sys.prefix identities: 20
+- virtual environments: 20
+- base interpreters: 0
 - unresolved environments: 10
-- explicit execution routes: 15
-- route candidates: 24
-- ambiguous routes: 9
-- unresolved execution routes: 7
+- multiple-candidate environments: 2
 
-Important correction:
+### Environment mapping counts
 
-Phase 3 used Python interpreter realpath for runtime identity.
-That can collapse separate virtual environments which share the same
-uv-managed base Python interpreter.
+- DIRECT_PROJECT_RUNTIME: 10
+- EXISTING_VENV_CANDIDATE: 7
+- MULTIPLE_VENV_CANDIDATES: 2
+- UNRESOLVED_NO_RUNTIME: 10
 
-Therefore Phase 3 route mapping is PARTIALLY_VERIFIED.
+## Important correction
+
+Python executable realpath is not used as a virtual-environment
+identity. Separate venvs sharing the same uv-managed Python binary
+are now identified separately using `sys.prefix`.
 
 ## Next
 
-Phase 3B must identify virtual environments by `sys.prefix`,
-not by the interpreter realpath.
-
-After Phase 3B:
-
-1. classify genuinely missing runtimes
-2. classify reusable existing runtimes
-3. repair import failures where necessary
-4. select Modern GPU / Legacy lanes
-5. begin Phase 4 real checkpoint load/inference smoke tests
+Review genuinely missing runtimes and ambiguous reusable-runtime
+candidates, then choose Modern GPU / Legacy lanes before beginning
+real checkpoint load/inference certification.
 
 ## Formal runtime certification
 
 Not yet completed.
 
-Formal success still requires:
+Still required:
 
 - checkpoint/model load
 - real input

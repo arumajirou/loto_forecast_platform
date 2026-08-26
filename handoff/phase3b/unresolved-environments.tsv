@@ -1,0 +1,11 @@
+environment	project_name	requires_python	mapping_status	expected_direct_prefix	candidate_count
+environments/autogluon-timeseries	loto-autogluon-timeseries-provider	>=3.11,<3.13	UNRESOLVED_NO_RUNTIME	/mnt/e/env/ts/loto_forecast_platform/environments/autogluon-timeseries/.venv	0
+environments/basicts-py310	loto-basicts-provider	>=3.10,<3.11	UNRESOLVED_NO_RUNTIME	/mnt/e/env/ts/loto_forecast_platform/environments/basicts-py310/.venv	0
+environments/basicts-py311	loto-basicts-provider	>=3.11,<3.12	UNRESOLVED_NO_RUNTIME	/mnt/e/env/ts/loto_forecast_platform/environments/basicts-py311/.venv	0
+environments/forecast-mcp	loto-forecast-mcp-runtime	>=3.11,<3.13	UNRESOLVED_NO_RUNTIME	/mnt/e/env/ts/loto_forecast_platform/environments/forecast-mcp/.venv	0
+environments/granite-ttm	loto-granite-ttm-provider	>=3.11,<3.13	UNRESOLVED_NO_RUNTIME	/mnt/e/env/ts/loto_forecast_platform/environments/granite-ttm/.venv	0
+environments/merlion-core-py311	loto-merlion-provider	>=3.11,<3.12	UNRESOLVED_NO_RUNTIME	/mnt/e/env/ts/loto_forecast_platform/environments/merlion-core-py311/.venv	0
+environments/sundial	loto-sundial-provider	>=3.11,<3.13	UNRESOLVED_NO_RUNTIME	/mnt/e/env/ts/loto_forecast_platform/environments/sundial/.venv	0
+environments/tirex	loto-tirex-provider	>=3.11,<3.13	UNRESOLVED_NO_RUNTIME	/mnt/e/env/ts/loto_forecast_platform/environments/tirex/.venv	0
+environments/tirex2-supported-py312	loto-tirex2-supported	>=3.12,<3.13	UNRESOLVED_NO_RUNTIME	/mnt/e/env/ts/loto_forecast_platform/environments/tirex2-supported-py312/.venv	0
+environments/tslib-core	loto-tslib-core-runtime	>=3.11,<3.14	UNRESOLVED_NO_RUNTIME	/mnt/e/env/ts/loto_forecast_platform/environments/tslib-core/.venv	0

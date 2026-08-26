@@ -11,11 +11,12 @@
     "phase1": "VERIFIED",
     "phase1b": "VERIFIED",
     "phase2": "VERIFIED",
-    "phase3": "PARTIALLY_VERIFIED"
+    "phase3": "PARTIALLY_VERIFIED",
+    "phase3b": "VERIFIED"
   },
-  "current_phase": "phase3b_venv_identity_correction",
-  "estimated_progress_percent": 30,
-  "handoff_run_id": "20260826-123710",
+  "current_phase": "phase3b_completed_pending_runtime_gap_review",
+  "estimated_progress_percent": 35,
+  "handoff_run_id": "20260826-124109",
   "next_phases": [
     "phase3b_venv_identity_correction",
     "phase4_model_load_inference_smoke",
@@ -39,7 +40,21 @@
     "known_problem": "interpreter realpath was used as runtime identity; separate venvs may collapse when sharing the same uv-managed base interpreter",
     "status": "PARTIALLY_VERIFIED"
   },
+  "phase3b": {
+    "distinct_sys_prefix_count": 20,
+    "environment_mapping_counts": {
+      "DIRECT_PROJECT_RUNTIME": 10,
+      "EXISTING_VENV_CANDIDATE": 7,
+      "MULTIPLE_VENV_CANDIDATES": 2,
+      "UNRESOLVED_NO_RUNTIME": 10
+    },
+    "multiple_candidate_environment_count": 2,
+    "runtime_identity_method": "sys.prefix",
+    "status": "VERIFIED",
+    "unresolved_environment_count": 10,
+    "virtual_environment_count": 20
+  },
   "schema_version": 1,
   "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
-  "updated_at_utc": "2026-08-26T03:37:10.334406+00:00"
+  "updated_at_utc": "2026-08-26T03:41:17.734912+00:00"
 }
