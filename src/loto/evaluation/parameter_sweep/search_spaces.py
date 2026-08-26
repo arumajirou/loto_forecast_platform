@@ -17,6 +17,12 @@ _LAG_CANDIDATES = (1, 2, 3, 4, 5, 7, 14, 28)
 _SEASON_CANDIDATES = (1, 2, 4, 7, 14)
 _WINDOW_CANDIDATES = (2, 3, 4, 7, 14, 28)
 _TEST_SIZE_CANDIDATES = (4, 8, 12, 20)
+_RUNTIME_RESOLVED_REQUIRED: dict[str, set[str]] = {
+    "neuralforecast": {"h", "input_size", "loss", "max_steps", "random_seed"},
+    "neuralforecast_auto": {"h"},
+    "mlforecast": set(),
+    "statsforecast": set(),
+}
 
 
 def _bounded_ints(values: tuple[int, ...], upper: int) -> tuple[int, ...]:
@@ -110,12 +116,26 @@ def _closed_space(
     row: ModelInventoryRow,
     status: SearchSpaceStatus,
     reason: str,
+    *,
+    unresolved: tuple[str, ...] = (),
 ) -> ModelSearchSpace:
     return ModelSearchSpace(
         model_id=row.model_id,
         status=status,
         baseline_params=_baseline_params(row),
+        unresolved_parameters=unresolved,
         reason=reason,
+    )
+
+
+def _unresolved_required(row: ModelInventoryRow, baseline: dict[str, Any]) -> tuple[str, ...]:
+    runtime_resolved = _RUNTIME_RESOLVED_REQUIRED.get(row.library, set())
+    return tuple(
+        sorted(
+            name
+            for name in row.required_args
+            if name not in baseline and name not in runtime_resolved
+        )
     )
 
 
@@ -154,25 +174,43 @@ def build_search_spaces(
             )
             continue
 
+        baseline = _baseline_params(row)
+        unresolved_required = _unresolved_required(row, baseline)
+        if unresolved_required:
+            output.append(
+                _closed_space(
+                    row,
+                    SearchSpaceStatus.UNRESOLVED_PARAMETER,
+                    "required constructor arguments have no approved runtime/default resolution",
+                    unresolved=unresolved_required,
+                )
+            )
+            continue
+
         tunable = [item for item in row.parameter_inventory if item.tunable]
         dimensions = tuple(
             dimension
             for descriptor in tunable
             if (dimension := _dimension(descriptor.name, train_rows=train_rows)) is not None
         )
-        resolved = {dimension.parameter for dimension in dimensions}
-        unresolved = tuple(sorted({descriptor.name for descriptor in tunable}.difference(resolved)))
+        resolved_dimensions = {dimension.parameter for dimension in dimensions}
+        unresolved_dimensions = {
+            descriptor.name for descriptor in tunable
+        }.difference(resolved_dimensions)
+        missing_anchors = {
+            dimension.parameter for dimension in dimensions if dimension.parameter not in baseline
+        }
+        unresolved = tuple(sorted(unresolved_dimensions | missing_anchors))
         if unresolved:
             output.append(
-                ModelSearchSpace(
-                    model_id=row.model_id,
-                    status=SearchSpaceStatus.UNRESOLVED_PARAMETER,
-                    baseline_params=_baseline_params(row),
-                    unresolved_parameters=unresolved,
-                    reason=(
-                        "one or more tunable constructor parameters lack an approved bounded search "
-                        "rule; upstream/source review is required before execution"
+                _closed_space(
+                    row,
+                    SearchSpaceStatus.UNRESOLVED_PARAMETER,
+                    (
+                        "tunable parameters lack an approved bounded rule or explicit baseline anchor; "
+                        "upstream/source review is required before execution"
                     ),
+                    unresolved=unresolved,
                 )
             )
             continue
@@ -188,12 +226,15 @@ def build_search_spaces(
 
         cost_class = "cheap" if row.library == "statsforecast" else "medium"
         budget = 100 if cost_class == "cheap" else 50
-        ofat_trials = 1 + sum(len(dimension.values) for dimension in dimensions)
+        ofat_trials = 1 + sum(
+            sum(value != baseline[dimension.parameter] for value in dimension.values)
+            for dimension in dimensions
+        )
         output.append(
             ModelSearchSpace(
                 model_id=row.model_id,
                 status=SearchSpaceStatus.READY,
-                baseline_params=_baseline_params(row),
+                baseline_params=baseline,
                 dimensions=dimensions,
                 trial_budget=min(budget, ofat_trials),
                 reason="coarse one-factor-at-a-time screening; no Cartesian product is permitted",
