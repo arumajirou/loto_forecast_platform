@@ -21,6 +21,7 @@ from .contracts import FailureCategory
 _EXPECTED_IDENTITIES = 250
 _EXPECTED_NEGATIVE_IDS = {"sf-nanmodel"}
 _KNOWN_NOT_ROUTABLE_IDS = {"sf-sklearnmodel"}
+_HOLDOUT_SIZE = 50
 
 
 def classify_failure(row: Mapping[str, Any]) -> FailureCategory | None:
@@ -52,7 +53,7 @@ def classify_failure(row: Mapping[str, Any]) -> FailureCategory | None:
         return FailureCategory.TIMEOUT
     if "modulenotfound" in text or "importerror" in text or "unavailable" in text:
         return FailureCategory.DEPENDENCY_ERROR
-    if "missing" in text and "argument" in text or "required positional argument" in text:
+    if ("missing" in text and "argument" in text) or "required positional argument" in text:
         return FailureCategory.CONSTRUCTOR_ERROR
     if "constructor" in text or "__init__" in text:
         return FailureCategory.CONSTRUCTOR_ERROR
@@ -82,6 +83,7 @@ def _failure_rows(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
     for row in results:
         if row.get("source") == "baseline" or row.get("status") == "SUCCEEDED":
             continue
+        category = classify_failure(row)
         failures.append(
             {
                 "game": row.get("game"),
@@ -91,9 +93,7 @@ def _failure_rows(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "task": row.get("task"),
                 "raw_status": row.get("status"),
                 "normalized_status": normalized_smoke_status(row),
-                "failure_category": classify_failure(row).value
-                if classify_failure(row) is not None
-                else None,
+                "failure_category": category.value if category is not None else None,
                 "reason": row.get("reason", ""),
                 "failures": row.get("failures", []),
             }
@@ -122,7 +122,7 @@ def run_bingo5_smoke(
     gpu_count: int = 0,
     gpu_memory_bytes: int = 0,
 ) -> dict[str, Any]:
-    """Execute exactly one chronological prediction per approved seed=42 identity."""
+    """Execute one real chronological prediction per seed=42 identity, excluding Holdout."""
 
     smoke_root = run_root.resolve() / "smoke"
     output = smoke_root / "artifacts"
@@ -132,7 +132,10 @@ def run_bingo5_smoke(
             "smoke output/checkpoint already exists; use the resumable campaign directly for resume"
         )
 
-    min_train_size = max(2, min(100, int(len(frame)) - 1))
+    development_rows = int(len(frame)) - _HOLDOUT_SIZE
+    if development_rows <= 1:
+        raise ValueError("Bingo5 frame is too short after sealing Holdout")
+    min_train_size = max(2, min(100, development_rows - 1))
     config = UnifiedCampaignConfig(
         output_dir=output,
         git_commit=git_commit,
@@ -142,7 +145,7 @@ def run_bingo5_smoke(
         folds=1,
         test_size=1,
         min_train_size=min_train_size,
-        holdout_size=0,
+        holdout_size=_HOLDOUT_SIZE,
         gap=0,
         device=device,
         precision=precision,
@@ -159,7 +162,9 @@ def run_bingo5_smoke(
     )
     summary = run_resumable_unified_campaign({"bingo5": frame}, config, resume=resume)
     candidate_results = [
-        row for row in summary["results"] if row.get("source") in {"catalog", "probabilistic"}
+        row
+        for row in summary["results"]
+        if row.get("source") in {"catalog", "probabilistic"}
     ]
     if len(candidate_results) != _EXPECTED_IDENTITIES:
         raise AssertionError(
@@ -183,6 +188,7 @@ def run_bingo5_smoke(
             "seed": 42,
             "folds": 1,
             "test_size": 1,
+            "holdout_size": _HOLDOUT_SIZE,
             "candidate_total": len(candidate_results),
             "normalized_status_counts": normalized_counts,
             "prediction_lock_required_for_success": True,
