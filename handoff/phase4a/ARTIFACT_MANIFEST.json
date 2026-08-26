@@ -1,0 +1,25 @@
+{
+  "artifacts": [
+    {
+      "path": "PHASE4A_REPORT.md",
+      "sha256": "b26a226b5735ce32731c9c0262d4c6fbfe6b0845163164ef2fe7373b7765fe8b",
+      "size": 754
+    },
+    {
+      "path": "gpu-before.json",
+      "sha256": "22686973d9cbdbe31f372dd88bfa868de5deb16c415b5df95a3d4bba6d1ce560",
+      "size": 111
+    },
+    {
+      "path": "summary.json",
+      "sha256": "451752f3c3daaf861ff514072ca9b69debb7234504ed78b73bf46bbaf4bf9adb",
+      "size": 355
+    },
+    {
+      "path": "torch-probe.json",
+      "sha256": "6493a14c31e715e5ed1f6f99a881345743e92d1b93bbb02e062f72e64aad1914",
+      "size": 366
+    }
+  ],
+  "schema_version": 1
+}

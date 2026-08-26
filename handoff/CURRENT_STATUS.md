@@ -1,38 +1,29 @@
 # Loto Forecast Runtime Audit Handoff
 
-Updated: 2026-08-26T12:49:29.711246+09:00
+Updated: 2026-08-26T12:54:52.891725+09:00
 
 ## Current overall status
 
-- overall: `PARTIALLY_VERIFIED`
 - estimated progress: `40%`
-- current phase: `Phase 3D completed / Phase 4A smoke next`
+- Phase 4A Darts GPU smoke: `FAILED`
+- source SHA: `8af95b2be18280589cbbb13aa1fc32dfb793767c`
 
-## Completed
+## Phase 4A
 
-- Phase 0: VERIFIED
-- Phase 1 / 1B: VERIFIED
-- Phase 2: VERIFIED
-- Phase 3: PARTIALLY_VERIFIED
-- Phase 3B: VERIFIED
-- Phase 3C: VERIFIED
-- Phase 3D: VERIFIED
+- model: `None`
+- runtime: `/mnt/e/env/ts/loto_forecast_platform/environments/darts-torch/.venv/bin/python`
+- real data source: `None`
+- real-data source SHA-256: `None`
+- derived smoke-data SHA-256: `None`
+- prediction shape/finite: `None` / `None`
+- GPU PID observed: `None`
+- peak provider VRAM MiB: `None`
+- save/reload certified: `None`
 
-## Phase 3D lane counts
+## Evidence policy
 
-- CURRENT_CPU_LEGACY: 4
-- CURRENT_LEGACY_GPU_COMPAT: 1
-- CURRENT_MODERN_GPU_CANDIDATE: 2
-- EXISTING_VENV_FORMAL_COMPAT_REQUIRED: 7
-- NO_FORMAL_RUNTIME_READY: 3
-- REPAIR_DECLARED_RUNTIME: 4
-- REUSABLE_COMPATIBLE_VENV: 1
-- SEPARATE_FORMAL_LANE_REQUIRED: 7
-
-- Phase 4 smoke allowed now: 8
-- blocked pending repair/formal lane: 21
+Trained model binaries and derived real-data rows remain local. Git handoff contains only metadata, hashes, request/response, metrics, logs, and GPU evidence.
 
 ## Next
 
-Begin Phase 4A real checkpoint/load-inference smoke on the ready queue.
-Do not treat Phase 3D metadata compatibility as formal model certification.
+If VERIFIED, continue Phase 4B across the remaining ready queue. If FAILED, inspect Phase 4A evidence before modifying dependencies.

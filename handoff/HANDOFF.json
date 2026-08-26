@@ -14,11 +14,12 @@
     "phase3": "PARTIALLY_VERIFIED",
     "phase3b": "VERIFIED",
     "phase3c": "VERIFIED",
-    "phase3d": "VERIFIED"
+    "phase3d": "VERIFIED",
+    "phase4a": "FAILED"
   },
-  "current_phase": "phase3d_completed_phase4a_next",
+  "current_phase": "phase4a_darts_gpu_requires_review",
   "estimated_progress_percent": 40,
-  "handoff_run_id": "20260826-124659",
+  "handoff_run_id": "20260826-125446",
   "next_phases": [
     "phase3b_venv_identity_correction",
     "phase4_model_load_inference_smoke",
@@ -101,7 +102,17 @@
     "source_environment_count": 29,
     "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c"
   },
+  "phase4a": {
+    "error": "REAL_DATA_NOT_FOUND: set LOTO_PHASE4_DATA to a CSV/Parquet with draw_no and n1..nN",
+    "error_type": "RuntimeError",
+    "formal_runtime_certification": false,
+    "run_id": "20260826-125446",
+    "schema_version": 1,
+    "scope": "Darts torch real-data GPU smoke",
+    "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
+    "status": "FAILED"
+  },
   "schema_version": 1,
   "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
-  "updated_at_utc": "2026-08-26T03:49:29.711131+00:00"
+  "updated_at_utc": "2026-08-26T03:54:52.891621+00:00"
 }
