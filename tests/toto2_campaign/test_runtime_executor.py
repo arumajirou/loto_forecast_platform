@@ -187,3 +187,41 @@ def test_prepare_and_forecast_with_injected_model(
     assert evidence.cpu_fallback is False
     assert artifact["output_finite"] is True
     assert artifact["quantile_monotonicity"] is True
+
+
+def test_cuda_memory_tracking_initializes_context_before_stats() -> None:
+    from loto.toto2_campaign.runtime_executor import _initialize_cuda_memory_tracking
+
+    calls: list[tuple[str, int | None]] = []
+
+    class FakeCuda:
+        def set_device(self, device: int) -> None:
+            calls.append(("set_device", device))
+
+        def init(self) -> None:
+            calls.append(("init", None))
+
+        def empty_cache(self) -> None:
+            calls.append(("empty_cache", None))
+
+        def reset_peak_memory_stats(self, device: int) -> None:
+            calls.append(("reset_peak_memory_stats", device))
+
+        def memory_allocated(self, device: int) -> int:
+            calls.append(("memory_allocated", device))
+            return 123
+
+    class FakeTorch:
+        cuda = FakeCuda()
+
+    class FakeDevice:
+        index = 0
+
+    assert _initialize_cuda_memory_tracking(FakeTorch(), FakeDevice()) == 123
+    assert calls == [
+        ("set_device", 0),
+        ("init", None),
+        ("empty_cache", None),
+        ("reset_peak_memory_stats", 0),
+        ("memory_allocated", 0),
+    ]
