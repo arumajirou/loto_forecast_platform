@@ -179,6 +179,20 @@ def _resolve_device(
     return torch.device("cpu")
 
 
+def _cuda_device_index(device: Any) -> int:
+    index = getattr(device, "index", None)
+    return 0 if index is None else int(index)
+
+
+def _initialize_cuda_memory_tracking(torch: Any, device: Any) -> int:
+    device_index = _cuda_device_index(device)
+    torch.cuda.set_device(device_index)
+    torch.cuda.init()
+    torch.cuda.empty_cache()
+    torch.cuda.reset_peak_memory_stats(device_index)
+    return int(torch.cuda.memory_allocated(device_index))
+
+
 def _validate_model(model: Any) -> tuple[str, int]:
     if type(model).__name__ != MODEL_CLASS:
         raise RuntimeExecutionError(
@@ -210,9 +224,7 @@ def prepare_runtime(
     device = _resolve_device(request, torch, versions)
     target_numpy = history_to_numpy(request)
     if request.device == "cuda":
-        torch.cuda.empty_cache()
-        torch.cuda.reset_peak_memory_stats(device)
-        vram_before = int(torch.cuda.memory_allocated(device))
+        vram_before = _initialize_cuda_memory_tracking(torch, device)
     else:
         vram_before = 0
     torch.manual_seed(request.seed)
@@ -258,7 +270,8 @@ def forecast_prepared(
             has_missing_values=False,
         )
     if request.device == "cuda":
-        torch.cuda.synchronize(prepared.device)
+        device_index = _cuda_device_index(prepared.device)
+        torch.cuda.synchronize(device_index)
     expected = (9, 1, request.game_geometry.position_count, request.prediction_length)
     if tuple(int(value) for value in output.shape) != expected:
         raise RuntimeExecutionError(
@@ -275,7 +288,9 @@ def forecast_prepared(
     if cpu_fallback:
         raise RuntimeExecutionError("CUDA request fell back to CPU")
     peak_vram = (
-        int(torch.cuda.max_memory_allocated(prepared.device)) if request.device == "cuda" else 0
+        int(torch.cuda.max_memory_allocated(_cuda_device_index(prepared.device)))
+        if request.device == "cuda"
+        else 0
     )
     native_output = output.detach().to("cpu", dtype=torch.float32).numpy()
     evidence = RuntimeEvidence(
