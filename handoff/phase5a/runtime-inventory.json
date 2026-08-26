@@ -1,0 +1,562 @@
+[
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": true,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": true,
+      "sklearn": true,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.venv",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.4.6",
+      "optuna": "4.9.0",
+      "pandas": "2.3.3",
+      "pydantic": "2.13.4",
+      "pytest": "9.1.1",
+      "scikit-learn": "1.7.2",
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/chronos2-py313/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/chronos2-py313/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": true,
+      "sklearn": false,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/chronos2-py313/.venv",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.5.2",
+      "optuna": null,
+      "pandas": "2.3.3",
+      "pydantic": "2.13.4",
+      "pytest": "9.1.1",
+      "scikit-learn": null,
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-notorch/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-notorch/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": false,
+      "sklearn": true,
+      "statsforecast": true
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-notorch/.venv",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.3.5",
+      "optuna": null,
+      "pandas": "3.0.5",
+      "pydantic": "2.13.4",
+      "pytest": null,
+      "scikit-learn": "1.9.0",
+      "statsforecast": "2.0.1"
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-torch/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-torch/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": false,
+      "sklearn": true,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-torch/.venv",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.3.5",
+      "optuna": null,
+      "pandas": "3.0.5",
+      "pydantic": "2.13.4",
+      "pytest": null,
+      "scikit-learn": "1.9.0",
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-compat/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-compat/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": true,
+      "sklearn": false,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-compat/.venv",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.4.6",
+      "optuna": null,
+      "pandas": "2.3.3",
+      "pydantic": "2.13.4",
+      "pytest": "9.1.1",
+      "scikit-learn": null,
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-latest/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-latest/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": true,
+      "sklearn": false,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/gluonts-latest/.venv",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.5.2",
+      "optuna": null,
+      "pandas": "2.3.3",
+      "pydantic": "2.13.4",
+      "pytest": "9.1.1",
+      "scikit-learn": null,
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/moirai2-cuda13-experimental/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/moirai2-cuda13-experimental/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": true,
+      "sklearn": false,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/moirai2-cuda13-experimental/.venv",
+    "python": "3.11.14",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "1.26.4",
+      "optuna": null,
+      "pandas": "2.2.3",
+      "pydantic": "2.13.4",
+      "pytest": "9.0.2",
+      "scikit-learn": null,
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-classic-py312/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-classic-py312/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": true,
+      "sklearn": true,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-classic-py312/.venv",
+    "python": "3.12.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.3.5",
+      "optuna": null,
+      "pandas": "2.3.3",
+      "pydantic": "2.13.4",
+      "pytest": "8.4.2",
+      "scikit-learn": "1.7.2",
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-core-py313/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-core-py313/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": true,
+      "sklearn": true,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-core-py313/.venv",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.3.5",
+      "optuna": null,
+      "pandas": "2.3.3",
+      "pydantic": "2.13.4",
+      "pytest": "8.4.2",
+      "scikit-learn": "1.7.2",
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": false,
+      "sklearn": true,
+      "statsforecast": true
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.5.2",
+      "optuna": null,
+      "pandas": "2.3.3",
+      "pydantic": "2.13.4",
+      "pytest": null,
+      "scikit-learn": "1.9.0",
+      "statsforecast": "2.1.1"
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/tabpfn-ts/.venv/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/tabpfn-ts/.venv/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": false,
+      "sklearn": true,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/tabpfn-ts/.venv",
+    "python": "3.12.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.4.6",
+      "optuna": null,
+      "pandas": "2.3.3",
+      "pydantic": "2.13.4",
+      "pytest": null,
+      "scikit-learn": "1.9.0",
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/chronos/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/chronos/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": false,
+      "pytest": false,
+      "sklearn": false,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/chronos",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.5.1",
+      "optuna": null,
+      "pandas": "3.0.5",
+      "pydantic": null,
+      "pytest": null,
+      "scikit-learn": null,
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/flowstate/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/flowstate/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": false,
+      "pytest": false,
+      "sklearn": true,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/flowstate",
+    "python": "3.11.14",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.4.6",
+      "optuna": null,
+      "pandas": "3.0.5",
+      "pydantic": null,
+      "pytest": null,
+      "scikit-learn": "1.7.2",
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/kronos/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/kronos/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": false,
+      "pytest": false,
+      "sklearn": false,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/kronos",
+    "python": "3.11.14",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.4.6",
+      "optuna": null,
+      "pandas": "2.2.2",
+      "pydantic": null,
+      "pytest": null,
+      "scikit-learn": null,
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/lag-llama/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/lag-llama/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": false,
+      "sklearn": false,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/lag-llama",
+    "python": "3.12.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "1.26.4",
+      "optuna": null,
+      "pandas": "2.1.4",
+      "pydantic": "2.13.4",
+      "pytest": null,
+      "scikit-learn": null,
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/moment/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/moment/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": false,
+      "pydantic": false,
+      "pytest": false,
+      "sklearn": false,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/moment",
+    "python": "3.11.14",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "1.25.2",
+      "optuna": null,
+      "pandas": null,
+      "pydantic": null,
+      "pytest": null,
+      "scikit-learn": null,
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/phase5a-mlforecast-py313/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/phase5a-mlforecast-py313/bin/python",
+    "imports": {
+      "mlforecast": true,
+      "numpy": true,
+      "optuna": true,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": false,
+      "sklearn": true,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/phase5a-mlforecast-py313",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": "1.1.0",
+      "numpy": "2.4.6",
+      "optuna": "4.9.0",
+      "pandas": "2.3.3",
+      "pydantic": "2.13.4",
+      "pytest": null,
+      "scikit-learn": "1.7.2",
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/timesfm/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/timesfm/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": false,
+      "pydantic": false,
+      "pytest": false,
+      "sklearn": false,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/timesfm",
+    "python": "3.13.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.5.1",
+      "optuna": null,
+      "pandas": null,
+      "pydantic": null,
+      "pytest": null,
+      "scikit-learn": null,
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": false,
+      "sklearn": false,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto",
+    "python": "3.12.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "2.5.1",
+      "optuna": null,
+      "pandas": "2.3.3",
+      "pydantic": "2.13.4",
+      "pytest": null,
+      "scikit-learn": null,
+      "statsforecast": null
+    }
+  },
+  {
+    "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto-open/bin/python",
+    "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto-open/bin/python",
+    "imports": {
+      "mlforecast": false,
+      "numpy": true,
+      "optuna": false,
+      "pandas": true,
+      "pydantic": true,
+      "pytest": true,
+      "sklearn": true,
+      "statsforecast": false
+    },
+    "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/toto-open",
+    "python": "3.12.13",
+    "returncode": 0,
+    "stderr": "",
+    "versions": {
+      "mlforecast": null,
+      "numpy": "1.26.4",
+      "optuna": null,
+      "pandas": "2.2.3",
+      "pydantic": "2.13.4",
+      "pytest": "8.3.5",
+      "scikit-learn": "1.5.0",
+      "statsforecast": null
+    }
+  }
+]

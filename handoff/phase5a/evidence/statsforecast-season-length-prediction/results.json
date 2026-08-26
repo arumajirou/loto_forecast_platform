@@ -1,0 +1,116 @@
+[
+  {
+    "control_aggregate": null,
+    "expected_relation": "change",
+    "expected_surface": "prediction",
+    "holdout_evaluated": false,
+    "library": "statsforecast",
+    "matched_fraction": 1.0,
+    "model": "SeasonalNaive",
+    "outcome": "effective",
+    "paired": [
+      {
+        "comparison": "control='a66ab855a998e62a02741a13b584779d24f52d7fc8f057c161f7f328e85e3f3b'; treatment='565e142f442be713db61c07189d0c74a3c69998aeb0b447243195af96fc9bd1b'; expected=change",
+        "control": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "StatsForecastParameterAdapter",
+            "forecast_column": "SeasonalNaive",
+            "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+          },
+          "observables": {
+            "metric": 0.14285714285714285
+          },
+          "output_shape": [
+            7,
+            3
+          ],
+          "prediction_sha256": "a66ab855a998e62a02741a13b584779d24f52d7fc8f057c161f7f328e85e3f3b",
+          "runtime_seconds": 0.0038346759974956512,
+          "success": true
+        },
+        "matched_expectation": true,
+        "repeat": 0,
+        "seed": 1,
+        "treatment": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "StatsForecastParameterAdapter",
+            "forecast_column": "SeasonalNaive",
+            "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+          },
+          "observables": {
+            "metric": 0.7142857142857143
+          },
+          "output_shape": [
+            7,
+            3
+          ],
+          "prediction_sha256": "565e142f442be713db61c07189d0c74a3c69998aeb0b447243195af96fc9bd1b",
+          "runtime_seconds": 0.001428081995982211,
+          "success": true
+        }
+      },
+      {
+        "comparison": "control='c2f5a1f2398b44e1efe198951463bc81381863efaf58aa3ae4b8a1ba3fae2a78'; treatment='509fca4afba24ff6395235fe46d6a4f4f18a12d395a67cf0d2eb88b40b0c3f0e'; expected=change",
+        "control": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "StatsForecastParameterAdapter",
+            "forecast_column": "SeasonalNaive",
+            "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+          },
+          "observables": {
+            "metric": 0.14285714285714285
+          },
+          "output_shape": [
+            7,
+            3
+          ],
+          "prediction_sha256": "c2f5a1f2398b44e1efe198951463bc81381863efaf58aa3ae4b8a1ba3fae2a78",
+          "runtime_seconds": 0.001243152997631114,
+          "success": true
+        },
+        "matched_expectation": true,
+        "repeat": 0,
+        "seed": 42,
+        "treatment": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "StatsForecastParameterAdapter",
+            "forecast_column": "SeasonalNaive",
+            "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+          },
+          "observables": {
+            "metric": 0.7142857142857143
+          },
+          "output_shape": [
+            7,
+            3
+          ],
+          "prediction_sha256": "509fca4afba24ff6395235fe46d6a4f4f18a12d395a67cf0d2eb88b40b0c3f0e",
+          "runtime_seconds": 0.0011630709996097721,
+          "success": true
+        }
+      }
+    ],
+    "pairs_eligible": 2,
+    "pairs_failed": 0,
+    "pairs_matched": 2,
+    "pairs_total": 2,
+    "parameter": "season_length",
+    "probe_id": "statsforecast-season-length-prediction",
+    "prospective_evaluated": false,
+    "support_reason": null,
+    "supported": true,
+    "treatment_aggregate": null
+  }
+]

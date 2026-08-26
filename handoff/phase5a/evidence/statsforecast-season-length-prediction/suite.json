@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "holdout_evaluated": false,
+    "prospective_evaluated": false,
+    "purpose": "Development-only cross-platform argument effectiveness smoke"
+  },
+  "probes": [
+    {
+      "absolute_tolerance": 1e-12,
+      "base_args": {
+        "freq": "D",
+        "h": 7,
+        "n_jobs": 1,
+        "train_length": 84
+      },
+      "control": 2,
+      "expected_relation": "change",
+      "expected_surface": "prediction",
+      "library": "statsforecast",
+      "metadata": {},
+      "min_match_fraction": 1.0,
+      "model": "SeasonalNaive",
+      "parameter": "season_length",
+      "probe_id": "statsforecast-season-length-prediction",
+      "relative_tolerance": 1e-09,
+      "repeats": 1,
+      "scope": "model_constructor",
+      "seeds": [
+        1,
+        42
+      ],
+      "treatment": 7
+    }
+  ],
+  "suite_id": "phase5a-v2-statsforecast-season-length-prediction"
+}

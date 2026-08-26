@@ -22,11 +22,12 @@
     "phase4e": "VERIFIED",
     "phase4f": "VERIFIED",
     "phase4g": "VERIFIED",
-    "phase4h": "VERIFIED"
+    "phase4h": "VERIFIED",
+    "phase5a": "VERIFIED"
   },
-  "current_phase": "phase4_complete_phase5_next",
+  "current_phase": "phase5a_verified_phase5b_next",
   "estimated_progress_percent": 48,
-  "handoff_run_id": "20260826-144414",
+  "handoff_run_id": "20260826-151111",
   "next_phases": [
     "phase3b_venv_identity_correction",
     "phase4_model_load_inference_smoke",
@@ -3189,7 +3190,751 @@
       }
     }
   },
+  "phase5a": {
+    "accuracy_ranking": false,
+    "coverage": {
+      "next": "phase5b_adapter_coverage_extension",
+      "phase5_complete": false,
+      "verified_adapter_count": 2,
+      "verified_probe_count": 2
+    },
+    "dependencies_modified": false,
+    "holdout_evaluated": false,
+    "lockfile_modified": false,
+    "phase": "PHASE5A_PARAMETER_EFFECTIVENESS_EXISTING_ADAPTERS",
+    "prospective_evaluated": false,
+    "run_id": "20260826-151111",
+    "runtime_layout": "adapter_specific_existing_runtimes",
+    "runtimes": {
+      "core_test": {
+        "candidate": "/mnt/e/env/ts/loto_forecast_platform/.venv/bin/python",
+        "executable": "/mnt/e/env/ts/loto_forecast_platform/.venv/bin/python",
+        "imports": {
+          "mlforecast": false,
+          "numpy": true,
+          "optuna": true,
+          "pandas": true,
+          "pydantic": true,
+          "pytest": true,
+          "sklearn": true,
+          "statsforecast": false
+        },
+        "prefix": "/mnt/e/env/ts/loto_forecast_platform/.venv",
+        "python": "3.13.13",
+        "returncode": 0,
+        "stderr": "",
+        "versions": {
+          "mlforecast": null,
+          "numpy": "2.4.6",
+          "optuna": "4.9.0",
+          "pandas": "2.3.3",
+          "pydantic": "2.13.4",
+          "pytest": "9.1.1",
+          "scikit-learn": "1.7.2",
+          "statsforecast": null
+        }
+      },
+      "mlforecast": {
+        "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/phase5a-mlforecast-py313/bin/python",
+        "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/phase5a-mlforecast-py313/bin/python",
+        "imports": {
+          "mlforecast": true,
+          "numpy": true,
+          "optuna": true,
+          "pandas": true,
+          "pydantic": true,
+          "pytest": false,
+          "sklearn": true,
+          "statsforecast": false
+        },
+        "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/phase5a-mlforecast-py313",
+        "python": "3.13.13",
+        "returncode": 0,
+        "stderr": "",
+        "versions": {
+          "mlforecast": "1.1.0",
+          "numpy": "2.4.6",
+          "optuna": "4.9.0",
+          "pandas": "2.3.3",
+          "pydantic": "2.13.4",
+          "pytest": null,
+          "scikit-learn": "1.7.2",
+          "statsforecast": null
+        }
+      },
+      "statsforecast": {
+        "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv/bin/python",
+        "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv/bin/python",
+        "imports": {
+          "mlforecast": false,
+          "numpy": true,
+          "optuna": false,
+          "pandas": true,
+          "pydantic": true,
+          "pytest": false,
+          "sklearn": true,
+          "statsforecast": true
+        },
+        "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv",
+        "python": "3.13.13",
+        "returncode": 0,
+        "stderr": "",
+        "versions": {
+          "mlforecast": null,
+          "numpy": "2.5.2",
+          "optuna": null,
+          "pandas": "2.3.3",
+          "pydantic": "2.13.4",
+          "pytest": null,
+          "scikit-learn": "1.9.0",
+          "statsforecast": "2.1.1"
+        }
+      }
+    },
+    "schema_version": 2,
+    "source_contract": {
+      "pyproject_sha256": "e2904a9ed042e83518cc878f5556ea8bdb1d318d9d4b2dcff4e0b607e4df43c2",
+      "source_sha": "0a13c287e0f0fcc8f983be3512654524dad18b2c",
+      "spec_sha256": "bcd97ef293e938b1f8bc487ccdb5ef512f451d68ffc7bac81a310b52d924bb0d",
+      "uv_lock_sha256": "44744e1707fbe342767baf0842ba26bcfa2fa8b855bce914866f755b7370670f"
+    },
+    "source_sha": "0a13c287e0f0fcc8f983be3512654524dad18b2c",
+    "status": "VERIFIED",
+    "validation": {
+      "checks": {
+        "all_critical_checks_pass": true,
+        "all_effective": true,
+        "all_match_fraction_1": true,
+        "all_pairs_2_of_2": true,
+        "dependencies_unchanged": true,
+        "holdout_not_evaluated": true,
+        "lockfile_unchanged": true,
+        "prospective_not_evaluated": true,
+        "separate_runtime_layout_allowed": true,
+        "source_exact": true,
+        "two_probe_results": true
+      },
+      "probe_details": {
+        "mlforecast": {
+          "checks": {
+            "all_pair_observations_valid": true,
+            "effective": true,
+            "holdout_false": true,
+            "library": true,
+            "matched_fraction": true,
+            "model": true,
+            "paired_count": true,
+            "pairs_eligible": true,
+            "pairs_failed": true,
+            "pairs_matched": true,
+            "pairs_total": true,
+            "parameter": true,
+            "probe_id": true,
+            "prospective_false": true,
+            "relation": true,
+            "surface": true
+          },
+          "evidence_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase5a-parameter-effectiveness-v2-20260826-151111/evidence/mlforecast-num-samples-trial-count",
+          "result": {
+            "control_aggregate": {
+              "count": 2,
+              "maximum": 1.0,
+              "mean": 1.0,
+              "minimum": 1.0,
+              "std": 0.0,
+              "worst": 1.0
+            },
+            "expected_relation": "increase",
+            "expected_surface": "trial_count",
+            "holdout_evaluated": false,
+            "library": "mlforecast",
+            "matched_fraction": 1.0,
+            "model": "AutoLinearRegression",
+            "outcome": "effective",
+            "paired": [
+              {
+                "comparison": "control=1; treatment=2; expected=increase",
+                "control": {
+                  "accepted": true,
+                  "error": null,
+                  "finite": true,
+                  "metadata": {
+                    "adapter": "MLForecastParameterAdapter",
+                    "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+                    "lags": "1,2,3,5,10",
+                    "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+                  },
+                  "observables": {
+                    "best_value": 0.09482168970392982,
+                    "history": 48,
+                    "metric": 1.0,
+                    "trial_count": 1
+                  },
+                  "output_shape": [
+                    3,
+                    3
+                  ],
+                  "prediction_sha256": "888a0a076b3dce43ab4c916607ce4a355d62ccbe9a7d6415c559d7aede866307",
+                  "runtime_seconds": 0.1338551640001242,
+                  "success": true
+                },
+                "matched_expectation": true,
+                "repeat": 0,
+                "seed": 1,
+                "treatment": {
+                  "accepted": true,
+                  "error": null,
+                  "finite": true,
+                  "metadata": {
+                    "adapter": "MLForecastParameterAdapter",
+                    "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+                    "lags": "1,2,3,5,10",
+                    "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+                  },
+                  "observables": {
+                    "best_value": 0.09482168970392982,
+                    "history": 48,
+                    "metric": 1.0,
+                    "trial_count": 2
+                  },
+                  "output_shape": [
+                    3,
+                    3
+                  ],
+                  "prediction_sha256": "888a0a076b3dce43ab4c916607ce4a355d62ccbe9a7d6415c559d7aede866307",
+                  "runtime_seconds": 0.027575077998335473,
+                  "success": true
+                }
+              },
+              {
+                "comparison": "control=1; treatment=2; expected=increase",
+                "control": {
+                  "accepted": true,
+                  "error": null,
+                  "finite": true,
+                  "metadata": {
+                    "adapter": "MLForecastParameterAdapter",
+                    "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+                    "lags": "1,2,3,5,10",
+                    "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+                  },
+                  "observables": {
+                    "best_value": 0.09813654002999916,
+                    "history": 48,
+                    "metric": 1.0,
+                    "trial_count": 1
+                  },
+                  "output_shape": [
+                    3,
+                    3
+                  ],
+                  "prediction_sha256": "d0b3468c9ede5fbd185f65d28f0073b4b0802e07caa908994095b505d8f4f22b",
+                  "runtime_seconds": 0.016375386003346648,
+                  "success": true
+                },
+                "matched_expectation": true,
+                "repeat": 0,
+                "seed": 42,
+                "treatment": {
+                  "accepted": true,
+                  "error": null,
+                  "finite": true,
+                  "metadata": {
+                    "adapter": "MLForecastParameterAdapter",
+                    "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+                    "lags": "1,2,3,5,10",
+                    "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+                  },
+                  "observables": {
+                    "best_value": 0.04936151676150657,
+                    "history": 48,
+                    "metric": 1.0,
+                    "trial_count": 2
+                  },
+                  "output_shape": [
+                    3,
+                    3
+                  ],
+                  "prediction_sha256": "49b680bdde0ccfc6bbd31d2d5b97be17bf94172de2398f88919390072d9f9109",
+                  "runtime_seconds": 0.026599372002237942,
+                  "success": true
+                }
+              }
+            ],
+            "pairs_eligible": 2,
+            "pairs_failed": 0,
+            "pairs_matched": 2,
+            "pairs_total": 2,
+            "parameter": "num_samples",
+            "probe_id": "mlforecast-num-samples-trial-count",
+            "prospective_evaluated": false,
+            "support_reason": null,
+            "supported": true,
+            "treatment_aggregate": {
+              "count": 2,
+              "maximum": 2.0,
+              "mean": 2.0,
+              "minimum": 2.0,
+              "std": 0.0,
+              "worst": 2.0
+            }
+          },
+          "runtime": {
+            "candidate": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/phase5a-mlforecast-py313/bin/python",
+            "executable": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/phase5a-mlforecast-py313/bin/python",
+            "imports": {
+              "mlforecast": true,
+              "numpy": true,
+              "optuna": true,
+              "pandas": true,
+              "pydantic": true,
+              "pytest": false,
+              "sklearn": true,
+              "statsforecast": false
+            },
+            "prefix": "/mnt/e/env/ts/loto_forecast_platform/.runtime-envs/phase5a-mlforecast-py313",
+            "python": "3.13.13",
+            "returncode": 0,
+            "stderr": "",
+            "versions": {
+              "mlforecast": "1.1.0",
+              "numpy": "2.4.6",
+              "optuna": "4.9.0",
+              "pandas": "2.3.3",
+              "pydantic": "2.13.4",
+              "pytest": null,
+              "scikit-learn": "1.7.2",
+              "statsforecast": null
+            }
+          }
+        },
+        "statsforecast": {
+          "checks": {
+            "all_pair_observations_valid": true,
+            "effective": true,
+            "holdout_false": true,
+            "library": true,
+            "matched_fraction": true,
+            "model": true,
+            "paired_count": true,
+            "pairs_eligible": true,
+            "pairs_failed": true,
+            "pairs_matched": true,
+            "pairs_total": true,
+            "parameter": true,
+            "probe_id": true,
+            "prospective_false": true,
+            "relation": true,
+            "surface": true
+          },
+          "evidence_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase5a-parameter-effectiveness-v2-20260826-151111/evidence/statsforecast-season-length-prediction",
+          "result": {
+            "control_aggregate": null,
+            "expected_relation": "change",
+            "expected_surface": "prediction",
+            "holdout_evaluated": false,
+            "library": "statsforecast",
+            "matched_fraction": 1.0,
+            "model": "SeasonalNaive",
+            "outcome": "effective",
+            "paired": [
+              {
+                "comparison": "control='a66ab855a998e62a02741a13b584779d24f52d7fc8f057c161f7f328e85e3f3b'; treatment='565e142f442be713db61c07189d0c74a3c69998aeb0b447243195af96fc9bd1b'; expected=change",
+                "control": {
+                  "accepted": true,
+                  "error": null,
+                  "finite": true,
+                  "metadata": {
+                    "adapter": "StatsForecastParameterAdapter",
+                    "forecast_column": "SeasonalNaive",
+                    "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+                  },
+                  "observables": {
+                    "metric": 0.14285714285714285
+                  },
+                  "output_shape": [
+                    7,
+                    3
+                  ],
+                  "prediction_sha256": "a66ab855a998e62a02741a13b584779d24f52d7fc8f057c161f7f328e85e3f3b",
+                  "runtime_seconds": 0.0038346759974956512,
+                  "success": true
+                },
+                "matched_expectation": true,
+                "repeat": 0,
+                "seed": 1,
+                "treatment": {
+                  "accepted": true,
+                  "error": null,
+                  "finite": true,
+                  "metadata": {
+                    "adapter": "StatsForecastParameterAdapter",
+                    "forecast_column": "SeasonalNaive",
+                    "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+                  },
+                  "observables": {
+                    "metric": 0.7142857142857143
+                  },
+                  "output_shape": [
+                    7,
+                    3
+                  ],
+                  "prediction_sha256": "565e142f442be713db61c07189d0c74a3c69998aeb0b447243195af96fc9bd1b",
+                  "runtime_seconds": 0.001428081995982211,
+                  "success": true
+                }
+              },
+              {
+                "comparison": "control='c2f5a1f2398b44e1efe198951463bc81381863efaf58aa3ae4b8a1ba3fae2a78'; treatment='509fca4afba24ff6395235fe46d6a4f4f18a12d395a67cf0d2eb88b40b0c3f0e'; expected=change",
+                "control": {
+                  "accepted": true,
+                  "error": null,
+                  "finite": true,
+                  "metadata": {
+                    "adapter": "StatsForecastParameterAdapter",
+                    "forecast_column": "SeasonalNaive",
+                    "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+                  },
+                  "observables": {
+                    "metric": 0.14285714285714285
+                  },
+                  "output_shape": [
+                    7,
+                    3
+                  ],
+                  "prediction_sha256": "c2f5a1f2398b44e1efe198951463bc81381863efaf58aa3ae4b8a1ba3fae2a78",
+                  "runtime_seconds": 0.001243152997631114,
+                  "success": true
+                },
+                "matched_expectation": true,
+                "repeat": 0,
+                "seed": 42,
+                "treatment": {
+                  "accepted": true,
+                  "error": null,
+                  "finite": true,
+                  "metadata": {
+                    "adapter": "StatsForecastParameterAdapter",
+                    "forecast_column": "SeasonalNaive",
+                    "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+                  },
+                  "observables": {
+                    "metric": 0.7142857142857143
+                  },
+                  "output_shape": [
+                    7,
+                    3
+                  ],
+                  "prediction_sha256": "509fca4afba24ff6395235fe46d6a4f4f18a12d395a67cf0d2eb88b40b0c3f0e",
+                  "runtime_seconds": 0.0011630709996097721,
+                  "success": true
+                }
+              }
+            ],
+            "pairs_eligible": 2,
+            "pairs_failed": 0,
+            "pairs_matched": 2,
+            "pairs_total": 2,
+            "parameter": "season_length",
+            "probe_id": "statsforecast-season-length-prediction",
+            "prospective_evaluated": false,
+            "support_reason": null,
+            "supported": true,
+            "treatment_aggregate": null
+          },
+          "runtime": {
+            "candidate": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv/bin/python",
+            "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv/bin/python",
+            "imports": {
+              "mlforecast": false,
+              "numpy": true,
+              "optuna": false,
+              "pandas": true,
+              "pydantic": true,
+              "pytest": false,
+              "sklearn": true,
+              "statsforecast": true
+            },
+            "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/statsforecast-py313/.venv",
+            "python": "3.13.13",
+            "returncode": 0,
+            "stderr": "",
+            "versions": {
+              "mlforecast": null,
+              "numpy": "2.5.2",
+              "optuna": null,
+              "pandas": "2.3.3",
+              "pydantic": "2.13.4",
+              "pytest": null,
+              "scikit-learn": "1.9.0",
+              "statsforecast": "2.1.1"
+            }
+          }
+        }
+      },
+      "results": [
+        {
+          "control_aggregate": {
+            "count": 2,
+            "maximum": 1.0,
+            "mean": 1.0,
+            "minimum": 1.0,
+            "std": 0.0,
+            "worst": 1.0
+          },
+          "expected_relation": "increase",
+          "expected_surface": "trial_count",
+          "holdout_evaluated": false,
+          "library": "mlforecast",
+          "matched_fraction": 1.0,
+          "model": "AutoLinearRegression",
+          "outcome": "effective",
+          "paired": [
+            {
+              "comparison": "control=1; treatment=2; expected=increase",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "MLForecastParameterAdapter",
+                  "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+                  "lags": "1,2,3,5,10",
+                  "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+                },
+                "observables": {
+                  "best_value": 0.09482168970392982,
+                  "history": 48,
+                  "metric": 1.0,
+                  "trial_count": 1
+                },
+                "output_shape": [
+                  3,
+                  3
+                ],
+                "prediction_sha256": "888a0a076b3dce43ab4c916607ce4a355d62ccbe9a7d6415c559d7aede866307",
+                "runtime_seconds": 0.1338551640001242,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 1,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "MLForecastParameterAdapter",
+                  "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+                  "lags": "1,2,3,5,10",
+                  "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+                },
+                "observables": {
+                  "best_value": 0.09482168970392982,
+                  "history": 48,
+                  "metric": 1.0,
+                  "trial_count": 2
+                },
+                "output_shape": [
+                  3,
+                  3
+                ],
+                "prediction_sha256": "888a0a076b3dce43ab4c916607ce4a355d62ccbe9a7d6415c559d7aede866307",
+                "runtime_seconds": 0.027575077998335473,
+                "success": true
+              }
+            },
+            {
+              "comparison": "control=1; treatment=2; expected=increase",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "MLForecastParameterAdapter",
+                  "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+                  "lags": "1,2,3,5,10",
+                  "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+                },
+                "observables": {
+                  "best_value": 0.09813654002999916,
+                  "history": 48,
+                  "metric": 1.0,
+                  "trial_count": 1
+                },
+                "output_shape": [
+                  3,
+                  3
+                ],
+                "prediction_sha256": "d0b3468c9ede5fbd185f65d28f0073b4b0802e07caa908994095b505d8f4f22b",
+                "runtime_seconds": 0.016375386003346648,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 42,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "MLForecastParameterAdapter",
+                  "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+                  "lags": "1,2,3,5,10",
+                  "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+                },
+                "observables": {
+                  "best_value": 0.04936151676150657,
+                  "history": 48,
+                  "metric": 1.0,
+                  "trial_count": 2
+                },
+                "output_shape": [
+                  3,
+                  3
+                ],
+                "prediction_sha256": "49b680bdde0ccfc6bbd31d2d5b97be17bf94172de2398f88919390072d9f9109",
+                "runtime_seconds": 0.026599372002237942,
+                "success": true
+              }
+            }
+          ],
+          "pairs_eligible": 2,
+          "pairs_failed": 0,
+          "pairs_matched": 2,
+          "pairs_total": 2,
+          "parameter": "num_samples",
+          "probe_id": "mlforecast-num-samples-trial-count",
+          "prospective_evaluated": false,
+          "support_reason": null,
+          "supported": true,
+          "treatment_aggregate": {
+            "count": 2,
+            "maximum": 2.0,
+            "mean": 2.0,
+            "minimum": 2.0,
+            "std": 0.0,
+            "worst": 2.0
+          }
+        },
+        {
+          "control_aggregate": null,
+          "expected_relation": "change",
+          "expected_surface": "prediction",
+          "holdout_evaluated": false,
+          "library": "statsforecast",
+          "matched_fraction": 1.0,
+          "model": "SeasonalNaive",
+          "outcome": "effective",
+          "paired": [
+            {
+              "comparison": "control='a66ab855a998e62a02741a13b584779d24f52d7fc8f057c161f7f328e85e3f3b'; treatment='565e142f442be713db61c07189d0c74a3c69998aeb0b447243195af96fc9bd1b'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "StatsForecastParameterAdapter",
+                  "forecast_column": "SeasonalNaive",
+                  "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+                },
+                "observables": {
+                  "metric": 0.14285714285714285
+                },
+                "output_shape": [
+                  7,
+                  3
+                ],
+                "prediction_sha256": "a66ab855a998e62a02741a13b584779d24f52d7fc8f057c161f7f328e85e3f3b",
+                "runtime_seconds": 0.0038346759974956512,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 1,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "StatsForecastParameterAdapter",
+                  "forecast_column": "SeasonalNaive",
+                  "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+                },
+                "observables": {
+                  "metric": 0.7142857142857143
+                },
+                "output_shape": [
+                  7,
+                  3
+                ],
+                "prediction_sha256": "565e142f442be713db61c07189d0c74a3c69998aeb0b447243195af96fc9bd1b",
+                "runtime_seconds": 0.001428081995982211,
+                "success": true
+              }
+            },
+            {
+              "comparison": "control='c2f5a1f2398b44e1efe198951463bc81381863efaf58aa3ae4b8a1ba3fae2a78'; treatment='509fca4afba24ff6395235fe46d6a4f4f18a12d395a67cf0d2eb88b40b0c3f0e'; expected=change",
+              "control": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "StatsForecastParameterAdapter",
+                  "forecast_column": "SeasonalNaive",
+                  "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+                },
+                "observables": {
+                  "metric": 0.14285714285714285
+                },
+                "output_shape": [
+                  7,
+                  3
+                ],
+                "prediction_sha256": "c2f5a1f2398b44e1efe198951463bc81381863efaf58aa3ae4b8a1ba3fae2a78",
+                "runtime_seconds": 0.001243152997631114,
+                "success": true
+              },
+              "matched_expectation": true,
+              "repeat": 0,
+              "seed": 42,
+              "treatment": {
+                "accepted": true,
+                "error": null,
+                "finite": true,
+                "metadata": {
+                  "adapter": "StatsForecastParameterAdapter",
+                  "forecast_column": "SeasonalNaive",
+                  "model_signature": "(season_length: int, alias: str = 'SeasonalNaive', prediction_intervals: Optional[statsforecast.utils.ConformalIntervals] = None)"
+                },
+                "observables": {
+                  "metric": 0.7142857142857143
+                },
+                "output_shape": [
+                  7,
+                  3
+                ],
+                "prediction_sha256": "509fca4afba24ff6395235fe46d6a4f4f18a12d395a67cf0d2eb88b40b0c3f0e",
+                "runtime_seconds": 0.0011630709996097721,
+                "success": true
+              }
+            }
+          ],
+          "pairs_eligible": 2,
+          "pairs_failed": 0,
+          "pairs_matched": 2,
+          "pairs_total": 2,
+          "parameter": "season_length",
+          "probe_id": "statsforecast-season-length-prediction",
+          "prospective_evaluated": false,
+          "support_reason": null,
+          "supported": true,
+          "treatment_aggregate": null
+        }
+      ]
+    }
+  },
   "schema_version": 1,
   "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
-  "updated_at_utc": "2026-08-26T05:44:44.978221+00:00"
+  "updated_at_utc": "2026-08-26T06:11:30.448161+00:00"
 }

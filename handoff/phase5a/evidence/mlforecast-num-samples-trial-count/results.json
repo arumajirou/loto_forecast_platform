@@ -1,0 +1,146 @@
+[
+  {
+    "control_aggregate": {
+      "count": 2,
+      "maximum": 1.0,
+      "mean": 1.0,
+      "minimum": 1.0,
+      "std": 0.0,
+      "worst": 1.0
+    },
+    "expected_relation": "increase",
+    "expected_surface": "trial_count",
+    "holdout_evaluated": false,
+    "library": "mlforecast",
+    "matched_fraction": 1.0,
+    "model": "AutoLinearRegression",
+    "outcome": "effective",
+    "paired": [
+      {
+        "comparison": "control=1; treatment=2; expected=increase",
+        "control": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "MLForecastParameterAdapter",
+            "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+            "lags": "1,2,3,5,10",
+            "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+          },
+          "observables": {
+            "best_value": 0.09482168970392982,
+            "history": 48,
+            "metric": 1.0,
+            "trial_count": 1
+          },
+          "output_shape": [
+            3,
+            3
+          ],
+          "prediction_sha256": "888a0a076b3dce43ab4c916607ce4a355d62ccbe9a7d6415c559d7aede866307",
+          "runtime_seconds": 0.1338551640001242,
+          "success": true
+        },
+        "matched_expectation": true,
+        "repeat": 0,
+        "seed": 1,
+        "treatment": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "MLForecastParameterAdapter",
+            "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+            "lags": "1,2,3,5,10",
+            "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+          },
+          "observables": {
+            "best_value": 0.09482168970392982,
+            "history": 48,
+            "metric": 1.0,
+            "trial_count": 2
+          },
+          "output_shape": [
+            3,
+            3
+          ],
+          "prediction_sha256": "888a0a076b3dce43ab4c916607ce4a355d62ccbe9a7d6415c559d7aede866307",
+          "runtime_seconds": 0.027575077998335473,
+          "success": true
+        }
+      },
+      {
+        "comparison": "control=1; treatment=2; expected=increase",
+        "control": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "MLForecastParameterAdapter",
+            "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+            "lags": "1,2,3,5,10",
+            "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+          },
+          "observables": {
+            "best_value": 0.09813654002999916,
+            "history": 48,
+            "metric": 1.0,
+            "trial_count": 1
+          },
+          "output_shape": [
+            3,
+            3
+          ],
+          "prediction_sha256": "d0b3468c9ede5fbd185f65d28f0073b4b0802e07caa908994095b505d8f4f22b",
+          "runtime_seconds": 0.016375386003346648,
+          "success": true
+        },
+        "matched_expectation": true,
+        "repeat": 0,
+        "seed": 42,
+        "treatment": {
+          "accepted": true,
+          "error": null,
+          "finite": true,
+          "metadata": {
+            "adapter": "MLForecastParameterAdapter",
+            "fit_signature": "(self, df: Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], n_windows: int, h: int, num_samples: int, step_size: Optional[int] = None, input_size: Optional[int] = None, refit: Union[bool, int] = False, loss: Optional[Callable[[Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame], Union[pandas.core.frame.DataFrame, utilsforecast.compat.pl_DataFrame]], float]] = None, id_col: str = 'unique_id', time_col: str = 'ds', target_col: str = 'y', study_kwargs: Optional[Dict[str, Any]] = None, optimize_kwargs: Optional[Dict[str, Any]] = None, fitted: bool = False, prediction_intervals: Optional[mlforecast.conformal_prediction.PredictionIntervals] = None, weight_col: Optional[numpy.ndarray] = None) -> 'AutoMLForecast'",
+            "lags": "1,2,3,5,10",
+            "model_signature": "(config: Optional[Callable[[optuna.trial._trial.Trial], Dict[str, Any]]] = None)"
+          },
+          "observables": {
+            "best_value": 0.04936151676150657,
+            "history": 48,
+            "metric": 1.0,
+            "trial_count": 2
+          },
+          "output_shape": [
+            3,
+            3
+          ],
+          "prediction_sha256": "49b680bdde0ccfc6bbd31d2d5b97be17bf94172de2398f88919390072d9f9109",
+          "runtime_seconds": 0.026599372002237942,
+          "success": true
+        }
+      }
+    ],
+    "pairs_eligible": 2,
+    "pairs_failed": 0,
+    "pairs_matched": 2,
+    "pairs_total": 2,
+    "parameter": "num_samples",
+    "probe_id": "mlforecast-num-samples-trial-count",
+    "prospective_evaluated": false,
+    "support_reason": null,
+    "supported": true,
+    "treatment_aggregate": {
+      "count": 2,
+      "maximum": 2.0,
+      "mean": 2.0,
+      "minimum": 2.0,
+      "std": 0.0,
+      "worst": 2.0
+    }
+  }
+]

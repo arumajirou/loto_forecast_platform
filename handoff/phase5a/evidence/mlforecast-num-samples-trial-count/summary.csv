@@ -1,0 +1,2 @@
+probe_id,library,model,parameter,surface,relation,outcome,pairs_total,pairs_eligible,pairs_matched,pairs_failed,matched_fraction
+mlforecast-num-samples-trial-count,mlforecast,AutoLinearRegression,num_samples,trial_count,increase,effective,2,2,2,0,1.0

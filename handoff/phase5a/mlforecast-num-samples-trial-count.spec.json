@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "holdout_evaluated": false,
+    "prospective_evaluated": false,
+    "purpose": "Development-only cross-platform argument effectiveness smoke"
+  },
+  "probes": [
+    {
+      "base_args": {
+        "h": 1,
+        "input_size": 48,
+        "n_windows": 2,
+        "refit": false,
+        "step_size": 1
+      },
+      "control": 1,
+      "expected_relation": "increase",
+      "expected_surface": "trial_count",
+      "library": "mlforecast",
+      "min_match_fraction": 1.0,
+      "model": "AutoLinearRegression",
+      "parameter": "num_samples",
+      "probe_id": "mlforecast-num-samples-trial-count",
+      "repeats": 1,
+      "scope": "fit",
+      "seeds": [
+        1,
+        42
+      ],
+      "treatment": 2
+    }
+  ],
+  "suite_id": "phase5a-v2-mlforecast-num-samples-trial-count"
+}
