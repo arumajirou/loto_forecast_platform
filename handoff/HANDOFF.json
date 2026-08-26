@@ -19,11 +19,12 @@
     "phase4b": "VERIFIED",
     "phase4c": "VERIFIED",
     "phase4d": "VERIFIED",
-    "phase4e": "VERIFIED"
+    "phase4e": "VERIFIED",
+    "phase4f": "VERIFIED"
   },
-  "current_phase": "phase4e_sktime_classic_verified_phase4f_next",
+  "current_phase": "phase4f_sktime_core_verified_phase4g_next",
   "estimated_progress_percent": 48,
-  "handoff_run_id": "20260826-135004",
+  "handoff_run_id": "20260826-135959",
   "next_phases": [
     "phase3b_venv_identity_correction",
     "phase4_model_load_inference_smoke",
@@ -1885,7 +1886,469 @@
       "reload_process_id": 3683359
     }
   },
+  "phase4f": {
+    "baseline_metrics": {
+      "fixed": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.0,
+        "horizon": 1,
+        "mae": 4.5,
+        "mse": 23.75,
+        "position_hit_at_plus_minus_1": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 4.873397172404482,
+        "tolerance": 1.0
+      },
+      "frequency": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.75,
+        "horizon": 1,
+        "mae": 0.75,
+        "mse": 1.25,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "positions": 4,
+        "rmse": 1.118033988749895,
+        "tolerance": 1.0
+      },
+      "last": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.75,
+        "horizon": 1,
+        "mae": 1.25,
+        "mse": 2.75,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "positions": 4,
+        "rmse": 1.6583123951777,
+        "tolerance": 1.0
+      },
+      "mean": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.5,
+        "horizon": 1,
+        "mae": 1.362204724409449,
+        "mse": 2.136369272738546,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 1.4616324000030056,
+        "tolerance": 1.0
+      },
+      "median": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.5,
+        "horizon": 1,
+        "mae": 1.25,
+        "mse": 2.25,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 1.5,
+        "tolerance": 1.0
+      },
+      "random": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.25,
+        "horizon": 1,
+        "mae": 3.25,
+        "mse": 14.25,
+        "position_hit_at_plus_minus_1": [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 3.774917217635375,
+        "tolerance": 1.0
+      },
+      "seasonal_naive": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.75,
+        "horizon": 1,
+        "mae": 1.25,
+        "mse": 2.75,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "positions": 4,
+        "rmse": 1.6583123951777,
+        "tolerance": 1.0
+      }
+    },
+    "data": {
+      "cuda_visible_devices": "",
+      "derived_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4f-sktime-core-smoke-20260826-135959/smoke-input.csv",
+      "derived_sha256": "0ba9eac7c88670bbbc4cf0db65dc69eda5eb4b4cbcda2aedee32cd0bb0ea8489",
+      "draw_no_col": "draw_no",
+      "first_draw": 354,
+      "last_draw": 481,
+      "max_value": 20,
+      "min_value": 1,
+      "position_columns": [
+        "n1",
+        "n2",
+        "n3",
+        "n4"
+      ],
+      "process_id": 3703584,
+      "rows": 128,
+      "sktime": "1.0.1",
+      "source_path": "/mnt/e/env/ts/backups/loto-pre-consolidation-20260802-012717/loto_life_feature_pipeline/data/interim/bingo5_normalized.csv",
+      "source_sha256": "62a2c0984877c58593961052787469272e3f609e9c88472394cc0657c1248a9d"
+    },
+    "dataset_policy": {
+      "accuracy_ranking": false,
+      "kind": "exact_phase4a_verified_real_data_window",
+      "phase6_metrics_pending": [
+        "Hit@±1",
+        "MAE",
+        "MSE",
+        "RMSE",
+        "position_Hit@±1",
+        "all_position_Hit@±1"
+      ]
+    },
+    "dependencies_modified": false,
+    "device_policy": {
+      "cpu_fallback": false,
+      "cuda_visible_devices": "",
+      "gpu_execution_claimed": false,
+      "reason": "CPU is the intended Phase 4F core-runtime contract",
+      "requested": "cpu"
+    },
+    "environment": "environments/sktime-core-py313",
+    "environment_contract": {
+      "dependencies_modified": false,
+      "lockfile_modified": false,
+      "pyproject_path": "/mnt/e/env/ts/worktrees/loto-runtime-audit-20260826-121248/environments/sktime-core-py313/pyproject.toml",
+      "pyproject_sha256": "c8360f847dd449864f3f15ed1cf983b4b0f55089f51cf872c7fdf5132c88826a",
+      "uv_lock_exists": false,
+      "uv_lock_sha256": null
+    },
+    "formal_runtime_certification": true,
+    "gpu": {
+      "fit_monitor": {
+        "duration_seconds": 2.305734872817993,
+        "matched_gpu_pids": [],
+        "peak_matching_gpu_memory_mib": 0,
+        "returncode": 0,
+        "root_pid": 3703670
+      },
+      "matched_gpu_pids": [],
+      "reload_monitor": {
+        "duration_seconds": 2.4109227657318115,
+        "matched_gpu_pids": [],
+        "peak_matching_gpu_memory_mib": 0,
+        "returncode": 0,
+        "root_pid": 3703900
+      }
+    },
+    "lane": {
+      "candidate_probe_status": "PASS",
+      "candidate_python_version": "3.13.13",
+      "candidate_runtime": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-core-py313/.venv",
+      "candidate_source": "DIRECT_PROJECT_RUNTIME",
+      "cuda_builds": "[]",
+      "decision_reason": "Direct venv, declared dependencies compatible, CPU import verified.",
+      "declared_contract_compatible": "True",
+      "dependency_coverage": "1.0",
+      "environment": "environments/sktime-core-py313",
+      "lane": "CURRENT_CPU_LEGACY",
+      "mapping_status": "DIRECT_PROJECT_RUNTIME",
+      "missing_dependencies": "[]",
+      "phase2_statuses": "[\"IMPORT_VERIFIED_CPU\"]",
+      "phase3c_classification": "",
+      "phase4_priority": "30",
+      "phase4_smoke_allowed": "True",
+      "python_compatible": "True",
+      "torch_versions": "[]",
+      "version_incompatible": "[]"
+    },
+    "lockfile_modified": false,
+    "metrics": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.75,
+      "horizon": 1,
+      "mae": 1.25,
+      "mse": 2.75,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "positions": 4,
+      "rmse": 1.6583123951777,
+      "tolerance": 1.0
+    },
+    "model": {
+      "public_name": "NaiveForecaster",
+      "separate_process_reload": true,
+      "serialization": "python-pickle",
+      "strategy": "last"
+    },
+    "phase": "PHASE4F_SKTIME_CORE_PY313_CPU_LIFECYCLE",
+    "run_id": "20260826-135959",
+    "runtime": {
+      "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-core-py313/.venv/bin/python",
+      "naive_forecaster_class": "NaiveForecaster",
+      "naive_forecaster_module": "sktime.forecasting.naive._naive",
+      "numpy": "2.3.5",
+      "pandas": "2.3.3",
+      "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/sktime-core-py313/.venv",
+      "python": "3.13.13",
+      "sktime": "1.0.1",
+      "statsmodels": null,
+      "torch_installed": false
+    },
+    "schema_version": 1,
+    "scope": "sktime core Python 3.13 CPU real-data lifecycle smoke",
+    "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
+    "status": "VERIFIED",
+    "validation": {
+      "baseline_metrics": {
+        "fixed": {
+          "all_position_hit_at_plus_minus_1": 0.0,
+          "hit_at_plus_minus_1": 0.0,
+          "horizon": 1,
+          "mae": 4.5,
+          "mse": 23.75,
+          "position_hit_at_plus_minus_1": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "positions": 4,
+          "rmse": 4.873397172404482,
+          "tolerance": 1.0
+        },
+        "frequency": {
+          "all_position_hit_at_plus_minus_1": 0.0,
+          "hit_at_plus_minus_1": 0.75,
+          "horizon": 1,
+          "mae": 0.75,
+          "mse": 1.25,
+          "position_hit_at_plus_minus_1": [
+            1.0,
+            1.0,
+            0.0,
+            1.0
+          ],
+          "positions": 4,
+          "rmse": 1.118033988749895,
+          "tolerance": 1.0
+        },
+        "last": {
+          "all_position_hit_at_plus_minus_1": 0.0,
+          "hit_at_plus_minus_1": 0.75,
+          "horizon": 1,
+          "mae": 1.25,
+          "mse": 2.75,
+          "position_hit_at_plus_minus_1": [
+            1.0,
+            1.0,
+            0.0,
+            1.0
+          ],
+          "positions": 4,
+          "rmse": 1.6583123951777,
+          "tolerance": 1.0
+        },
+        "mean": {
+          "all_position_hit_at_plus_minus_1": 0.0,
+          "hit_at_plus_minus_1": 0.5,
+          "horizon": 1,
+          "mae": 1.362204724409449,
+          "mse": 2.136369272738546,
+          "position_hit_at_plus_minus_1": [
+            1.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "positions": 4,
+          "rmse": 1.4616324000030056,
+          "tolerance": 1.0
+        },
+        "median": {
+          "all_position_hit_at_plus_minus_1": 0.0,
+          "hit_at_plus_minus_1": 0.5,
+          "horizon": 1,
+          "mae": 1.25,
+          "mse": 2.25,
+          "position_hit_at_plus_minus_1": [
+            1.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "positions": 4,
+          "rmse": 1.5,
+          "tolerance": 1.0
+        },
+        "random": {
+          "all_position_hit_at_plus_minus_1": 0.0,
+          "hit_at_plus_minus_1": 0.25,
+          "horizon": 1,
+          "mae": 3.25,
+          "mse": 14.25,
+          "position_hit_at_plus_minus_1": [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          "positions": 4,
+          "rmse": 3.774917217635375,
+          "tolerance": 1.0
+        },
+        "seasonal_naive": {
+          "all_position_hit_at_plus_minus_1": 0.0,
+          "hit_at_plus_minus_1": 0.75,
+          "horizon": 1,
+          "mae": 1.25,
+          "mse": 2.75,
+          "position_hit_at_plus_minus_1": [
+            1.0,
+            1.0,
+            0.0,
+            1.0
+          ],
+          "positions": 4,
+          "rmse": 1.6583123951777,
+          "tolerance": 1.0
+        }
+      },
+      "checks": {
+        "all_critical_checks_pass": true,
+        "baselines_complete": true,
+        "cpu_env_fit": true,
+        "cpu_env_reload": true,
+        "fit_shape_finite_all": true,
+        "fit_status_verified": true,
+        "four_positions_fit": true,
+        "four_positions_reload": true,
+        "metrics_complete": true,
+        "model_identity_fit": true,
+        "no_gpu_pid_fit": true,
+        "no_gpu_pid_reload": true,
+        "prediction_equal_after_reload": true,
+        "reload_shape_finite_all": true,
+        "reload_status_verified": true,
+        "separate_process_reload": true,
+        "sktime_version_fit": true,
+        "sktime_version_reload": true,
+        "strategy_fit": true,
+        "torch_not_imported_fit": true,
+        "torch_not_imported_reload": true,
+        "training_holdout_ordered": true
+      },
+      "fit_predictions": [
+        [
+          5.0
+        ],
+        [
+          10.0
+        ],
+        [
+          12.0
+        ],
+        [
+          16.0
+        ]
+      ],
+      "fit_process_id": 3703670,
+      "metrics": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.75,
+        "horizon": 1,
+        "mae": 1.25,
+        "mse": 2.75,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "positions": 4,
+        "rmse": 1.6583123951777,
+        "tolerance": 1.0
+      },
+      "model_artifacts": [
+        {
+          "artifact_sha256": "9b5a27bbc288bbc45f48753186ccb2d0951f1fbefc332a4472df45723602ca97",
+          "model_class": "NaiveForecaster",
+          "native_save_available": true,
+          "position": "n1",
+          "strategy": "last"
+        },
+        {
+          "artifact_sha256": "965a755abc60df0a0b6e9f04a517a13d3db26a547f5eeb2b51bb850cee053d2f",
+          "model_class": "NaiveForecaster",
+          "native_save_available": true,
+          "position": "n2",
+          "strategy": "last"
+        },
+        {
+          "artifact_sha256": "b6050ff2dcc0e70bffe7619ab5f81d77045453514706eee2ace6884cd92c79bf",
+          "model_class": "NaiveForecaster",
+          "native_save_available": true,
+          "position": "n3",
+          "strategy": "last"
+        },
+        {
+          "artifact_sha256": "d8e91a4ae04a5946dcbb70dfcc07cad716b05a75a74f97b27af06f46c2e185d4",
+          "model_class": "NaiveForecaster",
+          "native_save_available": true,
+          "position": "n4",
+          "strategy": "last"
+        }
+      ],
+      "reload_predictions": [
+        [
+          5.0
+        ],
+        [
+          10.0
+        ],
+        [
+          12.0
+        ],
+        [
+          16.0
+        ]
+      ],
+      "reload_process_id": 3703900
+    }
+  },
   "schema_version": 1,
   "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
-  "updated_at_utc": "2026-08-26T04:50:12.379153+00:00"
+  "updated_at_utc": "2026-08-26T05:00:12.787845+00:00"
 }

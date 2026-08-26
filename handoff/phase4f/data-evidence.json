@@ -1,0 +1,21 @@
+{
+  "cuda_visible_devices": "",
+  "derived_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4f-sktime-core-smoke-20260826-135959/smoke-input.csv",
+  "derived_sha256": "0ba9eac7c88670bbbc4cf0db65dc69eda5eb4b4cbcda2aedee32cd0bb0ea8489",
+  "draw_no_col": "draw_no",
+  "first_draw": 354,
+  "last_draw": 481,
+  "max_value": 20,
+  "min_value": 1,
+  "position_columns": [
+    "n1",
+    "n2",
+    "n3",
+    "n4"
+  ],
+  "process_id": 3703584,
+  "rows": 128,
+  "sktime": "1.0.1",
+  "source_path": "/mnt/e/env/ts/backups/loto-pre-consolidation-20260802-012717/loto_life_feature_pipeline/data/interim/bingo5_normalized.csv",
+  "source_sha256": "62a2c0984877c58593961052787469272e3f609e9c88472394cc0657c1248a9d"
+}

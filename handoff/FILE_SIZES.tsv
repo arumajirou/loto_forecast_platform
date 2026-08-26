@@ -4,9 +4,9 @@
 282908	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/discover-artifacts/response.json
 279704	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/discovery-inventory.json
 130925	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase1b/canonical-observations-repaired.tsv
+75754	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/HANDOFF.json
 68995	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/run.log
 68881	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase1b/expanded-v2-recovered.tsv
-62892	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/HANDOFF.json
 58336	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase1b/canonical-identities-repaired.tsv
 50635	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/tools/__pycache__/phase4a_darts_gpu_smoke.cpython-314.pyc
 48341	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4b/campaign.stdout.log
@@ -16,7 +16,7 @@
 43199	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/tools/phase4e_sktime_classic_smoke_runner.py
 40935	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase3b/raw-runtime-identity-probes.json
 38546	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase3c/candidate-compatibility.tsv
-36498	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/SHA256SUMS
+38228	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/SHA256SUMS
 33107	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/tools/phase4d_darts_notorch_smoke_runner.py
 31486	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/LOCAL_SHA256SUMS
 31049	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/tools/phase4a_darts_gpu_smoke.py
@@ -35,6 +35,7 @@
 12634	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/tools/phase4a_darts_gpu_smoke_runner.py
 12085	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4e/summary.json
 12025	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase3d/runtime-lane-plan.tsv
+11902	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/summary.json
 10728	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4a/provider.stderr.log
 10714	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/summary.json
 10262	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase3/environment-runtime-mapping.tsv
@@ -45,8 +46,10 @@
 9242	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4b/validation.json
 8728	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4a/gpu-process-samples.jsonl
 8290	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4a/selected-model.json
+7671	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/gpu-process-samples.jsonl
 7145	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/provider-registry.json
 7145	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4b/provider-registry.stdout.log
+6833	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/tools/phase4f_sktime_core_smoke_runner.py
 6456	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/selected-model.json
 6388	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4a/response.json
 6388	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4a/provider-artifacts/response.json
@@ -57,6 +60,7 @@
 5546	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4a/ARTIFACT_MANIFEST.json
 5446	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase1b/execution-surfaces.tsv
 5438	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4e/fit-result.json
+5307	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/fit-result.json
 5151	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/ARTIFACT_MANIFEST.json
 5014	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/response.json
 5014	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/provider-artifacts/response.json
@@ -74,6 +78,7 @@
 3758	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4b/campaign/provider/WaveNetEstimator/fit_serialize/response.json
 3756	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/campaign/provider/WaveNetEstimator/fit_serialize/response.json
 3746	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4e/SHA256SUMS
+3680	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/SHA256SUMS
 3663	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase3b/run.log
 3640	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4b/campaign/provider/PatchTSTEstimator/fit_serialize/response.json
 3638	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/campaign/provider/PatchTSTEstimator/fit_serialize/response.json
@@ -86,6 +91,7 @@
 3440	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4b/campaign/provider/DLinearEstimator/fit_serialize/response.json
 3438	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/campaign/provider/DLinearEstimator/fit_serialize/response.json
 3209	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4e/ARTIFACT_MANIFEST.json
+3206	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/ARTIFACT_MANIFEST.json
 3071	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase3d/phase4-ready-queue.tsv
 2943	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/tools/phase4c_publish_verified_local_safe.sh
 2551	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase2/runtime-classification.json
@@ -98,10 +104,12 @@
 2178	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/provider-artifacts/baseline_metrics.json
 2178	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4a/provider-artifacts/baseline_metrics.json
 2173	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4a/provider-artifacts/ARTIFACT_MANIFEST.json
+2151	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/reload-result.json
 2045	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase1b/SHA256SUMS
 1962	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4e/PHASE4E_REPORT.md
 1946	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/PHASE4C_REPORT.md
 1923	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase2/SHA256SUMS
+1922	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/PHASE4F_REPORT.md
 1909	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/campaign/provider/TemporalFusionTransformerEstimator/fit_serialize/stderr.log
 1898	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase3/SHA256SUMS
 1882	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4b/campaign/provider/SimpleFeedForwardEstimator/fit_serialize/stderr.log
@@ -152,7 +160,7 @@
 1136	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/request.json
 1124	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/campaign/provider/DeepAREstimator/load_predict/stderr.log
 1120	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/PHASE4D_REPORT.md
-1096	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/CURRENT_STATUS.md
+1104	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/CURRENT_STATUS.md
 1084	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/campaign/provider/TemporalFusionTransformerEstimator/fit_serialize/request.json
 1084	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4b/campaign/provider/TemporalFusionTransformerEstimator/fit_serialize/request.json
 1077	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/campaign/provider/DeepNPTSEstimator/load_predict/stderr.log
@@ -189,6 +197,7 @@
 762	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/environment-contract.json
 750	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/data-evidence.json
 715	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4e/data-evidence.json
+712	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/data-evidence.json
 684	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase3c/ARTIFACT_MANIFEST.json
 683	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/campaign/p6_campaign_manifest.json
 683	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4b/campaign/p6_campaign_manifest.json
@@ -222,6 +231,7 @@
 459	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4a/discover-request.json
 459	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase1b/known-source-defect.json
 431	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4e/runtime-probe.stdout.log
+421	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/runtime-probe.stdout.log
 413	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4c/runtime-probe.json
 368	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4d/discover-artifacts/ARTIFACT_MANIFEST.json
 368	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4a/discover-artifacts/ARTIFACT_MANIFEST.json
@@ -287,6 +297,13 @@
 2	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase3/exitcode.txt
 2	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase2/exitcode.txt
 2	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase1b/exitcode.txt
+0	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/runtime-probe.stderr.log
+0	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/reload.stdout.log
+0	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/reload.stderr.log
+0	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/prepare.stdout.log
+0	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/prepare.stderr.log
+0	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/fit.stdout.log
+0	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4f/fit.stderr.log
 0	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4e/runtime-probe.stderr.log
 0	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4e/reload.stdout.log
 0	/mnt/e/env/ts/worktrees/loto-runtime-handoff/handoff/phase4e/reload.stderr.log

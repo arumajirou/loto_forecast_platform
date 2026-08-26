@@ -1,0 +1,238 @@
+{
+  "actual": [
+    [
+      4.0
+    ],
+    [
+      9.0
+    ],
+    [
+      15.0
+    ],
+    [
+      16.0
+    ]
+  ],
+  "baseline_metrics": {
+    "fixed": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.0,
+      "horizon": 1,
+      "mae": 4.5,
+      "mse": 23.75,
+      "position_hit_at_plus_minus_1": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "positions": 4,
+      "rmse": 4.873397172404482,
+      "tolerance": 1.0
+    },
+    "frequency": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.75,
+      "horizon": 1,
+      "mae": 0.75,
+      "mse": 1.25,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "positions": 4,
+      "rmse": 1.118033988749895,
+      "tolerance": 1.0
+    },
+    "last": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.75,
+      "horizon": 1,
+      "mae": 1.25,
+      "mse": 2.75,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "positions": 4,
+      "rmse": 1.6583123951777,
+      "tolerance": 1.0
+    },
+    "mean": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.5,
+      "horizon": 1,
+      "mae": 1.362204724409449,
+      "mse": 2.136369272738546,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "positions": 4,
+      "rmse": 1.4616324000030056,
+      "tolerance": 1.0
+    },
+    "median": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.5,
+      "horizon": 1,
+      "mae": 1.25,
+      "mse": 2.25,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "positions": 4,
+      "rmse": 1.5,
+      "tolerance": 1.0
+    },
+    "random": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.25,
+      "horizon": 1,
+      "mae": 3.25,
+      "mse": 14.25,
+      "position_hit_at_plus_minus_1": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "positions": 4,
+      "rmse": 3.774917217635375,
+      "tolerance": 1.0
+    },
+    "seasonal_naive": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.75,
+      "horizon": 1,
+      "mae": 1.25,
+      "mse": 2.75,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "positions": 4,
+      "rmse": 1.6583123951777,
+      "tolerance": 1.0
+    }
+  },
+  "cuda_visible_devices": "",
+  "holdout_rows": 1,
+  "metrics": {
+    "all_position_hit_at_plus_minus_1": 0.0,
+    "hit_at_plus_minus_1": 0.75,
+    "horizon": 1,
+    "mae": 1.25,
+    "mse": 2.75,
+    "position_hit_at_plus_minus_1": [
+      1.0,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "positions": 4,
+    "rmse": 1.6583123951777,
+    "tolerance": 1.0
+  },
+  "model_public_name": "NaiveForecaster",
+  "models": [
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4f-sktime-core-smoke-20260826-135959/models/position-1.pickle",
+      "artifact_sha256": "9b5a27bbc288bbc45f48753186ccb2d0951f1fbefc332a4472df45723602ca97",
+      "model_class": "NaiveForecaster",
+      "native_save_available": true,
+      "position": "n1",
+      "prediction": [
+        5.0
+      ],
+      "prediction_finite": true,
+      "prediction_shape": [
+        1
+      ],
+      "strategy": "last"
+    },
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4f-sktime-core-smoke-20260826-135959/models/position-2.pickle",
+      "artifact_sha256": "965a755abc60df0a0b6e9f04a517a13d3db26a547f5eeb2b51bb850cee053d2f",
+      "model_class": "NaiveForecaster",
+      "native_save_available": true,
+      "position": "n2",
+      "prediction": [
+        10.0
+      ],
+      "prediction_finite": true,
+      "prediction_shape": [
+        1
+      ],
+      "strategy": "last"
+    },
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4f-sktime-core-smoke-20260826-135959/models/position-3.pickle",
+      "artifact_sha256": "b6050ff2dcc0e70bffe7619ab5f81d77045453514706eee2ace6884cd92c79bf",
+      "model_class": "NaiveForecaster",
+      "native_save_available": true,
+      "position": "n3",
+      "prediction": [
+        12.0
+      ],
+      "prediction_finite": true,
+      "prediction_shape": [
+        1
+      ],
+      "strategy": "last"
+    },
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4f-sktime-core-smoke-20260826-135959/models/position-4.pickle",
+      "artifact_sha256": "d8e91a4ae04a5946dcbb70dfcc07cad716b05a75a74f97b27af06f46c2e185d4",
+      "model_class": "NaiveForecaster",
+      "native_save_available": true,
+      "position": "n4",
+      "prediction": [
+        16.0
+      ],
+      "prediction_finite": true,
+      "prediction_shape": [
+        1
+      ],
+      "strategy": "last"
+    }
+  ],
+  "operation": "FIT_PREDICT_SERIALIZE",
+  "positions": [
+    "n1",
+    "n2",
+    "n3",
+    "n4"
+  ],
+  "predictions": [
+    [
+      5.0
+    ],
+    [
+      10.0
+    ],
+    [
+      12.0
+    ],
+    [
+      16.0
+    ]
+  ],
+  "process_id": 3703670,
+  "sktime": "1.0.1",
+  "status": "VERIFIED",
+  "strategy": "last",
+  "torch_imported": false,
+  "training_rows": 127
+}

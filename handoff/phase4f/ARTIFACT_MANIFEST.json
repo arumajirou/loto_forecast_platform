@@ -1,0 +1,105 @@
+{
+  "artifacts": [
+    {
+      "path": "PHASE4F_REPORT.md",
+      "sha256": "7ab3f4865e443a454f20b60c77611de7ccab03c0885720a4e18743976da910fa",
+      "size_bytes": 398
+    },
+    {
+      "path": "data-evidence.json",
+      "sha256": "bcb1c68cadf1ef7db298a38d4143b131f22b3d55ad46cd4d48decbbd3e52ddb2",
+      "size_bytes": 712
+    },
+    {
+      "path": "fit-result.json",
+      "sha256": "c3313d8071717a02542e180118b01b31978eb2cbe29ba554174fcac8e99865c0",
+      "size_bytes": 5307
+    },
+    {
+      "path": "fit.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "fit.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "gpu-process-samples.jsonl",
+      "sha256": "b92c0725adf57db15502e6a303642f31148bcdf9b74a257bb439ba068861c7be",
+      "size_bytes": 7671
+    },
+    {
+      "path": "models/position-1.pickle",
+      "sha256": "9b5a27bbc288bbc45f48753186ccb2d0951f1fbefc332a4472df45723602ca97",
+      "size_bytes": 2486
+    },
+    {
+      "path": "models/position-2.pickle",
+      "sha256": "965a755abc60df0a0b6e9f04a517a13d3db26a547f5eeb2b51bb850cee053d2f",
+      "size_bytes": 2486
+    },
+    {
+      "path": "models/position-3.pickle",
+      "sha256": "b6050ff2dcc0e70bffe7619ab5f81d77045453514706eee2ace6884cd92c79bf",
+      "size_bytes": 2486
+    },
+    {
+      "path": "models/position-4.pickle",
+      "sha256": "d8e91a4ae04a5946dcbb70dfcc07cad716b05a75a74f97b27af06f46c2e185d4",
+      "size_bytes": 2486
+    },
+    {
+      "path": "prepare.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "prepare.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "reload-result.json",
+      "sha256": "e3640c78c5759fa97fa3c6a38140176173cbefce2f6829d2aa81818f862b1824",
+      "size_bytes": 2151
+    },
+    {
+      "path": "reload.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "reload.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "runtime-probe.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "runtime-probe.stdout.log",
+      "sha256": "e4ddb44ee7d45048bfc71ac6dea31ddec0530d6924072c09eb107dfa7641f380",
+      "size_bytes": 421
+    },
+    {
+      "path": "sktime-core-child.py",
+      "sha256": "a69335f9d54d25321d58a8c31d5489d20f841ff217501791537ff6484894299d",
+      "size_bytes": 9280
+    },
+    {
+      "path": "smoke-input.csv",
+      "sha256": "0ba9eac7c88670bbbc4cf0db65dc69eda5eb4b4cbcda2aedee32cd0bb0ea8489",
+      "size_bytes": 1834
+    },
+    {
+      "path": "summary.json",
+      "sha256": "acb04ebb9871fe2e3369933c3ffb646673d2bae44775a1b4c823894ce2c1f0e6",
+      "size_bytes": 11902
+    }
+  ],
+  "schema_version": 1
+}
