@@ -1,0 +1,54 @@
+[
+  {
+    "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/provider-artifacts/models/position-1.model",
+    "finite_after_load": true,
+    "model_class": "NaiveDrift",
+    "prediction_equal": true,
+    "shape_after": [
+      1
+    ],
+    "shape_before": [
+      1
+    ],
+    "status": "RUNTIME_CERTIFIED"
+  },
+  {
+    "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/provider-artifacts/models/position-2.model",
+    "finite_after_load": true,
+    "model_class": "NaiveDrift",
+    "prediction_equal": true,
+    "shape_after": [
+      1
+    ],
+    "shape_before": [
+      1
+    ],
+    "status": "RUNTIME_CERTIFIED"
+  },
+  {
+    "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/provider-artifacts/models/position-3.model",
+    "finite_after_load": true,
+    "model_class": "NaiveDrift",
+    "prediction_equal": true,
+    "shape_after": [
+      1
+    ],
+    "shape_before": [
+      1
+    ],
+    "status": "RUNTIME_CERTIFIED"
+  },
+  {
+    "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/provider-artifacts/models/position-4.model",
+    "finite_after_load": true,
+    "model_class": "NaiveDrift",
+    "prediction_equal": true,
+    "shape_after": [
+      1
+    ],
+    "shape_before": [
+      1
+    ],
+    "status": "RUNTIME_CERTIFIED"
+  }
+]

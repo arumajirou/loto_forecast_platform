@@ -1,0 +1,52 @@
+{
+  "artifact_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/provider-artifacts",
+  "device": "cpu",
+  "evaluation": {
+    "baselines": [
+      "random",
+      "fixed",
+      "mean",
+      "median",
+      "last",
+      "frequency",
+      "seasonal_naive"
+    ],
+    "enabled": true,
+    "holdout_size": 1,
+    "season_length": 1,
+    "tolerance": 1.0
+  },
+  "fit_args": {},
+  "geometry": {
+    "draw_no_col": "draw_no",
+    "game_id": "phase4d-real-data",
+    "max_value": 20,
+    "min_value": 1,
+    "position_prefix": "n",
+    "positions": 4
+  },
+  "horizon": 1,
+  "mode": "fit_predict",
+  "model": {
+    "module": "darts.models",
+    "public_name": "NaiveDrift"
+  },
+  "model_args": {},
+  "persistence": {
+    "atol": 1e-06,
+    "rtol": 1e-06,
+    "save_model": true,
+    "verify_save_load": true
+  },
+  "predict_args": {},
+  "prospective": {
+    "actual_known": false,
+    "seal_predictions": false
+  },
+  "run_id": "phase4d-darts-notorch-20260826-134158",
+  "runtime": "notorch",
+  "schema_version": 1,
+  "seed": 1,
+  "series_layout": "position_local",
+  "timeout_seconds": 600
+}

@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "run_id": "phase4d-darts-notorch-20260826-134158",
+  "status": "SUCCEEDED",
+  "failure_class": null,
+  "message": null,
+  "predictions": [
+    [
+      5.015873015873016
+    ],
+    [
+      10.007936507936508
+    ],
+    [
+      12.0
+    ],
+    [
+      15.976190476190476
+    ]
+  ],
+  "model_inventory": null,
+  "argument_ledger": [],
+  "metrics": {
+    "hit_at_plus_minus_1": 0.25,
+    "position_hit_at_plus_minus_1": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "all_position_hit_at_plus_minus_1": 0.0,
+    "mae": 1.2619047619047619,
+    "mse": 2.762125220458554,
+    "rmse": 1.6619642656984397,
+    "positions": 4,
+    "horizon": 1,
+    "tolerance": 1.0
+  },
+  "baseline_metrics": {
+    "random": {
+      "hit_at_plus_minus_1": 0.25,
+      "position_hit_at_plus_minus_1": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "mae": 3.25,
+      "mse": 14.25,
+      "rmse": 3.774917217635375,
+      "positions": 4,
+      "horizon": 1,
+      "tolerance": 1.0
+    },
+    "fixed": {
+      "hit_at_plus_minus_1": 0.0,
+      "position_hit_at_plus_minus_1": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "mae": 4.5,
+      "mse": 23.75,
+      "rmse": 4.873397172404482,
+      "positions": 4,
+      "horizon": 1,
+      "tolerance": 1.0
+    },
+    "mean": {
+      "hit_at_plus_minus_1": 0.5,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "mae": 1.362204724409449,
+      "mse": 2.136369272738546,
+      "rmse": 1.4616324000030056,
+      "positions": 4,
+      "horizon": 1,
+      "tolerance": 1.0
+    },
+    "median": {
+      "hit_at_plus_minus_1": 0.5,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "mae": 1.25,
+      "mse": 2.25,
+      "rmse": 1.5,
+      "positions": 4,
+      "horizon": 1,
+      "tolerance": 1.0
+    },
+    "last": {
+      "hit_at_plus_minus_1": 0.75,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "mae": 1.25,
+      "mse": 2.75,
+      "rmse": 1.6583123951777,
+      "positions": 4,
+      "horizon": 1,
+      "tolerance": 1.0
+    },
+    "frequency": {
+      "hit_at_plus_minus_1": 0.75,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "mae": 0.75,
+      "mse": 1.25,
+      "rmse": 1.118033988749895,
+      "positions": 4,
+      "horizon": 1,
+      "tolerance": 1.0
+    },
+    "seasonal_naive": {
+      "hit_at_plus_minus_1": 0.75,
+      "position_hit_at_plus_minus_1": [
+        1.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "mae": 1.25,
+      "mse": 2.75,
+      "rmse": 1.6583123951777,
+      "positions": 4,
+      "horizon": 1,
+      "tolerance": 1.0
+    }
+  },
+  "runtime_certification": [
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/provider-artifacts/models/position-1.model",
+      "model_class": "NaiveDrift",
+      "status": "RUNTIME_CERTIFIED",
+      "shape_before": [
+        1
+      ],
+      "shape_after": [
+        1
+      ],
+      "finite_after_load": true,
+      "prediction_equal": true
+    },
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/provider-artifacts/models/position-2.model",
+      "model_class": "NaiveDrift",
+      "status": "RUNTIME_CERTIFIED",
+      "shape_before": [
+        1
+      ],
+      "shape_after": [
+        1
+      ],
+      "finite_after_load": true,
+      "prediction_equal": true
+    },
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/provider-artifacts/models/position-3.model",
+      "model_class": "NaiveDrift",
+      "status": "RUNTIME_CERTIFIED",
+      "shape_before": [
+        1
+      ],
+      "shape_after": [
+        1
+      ],
+      "finite_after_load": true,
+      "prediction_equal": true
+    },
+    {
+      "artifact_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/provider-artifacts/models/position-4.model",
+      "model_class": "NaiveDrift",
+      "status": "RUNTIME_CERTIFIED",
+      "shape_before": [
+        1
+      ],
+      "shape_after": [
+        1
+      ],
+      "finite_after_load": true,
+      "prediction_equal": true
+    }
+  ],
+  "prospective_seal": null,
+  "metadata": {
+    "library": "darts",
+    "public_name": "NaiveDrift",
+    "wrapper_name": null,
+    "base_models": [],
+    "series_layout": "position_local",
+    "positions": 4,
+    "horizon": 1,
+    "training_rows": 127,
+    "holdout_rows": 1
+  }
+}

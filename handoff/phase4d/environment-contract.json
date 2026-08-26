@@ -1,0 +1,10 @@
+{
+  "dependencies_modified": false,
+  "lock_status_path": "/mnt/e/env/ts/worktrees/loto-runtime-audit-20260826-121248/environments/darts-notorch/LOCK_STATUS.md",
+  "lock_status_sha256": "698c4f2ae141002248d37ee050176cccd138f0adeb209fe8b6dc0429d2025793",
+  "lock_status_text": "# Lock status\n\n`EXECUTION_PENDING / PACKAGE_REGISTRY_BLOCKED`\n\nGenerate `uv.lock` only in an environment that can resolve `darts[notorch]==0.46.1`.\nDo not fabricate or copy a lockfile from another extra.\n",
+  "lockfile_modified": false,
+  "pyproject_path": "/mnt/e/env/ts/worktrees/loto-runtime-audit-20260826-121248/environments/darts-notorch/pyproject.toml",
+  "pyproject_sha256": "92cdf27025590a97340fdb336bf74ccfb84f248d9b60c0676d60c33f3d413c93",
+  "uv_lock_exists": false
+}

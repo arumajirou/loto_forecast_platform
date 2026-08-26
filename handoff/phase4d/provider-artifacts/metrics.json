@@ -1,0 +1,16 @@
+{
+  "all_position_hit_at_plus_minus_1": 0.0,
+  "hit_at_plus_minus_1": 0.25,
+  "horizon": 1,
+  "mae": 1.2619047619047619,
+  "mse": 2.762125220458554,
+  "position_hit_at_plus_minus_1": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "positions": 4,
+  "rmse": 1.6619642656984397,
+  "tolerance": 1.0
+}

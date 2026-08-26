@@ -1,0 +1,9 @@
+{
+  "darts": "0.46.1",
+  "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-notorch/.venv/bin/python",
+  "numpy": "2.3.5",
+  "pandas": "3.0.5",
+  "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-notorch/.venv",
+  "python": "3.13.13",
+  "torch_installed": false
+}

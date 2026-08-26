@@ -1,0 +1,20 @@
+{
+  "comparison_basis": "same verified source/schema/window rule as Phase 4A",
+  "derived_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/smoke-input.csv",
+  "derived_sha256": "314f4a5c6dd8897cc242fd4c9a864c9a8470fad630bb0caf15cd5e329ea24e10",
+  "draw_no_col": "draw_no",
+  "first_draw": 354,
+  "last_draw": 481,
+  "max_value": 20,
+  "min_value": 1,
+  "phase4a_row_count_match": true,
+  "position_columns": [
+    "n1",
+    "n2",
+    "n3",
+    "n4"
+  ],
+  "rows": 128,
+  "source_path": "/mnt/e/env/ts/backups/loto-pre-consolidation-20260802-012717/loto_life_feature_pipeline/data/interim/bingo5_normalized.csv",
+  "source_sha256": "62a2c0984877c58593961052787469272e3f609e9c88472394cc0657c1248a9d"
+}

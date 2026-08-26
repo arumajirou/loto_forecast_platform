@@ -17,11 +17,12 @@
     "phase3d": "VERIFIED",
     "phase4a": "VERIFIED",
     "phase4b": "VERIFIED",
-    "phase4c": "VERIFIED"
+    "phase4c": "VERIFIED",
+    "phase4d": "VERIFIED"
   },
-  "current_phase": "phase4c_gluonts_compat_verified_phase4_remaining_next",
+  "current_phase": "phase4d_darts_notorch_verified_sktime_classic_next",
   "estimated_progress_percent": 48,
-  "handoff_run_id": "20260826-132838",
+  "handoff_run_id": "20260826-134158",
   "next_phases": [
     "phase3b_venv_identity_correction",
     "phase4_model_load_inference_smoke",
@@ -1162,7 +1163,266 @@
       ]
     }
   },
+  "phase4d": {
+    "accuracy_ranking": false,
+    "baseline_metrics": {
+      "fixed": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.0,
+        "horizon": 1,
+        "mae": 4.5,
+        "mse": 23.75,
+        "position_hit_at_plus_minus_1": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 4.873397172404482,
+        "tolerance": 1.0
+      },
+      "frequency": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.75,
+        "horizon": 1,
+        "mae": 0.75,
+        "mse": 1.25,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "positions": 4,
+        "rmse": 1.118033988749895,
+        "tolerance": 1.0
+      },
+      "last": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.75,
+        "horizon": 1,
+        "mae": 1.25,
+        "mse": 2.75,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "positions": 4,
+        "rmse": 1.6583123951777,
+        "tolerance": 1.0
+      },
+      "mean": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.5,
+        "horizon": 1,
+        "mae": 1.362204724409449,
+        "mse": 2.136369272738546,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 1.4616324000030056,
+        "tolerance": 1.0
+      },
+      "median": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.5,
+        "horizon": 1,
+        "mae": 1.25,
+        "mse": 2.25,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 1.5,
+        "tolerance": 1.0
+      },
+      "random": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.25,
+        "horizon": 1,
+        "mae": 3.25,
+        "mse": 14.25,
+        "position_hit_at_plus_minus_1": [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "positions": 4,
+        "rmse": 3.774917217635375,
+        "tolerance": 1.0
+      },
+      "seasonal_naive": {
+        "all_position_hit_at_plus_minus_1": 0.0,
+        "hit_at_plus_minus_1": 0.75,
+        "horizon": 1,
+        "mae": 1.25,
+        "mse": 2.75,
+        "position_hit_at_plus_minus_1": [
+          1.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "positions": 4,
+        "rmse": 1.6583123951777,
+        "tolerance": 1.0
+      }
+    },
+    "data": {
+      "comparison_basis": "same verified source/schema/window rule as Phase 4A",
+      "derived_path": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/smoke-input.csv",
+      "derived_sha256": "314f4a5c6dd8897cc242fd4c9a864c9a8470fad630bb0caf15cd5e329ea24e10",
+      "draw_no_col": "draw_no",
+      "first_draw": 354,
+      "last_draw": 481,
+      "max_value": 20,
+      "min_value": 1,
+      "phase4a_row_count_match": true,
+      "position_columns": [
+        "n1",
+        "n2",
+        "n3",
+        "n4"
+      ],
+      "rows": 128,
+      "source_path": "/mnt/e/env/ts/backups/loto-pre-consolidation-20260802-012717/loto_life_feature_pipeline/data/interim/bingo5_normalized.csv",
+      "source_sha256": "62a2c0984877c58593961052787469272e3f609e9c88472394cc0657c1248a9d"
+    },
+    "device_policy": {
+      "cpu_fallback": false,
+      "cuda_visible_devices_for_provider": "",
+      "gpu_execution_claimed": false,
+      "requested_device": "cpu",
+      "runtime": "notorch"
+    },
+    "discovery_row": {
+      "backtest_signature": "(self, series: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries']], past_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, future_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, historical_forecasts: darts.timeseries.TimeSeries | collections.abc.Sequence[darts.timeseries.TimeSeries] | collections.abc.Sequence[collections.abc.Sequence[darts.timeseries.TimeSeries]] | None = None, forecast_horizon: int = 1, num_samples: int = 1, train_length: int | None = None, val_length: int = 0, start: Union[pandas.Timestamp, int, float, Literal['end'], NoneType] = None, start_format: Literal['position', 'value'] = 'value', stride: int = 1, retrain: bool | int | collections.abc.Callable[..., bool] = True, apply_globally: bool = False, overlap_end: bool = False, last_points_only: bool = False, metric: collections.abc.Callable[..., float | list[float] | numpy.ndarray | list[numpy.ndarray]] | list[collections.abc.Callable[..., float | list[float] | numpy.ndarray | list[numpy.ndarray]]] = <function mape at 0x706458219260>, reduction: collections.abc.Callable[..., float] | None = <function nanmean at 0x70652afe6eb0>, verbose: bool = False, show_warnings: bool = True, predict_likelihood_parameters: bool = False, enable_optimization: bool = True, data_transformers: dict[str, darts.dataprocessing.transformers.base_data_transformer.BaseDataTransformer | darts.dataprocessing.pipeline.Pipeline] | None = None, metric_kwargs: dict[str, typing.Any] | list[dict[str, typing.Any]] | None = None, fit_kwargs: dict[str, typing.Any] | None = None, predict_kwargs: dict[str, typing.Any] | None = None, sample_weight: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], str, NoneType] = None, random_state: int | None = None) -> float | numpy.ndarray | list[float] | list[numpy.ndarray]",
+      "class_name": "NaiveDrift",
+      "constructor_signature": "(*args, **kwargs)",
+      "declares_supports_future_covariates": true,
+      "declares_supports_likelihood_parameter_prediction": true,
+      "declares_supports_multivariate": true,
+      "declares_supports_past_covariates": true,
+      "declares_supports_probabilistic_prediction": true,
+      "declares_supports_sample_weight": true,
+      "declares_supports_static_covariates": true,
+      "fit_signature": "(self, series: darts.timeseries.TimeSeries, verbose: bool | None = None)",
+      "historical_forecasts_signature": "(self, series: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries']], past_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, future_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, forecast_horizon: int = 1, num_samples: int = 1, train_length: int | None = None, val_length: int = 0, start: Union[pandas.Timestamp, int, float, Literal['end'], NoneType] = None, start_format: Literal['position', 'value'] = 'value', stride: int = 1, retrain: bool | int | collections.abc.Callable[..., bool] = True, apply_globally: bool = False, overlap_end: bool = False, last_points_only: bool = True, verbose: bool = False, show_warnings: bool = True, predict_likelihood_parameters: bool = False, enable_optimization: bool = True, data_transformers: dict[str, darts.dataprocessing.transformers.base_data_transformer.BaseDataTransformer | darts.dataprocessing.pipeline.Pipeline] | None = None, fit_kwargs: dict[str, typing.Any] | None = None, predict_kwargs: dict[str, typing.Any] | None = None, sample_weight: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], str, NoneType] = None, random_state: int | None = None) -> darts.timeseries.TimeSeries | list[darts.timeseries.TimeSeries] | list[list[darts.timeseries.TimeSeries]]",
+      "is_abstract": false,
+      "is_alias": false,
+      "is_class": true,
+      "load_signature": "(path: str | os.PathLike | typing.BinaryIO) -> 'ForecastingModel'",
+      "module": "darts.models.forecasting.baselines",
+      "predict_signature": "(self, n: int, num_samples: int = 1, verbose: bool | None = None, show_warnings: bool = True, random_state: int | None = None)",
+      "public_name": "NaiveDrift",
+      "residuals_signature": "(self, series: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries']], past_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, future_covariates: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], NoneType] = None, historical_forecasts: darts.timeseries.TimeSeries | collections.abc.Sequence[darts.timeseries.TimeSeries] | collections.abc.Sequence[collections.abc.Sequence[darts.timeseries.TimeSeries]] | None = None, forecast_horizon: int = 1, num_samples: int = 1, train_length: int | None = None, val_length: int = 0, start: Union[pandas.Timestamp, int, float, Literal['end'], NoneType] = None, start_format: Literal['position', 'value'] = 'value', stride: int = 1, retrain: bool | int | collections.abc.Callable[..., bool] = True, apply_globally: bool = False, overlap_end: bool = False, last_points_only: bool = True, metric: collections.abc.Callable[..., float | list[float] | numpy.ndarray | list[numpy.ndarray]] = <function err at 0x7064584af600>, verbose: bool = False, show_warnings: bool = True, predict_likelihood_parameters: bool = False, enable_optimization: bool = True, data_transformers: dict[str, darts.dataprocessing.transformers.base_data_transformer.BaseDataTransformer | darts.dataprocessing.pipeline.Pipeline] | None = None, metric_kwargs: dict[str, typing.Any] | None = None, fit_kwargs: dict[str, typing.Any] | None = None, predict_kwargs: dict[str, typing.Any] | None = None, sample_weight: Union[ForwardRef('TimeSeries'), collections.abc.Sequence['TimeSeries'], str, NoneType] = None, values_only: bool = False, random_state: int | None = None) -> darts.timeseries.TimeSeries | list[darts.timeseries.TimeSeries] | list[list[darts.timeseries.TimeSeries]]",
+      "save_signature": "(self, path: str | os.PathLike | typing.BinaryIO | None = None, clean: bool = False, **pkl_kwargs) -> None",
+      "status": "IMPORTED"
+    },
+    "environment": "environments/darts-notorch",
+    "environment_contract": {
+      "dependencies_modified": false,
+      "lock_status_path": "/mnt/e/env/ts/worktrees/loto-runtime-audit-20260826-121248/environments/darts-notorch/LOCK_STATUS.md",
+      "lock_status_sha256": "698c4f2ae141002248d37ee050176cccd138f0adeb209fe8b6dc0429d2025793",
+      "lock_status_text": "# Lock status\n\n`EXECUTION_PENDING / PACKAGE_REGISTRY_BLOCKED`\n\nGenerate `uv.lock` only in an environment that can resolve `darts[notorch]==0.46.1`.\nDo not fabricate or copy a lockfile from another extra.\n",
+      "lockfile_modified": false,
+      "pyproject_path": "/mnt/e/env/ts/worktrees/loto-runtime-audit-20260826-121248/environments/darts-notorch/pyproject.toml",
+      "pyproject_sha256": "92cdf27025590a97340fdb336bf74ccfb84f248d9b60c0676d60c33f3d413c93",
+      "uv_lock_exists": false
+    },
+    "execution": {
+      "cuda_visible_devices_for_provider": "",
+      "duration_seconds": 0.46479034423828125,
+      "gpu_sample_count": 5,
+      "matched_gpu_pids": [],
+      "provider_root_pid": 3666891,
+      "returncode": 0
+    },
+    "failure_class": null,
+    "formal_runtime_certification": true,
+    "lane": {
+      "candidate_probe_status": "PASS",
+      "candidate_python_version": "3.13.13",
+      "candidate_runtime": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-notorch/.venv",
+      "candidate_source": "DIRECT_PROJECT_RUNTIME",
+      "cuda_builds": "[]",
+      "decision_reason": "Direct venv, declared dependencies compatible, CPU import verified.",
+      "declared_contract_compatible": "True",
+      "dependency_coverage": "1.0",
+      "environment": "environments/darts-notorch",
+      "lane": "CURRENT_CPU_LEGACY",
+      "mapping_status": "DIRECT_PROJECT_RUNTIME",
+      "missing_dependencies": "[]",
+      "phase2_statuses": "[\"IMPORT_VERIFIED_CPU\"]",
+      "phase3c_classification": "",
+      "phase4_priority": "30",
+      "phase4_smoke_allowed": "True",
+      "python_compatible": "True",
+      "torch_versions": "[]",
+      "version_incompatible": "[]"
+    },
+    "metrics": {
+      "all_position_hit_at_plus_minus_1": 0.0,
+      "hit_at_plus_minus_1": 0.25,
+      "horizon": 1,
+      "mae": 1.2619047619047619,
+      "mse": 2.762125220458554,
+      "position_hit_at_plus_minus_1": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "positions": 4,
+      "rmse": 1.6619642656984397,
+      "tolerance": 1.0
+    },
+    "model_public_name": "NaiveDrift",
+    "phase": "PHASE4D_DARTS_NOTORCH_CPU_LIFECYCLE",
+    "response_status": "SUCCEEDED",
+    "run_id": "20260826-134158",
+    "runtime_probe": {
+      "darts": "0.46.1",
+      "executable": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-notorch/.venv/bin/python",
+      "numpy": "2.3.5",
+      "pandas": "3.0.5",
+      "prefix": "/mnt/e/env/ts/loto_forecast_platform/environments/darts-notorch/.venv",
+      "python": "3.13.13",
+      "torch_installed": false
+    },
+    "schema_version": 1,
+    "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
+    "status": "VERIFIED",
+    "validation": {
+      "checks": {
+        "all_critical_checks_pass": true,
+        "baselines_complete": true,
+        "metrics_complete": true,
+        "no_provider_gpu_pid_observed": true,
+        "prediction_finite": true,
+        "prediction_shape": true,
+        "process_exit_zero": true,
+        "provider_cuda_hidden": true,
+        "requested_device_cpu": true,
+        "requested_runtime_notorch": true,
+        "response_succeeded": true,
+        "save_reload_certified": true
+      },
+      "status": "VERIFIED"
+    }
+  },
   "schema_version": 1,
   "source_sha": "8af95b2be18280589cbbb13aa1fc32dfb793767c",
-  "updated_at_utc": "2026-08-26T04:37:20.228957+00:00"
+  "updated_at_utc": "2026-08-26T04:42:05.292438+00:00"
 }

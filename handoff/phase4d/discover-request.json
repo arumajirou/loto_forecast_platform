@@ -1,0 +1,17 @@
+{
+  "artifact_dir": "/mnt/e/env/ts/loto_forecast_platform/artifacts/phase4d-darts-notorch-smoke-20260826-134158/discover-artifacts",
+  "device": "cpu",
+  "geometry": {
+    "draw_no_col": "draw_no",
+    "game_id": "phase4d-real-data",
+    "max_value": 20,
+    "min_value": 1,
+    "position_prefix": "n",
+    "positions": 4
+  },
+  "mode": "discover",
+  "run_id": "phase4d-darts-notorch-discover-20260826-134158",
+  "runtime": "notorch",
+  "schema_version": 1,
+  "seed": 1
+}
